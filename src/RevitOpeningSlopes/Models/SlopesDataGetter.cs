@@ -19,30 +19,24 @@ namespace RevitOpeningSlopes.Models {
             List<SlopeCreationData> slopeCreationData = new List<SlopeCreationData>();
             SlopeCreationData slopeData = null;
             foreach(FamilyInstance opening in openings) {
-                //XYZ topXYZ = _openingTopXYZGetter.GetOpeningTopXYZ(opening);
-                //if(topXYZ == null) {
-                //    continue;
-                //}
+
                 OpeningHandler openingParameters = new OpeningHandler(_revitRepository, opening);
-                //double height = GetOpeningHeight(opening);
+
                 double height = openingParameters.OpeningHeight;
                 if(height <= 0) {
                     continue;
                 }
 
-                //XYZ g = GetVerticalCenterPoint(opening);
-                //GetDepthPoint(opening);
-                //double width = GetOpeningWidth(opening);
                 double width = openingParameters.OpeningWidth;
                 if(width <= 0) {
                     continue;
                 }
-                //double depth = GetOpeningDepth(opening);
-                //XYZ center = GetVerticalCenterPoint(opening);
-                double depth = openingParameters.OpeningDepth;
+
+                double depth = openingParameters.OpeningDepth
+                    + _revitRepository.ConvertToFeet(double.Parse(config.SlopeFrontOffset));
+
                 XYZ center = openingParameters.OpeningCenterPoint;
-                //XYZ center = _openingCenterXYZGetter.GetOpeningCenter(opening);
-                //XYZ frontPoint = _openingFrontPointGetter.GetFrontPoint(opening);
+
                 slopeData = new SlopeCreationData(_revitRepository.Document) {
                     Height = height,
                     Width = width,

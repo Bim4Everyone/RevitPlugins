@@ -8,7 +8,7 @@ namespace RevitOpeningSlopes.Models {
         public NearestElements(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }
-        public Element GetElementByRay(Curve curve, bool onlyWindow = false) {
+        public Element GetElementByRay(Curve curve) {
             XYZ lineDirection = (curve.GetEndPoint(1) - curve.GetEndPoint(0)).Normalize();
             ElementFilter categoryFilter = new ElementMulticategoryFilter(
                 new BuiltInCategory[] {
@@ -16,13 +16,6 @@ namespace RevitOpeningSlopes.Models {
                     BuiltInCategory.OST_Columns,
                     BuiltInCategory.OST_StructuralColumns,
                     BuiltInCategory.OST_Floors});
-            if(onlyWindow) {
-                categoryFilter = new ElementMulticategoryFilter(
-                new BuiltInCategory[] {
-                    BuiltInCategory.OST_Windows,
-                    BuiltInCategory.OST_WindowsFrameMullionProjection});
-                ;
-            }
 
             Element currentElement = null;
             ReferenceIntersector intersector

@@ -27,23 +27,8 @@ namespace RevitOpeningSlopes.Models {
             Plane plane = Plane.CreateByNormalAndOrigin(normal, origin);
             SketchPlane sketch = SketchPlane.Create(_revitRepository.Document, plane);
             ModelLine line = _revitRepository.Document.Create.NewModelCurve(geomLine, sketch) as ModelLine;
+        }
 
-        }
-        public Line MergeOppositeLines(Line firstLine, Line secondLine) {
-            XYZ startPoint = firstLine.GetEndPoint(1);
-            XYZ endPoint = secondLine.GetEndPoint(1);
-            return Line.CreateBound(startPoint, endPoint);
-        }
-        //public void CreateLines(IEnumerable<FamilyInstance> windows) {
-        //    using(var transaction = _revitRepository.Document.StartTransaction("Построение линии")) {
-        //        foreach(FamilyInstance window in windows) {
-        //            Line line = CreateLineFromOpening(window);
-        //            XYZ origin = _revitRepository.GetOpeningLocation(window);
-        //            CreateTestModelLine(line);
-        //        }
-        //        transaction.Commit();
-        //    }
-        //}
         public Line CreateLineFromOffsetPoint(FamilyInstance opening) {
             XYZ openingOrigin = _revitRepository.GetOpeningLocation(opening);
             XYZ openingVector = _revitRepository.GetOpeningVector(opening);
@@ -76,9 +61,6 @@ namespace RevitOpeningSlopes.Models {
             XYZ normalVector = XYZ.BasisZ.CrossProduct(openingVector).Normalize();
             length = _revitRepository.ConvertToFeet(length);
             double openingLocationZ = origin.Z;
-            //double distLeftRight = _revitRepository.ConvertToFeet(2000);
-            //double distForwardBack = _revitRepository.ConvertToFeet(600);
-            //double distTopDown = _revitRepository.ConvertToFeet(3000);
 
             XYZ start_point = new XYZ(origin.X, origin.Y, openingLocationZ);
             XYZ end_point = new XYZ(origin.X, origin.Y, openingLocationZ) + normalVector

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -14,20 +15,18 @@ using RevitOpeningSlopes.Models.Enums;
 using RevitOpeningSlopes.Models.Services;
 
 namespace RevitOpeningSlopes.ViewModels {
-    internal class MainViewModel : BaseViewModel {
+    internal class MainViewModel : BaseViewModel, IDataErrorInfo {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-        private readonly LinesFromOpening _linesFromOpening;
         private readonly CreationOpeningSlopes _creationOpeningSlopes;
-        private string _errorText;
         private SlopeTypeViewModel _selectedSlopeType;
 
 
+
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository,
-            LinesFromOpening linesFromOpening, CreationOpeningSlopes creationOpeningSlopes) {
+            CreationOpeningSlopes creationOpeningSlopes) {
             _pluginConfig = pluginConfig ?? throw new ArgumentNullException(nameof(pluginConfig));
             _revitRepository = revitRepository;
-            _linesFromOpening = linesFromOpening;
             _creationOpeningSlopes = creationOpeningSlopes;
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -43,15 +42,37 @@ namespace RevitOpeningSlopes.ViewModels {
 
 
             SelectedWindows = _revitRepository.GetSelectedWindows();
-
+            SlopeFrontOffset = "0";
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        public string ErrorText => Error;
+        public string Error => GetType()
+            .GetProperties()
+            .Select(prop => this[prop.Name])
+            .FirstOrDefault(error => !string.IsNullOrWhiteSpace(error)) ?? string.Empty;
+
+        public string this[string columnName] {
+            get {
+                var error = string.Empty;
+                switch(columnName) {
+                    case nameof(SelectedSlopeType): {
+                        if(SelectedSlopeType is null) {
+                            error = "Задайте тип создаваемого откоса";
+                        }
+                        break;
+                    }
+                    case nameof(SlopeFrontOffset): {
+                        if(!double.TryParse(SlopeFrontOffset, out double result)) {
+                            error = "Смещение не должно содержать символов или букв";
+                        }
+                        break;
+                    }
+                }
+                return error;
+            }
         }
 
         private bool _isCheckedSelect;
@@ -75,6 +96,15 @@ namespace RevitOpeningSlopes.ViewModels {
         public ObservableCollection<WindowsGetterMode> WindowGetterModes { get; }
         public WindowsGetterMode SelectedWindowGetterMode { get; set; }
 
+        private string _slopeFrontOffset;
+        public string SlopeFrontOffset {
+            get => _slopeFrontOffset;
+            set {
+                _slopeFrontOffset = value;
+                RaiseAndSetIfChanged(ref _slopeFrontOffset, value);
+                OnPropertyChanged(nameof(ErrorText));
+            }
+        }
 
         public ICollection<FamilyInstance> SelectedWindows { get; }
 
@@ -88,7 +118,6 @@ namespace RevitOpeningSlopes.ViewModels {
             }
         }
 
-
         private void LoadView() {
             LoadConfig();
         }
@@ -100,10 +129,16 @@ namespace RevitOpeningSlopes.ViewModels {
 
         private bool CanAcceptView() {
             return string.IsNullOrWhiteSpace(ErrorText);
+
         }
 
+        private static bool IsTextNumeric(string str) {
+            System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex("[^0-9]");
+            return !reg.IsMatch(str);
+        }
         private void LoadConfig() {
             SelectedWindowGetterMode = _pluginConfig.WindowsGetterMode;
+            SlopeFrontOffset = _pluginConfig.SlopeFrontOffset;
             if(SelectedWindows.Count > 0) {
                 switch(SelectedWindowGetterMode) {
                     case WindowsGetterMode.AlreadySelectedWindows:
@@ -148,6 +183,7 @@ namespace RevitOpeningSlopes.ViewModels {
             }
             _pluginConfig.SlopeTypeId = SelectedSlopeType.SlopeTypeId;
             _pluginConfig.WindowsGetterMode = SelectedWindowGetterMode;
+            _pluginConfig.SlopeFrontOffset = SlopeFrontOffset;
             _pluginConfig.SaveProjectConfig();
         }
     }

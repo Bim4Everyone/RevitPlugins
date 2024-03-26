@@ -53,6 +53,11 @@ namespace RevitOpeningSlopes.Models {
             _openingWidth = GetOpeningWidth(_verticalCenterPoint, _rightDepthPoint);
             _openingDepth = GetOpeningDepth(_rightDepthPoint, _rightFrontPoint);
         }
+        /// <summary>
+        /// Функция находит правую точку от окна
+        /// </summary>
+        /// <param name="forwardLine"></param>
+        /// <returns></returns>
         private XYZ GetRightPoint(Line forwardLine) {
             const double step = 0.032; //~10 мм
             const double rightLineLength = 2000;
@@ -165,7 +170,6 @@ namespace RevitOpeningSlopes.Models {
         }
 
         private XYZ GetVerticalCenterPoint(XYZ openingOrigin, XYZ horizontalCenterPoint) {
-            XYZ intersectCoord = null;
             XYZ verticalCenter = null;
             Line upwardLine = _linesFromOpening.CreateLineFromOpening(horizontalCenterPoint,
                 _opening, 4000, DirectionEnum.Top);
@@ -182,7 +186,7 @@ namespace RevitOpeningSlopes.Models {
                 };
                 SolidCurveIntersection intersection = topSolid.IntersectWithCurve(upwardLine, intersectOptOutside);
                 if(intersection.SegmentCount > 0) {
-                    intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(1);
+                    XYZ intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(1);
                     double centerZ = (intersectCoord.Z + openingOrigin.Z) / 2;
                     verticalCenter = new XYZ(intersectCoord.X, intersectCoord.Y, centerZ);
                 } else {
