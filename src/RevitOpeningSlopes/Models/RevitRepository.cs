@@ -29,10 +29,18 @@ namespace RevitOpeningSlopes.Models {
         public XYZ GetOpeningLocation(Element opening) {
             if(opening.Location is LocationPoint locationPoint) {
                 return locationPoint.Point;
-
             } else {
                 throw new ArgumentException("Расположение не является точкой");
             };
+        }
+        public XYZ GetOpeningOriginBoundingBox(Element opening) {
+            BoundingBoxXYZ bbox = opening.GetBoundingBox(Default3DView);
+            XYZ minPoint = bbox.Min;
+            XYZ maxPoint = bbox.Max;
+            double x = (minPoint.X + maxPoint.X) / 2;
+            double y = (minPoint.Y + maxPoint.Y) / 2;
+            double z = (minPoint.Z + maxPoint.Z) / 2;
+            return new XYZ(x, y, z);
         }
         public XYZ GetOpeningVector(FamilyInstance opening) {
             return opening.FacingOrientation.Normalize();

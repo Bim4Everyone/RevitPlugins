@@ -36,13 +36,14 @@ namespace RevitOpeningSlopes.Models {
                     + _revitRepository.ConvertToFeet(double.Parse(config.SlopeFrontOffset));
 
                 XYZ center = openingParameters.OpeningCenterPoint;
-
+                double rotationAngle = openingParameters.RotationAngle;
                 slopeData = new SlopeCreationData(_revitRepository.Document) {
                     Height = height,
                     Width = width,
                     Depth = depth,
                     Center = center,
-                    SlopeTypeId = config.SlopeTypeId
+                    SlopeTypeId = config.SlopeTypeId,
+                    RotationRadiansAngle = rotationAngle
                 };
                 slopeCreationData.Add(slopeData);
             }

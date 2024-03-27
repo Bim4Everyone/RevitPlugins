@@ -31,5 +31,10 @@ namespace RevitOpeningSlopes.Models {
         /// Типоразмер размещаемого откоса
         /// </summary>
         public ElementId SlopeTypeId { get; set; }
+
+        /// <summary>
+        /// Угол поворота откоса
+        /// </summary>
+        public double RotationRadiansAngle { get; set; }
     }
 }
