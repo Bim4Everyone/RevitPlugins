@@ -30,23 +30,11 @@ namespace RevitOpeningSlopes.Models {
             ModelLine line = _revitRepository.Document.Create.NewModelCurve(geomLine, sketch) as ModelLine;
         }
 
-        //public Line CreateLineFromOffsetPoint(FamilyInstance opening) {
-        //    XYZ openingOrigin = _revitRepository.GetOpeningLocation(opening);
-        //    XYZ openingVector = _revitRepository.GetOpeningVector(opening);
-        //    const double offset = 300;
-        //    const double frontLineLength = 900;
-        //    XYZ frontOffsetPoint = new XYZ(openingOrigin.X, openingOrigin.Y, openingOrigin.Z
-        //        + _revitRepository.ConvertToFeet(offset))
-        //        + openingVector * _revitRepository.ConvertToFeet(frontLineLength);
-        //    Line lineFromOffsetPoint = CreateLineFromOpening(
-        //        frontOffsetPoint, opening, frontLineLength, DirectionEnum.Back);
-        //    return lineFromOffsetPoint;
-        //}
         public Line CreateLineFromOffsetPoint(FamilyInstance opening) {
             XYZ openingOrigin = _revitRepository.GetOpeningOriginBoundingBox(opening);
             XYZ openingVector = _revitRepository.GetOpeningVector(opening);
-            const double frontLineLength = 1000;
-            const double backwardOffset = 200;
+            const double frontLineLength = 1500;
+            const double backwardOffset = 500;
             XYZ startPointBbox = new XYZ(openingOrigin.X, openingOrigin.Y, openingOrigin.Z) - openingVector
                     * _revitRepository.ConvertToFeet(backwardOffset);
             XYZ frontOffsetPoint = new XYZ(startPointBbox.X, startPointBbox.Y, startPointBbox.Z)

@@ -4,8 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit.Geometry;
-
 using RevitOpeningSlopes.Models.Enums;
 
 namespace RevitOpeningSlopes.Models {
@@ -19,6 +17,7 @@ namespace RevitOpeningSlopes.Models {
         private XYZ _openingOrigin;
         private XYZ _rightPoint;
         private XYZ _rightFrontPoint;
+        private XYZ _depthPoint;
         private XYZ _rightDepthPoint;
         private XYZ _horizontalCenterPoint;
         private XYZ _verticalCenterPoint;
@@ -46,15 +45,23 @@ namespace RevitOpeningSlopes.Models {
         public double RotationAngle { get => _rotationAngle; }
         private void FillingParameters() {
             _openingOrigin = _revitRepository.GetOpeningLocation(_opening);
-            //_openingOrigin = _revitRepository.GetOpeningOriginBoundingBox(_opening);
             _openingVector = _revitRepository.GetOpeningVector(_opening);
             _forwardOffsetLine = _linesFromOpening.CreateLineFromOffsetPoint(_opening);
             _rightPoint = GetRightPoint(_forwardOffsetLine);
             _rightFrontPoint = GetRightFrontPoint(_rightPoint, _openingVector);
-            _rightDepthPoint = GetRightDepthPoint(_rightFrontPoint);
-            Line testLine = _linesFromOpening.CreateLineFromOpening(_rightPoint, _opening, 1000,
-                DirectionEnum.Forward);
-            _linesFromOpening.CreateTestModelLine(testLine);
+            _depthPoint = GetDepthPoint(_rightFrontPoint);
+            _rightDepthPoint = GetRightDepthPoint(_depthPoint, _rightFrontPoint);
+            //Line testLine = _linesFromOpening.CreateLineFromOpening(_rightDepthPoint, _opening, 1000,
+            //    DirectionEnum.Left);
+            //_linesFromOpening.CreateTestModelLine(_forwardOffsetLine);
+            //_linesFromOpening.CreateTestModelLine(testLine);
+
+
+            //Line testLine2 = _linesFromOpening.CreateLineFromOpening(_rightPoint, _opening, 1000,
+            //    DirectionEnum.Forward);
+            //_linesFromOpening.CreateTestModelLine(_forwardOffsetLine);
+            //_linesFromOpening.CreateTestModelLine(_forwardOffsetLine);
+
 
             _horizontalCenterPoint = GetHorizontalCenterPoint(_rightDepthPoint, _openingVector);
             _verticalCenterPoint = GetVerticalCenterPoint(_openingOrigin, _horizontalCenterPoint);
@@ -70,6 +77,7 @@ namespace RevitOpeningSlopes.Models {
             //_rotationAngle = 1;
             //_openingDepth = 40;
         }
+
         /// <summary>
         /// Функция находит правую точку от окна
         /// </summary>
@@ -79,46 +87,39 @@ namespace RevitOpeningSlopes.Models {
             const double step = 0.032; //~10 мм
             const double rightLineLength = 2000;
             ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(forwardLine, step);
-            double closestDist = double.PositiveInfinity;
-            XYZ closestPoint = null;
+            XYZ intersectCoord = null;
             foreach(XYZ point in points) {
                 Line rightLine = _linesFromOpening.CreateLineFromOpening(point, _opening,
                     rightLineLength,
                     DirectionEnum.Right);
                 Element wall = _nearestElements.GetElementByRay(rightLine);
                 if(wall != null) {
-                    XYZ intersectCoord = null;
                     Solid wallSolid = _solidOperations.GetUnitedSolidFromHostElement(wall);
                     if(wallSolid != null) {
-                        SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
-                            ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside
+                        SolidCurveIntersectionOptions intersectOptInside = new SolidCurveIntersectionOptions() {
+                            ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
                         };
                         SolidCurveIntersection intersection = wallSolid.IntersectWithCurve(rightLine,
-                            intersectOptOutside);
+                            intersectOptInside);
                         if(intersection.SegmentCount > 0) {
-                            intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(1);
-                            double currentDist = intersectCoord.DistanceTo(point);
-                            if(currentDist < closestDist) {
-                                closestDist = currentDist;
-                                closestPoint = intersectCoord;
-                            }
-                        } else {
-                            continue;
+                            intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(0);
+                            break;
                         }
                     }
                 }
             }
-            return closestPoint;
+            return intersectCoord;
         }
         private XYZ GetRightFrontPoint(XYZ rightPoint, XYZ openingVector) {
             const double backLineLength = 800;
-            const double pointForwardOffset = 400;
+            const double pointForwardOffset = 200;
             XYZ rightPointWithForwardOffset = rightPoint + openingVector
                 * _revitRepository.ConvertToFeet(pointForwardOffset);
             Line backLine = _linesFromOpening.CreateLineFromOpening(
                 rightPointWithForwardOffset,
                 _opening, backLineLength,
                 DirectionEnum.Back);
+
             Element wall = _nearestElements.GetElementByRay(backLine);
             XYZ intersectCoord = null;
             if(wall != null) {
@@ -136,33 +137,84 @@ namespace RevitOpeningSlopes.Models {
             return intersectCoord;
         }
 
-        private XYZ GetRightDepthPoint(XYZ rightFrontPoint) {
-            const double depthLineLength = 1000;
-            Line depthLine = _linesFromOpening.CreateLineFromOpening(
-                rightFrontPoint,
-                _opening, depthLineLength,
-                DirectionEnum.Back);
-            IEnumerable<Solid> openingSolids = _opening.GetSolids();
+        //private XYZ GetRightDepthPoint(XYZ rightFrontPoint) {
+        //    const double depthLineLength = 1000;
+        //    Line depthLine = _linesFromOpening.CreateLineFromOpening(
+        //        rightFrontPoint,
+        //        _opening, depthLineLength,
+        //        DirectionEnum.Back);
+        //    IEnumerable<Solid> openingSolids = _opening.GetSolids();
+        //    XYZ closestPoint = null;
+        //    if(openingSolids.Count() > 0) {
+        //        SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
+        //            ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside
+        //        };
+        //        double closestDist = double.PositiveInfinity;
+        //        foreach(Solid solid in openingSolids) {
+        //            SolidCurveIntersection intersection = solid.IntersectWithCurve(depthLine, intersectOptOutside);
+        //            if(intersection.SegmentCount > 0) {
+        //                XYZ intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(1);
+        //                double currentDist = _revitRepository
+        //                    .ConvertToMillimeters(rightFrontPoint.DistanceTo(intersectCoord));
+        //                if(currentDist < closestDist) {
+        //                    closestDist = currentDist;
+        //                    closestPoint = intersectCoord;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return closestPoint;
+        //}
+
+        private XYZ GetDepthPoint(XYZ rightFrontPoint) {
+            const double step = 0.032; //~10 мм
+            const double alongsideLineLength = 300;
+            const double depthLineLength = 600;
+            Line alongsideLine = _linesFromOpening.CreateLineFromOpening(
+                rightFrontPoint, _opening, alongsideLineLength, DirectionEnum.Left);
+            ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(alongsideLine, step);
             XYZ closestPoint = null;
-            if(openingSolids.Count() > 0) {
-                SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
-                    ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside
-                };
-                double closestDist = double.PositiveInfinity;
-                foreach(Solid solid in openingSolids) {
-                    SolidCurveIntersection intersection = solid.IntersectWithCurve(depthLine, intersectOptOutside);
-                    if(intersection.SegmentCount > 0) {
-                        XYZ intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(1);
-                        double currentDist = _revitRepository
-                            .ConvertToMillimeters(rightFrontPoint.DistanceTo(intersectCoord));
-                        if(currentDist < closestDist) {
-                            closestDist = currentDist;
-                            closestPoint = intersectCoord;
-                        }
+
+            Solid openingSolid = _solidOperations.GetUnitedSolidFromOpening(_opening);
+            SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
+                ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside
+            };
+            double closestDist = double.PositiveInfinity;
+            foreach(XYZ point in points) {
+                Line backwardLine = _linesFromOpening.CreateLineFromOpening(
+            point, _opening, depthLineLength, DirectionEnum.Back);
+                SolidCurveIntersection intersection = openingSolid.IntersectWithCurve(
+                        backwardLine, intersectOptOutside);
+                if(intersection.SegmentCount > 0) {
+                    XYZ intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(1);
+                    double currentDist = _revitRepository
+                        .ConvertToMillimeters(point.DistanceTo(intersectCoord));
+                    if(currentDist < closestDist) {
+                        closestDist = currentDist;
+                        double tst = _revitRepository.ConvertToMillimeters(closestDist);
+                        closestPoint = intersectCoord;
                     }
                 }
             }
             return closestPoint;
+        }
+
+        private XYZ GetRightDepthPoint(XYZ depthPoint, XYZ rightFrontPoint) {
+            XYZ rightDepthPoint = null;
+            if(depthPoint != null) {
+                const double alongsideLineLength = 300;
+                const double depthLineLength = 600;
+                Line depthLine = _linesFromOpening.CreateLineFromOpening(
+                    rightFrontPoint, _opening, depthLineLength, DirectionEnum.Back);
+                Line lineFromClosestPoint = _linesFromOpening.CreateLineFromOpening(
+                    depthPoint, _opening, alongsideLineLength, DirectionEnum.Right);
+
+                IList<ClosestPointsPairBetweenTwoCurves> closestPoints = new List<ClosestPointsPairBetweenTwoCurves>();
+                depthLine.ComputeClosestPoints(lineFromClosestPoint, true, false, false,
+                            out closestPoints);
+                rightDepthPoint = closestPoints.FirstOrDefault().XYZPointOnFirstCurve;
+            }
+            return rightDepthPoint;
         }
 
         //private XYZ GetHorizontalCenterPoint(Line forwardOffsetLine, XYZ rightDepthPoint) {
@@ -242,35 +294,49 @@ namespace RevitOpeningSlopes.Models {
         }
 
         private double GetOpeningHeight(XYZ openingOrigin, XYZ verticalCenterPoint) {
-            double openingHeight = (verticalCenterPoint.Z - openingOrigin.Z) * 2;
+            double openingHeight = 0;
+            if(openingOrigin != null && verticalCenterPoint != null) {
+                openingHeight = (verticalCenterPoint.Z - openingOrigin.Z) * 2;
+            }
             return openingHeight;
         }
 
         private double GetOpeningWidth(XYZ verticalCenterPoint, XYZ rightDepthPoint) {
-            double openingWidth = Math.Sqrt(Math.Pow(verticalCenterPoint.X - rightDepthPoint.X, 2)
-                + Math.Pow(verticalCenterPoint.Y - rightDepthPoint.Y, 2)) * 2;
+            double openingWidth = 0;
+            if(verticalCenterPoint != null && rightDepthPoint != null) {
+                openingWidth = Math.Sqrt(Math.Pow(verticalCenterPoint.X - rightDepthPoint.X, 2)
+                    + Math.Pow(verticalCenterPoint.Y - rightDepthPoint.Y, 2)) * 2;
+            }
             return openingWidth;
         }
 
         private double GetOpeningDepth(XYZ rightDepthPoint, XYZ rightFrontPoint) {
-            return rightDepthPoint.DistanceTo(rightFrontPoint);
+            double openingDepth = 0;
+            if(rightDepthPoint != null && rightFrontPoint != null) {
+                openingDepth = rightDepthPoint.DistanceTo(rightFrontPoint);
+            }
+            return openingDepth;
         }
         private double GetRotationAngle(XYZ openingVector) {
-            XYZ originVector = new XYZ(0, -1, 0);
-            double scalarMultiply = ScalarMultiply(originVector, openingVector);
-            double originMagnitude = Magnitude(originVector.X, originVector.Y);
-            double openingMagnitude = Magnitude(openingVector.X, openingVector.Y);
-            double cosTheta = scalarMultiply / (originMagnitude * openingMagnitude);
-            double radians = Math.Acos(cosTheta);
-            double degrees = radians * 180.0 / Math.PI;
-            //TaskDialog taskdialog = new TaskDialog("Внимание");
-            //taskdialog.MainInstruction = Convert.ToString(degrees);
-            //taskdialog.Show();
-            if(openingVector.X < 0) {
-                return -radians;
-            } else {
-                return radians;
+            double radians = 0;
+            if(openingVector != null) {
+                XYZ originVector = new XYZ(0, -1, 0);
+                double scalarMultiply = ScalarMultiply(originVector, openingVector);
+                double originMagnitude = Magnitude(originVector.X, originVector.Y);
+                double openingMagnitude = Magnitude(openingVector.X, openingVector.Y);
+                double cosTheta = scalarMultiply / (originMagnitude * openingMagnitude);
+                radians = Math.Acos(cosTheta);
+                //double degrees = radians * 180.0 / Math.PI;
+                //TaskDialog taskdialog = new TaskDialog("Внимание");
+                //taskdialog.MainInstruction = Convert.ToString(degrees);
+                //taskdialog.Show();
+                if(openingVector.X < 0) {
+                    return -radians;
+                } else {
+                    return radians;
+                }
             }
+            return radians;
         }
         //private double GetRotationAngle(XYZ openingVector) {
         //    double radiansAngle = (_opening.Location as LocationPoint).Rotation;
@@ -281,7 +347,11 @@ namespace RevitOpeningSlopes.Models {
         //    }
         //}
         private double ScalarMultiply(XYZ originVector, XYZ openingVector) {
-            return openingVector.X * originVector.X + openingVector.Y * originVector.Y;
+            if(originVector != null && openingVector != null) {
+                return openingVector.X * originVector.X + openingVector.Y * originVector.Y;
+            } else {
+                return 0;
+            }
         }
         private double Magnitude(double x, double y) {
             return Math.Sqrt(x * x + y * y);

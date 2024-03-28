@@ -17,27 +17,24 @@ namespace RevitOpeningSlopes.Models {
                     .GetWindows(config.WindowsGetterMode);
 
             List<SlopeCreationData> slopeCreationData = new List<SlopeCreationData>();
-            SlopeCreationData slopeData = null;
             foreach(FamilyInstance opening in openings) {
 
                 OpeningHandler openingParameters = new OpeningHandler(_revitRepository, opening);
 
                 double height = openingParameters.OpeningHeight;
-                if(height <= 0) {
-                    continue;
-                }
-
                 double width = openingParameters.OpeningWidth;
-                if(width <= 0) {
-                    continue;
-                }
-
                 double depth = openingParameters.OpeningDepth
                     + _revitRepository.ConvertToFeet(double.Parse(config.SlopeFrontOffset));
 
                 XYZ center = openingParameters.OpeningCenterPoint;
                 double rotationAngle = openingParameters.RotationAngle;
-                slopeData = new SlopeCreationData(_revitRepository.Document) {
+
+                if(height <= 0 || width <= 0 || depth <= 0 || center == null) {
+                    continue;
+                }
+
+
+                SlopeCreationData slopeData = new SlopeCreationData(_revitRepository.Document) {
                     Height = height,
                     Width = width,
                     Depth = depth,

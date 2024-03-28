@@ -19,7 +19,6 @@ namespace RevitOpeningSlopes.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly CreationOpeningSlopes _creationOpeningSlopes;
-        private SlopeTypeViewModel _selectedSlopeType;
 
 
 
@@ -95,21 +94,20 @@ namespace RevitOpeningSlopes.ViewModels {
         public bool IsEnabledAlreadySelected => SelectedWindows?.Count > 0;
         public ObservableCollection<WindowsGetterMode> WindowGetterModes { get; }
         public WindowsGetterMode SelectedWindowGetterMode { get; set; }
+        public ICollection<FamilyInstance> SelectedWindows { get; }
+        public ObservableCollection<SlopeTypeViewModel> SlopeTypes { get; }
 
         private string _slopeFrontOffset;
         public string SlopeFrontOffset {
             get => _slopeFrontOffset;
             set {
-                _slopeFrontOffset = value;
                 RaiseAndSetIfChanged(ref _slopeFrontOffset, value);
                 OnPropertyChanged(nameof(ErrorText));
             }
         }
 
-        public ICollection<FamilyInstance> SelectedWindows { get; }
 
-        public ObservableCollection<SlopeTypeViewModel> SlopeTypes { get; }
-
+        private SlopeTypeViewModel _selectedSlopeType;
         public SlopeTypeViewModel SelectedSlopeType {
             get => _selectedSlopeType;
             set {
@@ -132,13 +130,9 @@ namespace RevitOpeningSlopes.ViewModels {
 
         }
 
-        private static bool IsTextNumeric(string str) {
-            System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex("[^0-9]");
-            return !reg.IsMatch(str);
-        }
         private void LoadConfig() {
             SelectedWindowGetterMode = _pluginConfig.WindowsGetterMode;
-            SlopeFrontOffset = _pluginConfig.SlopeFrontOffset;
+
             if(SelectedWindows.Count > 0) {
                 switch(SelectedWindowGetterMode) {
                     case WindowsGetterMode.AlreadySelectedWindows:
@@ -170,6 +164,7 @@ namespace RevitOpeningSlopes.ViewModels {
                         break;
                 }
             }
+            SlopeFrontOffset = _pluginConfig.SlopeFrontOffset;
             SelectedSlopeType = SlopeTypes.FirstOrDefault(slwm => slwm.SlopeTypeId == _pluginConfig.SlopeTypeId);
         }
 

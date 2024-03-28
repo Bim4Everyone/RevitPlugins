@@ -14,6 +14,33 @@ namespace RevitOpeningSlopes.Models {
             _revitRepository = revitRepository;
         }
 
+        public Solid GetUnitedSolid(IEnumerable<Solid> solids) {
+            return SolidExtensions.CreateUnitedSolids((IList<Solid>) solids)
+                .OrderByDescending(s => s.Volume)
+                .FirstOrDefault();
+        }
+
+        public Solid GetUnitedSolidFromOpening(Element opening) {
+            if(opening == null)
+                throw new ArgumentNullException(nameof(opening));
+            ElementCategoryFilter categoryFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows);
+            IList<ElementId> dependingElements = opening.GetDependentElements(categoryFilter);
+            IList<Solid> totalSolids = new List<Solid>();
+            foreach(ElementId depEl in dependingElements) {
+                Solid openingSolid = GetUnitedSolid(_revitRepository.Document.GetElement(depEl).GetSolids());
+                if(openingSolid.Volume > 0) {
+                    totalSolids.Add(openingSolid);
+                }
+            }
+            return GetUnitedSolid(totalSolids);
+        }
+
+        public void CreateDirectShape(Solid solid) {
+            DirectShape ds = DirectShape.CreateElement(_revitRepository.Document,
+                new ElementId(BuiltInCategory.OST_GenericModel));
+            ds.SetShape(new GeometryObject[] { solid });
+        }
+
         public Solid GetUnitedSolidFromHostElement(Element element) {
             if(element == null) {
                 throw new ArgumentNullException(nameof(element));
