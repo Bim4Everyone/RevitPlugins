@@ -15,6 +15,7 @@ namespace RevitOpeningSlopes.Models {
                     BuiltInCategory.OST_Walls,
                     BuiltInCategory.OST_Columns,
                     BuiltInCategory.OST_StructuralColumns,
+                    BuiltInCategory.OST_StructuralFraming,
                     BuiltInCategory.OST_Floors});
             if(onlyWindow) {
                 categoryFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows);

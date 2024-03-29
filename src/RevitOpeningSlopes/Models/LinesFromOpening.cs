@@ -29,7 +29,6 @@ namespace RevitOpeningSlopes.Models {
             SketchPlane sketch = SketchPlane.Create(_revitRepository.Document, plane);
             ModelLine line = _revitRepository.Document.Create.NewModelCurve(geomLine, sketch) as ModelLine;
         }
-
         public Line CreateLineFromOffsetPoint(FamilyInstance opening) {
             XYZ openingOrigin = _revitRepository.GetOpeningOriginBoundingBox(opening);
             XYZ openingVector = _revitRepository.GetOpeningVector(opening);
@@ -50,6 +49,7 @@ namespace RevitOpeningSlopes.Models {
                 return new XYZ[] { curve.Evaluate(0.5, true) };
             } else {
                 List<XYZ> points = new List<XYZ>();
+                points.Add(curve.GetEndPoint(0));
                 for(double lengthOfPiece = step; lengthOfPiece < curveLength; lengthOfPiece += step) {
                     points.Add(curve.Evaluate(lengthOfPiece / curveLength, true));
                 }
