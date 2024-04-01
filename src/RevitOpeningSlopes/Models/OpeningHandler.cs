@@ -13,6 +13,7 @@ namespace RevitOpeningSlopes.Models {
         private readonly LinesFromOpening _linesFromOpening;
         private readonly NearestElements _nearestElements;
         private readonly SolidOperations _solidOperations;
+
         private XYZ _frontOffsetPoint;
         private XYZ _openingDepthPoint;
         private XYZ _centralDepthPoint;
@@ -27,6 +28,7 @@ namespace RevitOpeningSlopes.Models {
         private XYZ _topPoint;
         private XYZ _bottomPoint;
         private XYZ _verticalCenterPoint;
+
         private double _openingHeight;
         private double _openingWidth;
         private double _openingDepth;
