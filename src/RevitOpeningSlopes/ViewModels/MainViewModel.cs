@@ -37,11 +37,11 @@ namespace RevitOpeningSlopes.ViewModels {
                 _revitRepository.GetSlopeTypes()
                 .Select(fs => new SlopeTypeViewModel(fs))
                 .OrderBy(fs => fs.Name));
-            SelectedSlopeType = SlopeTypes.FirstOrDefault();
+            //SelectedSlopeType = SlopeTypes.FirstOrDefault();
 
 
             SelectedWindows = _revitRepository.GetSelectedWindows();
-            SlopeFrontOffset = "0";
+            //SlopeFrontOffset = "0";
         }
 
         public ICommand LoadViewCommand { get; }
@@ -164,8 +164,17 @@ namespace RevitOpeningSlopes.ViewModels {
                         break;
                 }
             }
-            SlopeFrontOffset = _pluginConfig.SlopeFrontOffset;
-            SelectedSlopeType = SlopeTypes.FirstOrDefault(slwm => slwm.SlopeTypeId == _pluginConfig.SlopeTypeId);
+            if(string.IsNullOrEmpty(_pluginConfig.SlopeFrontOffset)) {
+                SlopeFrontOffset = "0";
+            } else {
+                SlopeFrontOffset = _pluginConfig.SlopeFrontOffset;
+            }
+
+            if(_pluginConfig.SlopeTypeId == ElementId.InvalidElementId) {
+                SelectedSlopeType = SlopeTypes.FirstOrDefault();
+            } else {
+                SelectedSlopeType = SlopeTypes.FirstOrDefault(slwp => slwp.SlopeTypeId == _pluginConfig.SlopeTypeId);
+            }
         }
 
         private void SaveConfig() {

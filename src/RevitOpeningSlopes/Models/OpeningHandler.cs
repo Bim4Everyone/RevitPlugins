@@ -4,6 +4,9 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+using dosymep.Revit.Geometry;
+
 using RevitOpeningSlopes.Models.Enums;
 
 namespace RevitOpeningSlopes.Models {
@@ -14,7 +17,10 @@ namespace RevitOpeningSlopes.Models {
         private readonly NearestElements _nearestElements;
         private readonly SolidOperations _solidOperations;
 
+        private Outline _outlineWithOffset;
+        private Solid _nearestElementsSolid;
         private XYZ _frontOffsetPoint;
+        private XYZ _backwardOffsetPoint;
         private XYZ _openingDepthPoint;
         private XYZ _centralDepthPoint;
         private XYZ _openingVector;
@@ -54,10 +60,14 @@ namespace RevitOpeningSlopes.Models {
 
             _openingBboxOrigin = _revitRepository.GetOpeningOriginBoundingBox(_opening);
             _openingVector = _revitRepository.GetOpeningVector(_opening);
-            _frontOffsetPoint = GetFrontOffsetPoint(_openingBboxOrigin, _openingVector);
-            _openingDepthPoint = GetOpeningDepthPoint(_openingBboxOrigin, _frontOffsetPoint);
+            _outlineWithOffset = GetOutlineWithOffset();
+            _nearestElementsSolid = GetUnitedSolidFromBoundingBox(_outlineWithOffset);
+
+            _backwardOffsetPoint = GetCentralBackwardOffsetPoint(_openingBboxOrigin, _openingVector);
+            _frontOffsetPoint = GetFrontOffsetPoint(_backwardOffsetPoint, _openingVector);
+            _openingDepthPoint = GetOpeningDepthPoint(_backwardOffsetPoint, _frontOffsetPoint);
             _centralDepthPoint = GetCentralOpeningDepthPoint(
-                _openingBboxOrigin, _frontOffsetPoint, _openingDepthPoint);
+                _backwardOffsetPoint, _frontOffsetPoint, _openingDepthPoint);
             _rightPoint = GetRightPoint(_centralDepthPoint, _frontOffsetPoint);
             _rightFrontPoint = GetRightFrontPoint(_rightPoint, _openingVector);
             _depthPoint = GetDepthPoint(_rightFrontPoint);
@@ -89,29 +99,70 @@ namespace RevitOpeningSlopes.Models {
             _openingWidth = GetOpeningWidth(_verticalCenterPoint, _rightDepthPoint);
             _openingDepth = GetOpeningDepth(_rightDepthPoint, _rightFrontPoint);
             _rotationAngle = GetRotationAngle(_openingVector);
-
         }
-        private XYZ GetFrontOffsetPoint(XYZ openingBboxOrigin, XYZ openingVector) {
-            XYZ frontOffsetPoint = null;
+        private XYZ GetCentralBackwardOffsetPoint(XYZ openingBboxOrigin, XYZ openingVector) {
+            XYZ centralBackwardOffsetPoint = null;
             if(openingBboxOrigin != null && openingVector != null) {
-                const double frontLineLength = 1500;
                 const double backwardOffset = 500;
-                XYZ startPointBbox = new XYZ(openingBboxOrigin.X, openingBboxOrigin.Y, openingBboxOrigin.Z) - openingVector
-                        * _revitRepository.ConvertToFeet(backwardOffset);
-                frontOffsetPoint = new XYZ(startPointBbox.X, startPointBbox.Y, startPointBbox.Z)
-                    + openingVector * _revitRepository.ConvertToFeet(frontLineLength);
+                centralBackwardOffsetPoint = new XYZ(openingBboxOrigin.X, openingBboxOrigin.Y, openingBboxOrigin.Z)
+                        - openingVector * _revitRepository.ConvertToFeet(backwardOffset);
+            }
+            return centralBackwardOffsetPoint;
+        }
 
+        private XYZ GetFrontOffsetPoint(XYZ backwardOffsetPoint, XYZ openingVector) {
+            XYZ frontOffsetPoint = null;
+            if(backwardOffsetPoint != null && openingVector != null) {
+                const double frontLineLength = 1500;
+                frontOffsetPoint = new XYZ(backwardOffsetPoint.X, backwardOffsetPoint.Y, backwardOffsetPoint.Z)
+                    + openingVector * _revitRepository.ConvertToFeet(frontLineLength);
             }
             return frontOffsetPoint;
         }
+        private Outline GetOutlineWithOffset() {
+            Outline outlineWithOffset = null;
+            BoundingBoxXYZ openingBoundingBox = _opening.GetBoundingBox();
+            if(openingBoundingBox != null) {
+                double offsetLength = _revitRepository.ConvertToFeet(300);
+                XYZ minPoint = openingBoundingBox.Min - new XYZ(1, 1, 1) * offsetLength;
+                XYZ maxPoint = openingBoundingBox.Max + new XYZ(1, 1, 1) * offsetLength;
+                outlineWithOffset = new Outline(minPoint, maxPoint);
+            }
+            return outlineWithOffset;
+        }
+        private Solid GetUnitedSolidFromBoundingBox(Outline outlineWithOffset) {
+            Solid unitedSolidFromNearestElements = null;
+            if(outlineWithOffset != null) {
+                ElementFilter categoryFilter = new ElementMulticategoryFilter(
+                new BuiltInCategory[] {
+                    BuiltInCategory.OST_Walls,
+                    BuiltInCategory.OST_Columns,
+                    BuiltInCategory.OST_StructuralColumns,
+                    BuiltInCategory.OST_StructuralFraming,
+                    BuiltInCategory.OST_Floors});
+                BoundingBoxIntersectsFilter bboxIntersectFilter =
+                new BoundingBoxIntersectsFilter(outlineWithOffset);
+                IEnumerable<Element> collection = new FilteredElementCollector(_revitRepository.Document)
+                    .WhereElementIsNotElementType()
+                    .WherePasses(categoryFilter)
+                    .WherePasses(bboxIntersectFilter)
+                    .ToElements();
+                IList<Solid> nearestSolids = collection
+                    .Select(el => _solidOperations.GetUnitedSolid(el.GetSolids()))
+                    .ToList();
 
-        private XYZ GetOpeningDepthPoint(XYZ openingBboxOrigin, XYZ frontOffsetPoint) {
+                unitedSolidFromNearestElements = _solidOperations.GetUnitedSolid(nearestSolids);
+                //_solidOperations.CreateDirectShape(unitedSolidFromNearestElements);
+            }
+            return unitedSolidFromNearestElements;
+        }
+        private XYZ GetOpeningDepthPoint(XYZ backwardOffsetPoint, XYZ frontOffsetPoint) {
             XYZ closestPoint = null;
-            if(openingBboxOrigin != null && frontOffsetPoint != null) {
+            if(backwardOffsetPoint != null && frontOffsetPoint != null) {
                 const double halfWidthLength = 2000;
                 const double step = 0.032; //~10 мм
                 double backWardLength = _revitRepository.ConvertToMillimeters(
-                    openingBboxOrigin.DistanceTo(frontOffsetPoint));
+                    backwardOffsetPoint.DistanceTo(frontOffsetPoint));
                 Line rightLine = _linesFromOpening.CreateLineFromOpening(
                     frontOffsetPoint, _opening, halfWidthLength, DirectionEnum.Right);
                 ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(rightLine, step);
@@ -127,8 +178,7 @@ namespace RevitOpeningSlopes.Models {
                                 intersectOptOutside);
                     if(intersection.SegmentCount > 0) {
                         XYZ intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(1);
-                        double currentDist = _revitRepository
-                            .ConvertToMillimeters(point.DistanceTo(intersectCoord));
+                        double currentDist = point.DistanceTo(intersectCoord);
                         if(currentDist < closestDist) {
                             closestDist = currentDist;
                             double tst = _revitRepository.ConvertToMillimeters(closestDist);
@@ -139,16 +189,19 @@ namespace RevitOpeningSlopes.Models {
             }
             return closestPoint;
         }
-        private XYZ GetCentralOpeningDepthPoint(XYZ openingBboxOrigin, XYZ frontOffsetPoint, XYZ openingDepthPoint) {
+        private XYZ GetCentralOpeningDepthPoint(XYZ backwardOffsetPoint, XYZ frontOffsetPoint, XYZ openingDepthPoint) {
             XYZ startBackwardLinePoint = null;
-            if(openingBboxOrigin != null && frontOffsetPoint != null && openingDepthPoint != null) {
+            if(backwardOffsetPoint != null && frontOffsetPoint != null && openingDepthPoint != null) {
                 double backWardLength = _revitRepository.ConvertToMillimeters(
-                    openingBboxOrigin.DistanceTo(frontOffsetPoint));
+                    backwardOffsetPoint.DistanceTo(frontOffsetPoint));
                 const double halfWidthLength = 2000;
                 Line lineFromDepthPointToLeft = _linesFromOpening.CreateLineFromOpening(
                     openingDepthPoint, _opening, halfWidthLength, DirectionEnum.Left);
+
                 Line backwardLineFromOffsetPoint = _linesFromOpening.CreateLineFromOpening(
                     frontOffsetPoint, _opening, backWardLength, DirectionEnum.Back);
+
+
                 IList<ClosestPointsPairBetweenTwoCurves> closestPoints = new List<ClosestPointsPairBetweenTwoCurves>();
                 backwardLineFromOffsetPoint.ComputeClosestPoints(lineFromDepthPointToLeft, true, false, false,
                             out closestPoints);
