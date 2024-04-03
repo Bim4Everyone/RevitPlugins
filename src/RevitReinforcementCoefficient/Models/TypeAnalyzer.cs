@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -21,16 +20,14 @@ namespace RevitReinforcementCoefficient.Models {
         private readonly List<string> _paramsForAll = new List<string>() {
             "обр_ФОП_Марка ведомости расхода",
             "обр_ФОП_Раздел проекта",
-            "обр_ФОП_Группа КР",                    // не требуется для распределения по группам конструкций, но потом ее отдельно 
-            "обр_ФОП_Орг. уровень"                  // проверять у опалубочных элементов будет не логично, поэтому сразу
+            "обр_ФОП_Орг. уровень"
         };
-
-        // НУЖНА ЛИ "обр_ФОП_Группа КР"???
 
 
         private readonly List<string> _paramsForRebars = new List<string>() {
             "обр_ФОП_Форма_номер",
             "мод_ФОП_Диаметр",
+            "обр_ФОП_Расчет в погонных метрах",
             "обр_ФОП_Количество типовых на этаже",
             "обр_ФОП_Количество типовых этажей"
         };
@@ -45,6 +42,47 @@ namespace RevitReinforcementCoefficient.Models {
             "обр_ФОП_Длина",
             "обр_ФОП_Количество"
         };
+
+
+        private readonly Dictionary<double, double> _massPerLengthDict = new Dictionary<double, double>() {
+            { 4, 0.098},
+            { 5, 0.144},
+            { 6, 0.222},
+            { 7, 0.302},
+            { 8, 0.395},
+            { 9, 0.499},
+            { 10, 0.617},
+            { 12, 0.888},
+            { 14, 1.208},
+            { 16, 1.578},
+            { 18, 1.998},
+            { 20, 2.466},
+            { 22, 2.984},
+            { 25, 3.853},
+            { 28, 4.834},
+            { 32, 6.313},
+            { 36, 7.99},
+            { 40, 9.805},
+        };
+
+        private readonly Dictionary<double, double> _overlapCoefDict = new Dictionary<double, double>() {
+            { 8, 1.034},
+            { 10, 1.043},
+            { 12, 1.051},
+            { 14, 1.06},
+            { 16, 1.068},
+            { 18, 1.077},
+            { 20, 1.085},
+            { 22, 1.094},
+            { 25, 1.107},
+            { 28, 1.12},
+            { 32, 6.313},
+            { 36, 7.99},
+            { 40, 9.805},
+        };
+
+
+
 
         public TypeAnalyzer() { }
 
@@ -130,12 +168,12 @@ namespace RevitReinforcementCoefficient.Models {
                 HasParams(rebar, _paramsForRebars, errors);
 
                 // Если элемент класса Rebar (т.е. системная арматура)
-                if(rebar is Rebar) {
-
-                    HasParams(rebar, _paramsForSysRebars, errors);
-                } else {
+                if(rebar is FamilyInstance) {
 
                     HasParams(rebar, _paramsForIfcRebars, errors);
+                } else {
+
+                    HasParams(rebar, _paramsForSysRebars, errors);
                 }
             }
 
@@ -167,34 +205,100 @@ namespace RevitReinforcementCoefficient.Models {
             }
         }
 
-        public void GetRebarData(DesignTypeInfoVM typeInfo) {
+        private double CalculateRebarMass(Element rebar) {
 
-            foreach(Element element in typeInfo.Rebars) {
+            //string rep = string.Empty;
 
-                int numberOfForm = GetParamValueAnywhere<int>(element, "обр_ФОП_Форма_номер");
-                double dimeter = GetParamValueAnywhere<double>(element, "мод_ФОП_Диаметр");
-                int countInLevel = GetParamValueAnywhere<int>(element, "обр_ФОП_Количество типовых на этаже");
-                int countOfLevel = GetParamValueAnywhere<int>(element, "обр_ФОП_Количество типовых этажей");
+            int numberOfForm = GetParamValueAnywhere<int>(rebar, "обр_ФОП_Форма_номер");
+            double dimeter = GetParamValueAnywhere<double>(rebar, "мод_ФОП_Диаметр");
+            double dimeterInMm = UnitUtilsHelper.ConvertFromInternalValue(dimeter);
+            int calcInLinearMeters = GetParamValueAnywhere<int>(rebar, "обр_ФОП_Расчет в погонных метрах");
+            int countInLevel = GetParamValueAnywhere<int>(rebar, "обр_ФОП_Количество типовых на этаже");
+            int countOfLevel = GetParamValueAnywhere<int>(rebar, "обр_ФОП_Количество типовых этажей");
 
-                double lengthOfRebar;
-                int count;
 
-                double length;
-                double fopCount;
+            // В основном масса арматуры будет определяться как масса единицы (* на разные коэффициенты) * количество таких стержней
+            // Но когда мы собираем с вида арматуру через FilteredrebarCollector, то помимо одиночных стержней у нас собираются и стержни в массиве,
+            // среди которых есть массивы с включенной функцией "Переменный набор арматурных стержней", тогда запросить "обра_ФОП_Длина"
+            // не представляется возможным, т.к. массив указывает, что у вложенных стержней она разная (вернет значение 0)
+            // Из-за этой проблемы, чтобы упростить задачу, получаем среднее значение этой длины из Полной длины стержня
 
-                // Если элемент класса Rebar (т.е. системная арматура)
-                if(element is Rebar) {
+            double length = GetParamValueAnywhere<double>(rebar, "обр_ФОП_Длина");
+            int count;
+            double fullLength;
 
-                    lengthOfRebar = GetParamValueAnywhere<double>(element, "Полная длина стержня");
-                    count = GetParamValueAnywhere<int>(element, "Количество");
-                } else {
+            // Если элемент класса FamilyInstance, то это IFC арматура
+            if(rebar is FamilyInstance) {
 
-                    length = GetParamValueAnywhere<double>(element, "обр_ФОП_Длина");
-                    fopCount = GetParamValueAnywhere<double>(element, "обр_ФОП_Количество");
-                }
+                count = Convert.ToInt32((GetParamValueAnywhere<double>(rebar, "обр_ФОП_Количество")));
+            } else {
 
-                TaskDialog.Show("fdf", dimeter.ToString());
+                count = GetParamValueAnywhere<int>(rebar, "Количество");
+                fullLength = GetParamValueAnywhere<double>(rebar, "Полная длина стержня");
+
+                // Если длина одного стержня равна 0, то это стержни переменной длины, и мы находим длину одного деля общую длину на кол-во
+                length = (length == 0) ? fullLength / count : length;
             }
+
+            double lengthInMm = UnitUtilsHelper.ConvertFromInternalValue(length);
+
+
+            // Погонная масса арматуры
+            double massPerUnitLength;
+            if(numberOfForm < 200) {
+
+                massPerUnitLength = _massPerLengthDict.ContainsKey(dimeterInMm) ? _massPerLengthDict[dimeterInMm] : 0;
+            } else {
+
+                massPerUnitLength = GetParamValueAnywhere<double>(rebar, "обр_ФОП_Масса на единицу длины");
+            }
+
+            // Коэффициент нахлеста
+            double overlapCoef = 1.1;
+            if(lengthInMm > 11700) {
+
+                overlapCoef = _overlapCoefDict.ContainsKey(dimeterInMm) ? _overlapCoefDict[dimeterInMm] : 1.1;
+            }
+
+            // Расчет массы одного стержня (длина в метрах * массу 1 метра)
+            double calc = Math.Round(lengthInMm / 1000 * massPerUnitLength, 3);
+
+            // Если стержень должен считаться погонажно, то добавляем коэффициент нахлеста
+            calc = (calcInLinearMeters == 1) ? calc * overlapCoef : calc;
+
+            // Вычисляем массу с учетом кол-ва стержней в массиве/сборке, на этаже, на этажах
+            calc = Math.Round(calc * count * countInLevel * countOfLevel, 2);
+
+
+            //rep += $"Диаметр: {dimeterInMm}" + Environment.NewLine;
+            //rep += $"Длина: {lengthInMm}" + Environment.NewLine;
+            //rep += $"Масса погонного метра: {massPerUnitLength}" + Environment.NewLine;
+            //rep += $"Коэффициент нахлеста: {overlapCoef}" + Environment.NewLine;
+            //rep += $"Масса ед: {calc}" + Environment.NewLine;
+            //rep += $"Общая масса: {calc}" + Environment.NewLine;
+            //TaskDialog.Show("rep", rep);
+
+            return calc;
+        }
+
+
+        public void CalculateRebarCoef(DesignTypeInfoVM typeInfo) {
+
+            // Рассчет суммарного объема бетона у типа конструкции
+            foreach(Element element in typeInfo.Elements) {
+
+                double volumeInInternal = element.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED).AsDouble();
+                typeInfo.ConcreteVolume += UnitUtilsHelper.ConvertVolumeFromInternalValue(volumeInInternal);
+                typeInfo.ConcreteVolume = Math.Round(typeInfo.ConcreteVolume, 2);
+            }
+
+            // Рассчет суммарной массы арматуры у типа конструкции
+            foreach(Element rebar in typeInfo.Rebars) {
+
+                typeInfo.RebarMass += CalculateRebarMass(rebar);
+            }
+
+            typeInfo.RebarCoef = Math.Round(typeInfo.RebarMass / typeInfo.ConcreteVolume, 2);
         }
     }
 }

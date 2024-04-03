@@ -14,7 +14,7 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="300" Width="700"    
+    Height="300" Width="1200"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -60,6 +60,12 @@
                                     Width="150" DisplayMemberBinding="{Binding Elements.Count}"/>
                     <GridViewColumn Header="Количество армирования" 
                                     Width="150" DisplayMemberBinding="{Binding Rebars.Count}"/>
+                    <GridViewColumn Header="Объем бетона" 
+                                    Width="150" DisplayMemberBinding="{Binding ConcreteVolume}"/>
+                    <GridViewColumn Header="Масса армирования" 
+                                    Width="150" DisplayMemberBinding="{Binding RebarMass}"/>
+                    <GridViewColumn Header="Коэффициент армирования" 
+                                    Width="150" DisplayMemberBinding="{Binding RebarCoef}"/>
                 </GridView>
             </ListView.View>
         </ListView>
@@ -101,8 +107,8 @@
 
             <Button
                 Margin="10"
-                Width="80"
-                Content="GetInfoCommand"
+                Width="200"
+                Content="Рассчитать коэффициент"
                 Command="{Binding GetInfoCommand}" />
             
             <Button

@@ -7,6 +7,10 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitReinforcementCoefficient.ViewModels {
     internal class DesignTypeInfoVM : BaseViewModel {
+        private double _concreteVolume = 0;
+        private double _rebarMass = 0;
+        private double _rebarCoef = 0;
+
         public DesignTypeInfoVM(string typeName, string docPackage, bool aboveZero) {
             TypeName = typeName;
             DocPackage = docPackage;
@@ -30,7 +34,21 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         public List<Element> Elements { get; set; } = new List<Element>();
         public List<Element> Rebars { get; set; } = new List<Element>();
-        public double Coef { get; set; }
+
+
+        public double ConcreteVolume {
+            get => _concreteVolume;
+            set => this.RaiseAndSetIfChanged(ref _concreteVolume, value);
+        }
+        public double RebarMass {
+            get => _rebarMass;
+            set => this.RaiseAndSetIfChanged(ref _rebarMass, value);
+        }
+
+        public double RebarCoef {
+            get => _rebarCoef;
+            set => this.RaiseAndSetIfChanged(ref _rebarCoef, value);
+        }
 
         public bool ParamsChecked { get; set; } = false;
 

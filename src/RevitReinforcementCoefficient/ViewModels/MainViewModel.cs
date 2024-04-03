@@ -149,7 +149,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
             }
             if(!SelectedDesignType.HasErrors) {
 
-                _typeAnalyzer.GetRebarData(SelectedDesignType);
+                _typeAnalyzer.CalculateRebarCoef(SelectedDesignType);
             }
         }
     }
