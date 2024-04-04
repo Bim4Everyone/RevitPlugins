@@ -5,6 +5,8 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -76,20 +78,19 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private void LoadView() {
             LoadConfig();
 
+            // Нужно ли иметь разные списки?
             AllElements = _revitRepository.ElementsByFilter;
             Rebars = _revitRepository.RebarsInActiveView;
 
             _typeAnalyzer = new TypeAnalyzer();
 
-
-
             DesignTypes = _typeAnalyzer.CheckNSortByDesignTypes(AllElements.Union(Rebars));
-
-
         }
 
         private void AcceptView() {
             SaveConfig();
+
+            WriteRebarCoef();
         }
 
         private bool CanAcceptView() {
@@ -143,13 +144,45 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 return;
             }
 
-            if(!SelectedDesignType.ParamsChecked) {
+            // Проверка элементов выбранного типа конструкции
+            if(!SelectedDesignType.FormParamsChecked) {
+
+                _typeAnalyzer.CheckParamsInFormElements(SelectedDesignType);
+            }
+            if(!SelectedDesignType.RebarParamsChecked) {
 
                 _typeAnalyzer.CheckParamsInRebars(SelectedDesignType);
             }
+
+            // Если есть ошибки либо в опалубке, либо в арматуре подсчет выполняться не будет, т.к. нужны оба
             if(!SelectedDesignType.HasErrors) {
 
+                // Выполняем расчет объема опалубки, массы арматуры и коэффициента армирования у выбранного типа конструкции
                 _typeAnalyzer.CalculateRebarCoef(SelectedDesignType);
+            }
+        }
+
+
+        /// <summary>
+        /// Запись значений коэффициенто армирования
+        /// </summary>
+        private void WriteRebarCoef() {
+
+            if(SelectedDesignType is null) {
+                TaskDialog.Show("Ошибка!", "Выберите тип конструкции!");
+                return;
+            }
+
+            // Если нет ошибок то выполняем запись
+            if(!SelectedDesignType.HasErrors) {
+
+                using(Transaction transaction = _revitRepository.Document.StartTransaction("Запись коэффициентов армирования")) {
+                    foreach(Element elem in SelectedDesignType.Elements) {
+
+                        elem.SetParamValue("ФОП_ТИП_Армирование", SelectedDesignType.RebarCoef.ToString());
+                    }
+                    transaction.Commit();
+                }
             }
         }
     }

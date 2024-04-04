@@ -23,10 +23,12 @@ namespace RevitReinforcementCoefficient.Models {
             "обр_ФОП_Орг. уровень"
         };
 
+        private readonly List<string> _paramsForFormElements = new List<string>() { "ФОП_ТИП_Армирование" };
 
         private readonly List<string> _paramsForRebars = new List<string>() {
             "обр_ФОП_Форма_номер",
             "мод_ФОП_Диаметр",
+            "обр_ФОП_Длина",
             "обр_ФОП_Расчет в погонных метрах",
             "обр_ФОП_Количество типовых на этаже",
             "обр_ФОП_Количество типовых этажей"
@@ -39,7 +41,7 @@ namespace RevitReinforcementCoefficient.Models {
         };
 
         private readonly List<string> _paramsForIfcRebars = new List<string>() {
-            "обр_ФОП_Длина",
+
             "обр_ФОП_Количество"
         };
 
@@ -158,7 +160,32 @@ namespace RevitReinforcementCoefficient.Models {
             return designTypes;
         }
 
+        /// <summary>
+        /// Проверяет наличие параметров у опалубки у типа конструкции
+        /// </summary>
+        public StringBuilder CheckParamsInFormElements(DesignTypeInfoVM designType) {
 
+            StringBuilder errors = new StringBuilder();
+
+            foreach(Element elem in designType.Elements) {
+
+                HasParams(elem, _paramsForFormElements, errors);
+            }
+
+            if(errors.Length > 0) {
+                designType.HasErrors = true;
+
+                TaskDialog.Show("Ошибки:", errors.ToString());
+            }
+
+            designType.FormParamsChecked = true;
+            return errors;
+        }
+
+
+        /// <summary>
+        /// Проверяет наличие параметров у арматуры у типа конструкции
+        /// </summary>
         public StringBuilder CheckParamsInRebars(DesignTypeInfoVM designType) {
 
             StringBuilder errors = new StringBuilder();
@@ -183,10 +210,9 @@ namespace RevitReinforcementCoefficient.Models {
                 TaskDialog.Show("Ошибки:", errors.ToString());
             }
 
-            designType.ParamsChecked = true;
+            designType.RebarParamsChecked = true;
             return errors;
         }
-
 
 
 
@@ -205,6 +231,9 @@ namespace RevitReinforcementCoefficient.Models {
             }
         }
 
+        /// <summary>
+        /// Расчет массы одного арматурного элемента
+        /// </summary>
         private double CalculateRebarMass(Element rebar) {
 
             //string rep = string.Empty;
@@ -267,7 +296,7 @@ namespace RevitReinforcementCoefficient.Models {
             calc = (calcInLinearMeters == 1) ? calc * overlapCoef : calc;
 
             // Вычисляем массу с учетом кол-ва стержней в массиве/сборке, на этаже, на этажах
-            calc = Math.Round(calc * count * countInLevel * countOfLevel, 2);
+            calc = calc * count * countInLevel * countOfLevel;
 
 
             //rep += $"Диаметр: {dimeterInMm}" + Environment.NewLine;
@@ -285,20 +314,24 @@ namespace RevitReinforcementCoefficient.Models {
         public void CalculateRebarCoef(DesignTypeInfoVM typeInfo) {
 
             // Рассчет суммарного объема бетона у типа конструкции
+            double volume = 0;
             foreach(Element element in typeInfo.Elements) {
 
                 double volumeInInternal = element.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED).AsDouble();
-                typeInfo.ConcreteVolume += UnitUtilsHelper.ConvertVolumeFromInternalValue(volumeInInternal);
-                typeInfo.ConcreteVolume = Math.Round(typeInfo.ConcreteVolume, 2);
+                volume += UnitUtilsHelper.ConvertVolumeFromInternalValue(volumeInInternal);
             }
+            typeInfo.ConcreteVolume = Math.Round(volume, 2);
+
 
             // Рассчет суммарной массы арматуры у типа конструкции
+            double sumMass = 0;
             foreach(Element rebar in typeInfo.Rebars) {
 
-                typeInfo.RebarMass += CalculateRebarMass(rebar);
+                sumMass += CalculateRebarMass(rebar);
             }
+            typeInfo.RebarMass = Math.Round(sumMass, 2);
 
-            typeInfo.RebarCoef = Math.Round(typeInfo.RebarMass / typeInfo.ConcreteVolume, 2);
+            typeInfo.RebarCoef = Math.Round(typeInfo.RebarMass / typeInfo.ConcreteVolume);
         }
     }
 }

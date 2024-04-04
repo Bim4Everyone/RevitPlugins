@@ -50,7 +50,8 @@ namespace RevitReinforcementCoefficient.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _rebarCoef, value);
         }
 
-        public bool ParamsChecked { get; set; } = false;
+        public bool FormParamsChecked { get; set; } = false;
+        public bool RebarParamsChecked { get; set; } = false;
 
 
         public bool HasErrors { get; set; } = false;
