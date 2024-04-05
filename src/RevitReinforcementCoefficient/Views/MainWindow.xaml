@@ -18,6 +18,11 @@
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
+    <Window.Resources>
+        <local:NullToStringConverter x:Key="NullToStringConverter" />
+        <local:BoolToStringConverter x:Key="BoolToStringConverter" />
+    </Window.Resources>
+
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction
@@ -28,6 +33,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -38,8 +44,59 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Left">
+
+            <Label 
+                Margin="10"
+                VerticalAlignment="Center"
+                Content="Выберите комплект документации:"/>
+
+            <ComboBox
+                Margin="10"
+                Width="200" 
+                VerticalContentAlignment="Center"
+                ItemsSource="{Binding Path=DockPackages}"
+                SelectedItem="{Binding Path=SelectedDockPackage, UpdateSourceTrigger=PropertyChanged}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock 
+                            Text="{Binding Converter={StaticResource NullToStringConverter}}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <Button
+                Margin="10"
+                Width="120"
+                Padding="3"
+                Content="Выбрать все"
+                Command="{Binding Path=SelectAllVisibleCommand}" />
+
+            <Button
+                Margin="10"
+                Width="120"
+                Padding="3"
+                Content="Отменить выбор"
+                Command="{Binding Path=UnselectAllVisibleCommand}" />
+        </StackPanel>
+
+
+
         <ListView
-            Grid.Row="0" 
+            Grid.Row="1" 
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="10"
@@ -50,12 +107,41 @@
             SelectedItem="{Binding Path=SelectedDesignType}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Тип конструкции" 
-                                    Width="150" DisplayMemberBinding="{Binding TypeName}"/>
-                    <GridViewColumn Header="Комплект документации" 
-                                    Width="140" DisplayMemberBinding="{Binding DocPackage}"/>
-                    <GridViewColumn Header="Выше нуля?" 
-                                    Width="80" DisplayMemberBinding="{Binding AboveZero}"/>
+                    <GridViewColumn Header="Выбор">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsCheck}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Тип конструкции" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=TypeName,
+                                    Converter={StaticResource NullToStringConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Комплект документации" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=DocPackage, 
+                                    Converter={StaticResource NullToStringConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Выше нуля?" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=AboveZero,
+                                    Converter={StaticResource BoolToStringConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
                     <GridViewColumn Header="Количество опалубки" 
                                     Width="150" DisplayMemberBinding="{Binding Elements.Count}"/>
                     <GridViewColumn Header="Количество армирования" 
@@ -71,7 +157,7 @@
         </ListView>
 
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="2"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Orientation="Horizontal"
@@ -93,7 +179,7 @@
         </StackPanel>
         
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Height="45"

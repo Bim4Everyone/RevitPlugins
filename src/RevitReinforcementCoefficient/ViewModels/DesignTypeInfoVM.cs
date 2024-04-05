@@ -10,11 +10,17 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private double _concreteVolume = 0;
         private double _rebarMass = 0;
         private double _rebarCoef = 0;
+        private bool _isCheck = false;
 
         public DesignTypeInfoVM(string typeName, string docPackage, bool aboveZero) {
             TypeName = typeName;
             DocPackage = docPackage;
             AboveZero = aboveZero;
+        }
+
+        public bool IsCheck {
+            get => _isCheck;
+            set => this.RaiseAndSetIfChanged(ref _isCheck, value);
         }
 
         /// <summary>

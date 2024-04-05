@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -21,10 +23,18 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private string _saveProperty;
         private List<Element> _rebars;
         private List<Element> _allElements;
-        private List<DesignTypeInfoVM> _designTypes;
+        private List<DesignTypeInfoVM> _designTypes = new List<DesignTypeInfoVM>();
         private DesignTypeInfoVM _selectedDesignType;
 
         private TypeAnalyzer _typeAnalyzer;
+        private List<string> _dockPackages;
+        private string _selectedDockPackage;
+
+        /// <summary>
+        /// Значение фильтра, когда не задана фильтрация ("<Не выбрано>")
+        /// </summary>
+        private readonly string _filterValueForNofiltering = "<Не выбрано>";
+
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
@@ -37,8 +47,15 @@ namespace RevitReinforcementCoefficient.ViewModels {
             ShowRebarElementsCommand = RelayCommand.Create(ShowRebarElements, CanShowElements);
 
             GetInfoCommand = RelayCommand.Create(GetInfo, CanShowElements);
+
+            SelectAllVisibleCommand = RelayCommand.Create(SelectAllVisible);
+            UnselectAllVisibleCommand = RelayCommand.Create(UnselectAllVisible);
+
+
         }
 
+        public ICommand SelectAllVisibleCommand { get; }
+        public ICommand UnselectAllVisibleCommand { get; }
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand ShowFormworkElementsCommand { get; }
@@ -75,6 +92,24 @@ namespace RevitReinforcementCoefficient.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedDesignType, value);
         }
 
+        public List<string> DockPackages {
+            get => _dockPackages;
+            set => this.RaiseAndSetIfChanged(ref _dockPackages, value);
+        }
+
+        public string SelectedDockPackage {
+            get => _selectedDockPackage;
+            set {
+                _selectedDockPackage = value;
+                CollectionViewSource.GetDefaultView(DesignTypes).Refresh();
+                RaisePropertyChanged("SelectedDockPackage");
+            }
+        }
+
+
+
+
+
         private void LoadView() {
             LoadConfig();
 
@@ -85,6 +120,11 @@ namespace RevitReinforcementCoefficient.ViewModels {
             _typeAnalyzer = new TypeAnalyzer();
 
             DesignTypes = _typeAnalyzer.CheckNSortByDesignTypes(AllElements.Union(Rebars));
+            DockPackages = DesignTypes.Select(o => o.DocPackage).Distinct().OrderBy(o => o).ToList();
+            DockPackages.Insert(0, _filterValueForNofiltering);
+            SelectedDockPackage = DockPackages.FirstOrDefault();
+
+            CollectionViewSource.GetDefaultView(DesignTypes).Filter = new Predicate<object>(Contains);
         }
 
         private void AcceptView() {
@@ -184,6 +224,45 @@ namespace RevitReinforcementCoefficient.ViewModels {
                     transaction.Commit();
                 }
             }
+        }
+
+        /// <summary>
+        /// Ставит галочки выбора у видимых с учетом фильтрации типов констуркций
+        /// </summary>
+        private void SelectAllVisible() {
+
+            foreach(DesignTypeInfoVM item in DesignTypes.Where(Contains)) {
+
+                item.IsCheck = true;
+            }
+        }
+
+        /// <summary>
+        /// Снимает галочки выбора у видимых с учетом фильтрации типов констуркций
+        /// </summary>
+        private void UnselectAllVisible() {
+
+            foreach(DesignTypeInfoVM item in DesignTypes.Where(Contains)) {
+
+                item.IsCheck = false;
+            }
+        }
+
+
+        private bool Contains(object o) {
+            // Если в параметре есть какое то значение (не null и не пустая строка (у нас это тоже null))
+            if(SelectedDockPackage != _filterValueForNofiltering) {
+
+                if(string.IsNullOrEmpty(SelectedDockPackage)) {
+
+                    return string.IsNullOrEmpty(((DesignTypeInfoVM) o).DocPackage) ? true : false;
+                } else {
+
+                    return ((DesignTypeInfoVM) o).DocPackage is null ? false : ((DesignTypeInfoVM) o).DocPackage.Contains(SelectedDockPackage);
+                }
+            }
+
+            return true;
         }
     }
 }
