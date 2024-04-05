@@ -14,7 +14,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    Height="300" Width="1200"    
+    Height="400" Width="950"
+    MinHeight="300" MinWidth="950"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -94,7 +95,6 @@
         </StackPanel>
 
 
-
         <ListView
             Grid.Row="1" 
             Grid.Column="0"
@@ -103,8 +103,7 @@
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False"
             ItemsSource="{Binding Path=DesignTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-            SelectionMode="Multiple"
-            SelectedItem="{Binding Path=SelectedDesignType}">
+            SelectionMode="Multiple">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Выбор">
@@ -115,7 +114,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Тип конструкции" Width="150">
+                    <GridViewColumn Header="Тип конструкции" Width="140">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=TypeName,
@@ -124,7 +123,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Комплект документации" Width="150">
+                    <GridViewColumn Header="Комплект" Width="90">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=DocPackage, 
@@ -142,16 +141,16 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Количество опалубки" 
-                                    Width="150" DisplayMemberBinding="{Binding Elements.Count}"/>
-                    <GridViewColumn Header="Количество армирования" 
-                                    Width="150" DisplayMemberBinding="{Binding Rebars.Count}"/>
+                    <GridViewColumn Header="Кол-во опалубки" 
+                                    Width="110" DisplayMemberBinding="{Binding Elements.Count}"/>
+                    <GridViewColumn Header="Кол-во арм-я" 
+                                    Width="100" DisplayMemberBinding="{Binding Rebars.Count}"/>
                     <GridViewColumn Header="Объем бетона" 
-                                    Width="150" DisplayMemberBinding="{Binding ConcreteVolume}"/>
-                    <GridViewColumn Header="Масса армирования" 
-                                    Width="150" DisplayMemberBinding="{Binding RebarMass}"/>
-                    <GridViewColumn Header="Коэффициент армирования" 
-                                    Width="150" DisplayMemberBinding="{Binding RebarCoef}"/>
+                                    Width="100" DisplayMemberBinding="{Binding ConcreteVolume}"/>
+                    <GridViewColumn Header="Масса арм-я" 
+                                    Width="100" DisplayMemberBinding="{Binding RebarMass}"/>
+                    <GridViewColumn Header="Коэффициент арм-я" 
+                                    Width="120" DisplayMemberBinding="{Binding RebarCoef}"/>
                 </GridView>
             </ListView.View>
 
@@ -214,14 +213,14 @@
 
             <Button
                 Margin="10"
-                Width="200"
-                Content="Рассчитать коэффициент"
+                Width="100"
+                Content="Рассчитать"
                 Command="{Binding GetInfoCommand}" />
             
             <Button
                 Margin="10"
-                Width="80"
-                Content="ОК"
+                Width="100"
+                Content="Записать"
                 IsDefault="True"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />

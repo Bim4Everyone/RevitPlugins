@@ -24,7 +24,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private List<Element> _rebars;
         private List<Element> _allElements;
         private List<DesignTypeInfoVM> _designTypes = new List<DesignTypeInfoVM>();
-        private DesignTypeInfoVM _selectedDesignType;
 
         private TypeAnalyzer _typeAnalyzer;
         private List<string> _dockPackages;
@@ -86,10 +85,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
         public List<DesignTypeInfoVM> DesignTypes {
             get => _designTypes;
             set => this.RaiseAndSetIfChanged(ref _designTypes, value);
-        }
-        public DesignTypeInfoVM SelectedDesignType {
-            get => _selectedDesignType;
-            set => this.RaiseAndSetIfChanged(ref _selectedDesignType, value);
         }
 
         public List<string> DockPackages {
@@ -161,44 +156,57 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         private void ShowFormworkElements() {
 
-            _revitRepository.ActiveUIDocument.Selection.SetElementIds(SelectedDesignType.Elements.Select(e => e.Id).ToList());
+            List<ElementId> ids = new List<ElementId>();
+
+            foreach(DesignTypeInfoVM designType in DesignTypes.Where(o => o.IsCheck)) {
+
+                ids.AddRange(designType.Elements.Select(e => e.Id));
+            }
+            _revitRepository.ActiveUIDocument.Selection.SetElementIds(ids);
         }
 
         private void ShowRebarElements() {
 
-            _revitRepository.ActiveUIDocument.Selection.SetElementIds(SelectedDesignType.Rebars.Select(e => e.Id).ToList());
+            List<ElementId> ids = new List<ElementId>();
+
+            foreach(DesignTypeInfoVM designType in DesignTypes.Where(o => o.IsCheck)) {
+
+                ids.AddRange(designType.Rebars.Select(e => e.Id));
+            }
+            _revitRepository.ActiveUIDocument.Selection.SetElementIds(ids);
         }
 
         private bool CanShowElements() {
-            if(SelectedDesignType is null) {
-                return false;
-            }
-            return true;
+
+            return DesignTypes.FirstOrDefault(o => o.IsCheck) is null ? false : true;
         }
 
 
         private void GetInfo() {
 
-            if(SelectedDesignType is null) {
+            if(DesignTypes.FirstOrDefault(o => o.IsCheck) is null) {
                 TaskDialog.Show("Ошибка!", "Выберите тип конструкции!");
                 return;
             }
 
-            // Проверка элементов выбранного типа конструкции
-            if(!SelectedDesignType.FormParamsChecked) {
+            foreach(DesignTypeInfoVM designType in DesignTypes.Where(o => o.IsCheck)) {
 
-                _typeAnalyzer.CheckParamsInFormElements(SelectedDesignType);
-            }
-            if(!SelectedDesignType.RebarParamsChecked) {
+                // Проверка элементов выбранного типа конструкции
+                if(!designType.FormParamsChecked) {
 
-                _typeAnalyzer.CheckParamsInRebars(SelectedDesignType);
-            }
+                    _typeAnalyzer.CheckParamsInFormElements(designType);
+                }
+                if(!designType.RebarParamsChecked) {
 
-            // Если есть ошибки либо в опалубке, либо в арматуре подсчет выполняться не будет, т.к. нужны оба
-            if(!SelectedDesignType.HasErrors) {
+                    _typeAnalyzer.CheckParamsInRebars(designType);
+                }
 
-                // Выполняем расчет объема опалубки, массы арматуры и коэффициента армирования у выбранного типа конструкции
-                _typeAnalyzer.CalculateRebarCoef(SelectedDesignType);
+                // Если есть ошибки либо в опалубке, либо в арматуре подсчет выполняться не будет, т.к. нужны оба
+                if(!designType.HasErrors) {
+
+                    // Выполняем расчет объема опалубки, массы арматуры и коэффициента армирования у выбранного типа конструкции
+                    _typeAnalyzer.CalculateRebarCoef(designType);
+                }
             }
         }
 
@@ -208,20 +216,23 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// </summary>
         private void WriteRebarCoef() {
 
-            if(SelectedDesignType is null) {
+            if(DesignTypes.FirstOrDefault(o => o.IsCheck) is null) {
                 TaskDialog.Show("Ошибка!", "Выберите тип конструкции!");
                 return;
             }
 
-            // Если нет ошибок то выполняем запись
-            if(!SelectedDesignType.HasErrors) {
+            foreach(DesignTypeInfoVM designType in DesignTypes.Where(o => o.IsCheck)) {
 
-                using(Transaction transaction = _revitRepository.Document.StartTransaction("Запись коэффициентов армирования")) {
-                    foreach(Element elem in SelectedDesignType.Elements) {
+                // Если нет ошибок то выполняем запись значений коэффициента армирования в опалубочные элементы
+                if(!designType.HasErrors) {
 
-                        elem.SetParamValue("ФОП_ТИП_Армирование", SelectedDesignType.RebarCoef.ToString());
+                    using(Transaction transaction = _revitRepository.Document.StartTransaction("Запись коэффициентов армирования")) {
+                        foreach(Element elem in designType.Elements) {
+
+                            elem.SetParamValue("ФОП_ТИП_Армирование", designType.RebarCoef.ToString());
+                        }
+                        transaction.Commit();
                     }
-                    transaction.Commit();
                 }
             }
         }
