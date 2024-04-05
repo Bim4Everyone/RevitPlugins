@@ -33,17 +33,25 @@ namespace RevitOpeningSlopes.Models {
                 throw new ArgumentException("Расположение не является точкой");
             };
         }
-        public XYZ GetOpeningOriginBoundingBox(Element opening) {
-            BoundingBoxXYZ bbox = opening.GetBoundingBox(Default3DView);
-            XYZ minPoint = bbox.Min;
-            XYZ maxPoint = bbox.Max;
-            double x = (minPoint.X + maxPoint.X) / 2;
-            double y = (minPoint.Y + maxPoint.Y) / 2;
-            double z = (minPoint.Z + maxPoint.Z) / 2;
-            return new XYZ(x, y, z);
+        public XYZ GetOpeningBoundingBoxOrigin(Element opening) {
+            XYZ boundingBoxOrigin = null;
+            if(opening != null) {
+                BoundingBoxXYZ bbox = opening.GetBoundingBox(Default3DView);
+                XYZ minPoint = bbox.Min;
+                XYZ maxPoint = bbox.Max;
+                double x = (minPoint.X + maxPoint.X) / 2;
+                double y = (minPoint.Y + maxPoint.Y) / 2;
+                double z = (minPoint.Z + maxPoint.Z) / 2;
+                boundingBoxOrigin = new XYZ(x, y, z);
+            }
+            return boundingBoxOrigin;
         }
         public XYZ GetOpeningVector(FamilyInstance opening) {
-            return opening.FacingOrientation.Normalize();
+            XYZ openingVector = null;
+            if(opening != null) {
+                openingVector = opening.FacingOrientation.Normalize();
+            }
+            return openingVector;
         }
 
         public IList<FamilySymbol> GetSlopeTypes() {

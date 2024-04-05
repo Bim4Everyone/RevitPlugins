@@ -41,6 +41,7 @@ namespace RevitOpeningSlopes.Models.Services {
                 IList<SlopeCreationData> slopeCreationData = _slopesDataGetter.GetSlopeCreationData(config);
                 foreach(SlopeCreationData slope in slopeCreationData) {
                     CreateSlope(slope);
+
                 }
                 transaction.Commit();
             }

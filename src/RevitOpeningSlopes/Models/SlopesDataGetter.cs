@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitOpeningSlopes.Models.Exceptions;
+
 namespace RevitOpeningSlopes.Models {
     internal class SlopesDataGetter {
         private readonly RevitRepository _revitRepository;
@@ -18,31 +20,37 @@ namespace RevitOpeningSlopes.Models {
 
             List<SlopeCreationData> slopeCreationData = new List<SlopeCreationData>();
             foreach(FamilyInstance opening in openings) {
+                try {
+                    OpeningHandler openingParameters = new OpeningHandler(_revitRepository, opening);
 
-                OpeningHandler openingParameters = new OpeningHandler(_revitRepository, opening);
+                    double height = openingParameters.GetOpeningHeight();
+                    double width = openingParameters.GetOpeningWidth();
+                    double depth = openingParameters.GetOpeningDepth()
+                        + _revitRepository.ConvertToFeet(double.Parse(config.SlopeFrontOffset));
 
-                double height = openingParameters.OpeningHeight;
-                double width = openingParameters.OpeningWidth;
-                double depth = openingParameters.OpeningDepth
-                    + _revitRepository.ConvertToFeet(double.Parse(config.SlopeFrontOffset));
+                    XYZ center = openingParameters.GetVerticalCenterPoint();
+                    double rotationAngle = openingParameters.GetRotationAngle();
 
-                XYZ center = openingParameters.OpeningCenterPoint;
-                double rotationAngle = openingParameters.RotationAngle;
+                    if(height <= 0 || width <= 0 || depth <= 0 || center == null) {
+                        continue;
+                    }
 
-                if(height <= 0 || width <= 0 || depth <= 0 || center == null) {
+
+                    SlopeCreationData slopeData = new SlopeCreationData(_revitRepository.Document) {
+                        Height = height,
+                        Width = width,
+                        Depth = depth,
+                        Center = center,
+                        SlopeTypeId = config.SlopeTypeId,
+                        RotationRadiansAngle = rotationAngle
+                    };
+                    slopeCreationData.Add(slopeData);
+                } catch(OpeningNullSolidException) {
                     continue;
                 }
 
 
-                SlopeCreationData slopeData = new SlopeCreationData(_revitRepository.Document) {
-                    Height = height,
-                    Width = width,
-                    Depth = depth,
-                    Center = center,
-                    SlopeTypeId = config.SlopeTypeId,
-                    RotationRadiansAngle = rotationAngle
-                };
-                slopeCreationData.Add(slopeData);
+
             }
             return slopeCreationData;
         }

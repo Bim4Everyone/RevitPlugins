@@ -29,19 +29,19 @@ namespace RevitOpeningSlopes.Models {
             SketchPlane sketch = SketchPlane.Create(_revitRepository.Document, plane);
             ModelLine line = _revitRepository.Document.Create.NewModelCurve(geomLine, sketch) as ModelLine;
         }
-        public Line CreateLineFromOffsetPoint(FamilyInstance opening) {
-            XYZ openingOrigin = _revitRepository.GetOpeningOriginBoundingBox(opening);
-            XYZ openingVector = _revitRepository.GetOpeningVector(opening);
-            const double frontLineLength = 1500;
-            const double backwardOffset = 500;
-            XYZ startPointBbox = new XYZ(openingOrigin.X, openingOrigin.Y, openingOrigin.Z) - openingVector
-                    * _revitRepository.ConvertToFeet(backwardOffset);
-            XYZ frontOffsetPoint = new XYZ(startPointBbox.X, startPointBbox.Y, startPointBbox.Z)
-                + openingVector * _revitRepository.ConvertToFeet(frontLineLength);
-            Line lineFromOffsetPoint = CreateLineFromOpening(
-                frontOffsetPoint, opening, frontLineLength, DirectionEnum.Back);
-            return lineFromOffsetPoint;
-        }
+        //public Line CreateLineFromOffsetPoint(FamilyInstance opening) {
+        //    XYZ openingOrigin = _revitRepository.GetOpeningOriginBoundingBox(opening);
+        //    XYZ openingVector = _revitRepository.GetOpeningVector(opening);
+        //    const double frontLineLength = 1500;
+        //    const double backwardOffset = 500;
+        //    XYZ startPointBbox = new XYZ(openingOrigin.X, openingOrigin.Y, openingOrigin.Z) - openingVector
+        //            * _revitRepository.ConvertToFeet(backwardOffset);
+        //    XYZ frontOffsetPoint = new XYZ(startPointBbox.X, startPointBbox.Y, startPointBbox.Z)
+        //        + openingVector * _revitRepository.ConvertToFeet(frontLineLength);
+        //    Line lineFromOffsetPoint = CreateLineFromOpening(
+        //        frontOffsetPoint, opening, frontLineLength, DirectionEnum.Back);
+        //    return lineFromOffsetPoint;
+        //}
         public ICollection<XYZ> SplitCurveToPoints(Curve curve, double step) {
             double curveLength = curve.Length;
             if(step >= curveLength) {
@@ -56,10 +56,9 @@ namespace RevitOpeningSlopes.Models {
                 return points;
             }
         }
-        public Line CreateLineFromOpening(XYZ origin, FamilyInstance opening, double length = 1000,
+        public Line CreateLineFromOpening(XYZ origin, XYZ openingVector, double length = 1000,
             DirectionEnum direction = DirectionEnum.Right) {
 
-            XYZ openingVector = _revitRepository.GetOpeningVector(opening);
             XYZ normalVector = XYZ.BasisZ.CrossProduct(openingVector).Normalize();
             length = _revitRepository.ConvertToFeet(length);
             double openingLocationZ = origin.Z;

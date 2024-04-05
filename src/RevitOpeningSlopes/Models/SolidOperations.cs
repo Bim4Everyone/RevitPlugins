@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit.Geometry;
 
+using RevitOpeningSlopes.Models.Exceptions;
+
 namespace RevitOpeningSlopes.Models {
     internal class SolidOperations {
         private readonly RevitRepository _revitRepository;
@@ -32,7 +34,11 @@ namespace RevitOpeningSlopes.Models {
                     totalSolids.Add(openingSolid);
                 }
             }
-            return GetUnitedSolid(totalSolids);
+            if(totalSolids.Count > 0) {
+                return GetUnitedSolid(totalSolids);
+            } else {
+                throw new OpeningNullSolidException();
+            }
         }
 
         public void CreateDirectShape(Solid solid) {
