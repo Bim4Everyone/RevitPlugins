@@ -90,8 +90,14 @@
                     Content="По выбранным окнам вручную"
                     IsChecked="{Binding IsCheckedSelect}"/>
                 <RadioButton 
-                    Content="По окнам на активном виде"
-                    IsChecked="{Binding IsCheckedOnView}"/>
+                    IsChecked="{Binding IsCheckedOnView}">
+                    <RadioButton.Content>
+                        <DockPanel>
+                            <TextBlock Text="По окнам на активном виде"/>
+                            <TextBlock Text="{Binding WindowsOnActiveView.Count, StringFormat={} ({0})}"/>
+                        </DockPanel>
+                </RadioButton.Content>
+                </RadioButton>
             </StackPanel>
         </Grid>
         <!--<TextBox

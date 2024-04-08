@@ -110,6 +110,7 @@ namespace RevitOpeningSlopes.Models {
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Windows)
                 .Cast<FamilyInstance>()
+                .Where(el => el.SuperComponent == null)
                 .ToArray();
         }
         public double ConvertToFeet(double value) {

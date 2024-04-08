@@ -37,7 +37,7 @@ namespace RevitOpeningSlopes.Models {
             if(totalSolids.Count > 0) {
                 return GetUnitedSolid(totalSolids);
             } else {
-                throw new OpeningNullSolidException();
+                throw new OpeningNullSolidException($"Отсутствует твердотельная геометрия в оконном проеме");
             }
         }
 

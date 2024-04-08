@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -19,14 +21,16 @@ namespace RevitOpeningSlopes.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly CreationOpeningSlopes _creationOpeningSlopes;
-
+        private readonly IMessageBoxService _messageBoxService;
 
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository,
-            CreationOpeningSlopes creationOpeningSlopes) {
+            CreationOpeningSlopes creationOpeningSlopes, IMessageBoxService messageBoxService) {
             _pluginConfig = pluginConfig ?? throw new ArgumentNullException(nameof(pluginConfig));
             _revitRepository = revitRepository;
             _creationOpeningSlopes = creationOpeningSlopes;
+            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
@@ -41,12 +45,13 @@ namespace RevitOpeningSlopes.ViewModels {
 
 
             SelectedWindows = _revitRepository.GetSelectedWindows();
+            WindowsOnActiveView = _revitRepository.GetWindowsOnActiveView();
             //SlopeFrontOffset = "0";
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
-
+        public IMessageBoxService MessageBoxService => _messageBoxService;
         public string ErrorText => Error;
         public string Error => GetType()
             .GetProperties()
@@ -95,6 +100,7 @@ namespace RevitOpeningSlopes.ViewModels {
         public ObservableCollection<WindowsGetterMode> WindowGetterModes { get; }
         public WindowsGetterMode SelectedWindowGetterMode { get; set; }
         public ICollection<FamilyInstance> SelectedWindows { get; }
+        public ICollection<FamilyInstance> WindowsOnActiveView { get; }
         public ObservableCollection<SlopeTypeViewModel> SlopeTypes { get; }
 
         private string _slopeFrontOffset;
@@ -123,6 +129,11 @@ namespace RevitOpeningSlopes.ViewModels {
         private void AcceptView() {
             SaveConfig();
             _creationOpeningSlopes.CreateSlopes(_pluginConfig, out string error);
+            if(!string.IsNullOrEmpty(error)) {
+                error = $"Не удалось обработать следующие окна:\n\n" + error;
+                _messageBoxService.Show(
+                    error, "BIM", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+            }
         }
 
         private bool CanAcceptView() {

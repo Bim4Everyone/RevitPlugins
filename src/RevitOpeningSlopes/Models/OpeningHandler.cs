@@ -49,49 +49,8 @@ namespace RevitOpeningSlopes.Models {
             _opening = opening
                 ?? throw new ArgumentNullException(nameof(opening));
             _solidOperations = new SolidOperations(revitRepository);
-            //FillingParameters();
             CheckVectorDirection();
         }
-
-        //public double OpeningHeight { get => _openingHeight; }
-        //public double OpeningWidth { get => _openingWidth; }
-        //public double OpeningDepth { get => _openingDepth; }
-        //public XYZ OpeningCenterPoint { get => _verticalCenterPoint; }
-        //public double RotationAngle { get => _rotationAngle; }
-        //private void FillingParameters() {
-
-        //    _openingBboxOrigin = _revitRepository.GetOpeningBoundingBoxOrigin(_opening);
-        //    _openingVector = _revitRepository.GetOpeningVector(_opening);
-
-        //    _outlineWithOffset = GetOutlineWithOffset();
-        //    _nearestElementsSolid = GetUnitedSolidFromBoundingBox(_outlineWithOffset);
-        //    _openingSolid = _solidOperations.GetUnitedSolidFromOpening(_opening);
-
-        //    _centralBackwardOffsetPoint = GetCentralBackwardOffsetPoint(_openingBboxOrigin, _openingVector);
-        //    _frontOffsetPoint = GetFrontOffsetPoint(_centralBackwardOffsetPoint, _openingVector);
-
-        //    _openingDepthPoint = GetOpeningDepthPoint(_centralBackwardOffsetPoint, _frontOffsetPoint, _openingSolid);
-        //    _centralOpeningDepthPoint = GetCentralOpeningDepthPoint(
-        //        _centralBackwardOffsetPoint, _frontOffsetPoint, _openingDepthPoint);
-
-        //    _rightPoint = GetRightPoint(_centralOpeningDepthPoint, _frontOffsetPoint, _nearestElementsSolid);
-        //    _rightFrontPoint = GetRightFrontPoint(_rightPoint, _openingVector, _nearestElementsSolid);
-        //    _depthPoint = GetDepthPoint(_rightFrontPoint, _openingSolid);
-        //    _rightDepthPoint = GetRightDepthPoint(_depthPoint, _rightFrontPoint);
-
-        //    _horizontalCenterPoint = GetHorizontalCenterPoint(_rightFrontPoint, _openingVector, _nearestElementsSolid);
-        //    _horizontalDepthPoint = GetHorizontalDepthPoint(_horizontalCenterPoint, _rightDepthPoint);
-
-        //    _topPoint = GetTopPoint(_horizontalDepthPoint, _nearestElementsSolid);
-        //    _bottomPoint = GetBottomPoint(_horizontalDepthPoint, _nearestElementsSolid);
-        //    _verticalCenterPoint = GetVerticalCenterPoint(_topPoint, _bottomPoint);
-
-        //    _openingHeight = GetOpeningHeight(_topPoint, _bottomPoint);
-
-        //    _openingWidth = GetOpeningWidth(_verticalCenterPoint, _rightDepthPoint);
-        //    _openingDepth = GetOpeningDepth(_rightDepthPoint, _rightFrontPoint);
-        //    _rotationAngle = GetRotationAngle(_openingVector);
-        //}
 
         private XYZ GetOpeningVector() {
             if(_openingVector != null) {
@@ -102,21 +61,7 @@ namespace RevitOpeningSlopes.Models {
             }
 
         }
-        //private XYZ GetOpeningVector(FamilyInstance opening) {
-        //    XYZ openingVector = null;
-        //    if(opening != null) {
-        //        openingVector = opening.FacingOrientation.Normalize();
-        //    }
-        //    return openingVector;
-        //}
-        //private XYZ GetOpeningBoundingBoxOrigin() {
-        //    if(_openingBboxOrigin != null) {
-        //        return _openingBboxOrigin;
-        //    } else {
-        //        _openingBboxOrigin = _revitRepository.GetOpeningBoundingBoxOrigin(_opening);
-        //        return _openingBboxOrigin;
-        //    }
-        //}
+
         public XYZ GetOpeningBoundingBoxOrigin() {
             if(_openingBboxOrigin != null) {
                 return _openingBboxOrigin;
@@ -165,12 +110,12 @@ namespace RevitOpeningSlopes.Models {
             } else {
                 XYZ openingBboxOrigin = GetOpeningBoundingBoxOrigin();
                 XYZ openingVector = GetOpeningVector();
-                //if(openingBboxOrigin != null && openingVector != null) {
-                const double backwardOffset = 500;
-                _centralBackwardOffsetPoint = new XYZ(
-                    openingBboxOrigin.X, openingBboxOrigin.Y, openingBboxOrigin.Z)
-                        - openingVector * _revitRepository.ConvertToFeet(backwardOffset);
-                //}
+                if(openingBboxOrigin != null && openingVector != null) {
+                    const double backwardOffset = 500;
+                    _centralBackwardOffsetPoint = new XYZ(
+                        openingBboxOrigin.X, openingBboxOrigin.Y, openingBboxOrigin.Z)
+                            - openingVector * _revitRepository.ConvertToFeet(backwardOffset);
+                }
                 return _centralBackwardOffsetPoint;
             }
         }
@@ -181,26 +126,14 @@ namespace RevitOpeningSlopes.Models {
             } else {
                 XYZ centralBackwardOffsetPoint = GetCentralBackwardOffsetPoint();
                 XYZ openingVector = GetOpeningVector();
-                //if(centralBackwardOffsetPoint != null && openingVector != null) {
-                _frontOffsetPoint = new XYZ(
+                if(centralBackwardOffsetPoint != null && openingVector != null) {
+                    _frontOffsetPoint = new XYZ(
                     centralBackwardOffsetPoint.X, centralBackwardOffsetPoint.Y, centralBackwardOffsetPoint.Z)
                     + openingVector * _revitRepository.ConvertToFeet(frontLineLength);
-                //}
+                }
                 return _frontOffsetPoint;
             }
         }
-        //private XYZ GetCheckFrontOffsetPoint(XYZ openingVector) {
-        //    if(openingVector == null) {
-        //        throw new ArgumentNullException(nameof(openingVector));
-        //    } else {
-        //        const double frontLineLength = 1500;
-        //        XYZ bboxOrigin = GetOpeningBoundingBoxOrigin();
-        //        XYZ point = new XYZ(
-        //                bboxOrigin.X, bboxOrigin.Y, bboxOrigin.Z)
-        //                + openingVector * _revitRepository.ConvertToFeet(frontLineLength);
-        //        return point;
-        //    }
-        //}
 
         private Outline GetOutlineWithOffset() {
             if(_outlineWithOffset != null) {
@@ -217,46 +150,11 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
-        //private void CheckForRoomIntersect() {
-        //    Outline outlineWithOffset = GetOutlineWithOffset();
-        //    ElementFilter categoryFilter = new ElementCategoryFilter(BuiltInCategory.OST_Rooms);
-        //    BoundingBoxIntersectsFilter bboxIntersectFilter =
-        //            new BoundingBoxIntersectsFilter(outlineWithOffset);
-
-        //    IEnumerable<Room> rooms = new FilteredElementCollector(_revitRepository.Document)
-        //                .WhereElementIsNotElementType()
-        //                .WherePasses(categoryFilter)
-        //                .WherePasses(bboxIntersectFilter)
-        //                .Cast<Room>();
-
-        //    XYZ openingVector = GetOpeningVector();
-        //    XYZ frontOffsetPoint = GetCheckFrontOffsetPoint(openingVector);
-        //    foreach(Room room in rooms) {
-        //        if(room.IsPointInRoom(frontOffsetPoint)) {
-        //            _openingVector = _openingVector.Negate();
-        //            frontOffsetPoint = GetCheckFrontOffsetPoint(_openingVector);
-        //            break;
-        //        }
-        //    }
-        //    foreach(Room room in rooms) {
-        //        if(room.IsPointInRoom(frontOffsetPoint)) {
-        //            _openingVector = _openingVector.Negate();
-        //            break;
-        //        }
-        //    }
-        //    Line tstl = _linesFromOpening.CreateLineFromOpening(
-        //        frontOffsetPoint, _openingVector, 1000, DirectionEnum.Forward);
-        //    _linesFromOpening.CreateTestModelLine(tstl);
-        //}
         private void CheckVectorDirection() {
             const double lineLength = 100;
             XYZ originPoint = GetOpeningBoundingBoxOrigin();
             XYZ openingVector = GetOpeningVector();
-            //BoundingBoxXYZ openingBoundingBox = GetOpeningGeometryBbox();
-            //XYZ testMin = openingBoundingBox.Min;
-            //XYZ testMax = openingBoundingBox.Max;
-            //Line tst1 = Line.CreateBound(openingBoundingBox.Min, openingBoundingBox.Max);
-            //_linesFromOpening.CreateTestModelLine(tst1);
+
             Line forwardLine = _linesFromOpening.CreateLineFromOpening(
                 originPoint, openingVector, lineLength, DirectionEnum.Forward);
 
@@ -415,6 +313,9 @@ namespace RevitOpeningSlopes.Models {
                             }
                         }
                     }
+                }
+                if(_rightPoint == null) {
+                    throw new ArgumentException("Окно не углублено внутрь фасада");
                 }
                 return _rightPoint;
             }
@@ -673,6 +574,8 @@ namespace RevitOpeningSlopes.Models {
 
                 if(topPoint != null && bottomPoint != null) {
                     _openingHeight = bottomPoint.DistanceTo(topPoint);
+                } else {
+                    throw new ArgumentException("Не удалось рассчитать высоту проема");
                 }
                 return _openingHeight;
             }
@@ -688,6 +591,8 @@ namespace RevitOpeningSlopes.Models {
                 if(verticalCenterPoint != null && rightDepthPoint != null) {
                     _openingWidth = Math.Sqrt(Math.Pow(verticalCenterPoint.X - rightDepthPoint.X, 2)
                         + Math.Pow(verticalCenterPoint.Y - rightDepthPoint.Y, 2)) * 2;
+                } else {
+                    throw new ArgumentException("не удалось рассчитать ширину проема");
                 }
                 return _openingWidth;
 
@@ -703,6 +608,8 @@ namespace RevitOpeningSlopes.Models {
 
                 if(rightDepthPoint != null && rightFrontPoint != null) {
                     _openingDepth = rightDepthPoint.DistanceTo(rightFrontPoint);
+                } else {
+                    throw new ArgumentException("Не удалось рассчитать глубину проема");
                 }
                 return _openingDepth;
             }
