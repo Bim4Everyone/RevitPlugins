@@ -40,6 +40,7 @@ namespace RevitOpeningSlopes.Models {
         //    }
         //    return currentElement;
         //}
+
         public IList<Element> GetElementsByRay(Curve curve, bool onlyRoom = false) {
             XYZ lineDirection = (curve.GetEndPoint(1) - curve.GetEndPoint(0)).Normalize();
             ElementFilter categoryFilter = new ElementMulticategoryFilter(

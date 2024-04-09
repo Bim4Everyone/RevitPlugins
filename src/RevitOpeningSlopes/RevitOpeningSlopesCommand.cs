@@ -33,10 +33,13 @@ namespace RevitOpeningSlopes {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
+                //kernel.UseXtraProgressDialog<MainViewModel>();
+
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+
 
                 Notification(kernel.Get<MainWindow>());
             }

@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+using Autodesk.Revit.DB;
+
 using RevitOpeningSlopes.Models;
 
 namespace RevitOpeningSlopes.Services {
@@ -10,6 +16,10 @@ namespace RevitOpeningSlopes.Services {
         /// </summary>
         /// <param name="config">Настройки откосов</param>
         /// <param name="error">Ошибки в построении откосов</param>
-        void CreateSlopes(PluginConfig config, out string error);
+        void CreateSlopes(PluginConfig config,
+            ICollection<FamilyInstance> openings,
+            out string error,
+            IProgress<int> progress,
+            CancellationToken ct);
     }
 }

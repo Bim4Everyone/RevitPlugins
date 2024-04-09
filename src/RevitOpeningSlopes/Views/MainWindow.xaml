@@ -24,7 +24,6 @@
             <i:InvokeCommandAction Command="{Binding LoadViewCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>

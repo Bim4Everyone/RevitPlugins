@@ -8,6 +8,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -24,15 +25,18 @@ namespace RevitOpeningSlopes.ViewModels {
         private readonly IMessageBoxService _messageBoxService;
 
 
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository,
-            CreationOpeningSlopes creationOpeningSlopes, IMessageBoxService messageBoxService) {
-            _pluginConfig = pluginConfig ?? throw new ArgumentNullException(nameof(pluginConfig));
+        public MainViewModel(PluginConfig pluginConfig,
+            RevitRepository revitRepository,
+            CreationOpeningSlopes creationOpeningSlopes,
+            IMessageBoxService messageBoxService
+            ) {
             _revitRepository = revitRepository;
             _creationOpeningSlopes = creationOpeningSlopes;
-            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+            _pluginConfig = pluginConfig
+                ?? throw new ArgumentNullException(nameof(pluginConfig));
+            _messageBoxService = messageBoxService
+                ?? throw new ArgumentNullException(nameof(messageBoxService));
 
-            LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
             WindowGetterModes = new ObservableCollection<WindowsGetterMode>(
                 Enum.GetValues(typeof(WindowsGetterMode)).Cast<WindowsGetterMode>());
@@ -41,12 +45,12 @@ namespace RevitOpeningSlopes.ViewModels {
                 _revitRepository.GetSlopeTypes()
                 .Select(fs => new SlopeTypeViewModel(fs))
                 .OrderBy(fs => fs.Name));
-            //SelectedSlopeType = SlopeTypes.FirstOrDefault();
-
 
             SelectedWindows = _revitRepository.GetSelectedWindows();
             WindowsOnActiveView = _revitRepository.GetWindowsOnActiveView();
-            //SlopeFrontOffset = "0";
+
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+            LoadViewCommand = RelayCommand.Create(LoadView);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -128,12 +132,21 @@ namespace RevitOpeningSlopes.ViewModels {
 
         private void AcceptView() {
             SaveConfig();
-            _creationOpeningSlopes.CreateSlopes(_pluginConfig, out string error);
-            if(!string.IsNullOrEmpty(error)) {
-                error = $"Не удалось обработать следующие окна:\n\n" + error;
-                _messageBoxService.Show(
-                    error, "BIM", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+            string errorMsg;
+            ICollection<FamilyInstance> openings = _revitRepository
+                    .GetWindows(_pluginConfig.WindowsGetterMode);
+            using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+                progressDialogService.MaxValue = openings.Count;
+                progressDialogService.StepValue = progressDialogService.MaxValue / 10;
+                progressDialogService.DisplayTitleFormat = "Обработка оконных проемов... [{0}]\\[{1}]";
+                var progress = progressDialogService.CreateProgress();
+                var ct = progressDialogService.CreateCancellationToken();
+                progressDialogService.Show();
+
+                _creationOpeningSlopes.CreateSlopes(_pluginConfig, openings, out string error, progress, ct);
+                errorMsg = error;
             }
+            ShowMessageBoxError(errorMsg);
         }
 
         private bool CanAcceptView() {
@@ -186,6 +199,8 @@ namespace RevitOpeningSlopes.ViewModels {
             } else {
                 SelectedSlopeType = SlopeTypes.FirstOrDefault(slwp => slwp.SlopeTypeId == _pluginConfig.SlopeTypeId);
             }
+
+            OnPropertyChanged(nameof(ErrorText));
         }
 
         private void SaveConfig() {
@@ -200,6 +215,14 @@ namespace RevitOpeningSlopes.ViewModels {
             _pluginConfig.WindowsGetterMode = SelectedWindowGetterMode;
             _pluginConfig.SlopeFrontOffset = SlopeFrontOffset;
             _pluginConfig.SaveProjectConfig();
+        }
+
+        private void ShowMessageBoxError(string error) {
+            if(!string.IsNullOrEmpty(error)) {
+                error = $"Не удалось обработать следующие окна:\n\n" + error;
+                _messageBoxService.Show(
+                    error, "BIM", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
@@ -29,6 +30,9 @@ namespace RevitOpeningSlopes.Models.Services {
 
         public void CreateSlope(SlopeCreationData slopeCreationData) {
             FamilySymbol slopeType = _revitRepository.GetSlopeType(slopeCreationData.SlopeTypeId);
+            if(!slopeType.IsActive) {
+                slopeType.Activate();
+            }
             FamilyInstance slope = _revitRepository
                         .Document
                         .Create
@@ -36,16 +40,23 @@ namespace RevitOpeningSlopes.Models.Services {
             _slopeParams.SetSlopeParams(slope, slopeCreationData);
         }
 
-        public void CreateSlopes(PluginConfig config, out string error) {
+        public void CreateSlopes(PluginConfig config,
+            ICollection<FamilyInstance> openings,
+            out string error,
+            IProgress<int> progress = null,
+            CancellationToken ct = default) {
             if(config is null) { throw new ArgumentNullException(nameof(config)); }
             StringBuilder sb = new StringBuilder();
 
             using(var transaction = _revitRepository.Document.StartTransaction("Размещение откосов")) {
                 //IList<SlopeCreationData> slopeCreationData = _slopesDataGetter
                 //    .GetOpeningSlopesCreationData(config, out ICollection<ElementId> notProcessedOpenings);
-                ICollection<FamilyInstance> openings = _revitRepository
-                    .GetWindows(config.WindowsGetterMode);
+                //ICollection<FamilyInstance> openings = _revitRepository
+                //    .GetWindows(config.WindowsGetterMode);
+                int i = 0;
                 foreach(FamilyInstance opening in openings) {
+                    ct.ThrowIfCancellationRequested();
+                    progress.Report(i++);
                     try {
                         SlopeCreationData slopeCreationData = _slopesDataGetter
                             .GetOpeningSlopeCreationData(config, opening);
