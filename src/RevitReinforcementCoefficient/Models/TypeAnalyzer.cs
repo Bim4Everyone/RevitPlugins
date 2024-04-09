@@ -25,8 +25,9 @@ namespace RevitReinforcementCoefficient.Models {
 
         private readonly List<string> _paramsForFormElements = new List<string>() { "ФОП_ТИП_Армирование" };
 
+        private readonly string _paramForRebarShell = "обр_ФОП_Форма_номер";
+
         private readonly List<string> _paramsForRebars = new List<string>() {
-            "обр_ФОП_Форма_номер",
             "мод_ФОП_Диаметр",
             "обр_ФОП_Длина",
             "обр_ФОП_Расчет в погонных метрах",
@@ -90,9 +91,9 @@ namespace RevitReinforcementCoefficient.Models {
 
 
         /// <summary>
-        /// Проверяет есть ли указанный список параметров в элементе на экземлпяре или типе
+        /// Проверяет есть ли указанный список параметров в элементе на экземпляре или типе, возвращает отчет
         /// </summary>
-        public StringBuilder HasParams(Element element, List<string> paramNames, StringBuilder errors = null) {
+        public StringBuilder HasParamsAnywhere(Element element, List<string> paramNames, StringBuilder errors = null) {
 
             if(errors is null) {
                 errors = new StringBuilder();
@@ -100,20 +101,33 @@ namespace RevitReinforcementCoefficient.Models {
 
             foreach(string paramName in paramNames) {
 
-                // Сначала проверяем есть ли параметр на экземпляре
-                if(!element.IsExistsParam(paramName)) {
+                if(!HasParamAnywhere(element, paramName)) {
 
-                    // Если не нашли, ищем на типоразмере
-                    Element elementType = element.Document.GetElement(element.GetTypeId());
-
-                    if(!elementType.IsExistsParam(paramName)) {
-                        // Если не нашли записываем
-
-                        errors.AppendLine($"У элемента с {element.Id} не найден параметр {paramName}");
-                    }
+                    errors.AppendLine($"У элемента с {element.Id} не найден параметр {paramName}");
                 }
             }
             return errors;
+        }
+
+
+        /// <summary>
+        /// Проверяет есть ли указанный параметр в элементе на экземпляре или типе
+        /// </summary>
+        public bool HasParamAnywhere(Element element, string paramName) {
+
+            // Сначала проверяем есть ли параметр на экземпляре
+            if(!element.IsExistsParam(paramName)) {
+
+                // Если не нашли, ищем на типоразмере
+                Element elementType = element.Document.GetElement(element.GetTypeId());
+
+                if(!elementType.IsExistsParam(paramName)) {
+                    // Если не нашли записываем, то возвращаем false
+
+                    return false;
+                }
+            }
+            return true;
         }
 
 
@@ -129,7 +143,7 @@ namespace RevitReinforcementCoefficient.Models {
             foreach(Element element in allElements) {
 
                 // Проверяем наличие параметров, необходимых для распределения по типам конструкций
-                if(HasParams(element, _paramsForAll).Length > 0) {
+                if(HasParamsAnywhere(element, _paramsForAll).Length > 0) {
 
                     // Пока просто пропускаем, в дальйшем нужно сделать сборщик проблемных
                     continue;
@@ -172,7 +186,7 @@ namespace RevitReinforcementCoefficient.Models {
 
             foreach(Element elem in designType.Elements) {
 
-                HasParams(elem, _paramsForFormElements, errors);
+                HasParamsAnywhere(elem, _paramsForFormElements, errors);
             }
 
             if(errors.Length > 0) {
@@ -195,15 +209,28 @@ namespace RevitReinforcementCoefficient.Models {
 
             foreach(Element rebar in designType.Rebars) {
 
-                HasParams(rebar, _paramsForRebars, errors);
+                // Есть нюанс, что если значение параметра "обр_ФОП_Форма_номер" == 1000, то других параметров мы не проверяем, 
+                // т.к. это элемент-оболочка и нужно считать данные из его внутренних частей
+                if(HasParamAnywhere(rebar, _paramForRebarShell)) {
+
+                    if(GetParamValueAnywhere<int>(rebar, _paramForRebarShell) == 1000) {
+                        continue;
+                    }
+                } else {
+
+                    errors.AppendLine($"У элемента с {rebar.Id} не найден параметр {_paramForRebarShell}");
+                }
+
+                // Далее проверяем параметры, которые должны быть у всех элементов арматуры
+                HasParamsAnywhere(rebar, _paramsForRebars, errors);
 
                 // Если элемент класса Rebar (т.е. системная арматура)
                 if(rebar is FamilyInstance) {
 
-                    HasParams(rebar, _paramsForIfcRebars, errors);
+                    HasParamsAnywhere(rebar, _paramsForIfcRebars, errors);
                 } else {
 
-                    HasParams(rebar, _paramsForSysRebars, errors);
+                    HasParamsAnywhere(rebar, _paramsForSysRebars, errors);
                 }
             }
 
@@ -239,19 +266,23 @@ namespace RevitReinforcementCoefficient.Models {
         /// </summary>
         private double CalculateRebarMass(Element rebar) {
 
-            //string rep = string.Empty;
+            string rep = string.Empty;
 
             int numberOfForm = GetParamValueAnywhere<int>(rebar, "обр_ФОП_Форма_номер");
+
+            if(numberOfForm == 1000) {
+                return 0;
+            }
+
             double dimeter = GetParamValueAnywhere<double>(rebar, "мод_ФОП_Диаметр");
             double dimeterInMm = UnitUtilsHelper.ConvertFromInternalValue(dimeter);
             int calcInLinearMeters = GetParamValueAnywhere<int>(rebar, "обр_ФОП_Расчет в погонных метрах");
             int countInLevel = GetParamValueAnywhere<int>(rebar, "обр_ФОП_Количество типовых на этаже");
             int countOfLevel = GetParamValueAnywhere<int>(rebar, "обр_ФОП_Количество типовых этажей");
 
-
             // В основном масса арматуры будет определяться как масса единицы (* на разные коэффициенты) * количество таких стержней
             // Но когда мы собираем с вида арматуру через FilteredrebarCollector, то помимо одиночных стержней у нас собираются и стержни в массиве,
-            // среди которых есть массивы с включенной функцией "Переменный набор арматурных стержней", тогда запросить "обра_ФОП_Длина"
+            // среди которых есть массивы с включенной функцией "Переменный набор арматурных стержней", тогда запросить "обр_ФОП_Длина"
             // не представляется возможным, т.к. массив указывает, что у вложенных стержней она разная (вернет значение 0)
             // Из-за этой проблемы, чтобы упростить задачу, получаем среднее значение этой длины из Полной длины стержня
 
@@ -272,9 +303,10 @@ namespace RevitReinforcementCoefficient.Models {
                 length = (length == 0) ? fullLength / count : length;
             }
 
-            double lengthInMm = UnitUtilsHelper.ConvertFromInternalValue(length);
+            double lengthInMm = Math.Round(UnitUtilsHelper.ConvertFromInternalValue(length), MidpointRounding.AwayFromZero);
 
-
+            // Далее со знаком @ указывается название расчетного поля спецификации армирования в Revit, ниже - пояснения
+            // @Базовый_Масса на единицу длины
             // Погонная масса арматуры
             double massPerUnitLength;
             if(numberOfForm < 200) {
@@ -285,32 +317,52 @@ namespace RevitReinforcementCoefficient.Models {
                 massPerUnitLength = GetParamValueAnywhere<double>(rebar, "обр_ФОП_Масса на единицу длины");
             }
 
+            // @Базовый_Нахлест
             // Коэффициент нахлеста
-            double overlapCoef = 1.1;
+            double overlapCoef = 1;
             if(lengthInMm > 11700) {
 
                 overlapCoef = _overlapCoefDict.ContainsKey(dimeterInMm) ? _overlapCoefDict[dimeterInMm] : 1.1;
             }
 
-            // Расчет массы одного стержня (длина в метрах * массу 1 метра)
-            double calc = Math.Round(lengthInMm / 1000 * massPerUnitLength, 3);
+            // @Базовый_Масса ЕД
+            // if(обр_ФОП_Расчет в погонных метрах, Базовый_Масса на единицу длины, round((обр_ФОП_Длина / 1000 * Базовый_Масса на единицу длины) / 0.01 мм) * 0.01)
+            double baseMassEd;
+            if(calcInLinearMeters == 1) {
 
-            // Если стержень должен считаться погонажно, то добавляем коэффициент нахлеста
-            calc = (calcInLinearMeters == 1) ? calc * overlapCoef : calc;
+                baseMassEd = massPerUnitLength;
+            } else {
 
-            // Вычисляем массу с учетом кол-ва стержней в массиве/сборке, на этаже, на этажах
-            calc = calc * count * countInLevel * countOfLevel;
+                baseMassEd = Math.Round(lengthInMm / 1000 * massPerUnitLength, 2, MidpointRounding.AwayFromZero);
+            }
+
+            // @Базовый_Количество
+            // decimal применен, т.к. иначе подсчет давал существенные расхождения со значениями спецификации
+            // if(мод_ФОП_IFC семейство, обр_ФОП_Количество, Количество) *
+            //          if(обр_ФОП_Расчет в погонных метрах, round((обр_ФОП_Длина / 1000 * Базовый_Нахлест) / 0.01 мм) * 0.01, 1) *
+            //          if(Учесть типовые, (обр_ФОП_Количество типовых на этаже * обр_ФОП_Количество типовых этажей), 1)
+            decimal baseCount;
+            if(calcInLinearMeters == 1) {
+
+                double temp = lengthInMm / 1000 * overlapCoef;
+                baseCount = count * decimal.Round((decimal) temp, 2, MidpointRounding.AwayFromZero) * countInLevel * countOfLevel;
+            } else {
+                baseCount = count * 1 * countInLevel * countOfLevel;
+            }
+
+            // Базовый_Масса Итог
+            decimal calc = decimal.Round(baseCount * (decimal) baseMassEd, 2, MidpointRounding.AwayFromZero);
 
 
-            //rep += $"Диаметр: {dimeterInMm}" + Environment.NewLine;
-            //rep += $"Длина: {lengthInMm}" + Environment.NewLine;
-            //rep += $"Масса погонного метра: {massPerUnitLength}" + Environment.NewLine;
-            //rep += $"Коэффициент нахлеста: {overlapCoef}" + Environment.NewLine;
-            //rep += $"Масса ед: {calc}" + Environment.NewLine;
-            //rep += $"Общая масса: {calc}" + Environment.NewLine;
+            rep += $"Диаметр: {dimeterInMm}" + Environment.NewLine;
+            rep += $"Длина: {lengthInMm}" + Environment.NewLine;
+            rep += $"Масса погонного метра: {massPerUnitLength}" + Environment.NewLine;
+            rep += $"Коэффициент нахлеста: {overlapCoef}" + Environment.NewLine;
+            rep += $"Масса ед: {calc}" + Environment.NewLine;
+            rep += $"Общая масса: {calc}" + Environment.NewLine;
             //TaskDialog.Show("rep", rep);
 
-            return calc;
+            return decimal.ToDouble(calc);
         }
 
 
