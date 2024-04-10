@@ -15,8 +15,7 @@ using RevitReinforcementCoefficient.ViewModels;
 namespace RevitReinforcementCoefficient.Models {
     internal class TypeAnalyzer {
 
-        //private readonly string _paramNameForIfcDetection = "мод_ФОП_IFC семейство";
-
+        // TODO в дальнейшем поля выполнить через настройки
         private readonly List<string> _paramsForAll = new List<string>() {
             "обр_ФОП_Марка ведомости расхода",
             "обр_ФОП_Раздел проекта",
@@ -34,7 +33,6 @@ namespace RevitReinforcementCoefficient.Models {
             "обр_ФОП_Количество типовых на этаже",
             "обр_ФОП_Количество типовых этажей"
         };
-
 
         private readonly List<string> _paramsForSysRebars = new List<string>() {
             "Полная длина стержня",
@@ -85,8 +83,6 @@ namespace RevitReinforcementCoefficient.Models {
         };
 
 
-
-
         public TypeAnalyzer() { }
 
 
@@ -131,23 +127,38 @@ namespace RevitReinforcementCoefficient.Models {
         }
 
 
-
         /// <summary>
-        /// Проверяет наличие нужных параметром и распределяет элементы по типам конструкции
+        /// Проверяет наличие нужных параметров и распределяет элементы по типам конструкции
         /// </summary>
         public List<DesignTypeInfoVM> CheckNSortByDesignTypes(IEnumerable<Element> allElements) {
 
             List<DesignTypeInfoVM> designTypes = new List<DesignTypeInfoVM>();
 
-
             foreach(Element element in allElements) {
 
-                // Проверяем наличие параметров, необходимых для распределения по типам конструкций
+                // Проверяем, только если это арматура
+                if(element.Category.GetBuiltInCategory() == BuiltInCategory.OST_Rebar) {
+
+                    // Проверяем у арматуры наличие параметра, по которому определяется семейство-оболочка
+                    if(!HasParamAnywhere(element, _paramForRebarShell)) {
+                        // TODO добавлять в отчет
+                        continue;
+                    }
+
+                    // Если значение параметра указывает, что это облочка, то пропускаем, этот элемент не участвует в расчетах
+                    if(GetParamValueAnywhere<int>(element, _paramForRebarShell) == 1000) {
+                        continue;
+                    }
+                }
+
+
+                // Проверяем у всех элементов наличие параметров, необходимых для распределения по типам конструкций
                 if(HasParamsAnywhere(element, _paramsForAll).Length > 0) {
 
                     // Пока просто пропускаем, в дальйшем нужно сделать сборщик проблемных
                     continue;
                 }
+
 
                 // Пока пусть так, дальше нужно сделать в зависимости от уровня
                 // Получение значений параметров, необходимых для распределения по типам конструкций
@@ -177,8 +188,9 @@ namespace RevitReinforcementCoefficient.Models {
             return designTypes;
         }
 
+
         /// <summary>
-        /// Проверяет наличие параметров у опалубки у типа конструкции
+        /// Проверяет наличие параметров у опалубки по типу конструкции
         /// </summary>
         public StringBuilder CheckParamsInFormElements(DesignTypeInfoVM designType) {
 
@@ -201,25 +213,13 @@ namespace RevitReinforcementCoefficient.Models {
 
 
         /// <summary>
-        /// Проверяет наличие параметров у арматуры у типа конструкции
+        /// Проверяет наличие параметров у арматуры по типу конструкции
         /// </summary>
         public StringBuilder CheckParamsInRebars(DesignTypeInfoVM designType) {
 
             StringBuilder errors = new StringBuilder();
 
             foreach(Element rebar in designType.Rebars) {
-
-                // Есть нюанс, что если значение параметра "обр_ФОП_Форма_номер" == 1000, то других параметров мы не проверяем, 
-                // т.к. это элемент-оболочка и нужно считать данные из его внутренних частей
-                if(HasParamAnywhere(rebar, _paramForRebarShell)) {
-
-                    if(GetParamValueAnywhere<int>(rebar, _paramForRebarShell) == 1000) {
-                        continue;
-                    }
-                } else {
-
-                    errors.AppendLine($"У элемента с {rebar.Id} не найден параметр {_paramForRebarShell}");
-                }
 
                 // Далее проверяем параметры, которые должны быть у всех элементов арматуры
                 HasParamsAnywhere(rebar, _paramsForRebars, errors);
@@ -237,13 +237,13 @@ namespace RevitReinforcementCoefficient.Models {
             if(errors.Length > 0) {
                 designType.HasErrors = true;
 
+                // TODO реализовать нормальный вывод ошибок
                 TaskDialog.Show("Ошибки:", errors.ToString());
             }
 
             designType.RebarParamsChecked = true;
             return errors;
         }
-
 
 
         /// <summary>
@@ -261,18 +261,13 @@ namespace RevitReinforcementCoefficient.Models {
             }
         }
 
+
         /// <summary>
         /// Расчет массы одного арматурного элемента
         /// </summary>
         private double CalculateRebarMass(Element rebar) {
 
-            string rep = string.Empty;
-
             int numberOfForm = GetParamValueAnywhere<int>(rebar, "обр_ФОП_Форма_номер");
-
-            if(numberOfForm == 1000) {
-                return 0;
-            }
 
             double dimeter = GetParamValueAnywhere<double>(rebar, "мод_ФОП_Диаметр");
             double dimeterInMm = UnitUtilsHelper.ConvertFromInternalValue(dimeter);
@@ -353,19 +348,14 @@ namespace RevitReinforcementCoefficient.Models {
             // Базовый_Масса Итог
             decimal calc = decimal.Round(baseCount * (decimal) baseMassEd, 2, MidpointRounding.AwayFromZero);
 
-
-            rep += $"Диаметр: {dimeterInMm}" + Environment.NewLine;
-            rep += $"Длина: {lengthInMm}" + Environment.NewLine;
-            rep += $"Масса погонного метра: {massPerUnitLength}" + Environment.NewLine;
-            rep += $"Коэффициент нахлеста: {overlapCoef}" + Environment.NewLine;
-            rep += $"Масса ед: {calc}" + Environment.NewLine;
-            rep += $"Общая масса: {calc}" + Environment.NewLine;
-            //TaskDialog.Show("rep", rep);
-
             return decimal.ToDouble(calc);
         }
 
 
+        /// <summary>
+        /// Рассчитывает коэффициент армирования у типа конструкции по массе арматуры и объему бетона
+        /// </summary>
+        /// <param name="typeInfo"></param>
         public void CalculateRebarCoef(DesignTypeInfoVM typeInfo) {
 
             // Рассчет суммарного объема бетона у типа конструкции
