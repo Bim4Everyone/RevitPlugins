@@ -90,6 +90,10 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// </summary>
         public bool HasErrors { get; set; } = false;
 
+        /// <summary>
+        /// Указывает, что данный тип конструкции уже рассчитывался ранее в этом сеансе
+        /// </summary>
+        public bool AlreadyCalculated { get; set; } = false;
 
         /// <summary>
         /// Добавляет элемент в коллекцию опалубочных элементов или арматуры в зависимости от его категории

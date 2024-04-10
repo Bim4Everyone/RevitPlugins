@@ -19,25 +19,32 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
-        private string _errorText;
-        private string _saveProperty;
-        private List<Element> _rebars;
-        private List<Element> _allElements;
-        private List<DesignTypeInfoVM> _designTypes = new List<DesignTypeInfoVM>();
-
-        private TypeAnalyzer _typeAnalyzer;
-        private List<string> _dockPackages;
-        private string _selectedDockPackage;
+        private readonly DesignTypeAnalyzer _typeAnalyzer;
+        private readonly ParamUtils _paramUtils;
+        private readonly CalculationUtils _сalculationUtils;
 
         /// <summary>
         /// Значение фильтра, когда не задана фильтрация ("<Не выбрано>")
         /// </summary>
         private readonly string _filterValueForNofiltering = "<Не выбрано>";
 
+        private string _errorText = string.Empty;
+        private List<Element> _allElements;
+        private List<DesignTypeInfoVM> _designTypes = new List<DesignTypeInfoVM>();
+
+        private List<string> _dockPackages;
+        private string _selectedDockPackage;
+
+
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+
+            _paramUtils = new ParamUtils();
+            _typeAnalyzer = new DesignTypeAnalyzer(_paramUtils);
+            _сalculationUtils = new CalculationUtils(_paramUtils);
+
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -49,8 +56,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
             SelectAllVisibleCommand = RelayCommand.Create(SelectAllVisible);
             UnselectAllVisibleCommand = RelayCommand.Create(UnselectAllVisible);
-
-
         }
 
         public ICommand SelectAllVisibleCommand { get; }
@@ -65,16 +70,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
-        }
-
-        public List<Element> Rebars {
-            get => _rebars;
-            set => this.RaiseAndSetIfChanged(ref _rebars, value);
         }
 
         public List<Element> AllElements {
@@ -103,23 +98,17 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
 
 
-
-
         private void LoadView() {
             LoadConfig();
 
-            // Нужно ли иметь разные списки?
-            AllElements = _revitRepository.ElementsByFilter;
-            Rebars = _revitRepository.RebarsInActiveView;
+            AllElements = _revitRepository.ElementsByFilterInActiveView;
 
-            _typeAnalyzer = new TypeAnalyzer();
-
-            DesignTypes = _typeAnalyzer.CheckNSortByDesignTypes(AllElements.Union(Rebars));
+            DesignTypes = _typeAnalyzer.CheckNSortByDesignTypes(AllElements);
             DockPackages = DesignTypes.Select(o => o.DocPackage).Distinct().OrderBy(o => o).ToList();
             DockPackages.Insert(0, _filterValueForNofiltering);
             SelectedDockPackage = DockPackages.FirstOrDefault();
 
-            CollectionViewSource.GetDefaultView(DesignTypes).Filter = new Predicate<object>(Contains);
+            CollectionViewSource.GetDefaultView(DesignTypes).Filter = new Predicate<object>(FilterByDocPackage);
         }
 
         private void AcceptView() {
@@ -129,29 +118,41 @@ namespace RevitReinforcementCoefficient.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText = "Введите значение сохраняемого свойства.";
+
+            if(DesignTypes.Count == 0) {
+                ErrorText = "Не удалось отобрать элементы";
                 return false;
             }
 
-            ErrorText = null;
+            if(DesignTypes.FirstOrDefault(o => o.IsCheck) is null) {
+                ErrorText = "Не выбран ни один тип конструкции";
+                return false;
+            }
+
+            if(DesignTypes.FirstOrDefault(o => o.IsCheck && o.AlreadyCalculated) is null) {
+                ErrorText = "Не рассчитан ни один выбранный тип конструкции";
+                return false;
+            }
+
+            if(!DesignTypes.Where(o => o.IsCheck).All(o => o.AlreadyCalculated)) {
+                ErrorText = "Не рассчитан один из выбранных типов конструкции";
+                return false;
+            }
+
+            ErrorText = string.Empty;
             return true;
         }
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-            SaveProperty = setting?.SaveProperty ?? "Привет Revit!";
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                     ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.SaveProperty = SaveProperty;
             _pluginConfig.SaveProjectConfig();
         }
-
 
 
         private void ShowFormworkElements() {
@@ -164,6 +165,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
             }
             _revitRepository.ActiveUIDocument.Selection.SetElementIds(ids);
         }
+
 
         private void ShowRebarElements() {
 
@@ -202,10 +204,10 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 }
 
                 // Если есть ошибки либо в опалубке, либо в арматуре подсчет выполняться не будет, т.к. нужны оба
-                if(!designType.HasErrors) {
+                if(!designType.HasErrors && !designType.AlreadyCalculated) {
 
                     // Выполняем расчет объема опалубки, массы арматуры и коэффициента армирования у выбранного типа конструкции
-                    _typeAnalyzer.CalculateRebarCoef(designType);
+                    _сalculationUtils.CalculateRebarCoef(designType);
                 }
             }
         }
@@ -242,7 +244,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// </summary>
         private void SelectAllVisible() {
 
-            foreach(DesignTypeInfoVM item in DesignTypes.Where(Contains)) {
+            foreach(DesignTypeInfoVM item in DesignTypes.Where(FilterByDocPackage)) {
 
                 item.IsCheck = true;
             }
@@ -253,14 +255,17 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// </summary>
         private void UnselectAllVisible() {
 
-            foreach(DesignTypeInfoVM item in DesignTypes.Where(Contains)) {
+            foreach(DesignTypeInfoVM item in DesignTypes.Where(FilterByDocPackage)) {
 
                 item.IsCheck = false;
             }
         }
 
 
-        private bool Contains(object o) {
+        /// <summary>
+        /// Используется в качестве аргумента предиката для фильтрации списка по выбранному комплекту документации
+        /// </summary>
+        private bool FilterByDocPackage(object o) {
             // Если в параметре есть какое то значение (не null и не пустая строка (у нас это тоже null))
             if(SelectedDockPackage != _filterValueForNofiltering) {
 
