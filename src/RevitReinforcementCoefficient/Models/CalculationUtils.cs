@@ -69,7 +69,6 @@ namespace RevitReinforcementCoefficient.Models {
         private double CalculateRebarMass(Element rebar) {
 
             int numberOfForm = _paramUtils.GetParamValueAnywhere<int>(rebar, "обр_ФОП_Форма_номер");
-
             double dimeter = _paramUtils.GetParamValueAnywhere<double>(rebar, "мод_ФОП_Диаметр");
             double dimeterInMm = UnitUtilsHelper.ConvertFromInternalValue(dimeter);
             int calcInLinearMeters = _paramUtils.GetParamValueAnywhere<int>(rebar, "обр_ФОП_Расчет в погонных метрах");
@@ -84,7 +83,6 @@ namespace RevitReinforcementCoefficient.Models {
 
             double length = _paramUtils.GetParamValueAnywhere<double>(rebar, "обр_ФОП_Длина");
             int count;
-            double fullLength;
 
             // Если элемент класса FamilyInstance, то это IFC арматура
             if(rebar is FamilyInstance) {
@@ -93,10 +91,9 @@ namespace RevitReinforcementCoefficient.Models {
             } else {
 
                 count = _paramUtils.GetParamValueAnywhere<int>(rebar, "Количество");
-                fullLength = _paramUtils.GetParamValueAnywhere<double>(rebar, "Полная длина стержня");
 
                 // Если длина одного стержня равна 0, то это стержни переменной длины, и мы находим длину одного деля общую длину на кол-во
-                length = (length == 0) ? fullLength / count : length;
+                length = (length == 0) ? _paramUtils.GetParamValueAnywhere<double>(rebar, "Полная длина стержня") / count : length;
             }
 
             double lengthInMm = Math.Round(UnitUtilsHelper.ConvertFromInternalValue(length), MidpointRounding.AwayFromZero);
@@ -107,9 +104,17 @@ namespace RevitReinforcementCoefficient.Models {
             double massPerUnitLength;
             if(numberOfForm < 200) {
 
+                // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался
                 massPerUnitLength = _massPerLengthDict.ContainsKey(dimeterInMm) ? _massPerLengthDict[dimeterInMm] : 0;
             } else {
 
+                // Проверяем параметр "обр_ФОП_Масса на единицу длины" только сейчас, т.к. крайне маловероятно, что расчет будет вестись через него
+                // Если его нет, то расчет невозможен
+                if(!_paramUtils.HasParamAnywhere(rebar, "обр_ФОП_Масса на единицу длины")) {
+
+                    // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался
+                    return 0;
+                }
                 massPerUnitLength = _paramUtils.GetParamValueAnywhere<double>(rebar, "обр_ФОП_Масса на единицу длины");
             }
 
@@ -137,14 +142,14 @@ namespace RevitReinforcementCoefficient.Models {
             // if(мод_ФОП_IFC семейство, обр_ФОП_Количество, Количество) *
             //          if(обр_ФОП_Расчет в погонных метрах, round((обр_ФОП_Длина / 1000 * Базовый_Нахлест) / 0.01 мм) * 0.01, 1) *
             //          if(Учесть типовые, (обр_ФОП_Количество типовых на этаже * обр_ФОП_Количество типовых этажей), 1)
-            decimal baseCount;
+            decimal baseCount = 1;
             if(calcInLinearMeters == 1) {
 
                 double temp = lengthInMm / 1000 * overlapCoef;
-                baseCount = count * decimal.Round((decimal) temp, 2, MidpointRounding.AwayFromZero) * countInLevel * countOfLevel;
-            } else {
-                baseCount = count * 1 * countInLevel * countOfLevel;
+                baseCount = decimal.Round((decimal) temp, 2, MidpointRounding.AwayFromZero);
             }
+            baseCount = count * baseCount * countInLevel * countOfLevel;
+
 
             // Базовый_Масса Итог
             decimal calc = decimal.Round(baseCount * (decimal) baseMassEd, 2, MidpointRounding.AwayFromZero);
