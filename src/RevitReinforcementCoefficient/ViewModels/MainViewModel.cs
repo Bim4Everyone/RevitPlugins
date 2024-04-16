@@ -34,8 +34,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         private List<string> _dockPackages;
         private string _selectedDockPackage;
-
-
+        private bool _calcСoefficientOnAverage = false;
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
@@ -94,6 +93,11 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 CollectionViewSource.GetDefaultView(DesignTypes).Refresh();
                 RaisePropertyChanged("SelectedDockPackage");
             }
+        }
+
+        public bool СalcСoefficientOnAverage {
+            get => _calcСoefficientOnAverage;
+            set => this.RaiseAndSetIfChanged(ref _calcСoefficientOnAverage, value);
         }
 
 
@@ -184,6 +188,10 @@ namespace RevitReinforcementCoefficient.ViewModels {
         }
 
 
+        /// <summary>
+        /// Получение инфорнмации об объеме опалубки, массе армирования и коэффициенте армирования 
+        /// у выбранных типах конструкции
+        /// </summary>
         private void GetInfo() {
 
             if(DesignTypes.FirstOrDefault(o => o.IsCheck) is null) {
@@ -191,7 +199,9 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 return;
             }
 
-            foreach(DesignTypeInfoVM designType in DesignTypes.Where(o => o.IsCheck)) {
+            IEnumerable<DesignTypeInfoVM> selectedDesignTypes = DesignTypes.Where(o => o.IsCheck);
+
+            foreach(DesignTypeInfoVM designType in selectedDesignTypes) {
 
                 // Проверка элементов выбранного типа конструкции
                 if(!designType.FormParamsChecked) {
@@ -206,8 +216,30 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 // Если есть ошибки либо в опалубке, либо в арматуре подсчет выполняться не будет, т.к. нужны оба
                 if(!designType.HasErrors && !designType.AlreadyCalculated) {
 
-                    // Выполняем расчет объема опалубки, массы арматуры и коэффициента армирования у выбранного типа конструкции
-                    _сalculationUtils.CalculateRebarCoef(designType);
+                    // Выполняем расчет объема опалубки
+                    _сalculationUtils.CalculateConcreteVolume(designType);
+                    // Выполняем расчет массы арматуры
+                    _сalculationUtils.CalculateRebarMass(designType);
+                }
+            }
+
+            // В зависимости от выбора пользователя, рассчитываем коэффициент усредненно или по отдельности
+            if(СalcСoefficientOnAverage) {
+
+                if(selectedDesignTypes.All(o => !o.HasErrors)) {
+
+                    _сalculationUtils.CalculateRebarCoefBySeveral(selectedDesignTypes);
+                } else {
+                    TaskDialog.Show("Ошибка!", "Возникли ошибки при подсчете коэффициента армирования");
+                }
+            } else {
+
+                foreach(DesignTypeInfoVM designType in selectedDesignTypes) {
+
+                    if(!designType.HasErrors) {
+
+                        _сalculationUtils.CalculateRebarCoef(designType);
+                    }
                 }
             }
         }

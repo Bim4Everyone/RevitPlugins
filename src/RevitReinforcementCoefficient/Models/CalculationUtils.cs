@@ -159,9 +159,9 @@ namespace RevitReinforcementCoefficient.Models {
 
 
         /// <summary>
-        /// Рассчитывает коэффициент армирования у типа конструкции по массе арматуры и объему бетона
+        /// Рассчитывает объем бетона у типа конструкции
         /// </summary>
-        public void CalculateRebarCoef(DesignTypeInfoVM typeInfo) {
+        public void CalculateConcreteVolume(DesignTypeInfoVM typeInfo) {
 
             // Рассчет суммарного объема бетона у типа конструкции
             double volume = 0;
@@ -170,7 +170,13 @@ namespace RevitReinforcementCoefficient.Models {
                 volume += CalculateFormElementVolume(element);
             }
             typeInfo.ConcreteVolume = Math.Round(volume, 2);
+        }
 
+
+        /// <summary>
+        /// Рассчитывает массу арматуры у типа конструкции
+        /// </summary>
+        public void CalculateRebarMass(DesignTypeInfoVM typeInfo) {
 
             // Рассчет суммарной массы арматуры у типа конструкции
             double sumMass = 0;
@@ -179,9 +185,40 @@ namespace RevitReinforcementCoefficient.Models {
                 sumMass += CalculateRebarMass(rebar);
             }
             typeInfo.RebarMass = Math.Round(sumMass, 2);
+        }
+
+
+        /// <summary>
+        /// Рассчитывает коэффициент армирования у одного типа конструкции по массе арматуры и объему бетона
+        /// </summary>
+        public void CalculateRebarCoef(DesignTypeInfoVM typeInfo) {
 
             typeInfo.RebarCoef = Math.Round(typeInfo.RebarMass / typeInfo.ConcreteVolume);
             typeInfo.AlreadyCalculated = true;
+        }
+
+
+        /// <summary>
+        /// Рассчитывает коэффициент армирования у нескольких типов конструкции по массе арматуры и объему бетона
+        /// </summary>
+        public void CalculateRebarCoefBySeveral(IEnumerable<DesignTypeInfoVM> typesInfo) {
+
+            double totalRebarMass = 0;
+            double totalConcreteVolume = 0;
+
+            foreach(DesignTypeInfoVM typeInfo in typesInfo) {
+
+                totalRebarMass += typeInfo.RebarMass;
+                totalConcreteVolume += typeInfo.ConcreteVolume;
+            }
+
+            double averageReinforcementCoefficient = Math.Round(totalRebarMass / totalConcreteVolume);
+
+            foreach(DesignTypeInfoVM typeInfo in typesInfo) {
+
+                typeInfo.RebarCoef = averageReinforcementCoefficient;
+                typeInfo.AlreadyCalculated = true;
+            }
         }
     }
 }

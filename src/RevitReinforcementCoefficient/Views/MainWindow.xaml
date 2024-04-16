@@ -176,6 +176,14 @@
             </ListView.ItemContainerStyle>
         </ListView>
 
+        <CheckBox 
+            Grid.Row="2"
+            Grid.Column="0"
+            Margin="10"
+            VerticalAlignment="Center"
+            IsChecked="{Binding Path=СalcСoefficientOnAverage}"
+            Content="Считать коэффициент армирования усредненно"/>
+
         <StackPanel
             Grid.Row="2"
             Grid.Column="0"
