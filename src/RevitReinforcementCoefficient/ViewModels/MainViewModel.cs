@@ -13,6 +13,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitReinforcementCoefficient.Models;
+using RevitReinforcementCoefficient.Views;
 
 namespace RevitReinforcementCoefficient.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -41,9 +42,9 @@ namespace RevitReinforcementCoefficient.ViewModels {
             _revitRepository = revitRepository;
 
             _paramUtils = new ParamUtils();
+
             _typeAnalyzer = new DesignTypeAnalyzer(_paramUtils);
             _сalculationUtils = new CalculationUtils(_paramUtils);
-
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -107,12 +108,20 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
             AllElements = _revitRepository.ElementsByFilterInActiveView;
 
-            DesignTypes = _typeAnalyzer.CheckNSortByDesignTypes(AllElements);
+            ReportVM report = new ReportVM(_revitRepository);
+            DesignTypes = _typeAnalyzer.CheckNSortByDesignTypes(AllElements, report);
+
             DockPackages = DesignTypes.Select(o => o.DocPackage).Distinct().OrderBy(o => o).ToList();
             DockPackages.Insert(0, _filterValueForNofiltering);
             SelectedDockPackage = DockPackages.FirstOrDefault();
 
             CollectionViewSource.GetDefaultView(DesignTypes).Filter = new Predicate<object>(FilterByDocPackage);
+
+            if(report.ReportItems.Count() > 0) {
+
+                ReportWindow reportWindow = new ReportWindow(report);
+                reportWindow.ShowDialog();
+            }
         }
 
         private void AcceptView() {
@@ -201,16 +210,18 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
             IEnumerable<DesignTypeInfoVM> selectedDesignTypes = DesignTypes.Where(o => o.IsCheck);
 
+            ReportVM report = new ReportVM(_revitRepository);
+
             foreach(DesignTypeInfoVM designType in selectedDesignTypes) {
 
                 // Проверка элементов выбранного типа конструкции
                 if(!designType.FormParamsChecked) {
 
-                    _typeAnalyzer.CheckParamsInFormElements(designType);
+                    _typeAnalyzer.CheckParamsInFormElements(designType, report);
                 }
                 if(!designType.RebarParamsChecked) {
 
-                    _typeAnalyzer.CheckParamsInRebars(designType);
+                    _typeAnalyzer.CheckParamsInRebars(designType, report);
                 }
 
                 // Если есть ошибки либо в опалубке, либо в арматуре подсчет выполняться не будет, т.к. нужны оба
@@ -219,7 +230,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
                     // Выполняем расчет объема опалубки
                     _сalculationUtils.CalculateConcreteVolume(designType);
                     // Выполняем расчет массы арматуры
-                    _сalculationUtils.CalculateRebarMass(designType);
+                    _сalculationUtils.CalculateRebarMass(designType, report);
                 }
             }
 
@@ -229,8 +240,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 if(selectedDesignTypes.All(o => !o.HasErrors)) {
 
                     _сalculationUtils.CalculateRebarCoefBySeveral(selectedDesignTypes);
-                } else {
-                    TaskDialog.Show("Ошибка!", "Возникли ошибки при подсчете коэффициента армирования");
                 }
             } else {
 
@@ -241,6 +250,12 @@ namespace RevitReinforcementCoefficient.ViewModels {
                         _сalculationUtils.CalculateRebarCoef(designType);
                     }
                 }
+            }
+
+            if(report.ReportItems.Count() > 0) {
+
+                ReportWindow reportWindow = new ReportWindow(report);
+                reportWindow.ShowDialog();
             }
         }
 

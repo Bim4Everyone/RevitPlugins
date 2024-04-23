@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+
+using RevitReinforcementCoefficient.ViewModels;
 
 namespace RevitReinforcementCoefficient.Models {
     internal class ParamUtils {
@@ -15,27 +16,24 @@ namespace RevitReinforcementCoefficient.Models {
         /// <summary>
         /// Проверяет есть ли указанный список параметров в элементе на экземпляре или типе, возвращает отчет
         /// </summary>
-        public StringBuilder HasParamsAnywhere(Element element, List<string> paramNames, StringBuilder errors = null) {
+        public bool HasParamsAnywhere(Element element, List<string> paramNames, ReportVM report) {
 
-            if(errors is null) {
-                errors = new StringBuilder();
-            }
-
+            bool flag = true;
             foreach(string paramName in paramNames) {
 
-                if(!HasParamAnywhere(element, paramName)) {
+                if(!HasParamAnywhere(element, paramName, report)) {
 
-                    errors.AppendLine($"У элемента с {element.Id} не найден параметр {paramName}");
+                    flag = false;
                 }
             }
-            return errors;
+            return flag;
         }
 
 
         /// <summary>
         /// Проверяет есть ли указанный параметр в элементе на экземпляре или типе
         /// </summary>
-        public bool HasParamAnywhere(Element element, string paramName) {
+        public bool HasParamAnywhere(Element element, string paramName, ReportVM report) {
 
             // Сначала проверяем есть ли параметр на экземпляре
             if(!element.IsExistsParam(paramName)) {
@@ -44,8 +42,9 @@ namespace RevitReinforcementCoefficient.Models {
                 Element elementType = element.Document.GetElement(element.GetTypeId());
 
                 if(!elementType.IsExistsParam(paramName)) {
-                    // Если не нашли записываем, то возвращаем false
+                    // Если не нашли записываем в отчет и возвращаем false
 
+                    report.Add(paramName, element.Id);
                     return false;
                 }
             }

@@ -66,7 +66,7 @@ namespace RevitReinforcementCoefficient.Models {
         /// <summary>
         /// Расчет массы одного арматурного элемента
         /// </summary>
-        private double CalculateRebarMass(Element rebar) {
+        private double CalculateRebarMass(Element rebar, ReportVM report) {
 
             int numberOfForm = _paramUtils.GetParamValueAnywhere<int>(rebar, "обр_ФОП_Форма_номер");
             double dimeter = _paramUtils.GetParamValueAnywhere<double>(rebar, "мод_ФОП_Диаметр");
@@ -110,7 +110,7 @@ namespace RevitReinforcementCoefficient.Models {
 
                 // Проверяем параметр "обр_ФОП_Масса на единицу длины" только сейчас, т.к. крайне маловероятно, что расчет будет вестись через него
                 // Если его нет, то расчет невозможен
-                if(!_paramUtils.HasParamAnywhere(rebar, "обр_ФОП_Масса на единицу длины")) {
+                if(!_paramUtils.HasParamAnywhere(rebar, "обр_ФОП_Масса на единицу длины", report)) {
 
                     // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался
                     return 0;
@@ -176,13 +176,13 @@ namespace RevitReinforcementCoefficient.Models {
         /// <summary>
         /// Рассчитывает массу арматуры у типа конструкции
         /// </summary>
-        public void CalculateRebarMass(DesignTypeInfoVM typeInfo) {
+        public void CalculateRebarMass(DesignTypeInfoVM typeInfo, ReportVM report) {
 
             // Рассчет суммарной массы арматуры у типа конструкции
             double sumMass = 0;
             foreach(Element rebar in typeInfo.Rebars) {
 
-                sumMass += CalculateRebarMass(rebar);
+                sumMass += CalculateRebarMass(rebar, report);
             }
             typeInfo.RebarMass = Math.Round(sumMass, 2);
         }

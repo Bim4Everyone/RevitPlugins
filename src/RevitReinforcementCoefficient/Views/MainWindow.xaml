@@ -13,7 +13,7 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Title="MainWindow"
+    Title="Расчет коэффициента армирования"
     Height="400" Width="950"
     MinHeight="300" MinWidth="950"
 

@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
@@ -55,7 +53,7 @@ namespace RevitReinforcementCoefficient.Models {
         /// <summary>
         /// Проверяет наличие нужных параметров и распределяет элементы по типам конструкции
         /// </summary>
-        public List<DesignTypeInfoVM> CheckNSortByDesignTypes(IEnumerable<Element> allElements) {
+        public List<DesignTypeInfoVM> CheckNSortByDesignTypes(IEnumerable<Element> allElements, ReportVM report) {
 
             List<DesignTypeInfoVM> designTypes = new List<DesignTypeInfoVM>();
 
@@ -65,8 +63,10 @@ namespace RevitReinforcementCoefficient.Models {
                 if(element.Category.GetBuiltInCategory() == BuiltInCategory.OST_Rebar) {
 
                     // Проверяем у арматуры наличие параметра, по которому определяется семейство-оболочка
-                    if(!_paramUtils.HasParamAnywhere(element, _paramForRebarShell)) {
+                    if(!_paramUtils.HasParamAnywhere(element, _paramForRebarShell, report)) {
                         // TODO добавлять в отчет
+
+
                         continue;
                     }
 
@@ -78,9 +78,8 @@ namespace RevitReinforcementCoefficient.Models {
 
 
                 // Проверяем у всех элементов наличие параметров, необходимых для распределения по типам конструкций
-                if(_paramUtils.HasParamsAnywhere(element, _paramsForAll).Length > 0) {
+                if(!_paramUtils.HasParamsAnywhere(element, _paramsForAll, report)) {
 
-                    // Пока просто пропускаем, в дальйшем нужно сделать сборщик проблемных
                     continue;
                 }
 
@@ -117,57 +116,52 @@ namespace RevitReinforcementCoefficient.Models {
         /// <summary>
         /// Проверяет наличие параметров у опалубки по типу конструкции
         /// </summary>
-        public StringBuilder CheckParamsInFormElements(DesignTypeInfoVM designType) {
-
-            StringBuilder errors = new StringBuilder();
+        public void CheckParamsInFormElements(DesignTypeInfoVM designType, ReportVM report) {
 
             foreach(Element elem in designType.Elements) {
 
-                _paramUtils.HasParamsAnywhere(elem, _paramsForFormElements, errors);
-            }
+                if(!_paramUtils.HasParamsAnywhere(elem, _paramsForFormElements, report)) {
 
-            if(errors.Length > 0) {
-                designType.HasErrors = true;
-
-                TaskDialog.Show("Ошибки:", errors.ToString());
+                    designType.HasErrors = true;
+                }
             }
 
             designType.FormParamsChecked = true;
-            return errors;
         }
 
 
         /// <summary>
         /// Проверяет наличие параметров у арматуры по типу конструкции
         /// </summary>
-        public StringBuilder CheckParamsInRebars(DesignTypeInfoVM designType) {
-
-            StringBuilder errors = new StringBuilder();
+        public void CheckParamsInRebars(DesignTypeInfoVM designType, ReportVM report) {
 
             foreach(Element rebar in designType.Rebars) {
 
                 // Далее проверяем параметры, которые должны быть у всех элементов арматуры
-                _paramUtils.HasParamsAnywhere(rebar, _paramsForRebars, errors);
+                if(!_paramUtils.HasParamsAnywhere(rebar, _paramsForRebars, report)) {
 
+                    designType.HasErrors = true;
+                }
+
+                // Здесь проверяем разные параметры, которые должны быть у системной/IFC арматуры
                 // Если элемент класса Rebar (т.е. системная арматура)
                 if(rebar is FamilyInstance) {
 
-                    _paramUtils.HasParamsAnywhere(rebar, _paramsForIfcRebars, errors);
+                    if(!_paramUtils.HasParamsAnywhere(rebar, _paramsForIfcRebars, report)) {
+
+                        designType.HasErrors = true;
+                    }
+
                 } else {
 
-                    _paramUtils.HasParamsAnywhere(rebar, _paramsForSysRebars, errors);
+                    if(!_paramUtils.HasParamsAnywhere(rebar, _paramsForSysRebars, report)) {
+
+                        designType.HasErrors = true;
+                    }
                 }
             }
 
-            if(errors.Length > 0) {
-                designType.HasErrors = true;
-
-                // TODO реализовать нормальный вывод ошибок
-                TaskDialog.Show("Ошибки:", errors.ToString());
-            }
-
             designType.RebarParamsChecked = true;
-            return errors;
         }
     }
 }
