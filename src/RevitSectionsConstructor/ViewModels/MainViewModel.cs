@@ -1,69 +1,166 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
+using DevExpress.Xpf.Core;
+
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitSectionsConstructor.Models;
+using RevitSectionsConstructor.Services;
 
 namespace RevitSectionsConstructor.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly GroupsHandler _groupsHandler;
+        private readonly DocumentSaver _documentSaver;
+        private readonly ISaveFileDialogService _saveFileDialogService;
+
+        public MainViewModel(
+            RevitRepository revitRepository,
+            GroupsHandler groupsHandler,
+            DocumentSaver documentSaver,
+            ISaveFileDialogService saveFileDialogService) {
+
+            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+            _groupsHandler = groupsHandler ?? throw new System.ArgumentNullException(nameof(groupsHandler));
+            _documentSaver = documentSaver ?? throw new ArgumentNullException(nameof(documentSaver));
+            _saveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+            GroupsNotForCopy = new ObservableCollection<GroupViewModel>(InitializeGroupViewModels(_revitRepository));
+            GroupsForCopy = new ObservableCollection<GroupViewModel>();
+
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+            SelectPathCommand = RelayCommand.Create(SelectPath);
+            MoveGroupsToCopyCommand = RelayCommand.Create<object>(MoveGroupsToCopy, CanMoveGroups);
+            MoveGroupsFromCopyCommand = RelayCommand.Create<object>(MoveGroupsFromCopy, CanMoveGroups);
+        }
+
+
+        public ISaveFileDialogService SaveFileDialogService => _saveFileDialogService;
+        public ICommand AcceptViewCommand { get; }
+        public ICommand SelectPathCommand { get; }
+        public ICommand MoveGroupsToCopyCommand { get; }
+        public ICommand MoveGroupsFromCopyCommand { get; }
+
+
+        /// <summary>
+        /// Список для левой половины окна с группами, с которыми либо ничего не делать, либо удалить их
+        /// </summary>
+        public ObservableCollection<GroupViewModel> GroupsNotForCopy { get; }
+
+        /// <summary>
+        /// Список для правой половины окна с группами, которые надо скопировать на выбранные этажи
+        /// </summary>
+        public ObservableCollection<GroupViewModel> GroupsForCopy { get; }
+
 
         private string _errorText;
-        private string _saveProperty;
-
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
-            _pluginConfig = pluginConfig;
-            _revitRepository = revitRepository;
-
-            LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-        }
-
-        public ICommand LoadViewCommand { get; }
-        public ICommand AcceptViewCommand { get; }
-
         public string ErrorText {
             get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+            set => RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
+
+        private string _path;
+        public string Path {
+            get => _path;
+            set => RaiseAndSetIfChanged(ref _path, value);
         }
 
-        private void LoadView() {
-            LoadConfig();
-        }
 
         private void AcceptView() {
-            SaveConfig();
+            _groupsHandler.ProcessGroups(GetGroupWithActions());
+            _documentSaver.SaveDocument(Path);
         }
-        
+
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText = "Введите значение сохраняемого свойства.";
+            if(string.IsNullOrWhiteSpace(Path)) {
+                ErrorText = "Укажите путь для сохранения модели";
                 return false;
             }
 
-            ErrorText = null;
+            ErrorText = string.Empty;
             return true;
         }
 
-        private void LoadConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-            SaveProperty = setting?.SaveProperty ?? "Привет Revit!";
+        private void SelectPath() {
+            _saveFileDialogService.Title = "Выберите место для сохранения";
+            _saveFileDialogService.AddExtension = true;
+            _saveFileDialogService.Filter = "Revit projects | *.rvt";
+            _saveFileDialogService.DefaultExt = "rvt";
+            if(_saveFileDialogService.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "")) {
+                Path = _saveFileDialogService.File.FullName;
+            }
         }
 
-        private void SaveConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                    ?? _pluginConfig.AddSettings(_revitRepository.Document);
+        private void MoveGroupsToCopy(object selectedGroupViewModels) {
+            MoveGroupsFromTo(selectedGroupViewModels, GroupsNotForCopy, GroupsForCopy);
+            UpdateActionsOnGroups();
+        }
 
-            setting.SaveProperty = SaveProperty;
-            _pluginConfig.SaveProjectConfig();
+        private void MoveGroupsFromCopy(object selectedGroupViewModels) {
+            MoveGroupsFromTo(selectedGroupViewModels, GroupsForCopy, GroupsNotForCopy);
+            UpdateActionsOnGroups();
+        }
+
+        private void MoveGroupsFromTo(
+            object selectedGroupViewModels,
+            ObservableCollection<GroupViewModel> from,
+            ObservableCollection<GroupViewModel> to) {
+
+            var selectedItems = (selectedGroupViewModels as ObservableCollectionCore<object>)
+                .Where(item => item is GroupViewModel)
+                .Cast<GroupViewModel>()
+                .ToArray();
+            foreach(GroupViewModel item in selectedItems) {
+                to.Add(item);
+                from.Remove(item);
+            }
+        }
+
+        private void UpdateActionsOnGroups() {
+            foreach(var item in GroupsForCopy) {
+                item.DeleteGroup = false;
+                item.ActionOnGroup = ActionsOnGroup.Copy;
+            }
+            foreach(var item in GroupsNotForCopy) {
+                if(item.ActionOnGroup == ActionsOnGroup.Copy) {
+                    item.ActionOnGroup = ActionsOnGroup.Nothing;
+                }
+            }
+        }
+
+        private bool CanMoveGroups(object selectedGroupViewModels) {
+            return selectedGroupViewModels != null
+                && selectedGroupViewModels is ObservableCollectionCore<object> collection
+                && collection.Where(item => item is GroupViewModel).Count() > 0
+                ;
+        }
+
+
+        private IOrderedEnumerable<GroupViewModel> InitializeGroupViewModels(RevitRepository revitRepository) {
+            IReadOnlyCollection<LevelWrapper> levels = revitRepository.GetLevelWrappers();
+
+            return revitRepository
+                .GetParentGroups()
+                .Select(group => new GroupViewModel(group, levels))
+                .OrderBy(group => group.Level.Elevation);
+        }
+
+
+        private IList<GroupWithAction> GetGroupWithActions() {
+            List<GroupWithAction> list = new List<GroupWithAction>();
+            foreach(var item in GroupsForCopy) {
+                list.Add(new GroupWithAction(item.Group, item.Level, item.ActionOnGroup, item.GetLevelsRange()));
+            }
+            foreach(var item in GroupsNotForCopy) {
+                list.Add(new GroupWithAction(item.Group, item.Level, item.ActionOnGroup, Array.Empty<LevelWrapper>()));
+            }
+            return list;
         }
     }
 }
