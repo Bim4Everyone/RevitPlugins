@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -39,7 +39,12 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             XYZ point;
             try {
                 point = PointFinder.GetPoint();
-            } catch(IntersectionNotFoundException) {
+            } catch(Exception ex) when(
+            ex is IntersectionNotFoundException
+            || ex is NullReferenceException
+            || ex is ArgumentNullException
+            || ex is Autodesk.Revit.Exceptions.ArgumentNullException) {
+
                 throw new OpeningNotPlacedException("Не удалось найти точку вставки");
             }
 

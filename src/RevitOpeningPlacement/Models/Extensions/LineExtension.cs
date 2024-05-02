@@ -1,6 +1,8 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
+
+using RevitOpeningPlacement.Models.Exceptions;
 
 namespace RevitOpeningPlacement.Models.Extensions {
     internal static class LineExtension {
@@ -66,7 +68,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
 
             projectedMepLine.Intersect(projectedWallLIne, out IntersectionResultArray result);
 
-            return result.get_Item(0).XYZPoint;
+            return result.get_Item(0).XYZPoint ?? throw new IntersectionNotFoundException("Линии не пересекаются");
         }
 
         public static XYZ GetIntersectionWithFaceFromEquation(this Line line, Face face) {
@@ -121,7 +123,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
             var projectedLine = Line.CreateBound(point1, point2);
 
             line.Intersect(projectedLine, out IntersectionResultArray result);
-            return result.get_Item(0).XYZPoint;
+            return result.get_Item(0).XYZPoint ?? throw new IntersectionNotFoundException("Линия параллельна плоскости");
         }
     }
 }
