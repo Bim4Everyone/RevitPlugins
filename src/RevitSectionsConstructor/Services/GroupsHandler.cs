@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using dosymep.Revit;
 
@@ -19,7 +20,9 @@ namespace RevitSectionsConstructor.Services {
                     switch(group.ActionOnGroup) {
                         case ActionsOnGroup.Copy:
                             _revitRepository.CopyGroup(group);
-                            _revitRepository.RemoveElement(group.Group.Id);
+                            if(!group.LevelsForPlacing.Contains(group.CurrentLevel)) {
+                                _revitRepository.RemoveElement(group.Group.Id);
+                            }
                             break;
                         case ActionsOnGroup.Delete:
                             _revitRepository.RemoveElement(group.Group.Id);

@@ -45,12 +45,20 @@ namespace RevitSectionsConstructor.Models {
             Document.Delete(elementId);
         }
 
+        /// <summary>
+        /// Копирует группу на уровни, которые в ней заданы.
+        /// Если группа расположена на уровне, на который ее снова надо скопировать,
+        /// то группа не удаляется и не копируется на этот уровень, а остается на этом текущем уровне
+        /// </summary>
+        /// <param name="group"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void CopyGroup(GroupWithAction group) {
             if(group is null) { throw new ArgumentNullException(nameof(group)); }
 
             XYZ currentLocation = (group.Group.Location as LocationPoint).Point;
             GroupType groupType = group.Group.GroupType;
-            foreach(var level in group.LevelsForPlacing) {
+            var levelsForPlacing = group.LevelsForPlacing.Where(level => !level.Equals(group.CurrentLevel)).ToArray();
+            foreach(var level in levelsForPlacing) {
                 XYZ levelsDiff = new XYZ(0, 0, level.Elevation - group.CurrentLevel.Elevation);
                 XYZ newLocation = currentLocation + levelsDiff;
 
