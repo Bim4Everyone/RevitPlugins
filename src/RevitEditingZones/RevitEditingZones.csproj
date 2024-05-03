@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <UseDevExpress>true</UseDevExpress>
+    </PropertyGroup>
+    <ItemGroup>
+      <Page Update="ViewTemplates\GridRowStyle.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+    </ItemGroup>
+</Project>

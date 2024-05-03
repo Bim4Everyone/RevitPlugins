@@ -3,6 +3,7 @@
   "Solution": "RevitPlugins.sln",
   "PluginName": "RevitEditingZones",
   "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "RevitVersions": ["Rv2020", "Rv2021", "Rv2022", "Rv2023", "Rv2024"],
   "IconUrl": "https://icons8.com/icon/pOOiCxeiUk4q/element-level",
   "BundleName": "Проверить зоны",
   "BundleType": "InvokeButton",

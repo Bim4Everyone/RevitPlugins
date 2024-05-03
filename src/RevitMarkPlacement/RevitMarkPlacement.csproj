@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<UseDevExpress>true</UseDevExpress>
+	</PropertyGroup>
+	<ItemGroup>
+		<Resource Include="Resources\icons8-error.png" />
+		<Resource Include="Resources\icons8-info.png" />
+		<Resource Include="Resources\icons8-warn.png" />
+	</ItemGroup>
+</Project>

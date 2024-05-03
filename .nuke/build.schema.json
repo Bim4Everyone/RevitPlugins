@@ -7,21 +7,37 @@
       "type": "object",
       "properties": {
         "BundleName": {
-          "type": "string"
+          "type": "string",
+          "description": "Bundle name"
         },
         "BundleOutput": {
-          "type": "string"
+          "type": "string",
+          "description": "Bundle output"
         },
         "BundleType": {
           "type": "string",
+          "description": "Bundle type",
           "enum": [
             "InvokeButton",
             "PushButton"
           ]
         },
+        "Configuration": {
+          "type": "string",
+          "description": "Configuration to build. Default is 'Debug' (local) or 'Release' (server)",
+          "enum": [
+            "Debug",
+            "Release"
+          ]
+        },
         "Continue": {
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
+        },
+        "ExtensionsAppToken": {
+          "type": "string",
+          "description": "Extensions token value",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
         "Help": {
           "type": "boolean",
@@ -49,7 +65,38 @@
           ]
         },
         "IconUrl": {
-          "type": "string"
+          "type": "string",
+          "description": "Bundle icon url"
+        },
+        "MaxVersion": {
+          "type": "string",
+          "description": "Max Revit version. Default value is \"Rv2024\"",
+          "enum": [
+            "Rv2016",
+            "Rv2017",
+            "Rv2018",
+            "Rv2019",
+            "Rv2020",
+            "Rv2021",
+            "Rv2022",
+            "Rv2023",
+            "Rv2024"
+          ]
+        },
+        "MinVersion": {
+          "type": "string",
+          "description": "Min Revit version. Default value is \"Rv2022\"",
+          "enum": [
+            "Rv2016",
+            "Rv2017",
+            "Rv2018",
+            "Rv2019",
+            "Rv2020",
+            "Rv2021",
+            "Rv2022",
+            "Rv2023",
+            "Rv2024"
+          ]
         },
         "NoLogo": {
           "type": "boolean",
@@ -57,7 +104,7 @@
         },
         "Output": {
           "type": "string",
-          "description": "Output folder, default value is \"RootDirectory/bin\""
+          "description": "Output directory"
         },
         "Partition": {
           "type": "string",
@@ -69,7 +116,7 @@
         },
         "PluginName": {
           "type": "string",
-          "description": "Project plugin name in solution"
+          "description": "Project (plugin) name in solution"
         },
         "Profile": {
           "type": "array",
@@ -79,7 +126,35 @@
           }
         },
         "PublishDirectory": {
-          "type": "string"
+          "type": "string",
+          "description": "Publish directory"
+        },
+        "PullRequestMerged": {
+          "type": "boolean",
+          "description": "When PullRequest has merged equals true"
+        },
+        "RevitPluginsAppToken": {
+          "type": "string",
+          "description": "RevitPlugins token value",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
+        "RevitVersions": {
+          "type": "array",
+          "description": "Build Revit versions. Default value is Empty",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Rv2016",
+              "Rv2017",
+              "Rv2018",
+              "Rv2019",
+              "Rv2020",
+              "Rv2021",
+              "Rv2022",
+              "Rv2023",
+              "Rv2024"
+            ]
+          }
         },
         "Root": {
           "type": "string",
@@ -92,16 +167,17 @@
             "type": "string",
             "enum": [
               "Clean",
+              "CloneRepos",
               "Compile",
               "CreateBranch",
               "CreateBundle",
               "CreatePlugin",
               "CreateProfile",
-              "CreateScript",
+              "CreatePullRequest",
+              "CreateWorkflow",
               "FullClean",
-              "FullCompile",
-              "FullPublish",
-              "Publish"
+              "Publish",
+              "PublishArtifacts"
             ]
           }
         },
@@ -116,16 +192,17 @@
             "type": "string",
             "enum": [
               "Clean",
+              "CloneRepos",
               "Compile",
               "CreateBranch",
               "CreateBundle",
               "CreatePlugin",
               "CreateProfile",
-              "CreateScript",
+              "CreatePullRequest",
+              "CreateWorkflow",
               "FullClean",
-              "FullCompile",
-              "FullPublish",
-              "Publish"
+              "Publish",
+              "PublishArtifacts"
             ]
           }
         },

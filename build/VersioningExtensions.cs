@@ -1,20 +1,24 @@
 ﻿using System;
 
+using dosymep.Nuke.RevitVersions;
+
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 
 static class VersioningExtensions {
     public static DotNetBuildSettings SetSimpleVersion(this DotNetBuildSettings settings,
-        GitVersion gitVersion,
-        RevitConfiguration configuration) {
+        Build.BuildParams buildParams,
+        RevitVersion revitVersion) {
         return settings
-            .SetVersion(InjectRevitVersion(configuration, gitVersion.AssemblySemVer))
-            .SetFileVersion(InjectRevitVersion(configuration, gitVersion.AssemblySemFileVer))
-            .SetInformationalVersion(InjectRevitVersion(configuration, gitVersion.InformationalVersion));
+            .SetVersion(InjectRevitVersion(revitVersion, $"{revitVersion}.2.4"))
+            .SetFileVersion(InjectRevitVersion(revitVersion, $"{revitVersion}.2.4"))
+            .SetInformationalVersion(InjectRevitVersion(revitVersion, $"{revitVersion}.2.4" +
+                                                                      $"{buildParams.BranchTag}+{buildParams.BranchCommitCount}" +
+                                                                      $".Branch.{buildParams.BranchName}.Sha")); // Sha само добавляется (хз почему)
     }
 
-    public static string InjectRevitVersion(RevitConfiguration configuration, string versionString) {
+    public static string InjectRevitVersion(RevitVersion revitVersion, string versionString) {
         int index = versionString.IndexOf('.');
-        return configuration.Version + versionString.Substring(index);
+        return revitVersion + versionString.Substring(index);
     }
 }

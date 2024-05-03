@@ -2,33 +2,21 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace></RootNamespace>
     <NoWarn>CS0649;CS0169</NoWarn>
     <NukeRootDirectory>..</NukeRootDirectory>
     <NukeScriptDirectory>..</NukeScriptDirectory>
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nuke.Common" Version="7.0.2" />
-    <PackageReference Include="Nuke.Components" Version="7.0.2" />
-    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageDownload Include="GitVersion.CommandLine" Version="[5.12.0]" />
-    <PackageDownload Include="GitVersion.Tool" Version="[5.12.0]" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\GitVersion.yml">
-      <Link>config\GitVersion.yml</Link>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ci" />
+    <PackageReference Include="dosymep.Nuke.RevitVersions" Version="1.0.0" />
+    <PackageReference Include="Nuke.Common" Version="8.0.0" />
+    <PackageReference Include="Nuke.Components" Version="8.0.0" />
+    <PackageReference Include="Octokit" Version="10.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.3" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <Resource Include="Resources\cant_place_family_symbol.png" />
+        <Resource Include="Resources\insert.png" />
+        <Resource Include="Resources\not-insert.png" />
+        <Resource Include="Resources\place_family_symbol.png" />
+    </ItemGroup>
+</Project>
