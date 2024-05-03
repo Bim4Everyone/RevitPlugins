@@ -55,6 +55,7 @@ namespace RevitOpeningSlopes.Models {
             if(onlyRoom) {
                 categoryFilter = new ElementCategoryFilter(BuiltInCategory.OST_Rooms);
             }
+
             IList<Element> elements = new List<Element>();
             ReferenceIntersector intersector
                 = new ReferenceIntersector(categoryFilter, FindReferenceTarget.All,
@@ -71,7 +72,6 @@ namespace RevitOpeningSlopes.Models {
                     if(elementReference != null) {
                         elements.Add(_revitRepository.Document.GetElement(elementReference));
                     }
-
                 }
             }
             return elements;

@@ -55,7 +55,7 @@ namespace RevitOpeningSlopes.Models {
         }
 
         public IList<FamilySymbol> GetSlopeTypes() {
-            string familyName = "Откос_V2";
+            string familyName = "ОбщМд_Откос_Отлив_New";
             return new FilteredElementCollector(Document)
                 .WhereElementIsElementType()
                 .OfCategory(BuiltInCategory.OST_GenericModel)

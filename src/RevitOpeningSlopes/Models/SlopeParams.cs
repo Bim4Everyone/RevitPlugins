@@ -15,7 +15,7 @@ namespace RevitOpeningSlopes.Models {
             Parameter widthParam = ElementExtensions.GetParam(slope, "Ширина");
             widthParam.Set(slopeCreationData.Width);
 
-            Parameter depthParam = ElementExtensions.GetParam(slope, "Ширина откоса");
+            Parameter depthParam = ElementExtensions.GetParam(slope, "Глубина");
             depthParam.Set(slopeCreationData.Depth);
 
             //Поворот элемента

@@ -315,7 +315,7 @@ namespace RevitOpeningSlopes.Models {
                     }
                 }
                 if(_rightPoint == null) {
-                    throw new ArgumentException("Окно не углублено внутрь фасада, либо отсутствует справа граница");
+                    throw new ArgumentException("Окно не углублено внутрь фасада, либо отсутствует граница справа");
                 }
                 return _rightPoint;
             }
