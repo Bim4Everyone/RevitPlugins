@@ -65,5 +65,15 @@ namespace RevitSectionsConstructor.Models {
                 Document.Create.PlaceGroup(newLocation, groupType);
             }
         }
+
+        /// <summary>
+        /// Проверяет, открыт ли в активном документе только 1 пустой лист
+        /// </summary>
+        /// <returns></returns>
+        public bool ActiveDocOnEmptySheet() {
+            return ActiveUIDocument.GetOpenUIViews().Count == 1
+                && Document.ActiveView is ViewSheet sheet
+                && sheet.GetAllPlacedViews().Count == 0;
+        }
     }
 }

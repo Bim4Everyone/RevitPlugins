@@ -22,6 +22,10 @@
                            d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <dxmvvm:Interaction.Behaviors>
         <common:AttachServiceBehavior AttachableService="{Binding SaveFileDialogService}" />
+        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
+        <dxmvvm:EventToCommand EventName="Initialized"
+                               Command="{Binding CheckViewsCommand}"
+                               CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type Window}}}" />
     </dxmvvm:Interaction.Behaviors>
     <Grid>
         <Grid.RowDefinitions>

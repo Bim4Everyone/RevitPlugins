@@ -38,7 +38,7 @@ namespace RevitSectionsConstructor {
                     filter: "Revit projects |*.rvt",
                     initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
                     );
-
+                kernel.UseXtraMessageBox<MainViewModel>();
 
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using DevExpress.Xpf.Core;
@@ -19,32 +20,48 @@ namespace RevitSectionsConstructor.ViewModels {
         private readonly GroupsHandler _groupsHandler;
         private readonly DocumentSaver _documentSaver;
         private readonly ISaveFileDialogService _saveFileDialogService;
+        private readonly IMessageBoxService _messageBoxService;
 
         public MainViewModel(
             RevitRepository revitRepository,
             GroupsHandler groupsHandler,
             DocumentSaver documentSaver,
-            ISaveFileDialogService saveFileDialogService) {
+            ISaveFileDialogService saveFileDialogService,
+            IMessageBoxService messageBoxService) {
 
-            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
-            _groupsHandler = groupsHandler ?? throw new System.ArgumentNullException(nameof(groupsHandler));
-            _documentSaver = documentSaver ?? throw new ArgumentNullException(nameof(documentSaver));
-            _saveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+            _revitRepository = revitRepository
+                ?? throw new System.ArgumentNullException(nameof(revitRepository));
+            _groupsHandler = groupsHandler
+                ?? throw new System.ArgumentNullException(nameof(groupsHandler));
+            _documentSaver = documentSaver
+                ?? throw new ArgumentNullException(nameof(documentSaver));
+            _saveFileDialogService = saveFileDialogService
+                ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+            _messageBoxService = messageBoxService
+                ?? throw new ArgumentNullException(nameof(messageBoxService));
             GroupsNotForCopy = new ObservableCollection<GroupViewModel>(InitializeGroupViewModels(_revitRepository));
             GroupsForCopy = new ObservableCollection<GroupViewModel>();
 
-            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            SelectPathCommand = RelayCommand.Create(SelectPath);
-            MoveGroupsToCopyCommand = RelayCommand.Create<object>(MoveGroupsToCopy, CanMoveGroups);
-            MoveGroupsFromCopyCommand = RelayCommand.Create<object>(MoveGroupsFromCopy, CanMoveGroups);
+            AcceptViewCommand
+                = RelayCommand.Create(AcceptView, CanAcceptView);
+            SelectPathCommand
+                = RelayCommand.Create(SelectPath);
+            MoveGroupsToCopyCommand
+                = RelayCommand.Create<ObservableCollectionCore<object>>(MoveGroupsToCopy, CanMoveGroups);
+            MoveGroupsFromCopyCommand
+                = RelayCommand.Create<ObservableCollectionCore<object>>(MoveGroupsFromCopy, CanMoveGroups);
+            CheckViewsCommand
+                = RelayCommand.Create<Window>(CheckViews);
         }
 
 
+        public IMessageBoxService MessageBoxService => _messageBoxService;
         public ISaveFileDialogService SaveFileDialogService => _saveFileDialogService;
         public ICommand AcceptViewCommand { get; }
         public ICommand SelectPathCommand { get; }
         public ICommand MoveGroupsToCopyCommand { get; }
         public ICommand MoveGroupsFromCopyCommand { get; }
+        public ICommand CheckViewsCommand { get; }
 
 
         /// <summary>
@@ -69,6 +86,21 @@ namespace RevitSectionsConstructor.ViewModels {
         public string Path {
             get => _path;
             set => RaiseAndSetIfChanged(ref _path, value);
+        }
+
+
+        private void CheckViews(Window window) {
+            if(!_revitRepository.ActiveDocOnEmptySheet()) {
+                var result = _messageBoxService.Show(
+                    "Перед запуском плагина настоятельно рекомендуется перейти на пустой лист и закрыть все другие виды." +
+                    "\nХотите продолжить?",
+                    "Конструктор секций",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning);
+                if(result != System.Windows.MessageBoxResult.Yes) {
+                    window.Close();
+                }
+            }
         }
 
 
@@ -97,22 +129,22 @@ namespace RevitSectionsConstructor.ViewModels {
             }
         }
 
-        private void MoveGroupsToCopy(object selectedGroupViewModels) {
+        private void MoveGroupsToCopy(ObservableCollectionCore<object> selectedGroupViewModels) {
             MoveGroupsFromTo(selectedGroupViewModels, GroupsNotForCopy, GroupsForCopy);
             UpdateActionsOnGroups();
         }
 
-        private void MoveGroupsFromCopy(object selectedGroupViewModels) {
+        private void MoveGroupsFromCopy(ObservableCollectionCore<object> selectedGroupViewModels) {
             MoveGroupsFromTo(selectedGroupViewModels, GroupsForCopy, GroupsNotForCopy);
             UpdateActionsOnGroups();
         }
 
         private void MoveGroupsFromTo(
-            object selectedGroupViewModels,
+            ObservableCollectionCore<object> selectedGroupViewModels,
             ObservableCollection<GroupViewModel> from,
             ObservableCollection<GroupViewModel> to) {
 
-            var selectedItems = (selectedGroupViewModels as ObservableCollectionCore<object>)
+            var selectedItems = selectedGroupViewModels
                 .Where(item => item is GroupViewModel)
                 .Cast<GroupViewModel>()
                 .ToArray();
@@ -134,10 +166,9 @@ namespace RevitSectionsConstructor.ViewModels {
             }
         }
 
-        private bool CanMoveGroups(object selectedGroupViewModels) {
+        private bool CanMoveGroups(ObservableCollectionCore<object> selectedGroupViewModels) {
             return selectedGroupViewModels != null
-                && selectedGroupViewModels is ObservableCollectionCore<object> collection
-                && collection.Where(item => item is GroupViewModel).Count() > 0
+                && selectedGroupViewModels.Where(item => item is GroupViewModel).Count() > 0
                 ;
         }
 
