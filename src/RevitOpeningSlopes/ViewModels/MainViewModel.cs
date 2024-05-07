@@ -151,7 +151,6 @@ namespace RevitOpeningSlopes.ViewModels {
 
         private bool CanAcceptView() {
             return string.IsNullOrWhiteSpace(ErrorText);
-
         }
 
         private void LoadConfig() {

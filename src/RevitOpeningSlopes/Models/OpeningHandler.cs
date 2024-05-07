@@ -49,6 +49,8 @@ namespace RevitOpeningSlopes.Models {
             _opening = opening
                 ?? throw new ArgumentNullException(nameof(opening));
             _solidOperations = new SolidOperations(revitRepository);
+
+            //Запуск функции для проверки правильного направления вектора семейства окна
             CheckVectorDirection();
         }
 
@@ -62,6 +64,10 @@ namespace RevitOpeningSlopes.Models {
 
         }
 
+        /// <summary>
+        /// Функция возвращает точку, расположенную в центре геометрического BoundingBox семейства окна
+        /// </summary>
+        /// <returns>Точка центра геометрического BoundingBox семейства окна</returns>
         public XYZ GetOpeningBoundingBoxOrigin() {
             if(_openingBboxOrigin != null) {
                 return _openingBboxOrigin;
@@ -78,6 +84,11 @@ namespace RevitOpeningSlopes.Models {
                 return _openingBboxOrigin;
             }
         }
+
+        /// <summary>
+        /// Функция создает BoundingBox из объединенного Solid семейства окна
+        /// </summary>
+        /// <returns>BoundingBox из геометрии окна</returns>
         private BoundingBoxXYZ GetOpeningGeometryBbox() {
             if(_openingBoundingBox != null) {
                 return _openingBoundingBox;
@@ -104,6 +115,10 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция создает точку по центру семейства окна с отступом назад (P1)
+        /// </summary>
+        /// <returns>Центральная точка с отступом назад (P1)</returns>
         private XYZ GetCentralBackwardOffsetPoint() {
             if(_centralBackwardOffsetPoint != null) {
                 return _centralBackwardOffsetPoint;
@@ -120,6 +135,11 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция создает центральную точку с отступом вперед (P2) из центральной точки с отступом назад (P1)
+        /// </summary>
+        /// <param name="frontLineLength">Длина отступа вперед</param>
+        /// <returns>Центральная точка с отступом вперед (P2)</returns>
         private XYZ GetFrontOffsetPoint(double frontLineLength = 1500) {
             if(_frontOffsetPoint != null) {
                 return _frontOffsetPoint;
@@ -135,6 +155,10 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Создание объекта Outline - увеличенного BoundingBox из BoundingBox семейства окна 
+        /// </summary>
+        /// <returns></returns>
         private Outline GetOutlineWithOffset() {
             if(_outlineWithOffset != null) {
                 return _outlineWithOffset;
@@ -150,6 +174,9 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Проверка вектора окна, размещенного в проекте и установка направления вектора окна в сторону от фасада
+        /// </summary>
         private void CheckVectorDirection() {
             const double lineLength = 100;
             XYZ originPoint = GetOpeningBoundingBoxOrigin();
@@ -164,12 +191,18 @@ namespace RevitOpeningSlopes.Models {
             IList<Element> forwardElements = _nearestElements.GetElementsByRay(forwardLine);
             IList<Element> backwardElements = _nearestElements.GetElementsByRay(backwardLine);
 
+            //Предполагается, что там, где луч пересек меньше элементов - направление от здания, иначе - направление
+            //внутрь здания, которое нужно развернуть
             if(forwardElements.Count > backwardElements.Count) {
                 _openingVector = _openingVector.Negate();
             }
 
         }
 
+        /// <summary>
+        /// Функция создает объединенный Solid из элементов, находящихся внутри увеличенного BoundingBox семейства окна
+        /// </summary>
+        /// <returns>Объединенный Solid из Solid элементов вокруг окна</returns>
         private Solid GetUnitedSolidFromBoundingBox() {
             if(_nearestElementsSolid != null) {
                 return _nearestElementsSolid;
@@ -205,6 +238,10 @@ namespace RevitOpeningSlopes.Models {
             return _nearestElementsSolid;
         }
 
+        /// <summary>
+        /// Функция находит самую отдаленную точку в направлении от фасада (P3)
+        /// </summary>
+        /// <returns>Самая отдаленная точка в направлении от фасада (P3)</returns>
         private XYZ GetOpeningDepthPoint() {
             if(_openingDepthPoint != null) {
                 return _openingDepthPoint;
@@ -219,6 +256,8 @@ namespace RevitOpeningSlopes.Models {
                         centralBackwardOffsetPoint.DistanceTo(frontOffsetPoint));
                     XYZ openingVector = GetOpeningVector();
 
+                    //Создание линии вправо и разделения ее на точки для запуска массива линий из этих точек
+                    //в сторону окна
                     Line rightLine = _linesFromOpening.CreateLineFromOpening(
                         frontOffsetPoint, openingVector, halfWidthLength, DirectionEnum.Right);
                     ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(rightLine, step);
@@ -237,7 +276,6 @@ namespace RevitOpeningSlopes.Models {
                             double currentDist = point.DistanceTo(intersectCoord);
                             if(currentDist < closestDist) {
                                 closestDist = currentDist;
-                                double tst = _revitRepository.ConvertToMillimeters(closestDist);
                                 _openingDepthPoint = intersectCoord;
                             }
                         }
@@ -247,6 +285,11 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция запускает 2 линии - в направлении внутрь здания из точки (P2) и влево из самой 
+        /// отдаленной точки (P3) и возвращает точку пересечения этих двух линий (P4)
+        /// </summary>
+        /// <returns>Центральная самая отдаленная точка фасада (P4)</returns>
         private XYZ GetCentralOpeningDepthPoint() {
             if(_centralOpeningDepthPoint != null) {
                 return _centralOpeningDepthPoint;
@@ -261,6 +304,7 @@ namespace RevitOpeningSlopes.Models {
                         centralBackwardOffsetPoint.DistanceTo(frontOffsetPoint));
                     const double halfWidthLength = 2000;
 
+                    //Создание линий влево из точки P3 и в сторону окна из центральной точки P2
                     Line lineFromDepthPointToLeft = _linesFromOpening.CreateLineFromOpening(
                         openingDepthPoint, openingVector, halfWidthLength, DirectionEnum.Left);
                     Line backwardLineFromOffsetPoint = _linesFromOpening.CreateLineFromOpening(
@@ -277,6 +321,11 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит ближайшую правую точку к центру семейства окна (P5)
+        /// </summary>
+        /// <returns>Ближайшая правая точка проема к центру семейства окна (P5)</returns>
+        /// <exception cref="ArgumentException"></exception>
         private XYZ GetRightPoint() {
             if(_rightPoint != null) {
                 return _rightPoint;
@@ -291,6 +340,7 @@ namespace RevitOpeningSlopes.Models {
                     const double rightLineLength = 2000;
                     double closestDist = double.PositiveInfinity;
 
+                    //Создание линии из точки P2 и P4 и разделение ее на точки для запуска линий вправо от окна
                     Line forwardLine = Line.CreateBound(frontOffsetPoint, centralBackwardDepthPoint);
                     ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(forwardLine, step);
                     foreach(XYZ point in points) {
@@ -321,6 +371,10 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит правую точку, расположенную на внешней стороне фасада, используя правую точку (P5)
+        /// </summary>
+        /// <returns>Правая точка на внешней стороне фасада (P6)</returns>
         private XYZ GetRightFrontPoint() {
             if(_rightFrontPoint != null) {
                 return _rightFrontPoint;
@@ -331,6 +385,7 @@ namespace RevitOpeningSlopes.Models {
                 if(rightPoint != null && openingVector != null & nearestElementsSolid != null) {
                     const double backLineLength = 1000;
                     const double pointForwardOffset = 800;
+
                     XYZ rightPointWithForwardOffset = rightPoint + openingVector
                         * _revitRepository.ConvertToFeet(pointForwardOffset);
                     Line backLine = _linesFromOpening.CreateLineFromOpening(
@@ -351,6 +406,11 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит точку глубины (P7) - ближайшая точка в выпирающей геометрической части семейства 
+        /// окна в сторону от здания
+        /// </summary>
+        /// <returns>Точка глубины (P7)</returns>
         private XYZ GetDepthPoint() {
             if(_depthPoint != null) {
                 return _depthPoint;
@@ -365,6 +425,8 @@ namespace RevitOpeningSlopes.Models {
                     const double depthLineLength = 600;
                     double closestDist = double.PositiveInfinity;
 
+                    //Создание линии влево от точки P6 и разделение ее на точки для создания линий в направлении внутрь
+                    //здания
                     Line alongsideLine = _linesFromOpening.CreateLineFromOpening(
                         rightFrontPoint, openingVector, alongsideLineLength, DirectionEnum.Left);
                     ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(alongsideLine, step);
@@ -392,6 +454,11 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит правую точку глубины (P8), путем нахождения точки пересечения линий, запущенных 
+        /// из точки P7 и P6
+        /// </summary>
+        /// <returns>Правая точка глубины (P8)</returns>
         private XYZ GetRightDepthPoint() {
             if(_rightDepthPoint != null) {
                 return _rightDepthPoint;
@@ -404,6 +471,8 @@ namespace RevitOpeningSlopes.Models {
                     const double alongsideLineLength = 300;
                     const double depthLineLength = 600;
 
+                    //Создание линий из точки внешней границы фасада P6 в направлении внутрь здания и из точки
+                    //глубины P7 вправо для нахождения точки пересечения между ними - P8
                     Line depthLine = _linesFromOpening.CreateLineFromOpening(
                         rightFrontPoint, openingVector, depthLineLength, DirectionEnum.Back);
                     Line lineFromClosestPoint = _linesFromOpening.CreateLineFromOpening(
@@ -419,6 +488,10 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит точку центра по горизонтали семейства окна (P9), используя точку P6
+        /// </summary>
+        /// <returns>Точка горизонтального центра P9</returns>
         private XYZ GetHorizontalCenterPoint() {
             if(_horizontalCenterPoint != null) {
                 return _horizontalCenterPoint;
@@ -432,6 +505,9 @@ namespace RevitOpeningSlopes.Models {
                     const double offset = 10;
 
                     XYZ normalVector = XYZ.BasisZ.CrossProduct(openingVector).Normalize();
+
+                    ///Изменение стартовой точки для того, чтобы не было пересечения со стеной 
+                    ///справа у запущенной линии
                     XYZ startPoint = new XYZ(rightFrontpoint.X, rightFrontpoint.Y, rightFrontpoint.Z) - normalVector
                             * _revitRepository.ConvertToFeet(offset);
                     Line leftLine = _linesFromOpening.CreateLineFromOpening(startPoint, openingVector,
@@ -455,6 +531,10 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит горизонтальный центр проема в плоскости вставки семейства откоса (P10), используя точку P9
+        /// </summary>
+        /// <returns>Точка горизонтального центра в плоскости вставки семейства откоса P10</returns>
         private XYZ GetHorizontalDepthPoint() {
             if(_horizontalDepthPoint != null) {
                 return _horizontalDepthPoint;
@@ -482,6 +562,10 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит верхнюю точку проема (P11), используя точку P10
+        /// </summary>
+        /// <returns>Верхняя точка проема P11</returns>
         private XYZ GetTopPoint() {
             if(_topPoint != null) {
                 return _topPoint;
@@ -510,6 +594,10 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит нижнюю точку проема (P12)
+        /// </summary>
+        /// <returns>Нижняя точка проема P12</returns>
         private XYZ GetBottomPoint() {
             if(_bottomPoint != null) {
                 return _bottomPoint;
@@ -537,6 +625,35 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Реализация скалярного произведения двух векторов
+        /// </summary>
+        /// <param name="originVector"></param>
+        /// <param name="openingVector"></param>
+        /// <returns>Скалярное произведение</returns>
+        private double ScalarMultiply(XYZ originVector, XYZ openingVector) {
+            if(originVector != null && openingVector != null) {
+                return openingVector.X * originVector.X + openingVector.Y * originVector.Y;
+            } else {
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Функция вычисляет длину вектора в двумерном пространстве
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns>Значение длины вектора</returns>
+        private double Magnitude(double x, double y) {
+            return Math.Sqrt(x * x + y * y);
+        }
+
+        /// <summary>
+        /// Функция находит точку центра проема по вертикали (P13), используя верхнюю (P11) и нижнюю (P12) 
+        /// точку соответственно
+        /// </summary>
+        /// <returns>Точка центра проема по вертикали P13</returns>
         public XYZ GetVerticalCenterPoint() {
             if(_verticalCenterPoint != null) {
                 return _verticalCenterPoint;
@@ -554,17 +671,12 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
-        private double ScalarMultiply(XYZ originVector, XYZ openingVector) {
-            if(originVector != null && openingVector != null) {
-                return openingVector.X * originVector.X + openingVector.Y * originVector.Y;
-            } else {
-                return 0;
-            }
-        }
-        private double Magnitude(double x, double y) {
-            return Math.Sqrt(x * x + y * y);
-        }
-
+        /// <summary>
+        /// Функция находит высоту проема, используя верхнюю (P11) и нижнюю (P12) 
+        /// точку соответственно
+        /// </summary>
+        /// <returns>Высота проема</returns>
+        /// <exception cref="ArgumentException"></exception>
         public double GetOpeningHeight() {
             if(_openingHeight > 0) {
                 return _openingHeight;
@@ -581,6 +693,11 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит ширину проема, используя точки P13 и P8
+        /// </summary>
+        /// <returns>Ширина проема</returns>
+        /// <exception cref="ArgumentException"></exception>
         public double GetOpeningWidth() {
             if(_openingWidth > 0) {
                 return _openingWidth;
@@ -599,6 +716,11 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит глубину проема, используя точки P8 и P6
+        /// </summary>
+        /// <returns>Глубина проема</returns>
+        /// <exception cref="ArgumentException"></exception>
         public double GetOpeningDepth() {
             if(_openingDepth > 0) {
                 return _openingDepth;
@@ -615,6 +737,10 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Функция находит угол поворота семейства окна
+        /// </summary>
+        /// <returns>Угол поворота для откоса, в радианах</returns>
         public double GetRotationAngle() {
             if(_rotationAngle > 0) {
                 return _rotationAngle;

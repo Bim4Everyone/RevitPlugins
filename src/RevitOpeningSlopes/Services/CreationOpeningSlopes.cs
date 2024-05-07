@@ -49,10 +49,6 @@ namespace RevitOpeningSlopes.Models.Services {
             StringBuilder sb = new StringBuilder();
 
             using(var transaction = _revitRepository.Document.StartTransaction("Размещение откосов")) {
-                //IList<SlopeCreationData> slopeCreationData = _slopesDataGetter
-                //    .GetOpeningSlopesCreationData(config, out ICollection<ElementId> notProcessedOpenings);
-                //ICollection<FamilyInstance> openings = _revitRepository
-                //    .GetWindows(config.WindowsGetterMode);
                 int i = 0;
                 foreach(FamilyInstance opening in openings) {
                     ct.ThrowIfCancellationRequested();
@@ -67,10 +63,6 @@ namespace RevitOpeningSlopes.Models.Services {
                         sb.AppendLine($"{e.Message}, Id = {opening.Id}");
                     }
                 }
-                //foreach(SlopeCreationData slope in slopeCreationData) {
-                //    CreateSlope(slope);
-                //}
-
                 transaction.Commit();
             }
             error = sb.ToString();

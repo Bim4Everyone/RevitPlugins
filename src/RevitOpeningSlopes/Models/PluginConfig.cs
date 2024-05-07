@@ -16,7 +16,7 @@ namespace RevitOpeningSlopes.Models {
 
         public WindowsGetterMode WindowsGetterMode { get; set; }
         public ElementId SlopeTypeId { get; set; } = ElementId.InvalidElementId;
-        public string SlopeFrontOffset { get; set; }
+        public string SlopeFrontOffset { get; set; } //Вылет откоса от фасада здания наружу
         public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())

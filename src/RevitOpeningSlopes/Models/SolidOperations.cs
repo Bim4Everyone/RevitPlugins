@@ -41,6 +41,10 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Вспомогательная функция для теста
+        /// </summary>
+        /// <param name="solid"></param>
         public void CreateDirectShape(Solid solid) {
             DirectShape ds = DirectShape.CreateElement(_revitRepository.Document,
                 new ElementId(BuiltInCategory.OST_GenericModel));

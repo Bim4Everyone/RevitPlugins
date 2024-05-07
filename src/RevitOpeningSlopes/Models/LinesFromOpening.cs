@@ -12,11 +12,14 @@ namespace RevitOpeningSlopes.Models {
 
         private readonly RevitRepository _revitRepository;
 
-
         public LinesFromOpening(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }
 
+        /// <summary>
+        /// Функция для создания тестовой линии модели в ревите на основе линии класса Line
+        /// </summary>
+        /// <param name="geomLine"></param>
         public void CreateTestModelLine(Line geomLine) {
             XYZ dir = geomLine.Direction.Normalize();
             XYZ dir1 = geomLine.Direction;
@@ -29,19 +32,13 @@ namespace RevitOpeningSlopes.Models {
             SketchPlane sketch = SketchPlane.Create(_revitRepository.Document, plane);
             ModelLine line = _revitRepository.Document.Create.NewModelCurve(geomLine, sketch) as ModelLine;
         }
-        //public Line CreateLineFromOffsetPoint(FamilyInstance opening) {
-        //    XYZ openingOrigin = _revitRepository.GetOpeningOriginBoundingBox(opening);
-        //    XYZ openingVector = _revitRepository.GetOpeningVector(opening);
-        //    const double frontLineLength = 1500;
-        //    const double backwardOffset = 500;
-        //    XYZ startPointBbox = new XYZ(openingOrigin.X, openingOrigin.Y, openingOrigin.Z) - openingVector
-        //            * _revitRepository.ConvertToFeet(backwardOffset);
-        //    XYZ frontOffsetPoint = new XYZ(startPointBbox.X, startPointBbox.Y, startPointBbox.Z)
-        //        + openingVector * _revitRepository.ConvertToFeet(frontLineLength);
-        //    Line lineFromOffsetPoint = CreateLineFromOpening(
-        //        frontOffsetPoint, opening, frontLineLength, DirectionEnum.Back);
-        //    return lineFromOffsetPoint;
-        //}
+
+        /// <summary>
+        /// Функция делит кривую на точки с указанным шагом и возвращает список из этих точек
+        /// </summary>
+        /// <param name="curve"></param>
+        /// <param name="step"></param>
+        /// <returns>Список точек</returns>
         public ICollection<XYZ> SplitCurveToPoints(Curve curve, double step) {
             double curveLength = curve.Length;
             if(step >= curveLength) {
@@ -56,6 +53,15 @@ namespace RevitOpeningSlopes.Models {
                 return points;
             }
         }
+
+        /// <summary>
+        /// Функция создает линию из указанного начала координат окна в указанном направлении
+        /// </summary>
+        /// <param name="origin">Начало координат</param>
+        /// <param name="openingVector">Вектор окна</param>
+        /// <param name="length">Длина линии</param>
+        /// <param name="direction">Направление линии (Enum)</param>
+        /// <returns>Линия, созданная из указанного начала координат</returns>
         public Line CreateLineFromOpening(XYZ origin, XYZ openingVector, double length = 1000,
             DirectionEnum direction = DirectionEnum.Right) {
 
@@ -66,6 +72,7 @@ namespace RevitOpeningSlopes.Models {
             XYZ startPoint = new XYZ(origin.X, origin.Y, openingLocationZ);
             XYZ endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) + normalVector
                 * length;
+
             if(direction == DirectionEnum.Left) {
                 endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) - normalVector
                     * length;
