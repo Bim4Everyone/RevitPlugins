@@ -11,7 +11,7 @@
       d:DesignHeight="300" d:DesignWidth="300"
       Title="SettingsPage"
       
-      d:DataContext="{d:DesignInstance vms:SettingsPageViewModel, IsDesignTimeCreatable=False}">
+      d:DataContext="{d:DesignInstance vms:SettingsPageVM, IsDesignTimeCreatable=False}">
 
 
     <i:Interaction.Triggers>
@@ -22,23 +22,113 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Grid Background="AliceBlue">
+    <Grid Background="White">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="50" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Button
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="10"
+            Content="Выбрать все"
+            Command="{Binding Path=SelectAllCommand}" />
+
+        <Button
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="10"
+            Content="Отменить выбор"
+            Command="{Binding Path=UnselectAllCommand}" />
+
+        <ListView
             Grid.Row="1"
-            Text="{Binding Path=SomeText}"
-            Margin="10"/>
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Margin="10 5"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.CanContentScroll="False"
+            ItemsSource="{Binding Path=Tasks, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            SelectionMode="Multiple">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Выбор">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsCheck}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Параметр" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Width="Auto" Text="{Binding Path=ParamName}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Значение" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Width="Auto" Text="{Binding Path=ParamValue}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="IsSelected" Value="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" 
+                                    Value="WhiteSmoke" />
+                            <Setter Property="BorderBrush"
+                                    Value="LightGray" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="False">
+                            <Setter Property="Background" 
+                                    Value="{x:Null}" />
+                            <Setter Property="BorderBrush"
+                                    Value="LightGray" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
 
         <Button
             Grid.Row="2"
+            Grid.Column="0"
             Margin="10"
-            Width="80"
-            Content="ОК"
-            Command="{Binding AcceptViewCommand}"/>
+            Content="Добавить"
+            Command="{Binding Path=AddTaskCommand}" />
+
+        <Button
+            Grid.Row="2"
+            Grid.Column="1"
+            Margin="10"
+            Content="Удалить"
+            Command="{Binding Path=DeleteTaskCommand}" />
+        
+        <Button
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Margin="10"
+            Padding="5"
+            Content="Сохранить настройки"
+            Command="{Binding Path=SaveSettingsCommand}"/>
     </Grid>
 </Page>

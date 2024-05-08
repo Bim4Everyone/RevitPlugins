@@ -28,26 +28,11 @@ namespace RevitParamValuesByEvents {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                //kernel.Bind<MainViewModel>().ToSelf();
-                //kernel.Bind<MainWindow>().ToSelf()
-                //                .WithPropertyValue(nameof(Window.Title), PluginName)
-                //                .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
-
-
-                kernel.Bind<SettingsPageViewModel>().ToSelf();
+                kernel.Bind<SettingsPageVM>().ToSelf();
                 kernel.Bind<SettingsPage>().ToSelf()
-                                .WithPropertyValue(nameof(FrameworkElement.DataContext), c => c.Kernel.Get<SettingsPageViewModel>());
-
-
-
-                //MainWindow window = kernel.Get<MainWindow>();
-                //window.ShowDialog();
-
+                                .WithPropertyValue(nameof(FrameworkElement.DataContext), c => c.Kernel.Get<SettingsPageVM>());
 
                 SettingsPage page = kernel.Get<SettingsPage>();
-
-
-                //Notification(kernel.Get<MainWindow>());
             }
         }
     }

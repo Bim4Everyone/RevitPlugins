@@ -24,16 +24,25 @@ namespace RevitParamValuesByEvents.Views {
                 return;
             }
 
-            uIApplication.RegisterDockablePane(_dockablePaneId, "Корректор свойств", this as IDockablePaneProvider);
+            // На случай, когда вкладку плагина закрыли, сначала пытаемся ее получить, потом регаем
+            // Т.к. нет возможности запросить наличие зареганой панели, то пытаемся ее получить
+            // Если ее нет, регестрируем и показываем
+            try {
 
-            OpenNCloseTempDoc(uIApplication);
+                DockablePane dockablePane = uIApplication.GetDockablePane(_dockablePaneId);
+                dockablePane.Show();
+
+            } catch(Exception) {
+
+                uIApplication.RegisterDockablePane(_dockablePaneId, "Корректор свойств", this as IDockablePaneProvider);
+
+                OpenNCloseTempDoc(uIApplication);
+            }
         }
 
-
-        //public void Dispose() {
-        //    this.Dispose();
-        //}
-
+        /// <summary>
+        /// Метод автоматически вызывающийся при создании встраиваемой панели
+        /// </summary>
         public void SetupDockablePane(DockablePaneProviderData data) {
             data.FrameworkElement = this as FrameworkElement;
             data.EditorInteraction = new EditorInteraction(EditorInteractionType.KeepAlive);
@@ -46,6 +55,11 @@ namespace RevitParamValuesByEvents.Views {
         }
 
 
+        /// <summary>
+        /// Метод использующийся для перезагрузки UIApplication Revit, т.к. API не предоставляет иного.
+        /// Перезагрузка UI приложения необходима для отображения встраиваемой панели, т.к. при ее создании применяется не стандартная методика
+        /// Создает временный файл по пути хранения настроек плагина, открывает его, закрывает и удаляет.
+        /// </summary>
         private void OpenNCloseTempDoc(UIApplication uIApplication) {
 
             // Формирование пути к временному файлу
