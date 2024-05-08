@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -25,21 +20,35 @@ namespace RevitParamValuesByEvents {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-			using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-					
-				kernel.Bind<PluginConfig>()
+
+                kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
-				
-				kernel.Bind<MainViewModel>().ToSelf();
-				kernel.Bind<MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
-				
-				Notification(kernel.Get<MainWindow>());
-			}
+
+                //kernel.Bind<MainViewModel>().ToSelf();
+                //kernel.Bind<MainWindow>().ToSelf()
+                //                .WithPropertyValue(nameof(Window.Title), PluginName)
+                //                .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+
+
+                kernel.Bind<SettingsPageViewModel>().ToSelf();
+                kernel.Bind<SettingsPage>().ToSelf()
+                                .WithPropertyValue(nameof(FrameworkElement.DataContext), c => c.Kernel.Get<SettingsPageViewModel>());
+
+
+
+                //MainWindow window = kernel.Get<MainWindow>();
+                //window.ShowDialog();
+
+
+                SettingsPage page = kernel.Get<SettingsPage>();
+
+
+                //Notification(kernel.Get<MainWindow>());
+            }
         }
     }
 }

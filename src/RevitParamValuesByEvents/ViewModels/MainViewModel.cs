@@ -41,7 +41,7 @@ namespace RevitParamValuesByEvents.ViewModels {
         private void AcceptView() {
             SaveConfig();
         }
-        
+
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(SaveProperty)) {
                 ErrorText = "Введите значение сохраняемого свойства.";
