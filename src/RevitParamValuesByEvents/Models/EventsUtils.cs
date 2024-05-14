@@ -93,7 +93,7 @@ namespace RevitParamValuesByEvents.Models {
                                     continue;
                                 }
 
-                                Parameter parameter = elem.GetParam(task.ParamName);
+                                Parameter parameter = elem.GetParam(task.SelectedParamName);
 
                                 if(parameter is null) {
 

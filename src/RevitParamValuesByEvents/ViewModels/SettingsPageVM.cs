@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -16,6 +18,7 @@ namespace RevitParamValuesByEvents.ViewModels {
         private ObservableCollection<TaskItemVM> _tasks = new ObservableCollection<TaskItemVM>();
 
         private string _saveProperty;
+        private List<string> _paramNames = new List<string>();
 
         public SettingsPageVM(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
@@ -24,6 +27,9 @@ namespace RevitParamValuesByEvents.ViewModels {
             _eventUtils = new EventsUtils(this, _revitRepository);
             _eventUtils.SubscribeToEvents();
 
+            GetParams();
+
+            Tasks.Add(new TaskItemVM(ParamNames));
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             SaveSettingsCommand = RelayCommand.Create(SaveSettings, CanSaveSettings);
@@ -32,10 +38,8 @@ namespace RevitParamValuesByEvents.ViewModels {
             DeleteTaskCommand = RelayCommand.Create(DeleteTask);
             SelectAllCommand = RelayCommand.Create(SelectAll);
             UnselectAllCommand = RelayCommand.Create(UnselectAll);
-
-            Tasks.Add(new TaskItemVM(true, "Комментарии", "111"));
-            Tasks.Add(new TaskItemVM(false, "Марка", "222"));
         }
+
 
         public ICommand LoadViewCommand { get; }
         public ICommand SaveSettingsCommand { get; }
@@ -48,6 +52,11 @@ namespace RevitParamValuesByEvents.ViewModels {
         public string SaveProperty {
             get => _saveProperty;
             set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
+        }
+
+        public List<string> ParamNames {
+            get => _paramNames;
+            set => this.RaiseAndSetIfChanged(ref _paramNames, value);
         }
 
 
@@ -76,7 +85,7 @@ namespace RevitParamValuesByEvents.ViewModels {
 
         private void AddTask() {
 
-            Tasks.Add(new TaskItemVM(true, "", ""));
+            Tasks.Add(new TaskItemVM(ParamNames));
         }
 
 
@@ -127,6 +136,44 @@ namespace RevitParamValuesByEvents.ViewModels {
 
             setting.SaveProperty = SaveProperty;
             _pluginConfig.SaveProjectConfig();
+        }
+
+
+        private void GetParams() {
+
+            Document document = _revitRepository.Document;
+
+            List<Category> neededCategories = new List<Category>() {
+
+                Category.GetCategory(document, BuiltInCategory.OST_Walls),
+                Category.GetCategory(document, BuiltInCategory.OST_Floors),
+                Category.GetCategory(document, BuiltInCategory.OST_Columns),
+                Category.GetCategory(document, BuiltInCategory.OST_StructuralColumns),
+                Category.GetCategory(document, BuiltInCategory.OST_StructuralFoundation),
+                Category.GetCategory(document, BuiltInCategory.OST_Rebar)
+            };
+
+            BindingMap bindingMap = _revitRepository.Document.ParameterBindings;
+            DefinitionBindingMapIterator iterator = bindingMap.ForwardIterator();
+            //iterator.Reset();
+            while(iterator.MoveNext()) {
+
+                var current = iterator.Current;
+
+                if(current is InstanceBinding binding) {
+
+                    foreach(Category category in neededCategories) {
+
+                        if(binding.Categories.Contains(category)) {
+
+                            ParamNames.Add(iterator.Key.Name);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            ParamNames.Sort();
         }
     }
 }

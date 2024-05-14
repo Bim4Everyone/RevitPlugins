@@ -13,6 +13,9 @@
       
       d:DataContext="{d:DesignInstance vms:SettingsPageVM, IsDesignTimeCreatable=False}">
 
+    <Page.Resources>
+        <local:PercentageConverter x:Key="ConverterByPercentage"/>
+    </Page.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -60,26 +63,42 @@
             SelectionMode="Multiple">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Выбор">
+                    <GridViewColumn x:Name="choiceColumn" Header="Выбор" Width="45">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsCheck}"/>
+                                <CheckBox 
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    IsChecked="{Binding IsCheck}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Параметр" Width="100">
+                    <GridViewColumn x:Name="paramColumn" Header="Параметр" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Width="Auto" Text="{Binding Path=ParamName}"/>
+                                <ComboBox
+                                    Width="{Binding 
+                                        ElementName=paramColumn, 
+                                        Path=ActualWidth,
+                                        Converter={StaticResource ConverterByPercentage}, 
+                                        ConverterParameter='0,92'}"
+                                    ItemsSource="{Binding Path=ParamNames}"
+                                    SelectedItem="{Binding Path=SelectedParamName}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Значение" Width="100">
+                    <GridViewColumn x:Name="valueColumn" Header="Значение" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Width="Auto" Text="{Binding Path=ParamValue}"/>
+                                <TextBox 
+                                    Width="{Binding 
+                                        ElementName=valueColumn, 
+                                        Path=ActualWidth,
+                                        Converter={StaticResource ConverterByPercentage}, 
+                                        ConverterParameter='0,85'}"
+                                    Text="{Binding Path=ParamValue}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
