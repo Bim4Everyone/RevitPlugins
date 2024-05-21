@@ -54,23 +54,30 @@ namespace RevitOpeningSlopes.Models {
             return openingVector;
         }
 
+        /// <summary>
+        /// Функция возвращает допустимые типоразмеры откоса для выбора пользователем
+        /// </summary>
+        /// <returns></returns>
         public IList<FamilySymbol> GetSlopeTypes() {
             //string familyName = "ОбщМд_Откос_Отлив_New";
-            string familyName = "Откос";
+            string familyName = "ОбщМд_Откос_Отлив_New";
             return new FilteredElementCollector(Document)
                 .WhereElementIsElementType()
                 .OfCategory(BuiltInCategory.OST_GenericModel)
-                .Where(el => el is FamilySymbol fs && fs.Family.Name.ToLower().Contains(familyName.ToLower()) && )
+                //.Where(el => el is FamilySymbol fs && fs.Family.Name.ToLower().Contains(familyName.ToLower()))
+                .Where(el => el is FamilySymbol fs && fs.Family.Name == familyName)
                 .Cast<FamilySymbol>()
                 .OrderBy(el => el.Name)
                 .ToList();
         }
+
         public FamilySymbol GetSlopeType(ElementId slopeTypeId) {
             if(slopeTypeId.IsNull()) {
                 throw new ArgumentNullException(nameof(slopeTypeId));
             }
             return Document.GetElement(slopeTypeId) as FamilySymbol ?? throw new ArgumentException(nameof(slopeTypeId));
         }
+
         public ICollection<FamilyInstance> GetWindows(WindowsGetterMode windowsGetterMode) {
             switch(windowsGetterMode) {
                 case WindowsGetterMode.AlreadySelectedWindows: {

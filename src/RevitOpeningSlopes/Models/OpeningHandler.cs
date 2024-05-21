@@ -165,7 +165,7 @@ namespace RevitOpeningSlopes.Models {
             } else {
                 BoundingBoxXYZ openingBoundingBox = GetOpeningGeometryBbox();
                 if(openingBoundingBox != null) {
-                    double offsetLength = _revitRepository.ConvertToFeet(300);
+                    double offsetLength = _revitRepository.ConvertToFeet(800);
                     XYZ minPoint = openingBoundingBox.Min - new XYZ(1, 1, 1) * offsetLength;
                     XYZ maxPoint = openingBoundingBox.Max + new XYZ(1, 1, 1) * offsetLength;
                     _outlineWithOffset = new Outline(minPoint, maxPoint);
@@ -239,9 +239,9 @@ namespace RevitOpeningSlopes.Models {
         }
 
         /// <summary>
-        /// Функция находит самую отдаленную точку в направлении от фасада (P3)
+        /// Функция находит точку, соответствующей самой выпирающей части окна (P3)
         /// </summary>
-        /// <returns>Самая отдаленная точка в направлении от фасада (P3)</returns>
+        /// <returns>Точка самой выпирающей части окна (P3)</returns>
         private XYZ GetOpeningDepthPoint() {
             if(_openingDepthPoint != null) {
                 return _openingDepthPoint;
@@ -286,8 +286,8 @@ namespace RevitOpeningSlopes.Models {
         }
 
         /// <summary>
-        /// Функция запускает 2 линии - в направлении внутрь здания из точки (P2) и влево из самой 
-        /// отдаленной точки (P3) и возвращает точку пересечения этих двух линий (P4)
+        /// Функция запускает 2 линии - в направлении внутрь здания из точки (P2) и влево из точки
+        /// окна (P3) и возвращает точку пересечения этих двух линий (P4)
         /// </summary>
         /// <returns>Центральная самая отдаленная точка фасада (P4)</returns>
         private XYZ GetCentralOpeningDepthPoint() {
@@ -330,18 +330,18 @@ namespace RevitOpeningSlopes.Models {
             if(_rightPoint != null) {
                 return _rightPoint;
             } else {
-                XYZ centralBackwardDepthPoint = GetCentralOpeningDepthPoint();
+                XYZ centralOpeningDepthPoint = GetCentralOpeningDepthPoint();
                 XYZ frontOffsetPoint = GetFrontOffsetPoint();
                 Solid nearestElementsSolid = GetUnitedSolidFromBoundingBox();
                 XYZ openingVector = GetOpeningVector();
 
-                if(centralBackwardDepthPoint != null && frontOffsetPoint != null && nearestElementsSolid != null) {
+                if(centralOpeningDepthPoint != null && frontOffsetPoint != null && nearestElementsSolid != null) {
                     const double step = 0.032; //~10 мм
                     const double rightLineLength = 2000;
                     double closestDist = double.PositiveInfinity;
 
                     //Создание линии из точки P2 и P4 и разделение ее на точки для запуска линий вправо от окна
-                    Line forwardLine = Line.CreateBound(frontOffsetPoint, centralBackwardDepthPoint);
+                    Line forwardLine = Line.CreateBound(frontOffsetPoint, centralOpeningDepthPoint);
                     ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(forwardLine, step);
                     foreach(XYZ point in points) {
                         Line rightLine = _linesFromOpening.CreateLineFromOpening(point, openingVector,
@@ -502,14 +502,14 @@ namespace RevitOpeningSlopes.Models {
 
                 if(rightFrontpoint != null && openingVector != null && nearestElementsSolid != null) {
                     const double leftLineLength = 4000;
-                    const double offset = 10;
+                    const double offset = 0.032; //~10 мм
 
                     XYZ normalVector = XYZ.BasisZ.CrossProduct(openingVector).Normalize();
 
-                    ///Изменение стартовой точки для того, чтобы не было пересечения со стеной 
-                    ///справа у запущенной линии
+                    //Изменение стартовой точки для того, чтобы не было пересечения со стеной 
+                    //справа у запущенной линии
                     XYZ startPoint = new XYZ(rightFrontpoint.X, rightFrontpoint.Y, rightFrontpoint.Z) - normalVector
-                            * _revitRepository.ConvertToFeet(offset);
+                            * offset;
                     Line leftLine = _linesFromOpening.CreateLineFromOpening(startPoint, openingVector,
                             leftLineLength,
                             DirectionEnum.Left);
@@ -532,7 +532,8 @@ namespace RevitOpeningSlopes.Models {
         }
 
         /// <summary>
-        /// Функция находит горизонтальный центр проема в плоскости вставки семейства откоса (P10), используя точку P9
+        /// Функция находит горизонтальный центр проема в плоскости вставки семейства откоса (P10), используя 
+        /// точку P9 и P8
         /// </summary>
         /// <returns>Точка горизонтального центра в плоскости вставки семейства откоса P10</returns>
         private XYZ GetHorizontalDepthPoint() {
@@ -575,19 +576,34 @@ namespace RevitOpeningSlopes.Models {
                 XYZ openingVector = GetOpeningVector();
 
                 if(horizontalDepthPoint != null && nearestElementsSolid != null) {
-                    const double lineLength = 6000;
+                    const double lineLength = 5000;
+                    const double forwardLineLength = 1000;
+                    const double step = 0.032; //~10 мм
+                    double closestDist = double.PositiveInfinity;
 
-                    Line upwardLine = _linesFromOpening.CreateLineFromOpening(horizontalDepthPoint,
-                        openingVector, lineLength, DirectionEnum.Top);
-
-                    SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
-                        ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside
+                    //Создание линии из точки горизонтального центра P10 в направлении от фасада и разделение
+                    //ее на точки для построения линий в направлении наверх
+                    Line forwardLine = _linesFromOpening.CreateLineFromOpening(horizontalDepthPoint, openingVector,
+                        forwardLineLength, DirectionEnum.Forward);
+                    ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(forwardLine, step);
+                    SolidCurveIntersectionOptions intersectOptInside = new SolidCurveIntersectionOptions() {
+                        ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
                     };
-                    SolidCurveIntersection topIntersection = nearestElementsSolid.IntersectWithCurve(
-                        upwardLine, intersectOptOutside);
 
-                    if(topIntersection.SegmentCount > 0) {
-                        _topPoint = topIntersection.GetCurveSegment(0).GetEndPoint(1);
+                    foreach(XYZ point in points) {
+                        Line upwardLine = _linesFromOpening.CreateLineFromOpening(point,
+                            openingVector, lineLength, DirectionEnum.Top);
+                        SolidCurveIntersection topIntersection = nearestElementsSolid.IntersectWithCurve(
+                            upwardLine, intersectOptInside);
+                        if(topIntersection.SegmentCount > 0) {
+                            XYZ intersectCoord = topIntersection.GetCurveSegment(0).GetEndPoint(0);
+                            double currentDist = _revitRepository
+                                .ConvertToMillimeters(point.DistanceTo(intersectCoord));
+                            if(currentDist < closestDist) {
+                                closestDist = currentDist;
+                                _topPoint = intersectCoord;
+                            }
+                        }
                     }
                 }
                 return _topPoint;
@@ -662,8 +678,11 @@ namespace RevitOpeningSlopes.Models {
                 XYZ bottomPoint = GetBottomPoint();
 
                 if(topPoint != null && bottomPoint != null) {
-                    double x = (topPoint.X + bottomPoint.X) / 2;
-                    double y = (topPoint.Y + bottomPoint.Y) / 2;
+                    //double x = (topPoint.X + bottomPoint.X) / 2;
+                    //double y = (topPoint.Y + bottomPoint.Y) / 2;
+                    //double z = (topPoint.Z + bottomPoint.Z) / 2;
+                    double x = bottomPoint.X;
+                    double y = bottomPoint.Y;
                     double z = (topPoint.Z + bottomPoint.Z) / 2;
                     _verticalCenterPoint = new XYZ(x, y, z);
                 }
@@ -685,7 +704,9 @@ namespace RevitOpeningSlopes.Models {
                 XYZ bottomPoint = GetBottomPoint();
 
                 if(topPoint != null && bottomPoint != null) {
-                    _openingHeight = bottomPoint.DistanceTo(topPoint);
+                    //_openingHeight = bottomPoint.DistanceTo(topPoint);
+                    _openingHeight = Math.Abs(bottomPoint.Z - topPoint.Z);
+
                 } else {
                     throw new ArgumentException("Не удалось рассчитать высоту проема");
                 }
