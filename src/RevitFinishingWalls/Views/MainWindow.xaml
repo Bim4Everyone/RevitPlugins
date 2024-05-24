@@ -54,7 +54,7 @@
             <Setter Property="Margin"
                     Value="5 0" />
             <Setter Property="Width"
-                    Value="160" />
+                    Value="200" />
             <Setter Property="TextAlignment"
                     Value="Justify" />
             <Setter Property="VerticalAlignment"
@@ -69,6 +69,10 @@
 
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Center">
+            <StackPanel.ToolTip>
+                <TextBlock Text="Отделочные стены создаются только для помещений из активного документа.&#10;У создаваемых отделочных стен отключена галочка 'Граница помещения'.&#10;Также созданные стены будут соединены с элементами из активного файла,&#10;которые образуют границу помещения: стены, колонны, несущие колонны."
+                           FontSize="14" />
+            </StackPanel.ToolTip>
             <DockPanel Style="{StaticResource DockPanelInput}">
                 <TextBlock Text="Создавать стены:"
                            Style="{StaticResource InputDescription}" />
@@ -98,7 +102,6 @@
                                   DisplayMember="Name">
                 </dxe:ComboBoxEdit>
             </DockPanel>
-            <!--TODO tooltip с описанием работы: стены создаются только по элементам из активного документа и т.д.-->
             <DockPanel Style="{StaticResource DockPanelInput}">
                 <TextBlock Text="Отметка верха от уровня:"
                            Style="{StaticResource InputDescription}" />
