@@ -1,4 +1,6 @@
+using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 
 namespace RevitDeclarations.Views {
     public partial class MainWindow {

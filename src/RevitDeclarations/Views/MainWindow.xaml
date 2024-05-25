@@ -10,6 +10,7 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitDeclarations.Views"
     xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
+    xmlns:tabData="clr-namespace:RevitDeclarations.Views"
     
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
 	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
@@ -18,16 +19,20 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Title="MainWindow"
-    Height="450" Width="800"    
+    Title="Декларации"
+    Height="850" Width="670"
+    ResizeMode="NoResize"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadViewCommand}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="Styles/StyleResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        </ResourceDictionary>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -35,12 +40,24 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock
-            Grid.Row="0"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty}"/>
+        <TabControl>
+            <TabItem 
+                Header="Декларация">
+                <tabData:DeclarationTabItem/>
+            </TabItem>
+
+            <TabItem
+                Header="Параметры"
+                DataContext="{Binding DeclarationSettingsVM}">
+                <tabData:ParametersTabItem/>
+            </TabItem>
+
+            <TabItem 
+                Header="Приоритеты"
+                DataContext="{Binding PrioritiesViewModel}">
+                <tabData:PrioritiesTabItem/>
+            </TabItem>
+        </TabControl>
 
         <StackPanel
             Grid.Row="1"
@@ -59,7 +76,7 @@
                 Content="ОК"
                 IsDefault="True"
                 Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}"/>
+                Command="{Binding ExportToExcelCommand}"/>
 
             <Button
                 Margin="10"
