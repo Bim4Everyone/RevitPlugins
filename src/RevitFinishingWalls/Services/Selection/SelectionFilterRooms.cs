@@ -16,12 +16,11 @@ namespace RevitFinishingWalls.Services.Selection {
 
 
         public bool AllowElement(Element elem) {
-            return (elem != null) && (elem is Room);
+            return (elem != null) && (elem is Room room) && (room.Area > 0);
         }
 
         public bool AllowReference(Reference reference, XYZ position) {
-            return (_activeDocument.GetElement(reference) is Room room)
-                && room.Area > 0;
+            return false;
         }
     }
 }
