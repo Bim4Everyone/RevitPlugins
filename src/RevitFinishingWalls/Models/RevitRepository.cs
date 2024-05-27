@@ -345,7 +345,7 @@ namespace RevitFinishingWalls.Models {
             }
             if(view == null) {
                 //создаем наш 3D вид по умолчанию
-                using(Transaction t = Document.StartTransaction("BIM: Создание 3D-вида")) {
+                using(Transaction t = Document.StartTransaction("Создание 3D-вида")) {
                     var type = new FilteredElementCollector(Document)
                         .OfClass(typeof(ViewFamilyType))
                         .Cast<ViewFamilyType>()
