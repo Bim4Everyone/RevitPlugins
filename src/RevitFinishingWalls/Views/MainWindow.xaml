@@ -78,15 +78,17 @@
             <DockPanel Style="{StaticResource DockPanelInput}">
                 <TextBlock Text="Создавать стены:"
                            Style="{StaticResource InputDescription}" />
-                <ComboBox ItemsSource="{Binding RoomGetterModes}"
-                          SelectedItem="{Binding SelectedRoomGetterMode}"
-                          Style="{StaticResource ComboBoxInput}">
-                    <ComboBox.ItemTemplate>
+                <dxe:ComboBoxEdit ItemsSource="{Binding RoomGetterModes}"
+                                  SelectedItem="{Binding SelectedRoomGetterMode}"
+                                  Style="{StaticResource ComboBoxInput}"
+                                  ApplyItemTemplateToSelectedItem="True"
+                                  IsTextEditable="False">
+                    <dxe:ComboBoxEdit.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:RoomGetterMode}}" />
                         </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                    </dxe:ComboBoxEdit.ItemTemplate>
+                </dxe:ComboBoxEdit>
             </DockPanel>
 
             <DockPanel Style="{StaticResource DockPanelInput}">
@@ -107,15 +109,17 @@
             <DockPanel Style="{StaticResource DockPanelInput}">
                 <TextBlock Text="Отметка верха от уровня:"
                            Style="{StaticResource InputDescription}" />
-                <ComboBox ItemsSource="{Binding WallElevationModes}"
-                          SelectedItem="{Binding SelectedWallElevationMode}"
-                          Style="{StaticResource ComboBoxInput}">
-                    <ComboBox.ItemTemplate>
+                <dxe:ComboBoxEdit ItemsSource="{Binding WallElevationModes}"
+                                  SelectedItem="{Binding SelectedWallElevationMode}"
+                                  Style="{StaticResource ComboBoxInput}"
+                                  ApplyItemTemplateToSelectedItem="True"
+                                  IsTextEditable="False">
+                    <dxe:ComboBoxEdit.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:WallElevationMode}}" />
                         </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                    </dxe:ComboBoxEdit.ItemTemplate>
+                </dxe:ComboBoxEdit>
                 <dxe:TextEdit Text="{Binding WallElevationByUser, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                               IsEnabled="{Binding IsWallHeightByUserEnabled}" />
                 <TextBlock Text="мм"
