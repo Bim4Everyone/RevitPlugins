@@ -10,7 +10,8 @@
                            xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-                           xmlns:converters="clr-namespace:RevitFinishingWalls.Resources.Converters"
+                           xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+                           xmlns:enums="clr-namespace:RevitFinishingWalls.Models.Enums"
                            mc:Ignorable="d"
                            WindowStartupLocation="CenterOwner"
                            MinHeight="250"
@@ -25,6 +26,7 @@
         <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
     </dxmvvm:Interaction.Behaviors>
     <Window.Resources>
+        <converters:EnumConverter x:Key="EnumConverter" />
         <Style TargetType="dxe:TextEdit">
             <Setter Property="Width"
                     Value="50" />
@@ -81,7 +83,7 @@
                           Style="{StaticResource ComboBoxInput}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Converter={converters:EnumDescriptionTypeConverter}}" />
+                            <TextBlock Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:RoomGetterMode}}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
@@ -110,7 +112,7 @@
                           Style="{StaticResource ComboBoxInput}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Converter={converters:EnumDescriptionTypeConverter}}" />
+                            <TextBlock Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:WallElevationMode}}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
