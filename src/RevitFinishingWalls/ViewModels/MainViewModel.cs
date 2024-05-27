@@ -114,11 +114,10 @@ namespace RevitFinishingWalls.ViewModels {
 
         public string this[string columnName] {
             get {
-                var error = string.Empty;
                 switch(columnName) {
                     case nameof(SelectedWallType): {
                         if(SelectedWallType is null) {
-                            error = "Задайте тип отделочных стен";
+                            return "Задайте тип отделочных стен";
                         }
                         break;
                     }
@@ -126,14 +125,14 @@ namespace RevitFinishingWalls.ViewModels {
                         if(SelectedWallElevationMode == WallElevationMode.ManualHeight) {
                             if(double.TryParse(WallElevationByUser, out double height)) {
                                 if(height <= 0) {
-                                    error = "Отметка верха должна быть больше 0";
+                                    return "Отметка верха должна быть больше 0";
                                 } else if(height > 50000) {
-                                    error = "Слишком большая отметка верха стены";
+                                    return "Слишком большая отметка верха стены";
                                 } else if(double.TryParse(WallBaseOffset, out double offset) && (height <= offset)) {
-                                    error = "Отметка верха должна быть больше смещения";
+                                    return "Отметка верха должна быть больше смещения";
                                 }
                             } else {
-                                error = "Отметка верха должна быть числом";
+                                return "Отметка верха должна быть числом";
                             }
                         }
                         break;
@@ -141,17 +140,17 @@ namespace RevitFinishingWalls.ViewModels {
                     case nameof(WallBaseOffset): {
                         if(double.TryParse(WallBaseOffset, out double offset)) {
                             if(offset < -5000) {
-                                error = "Слишком большое смещение вниз";
+                                return "Слишком большое смещение вниз";
                             } else if(offset > 5000) {
-                                error = "Слишком большое смещение вверх";
+                                return "Слишком большое смещение вверх";
                             }
                         } else {
-                            error = "Смещение должно быть числом";
+                            return "Смещение должно быть числом";
                         }
                         break;
                     }
                 }
-                return error;
+                return string.Empty;
             }
         }
 
