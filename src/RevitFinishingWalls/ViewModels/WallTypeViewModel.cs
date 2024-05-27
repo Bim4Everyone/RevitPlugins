@@ -8,13 +8,13 @@ namespace RevitFinishingWalls.ViewModels {
         private readonly WallType _wallType;
 
         public WallTypeViewModel(WallType wallType) {
-            _wallType = wallType;
+            _wallType = wallType ?? throw new ArgumentNullException(nameof(wallType));
         }
 
 
-        public string Name => _wallType?.Name ?? string.Empty;
+        public string Name => _wallType.Name;
 
-        public ElementId WallTypeId => _wallType?.Id ?? ElementId.InvalidElementId;
+        public ElementId WallTypeId => _wallType.Id;
 
 
         public override bool Equals(object obj) {
@@ -24,11 +24,11 @@ namespace RevitFinishingWalls.ViewModels {
         public bool Equals(WallTypeViewModel other) {
             if(ReferenceEquals(null, other)) { return false; }
             if(ReferenceEquals(this, other)) { return true; }
-            return _wallType?.Id == other._wallType?.Id;
+            return _wallType.Id == other._wallType.Id;
         }
 
         public override int GetHashCode() {
-            return 1320577646 + EqualityComparer<ElementId>.Default.GetHashCode(_wallType?.Id);
+            return 1320577646 + EqualityComparer<ElementId>.Default.GetHashCode(_wallType.Id);
         }
 
         public override string ToString() {
