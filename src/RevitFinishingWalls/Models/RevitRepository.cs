@@ -375,10 +375,8 @@ namespace RevitFinishingWalls.Models {
                         BuiltInCategory.OST_StructuralColumns,
                         BuiltInCategory.OST_Columns });
                 return GetElementByRay(_defaultView3D, boundarySegment.GetCurve(), categoryFilter);
-            } else if(borderEl != null) {
-                return new Element[] { borderEl };
             } else {
-                return Array.Empty<Element>();
+                return new Element[] { borderEl }; // borderEl всегда не null
             }
         }
 
