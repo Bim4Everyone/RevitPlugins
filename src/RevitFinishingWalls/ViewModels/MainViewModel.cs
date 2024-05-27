@@ -20,6 +20,14 @@ namespace RevitFinishingWalls.ViewModels {
         private readonly IRoomFinisher _roomFinisher;
         private readonly IMessageBoxService _messageBoxService;
 
+        /// <summary>Максимальная допустимая отметка верха отделочной стены в мм</summary>
+        private const int _wallTopMaxElevationMM = 50000;
+        /// <summary>Максимальное смещение низа стены вверх в мм</summary>
+        private const int _wallBaseMaxOffsetMM = 5000;
+        /// <summary>Минимальное смещение низа стены вниз в мм</summary>
+        private const int _wallBaseMinOffsetMM = -5000;
+
+
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
@@ -126,7 +134,7 @@ namespace RevitFinishingWalls.ViewModels {
                             if(double.TryParse(WallElevationByUser, out double height)) {
                                 if(height <= 0) {
                                     return "Отметка верха должна быть больше 0";
-                                } else if(height > 50000) {
+                                } else if(height > _wallTopMaxElevationMM) {
                                     return "Слишком большая отметка верха стены";
                                 } else if(double.TryParse(WallBaseOffset, out double offset) && (height <= offset)) {
                                     return "Отметка верха должна быть больше смещения";
@@ -139,9 +147,9 @@ namespace RevitFinishingWalls.ViewModels {
                     }
                     case nameof(WallBaseOffset): {
                         if(double.TryParse(WallBaseOffset, out double offset)) {
-                            if(offset < -5000) {
+                            if(offset < _wallBaseMinOffsetMM) {
                                 return "Слишком большое смещение вниз";
-                            } else if(offset > 5000) {
+                            } else if(offset > _wallBaseMaxOffsetMM) {
                                 return "Слишком большое смещение вверх";
                             }
                         } else {
