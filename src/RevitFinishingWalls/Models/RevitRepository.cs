@@ -333,6 +333,7 @@ namespace RevitFinishingWalls.Models {
             var views3D = new FilteredElementCollector(Document)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
+                .Where(v => !v.IsTemplate && !v.IsCallout && !v.IsAssemblyView)
                 .ToArray();
             //ищем ревитовский 3D вид по умолчанию
             var view = views3D.FirstOrDefault(
