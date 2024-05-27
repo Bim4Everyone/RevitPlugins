@@ -28,6 +28,7 @@ namespace RevitFinishingWalls {
                     .ToSelf()
                     .InSingletonScope();
 
+                kernel.Bind<IWallCreationDataProvider>().To<WallCreationDataProvider>().InSingletonScope();
                 kernel.Bind<IRoomFinisher>().To<RoomFinisher>().InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());

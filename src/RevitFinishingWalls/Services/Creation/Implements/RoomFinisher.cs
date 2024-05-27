@@ -13,12 +13,17 @@ using RevitFinishingWalls.Services.FailureHandlers;
 namespace RevitFinishingWalls.Services.Creation.Implements {
     internal class RoomFinisher : IRoomFinisher {
         private readonly RevitRepository _revitRepository;
+        private readonly IWallCreationDataProvider _wallCreationDataProvider;
 
         public RoomFinisher(
-            RevitRepository revitRepository
+            RevitRepository revitRepository,
+            IWallCreationDataProvider wallCreationDataProvider
             ) {
 
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _wallCreationDataProvider = wallCreationDataProvider
+                ?? throw new ArgumentNullException(nameof(wallCreationDataProvider));
         }
 
 
@@ -33,7 +38,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                 failOpt.SetFailuresPreprocessor(new WallAndRoomSeparationLineOverlapHandler());
                 transaction.SetFailureHandlingOptions(failOpt);
                 foreach(var room in rooms) {
-                    IList<WallCreationData> datas = _revitRepository.GetWallCreationData(room, config);
+                    IList<WallCreationData> datas = _wallCreationDataProvider.GetWallCreationData(room, config);
                     for(int i = 0; i < datas.Count; i++) {
                         try {
                             var wall = _revitRepository.CreateWall(

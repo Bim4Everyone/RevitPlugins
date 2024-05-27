@@ -109,49 +109,6 @@ namespace RevitFinishingWalls.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию данных для построения стен в помещении 
-        /// в соответствии с заданными настройками расстановки стен
-        /// </summary>
-        /// <param name="room">Помещение, в котором будут создаваться отделочные стены</param>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public IList<WallCreationData> GetWallCreationData(Room room, PluginConfig config) {
-
-            if(room is null) { throw new ArgumentNullException(nameof(room)); }
-            if(config is null) { throw new ArgumentNullException(nameof(config)); }
-
-            List<WallCreationData> wallCreationData = new List<WallCreationData>();
-            WallCreationData lastWallCreationData = null;
-            double wallHeight = CalculateFinishingWallHeight(room, config);
-            double wallBaseOffset = ConvertMmToFeet(config.WallBaseOffsetMm);
-
-            foreach(IList<BoundarySegment> loop in GetBoundarySegments(room)) {
-                IList<CurveSegmentElement> curveSegmentsElements = GetCurveSegmentsElements(loop, config.WallTypeId);
-                for(int i = 0; i < curveSegmentsElements.Count; i++) {
-                    CurveSegmentElement curveSegmentElement = curveSegmentsElements[i];
-                    if((lastWallCreationData != null)
-                        && IsContinuation(lastWallCreationData.Curve, curveSegmentElement.Curve)) {
-
-                        lastWallCreationData.Curve = CombineCurves(lastWallCreationData.Curve, curveSegmentElement.Curve);
-                        lastWallCreationData.AddRangeElementsForJoin(curveSegmentElement.Elements);
-                    } else {
-                        lastWallCreationData = new WallCreationData(Document) {
-                            Curve = curveSegmentElement.Curve,
-                            LevelId = room.LevelId,
-                            Height = wallHeight,
-                            WallTypeId = config.WallTypeId,
-                            BaseOffset = wallBaseOffset
-                        };
-                        lastWallCreationData.AddRangeElementsForJoin(curveSegmentElement.Elements);
-                        wallCreationData.Add(lastWallCreationData);
-                    }
-                }
-            }
-            return wallCreationData;
-        }
-
-        /// <summary>
         /// Создает стену с линией привязки "Чистовая поверхность: Наружная", с отключенными границами помещения
         /// </summary>
         /// <param name="wallCreationData"></param>
@@ -191,6 +148,111 @@ namespace RevitFinishingWalls.Models {
             return wall;
         }
 
+        /// <summary>
+        /// Определяет пары "сегмент границы помещения"-"элемент", который образует этот сегмент.
+        /// </summary>
+        /// <param name="segmentsLoop">Исходная коллекция сегментов границ помещения</param>
+        /// <param name="finishingWallTypeId">Id типа отделочной стены</param>
+        /// <returns>Коллекция классов, в которых содержатся линия границы помещения, 
+        /// смещенная влево на 1/2 толщины отделочной стены и элемент(ы), который(ые) образует эту границу</returns>
+        public IList<CurveSegmentElement> GetCurveSegmentsElements(
+            IList<BoundarySegment> segmentsLoop,
+            ElementId finishingWallTypeId) {
+
+            List<CurveSegmentElement> curveSegmentsElements = new List<CurveSegmentElement>();
+
+            for(int i = 0; i < segmentsLoop.Count; i++) {
+                BoundarySegment segment = segmentsLoop[i];
+                ICollection<Element> segmentElements = GetBoundaryElement(segment);
+                if(segmentElements.Count > 0) {
+                    // получение линии оси отделочной стены,
+                    // смещенной влево на 1/2 толщины отделочной стены относительно исходной границы помещения
+                    double finishingWallTypeHalfWidth = GetWallTypeWidth(finishingWallTypeId) / 2;
+                    Curve curveWithOffset = segment.GetCurve().CreateOffset(-finishingWallTypeHalfWidth, XYZ.BasisZ);
+                    curveSegmentsElements.Add(new CurveSegmentElement(segmentElements, curveWithOffset));
+                }
+            }
+            return curveSegmentsElements;
+        }
+
+        /// <summary>
+        /// Возвращает список замкнутых контуров, составляющих границы помещения
+        /// </summary>
+        /// <param name="room"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public IList<IList<BoundarySegment>> GetBoundarySegments(Room room) {
+            if(room is null) { throw new ArgumentNullException(nameof(room)); }
+
+            return room.GetBoundarySegments(_spatialElementBoundaryOptions);
+        }
+
+        /// <summary>
+        /// Конвертирует миллиметры в футы (единицы длины ревита)
+        /// </summary>
+        /// <param name="mm"></param>
+        /// <returns></returns>
+        public double ConvertMmToFeet(double mm) {
+#if REVIT_2021_OR_GREATER
+            return UnitUtils.ConvertToInternalUnits(mm, UnitTypeId.Millimeters);
+#else
+            return UnitUtils.ConvertToInternalUnits(mm, DisplayUnitType.DUT_MILLIMETERS);
+#endif
+        }
+
+        /// <summary>
+        /// Возвращает отметку верха стены помещения с учетом верхнего ограничивающего элемента в единицах ревита
+        /// </summary>
+        /// <param name="room"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public double GetRoomTopElevation(Room room) {
+            if(room is null) { throw new ArgumentNullException(nameof(room)); }
+
+            double roomVolume = room.GetParamValue<double>(BuiltInParameter.ROOM_VOLUME);
+            if(roomVolume > 0) {
+                double roomHeight = roomVolume / room.GetParamValue<double>(BuiltInParameter.ROOM_AREA);
+                return roomHeight + room.GetParamValue<double>(BuiltInParameter.ROOM_LOWER_OFFSET);
+            } else {
+                return room.GetParamValue<double>(BuiltInParameter.ROOM_UPPER_OFFSET);
+            }
+        }
+
+        /// <summary>
+        /// Проверяет, является ли вторая линия продолжением первой.
+        /// </summary>
+        /// <param name="first">Первая линия</param>
+        /// <param name="second">Вторая линия</param>
+        /// <returns>Вторая линия является продолжением первой только если обе линии - отрезки 
+        /// и если начало второго отрезка - это конец первого отрезка или наоборот</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public bool IsContinuation(Curve first, Curve second) {
+            if(first is null) { throw new ArgumentNullException(nameof(first)); }
+            if(second is null) { throw new ArgumentNullException(nameof(second)); }
+
+            if((first is Line firstLine) && (second is Line secondLine)) {
+                return firstLine.Direction.IsAlmostEqualTo(secondLine.Direction)
+                    && (firstLine.GetEndPoint(0).IsAlmostEqualTo(secondLine.GetEndPoint(1))
+                    || firstLine.GetEndPoint(1).IsAlmostEqualTo(secondLine.GetEndPoint(0)));
+            } else {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Строит отрезок с начальной точкой в начале первой линии и конечной точкой в конце второй линии
+        /// </summary>
+        /// <param name="curveFirst">Первая линия</param>
+        /// <param name="curveSecond">Вторая линия</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public Curve CombineCurves(Curve curveFirst, Curve curveSecond) {
+            if(curveFirst is null) { throw new ArgumentNullException(nameof(curveFirst)); }
+            if(curveSecond is null) { throw new ArgumentNullException(nameof(curveSecond)); }
+
+            return Line.CreateBound(curveFirst.GetEndPoint(0), curveSecond.GetEndPoint(1));
+        }
+
 
         /// <summary>
         /// Возвращает толщину стены по Id типа стены из активного документа
@@ -211,123 +273,6 @@ namespace RevitFinishingWalls.Models {
                     throw new ArgumentException(nameof(wallTypeId));
                 }
             }
-        }
-
-        /// <summary>
-        /// Определяет пары сегмент границы помещения-элемент, который образует этот сегмент.
-        /// </summary>
-        /// <param name="segmentsLoop">Исходная коллекция сегментов границ помещения</param>
-        /// <param name="finishingWallTypeId">Id типа отделочной стены</param>
-        /// <returns>Коллекция классов, в которых содержатся линия границы помещения, 
-        /// смещенная вверх на заданное расстояние и элемент, который образует эту границу</returns>
-        private IList<CurveSegmentElement> GetCurveSegmentsElements(
-            IList<BoundarySegment> segmentsLoop,
-            ElementId finishingWallTypeId) {
-
-            List<CurveSegmentElement> curveSegmentsElements = new List<CurveSegmentElement>();
-
-            for(int i = 0; i < segmentsLoop.Count; i++) {
-                BoundarySegment segment = segmentsLoop[i];
-                ICollection<Element> segmentElements = GetBoundaryElement(segment);
-                if(segmentElements.Count > 0) {
-                    // получение лини оси отделочной стены,
-                    // смещенной влево на 1/2 толщины отделочной стены относительно исходной границы помещения
-                    double finishingWallTypeHalfWidth = GetWallTypeWidth(finishingWallTypeId) / 2;
-                    Curve curveWithOffset = segment.GetCurve().CreateOffset(-finishingWallTypeHalfWidth, XYZ.BasisZ);
-                    curveSegmentsElements.Add(new CurveSegmentElement(segmentElements, curveWithOffset));
-                }
-            }
-            return curveSegmentsElements;
-        }
-
-        private IList<IList<BoundarySegment>> GetBoundarySegments(Room room) {
-            if(room is null) { throw new ArgumentNullException(nameof(room)); }
-
-            return room.GetBoundarySegments(_spatialElementBoundaryOptions);
-        }
-
-        /// <summary>
-        /// Конвертирует миллиметры в футы (единицы длины ревита)
-        /// </summary>
-        /// <param name="mm"></param>
-        /// <returns></returns>
-        private double ConvertMmToFeet(double mm) {
-#if REVIT_2021_OR_GREATER
-            return UnitUtils.ConvertToInternalUnits(mm, UnitTypeId.Millimeters);
-#else
-            return UnitUtils.ConvertToInternalUnits(mm, DisplayUnitType.DUT_MILLIMETERS);
-#endif
-        }
-
-        /// <summary>
-        /// Вычисляет высоту стены, чтобы ее верхняя отметка от уровня была в соответствии с настройками
-        /// </summary>
-        /// <param name="room"></param>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        private double CalculateFinishingWallHeight(Room room, PluginConfig config) {
-            if(room is null) { throw new ArgumentNullException(nameof(room)); }
-            if(config is null) { throw new ArgumentNullException(nameof(config)); }
-
-            if(config.WallElevationMode == WallElevationMode.ManualHeight) {
-                return ConvertMmToFeet(config.WallElevationMm - config.WallBaseOffsetMm);
-            } else {
-                return GetRoomTopElevation(room) - ConvertMmToFeet(config.WallBaseOffsetMm);
-            }
-        }
-
-        /// <summary>
-        /// Возвращает отметку верха стены помещения с учетом верхнего ограничивающего элемента в единицах ревита
-        /// </summary>
-        /// <param name="room"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        private double GetRoomTopElevation(Room room) {
-            if(room is null) { throw new ArgumentNullException(nameof(room)); }
-
-            double roomVolume = room.GetParamValue<double>(BuiltInParameter.ROOM_VOLUME);
-            if(roomVolume > 0) {
-                double roomHeight = roomVolume / room.GetParamValue<double>(BuiltInParameter.ROOM_AREA);
-                return roomHeight + room.GetParamValue<double>(BuiltInParameter.ROOM_LOWER_OFFSET);
-            } else {
-                return room.GetParamValue<double>(BuiltInParameter.ROOM_UPPER_OFFSET);
-            }
-        }
-
-        /// <summary>
-        /// Проверяет, является ли вторая линия продолжением первой.
-        /// </summary>
-        /// <param name="first">Первая линия</param>
-        /// <param name="second">Вторая линия</param>
-        /// <returns>Вторая линия является продолжением первой только если обе линии - отрезки 
-        /// и если начало второго отрезка - это конец первого отрезка или наоборот</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        private bool IsContinuation(Curve first, Curve second) {
-            if(first is null) { throw new ArgumentNullException(nameof(first)); }
-            if(second is null) { throw new ArgumentNullException(nameof(second)); }
-
-            if((first is Line firstLine) && (second is Line secondLine)) {
-                return firstLine.Direction.IsAlmostEqualTo(secondLine.Direction)
-                    && (firstLine.GetEndPoint(0).IsAlmostEqualTo(secondLine.GetEndPoint(1))
-                    || firstLine.GetEndPoint(1).IsAlmostEqualTo(secondLine.GetEndPoint(0)));
-            } else {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Строит отрезок с начальной точкой в начале первой линии и конечной точкой в конце второй линии
-        /// </summary>
-        /// <param name="curveFirst">Первая линия</param>
-        /// <param name="curveSecond">Вторая линия</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        private Curve CombineCurves(Curve curveFirst, Curve curveSecond) {
-            if(curveFirst is null) { throw new ArgumentNullException(nameof(curveFirst)); }
-            if(curveSecond is null) { throw new ArgumentNullException(nameof(curveSecond)); }
-
-            return Line.CreateBound(curveFirst.GetEndPoint(0), curveSecond.GetEndPoint(1));
         }
 
         /// <summary>
