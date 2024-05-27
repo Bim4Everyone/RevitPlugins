@@ -28,7 +28,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
             var rooms = _revitRepository.GetRooms(config.RoomGetterMode);
             StringBuilder sb = new StringBuilder();
 
-            using(var transaction = _revitRepository.Document.StartTransaction("BIM: Создание отделочных стен")) {
+            using(var transaction = _revitRepository.Document.StartTransaction("Создание отделочных стен")) {
                 FailureHandlingOptions failOpt = transaction.GetFailureHandlingOptions();
                 failOpt.SetFailuresPreprocessor(new WallAndRoomSeparationLineOverlapHandler());
                 transaction.SetFailureHandlingOptions(failOpt);
