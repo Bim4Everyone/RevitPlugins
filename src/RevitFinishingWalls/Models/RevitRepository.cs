@@ -331,7 +331,7 @@ namespace RevitFinishingWalls.Models {
         }
 
         /// <summary>
-        /// Возвращает 3D вид по умолчанию
+        /// Возвращает 3D вид по умолчанию. Если {3D} вид по умолчанию не найден, будет создан новый "3D" вид по умолчанию
         /// </summary>
         /// <returns></returns>
         private View3D GetDefaultView3D() {
