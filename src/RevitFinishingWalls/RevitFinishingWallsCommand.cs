@@ -10,6 +10,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitFinishingWalls.Models;
+using RevitFinishingWalls.Services;
 using RevitFinishingWalls.Services.Creation;
 using RevitFinishingWalls.Services.Creation.Implements;
 using RevitFinishingWalls.ViewModels;
@@ -32,6 +33,9 @@ namespace RevitFinishingWalls {
                 kernel.Bind<IRoomFinisher>().To<RoomFinisher>().InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
+                kernel.Bind<ErrorViewModel>().ToSelf().InTransientScope();
+                kernel.Bind<ErrorWindow>().ToSelf().InTransientScope();
+                kernel.Bind<RichErrorMessageService>().ToSelf().InTransientScope();
 
                 kernel.UseXtraMessageBox<MainViewModel>();
 

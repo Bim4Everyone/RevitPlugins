@@ -23,7 +23,6 @@
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand EventName="Loaded"
                                Command="{Binding LoadConfigCommand}" />
-        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
     </dxmvvm:Interaction.Behaviors>
     <Window.Resources>
         <converters:EnumConverter x:Key="EnumConverter" />

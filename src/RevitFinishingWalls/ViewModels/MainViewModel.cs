@@ -2,15 +2,15 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitFinishingWalls.Models;
 using RevitFinishingWalls.Models.Enums;
+using RevitFinishingWalls.Services;
 using RevitFinishingWalls.Services.Creation;
 
 namespace RevitFinishingWalls.ViewModels {
@@ -18,7 +18,6 @@ namespace RevitFinishingWalls.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly IRoomFinisher _roomFinisher;
-        private readonly IMessageBoxService _messageBoxService;
 
         /// <summary>Максимальная допустимая отметка верха отделочной стены в мм</summary>
         private const int _wallTopMaxElevationMM = 50000;
@@ -31,13 +30,11 @@ namespace RevitFinishingWalls.ViewModels {
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
-            IRoomFinisher roomFinisher,
-            IMessageBoxService messageBoxService
+            IRoomFinisher roomFinisher
             ) {
             _pluginConfig = pluginConfig ?? throw new ArgumentNullException(nameof(pluginConfig));
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _roomFinisher = roomFinisher ?? throw new ArgumentNullException(nameof(roomFinisher));
-            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
 
             RoomGetterModes = new ObservableCollection<RoomGetterMode>(
                 Enum.GetValues(typeof(RoomGetterMode)).Cast<RoomGetterMode>());
@@ -53,8 +50,6 @@ namespace RevitFinishingWalls.ViewModels {
         public ICommand LoadConfigCommand { get; }
 
         public ICommand AcceptViewCommand { get; }
-
-        public IMessageBoxService MessageBoxService => _messageBoxService;
 
         public string ErrorText => Error;
 
@@ -166,7 +161,8 @@ namespace RevitFinishingWalls.ViewModels {
             SaveConfig();
             _roomFinisher.CreateWallsFinishing(_pluginConfig, out string error);
             if(!string.IsNullOrWhiteSpace(error)) {
-                _messageBoxService.Show(error, "BIM", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                var errorMsgService = ServicesProvider.GetPlatformService<RichErrorMessageService>();
+                errorMsgService.ShowErrorMessage(error);
             }
         }
 
