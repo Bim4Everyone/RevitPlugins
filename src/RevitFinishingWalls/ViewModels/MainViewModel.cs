@@ -177,8 +177,8 @@ namespace RevitFinishingWalls.ViewModels {
         private void LoadConfig() {
             SelectedRoomGetterMode = _pluginConfig.RoomGetterMode;
             SelectedWallElevationMode = _pluginConfig.WallElevationMode;
-            WallElevationByUser = _pluginConfig.WallElevation.ToString();
-            WallBaseOffset = _pluginConfig.WallBaseOffset.ToString();
+            WallElevationByUser = _pluginConfig.WallElevationMm.ToString();
+            WallBaseOffset = _pluginConfig.WallBaseOffsetMm.ToString();
             SelectedWallType = WallTypes.FirstOrDefault(wtvm => wtvm.WallTypeId == _pluginConfig.WallTypeId);
 
             OnPropertyChanged(nameof(ErrorText));
@@ -187,8 +187,8 @@ namespace RevitFinishingWalls.ViewModels {
         private void SaveConfig() {
             _pluginConfig.RoomGetterMode = SelectedRoomGetterMode;
             _pluginConfig.WallElevationMode = SelectedWallElevationMode;
-            _pluginConfig.WallBaseOffset = double.TryParse(WallBaseOffset, out double offset) ? offset : 0;
-            _pluginConfig.WallElevation = double.TryParse(WallElevationByUser, out double height) ? height : 0;
+            _pluginConfig.WallBaseOffsetMm = double.TryParse(WallBaseOffset, out double offset) ? offset : 0;
+            _pluginConfig.WallElevationMm = double.TryParse(WallElevationByUser, out double height) ? height : 0;
             _pluginConfig.WallTypeId = SelectedWallType.WallTypeId;
             _pluginConfig.SaveProjectConfig();
         }

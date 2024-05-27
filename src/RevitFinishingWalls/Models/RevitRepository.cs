@@ -124,7 +124,7 @@ namespace RevitFinishingWalls.Models {
             List<WallCreationData> wallCreationData = new List<WallCreationData>();
             WallCreationData lastWallCreationData = null;
             double wallHeight = CalculateFinishingWallHeight(room, config);
-            double wallBaseOffset = ConvertMmToFeet(config.WallBaseOffset);
+            double wallBaseOffset = ConvertMmToFeet(config.WallBaseOffsetMm);
 
             foreach(IList<BoundarySegment> loop in GetBoundarySegments(room)) {
                 IList<CurveSegmentElement> curveSegmentsElements = GetCurveSegmentsElements(loop, config.WallTypeId);
@@ -271,9 +271,9 @@ namespace RevitFinishingWalls.Models {
             if(config is null) { throw new ArgumentNullException(nameof(config)); }
 
             if(config.WallElevationMode == WallElevationMode.ManualHeight) {
-                return ConvertMmToFeet(config.WallElevation - config.WallBaseOffset);
+                return ConvertMmToFeet(config.WallElevationMm - config.WallBaseOffsetMm);
             } else {
-                return GetRoomTopElevation(room) - ConvertMmToFeet(config.WallBaseOffset);
+                return GetRoomTopElevation(room) - ConvertMmToFeet(config.WallBaseOffsetMm);
             }
         }
 

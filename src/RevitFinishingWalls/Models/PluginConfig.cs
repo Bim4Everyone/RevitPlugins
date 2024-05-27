@@ -25,7 +25,7 @@ namespace RevitFinishingWalls.Models {
         /// <summary>
         /// Отметка верха стены от уровня, заданная пользователем в мм
         /// </summary>
-        public double WallElevation { get; set; } = 3000;
+        public double WallElevationMm { get; set; } = 3000;
 
         /// <summary>
         /// Режим выбора помещений для обработки
@@ -40,7 +40,7 @@ namespace RevitFinishingWalls.Models {
         /// <summary>
         /// Отступ низа стены от уровня в мм
         /// </summary>
-        public double WallBaseOffset { get; set; } = 0;
+        public double WallBaseOffsetMm { get; set; } = 0;
 
 
         public static PluginConfig GetPluginConfig() {
