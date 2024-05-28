@@ -6,6 +6,6 @@ namespace RevitFinishingWalls.Views {
 
 
         public override string PluginName => nameof(RevitFinishingWalls);
-        public override string ProjectConfigName => nameof(MainWindow);
+        public override string ProjectConfigName => nameof(ErrorWindow);
     }
 }
