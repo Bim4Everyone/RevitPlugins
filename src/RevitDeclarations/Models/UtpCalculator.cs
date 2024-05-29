@@ -79,8 +79,8 @@ namespace RevitDeclarations.Models {
             foreach(var door in doors) {
                 Room room1 = door.get_FromRoom(_project.Phase);
                 Room room2 = door.get_ToRoom(_project.Phase);
-                string roomName1 = room1.get_Parameter(bltParam).AsString().ToLower();
-                string roomName2 = room2.get_Parameter(bltParam).AsString().ToLower();
+                string roomName1 = room1?.get_Parameter(bltParam).AsString().ToLower();
+                string roomName2 = room2?.get_Parameter(bltParam).AsString().ToLower();
 
                 if(roomName1 == name1 && roomName2 == name2) {
                     roomByNames[name1].Add(room1.Id);
@@ -107,8 +107,8 @@ namespace RevitDeclarations.Models {
             foreach(var door in doors) {
                 Room room1 = door.get_FromRoom(_project.Phase);
                 Room room2 = door.get_ToRoom(_project.Phase);
-                string roomName1 = room1.get_Parameter(bltParam).AsString().ToLower();
-                string roomName2 = room2.get_Parameter(bltParam).AsString().ToLower();
+                string roomName1 = room1?.get_Parameter(bltParam).AsString().ToLower();
+                string roomName2 = room2?.get_Parameter(bltParam).AsString().ToLower();
 
                 if(roomName1 == name1 && rooms.Contains(room2.Id)) {
                     roomByNames[name1].Add(room1.Id);
