@@ -3,6 +3,7 @@
   "Solution": "RevitPlugins.sln",
   "PluginName": "RevitVolumeOfWork",
   "PublishDirectory": "02.AR.extension\\АР.tab\\bin",
+  "RevitVersions": ["Rv2020", "Rv2021", "Rv2022", "Rv2023", "Rv2024"],
   "IconUrl": "https://icons8.com/icon/40112/brick-wall",
   "BundleName": "ВОР кладка",
   "BundleType": "InvokeButton",

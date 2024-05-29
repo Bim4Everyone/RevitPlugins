@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup Condition="$(Configuration.Contains('2016'))">
+        <RevitVersion>2016</RevitVersion>
+        <TargetFramework>net45</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)' != '' and $(RevitVersion) == 2016">
+        <DefineConstants>$(DefineConstants);REVIT_2016</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)' != '' and $(RevitVersion) &lt;= 2016">
+        <DefineConstants>$(DefineConstants);REVIT_2016_OR_LESS</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)' != '' and $(RevitVersion) &gt;= 2016">
+        <DefineConstants>$(DefineConstants);REVIT_2016_OR_GREATER</DefineConstants>
+    </PropertyGroup>
+</Project>

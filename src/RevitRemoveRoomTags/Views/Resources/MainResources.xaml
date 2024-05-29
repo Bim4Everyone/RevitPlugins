@@ -1,0 +1,61 @@
+﻿ <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+    <ControlTemplate x:Key="ValidationFailed">
+        <StackPanel Orientation="Horizontal">
+            <Border
+                BorderBrush="Red" 
+                BorderThickness="2">
+                <AdornedElementPlaceholder />
+            </Border>
+            <TextBlock
+                Foreground="Red"
+                FontSize="26" 
+                Margin="3 0"
+                Text="!"/>
+        </StackPanel>
+    </ControlTemplate>
+
+
+    <Style TargetType="TextBox">
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter
+                    Property="ToolTip"
+                    Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                <Setter Property="Foreground" Value="Red" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+
+    <Style x:Key="ErrorTextBlock" TargetType="TextBlock">
+        <Setter Property="Text" 
+            Value="{Binding 
+                 RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
+                 Path=ValidationErrors[0].ErrorContent}"/>
+
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding 
+                 RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
+                 Path=ValidationErrors.Count}" 
+                 Value="0">
+                <Setter Property="Text" Value="{Binding ErrorText}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+
+    <Style x:Key="AcceptViewButton" TargetType="Button">
+        <Setter Property="IsEnabled" Value="False"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding 
+                     RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
+                     Path=ValidationErrors.Count}" 
+                     Value="0">
+                <Setter Property="IsEnabled" Value="True"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

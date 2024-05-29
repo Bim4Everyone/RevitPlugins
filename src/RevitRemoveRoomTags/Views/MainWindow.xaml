@@ -1,0 +1,246 @@
+﻿ <base:PlatformWindow
+    x:Class="RevitRemoveRoomTags.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitRemoveRoomTags.Views"
+    xmlns:vms="clr-namespace:RevitRemoveRoomTags.ViewModels"
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="MainWindow"
+    MinHeight="450" MinWidth="765"
+    Height="450" Width="765"
+    
+    Validation.Error="Window_Error"
+    
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/MainResources.xaml"/>
+                <ResourceDictionary Source="Resources/ToolTipResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+
+        <DockPanel>
+            <TextBlock
+                DockPanel.Dock="Left"
+                Margin="10 5 5 5"
+                VerticalAlignment="Center"
+                Text="Выбрано видов до запуска плагина: " />
+
+            <TextBlock
+                DockPanel.Dock="Left"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="{Binding Path=SelectedViews.Count}" />
+
+            <CheckBox
+                DockPanel.Dock="Left"
+                Margin="100 5 5 5"
+                VerticalContentAlignment="Center"
+                Content="Открыть выбранные виды"
+                IsChecked="{Binding Path=NeedOpenSelectedViews}"/>
+
+            <Grid DockPanel.Dock="Right">
+                <Rectangle 
+                    HorizontalAlignment="Right"
+                    Margin="10"
+                    Fill="WhiteSmoke"
+                    Stroke="Black"
+                    Width="20"
+                    Height="20"
+                    RadiusX="8"
+                    RadiusY="8"/>
+                <TextBlock
+                    HorizontalAlignment="Right"
+                    Margin="10 10 18.5 10"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Text="i" FontFamily="Arial">
+                    <TextBlock.ToolTip>
+                        <StaticResource ResourceKey="TextBlockToolTip" />
+                    </TextBlock.ToolTip>
+                </TextBlock>
+            </Grid>
+        </DockPanel>
+
+
+        <TextBlock
+            Grid.Row="1"
+            Margin="10 5 5 5"
+            VerticalAlignment="Center"
+            Text="Задачи для работы: " />
+
+        <ListView 
+            Grid.Row="2"
+            Margin="10"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.CanContentScroll="False"
+            ItemsSource="{Binding Path=RoomTagTasks, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            SelectedItem="{Binding Path=SelectedRoomTagTask}"
+            SelectionMode="Single">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Выбор марок" Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Margin="3"
+                                    Width="155"
+                                    Height="30"
+                                    Content="Выбрать"
+                                    Click="ButtonCancel_Click"
+                                    Command="{Binding Path=DataContext.SelectRoomTagsCommand, 
+                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                    CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn 
+                        Header="Выбрано:" 
+                        Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Width="50" 
+                                    TextAlignment="Center"
+                                    Text="{Binding RoomTags.Count}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn 
+                        Header="Смещение по X"
+                        Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox 
+                                    Margin="5"
+                                    Width="155"
+                                    Height="30"
+                                    HorizontalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Validation.ErrorTemplate="{StaticResource ValidationFailed}"
+                                    
+                                    Text="{Binding 
+                                        Path=XOffsetAsStr,
+                                        UpdateSourceTrigger=PropertyChanged, 
+                                        ValidatesOnDataErrors=True, 
+                                        NotifyOnValidationError=True}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn
+                        Header="Смещение по Y" 
+                        Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox
+                                    Margin="5"
+                                    Width="155"
+                                    Height="30"
+                                    HorizontalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Validation.ErrorTemplate="{StaticResource ValidationFailed}"
+                                    
+                                    Text="{Binding 
+                                        Path=YOffsetAsStr,
+                                        UpdateSourceTrigger=PropertyChanged, 
+                                        ValidatesOnDataErrors=True, 
+                                        NotifyOnValidationError=True}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Удалять?" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox 
+                                    HorizontalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    IsChecked="{Binding Path=RemoveTags}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel
+            Grid.Row="3"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <Button
+                Margin="10 0 10 20"
+                Width="150"
+                ToolTip="Добавить пустую задачу в список задач"
+                Content="Добавить задачу"
+                Command="{Binding Path=AddTaskCommand}"/>
+
+            <Button
+                Margin="10 0 10 20"
+                Width="150"
+                ToolTip="Удалить выбранную задачу в списке задач"
+                Content="Удалить задачу"
+                Command="{Binding Path=DeleteTaskCommand}"/>
+        </StackPanel>
+
+
+        <StackPanel
+            Grid.Row="4"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}"/>
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                Click="ButtonOk_Click"
+                Style="{StaticResource AcceptViewButton}"
+                Command="{Binding Path=AcceptViewCommand}"/>
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Отмена"
+                Click="ButtonCancel_Click">
+            </Button>
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>

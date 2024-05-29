@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup Condition="$(Configuration.Contains('2023'))">
+        <RevitVersion>2023</RevitVersion>
+        <TargetFramework>net48</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)' != '' and $(RevitVersion) == 2023">
+        <DefineConstants>$(DefineConstants);REVIT_2023</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)' != '' and $(RevitVersion) &lt;= 2023">
+        <DefineConstants>$(DefineConstants);REVIT_2023_OR_LESS</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)' != '' and $(RevitVersion) &gt;= 2023">
+        <DefineConstants>$(DefineConstants);REVIT_2023_OR_GREATER</DefineConstants>
+    </PropertyGroup>
+</Project>

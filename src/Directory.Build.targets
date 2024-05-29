@@ -1,0 +1,6 @@
+<Project>
+    <Target Name="IncrementalClean" />
+    <Import Project="_RevitVersions\Autodesk.Revit.Sdk.Refs.*.props"/>
+    <Import Condition="'$(UseDevExpress)' == 'true'" Project="_ProjectProps\DevExpress.props"/>
+    <Import Condition="'$(UseRevitClashes)' == 'true'" Project="_ProjectProps\RevitClashes.props"/>
+</Project>

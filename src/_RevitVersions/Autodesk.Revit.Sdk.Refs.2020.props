@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup Condition="$(Configuration.Contains('2020'))">
+        <RevitVersion>2020</RevitVersion>
+        <TargetFramework>net47</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)' != '' and $(RevitVersion) == 2020">
+        <DefineConstants>$(DefineConstants);REVIT_2020</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)' != '' and $(RevitVersion) &lt;= 2020">
+        <DefineConstants>$(DefineConstants);REVIT_2020_OR_LESS</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(RevitVersion)' != '' and $(RevitVersion) &gt;= 2020">
+        <DefineConstants>$(DefineConstants);REVIT_2020_OR_GREATER</DefineConstants>
+    </PropertyGroup>
+</Project>

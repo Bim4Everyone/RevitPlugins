@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<UseDevExpress>true</UseDevExpress>
+		<UseRevitClashes>true</UseRevitClashes>
+	</PropertyGroup>
+	
+	<ItemGroup>
+	  <Resource Include="Resources\conduit.png" />
+	  <Resource Include="Resources\pipe.png" />
+	  <Resource Include="Resources\rectangleDuct.png" />
+	  <Resource Include="Resources\roundDuct.png" />
+	  <Resource Include="Resources\tray.png" />
+	</ItemGroup>
+</Project>
