@@ -81,6 +81,7 @@ namespace RevitFinishingWalls.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _wallHeightByUser, value);
                 OnPropertyChanged(nameof(ErrorText));
+                OnPropertyChanged(nameof(WallBaseOffset));
             }
         }
 
@@ -107,6 +108,7 @@ namespace RevitFinishingWalls.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _wallBaseOffset, value);
                 OnPropertyChanged(nameof(ErrorText));
+                OnPropertyChanged(nameof(WallElevationByUser));
             }
         }
 
