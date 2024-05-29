@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -51,7 +52,7 @@ namespace RevitFinishingWalls.Models {
             if(elements is null) { throw new ArgumentNullException(nameof(elements)); }
 
             foreach(Element element in elements) {
-                if(element != null) {
+                if(element != null && !ElementsForJoin.Any(el => el.Id == element.Id)) {
                     ElementsForJoin.Add(element);
                 }
             }
