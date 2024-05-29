@@ -11,7 +11,7 @@ namespace RevitDeclarations.Models
         public RoomElement(Room room, DeclarationSettings settings) {
             _revitRoom = room;
 
-            _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, 2);
+            _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.Accuracy);
             _areaCoefRevit = CalculateAreaCoefRevit(settings);
         }
 
