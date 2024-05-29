@@ -33,7 +33,7 @@ namespace RevitDeclarations.Models {
         public int Accuracy { get; set; }
         public List<string> MainRoomNames => _mainNames;
         public string[] BannedRoomNames => _prioritiesConfig.BannedRoomNames;
-        public DeclarationSettingsViewModel ViewModel { get; set; }
+        public ParametersViewModel ViewModel { get; set; }
 
         public Parameter FilterRoomsParam => ViewModel.SelectedFilterRoomsParam;
         public string FilterRoomsValue => ViewModel.FilterRoomsValue;

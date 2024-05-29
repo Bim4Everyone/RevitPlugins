@@ -48,7 +48,7 @@
 
             <TabItem
                 Header="Параметры"
-                DataContext="{Binding DeclarationSettingsVM}">
+                DataContext="{Binding ParametersViewModel}">
                 <tabData:ParametersTabItem/>
             </TabItem>
 

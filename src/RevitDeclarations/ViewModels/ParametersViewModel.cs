@@ -10,7 +10,7 @@ using dosymep.WPF.ViewModels;
 using Autodesk.Revit.DB;
 
 namespace RevitDeclarations.ViewModels {
-    internal class DeclarationSettingsViewModel : BaseViewModel {
+    internal class ParametersViewModel : BaseViewModel {
         private readonly MainViewModel _mainViewModel;
         private readonly RevitRepository _revitRepository;
         private readonly ParameterToolTip _parameterToolTip;
@@ -44,7 +44,7 @@ namespace RevitDeclarations.ViewModels {
         private Parameter _selectedRoomAreatParam;
         private Parameter _selectedRoomAreaCoefParam;
 
-        public DeclarationSettingsViewModel(RevitRepository revitRepository, MainViewModel mainViewModel) {
+        public ParametersViewModel(RevitRepository revitRepository, MainViewModel mainViewModel) {
             _mainViewModel = mainViewModel;
             _revitRepository = revitRepository;
 

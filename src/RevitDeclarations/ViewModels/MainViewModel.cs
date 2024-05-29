@@ -18,7 +18,7 @@ namespace RevitDeclarations.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly DeclarationSettings _settings;
 
-        private readonly DeclarationSettingsViewModel _declarationSettingsVM;
+        private readonly ParametersViewModel _parametersViewModel;
         private readonly PrioritiesViewModel _prioritiesViewModel;
         private readonly IList<RevitDocumentViewModel> _revitDocuments;
         private readonly List<Phase> _phases;
@@ -49,7 +49,7 @@ namespace RevitDeclarations.ViewModels {
                 _revitDocuments.Insert(0, currentDocumentVM);
             }
 
-            _declarationSettingsVM = new DeclarationSettingsViewModel(_revitRepository, this);
+            _parametersViewModel = new ParametersViewModel(_revitRepository, this);
             _prioritiesViewModel = new PrioritiesViewModel(_settings.Priorities);
 
             SelectFolderCommand = new RelayCommand(SelectFolder);
@@ -84,10 +84,9 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _accuracy, value);
         }
 
-        public PrioritiesViewModel PrioritiesViewModel => _prioritiesViewModel;
-
         public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
-        public DeclarationSettingsViewModel DeclarationSettingsVM => _declarationSettingsVM;
+        public ParametersViewModel ParametersViewModel => _parametersViewModel;
+        public PrioritiesViewModel PrioritiesViewModel => _prioritiesViewModel;
 
         public string ErrorText {
             get => _errorText;
@@ -108,7 +107,7 @@ namespace RevitDeclarations.ViewModels {
             int.TryParse(_accuracy, out int accuracy);
             _settings.Accuracy = accuracy;
             _settings.SelectedPhase = _selectedPhase;
-            _settings.ViewModel = DeclarationSettingsVM;
+            _settings.ViewModel = ParametersViewModel;
 
             List<RevitDocumentViewModel> checkedDocuments = _revitDocuments
                 .Where(x => x.IsChecked)
@@ -273,7 +272,7 @@ namespace RevitDeclarations.ViewModels {
                 SelectedPhase = _selectedPhase = _phases[_phases.Count - 1];
             }
 
-            _declarationSettingsVM.SetParametersFromConfig(configSettings);
+            _parametersViewModel.SetParametersFromConfig(configSettings);
 
             config.SaveProjectConfig();
         }
