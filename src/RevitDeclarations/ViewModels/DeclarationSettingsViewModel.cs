@@ -66,10 +66,7 @@ namespace RevitDeclarations.ViewModels {
         public ICommand SetLastConfigCommand { get; }
         public ICommand SetCompanyConfigCommand { get; }
 
-        public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.
-            RevitDocuments
-            .Where(x => x.HasRooms())
-            .ToList();
+        public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.RevitDocuments;
 
         public RevitDocumentViewModel SelectedDocument {
             get => _selectedDocument;

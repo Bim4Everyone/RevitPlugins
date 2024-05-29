@@ -41,8 +41,13 @@ namespace RevitDeclarations.ViewModels {
             _revitDocuments = _revitRepository
                 .GetLinks()
                 .Select(x => new RevitDocumentViewModel(x, _settings))
+                .Where(x => x.HasRooms())
                 .ToList();
-            _revitDocuments.Insert(0, new RevitDocumentViewModel(_revitRepository.Document, _settings));
+
+            RevitDocumentViewModel currentDocumentVM = new RevitDocumentViewModel(_revitRepository.Document, _settings);
+            if(currentDocumentVM.HasRooms()) {
+                _revitDocuments.Insert(0, currentDocumentVM);
+            }
 
             _declarationSettingsVM = new DeclarationSettingsViewModel(_revitRepository, this);
             _prioritiesViewModel = new PrioritiesViewModel(_settings.Priorities);
@@ -194,9 +199,6 @@ namespace RevitDeclarations.ViewModels {
             bool hasPhases = checkedDocuments
                 .All(x => x.HasPhase(_selectedPhase));
 
-            bool hasLinkRooms = checkedDocuments
-                .All(x => x.HasRooms());
-
             if(string.IsNullOrEmpty(_filePath)) {
                 ErrorText = "Не выбрана папка";
                 return false;
@@ -211,10 +213,6 @@ namespace RevitDeclarations.ViewModels {
             }
             if(!hasPhases) {
                 ErrorText = "В выбранных проектах отсутствует выбранная стадия";
-                return false;
-            }
-            if(!hasLinkRooms) {
-                ErrorText = "Выбран проект без помещений";
                 return false;
             }
 
