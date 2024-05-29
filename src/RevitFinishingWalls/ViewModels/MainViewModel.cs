@@ -4,13 +4,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitFinishingWalls.Models;
 using RevitFinishingWalls.Models.Enums;
-using RevitFinishingWalls.Services;
 using RevitFinishingWalls.Services.Creation;
 
 namespace RevitFinishingWalls.ViewModels {
@@ -162,10 +160,10 @@ namespace RevitFinishingWalls.ViewModels {
         private void AcceptView() {
             SaveConfig();
             _roomFinisher.CreateWallsFinishing(_pluginConfig, out string error);
-            if(!string.IsNullOrWhiteSpace(error)) {
-                var errorMsgService = ServicesProvider.GetPlatformService<RichErrorMessageService>();
-                errorMsgService.ShowErrorMessage(error);
-            }
+            //if(!string.IsNullOrWhiteSpace(error)) {
+            //    var errorMsgService = ServicesProvider.GetPlatformService<RichErrorMessageService>();
+            //    errorMsgService.ShowErrorMessage(error);
+            //}
         }
 
         private bool CanAcceptView() {
