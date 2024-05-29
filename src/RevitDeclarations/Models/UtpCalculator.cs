@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 
 namespace RevitDeclarations.Models {
     internal class UtpCalculator {
-        private readonly RevitProject _project;
+        private readonly DeclarationProject _project;
         private readonly DeclarationSettings _settings;
 
         private readonly PrioritiesConfig _priorities;
@@ -23,7 +23,7 @@ namespace RevitDeclarations.Models {
 
         private readonly List<ElementId> _roomsWithBathFamily;
 
-        public UtpCalculator(RevitProject project, DeclarationSettings settings) {
+        public UtpCalculator(DeclarationProject project, DeclarationSettings settings) {
             _project = project;
             _settings = settings;
 

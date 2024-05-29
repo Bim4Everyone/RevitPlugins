@@ -79,7 +79,7 @@ namespace RevitDeclarations.Models {
         public string UtpLaundry => _utpLaundry;
         public string UtpExtraBalconyArea => _utpExtraBalconyArea;
 
-        // Calculates apartemnt areas based on the current system room area property
+        // Calculates apartment areas based on the current system room area property
         public void CalculateRevitAreas() {
             _areaMainRevit = _rooms
                 .Select(x => x.AreaRevit)

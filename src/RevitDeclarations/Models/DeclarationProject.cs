@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
-    internal class RevitProject {
+    internal class DeclarationProject {
         private readonly RevitDocumentViewModel _document;
         private readonly IList<RoomElement> _rooms;
         private readonly IList<Apartment> _apartments;
@@ -14,7 +14,7 @@ namespace RevitDeclarations.Models {
         private readonly RevitRepository _revitRepository;
         private readonly Phase _phase;
 
-        public RevitProject(RevitDocumentViewModel document,
+        public DeclarationProject(RevitDocumentViewModel document,
                             RevitRepository revitRepository,
                             DeclarationSettings settings) {
             _document = document;

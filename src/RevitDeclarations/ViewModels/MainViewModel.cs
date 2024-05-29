@@ -44,7 +44,9 @@ namespace RevitDeclarations.ViewModels {
                 .Where(x => x.HasRooms())
                 .ToList();
 
-            RevitDocumentViewModel currentDocumentVM = new RevitDocumentViewModel(_revitRepository.Document, _settings);
+            RevitDocumentViewModel currentDocumentVM = 
+                new RevitDocumentViewModel(_revitRepository.Document, _settings);
+
             if(currentDocumentVM.HasRooms()) {
                 _revitDocuments.Insert(0, currentDocumentVM);
             }
@@ -123,8 +125,8 @@ namespace RevitDeclarations.ViewModels {
                 var window = new ErrorWindow() { DataContext = new ErrorsViewModel(parameterErrors, false) };
                 window.ShowDialog();
             } else {
-                List<RevitProject> projects = checkedDocuments
-                    .Select(x => new RevitProject(x, _revitRepository, _settings))
+                List<DeclarationProject> projects = checkedDocuments
+                    .Select(x => new DeclarationProject(x, _revitRepository, _settings))
                     .ToList();
 
                 IEnumerable<ErrorsListViewModel> noApartsErrors = projects
@@ -173,8 +175,8 @@ namespace RevitDeclarations.ViewModels {
             }
         }
 
-        private void ExportProjects(List<RevitProject> projects) {
-            foreach(RevitProject project in projects) {
+        private void ExportProjects(List<DeclarationProject> projects) {
+            foreach(DeclarationProject project in projects) {
                 project.CalculateUtpForApartments();
             }
 
