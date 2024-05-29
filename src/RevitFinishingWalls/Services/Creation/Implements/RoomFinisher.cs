@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -9,6 +9,7 @@ using dosymep.Revit;
 using RevitFinishingWalls.Exceptions;
 using RevitFinishingWalls.Models;
 using RevitFinishingWalls.Services.FailureHandlers;
+using RevitFinishingWalls.ViewModels;
 
 namespace RevitFinishingWalls.Services.Creation.Implements {
     internal class RoomFinisher : IRoomFinisher {
@@ -27,11 +28,11 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
         }
 
 
-        public void CreateWallsFinishing(PluginConfig config, out string error) {
+        public ICollection<RoomErrorsViewModel> CreateWallsFinishing(PluginConfig config) {
             if(config is null) { throw new ArgumentNullException(nameof(config)); }
 
             var rooms = _revitRepository.GetRooms(config.RoomGetterMode);
-            StringBuilder sb = new StringBuilder();
+            List<RoomErrorsViewModel> errors = new List<RoomErrorsViewModel>();
 
             using(var transaction = _revitRepository.Document.StartTransaction("Создание отделочных стен")) {
                 FailureHandlingOptions failOpt = transaction.GetFailureHandlingOptions();
@@ -39,24 +40,28 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                 transaction.SetFailureHandlingOptions(failOpt);
                 foreach(var room in rooms) {
                     IList<WallCreationData> datas = _wallCreationDataProvider.GetWallCreationData(room, config);
+                    RoomErrorsViewModel roomErrors = new RoomErrorsViewModel(room);
                     for(int i = 0; i < datas.Count; i++) {
                         try {
                             var wall = _revitRepository.CreateWall(
                                 datas[i],
                                 out ICollection<ElementId> notJoinedElements);
                             if(notJoinedElements.Count > 0) {
-                                sb.AppendLine(
-                                    $"Не удалось соединить стену с Id={wall.Id} и элементы с Id: " +
-                                    $"{string.Join(", ", notJoinedElements)}");
+                                roomErrors.Errors.Add(
+                                    new ErrorViewModel("Не удалось присоединить отделочную стену",
+                                    new HashSet<ElementId>(notJoinedElements.Union(new ElementId[] { wall.Id }))));
                             }
                         } catch(CannotCreateWallException e) {
-                            sb.AppendLine(e.Message + "\n");
+                            roomErrors.Errors.Add(new ErrorViewModel(e.Message, room.Id));
                         }
+                    }
+                    if(roomErrors.Errors.Count > 0) {
+                        errors.Add(roomErrors);
                     }
                 }
                 transaction.Commit();
             }
-            error = sb.ToString();
+            return errors;
         }
     }
 }

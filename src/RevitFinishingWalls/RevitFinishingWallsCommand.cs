@@ -33,7 +33,7 @@ namespace RevitFinishingWalls {
                 kernel.Bind<IRoomFinisher>().To<RoomFinisher>().InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
-                kernel.Bind<ErrorViewModel>().ToSelf().InTransientScope();
+                kernel.Bind<ErrorWindowViewModel>().ToSelf().InTransientScope();
                 kernel.Bind<ErrorWindow>().ToSelf().InTransientScope();
                 kernel.Bind<RichErrorMessageService>().ToSelf().InTransientScope();
 

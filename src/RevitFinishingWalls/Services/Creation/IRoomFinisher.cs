@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+
 using RevitFinishingWalls.Models;
+using RevitFinishingWalls.ViewModels;
 
 namespace RevitFinishingWalls.Services.Creation {
     /// <summary>
@@ -9,7 +12,7 @@ namespace RevitFinishingWalls.Services.Creation {
         /// Создает отделку стен
         /// </summary>
         /// <param name="config">Настройки отделки стен</param>
-        /// <param name="error">Ошибки в построении отделочных стен</param>
-        void CreateWallsFinishing(PluginConfig config, out string error);
+        /// <returns>Ошибки в построении отделочных стен в помещениях</returns>
+        ICollection<RoomErrorsViewModel> CreateWallsFinishing(PluginConfig config);
     }
 }

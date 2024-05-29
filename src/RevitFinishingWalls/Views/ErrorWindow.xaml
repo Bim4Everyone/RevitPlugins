@@ -14,18 +14,8 @@
                            MinHeight="200"
                            MinWidth="200"
                            WindowStartupLocation="CenterScreen"
-                           d:DataContext="{d:DesignInstance vms:ErrorViewModel, IsDesignTimeCreatable=False}">
+                           d:DataContext="{d:DesignInstance vms:ErrorWindowViewModel, IsDesignTimeCreatable=False}">
     <DockPanel>
-        <dxe:TextEdit Text="{Binding Message}"
-                      Background="Transparent"
-                      BorderThickness="0"
-                      TextWrapping="Wrap"
-                      Margin="5"
-                      IsReadOnly="True"
-                      HorizontalContentAlignment="Left"
-                      VerticalContentAlignment="Top"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      VerticalScrollBarVisibility="Auto" />
+
     </DockPanel>
 </base:ThemedPlatformWindow>

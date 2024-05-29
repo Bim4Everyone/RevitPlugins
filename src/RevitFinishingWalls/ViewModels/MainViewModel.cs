@@ -161,10 +161,10 @@ namespace RevitFinishingWalls.ViewModels {
 
         private void AcceptView() {
             SaveConfig();
-            _roomFinisher.CreateWallsFinishing(_pluginConfig, out string error);
-            if(!string.IsNullOrWhiteSpace(error)) {
+            var errors = _roomFinisher.CreateWallsFinishing(_pluginConfig);
+            if(errors.Count > 0) {
                 var errorMsgService = ServicesProvider.GetPlatformService<RichErrorMessageService>();
-                errorMsgService.ShowErrorMessage(error);
+                errorMsgService.ShowErrorWindow(errors);
             }
         }
 
