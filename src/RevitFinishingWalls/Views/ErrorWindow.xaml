@@ -65,6 +65,8 @@
                     Value="False" />
             <Setter Property="ShowGroupPanel"
                     Value="False" />
+            <Setter Property="AllowGrouping"
+                    Value="False" />
         </Style>
         <Style TargetType="dxg:GridColumn">
             <Setter Property="SortMode"
@@ -89,8 +91,7 @@
                                      ItemsSource="{Binding Rooms}"
                                      SelectedItem="{Binding SelectedRoom}">
                         <dxg:GridControl.View>
-                            <dxg:TableView x:Name="viewRooms"
-                                           AllowGrouping="False"></dxg:TableView>
+                            <dxg:TableView x:Name="viewRooms"></dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem SummaryType="Count" />
