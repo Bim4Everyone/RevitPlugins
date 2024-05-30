@@ -3,7 +3,4 @@
 		<UseDevExpress>true</UseDevExpress>
 		<UseRevitClashes>true</UseRevitClashes>
 	</PropertyGroup>
-	<ItemGroup>
-	  <Folder Include="Models\Handlers\" />
-	</ItemGroup>
 </Project>
