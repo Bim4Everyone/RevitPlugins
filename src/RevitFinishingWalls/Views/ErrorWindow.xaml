@@ -47,6 +47,8 @@
                     Value="Auto" />
             <Setter Property="SelectionMode"
                     Value="Row" />
+            <Setter Property="AutoExpandAllGroups"
+                    Value="True" />
         </Style>
         <Style TargetType="dxg:TableView">
             <Setter Property="ShowDataNavigator"
@@ -97,12 +99,19 @@
                             <dxg:GridSummaryItem SummaryType="Count" />
                         </dxg:GridControl.GroupSummary>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn Width="70">
+                            <dxg:GridColumn Width="100"
+                                            AllowResizing="False">
                                 <dxg:GridColumn.CellTemplate>
                                     <DataTemplate>
-                                        <dx:SimpleButton Content="Выбрать"
-                                                         Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
-                                                         CommandParameter="{Binding Row}" />
+                                        <dx:SimpleButton Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
+                                                         CommandParameter="{Binding Row}"
+                                                         Glyph="{dx:DXImage 'SvgImages/HybridDemoIcons/Editors/HybridDemo_Search Button.svg'}">
+                                            <dx:SimpleButton.Content>
+                                                <DockPanel>
+                                                    <TextBlock Text="{Binding RowData.Row.RoomId}" />
+                                                </DockPanel>
+                                            </dx:SimpleButton.Content>
+                                        </dx:SimpleButton>
                                     </DataTemplate>
                                 </dxg:GridColumn.CellTemplate>
                             </dxg:GridColumn>
@@ -114,13 +123,9 @@
                                             Header="Номер"
                                             FieldName="RoomNumber">
                             </dxg:GridColumn>
-                            <dxg:GridColumn Width="3*"
+                            <dxg:GridColumn Width="4*"
                                             Header="Имя"
                                             FieldName="Name">
-                            </dxg:GridColumn>
-                            <dxg:GridColumn Width="2*"
-                                            Header="ID"
-                                            FieldName="RoomId">
                             </dxg:GridColumn>
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
