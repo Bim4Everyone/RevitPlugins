@@ -77,6 +77,8 @@
                     Value="True" />
             <Setter Property="ReadOnly"
                     Value="True" />
+            <Setter Property="MinWidth"
+                    Value="50" />
         </Style>
     </Window.Resources>
 
@@ -105,7 +107,8 @@
                                     <DataTemplate>
                                         <dx:SimpleButton Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
                                                          CommandParameter="{Binding Row}"
-                                                         Glyph="{dx:DXImage 'SvgImages/HybridDemoIcons/Editors/HybridDemo_Search Button.svg'}">
+                                                         Glyph="{dx:DXImage 'SvgImages/HybridDemoIcons/Editors/HybridDemo_Search Button.svg'}"
+                                                         GlyphHeight="16">
                                             <dx:SimpleButton.Content>
                                                 <DockPanel>
                                                     <TextBlock Text="{Binding RowData.Row.RoomId}" />
@@ -151,7 +154,8 @@
                             <dxg:TableView x:Name="viewErrors"></dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn Width="70">
+                            <dxg:GridColumn Width="70"
+                                            AllowResizing="False">
                                 <dxg:GridColumn.CellTemplate>
                                     <DataTemplate>
                                         <dx:SimpleButton Content="Выбрать"
