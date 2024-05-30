@@ -117,62 +117,67 @@ namespace RevitDeclarations.ViewModels {
 
             SaveConfig();
 
+            // Проверка 1. Наличие параметров во всех выбранных проектах.
             IEnumerable<ErrorsListViewModel> parameterErrors = checkedDocuments
                 .Select(x => x.CheckParameters())
                 .Where(x => x.Errors.Any());
-
             if(parameterErrors.Any()) {
                 var window = new ErrorWindow() { DataContext = new ErrorsViewModel(parameterErrors, false) };
                 window.ShowDialog();
-            } else {
-                List<DeclarationProject> projects = checkedDocuments
-                    .Select(x => new DeclarationProject(x, _revitRepository, _settings))
-                    .ToList();
+                return;
+            }
 
-                IEnumerable<ErrorsListViewModel> noApartsErrors = projects
-                    .Select(x => x.CheckApartmentsInRpoject())
-                    .Where(x => x.Errors.Any());
+            List<DeclarationProject> projects = checkedDocuments
+                .Select(x => new DeclarationProject(x, _revitRepository, _settings))
+                .ToList();
 
-                IEnumerable<ErrorsListViewModel> areasErrors = projects
-                    .Select(x => x.CheckRoomAreasEquality())
-                    .Where(x => x.Errors.Any());
+            // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.
+            IEnumerable<ErrorsListViewModel> noApartsErrors = projects
+                .Select(x => x.CheckApartmentsInRpoject())
+                .Where(x => x.Errors.Any());
+            if(noApartsErrors.Any()) {
+                var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
+                window.ShowDialog();
+                return;
+            }
 
-                if(noApartsErrors.Any()) {
-                    var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
-                    window.ShowDialog();
-                } else if(areasErrors.Any()) {
-                    var window = new ErrorWindow() { DataContext = new ErrorsViewModel(areasErrors, false) };
-                    window.ShowDialog();
-                } else {
-                    IEnumerable<ErrorsListViewModel> actualRoomAreasErrors = projects
-                        .Select(x => x.CheckActualRoomAreas())
-                        .Where(x => x.Errors.Any());
+            // Проверка 3. У всех помещений каждой квартиры должны совпадать общие площади квартиры.
+            IEnumerable<ErrorsListViewModel> areasErrors = projects
+                .Select(x => x.CheckRoomAreasEquality())
+                .Where(x => x.Errors.Any());
+            if(areasErrors.Any()) {
+                var window = new ErrorWindow() { DataContext = new ErrorsViewModel(areasErrors, false) };
+                window.ShowDialog();
+                return;
+            }
 
-                    if(actualRoomAreasErrors.Any()) {
-                        var window = new ErrorWindow() { DataContext = new ErrorsViewModel(actualRoomAreasErrors, true) };
-                        window.ShowDialog();
+            // Проверка 4. У каждого помещения должны быть актуальные площади помещения из кватирографии.
+            IEnumerable<ErrorsListViewModel> actualRoomAreasErrors = projects
+                .Select(x => x.CheckActualRoomAreas())
+                .Where(x => x.Errors.Any());
+            if(actualRoomAreasErrors.Any()) {
+                var window = new ErrorWindow() { DataContext = new ErrorsViewModel(actualRoomAreasErrors, true) };
+                window.ShowDialog();
 
-                        if(!(bool) window.DialogResult) {
-                            return;
-                        }
-                    }
-
-                    IEnumerable<ErrorsListViewModel> actualApartmentAreasErrors = projects
-                        .Select(x => x.CheckActualApartmentAreas())
-                        .Where(x => x.Errors.Any());
-
-                    if(actualApartmentAreasErrors.Any()) {
-                        var window = new ErrorWindow() { DataContext = new ErrorsViewModel(actualApartmentAreasErrors, true) };
-                        window.ShowDialog();
-
-                        if(!(bool) window.DialogResult) {
-                            return;
-                        }
-                    }
-
-                    ExportProjects(projects);
+                if(!(bool) window.DialogResult) {
+                    return;
                 }
             }
+
+            // Проверка 5. У каждого помещения должны быть актуальные площади квартиры из кватирографии.
+            IEnumerable<ErrorsListViewModel> actualApartmentAreasErrors = projects
+                .Select(x => x.CheckActualApartmentAreas())
+                .Where(x => x.Errors.Any());
+            if(actualApartmentAreasErrors.Any()) {
+                var window = new ErrorWindow() { DataContext = new ErrorsViewModel(actualApartmentAreasErrors, true) };
+                window.ShowDialog();
+
+                if(!(bool) window.DialogResult) {
+                    return;
+                }
+            }
+
+            ExportProjects(projects);
         }
 
         private void ExportProjects(List<DeclarationProject> projects) {
