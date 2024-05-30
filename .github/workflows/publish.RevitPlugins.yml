@@ -1,17 +1,17 @@
-name: publish ${{ gen.plugin_name }}
+name: publish RevitPlugins
 
 on:
   workflow_dispatch:
   pull_request:
     types: [ closed, synchronize, review_requested ]
-    branches: [ main, master ]
+    branches: [main, master]
     paths:
-      - '**${{ gen.plugin_name }}**.cs'
-      - '**${{ gen.plugin_name }}**.xaml'
+      - '**RevitPlugins**.cs'
+      - '**RevitPlugins**.xaml'
 
 env:
-  plugin-name: "${{ gen.plugin_name }}"
-  
+  plugin-name: "RevitPlugins"
+
 jobs:
   build:
     name: build
@@ -35,3 +35,4 @@ jobs:
         run: ./build.cmd publish --profile ${{ env.plugin-name }} --pull-request-merged ${{ github.event.pull_request.merged }} --extensions-app-token ${{ secrets.EXTENSIONS_APP_TOKEN }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          

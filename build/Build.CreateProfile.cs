@@ -5,11 +5,9 @@ using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Utilities;
 
-interface ICreateProfile : ICreateBundle {
-    AbsolutePath ProfileFile => RootDirectory / ".nuke" / $"parameters.{PluginName}.json";
-
+partial class Build {
     Target CreateProfile => _ => _
-        .OnlyWhenDynamic(() => !ProfileFile.FileExists(), $"Profile file does exists.")
+        .OnlyWhenDynamic(() => !Params.ProfileFile.FileExists(), $"Profile file does exists.")
         .Executes(() => {
             Dictionary<string, object> result = new();
             result.Add("$schema", "./build.schema.json");
@@ -18,7 +16,7 @@ interface ICreateProfile : ICreateBundle {
             // Build
             result.Add(nameof(PluginName), PluginName);
             result.Add(nameof(PublishDirectory), PublishDirectory);
-            result.Add(nameof(RevitVersions), BuildRevitVersions.Select(item => $"Rv{item}"));
+            result.Add(nameof(RevitVersions), Params.BuildRevitVersions.Select(item => $"Rv{item}"));
             
             // CreateBundle
             result.Add(nameof(IconUrl), IconUrl.ToString());
@@ -26,6 +24,6 @@ interface ICreateProfile : ICreateBundle {
             result.Add(nameof(BundleType), BundleType);
             result.Add(nameof(BundleOutput), BundleOutput);
 
-            ProfileFile.WriteJson(result);
+            Params.ProfileFile.WriteJson(result);
         });
 }

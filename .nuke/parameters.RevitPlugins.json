@@ -1,0 +1,11 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitPlugins",
+  "PublishDirectory": "00.Admin.extension\\Admin.tab\\bin",
+  "RevitVersions": ["Rv2020", "Rv2021", "Rv2022", "Rv2023", "Rv2024"],
+  "IconUrl": "",
+  "BundleName": "RevitPlugins",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "D:\\Temp\\RevitPlugins\\Bundle"
+}

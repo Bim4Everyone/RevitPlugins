@@ -1,4 +1,4 @@
-name: publish ${{ gen.plugin_name }}
+name: publish RevitClashDetective
 
 on:
   workflow_dispatch:
@@ -6,11 +6,12 @@ on:
     types: [ closed, synchronize, review_requested ]
     branches: [ main, master ]
     paths:
-      - '**${{ gen.plugin_name }}**.cs'
-      - '**${{ gen.plugin_name }}**.xaml'
+      - '**RevitClashes**.cs'
+      - '**RevitClashDetective**.cs'
+      - '**RevitClashDetective**.xaml'
 
 env:
-  plugin-name: "${{ gen.plugin_name }}"
+  plugin-name: "RevitClashDetective"
   
 jobs:
   build:

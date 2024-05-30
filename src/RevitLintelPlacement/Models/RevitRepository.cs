@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -22,7 +22,7 @@ namespace RevitLintelPlacement.Models {
 
     internal class RevitRepository {
         private readonly string _view3DName = "3D_Перемычки";
-        private static readonly string _settingsPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
+        private static readonly string _settingsPath = @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
         
         private readonly BuiltInParameter[] _bottomBarHeightsParams = new[] {
             BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM,

@@ -1,4 +1,4 @@
-﻿#region Namespaces
+#region Namespaces
 
 using System;
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace RevitCopyStandarts {
             Document document = uiDocument.Document;
 
             var mainFolder =
-                @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
+                @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
 
             mainFolder =
                 Path.Combine(mainFolder, ModuleEnvironment.RevitVersion, "RevitCopyStandarts");
