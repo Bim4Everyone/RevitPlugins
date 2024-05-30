@@ -19,8 +19,7 @@
                            MinHeight="400"
                            MinWidth="400"
                            WindowStartupLocation="CenterScreen"
-                           d:DataContext="{d:DesignInstance vms:ErrorWindowViewModel, IsDesignTimeCreatable=False}"
-                           Loaded="ThemedPlatformWindow_Loaded">
+                           d:DataContext="{d:DesignInstance vms:ErrorWindowViewModel, IsDesignTimeCreatable=False}">
     <dxmvvm:Interaction.Behaviors>
         <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
     </dxmvvm:Interaction.Behaviors>
