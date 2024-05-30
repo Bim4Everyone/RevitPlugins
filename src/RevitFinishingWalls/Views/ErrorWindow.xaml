@@ -4,18 +4,138 @@
                            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                            xmlns:base="clr-namespace:dosymep.WPF.Views"
                            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
                            xmlns:local="clr-namespace:RevitFinishingWalls.Views"
                            xmlns:vms="clr-namespace:RevitFinishingWalls.ViewModels"
+                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                           xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+                           xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            mc:Ignorable="d"
                            Title="{Binding Title}"
                            Height="400"
-                           Width="400"
-                           MinHeight="200"
-                           MinWidth="200"
+                           Width="600"
+                           MinHeight="400"
+                           MinWidth="400"
                            WindowStartupLocation="CenterScreen"
-                           d:DataContext="{d:DesignInstance vms:ErrorWindowViewModel, IsDesignTimeCreatable=False}">
-    <DockPanel>
+                           d:DataContext="{d:DesignInstance vms:ErrorWindowViewModel, IsDesignTimeCreatable=False}"
+                           Loaded="ThemedPlatformWindow_Loaded">
+    <dxmvvm:Interaction.Behaviors>
+        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
+    </dxmvvm:Interaction.Behaviors>
+    <Window.Resources>
+        <Style TargetType="Grid"
+               x:Key="MainGrid">
+            <Setter Property="Margin"
+                    Value="5" />
+        </Style>
+        <Style TargetType="dxdo:LayoutGroup">
+            <Setter Property="AllowSplitters"
+                    Value="True" />
+            <Setter Property="Orientation"
+                    Value="Horizontal" />
+        </Style>
+        <Style TargetType="dxdo:LayoutPanel">
+            <Setter Property="ShowPinButton"
+                    Value="False" />
+            <Setter Property="ShowCloseButton"
+                    Value="False" />
+        </Style>
+        <Style TargetType="dxg:GridControl">
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
+                    Value="Auto" />
+            <Setter Property="SelectionMode"
+                    Value="Row" />
+        </Style>
+        <Style TargetType="dxg:TableView">
+            <Setter Property="ShowDataNavigator"
+                    Value="False" />
+            <Setter Property="ShowSearchPanelMode"
+                    Value="Never" />
+            <Setter Property="NavigationStyle"
+                    Value="Cell" />
+            <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping"
+                    Value="True" />
+            <Setter Property="VirtualizingPanel.VirtualizationMode"
+                    Value="Recycling" />
+            <Setter Property="VirtualizingPanel.IsVirtualizing"
+                    Value="True" />
+        </Style>
+        <Style TargetType="dxg:GridColumn">
+            <Setter Property="SortMode"
+                    Value="Custom" />
+            <Setter Property="AllowResizing"
+                    Value="True" />
+            <Setter Property="ReadOnly"
+                    Value="True" />
+        </Style>
+    </Window.Resources>
 
-    </DockPanel>
+    <Grid Style="{StaticResource MainGrid}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <dxdo:DockLayoutManager x:Name="Manager">
+            <dxdo:LayoutGroup x:Name="layoutRoot">
+                <dxdo:LayoutPanel Caption="Помещения">
+
+                    <dxg:GridControl x:Name="_dgRooms"
+                                     ItemsSource="{Binding Rooms}"
+                                     SelectedItem="{Binding SelectedRoom}">
+                        <dxg:GridControl.View>
+                            <dxg:TableView x:Name="viewRooms"></dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn Width="1*"
+                                            Header="Уровень"
+                                            FieldName="LevelName">
+                            </dxg:GridColumn>
+                            <dxg:GridColumn Width="1*"
+                                            Header="Имя"
+                                            FieldName="Name">
+                            </dxg:GridColumn>
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+
+                </dxdo:LayoutPanel>
+
+                <dxdo:LayoutPanel>
+                    <dxdo:LayoutPanel.CaptionTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <TextBlock Text="Ошибки в помещении: " />
+                                <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectedRoom.Name}" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </dxdo:LayoutPanel.CaptionTemplate>
+                    <dxg:GridControl x:Name="_dgErrors"
+                                     Grid.Column="1"
+                                     ItemsSource="{Binding SelectedRoomErrors}">
+                        <dxg:GridControl.View>
+                            <dxg:TableView x:Name="viewErrors"></dxg:TableView>
+                        </dxg:GridControl.View>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn Width="70">
+                                <dxg:GridColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <dx:SimpleButton Content="Выбрать"
+                                                         Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
+                                                         CommandParameter="{Binding Row}" />
+                                    </DataTemplate>
+                                </dxg:GridColumn.CellTemplate>
+                            </dxg:GridColumn>
+                            <dxg:GridColumn Width="1*"
+                                            Header="Описание"
+                                            FieldName="Message">
+                            </dxg:GridColumn>
+                        </dxg:GridControl.Columns>
+                    </dxg:GridControl>
+
+                </dxdo:LayoutPanel>
+            </dxdo:LayoutGroup>
+        </dxdo:DockLayoutManager>
+
+    </Grid>
 </base:ThemedPlatformWindow>

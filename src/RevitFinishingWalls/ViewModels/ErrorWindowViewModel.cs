@@ -4,18 +4,28 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitFinishingWalls.Models;
+
 namespace RevitFinishingWalls.ViewModels {
     internal class ErrorWindowViewModel : BaseViewModel {
-        public ErrorWindowViewModel() {
+        private readonly RevitRepository _revitRepository;
+        private readonly IMessageBoxService _messageBoxService;
+
+        public ErrorWindowViewModel(RevitRepository revitRepository, IMessageBoxService messageBoxService) {
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+
             Rooms = new ObservableCollection<RoomErrorsViewModel>();
             SelectedRoomErrors = new ObservableCollection<ErrorViewModel>();
 
-            SelectErrorCommand = RelayCommand.Create<ErrorViewModel>(SelectAndShowError);
+            SelectErrorCommand = RelayCommand.Create<ErrorViewModel>(SelectAndShowError, CanSelectAndShowError);
         }
 
+        public IMessageBoxService MessageBoxService => _messageBoxService;
 
         public ICommand SelectErrorCommand { get; }
 
@@ -31,8 +41,10 @@ namespace RevitFinishingWalls.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _selectedRoom, value);
                 SelectedRoomErrors.Clear();
-                foreach(ErrorViewModel error in _selectedRoom.Errors) {
-                    SelectedRoomErrors.Add(error);
+                if(_selectedRoom != null) {
+                    foreach(ErrorViewModel error in _selectedRoom.Errors) {
+                        SelectedRoomErrors.Add(error);
+                    }
                 }
             }
         }
@@ -54,8 +66,19 @@ namespace RevitFinishingWalls.ViewModels {
             SelectedRoom = Rooms.First();
         }
 
-        public void SelectAndShowError(ErrorViewModel error) {
-
+        private void SelectAndShowError(ErrorViewModel error) {
+            try {
+                _revitRepository.ShowElementsOnActiveView(error.DependentElements);
+            } catch(InvalidOperationException ex) {
+                _messageBoxService.Show(
+                    ex.Message,
+                    "BIM",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
+            }
+        }
+        private bool CanSelectAndShowError(ErrorViewModel error) {
+            return error != null;
         }
     }
 }

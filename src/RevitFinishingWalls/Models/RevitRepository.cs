@@ -10,6 +10,9 @@ using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 
+using RevitClashDetective.Models.Extensions;
+using RevitClashDetective.Models.Handlers;
+
 using RevitFinishingWalls.Exceptions;
 using RevitFinishingWalls.Models.Enums;
 using RevitFinishingWalls.Services.Selection;
@@ -19,11 +22,11 @@ namespace RevitFinishingWalls.Models {
         private readonly SpatialElementBoundaryOptions _spatialElementBoundaryOptions;
         private readonly View3D _defaultView3D;
         private readonly Dictionary<ElementId, double> _wallTypesWidthById;
+        private readonly RevitEventHandler _revitEventHandler;
 
-
-        public RevitRepository(UIApplication uiApplication) {
-            UIApplication = uiApplication;
-
+        public RevitRepository(UIApplication uiApplication, RevitEventHandler revitEventHandler) {
+            UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
+            _revitEventHandler = revitEventHandler ?? throw new ArgumentNullException(nameof(revitEventHandler));
             _spatialElementBoundaryOptions = new SpatialElementBoundaryOptions() {
                 SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Finish,
                 StoreFreeBoundaryFaces = false
@@ -251,6 +254,41 @@ namespace RevitFinishingWalls.Models {
             if(curveSecond is null) { throw new ArgumentNullException(nameof(curveSecond)); }
 
             return Line.CreateBound(curveFirst.GetEndPoint(0), curveSecond.GetEndPoint(1));
+        }
+
+        /// <summary>
+        /// Выделяет и зуммирует активный вид пользователя на заданные элементы
+        /// </summary>
+        /// <param name="dependentElements"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public void ShowElementsOnActiveView(IEnumerable<ElementId> dependentElements) {
+            try {
+                _revitEventHandler.TransactAction = () => {
+                    ZoomAndCenter(GetBoundingBox(dependentElements));
+                };
+                _revitEventHandler.Raise();
+                ActiveUIDocument.Selection.SetElementIds(dependentElements.ToArray());
+            } catch(AccessViolationException) {
+                throw new InvalidOperationException(
+                    "Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.");
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                throw new InvalidOperationException(
+                    "Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.");
+            }
+        }
+
+        private BoundingBoxXYZ GetBoundingBox(IEnumerable<ElementId> dependentElements) {
+            return dependentElements
+                .Select(el => Document.GetElement(el).GetBoundingBox())
+                .Where(box => box != null)
+                .GetCommonBoundingBox();
+        }
+
+        private void ZoomAndCenter(BoundingBoxXYZ bbox) {
+            if(bbox != null) {
+                var view = ActiveUIDocument.GetOpenUIViews().First(v => v.ViewId == ActiveUIDocument.ActiveView.Id);
+                view.ZoomAndCenterRectangle(bbox.Min, bbox.Max);
+            }
         }
 
 
