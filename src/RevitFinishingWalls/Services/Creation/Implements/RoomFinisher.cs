@@ -48,11 +48,13 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                                 out ICollection<ElementId> notJoinedElements);
                             if(notJoinedElements.Count > 0) {
                                 roomErrors.Errors.Add(
-                                    new ErrorViewModel("Не удалось присоединить отделочную стену",
-                                    new HashSet<ElementId>(notJoinedElements.Union(new ElementId[] { wall.Id }))));
+                                    new ErrorViewModel(
+                                        "Ошибки соединения стен",
+                                        "Не удалось присоединить отделочную стену",
+                                        new HashSet<ElementId>(notJoinedElements.Union(new ElementId[] { wall.Id }))));
                             }
                         } catch(CannotCreateWallException e) {
-                            roomErrors.Errors.Add(new ErrorViewModel(e.Message, room.Id));
+                            roomErrors.Errors.Add(new ErrorViewModel("Ошибки создания стен", e.Message, room.Id));
                         }
                     }
                     if(roomErrors.Errors.Count > 0) {

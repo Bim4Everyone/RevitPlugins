@@ -22,7 +22,7 @@ namespace RevitFinishingWalls.ViewModels {
             Rooms = new ObservableCollection<RoomErrorsViewModel>();
             SelectedRoomErrors = new ObservableCollection<ErrorViewModel>();
 
-            SelectErrorCommand = RelayCommand.Create<ErrorViewModel>(SelectAndShowError, CanSelectAndShowError);
+            SelectErrorCommand = RelayCommand.Create<IElementsContainer>(SelectAndShowError, CanSelectAndShowError);
         }
 
         public IMessageBoxService MessageBoxService => _messageBoxService;
@@ -66,7 +66,7 @@ namespace RevitFinishingWalls.ViewModels {
             SelectedRoom = Rooms.First();
         }
 
-        private void SelectAndShowError(ErrorViewModel error) {
+        private void SelectAndShowError(IElementsContainer error) {
             try {
                 _revitRepository.ShowElementsOnActiveView(error.DependentElements);
             } catch(InvalidOperationException ex) {
@@ -77,7 +77,7 @@ namespace RevitFinishingWalls.ViewModels {
                     System.Windows.MessageBoxImage.Error);
             }
         }
-        private bool CanSelectAndShowError(ErrorViewModel error) {
+        private bool CanSelectAndShowError(IElementsContainer error) {
             return error != null;
         }
     }
