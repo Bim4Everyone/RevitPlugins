@@ -63,9 +63,9 @@ namespace RevitDeclarations.Models {
             };
 
             foreach(var apartment in _apartments) {
-                if(!apartment.CheckEqaulityOfRoomAreas()) {
+                if(!apartment.CheckEqualityOfRoomAreas()) {
                     string apartInfo = $"Квартира № {apartment.Number} на этаже {apartment.Level}";
-                    string apartAreas = "Площади квартиры (без коэффициента/с коэффициентом/жилая) " +
+                    string apartAreas = "Площади квартиры (без коэффициента/с коэффициентом/жилая/без ЛП) " +
                         "должны быть одинаковыми для каждого помещения квартиры";
                     errorListVM.Errors.Add(new ErrorElement(apartInfo, apartAreas));
                 }

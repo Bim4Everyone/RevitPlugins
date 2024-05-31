@@ -135,7 +135,7 @@ namespace RevitDeclarations.Models {
 
         // This method compares the areas calculated by rooms script.
         // Every room in the apartment should have the same area value.
-        public bool CheckEqaulityOfRoomAreas() {
+        public bool CheckEqualityOfRoomAreas() {
             int amountOfAreas = _rooms
                 .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy))
                 .Distinct()
@@ -159,6 +159,15 @@ namespace RevitDeclarations.Models {
                 .Count();
 
             if(amountOfAreasLiving > 1) {
+                return false;
+            }
+
+            int amountOfAreasNonSum = _rooms
+                .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaNonSumParam, _accuracy))
+                .Distinct()
+                .Count();
+
+            if(amountOfAreasNonSum > 1) {
                 return false;
             }
 
