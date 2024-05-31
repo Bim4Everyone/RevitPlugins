@@ -31,9 +31,9 @@ namespace RevitDeclarations.Models
             PrioritiesConfig priorConfig = settings.PrioritiesConfig;
 
             if(priorConfig.Balcony.CheckName(Name) || priorConfig.Terrace.CheckName(Name)) {
-                areaCoefRevit = AreaRevit * 0.3;
+                areaCoefRevit = AreaRevit * priorConfig.Balcony.AreaCoefficient;
             } else if(priorConfig.Loggia.CheckName(Name)) {
-                areaCoefRevit = AreaRevit * 0.5;
+                areaCoefRevit = AreaRevit * priorConfig.Loggia.AreaCoefficient;
             } else {
                 areaCoefRevit = AreaRevit;
             }

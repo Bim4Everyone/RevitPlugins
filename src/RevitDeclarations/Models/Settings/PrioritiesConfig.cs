@@ -21,19 +21,28 @@ namespace RevitDeclarations.Models
         private readonly List<RoomPriority> _priorities;
 
         public PrioritiesConfig() {
-
-            _livingRoom = new RoomPriority(1, "Жилая комната", false);
-            _kitchen = new RoomPriority(2, "Кухня", false);
-            _kitchenNiche = new RoomPriority(3, "Кухня-ниша", false);
-            _bathroom = new RoomPriority(4, "Санузел", false);
-            _laundry = new RoomPriority(5, "Постирочная", false);
-            _pantry = new RoomPriority(6, "Гардеробная", false);
-            _cabinet = new RoomPriority(7, "Кабинет", false);
-            _corridor = new RoomPriority(8, "Коридор", false);
-            _hall = new RoomPriority(9, "Прихожая", false);
-            _loggia = new RoomPriority(10, "Лоджия", true);
-            _balcony = new RoomPriority(11, "Балкон", true);
-            _terrace = new RoomPriority(12, "Терраса", true);
+            _livingRoom = new RoomPriority(1, "Жилая комната");
+            _kitchen = new RoomPriority(2, "Кухня");
+            _kitchenNiche = new RoomPriority(3, "Кухня-ниша");
+            _bathroom = new RoomPriority(4, "Санузел");
+            _laundry = new RoomPriority(5, "Постирочная");
+            _pantry = new RoomPriority(6, "Гардеробная");
+            _cabinet = new RoomPriority(7, "Кабинет");
+            _corridor = new RoomPriority(8, "Коридор");
+            _hall = new RoomPriority(9, "Прихожая");
+            _loggia = new RoomPriority(10, "Лоджия") {
+                IsSummer = true,
+                AreaCoefficient = 0.5
+            };
+            _balcony = new RoomPriority(11, "Балкон") {
+                IsSummer = true,
+                AreaCoefficient = 0.3
+            };
+            _terrace = new RoomPriority(12, "Терраса") {
+                IsSummer = true,
+                AreaCoefficient = 0.3
+            };
+            ;
 
             _priorities = new List<RoomPriority>() {
                 _livingRoom,

@@ -83,7 +83,9 @@ namespace RevitDeclarations.Models {
             int prioritiesLength = _roomPriorities.Count;
             newNames.Sort();
             foreach(var name in newNames) {
-                _roomPriorities.Add(new RoomPriority(prioritiesLength, name, false, true));
+                _roomPriorities.Add(new RoomPriority(prioritiesLength, name) {
+                    IsOther = true
+                });
                 prioritiesLength++;
             }
         }

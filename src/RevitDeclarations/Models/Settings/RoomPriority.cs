@@ -3,11 +3,12 @@ using System;
 namespace RevitDeclarations.Models
 {
     public class RoomPriority {
-        public RoomPriority(int number, string name, bool isSummer, bool isOther = false) {
+        public RoomPriority(int number, string name) {
             OrdinalNumber = number;
             Name = name;
-            IsSummer = isSummer;
-            IsOther = isOther;
+            IsSummer = false;
+            IsOther = false;
+            AreaCoefficient = 1;
         }
 
         public int OrdinalNumber { get; set; }
@@ -16,6 +17,7 @@ namespace RevitDeclarations.Models
         public bool IsSummer { get; set; }
         public bool IsOther { get; set; }
         public int MaxRoomAmount { get; set; }
+        public double AreaCoefficient { get; set; }
 
         public bool CheckName(string name) {
             if(string.Equals(name, this.Name, StringComparison.OrdinalIgnoreCase)) {
