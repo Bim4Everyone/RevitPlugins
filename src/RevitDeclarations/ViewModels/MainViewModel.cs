@@ -156,7 +156,8 @@ namespace RevitDeclarations.ViewModels {
                 .Select(x => x.CheckActualRoomAreas())
                 .Where(x => x.Errors.Any());
             if(actualRoomAreasErrors.Any()) {
-                var window = new ErrorWindow() { DataContext = new ErrorsViewModel(actualRoomAreasErrors, true) };
+                var window = new ErrorWindow() { 
+                    DataContext = new ErrorsViewModel(actualRoomAreasErrors, true) };
                 window.ShowDialog();
 
                 if(!(bool) window.DialogResult) {
@@ -169,7 +170,9 @@ namespace RevitDeclarations.ViewModels {
                 .Select(x => x.CheckActualApartmentAreas())
                 .Where(x => x.Errors.Any());
             if(actualApartmentAreasErrors.Any()) {
-                var window = new ErrorWindow() { DataContext = new ErrorsViewModel(actualApartmentAreasErrors, true) };
+                var window = new ErrorWindow() { 
+                    DataContext = new ErrorsViewModel(actualApartmentAreasErrors, true) 
+                };
                 window.ShowDialog();
 
                 if(!(bool) window.DialogResult) {

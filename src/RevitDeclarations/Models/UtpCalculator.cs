@@ -32,21 +32,21 @@ namespace RevitDeclarations.Models {
 
             _priorities = _settings.PrioritiesConfig;
 
-            var bedroomBathroom = GetRoomsByDoors(_priorities.LivingRoom.NameLower, _priorities.Bathroom.NameLower);
+            var bedroomBathroom = GetRoomsByDoors(_priorities.LivingRoom, _priorities.Bathroom);
             List<ElementId> bedroomsWithBathroom = bedroomBathroom[_priorities.LivingRoom.NameLower];
 
-            var pantryBedroom = GetRoomsByDoors(_priorities.Pantry.NameLower, _priorities.LivingRoom.NameLower);
-            var pantryBathroom = GetRoomsByDoors(_priorities.Pantry.NameLower, _priorities.Bathroom.NameLower);
+            var pantryBedroom = GetRoomsByDoors(_priorities.Pantry, _priorities.LivingRoom);
+            var pantryBathroom = GetRoomsByDoors(_priorities.Pantry, _priorities.Bathroom);
             _pantriesWithBedroom = pantryBedroom[_priorities.Pantry.NameLower];
             List<ElementId> pantriesWithBathroom = pantryBathroom[_priorities.Pantry.NameLower];
             List<ElementId> masterPantries = _pantriesWithBedroom.Intersect(pantriesWithBathroom).ToList();
 
-            var bedroomPantry = GetRoomsByDoors(_priorities.LivingRoom.NameLower, masterPantries);
+            var bedroomPantry = GetRoomsByDoors(_priorities.LivingRoom, masterPantries);
             var bedroomsWithPantryAndBathroom = bedroomPantry[_priorities.LivingRoom.NameLower];
             _masterBedrooms = bedroomsWithBathroom.Concat(bedroomsWithPantryAndBathroom).ToList();
 
             List<ElementId> bathroomsWithBedroom = bedroomBathroom[_priorities.Bathroom.NameLower];
-            var bathroomPantry = GetRoomsByDoors(_priorities.Bathroom.NameLower, masterPantries);
+            var bathroomPantry = GetRoomsByDoors(_priorities.Bathroom, masterPantries);
             var bathroomsWithMasterPantry = bathroomPantry[_priorities.Bathroom.NameLower];
             _masterBathrooms = bathroomsWithBedroom.Concat(bathroomsWithMasterPantry).ToList();
 
@@ -67,7 +67,9 @@ namespace RevitDeclarations.Models {
                 .Any();
         }
 
-        private Dictionary<string, List<ElementId>> GetRoomsByDoors(string name1, string name2) {
+        private Dictionary<string, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, RoomPriority priority2) {
+            string name1 = priority1.NameLower;
+            string name2 = priority2.NameLower;
             BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
             List<FamilyInstance> doors = _project.GetDoors();
 
@@ -96,7 +98,8 @@ namespace RevitDeclarations.Models {
             return roomByNames;
         }
 
-        private Dictionary<string, List<ElementId>> GetRoomsByDoors(string name1, List<ElementId> rooms) {
+        private Dictionary<string, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, List<ElementId> rooms) {
+            string name1 = priority1.NameLower;
             BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
             List<FamilyInstance> doors = _project.GetDoors();
 
