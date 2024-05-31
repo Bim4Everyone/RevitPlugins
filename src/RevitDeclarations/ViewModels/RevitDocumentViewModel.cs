@@ -31,7 +31,7 @@ namespace RevitDeclarations.ViewModels {
         public RevitDocumentViewModel(RevitLinkInstance revitLinkInstance, DeclarationSettings settings) {
             _document = revitLinkInstance.GetLinkDocument();
             _settings = settings;
-            _name = $"{revitLinkInstance.Name} [текущий проект]";
+            _name = $"{revitLinkInstance.Name} [связь]";
 
             _room = new FilteredElementCollector(_document)
                 .OfCategory(BuiltInCategory.OST_Rooms)

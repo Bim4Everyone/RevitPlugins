@@ -42,7 +42,6 @@ namespace RevitDeclarations.Models
                 IsSummer = true,
                 AreaCoefficient = 0.3
             };
-            ;
 
             _priorities = new List<RoomPriority>() {
                 _livingRoom,
