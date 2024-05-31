@@ -217,7 +217,9 @@ namespace RevitFinishingWalls.Models {
                 double roomHeight = roomVolume / room.GetParamValue<double>(BuiltInParameter.ROOM_AREA);
                 return roomHeight + room.GetParamValue<double>(BuiltInParameter.ROOM_LOWER_OFFSET);
             } else {
-                return room.GetParamValue<double>(BuiltInParameter.ROOM_UPPER_OFFSET);
+                var levelId = room.GetParamValue<ElementId>(BuiltInParameter.ROOM_UPPER_LEVEL);
+                var upperLevel = Document.GetElement(levelId) as Level;
+                return room.GetParamValue<double>(BuiltInParameter.ROOM_UPPER_OFFSET) + upperLevel.Elevation;
             }
         }
 
