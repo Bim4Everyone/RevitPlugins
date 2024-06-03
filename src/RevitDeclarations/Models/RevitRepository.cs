@@ -80,8 +80,8 @@ namespace RevitDeclarations.Models {
         }
 
         public IList<FamilyInstance> GetBathInstancesOnPhase(Document document, Phase phase) {
-            ElementCategoryFilter doorsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Doors, true);
-            ElementCategoryFilter windowsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows, true);
+            ElementCategoryFilter notDoorsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Doors, true);
+            ElementCategoryFilter notWindowsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows, true);
 
             List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
                 ElementOnPhaseStatus.Existing,
@@ -97,11 +97,12 @@ namespace RevitDeclarations.Models {
             return new FilteredElementCollector(document)
                 .OfClass(typeof(FamilyInstance))
                 .WhereElementIsNotElementType()
-                .WherePasses(doorsFilter)
-                .WherePasses(windowsFilter)
+                .WherePasses(notDoorsFilter)
+                .WherePasses(notWindowsFilter)
                 .WherePasses(phaseFilter)
                 .OfType<FamilyInstance>()
-                .Where(x => x.Symbol.Family.Name.ToLower().Contains("ванна") || x.Symbol.Family.Name.ToLower().Contains("душев"))
+                .Where(x => x.Symbol.Family.Name.ToLower().Contains("ванна") || 
+                    x.Symbol.Family.Name.ToLower().Contains("душев"))
                 .Where(x => !x.Symbol.Family.Name.ToLower().Contains("ованна"))
                 .ToList();
         }

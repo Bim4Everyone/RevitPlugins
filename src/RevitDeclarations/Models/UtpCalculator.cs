@@ -8,7 +8,6 @@ namespace RevitDeclarations.Models {
     internal class UtpCalculator {
         private readonly DeclarationProject _project;
         private readonly DeclarationSettings _settings;
-
         private readonly PrioritiesConfig _priorities;
 
         private readonly bool _hasNullAreas;
@@ -20,7 +19,6 @@ namespace RevitDeclarations.Models {
         private readonly List<ElementId> _masterBedrooms;
         // Санузлы, относящиеся к мастер спальням
         private readonly List<ElementId> _masterBathrooms;
-
         private readonly List<ElementId> _roomsWithBathFamily;
 
         public UtpCalculator(DeclarationProject project, DeclarationSettings settings) {
@@ -33,21 +31,28 @@ namespace RevitDeclarations.Models {
             _priorities = _settings.PrioritiesConfig;
 
             var bedroomBathroom = GetRoomsByDoors(_priorities.LivingRoom, _priorities.Bathroom);
+            // Жилые комната, соединенные с санузлами
             List<ElementId> bedroomsWithBathroom = bedroomBathroom[_priorities.LivingRoom.NameLower];
 
             var pantryBedroom = GetRoomsByDoors(_priorities.Pantry, _priorities.LivingRoom);
             var pantryBathroom = GetRoomsByDoors(_priorities.Pantry, _priorities.Bathroom);
+            // Гардеробные, соединенные с жилыми комнатами (не учитываются для УТП Гардеробная)
             _pantriesWithBedroom = pantryBedroom[_priorities.Pantry.NameLower];
+            // Гардеробные, соединенные с санузлами
             List<ElementId> pantriesWithBathroom = pantryBathroom[_priorities.Pantry.NameLower];
+            // Мастер-гардеробные (имеющие дверь в санузел) для определения мастер-спален
             List<ElementId> masterPantries = _pantriesWithBedroom.Intersect(pantriesWithBathroom).ToList();
 
             var bedroomPantry = GetRoomsByDoors(_priorities.LivingRoom, masterPantries);
+            // Жилые комнаты, соединенные с мастер-гврдеробными
             var bedroomsWithPantryAndBathroom = bedroomPantry[_priorities.LivingRoom.NameLower];
             _masterBedrooms = bedroomsWithBathroom.Concat(bedroomsWithPantryAndBathroom).ToList();
 
             List<ElementId> bathroomsWithBedroom = bedroomBathroom[_priorities.Bathroom.NameLower];
             var bathroomPantry = GetRoomsByDoors(_priorities.Bathroom, masterPantries);
+            // Санузлы, соединенные с мастер-гардеробными
             var bathroomsWithMasterPantry = bathroomPantry[_priorities.Bathroom.NameLower];
+            // Санузлы, относящиеся к мастер-спальням для определение УТП Две ванны
             _masterBathrooms = bathroomsWithBedroom.Concat(bathroomsWithMasterPantry).ToList();
 
             _roomsWithBathFamily = GetRoomsWithBath();
