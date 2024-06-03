@@ -35,6 +35,7 @@
 | 22. | Выгрузить объемы          | [RevitMepTotals](src/RevitMepTotals)                   | [Confluence]()                                                          | [BIM](https://github.com/dosymep/BIMExtensions)     | Экспорт        |
 | 23. | Маркировать помещения     | [RevitRoomTagPlacement](src/RevitRoomTagPlacement)     | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Квартирография |
 | 24. | Удалить марки помещений   | [RevitRemoveRoomTags](src/RevitRemoveRoomTags)         | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Прочее         |
+| 25. | Отделка стен              | [RevitFinishingWalls](src/RevitFinishingWalls)         | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
 
 # Сборка проекта
 
