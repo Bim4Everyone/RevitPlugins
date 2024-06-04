@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:RevitDeclarations.Views"
              mc:Ignorable="d" 
              Background="White"
-             Height="750" Width="630">
+             Height="730" Width="630">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -19,6 +19,8 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -53,10 +55,11 @@
                 Grid.Column="0"
                 ToolTip="{Binding ParameterToolTip.ParamDocumentToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Row="0"
                 Grid.Column="1"
-                Content="Документ для поиска параметров:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Документ для поиска параметров:"/>
             <ComboBox
                 Grid.Row="0"
                 Grid.Column="2"
@@ -70,10 +73,11 @@
                 Grid.Column="0"
                 ToolTip="{Binding ParameterToolTip.LastConfigToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Row="1"
                 Grid.Column="1"
-                Content="Конфигурация последнего запуска:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Конфигурация последнего запуска:"/>
             <Button
                 Grid.Row="1"
                 Grid.Column="2"
@@ -86,10 +90,11 @@
                 Grid.Row="2"
                 ToolTip="{Binding ParameterToolTip.CompanyConfigToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Row="2"
                 Grid.Column="1"
-                Content="Конфигурация А101:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Конфигурация А101:"/>
             <Button
                 Grid.Row="2"
                 Grid.Column="2"
@@ -124,10 +129,11 @@
                 Grid.Row="0"
                 ToolTip="{Binding ParameterToolTip.FilterRoomsParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="0"
-                Content="Параметр для фильтрации помещений квартир:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Параметр для фильтрации помещений квартир:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="0"
@@ -141,10 +147,11 @@
                 Grid.Row="1"
                 ToolTip="{Binding ParameterToolTip.FilterRoomsValueToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="1"
-                Content="Значение для фильтрации квартир:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Значение для фильтрации квартир:"/>
             <TextBox
                 Grid.Column="2"
                 Grid.Row="1"
@@ -156,10 +163,11 @@
                 Grid.Row="2"
                 ToolTip="{Binding ParameterToolTip.GroupBySectionParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="2"
-                Content="Параметр для группировки квартир по секциям:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Параметр для группировки квартир по секциям:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="2"
@@ -173,10 +181,11 @@
                 Grid.Row="3"
                 ToolTip="{Binding ParameterToolTip.GroupByGroupParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="3"
-                Content="Параметр для группировки помещений по квартирам:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Параметр для группировки помещений по квартирам:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="3"
@@ -190,10 +199,11 @@
                 Grid.Row="4"
                 ToolTip="{Binding ParameterToolTip.MultiStoreyParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="4"
-                Content="Параметр для многоуровневых квартир:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Параметр для многоуровневых квартир:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="4"
@@ -237,10 +247,11 @@
                 Grid.Row="0"
                 ToolTip="{Binding ParameterToolTip.FullApartNumParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="0"
-                Content="1. Сквозной номер:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="1. Сквозной номер:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="0"
@@ -254,10 +265,10 @@
                 Grid.Row="1"
                 ToolTip="{Binding ParameterToolTip.DepartmentParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="1"
-                Content="2. Назначение:"/>
+                Text="2. Назначение:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="1"
@@ -271,10 +282,11 @@
                 Grid.Row="2"
                 ToolTip="{Binding ParameterToolTip.LevelParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="2"
-                Content="3. Этаж расположения:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="3. Этаж расположения:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="2"
@@ -288,10 +300,11 @@
                 Grid.Row="3"
                 ToolTip="{Binding ParameterToolTip.SectionParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="3"
-                Content="4. Номер подъезда:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="4. Номер подъезда:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="3"
@@ -305,10 +318,11 @@
                 Grid.Row="4"
                 ToolTip="{Binding ParameterToolTip.BuildingParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="4"
-                Content="5. Номер корпуса:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="5. Номер корпуса:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="4"
@@ -322,10 +336,11 @@
                 Grid.Row="5"
                 ToolTip="{Binding ParameterToolTip.ApartNumParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="5"
-                Content="6. Номер на площадке:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="6. Номер на площадке:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="5"
@@ -339,10 +354,11 @@
                 Grid.Row="6"
                 ToolTip="{Binding ParameterToolTip.ApartAreaParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="6"
-                Content="7. Общая площадь без пониж. коэффициента, м2:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="7. Общая площадь без пониж. коэффициента, м2:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="6"
@@ -356,10 +372,11 @@
                 Grid.Row="7"
                 ToolTip="{Binding ParameterToolTip.ApartAreaCoefParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="7"
-                Content="8. Общая площадь с пониж. коэффициентом, м2:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="8. Общая площадь с пониж. коэффициентом, м2:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="7"
@@ -373,10 +390,11 @@
                 Grid.Row="8"
                 ToolTip="{Binding ParameterToolTip.ApartAreaLivingParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="8"
-                Content="9. Жилая площадь, м2:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="9. Жилая площадь, м2:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="8"
@@ -390,10 +408,11 @@
                 Grid.Row="9"
                 ToolTip="{Binding ParameterToolTip.RoomsAmountParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="9"
-                Content="10. Количество комнат:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="10. Количество комнат:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="9"
@@ -407,10 +426,11 @@
                 Grid.Row="10"
                 ToolTip="{Binding ParameterToolTip.ProjectNameToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="10"
-                Content="11. ИД Объекта:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="11. ИД Объекта:"/>
             <TextBox
                 Grid.Column="2"
                 Grid.Row="10"
@@ -422,10 +442,11 @@
                 Grid.Row="11"
                 ToolTip="{Binding ParameterToolTip.ApartAreaNonSumParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="11"
-                Content="12. Площадь без летних помещений, м2:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="12. Площадь без летних помещений, м2:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="11"
@@ -439,10 +460,11 @@
                 Grid.Column="0"
                 ToolTip="{Binding ParameterToolTip.RoomsHeightParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Row="12"
                 Grid.Column="1"
-                Content="13. Высота потолка, м:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="13. Высота потолка, м:"/>
             <ComboBox
                 Grid.Row="12"
                 Grid.Column="2"
@@ -475,10 +497,11 @@
                 Grid.Row="0"
                 ToolTip="{Binding ParameterToolTip.RoomAreaParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="0"
-                Content="Площадь помещения:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Площадь помещения:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="0"
@@ -492,14 +515,69 @@
                 Grid.Row="1"
                 ToolTip="{Binding ParameterToolTip.RoomAreaCoefParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
-            <Label
+            <TextBlock
                 Grid.Column="1"
                 Grid.Row="1"
-                Content="Площадь помещения с коэффициентом:"/>
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Площадь помещения с коэффициентом:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="1"
                 Margin="10, 0"
+                ItemsSource="{Binding DoubleParameters}"
+                DisplayMemberPath="Definition.Name"
+                SelectedItem="{Binding SelectedRoomAreaCoefParam}"/>
+        </Grid>
+
+        <TextBlock 
+            Grid.Row="8"
+            Style="{StaticResource HeaderName}"
+            Text="Настройки УТП"/>
+
+        <Grid
+            Grid.Row="9">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button
+                Grid.Column="0"
+                Grid.Row="0"
+                ToolTip="{Binding ParameterToolTip.RoomAreaParamToolTip}"
+                Style="{StaticResource RoundButton}"/>
+            <TextBlock
+                Grid.Column="1"
+                Grid.Row="0"
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Рассчитывать УТП:"/>
+            <CheckBox
+                Grid.Column="2"
+                Grid.Row="0"
+                Margin="10, 5"
+                IsChecked="{Binding CanLoadUTP}"/>
+
+            <Button
+                Grid.Column="0"
+                Grid.Row="1"
+                ToolTip="{Binding ParameterToolTip.RoomAreaCoefParamToolTip}"
+                Style="{StaticResource RoundButton}"/>
+            <TextBlock
+                Grid.Column="1"
+                Grid.Row="1"
+                Style="{StaticResource ParameterNameSmall}"
+                Text="Настройки проверок контуров помещений:"/>
+            <ComboBox
+                Grid.Column="2"
+                Grid.Row="1"
+                Margin="10, 0"
+                IsEnabled="{Binding CanLoadUTP}"
                 ItemsSource="{Binding DoubleParameters}"
                 DisplayMemberPath="Definition.Name"
                 SelectedItem="{Binding SelectedRoomAreaCoefParam}"/>

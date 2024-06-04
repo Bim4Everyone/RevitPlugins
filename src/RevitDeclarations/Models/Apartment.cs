@@ -57,7 +57,6 @@ namespace RevitDeclarations.Models {
         public Dictionary<string, List<RoomElement>> OtherRooms => _otherRooms;
 
         public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
-        //public string Department => _firstRoom.GetTextParamValue(_settings.DepartmentParam);
         public string Department {
             get {
                 if(string.IsNullOrEmpty(_firstRoom.GetTextParamValue(_settings.MultiStoreyParam))) {
