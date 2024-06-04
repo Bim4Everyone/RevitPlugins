@@ -82,7 +82,7 @@ namespace RevitDeclarations.Models {
             };
 
             foreach(var apartment in _apartments) {
-                if(!apartment.CheclActualRoomAreas()) {
+                if(!apartment.CheckActualRoomAreas()) {
                     string apartInfo = $"Квартира № {apartment.Number} на этаже {apartment.Level}";
                     string apartAreas = "Площади помещений, рассчитанные квартирографией " +
                         "отличаются от актуальной системной площадей помещения.";
@@ -101,7 +101,7 @@ namespace RevitDeclarations.Models {
             };
 
             foreach(var apartment in _apartments) {
-                if(!apartment.CheclActualApartmentAreas()) {
+                if(!apartment.CheckActualApartmentAreas()) {
                     string apartInfo = $"Квартира № {apartment.Number} на этаже {apartment.Level}";
                     string apartAreas = "Площади квартиры, рассчитанные квартирографией " +
                         "отличаются от суммы актуальных системных площадей этой квартиры. " +

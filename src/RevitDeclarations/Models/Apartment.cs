@@ -56,9 +56,16 @@ namespace RevitDeclarations.Models {
         public Dictionary<string, List<RoomElement>> MainRooms => _mainRooms;
         public Dictionary<string, List<RoomElement>> OtherRooms => _otherRooms;
 
-        public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
+        public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
         public string Department => _firstRoom.GetTextParamValue(_settings.DepartmentParam);
-        public string Level => _firstRoom.GetTextParamValue(_settings.LevelParam);
+        public string Level { 
+            get {
+                var levelNames = _rooms
+                    .Select(x => x.GetTextParamValue(_settings.LevelParam))
+                    .Distinct();
+                return string.Join(",", levelNames); 
+            } 
+        }
         public string Section => _firstRoom.GetTextParamValue(_settings.SectionParam);
         public string Building => _firstRoom.GetTextParamValue(_settings.BuildingParam);
         public string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
@@ -100,7 +107,7 @@ namespace RevitDeclarations.Models {
                 .Sum();
         }
 
-        public bool CheclActualRoomAreas() {
+        public bool CheckActualRoomAreas() {
             foreach(var room in _rooms) {
                 double roomArea = room.GetAreaParamValue(_settings.RoomAreaParam, _accuracy);
                 if(Math.Abs(room.AreaRevit - roomArea) > _maxAreaDeviation) {
@@ -116,7 +123,7 @@ namespace RevitDeclarations.Models {
             return true;
         }
 
-        public bool CheclActualApartmentAreas() {
+        public bool CheckActualApartmentAreas() {
             if(Math.Abs(AreaMain - _areaMainRevit) > _maxAreaDeviation) {
                 return false;
             }
