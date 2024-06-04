@@ -184,6 +184,8 @@ namespace RevitOpeningPlacement.OpeningModels {
                 return CreateRawSolid(box);
             } catch(Autodesk.Revit.Exceptions.ArgumentOutOfRangeException) {
                 return CreateRawSolid(box);
+            } catch(Autodesk.Revit.Exceptions.ArgumentException) {
+                return CreateRawSolid(box);
             } catch(InvalidOperationException) {
                 return CreateRawSolid(box);
             } catch(ArgumentException) {
