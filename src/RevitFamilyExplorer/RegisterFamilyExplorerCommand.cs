@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,7 +45,7 @@ namespace RevitFamilyExplorer {
         public void SetupDockablePane(DockablePaneProviderData data) {
             AppDomain.CurrentDomain.AssemblyResolve += AppDomainExtensions.CurrentDomain_AssemblyResolve;
             try {
-                var configPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\5-Надстройки\99.FamilyExplorer";
+                var configPath = @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\99.FamilyExplorer";
                 configPath = Path.Combine(configPath, _uiApplication.Application.VersionNumber);
                 _dataContext = new FamilyExplorerViewModel(new Models.RevitRepository(_uiApplication), new Models.FamilyRepository(configPath));
                 var panel = new FamilyExplorerPanel() { DataContext = _dataContext };
