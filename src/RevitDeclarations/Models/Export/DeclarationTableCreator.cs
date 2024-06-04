@@ -58,15 +58,15 @@ namespace RevitDeclarations.Models {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
                         range[1, columnNumber + k * _tableData.SummerRoomCells] = "№ Пом.";
                         range[1, columnNumber + k * _tableData.SummerRoomCells + 1] = "Наименование на планировке";
-                        range[1, columnNumber + k * _tableData.SummerRoomCells + 2] = $"{priority.Name}, площадь без коэф.";
-                        range[1, columnNumber + k * _tableData.SummerRoomCells + 3] = $"{priority.Name}, площадь с коэф.";
+                        range[1, columnNumber + k * _tableData.SummerRoomCells + 2] = $"{priority.Name}_{k + 1}, площадь без коэф.";
+                        range[1, columnNumber + k * _tableData.SummerRoomCells + 3] = $"{priority.Name}_{k + 1}, площадь с коэф.";
                     }
                     columnNumber += priority.MaxRoomAmount * _tableData.SummerRoomCells;
                 } else {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
                         range[1, columnNumber + k * _tableData.MainRoomCells] = "№ Пом.";
                         range[1, columnNumber + k * _tableData.MainRoomCells + 1] = "Наименование на планировке";
-                        range[1, columnNumber + k * _tableData.MainRoomCells + 2] = priority.Name;
+                        range[1, columnNumber + k * _tableData.MainRoomCells + 2] = $"{priority.Name}_{k + 1}";
                     }
                     columnNumber += priority.MaxRoomAmount * _tableData.MainRoomCells;
                 }
