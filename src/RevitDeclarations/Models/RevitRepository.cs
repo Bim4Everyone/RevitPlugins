@@ -108,9 +108,18 @@ namespace RevitDeclarations.Models {
         }
 
         public List<Apartment> GetApartments(IEnumerable<RoomElement> rooms, DeclarationSettings settings) {
-            return rooms
+            var multiStoreyAparts = rooms.Where(x => !string.IsNullOrEmpty(x.GetTextParamValue(settings.MultiStoreyParam)))
+                .GroupBy(r => new { l = r.GetTextParamValue(settings.MultiStoreyParam), s = r.GetTextParamValue(settings.SectionParam) })
+                .Select(g => new Apartment(g, settings))
+                .ToList();
+
+            var oneStoreyAparts = rooms.Where(x => string.IsNullOrEmpty(x.GetTextParamValue(settings.MultiStoreyParam)))
                 .GroupBy(r => new { r.RoomLevel, s = r.GetTextParamValue(settings.SectionParam), g = r.GetTextParamValue(settings.GroupingByGroupParam) })
                 .Select(g => new Apartment(g, settings))
+                .ToList();            
+
+            return oneStoreyAparts
+                .Concat(multiStoreyAparts)
                 .ToList();
         }
 
