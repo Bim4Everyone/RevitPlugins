@@ -19,7 +19,10 @@ namespace RevitDeclarations.Models {
             FillTableApartmentHeader(range);
             FillTableRoomsHeader(range);
             FillTableApartmentsInfo(range);
-            FillTableUtpInfo(range);
+
+            if(_settings.LoadUtp) {
+                FillTableUtpInfo(range);
+            }
 
             SetGraphicSettings(workSheet);
         }
@@ -39,15 +42,17 @@ namespace RevitDeclarations.Models {
             range[1, 12] = "Площадь квартиры без летних помещений, м2";
             range[1, 13] = "Высота потолка, м";
 
-            range[1, _tableData.UtpStart + 1] = "Две ванны";
-            range[1, _tableData.UtpStart + 2] = "Хайфлет";
-            range[1, _tableData.UtpStart + 3] = "Лоджия/ балкон";
-            range[1, _tableData.UtpStart + 4] = "Доп. летние помещения";
-            range[1, _tableData.UtpStart + 5] = "Терраса";
-            range[1, _tableData.UtpStart + 6] = "Мастер-спальня";
-            range[1, _tableData.UtpStart + 7] = "Гардеробная";
-            range[1, _tableData.UtpStart + 8] = "Постирочная";
-            range[1, _tableData.UtpStart + 9] = "Увеличенная площадь балкона/ лоджии";
+            if(_settings.LoadUtp) {
+                range[1, _tableData.UtpStart + 1] = "Две ванны";
+                range[1, _tableData.UtpStart + 2] = "Хайфлет";
+                range[1, _tableData.UtpStart + 3] = "Лоджия/ балкон";
+                range[1, _tableData.UtpStart + 4] = "Доп. летние помещения";
+                range[1, _tableData.UtpStart + 5] = "Терраса";
+                range[1, _tableData.UtpStart + 6] = "Мастер-спальня";
+                range[1, _tableData.UtpStart + 7] = "Гардеробная";
+                range[1, _tableData.UtpStart + 8] = "Постирочная";
+                range[1, _tableData.UtpStart + 9] = "Увеличенная площадь балкона/ лоджии";
+            }
         }
 
         private void FillTableRoomsHeader(Range range) {

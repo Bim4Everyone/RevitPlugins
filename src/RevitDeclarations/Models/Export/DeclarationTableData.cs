@@ -21,6 +21,10 @@ namespace RevitDeclarations.Models {
             _apartments = apartments;
             _settings = settings;
 
+            if(!_settings.LoadUtp) {
+                UtpWidth = 0;
+            }
+
             List<string> otherNames = GetOtherPriorities();
             settings.UpdatePriorities(otherNames);
 

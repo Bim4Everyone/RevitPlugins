@@ -31,6 +31,7 @@ namespace RevitDeclarations.Models {
 
         public Phase SelectedPhase { get; set; }
         public int Accuracy { get; set; }
+        public bool LoadUtp { get; set; }
         public List<string> MainRoomNames => _mainNames;
         public string[] BannedRoomNames => _prioritiesConfig.BannedRoomNames;
         public ParametersViewModel ViewModel { get; set; }

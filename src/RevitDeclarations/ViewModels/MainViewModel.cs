@@ -27,6 +27,7 @@ namespace RevitDeclarations.ViewModels {
         private string _fileName;
         private string _accuracy;
         private Phase _selectedPhase;
+        private bool _loadUtp;
         private string _errorText;
 
         public MainViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
@@ -86,6 +87,11 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _accuracy, value);
         }
 
+        public bool LoadUtp {
+            get => _loadUtp;
+            set => RaiseAndSetIfChanged(ref _loadUtp, value);
+        }
+
         public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
         public ParametersViewModel ParametersViewModel => _parametersViewModel;
         public PrioritiesViewModel PrioritiesViewModel => _prioritiesViewModel;
@@ -110,6 +116,7 @@ namespace RevitDeclarations.ViewModels {
             _settings.Accuracy = accuracy;
             _settings.SelectedPhase = _selectedPhase;
             _settings.ViewModel = ParametersViewModel;
+            _settings.LoadUtp = _loadUtp;
 
             List<RevitDocumentViewModel> checkedDocuments = _revitDocuments
                 .Where(x => x.IsChecked)
@@ -184,8 +191,10 @@ namespace RevitDeclarations.ViewModels {
         }
 
         private void ExportProjects(List<DeclarationProject> projects) {
-            foreach(DeclarationProject project in projects) {
-                project.CalculateUtpForApartments();
+            if(_loadUtp) {
+                foreach(DeclarationProject project in projects) {
+                    project.CalculateUtpForApartments();
+                }
             }
 
             List<Apartment> apartments = projects
