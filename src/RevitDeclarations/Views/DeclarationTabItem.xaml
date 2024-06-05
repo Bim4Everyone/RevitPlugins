@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:RevitDeclarations.Views"
     Background="White"
-    Height="730" Width="630">
+    Height="650" Width="630">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -21,13 +21,16 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="Auto" MinHeight="25"/>
-                <RowDefinition Height="25"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="25"/>
+                <RowDefinition Height="Auto" MinHeight="25"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -47,7 +50,7 @@
                 Grid.Row="1"
                 Grid.Column="0"
                 Margin="10, 0"
-                VerticalAlignment="Center"
+                Style="{StaticResource ParameterName}"
                 Text="Название файла:"/>
             <TextBox
                 Grid.Row="1"
@@ -64,7 +67,7 @@
                 Grid.Row="2"  
                 Grid.Column="0"
                 Margin="10,0"
-                VerticalAlignment="Center"
+                Style="{StaticResource ParameterName}"
                 Text="Папка выгрузки:"/>
             <TextBlock
                 Grid.Row="2"
@@ -79,7 +82,7 @@
                 Grid.Row="3"
                 Grid.Column="0"
                 Margin="10, 0"
-                VerticalAlignment="Center"
+                Style="{StaticResource ParameterName}"
                 Text="Формат файла:"/>
             <StackPanel
                 Grid.Row="3"
@@ -101,13 +104,13 @@
             <TextBlock 
                 Grid.Row="4"
                 Grid.ColumnSpan="2"
-                VerticalAlignment="Bottom"
                 Style="{StaticResource HeaderName}"
-                Text="Настройки выгрузки"/>
+                Text="Настройки выгрузки декларации"/>
 
             <TextBlock 
                 Grid.Row="5"
                 Grid.Column="0"
+                Margin="10, 0"
                 Style="{StaticResource ParameterName}"
                 Text="Стадия:"/>
             <ComboBox
@@ -122,6 +125,7 @@
             <TextBlock 
                 Grid.Row="6"
                 Grid.Column="0"                    
+                Margin="10, 0"
                 Style="{StaticResource ParameterName}"
                 Text="Количество знаков после запятой:"/>
             <TextBox
@@ -135,15 +139,49 @@
 
             <TextBlock 
                 Grid.Row="7"
+                Style="{StaticResource HeaderName}"
+                Text="Настройки УТП"/>
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="8"
+                Margin="10, 0"
+                Style="{StaticResource ParameterName}"
+                Text="Рассчитывать УТП:"/>
+            <CheckBox
+                Grid.Row="8"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="0, 5"
+                IsChecked="{Binding CanLoadUTP}"/>
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="9"
+                Margin="10, 0"
+                Style="{StaticResource ParameterName}"
+                Text="Расчет контуров помещений:"/>
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="9"
+                Grid.ColumnSpan="2"
+                Margin="0, 0, 10, 0"
+                IsEnabled="{Binding CanLoadUTP}"
+                ItemsSource="{Binding DoubleParameters}"
+                DisplayMemberPath="Definition.Name"
+                SelectedItem="{Binding SelectedRoomAreaCoefParam}"/>
+
+            <TextBlock 
+                Grid.Row="10"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
-                Style="{StaticResource ParameterName}"
+                Style="{StaticResource HeaderName}"
                 Text="Проекты с помещениями, доступные для выгрузки:"/>
 
             <ListBox                    
-                Grid.Row="8"
+                Grid.Row="11"
                 Grid.ColumnSpan="3"
-                Margin="10, 0, 10, 20"
+                Margin="10, 0, 10, 10"
                 ItemsSource="{Binding RevitDocuments}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>

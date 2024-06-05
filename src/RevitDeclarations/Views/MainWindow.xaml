@@ -20,7 +20,7 @@
     WindowStartupLocation="CenterOwner"
     
     Title="Декларации"
-    Height="830" Width="650"
+    Height="760" Width="650"
     ResizeMode="NoResize"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
