@@ -66,7 +66,7 @@
                         <Setter Property="HorizontalAlignment"
                                 Value="Right" />
                         <Setter Property="Text"
-                                Value="Путь и имя для сохранения модели test" />
+                                Value="Путь и имя для сохранения модели" />
                         <Setter Property="FontStyle"
                                 Value="Italic" />
                         <Style.Triggers>
