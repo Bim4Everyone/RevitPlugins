@@ -168,8 +168,7 @@ namespace RevitSectionsConstructor.ViewModels {
 
         private bool CanMoveGroups(ObservableCollectionCore<object> selectedGroupViewModels) {
             return selectedGroupViewModels != null
-                && selectedGroupViewModels.Where(item => item is GroupViewModel).Count() > 0
-                ;
+                && selectedGroupViewModels.Where(item => item is GroupViewModel).Count() > 0;
         }
 
 
