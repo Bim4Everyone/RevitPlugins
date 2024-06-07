@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitSectionsConstructor",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/0T1IcllNt1BY/city-buildings",
+  "BundleName": "Конструктор секций",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\ОПП.panel"
+}
