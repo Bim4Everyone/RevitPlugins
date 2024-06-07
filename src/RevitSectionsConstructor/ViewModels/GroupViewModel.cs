@@ -33,8 +33,9 @@ namespace RevitSectionsConstructor.ViewModels {
         public Group Group { get; }
         public ElementId Id { get; }
         public string Name { get; }
-
         public LevelWrapper Level { get; }
+        public ObservableCollection<LevelWrapper> EnabledBottomLevels { get; }
+        public ObservableCollection<LevelWrapper> EnabledTopLevels { get; }
 
         private bool _deleteGroup;
         public bool DeleteGroup {
@@ -49,8 +50,6 @@ namespace RevitSectionsConstructor.ViewModels {
             }
         }
 
-        public ObservableCollection<LevelWrapper> EnabledBottomLevels { get; }
-
         private LevelWrapper _selectedBottomLevel;
         public LevelWrapper SelectedBottomLevel {
             get => _selectedBottomLevel;
@@ -60,8 +59,6 @@ namespace RevitSectionsConstructor.ViewModels {
                 UpdateTopLevels(value);
             }
         }
-
-        public ObservableCollection<LevelWrapper> EnabledTopLevels { get; }
 
         private LevelWrapper _selectedTopLevel;
         public LevelWrapper SelectedTopLevel {
@@ -95,7 +92,6 @@ namespace RevitSectionsConstructor.ViewModels {
             return Name;
         }
 
-
         public IList<LevelWrapper> GetLevelsRange() {
             return _levelsForPlacing
                 .Where(level =>
@@ -103,7 +99,6 @@ namespace RevitSectionsConstructor.ViewModels {
                                     && level.Elevation <= SelectedTopLevel?.Elevation)
                 .ToList();
         }
-
 
         private void UpdateTopLevels(LevelWrapper selectedBottomLevel) {
             if(selectedBottomLevel is null) {

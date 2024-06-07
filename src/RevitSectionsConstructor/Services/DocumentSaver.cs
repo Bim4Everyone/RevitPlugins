@@ -21,7 +21,6 @@ namespace RevitSectionsConstructor.Services {
             }
         }
 
-
         private void SaveWorksharedDocument(string path) {
             WorksharingSaveAsOptions wsOptions = new WorksharingSaveAsOptions() {
                 SaveAsCentral = true

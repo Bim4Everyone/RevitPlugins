@@ -58,18 +58,14 @@ namespace RevitSectionsConstructor.ViewModels {
         public ICommand SelectPathCommand { get; }
         public ICommand MoveGroupsToCopyCommand { get; }
         public ICommand MoveGroupsFromCopyCommand { get; }
-
-
         /// <summary>
         /// Список для левой половины окна с группами, с которыми либо ничего не делать, либо удалить их
         /// </summary>
         public ObservableCollection<GroupViewModel> GroupsNotForCopy { get; }
-
         /// <summary>
         /// Список для правой половины окна с группами, которые надо скопировать на выбранные этажи
         /// </summary>
         public ObservableCollection<GroupViewModel> GroupsForCopy { get; }
-
 
         private string _errorText;
         public string ErrorText {
@@ -77,14 +73,11 @@ namespace RevitSectionsConstructor.ViewModels {
             set => RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-
         private string _path;
         public string Path {
             get => _path;
             set => RaiseAndSetIfChanged(ref _path, value);
         }
-
-
 
 
         private void AcceptView() {
@@ -154,7 +147,6 @@ namespace RevitSectionsConstructor.ViewModels {
                 && selectedGroupViewModels.Any(item => item is GroupViewModel);
         }
 
-
         private IOrderedEnumerable<GroupViewModel> InitializeGroupViewModels(RevitRepository revitRepository) {
             IReadOnlyCollection<LevelWrapper> levels = revitRepository.GetLevelWrappers();
 
@@ -163,7 +155,6 @@ namespace RevitSectionsConstructor.ViewModels {
                 .Select(group => new GroupViewModel(group, levels))
                 .OrderBy(group => group.Level.Elevation);
         }
-
 
         private IList<GroupWithAction> GetGroupWithActions() {
             List<GroupWithAction> list = new List<GroupWithAction>();

@@ -24,11 +24,8 @@ namespace RevitSectionsConstructor.Models {
 
 
         public Group Group { get; }
-
         public LevelWrapper CurrentLevel { get; }
-
         public ActionsOnGroup ActionOnGroup { get; }
-
         public IReadOnlyCollection<LevelWrapper> LevelsForPlacing { get; }
     }
 }

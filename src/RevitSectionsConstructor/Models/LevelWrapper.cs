@@ -13,10 +13,9 @@ namespace RevitSectionsConstructor.Models {
             Name = level.Name;
         }
 
+
         public ElementId LevelId { get; }
-
         public double Elevation { get; }
-
         public string Name { get; }
 
 

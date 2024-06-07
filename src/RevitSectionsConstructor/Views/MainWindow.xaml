@@ -126,7 +126,6 @@
                         </dxg:GridColumn.CellTemplate>
                     </dxg:GridColumn>
                 </dxg:GridControl.Columns>
-
             </dxg:GridControl>
 
             <StackPanel Grid.Row="1"
@@ -176,7 +175,6 @@
                                 <dxe:ComboBoxEdit IsTextEditable="False"
                                                   ItemsSource="{Binding RowData.Row.EnabledBottomLevels}"
                                                   EditValue="{Binding RowData.Row.SelectedBottomLevel, UpdateSourceTrigger=PropertyChanged}" />
-
                             </DataTemplate>
                         </dxg:GridColumn.CellTemplate>
                     </dxg:GridColumn>
@@ -193,7 +191,6 @@
                         </dxg:GridColumn.CellTemplate>
                     </dxg:GridColumn>
                 </dxg:GridControl.Columns>
-
             </dxg:GridControl>
         </Grid>
 
