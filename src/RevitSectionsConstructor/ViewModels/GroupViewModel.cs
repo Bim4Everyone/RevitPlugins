@@ -43,6 +43,8 @@ namespace RevitSectionsConstructor.ViewModels {
                 RaiseAndSetIfChanged(ref _deleteGroup, value);
                 if(value) {
                     ActionOnGroup = ActionsOnGroup.Delete;
+                } else {
+                    ActionOnGroup = ActionsOnGroup.Nothing;
                 }
             }
         }
