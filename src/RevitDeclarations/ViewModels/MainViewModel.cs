@@ -38,11 +38,13 @@ namespace RevitDeclarations.ViewModels {
             _selectedPhase = _phases[_phases.Count - 1];
 
             _accuracy = "1";
+            _loadUtp = true;
 
             _revitDocuments = _revitRepository
                 .GetLinks()
                 .Select(x => new RevitDocumentViewModel(x, _settings))
                 .Where(x => x.HasRooms())
+                .OrderBy(x => x.Name)
                 .ToList();
 
             RevitDocumentViewModel currentDocumentVM = 
@@ -187,11 +189,23 @@ namespace RevitDeclarations.ViewModels {
                 }
             }
 
-            ExportProjects(projects);
-        }
-
-        private void ExportProjects(List<DeclarationProject> projects) {
             if(_loadUtp) {
+                // Проверка 6. Проверка поректа для корректной выгрузки УТП.
+                IEnumerable<ErrorsListViewModel> utpErrors = projects
+                    .Select(x => x.CheckUtpWarnings())
+                    .SelectMany(x => x)
+                    .Where(x => x.Errors.Any());
+                if(utpErrors.Any()) {
+                    var window = new ErrorWindow() {
+                        DataContext = new ErrorsViewModel(utpErrors, true)
+                    };
+                    window.ShowDialog();
+
+                    if(!(bool) window.DialogResult) {
+                        return;
+                    }
+                }
+
                 foreach(DeclarationProject project in projects) {
                     project.CalculateUtpForApartments();
                 }
@@ -199,11 +213,20 @@ namespace RevitDeclarations.ViewModels {
 
             List<Apartment> apartments = projects
                 .SelectMany(x => x.Apartments)
+                .OrderBy(x => x.Building)
+                .ThenBy(x => x.FullNumber)
                 .ToList();
 
-            DeclarationTableData tableData = new DeclarationTableData(apartments, _settings);
-            DeclarationExporter exporter = new DeclarationExporter(tableData, _settings);
-            exporter.ExportToExcel(FullPath);
+            DeclarationExporter exporter = new DeclarationExporter(_settings);
+
+            bool exportToExcel = false;
+
+            if(exportToExcel) {
+                DeclarationTableData tableData = new DeclarationTableData(apartments, _settings);
+                exporter.ExportToExcel(FullPath, tableData);
+            } else {
+                exporter.ExportToJson(FullPath, apartments);
+            }
         }
 
         public bool CanExportToExcel(object obj) {
