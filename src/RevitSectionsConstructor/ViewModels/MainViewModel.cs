@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 
 using DevExpress.Xpf.Core;
@@ -50,8 +49,6 @@ namespace RevitSectionsConstructor.ViewModels {
                 = RelayCommand.Create<ObservableCollectionCore<object>>(MoveGroupsToCopy, CanMoveGroups);
             MoveGroupsFromCopyCommand
                 = RelayCommand.Create<ObservableCollectionCore<object>>(MoveGroupsFromCopy, CanMoveGroups);
-            CheckViewsCommand
-                = RelayCommand.Create<Window>(CheckViews);
         }
 
 
@@ -61,7 +58,6 @@ namespace RevitSectionsConstructor.ViewModels {
         public ICommand SelectPathCommand { get; }
         public ICommand MoveGroupsToCopyCommand { get; }
         public ICommand MoveGroupsFromCopyCommand { get; }
-        public ICommand CheckViewsCommand { get; }
 
 
         /// <summary>
@@ -89,19 +85,6 @@ namespace RevitSectionsConstructor.ViewModels {
         }
 
 
-        private void CheckViews(Window window) {
-            if(!_revitRepository.ActiveDocOnEmptySheet()) {
-                var result = _messageBoxService.Show(
-                    "Перед запуском плагина настоятельно рекомендуется перейти на пустой лист и закрыть все другие виды." +
-                    "\nХотите продолжить?",
-                    "Конструктор секций",
-                    System.Windows.MessageBoxButton.YesNo,
-                    System.Windows.MessageBoxImage.Warning);
-                if(result != System.Windows.MessageBoxResult.Yes) {
-                    window.Close();
-                }
-            }
-        }
 
 
         private void AcceptView() {

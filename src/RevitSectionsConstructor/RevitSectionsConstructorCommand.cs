@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -45,7 +46,23 @@ namespace RevitSectionsConstructor {
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
 
+                CheckViews(kernel.Get<RevitRepository>(), kernel.Get<IMessageBoxService>());
+
                 Notification(kernel.Get<MainWindow>());
+            }
+        }
+
+        private void CheckViews(RevitRepository revitRepository, IMessageBoxService messageBoxService) {
+            if(!revitRepository.ActiveDocOnEmptySheet()) {
+                var result = messageBoxService.Show(
+                    "Перед запуском плагина настоятельно рекомендуется перейти на пустой лист и закрыть все другие виды." +
+                    "\nХотите продолжить?",
+                    "Конструктор секций",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning);
+                if(result != System.Windows.MessageBoxResult.Yes) {
+                    throw new OperationCanceledException();
+                }
             }
         }
     }
