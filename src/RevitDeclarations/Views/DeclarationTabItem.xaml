@@ -93,7 +93,8 @@
                 <RadioButton
                     GroupName="DeclarationFormat"
                     VerticalAlignment="Center"
-                    Content="Excel"/>
+                    Content="Excel"
+                    IsChecked="{Binding ExportToExcel}"/>
                 <RadioButton
                     Margin="10, 0"
                     GroupName="DeclarationFormat"

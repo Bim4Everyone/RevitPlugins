@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using pyRevitLabs.Json;
+
 namespace RevitDeclarations.Models {
     internal class Apartment {
         private const double _maxAreaDeviation = 0.2;
@@ -52,11 +54,16 @@ namespace RevitDeclarations.Models {
             CalculateRevitAreas();
         }
 
+        [JsonProperty("rooms")]
         public List<RoomElement> Rooms => _rooms;
+        [JsonIgnore]
         public Dictionary<string, List<RoomElement>> MainRooms => _mainRooms;
+        [JsonIgnore]
         public Dictionary<string, List<RoomElement>> OtherRooms => _otherRooms;
 
+        [JsonProperty("full_number")]
         public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
+        [JsonProperty("type")]
         public string Department {
             get {
                 if(string.IsNullOrEmpty(_firstRoom.GetTextParamValue(_settings.MultiStoreyParam))) {
@@ -66,6 +73,7 @@ namespace RevitDeclarations.Models {
                 }
             }
         }
+        [JsonProperty("floor_number")]
         public string Level { 
             get {
                 var levelNames = _rooms
@@ -74,24 +82,42 @@ namespace RevitDeclarations.Models {
                 return string.Join(",", levelNames); 
             } 
         }
+        [JsonProperty("section")]
         public string Section => _firstRoom.GetTextParamValue(_settings.SectionParam);
+        [JsonProperty("building")]
         public string Building => _firstRoom.GetTextParamValue(_settings.BuildingParam);
+        [JsonProperty("number")]
         public string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
+        [JsonProperty("area")]
         public double AreaMain => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy);
+        [JsonProperty("area_k")]
         public double AreaCoef => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaCoefParam, _accuracy);
+        [JsonProperty("area_living")]
         public double AreaLiving => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaLivingParam, _accuracy);
+        [JsonProperty("area_non_summer")]
         public double AreaNonSummer => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaNonSumParam, _accuracy);
+        [JsonProperty("room_size")]
         public int RoomsAmount => _firstRoom.GetIntParamValue(_settings.RoomsAmountParam);
+        [JsonProperty("ceiling_height")]
         public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracy);
 
+        [JsonIgnore]
         public string UtpTwoBaths => _utpTwoBaths;
+        [JsonIgnore]
         public string UtpMasterBedroom => _utpMasterBedroom;
+        [JsonIgnore]
         public string UtpHighflat => _utpHighflat;
+        [JsonIgnore]
         public string UtpBalcony => _utpBalcony;
+        [JsonIgnore]
         public string UtpExtraSummerRooms => _utpExtraSummerRooms;
+        [JsonIgnore]
         public string UtpTerrace => _utpTerrace;
+        [JsonIgnore]
         public string UtpPantry => _utpPantry;
+        [JsonIgnore]
         public string UtpLaundry => _utpLaundry;
+        [JsonIgnore]
         public string UtpExtraBalconyArea => _utpExtraBalconyArea;
 
         // Calculates apartment areas based on the current system room area property
@@ -117,13 +143,11 @@ namespace RevitDeclarations.Models {
 
         public bool CheckActualRoomAreas() {
             foreach(var room in _rooms) {
-                double roomArea = room.GetAreaParamValue(_settings.RoomAreaParam, _accuracy);
-                if(Math.Abs(room.AreaRevit - roomArea) > _maxAreaDeviation) {
+                if(Math.Abs(room.AreaRevit - room.Area) > _maxAreaDeviation) {
                     return false;
                 }
 
-                double roomAreaCoef = room.GetAreaParamValue(_settings.RoomAreaCoefParam, _accuracy);
-                if(Math.Abs(room.AreaCoefRevit - roomAreaCoef) > _maxAreaDeviation) {
+                if(Math.Abs(room.AreaCoefRevit - room.AreaCoef) > _maxAreaDeviation) {
                     return false;
                 }
             }

@@ -25,6 +25,7 @@ namespace RevitDeclarations.ViewModels {
 
         private string _filePath;
         private string _fileName;
+        private bool _exportToExcel;
         private string _accuracy;
         private Phase _selectedPhase;
         private bool _loadUtp;
@@ -38,6 +39,7 @@ namespace RevitDeclarations.ViewModels {
             _selectedPhase = _phases[_phases.Count - 1];
 
             _accuracy = "1";
+            _exportToExcel = true;
             _loadUtp = true;
 
             _revitDocuments = _revitRepository
@@ -58,25 +60,27 @@ namespace RevitDeclarations.ViewModels {
             _prioritiesViewModel = new PrioritiesViewModel(_settings.Priorities);
 
             SelectFolderCommand = new RelayCommand(SelectFolder);
-            ExportToExcelCommand = new RelayCommand(ExportToExcel, CanExportToExcel);
+            ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExportToExcel);
 
             LoadConfig();
         }
 
         public ICommand SelectFolderCommand { get; }
-        public ICommand ExportToExcelCommand { get; }
+        public ICommand ExportDeclarationCommand { get; }
 
         public string FilePath {
             get => _filePath;
             set => RaiseAndSetIfChanged(ref _filePath, value);
         }
-
         public string FileName {
             get => _fileName;
             set => RaiseAndSetIfChanged(ref _fileName, value);
         }
-
         public string FullPath => FilePath + "\\" + FileName;
+        public bool ExportToExcel {
+            get => _exportToExcel;
+            set => RaiseAndSetIfChanged(ref _exportToExcel, value);
+        }
 
         public List<Phase> Phases => _phases;
         public Phase SelectedPhase {
@@ -113,7 +117,7 @@ namespace RevitDeclarations.ViewModels {
             }
         }
 
-        public void ExportToExcel(object obj) {
+        public void ExportDeclaration(object obj) {
             int.TryParse(_accuracy, out int accuracy);
             _settings.Accuracy = accuracy;
             _settings.SelectedPhase = _selectedPhase;
@@ -219,9 +223,7 @@ namespace RevitDeclarations.ViewModels {
 
             DeclarationExporter exporter = new DeclarationExporter(_settings);
 
-            bool exportToExcel = false;
-
-            if(exportToExcel) {
+            if(ExportToExcel) {
                 DeclarationTableData tableData = new DeclarationTableData(apartments, _settings);
                 exporter.ExportToExcel(FullPath, tableData);
             } else {

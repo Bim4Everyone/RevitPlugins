@@ -76,7 +76,7 @@
                 Content="ОК"
                 IsDefault="True"
                 Click="ButtonOk_Click"
-                Command="{Binding ExportToExcelCommand}"/>
+                Command="{Binding ExportDeclarationCommand}"/>
 
             <Button
                 Margin="10"

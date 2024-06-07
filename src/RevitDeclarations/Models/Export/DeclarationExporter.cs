@@ -1,19 +1,23 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
+
+using Autodesk.Revit.DB;
 
 using Microsoft.Office.Interop.Excel;
 
+using pyRevitLabs.Json;
+
 namespace RevitDeclarations.Models {
     internal class DeclarationExporter {
-        private readonly DeclarationTableData _tableData;
         private readonly DeclarationSettings _settings;
 
-        public DeclarationExporter(DeclarationTableData tableData, DeclarationSettings settings) {
-            _tableData = tableData;
+        public DeclarationExporter(DeclarationSettings settings) {
             _settings = settings;
         }
 
-        public void ExportToExcel(string path) {
+        public void ExportToExcel(string path, DeclarationTableData tableData) {
             /* Releasing all COM objects was made on the basis of the article:
              * https://www.add-in-express.com/creating-addins-blog/release-excel-com-objects/
              */
@@ -35,7 +39,7 @@ namespace RevitDeclarations.Models {
                     workSheets = workBook.Worksheets;
                     workSheet = workSheets["Лист1"];
 
-                    new DeclarationTableCreator(_tableData, _settings).Create(workSheet);
+                    new DeclarationTableCreator(tableData, _settings).Create(workSheet);
 
                     workBook.SaveAs(path);
                     workBook.Close(false);
@@ -50,8 +54,12 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        public static void ExportToJson() {
-
+        public void ExportToJson(string path, List<Apartment> apartments) {
+            path = path + ".json";
+            using(StreamWriter file = File.CreateText(path)) {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, apartments);
+            }
         }
     }
 }
