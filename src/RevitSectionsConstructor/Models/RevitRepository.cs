@@ -34,7 +34,7 @@ namespace RevitSectionsConstructor.Models {
             return new FilteredElementCollector(Document)
                 .OfCategory(BuiltInCategory.OST_IOSModelGroups)
                 .OfClass(typeof(Group))
-                .Where(group => group.GroupId == ElementId.InvalidElementId && group.Location is LocationPoint)
+                .Where(group => group.GroupId == ElementId.InvalidElementId)
                 .Cast<Group>()
                 .ToArray();
         }
@@ -55,9 +55,11 @@ namespace RevitSectionsConstructor.Models {
         /// <exception cref="ArgumentException"></exception>
         public void CopyGroup(GroupWithAction group) {
             if(group is null) { throw new ArgumentNullException(nameof(group)); }
-            if(!(group.Group.Location is LocationPoint locationPoint)) { throw new ArgumentException(nameof(group)); }
+            if(!(group.Group.Location is LocationPoint)) {
+                throw new ArgumentException($"Location группы с Id={group.Group.Id} не является точкой");
+            }
 
-            XYZ currentLocation = locationPoint.Point;
+            XYZ currentLocation = ((LocationPoint) group.Group.Location).Point;
             GroupType groupType = group.Group.GroupType;
             var levelsForPlacing = group.LevelsForPlacing
                 .Where(level => !level.Equals(group.CurrentLevel))
