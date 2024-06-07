@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,8 +28,10 @@ namespace RevitSectionsConstructor.Services {
                         case ActionsOnGroup.Delete:
                             _revitRepository.RemoveElement(group.Group.Id);
                             break;
-                        default:
+                        case ActionsOnGroup.Nothing:
                             break;
+                        default:
+                            throw new NotSupportedException($"{(int) group.ActionOnGroup}");
                     }
                 }
                 trans.Commit();
