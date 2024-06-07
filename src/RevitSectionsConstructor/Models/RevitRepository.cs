@@ -52,10 +52,12 @@ namespace RevitSectionsConstructor.Models {
         /// </summary>
         /// <param name="group"></param>
         /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public void CopyGroup(GroupWithAction group) {
             if(group is null) { throw new ArgumentNullException(nameof(group)); }
+            if(!(group.Group.Location is LocationPoint locationPoint)) { throw new ArgumentException(nameof(group)); }
 
-            XYZ currentLocation = (group.Group.Location as LocationPoint).Point;
+            XYZ currentLocation = locationPoint.Point;
             GroupType groupType = group.Group.GroupType;
             var levelsForPlacing = group.LevelsForPlacing.Where(level => !level.Equals(group.CurrentLevel)).ToArray();
             foreach(var level in levelsForPlacing) {
