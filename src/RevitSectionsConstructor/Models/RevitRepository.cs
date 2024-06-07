@@ -59,7 +59,9 @@ namespace RevitSectionsConstructor.Models {
 
             XYZ currentLocation = locationPoint.Point;
             GroupType groupType = group.Group.GroupType;
-            var levelsForPlacing = group.LevelsForPlacing.Where(level => !level.Equals(group.CurrentLevel)).ToArray();
+            var levelsForPlacing = group.LevelsForPlacing
+                .Where(level => !level.Equals(group.CurrentLevel))
+                .ToArray();
             foreach(var level in levelsForPlacing) {
                 XYZ levelsDiff = new XYZ(0, 0, level.Elevation - group.CurrentLevel.Elevation);
                 XYZ newLocation = currentLocation + levelsDiff;
