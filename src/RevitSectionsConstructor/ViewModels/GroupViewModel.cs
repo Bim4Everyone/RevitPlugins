@@ -118,10 +118,9 @@ namespace RevitSectionsConstructor.ViewModels {
             }
             var enabledTopLevels = _levelsForPlacing
                 .Where(level => level.Elevation >= selectedBottomLevel.Elevation)
-                .OrderBy(level => level.Elevation)
-                .ToArray();
-            for(int i = 0; i < enabledTopLevels.Length; i++) {
-                EnabledTopLevels.Add(enabledTopLevels[i]);
+                .OrderBy(level => level.Elevation);
+            foreach(var level in enabledTopLevels) {
+                EnabledTopLevels.Add(level);
             }
         }
     }
