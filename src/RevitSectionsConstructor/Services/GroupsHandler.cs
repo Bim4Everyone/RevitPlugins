@@ -31,7 +31,9 @@ namespace RevitSectionsConstructor.Services {
                         case ActionsOnGroup.Nothing:
                             break;
                         default:
-                            throw new NotSupportedException($"{(int) group.ActionOnGroup}");
+                            throw new NotSupportedException(
+                                $"Не поддерживаемое действие над группами: " +
+                                $"{group.ActionOnGroup}={(int) group.ActionOnGroup}");
                     }
                 }
                 trans.Commit();
