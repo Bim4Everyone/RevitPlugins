@@ -143,9 +143,9 @@ namespace RevitDeclarations.Models {
                     range[rowNumber, startColumn + k * _tableData.SummerRoomCells + 1]
                         = rooms[k].DeclarationName;
                     range[rowNumber, startColumn + k * _tableData.SummerRoomCells + 2]
-                        = rooms[k].GetAreaParamValue(_settings.RoomAreaParam, _settings.Accuracy);
+                        = rooms[k].Area;
                     range[rowNumber, startColumn + k * _tableData.SummerRoomCells + 3]
-                        = rooms[k].GetAreaParamValue(_settings.RoomAreaCoefParam, _settings.Accuracy);
+                        = rooms[k].AreaCoef;
                 }
             }
 
@@ -165,7 +165,7 @@ namespace RevitDeclarations.Models {
                     range[rowNumber, startColumn + k * _tableData.MainRoomCells + 1]
                         = rooms[k].DeclarationName;
                     range[rowNumber, startColumn + k * _tableData.MainRoomCells + 2]
-                        = rooms[k].GetAreaParamValue(_settings.RoomAreaParam, _settings.Accuracy);
+                        = rooms[k].Area;
                 }
             }
 

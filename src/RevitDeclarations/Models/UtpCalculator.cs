@@ -107,7 +107,7 @@ namespace RevitDeclarations.Models {
         private List<string> GetBannedUtpRoomNames() {
             return _project
                 .Rooms
-                .Select(x => x.Name)
+                .Select(x => x.NameLower)
                 .Where(x => _settings.BannedRoomNames.Contains(x))
                 .Distinct()
                 .ToList();

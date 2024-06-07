@@ -1,28 +1,47 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
+using pyRevitLabs.Json;
+
 namespace RevitDeclarations.Models
 {
     internal class RoomElement {
         private readonly Room _revitRoom;
         private readonly double _areaRevit;
         private readonly double _areaCoefRevit;
+        private readonly double _area;
+        private readonly double _areaCoef;
 
         public RoomElement(Room room, DeclarationSettings settings) {
             _revitRoom = room;
 
             _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.Accuracy);
             _areaCoefRevit = CalculateAreaCoefRevit(settings);
+            _area = GetAreaParamValue(settings.RoomAreaParam, settings.Accuracy);
+            _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.Accuracy);
         }
 
+        [JsonIgnore] 
         public Room RevitRoom => _revitRoom;
 
+        [JsonIgnore]
         public ElementId RoomLevel => _revitRoom.LevelId;
-        public string Name => _revitRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString().ToLower();
+        [JsonProperty("room_type")]
+        public string Name => _revitRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+        [JsonIgnore]
         public string NameLower => Name.ToLower();
+        [JsonIgnore]
         public string DeclarationName => $"{Name}_{Number}";
+
+        [JsonIgnore]
         public double AreaRevit => _areaRevit;
+        [JsonIgnore]
         public double AreaCoefRevit => _areaCoefRevit;
+        [JsonProperty("area")]
+        public double Area => _area;
+        [JsonProperty("area_k")]
+        public double AreaCoef => _areaCoef;
+        [JsonProperty("number")]
         public string Number => _revitRoom.Number.ToString();
 
 
