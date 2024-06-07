@@ -3,6 +3,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
+using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class UtpCalculator {
@@ -12,24 +13,27 @@ namespace RevitDeclarations.Models {
 
         private readonly bool _hasNullAreas;
         private readonly bool _hasBannedNames;
+        private readonly List<ElementId> _roomsWithBathFamily;
 
         // Гардеробные с дверью в жилую комнату. Для УТП Гардеробная
-        private readonly List<ElementId> _pantriesWithBedroom;
+        private List<ElementId> _pantriesWithBedroom;
         // Мастер-спальни 
-        private readonly List<ElementId> _masterBedrooms;
+        private List<ElementId> _masterBedrooms;
         // Санузлы, относящиеся к мастер спальням
-        private readonly List<ElementId> _masterBathrooms;
-        private readonly List<ElementId> _roomsWithBathFamily;
+        private List<ElementId> _masterBathrooms;
 
         public UtpCalculator(DeclarationProject project, DeclarationSettings settings) {
             _project = project;
             _settings = settings;
 
             _hasNullAreas = CheckUtpNullAreas();
-            _hasBannedNames = CheckUtpRoomNames();
+            _hasBannedNames = GetBannedUtpRoomNames().Any();
+            _roomsWithBathFamily = GetRoomsWithBath();
 
             _priorities = _settings.PrioritiesConfig;
+        }
 
+        public void CalculateRoomsForUtp() {
             var bedroomBathroom = GetRoomsByDoors(_priorities.LivingRoom, _priorities.Bathroom);
             // Жилые комната, соединенные с санузлами
             List<ElementId> bedroomsWithBathroom = bedroomBathroom[_priorities.LivingRoom.NameLower];
@@ -54,15 +58,59 @@ namespace RevitDeclarations.Models {
             var bathroomsWithMasterPantry = bathroomPantry[_priorities.Bathroom.NameLower];
             // Санузлы, относящиеся к мастер-спальням для определение УТП Две ванны
             _masterBathrooms = bathroomsWithBedroom.Concat(bathroomsWithMasterPantry).ToList();
-
-            _roomsWithBathFamily = GetRoomsWithBath();
         }
 
-        private bool CheckUtpRoomNames() {
+        public List<ErrorsListViewModel> CheckProjectForUtp() {
+
+
+            ErrorsListViewModel areaErrorListVM = new ErrorsListViewModel() {
+                Message = "Предупреждение",
+                Description = "В проекте присутствуют помещения квартир с нулевыми системными площадьми",
+                DocumentName = _project.Document.Name
+            };
+
+            if(_hasNullAreas) {
+                areaErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
+                    "В проекте присутствуют помещения квартир с нулевыми системными площадьми. " +
+                    "УТП \"Гардеробная\" и \"Увеличенная площадь балкона/лоджии\" не могут быть корректно рассчитаны."));
+            }
+
+            ErrorsListViewModel namesErrorListVM = new ErrorsListViewModel() {
+                Message = "Предупреждение",
+                Description = "В проекте присутствуют помещения c некорректными именами.",
+                DocumentName = _project.Document.Name
+            };
+
+            if(_hasBannedNames) {
+                string names = string.Join(",", GetBannedUtpRoomNames());
+
+                namesErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
+                    $"В проекте присутствуют помещения квартир c некорректными именами: \"{names}\". " +
+                    "УТП \"Мастер-спальня\" и \"Две ванные\" не могут быть корректно рассчитаны."));
+            }
+
+            ErrorsListViewModel bathesErrorListVM = new ErrorsListViewModel() {
+                Message = "Предупреждение",
+                Description = "В проекте отсутсвуют семейства ванн и душевых.",
+                DocumentName = _project.Document.Name
+            };
+
+            if(_project.GetBathInstances().Count == 0) {
+                bathesErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
+                    "В проекте отсутствуют экземпляры семейств с именами, включающими \"ванн\" или \"душев\". " +
+                    "УТП \"Две ванные\" не может быть корректно рассчитано."));
+            }
+
+            return new List<ErrorsListViewModel>() { areaErrorListVM, namesErrorListVM, bathesErrorListVM };
+        }
+
+        private List<string> GetBannedUtpRoomNames() {
             return _project
                 .Rooms
-                .Where(x => _settings.BannedRoomNames.Contains(x.Name))
-                .Any();
+                .Select(x => x.Name)
+                .Where(x => _settings.BannedRoomNames.Contains(x))
+                .Distinct()
+                .ToList();
         }
 
         private bool CheckUtpNullAreas() {
