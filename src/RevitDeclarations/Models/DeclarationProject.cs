@@ -14,6 +14,8 @@ namespace RevitDeclarations.Models {
         private readonly RevitRepository _revitRepository;
         private readonly Phase _phase;
 
+        private UtpCalculator _utpCalculator;
+
         public DeclarationProject(RevitDocumentViewModel document,
                             RevitRepository revitRepository,
                             DeclarationSettings settings) {
@@ -31,6 +33,7 @@ namespace RevitDeclarations.Models {
         /// <summary>Rooms on selected phase than belong to apartments</summary>
         public IList<RoomElement> Rooms => _rooms;
         public IList<Apartment> Apartments => _apartments;
+        public RevitDocumentViewModel Document => _document;
         public Phase Phase => _phase;
 
         private IList<RoomElement> FilterApartmentRooms(IList<RoomElement> rooms) {
@@ -114,11 +117,16 @@ namespace RevitDeclarations.Models {
             return errorListVM;
         }
 
+        public List<ErrorsListViewModel> CheckUtpWarnings() {
+            _utpCalculator = new UtpCalculator(this, _settings);
+            return _utpCalculator.CheckProjectForUtp();
+        }
+
         public void CalculateUtpForApartments() {
-            UtpCalculator calculator = new UtpCalculator(this, _settings);
+            _utpCalculator.CalculateRoomsForUtp();
 
             foreach(var apartment in _apartments) {
-                apartment.CalculateUtp(calculator);
+                apartment.CalculateUtp(_utpCalculator);
             }
         }
 
