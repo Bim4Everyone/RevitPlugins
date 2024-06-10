@@ -11,6 +11,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private double _rebarMass = 0;
         private double _rebarCoef = 0;
         private bool _isCheck = false;
+        private static readonly IEnumerable<BuiltInCategory> _rebarBIC = new List<BuiltInCategory>() { BuiltInCategory.OST_Rebar };
 
         public DesignTypeInfoVM(string typeName, string docPackage, bool aboveZero) {
             TypeName = typeName;
@@ -100,11 +101,18 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// </summary>
         public void AddItem(Element elem) {
 
-            if(elem.Category.GetBuiltInCategory() == BuiltInCategory.OST_Rebar) {
+            if(elem.InAnyCategory(_rebarBIC)) {
                 Rebars.Add(elem);
             } else {
                 Elements.Add(elem);
             }
+
+
+            //if(elem.Category.GetBuiltInCategory() == BuiltInCategory.OST_Rebar) {
+            //    Rebars.Add(elem);
+            //} else {
+            //    Elements.Add(elem);
+            //}
         }
     }
 }

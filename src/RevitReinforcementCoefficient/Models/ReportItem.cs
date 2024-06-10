@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 namespace RevitReinforcementCoefficient.Models {
     public class ReportItem {
         public ReportItem(string paramName, ElementId elementId) {
-
             ErrorName = $"Отсутствует параметр \"{paramName}\"";
             ElementIdsAsString = elementId.ToString();
             ElementIds.Add(elementId);
@@ -24,7 +23,6 @@ namespace RevitReinforcementCoefficient.Models {
         /// Добавляет id элемента в список ошибочных, если его там еще нет
         /// </summary>
         public void AddIdIfNotContained(ElementId elementId) {
-
             if(!ElementIds.Contains(elementId)) {
 
                 ElementIds.Add(elementId);

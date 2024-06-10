@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -21,25 +16,25 @@ namespace RevitReinforcementCoefficient {
     [Transaction(TransactionMode.Manual)]
     public class RevitReinforcementCoefficientCommand : BasePluginCommand {
         public RevitReinforcementCoefficientCommand() {
-            PluginName = "RevitReinforcementCoefficient";
+            PluginName = "Подсчет коэффициентов армирования";
         }
 
         protected override void Execute(UIApplication uiApplication) {
-			using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-					
-				kernel.Bind<PluginConfig>()
+
+                kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
-				
-				kernel.Bind<MainViewModel>().ToSelf();
-				kernel.Bind<MainWindow>().ToSelf()
+
+                kernel.Bind<MainViewModel>().ToSelf();
+                kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
-				
-				Notification(kernel.Get<MainWindow>());
-			}
+
+                Notification(kernel.Get<MainWindow>());
+            }
         }
     }
 }

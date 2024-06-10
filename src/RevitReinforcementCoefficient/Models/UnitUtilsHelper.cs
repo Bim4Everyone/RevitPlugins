@@ -4,7 +4,6 @@ namespace RevitReinforcementCoefficient.Models {
     public class UnitUtilsHelper {
         public static double ConvertFromInternalValue(double value) {
             // Перевод из внутренних единиц Revit длины
-
 #if REVIT_2021_OR_GREATER
             ForgeTypeId unitType = UnitTypeId.Millimeters;
 #else
@@ -15,7 +14,6 @@ namespace RevitReinforcementCoefficient.Models {
 
         public static double ConvertVolumeFromInternalValue(double value) {
             // Перевод из внутренних единиц Revit объема
-
 #if REVIT_2021_OR_GREATER
             ForgeTypeId unitType = UnitTypeId.CubicMeters;
 #else
@@ -26,7 +24,6 @@ namespace RevitReinforcementCoefficient.Models {
 
         public static double ConvertToInternalValue(double value) {
             // Перевод во внутренние единицы Revit
-
 #if REVIT_2021_OR_GREATER
             ForgeTypeId unitType = UnitTypeId.Millimeters;
 #else

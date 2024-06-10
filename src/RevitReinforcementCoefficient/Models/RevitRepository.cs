@@ -19,7 +19,6 @@ namespace RevitReinforcementCoefficient.Models {
                 new ElementCategoryFilter(BuiltInCategory.OST_Rebar)
             });
 
-
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
