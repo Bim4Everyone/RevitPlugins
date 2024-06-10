@@ -7,6 +7,8 @@ namespace RevitDeclarations.Models
 {
     internal class RoomElement {
         private readonly Room _revitRoom;
+        private readonly string _name;
+
         private readonly double _areaRevit;
         private readonly double _areaCoefRevit;
         private readonly double _area;
@@ -15,10 +17,14 @@ namespace RevitDeclarations.Models
         public RoomElement(Room room, DeclarationSettings settings) {
             _revitRoom = room;
 
+            _name = _revitRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+
             _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.Accuracy);
             _areaCoefRevit = CalculateAreaCoefRevit(settings);
             _area = GetAreaParamValue(settings.RoomAreaParam, settings.Accuracy);
             _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.Accuracy);
+
+
         }
 
         [JsonIgnore] 
@@ -27,9 +33,9 @@ namespace RevitDeclarations.Models
         [JsonIgnore]
         public ElementId RoomLevel => _revitRoom.LevelId;
         [JsonProperty("room_type")]
-        public string Name => _revitRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+        public string Name => _name;
         [JsonIgnore]
-        public string NameLower => Name.ToLower();
+        public string NameLower => _name.ToLower();
         [JsonIgnore]
         public string DeclarationName => $"{Name}_{Number}";
 
@@ -42,7 +48,7 @@ namespace RevitDeclarations.Models
         [JsonProperty("area_k")]
         public double AreaCoef => _areaCoef;
         [JsonProperty("number")]
-        public string Number => _revitRoom.Number.ToString();
+        public string Number => _revitRoom.Number;
 
 
         private double CalculateAreaCoefRevit(DeclarationSettings settings) {

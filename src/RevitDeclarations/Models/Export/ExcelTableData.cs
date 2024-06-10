@@ -40,7 +40,7 @@ namespace RevitDeclarations.Models {
 
         private List<string> GetOtherPriorities() {
             return _apartments
-               .SelectMany(x => x.OtherRooms.Keys)
+               .SelectMany(x => x.GetOtherPriorityNames())
                .Distinct()
                .ToList();
         }

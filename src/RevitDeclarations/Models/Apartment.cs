@@ -9,11 +9,13 @@ namespace RevitDeclarations.Models {
         private const double _maxAreaDeviation = 0.2;
 
         private readonly DeclarationSettings _settings;
-        private readonly int _accuracy;
         private readonly PrioritiesConfig _priorConfig;
+        private readonly int _accuracy;
 
-        private readonly List<RoomElement> _rooms;
+        private readonly IReadOnlyCollection<RoomElement> _rooms;
+        // Словарь для группировки помещений, входящих в исходные приоритеты
         private readonly Dictionary<string, List<RoomElement>> _mainRooms;
+        // Словарь для группировки помещений, не входящих в исходные приоритеты
         private readonly Dictionary<string, List<RoomElement>> _otherRooms;
         private readonly RoomElement _firstRoom;
 
@@ -38,7 +40,7 @@ namespace RevitDeclarations.Models {
             _priorConfig = _settings.PrioritiesConfig;
 
             _rooms = rooms.ToList();
-            _firstRoom = _rooms[0];
+            _firstRoom = rooms.FirstOrDefault();
 
             _mainRooms = new Dictionary<string, List<RoomElement>>();
             _otherRooms = new Dictionary<string, List<RoomElement>>();
@@ -55,11 +57,7 @@ namespace RevitDeclarations.Models {
         }
 
         [JsonProperty("rooms")]
-        public List<RoomElement> Rooms => _rooms;
-        [JsonIgnore]
-        public Dictionary<string, List<RoomElement>> MainRooms => _mainRooms;
-        [JsonIgnore]
-        public Dictionary<string, List<RoomElement>> OtherRooms => _otherRooms;
+        public IReadOnlyCollection<RoomElement> Rooms => _rooms;
 
         [JsonProperty("full_number")]
         public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
@@ -221,7 +219,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        public List<RoomElement> GetRoomsByPrior(RoomPriority priority) {
+        public IReadOnlyCollection<RoomElement> GetRoomsByPrior(RoomPriority priority) {
             string name = priority.NameLower;
 
             if(_mainRooms.Keys.Contains(name)) {
@@ -231,6 +229,10 @@ namespace RevitDeclarations.Models {
             } else {
                 return new List<RoomElement>();
             }
+        }
+
+        public IReadOnlyCollection<string> GetOtherPriorityNames() {
+            return _otherRooms.Keys;
         }
 
         public void CalculateUtp(UtpCalculator calculator) {
