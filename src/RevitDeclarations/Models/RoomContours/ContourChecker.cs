@@ -14,7 +14,10 @@ namespace RevitDeclarations.Models {
             widthCheck = ParamConverter.ConvertLengthToInternal(widthCheck, accuracy);
 
             RoomContour contour = new RoomContour(room);
-            List<Curve> curves = contour.ContourCurves.OrderByDescending(x => x.Length).ToList();
+            IReadOnlyList<Curve> curves = contour
+                .ContourCurves
+                .OrderByDescending(x => x.Length)
+                .ToList();
             int contourLength = curves.Count;
 
             switch(contourLength) {
@@ -51,7 +54,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        public static ContourCheckEnum CheckAnyRoomSizes(List<Room> rooms,
+        public static ContourCheckEnum CheckAnyRoomSizes(IEnumerable<Room> rooms,
                                                          int accuracy,
                                                          double lengthCheck,
                                                          double widthCheck = 0) {

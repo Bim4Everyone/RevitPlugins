@@ -6,7 +6,7 @@ using Autodesk.Revit.DB.Architecture;
 
 namespace RevitDeclarations.Models {
     internal class RoomContour {
-        private readonly List<Curve> _mainContour;
+        private readonly IReadOnlyList<Curve> _mainContour;
         private readonly double _curveTolerance;
         private bool _needToCheck;
 
@@ -14,22 +14,26 @@ namespace RevitDeclarations.Models {
             _curveTolerance = room.Document.Application.ShortCurveTolerance;
 
             SpatialElementBoundaryOptions options = new SpatialElementBoundaryOptions();
-            List<IList<BoundarySegment>> roomBoundaries = room.GetBoundarySegments(options).ToList();
+            IList<IList<BoundarySegment>> roomBoundaries = room
+                .GetBoundarySegments(options)
+                .ToList();
             IList<BoundarySegment> outerBoundary = GetOuterBoundary(roomBoundaries);
 
             if(outerBoundary.Count > 2) {
-                List<Curve> straightContour = GetStraightContour(outerBoundary);
-                List<Curve> updatedContour = UpdateContourOrder(straightContour);
-                _mainContour = ConnectRoomContour(updatedContour).OrderBy(x => x.Length).ToList();
+                IList<Curve> straightContour = GetStraightContour(outerBoundary);
+                IList<Curve> updatedContour = UpdateContourOrder(straightContour);
+                _mainContour = ConnectRoomContour(updatedContour)
+                    .OrderBy(x => x.Length)
+                    .ToList();
             } else {
                 _mainContour = new List<Curve>();
             }
         }
 
-        public List<Curve> ContourCurves => _mainContour;
+        public IReadOnlyList<Curve> ContourCurves => _mainContour;
         public bool NeedToCheck => _needToCheck;
 
-        private List<Curve> GetStraightContour(IList<BoundarySegment> boundaries) {
+        private IList<Curve> GetStraightContour(IList<BoundarySegment> boundaries) {
             Curve prevCurve = boundaries[boundaries.Count - 1].GetCurve();
             List<Curve> contour = new List<Curve>();
 
@@ -50,7 +54,7 @@ namespace RevitDeclarations.Models {
 
         // Метод для настройки порядка линий в контуре помещения.
         // Первой линией должна быть линия на углу контура.
-        private List<Curve> UpdateContourOrder(List<Curve> contour) {
+        private IList<Curve> UpdateContourOrder(IList<Curve> contour) {
             Line firstLine = contour.First() as Line;
             Line lastLine = contour.Last() as Line;
 
@@ -58,7 +62,7 @@ namespace RevitDeclarations.Models {
             XYZ lastLineDirection = lastLine.Direction;
 
             if(firstLineDirection.CrossProduct(lastLineDirection).IsAlmostEqualTo(XYZ.Zero)) {
-                List<Curve> newContour = contour.Skip(1).ToList();
+                IList<Curve> newContour = contour.Skip(1).ToList();
                 newContour.Add(contour[0]);
 
                 return UpdateContourOrder(newContour);
@@ -67,15 +71,15 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        private List<Curve> ConnectRoomContour(List<Curve> contour) {
+        private IList<Curve> ConnectRoomContour(IList<Curve> contour) {
             int contourLength = contour.Count();
 
             if(contourLength < 2) {
                 return contour;
             }
 
-            List<Curve> leftContour = ConnectRoomContour(contour.Take(contourLength / 2).ToList());
-            List<Curve> rightContour = ConnectRoomContour(contour.Skip(contourLength / 2).ToList());
+            IList<Curve> leftContour = ConnectRoomContour(contour.Take(contourLength / 2).ToList());
+            IList<Curve> rightContour = ConnectRoomContour(contour.Skip(contourLength / 2).ToList());
 
             Line endOfTheLeftContour = leftContour.Last() as Line;
             Line startOfTheRightContour = rightContour.First() as Line;
@@ -97,7 +101,7 @@ namespace RevitDeclarations.Models {
             return connectedContour;
         }
 
-        private IList<BoundarySegment> GetOuterBoundary(List<IList<BoundarySegment>> boundaries) {
+        private IList<BoundarySegment> GetOuterBoundary(IList<IList<BoundarySegment>> boundaries) {
             int length = boundaries.Count;
 
             if(length == 0) {
