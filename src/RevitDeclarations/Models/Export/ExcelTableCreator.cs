@@ -4,12 +4,12 @@ using System.Linq;
 using Microsoft.Office.Interop.Excel;
 
 namespace RevitDeclarations.Models {
-    internal class DeclarationTableCreator {
-        private readonly DeclarationTableData _tableData;
+    internal class ExcelTableCreator {
+        private readonly ExcelTableData _excelTableData;
         private readonly DeclarationSettings _settings;
 
-        public DeclarationTableCreator(DeclarationTableData tableData, DeclarationSettings settings) {
-            _tableData = tableData;
+        public ExcelTableCreator(ExcelTableData tableData, DeclarationSettings settings) {
+            _excelTableData = tableData;
             _settings = settings;
         }
 
@@ -43,37 +43,37 @@ namespace RevitDeclarations.Models {
             range[1, 13] = "Высота потолка, м";
 
             if(_settings.LoadUtp) {
-                range[1, _tableData.UtpStart + 1] = "Две ванны";
-                range[1, _tableData.UtpStart + 2] = "Хайфлет";
-                range[1, _tableData.UtpStart + 3] = "Лоджия/ балкон";
-                range[1, _tableData.UtpStart + 4] = "Доп. летние помещения";
-                range[1, _tableData.UtpStart + 5] = "Терраса";
-                range[1, _tableData.UtpStart + 6] = "Мастер-спальня";
-                range[1, _tableData.UtpStart + 7] = "Гардеробная";
-                range[1, _tableData.UtpStart + 8] = "Постирочная";
-                range[1, _tableData.UtpStart + 9] = "Увеличенная площадь балкона/ лоджии";
+                range[1, _excelTableData.UtpStart + 1] = "Две ванны";
+                range[1, _excelTableData.UtpStart + 2] = "Хайфлет";
+                range[1, _excelTableData.UtpStart + 3] = "Лоджия/ балкон";
+                range[1, _excelTableData.UtpStart + 4] = "Доп. летние помещения";
+                range[1, _excelTableData.UtpStart + 5] = "Терраса";
+                range[1, _excelTableData.UtpStart + 6] = "Мастер-спальня";
+                range[1, _excelTableData.UtpStart + 7] = "Гардеробная";
+                range[1, _excelTableData.UtpStart + 8] = "Постирочная";
+                range[1, _excelTableData.UtpStart + 9] = "Увеличенная площадь балкона/ лоджии";
             }
         }
 
         private void FillTableRoomsHeader(Range range) {
-            int columnNumber = _tableData.InfoWidth + 1;
+            int columnNumber = _excelTableData.InfoWidth + 1;
 
             foreach(RoomPriority priority in _settings.UsedPriorities) {
                 if(priority.IsSummer) {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        range[1, columnNumber + k * _tableData.SummerRoomCells] = "№ Пом.";
-                        range[1, columnNumber + k * _tableData.SummerRoomCells + 1] = "Наименование на планировке";
-                        range[1, columnNumber + k * _tableData.SummerRoomCells + 2] = $"{priority.Name}_{k + 1}, площадь без коэф.";
-                        range[1, columnNumber + k * _tableData.SummerRoomCells + 3] = $"{priority.Name}_{k + 1}, площадь с коэф.";
+                        range[1, columnNumber + k * _excelTableData.SummerRoomCells] = "№ Пом.";
+                        range[1, columnNumber + k * _excelTableData.SummerRoomCells + 1] = "Наименование на планировке";
+                        range[1, columnNumber + k * _excelTableData.SummerRoomCells + 2] = $"{priority.Name}_{k + 1}, площадь без коэф.";
+                        range[1, columnNumber + k * _excelTableData.SummerRoomCells + 3] = $"{priority.Name}_{k + 1}, площадь с коэф.";
                     }
-                    columnNumber += priority.MaxRoomAmount * _tableData.SummerRoomCells;
+                    columnNumber += priority.MaxRoomAmount * _excelTableData.SummerRoomCells;
                 } else {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        range[1, columnNumber + k * _tableData.MainRoomCells] = "№ Пом.";
-                        range[1, columnNumber + k * _tableData.MainRoomCells + 1] = "Наименование на планировке";
-                        range[1, columnNumber + k * _tableData.MainRoomCells + 2] = $"{priority.Name}_{k + 1}";
+                        range[1, columnNumber + k * _excelTableData.MainRoomCells] = "№ Пом.";
+                        range[1, columnNumber + k * _excelTableData.MainRoomCells + 1] = "Наименование на планировке";
+                        range[1, columnNumber + k * _excelTableData.MainRoomCells + 2] = $"{priority.Name}_{k + 1}";
                     }
-                    columnNumber += priority.MaxRoomAmount * _tableData.MainRoomCells;
+                    columnNumber += priority.MaxRoomAmount * _excelTableData.MainRoomCells;
                 }
             }
         }
@@ -81,7 +81,7 @@ namespace RevitDeclarations.Models {
         private void FillTableApartmentsInfo(Range range) {
             int rowNumber = 2;
 
-            foreach(Apartment apartment in _tableData.Apartments) {
+            foreach(Apartment apartment in _excelTableData.Apartments) {
                 range[rowNumber, 1] = apartment.FullNumber;
                 range[rowNumber, 2] = apartment.Department;
                 range[rowNumber, 3] = apartment.Level;
@@ -96,7 +96,7 @@ namespace RevitDeclarations.Models {
                 range[rowNumber, 12] = apartment.AreaNonSummer;
                 range[rowNumber, 13] = apartment.RoomsHeight;
 
-                int columnNumber = _tableData.InfoWidth + 1;
+                int columnNumber = _excelTableData.InfoWidth + 1;
 
                 foreach(RoomPriority priority in _settings.UsedPriorities) {
                     List<RoomElement> rooms = apartment.GetRoomsByPrior(priority);
@@ -114,9 +114,9 @@ namespace RevitDeclarations.Models {
 
         private void FillTableUtpInfo(Range range) {
             int rowNumber = 2;
-            int columnNumber = _tableData.UtpStart;
+            int columnNumber = _excelTableData.UtpStart;
 
-            foreach(Apartment apartment in _tableData.Apartments) {
+            foreach(Apartment apartment in _excelTableData.Apartments) {
                 range[rowNumber, columnNumber + 1] = apartment.UtpTwoBaths;
                 range[rowNumber, columnNumber + 2] = apartment.UtpHighflat;
                 range[rowNumber, columnNumber + 3] = apartment.UtpBalcony;
@@ -138,18 +138,18 @@ namespace RevitDeclarations.Models {
                                        int startColumn) {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
-                    range[rowNumber, startColumn + k * _tableData.SummerRoomCells]
+                    range[rowNumber, startColumn + k * _excelTableData.SummerRoomCells]
                         = rooms[k].Number;
-                    range[rowNumber, startColumn + k * _tableData.SummerRoomCells + 1]
+                    range[rowNumber, startColumn + k * _excelTableData.SummerRoomCells + 1]
                         = rooms[k].DeclarationName;
-                    range[rowNumber, startColumn + k * _tableData.SummerRoomCells + 2]
+                    range[rowNumber, startColumn + k * _excelTableData.SummerRoomCells + 2]
                         = rooms[k].Area;
-                    range[rowNumber, startColumn + k * _tableData.SummerRoomCells + 3]
+                    range[rowNumber, startColumn + k * _excelTableData.SummerRoomCells + 3]
                         = rooms[k].AreaCoef;
                 }
             }
 
-            startColumn += priority.MaxRoomAmount * _tableData.SummerRoomCells;
+            startColumn += priority.MaxRoomAmount * _excelTableData.SummerRoomCells;
             return startColumn;
         }
 
@@ -160,16 +160,16 @@ namespace RevitDeclarations.Models {
                                       int startColumn) {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
-                    range[rowNumber, startColumn + k * _tableData.MainRoomCells]
+                    range[rowNumber, startColumn + k * _excelTableData.MainRoomCells]
                         = rooms[k].Number;
-                    range[rowNumber, startColumn + k * _tableData.MainRoomCells + 1]
+                    range[rowNumber, startColumn + k * _excelTableData.MainRoomCells + 1]
                         = rooms[k].DeclarationName;
-                    range[rowNumber, startColumn + k * _tableData.MainRoomCells + 2]
+                    range[rowNumber, startColumn + k * _excelTableData.MainRoomCells + 2]
                         = rooms[k].Area;
                 }
             }
 
-            startColumn += priority.MaxRoomAmount * _tableData.MainRoomCells;
+            startColumn += priority.MaxRoomAmount * _excelTableData.MainRoomCells;
             return startColumn;
         }
 
@@ -186,42 +186,42 @@ namespace RevitDeclarations.Models {
             workSheet.Columns[1].NumberFormat = "@";
 
             Range firstCell = workSheet.Cells[1, 1];
-            Range lastCell = workSheet.Cells[_tableData.Apartments.Count + 1, _tableData.FullTableWidth];
+            Range lastCell = workSheet.Cells[_excelTableData.Apartments.Count + 1, _excelTableData.FullTableWidth];
 
             workSheet.Range[firstCell, lastCell].Borders.ColorIndex = 0;
             workSheet.Range[firstCell, lastCell].HorizontalAlignment = XlHAlign.xlHAlignCenter;
             workSheet.Range[firstCell, lastCell].VerticalAlignment = XlVAlign.xlVAlignCenter;
 
-            for(int i = 1; i <= _tableData.FullTableWidth; i++) {
-                if(i <= _tableData.InfoWidth) {
+            for(int i = 1; i <= _excelTableData.FullTableWidth; i++) {
+                if(i <= _excelTableData.InfoWidth) {
                     workSheet.Columns[i].ColumnWidth = 15.5;
                     workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(221, 235, 247);
-                } else if(i > _tableData.InfoWidth && i <= _tableData.SummerRoomsStart) {
+                } else if(i > _excelTableData.InfoWidth && i <= _excelTableData.SummerRoomsStart) {
                     workSheet.Columns[i].ColumnWidth = 10;
                     workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(248, 203, 173);
 
-                    int checkColumnNumber = (i - _tableData.InfoWidth) % 3;
+                    int checkColumnNumber = (i - _excelTableData.InfoWidth) % 3;
                     if(checkColumnNumber == 0) {
                         workSheet.Columns[i - 2].NumberFormat = "@";
                         workSheet.Columns[i - 1].ColumnWidth = 17;
                         workSheet.Columns[i].NumberFormat = "0,0";
                     }
-                } else if(i > _tableData.SummerRoomsStart && i <= _tableData.OtherRoomsStart) {
+                } else if(i > _excelTableData.SummerRoomsStart && i <= _excelTableData.OtherRoomsStart) {
                     workSheet.Columns[i].ColumnWidth = 10;
                     workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(217, 235, 205);
 
-                    int checkColumnNumber = (i - _tableData.SummerRoomsStart) % 4;
+                    int checkColumnNumber = (i - _excelTableData.SummerRoomsStart) % 4;
                     if(checkColumnNumber == 0) {
                         workSheet.Columns[i - 3].NumberFormat = "@";
                         workSheet.Columns[i - 2].ColumnWidth = 17;
                         workSheet.Columns[i - 1].NumberFormat = "0,0";
                         workSheet.Columns[i].NumberFormat = "0,0";
                     }
-                } else if(i > _tableData.OtherRoomsStart && i <= _tableData.UtpStart) {
+                } else if(i > _excelTableData.OtherRoomsStart && i <= _excelTableData.UtpStart) {
                     workSheet.Columns[i].ColumnWidth = 10;
                     workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(237, 237, 237);
 
-                    int checkColumnNumber = (i - _tableData.OtherRoomsStart) % 3;
+                    int checkColumnNumber = (i - _excelTableData.OtherRoomsStart) % 3;
                     if(checkColumnNumber == 0) {
                         workSheet.Columns[i - 2].NumberFormat = "@";
                         workSheet.Columns[i - 1].ColumnWidth = 17;

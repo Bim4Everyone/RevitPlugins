@@ -17,7 +17,7 @@ namespace RevitDeclarations.Models {
             _settings = settings;
         }
 
-        public void ExportToExcel(string path, DeclarationTableData tableData) {
+        public void ExportToExcel(string path, ExcelTableData tableData) {
             /* Releasing all COM objects was made on the basis of the article:
              * https://www.add-in-express.com/creating-addins-blog/release-excel-com-objects/
              */
@@ -39,7 +39,7 @@ namespace RevitDeclarations.Models {
                     workSheets = workBook.Worksheets;
                     workSheet = workSheets["Лист1"];
 
-                    new DeclarationTableCreator(tableData, _settings).Create(workSheet);
+                    new ExcelTableCreator(tableData, _settings).Create(workSheet);
                     TaskDialog.Show("Декларации", "Файл Excel создан");
 
                     workBook.SaveAs(path);

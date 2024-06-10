@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace RevitDeclarations.Models {
-    internal class DeclarationTableData {
-        public readonly int MainRoomCells = 3;
-        public readonly int SummerRoomCells = 4;
+    internal class ExcelTableData {
+        public const int MainRoomCells = 3;
+        public const int SummerRoomCells = 4;
+        public const int InfoWidth = 13;
 
-        public readonly int InfoWidth = 13;
         public readonly int UtpWidth = 9;
 
         private readonly List<Apartment> _apartments;
@@ -17,7 +17,7 @@ namespace RevitDeclarations.Models {
         private int _otherRoomsStart;
         private int _utpStart;
 
-        public DeclarationTableData(List<Apartment> apartments, DeclarationSettings settings) {
+        public ExcelTableData(List<Apartment> apartments, DeclarationSettings settings) {
             _apartments = apartments;
             _settings = settings;
 
