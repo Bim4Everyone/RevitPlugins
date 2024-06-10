@@ -55,7 +55,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        public void ExportToJson(string path, List<Apartment> apartments) {
+        public void ExportToJson(string path, IEnumerable<Apartment> apartments) {
             path = path + ".json";
             using(StreamWriter file = File.CreateText(path)) {
                 JsonSerializer serializer = new JsonSerializer();

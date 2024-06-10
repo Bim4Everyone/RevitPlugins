@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
+using System.Windows.Forms;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -224,7 +225,7 @@ namespace RevitDeclarations.ViewModels {
             DeclarationExporter exporter = new DeclarationExporter(_settings);
 
             if(ExportToExcel) {
-                DeclarationTableData tableData = new DeclarationTableData(apartments, _settings);
+                ExcelTableData tableData = new ExcelTableData(apartments, _settings);
                 exporter.ExportToExcel(FullPath, tableData);
             } else {
                 exporter.ExportToJson(FullPath, apartments);

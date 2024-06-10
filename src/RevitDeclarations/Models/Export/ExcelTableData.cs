@@ -9,7 +9,7 @@ namespace RevitDeclarations.Models {
 
         public readonly int UtpWidth = 9;
 
-        private readonly List<Apartment> _apartments;
+        private readonly IReadOnlyCollection<Apartment> _apartments;
         private readonly DeclarationSettings _settings;
 
         private int _fullTableWidth;
@@ -17,7 +17,7 @@ namespace RevitDeclarations.Models {
         private int _otherRoomsStart;
         private int _utpStart;
 
-        public ExcelTableData(List<Apartment> apartments, DeclarationSettings settings) {
+        public ExcelTableData(IReadOnlyCollection<Apartment> apartments, DeclarationSettings settings) {
             _apartments = apartments;
             _settings = settings;
 
@@ -32,8 +32,7 @@ namespace RevitDeclarations.Models {
             CalculateTableSizes();
         }
 
-        public List<Apartment> Apartments => _apartments;
-
+        public IReadOnlyCollection<Apartment> Apartments => _apartments;
         public int FullTableWidth => _fullTableWidth;
         public int SummerRoomsStart => _summerRoomsStart;
         public int OtherRoomsStart => _otherRoomsStart;

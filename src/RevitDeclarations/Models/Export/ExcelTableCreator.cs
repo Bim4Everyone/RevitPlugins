@@ -56,24 +56,24 @@ namespace RevitDeclarations.Models {
         }
 
         private void FillTableRoomsHeader(Range range) {
-            int columnNumber = _excelTableData.InfoWidth + 1;
+            int columnNumber = ExcelTableData.InfoWidth + 1;
 
             foreach(RoomPriority priority in _settings.UsedPriorities) {
                 if(priority.IsSummer) {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        range[1, columnNumber + k * _excelTableData.SummerRoomCells] = "№ Пом.";
-                        range[1, columnNumber + k * _excelTableData.SummerRoomCells + 1] = "Наименование на планировке";
-                        range[1, columnNumber + k * _excelTableData.SummerRoomCells + 2] = $"{priority.Name}_{k + 1}, площадь без коэф.";
-                        range[1, columnNumber + k * _excelTableData.SummerRoomCells + 3] = $"{priority.Name}_{k + 1}, площадь с коэф.";
+                        range[1, columnNumber + k * ExcelTableData.SummerRoomCells] = "№ Пом.";
+                        range[1, columnNumber + k * ExcelTableData.SummerRoomCells + 1] = "Наименование на планировке";
+                        range[1, columnNumber + k * ExcelTableData.SummerRoomCells + 2] = $"{priority.Name}_{k + 1}, площадь без коэф.";
+                        range[1, columnNumber + k * ExcelTableData.SummerRoomCells + 3] = $"{priority.Name}_{k + 1}, площадь с коэф.";
                     }
-                    columnNumber += priority.MaxRoomAmount * _excelTableData.SummerRoomCells;
+                    columnNumber += priority.MaxRoomAmount * ExcelTableData.SummerRoomCells;
                 } else {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        range[1, columnNumber + k * _excelTableData.MainRoomCells] = "№ Пом.";
-                        range[1, columnNumber + k * _excelTableData.MainRoomCells + 1] = "Наименование на планировке";
-                        range[1, columnNumber + k * _excelTableData.MainRoomCells + 2] = $"{priority.Name}_{k + 1}";
+                        range[1, columnNumber + k * ExcelTableData.MainRoomCells] = "№ Пом.";
+                        range[1, columnNumber + k * ExcelTableData.MainRoomCells + 1] = "Наименование на планировке";
+                        range[1, columnNumber + k * ExcelTableData.MainRoomCells + 2] = $"{priority.Name}_{k + 1}";
                     }
-                    columnNumber += priority.MaxRoomAmount * _excelTableData.MainRoomCells;
+                    columnNumber += priority.MaxRoomAmount * ExcelTableData.MainRoomCells;
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace RevitDeclarations.Models {
                 range[rowNumber, 12] = apartment.AreaNonSummer;
                 range[rowNumber, 13] = apartment.RoomsHeight;
 
-                int columnNumber = _excelTableData.InfoWidth + 1;
+                int columnNumber = ExcelTableData.InfoWidth + 1;
 
                 foreach(RoomPriority priority in _settings.UsedPriorities) {
                     List<RoomElement> rooms = apartment.GetRoomsByPrior(priority);
@@ -133,43 +133,43 @@ namespace RevitDeclarations.Models {
 
         private int FillSummerRoomsByPriority(Range range,
                                        RoomPriority priority,
-                                       List<RoomElement> rooms,
+                                       IReadOnlyList<RoomElement> rooms,
                                        int rowNumber,
                                        int startColumn) {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
-                    range[rowNumber, startColumn + k * _excelTableData.SummerRoomCells]
+                    range[rowNumber, startColumn + k * ExcelTableData.SummerRoomCells]
                         = rooms[k].Number;
-                    range[rowNumber, startColumn + k * _excelTableData.SummerRoomCells + 1]
+                    range[rowNumber, startColumn + k * ExcelTableData.SummerRoomCells + 1]
                         = rooms[k].DeclarationName;
-                    range[rowNumber, startColumn + k * _excelTableData.SummerRoomCells + 2]
+                    range[rowNumber, startColumn + k * ExcelTableData.SummerRoomCells + 2]
                         = rooms[k].Area;
-                    range[rowNumber, startColumn + k * _excelTableData.SummerRoomCells + 3]
+                    range[rowNumber, startColumn + k * ExcelTableData.SummerRoomCells + 3]
                         = rooms[k].AreaCoef;
                 }
             }
 
-            startColumn += priority.MaxRoomAmount * _excelTableData.SummerRoomCells;
+            startColumn += priority.MaxRoomAmount * ExcelTableData.SummerRoomCells;
             return startColumn;
         }
 
         private int FillMainRoomsByPriority(Range range,
                                       RoomPriority priority,
-                                      List<RoomElement> rooms,
+                                      IReadOnlyList<RoomElement> rooms,
                                       int rowNumber,
                                       int startColumn) {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
-                    range[rowNumber, startColumn + k * _excelTableData.MainRoomCells]
+                    range[rowNumber, startColumn + k * ExcelTableData.MainRoomCells]
                         = rooms[k].Number;
-                    range[rowNumber, startColumn + k * _excelTableData.MainRoomCells + 1]
+                    range[rowNumber, startColumn + k * ExcelTableData.MainRoomCells + 1]
                         = rooms[k].DeclarationName;
-                    range[rowNumber, startColumn + k * _excelTableData.MainRoomCells + 2]
+                    range[rowNumber, startColumn + k * ExcelTableData.MainRoomCells + 2]
                         = rooms[k].Area;
                 }
             }
 
-            startColumn += priority.MaxRoomAmount * _excelTableData.MainRoomCells;
+            startColumn += priority.MaxRoomAmount * ExcelTableData.MainRoomCells;
             return startColumn;
         }
 
@@ -193,14 +193,14 @@ namespace RevitDeclarations.Models {
             workSheet.Range[firstCell, lastCell].VerticalAlignment = XlVAlign.xlVAlignCenter;
 
             for(int i = 1; i <= _excelTableData.FullTableWidth; i++) {
-                if(i <= _excelTableData.InfoWidth) {
+                if(i <= ExcelTableData.InfoWidth) {
                     workSheet.Columns[i].ColumnWidth = 15.5;
                     workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(221, 235, 247);
-                } else if(i > _excelTableData.InfoWidth && i <= _excelTableData.SummerRoomsStart) {
+                } else if(i > ExcelTableData.InfoWidth && i <= _excelTableData.SummerRoomsStart) {
                     workSheet.Columns[i].ColumnWidth = 10;
                     workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(248, 203, 173);
 
-                    int checkColumnNumber = (i - _excelTableData.InfoWidth) % 3;
+                    int checkColumnNumber = (i - ExcelTableData.InfoWidth) % 3;
                     if(checkColumnNumber == 0) {
                         workSheet.Columns[i - 2].NumberFormat = "@";
                         workSheet.Columns[i - 1].ColumnWidth = 17;
