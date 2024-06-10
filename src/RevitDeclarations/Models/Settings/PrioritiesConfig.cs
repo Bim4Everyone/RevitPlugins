@@ -18,7 +18,7 @@ namespace RevitDeclarations.Models
         private readonly RoomPriority _balcony;
         private readonly RoomPriority _terrace;
 
-        private readonly List<RoomPriority> _priorities;
+        private readonly ICollection<RoomPriority> _priorities;
 
         public PrioritiesConfig() {
             _livingRoom = new RoomPriority(1, "Жилая комната");
@@ -82,7 +82,7 @@ namespace RevitDeclarations.Models
         public RoomPriority Balcony => _balcony;
         public RoomPriority Terrace => _terrace;
 
-        public List<RoomPriority> Priorities => _priorities;
+        public ICollection<RoomPriority> Priorities => _priorities;
         public string[] BannedRoomNames => _bannedNames;
     }
 }

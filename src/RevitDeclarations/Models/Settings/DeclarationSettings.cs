@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -10,8 +7,8 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class DeclarationSettings {
-        private readonly List<RoomPriority> _roomPriorities;
-        private readonly List<string> _mainNames;
+        private readonly ICollection<RoomPriority> _roomPriorities;
+        private readonly IReadOnlyCollection<string> _mainNames;
         private readonly PrioritiesConfig _prioritiesConfig;
 
         public DeclarationSettings() {
@@ -23,16 +20,16 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
-        public List<RoomPriority> Priorities => _roomPriorities;
+        public ICollection<RoomPriority> Priorities => _roomPriorities;
         public PrioritiesConfig PrioritiesConfig => _prioritiesConfig;
-        public List<RoomPriority> UsedPriorities => _roomPriorities
+        public IReadOnlyCollection<RoomPriority> UsedPriorities => _roomPriorities
             .Where(x => x.MaxRoomAmount > 0)
             .ToList();
 
         public Phase SelectedPhase { get; set; }
         public int Accuracy { get; set; }
         public bool LoadUtp { get; set; }
-        public List<string> MainRoomNames => _mainNames;
+        public IReadOnlyCollection<string> MainRoomNames => _mainNames;
         public string[] BannedRoomNames => _prioritiesConfig.BannedRoomNames;
         public ParametersViewModel ViewModel { get; set; }
 
@@ -59,7 +56,7 @@ namespace RevitDeclarations.Models {
         public Parameter RoomAreaParam => ViewModel.SelectedRoomAreaParam;
         public Parameter RoomAreaCoefParam => ViewModel.SelectedRoomAreaCoefParam;
 
-        public List<Parameter> AllParameters => new List<Parameter>() {
+        public IReadOnlyCollection<Parameter> AllParameters => new List<Parameter>() {
             FilterRoomsParam,
             GroupingBySectionParam,
             GroupingByGroupParam,
