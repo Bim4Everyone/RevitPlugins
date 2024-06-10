@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 
-using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using Microsoft.Office.Interop.Excel;
 
@@ -40,6 +40,7 @@ namespace RevitDeclarations.Models {
                     workSheet = workSheets["Лист1"];
 
                     new DeclarationTableCreator(tableData, _settings).Create(workSheet);
+                    TaskDialog.Show("Декларации", "Файл Excel создан");
 
                     workBook.SaveAs(path);
                     workBook.Close(false);
@@ -59,6 +60,7 @@ namespace RevitDeclarations.Models {
             using(StreamWriter file = File.CreateText(path)) {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, apartments);
+                TaskDialog.Show("Декларации", "Файл JSON создан");
             }
         }
     }
