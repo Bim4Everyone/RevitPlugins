@@ -17,6 +17,6 @@ namespace RevitDeclarations.ViewModels {
                 .ToList();
         }
 
-        public List<PriorityViewModel> Priorities => _priorities;
+        public IList<PriorityViewModel> Priorities => _priorities;
     }
 }

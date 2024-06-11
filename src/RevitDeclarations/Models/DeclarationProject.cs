@@ -13,7 +13,7 @@ namespace RevitDeclarations.Models {
 
         private readonly Phase _phase;
 
-        private readonly IReadOnlyCollection<RoomElement> _rooms;
+        private readonly IEnumerable<RoomElement> _rooms;
         private readonly IReadOnlyCollection<Apartment> _apartments;
 
         private UtpCalculator _utpCalculator;
@@ -33,12 +33,12 @@ namespace RevitDeclarations.Models {
         }
 
         /// <summary>Rooms on selected phase than belong to apartments</summary>
-        public IReadOnlyCollection<RoomElement> Rooms => _rooms;
+        public IEnumerable<RoomElement> Rooms => _rooms;
         public IReadOnlyCollection<Apartment> Apartments => _apartments;
         public RevitDocumentViewModel Document => _document;
         public Phase Phase => _phase;
 
-        private IReadOnlyCollection<RoomElement> FilterApartmentRooms(IReadOnlyCollection<RoomElement> rooms) {
+        private IReadOnlyCollection<RoomElement> FilterApartmentRooms(IEnumerable<RoomElement> rooms) {
             return rooms
                 .Where(x => x.GetTextParamValue(_settings.FilterRoomsParam) == _settings.FilterRoomsValue)
                 .ToList();

@@ -8,7 +8,7 @@ namespace RevitDeclarations.ViewModels {
         public string Description { get; set; }
         public string DocumentName { get; set; }
 
-        public List<ErrorElement> Errors { get; set; } = new List<ErrorElement>();
+        public IList<ErrorElement> Errors { get; set; } = new List<ErrorElement>();
     }
 
     public class ErrorElement {

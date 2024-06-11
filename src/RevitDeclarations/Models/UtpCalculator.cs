@@ -14,14 +14,14 @@ namespace RevitDeclarations.Models {
 
         private readonly bool _hasNullAreas;
         private readonly bool _hasBannedNames;
-        private readonly List<ElementId> _roomsWithBathFamily;
+        private readonly IEnumerable<ElementId> _roomsWithBathFamily;
 
         // Гардеробные с дверью в жилую комнату. Для УТП Гардеробная
-        private List<ElementId> _pantriesWithBedroom;
+        private IEnumerable<ElementId> _pantriesWithBedroom;
         // Мастер-спальни 
-        private List<ElementId> _masterBedrooms;
+        private IEnumerable<ElementId> _masterBedrooms;
         // Санузлы, относящиеся к мастер спальням
-        private List<ElementId> _masterBathrooms;
+        private IEnumerable<ElementId> _masterBathrooms;
 
         public UtpCalculator(DeclarationProject project, DeclarationSettings settings) {
             _project = project;
@@ -61,7 +61,7 @@ namespace RevitDeclarations.Models {
             _masterBathrooms = bathroomsWithBedroom.Concat(bathroomsWithMasterPantry).ToList();
         }
 
-        public List<ErrorsListViewModel> CheckProjectForUtp() {
+        public IReadOnlyCollection<ErrorsListViewModel> CheckProjectForUtp() {
             ErrorsListViewModel areaErrorListVM = new ErrorsListViewModel() {
                 Message = "Предупреждение",
                 Description = "В проекте присутствуют помещения квартир с нулевыми системными площадьми",
@@ -101,89 +101,6 @@ namespace RevitDeclarations.Models {
             }
 
             return new List<ErrorsListViewModel>() { areaErrorListVM, namesErrorListVM, bathesErrorListVM };
-        }
-
-        private List<string> GetBannedUtpRoomNames() {
-            return _project
-                .Rooms
-                .Select(x => x.NameLower)
-                .Where(x => _settings.BannedRoomNames.Contains(x))
-                .Distinct()
-                .ToList();
-        }
-
-        private bool CheckUtpNullAreas() {
-            return _project
-                .Rooms
-                .Where(x => x.AreaRevit < 0.1)
-                .Any();
-        }
-
-        private Dictionary<string, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, RoomPriority priority2) {
-            string name1 = priority1.NameLower;
-            string name2 = priority2.NameLower;
-            BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
-            IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
-
-            Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>> {
-                [name1] = new List<ElementId>(),
-                [name2] = new List<ElementId>()
-            };
-
-            foreach(var door in doors) {
-                Room room1 = door.get_FromRoom(_project.Phase);
-                Room room2 = door.get_ToRoom(_project.Phase);
-                string roomName1 = room1?.get_Parameter(bltParam).AsString().ToLower();
-                string roomName2 = room2?.get_Parameter(bltParam).AsString().ToLower();
-
-                if(roomName1 == name1 && roomName2 == name2) {
-                    roomByNames[name1].Add(room1.Id);
-                    roomByNames[name2].Add(room2.Id);
-                }
-
-                if(roomName1 == name2 && roomName2 == name1) {
-                    roomByNames[name1].Add(room2.Id);
-                    roomByNames[name2].Add(room1.Id);
-                }
-            }
-
-            return roomByNames;
-        }
-
-        private Dictionary<string, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, List<ElementId> rooms) {
-            string name1 = priority1.NameLower;
-            BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
-            IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
-
-            Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>> {
-                [name1] = new List<ElementId>(),
-            };
-
-            foreach(var door in doors) {
-                Room room1 = door.get_FromRoom(_project.Phase);
-                Room room2 = door.get_ToRoom(_project.Phase);
-                string roomName1 = room1?.get_Parameter(bltParam).AsString().ToLower();
-                string roomName2 = room2?.get_Parameter(bltParam).AsString().ToLower();
-
-                if(roomName1 == name1 && rooms.Contains(room2.Id)) {
-                    roomByNames[name1].Add(room1.Id);
-                }
-
-                if(roomName2 == name1 && rooms.Contains(room1.Id)) {
-                    roomByNames[name1].Add(room2.Id);
-                }
-            }
-
-            return roomByNames;
-        }
-
-        private List<ElementId> GetRoomsWithBath() {
-            return _project
-                .GetBathInstances()
-                .Select(x => x.get_Room(_project.Phase))
-                .Distinct()
-                .Select(x => x.Id)
-                .ToList();
         }
 
         // УТП Хайфлет.
@@ -335,6 +252,90 @@ namespace RevitDeclarations.Models {
                 return "Да";
             }
             return "Нет";
+        }
+
+
+        private bool CheckUtpNullAreas() {
+            return _project
+                .Rooms
+                .Where(x => x.AreaRevit < 0.1)
+                .Any();
+        }
+
+        private IEnumerable<string> GetBannedUtpRoomNames() {
+            return _project
+                .Rooms
+                .Select(x => x.NameLower)
+                .Where(x => _settings.BannedRoomNames.Contains(x))
+                .Distinct()
+                .ToList();
+        }
+
+        private Dictionary<string, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, RoomPriority priority2) {
+            string name1 = priority1.NameLower;
+            string name2 = priority2.NameLower;
+            BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
+            IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
+
+            Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>> {
+                [name1] = new List<ElementId>(),
+                [name2] = new List<ElementId>()
+            };
+
+            foreach(var door in doors) {
+                Room room1 = door.get_FromRoom(_project.Phase);
+                Room room2 = door.get_ToRoom(_project.Phase);
+                string roomName1 = room1?.get_Parameter(bltParam).AsString().ToLower();
+                string roomName2 = room2?.get_Parameter(bltParam).AsString().ToLower();
+
+                if(roomName1 == name1 && roomName2 == name2) {
+                    roomByNames[name1].Add(room1.Id);
+                    roomByNames[name2].Add(room2.Id);
+                }
+
+                if(roomName1 == name2 && roomName2 == name1) {
+                    roomByNames[name1].Add(room2.Id);
+                    roomByNames[name2].Add(room1.Id);
+                }
+            }
+
+            return roomByNames;
+        }
+
+        private Dictionary<string, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, List<ElementId> rooms) {
+            string name1 = priority1.NameLower;
+            BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
+            IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
+
+            Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>> {
+                [name1] = new List<ElementId>(),
+            };
+
+            foreach(var door in doors) {
+                Room room1 = door.get_FromRoom(_project.Phase);
+                Room room2 = door.get_ToRoom(_project.Phase);
+                string roomName1 = room1?.get_Parameter(bltParam).AsString().ToLower();
+                string roomName2 = room2?.get_Parameter(bltParam).AsString().ToLower();
+
+                if(roomName1 == name1 && rooms.Contains(room2.Id)) {
+                    roomByNames[name1].Add(room1.Id);
+                }
+
+                if(roomName2 == name1 && rooms.Contains(room1.Id)) {
+                    roomByNames[name1].Add(room2.Id);
+                }
+            }
+
+            return roomByNames;
+        }
+
+        private IEnumerable<ElementId> GetRoomsWithBath() {
+            return _project
+                .GetBathInstances()
+                .Select(x => x.get_Room(_project.Phase))
+                .Distinct()
+                .Select(x => x.Id)
+                .ToList();
         }
     }
 }

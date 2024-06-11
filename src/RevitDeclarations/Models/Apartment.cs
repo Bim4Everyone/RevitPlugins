@@ -12,7 +12,7 @@ namespace RevitDeclarations.Models {
         private readonly PrioritiesConfig _priorConfig;
         private readonly int _accuracy;
 
-        private readonly IReadOnlyCollection<RoomElement> _rooms;
+        private readonly IEnumerable<RoomElement> _rooms;
         // Словарь для группировки помещений, входящих в исходные приоритеты
         private readonly Dictionary<string, List<RoomElement>> _mainRooms;
         // Словарь для группировки помещений, не входящих в исходные приоритеты
@@ -57,7 +57,7 @@ namespace RevitDeclarations.Models {
         }
 
         [JsonProperty("rooms")]
-        public IReadOnlyCollection<RoomElement> Rooms => _rooms;
+        public IEnumerable<RoomElement> Rooms => _rooms;
 
         [JsonProperty("full_number")]
         public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
@@ -231,7 +231,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        public IReadOnlyCollection<string> GetOtherPriorityNames() {
+        public IEnumerable<string> GetOtherPriorityNames() {
             return _otherRooms.Keys;
         }
 
