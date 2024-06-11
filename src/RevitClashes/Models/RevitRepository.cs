@@ -17,6 +17,7 @@ using dosymep.SimpleServices;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterableValueProviders;
+using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
@@ -32,6 +33,7 @@ namespace RevitClashDetective.Models {
         private static readonly HashSet<string> _endings = new HashSet<string> { "_отсоединено", "_detached" };
         private readonly string _clashViewName = "BIM_Проверка на коллизии";
         private readonly View3D _view;
+        private readonly ParameterFilterProvider _parameterFilterProvider;
 
         public RevitRepository(Application application, Document document) {
             _application = application;
@@ -44,6 +46,7 @@ namespace RevitClashDetective.Models {
             _endings.Add("_" + _application.Username);
 
             _view = GetClashView();
+            _parameterFilterProvider = new ParameterFilterProvider();
 
             CommonConfig = RevitClashDetectiveConfig.GetRevitClashDetectiveConfig();
 
@@ -309,6 +312,7 @@ namespace RevitClashDetective.Models {
                 if(elementsBBox != null) {
                     _revitEventHandler.TransactAction = () => {
                         SetSectionBox(elementsBBox, view, additionalSize);
+                        HighlightElement(view, elements.First());
                     };
                     _revitEventHandler.Raise();
                 }
@@ -427,6 +431,21 @@ namespace RevitClashDetective.Models {
                 if(uiView != null) {
                     uiView.ZoomAndCenterRectangle(bb.Min, bb.Max);
                 }
+                t.Commit();
+            }
+        }
+
+        private void HighlightElement(View3D view, Element element) {
+            var filter = _parameterFilterProvider.GetHighlightFilter(
+                _document,
+                element,
+                $"BIM_коллизии_не_первый_элемент_{_document.Application.Username}");
+            using(Transaction t = _document.StartTransaction("Выделение первого элемента коллизии")) {
+                if(view.GetFilters().Contains(filter.Id)) {
+                    view.RemoveFilter(filter.Id);
+                }
+                view.AddFilter(filter.Id);
+
                 t.Commit();
             }
         }
