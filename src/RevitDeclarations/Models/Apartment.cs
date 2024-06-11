@@ -219,7 +219,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        public IReadOnlyCollection<RoomElement> GetRoomsByPrior(RoomPriority priority) {
+        public IReadOnlyList<RoomElement> GetRoomsByPrior(RoomPriority priority) {
             string name = priority.NameLower;
 
             if(_mainRooms.Keys.Contains(name)) {

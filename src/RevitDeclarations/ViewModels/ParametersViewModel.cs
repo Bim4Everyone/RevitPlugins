@@ -17,9 +17,9 @@ namespace RevitDeclarations.ViewModels {
 
         private RevitDocumentViewModel _selectedDocument;
 
-        private List<Parameter> _textParameters;
-        private List<Parameter> _doubleParameters;
-        private List<Parameter> _intParameters;
+        private IReadOnlyCollection<Parameter> _textParameters;
+        private IReadOnlyCollection<Parameter> _doubleParameters;
+        private IReadOnlyCollection<Parameter> _intParameters;
 
         private Parameter _selectedFilterRoomsParam;
         private string _filterRoomsValue;
@@ -83,9 +83,9 @@ namespace RevitDeclarations.ViewModels {
                 OnPropertyChanged(nameof(IntParameters));
             }
         }
-        public List<Parameter> TextParameters => _textParameters;
-        public List<Parameter> DoubleParameters => _doubleParameters;
-        public List<Parameter> IntParameters => _intParameters;
+        public IReadOnlyCollection<Parameter> TextParameters => _textParameters;
+        public IReadOnlyCollection<Parameter> DoubleParameters => _doubleParameters;
+        public IReadOnlyCollection<Parameter> IntParameters => _intParameters;
 
         public Parameter SelectedFilterRoomsParam {
             get => _selectedFilterRoomsParam;

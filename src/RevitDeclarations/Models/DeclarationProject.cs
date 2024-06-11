@@ -8,17 +8,19 @@ using RevitDeclarations.ViewModels;
 namespace RevitDeclarations.Models {
     internal class DeclarationProject {
         private readonly RevitDocumentViewModel _document;
-        private readonly IList<RoomElement> _rooms;
-        private readonly IList<Apartment> _apartments;
         private readonly DeclarationSettings _settings;
         private readonly RevitRepository _revitRepository;
+
         private readonly Phase _phase;
+
+        private readonly IReadOnlyCollection<RoomElement> _rooms;
+        private readonly IReadOnlyCollection<Apartment> _apartments;
 
         private UtpCalculator _utpCalculator;
 
         public DeclarationProject(RevitDocumentViewModel document,
-                            RevitRepository revitRepository,
-                            DeclarationSettings settings) {
+                                  RevitRepository revitRepository,
+                                  DeclarationSettings settings) {
             _document = document;
             _settings = settings;
             _revitRepository = revitRepository;
@@ -31,12 +33,12 @@ namespace RevitDeclarations.Models {
         }
 
         /// <summary>Rooms on selected phase than belong to apartments</summary>
-        public IList<RoomElement> Rooms => _rooms;
-        public IList<Apartment> Apartments => _apartments;
+        public IReadOnlyCollection<RoomElement> Rooms => _rooms;
+        public IReadOnlyCollection<Apartment> Apartments => _apartments;
         public RevitDocumentViewModel Document => _document;
         public Phase Phase => _phase;
 
-        private IList<RoomElement> FilterApartmentRooms(IList<RoomElement> rooms) {
+        private IReadOnlyCollection<RoomElement> FilterApartmentRooms(IReadOnlyCollection<RoomElement> rooms) {
             return rooms
                 .Where(x => x.GetTextParamValue(_settings.FilterRoomsParam) == _settings.FilterRoomsValue)
                 .ToList();
@@ -117,7 +119,7 @@ namespace RevitDeclarations.Models {
             return errorListVM;
         }
 
-        public List<ErrorsListViewModel> CheckUtpWarnings() {
+        public IReadOnlyCollection<ErrorsListViewModel> CheckUtpWarnings() {
             _utpCalculator = new UtpCalculator(this, _settings);
             return _utpCalculator.CheckProjectForUtp();
         }
@@ -130,16 +132,14 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        public List<FamilyInstance> GetDoors() {
+        public IReadOnlyCollection<FamilyInstance> GetDoors() {
             return _revitRepository
-                .GetDoorsOnPhase(_document.Document, _phase)
-                .ToList();
+                .GetDoorsOnPhase(_document.Document, _phase);
         }
 
-        public List<FamilyInstance> GetBathInstances() {
+        public IReadOnlyCollection<FamilyInstance> GetBathInstances() {
             return _revitRepository.
-                GetBathInstancesOnPhase(_document.Document, _phase)
-                .ToList();
+                GetBathInstancesOnPhase(_document.Document, _phase);
         }
     }
 }

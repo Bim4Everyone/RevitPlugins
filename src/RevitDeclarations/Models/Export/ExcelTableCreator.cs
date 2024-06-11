@@ -99,7 +99,7 @@ namespace RevitDeclarations.Models {
                 int columnNumber = ExcelTableData.InfoWidth + 1;
 
                 foreach(RoomPriority priority in _settings.UsedPriorities) {
-                    List<RoomElement> rooms = apartment.GetRoomsByPrior(priority);
+                    IReadOnlyList<RoomElement> rooms = apartment.GetRoomsByPrior(priority);
 
                     if(priority.IsSummer) {
                         columnNumber = FillSummerRoomsByPriority(range, priority, rooms, rowNumber, columnNumber);

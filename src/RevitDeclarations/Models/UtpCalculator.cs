@@ -3,6 +3,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
+
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
@@ -61,8 +62,6 @@ namespace RevitDeclarations.Models {
         }
 
         public List<ErrorsListViewModel> CheckProjectForUtp() {
-
-
             ErrorsListViewModel areaErrorListVM = new ErrorsListViewModel() {
                 Message = "Предупреждение",
                 Description = "В проекте присутствуют помещения квартир с нулевыми системными площадьми",
@@ -124,7 +123,7 @@ namespace RevitDeclarations.Models {
             string name1 = priority1.NameLower;
             string name2 = priority2.NameLower;
             BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
-            List<FamilyInstance> doors = _project.GetDoors();
+            IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
 
             Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>> {
                 [name1] = new List<ElementId>(),
@@ -154,7 +153,7 @@ namespace RevitDeclarations.Models {
         private Dictionary<string, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, List<ElementId> rooms) {
             string name1 = priority1.NameLower;
             BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
-            List<FamilyInstance> doors = _project.GetDoors();
+            IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
 
             Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>> {
                 [name1] = new List<ElementId>(),
@@ -283,7 +282,8 @@ namespace RevitDeclarations.Models {
                 return "Ошибка нулевых площадей";
             }
 
-            List<RoomElement> summerRooms = apartment.GetRoomsByPrior(_priorities.Balcony);
+            List<RoomElement> summerRooms = new List<RoomElement>();
+            summerRooms.AddRange(apartment.GetRoomsByPrior(_priorities.Balcony));
             summerRooms.AddRange(apartment.GetRoomsByPrior(_priorities.Loggia));
             List<Room> summerRevitRooms = summerRooms.Select(x => x.RevitRoom).ToList();
 

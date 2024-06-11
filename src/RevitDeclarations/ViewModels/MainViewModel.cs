@@ -22,7 +22,7 @@ namespace RevitDeclarations.ViewModels {
         private readonly ParametersViewModel _parametersViewModel;
         private readonly PrioritiesViewModel _prioritiesViewModel;
         private readonly IList<RevitDocumentViewModel> _revitDocuments;
-        private readonly List<Phase> _phases;
+        private readonly IReadOnlyList<Phase> _phases;
 
         private string _filePath;
         private string _fileName;
@@ -83,7 +83,7 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _exportToExcel, value);
         }
 
-        public List<Phase> Phases => _phases;
+        public IReadOnlyList<Phase> Phases => _phases;
         public Phase SelectedPhase {
             get => _selectedPhase;
             set => RaiseAndSetIfChanged(ref _selectedPhase, value);

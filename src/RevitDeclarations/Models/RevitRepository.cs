@@ -43,7 +43,9 @@ namespace RevitDeclarations.Models {
                 .FirstOrDefault();
         }
 
-        public IList<RoomElement> GetRoomsOnPhase(Document document, Phase phase, DeclarationSettings settings) {
+        public IReadOnlyCollection<RoomElement> GetRoomsOnPhase(Document document, 
+                                                                Phase phase, 
+                                                                DeclarationSettings settings) {
             var phaseProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
 
             FilterElementIdRule phaseRule = new FilterElementIdRule(
@@ -61,7 +63,7 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
-        public IList<FamilyInstance> GetDoorsOnPhase(Document document, Phase phase) {
+        public IReadOnlyCollection<FamilyInstance> GetDoorsOnPhase(Document document, Phase phase) {
             List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
                 ElementOnPhaseStatus.Existing,
                 ElementOnPhaseStatus.Demolished,
@@ -79,7 +81,7 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
-        public IList<FamilyInstance> GetBathInstancesOnPhase(Document document, Phase phase) {
+        public IReadOnlyCollection<FamilyInstance> GetBathInstancesOnPhase(Document document, Phase phase) {
             ElementCategoryFilter notDoorsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Doors, true);
             ElementCategoryFilter notWindowsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows, true);
 
@@ -107,7 +109,8 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
-        public List<Apartment> GetApartments(IEnumerable<RoomElement> rooms, DeclarationSettings settings) {
+        public IReadOnlyCollection<Apartment> GetApartments(IEnumerable<RoomElement> rooms, 
+                                                            DeclarationSettings settings) {
             var multiStoreyAparts = rooms.Where(x => !string.IsNullOrEmpty(x.GetTextParamValue(settings.MultiStoreyParam)))
                 .GroupBy(r => new { l = r.GetTextParamValue(settings.MultiStoreyParam), s = r.GetTextParamValue(settings.SectionParam) })
                 .Select(g => new Apartment(g, settings))
@@ -123,15 +126,15 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
-        public List<Phase> GetPhases() {
+        public IReadOnlyList<Phase> GetPhases() {
             return Document
                 .Phases
                 .OfType<Phase>()
                 .ToList();
         }
 
-        public List<Parameter> GetRoomsParamsByStorageType(RevitDocumentViewModel document,
-                                                           StorageType storageType) {
+        public IReadOnlyCollection<Parameter> GetRoomsParamsByStorageType(RevitDocumentViewModel document,
+                                                                          StorageType storageType) {
             Room room = document?.Room;
 
             if(room == null) {
