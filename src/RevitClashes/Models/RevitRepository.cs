@@ -493,20 +493,23 @@ namespace RevitClashDetective.Models {
             }
         }
 
-        private IEnumerable<ParameterFilterElement> GetHighlightFilters(ClashModel clash) {
+        private ICollection<ParameterFilterElement> GetHighlightFilters(ClashModel clash) {
             string username = _document.Application.Username;
-            yield return _parameterFilterProvider.GetHighlightFilter(
-                _document,
-                clash.MainElement.GetElement(DocInfos),
-                $"{_filtersNamePrefix}не_первый_элемент_{username}");
-            yield return _parameterFilterProvider.GetHighlightFilter(
-                _document,
-                clash.OtherElement.GetElement(DocInfos),
-                $"{_filtersNamePrefix}не_второй_элемент_{username}");
-            yield return _parameterFilterProvider.GetExceptCategoriesFilter(
-                _document,
-                GetClashCategories(clash),
-                $"{_filtersNamePrefix}не_категории_элементов_коллизии_{username}");
+            var filters = new List<ParameterFilterElement>() {
+                _parameterFilterProvider.GetHighlightFilter(
+                    _document,
+                    clash.MainElement.GetElement(DocInfos),
+                    $"{_filtersNamePrefix}не_первый_элемент_{username}"),
+                _parameterFilterProvider.GetHighlightFilter(
+                    _document,
+                    clash.OtherElement.GetElement(DocInfos),
+                    $"{_filtersNamePrefix}не_второй_элемент_{username}"),
+                _parameterFilterProvider.GetExceptCategoriesFilter(
+                    _document,
+                    GetClashCategories(clash),
+                    $"{_filtersNamePrefix}не_категории_элементов_коллизии_{username}")
+            };
+            return filters;
         }
 
         private ICollection<BuiltInCategory> GetClashCategories(ClashModel clash) {

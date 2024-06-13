@@ -49,7 +49,8 @@ namespace RevitClashDetective.Models.GraphicView {
 
             var categoriesToFilter = GetAllModelCategories(document);
             categoriesToFilter.ExceptWith(exceptCategories);
-            return GetOrCreateFilter(document, filterName, categoriesToFilter);
+            var filter = GetOrCreateFilter(document, filterName, categoriesToFilter);
+            return UpdateHighlightFilter(filter, categoriesToFilter);
         }
 
         /// <summary>
@@ -61,7 +62,7 @@ namespace RevitClashDetective.Models.GraphicView {
             Categories allCategories = document.Settings.Categories;
             HashSet<BuiltInCategory> modelCategories = new HashSet<BuiltInCategory>();
             foreach(Category category in allCategories) {
-                if(category.CategoryType == CategoryType.Model) {
+                if(category.CategoryType == CategoryType.Model && category.IsVisibleInUI) {
                     modelCategories.Add(category.GetBuiltInCategory());
                 }
             }
@@ -96,11 +97,27 @@ namespace RevitClashDetective.Models.GraphicView {
                 .OfClass(typeof(ParameterFilterElement))
                 .OfType<ParameterFilterElement>()
                 .FirstOrDefault(item => item.Name.Equals(filterName));
-            filter?.SetCategories(categoriesIds);
             if(filter == null) {
                 filter = ParameterFilterElement.Create(document, filterName, categoriesIds);
             }
 
+            return filter;
+        }
+
+        /// <summary>
+        /// Переназначает категории для фильтра и сбрасывает критерии фильтрации
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="categoriesToFilter"></param>
+        /// <returns></returns>
+        private ParameterFilterElement UpdateHighlightFilter(
+            ParameterFilterElement filter,
+            ICollection<BuiltInCategory> categoriesToFilter) {
+
+            //переназначить категории элементов, если пользователь изменил их
+            filter.SetCategories(categoriesToFilter.Select(c => new ElementId(c)).ToArray());
+            //сбросить все критерии фильтрации
+            filter.ClearRules();
             return filter;
         }
 
