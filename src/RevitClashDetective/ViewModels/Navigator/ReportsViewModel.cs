@@ -136,11 +136,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private bool CanDelete() => SelectedReport != null;
 
         private void SelectClash(ClashViewModel clash) {
-            var elements = new[] {
-                clash.Clash.MainElement,
-                clash.Clash.OtherElement
-            };
-            _revitRepository.SelectAndShowElement(elements);
+            _revitRepository.SelectAndShowElement(clash.Clash, IsolateSelectedElements);
         }
 
         private bool CanSelectClash(ClashViewModel p) {
