@@ -19,7 +19,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
     internal class ReportsViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
-        private bool _isolateSelectedElements;
+        private bool _isolateSelectedElements = true;
         private bool _openFromClashDetector;
         private ReportViewModel _selectedFile;
         private ObservableCollection<ReportViewModel> _reports;
