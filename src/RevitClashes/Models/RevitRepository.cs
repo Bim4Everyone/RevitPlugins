@@ -496,19 +496,32 @@ namespace RevitClashDetective.Models {
         private ICollection<ParameterFilterElement> GetHighlightFilters(ClashModel clash) {
             string username = _document.Application.Username;
             var filters = new List<ParameterFilterElement>() {
-                _parameterFilterProvider.GetHighlightFilter(
-                    _document,
-                    clash.MainElement.GetElement(DocInfos),
-                    $"{_filtersNamePrefix}не_первый_элемент_{username}"),
-                _parameterFilterProvider.GetHighlightFilter(
-                    _document,
-                    clash.OtherElement.GetElement(DocInfos),
-                    $"{_filtersNamePrefix}не_второй_элемент_{username}"),
                 _parameterFilterProvider.GetExceptCategoriesFilter(
                     _document,
                     GetClashCategories(clash),
                     $"{_filtersNamePrefix}не_категории_элементов_коллизии_{username}")
             };
+            var firstEl = clash.MainElement.GetElement(DocInfos);
+            var secondEl = clash.OtherElement.GetElement(DocInfos);
+            if(firstEl.Category.GetBuiltInCategory() == secondEl.Category.GetBuiltInCategory()) {
+                filters.Add(
+                    _parameterFilterProvider.GetHighlightFilter(
+                        _document,
+                        firstEl,
+                        secondEl,
+                        $"{_filtersNamePrefix}не_элементы_категории_коллизии_{username}"));
+            } else {
+                filters.Add(
+                    _parameterFilterProvider.GetHighlightFilter(
+                        _document,
+                        firstEl,
+                        $"{_filtersNamePrefix}не_первый_элемент_{username}"));
+                filters.Add(
+                    _parameterFilterProvider.GetHighlightFilter(
+                        _document,
+                        secondEl,
+                        $"{_filtersNamePrefix}не_второй_элемент_{username}"));
+            }
             return filters;
         }
 
