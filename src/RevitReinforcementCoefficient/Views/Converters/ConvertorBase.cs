@@ -6,9 +6,7 @@ using System.Windows.Markup;
 namespace RevitReinforcementCoefficient.Views.Converters {
     public abstract class ConvertorBase<T> : MarkupExtension, IValueConverter
         where T : class, new() {
-        /// <summary>
-        /// Должен быть реализован в наследнике
-        /// </summary>
+
         public abstract object Convert(object value, Type targetType, object parameter,
             CultureInfo culture);
 

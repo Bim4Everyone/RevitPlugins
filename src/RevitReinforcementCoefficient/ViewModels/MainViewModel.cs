@@ -193,7 +193,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// у выбранных типах конструкции
         /// </summary>
         private void GetInfo() {
-            IEnumerable<DesignTypeInfoVM> selectedDesignTypes = DesignTypes.Where(o => o.IsCheck);
+            List<DesignTypeInfoVM> selectedDesignTypes = DesignTypes.Where(o => o.IsCheck).ToList();
             ReportVM report = new ReportVM(_revitRepository);
 
             foreach(DesignTypeInfoVM designType in selectedDesignTypes) {
@@ -247,7 +247,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 if(!designType.HasErrors) {
                     using(Transaction transaction = _revitRepository.Document.StartTransaction("Запись коэффициентов армирования")) {
                         foreach(Element elem in designType.Elements) {
-                            elem.SetParamValue("ФОП_ТИП_Армирование", designType.RebarCoef.ToString());
+                            elem.SetParamValue("ФОП_ТИП_Армирование", designType.RebarCoef);
                         }
                         transaction.Commit();
                     }
@@ -277,15 +277,16 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// Используется в качестве аргумента предиката для фильтрации списка по выбранному комплекту документации
         /// </summary>
         private bool FilterByDocPackage(object o) {
-            // Если в параметре есть какое то значение (не null и не пустая строка (у нас это тоже null))
-            if(SelectedDockPackage != _filterValueForNofiltering) {
-                if(string.IsNullOrEmpty(SelectedDockPackage)) {
-                    return string.IsNullOrEmpty(((DesignTypeInfoVM) o).DocPackage);
-                } else {
-                    return ((DesignTypeInfoVM) o).DocPackage is null ? false : ((DesignTypeInfoVM) o).DocPackage.Equals(SelectedDockPackage);
-                }
+            if(SelectedDockPackage == _filterValueForNofiltering) {
+                return true;
             }
-            return true;
+
+            // Если в параметре есть какое то значение (не null и не пустая строка (у нас это тоже null))
+            if(string.IsNullOrEmpty(SelectedDockPackage)) {
+                return string.IsNullOrEmpty(((DesignTypeInfoVM) o).DocPackage);
+            } else {
+                return ((DesignTypeInfoVM) o).DocPackage is null ? false : ((DesignTypeInfoVM) o).DocPackage.Equals(SelectedDockPackage);
+            }
         }
     }
 }

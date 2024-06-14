@@ -73,9 +73,10 @@ namespace RevitReinforcementCoefficient.Models {
                 // Пока пусть так, дальше нужно сделать в зависимости от уровня
                 // Получение значений параметров, необходимых для распределения по типам конструкций
                 string typeName = element.GetParamValue<string>("обр_ФОП_Марка ведомости расхода");
-                typeName = typeName is null ? "" : typeName;
+                typeName = typeName ?? "";
                 string docPackage = element.GetParamValue<string>("обр_ФОП_Раздел проекта");
                 docPackage = docPackage is null ? "" : docPackage;
+                docPackage = docPackage ?? "";
                 bool aboveZero = element.GetParamValue<int>("обр_ФОП_Орг. уровень") > 0;
                 // Сделали преобразование null в "" из-за того, что фильтрация в GUI иначе нормально не отрабатывает
 

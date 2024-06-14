@@ -9,9 +9,9 @@ namespace RevitReinforcementCoefficient.ViewModels {
     internal class DesignTypeInfoVM : BaseViewModel {
         private double _concreteVolume = 0;
         private double _rebarMass = 0;
-        private double _rebarCoef = 0;
+        private string _rebarCoef = "0";
         private bool _isCheck = false;
-        private static readonly IEnumerable<BuiltInCategory> _rebarBIC = new List<BuiltInCategory>() { BuiltInCategory.OST_Rebar };
+        private readonly List<BuiltInCategory> _rebarBIC = new List<BuiltInCategory>() { BuiltInCategory.OST_Rebar };
 
         public DesignTypeInfoVM(string typeName, string docPackage, bool aboveZero) {
             TypeName = typeName;
@@ -71,7 +71,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// <summary>
         /// Коэффициент армирования опалубочных элементов данного типа конструкции
         /// </summary>
-        public double RebarCoef {
+        public string RebarCoef {
             get => _rebarCoef;
             set => this.RaiseAndSetIfChanged(ref _rebarCoef, value);
         }
@@ -106,13 +106,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
             } else {
                 Elements.Add(elem);
             }
-
-
-            //if(elem.Category.GetBuiltInCategory() == BuiltInCategory.OST_Rebar) {
-            //    Rebars.Add(elem);
-            //} else {
-            //    Elements.Add(elem);
-            //}
         }
     }
 }

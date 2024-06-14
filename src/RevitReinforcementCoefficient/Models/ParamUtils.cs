@@ -16,13 +16,12 @@ namespace RevitReinforcementCoefficient.Models {
         /// Проверяет есть ли указанный список параметров в элементе на экземпляре или типе, возвращает отчет
         /// </summary>
         public bool HasParamsAnywhere(Element element, List<string> paramNames, ReportVM report) {
-            bool flag = true;
             foreach(string paramName in paramNames) {
                 if(!HasParamAnywhere(element, paramName, report)) {
-                    flag = false;
+                    return false;
                 }
             }
-            return flag;
+            return true;
         }
 
         /// <summary>
@@ -32,7 +31,7 @@ namespace RevitReinforcementCoefficient.Models {
             // Сначала проверяем есть ли параметр на экземпляре
             if(!element.IsExistsParam(paramName)) {
                 // Если не нашли, ищем на типоразмере
-                Element elementType = element.Document.GetElement(element.GetTypeId());
+                Element elementType = element.GetElementType();
 
                 if(!elementType.IsExistsParam(paramName)) {
                     // Если не нашли записываем в отчет и возвращаем false
@@ -50,7 +49,7 @@ namespace RevitReinforcementCoefficient.Models {
             try {
                 return element.GetParamValue<T>(paramName);
             } catch(Exception) {
-                Element elementType = element.Document.GetElement(element.GetTypeId());
+                Element elementType = element.GetElementType();
                 return elementType.GetParamValue<T>(paramName);
             }
         }
