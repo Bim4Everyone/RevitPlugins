@@ -16,7 +16,7 @@ namespace RevitOpeningPlacement.Models.Selection {
 
 
         public bool AllowElement(Element elem) {
-            if(elem is null) { return false; }
+            if(elem is null || elem.Category is null) { return false; }
 
             return _categories.Contains(elem.Category.GetBuiltInCategory());
         }
