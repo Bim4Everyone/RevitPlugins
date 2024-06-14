@@ -81,12 +81,6 @@
                 <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
 
-            <!--<mvvm:Interaction.Behaviors>
-                <mvvm:EventToCommand EventName="SelectedItemChanged"
-                                     Command="{Binding SelectClashCommand}"
-                                     CommandParameter="{Binding ElementName=_dg, Path=CurrentItem}" />
-            </mvvm:Interaction.Behaviors>-->
-
             <dxg:GridControl.View>
                 <dxg:TableView Name="_gridView"
                                AutoWidth="True"
