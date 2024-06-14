@@ -17,6 +17,7 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Handlers;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement;
@@ -571,29 +572,29 @@ namespace RevitOpeningPlacement.Models {
         public Category[] GetCategories(MepCategoryEnum mepCategory) {
             switch(mepCategory) {
                 case MepCategoryEnum.Pipe:
-                return new Category[] {
+                    return new Category[] {
                     Category.GetCategory(_document, BuiltInCategory.OST_PipeCurves),
                     Category.GetCategory(_document, BuiltInCategory.OST_PipeFitting)
                 };
                 case MepCategoryEnum.RectangleDuct:
                 case MepCategoryEnum.RoundDuct:
-                return new Category[] {
+                    return new Category[] {
                     Category.GetCategory(_document, BuiltInCategory.OST_DuctCurves),
                     Category.GetCategory(_document, BuiltInCategory.OST_DuctFitting),
                     Category.GetCategory(_document, BuiltInCategory.OST_DuctAccessory)
                 };
                 case MepCategoryEnum.CableTray:
-                return new Category[] {
+                    return new Category[] {
                     Category.GetCategory(_document, BuiltInCategory.OST_CableTray),
                     Category.GetCategory(_document, BuiltInCategory.OST_CableTrayFitting)
                 };
                 case MepCategoryEnum.Conduit:
-                return new Category[] {
+                    return new Category[] {
                     Category.GetCategory(_document, BuiltInCategory.OST_Conduit),
                     Category.GetCategory(_document, BuiltInCategory.OST_ConduitFitting)
                 };
                 default:
-                throw new NotImplementedException(nameof(mepCategory));
+                    throw new NotImplementedException(nameof(mepCategory));
             }
         }
 
@@ -977,7 +978,7 @@ namespace RevitOpeningPlacement.Models {
 
         /// <summary>
         /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из связанных файлов АР, 
-        /// подгруженных в активный документ КР, и вохвращает его выбор
+        /// подгруженных в активный документ КР, и возвращает его выбор
         /// </summary>
         /// <returns>Выбранная пользователем коллекция элементов</returns>
         /// <exception cref="OperationCanceledException"></exception>
@@ -1000,6 +1001,36 @@ namespace RevitOpeningPlacement.Models {
                 }
             }
             return openingTasks;
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать экземпляры элементов ВИС, категории которых выбраны в настройках плагина,
+        /// и возвращает его выбор
+        /// </summary>
+        /// <param name="mepCategories">Категории из настроек плагина</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public ElementId[] PickMepElements(MepCategoryCollection mepCategories) {
+            if(mepCategories is null) { throw new ArgumentNullException(nameof(mepCategories)); }
+
+            var categories = mepCategories
+                .Where(c => c.IsSelected)
+                .SelectMany(c => GetCategories(GetMepCategoryEnum(c.Name)))
+                .Select(c => c.GetBuiltInCategory())
+                .ToArray();
+            ISelectionFilter filter = new SelectionFilterMepElements(categories);
+
+            IList<Reference> references = _uiDocument.Selection
+                .PickObjects(ObjectType.Element, filter, "Выберите элементы ВИС и нажмите \"Готово\"");
+
+            HashSet<ElementId> mepElements = new HashSet<ElementId>();
+            foreach(var reference in references) {
+                if(reference != null) {
+                    ElementId elId = reference.ElementId;
+                    mepElements.Add(elId);
+                }
+            }
+            return mepElements.ToArray();
         }
 
         /// <summary>
