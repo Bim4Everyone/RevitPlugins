@@ -28,7 +28,10 @@ namespace RevitDeclarations.Models {
                 case 2:
                     return new ContourCheckResult() { HasError = true };
                 case 3:
-                    return new ContourCheckResult() { MainResult = false };
+                    return new ContourCheckResult() { 
+                        MainResult = false, 
+                        NeedToCheck = true 
+                    };
                 case 4:
                     if(curves[0].Length > lengthCheck && curves[3].Length > widthCheck) {
                         return new ContourCheckResult() {

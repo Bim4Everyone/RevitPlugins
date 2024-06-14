@@ -23,8 +23,6 @@ namespace RevitDeclarations.Models
             _areaCoefRevit = CalculateAreaCoefRevit(settings);
             _area = GetAreaParamValue(settings.RoomAreaParam, settings.Accuracy);
             _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.Accuracy);
-
-
         }
 
         [JsonIgnore] 
