@@ -9,13 +9,11 @@ using dosymep.Revit;
 using RevitReinforcementCoefficient.ViewModels;
 
 namespace RevitReinforcementCoefficient.Models {
-    internal class ParamUtils {
-        public ParamUtils() { }
-
+    internal static class ParamUtils {
         /// <summary>
         /// Проверяет есть ли указанный список параметров в элементе на экземпляре или типе, возвращает отчет
         /// </summary>
-        public bool HasParamsAnywhere(Element element, List<string> paramNames, ReportVM report) {
+        public static bool HasParamsAnywhere(Element element, List<string> paramNames, ReportVM report) {
             foreach(string paramName in paramNames) {
                 if(!HasParamAnywhere(element, paramName, report)) {
                     return false;
@@ -27,7 +25,7 @@ namespace RevitReinforcementCoefficient.Models {
         /// <summary>
         /// Проверяет есть ли указанный параметр в элементе на экземпляре или типе
         /// </summary>
-        public bool HasParamAnywhere(Element element, string paramName, ReportVM report) {
+        public static bool HasParamAnywhere(Element element, string paramName, ReportVM report) {
             // Сначала проверяем есть ли параметр на экземпляре
             if(!element.IsExistsParam(paramName)) {
                 // Если не нашли, ищем на типоразмере
@@ -45,7 +43,7 @@ namespace RevitReinforcementCoefficient.Models {
         /// <summary>
         /// Получает значение параметра в элементе на экземпляре или типе
         /// </summary>
-        public T GetParamValueAnywhere<T>(Element element, string paramName) {
+        public static T GetParamValueAnywhere<T>(Element element, string paramName) {
             try {
                 return element.GetParamValue<T>(paramName);
             } catch(Exception) {

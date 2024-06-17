@@ -1,19 +1,23 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitReinforcementCoefficient.Models.ElementModels;
+
 namespace RevitReinforcementCoefficient.ViewModels {
-    internal class DesignTypeInfoVM : BaseViewModel {
-        private double _concreteVolume = 0;
+    internal class DesignTypeVM : BaseViewModel {
+        private double _formworkVolume = 0;
         private double _rebarMass = 0;
         private string _rebarCoef = "0";
         private bool _isCheck = false;
         private readonly List<BuiltInCategory> _rebarBIC = new List<BuiltInCategory>() { BuiltInCategory.OST_Rebar };
 
-        public DesignTypeInfoVM(string typeName, string docPackage, bool aboveZero) {
+        public DesignTypeVM(string typeName, string docPackage, bool aboveZero) {
             TypeName = typeName;
             DocPackage = docPackage;
             AboveZero = aboveZero;
@@ -45,19 +49,19 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// <summary>
         /// Опалубочные элементы данного типа конструкции
         /// </summary>
-        public List<Element> Elements { get; set; } = new List<Element>();
+        public List<FormworkElement> Formworks { get; set; } = new List<FormworkElement>();
 
         /// <summary>
         /// Арматурные элементы данного типа конструкции
         /// </summary>
-        public List<Element> Rebars { get; set; } = new List<Element>();
+        public List<RebarElement> Rebars { get; set; } = new List<RebarElement>();
 
         /// <summary>
         /// Суммарны объем опалубочных элементов данного типа конструкции
         /// </summary>
-        public double ConcreteVolume {
-            get => _concreteVolume;
-            set => this.RaiseAndSetIfChanged(ref _concreteVolume, value);
+        public double FormworkVolume {
+            get => _formworkVolume;
+            set => this.RaiseAndSetIfChanged(ref _formworkVolume, value);
         }
 
         /// <summary>
@@ -102,10 +106,37 @@ namespace RevitReinforcementCoefficient.ViewModels {
         public void AddItem(Element elem) {
 
             if(elem.InAnyCategory(_rebarBIC)) {
-                Rebars.Add(elem);
+                Rebars.Add(new RebarElement(elem));
             } else {
-                Elements.Add(elem);
+                Formworks.Add(new FormworkElement(elem));
             }
+        }
+
+
+        public void CalculateRebars() => RebarMass = Calculate(Rebars);
+        public void CalculateFormworks() => FormworkVolume = Calculate(Formworks);
+
+        /// <summary>
+        /// Рассчитывает коэффициент армирования у одного типа конструкции по массе арматуры и объему бетона
+        /// </summary>
+        public void CalculateRebarCoef() {
+            RebarCoef = Math.Round(RebarMass / FormworkVolume).ToString(CultureInfo.GetCultureInfo("ru-Ru"));
+            AlreadyCalculated = true;
+        }
+
+
+        private double Calculate(IEnumerable<ICommonElement> elements) {
+            double sum = 0;
+
+            //sum = elements
+            //    .Select(e => e.Calculate(null))
+            //    .Sum();
+
+
+            foreach(ICommonElement element in elements) {
+                sum += element.Calculate(null);
+            }
+            return Math.Round(sum, 2);
         }
     }
 }

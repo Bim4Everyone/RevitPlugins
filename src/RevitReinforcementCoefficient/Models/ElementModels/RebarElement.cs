@@ -1,18 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Revit;
-
 using RevitReinforcementCoefficient.ViewModels;
 
-namespace RevitReinforcementCoefficient.Models {
-    internal class CalculationUtils {
+namespace RevitReinforcementCoefficient.Models.ElementModels {
+    internal class RebarElement : ICommonElement {
 
-        private readonly ParamUtils _paramUtils;
         // Соотношение между диаметром арматурного стержня и массой его одного метра
         private readonly Dictionary<double, double> _massPerLengthDict = new Dictionary<double, double>() {
             { 8, 0.395},
@@ -59,53 +54,48 @@ namespace RevitReinforcementCoefficient.Models {
         // Граничный номер формы для арматуры (более данного числа начинаются формы металлических деталей)
         private readonly int _limitNumberOfForm = 200;
         // Длина арматурного стержня,который приходит на стройку с завода
-        private readonly double _lengthOfFactoryRebar = 11700;
+        private readonly double _lengthOfFactoryRevitElement = 11700;
         // Коэф. нахлеста стержней, для которых не задекларирован коэф. конструкторами от А101
         private readonly double _overlapCoefForUnknown = 1.1;
 
-        public CalculationUtils(ParamUtils paramUtils) {
-            _paramUtils = paramUtils;
-        }
 
-        /// <summary>
-        /// Расчет объема одного опалубочного элемента конструкции
-        /// </summary>
-        private double CalculateFormElementVolume(Element element) {
-            double volumeInInternal = (double) element.GetParamValue(BuiltInParameter.HOST_VOLUME_COMPUTED);
-            return UnitUtilsHelper.ConvertVolumeFromInternalValue(volumeInInternal);
-        }
+        public RebarElement(Element element) => RevitElement = element;
+
+
+        public Element RevitElement { get; set; }
+
 
         /// <summary>
         /// Расчет массы одного арматурного элемента
         /// </summary>
-        private double CalculateRebarMass(Element rebar, ReportVM report) {
+        public double Calculate(ReportVM report) {
 
-            int numberOfForm = _paramUtils.GetParamValueAnywhere<int>(rebar, _numberOfFormParamName);
-            double dimeter = _paramUtils.GetParamValueAnywhere<double>(rebar, _dimeterParamName);
+            int numberOfForm = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _numberOfFormParamName);
+            double dimeter = ParamUtils.GetParamValueAnywhere<double>(RevitElement, _dimeterParamName);
             double dimeterInMm = UnitUtilsHelper.ConvertFromInternalValue(dimeter);
-            int calcInLinearMeters = _paramUtils.GetParamValueAnywhere<int>(rebar, _calcInLinearMetersParamName);
-            int countInLevel = _paramUtils.GetParamValueAnywhere<int>(rebar, _countInLevelParamName);
-            int countOfLevel = _paramUtils.GetParamValueAnywhere<int>(rebar, _countOfLevelParamName);
+            int calcInLinearMeters = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _calcInLinearMetersParamName);
+            int countInLevel = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _countInLevelParamName);
+            int countOfLevel = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _countOfLevelParamName);
 
             // В основном масса арматуры будет определяться как масса единицы (* на разные коэффициенты) * количество таких стержней
-            // Но когда мы собираем с вида арматуру через FilteredrebarCollector, то помимо одиночных стержней у нас собираются и стержни в массиве,
+            // Но когда мы собираем с вида арматуру через FilteredRevitElementCollector, то помимо одиночных стержней у нас собираются и стержни в массиве,
             // среди которых есть массивы с включенной функцией "Переменный набор арматурных стержней", тогда запросить "обр_ФОП_Длина"
             // не представляется возможным, т.к. массив указывает, что у вложенных стержней она разная (вернет значение 0)
             // Из-за этой проблемы, чтобы упростить задачу, получаем среднее значение этой длины из Полной длины стержня
 
-            double length = _paramUtils.GetParamValueAnywhere<double>(rebar, _lengthParamName);
+            double length = ParamUtils.GetParamValueAnywhere<double>(RevitElement, _lengthParamName);
             int count;
 
             // Если элемент класса FamilyInstance, то это IFC арматура
-            if(rebar is FamilyInstance) {
+            if(RevitElement is FamilyInstance) {
 
-                count = Convert.ToInt32(_paramUtils.GetParamValueAnywhere<double>(rebar, _countSharedParamName));
+                count = Convert.ToInt32(ParamUtils.GetParamValueAnywhere<double>(RevitElement, _countSharedParamName));
             } else {
 
-                count = _paramUtils.GetParamValueAnywhere<int>(rebar, _countSystemParamName);
+                count = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _countSystemParamName);
 
                 // Если длина одного стержня равна 0, то это стержни переменной длины, и мы находим длину одного деля общую длину на кол-во
-                length = length.Equals(0.0) ? _paramUtils.GetParamValueAnywhere<double>(rebar, _fullLengthParamName) / count : length;
+                length = length.Equals(0.0) ? ParamUtils.GetParamValueAnywhere<double>(RevitElement, _fullLengthParamName) / count : length;
             }
 
             double lengthInMm = Math.Round(UnitUtilsHelper.ConvertFromInternalValue(length), MidpointRounding.AwayFromZero);
@@ -123,12 +113,12 @@ namespace RevitReinforcementCoefficient.Models {
 
                 // Проверяем параметр "обр_ФОП_Масса на единицу длины" только сейчас, т.к. крайне маловероятно, что расчет будет вестись через него
                 // Если его нет, то расчет невозможен
-                if(!_paramUtils.HasParamAnywhere(rebar, _massPerUnitLengthParamName, report)) {
+                if(!ParamUtils.HasParamAnywhere(RevitElement, _massPerUnitLengthParamName, report)) {
 
                     // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался
                     return 0;
                 }
-                massPerUnitLength = _paramUtils.GetParamValueAnywhere<double>(rebar, _massPerUnitLengthParamName);
+                massPerUnitLength = ParamUtils.GetParamValueAnywhere<double>(RevitElement, _massPerUnitLengthParamName);
             }
 
             // @Базовый_Нахлест
@@ -136,7 +126,7 @@ namespace RevitReinforcementCoefficient.Models {
             double overlapCoef = 1;
             // Сравниваем длину стержня с заводской длиной
             // Если больше, значит будет укладываться несколько стержней по длине с нахлестом и нужно считать коэф. нахлеста
-            if(lengthInMm > _lengthOfFactoryRebar) {
+            if(lengthInMm > _lengthOfFactoryRevitElement) {
 
                 overlapCoef = _overlapCoefDict.ContainsKey(dimeterInMm) ? _overlapCoefDict[dimeterInMm] : _overlapCoefForUnknown;
             }
@@ -168,59 +158,6 @@ namespace RevitReinforcementCoefficient.Models {
             decimal calc = decimal.Round(baseCount * (decimal) baseMassEd, 2, MidpointRounding.AwayFromZero);
 
             return decimal.ToDouble(calc);
-        }
-
-        /// <summary>
-        /// Рассчитывает объем бетона у типа конструкции
-        /// </summary>
-        public void CalculateConcreteVolume(DesignTypeInfoVM typeInfo) {
-            // Рассчет суммарного объема бетона у типа конструкции
-            double volume = 0;
-
-            foreach(Element element in typeInfo.Elements) {
-                volume += CalculateFormElementVolume(element);
-            }
-            typeInfo.ConcreteVolume = Math.Round(volume, 2);
-        }
-
-        /// <summary>
-        /// Рассчитывает массу арматуры у типа конструкции
-        /// </summary>
-        public void CalculateRebarMass(DesignTypeInfoVM typeInfo, ReportVM report) {
-            // Рассчет суммарной массы арматуры у типа конструкции
-            double sumMass = 0;
-
-            foreach(Element rebar in typeInfo.Rebars) {
-                sumMass += CalculateRebarMass(rebar, report);
-            }
-            typeInfo.RebarMass = Math.Round(sumMass, 2);
-        }
-
-        /// <summary>
-        /// Рассчитывает коэффициент армирования у одного типа конструкции по массе арматуры и объему бетона
-        /// </summary>
-        public void CalculateRebarCoef(DesignTypeInfoVM typeInfo) {
-            typeInfo.RebarCoef = Math.Round(typeInfo.RebarMass / typeInfo.ConcreteVolume).ToString(CultureInfo.GetCultureInfo("ru-Ru"));
-            typeInfo.AlreadyCalculated = true;
-        }
-
-        /// <summary>
-        /// Рассчитывает коэффициент армирования у нескольких типов конструкции по массе арматуры и объему бетона
-        /// </summary>
-        public void CalculateRebarCoefBySeveral(List<DesignTypeInfoVM> typesInfo) {
-            double totalRebarMass = 0;
-            double totalConcreteVolume = 0;
-
-            foreach(DesignTypeInfoVM typeInfo in typesInfo) {
-                totalRebarMass += typeInfo.RebarMass;
-                totalConcreteVolume += typeInfo.ConcreteVolume;
-            }
-            string averageReinforcementCoefficient = Math.Round(totalRebarMass / totalConcreteVolume).ToString(CultureInfo.GetCultureInfo("ru-Ru"));
-
-            foreach(DesignTypeInfoVM typeInfo in typesInfo) {
-                typeInfo.RebarCoef = averageReinforcementCoefficient;
-                typeInfo.AlreadyCalculated = true;
-            }
         }
     }
 }

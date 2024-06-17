@@ -98,7 +98,7 @@
             Margin="10"
             ScrollViewer.VerticalScrollBarVisibility="Visible"
             ScrollViewer.CanContentScroll="False"
-            ItemsSource="{Binding Path=DesignTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            ItemsSource="{Binding Path=DesignTypesList.DesignTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             SelectionMode="Multiple">
             <ListView.View>
                 <GridView>
@@ -138,11 +138,11 @@
                     </GridViewColumn>
 
                     <GridViewColumn Header="Кол-во опалубки" 
-                                    Width="110" DisplayMemberBinding="{Binding Elements.Count}"/>
+                                    Width="110" DisplayMemberBinding="{Binding Formworks.Count}"/>
                     <GridViewColumn Header="Кол-во арм-я" 
                                     Width="100" DisplayMemberBinding="{Binding Rebars.Count}"/>
                     <GridViewColumn Header="Объем бетона" 
-                                    Width="100" DisplayMemberBinding="{Binding ConcreteVolume}"/>
+                                    Width="100" DisplayMemberBinding="{Binding FormworkVolume}"/>
                     <GridViewColumn Header="Масса арм-я" 
                                     Width="100" DisplayMemberBinding="{Binding RebarMass}"/>
                     <GridViewColumn Header="Коэффициент арм-я" 

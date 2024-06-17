@@ -6,12 +6,12 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using RevitReinforcementCoefficient.Models.ElementModels;
 using RevitReinforcementCoefficient.ViewModels;
 
 
 namespace RevitReinforcementCoefficient.Models {
     internal class DesignTypeAnalyzer {
-        private readonly ParamUtils _paramUtils;
 
         // TODO в дальнейшем поля выполнить через настройки и отдельный класс
         private readonly List<string> _paramsForAll = new List<string>() {
@@ -39,34 +39,33 @@ namespace RevitReinforcementCoefficient.Models {
 
         private readonly List<string> _paramsForIfcRebars = new List<string>() { "обр_ФОП_Количество" };
 
-        public DesignTypeAnalyzer(ParamUtils paramUtils) {
+        private readonly List<BuiltInCategory> _rebarBIC = new List<BuiltInCategory>() { BuiltInCategory.OST_Rebar };
 
-            _paramUtils = paramUtils;
-        }
+        public DesignTypeAnalyzer() { }
 
         /// <summary>
         /// Проверяет наличие нужных параметров и распределяет элементы по типам конструкции
         /// </summary>
-        public List<DesignTypeInfoVM> CheckNSortByDesignTypes(IEnumerable<Element> allElements, ReportVM report) {
-            List<DesignTypeInfoVM> designTypes = new List<DesignTypeInfoVM>();
+        public List<DesignTypeVM> CheckNSortByDesignTypes(IEnumerable<Element> allElements, ReportVM report) {
+            List<DesignTypeVM> designTypes = new List<DesignTypeVM>();
 
             foreach(Element element in allElements) {
                 // Проверяем, только если это арматура
-                if(element.Category.GetBuiltInCategory() == BuiltInCategory.OST_Rebar) {
+                if(element.InAnyCategory(_rebarBIC)) {
+                    // Отсеиваем арматуры с номером формы == 1000 - это семейства-оболочки, которые управляют другой арматурой
                     // Проверяем у арматуры наличие параметра, по которому определяется семейство-оболочка
-                    if(!_paramUtils.HasParamAnywhere(element, _paramForRebarShell, report)) {
-                        // TODO добавлять в отчет
+                    if(!ParamUtils.HasParamAnywhere(element, _paramForRebarShell, report)) {
                         continue;
                     }
 
                     // Если значение параметра указывает, что это облочка, то пропускаем, этот элемент не участвует в расчетах
-                    if(_paramUtils.GetParamValueAnywhere<int>(element, _paramForRebarShell) == 1000) {
+                    if(ParamUtils.GetParamValueAnywhere<int>(element, _paramForRebarShell) == 1000) {
                         continue;
                     }
                 }
 
                 // Проверяем у всех элементов наличие параметров, необходимых для распределения по типам конструкций
-                if(!_paramUtils.HasParamsAnywhere(element, _paramsForAll, report)) {
+                if(!ParamUtils.HasParamsAnywhere(element, _paramsForAll, report)) {
                     continue;
                 }
 
@@ -75,18 +74,17 @@ namespace RevitReinforcementCoefficient.Models {
                 string typeName = element.GetParamValue<string>("обр_ФОП_Марка ведомости расхода");
                 typeName = typeName ?? "";
                 string docPackage = element.GetParamValue<string>("обр_ФОП_Раздел проекта");
-                docPackage = docPackage is null ? "" : docPackage;
                 docPackage = docPackage ?? "";
-                bool aboveZero = element.GetParamValue<int>("обр_ФОП_Орг. уровень") > 0;
                 // Сделали преобразование null в "" из-за того, что фильтрация в GUI иначе нормально не отрабатывает
+                bool aboveZero = element.GetParamValue<int>("обр_ФОП_Орг. уровень") > 0;
 
                 // Ищем подходящий тип конструкции среди уже существующих в списке
-                DesignTypeInfoVM designType = designTypes.FirstOrDefault(
+                DesignTypeVM designType = designTypes.FirstOrDefault(
                     e => e.TypeName == typeName && e.DocPackage == docPackage && e.AboveZero == aboveZero);
 
                 // Если null, то создаем новый, если нет, то дописываем элемент в список уже существующего
                 if(designType is null) {
-                    DesignTypeInfoVM newDesignType = new DesignTypeInfoVM(typeName, docPackage, aboveZero);
+                    DesignTypeVM newDesignType = new DesignTypeVM(typeName, docPackage, aboveZero);
 
                     newDesignType.AddItem(element);
                     designTypes.Add(newDesignType);
@@ -101,9 +99,9 @@ namespace RevitReinforcementCoefficient.Models {
         /// <summary>
         /// Проверяет наличие параметров у опалубки по типу конструкции
         /// </summary>
-        public void CheckParamsInFormElements(DesignTypeInfoVM designType, ReportVM report) {
-            foreach(Element elem in designType.Elements) {
-                if(!_paramUtils.HasParamsAnywhere(elem, _paramsForFormElements, report)) {
+        public void CheckParamsInFormElements(DesignTypeVM designType, ReportVM report) {
+            foreach(ICommonElement elem in designType.Formworks) {
+                if(!ParamUtils.HasParamsAnywhere(elem.RevitElement, _paramsForFormElements, report)) {
                     designType.HasErrors = true;
                 }
             }
@@ -114,21 +112,21 @@ namespace RevitReinforcementCoefficient.Models {
         /// <summary>
         /// Проверяет наличие параметров у арматуры по типу конструкции
         /// </summary>
-        public void CheckParamsInRebars(DesignTypeInfoVM designType, ReportVM report) {
-            foreach(Element rebar in designType.Rebars) {
+        public void CheckParamsInRebars(DesignTypeVM designType, ReportVM report) {
+            foreach(ICommonElement rebar in designType.Rebars) {
                 // Далее проверяем параметры, которые должны быть у всех элементов арматуры
-                if(!_paramUtils.HasParamsAnywhere(rebar, _paramsForRebars, report)) {
+                if(!ParamUtils.HasParamsAnywhere(rebar.RevitElement, _paramsForRebars, report)) {
                     designType.HasErrors = true;
                 }
 
                 // Здесь проверяем разные параметры, которые должны быть у системной/IFC арматуры
                 // Если элемент класса Rebar (т.е. системная арматура)
                 if(rebar is FamilyInstance) {
-                    if(!_paramUtils.HasParamsAnywhere(rebar, _paramsForIfcRebars, report)) {
+                    if(!ParamUtils.HasParamsAnywhere(rebar.RevitElement, _paramsForIfcRebars, report)) {
                         designType.HasErrors = true;
                     }
                 } else {
-                    if(!_paramUtils.HasParamsAnywhere(rebar, _paramsForSysRebars, report)) {
+                    if(!ParamUtils.HasParamsAnywhere(rebar.RevitElement, _paramsForSysRebars, report)) {
                         designType.HasErrors = true;
                     }
                 }
