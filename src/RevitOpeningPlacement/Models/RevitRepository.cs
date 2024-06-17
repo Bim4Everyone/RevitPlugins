@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -154,6 +155,96 @@ namespace RevitOpeningPlacement.Models {
             {OpeningType.WallRectangle, "Отверстие прямоугольное" },
             {OpeningType.WallRound, "Отверстие круглое" }
         };
+
+        /// <summary>
+        /// Используемые в плагине линейные категории для труб: Трубы
+        /// </summary>
+        public static BuiltInCategory MepPipeLinearCategory { get; } = BuiltInCategory.OST_PipeCurves;
+
+        /// <summary>
+        /// Используемые в плагине нелинейные категории для труб: Соединительные детали трубопроводов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepPipeFittingCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_PipeFitting
+            });
+
+        /// <summary>
+        /// Все используемые в плагине категории для труб: Трубы, Соединительные детали трубопроводов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepPipeCategories { get; } =
+           new ReadOnlyCollection<BuiltInCategory>(
+               new List<BuiltInCategory>(MepPipeFittingCategories)
+               .Append(MepPipeLinearCategory)
+               .ToArray());
+
+        /// <summary>
+        /// Используемые в плагине линейные категории для воздуховодов: Воздуховоды
+        /// </summary>
+        public static BuiltInCategory MepDuctLinearCategory { get; } = BuiltInCategory.OST_DuctCurves;
+
+        /// <summary>
+        /// Используемые в плагине нелинейные категории для воздуховодов: Соединители детали воздуховодов, Арматура воздуховодов, Воздухораспределители
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepDuctFittingCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_DuctFitting,
+                BuiltInCategory.OST_DuctAccessory,
+                BuiltInCategory.OST_DuctTerminal
+            });
+
+        /// <summary>
+        /// Все используемые в плагине категории для воздуховодов: Воздуховоды, Соединители детали воздуховодов, Арматура воздуховодов, Воздухораспределители
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepDuctCategories { get; } =
+           new ReadOnlyCollection<BuiltInCategory>(
+               new List<BuiltInCategory>(MepDuctFittingCategories)
+               .Append(MepDuctLinearCategory)
+               .ToArray());
+
+        /// <summary>
+        /// Используемые в плагине линейные категории для кабельных лотков: Кабельные лотки
+        /// </summary>
+        public static BuiltInCategory MepCableTrayLinearCategory { get; } = BuiltInCategory.OST_CableTray;
+
+        /// <summary>
+        /// Используемые в плагине нелинейные категории для кабельных лотков: Соединители детали кабельных лотков
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepCableTrayFittingCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_CableTrayFitting
+            });
+
+        /// <summary>
+        /// Все используемые в плагине категории для кабельных лотков: Кабельные лотки, Соединители детали кабельных лотков
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepCableTrayCategories { get; } =
+           new ReadOnlyCollection<BuiltInCategory>(
+               new List<BuiltInCategory>(MepCableTrayFittingCategories)
+               .Append(MepCableTrayLinearCategory)
+               .ToArray());
+
+        /// <summary>
+        /// Используемые в плагине линейные категории для коробов: Короба
+        /// </summary>
+        public static BuiltInCategory MepConduitLinearCategory { get; } = BuiltInCategory.OST_Conduit;
+
+        /// <summary>
+        /// Используемые в плагине нелинейные категории для коробов: Соединители детали коробов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepConduitFittingCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_ConduitFitting
+            });
+
+        /// <summary>
+        /// Все используемые в плагине категории для коробов: Короба, Соединители детали коробов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepConduitCategories { get; } =
+           new ReadOnlyCollection<BuiltInCategory>(
+               new List<BuiltInCategory>(MepConduitFittingCategories)
+               .Append(MepConduitLinearCategory)
+               .ToArray());
 
 
         public const string OpeningDiameter = "ADSK_Размер_Диаметр";
@@ -570,32 +661,25 @@ namespace RevitOpeningPlacement.Models {
         /// <exception cref="NotImplementedException">Исключение, 
         /// если поданная категория <paramref name="mepCategory"/> не поддерживается</exception>
         public Category[] GetCategories(MepCategoryEnum mepCategory) {
+            IReadOnlyCollection<BuiltInCategory> categoryCollection;
             switch(mepCategory) {
                 case MepCategoryEnum.Pipe:
-                    return new Category[] {
-                    Category.GetCategory(_document, BuiltInCategory.OST_PipeCurves),
-                    Category.GetCategory(_document, BuiltInCategory.OST_PipeFitting)
-                };
+                    categoryCollection = MepPipeCategories;
+                    break;
                 case MepCategoryEnum.RectangleDuct:
                 case MepCategoryEnum.RoundDuct:
-                    return new Category[] {
-                    Category.GetCategory(_document, BuiltInCategory.OST_DuctCurves),
-                    Category.GetCategory(_document, BuiltInCategory.OST_DuctFitting),
-                    Category.GetCategory(_document, BuiltInCategory.OST_DuctAccessory)
-                };
+                    categoryCollection = MepDuctCategories;
+                    break;
                 case MepCategoryEnum.CableTray:
-                    return new Category[] {
-                    Category.GetCategory(_document, BuiltInCategory.OST_CableTray),
-                    Category.GetCategory(_document, BuiltInCategory.OST_CableTrayFitting)
-                };
+                    categoryCollection = MepCableTrayCategories;
+                    break;
                 case MepCategoryEnum.Conduit:
-                    return new Category[] {
-                    Category.GetCategory(_document, BuiltInCategory.OST_Conduit),
-                    Category.GetCategory(_document, BuiltInCategory.OST_ConduitFitting)
-                };
+                    categoryCollection = MepConduitCategories;
+                    break;
                 default:
                     throw new NotImplementedException(nameof(mepCategory));
             }
+            return categoryCollection.Select(c => Category.GetCategory(_document, c)).ToArray();
         }
 
         /// <summary>
