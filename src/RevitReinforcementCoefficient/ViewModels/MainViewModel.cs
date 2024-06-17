@@ -20,11 +20,10 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// <summary>
         /// Значение фильтра, когда не задана фильтрация ("<Не выбрано>")
         /// </summary>
-        private readonly string _filterValueForNofiltering = "<Не выбрано>";
+        private string _filterValueForNoFiltering = "<Не выбрано>";
 
         private string _errorText = string.Empty;
-        private List<Element> _allElements;
-        private DesignTypeListVM _designTypesList = new DesignTypeListVM();
+        private DesignTypeListVM _designTypesList;
 
         private List<string> _dockPackages;
         private string _selectedDockPackage;
@@ -35,41 +34,34 @@ namespace RevitReinforcementCoefficient.ViewModels {
             _revitRepository = revitRepository;
 
             _typeAnalyzer = new DesignTypeAnalyzer();
+            DesignTypesList = new DesignTypeListVM(this);
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+
+            SelectAllVisibleCommand = RelayCommand.Create(SelectAllVisible);
+            UnselectAllVisibleCommand = RelayCommand.Create(UnselectAllVisible);
 
             ShowFormworkElementsCommand = RelayCommand.Create(ShowFormworkElements, CanShowElements);
             ShowRebarElementsCommand = RelayCommand.Create(ShowRebarElements, CanShowElements);
 
             GetInfoCommand = RelayCommand.Create(GetInfo, CanShowElements);
-            SelectAllVisibleCommand = RelayCommand.Create(SelectAllVisible);
-            UnselectAllVisibleCommand = RelayCommand.Create(UnselectAllVisible);
+            UpdateFilteringCommand = RelayCommand.Create(DesignTypesList.UpdateFiltering);
         }
 
-        public ICommand SelectAllVisibleCommand { get; }
-        public ICommand UnselectAllVisibleCommand { get; }
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
+        public ICommand SelectAllVisibleCommand { get; }
+        public ICommand UnselectAllVisibleCommand { get; }
         public ICommand ShowFormworkElementsCommand { get; }
         public ICommand ShowRebarElementsCommand { get; }
-
         public ICommand GetInfoCommand { get; }
+        public ICommand UpdateFilteringCommand { get; }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
-
-        public List<Element> AllElements {
-            get => _allElements;
-            set => this.RaiseAndSetIfChanged(ref _allElements, value);
-        }
-
-        //public List<DesignTypeInfoVM> DesignTypes {
-        //    get => _designTypes;
-        //    set => this.RaiseAndSetIfChanged(ref _designTypes, value);
-        //}
 
         public DesignTypeListVM DesignTypesList {
             get => _designTypesList;
@@ -83,11 +75,12 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         public string SelectedDockPackage {
             get => _selectedDockPackage;
-            set {
-                _selectedDockPackage = value;
-                //CollectionViewSource.GetDefaultView(DesignTypes).Refresh();
-                //RaisePropertyChanged(nameof(SelectedDockPackage));
-            }
+            set => this.RaiseAndSetIfChanged(ref _selectedDockPackage, value);
+        }
+
+        public string FilterValueForNoFiltering {
+            get => _filterValueForNoFiltering;
+            set => this.RaiseAndSetIfChanged(ref _filterValueForNoFiltering, value);
         }
 
         public bool СalcСoefficientOnAverage {
@@ -98,26 +91,34 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         private void LoadView() {
             LoadConfig();
-            AllElements = _revitRepository.ElementsByFilterInActiveView;
-
             ReportVM report = new ReportVM(_revitRepository);
 
-            DesignTypesList.DesignTypes = _typeAnalyzer.CheckNSortByDesignTypes(AllElements, report);
-
-            DockPackages = DesignTypesList.DesignTypes
-                .Select(o => o.DocPackage)
-                .Distinct()
-                .OrderBy(o => o)
-                .ToList();
-            DockPackages.Insert(0, _filterValueForNofiltering);
-            SelectedDockPackage = DockPackages.FirstOrDefault();
-
-            //CollectionViewSource.GetDefaultView(DesignTypes).Filter = new Predicate<object>(FilterByDocPackage);
+            // Получаем и распределяем элементы по типам конструкции
+            var designTypesByElems = _typeAnalyzer.CheckNSortByDesignTypes(_revitRepository.ElementsByFilterInActiveView, report);
+            // Чтобы фильтрация списка не сбивалась делаем именно AddRange
+            DesignTypesList.DesignTypes.AddRange(designTypesByElems);
+            GetDockPackages();
 
             if(report.ReportItems.Count() > 0) {
                 ReportWindow reportWindow = new ReportWindow(report);
                 reportWindow.ShowDialog();
             }
+        }
+
+        /// <summary>
+        /// Заполняем список комплектов документации по полученным элементам
+        /// </summary>
+        private void GetDockPackages() {
+            DockPackages = DesignTypesList.DesignTypes
+                .Select(o => o.DocPackage)
+                .Distinct()
+                .OrderBy(o => o)
+                .ToList();
+            DockPackages.Insert(0, _filterValueForNoFiltering);
+            SelectedDockPackage = DockPackages.FirstOrDefault();
+
+            // Обновляем вид принудительно, т.к. меняли коллекцию, по которой происходит фильтрация из кода
+            DesignTypesList.UpdateFiltering();
         }
 
         private void AcceptView() {
@@ -186,66 +187,24 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
 
         /// <summary>
-        /// Получение инфорнмации об объеме опалубки, массе армирования и коэффициенте армирования 
-        /// у выбранных типах конструкции
+        /// Получение информации об объеме опалубки, массе армирования и коэффициенте армирования 
+        /// у выбранных типов конструкций
         /// </summary>
         private void GetInfo() => DesignTypesList.GetInfo(СalcСoefficientOnAverage);
-
 
         /// <summary>
         /// Запись значений коэффициенто армирования
         /// </summary>
-        private void WriteRebarCoef() {
-            //if(DesignTypes.FirstOrDefault(o => o.IsCheck) is null) {
-            //    TaskDialog.Show("Ошибка!", "Выберите тип конструкции!");
-            //    return;
-            //}
-
-            //foreach(DesignTypeInfoVM designType in DesignTypes.Where(o => o.IsCheck)) {
-            //    // Если нет ошибок то выполняем запись значений коэффициента армирования в опалубочные элементы
-            //    if(!designType.HasErrors) {
-            //        using(Transaction transaction = _revitRepository.Document.StartTransaction("Запись коэффициентов армирования")) {
-            //            foreach(Element elem in designType.Elements) {
-            //                elem.SetParamValue("ФОП_ТИП_Армирование", designType.RebarCoef);
-            //            }
-            //            transaction.Commit();
-            //        }
-            //    }
-            //}
-        }
+        private void WriteRebarCoef() => DesignTypesList.WriteRebarCoef(_revitRepository.Document);
 
         /// <summary>
         /// Ставит галочки выбора у видимых с учетом фильтрации типов констуркций
         /// </summary>
-        private void SelectAllVisible() {
-            //foreach(DesignTypeInfoVM item in DesignTypesList.DesignTypes.Where(FilterByDocPackage)) {
-            //    item.IsCheck = true;
-            //}
-        }
+        private void SelectAllVisible() => DesignTypesList.SelectAllVisible();
 
         /// <summary>
         /// Снимает галочки выбора у видимых с учетом фильтрации типов констуркций
         /// </summary>
-        private void UnselectAllVisible() {
-            //foreach(DesignTypeInfoVM item in DesignTypes.Where(FilterByDocPackage)) {
-            //    item.IsCheck = false;
-            //}
-        }
-
-        ///// <summary>
-        ///// Используется в качестве аргумента предиката для фильтрации списка по выбранному комплекту документации
-        ///// </summary>
-        //private bool FilterByDocPackage(object o) {
-        //    if(SelectedDockPackage == _filterValueForNofiltering) {
-        //        return true;
-        //    }
-
-        //    // Если в параметре есть какое то значение (не null и не пустая строка (у нас это тоже null))
-        //    if(string.IsNullOrEmpty(SelectedDockPackage)) {
-        //        return string.IsNullOrEmpty(((DesignTypeInfoVM) o).DocPackage);
-        //    } else {
-        //        return ((DesignTypeInfoVM) o).DocPackage is null ? false : ((DesignTypeInfoVM) o).DocPackage.Equals(SelectedDockPackage);
-        //    }
-        //}
+        private void UnselectAllVisible() => DesignTypesList.UnselectAllVisible();
     }
 }

@@ -7,7 +7,6 @@ using RevitReinforcementCoefficient.ViewModels;
 
 namespace RevitReinforcementCoefficient.Models.ElementModels {
     internal class RebarElement : ICommonElement {
-
         // Соотношение между диаметром арматурного стержня и массой его одного метра
         private readonly Dictionary<double, double> _massPerLengthDict = new Dictionary<double, double>() {
             { 8, 0.395},

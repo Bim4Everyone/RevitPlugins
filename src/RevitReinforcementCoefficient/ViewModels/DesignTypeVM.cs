@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -15,7 +16,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private double _rebarMass = 0;
         private string _rebarCoef = "0";
         private bool _isCheck = false;
-        private readonly List<BuiltInCategory> _rebarBIC = new List<BuiltInCategory>() { BuiltInCategory.OST_Rebar };
 
         public DesignTypeVM(string typeName, string docPackage, bool aboveZero) {
             TypeName = typeName;
@@ -105,16 +105,22 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// </summary>
         public void AddItem(Element elem) {
 
-            if(elem.InAnyCategory(_rebarBIC)) {
+            if(elem.InAnyCategory(BuiltInCategory.OST_Rebar)) {
                 Rebars.Add(new RebarElement(elem));
             } else {
                 Formworks.Add(new FormworkElement(elem));
             }
         }
 
-
-        public void CalculateRebars() => RebarMass = Calculate(Rebars);
+        /// <summary>
+        /// Рассчитать объем бетона
+        /// </summary>
         public void CalculateFormworks() => FormworkVolume = Calculate(Formworks);
+
+        /// <summary>
+        /// Рассчитать массу арматуры
+        /// </summary>
+        public void CalculateRebars() => RebarMass = Calculate(Rebars);
 
         /// <summary>
         /// Рассчитывает коэффициент армирования у одного типа конструкции по массе арматуры и объему бетона
@@ -124,18 +130,14 @@ namespace RevitReinforcementCoefficient.ViewModels {
             AlreadyCalculated = true;
         }
 
-
+        /// <summary>
+        /// Выполняет вызов метода калькуляции на каждом объекте коллекции
+        /// </summary>
         private double Calculate(IEnumerable<ICommonElement> elements) {
-            double sum = 0;
+            double sum = elements
+                .Select(e => e.Calculate(null))
+                .Sum();
 
-            //sum = elements
-            //    .Select(e => e.Calculate(null))
-            //    .Sum();
-
-
-            foreach(ICommonElement element in elements) {
-                sum += element.Calculate(null);
-            }
             return Math.Round(sum, 2);
         }
     }

@@ -65,6 +65,12 @@
                             Text="{Binding Converter={converters:NullToString}}"/>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding UpdateFilteringCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
             </ComboBox>
         </StackPanel>
 

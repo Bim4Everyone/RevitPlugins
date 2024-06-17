@@ -39,8 +39,6 @@ namespace RevitReinforcementCoefficient.Models {
 
         private readonly List<string> _paramsForIfcRebars = new List<string>() { "обр_ФОП_Количество" };
 
-        private readonly List<BuiltInCategory> _rebarBIC = new List<BuiltInCategory>() { BuiltInCategory.OST_Rebar };
-
         public DesignTypeAnalyzer() { }
 
         /// <summary>
@@ -51,7 +49,7 @@ namespace RevitReinforcementCoefficient.Models {
 
             foreach(Element element in allElements) {
                 // Проверяем, только если это арматура
-                if(element.InAnyCategory(_rebarBIC)) {
+                if(element.InAnyCategory(BuiltInCategory.OST_Rebar)) {
                     // Отсеиваем арматуры с номером формы == 1000 - это семейства-оболочки, которые управляют другой арматурой
                     // Проверяем у арматуры наличие параметра, по которому определяется семейство-оболочка
                     if(!ParamUtils.HasParamAnywhere(element, _paramForRebarShell, report)) {
