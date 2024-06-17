@@ -5,6 +5,7 @@ using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
@@ -682,6 +683,34 @@ namespace RevitOpeningPlacement.Models {
             return categoryCollection.Select(c => Category.GetCategory(_document, c)).ToArray();
         }
 
+        public bool ElementBelongsToMepCategory(MepCategoryEnum mepCategory, Element element) {
+            BuiltInCategory elCategory = element.Category.GetBuiltInCategory();
+            switch(mepCategory) {
+                case MepCategoryEnum.Pipe:
+                    return MepPipeCategories.Contains(elCategory);
+                case MepCategoryEnum.RectangleDuct: {
+                    //либо это элемент из категории для воздуховодов и не Воздуховод, либо это Воздуховод только прямоугольного сечения
+                    return MepDuctCategories.Contains(elCategory)
+                        && (!(element is Duct)
+                        || ((element is Duct duct)
+                        && (duct.DuctType.Shape == ConnectorProfileType.Rectangular)));
+                }
+                case MepCategoryEnum.RoundDuct: {
+                    //либо это элемент из категории для воздуховодов и не Воздуховод, либо это Воздуховод только круглого сечения
+                    return MepDuctCategories.Contains(elCategory)
+                        && (!(element is Duct)
+                        || ((element is Duct duct)
+                        && (duct.DuctType.Shape == ConnectorProfileType.Round)));
+                }
+                case MepCategoryEnum.CableTray:
+                    return MepCableTrayCategories.Contains(elCategory);
+                case MepCategoryEnum.Conduit:
+                    return MepConduitCategories.Contains(elCategory);
+                default:
+                    throw new NotImplementedException(nameof(mepCategory));
+            };
+        }
+
         /// <summary>
         /// Спрашивает у пользователя, нужно ли продолжать операцию, если загружены не все связи
         /// </summary>
@@ -1099,10 +1128,9 @@ namespace RevitOpeningPlacement.Models {
 
             var categories = mepCategories
                 .Where(c => c.IsSelected)
-                .SelectMany(c => GetCategories(GetMepCategoryEnum(c.Name)))
-                .Select(c => c.GetBuiltInCategory())
+                .Select(c => GetMepCategoryEnum(c.Name))
                 .ToArray();
-            ISelectionFilter filter = new SelectionFilterMepElements(categories);
+            ISelectionFilter filter = new SelectionFilterMepElements(this, categories);
 
             IList<Reference> references = _uiDocument.Selection
                 .PickObjects(ObjectType.Element, filter, "Выберите элементы ВИС и нажмите \"Готово\"");
