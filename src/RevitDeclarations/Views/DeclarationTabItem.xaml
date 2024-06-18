@@ -30,7 +30,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -156,31 +155,15 @@
                 Margin="0, 5"
                 IsChecked="{Binding LoadUtp}"/>
 
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="9"
-                Margin="10, 0"
-                Style="{StaticResource ParameterName}"
-                Text="Расчет контуров помещений:"/>
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="9"
-                Grid.ColumnSpan="2"
-                Margin="0, 0, 10, 0"
-                IsEnabled="{Binding LoadUtp}"
-                ItemsSource="{Binding DoubleParameters}"
-                DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedRoomAreaCoefParam}"/>
-
             <TextBlock 
-                Grid.Row="10"
+                Grid.Row="9"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Style="{StaticResource HeaderName}"
                 Text="Проекты с помещениями, доступные для выгрузки:"/>
 
             <ListBox                    
-                Grid.Row="11"
+                Grid.Row="10"
                 Grid.ColumnSpan="3"
                 Margin="10, 0, 10, 10"
                 ItemsSource="{Binding RevitDocuments}">

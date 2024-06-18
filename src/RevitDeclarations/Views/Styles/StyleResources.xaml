@@ -15,7 +15,8 @@
     <Style 
         x:Key="ParameterName" 
         TargetType="TextBlock">
-        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="Padding" Value="0,2"/>
         <Setter Property="Height" Value="23"/>
     </Style>
 
