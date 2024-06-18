@@ -1,4 +1,4 @@
-﻿
+
 using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Clashes;
@@ -20,12 +20,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             var solidProvider = new FittingClashSolidProvider<Wall>(clash, angleFinder);
             var heightGetter = new WallOpeningSizeInitializer(solidProvider.GetSolid(), categoryOptions).GetHeight();
             var pointFinder = new FittingWallPointFinder(clash, angleFinder, heightGetter);
+            var levelFinder = new ClashLevelFinder(revitRepository, clashModel);
 
             return new OpeningPlacer(revitRepository, clashModel) {
                 Type = revitRepository.GetOpeningTaskType(OpeningType.WallRectangle),
-                LevelFinder = new ClashLevelFinder(revitRepository, clashModel),
+                LevelFinder = levelFinder,
                 AngleFinder = angleFinder,
-                ParameterGetter = new WallSolidParameterGetter(solidProvider, pointFinder, clash.Element1, clash.Element2, categoryOptions),
+                ParameterGetter = new WallSolidParameterGetter(solidProvider, pointFinder, levelFinder, clash.Element1, clash.Element2, categoryOptions),
                 PointFinder = pointFinder
             };
         }

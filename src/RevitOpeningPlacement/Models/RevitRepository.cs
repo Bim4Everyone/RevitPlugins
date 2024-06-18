@@ -259,6 +259,9 @@ namespace RevitOpeningPlacement.Models {
         public const string OpeningOffsetBottom = "ФОП_ВИС_Отметка низа от нуля";
         public const string OpeningAuthor = "ФОП_Автор задания";
         public const string OpeningIsManuallyPlaced = "ФОП_Размещено вручную";
+        public const string OpeningOffsetBottomAdsk = "ADSK_Отверстие_Отметка от нуля";
+        public const string OpeningOffsetFromLevelAdsk = "ADSK_Отверстие_Отметка от этажа";
+        public const string OpeningLevelOffsetAdsk = "ADSK_Отверстие_Отметка этажа";
 
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
