@@ -40,7 +40,7 @@ namespace RevitDeclarations.Models {
 
         private IReadOnlyCollection<RoomElement> FilterApartmentRooms(IEnumerable<RoomElement> rooms) {
             return rooms
-                .Where(x => x.GetTextParamValue(_settings.FilterRoomsParam) == _settings.FilterRoomsValue)
+                .Where(x => x.GetTextParamValue(_settings.FilterRoomsParam) == _settings.FilterRoomsValue.ToLower())
                 .ToList();
         }
 
