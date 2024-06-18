@@ -99,6 +99,15 @@ namespace RevitOpeningPlacement.Models {
         };
 
         /// <summary>
+        /// Названия вложенных общих семейств, по которым берется солид инженерного элемента, если его надо переопределить.
+        /// </summary>
+        public static IReadOnlyCollection<string> CustomGeometryFamilies { get; }
+            = new ReadOnlyCollection<string>(new string[] {
+                "ОбщМд_Отв_Принудительный габарит_Прямоугольный",
+                "ОбщМд_Отв_Принудительный габарит_Круглый"
+            });
+
+        /// <summary>
         /// Словарь типов проемов и названий семейств заданий на отверстия
         /// </summary>
         public static Dictionary<OpeningType, string> OpeningTaskFamilyName { get; }
