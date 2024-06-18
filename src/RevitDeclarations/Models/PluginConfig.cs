@@ -1,5 +1,10 @@
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Serializers;
 
 using pyRevitLabs.Json;
@@ -20,12 +25,14 @@ namespace RevitDeclarations.Models {
         }
     }
 
+    // Настройки Accuracy и LoadUtp не сохраняются в конфиг
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
         public string DeclarationName { get; set; }
         public string DeclarationPath { get; set; }
+        public bool ExportToExcel { get; set; }
         public string Phase { get; set; }
-        public string Accuracy { get; set; }
+        public List<string> RevitDocuments { get; set; }
 
         public string FilterRoomsParam { get; set; }
         public string FilterRoomsValue { get; set; }
@@ -52,28 +59,28 @@ namespace RevitDeclarations.Models {
 
         public RevitSettings GetCompanyConfig() {
             return new RevitSettings() {
-                FilterRoomsParam = "Назначение",
-                FilterRoomsValue = "Квартира",
-                GroupingBySectionParam = "ФОП_ПМЩ_Секция",
-                GroupingByGroupParam = "ФОП_ПМЩ_Группа",
-                MultiStoreyParam = "Комментарии",
+                FilterRoomsParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
+                FilterRoomsValue = "квартира",
+                GroupingBySectionParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
+                GroupingByGroupParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,                
+                MultiStoreyParam = SharedParamsConfig.Instance.RoomMultilevelGroup.Name,
 
-                ApartmentFullNumberParam = "ФОП_Номер квартиры",
-                DepartmentParam = "Назначение",
-                LevelParam = "ФОП_Этаж",
-                SectionParam = "ФОП_ПМЩ_Секция",
-                BuildingParam = "ФОП_ПМЩ_Секция",
-                ApartmentNumberParam = "ФОП_ПМЩ_Группа",
-                ApartmentAreaParam = "ФОП_КВР_Площадь без коэф.",
-                ApartmentAreaCoefParam = "ФОП_КВР_Площадь с коэф.",
-                ApartmentAreaLivingParam = "ФОП_КВР_Площадь жилая",
-                RoomsAmountParam = "ФОП_Количество комнат",
-                ProjectNameID = "Тест 1",
-                ApartmentAreaNonSumParam = "ФОП_КВР_Площадь без ЛП",
-                RoomsHeightParam = "Полная высота",
+                ApartmentFullNumberParam = SharedParamsConfig.Instance.ApartmentNumber.Name,
+                DepartmentParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
+                LevelParam = SharedParamsConfig.Instance.Level.Name,
+                SectionParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
+                BuildingParam = "ФОП_ПМЩ_Корпус",
+                ApartmentNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
+                ApartmentAreaParam = SharedParamsConfig.Instance.ApartmentArea.Name,
+                ApartmentAreaCoefParam = SharedParamsConfig.Instance.ApartmentAreaRatio.Name,
+                ApartmentAreaLivingParam = SharedParamsConfig.Instance.ApartmentLivingArea.Name,
+                RoomsAmountParam = SharedParamsConfig.Instance.RoomsCount.Name,
+                ProjectNameID = "",
+                ApartmentAreaNonSumParam = SharedParamsConfig.Instance.ApartmentAreaNoBalcony.Name,
+                RoomsHeightParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_HEIGHT),
 
-                RoomAreaParam = "ФОП_ПМЩ_Площадь",
-                RoomAreaCoefParam = "ФОП_ПМЩ_Площадь с коэф."
+                RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
+                RoomAreaCoefParam = SharedParamsConfig.Instance.RoomAreaWithRatio.Name
             };
         }
     }

@@ -61,7 +61,7 @@ namespace RevitDeclarations.ViewModels {
             _prioritiesViewModel = new PrioritiesViewModel(_settings.Priorities);
 
             SelectFolderCommand = new RelayCommand(SelectFolder);
-            ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExportToExcel);
+            ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
 
             LoadConfig();
         }
@@ -232,7 +232,7 @@ namespace RevitDeclarations.ViewModels {
             }
         }
 
-        public bool CanExportToExcel(object obj) {
+        public bool CanExport(object obj) {
             IEnumerable<RevitDocumentViewModel> checkedDocuments = _revitDocuments
                 .Where(x => x.IsChecked);
 
@@ -272,8 +272,13 @@ namespace RevitDeclarations.ViewModels {
 
             configSettings.DeclarationName = FileName;
             configSettings.DeclarationPath = FilePath;
+            configSettings.ExportToExcel = ExportToExcel;
             configSettings.Phase = SelectedPhase.Name;
-            configSettings.Accuracy = Accuracy;
+
+            configSettings.RevitDocuments = RevitDocuments
+                .Where(x => x.IsChecked)
+                .Select(x => x.Name)
+                .ToList();
 
             configSettings.FilterRoomsParam = _settings.FilterRoomsParam?.Definition.Name;
             configSettings.FilterRoomsValue = _settings.FilterRoomsValue;
@@ -310,11 +315,15 @@ namespace RevitDeclarations.ViewModels {
 
             FileName = configSettings.DeclarationName;
             FilePath = configSettings.DeclarationPath;
+            ExportToExcel = configSettings.ExportToExcel;
             SelectedPhase = Phases.FirstOrDefault(x => x.Name == configSettings.Phase);
-            Accuracy = configSettings.Accuracy;
 
             if(SelectedPhase == null) {
                 SelectedPhase = _selectedPhase = _phases[_phases.Count - 1];
+            }
+
+            foreach(var document in RevitDocuments.Where(x => configSettings.RevitDocuments.Contains(x.Name))) {
+                document.IsChecked = true;
             }
 
             _parametersViewModel.SetParametersFromConfig(configSettings);
