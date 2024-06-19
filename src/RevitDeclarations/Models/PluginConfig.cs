@@ -69,7 +69,7 @@ namespace RevitDeclarations.Models {
                 DepartmentParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
                 LevelParam = SharedParamsConfig.Instance.Level.Name,
                 SectionParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
-                BuildingParam = "ФОП_ПМЩ_Корпус",
+                BuildingParam = SharedParamsConfig.Instance.RoomBuildingShortName.Name,
                 ApartmentNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
                 ApartmentAreaParam = SharedParamsConfig.Instance.ApartmentArea.Name,
                 ApartmentAreaCoefParam = SharedParamsConfig.Instance.ApartmentAreaRatio.Name,
