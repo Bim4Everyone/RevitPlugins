@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web.UI.WebControls;
-using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
@@ -44,13 +38,13 @@ namespace RevitArchitecturalDocumentation.Models {
         /// Проверяет на наличие ошибок в имени и получает номер уровня, префикс и суффикс блока уровня и префикс и суффикс до и после блока этажа.
         /// Блок этажа - часть имени, отделенная "_" и имеющая слово "этаж"
         /// </summary>
-        public void AnilizeNGetNameInfo() {
+        public void AnalyzeNGetNameInfo() {
             // "О_ПСО_05 этаж_Жилье Корпуса 1-3" или "О_ПСО_этаж 05_Жилье Корпуса 1-3"
             // [Prefix][PrefixOfLevelBlock] NUMBER [SuffixOfLevelBlock][Suffix]
             // [О_ПСО_]         []            5          [ этаж]       [_Жилье Корпуса 1-3] или
             // [О_ПСО_]      [этаж ]          5            []          [_Жилье Корпуса 1-3]
 
-            AnilizeNGetLevelNumber();
+            AnalyzeNGetLevelNumber();
 
             // Получаем префикс и суффикс блока этажа относительно номера уровня, т.е. например
             // - в случае "05 этаж" - "" и " этаж"
@@ -71,12 +65,12 @@ namespace RevitArchitecturalDocumentation.Models {
         /// Проверяет на наличие ошибок в имени и получает номер уровня.
         /// Номер уровня берется из части имени, отделенной "_" и имеющая слово "этаж"
         /// </summary>
-        public void AnilizeNGetLevelNumber() {
+        public void AnalyzeNGetLevelNumber() {
             // "AAAA_05 этаж_BBBB" или "AAAA_этаж 05_BBBB"
 
             // Проверяем, что строку имени вида передали и передали не пустую
             if(ViewName is null || ViewName.Length == 0) {
-                throw new Exception();
+                throw new ViewNameException();
             }
 
             // Т.к. дальше будем резать строку на блоки через символ "_", то этот символ должен в строке быть
@@ -119,7 +113,7 @@ namespace RevitArchitecturalDocumentation.Models {
             // "|XXXX|" - ключевая часть (keyString), которая должна быть по середине
             // "-AAAA-" или "-BBBB-" - часть имени, где не содержится ключевая часть
             // "-AAAA-|XXXX|-BBBB-"
-            
+
             if(stringForAnalyze is null || keyString is null) {
                 throw new ViewNameException($"Не удалось получить префикс и суффикс - {RevitViewCatName} \"{ViewName}\"");
             }

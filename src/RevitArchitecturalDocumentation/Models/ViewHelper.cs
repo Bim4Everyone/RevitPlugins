@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.UI.WebControls;
 
 using Autodesk.Revit.DB;
-
-using RevitArchitecturalDocumentation.ViewModels;
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class ViewHelper {
@@ -30,7 +24,7 @@ namespace RevitArchitecturalDocumentation.Models {
         public RevitRepository Repository { get; set; }
         public ViewPlan View { get; set; }
         public TreeReportNode Report { get; set; }
-        public ViewNameHelper NameHelper { get; set; } 
+        public ViewNameHelper NameHelper { get; set; }
 
 
         /// <summary>
@@ -66,7 +60,7 @@ namespace RevitArchitecturalDocumentation.Models {
                 Report?.AddNodeWithName($"Вид с именем \"{newViewName}\" успешно найден в проекте!");
                 View = newViewPlan;
             }
-                        
+
             return newViewPlan;
         }
 

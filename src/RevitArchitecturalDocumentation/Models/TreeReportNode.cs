@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Markup;
 
-using Autodesk.AdvanceSteel.StructuralAnalysis;
-using Autodesk.Revit.UI;
-
-namespace RevitArchitecturalDocumentation.Models
-{
-    class TreeReportNode
-    {
+namespace RevitArchitecturalDocumentation.Models {
+    class TreeReportNode {
         public TreeReportNode(TreeReportNode parent) {
             Parent = parent;
         }
@@ -36,7 +25,7 @@ namespace RevitArchitecturalDocumentation.Models
         /// то прописывает указанную подстроку в имена всем узлам выше (всем родительским, включая тот на котором запущен метод)
         /// </summary>
         public void RewriteByChildNamesRecursively(string text) {
-            foreach (TreeReportNode node in Nodes) { 
+            foreach(TreeReportNode node in Nodes) {
                 if(node.Name.Contains(text)) {
                     WriteTextInParentName(text);
                 }
@@ -66,7 +55,7 @@ namespace RevitArchitecturalDocumentation.Models
         /// то удаляет подстроку для удаления из имени текущего узла
         /// </summary>
         public void RewriteByChildNames(string textForFind, string textForDelete) {
-            
+
             // Применяем Regex для замены, чтобы заменить именно одно первое вхождение
             Regex regex = new Regex(textForDelete);
 
