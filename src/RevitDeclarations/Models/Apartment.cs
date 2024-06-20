@@ -139,6 +139,10 @@ namespace RevitDeclarations.Models {
                 .Sum();
         }
 
+        // Проверка актуальности площадей помещений.
+        // 1. Сравнивается системная площадь помещения с площадью из квартирографии.
+        // 2. Сравнивается системная площадь помещения, умноженная на коэффициент из приоритета
+        // с площадью из квартирографии.
         public bool CheckActualRoomAreas() {
             foreach(var room in _rooms) {
                 if(Math.Abs(room.AreaRevit - room.Area) > _maxAreaDeviation) {
@@ -153,6 +157,9 @@ namespace RevitDeclarations.Models {
             return true;
         }
 
+        // Проверка актуальности площадей квартир.
+        // Сравнивается сумма системных площадей помещений с площадью из квартирографии.
+        // Проверка учитывает общую площадь, с коэффициентом, жилую и без летних помещений.
         public bool CheckActualApartmentAreas() {
             if(Math.Abs(AreaMain - _areaMainRevit) > _maxAreaDeviation) {
                 return false;
