@@ -20,7 +20,9 @@ namespace RevitDeclarations.Models
             _name = _revitRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
 
             _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.Accuracy);
-            _areaCoefRevit = CalculateAreaCoefRevit(settings);
+            RoomAreaCalculator areaCalculator = new RoomAreaCalculator(settings, this);
+            _areaCoefRevit = areaCalculator.CalculateAreaCoefRevit();
+
             _area = GetAreaParamValue(settings.RoomAreaParam, settings.Accuracy);
             _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.Accuracy);
         }
@@ -47,22 +49,6 @@ namespace RevitDeclarations.Models
         public double AreaCoef => _areaCoef;
         [JsonProperty("number")]
         public string Number => _revitRoom.Number;
-
-
-        private double CalculateAreaCoefRevit(DeclarationSettings settings) {
-            double areaCoefRevit;
-            PrioritiesConfig priorConfig = settings.PrioritiesConfig;
-
-            if(priorConfig.Balcony.CheckName(Name) || priorConfig.Terrace.CheckName(Name)) {
-                areaCoefRevit = AreaRevit * priorConfig.Balcony.AreaCoefficient;
-            } else if(priorConfig.Loggia.CheckName(Name)) {
-                areaCoefRevit = AreaRevit * priorConfig.Loggia.AreaCoefficient;
-            } else {
-                areaCoefRevit = AreaRevit;
-            }
-
-            return areaCoefRevit;
-        }
 
         public bool HasParameter(Parameter parameter) {
             if(RevitRoom.LookupParameter(parameter.Definition.Name) == null) {
