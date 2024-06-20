@@ -19,7 +19,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
     internal class ReportsViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
-        private bool _isolateSelectedElements = true;
+        private bool _elementsIsolationEnabled = true;
         private bool _openFromClashDetector;
         private ReportViewModel _selectedFile;
         private ObservableCollection<ReportViewModel> _reports;
@@ -63,9 +63,9 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _selectedFile, value);
         }
 
-        public bool IsolateSelectedElements {
-            get => _isolateSelectedElements;
-            set => RaiseAndSetIfChanged(ref _isolateSelectedElements, value);
+        public bool ElementsIsolationEnabled {
+            get => _elementsIsolationEnabled;
+            set => RaiseAndSetIfChanged(ref _elementsIsolationEnabled, value);
         }
 
 
@@ -136,7 +136,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private bool CanDelete() => SelectedReport != null;
 
         private void SelectClash(ClashViewModel clash) {
-            _revitRepository.SelectAndShowElement(clash.Clash, IsolateSelectedElements);
+            _revitRepository.SelectAndShowElement(clash.Clash, ElementsIsolationEnabled);
         }
 
         private bool CanSelectClash(ClashViewModel p) {

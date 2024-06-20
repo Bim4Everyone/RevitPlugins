@@ -184,12 +184,12 @@ namespace RevitClashDetective.Models.GraphicView {
             ParameterFilterElement filter,
             Element firstEl,
             Element secondEl) {
-            if(firstEl.Category.GetBuiltInCategory() != secondEl.Category.GetBuiltInCategory()) {
+            if(firstEl.Category.Id != secondEl.Category.Id) {
                 throw new InvalidOperationException("У элементов разные категории");
             }
 
             //переназначить категории элементов, если пользователь изменил их
-            filter.SetCategories(new ElementId[] { new ElementId(firstEl.Category.GetBuiltInCategory()) });
+            filter.SetCategories(new ElementId[] { firstEl.Category.Id });
             //переназначить критерии фильтрации
             filter.SetElementFilter(GetHighlightElementFilter(firstEl, secondEl, filter));
             return filter;
@@ -204,7 +204,7 @@ namespace RevitClashDetective.Models.GraphicView {
         /// <param name="checker">Экземпляр класса для проверки возможности установить фильтры на параметры</param>
         /// <returns>Фильтр вида: Имя типа != "имя типа" ИЛИ Размер != ХХХ ИЛИ Высота != ХХХ и т.д.</returns>
         private ElementFilter GetHighlightElementFilter(Element element, ParameterFilterElement checker) {
-            List<ElementFilter> filters = new List<ElementFilter> { };
+            List<ElementFilter> filters = new List<ElementFilter>();
             //проверяем наличие типа у элемента
             if(element.HasElementType()) {
                 BuiltInParameter typeName = BuiltInParameter.ALL_MODEL_TYPE_NAME;
@@ -244,7 +244,7 @@ namespace RevitClashDetective.Models.GraphicView {
             Element firstEl,
             Element secondEl,
             ParameterFilterElement checker) {
-            if(firstEl.Category.GetBuiltInCategory() != secondEl.Category.GetBuiltInCategory()) {
+            if(firstEl.Category.Id != secondEl.Category.Id) {
                 throw new InvalidOperationException("У элементов разные категории");
             }
 
@@ -266,12 +266,8 @@ namespace RevitClashDetective.Models.GraphicView {
                 && checker.AllRuleParametersApplicable(elementFilter);
         }
 
-        private ICollection<Parameter> GetParameters(Element element) {
-            List<Parameter> parameters = new List<Parameter>();
-            foreach(Parameter parameter in element.Parameters) {
-                parameters.Add(parameter);
-            }
-            return parameters;
+        private IEnumerable<Parameter> GetParameters(Element element) {
+            return element.Parameters.OfType<Parameter>();
         }
     }
 }

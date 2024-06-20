@@ -149,7 +149,7 @@
         <DockPanel Grid.Row="2"
                    Margin="0 10 0 0">
             <DockPanel>
-                <dxe:CheckEdit EditValue="{Binding IsolateSelectedElements}"
+                <dxe:CheckEdit EditValue="{Binding ElementsIsolationEnabled}"
                                Content="Изолировать выделенные элементы" />
             </DockPanel>
 
