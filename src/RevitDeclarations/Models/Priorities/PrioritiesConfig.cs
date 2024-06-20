@@ -21,7 +21,9 @@ namespace RevitDeclarations.Models
         private readonly ICollection<RoomPriority> _priorities;
 
         public PrioritiesConfig() {
-            _livingRoom = new RoomPriority(1, "Жилая комната");
+            _livingRoom = new RoomPriority(1, "Жилая комната") { 
+                IsLiving = true 
+            };
             _kitchen = new RoomPriority(2, "Кухня");
             _kitchenNiche = new RoomPriority(3, "Кухня-ниша");
             _bathroom = new RoomPriority(4, "Санузел");

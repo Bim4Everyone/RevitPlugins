@@ -97,10 +97,20 @@
                     IsReadOnly="True"
                     Binding="{Binding Name}"/>
                 <DataGridTextColumn
+                    Header="Коэффициент"
+                    Width="90"
+                    IsReadOnly="True"
+                    Binding="{Binding AreaCoefficient}"/>
+                <DataGridTextColumn
                     Header="Летнее"
-                    Width="100"
+                    Width="90"
                     IsReadOnly="True"
                     Binding="{Binding IsSummer}"/>
+                <DataGridTextColumn
+                    Header="Жилое"
+                    Width="90"
+                    IsReadOnly="True"
+                    Binding="{Binding IsLiving}"/>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

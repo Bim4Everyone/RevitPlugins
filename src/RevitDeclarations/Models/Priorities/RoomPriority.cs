@@ -7,6 +7,7 @@ namespace RevitDeclarations.Models
             OrdinalNumber = number;
             Name = name;
             IsSummer = false;
+            IsLiving = false;
             IsOther = false;
             AreaCoefficient = 1;
         }
@@ -15,6 +16,7 @@ namespace RevitDeclarations.Models
         public string Name { get; set; }
         public string NameLower => Name.ToLower();
         public bool IsSummer { get; set; }
+        public bool IsLiving { get; set; }
         public bool IsOther { get; set; }
         public int MaxRoomAmount { get; set; }
         public double AreaCoefficient { get; set; }
