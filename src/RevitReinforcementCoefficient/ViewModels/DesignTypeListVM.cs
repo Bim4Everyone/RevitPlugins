@@ -5,26 +5,58 @@ using System.Linq;
 using System.Windows.Data;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
+using RevitReinforcementCoefficient.Models.Analyzers;
 using RevitReinforcementCoefficient.Models.ElementModels;
+using RevitReinforcementCoefficient.Models.Report;
 
 namespace RevitReinforcementCoefficient.ViewModels {
     internal class DesignTypeListVM : BaseViewModel {
+        private readonly DesignTypeListAnalyzer _designTypeListAnalyzer;
+        private readonly DesignTypeAnalyzer _designTypeAnalyzer;
+        private readonly IReportService _reportService;
 
         private List<DesignTypeVM> _designTypes = new List<DesignTypeVM>();
-        private readonly MainViewModel _mvm;
 
-        public DesignTypeListVM(MainViewModel mvm) {
-            _mvm = mvm;
-            SetFiltering();
+        public DesignTypeListVM(
+            DesignTypeListAnalyzer designTypeListAnalyzer,
+            DesignTypeAnalyzer designTypeAnalyzer,
+            IReportService reportService) {
+
+            _designTypeListAnalyzer = designTypeListAnalyzer;
+            _designTypeAnalyzer = designTypeAnalyzer;
+            _reportService = reportService;
         }
-
         public List<DesignTypeVM> DesignTypes {
             get => _designTypes;
             set => this.RaiseAndSetIfChanged(ref _designTypes, value);
+        }
+        public MainViewModel MainVM { get; private set; }
+
+        public bool GetElementsForAnalize() {
+            return _designTypeListAnalyzer.GetElementsForAnalize();
+        }
+
+        public void GetDesignTypes() {
+            DesignTypes = _designTypeListAnalyzer.CheckNSortByDesignTypes();
+            if(_reportService.ReportItems.Count > 0) {
+                //ReportVMTEST report = new ReportVMTEST();
+
+                //if(report.ReportItems.Count() > 0) {
+                //    //ReportWindow reportWindow = new ReportWindow(report);
+                //    //reportWindow.ShowDialog();
+                //    string temp = string.Empty;
+                //    foreach(var item in report.ReportItems) {
+                //        temp += $"{item.ParamName} {item.ElementId}" + Environment.NewLine;
+                //    }
+
+                //    TaskDialog.Show("Отчет", temp);
+                //}
+            }
         }
 
 
@@ -32,30 +64,37 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// Используется в качестве аргумента предиката для фильтрации списка по выбранному комплекту документации
         /// </summary>
         public bool FilterByDocPackage(object o) {
-            if(_mvm.SelectedDockPackage == _mvm.FilterValueForNoFiltering) {
+            if(MainVM == null) {
+                TaskDialog.Show("Ошибка!", "Не найдена модель основного вида");
+                // TODO сделать иначе
+            }
+
+            if(MainVM.SelectedDockPackage == MainVM.FilterValueForNoFiltering) {
                 return true;
             }
 
             // Если в параметре есть какое то значение (не null и не пустая строка (у нас это тоже null))
-            if(string.IsNullOrEmpty(_mvm.SelectedDockPackage)) {
+            if(string.IsNullOrEmpty(MainVM.SelectedDockPackage)) {
                 return string.IsNullOrEmpty(((DesignTypeVM) o).DocPackage);
             } else {
-                return ((DesignTypeVM) o).DocPackage is null ? false : ((DesignTypeVM) o).DocPackage.Equals(_mvm.SelectedDockPackage);
+                return ((DesignTypeVM) o).DocPackage is null ? false : ((DesignTypeVM) o).DocPackage.Equals(MainVM.SelectedDockPackage);
             }
         }
 
         public void GetInfo(bool calcСoefficientOnAverage) {
             List<DesignTypeVM> selectedDesignTypes = DesignTypes.Where(o => o.IsCheck).ToList();
             //ReportVM report = new ReportVM(_revitRepository);
+            //ReportVMTEST report = new ReportVMTEST();
+            //List<ReportItemSimple> tempReport;
 
             foreach(DesignTypeVM designType in selectedDesignTypes) {
-                //// Проверка элементов выбранного типа конструкции
-                //if(!designType.FormParamsChecked) {
-                //    _typeAnalyzer.CheckParamsInFormElements(designType, report);
-                //}
-                //if(!designType.RebarParamsChecked) {
-                //    _typeAnalyzer.CheckParamsInRebars(designType, report);
-                //}
+                // Проверка элементов выбранного типа конструкции
+                if(!designType.FormParamsChecked) {
+                    _designTypeAnalyzer.CheckParamsInFormworks(designType);
+                }
+                if(!designType.RebarParamsChecked) {
+                    _designTypeAnalyzer.CheckParamsInRebars(designType);
+                }
 
                 // Если есть ошибки либо в опалубке, либо в арматуре подсчет выполняться не будет, т.к. нужны оба
                 if(!designType.HasErrors && !designType.AlreadyCalculated) {
@@ -79,8 +118,14 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 }
             }
             //if(report.ReportItems.Count() > 0) {
-            //    ReportWindow reportWindow = new ReportWindow(report);
-            //    reportWindow.ShowDialog();
+            //    //ReportWindow reportWindow = new ReportWindow(report);
+            //    //reportWindow.ShowDialog();
+            //    string temp = string.Empty;
+            //    foreach(var item in report.ReportItems) {
+            //        temp += $"{item.ParamName} {item.ElementId}" + Environment.NewLine;
+            //    }
+
+            //    TaskDialog.Show("Отчет", temp);
             //}
         }
 
@@ -120,18 +165,20 @@ namespace RevitReinforcementCoefficient.ViewModels {
         }
 
         /// <summary>
+        /// Задаем фильтрацию списка типов конструкций по выбранному комплекту документации
+        /// </summary>
+        public void SetFiltering(MainViewModel mainViewModel) {
+            MainVM = mainViewModel;
+            CollectionViewSource.GetDefaultView(DesignTypes).Filter = new Predicate<object>(FilterByDocPackage);
+        }
+
+        /// <summary>
         /// Обновляем элемент в UI, привязанный к коллекции типов конструкций с учетом фильтрации
         /// </summary>
         public void UpdateFiltering() {
             CollectionViewSource.GetDefaultView(DesignTypes).Refresh();
         }
 
-        /// <summary>
-        /// Задаем фильтрацию списка типов конструкций по выбранному комплекту документации
-        /// </summary>
-        private void SetFiltering() {
-            CollectionViewSource.GetDefaultView(DesignTypes).Filter = new Predicate<object>(FilterByDocPackage);
-        }
 
 
         /// <summary>

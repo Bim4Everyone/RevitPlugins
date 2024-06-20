@@ -3,10 +3,13 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitReinforcementCoefficient.Models.Report;
 using RevitReinforcementCoefficient.ViewModels;
 
 namespace RevitReinforcementCoefficient.Models.ElementModels {
     internal class RebarElement : ICommonElement {
+        private readonly ParamUtils _utils;
+
         // Соотношение между диаметром арматурного стержня и массой его одного метра
         private readonly Dictionary<double, double> _massPerLengthDict = new Dictionary<double, double>() {
             { 8, 0.395},
@@ -58,10 +61,14 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
         private readonly double _overlapCoefForUnknown = 1.1;
 
 
-        public RebarElement(Element element) => RevitElement = element;
+        public RebarElement(Element element, IReportService reportService) {
+            _utils = new ParamUtils(reportService);
+            RevitElement = element;
+        }
 
 
         public Element RevitElement { get; set; }
+
 
 
         /// <summary>
@@ -69,12 +76,12 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
         /// </summary>
         public double Calculate(ReportVM report) {
 
-            int numberOfForm = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _numberOfFormParamName);
-            double dimeter = ParamUtils.GetParamValueAnywhere<double>(RevitElement, _dimeterParamName);
+            int numberOfForm = _utils.GetParamValueAnywhere<int>(RevitElement, _numberOfFormParamName);
+            double dimeter = _utils.GetParamValueAnywhere<double>(RevitElement, _dimeterParamName);
             double dimeterInMm = UnitUtilsHelper.ConvertFromInternalValue(dimeter);
-            int calcInLinearMeters = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _calcInLinearMetersParamName);
-            int countInLevel = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _countInLevelParamName);
-            int countOfLevel = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _countOfLevelParamName);
+            int calcInLinearMeters = _utils.GetParamValueAnywhere<int>(RevitElement, _calcInLinearMetersParamName);
+            int countInLevel = _utils.GetParamValueAnywhere<int>(RevitElement, _countInLevelParamName);
+            int countOfLevel = _utils.GetParamValueAnywhere<int>(RevitElement, _countOfLevelParamName);
 
             // В основном масса арматуры будет определяться как масса единицы (* на разные коэффициенты) * количество таких стержней
             // Но когда мы собираем с вида арматуру через FilteredRevitElementCollector, то помимо одиночных стержней у нас собираются и стержни в массиве,
@@ -82,19 +89,19 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
             // не представляется возможным, т.к. массив указывает, что у вложенных стержней она разная (вернет значение 0)
             // Из-за этой проблемы, чтобы упростить задачу, получаем среднее значение этой длины из Полной длины стержня
 
-            double length = ParamUtils.GetParamValueAnywhere<double>(RevitElement, _lengthParamName);
+            double length = _utils.GetParamValueAnywhere<double>(RevitElement, _lengthParamName);
             int count;
 
             // Если элемент класса FamilyInstance, то это IFC арматура
             if(RevitElement is FamilyInstance) {
 
-                count = Convert.ToInt32(ParamUtils.GetParamValueAnywhere<double>(RevitElement, _countSharedParamName));
+                count = Convert.ToInt32(_utils.GetParamValueAnywhere<double>(RevitElement, _countSharedParamName));
             } else {
 
-                count = ParamUtils.GetParamValueAnywhere<int>(RevitElement, _countSystemParamName);
+                count = _utils.GetParamValueAnywhere<int>(RevitElement, _countSystemParamName);
 
                 // Если длина одного стержня равна 0, то это стержни переменной длины, и мы находим длину одного деля общую длину на кол-во
-                length = length.Equals(0.0) ? ParamUtils.GetParamValueAnywhere<double>(RevitElement, _fullLengthParamName) / count : length;
+                length = length.Equals(0.0) ? _utils.GetParamValueAnywhere<double>(RevitElement, _fullLengthParamName) / count : length;
             }
 
             double lengthInMm = Math.Round(UnitUtilsHelper.ConvertFromInternalValue(length), MidpointRounding.AwayFromZero);
@@ -112,12 +119,18 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
 
                 // Проверяем параметр "обр_ФОП_Масса на единицу длины" только сейчас, т.к. крайне маловероятно, что расчет будет вестись через него
                 // Если его нет, то расчет невозможен
-                if(!ParamUtils.HasParamAnywhere(RevitElement, _massPerUnitLengthParamName, report)) {
+                //if(!Utils.HasParamAnywhere(RevitElement, _massPerUnitLengthParamName, report)) {
+
+                //    // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался
+                //    return 0;
+                //}
+
+                if(_utils.HasParamAnywhereTEST(RevitElement, _massPerUnitLengthParamName) != null) {
 
                     // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался
                     return 0;
                 }
-                massPerUnitLength = ParamUtils.GetParamValueAnywhere<double>(RevitElement, _massPerUnitLengthParamName);
+                massPerUnitLength = _utils.GetParamValueAnywhere<double>(RevitElement, _massPerUnitLengthParamName);
             }
 
             // @Базовый_Нахлест

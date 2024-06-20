@@ -9,6 +9,9 @@ using dosymep.Bim4Everyone.SimpleServices;
 using Ninject;
 
 using RevitReinforcementCoefficient.Models;
+using RevitReinforcementCoefficient.Models.Analyzers;
+using RevitReinforcementCoefficient.Models.ElementModels;
+using RevitReinforcementCoefficient.Models.Report;
 using RevitReinforcementCoefficient.ViewModels;
 using RevitReinforcementCoefficient.Views;
 
@@ -21,10 +24,29 @@ namespace RevitReinforcementCoefficient {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
+                kernel.Bind<IReportService>()
+                    .To<ReportService>()
+                    .InSingletonScope();
+                kernel.Bind<ParamUtils>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ElementFactory>()
                     .ToSelf()
                     .InSingletonScope();
 
+                kernel.Bind<DesignTypeAnalyzer>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<DesignTypeListAnalyzer>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<DesignTypeListVM>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 

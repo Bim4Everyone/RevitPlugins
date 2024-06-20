@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -14,8 +15,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-
-        private readonly DesignTypeAnalyzer _typeAnalyzer;
 
         /// <summary>
         /// Значение фильтра, когда не задана фильтрация ("<Не выбрано>")
@@ -29,14 +28,12 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private string _selectedDockPackage;
         private bool _calcСoefficientOnAverage = false;
 
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, DesignTypeListVM designTypeListVM) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+            DesignTypesList = designTypeListVM;
 
-            _typeAnalyzer = new DesignTypeAnalyzer();
-            DesignTypesList = new DesignTypeListVM(this);
-
-            LoadViewCommand = RelayCommand.Create(LoadView);
+            LoadViewCommand = RelayCommand.Create<object>(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
             SelectAllVisibleCommand = RelayCommand.Create(SelectAllVisible);
@@ -89,14 +86,22 @@ namespace RevitReinforcementCoefficient.ViewModels {
         }
 
 
-        private void LoadView() {
+        private void LoadView(object obj) {
             LoadConfig();
             ReportVM report = new ReportVM(_revitRepository);
 
             // Получаем и распределяем элементы по типам конструкции
-            var designTypesByElems = _typeAnalyzer.CheckNSortByDesignTypes(_revitRepository.ElementsByFilterInActiveView, report);
-            // Чтобы фильтрация списка не сбивалась делаем именно AddRange
-            DesignTypesList.DesignTypes.AddRange(designTypesByElems);
+            // Если не нашли подходящих элементов на виде, то прекращаем работу и выводим сообщение об ошибке
+            if(!DesignTypesList.GetElementsForAnalize()) {
+                TaskDialog error = new TaskDialog("Ошибка!");
+                error.MainInstruction = "На текущем виде не найдено ни одного элемента для работы!";
+                error.MainContent = "Плагин работает с элементами следующих категорий: " +
+                    "Стены, Перекрытия, Каркас несущий, Колонны, Несущие колонны, Фундамент несущей конструкции и Арматура.";
+                error.Show();
+                (obj as MainWindow).Close();
+            }
+            DesignTypesList.GetDesignTypes();
+            DesignTypesList.SetFiltering(this);
             GetDockPackages();
 
             if(report.ReportItems.Count() > 0) {
@@ -161,7 +166,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
             _pluginConfig.SaveProjectConfig();
         }
 
-
         private void ShowFormworkElements() {
             List<ElementId> ids = new List<ElementId>();
 
@@ -170,7 +174,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
             }
             _revitRepository.ActiveUIDocument.Selection.SetElementIds(ids);
         }
-
 
         private void ShowRebarElements() {
             List<ElementId> ids = new List<ElementId>();

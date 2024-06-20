@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-using Autodesk.Revit.DB;
-
-using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitReinforcementCoefficient.Models.ElementModels;
@@ -17,10 +14,17 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private string _rebarCoef = "0";
         private bool _isCheck = false;
 
-        public DesignTypeVM(string typeName, string docPackage, bool aboveZero) {
+        //public DesignTypeVM(string typeName, string docPackage, bool aboveZero) {
+        //    TypeName = typeName;
+        //    DocPackage = docPackage;
+        //    AboveZero = aboveZero;
+        //}
+
+        public DesignTypeVM(string typeName, string docPackage, bool aboveZero, ICommonElement firstElement) {
             TypeName = typeName;
             DocPackage = docPackage;
             AboveZero = aboveZero;
+            AddItem(firstElement);
         }
 
         /// <summary>
@@ -103,14 +107,34 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// <summary>
         /// Добавляет элемент в коллекцию опалубочных элементов или арматуры в зависимости от его категории
         /// </summary>
-        public void AddItem(Element elem) {
+        //public void AddItem(Element elem) {
 
-            if(elem.InAnyCategory(BuiltInCategory.OST_Rebar)) {
-                Rebars.Add(new RebarElement(elem));
+        //    if(elem.InAnyCategory(BuiltInCategory.OST_Rebar)) {
+        //        Rebars.Add(new RebarElement(elem));
+        //    } else {
+        //        Formworks.Add(new FormworkElement(elem));
+        //    }
+        //}
+
+
+
+
+        public void AddItem(ICommonElement elem) {
+
+            if(elem is RebarElement) {
+                Rebars.Add(elem as RebarElement);
             } else {
-                Formworks.Add(new FormworkElement(elem));
+                Formworks.Add(elem as FormworkElement);
             }
         }
+
+
+
+
+
+
+
+
 
         /// <summary>
         /// Рассчитать объем бетона
