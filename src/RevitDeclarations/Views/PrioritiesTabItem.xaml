@@ -21,11 +21,20 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
         <TextBlock 
             Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Margin="10"
             HorizontalAlignment="Left"                     
             Style="{StaticResource HeaderName}"
@@ -33,16 +42,44 @@
 
         <TextBlock
             Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Margin="10, 5">
             <Run Text="Имена помещений квартир в проекте должны соответствовать следующему списку приоритетов."/>
             <LineBreak/>
             <Run Text="Столбцы в декларации будут созданы в соответствии с порядковым номером приоритета."/>
             <LineBreak/>
             <Run Text="Помещения, для которых не найден приоритет, будут добавлены в конце таблицы."/>
+            <LineBreak/>
+            <Run Text="Приоритеты настраиваются в файле JSON. Вы можете использовать ваш собственный файл приоритетов."/>
         </TextBlock>
 
-        <DataGrid
+        <Button
             Grid.Row="2"
+            Grid.Column="0"
+            Content="Приоритеты А101"
+            Margin="10, 5"
+            Height="25"
+            Command="{Binding SetCompanyPriorities}"/>
+        <Button
+            Grid.Row="2"
+            Grid.Column="1"
+            Content="Экспорт приоритетов"
+            Margin="10, 5"
+            Height="25"
+            Command="{Binding ExportPriorities}"/>
+        <Button
+            Grid.Row="2"
+            Grid.Column="2"
+            Content="Импорт приоритетов"
+            Margin="10, 5"
+            Height="25"
+            Command="{Binding ImportPriorities}"/>
+
+        <DataGrid
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Margin="10"
             AutoGenerateColumns="False"
             CanUserAddRows="False"
