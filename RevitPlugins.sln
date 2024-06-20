@@ -202,6 +202,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Handlers", "Handlers", "{7D
 		RevitClashes\Models\Handlers\RevitEventHandler.cs = RevitClashes\Models\Handlers\RevitEventHandler.cs
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GraphicView", "GraphicView", "{E41C8530-D08A-4320-BA0D-D604D85E23D2}"
+	ProjectSection(SolutionItems) = preProject
+		src\RevitClashes\Models\GraphicView\ParameterFilterProvider.cs = src\RevitClashes\Models\GraphicView\ParameterFilterProvider.cs
+	EndProjectSection
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitGenLookupTables", "src\RevitGenLookupTables\RevitGenLookupTables.csproj", "{65795232-ECD1-4811-A473-B718AE74E4E1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitFamilyExplorer", "src\RevitFamilyExplorer\RevitFamilyExplorer.csproj", "{0D3A89D6-19AA-44BA-A854-D5C63542CC60}"
@@ -803,6 +808,7 @@ Global
 		{D9661EB6-ECF7-4E7F-B055-65A6313EDF8B} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 		{74DD9D4A-AEAD-4C5E-ACBD-B5447AA791DA} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 		{7D8627B7-D98F-4D86-A10F-7C9DA00EEA7B} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
+		{E41C8530-D08A-4320-BA0D-D604D85E23D2} = {968DE2B9-F390-4B99-A796-A797FBB7847A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2332A0ED-46BB-427C-AAD9-EFA10FA76316}
