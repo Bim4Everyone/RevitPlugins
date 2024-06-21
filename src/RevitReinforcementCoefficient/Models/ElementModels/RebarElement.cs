@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 using RevitReinforcementCoefficient.Models.Report;
-using RevitReinforcementCoefficient.ViewModels;
 
 namespace RevitReinforcementCoefficient.Models.ElementModels {
     internal class RebarElement : ICommonElement {
@@ -74,8 +73,7 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
         /// <summary>
         /// Расчет массы одного арматурного элемента
         /// </summary>
-        public double Calculate(ReportVM report) {
-
+        public double Calculate() {
             int numberOfForm = _utils.GetParamValueAnywhere<int>(RevitElement, _numberOfFormParamName);
             double dimeter = _utils.GetParamValueAnywhere<double>(RevitElement, _dimeterParamName);
             double dimeterInMm = UnitUtilsHelper.ConvertFromInternalValue(dimeter);
@@ -88,16 +86,13 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
             // среди которых есть массивы с включенной функцией "Переменный набор арматурных стержней", тогда запросить "обр_ФОП_Длина"
             // не представляется возможным, т.к. массив указывает, что у вложенных стержней она разная (вернет значение 0)
             // Из-за этой проблемы, чтобы упростить задачу, получаем среднее значение этой длины из Полной длины стержня
-
             double length = _utils.GetParamValueAnywhere<double>(RevitElement, _lengthParamName);
             int count;
 
             // Если элемент класса FamilyInstance, то это IFC арматура
             if(RevitElement is FamilyInstance) {
-
                 count = Convert.ToInt32(_utils.GetParamValueAnywhere<double>(RevitElement, _countSharedParamName));
             } else {
-
                 count = _utils.GetParamValueAnywhere<int>(RevitElement, _countSystemParamName);
 
                 // Если длина одного стержня равна 0, то это стержни переменной длины, и мы находим длину одного деля общую длину на кол-во
@@ -119,13 +114,7 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
 
                 // Проверяем параметр "обр_ФОП_Масса на единицу длины" только сейчас, т.к. крайне маловероятно, что расчет будет вестись через него
                 // Если его нет, то расчет невозможен
-                //if(!Utils.HasParamAnywhere(RevitElement, _massPerUnitLengthParamName, report)) {
-
-                //    // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался
-                //    return 0;
-                //}
-
-                if(_utils.HasParamAnywhereTEST(RevitElement, _massPerUnitLengthParamName) != null) {
+                if(!_utils.HasParamAnywhere(RevitElement, _massPerUnitLengthParamName)) {
 
                     // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался
                     return 0;

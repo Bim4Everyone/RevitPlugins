@@ -88,8 +88,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         private void LoadView(object obj) {
             LoadConfig();
-            ReportVM report = new ReportVM(_revitRepository);
-
             // Получаем и распределяем элементы по типам конструкции
             // Если не нашли подходящих элементов на виде, то прекращаем работу и выводим сообщение об ошибке
             if(!DesignTypesList.GetElementsForAnalize()) {
@@ -103,11 +101,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
             DesignTypesList.GetDesignTypes();
             DesignTypesList.SetFiltering(this);
             GetDockPackages();
-
-            if(report.ReportItems.Count() > 0) {
-                ReportWindow reportWindow = new ReportWindow(report);
-                reportWindow.ShowDialog();
-            }
         }
 
         /// <summary>

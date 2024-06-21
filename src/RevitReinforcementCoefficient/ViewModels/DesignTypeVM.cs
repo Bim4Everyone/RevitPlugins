@@ -159,7 +159,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// </summary>
         private double Calculate(IEnumerable<ICommonElement> elements) {
             double sum = elements
-                .Select(e => e.Calculate(null))
+                .Select(e => e.Calculate())
                 .Sum();
 
             return Math.Round(sum, 2);

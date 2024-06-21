@@ -13,12 +13,14 @@ using dosymep.WPF.ViewModels;
 using RevitReinforcementCoefficient.Models.Analyzers;
 using RevitReinforcementCoefficient.Models.ElementModels;
 using RevitReinforcementCoefficient.Models.Report;
+using RevitReinforcementCoefficient.Views;
 
 namespace RevitReinforcementCoefficient.ViewModels {
     internal class DesignTypeListVM : BaseViewModel {
         private readonly DesignTypeListAnalyzer _designTypeListAnalyzer;
         private readonly DesignTypeAnalyzer _designTypeAnalyzer;
         private readonly IReportService _reportService;
+        //private readonly ReportWindow _reportWindow;
 
         private List<DesignTypeVM> _designTypes = new List<DesignTypeVM>();
 
@@ -30,6 +32,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
             _designTypeListAnalyzer = designTypeListAnalyzer;
             _designTypeAnalyzer = designTypeAnalyzer;
             _reportService = reportService;
+            //_reportWindow = reportWindow;
         }
         public List<DesignTypeVM> DesignTypes {
             get => _designTypes;
@@ -43,22 +46,16 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         public void GetDesignTypes() {
             DesignTypes = _designTypeListAnalyzer.CheckNSortByDesignTypes();
-            if(_reportService.ReportItems.Count > 0) {
-                //ReportVMTEST report = new ReportVMTEST();
-
-                //if(report.ReportItems.Count() > 0) {
-                //    //ReportWindow reportWindow = new ReportWindow(report);
-                //    //reportWindow.ShowDialog();
-                //    string temp = string.Empty;
-                //    foreach(var item in report.ReportItems) {
-                //        temp += $"{item.ParamName} {item.ElementId}" + Environment.NewLine;
-                //    }
-
-                //    TaskDialog.Show("Отчет", temp);
-                //}
-            }
+            ShowReportIfNeed();
         }
 
+        private void ShowReportIfNeed() {
+            if(_reportService.ReportItems.Count > 0) {
+                var reportWindow = new ReportWindow();
+                reportWindow.ShowDialog();
+                _reportService.ClearReportItems();
+            }
+        }
 
         /// <summary>
         /// Используется в качестве аргумента предиката для фильтрации списка по выбранному комплекту документации
@@ -83,9 +80,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         public void GetInfo(bool calcСoefficientOnAverage) {
             List<DesignTypeVM> selectedDesignTypes = DesignTypes.Where(o => o.IsCheck).ToList();
-            //ReportVM report = new ReportVM(_revitRepository);
-            //ReportVMTEST report = new ReportVMTEST();
-            //List<ReportItemSimple> tempReport;
 
             foreach(DesignTypeVM designType in selectedDesignTypes) {
                 // Проверка элементов выбранного типа конструкции
@@ -117,16 +111,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
                     }
                 }
             }
-            //if(report.ReportItems.Count() > 0) {
-            //    //ReportWindow reportWindow = new ReportWindow(report);
-            //    //reportWindow.ShowDialog();
-            //    string temp = string.Empty;
-            //    foreach(var item in report.ReportItems) {
-            //        temp += $"{item.ParamName} {item.ElementId}" + Environment.NewLine;
-            //    }
-
-            //    TaskDialog.Show("Отчет", temp);
-            //}
+            ShowReportIfNeed();
         }
 
         /// <summary>

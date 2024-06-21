@@ -24,9 +24,17 @@ namespace RevitReinforcementCoefficient {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+
                 kernel.Bind<IReportService>()
                     .To<ReportService>()
                     .InSingletonScope();
+
+                kernel.Bind<ReportVM>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ReportWindow>()
+                    .ToSelf()
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportVM>());
                 kernel.Bind<ParamUtils>()
                     .ToSelf()
                     .InSingletonScope();

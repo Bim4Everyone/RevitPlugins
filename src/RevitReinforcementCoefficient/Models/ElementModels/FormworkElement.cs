@@ -3,7 +3,6 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 
 using RevitReinforcementCoefficient.Models.Report;
-using RevitReinforcementCoefficient.ViewModels;
 
 namespace RevitReinforcementCoefficient.Models.ElementModels {
     internal class FormworkElement : ICommonElement {
@@ -19,7 +18,7 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
         /// <summary>
         /// Расчет объема одного опалубочного элемента конструкции
         /// </summary>
-        public double Calculate(ReportVM report) {
+        public double Calculate() {
             double volumeInInternal = (double) RevitElement.GetParamValue(BuiltInParameter.HOST_VOLUME_COMPUTED);
             return UnitUtilsHelper.ConvertVolumeFromInternalValue(volumeInInternal);
         }

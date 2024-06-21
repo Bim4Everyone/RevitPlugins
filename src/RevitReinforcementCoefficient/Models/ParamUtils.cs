@@ -44,51 +44,9 @@ namespace RevitReinforcementCoefficient.Models {
                 }
             }
 
-            //_reportService.AddReportItem(paramName, element.Id);
-
+            _reportService.AddReportItem("Все окей, это тест!", element.Id);
             return true;
         }
-
-
-
-
-
-
-
-
-        //public List<ReportItemSimple> HasParamsAnywhereTEST(Element element, List<string> paramNames) {
-        //    List<ReportItemSimple> summaryReport = null;
-
-        //    foreach(string paramName in paramNames) {
-        //        var report = HasParamAnywhereTEST(element, paramName);
-        //        if(report != null) {
-        //            summaryReport = summaryReport ?? new List<ReportItemSimple>();
-        //            summaryReport.Add(report);
-        //        }
-        //    }
-        //    return summaryReport;
-        //}
-
-        /// <summary>
-        /// Проверяет есть ли указанный параметр в элементе на экземпляре или типе
-        /// </summary>
-        public ReportItemSimple HasParamAnywhereTEST(Element element, string paramName) {
-
-
-
-            // Сначала проверяем есть ли параметр на экземпляре
-            if(!element.IsExistsParam(paramName)) {
-                // Если не нашли, ищем на типоразмере
-                Element elementType = element.GetElementType();
-                if(!elementType.IsExistsParam(paramName)) {
-                    // Если не нашли записываем в отчет и возвращаем false
-                    return new ReportItemSimple(paramName, element.Id);
-                }
-            }
-            return null;
-        }
-
-
 
         /// <summary>
         /// Получает значение параметра в элементе на экземпляре или типе

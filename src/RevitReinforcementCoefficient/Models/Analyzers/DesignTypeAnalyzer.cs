@@ -71,23 +71,6 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         ///// <summary>
         ///// Проверяет наличие параметров у арматуры по типу конструкции
         ///// </summary>
