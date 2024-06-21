@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
+
+using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
@@ -12,11 +14,13 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         private readonly MepCategory _mepCategory;
         private readonly IPointFinder _pointFinder;
         private readonly OpeningType _openingType;
+        private readonly ILevelFinder _levelFinder;
 
-        public PerpendicularRoundCurveWallParamGetter(MepCurveClash<Wall> clash, MepCategory mepCategory, IPointFinder pointFinder, OpeningType openingType) {
+        public PerpendicularRoundCurveWallParamGetter(MepCurveClash<Wall> clash, MepCategory mepCategory, IPointFinder pointFinder, OpeningType openingType, ILevelFinder levelFinder) {
             _clash = clash ?? throw new System.ArgumentNullException(nameof(clash));
             _mepCategory = mepCategory ?? throw new System.ArgumentNullException(nameof(mepCategory));
             _pointFinder = pointFinder ?? throw new System.ArgumentNullException(nameof(pointFinder));
+            _levelFinder = levelFinder ?? throw new System.ArgumentNullException(nameof(levelFinder));
             _openingType = openingType;
         }
 
@@ -36,16 +40,21 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash.Element2)).GetParamValue();
 
             //отметки отверстия
+            IValueGetter<DoubleParamValue> bottomOffsetValueGetter;
             if(openingTaskIsRound) {
                 //отверстие круглое
                 yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetValueGetter(_pointFinder)).GetParamValue();
-                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, new BottomOffsetValueGetter(_pointFinder, openingSizeGetter)).GetParamValue();
-
+                bottomOffsetValueGetter = new BottomOffsetValueGetter(_pointFinder, openingSizeGetter);
+                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
             } else {
                 // отверстие прямоугольное (квадратное)
                 yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetOfRectangleOpeningInWallValueGetter(_pointFinder, openingSizeGetter)).GetParamValue();
-                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, new BottomOffsetOfRectangleOpeningInWallValueGetter(_pointFinder)).GetParamValue();
+                bottomOffsetValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(_pointFinder);
+                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
             }
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottomAdsk, new BottomOffsetInFeetValueGetter(bottomOffsetValueGetter)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdsk, new BottomOffsetFromLevelValueGetter(bottomOffsetValueGetter, _levelFinder)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningLevelOffsetAdsk, new LevelOffsetValueGetter(_levelFinder)).GetParamValue();
 
             //текстовые данные отверстия
             yield return new StringParameterGetter(RevitRepository.OpeningDate, new DateValueGetter()).GetParamValue();

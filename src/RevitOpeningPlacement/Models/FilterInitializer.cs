@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -48,7 +48,7 @@ namespace RevitOpeningPlacement.Models {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM));
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.Pipe],
                                  revitRepository,
-                                 BuiltInCategory.OST_PipeCurves,
+                                 RevitRepository.MepPipeLinearCategory,
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
         }
 
@@ -62,7 +62,7 @@ namespace RevitOpeningPlacement.Models {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM));
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.RoundDuct],
                                  revitRepository,
-                                 BuiltInCategory.OST_DuctCurves,
+                                 RevitRepository.MepDuctLinearCategory,
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
         }
 
@@ -76,7 +76,7 @@ namespace RevitOpeningPlacement.Models {
             var revitParam = ParameterInitializer.InitializeParameter(revitRepository.Doc, new ElementId(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM));
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
                                  revitRepository,
-                                 BuiltInCategory.OST_Conduit,
+                                 RevitRepository.MepConduitLinearCategory,
                                  new[] { new ParamValuePair { RevitParam = revitParam, Value = minDiameter } });
         }
 
@@ -93,7 +93,7 @@ namespace RevitOpeningPlacement.Models {
 
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.RectangleDuct],
                                  revitRepository,
-                                 BuiltInCategory.OST_DuctCurves,
+                                 RevitRepository.MepDuctLinearCategory,
                                  new[] { heightParamValuePair, widthParamValuePair });
         }
 
@@ -110,7 +110,7 @@ namespace RevitOpeningPlacement.Models {
 
             return GetdMepFilter(RevitRepository.MepCategoryNames[MepCategoryEnum.CableTray],
                                  revitRepository,
-                                 BuiltInCategory.OST_CableTray,
+                                 RevitRepository.MepCableTrayLinearCategory,
                                  new[] { heightParamValuePair, widthParamValuePair });
         }
 
@@ -120,7 +120,10 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="revitRepository"></param>
         /// <returns></returns>
         public static Filter GetTrayFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return CreateFilterByCategory(RevitRepository.FittingCategoryNames[FittingCategoryEnum.CableTrayFitting], revitRepository, BuiltInCategory.OST_CableTrayFitting);
+            return CreateFilterByCategory(
+                RevitRepository.FittingCategoryNames[FittingCategoryEnum.CableTrayFitting],
+                revitRepository,
+                RevitRepository.MepCableTrayFittingCategories.ToArray());
         }
 
         /// <summary>
@@ -129,7 +132,10 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="revitRepository"></param>
         /// <returns></returns>
         public static Filter GetPipeFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return CreateFilterByCategory(RevitRepository.FittingCategoryNames[FittingCategoryEnum.PipeFitting], revitRepository, BuiltInCategory.OST_PipeFitting);
+            return CreateFilterByCategory(
+                RevitRepository.FittingCategoryNames[FittingCategoryEnum.PipeFitting],
+                revitRepository,
+                RevitRepository.MepPipeFittingCategories.ToArray());
         }
 
         /// <summary>
@@ -141,10 +147,7 @@ namespace RevitOpeningPlacement.Models {
             return CreateFilterByCategory(
                 RevitRepository.FittingCategoryNames[FittingCategoryEnum.DuctFitting],
                 revitRepository,
-                new BuiltInCategory[] {
-                    BuiltInCategory.OST_DuctFitting,
-                    BuiltInCategory.OST_DuctAccessory }
-                );
+                RevitRepository.MepDuctFittingCategories.ToArray());
         }
 
         /// <summary>
@@ -153,7 +156,10 @@ namespace RevitOpeningPlacement.Models {
         /// <param name="revitRepository"></param>
         /// <returns></returns>
         public static Filter GetConduitFittingFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
-            return CreateFilterByCategory(RevitRepository.FittingCategoryNames[FittingCategoryEnum.ConduitFitting], revitRepository, BuiltInCategory.OST_ConduitFitting);
+            return CreateFilterByCategory(
+                RevitRepository.FittingCategoryNames[FittingCategoryEnum.ConduitFitting],
+                revitRepository,
+                RevitRepository.MepConduitFittingCategories.ToArray());
         }
 
         /// <summary>
@@ -178,22 +184,12 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns></returns>
         public static ICollection<BuiltInCategory> GetAllUsedMepCategories() {
-            return new BuiltInCategory[] {
-                BuiltInCategory.OST_PipeCurves,
-                BuiltInCategory.OST_PipeFitting,
-
-                BuiltInCategory.OST_DuctCurves,
-                BuiltInCategory.OST_DuctFitting,
-                BuiltInCategory.OST_DuctAccessory,
-                BuiltInCategory.OST_DuctTerminal,
-                BuiltInCategory.OST_MechanicalEquipment,
-
-                BuiltInCategory.OST_CableTray,
-                BuiltInCategory.OST_CableTrayFitting,
-
-                BuiltInCategory.OST_Conduit,
-                BuiltInCategory.OST_ConduitFitting,
-            };
+            List<BuiltInCategory> categories = new List<BuiltInCategory>();
+            categories.AddRange(RevitRepository.MepPipeCategories);
+            categories.AddRange(RevitRepository.MepDuctCategories);
+            categories.AddRange(RevitRepository.MepCableTrayCategories);
+            categories.AddRange(RevitRepository.MepConduitCategories);
+            return categories;
         }
 
         /// <summary>

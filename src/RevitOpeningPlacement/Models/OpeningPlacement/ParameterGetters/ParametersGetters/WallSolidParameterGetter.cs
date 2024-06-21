@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -20,6 +20,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         private readonly ISolidProvider _solidProvider;
         private readonly MepCategory[] _mepCategories;
         private readonly IPointFinder _pointFinder;
+        private readonly ILevelFinder _levelFinder;
         private readonly Element _mepElement;
         private readonly Element _structureElement;
         private readonly OpeningsGroup _openingsGroup;
@@ -29,10 +30,12 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         public WallSolidParameterGetter(
             ISolidProvider solidProvider,
             IPointFinder pointFinder,
+            ILevelFinder levelFinder,
             OpeningsGroup openingsGroup
             ) {
             _solidProvider = solidProvider ?? throw new System.ArgumentNullException(nameof(solidProvider));
             _pointFinder = pointFinder ?? throw new System.ArgumentNullException(nameof(pointFinder));
+            _levelFinder = levelFinder ?? throw new System.ArgumentNullException(nameof(levelFinder));
             _openingsGroup = openingsGroup ?? throw new System.ArgumentNullException(nameof(openingsGroup));
             _createdByOpeningGroup = true;
         }
@@ -40,6 +43,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         public WallSolidParameterGetter(
             ISolidProvider solidProvider,
             IPointFinder pointFinder,
+            ILevelFinder levelFinder,
             Element mepElement,
             Element structureElement,
             params MepCategory[] mepCategories) {
@@ -47,6 +51,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             _solidProvider = solidProvider ?? throw new System.ArgumentNullException(nameof(solidProvider));
             _mepCategories = mepCategories ?? throw new System.ArgumentNullException(nameof(mepCategories));
             _pointFinder = pointFinder ?? throw new System.ArgumentNullException(nameof(pointFinder));
+            _levelFinder = levelFinder ?? throw new System.ArgumentNullException(nameof(levelFinder));
             _mepElement = mepElement ?? throw new System.ArgumentNullException(nameof(mepElement));
             _structureElement = structureElement ?? throw new System.ArgumentNullException(nameof(structureElement));
             _createdByOpeningGroup = false;
@@ -69,13 +74,19 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             }
 
             //отметки отверстия
+            IValueGetter<DoubleParamValue> bottomOffsetValueGetter;
             if(_createdByOpeningGroup && _openingsGroup.IsCylinder) {
                 yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetValueGetter(_pointFinder)).GetParamValue();
-                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, new BottomOffsetValueGetter(_pointFinder, sizeInit.GetHeight())).GetParamValue();
+                bottomOffsetValueGetter = new BottomOffsetValueGetter(_pointFinder, sizeInit.GetHeight());
+                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
             } else {
                 yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetOfRectangleOpeningInWallValueGetter(_pointFinder, sizeInit.GetHeight())).GetParamValue();
-                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, new BottomOffsetOfRectangleOpeningInWallValueGetter(_pointFinder)).GetParamValue();
+                bottomOffsetValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(_pointFinder);
+                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
             }
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottomAdsk, new BottomOffsetInFeetValueGetter(bottomOffsetValueGetter)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdsk, new BottomOffsetFromLevelValueGetter(bottomOffsetValueGetter, _levelFinder)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningLevelOffsetAdsk, new LevelOffsetValueGetter(_levelFinder)).GetParamValue();
 
             //текстовые данные отверстия
             yield return new StringParameterGetter(RevitRepository.OpeningDate, new DateValueGetter()).GetParamValue();

@@ -1,17 +1,15 @@
-﻿using System;
-
-using Autodesk.Revit.DB;
+using System;
 
 using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
-    internal class CenterOffsetValueGetter : IValueGetter<DoubleParamValue> {
+    internal class CenterOffsetValueGetter : LengthConverter, IValueGetter<DoubleParamValue> {
         private readonly IPointFinder _pointFinder;
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение высотной отметки центра отверстия, кроме прямоугольных отверстий в стенах и кроме отверстий в перекрытиях
+        /// Конструктор класса, предоставляющего значение высотной отметки центра отверстия в мм от начала проекта, кроме прямоугольных отверстий в стенах и кроме отверстий в перекрытиях
         /// Для прямоугольных отверстий в стенах использовать <see cref="CenterOffsetOfRectangleOpeningInWallValueGetter"/>
         /// </summary>
         /// <param name="pointFinder">Объект, предоставляющий координату центра отверстия</param>
@@ -26,17 +24,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
 
         public DoubleParamValue GetValue() {
             var offsetInFeet = _pointFinder.GetPoint().Z;
-            return new DoubleParamValue(Math.Round(GetOffsetInMm(offsetInFeet)));
-        }
-
-        private double GetOffsetInMm(double offsetInFeet) {
-            double offsetInMm = 0;
-#if REVIT_2020_OR_LESS
-            offsetInMm = UnitUtils.ConvertFromInternalUnits(offsetInFeet, DisplayUnitType.DUT_MILLIMETERS);
-#else
-            offsetInMm = UnitUtils.ConvertFromInternalUnits(offsetInFeet, UnitTypeId.Millimeters);
-#endif
-            return offsetInMm;
+            return new DoubleParamValue(Math.Round(ConvertFromInternal(offsetInFeet)));
         }
     }
 }

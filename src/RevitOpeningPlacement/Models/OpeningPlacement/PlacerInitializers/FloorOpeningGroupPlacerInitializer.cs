@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
@@ -29,6 +29,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 throw new ArgumentOutOfRangeException(nameof(openingsGroup.Elements.Count));
             }
             var pointFinder = new FloorOpeningsGroupPointFinder(openingsGroup);
+            var levelFinder = new OpeningsGroupLevelFinder(openingsGroup);
             return new OpeningPlacer(revitRepository) {
                 Type = openingsGroup.IsCylinder
                 ? revitRepository.GetOpeningTaskType(OpeningType.FloorRound)
@@ -36,10 +37,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
 
                 PointFinder = pointFinder,
 
-                LevelFinder = new OpeningsGroupLevelFinder(openingsGroup),
+                LevelFinder = levelFinder,
                 AngleFinder = new FloorOpeningsGroupAngleFinder(openingsGroup),
 
-                ParameterGetter = new FloorSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, openingsGroup)
+                ParameterGetter = new FloorSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, levelFinder, openingsGroup)
             };
         }
     }

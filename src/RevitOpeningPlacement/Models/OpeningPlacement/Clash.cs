@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -43,9 +44,27 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         public Transform Element2Transform { get; set; }
 
         public Solid GetIntersection() {
-            return Element1.GetSolid().GetIntersection(Element2.GetSolid(), Element2Transform);
+            Element geometryElement = Element1;
+            if(Element1 is FamilyInstance familyInstance
+                && TryGetGeometryCustomGeometry(familyInstance, out FamilyInstance elementCustomGeometry)) {
+
+                geometryElement = elementCustomGeometry;
+            }
+            return geometryElement.GetSolid().GetIntersection(Element2.GetSolid(), Element2Transform);
         }
 
         public abstract double GetConnectorArea();
+
+
+        private bool TryGetGeometryCustomGeometry(FamilyInstance element, out FamilyInstance geometryInstance) {
+            geometryInstance = element
+                .GetSubComponentIds()
+                .Select(s => element.Document.GetElement(s))
+                .Where(e => e is FamilyInstance)
+                .Cast<FamilyInstance>()
+                .FirstOrDefault(e => RevitRepository.CustomGeometryFamilies
+                    .Any(s => s.Equals(e.Name, StringComparison.CurrentCultureIgnoreCase)));
+            return geometryInstance != null;
+        }
     }
 }
