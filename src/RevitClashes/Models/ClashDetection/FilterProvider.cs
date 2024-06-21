@@ -29,7 +29,7 @@ namespace RevitClashDetective.Models.ClashDetection {
         public Transform MainTransform { get; }
 
         public List<Element> GetElements() {
-            var categories = _filter.CategoryIds.Select(item => (BuiltInCategory) item.GetIdValue()).ToList();
+            var categories = _filter.CategoryIds.Select(item => item.AsBuiltInCategory()).ToList();
 
             var elements = GetFilteredElementCollector()
                 .WherePasses(new ElementMulticategoryFilter(categories))

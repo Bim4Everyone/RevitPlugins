@@ -64,10 +64,13 @@ namespace RevitOpeningPlacement {
                 var placers = placementConfigurator.GetPlacersMepOutcomingTasks(mepElements)
                                                    .ToList();
                 uiApplication.Application.FailuresProcessing += FailureProcessor;
-                var unplacedClashes = InitializePlacing(revitRepository, placers)
-                    .Concat(placementConfigurator.GetUnplacedClashes());
-                uiApplication.Application.FailuresProcessing -= FailureProcessor;
-                InitializeReport(revitRepository, unplacedClashes);
+                try {
+                    var unplacedClashes = InitializePlacing(revitRepository, placers)
+                        .Concat(placementConfigurator.GetUnplacedClashes());
+                    InitializeReport(revitRepository, unplacedClashes);
+                } finally {
+                    uiApplication.Application.FailuresProcessing -= FailureProcessor;
+                }
             }
             _duplicatedInstancesToRemoveIds.Clear();
         }
