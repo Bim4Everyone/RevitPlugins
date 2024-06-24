@@ -1,9 +1,14 @@
+using System.Globalization;
+using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
+using dosymep.WPF.Views;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -65,11 +70,19 @@ namespace RevitPlatformSettings {
 
                 kernel.Bind<MainViewModel>().ToSelf()
                     .InSingletonScope();
-                kernel.Bind<MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>());
 
+                kernel.Bind<MainWindow>().ToSelf()
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<MainViewModel>())
+                    .WithPropertyValue(nameof(ThemedPlatformWindow.LocalizationService),
+                        c => c.Kernel.Get<ILocalizationService>());
+                
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+                kernel.UseLocalization(
+                    $"/{assemblyName};component/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
+                
                 return kernel.Get<MainWindow>().ShowDialog();
             }
         }
