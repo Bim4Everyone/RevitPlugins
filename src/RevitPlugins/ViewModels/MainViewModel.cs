@@ -29,7 +29,7 @@ namespace RevitPlugins.ViewModels {
             _localizationService = localizationService;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView);
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -52,11 +52,21 @@ namespace RevitPlugins.ViewModels {
         private void AcceptView() {
             SaveConfig();
         }
+        
+        private bool CanAcceptView() {
+            if(string.IsNullOrEmpty(SaveProperty)) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
+        }
 
         private void LoadConfig() {
             var setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            SaveProperty = setting?.SaveProperty ??_localizationService.GetLocalizedString("MainWindow.Hello");
+            SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
         }
 
         private void SaveConfig() {
