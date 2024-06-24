@@ -2,14 +2,9 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitReinforcementCoefficient.Models.Report;
-
 namespace RevitReinforcementCoefficient.Models.ElementModels {
     internal class FormworkElement : ICommonElement {
-        private readonly IReportService _reportService;
-
-        public FormworkElement(Element element, IReportService reportService) {
-            _reportService = reportService;
+        public FormworkElement(Element element) {
             RevitElement = element;
         }
 

@@ -29,13 +29,13 @@ namespace RevitReinforcementCoefficient {
                     .To<ReportService>()
                     .InSingletonScope();
 
-                kernel.Bind<ReportVM>()
+                kernel.Bind<ReportViewModel>()
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<ReportWindow>()
                     .ToSelf()
                     .InSingletonScope()
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportVM>());
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportViewModel>());
 
                 kernel.Bind<ParamUtils>()
                     .ToSelf()

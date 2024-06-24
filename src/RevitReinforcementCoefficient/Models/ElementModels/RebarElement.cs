@@ -68,8 +68,6 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
 
         public Element RevitElement { get; set; }
 
-
-
         /// <summary>
         /// Расчет массы одного арматурного элемента
         /// </summary>

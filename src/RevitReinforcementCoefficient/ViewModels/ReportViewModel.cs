@@ -12,14 +12,14 @@ using RevitReinforcementCoefficient.Models;
 using RevitReinforcementCoefficient.Models.Report;
 
 namespace RevitReinforcementCoefficient.ViewModels {
-    internal class ReportVM : BaseViewModel {
+    internal class ReportViewModel : BaseViewModel {
         private readonly IReportService _reportService;
         private readonly RevitRepository _revitRepository;
         private readonly DesignTypeListVM _designTypeListVM;
 
         private ObservableCollection<ReportItem> _reportItems = new ObservableCollection<ReportItem>();
 
-        public ReportVM(IReportService reportService, RevitRepository revitRepository, DesignTypeListVM designTypeListVM) {
+        public ReportViewModel(IReportService reportService, RevitRepository revitRepository, DesignTypeListVM designTypeListVM) {
             _reportService = reportService;
             _revitRepository = revitRepository;
             _designTypeListVM = designTypeListVM;

@@ -15,7 +15,7 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
             if(elem.InAnyCategory(BuiltInCategory.OST_Rebar)) {
                 return new RebarElement(elem, _reportService);
             } else {
-                return new FormworkElement(elem, _reportService);
+                return new FormworkElement(elem);
             }
         }
     }

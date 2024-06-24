@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 using RevitReinforcementCoefficient.Models.ElementModels;
 using RevitReinforcementCoefficient.ViewModels;
 
-
 namespace RevitReinforcementCoefficient.Models.Analyzers {
     internal class DesignTypeAnalyzer {
         private readonly ParamUtils _paramUtils;
@@ -26,7 +25,6 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
         };
 
         private readonly List<string> _paramsForIfcRebars = new List<string>() { "обр_ФОП_Количество" };
-
 
 
         public DesignTypeAnalyzer(ParamUtils paramUtils) {

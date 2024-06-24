@@ -170,7 +170,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
         }
 
 
-
         /// <summary>
         /// Рассчитывает коэффициент армирования у нескольких типов конструкции по массе арматуры и объему бетона
         /// </summary>

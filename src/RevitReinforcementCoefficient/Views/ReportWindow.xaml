@@ -16,7 +16,7 @@
         Height="450" Width="800"
         MinHeight="450" MinWidth="800"
         
-        d:DataContext="{d:DesignInstance vms:ReportVM, IsDesignTimeCreatable=False}">
+        d:DataContext="{d:DesignInstance vms:ReportViewModel, IsDesignTimeCreatable=False}">
 
     <Grid>
         <Grid.RowDefinitions>

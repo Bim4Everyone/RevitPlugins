@@ -11,7 +11,6 @@ namespace RevitReinforcementCoefficient.Models.Report {
 
         public void AddReportItem(string paramName, ElementId elementId) {
             ReportItem error = ReportItems.FirstOrDefault(e => e.ErrorName.Contains($"\"{paramName}\""));
-
             if(error is null) {
                 ReportItems.Add(new ReportItem(paramName, elementId));
             } else {

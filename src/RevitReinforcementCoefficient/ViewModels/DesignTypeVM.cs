@@ -14,12 +14,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private string _rebarCoef = "0";
         private bool _isCheck = false;
 
-        //public DesignTypeVM(string typeName, string docPackage, bool aboveZero) {
-        //    TypeName = typeName;
-        //    DocPackage = docPackage;
-        //    AboveZero = aboveZero;
-        //}
-
         public DesignTypeVM(string typeName, string docPackage, bool aboveZero, ICommonElement firstElement) {
             TypeName = typeName;
             DocPackage = docPackage;
@@ -105,36 +99,15 @@ namespace RevitReinforcementCoefficient.ViewModels {
         public bool AlreadyCalculated { get; set; } = false;
 
         /// <summary>
-        /// Добавляет элемент в коллекцию опалубочных элементов или арматуры в зависимости от его категории
+        /// Добавляет элемент в коллекцию опалубочных элементов или арматуры в зависимости от его класса
         /// </summary>
-        //public void AddItem(Element elem) {
-
-        //    if(elem.InAnyCategory(BuiltInCategory.OST_Rebar)) {
-        //        Rebars.Add(new RebarElement(elem));
-        //    } else {
-        //        Formworks.Add(new FormworkElement(elem));
-        //    }
-        //}
-
-
-
-
         public void AddItem(ICommonElement elem) {
-
             if(elem is RebarElement) {
                 Rebars.Add(elem as RebarElement);
             } else {
                 Formworks.Add(elem as FormworkElement);
             }
         }
-
-
-
-
-
-
-
-
 
         /// <summary>
         /// Рассчитать объем бетона
@@ -161,7 +134,6 @@ namespace RevitReinforcementCoefficient.ViewModels {
             double sum = elements
                 .Select(e => e.Calculate())
                 .Sum();
-
             return Math.Round(sum, 2);
         }
     }

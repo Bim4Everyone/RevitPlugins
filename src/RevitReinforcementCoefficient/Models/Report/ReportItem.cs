@@ -23,14 +23,10 @@ namespace RevitReinforcementCoefficient.Models.Report {
         /// Добавляет id элемента в список ошибочных, если его там еще нет
         /// </summary>
         public void AddId(ElementId elementId) {
-
-            ElementIds.Add(elementId);
-            ElementIdsAsString += $", {elementId}";
-
-            //if(!ElementIds.Contains(elementId)) {
-            //    ElementIds.Add(elementId);
-            //    ElementIdsAsString += $", {elementId}";
-            //}
+            if(!ElementIds.Contains(elementId)) {
+                ElementIds.Add(elementId);
+                ElementIdsAsString += $", {elementId}";
+            }
         }
     }
 }
