@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
@@ -47,11 +48,12 @@ namespace RevitDeclarations.ViewModels {
         public void ImportConfig(object obj) {
             string path;
 
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog() {
-               Title = "Выберите Json файл" 
+            OpenFileDialog dialog = new OpenFileDialog() {
+               Title = "Выберите Json файл",
+               Filter = "json файлы (*.json)|*.json"
             };
 
-            if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+            if(dialog.ShowDialog() == DialogResult.OK) {
                 path = dialog.FileName;
                 List<RoomPriority> priorities = JsonImporter<RoomPriority>.Import(path);
 
