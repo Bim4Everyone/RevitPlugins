@@ -37,7 +37,8 @@
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
 
-            Text="{Binding SaveProperty}" />
+            Text="{Binding SaveProperty,
+                UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel
             Grid.Row="1"
