@@ -60,21 +60,21 @@
             Content="Приоритеты А101"
             Margin="10, 5"
             Height="25"
-            Command="{Binding SetCompanyPriorities}"/>
+            Command="{Binding SetDefaultConfigCommand}"/>
         <Button
             Grid.Row="2"
             Grid.Column="1"
             Content="Экспорт приоритетов"
             Margin="10, 5"
             Height="25"
-            Command="{Binding ExportPriorities}"/>
+            Command="{Binding ExportConfigCommand}"/>
         <Button
             Grid.Row="2"
             Grid.Column="2"
             Content="Импорт приоритетов"
             Margin="10, 5"
             Height="25"
-            Command="{Binding ImportPriorities}"/>
+            Command="{Binding ImportConfigCommand}"/>
 
         <DataGrid
             Grid.Row="3"

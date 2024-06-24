@@ -6,21 +6,17 @@ using System.Windows.Input;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Microsoft.WindowsAPICodePack.Dialogs;
+
 using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels {
     internal class PrioritiesViewModel : BaseViewModel {
         private PrioritiesConfig _prioritiesConfig;
-        private List<PriorityViewModel> _priorities;
+        private List<PriorityViewModel> _prioritiesVM;
 
         public PrioritiesViewModel() {
-            _prioritiesConfig = new DefaultPrioritiesConfig();
-
-            _priorities = _prioritiesConfig
-                .Priorities
-                .OrderBy(x => x.OrdinalNumber)
-                .Select(x => new PriorityViewModel(x))
-                .ToList();
+            SetDefaultConfig(new object());
 
             SetDefaultConfigCommand = new RelayCommand(SetDefaultConfig);
             ImportConfigCommand = new RelayCommand(ImportConfig);
@@ -32,23 +28,56 @@ namespace RevitDeclarations.ViewModels {
         public ICommand ExportConfigCommand { get; }
 
         public List<PriorityViewModel> PrioritiesVM {
-            get => _priorities;
-            set => RaiseAndSetIfChanged(ref _priorities, value);
+            get => _prioritiesVM;
+            set => RaiseAndSetIfChanged(ref _prioritiesVM, value);
         }
 
         public PrioritiesConfig PrioritiesConfig => _prioritiesConfig;
 
         public void SetDefaultConfig(object obj) {
             _prioritiesConfig = new DefaultPrioritiesConfig();
+
+            PrioritiesVM = _prioritiesConfig
+                .Priorities
+                .OrderBy(x => x.OrdinalNumber)
+                .Select(x => new PriorityViewModel(x))
+                .ToList();
         }
 
         public void ImportConfig(object obj) {
-            _prioritiesConfig = new PrioritiesConfig(PrioritiesVM
-                                        .Select(x => x.Priority)
-                                        .ToList());
+            string path;
+
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog() {
+               Title = "Выберите Json файл" 
+            };
+
+            if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                path = dialog.FileName;
+                List<RoomPriority> priorities = JsonImporter<RoomPriority>.Import(path);
+
+                PrioritiesVM = priorities
+                    .OrderBy(x => x.OrdinalNumber)
+                    .Select(x => new PriorityViewModel(x))
+                    .ToList();
+
+                _prioritiesConfig = new PrioritiesConfig(PrioritiesVM
+                                            .Select(x => x.Priority)
+                                            .ToList());
+            }
         }
 
         public void ExportConfig(object obj) {
+            string path;
+
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog() {
+                IsFolderPicker = true
+            };
+
+            if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                path = dialog.FileName + "\\ExportedConfig";
+                JsonExporter<RoomPriority>.Export(path, _prioritiesConfig.Priorities);
+                TaskDialog.Show("Декларации", "Файл конфигурации приоритетов создан");
+            }
 
         }
     }

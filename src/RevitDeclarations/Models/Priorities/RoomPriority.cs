@@ -1,5 +1,7 @@
 using System;
 
+using pyRevitLabs.Json;
+
 namespace RevitDeclarations.Models
 {
     public class RoomPriority {
@@ -14,12 +16,15 @@ namespace RevitDeclarations.Models
 
         public int OrdinalNumber { get; set; }
         public string Name { get; set; }
+        [JsonIgnore]
         public string NameLower => Name.ToLower();
         public bool IsSummer { get; set; }
         public bool IsLiving { get; set; }
-        public bool IsOther { get; set; }
-        public int MaxRoomAmount { get; set; }
+        [JsonIgnore]
+        public bool IsOther { get; set; } = false;
         public double AreaCoefficient { get; set; }
+        [JsonIgnore]
+        public int MaxRoomAmount { get; set; }
 
         public bool CheckName(string name) {
             if(string.Equals(name, this.Name, StringComparison.OrdinalIgnoreCase)) {
