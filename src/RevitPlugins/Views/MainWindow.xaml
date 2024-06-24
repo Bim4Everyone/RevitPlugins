@@ -13,7 +13,7 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    Title="MainWindow"
+    Title="{DynamicResource MainWindow.Title}"
     Height="450" Width="800"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
@@ -53,14 +53,14 @@
             <Button
                 Width="80"
                 Margin="10"
-                Content="ОК"
+                Content="{DynamicResource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <Button
                 Width="80"
                 Margin="10"
-                Content="Отмена"
+                Content="{DynamicResource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>

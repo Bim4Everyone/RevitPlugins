@@ -2,4 +2,16 @@
     <PropertyGroup>
         <UseDevExpress>true</UseDevExpress>
     </PropertyGroup>
+    <ItemGroup>
+      <Page Update="Localization\Language.ru-RU.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Localization\Language.en-US.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+    </ItemGroup>
 </Project>
