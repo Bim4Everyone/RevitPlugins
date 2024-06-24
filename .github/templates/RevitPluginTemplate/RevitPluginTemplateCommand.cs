@@ -1,21 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 
+using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
+using dosymep.WPF.Views;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
-using RevitPluginTemplate.Models;
-using RevitPluginTemplate.ViewModels;
-using RevitPluginTemplate.Views;
+using RevitPlugins.Models;
+using RevitPlugins.ViewModels;
+using RevitPlugins.Views;
 
 namespace RevitPluginTemplate {
     [Transaction(TransactionMode.Manual)]
@@ -35,9 +43,17 @@ namespace RevitPluginTemplate {
 				
 				kernel.Bind<MainViewModel>().ToSelf();
 				kernel.Bind<MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+                    .WithPropertyValue(nameof(Window.DataContext), 
+                        c => c.Kernel.Get<MainViewModel>())
+                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                        c => c.Kernel.Get<ILocalizationService>());
 				
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+                kernel.UseLocalization(
+                    $"/{assemblyName};component/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
+                
 				Notification(kernel.Get<MainWindow>());
 			}
         }

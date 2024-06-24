@@ -55,7 +55,7 @@ namespace RevitPluginTemplate.ViewModels {
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            SaveProperty = setting?.SaveProperty ?? "Привет Revit!";
+            SaveProperty = setting?.SaveProperty ??  _localizationService.GetLocalizedString("MainWindow.Hello");
         }
 
         private void SaveConfig() {
