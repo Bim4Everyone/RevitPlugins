@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
+    <!-- Пример перевода на голанский язык (google translate) -->
+    
     <system:String x:Key="MainWindow.Title">Voorbeeld commando</system:String>
     <system:String x:Key="MainWindow.Hello">Hallo Revit!</system:String>
     

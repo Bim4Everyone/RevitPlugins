@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
+    <!-- Пример перевода на венгерский язык (google translate) -->
+    
     <system:String x:Key="MainWindow.Title">Példa parancs</system:String>
     <system:String x:Key="MainWindow.Hello">Helló Revit!</system:String>
     

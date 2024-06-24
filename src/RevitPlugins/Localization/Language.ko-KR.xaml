@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
+    <!-- Пример перевода на корейский язык (google translate) -->
+    
     <system:String x:Key="MainWindow.Title">예제 명령</system:String>
     <system:String x:Key="MainWindow.Hello">안녕하세요 Revit!</system:String>
     

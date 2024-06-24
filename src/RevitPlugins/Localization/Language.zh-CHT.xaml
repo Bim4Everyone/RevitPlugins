@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
+    <!-- Пример перевода на китайский традиционный язык (google translate) -->
+    
     <system:String x:Key="MainWindow.Title">命令範例</system:String>
     <system:String x:Key="MainWindow.Hello">你好 Revit!</system:String>
     
