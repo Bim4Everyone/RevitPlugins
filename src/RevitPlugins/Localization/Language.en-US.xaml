@@ -6,6 +6,7 @@
     
     <system:String x:Key="MainWindow.Title">Sample command</system:String>
     <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
+    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>

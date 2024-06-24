@@ -6,6 +6,7 @@
     
     <system:String x:Key="MainWindow.Title">Przykładowe polecenie</system:String>
     <system:String x:Key="MainWindow.Hello">Cześć Revit!</system:String>
+    <system:String x:Key="MainWindow.HelloCheck">Wprowadź wartość właściwości do zapisania.</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Anulować</system:String>

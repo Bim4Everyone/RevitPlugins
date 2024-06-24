@@ -6,6 +6,7 @@
     
     <system:String x:Key="MainWindow.Title">命令示例</system:String>
     <system:String x:Key="MainWindow.Hello">你好 Revit!</system:String>
+    <system:String x:Key="MainWindow.HelloCheck">输入要保存的属性的值。</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">取消</system:String>

@@ -6,6 +6,8 @@
     
     <system:String x:Key="MainWindow.Title">Příklad příkazu</system:String>
     <system:String x:Key="MainWindow.Hello">Ahoj Revit!</system:String>
+    <system:String x:Key="MainWindow.HelloCheck">Zadejte hodnotu vlastnosti, kterou chcete uložit.</system:String>
+    
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Zrušit</system:String>

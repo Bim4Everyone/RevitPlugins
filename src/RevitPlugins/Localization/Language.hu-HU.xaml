@@ -6,6 +6,7 @@
     
     <system:String x:Key="MainWindow.Title">Példa parancs</system:String>
     <system:String x:Key="MainWindow.Hello">Helló Revit!</system:String>
+    <system:String x:Key="MainWindow.HelloCheck">Adja meg a menteni kívánt tulajdonság értékét.</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Mégse</system:String>

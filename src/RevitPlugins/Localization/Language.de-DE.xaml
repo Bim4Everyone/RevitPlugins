@@ -6,6 +6,7 @@
     
     <system:String x:Key="MainWindow.Title">Beispielbefehl</system:String>
     <system:String x:Key="MainWindow.Hello">Hallo Revit!</system:String>
+    <system:String x:Key="MainWindow.HelloCheck">Geben Sie einen Wert für die zu speichernde Eigenschaft ein.</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Stornierung</system:String>
