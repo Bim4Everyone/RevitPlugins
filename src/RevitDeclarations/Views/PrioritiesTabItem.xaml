@@ -84,7 +84,7 @@
             AutoGenerateColumns="False"
             CanUserAddRows="False"
             CanUserDeleteRows="False"
-            ItemsSource="{Binding Priorities}">
+            ItemsSource="{Binding PrioritiesVM}">
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Header="Номер"

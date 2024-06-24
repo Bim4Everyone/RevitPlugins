@@ -7,54 +7,45 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class DeclarationSettings {
-        private readonly ICollection<RoomPriority> _roomPriorities;
-        private readonly IReadOnlyCollection<string> _mainNames;
-        private readonly PrioritiesConfig _prioritiesConfig;
-
-        public DeclarationSettings() {
-            _prioritiesConfig = new PrioritiesConfig();
-            _roomPriorities = _prioritiesConfig.Priorities;
-
-            _mainNames = _roomPriorities
-                .Select(x => x.NameLower)
-                .ToList();
-        }
-
-        public ICollection<RoomPriority> Priorities => _roomPriorities;
-        public PrioritiesConfig PrioritiesConfig => _prioritiesConfig;
-        public IReadOnlyCollection<RoomPriority> UsedPriorities => _roomPriorities
+        public ICollection<RoomPriority> Priorities => PrioritiesConfig.Priorities;
+        public PrioritiesConfig PrioritiesConfig { get; set; }
+        public IReadOnlyCollection<RoomPriority> UsedPriorities => PrioritiesConfig
+            .Priorities
             .Where(x => x.MaxRoomAmount > 0)
             .ToList();
 
         public Phase SelectedPhase { get; set; }
         public int Accuracy { get; set; }
         public bool LoadUtp { get; set; }
-        public IReadOnlyCollection<string> MainRoomNames => _mainNames;
-        public string[] BannedRoomNames => _prioritiesConfig.BannedRoomNames;
-        public ParametersViewModel ViewModel { get; set; }
+        public IReadOnlyCollection<string> MainRoomNames => PrioritiesConfig
+                .Priorities
+                .Select(x => x.NameLower)
+                .ToList();
+        public string[] BannedRoomNames => PrioritiesConfig.BannedRoomNames;
+        public ParametersViewModel ParametersVM { get; set; }
 
-        public Parameter FilterRoomsParam => ViewModel.SelectedFilterRoomsParam;
-        public string FilterRoomsValue => ViewModel.FilterRoomsValue;
-        public Parameter GroupingBySectionParam => ViewModel.SelectedGroupingBySectionParam;
-        public Parameter GroupingByGroupParam => ViewModel.SelectedGroupingByGroupParam;
-        public Parameter MultiStoreyParam => ViewModel.SelectedMultiStoreyParam;
+        public Parameter FilterRoomsParam => ParametersVM.SelectedFilterRoomsParam;
+        public string FilterRoomsValue => ParametersVM.FilterRoomsValue;
+        public Parameter GroupingBySectionParam => ParametersVM.SelectedGroupingBySectionParam;
+        public Parameter GroupingByGroupParam => ParametersVM.SelectedGroupingByGroupParam;
+        public Parameter MultiStoreyParam => ParametersVM.SelectedMultiStoreyParam;
 
-        public Parameter ApartmentFullNumberParam => ViewModel.SelectedFullApartNumParam;
-        public Parameter DepartmentParam => ViewModel.SelectedDepartmentParam;
-        public Parameter LevelParam => ViewModel.SelectedLevelParam;
-        public Parameter SectionParam => ViewModel.SelectedSectionParam;
-        public Parameter BuildingParam => ViewModel.SelectedBuildingParam;
-        public Parameter ApartmentNumberParam => ViewModel.SelectedApartNumParam;
-        public Parameter ApartmentAreaParam => ViewModel.SelectedApartAreaParam;
-        public Parameter ApartmentAreaCoefParam => ViewModel.SelectedApartAreaCoefParam;
-        public Parameter ApartmentAreaLivingParam => ViewModel.SelectedApartAreaLivingParam;
-        public Parameter RoomsAmountParam => ViewModel.SelectedRoomsAmountParam;
-        public string ProjectName => ViewModel.ProjectName;
-        public Parameter ApartmentAreaNonSumParam => ViewModel.SelectedApartAreaNonSumParam;
-        public Parameter RoomsHeightParam => ViewModel.SelectedRoomsHeightParam;
+        public Parameter ApartmentFullNumberParam => ParametersVM.SelectedFullApartNumParam;
+        public Parameter DepartmentParam => ParametersVM.SelectedDepartmentParam;
+        public Parameter LevelParam => ParametersVM.SelectedLevelParam;
+        public Parameter SectionParam => ParametersVM.SelectedSectionParam;
+        public Parameter BuildingParam => ParametersVM.SelectedBuildingParam;
+        public Parameter ApartmentNumberParam => ParametersVM.SelectedApartNumParam;
+        public Parameter ApartmentAreaParam => ParametersVM.SelectedApartAreaParam;
+        public Parameter ApartmentAreaCoefParam => ParametersVM.SelectedApartAreaCoefParam;
+        public Parameter ApartmentAreaLivingParam => ParametersVM.SelectedApartAreaLivingParam;
+        public Parameter RoomsAmountParam => ParametersVM.SelectedRoomsAmountParam;
+        public string ProjectName => ParametersVM.ProjectName;
+        public Parameter ApartmentAreaNonSumParam => ParametersVM.SelectedApartAreaNonSumParam;
+        public Parameter RoomsHeightParam => ParametersVM.SelectedRoomsHeightParam;
 
-        public Parameter RoomAreaParam => ViewModel.SelectedRoomAreaParam;
-        public Parameter RoomAreaCoefParam => ViewModel.SelectedRoomAreaCoefParam;
+        public Parameter RoomAreaParam => ParametersVM.SelectedRoomAreaParam;
+        public Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaCoefParam;
 
         public IReadOnlyCollection<Parameter> AllParameters => new List<Parameter>() {
             FilterRoomsParam,
@@ -78,10 +69,10 @@ namespace RevitDeclarations.Models {
         };
 
         public void UpdatePriorities(List<string> newNames) {
-            int prioritiesLength = _roomPriorities.Count;
+            int prioritiesLength = PrioritiesConfig.Priorities.Count;
             newNames.Sort();
             foreach(var name in newNames) {
-                _roomPriorities.Add(new RoomPriority(prioritiesLength, name) {
+                PrioritiesConfig.Priorities.Add(new RoomPriority(prioritiesLength, name) {
                     IsOther = true
                 });
                 prioritiesLength++;

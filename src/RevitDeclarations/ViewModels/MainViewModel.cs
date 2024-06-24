@@ -58,7 +58,7 @@ namespace RevitDeclarations.ViewModels {
             }
 
             _parametersViewModel = new ParametersViewModel(_revitRepository, this);
-            _prioritiesViewModel = new PrioritiesViewModel(_settings.Priorities);
+            _prioritiesViewModel = new PrioritiesViewModel();
 
             SelectFolderCommand = new RelayCommand(SelectFolder);
             ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
@@ -122,7 +122,8 @@ namespace RevitDeclarations.ViewModels {
             int.TryParse(_accuracy, out int accuracy);
             _settings.Accuracy = accuracy;
             _settings.SelectedPhase = _selectedPhase;
-            _settings.ViewModel = ParametersViewModel;
+            _settings.ParametersVM = ParametersViewModel;
+            _settings.PrioritiesConfig = _prioritiesViewModel.PrioritiesConfig;
             _settings.LoadUtp = _loadUtp;
 
             List<RevitDocumentViewModel> checkedDocuments = _revitDocuments
@@ -195,7 +196,7 @@ namespace RevitDeclarations.ViewModels {
             }
 
             if(_loadUtp) {
-                // Проверка 6. Проверка поректа для корректной выгрузки УТП.
+                // Проверка 6. Проверка проекта для корректной выгрузки УТП.
                 IEnumerable<ErrorsListViewModel> utpErrors = projects
                     .Select(x => x.CheckUtpWarnings())
                     .SelectMany(x => x)

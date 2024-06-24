@@ -10,7 +10,7 @@ namespace RevitDeclarations.Models {
     internal class UtpCalculator {
         private readonly DeclarationProject _project;
         private readonly DeclarationSettings _settings;
-        private readonly PrioritiesConfig _priorities;
+        private readonly DefaultPrioritiesConfig _priorities;
 
         private readonly bool _hasNullAreas;
         private readonly bool _hasBannedNames;
@@ -31,7 +31,7 @@ namespace RevitDeclarations.Models {
             _hasBannedNames = GetBannedUtpRoomNames().Any();
             _roomsWithBathFamily = GetRoomsWithBath();
 
-            _priorities = _settings.PrioritiesConfig;
+            _priorities = _settings.PrioritiesConfig as DefaultPrioritiesConfig;
         }
 
         public void CalculateRoomsForUtp() {
