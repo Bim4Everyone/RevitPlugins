@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace RevitDeclarations.Models {
     internal class RoomAreaCalculator {
         private readonly PrioritiesConfig _priorConfig;
@@ -15,17 +9,26 @@ namespace RevitDeclarations.Models {
         }
 
         public double CalculateAreaCoefRevit() {
-            double areaCoefRevit;
+            double coef = _priorConfig.GetPriorityByNameOrDefault(_room.Name).AreaCoefficient;
+            return _room.AreaRevit * coef;
+        }
 
-            if(_priorConfig.Balcony.CheckName(_room.Name) || _priorConfig.Terrace.CheckName(_room.Name)) {
-                areaCoefRevit = _room.AreaRevit * _priorConfig.Balcony.AreaCoefficient;
-            } else if(_priorConfig.Loggia.CheckName(_room.Name)) {
-                areaCoefRevit = _room.AreaRevit * _priorConfig.Loggia.AreaCoefficient;
-            } else {
-                areaCoefRevit = _room.AreaRevit;
+        public double CalculateAreaLivingRevit() {
+            bool isLiving = _priorConfig.GetPriorityByNameOrDefault(_room.Name).IsLiving;
+
+            if (isLiving) {
+                return _room.AreaRevit;
             }
+            return 0;
+        }
 
-            return areaCoefRevit;
+        public double CalculateAreaNonSummerRevit() {
+            bool isSummer = _priorConfig.GetPriorityByNameOrDefault(_room.Name).IsSummer;
+
+            if(!isSummer) {
+                return _room.AreaRevit;
+            }
+            return 0;
         }
     }
 }

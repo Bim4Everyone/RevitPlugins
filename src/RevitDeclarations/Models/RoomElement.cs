@@ -11,6 +11,8 @@ namespace RevitDeclarations.Models
 
         private readonly double _areaRevit;
         private readonly double _areaCoefRevit;
+        private readonly double _areaLivingRevit;
+        private readonly double _areaNonSummerRevit;
         private readonly double _area;
         private readonly double _areaCoef;
 
@@ -22,6 +24,8 @@ namespace RevitDeclarations.Models
             _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.Accuracy);
             RoomAreaCalculator areaCalculator = new RoomAreaCalculator(settings, this);
             _areaCoefRevit = areaCalculator.CalculateAreaCoefRevit();
+            _areaLivingRevit = areaCalculator.CalculateAreaLivingRevit();
+            _areaNonSummerRevit = areaCalculator.CalculateAreaNonSummerRevit();
 
             _area = GetAreaParamValue(settings.RoomAreaParam, settings.Accuracy);
             _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.Accuracy);
@@ -43,6 +47,10 @@ namespace RevitDeclarations.Models
         public double AreaRevit => _areaRevit;
         [JsonIgnore]
         public double AreaCoefRevit => _areaCoefRevit;
+        [JsonIgnore]
+        public double AreaLivingRevit => _areaLivingRevit;
+        [JsonIgnore]
+        public double AreaNonSummerRevit => _areaNonSummerRevit;
         [JsonProperty("area")]
         public double Area => _area;
         [JsonProperty("area_k")]

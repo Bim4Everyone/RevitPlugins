@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,8 +40,12 @@ namespace RevitDeclarations.Models {
         public Phase Phase => _phase;
 
         private IReadOnlyCollection<RoomElement> FilterApartmentRooms(IEnumerable<RoomElement> rooms) {
+            Parameter filterParam = _settings.FilterRoomsParam;
+            string filterValue = _settings.FilterRoomsValue;
+            StringComparison ignorCase = StringComparison.OrdinalIgnoreCase;
+
             return rooms
-                .Where(x => x.GetTextParamValue(_settings.FilterRoomsParam) == _settings.FilterRoomsValue.ToLower())
+                .Where(x => string.Equals(x.GetTextParamValue(filterParam), filterValue, ignorCase))
                 .ToList();
         }
 

@@ -129,13 +129,11 @@ namespace RevitDeclarations.Models {
                 .Sum();
 
             _areaLivingRevit = _rooms
-                .Where(x => _priorConfig.LivingRoom.CheckName(x.Name))
-                .Select(x => x.AreaRevit)
+                .Select(x => x.AreaLivingRevit)
                 .Sum();
 
             _areaNonSummerRevit = _rooms
-                .Where(x => x.AreaRevit == x.AreaCoefRevit)
-                .Select(x => x.AreaRevit)
+                .Select(x => x.AreaNonSummerRevit)
                 .Sum();
         }
 

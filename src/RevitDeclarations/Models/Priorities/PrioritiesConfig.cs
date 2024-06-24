@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RevitDeclarations.Models
 {
@@ -86,5 +87,14 @@ namespace RevitDeclarations.Models
 
         public ICollection<RoomPriority> Priorities => _priorities;
         public string[] BannedRoomNames => _bannedNames;
+
+        // Возвращает приоритет из исходного списка приоритетов.
+        // Если приоритет не был найден, то возращает условный приоритет
+        // с номером 0, полученным именем и коэффициентом равным 1.
+        public RoomPriority GetPriorityByNameOrDefault(string name) {
+            return _priorities
+                .Where(x => x.CheckName(name))
+                .FirstOrDefault() ?? new RoomPriority(0, name);
+        }
     }
 }
