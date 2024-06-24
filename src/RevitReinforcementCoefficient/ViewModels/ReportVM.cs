@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -14,40 +15,27 @@ namespace RevitReinforcementCoefficient.ViewModels {
     internal class ReportVM : BaseViewModel {
         private readonly IReportService _reportService;
         private readonly RevitRepository _revitRepository;
-        private List<ReportItem> _reportItems = new List<ReportItem>();
+        private readonly DesignTypeListVM _designTypeListVM;
 
-        public ReportVM(IReportService reportService, RevitRepository revitRepository) {
+        private ObservableCollection<ReportItem> _reportItems = new ObservableCollection<ReportItem>();
+
+        public ReportVM(IReportService reportService, RevitRepository revitRepository, DesignTypeListVM designTypeListVM) {
             _reportService = reportService;
             _revitRepository = revitRepository;
+            _designTypeListVM = designTypeListVM;
 
-            LoadViewCommand = RelayCommand.Create(LoadView);
+            _designTypeListVM.UpdateReportData += UpdateReportData;
             ShowSelectedErrorElementsCommand = RelayCommand.Create(ShowSelectedErrorElements, CanShowSelectedErrorElements);
         }
 
-        public ICommand LoadViewCommand { get; }
         public ICommand ShowSelectedErrorElementsCommand { get; }
 
-        public List<ReportItem> ReportItems {
+        public ObservableCollection<ReportItem> ReportItems {
             get => _reportItems;
             set => this.RaiseAndSetIfChanged(ref _reportItems, value);
         }
 
-
-        private void LoadView() {
-            ReportItems = _reportService.ReportItems;
-        }
-
-
-
-        //internal void Add(string paramName, ElementId elementId) {
-        //    ReportItem error = ReportItems.FirstOrDefault(e => e.ErrorName.Contains($"\"{paramName}\""));
-
-        //    if(error is null) {
-        //        ReportItems.Add(new ReportItem(paramName, elementId));
-        //    } else {
-        //        error.AddIdIfNotContained(elementId);
-        //    }
-        //}
+        private void UpdateReportData() => ReportItems = new ObservableCollection<ReportItem>(_reportService.ReportItems);
 
         private void ShowSelectedErrorElements() {
             List<ElementId> ids = new List<ElementId>();

@@ -9,5 +9,9 @@ namespace RevitReinforcementCoefficient.Views {
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
         }
+
+        private void ButtonTestForHide_Click(object sender, RoutedEventArgs e) {
+            Hide();
+        }
     }
 }

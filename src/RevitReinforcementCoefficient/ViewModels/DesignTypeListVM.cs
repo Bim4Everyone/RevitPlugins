@@ -17,22 +17,26 @@ using RevitReinforcementCoefficient.Views;
 
 namespace RevitReinforcementCoefficient.ViewModels {
     internal class DesignTypeListVM : BaseViewModel {
+        public delegate void Notify();
+        public event Notify UpdateReportData;
+
         private readonly DesignTypeListAnalyzer _designTypeListAnalyzer;
         private readonly DesignTypeAnalyzer _designTypeAnalyzer;
         private readonly IReportService _reportService;
-        //private readonly ReportWindow _reportWindow;
+        private readonly ReportWindow _reportWindow;
 
         private List<DesignTypeVM> _designTypes = new List<DesignTypeVM>();
 
         public DesignTypeListVM(
             DesignTypeListAnalyzer designTypeListAnalyzer,
             DesignTypeAnalyzer designTypeAnalyzer,
-            IReportService reportService) {
+            IReportService reportService,
+            ReportWindow reportWindow) {
 
             _designTypeListAnalyzer = designTypeListAnalyzer;
             _designTypeAnalyzer = designTypeAnalyzer;
             _reportService = reportService;
-            //_reportWindow = reportWindow;
+            _reportWindow = reportWindow;
         }
         public List<DesignTypeVM> DesignTypes {
             get => _designTypes;
@@ -51,11 +55,12 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         private void ShowReportIfNeed() {
             if(_reportService.ReportItems.Count > 0) {
-                var reportWindow = new ReportWindow();
-                reportWindow.ShowDialog();
+                UpdateReportData?.Invoke();
+                _reportWindow.ShowDialog();
                 _reportService.ClearReportItems();
             }
         }
+
 
         /// <summary>
         /// Используется в качестве аргумента предиката для фильтрации списка по выбранному комплекту документации

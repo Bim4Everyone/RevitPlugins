@@ -10,21 +10,13 @@
         xmlns:vms="clr-namespace:RevitReinforcementCoefficient.ViewModels"
         
         mc:Ignorable="d"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         
         Title="Отчет об ошибках" 
         Height="450" Width="800"
         MinHeight="450" MinWidth="800"
         
         d:DataContext="{d:DesignInstance vms:ReportVM, IsDesignTimeCreatable=False}">
-
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction
-                Command="{Binding LoadViewCommand}"
-                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -112,7 +104,7 @@
                 Width="100"
                 Content="Закрыть"
                 IsDefault="True"
-                Click="ButtonOk_Click"/>
+                Click="ButtonTestForHide_Click"/>
         </StackPanel>
     </Grid>
 </Window>

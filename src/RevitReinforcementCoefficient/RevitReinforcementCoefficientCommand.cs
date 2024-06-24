@@ -34,7 +34,9 @@ namespace RevitReinforcementCoefficient {
                     .InSingletonScope();
                 kernel.Bind<ReportWindow>()
                     .ToSelf()
+                    .InSingletonScope()
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportVM>());
+
                 kernel.Bind<ParamUtils>()
                     .ToSelf()
                     .InSingletonScope();

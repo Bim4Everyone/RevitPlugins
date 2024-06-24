@@ -34,9 +34,6 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
         }
 
 
-
-        //public ParamUtils Utils { get; private set; }
-
         /// <summary>
         /// Проверяет наличие параметров у опалубки по типу конструкции
         /// </summary>
@@ -48,56 +45,6 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
             }
             designType.FormParamsChecked = true;
         }
-
-
-
-        ///// <summary>
-        ///// Проверяет наличие параметров у опалубки по типу конструкции
-        ///// </summary>
-        //public List<ReportItemSimple> CheckParamsInFormworksTEST(DesignTypeVM designType) {
-        //    List<ReportItemSimple> summaryReport = null;
-
-        //    foreach(ICommonElement elem in designType.Formworks) {
-        //        List<ReportItemSimple> report = Utils.HasParamsAnywhereTEST(elem.RevitElement, _paramsForFormElements);
-        //        if(report != null) {
-        //            designType.HasErrors = true;
-        //            summaryReport = summaryReport ?? new List<ReportItemSimple>();
-        //            summaryReport.AddRange(report);
-        //        }
-        //    }
-        //    designType.FormParamsChecked = true;
-        //    return summaryReport;
-        //}
-
-
-
-        ///// <summary>
-        ///// Проверяет наличие параметров у арматуры по типу конструкции
-        ///// </summary>
-        //public static void CheckParamsInRebars(DesignTypeVM designType, ReportVM report) {
-        //    foreach(ICommonElement rebar in designType.Rebars) {
-        //        // Далее проверяем параметры, которые должны быть у всех элементов арматуры
-        //        if(!ParamUtils.HasParamsAnywhere(rebar.RevitElement, _paramsForRebars, report)) {
-        //            designType.HasErrors = true;
-        //        }
-
-        //        // Здесь проверяем разные параметры, которые должны быть у системной/IFC арматуры
-        //        // Если элемент класса Rebar (т.е. системная арматура)
-        //        if(rebar is FamilyInstance) {
-        //            if(!ParamUtils.HasParamsAnywhere(rebar.RevitElement, _paramsForIfcRebars, report)) {
-        //                designType.HasErrors = true;
-        //            }
-        //        } else {
-        //            if(!ParamUtils.HasParamsAnywhere(rebar.RevitElement, _paramsForSysRebars, report)) {
-        //                designType.HasErrors = true;
-        //            }
-        //        }
-        //    }
-        //    designType.RebarParamsChecked = true;
-        //}
-
-
-
 
 
         /// <summary>
@@ -124,14 +71,5 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
             }
             designType.RebarParamsChecked = true;
         }
-
-        //private static void CheckElement(List<ReportItemSimple> summaryReport, DesignTypeVM designType, ICommonElement element, List<string> paramsForCheck) {
-        //    var report = ParamUtils.HasParamsAnywhereTEST(element.RevitElement, paramsForCheck);
-        //    if(report != null) {
-        //        designType.HasErrors = true;
-        //        summaryReport = summaryReport ?? new List<ReportItemSimple>();
-        //        summaryReport.AddRange(report);
-        //    }
-        //}
     }
 }

@@ -43,8 +43,6 @@ namespace RevitReinforcementCoefficient.Models {
                     return false;
                 }
             }
-
-            _reportService.AddReportItem("Все окей, это тест!", element.Id);
             return true;
         }
 
