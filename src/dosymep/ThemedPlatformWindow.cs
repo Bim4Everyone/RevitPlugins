@@ -67,10 +67,15 @@ namespace dosymep.WPF.Views {
         /// Предоставляет доступ к текущему языку платформы.
         /// </summary>
         protected ILanguageService LanguageService { get; }
+        
         /// <summary>
         /// Предоставляет доступ к настройкам темы платформы.
         /// </summary>
         protected IUIThemeService UIThemeService { get; }
+        
+        /// <summary>
+        /// Сервис по обновлению темы у окна.
+        /// </summary>
         protected IUIThemeUpdaterService UIThemeUpdaterService { get; }
 
         protected T GetPlatformService<T>() {
