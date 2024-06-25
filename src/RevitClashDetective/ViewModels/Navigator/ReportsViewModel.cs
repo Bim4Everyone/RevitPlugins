@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -19,6 +19,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
     internal class ReportsViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
+        private bool _elementsIsolationEnabled = true;
         private bool _openFromClashDetector;
         private ReportViewModel _selectedFile;
         private ObservableCollection<ReportViewModel> _reports;
@@ -33,30 +34,38 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 InitializeFiles(selectedFile);
             }
 
-            OpenClashDetectorCommand = new RelayCommand(OpenClashDetector, p => OpenFromClashDetector);
-            LoadCommand = new RelayCommand(Load);
-            DeleteCommand = new RelayCommand(Delete, CanDelete);
+            OpenClashDetectorCommand = RelayCommand.Create(OpenClashDetector, () => OpenFromClashDetector);
+            LoadCommand = RelayCommand.Create(Load);
+            DeleteCommand = RelayCommand.Create(Delete, CanDelete);
+            SelectClashCommand = RelayCommand.Create<ClashViewModel>(SelectClash, CanSelectClash);
         }
 
+
+        public ICommand SelectClashCommand { get; }
         public ICommand OpenClashDetectorCommand { get; }
         public ICommand LoadCommand { get; }
         public ICommand DeleteCommand { get; }
 
         public ObservableCollection<ReportViewModel> Reports {
             get => _reports;
-            set => this.RaiseAndSetIfChanged(ref _reports, value);
+            set => RaiseAndSetIfChanged(ref _reports, value);
         }
 
         public bool IsColumnVisible => Reports != null;
 
         public bool OpenFromClashDetector {
             get => _openFromClashDetector;
-            set => this.RaiseAndSetIfChanged(ref _openFromClashDetector, value);
+            set => RaiseAndSetIfChanged(ref _openFromClashDetector, value);
         }
 
         public ReportViewModel SelectedReport {
             get => _selectedFile;
-            set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
+            set => RaiseAndSetIfChanged(ref _selectedFile, value);
+        }
+
+        public bool ElementsIsolationEnabled {
+            get => _elementsIsolationEnabled;
+            set => RaiseAndSetIfChanged(ref _elementsIsolationEnabled, value);
         }
 
 
@@ -78,16 +87,15 @@ namespace RevitClashDetective.ViewModels.Navigator {
             }
         }
 
-        private void OpenClashDetector(object p) {
-            void action() {
+        private void OpenClashDetector() {
+            _revitRepository.DoAction(() => {
                 var command = new DetectiveClashesCommand();
                 command.ExecuteCommand(_revitRepository.UiApplication);
-            }
-            _revitRepository.DoAction(action);
+            });
         }
 
 
-        private void Load(object p) {
+        private void Load() {
             var openWindow = GetPlatformService<IOpenFileDialogService>();
             openWindow.Filter = "AutodeskClashReport (*.html)|*.html|PluginClashReport (*.json)|*.json";
 
@@ -110,7 +118,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SelectedReport = report;
         }
 
-        private void Delete(object p) {
+        private void Delete() {
             var mb = GetPlatformService<IMessageBoxService>();
             if(mb.Show("Вы уверены, что хотите удалить файл?", "BIM", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes) {
                 DeleteConfig(SelectedReport.GetUpdatedConfig());
@@ -125,6 +133,17 @@ namespace RevitClashDetective.ViewModels.Navigator {
             }
         }
 
-        private bool CanDelete(object p) => SelectedReport != null;
+        private bool CanDelete() => SelectedReport != null;
+
+        private void SelectClash(ClashViewModel clash) {
+            _revitRepository.SelectAndShowElement(clash.Clash, ElementsIsolationEnabled);
+        }
+
+        private bool CanSelectClash(ClashViewModel p) {
+            return p != null
+                && p.Clash != null
+                && p.Clash.MainElement != null
+                && p.Clash.OtherElement != null;
+        }
     }
 }

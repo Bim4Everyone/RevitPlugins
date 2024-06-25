@@ -1,0 +1,222 @@
+<base:ThemedPlatformWindow x:Class="RevitSectionsConstructor.Views.MainWindow"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:base="clr-namespace:dosymep.WPF.Views"
+                           xmlns:local="clr-namespace:RevitSectionsConstructor.Views"
+                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
+                           xmlns:vms="clr-namespace:RevitSectionsConstructor.ViewModels"
+                           xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                           xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                           mc:Ignorable="d"
+                           WindowStartupLocation="CenterOwner"
+                           Title="MainWindow"
+                           Height="700"
+                           Width="1100"
+                           MinHeight="200"
+                           MinWidth="300"
+                           d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <dxmvvm:Interaction.Behaviors>
+        <common:AttachServiceBehavior AttachableService="{Binding SaveFileDialogService}" />
+        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
+    </dxmvvm:Interaction.Behaviors>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Margin="10 10 10 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="45" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="VerticalAlignment"
+                            Value="Center" />
+                    <Setter Property="HorizontalAlignment"
+                            Value="Left" />
+                </Style>
+            </Grid.Resources>
+
+            <DockPanel Grid.Row="0"
+                       Grid.ColumnSpan="3"
+                       HorizontalAlignment="Right">
+                <DockPanel.Resources>
+                    <Style TargetType="TextBlock"
+                           x:Key="Hint">
+                        <Setter Property="Visibility"
+                                Value="Collapsed" />
+                        <Setter Property="VerticalAlignment"
+                                Value="Center" />
+                        <Setter Property="HorizontalAlignment"
+                                Value="Right" />
+                        <Setter Property="Text"
+                                Value="Путь и имя для сохранения модели" />
+                        <Setter Property="FontStyle"
+                                Value="Italic" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=SavePath, Path=Text}"
+                                         Value="{x:Static sys:String.Empty}">
+                                <Setter Property="Visibility"
+                                        Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DockPanel.Resources>
+                <TextBlock Style="{StaticResource Hint}" />
+                <TextBlock x:Name="SavePath"
+                           Text="{Binding Path}"
+                           HorizontalAlignment="Right" />
+                <dx:SimpleButton Width="80"
+                                 Height="25"
+                                 Margin="5 0 0 0"
+                                 HorizontalAlignment="Right"
+                                 Content="Обзор"
+                                 Command="{Binding SelectPathCommand}" />
+            </DockPanel>
+
+            <dxg:GridControl x:Name="LeftGrid"
+                             Grid.Row="1"
+                             Grid.Column="0"
+                             AutoGenerateColumns="None"
+                             DefaultSorting="Level"
+                             ItemsSource="{Binding GroupsNotForCopy}"
+                             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                             VirtualizingPanel.VirtualizationMode="Recycling"
+                             VirtualizingPanel.IsVirtualizing="True"
+                             SelectionMode="Cell">
+                <dxg:GridControl.View>
+                    <dxg:TableView VerticalScrollbarVisibility="Auto"
+                                   HorizontalScrollbarVisibility="Auto">
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn Header="Группа"
+                                    FieldName="Name"
+                                    Width="1*"
+                                    ReadOnly="True"
+                                    AllowEditing="False" />
+                    <dxg:GridColumn Header="Текущий этаж"
+                                    Width="1*"
+                                    FieldName="Level.Name"
+                                    ReadOnly="True"
+                                    AllowEditing="False" />
+                    <dxg:GridColumn Header="Удалить группу"
+                                    FieldName="DeleteGroup"
+                                    Width="120"
+                                    ReadOnly="False">
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate>
+                                <dxe:CheckEdit IsChecked="{Binding RowData.Row.DeleteGroup}"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="1"
+                        VerticalAlignment="Center">
+                <dx:SimpleButton Margin="1"
+                                 CommandParameter="{Binding ElementName=LeftGrid, Path=SelectedItems}"
+                                 Command="{Binding MoveGroupsToCopyCommand}"
+                                 Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Arrow1Right.svg'}" />
+                <dx:SimpleButton Margin="1"
+                                 CommandParameter="{Binding ElementName=RightGrid, Path=SelectedItems}"
+                                 Command="{Binding MoveGroupsFromCopyCommand}"
+                                 Glyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Arrow1Left.svg'}" />
+            </StackPanel>
+
+            <dxg:GridControl x:Name="RightGrid"
+                             Grid.Row="1"
+                             Grid.Column="2"
+                             AutoGenerateColumns="None"
+                             DefaultSorting="Level"
+                             ItemsSource="{Binding GroupsForCopy}"
+                             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                             VirtualizingPanel.VirtualizationMode="Recycling"
+                             VirtualizingPanel.IsVirtualizing="True"
+                             SelectionMode="Cell">
+                <dxg:GridControl.View>
+                    <dxg:TableView VerticalScrollbarVisibility="Auto"
+                                   HorizontalScrollbarVisibility="Auto">
+                    </dxg:TableView>
+                </dxg:GridControl.View>
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn Header="Группа"
+                                    FieldName="Name"
+                                    Width="1*"
+                                    ReadOnly="True"
+                                    AllowEditing="False" />
+                    <dxg:GridColumn Header="Текущий этаж"
+                                    Width="1*"
+                                    FieldName="Level.Name"
+                                    ReadOnly="True"
+                                    AllowEditing="False" />
+                    <dxg:GridColumn Header="Этаж стартовый"
+                                    Width="1*"
+                                    ReadOnly="True">
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate>
+                                <dxe:ComboBoxEdit IsTextEditable="False"
+                                                  ItemsSource="{Binding RowData.Row.EnabledBottomLevels}"
+                                                  EditValue="{Binding RowData.Row.SelectedBottomLevel, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+                    <dxg:GridColumn Header="Этаж итоговый"
+                                    Width="1*"
+                                    ReadOnly="False">
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate>
+                                <dxe:ComboBoxEdit IsTextEditable="False"
+                                                  AllowRejectUnknownValues="True"
+                                                  ItemsSource="{Binding RowData.Row.EnabledTopLevels}"
+                                                  EditValue="{Binding RowData.Row.SelectedTopLevel, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
+        </Grid>
+
+        <StackPanel Grid.Row="1"
+                    Height="45"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <TextBlock Margin="10"
+                       Foreground="Orange"
+                       VerticalAlignment="Center"
+                       Text="{Binding ErrorText}" />
+
+            <dx:SimpleButton Margin="10"
+                             Width="80"
+                             Height="25"
+                             Content="ОК"
+                             IsDefault="True"
+                             Click="ButtonOk_Click"
+                             Command="{Binding AcceptViewCommand}" />
+
+            <dx:SimpleButton Margin="10"
+                             Width="80"
+                             Height="25"
+                             Content="Отмена"
+                             IsCancel="True"
+                             Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:ThemedPlatformWindow>

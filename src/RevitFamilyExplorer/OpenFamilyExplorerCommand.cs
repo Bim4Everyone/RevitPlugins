@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace RevitFamilyExplorer {
         }
         
         protected override void Execute(UIApplication uiApplication) {
-            var configPath = @"T:\Проектный институт\Отдел стандартизации BIM и RD\BIM-Ресурсы\99.FamilyExplorer";
+            var configPath = @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\99.FamilyExplorer";
             configPath = Path.Combine(configPath, uiApplication.Application.VersionNumber);
             var dataContext = new FamilyExplorerViewModel(new Models.RevitRepository(uiApplication), new Models.FamilyRepository(configPath));
             var panel = new FamilyExplorerPanel() { DataContext = dataContext };

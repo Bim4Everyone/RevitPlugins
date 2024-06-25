@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -55,7 +55,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             _categories = categories;
         }
 
-        public IEnumerable<OpeningPlacer> GetPlacersMepOutcomingTasks() {
+        public IEnumerable<OpeningPlacer> GetPlacersMepOutcomingTasks(ElementId[] mepElementsToFilter) {
             var wallFilter = FiltersInitializer.GetWallFilter(_revitRepository.GetClashRevitRepository());
             var floorFilter = FiltersInitializer.GetFloorFilter(_revitRepository.GetClashRevitRepository());
 
@@ -63,16 +63,19 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             var mepCurveFloorClashChecker = ClashChecker.GetMepCurveFloorClashChecker(_revitRepository);
 
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
-            placers.AddRange(GetRoundMepPlacers(wallFilter, mepCurveWallClashChecker, new RoundMepWallPlacerInitializer()));
-            placers.AddRange(GetRoundMepPlacers(floorFilter, mepCurveFloorClashChecker, new RoundMepFloorPlacerInitializer()));
-            placers.AddRange(GetRectangleMepPlacers(wallFilter, mepCurveWallClashChecker, new RectangleMepWallPlacerInitializer()));
-            placers.AddRange(GetRectangleMepPlacers(floorFilter, mepCurveFloorClashChecker, new RectangleMepFloorPlacerInitializer()));
-            placers.AddRange(GetFittingPlacers(floorFilter,
+            placers.AddRange(GetRoundMepPlacers(wallFilter, mepCurveWallClashChecker, new RoundMepWallPlacerInitializer(), mepElementsToFilter));
+            placers.AddRange(GetRoundMepPlacers(floorFilter, mepCurveFloorClashChecker, new RoundMepFloorPlacerInitializer(), mepElementsToFilter));
+            placers.AddRange(GetRectangleMepPlacers(wallFilter, mepCurveWallClashChecker, new RectangleMepWallPlacerInitializer(), mepElementsToFilter));
+            placers.AddRange(GetRectangleMepPlacers(floorFilter, mepCurveFloorClashChecker, new RectangleMepFloorPlacerInitializer(), mepElementsToFilter));
+            placers.AddRange(GetFittingPlacers(
+                floorFilter,
                 (categories) => ClashChecker.GetFittingFloorClashChecker(_revitRepository, categories),
-                new FittingFloorPlacerInitializer()));
-            placers.AddRange(GetFittingPlacers(wallFilter,
+                new FittingFloorPlacerInitializer(), mepElementsToFilter));
+            placers.AddRange(GetFittingPlacers(
+                wallFilter,
                 (categories) => ClashChecker.GetFittingWallClashChecker(_revitRepository, categories),
-                new FittingWallPlacerInitializer()));
+                new FittingWallPlacerInitializer(),
+                mepElementsToFilter));
             return placers;
         }
 
@@ -123,66 +126,126 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         }
 
 
-        private List<OpeningPlacer> GetRoundMepPlacers(Filter structureFilter, IClashChecker structureChecker, IMepCurvePlacerInitializer placerInitializer) {
+        private List<OpeningPlacer> GetRoundMepPlacers(
+            Filter structureFilter,
+            IClashChecker structureChecker,
+            IMepCurvePlacerInitializer placerInitializer,
+            ElementId[] mepElementsToFilter) {
+
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             foreach(var filterProvider in _roundMepFilterProviders) {
                 MepCategory mepCategory = _categories[filterProvider.Key];
-                if(mepCategory.IsSelected && MepCategoryIntersectionWithStructureCategoryEnabled(mepCategory, structureFilter.Name)) {
+                if(mepCategory.IsSelected && IntersectionWithStructureEnabled(mepCategory, structureFilter.Name)) {
                     //получение стандартного фильтра по категории и минимальным габаритам
                     Filter mepStandardFilter = GetRoundMepFilter(filterProvider.Key, filterProvider.Value);
                     //добавление к стандартному фильтру критериев по параметрам, созданных пользователем
-                    Filter mepComplexFilter = CreateMepCategoriesAndFilterSet(_revitRepository.GetClashRevitRepository(), mepStandardFilter, mepCategory);
-                    placers.AddRange(GetMepPlacers(mepComplexFilter, structureFilter, structureChecker, _categories[filterProvider.Key], placerInitializer));
+                    Filter mepComplexFilter = CreateMepCategoriesAndFilterSet(
+                        _revitRepository.GetClashRevitRepository(),
+                        mepStandardFilter,
+                        mepCategory);
+                    placers.AddRange(GetMepPlacers(
+                        mepComplexFilter,
+                        structureFilter,
+                        structureChecker,
+                        _categories[filterProvider.Key],
+                        placerInitializer,
+                        mepElementsToFilter));
                 }
             };
             return placers;
         }
 
-        private List<OpeningPlacer> GetRectangleMepPlacers(Filter structureFilter, IClashChecker structureChecker, IMepCurvePlacerInitializer placerInitializer) {
+        private List<OpeningPlacer> GetRectangleMepPlacers(
+            Filter structureFilter,
+            IClashChecker structureChecker,
+            IMepCurvePlacerInitializer placerInitializer,
+            ElementId[] mepElementsToFilter) {
+
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             foreach(var filterProvider in _rectangleMepFilterProviders) {
                 MepCategory mepCategory = _categories[filterProvider.Key];
-                if(mepCategory.IsSelected && MepCategoryIntersectionWithStructureCategoryEnabled(mepCategory, structureFilter.Name)) {
+                if(mepCategory.IsSelected && IntersectionWithStructureEnabled(mepCategory, structureFilter.Name)) {
                     //получение стандартного фильтра по категории и минимальным габаритам
                     Filter mepStandardFilter = GetRectangleMepFilter(filterProvider.Key, filterProvider.Value);
                     //добавление к стандартному фильтру критериев по параметрам, созданных пользователем
-                    Filter mepComplexFilter = CreateMepCategoriesAndFilterSet(_revitRepository.GetClashRevitRepository(), mepStandardFilter, mepCategory);
-                    placers.AddRange(GetMepPlacers(mepComplexFilter, structureFilter, structureChecker, _categories[filterProvider.Key], placerInitializer));
+                    Filter mepComplexFilter = CreateMepCategoriesAndFilterSet(
+                        _revitRepository.GetClashRevitRepository(),
+
+                        mepStandardFilter, mepCategory);
+                    placers.AddRange(GetMepPlacers(
+                        mepComplexFilter,
+                        structureFilter,
+                        structureChecker,
+                        _categories[filterProvider.Key],
+                        placerInitializer,
+                        mepElementsToFilter));
                 }
             };
             return placers;
         }
 
-        private List<OpeningPlacer> GetFittingPlacers(Filter structureFilter, Func<MepCategory[], IClashChecker> structureCheckerFunc, IFittingPlacerInitializer placerInitializer) {
+        private List<OpeningPlacer> GetFittingPlacers(
+            Filter structureFilter,
+            Func<MepCategory[], IClashChecker> structureCheckerFunc,
+            IFittingPlacerInitializer placerInitializer,
+            ElementId[] mepElementsToFilter) {
+
             List<OpeningPlacer> placers = new List<OpeningPlacer>();
             foreach(var filterProvider in _fittingFilterProviders) {
-                MepCategory[] mepCategories = _categories.GetCategories(filterProvider.Key).Where(category => category.IsSelected).ToArray();
-                if(mepCategories.Any(category => MepCategoryIntersectionWithStructureCategoryEnabled(category, structureFilter.Name))) {
+                MepCategory[] mepCategories = _categories.GetCategories(filterProvider.Key)
+                    .Where(category => category.IsSelected)
+                    .ToArray();
+                if(mepCategories.Any(category => IntersectionWithStructureEnabled(category, structureFilter.Name))) {
                     //получение стандартного фильтра по категории
                     Filter mepStandardFilter = GetFittingFilter(filterProvider.Value);
                     //добавление к стандартному фильтру критериев по параметрам, созданных пользователем
-                    Filter mepComplexFilter = CreateMepCategoriesAndFilterSet(_revitRepository.GetClashRevitRepository(), mepStandardFilter, mepCategories);
+                    Filter mepComplexFilter = CreateMepCategoriesAndFilterSet(
+                        _revitRepository.GetClashRevitRepository(),
+                        mepStandardFilter,
+                        mepCategories);
                     placers.AddRange(GetFittingPlacers(
                         mepComplexFilter,
                         structureFilter,
                         structureCheckerFunc.Invoke(mepCategories),
                         placerInitializer,
+                        mepElementsToFilter,
                         mepCategories));
                 }
             };
             return placers;
         }
 
-        private IEnumerable<OpeningPlacer> GetMepPlacers(Filter mepFilter, Filter structureFilter, IClashChecker clashChecker, MepCategory mepCategory, IMepCurvePlacerInitializer placerInitializer) {
-            return GetClashes(mepFilter, structureFilter, clashChecker).Select(item => placerInitializer.GetPlacer(_revitRepository, item, mepCategory));
+        private IEnumerable<OpeningPlacer> GetMepPlacers(
+            Filter mepFilter,
+            Filter structureFilter,
+            IClashChecker clashChecker,
+            MepCategory mepCategory,
+            IMepCurvePlacerInitializer placerInitializer,
+            ElementId[] mepElements
+            ) {
+
+            return GetClashes(mepFilter, structureFilter, clashChecker, mepElements)
+                .Select(item => placerInitializer.GetPlacer(_revitRepository, item, mepCategory));
         }
 
-        private IEnumerable<OpeningPlacer> GetFittingPlacers(Filter mepFilter, Filter structureFilter, IClashChecker clashChecker, IFittingPlacerInitializer placerInitializer, params MepCategory[] mepCategories) {
-            return GetClashes(mepFilter, structureFilter, clashChecker).Select(item => placerInitializer.GetPlacer(_revitRepository, item, mepCategories));
+        private IEnumerable<OpeningPlacer> GetFittingPlacers(
+            Filter mepFilter,
+            Filter structureFilter,
+            IClashChecker clashChecker,
+            IFittingPlacerInitializer placerInitializer,
+            ElementId[] mepElements,
+            params MepCategory[] mepCategories) {
+
+            return GetClashes(mepFilter, structureFilter, clashChecker, mepElements)
+                .Select(item => placerInitializer.GetPlacer(_revitRepository, item, mepCategories));
         }
 
-        private IEnumerable<ClashModel> GetClashes(Filter mepFilter, Filter constructionFilter, IClashChecker clashChecker) {
-            var clashes = ClashInitializer.GetClashes(_revitRepository, mepFilter, constructionFilter)
+        private IEnumerable<ClashModel> GetClashes(
+            Filter mepFilter,
+            Filter constructionFilter,
+            IClashChecker clashChecker,
+            params ElementId[] mepElements) {
+            var clashes = ClashInitializer.GetClashes(_revitRepository, mepFilter, constructionFilter, mepElements)
                 .ToList();
             if(clashes.Count == 0) {
                 return Enumerable.Empty<ClashModel>();
@@ -193,7 +256,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
                     Message = clashChecker.Check(item),
                     Clash = item
                 })
-                .Where(item => !string.IsNullOrEmpty(item.Message) && !item.Message.Equals(RevitRepository.SystemCheck, StringComparison.CurrentCulture)));
+                .Where(item => !string.IsNullOrEmpty(item.Message)
+                   && !item.Message.Equals(RevitRepository.SystemCheck, StringComparison.CurrentCulture)));
             return clashes.Where(item => string.IsNullOrEmpty(clashChecker.Check(item)));
         }
 
@@ -228,7 +292,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         /// <param name="mepCategory">Настройки расстановки отверстий для категории инженерных элементов</param>
         /// <param name="structureCategoryName">Название категории конструкций</param>
         /// <returns>True, если в настройках расстановки включена проверка на пересечения с заданной категорией конструкций, иначе False</returns>
-        private bool MepCategoryIntersectionWithStructureCategoryEnabled(MepCategory mepCategory, string structureCategoryName) {
+        private bool IntersectionWithStructureEnabled(MepCategory mepCategory, string structureCategoryName) {
             return mepCategory.Intersections.Any(intersection =>
                 intersection.IsSelected
                 && intersection.Name.Equals(structureCategoryName));

@@ -250,7 +250,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <param name="hostObject"></param>
         /// <returns>True, если <paramref name="hostObject"/> - стена, иначе False (перекрытия, крыши, потолки)</returns>
         private static bool IsVerticallyCompound(this HostObject hostObject) {
-            return hostObject.GetElementType<HostObjAttributes>().GetCompoundStructure().IsVerticallyCompound;
+            return hostObject.GetElementType<HostObjAttributes>().GetCompoundStructure()?.IsVerticallyCompound ?? false;
         }
     }
 }
