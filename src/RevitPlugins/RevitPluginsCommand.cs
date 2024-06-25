@@ -59,7 +59,7 @@ namespace RevitPlugins {
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-                kernel.UseLocalization(
+                kernel.UseXtraLocalization(
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
 
