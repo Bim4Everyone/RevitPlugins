@@ -1,37 +1,31 @@
 using System;
 using System.Globalization;
+using System.Windows.Data;
+using System.Windows.Markup;
 
 namespace RevitReinforcementCoefficient.Views.Converters {
-    public class BoolToString : ConvertorBase<BoolToString> {
-        private string _whenTrue = "Да";
-        private string _whenFalse = "Нет";
-
+    public class BoolToString : MarkupExtension, IValueConverter {
         /// <summary> 
         /// Вывод, когда значение bool == True
         /// </summary>
-        public string WhenTrue {
-            set {
-                _whenTrue = value;
-            }
-            private get {
-                return _whenTrue;
-            }
-        }
+        public string WhenTrue { get; set; } = "Да";
 
         /// <summary>
         /// Вывод, когда значение bool == False
         /// </summary>
-        public string WhenFalse {
-            set {
-                _whenFalse = value;
-            }
-            private get {
-                return _whenFalse;
-            }
+        public string WhenFalse { get; set; } = "Нет";
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            bool? boolValue = (bool?) value;
+            return boolValue.HasValue ? WhenTrue : WhenFalse;
         }
 
-        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            return (bool) value == true ? WhenTrue : WhenFalse;
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotImplementedException();
+        }
+
+        public override object ProvideValue(IServiceProvider serviceProvider) {
+            return this;
         }
     }
 }

@@ -1,24 +1,26 @@
 using System;
 using System.Globalization;
+using System.Windows.Data;
+using System.Windows.Markup;
 
 namespace RevitReinforcementCoefficient.Views.Converters {
-    public class NullToString : ConvertorBase<NullToString> {
-        private string _whenNull = "<Нет данных>";
-
+    public class NullToString : MarkupExtension, IValueConverter {
         /// <summary> 
         /// Вывод, когда значение Null
         /// </summary>
-        public string WhenNull {
-            set {
-                _whenNull = value;
-            }
-            private get {
-                return _whenNull;
-            }
+        public string WhenNull { get; set; } = "<Нет данных>";
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            var stringValue = value?.ToString();
+            return string.IsNullOrEmpty(stringValue) ? WhenNull : value;
         }
 
-        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            return value is string ? (string.IsNullOrEmpty((string) value) ? WhenNull : value) : value;
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotImplementedException();
+        }
+
+        public override object ProvideValue(IServiceProvider serviceProvider) {
+            return this;
         }
     }
 }
