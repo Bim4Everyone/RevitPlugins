@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		src\dosymep\AsyncRelayCommand.T.cs = src\dosymep\AsyncRelayCommand.T.cs
 		src\dosymep\BasePluginCommand.cs = src\dosymep\BasePluginCommand.cs
 		src\dosymep\BaseViewModel.cs = src\dosymep\BaseViewModel.cs
+		src\dosymep\BoolToStringConverter.cs = src\dosymep\BoolToStringConverter.cs
 		src\dosymep\BoolToVisibilityConverter.cs = src\dosymep\BoolToVisibilityConverter.cs
 		src\dosymep\ConfigSerializer.cs = src\dosymep\ConfigSerializer.cs
 		src\dosymep\ConvertibleExtention.cs = src\dosymep\ConvertibleExtention.cs
@@ -31,6 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		src\dosymep\ICommand.cs = src\dosymep\ICommand.cs
 		src\dosymep\IndexConverter.cs = src\dosymep\IndexConverter.cs
 		src\dosymep\InverseBooleanConverter.cs = src\dosymep\InverseBooleanConverter.cs
+		src\dosymep\NullToStringConverter.cs = src\dosymep\NullToStringConverter.cs
 		src\dosymep\ObservableObject.cs = src\dosymep\ObservableObject.cs
 		src\dosymep\PlatformWindow.cs = src\dosymep\PlatformWindow.cs
 		src\dosymep\RelayCommand.cs = src\dosymep\RelayCommand.cs
@@ -292,6 +294,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitSectionsConstructor", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitFinishingWalls", "src\RevitFinishingWalls\RevitFinishingWalls.csproj", "{6EDA98F4-285F-47A1-BEBA-6EAE9323D9DF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitReinforcementCoefficient", "src\RevitReinforcementCoefficient\RevitReinforcementCoefficient.csproj", "{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		D2020|x64 = D2020|x64
@@ -544,6 +548,7 @@ Global
 		{09BF8F15-C3C3-4631-A773-A4434F8E083B}.D2020|x64.ActiveCfg = Debug|Any CPU
 		{09BF8F15-C3C3-4631-A773-A4434F8E083B}.D2021|x64.ActiveCfg = Debug|Any CPU
 		{09BF8F15-C3C3-4631-A773-A4434F8E083B}.D2022|x64.ActiveCfg = Debug|Any CPU
+		{09BF8F15-C3C3-4631-A773-A4434F8E083B}.D2022|x64.Build.0 = Debug|Any CPU
 		{09BF8F15-C3C3-4631-A773-A4434F8E083B}.D2023|x64.ActiveCfg = Debug|Any CPU
 		{09BF8F15-C3C3-4631-A773-A4434F8E083B}.D2024|x64.ActiveCfg = Debug|Any CPU
 		{09BF8F15-C3C3-4631-A773-A4434F8E083B}.Debug|x64.ActiveCfg = Debug|x64
@@ -786,6 +791,20 @@ Global
 		{6EDA98F4-285F-47A1-BEBA-6EAE9323D9DF}.Debug|x64.Build.0 = Debug|x64
 		{6EDA98F4-285F-47A1-BEBA-6EAE9323D9DF}.Release|x64.ActiveCfg = Release|x64
 		{6EDA98F4-285F-47A1-BEBA-6EAE9323D9DF}.Release|x64.Build.0 = Release|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2020|x64.ActiveCfg = D2020|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2020|x64.Build.0 = D2020|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2021|x64.ActiveCfg = D2021|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2021|x64.Build.0 = D2021|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2022|x64.ActiveCfg = D2022|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2022|x64.Build.0 = D2022|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2023|x64.ActiveCfg = D2023|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2023|x64.Build.0 = D2023|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2024|x64.ActiveCfg = D2024|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.D2024|x64.Build.0 = D2024|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.Debug|x64.ActiveCfg = Debug|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.Debug|x64.Build.0 = Debug|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.Release|x64.ActiveCfg = Release|x64
+		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
