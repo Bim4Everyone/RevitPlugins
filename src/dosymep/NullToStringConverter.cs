@@ -3,8 +3,8 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace RevitReinforcementCoefficient.Views.Converters {
-    public class NullToString : MarkupExtension, IValueConverter {
+namespace dosymep.WPF.Converters {
+    public class NullToStringConverter : MarkupExtension, IValueConverter {
         /// <summary> 
         /// Вывод, когда значение Null
         /// </summary>

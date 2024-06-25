@@ -46,7 +46,9 @@
         <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs"/>
         <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs"/>
         <Compile Include="..\dosymep\ObservableObject.cs" Link="dosymep\ObservableObject.cs"/>
-        <Compile Include="..\dosymep\BoolToVisibilityConverter.cs" Link="dosymep\BoolToVisibilityConverter.cs"/>
+        <Compile Include="..\dosymep\BoolToVisibilityConverter.cs" Link="dosymep\Converters\BoolToVisibilityConverter.cs"/>
+        <Compile Include="..\dosymep\BoolToStringConverter.cs" Link="dosymep\Converters\BoolToStringConverter.cs"/>
+        <Compile Include="..\dosymep\NullToStringConverter.cs" Link="dosymep\Converters\NullToStringConverter.cs"/>
         <Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs"/>
         <Compile Include="..\dosymep\ConvertibleExtention.cs" Link="dosymep\ConvertibleExtention.cs"/>
         <Compile Include="..\dosymep\BasePluginCommand.cs" Link="dosymep\BasePluginCommand.cs"/>

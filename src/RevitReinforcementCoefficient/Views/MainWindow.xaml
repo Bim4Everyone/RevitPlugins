@@ -9,7 +9,7 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitReinforcementCoefficient.Views"
     xmlns:vms="clr-namespace:RevitReinforcementCoefficient.ViewModels"
-    xmlns:converters="clr-namespace:RevitReinforcementCoefficient.Views.Converters"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
         
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -62,7 +62,7 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock 
-                            Text="{Binding Converter={converters:NullToString}}"/>
+                            Text="{Binding Converter={converters:NullToStringConverter}}"/>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
 
@@ -120,7 +120,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=TypeName,
-                                    Converter={converters:NullToString}}"/>
+                                    Converter={converters:NullToStringConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -129,7 +129,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=DocPackage, 
-                                    Converter={converters:NullToString}}"/>
+                                    Converter={converters:NullToStringConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -138,7 +138,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=AboveZero,
-                                    Converter={converters:BoolToString}}"/>
+                                    Converter={converters:BoolToStringConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

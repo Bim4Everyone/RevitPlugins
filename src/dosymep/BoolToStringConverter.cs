@@ -3,8 +3,8 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace RevitReinforcementCoefficient.Views.Converters {
-    public class BoolToString : MarkupExtension, IValueConverter {
+namespace dosymep.WPF.Converters {
+    public class BoolToStringConverter : MarkupExtension, IValueConverter {
         /// <summary> 
         /// Вывод, когда значение bool == True
         /// </summary>
