@@ -35,7 +35,8 @@ namespace RevitReinforcementCoefficient {
                 kernel.Bind<ReportWindow>()
                     .ToSelf()
                     .InSingletonScope()
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportViewModel>());
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<ReportViewModel>());
 
                 kernel.Bind<ParamUtils>()
                     .ToSelf()
@@ -63,7 +64,8 @@ namespace RevitReinforcementCoefficient {
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+                    .WithPropertyValue(nameof(Window.DataContext), 
+                        c => c.Kernel.Get<MainViewModel>());
 
                 Notification(kernel.Get<MainWindow>());
             }
