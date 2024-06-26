@@ -30,7 +30,9 @@ namespace RevitDeclarations.ViewModels {
         private string _accuracy;
         private Phase _selectedPhase;
         private bool _loadUtp;
+        private bool _canLoadUtp;
         private string _errorText;
+        private string _canLoadUtpText;
 
         public MainViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
             _revitRepository = revitRepository;
@@ -42,6 +44,7 @@ namespace RevitDeclarations.ViewModels {
             _accuracy = "1";
             _exportToExcel = true;
             _loadUtp = true;
+            _canLoadUtp = true;
 
             _revitDocuments = _revitRepository
                 .GetLinks()
@@ -58,7 +61,7 @@ namespace RevitDeclarations.ViewModels {
             }
 
             _parametersViewModel = new ParametersViewModel(_revitRepository, this);
-            _prioritiesViewModel = new PrioritiesViewModel();
+            _prioritiesViewModel = new PrioritiesViewModel(this);
 
             SelectFolderCommand = new RelayCommand(SelectFolder);
             ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
@@ -99,6 +102,11 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _loadUtp, value);
         }
 
+        public bool CanLoadUtp {
+            get => _canLoadUtp;
+            set => RaiseAndSetIfChanged(ref _canLoadUtp, value);
+        }
+
         public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
         public ParametersViewModel ParametersViewModel => _parametersViewModel;
         public PrioritiesViewModel PrioritiesViewModel => _prioritiesViewModel;
@@ -106,6 +114,11 @@ namespace RevitDeclarations.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public string CanLoadUtpText {
+            get => _canLoadUtpText;
+            set => RaiseAndSetIfChanged(ref _canLoadUtpText, value);
         }
 
         public void SelectFolder(object obj) {

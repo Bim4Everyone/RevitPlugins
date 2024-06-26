@@ -13,10 +13,15 @@ using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels {
     internal class PrioritiesViewModel : BaseViewModel {
+        private readonly MainViewModel _mainViewModel;
+
         private PrioritiesConfig _prioritiesConfig;
         private List<PriorityViewModel> _prioritiesVM;
 
-        public PrioritiesViewModel() {
+
+        public PrioritiesViewModel(MainViewModel mainViewModel) {
+            _mainViewModel = mainViewModel;
+
             SetDefaultConfig(new object());
 
             SetDefaultConfigCommand = new RelayCommand(SetDefaultConfig);
@@ -37,6 +42,9 @@ namespace RevitDeclarations.ViewModels {
 
         public void SetDefaultConfig(object obj) {
             _prioritiesConfig = new DefaultPrioritiesConfig();
+
+            _mainViewModel.CanLoadUtp = true;
+            _mainViewModel.CanLoadUtpText = "";
 
             PrioritiesVM = _prioritiesConfig
                 .Priorities
@@ -63,6 +71,10 @@ namespace RevitDeclarations.ViewModels {
                         .OrderBy(x => x.OrdinalNumber)
                         .Select(x => new PriorityViewModel(x))
                         .ToList();
+
+                    _mainViewModel.LoadUtp = false;
+                    _mainViewModel.CanLoadUtp = false;
+                    _mainViewModel.CanLoadUtpText = "Выгрузка доступна только с приоритетами A101";
 
                     _prioritiesConfig = new PrioritiesConfig(PrioritiesVM
                                                 .Select(x => x.Priority)

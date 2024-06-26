@@ -148,12 +148,21 @@
                 Margin="10, 0"
                 Style="{StaticResource ParameterName}"
                 Text="Рассчитывать УТП:"/>
-            <CheckBox
+            <StackPanel
                 Grid.Row="8"
                 Grid.Column="1"
-                Grid.ColumnSpan="2"
-                Margin="0, 5"
-                IsChecked="{Binding LoadUtp}"/>
+                Orientation="Horizontal">
+                <CheckBox
+                    VerticalAlignment="Center"
+                    IsEnabled="{Binding CanLoadUtp}"
+                    IsChecked="{Binding LoadUtp}"/>
+                <TextBlock
+                    Margin="5,0,0,0"
+                    Foreground="Orange"
+                    Padding="0,2"
+                    VerticalAlignment="Center"
+                    Text="{Binding CanLoadUtpText}"/>
+            </StackPanel>
 
             <TextBlock 
                 Grid.Row="9"
