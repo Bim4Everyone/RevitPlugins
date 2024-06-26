@@ -9,7 +9,7 @@
     "Rv2024"
   ],
   "IconUrl": "https://icons8.com/icon/21940/design",
-  "BundleName": "Коэффициент армирования",
+  "BundleName": "Подсчет коэффициентов армирования",
   "BundleType": "InvokeButton",
-  "BundleOutput": "03.KR.extension/КР.tab/Арматура.panel/Арматура.stack"
+  "BundleOutput": "03.KR.extension/КР.tab/ВОР.panel"
 }

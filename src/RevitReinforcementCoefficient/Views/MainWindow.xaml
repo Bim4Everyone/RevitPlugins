@@ -18,6 +18,7 @@
     Height="400" Width="950"
     MinHeight="300" MinWidth="950"
 
+    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
