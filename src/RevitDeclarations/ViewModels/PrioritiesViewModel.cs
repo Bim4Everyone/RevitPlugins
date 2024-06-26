@@ -55,16 +55,21 @@ namespace RevitDeclarations.ViewModels {
 
             if(dialog.ShowDialog() == DialogResult.OK) {
                 path = dialog.FileName;
-                List<RoomPriority> priorities = JsonImporter<RoomPriority>.Import(path);
+                JsonImporter<RoomPriority> importer = new JsonImporter<RoomPriority>();
+                List<RoomPriority> priorities = importer.Import(path);
 
-                PrioritiesVM = priorities
-                    .OrderBy(x => x.OrdinalNumber)
-                    .Select(x => new PriorityViewModel(x))
-                    .ToList();
+                if(priorities.Any()) {
+                    PrioritiesVM = priorities
+                        .OrderBy(x => x.OrdinalNumber)
+                        .Select(x => new PriorityViewModel(x))
+                        .ToList();
 
-                _prioritiesConfig = new PrioritiesConfig(PrioritiesVM
-                                            .Select(x => x.Priority)
-                                            .ToList());
+                    _prioritiesConfig = new PrioritiesConfig(PrioritiesVM
+                                                .Select(x => x.Priority)
+                                                .ToList());
+                } else {
+                    Autodesk.Revit.UI.TaskDialog.Show("Импорт приоритетов", importer.ErrorInfo);
+                }
             }
         }
 
@@ -77,10 +82,12 @@ namespace RevitDeclarations.ViewModels {
 
             if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
                 path = dialog.FileName + "\\ExportedConfig";
-                JsonExporter<RoomPriority>.Export(path, _prioritiesConfig.Priorities);
-                TaskDialog.Show("Декларации", "Файл конфигурации приоритетов создан");
+                JsonExporter<RoomPriority> exporter = new JsonExporter<RoomPriority>();
+                exporter.Export(path, _prioritiesConfig.Priorities);
+                Autodesk.Revit.UI.TaskDialog.Show(
+                    "Декларации", 
+                    "Файл конфигурации приоритетов создан");
             }
-
         }
     }
 }
