@@ -11,5 +11,5 @@
   "IconUrl": "https://icons8.com/icon/21940/design",
   "BundleName": "Подсчет коэффициентов армирования",
   "BundleType": "InvokeButton",
-  "BundleOutput": "03.KR.extension/КР.tab/ВОР.panel"
+  "BundleOutput": "03.KR.extension\\КР.tab\\ВОР.panel"
 }
