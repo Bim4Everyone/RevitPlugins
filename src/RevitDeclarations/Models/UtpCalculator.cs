@@ -193,7 +193,7 @@ namespace RevitDeclarations.Models {
 
         // УТП Увеличенная площадь балкона/лоджии.
         // Есть минимум одно помещение с именем "Лоджия" или "Балкон"
-        // с размерами не менее 2000х1200 мм.
+        // с глубиной не менее 1200 мм.
         public string CalculateExtraBalconyArea(Apartment apartment) {
             if(_hasNullAreas) {
                 return "Ошибка нулевых площадей";
@@ -206,7 +206,7 @@ namespace RevitDeclarations.Models {
 
             if(summerRooms.Any()) {
                 return ContourChecker
-                    .CheckAnyRoomSizes(summerRevitRooms, _settings.Accuracy, 2000, 1200)
+                    .CheckAnyRoomSizes(summerRevitRooms, _settings.Accuracy, 0, 1200)
                     .GetDescription();
             } else {
                 return "Нет";
@@ -229,7 +229,7 @@ namespace RevitDeclarations.Models {
                 .GetRoomsByPrior(_priorities.Pantry)
                 .Select(x => x.RevitRoom)
                 .Where(x => !_pantriesWithBedroom.Contains(x.Id))
-                .Where(x => ContourChecker.CheckArea(x, _settings.Accuracy, 1.5))
+                .Where(x => ContourChecker.CheckArea(x, _settings.Accuracy, 1.8))
                 .ToList();
 
             if(pantriesWithoutBedrooms.Any()) {

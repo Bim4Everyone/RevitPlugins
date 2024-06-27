@@ -33,7 +33,7 @@ namespace RevitDeclarations.Models {
                         NeedToCheck = true
                     };
                 case 4:
-                    if(curves[0].Length > lengthCheck && curves[3].Length > widthCheck) {
+                    if(curves[0].Length >= lengthCheck && curves[3].Length >= widthCheck) {
                         return new ContourCheckResult() {
                             MainResult = true,
                             NeedToCheck = contour.NeedToCheck
@@ -44,7 +44,7 @@ namespace RevitDeclarations.Models {
                         NeedToCheck = contour.NeedToCheck
                     };
                 default:
-                    if(curves[0].Length > lengthCheck && curves[3].Length > widthCheck) {
+                    if(curves[0].Length >= lengthCheck && curves[3].Length >= widthCheck) {
                         return new ContourCheckResult() {
                             MainResult = true,
                             NeedToCheck = true
@@ -70,7 +70,7 @@ namespace RevitDeclarations.Models {
         }
 
         public static bool CheckArea(Room room, int accuracy, double areaCheck) {
-            if(ParamConverter.ConvertArea(room.Area, accuracy) > areaCheck) {
+            if(ParamConverter.ConvertArea(room.Area, accuracy) >= areaCheck) {
                 return true;
             }
             return false;
