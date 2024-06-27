@@ -14,9 +14,9 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
         private readonly ParamUtils _paramUtils;
         private readonly ElementFactory _elementFactory;
 
-        // Если номером формы у арматуры == 1000 или 10000, то это семейства-оболочки, которые управляют другой арматурой, их не считаем
+        // Если номер формы у арматуры == 10000, то это семейства-оболочки, которые управляют другой арматурой, их не считаем
         private readonly string _paramForRebarShell = "обр_ФОП_Форма_номер";
-        private readonly int[] _paramValuesForRebarShell = { 1000, 10000 };
+        private readonly int _paramValueForRebarShell = 10000;
 
         private List<Element> _elementsForAnalize;
 
@@ -55,14 +55,14 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
             foreach(Element element in _elementsForAnalize) {
                 // Проверяем, только если это арматура
                 if(element.InAnyCategory(BuiltInCategory.OST_Rebar)) {
-                    // Отсеиваем арматуры с номером формы == 1000 или 10000 - это семейства-оболочки, которые управляют другой арматурой
+                    // Отсеиваем арматуры с номером формы == 10000 - это семейства-оболочки, которые управляют другой арматурой
                     // Проверяем у арматуры наличие параметра, по которому определяется семейство-оболочка
                     if(!_paramUtils.HasParamAnywhere(element, _paramForRebarShell)) {
                         continue;
                     }
 
                     // Если значение параметра указывает, что это облочка, то пропускаем, этот элемент не участвует в расчетах
-                    if(_paramValuesForRebarShell.Contains(_paramUtils.GetParamValueAnywhere<int>(element, _paramForRebarShell))) {
+                    if(_paramUtils.GetParamValueAnywhere<int>(element, _paramForRebarShell) == _paramValueForRebarShell) {
                         continue;
                     }
                 }
