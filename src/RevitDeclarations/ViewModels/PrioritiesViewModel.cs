@@ -1,8 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -14,6 +15,7 @@ using RevitDeclarations.Models;
 namespace RevitDeclarations.ViewModels {
     internal class PrioritiesViewModel : BaseViewModel {
         private readonly MainViewModel _mainViewModel;
+        private string _filePath;
 
         private PrioritiesConfig _prioritiesConfig;
         private List<PriorityViewModel> _prioritiesVM;
@@ -38,6 +40,11 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _prioritiesVM, value);
         }
 
+        public string FilePath {
+            get => _filePath;
+            set => RaiseAndSetIfChanged(ref _filePath, value);
+        }
+
         public PrioritiesConfig PrioritiesConfig => _prioritiesConfig;
 
         public void SetDefaultConfig(object obj) {
@@ -45,6 +52,7 @@ namespace RevitDeclarations.ViewModels {
 
             _mainViewModel.CanLoadUtp = true;
             _mainViewModel.CanLoadUtpText = "";
+            FilePath = "";
 
             PrioritiesVM = _prioritiesConfig
                 .Priorities
@@ -54,34 +62,13 @@ namespace RevitDeclarations.ViewModels {
         }
 
         public void ImportConfig(object obj) {
-            string path;
-
             OpenFileDialog dialog = new OpenFileDialog() {
                Title = "Выберите Json файл",
                Filter = "json файлы (*.json)|*.json"
             };
 
             if(dialog.ShowDialog() == DialogResult.OK) {
-                path = dialog.FileName;
-                JsonImporter<RoomPriority> importer = new JsonImporter<RoomPriority>();
-                List<RoomPriority> priorities = importer.Import(path);
-
-                if(priorities.Any()) {
-                    PrioritiesVM = priorities
-                        .OrderBy(x => x.OrdinalNumber)
-                        .Select(x => new PriorityViewModel(x))
-                        .ToList();
-
-                    _mainViewModel.LoadUtp = false;
-                    _mainViewModel.CanLoadUtp = false;
-                    _mainViewModel.CanLoadUtpText = "Выгрузка доступна только с приоритетами A101";
-
-                    _prioritiesConfig = new PrioritiesConfig(PrioritiesVM
-                                                .Select(x => x.Priority)
-                                                .ToList());
-                } else {
-                    Autodesk.Revit.UI.TaskDialog.Show("Импорт приоритетов", importer.ErrorInfo);
-                }
+                SetConfigFromPath(dialog.FileName);
             }
         }
 
@@ -99,6 +86,29 @@ namespace RevitDeclarations.ViewModels {
                 Autodesk.Revit.UI.TaskDialog.Show(
                     "Декларации", 
                     "Файл конфигурации приоритетов создан");
+            }
+        }
+
+        public void SetConfigFromPath(string path) {
+            FilePath = path;
+            JsonImporter<RoomPriority> importer = new JsonImporter<RoomPriority>();
+            List<RoomPriority> priorities = importer.Import(path);
+
+            if(priorities.Any()) {
+                PrioritiesVM = priorities
+                    .OrderBy(x => x.OrdinalNumber)
+                    .Select(x => new PriorityViewModel(x))
+                    .ToList();
+
+                _mainViewModel.LoadUtp = false;
+                _mainViewModel.CanLoadUtp = false;
+                _mainViewModel.CanLoadUtpText = "Выгрузка доступна только с приоритетами A101";
+
+                _prioritiesConfig = new PrioritiesConfig(PrioritiesVM
+                                            .Select(x => x.Priority)
+                                            .ToList());
+            } else {
+                Autodesk.Revit.UI.TaskDialog.Show("Импорт приоритетов", importer.ErrorInfo);
             }
         }
     }

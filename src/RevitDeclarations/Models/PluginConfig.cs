@@ -57,6 +57,9 @@ namespace RevitDeclarations.Models {
         public string RoomAreaParam { get; set; }
         public string RoomAreaCoefParam { get; set; }
 
+        public string PrioritiesFilePath { get; set; }
+
+
         public RevitSettings GetCompanyConfig() {
             return new RevitSettings() {
                 FilterRoomsParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),

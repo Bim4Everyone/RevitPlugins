@@ -22,6 +22,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -76,8 +77,23 @@
             Height="25"
             Command="{Binding ImportConfigCommand}"/>
 
+        <TextBlock
+                Grid.Row="3"  
+                Grid.Column="0"
+                Margin="10,0"
+                Style="{StaticResource ParameterName}"
+                Text="Путь к файлу приоритетов:"/>
+        <TextBlock
+                Grid.Row="3"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="0, 5, 10, 5"
+                VerticalAlignment="Center"
+                TextWrapping="Wrap"
+                Text="{Binding FilePath}"/>
+
         <DataGrid
-            Grid.Row="3"
+            Grid.Row="4"
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Margin="10"

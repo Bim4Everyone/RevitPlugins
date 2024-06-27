@@ -317,6 +317,8 @@ namespace RevitDeclarations.ViewModels {
             configSettings.RoomAreaParam = _settings.RoomAreaParam?.Definition.Name;
             configSettings.RoomAreaCoefParam = _settings.RoomAreaCoefParam?.Definition.Name;
 
+            configSettings.PrioritiesFilePath = _prioritiesViewModel.FilePath;
+
             config.SaveProjectConfig();
         }
 
@@ -341,6 +343,10 @@ namespace RevitDeclarations.ViewModels {
             }
 
             _parametersViewModel.SetParametersFromConfig(configSettings);
+
+            if(!string.IsNullOrEmpty(configSettings.PrioritiesFilePath)) {
+                _prioritiesViewModel.SetConfigFromPath(configSettings.PrioritiesFilePath);
+            }
 
             config.SaveProjectConfig();
         }
