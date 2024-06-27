@@ -14,8 +14,12 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
         /// Расчет объема одного опалубочного элемента конструкции
         /// </summary>
         public double Calculate() {
-            double volumeInInternal = (double) RevitElement.GetParamValue(BuiltInParameter.HOST_VOLUME_COMPUTED);
-            return UnitUtilsHelper.ConvertVolumeFromInternalValue(volumeInInternal);
+            var volumeValue = RevitElement.GetParamValue(BuiltInParameter.HOST_VOLUME_COMPUTED);
+            if(volumeValue is null) {
+                return 0;
+            } else {
+                return UnitUtilsHelper.ConvertVolumeFromInternalValue((double) volumeValue);
+            }
         }
     }
 }
