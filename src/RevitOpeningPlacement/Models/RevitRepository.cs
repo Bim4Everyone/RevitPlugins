@@ -194,17 +194,16 @@ namespace RevitOpeningPlacement.Models {
         public static BuiltInCategory MepDuctLinearCategory { get; } = BuiltInCategory.OST_DuctCurves;
 
         /// <summary>
-        /// Используемые в плагине нелинейные категории для воздуховодов: Соединители детали воздуховодов, Арматура воздуховодов, Воздухораспределители
+        /// Используемые в плагине нелинейные категории для воздуховодов: Соединители детали воздуховодов, Арматура воздуховодов
         /// </summary>
         public static IReadOnlyCollection<BuiltInCategory> MepDuctFittingCategories { get; } =
             new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
                 BuiltInCategory.OST_DuctFitting,
-                BuiltInCategory.OST_DuctAccessory,
-                BuiltInCategory.OST_DuctTerminal
+                BuiltInCategory.OST_DuctAccessory
             });
 
         /// <summary>
-        /// Все используемые в плагине категории для воздуховодов: Воздуховоды, Соединители детали воздуховодов, Арматура воздуховодов, Воздухораспределители
+        /// Все используемые в плагине категории для воздуховодов: Воздуховоды, Соединители детали воздуховодов, Арматура воздуховодов
         /// </summary>
         public static IReadOnlyCollection<BuiltInCategory> MepDuctCategories { get; } =
            new ReadOnlyCollection<BuiltInCategory>(
