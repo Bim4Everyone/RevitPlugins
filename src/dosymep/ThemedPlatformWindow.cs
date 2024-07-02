@@ -31,10 +31,13 @@ namespace dosymep.WPF.Views {
         private readonly WindowInteropHelper _windowInteropHelper;
 
         public ThemedPlatformWindow() {
+            LanguageService = GetPlatformService<ILanguageService>();
+            
             UIThemeService = GetPlatformService<IUIThemeService>();
             UIThemeUpdaterService = GetPlatformService<IUIThemeUpdaterService>();
-
+            
             UIThemeService.UIThemeChanged += OnUIThemeChanged;
+            
             _windowInteropHelper = new WindowInteropHelper(this) {
                 Owner = Process.GetCurrentProcess().MainWindowHandle
             };
@@ -49,6 +52,11 @@ namespace dosymep.WPF.Views {
         /// Наименование файла конфигурации.
         /// </summary>
         public virtual string ProjectConfigName { get; }
+        
+        /// <summary>
+        /// Сервис локализации окон.
+        /// </summary>
+        public virtual ILocalizationService LocalizationService { get; set; }
 
         /// <summary>
         /// Предоставляет доступ к логгеру платформы.
@@ -56,9 +64,18 @@ namespace dosymep.WPF.Views {
         protected ILoggerService LoggerService => GetPlatformService<ILoggerService>();
 
         /// <summary>
+        /// Предоставляет доступ к текущему языку платформы.
+        /// </summary>
+        protected ILanguageService LanguageService { get; }
+        
+        /// <summary>
         /// Предоставляет доступ к настройкам темы платформы.
         /// </summary>
         protected IUIThemeService UIThemeService { get; }
+        
+        /// <summary>
+        /// Сервис по обновлению темы у окна.
+        /// </summary>
         protected IUIThemeUpdaterService UIThemeUpdaterService { get; }
 
         protected T GetPlatformService<T>() {
@@ -66,10 +83,11 @@ namespace dosymep.WPF.Views {
         }
 
         protected override void OnSourceInitialized(EventArgs e) {
-            base.OnSourceInitialized(e);
-
             UpdateTheme();
-
+            LocalizationService?.SetLocalization(LanguageService.HostLanguage, this);
+            
+            base.OnSourceInitialized(e);
+            
             PlatformWindowConfig config = GetProjectConfig();
             if(config.WindowPlacement.HasValue) {
                 this.SetPlacement(config.WindowPlacement.Value);

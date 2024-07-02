@@ -1,0 +1,22 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <system:String x:Key="MainWindow.Title">Настройки платформы</system:String>
+    <system:String x:Key="SettingsNode.Title">Общие</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="ExtensionSettings.Title">Расширения</system:String>
+    <system:String x:Key="ExtensionSettings.CategoryGridColumn">Категория</system:String>
+    <system:String x:Key="ExtensionSettings.NameGridColumn">Имя</system:String>
+    <system:String x:Key="ExtensionSettings.DescriptionGridColumn">Описание</system:String>
+    
+    <system:String x:Key="RevitParamsSettings.Title">Параметры платформы</system:String>
+    <system:String x:Key="RevitParamsSettings.IdGridColumn">Id</system:String>
+    <system:String x:Key="RevitParamsSettings.NameGridColumn">Наименование</system:String>
+    <system:String x:Key="RevitParamsSettings.StorageTypeGridColumn">StorageType</system:String>
+    
+    <system:String x:Key="SettingsView.Prompt">Выберите настройки слева в дереве.</system:String>
+</ResourceDictionary>

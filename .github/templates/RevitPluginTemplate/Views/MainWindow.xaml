@@ -16,7 +16,7 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Title="MainWindow"
+    Title="{DynamicResource MainWindow.Title}"
     Height="450" Width="800"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
@@ -37,7 +37,8 @@
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
 
-            Text="{Binding SaveProperty}" />
+            Text="{Binding SaveProperty,
+                UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel
             Grid.Row="1"
@@ -53,7 +54,7 @@
             <dx:SimpleButton
                 Margin="10"
                 Width="80"
-                Content="ОК"
+                Content="{DynamicResource MainWindow.ButtonOk}"
                 IsDefault="True"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
@@ -61,7 +62,7 @@
             <dx:SimpleButton
                 Margin="10"
                 Width="80"
-                Content="Отмена"
+                Content="{DynamicResource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>

@@ -42,9 +42,12 @@
 
             </dxg:GridColumn>
 
-            <dxg:GridColumn Header="Категория" Width="100" FieldName="Category" GroupIndex="0" />
-            <dxg:GridColumn Header="Имя" Width="250" FieldName="Name" />
-            <dxg:GridColumn Header="Описание" Width="250" FieldName="Description" />
+            <dxg:GridColumn
+                Header="{DynamicResource ExtensionSettings.CategoryGridColumn}" Width="100" FieldName="Category" GroupIndex="0" />
+            <dxg:GridColumn
+                Header="{DynamicResource ExtensionSettings.NameGridColumn}" Width="250" FieldName="Name" />
+            <dxg:GridColumn
+                Header="{DynamicResource ExtensionSettings.DescriptionGridColumn}" Width="250" FieldName="Description" />
         </dxg:GridControl>
     </DataTemplate>
 </ResourceDictionary>
