@@ -51,19 +51,13 @@ namespace RevitDeclarations.Models
         public double AreaLivingRevit => _areaLivingRevit;
         [JsonIgnore]
         public double AreaNonSummerRevit => _areaNonSummerRevit;
+
         [JsonProperty("area")]
         public double Area => _area;
         [JsonProperty("area_k")]
         public double AreaCoef => _areaCoef;
         [JsonProperty("number")]
         public string Number => _revitRoom.Number;
-
-        public bool HasParameter(Parameter parameter) {
-            if(RevitRoom.LookupParameter(parameter.Definition.Name) == null) {
-                return false;
-            }
-            return true;
-        }
 
         public string GetTextParamValue(Parameter parameter) {
             return RevitRoom.LookupParameter(parameter.Definition.Name).AsString();

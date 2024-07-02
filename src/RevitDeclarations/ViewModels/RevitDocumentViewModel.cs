@@ -75,11 +75,11 @@ namespace RevitDeclarations.ViewModels {
                 DocumentName = _name
             };
 
-            RoomElement mainRoom = new RoomElement(_room, _settings);
+            RoomForChecks roomForCheck = new RoomForChecks(_room);
 
             errorListVM.Errors = _settings
                 .AllParameters
-                .Where(x => !mainRoom.HasParameter(x))
+                .Where(x => !roomForCheck.HasParameter(x))
                 .Select(x => new ErrorElement(x.Definition.Name, "Отсутствует параметр в проекте"))
                 .ToList();
 
