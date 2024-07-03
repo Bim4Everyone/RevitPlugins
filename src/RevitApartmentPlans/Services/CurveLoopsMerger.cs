@@ -124,8 +124,8 @@ namespace RevitApartmentPlans.Services {
         /// </summary>
         private CurveLoop CreateOffsetLoop(CurveLoop curveLoop, double feetOffset) {
             try {
-                //если ориентация линий в контуре по часовой стрелке, то положительный оффсет увеличивает контур
-                //если ориентация линий в контуре против часовой стрелки, то отрицательный оффсет увеличивает контур
+                //если ориентация линий в контуре против часовой стрелки, то положительный оффсет увеличивает контур
+                //если ориентация линий в контуре по часовой стрелке, то отрицательный оффсет увеличивает контур
                 double offset = curveLoop.IsCounterclockwise(XYZ.BasisZ) ? feetOffset : -feetOffset;
                 return CurveLoop.CreateViaOffset(curveLoop, offset, XYZ.BasisZ);
             } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
@@ -177,7 +177,7 @@ namespace RevitApartmentPlans.Services {
 
         /// <summary>
         /// Создает прямоугольный замкнутый наружный контур, в который вписаны все заданные замкнутые контуры.<br/>
-        /// Линии в этом контуре ориентированы по часовой стрелке.
+        /// Линии в этом контуре ориентированы против часовой стрелки.
         /// </summary>
         private CurveLoop CreateRectangleLoop(ICollection<CurveLoop> curveLoops) {
             var points = curveLoops
@@ -198,12 +198,12 @@ namespace RevitApartmentPlans.Services {
             XYZ rightTop = new XYZ(maxX, maxY, z);
             XYZ rightBottom = new XYZ(maxX, minY, z);
 
-            var left = Line.CreateBound(leftBottom, leftTop);
-            var top = Line.CreateBound(leftTop, rightTop);
-            var right = Line.CreateBound(rightTop, rightBottom);
-            var bottom = Line.CreateBound(rightBottom, leftBottom);
+            var left = Line.CreateBound(leftTop, leftBottom);
+            var bottom = Line.CreateBound(leftBottom, rightBottom);
+            var right = Line.CreateBound(rightBottom, rightTop);
+            var top = Line.CreateBound(rightTop, leftTop);
 
-            return CurveLoop.Create(new Curve[] { left, top, right, bottom });
+            return CurveLoop.Create(new Curve[] { left, bottom, right, top });
         }
 
         private CurveLoop CreateRectangleLoop(CurveLoop curveLoop) {
