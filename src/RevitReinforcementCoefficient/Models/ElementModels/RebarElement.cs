@@ -53,7 +53,7 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
         private readonly string _countOfLevelParamName = "обр_ФОП_Количество типовых этажей";
 
         // Граничный номер формы для арматуры (более данного числа начинаются формы металлических деталей)
-        private readonly int _limitNumberOfForm = 200;
+        private readonly int _limitNumberOfForm = 2000;
         // Длина арматурного стержня,который приходит на стройку с завода
         private readonly double _lengthOfFactoryRevitElement = 11700;
         // Коэф. нахлеста стержней, для которых не задекларирован коэф. конструкторами от А101
@@ -103,7 +103,7 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
             // @Базовый_Масса на единицу длины
             // Погонная масса арматуры
             double massPerUnitLength;
-            // Сравниваем номер формы арматурногно стержня и граничный номер формы для арматуры (обычно 200)
+            // Сравниваем номер формы арматурногно стержня и граничный номер формы для арматуры (обычно 2000)
             if(numberOfForm < _limitNumberOfForm) {
 
                 // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался
