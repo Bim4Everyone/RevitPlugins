@@ -285,17 +285,20 @@ namespace RevitDeclarations.Models {
             foreach(var door in doors) {
                 Room room1 = door.get_FromRoom(_project.Phase);
                 Room room2 = door.get_ToRoom(_project.Phase);
-                string roomName1 = room1?.get_Parameter(bltParam).AsString().ToLower();
-                string roomName2 = room2?.get_Parameter(bltParam).AsString().ToLower();
+                // У дверей может не быть помещения с одной стороны
+                if(room1 != null && room2 != null) { 
+                    string roomName1 = room1.get_Parameter(bltParam).AsString().ToLower();
+                    string roomName2 = room2.get_Parameter(bltParam).AsString().ToLower();
 
-                if(roomName1 == name1 && roomName2 == name2) {
-                    roomByNames[name1].Add(room1.Id);
-                    roomByNames[name2].Add(room2.Id);
-                }
+                    if(roomName1 == name1 && roomName2 == name2) {
+                        roomByNames[name1].Add(room1.Id);
+                        roomByNames[name2].Add(room2.Id);
+                    }
 
-                if(roomName1 == name2 && roomName2 == name1) {
-                    roomByNames[name1].Add(room2.Id);
-                    roomByNames[name2].Add(room1.Id);
+                    if(roomName1 == name2 && roomName2 == name1) {
+                        roomByNames[name1].Add(room2.Id);
+                        roomByNames[name2].Add(room1.Id);
+                    }                
                 }
             }
 
@@ -314,15 +317,18 @@ namespace RevitDeclarations.Models {
             foreach(var door in doors) {
                 Room room1 = door.get_FromRoom(_project.Phase);
                 Room room2 = door.get_ToRoom(_project.Phase);
-                string roomName1 = room1?.get_Parameter(bltParam).AsString().ToLower();
-                string roomName2 = room2?.get_Parameter(bltParam).AsString().ToLower();
+                // У дверей может не быть помещения с одной стороны
+                if(room1 != null && room2 != null) {
+                    string roomName1 = room1.get_Parameter(bltParam).AsString().ToLower();
+                    string roomName2 = room2.get_Parameter(bltParam).AsString().ToLower();
 
-                if(roomName1 == name1 && rooms.Contains(room2.Id)) {
-                    roomByNames[name1].Add(room1.Id);
-                }
+                    if(roomName1 == name1 && rooms.Contains(room2.Id)) {
+                        roomByNames[name1].Add(room1.Id);
+                    }
 
-                if(roomName2 == name1 && rooms.Contains(room1.Id)) {
-                    roomByNames[name1].Add(room2.Id);
+                    if(roomName2 == name1 && rooms.Contains(room1.Id)) {
+                        roomByNames[name1].Add(room2.Id);
+                    }
                 }
             }
 
@@ -334,7 +340,7 @@ namespace RevitDeclarations.Models {
                 .GetBathInstances()
                 .Select(x => x.get_Room(_project.Phase))
                 .Distinct()
-                .Select(x => x.Id)
+                .Select(x => x?.Id)
                 .ToList();
         }
     }
