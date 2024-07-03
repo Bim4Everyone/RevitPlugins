@@ -41,7 +41,7 @@ namespace RevitDeclarations.ViewModels {
         private Parameter _selectedApartmentAreaNonSumParam;
         private Parameter _selectedRoomsHeightParam;
 
-        private Parameter _selectedRoomAreatParam;
+        private Parameter _selectedRoomAreaParam;
         private Parameter _selectedRoomAreaCoefParam;
 
         public ParametersViewModel(RevitRepository revitRepository, MainViewModel mainViewModel) {
@@ -162,8 +162,8 @@ namespace RevitDeclarations.ViewModels {
         }
 
         public Parameter SelectedRoomAreaParam {
-            get => _selectedRoomAreatParam;
-            set => RaiseAndSetIfChanged(ref _selectedRoomAreatParam, value);
+            get => _selectedRoomAreaParam;
+            set => RaiseAndSetIfChanged(ref _selectedRoomAreaParam, value);
         }
         public Parameter SelectedRoomAreaCoefParam {
             get => _selectedRoomAreaCoefParam;
@@ -171,6 +171,29 @@ namespace RevitDeclarations.ViewModels {
         }
 
         public ParameterToolTip ParameterToolTip => _parameterToolTip;
+
+        public List<Parameter> GetAllParametrs() {
+            return new List<Parameter> {
+                SelectedFilterRoomsParam,
+                SelectedGroupingBySectionParam,
+                SelectedGroupingByGroupParam,
+                SelectedMultiStoreyParam,
+                SelectedFullApartNumParam,
+                SelectedDepartmentParam,
+                SelectedLevelParam,
+                SelectedSectionParam,
+                SelectedBuildingParam,
+                SelectedApartNumParam,
+                SelectedApartAreaParam,
+                SelectedApartAreaCoefParam,
+                SelectedApartAreaLivingParam,
+                SelectedRoomsAmountParam,
+                SelectedApartAreaNonSumParam,
+                SelectedRoomsHeightParam,
+                SelectedRoomAreaParam,
+                SelectedRoomAreaCoefParam
+            };
+        }
 
         public void SetLastParamConfig(object obj) {
             PluginConfig config = PluginConfig.GetPluginConfig();

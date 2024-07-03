@@ -257,6 +257,11 @@ namespace RevitDeclarations.ViewModels {
             bool hasPhases = checkedDocuments
                 .All(x => x.HasPhase(_selectedPhase));
 
+            bool hasEmptyParameters = _parametersViewModel
+                .GetAllParametrs()
+                .Where(x => x == null)
+                .Any();
+
             if(string.IsNullOrEmpty(_filePath)) {
                 ErrorText = "Не выбрана папка";
                 return false;
@@ -271,6 +276,12 @@ namespace RevitDeclarations.ViewModels {
             }
             if(!hasPhases) {
                 ErrorText = "В выбранных проектах отсутствует выбранная стадия";
+                return false;
+            }
+            if(hasEmptyParameters 
+                || string.IsNullOrEmpty(_parametersViewModel.FilterRoomsValue)
+                || string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
+                ErrorText = "Не выбран параметр на вкладке \"Параметры\"";
                 return false;
             }
 
