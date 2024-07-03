@@ -31,6 +31,12 @@ namespace RevitApartmentPlans {
                 kernel.Bind<ICurveLoopsMerger>()
                     .To<CurveLoopsMerger>()
                     .InSingletonScope();
+                kernel.Bind<ICurveLoopsOffsetter>()
+                    .To<CurveLoopsOffsetter>()
+                    .InSingletonScope();
+                kernel.Bind<IRectangleLoopProvider>()
+                    .To<RectangleLoopProvider>()
+                    .InSingletonScope();
 
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());

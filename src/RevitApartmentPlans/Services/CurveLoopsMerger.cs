@@ -32,10 +32,18 @@ namespace RevitApartmentPlans.Services {
         /// </summary>
         private const double _offsetMax = 3.281;
         private readonly SolidOptions _solidOptions;
+        private readonly ICurveLoopsOffsetter _curveLoopsOffsetter;
+        private readonly IRectangleLoopProvider _rectangleLoopProvider;
 
+        public CurveLoopsMerger(
+            ICurveLoopsOffsetter curveLoopsOffsetter,
+            IRectangleLoopProvider rectangleLoopProvider) {
 
-        public CurveLoopsMerger() {
             _solidOptions = new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId);
+            _curveLoopsOffsetter = curveLoopsOffsetter
+                ?? throw new ArgumentNullException(nameof(curveLoopsOffsetter));
+            _rectangleLoopProvider = rectangleLoopProvider
+                ?? throw new ArgumentNullException(nameof(rectangleLoopProvider));
         }
 
 
@@ -55,7 +63,7 @@ namespace RevitApartmentPlans.Services {
                     CurveLoop bottomLoop = GetOuterCurveLoop(bottomFace);
                     Transform transform = GetVerticalTransformFromZero(curveLoops.First());
                     try {
-                        return CurveLoop.CreateViaTransform(CreateOffsetLoop(bottomLoop, -offset), transform);
+                        return CurveLoop.CreateViaTransform(_curveLoopsOffsetter.CreateOffsetLoop(bottomLoop, -offset), transform);
                     } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
                         offset += _offsetFeetStep;
                     }
@@ -63,7 +71,7 @@ namespace RevitApartmentPlans.Services {
                     offset += _offsetFeetStep;
                 }
             }
-            return CreateRectangleLoop(curveLoops);
+            return _rectangleLoopProvider.CreateRectCounterClockwise(curveLoops);
         }
 
 
@@ -119,26 +127,11 @@ namespace RevitApartmentPlans.Services {
         }
 
         /// <summary>
-        /// Создает замкнутый контур с заданным оффсетом исходного контура в горизонтальной плоскости.<br/>
-        /// Если оффсет не удалось создать по исходному контуру, будет создан оффсет по прямоугольнику, который описывает исходный контур.
-        /// </summary>
-        private CurveLoop CreateOffsetLoop(CurveLoop curveLoop, double feetOffset) {
-            try {
-                //если ориентация линий в контуре против часовой стрелки, то положительный оффсет увеличивает контур
-                //если ориентация линий в контуре по часовой стрелке, то отрицательный оффсет увеличивает контур
-                double offset = curveLoop.IsCounterclockwise(XYZ.BasisZ) ? feetOffset : -feetOffset;
-                return CurveLoop.CreateViaOffset(curveLoop, offset, XYZ.BasisZ);
-            } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
-                return CurveLoop.CreateViaOffset(CreateRectangleLoop(curveLoop), feetOffset, XYZ.BasisZ);
-            }
-        }
-
-        /// <summary>
         /// Возвращает коллекцию замкнутых контуров с заданным оффсетом исходных контуров в горизонтальной плоскости
         /// </summary>
         private ICollection<CurveLoop> CreateOffsetLoop(ICollection<CurveLoop> curveLoops, double feetOffset) {
             return curveLoops
-                .Select(loop => CreateOffsetLoop(loop, feetOffset))
+                .Select(loop => _curveLoopsOffsetter.CreateOffsetLoop(loop, feetOffset))
                 .ToArray();
         }
 
@@ -173,41 +166,6 @@ namespace RevitApartmentPlans.Services {
             foreach(Face face in solid.Faces) {
                 yield return face;
             }
-        }
-
-        /// <summary>
-        /// Создает прямоугольный замкнутый наружный контур, в который вписаны все заданные замкнутые контуры.<br/>
-        /// Линии в этом контуре ориентированы против часовой стрелки.
-        /// </summary>
-        private CurveLoop CreateRectangleLoop(ICollection<CurveLoop> curveLoops) {
-            var points = curveLoops
-                .SelectMany(loop => loop.Select(curve => curve.GetEndPoint(0)))
-                .ToArray();
-            Outline outline = new Outline(points[0], points[1]);
-            for(var i = 2; i < points.Length; i++) {
-                outline.AddPoint(points[i]);
-            }
-            double z = outline.MinimumPoint.Z;
-            double minX = outline.MinimumPoint.X;
-            double minY = outline.MinimumPoint.Y;
-            double maxX = outline.MaximumPoint.X;
-            double maxY = outline.MaximumPoint.Y;
-
-            XYZ leftBottom = new XYZ(minX, minY, z);
-            XYZ leftTop = new XYZ(minX, maxY, z);
-            XYZ rightTop = new XYZ(maxX, maxY, z);
-            XYZ rightBottom = new XYZ(maxX, minY, z);
-
-            var left = Line.CreateBound(leftTop, leftBottom);
-            var bottom = Line.CreateBound(leftBottom, rightBottom);
-            var right = Line.CreateBound(rightBottom, rightTop);
-            var top = Line.CreateBound(rightTop, leftTop);
-
-            return CurveLoop.Create(new Curve[] { left, bottom, right, top });
-        }
-
-        private CurveLoop CreateRectangleLoop(CurveLoop curveLoop) {
-            return CreateRectangleLoop(new CurveLoop[] { curveLoop });
         }
     }
 }
