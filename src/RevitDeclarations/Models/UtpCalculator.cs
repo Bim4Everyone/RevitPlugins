@@ -64,13 +64,13 @@ namespace RevitDeclarations.Models {
         public IReadOnlyCollection<ErrorsListViewModel> CheckProjectForUtp() {
             ErrorsListViewModel areaErrorListVM = new ErrorsListViewModel() {
                 Message = "Предупреждение",
-                Description = "В проекте присутствуют помещения квартир с нулевыми системными площадьми",
+                Description = "В проекте присутствуют помещения квартир с нулевыми системными площадями",
                 DocumentName = _project.Document.Name
             };
 
             if(_hasNullAreas) {
                 areaErrorListVM.Errors.Add(new ErrorElement(_project.Document.Name,
-                    "В проекте присутствуют помещения квартир с нулевыми системными площадьми. " +
+                    "В проекте присутствуют помещения квартир с нулевыми системными площадями. " +
                     "УТП \"Гардеробная\" и \"Увеличенная площадь балкона/лоджии\" не могут быть корректно рассчитаны."));
             }
 
