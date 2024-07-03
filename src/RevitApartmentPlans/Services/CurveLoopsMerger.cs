@@ -34,14 +34,36 @@ namespace RevitApartmentPlans.Services {
         private readonly SolidOptions _solidOptions;
 
 
-
         public CurveLoopsMerger() {
             _solidOptions = new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId);
         }
 
 
+        /// <summary>
+        /// Объединяет замкнутые плоские контуры в один внешний контур.<br/>
+        /// Если объединить не получилось, будет возвращен прямоугольник, описанный вокруг всех исходных контуров.
+        /// </summary>
         public CurveLoop Merge(ICollection<CurveLoop> curveLoops) {
-            throw new NotImplementedException();
+            double offset = 0;
+            ICollection<CurveLoop> curveLoopsXOY = CreateCopyLoopsOnXOY(curveLoops);
+            while(offset <= _offsetMax) {
+                ICollection<CurveLoop> offsettedLoops = CreateOffsetLoop(curveLoopsXOY, offset);
+                IList<Solid> solids = CreateSolids(offsettedLoops);
+                if(TryMergeSolids(solids, out Solid mergedSolid)) {
+                    Face bottomFace = GetBottomFace(mergedSolid);
+                    CurveLoop bottomLoop = GetOuterCurveLoop(bottomFace);
+                    Transform transform = GetVerticalTransformFromZero(curveLoops.First());
+                    try {
+                        //return CurveLoop.CreateViaTransform(CreateOffsetLoop(bottomLoop, -offset), transform);
+                        return CurveLoop.CreateViaTransform(CreateOffsetLoop(bottomLoop, -offset), transform);
+                    } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
+                        offset += _offsetFeetStep;
+                    }
+                } else {
+                    offset += _offsetFeetStep;
+                }
+            }
+            return CreateRectangleLoop(curveLoops);
         }
 
 
@@ -94,6 +116,98 @@ namespace RevitApartmentPlans.Services {
                 }
             }
             return SolidUtils.SplitVolumes(mergedSolid).Count == 1;
+        }
+
+        /// <summary>
+        /// Создает замкнутый контур с заданным оффсетом исходного контура в горизонтальной плоскости.<br/>
+        /// Если оффсет не удалось создать по исходному контуру, будет создан оффсет по прямоугольнику, который описывает исходный контур.
+        /// </summary>
+        private CurveLoop CreateOffsetLoop(CurveLoop curveLoop, double feetOffset) {
+            try {
+                //если ориентация линий в контуре по часовой стрелке, то положительный оффсет увеличивает контур
+                //если ориентация линий в контуре против часовой стрелки, то отрицательный оффсет увеличивает контур
+                double offset = curveLoop.IsCounterclockwise(XYZ.BasisZ) ? feetOffset : -feetOffset;
+                return CurveLoop.CreateViaOffset(curveLoop, offset, XYZ.BasisZ);
+            } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
+                return CurveLoop.CreateViaOffset(CreateRectangleLoop(curveLoop), feetOffset, XYZ.BasisZ);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию замкнутых контуров с заданным оффсетом исходных контуров в горизонтальной плоскости
+        /// </summary>
+        private ICollection<CurveLoop> CreateOffsetLoop(ICollection<CurveLoop> curveLoops, double feetOffset) {
+            return curveLoops
+                .Select(loop => CreateOffsetLoop(loop, feetOffset))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Возвращает список солидов, созданных из заданных замкнутых контуров
+        /// </summary>
+        private IList<Solid> CreateSolids(ICollection<CurveLoop> curveLoops) {
+            return curveLoops
+                .Select(loop => CreateSolid(loop))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Возвращает наружный контур грани солида
+        /// </summary>
+        private CurveLoop GetOuterCurveLoop(Face face) {
+            return face.GetEdgesAsCurveLoops()
+                .OrderByDescending(loop => loop.GetExactLength())
+                .First();
+        }
+
+        /// <summary>
+        /// Возвращает нижнюю грань солида
+        /// </summary>
+        private Face GetBottomFace(Solid solid) {
+            var uv = new UV();
+            var zVectorNegate = XYZ.BasisZ.Negate();
+            return GetFaces(solid).First(face => face.ComputeNormal(uv).IsAlmostEqualTo(zVectorNegate));
+        }
+
+        private IEnumerable<Face> GetFaces(Solid solid) {
+            foreach(Face face in solid.Faces) {
+                yield return face;
+            }
+        }
+
+        /// <summary>
+        /// Создает прямоугольный замкнутый наружный контур, в который вписаны все заданные замкнутые контуры.<br/>
+        /// Линии в этом контуре ориентированы по часовой стрелке.
+        /// </summary>
+        private CurveLoop CreateRectangleLoop(ICollection<CurveLoop> curveLoops) {
+            var points = curveLoops
+                .SelectMany(loop => loop.Select(curve => curve.GetEndPoint(0)))
+                .ToArray();
+            Outline outline = new Outline(points[0], points[1]);
+            for(var i = 2; i < points.Length; i++) {
+                outline.AddPoint(points[i]);
+            }
+            double z = outline.MinimumPoint.Z;
+            double minX = outline.MinimumPoint.X;
+            double minY = outline.MinimumPoint.Y;
+            double maxX = outline.MaximumPoint.X;
+            double maxY = outline.MaximumPoint.Y;
+
+            XYZ leftBottom = new XYZ(minX, minY, z);
+            XYZ leftTop = new XYZ(minX, maxY, z);
+            XYZ rightTop = new XYZ(maxX, maxY, z);
+            XYZ rightBottom = new XYZ(maxX, minY, z);
+
+            var left = Line.CreateBound(leftBottom, leftTop);
+            var top = Line.CreateBound(leftTop, rightTop);
+            var right = Line.CreateBound(rightTop, rightBottom);
+            var bottom = Line.CreateBound(rightBottom, leftBottom);
+
+            return CurveLoop.Create(new Curve[] { left, top, right, bottom });
+        }
+
+        private CurveLoop CreateRectangleLoop(CurveLoop curveLoop) {
+            return CreateRectangleLoop(new CurveLoop[] { curveLoop });
         }
     }
 }
