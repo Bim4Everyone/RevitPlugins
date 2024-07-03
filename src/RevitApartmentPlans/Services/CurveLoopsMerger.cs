@@ -54,7 +54,6 @@ namespace RevitApartmentPlans.Services {
                     CurveLoop bottomLoop = GetOuterCurveLoop(bottomFace);
                     Transform transform = GetVerticalTransformFromZero(curveLoops.First());
                     try {
-                        //return CurveLoop.CreateViaTransform(CreateOffsetLoop(bottomLoop, -offset), transform);
                         return CurveLoop.CreateViaTransform(CreateOffsetLoop(bottomLoop, -offset), transform);
                     } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
                         offset += _offsetFeetStep;
