@@ -64,7 +64,7 @@ namespace RevitApartmentPlans.Services {
                     Transform transform = GetVerticalTransformFromZero(curveLoops.First());
                     try {
                         return CurveLoop.CreateViaTransform(_curveLoopsOffsetter.CreateOffsetLoop(bottomLoop, -offset), transform);
-                    } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
+                    } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                         offset += _offsetFeetStep;
                     }
                 } else {
@@ -118,7 +118,7 @@ namespace RevitApartmentPlans.Services {
                         mergedSolid,
                         solids[i],
                         BooleanOperationsType.Union);
-                } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
+                } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                     mergedSolid = default;
                     return false;
                 }

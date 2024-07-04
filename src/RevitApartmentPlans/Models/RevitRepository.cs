@@ -57,6 +57,19 @@ namespace RevitApartmentPlans.Models {
         /// <summary>
         /// TODO debug only method
         /// </summary>
+        /// <returns></returns>
+        public ICollection<ViewPlan> GetDebugTemplates() {
+            return new FilteredElementCollector(Document)
+                .OfClass(typeof(ViewPlan))
+                .Cast<ViewPlan>()
+                .Where(plan => plan.IsTemplate
+                    && (plan.ViewType == ViewType.FloorPlan || plan.ViewType == ViewType.CeilingPlan))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// TODO debug only method
+        /// </summary>
         /// <param name="curveLoop"></param>
         public void CreateDebugLines(CurveLoop curveLoop) {
             using(Transaction t = Document.StartTransaction("Создание тестового контура")) {
@@ -69,6 +82,31 @@ namespace RevitApartmentPlans.Models {
 
                 t.Commit();
             }
+        }
+
+        /// <summary>
+        /// Возвращает тип шаблона вида: план этажа/план потолка
+        /// </summary>
+        /// <param name="template">Шаблон вида</param>
+        /// <exception cref="NotSupportedException">Исключение, если шаблон вида - не план этажа/потолка</exception>
+        public ElementId GetViewFamilyTypeId(ViewPlan template) {
+            switch(template.ViewType) {
+                case ViewType.FloorPlan:
+                    return GetViewFamilyTypeId(ViewFamily.FloorPlan);
+                case ViewType.CeilingPlan:
+                    return GetViewFamilyTypeId(ViewFamily.CeilingPlan);
+                default:
+                    throw new NotSupportedException($"Тип шаблона {template.ViewType} не поддерживается");
+            }
+        }
+
+        private ElementId GetViewFamilyTypeId(ViewFamily viewFamily) {
+            return new FilteredElementCollector(Document)
+                .OfClass(typeof(ViewFamilyType))
+                .Cast<ViewFamilyType>()
+                .Where(v => v.ViewFamily == viewFamily)
+                .First()
+                .Id;
         }
 
         /// <summary>

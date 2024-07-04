@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 namespace RevitApartmentPlans.Models {
@@ -28,11 +29,18 @@ namespace RevitApartmentPlans.Models {
 
             _rooms = rooms;
             Name = name;
-            LevelName = rooms.First().Level.Name;
+            Level level = rooms.First().Level;
+            LevelName = level.Name;
+            LevelId = level.Id;
         }
 
 
+        /// <summary>
+        /// Номер квартиры
+        /// </summary>
         public string Name { get; }
+
+        public ElementId LevelId { get; }
 
         public string LevelName { get; }
 

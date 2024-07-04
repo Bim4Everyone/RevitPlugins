@@ -37,7 +37,12 @@ namespace RevitApartmentPlans {
                 kernel.Bind<IRectangleLoopProvider>()
                     .To<RectangleLoopProvider>()
                     .InSingletonScope();
-
+                kernel.Bind<IViewPlanCreationService>()
+                    .To<ViewPlanCreationService>()
+                    .InSingletonScope();
+                kernel.Bind<ILengthConverter>()
+                    .To<Services.LengthConverter>()
+                    .InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
@@ -49,9 +54,12 @@ namespace RevitApartmentPlans {
                 //TODO Debug only code
                 var repo = kernel.Get<RevitRepository>();
                 var apartment = repo.GetDebugApartment();
-                var service = kernel.Get<IBoundsCalculateService>();
-                var loop = service.CreateBounds(apartment, 0);
-                repo.CreateDebugLines(loop);
+                var planCreationService = kernel.Get<IViewPlanCreationService>();
+                var lengthConverter = kernel.Get<ILengthConverter>();
+                planCreationService.CreateViews(
+                    new Apartment[] { apartment },
+                    repo.GetDebugTemplates(),
+                    lengthConverter.ConvertToInternal(200));
                 //Notification(kernel.Get<MainWindow>());
             }
         }
