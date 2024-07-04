@@ -11,11 +11,11 @@ using RevitApartmentPlans.Models;
 namespace RevitApartmentPlans.Services {
     internal class ViewPlanCreationService : IViewPlanCreationService {
         private readonly RevitRepository _revitRepository;
-        private readonly IBoundsCalculateService _boundsCalculateService;
+        private readonly IBoundsCalculationService _boundsCalculateService;
 
         public ViewPlanCreationService(
             RevitRepository revitRepository,
-            IBoundsCalculateService boundsCalculateService) {
+            IBoundsCalculationService boundsCalculateService) {
 
             _revitRepository = revitRepository
                 ?? throw new ArgumentNullException(nameof(revitRepository));

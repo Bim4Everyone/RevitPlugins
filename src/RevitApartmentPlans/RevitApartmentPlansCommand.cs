@@ -25,8 +25,8 @@ namespace RevitApartmentPlans {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<IBoundsCalculateService>()
-                    .To<BoundsCalculateService>()
+                kernel.Bind<IBoundsCalculationService>()
+                    .To<BoundsCalculationService>()
                     .InSingletonScope();
                 kernel.Bind<ICurveLoopsMerger>()
                     .To<CurveLoopsMerger>()

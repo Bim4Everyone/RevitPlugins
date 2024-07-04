@@ -6,7 +6,7 @@ namespace RevitApartmentPlans.Services {
     /// <summary>
     /// Сервис для обработки контуров помещений и квартир
     /// </summary>
-    internal interface IBoundsCalculateService {
+    internal interface IBoundsCalculationService {
         /// <summary>
         /// Находит наружный контур квартиры, увеличенный на заданный отступ в футах
         /// </summary>

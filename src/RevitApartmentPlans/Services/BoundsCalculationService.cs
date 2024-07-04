@@ -7,12 +7,12 @@ using Autodesk.Revit.DB.Architecture;
 using RevitApartmentPlans.Models;
 
 namespace RevitApartmentPlans.Services {
-    internal class BoundsCalculateService : IBoundsCalculateService {
+    internal class BoundsCalculationService : IBoundsCalculationService {
         private readonly RevitRepository _revitRepository;
         private readonly ICurveLoopsMerger _curveLoopsMerger;
         private readonly ICurveLoopsOffsetter _curveLoopsOffsetter;
 
-        public BoundsCalculateService(
+        public BoundsCalculationService(
             RevitRepository revitRepository,
             ICurveLoopsMerger curveLoopsMerger,
             ICurveLoopsOffsetter curveLoopsOffsetter) {
