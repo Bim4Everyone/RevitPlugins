@@ -40,7 +40,7 @@ namespace RevitApartmentPlans.Services {
         }
 
 
-        private ViewPlan CreateView(Apartment apartment, ViewPlan template, double feetOffset) {
+        private ViewPlan CreateView(Apartment apartment, ViewPlan template, CurveLoop cropShape) {
             var viewPlan = ViewPlan.Create(
                 _revitRepository.Document,
                 _revitRepository.GetViewFamilyTypeId(template),
@@ -61,9 +61,8 @@ namespace RevitApartmentPlans.Services {
                 //pass
             }
 
-            var loop = _boundsCalculateService.CreateBounds(apartment, feetOffset);
             try {
-                viewPlan.GetCropRegionShapeManager().SetCropShape(loop);
+                viewPlan.GetCropRegionShapeManager().SetCropShape(cropShape);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 //pass
             }
@@ -75,8 +74,10 @@ namespace RevitApartmentPlans.Services {
             ICollection<ViewPlan> templates,
             double feetOffset) {
 
+            CurveLoop loop = _boundsCalculateService.CreateBounds(apartment, feetOffset);
+
             return templates
-                .Select(t => CreateView(apartment, t, feetOffset))
+                .Select(t => CreateView(apartment, t, loop))
                 .ToArray();
         }
 
