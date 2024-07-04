@@ -10,11 +10,15 @@ namespace RevitApartmentPlans.Services {
     internal class BoundsCalculateService : IBoundsCalculateService {
         private readonly RevitRepository _revitRepository;
         private readonly ICurveLoopsMerger _curveLoopsMerger;
+        private readonly ICurveLoopsOffsetter _curveLoopsOffsetter;
 
-
-        public BoundsCalculateService(RevitRepository revitRepository, ICurveLoopsMerger curveLoopsMerger) {
+        public BoundsCalculateService(
+            RevitRepository revitRepository,
+            ICurveLoopsMerger curveLoopsMerger,
+            ICurveLoopsOffsetter curveLoopsOffsetter) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _curveLoopsMerger = curveLoopsMerger ?? throw new ArgumentNullException(nameof(curveLoopsMerger));
+            _curveLoopsOffsetter = curveLoopsOffsetter ?? throw new ArgumentNullException(nameof(curveLoopsOffsetter));
         }
 
 
@@ -22,7 +26,7 @@ namespace RevitApartmentPlans.Services {
             var curveLoops = apartment.GetRooms()
                 .Select(r => GetOuterRoomBound(r))
                 .ToArray();
-            return CurveLoop.CreateViaOffset(_curveLoopsMerger.Merge(curveLoops), feetOffset, XYZ.BasisZ);
+            return _curveLoopsOffsetter.CreateOffsetLoop(_curveLoopsMerger.Merge(curveLoops), feetOffset);
         }
 
         /// <summary>
