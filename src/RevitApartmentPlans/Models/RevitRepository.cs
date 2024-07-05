@@ -47,6 +47,41 @@ namespace RevitApartmentPlans.Models {
         }
 
         /// <summary>
+        /// Возвращает массив используемых типов видов
+        /// </summary>
+        public ViewType[] GetAllUsedViewTypes() {
+            return new ViewType[] {
+                ViewType.FloorPlan,
+                ViewType.CeilingPlan
+            };
+        }
+
+        /// <summary>
+        /// По заданным Id находит все шаблоны видов из активного документа, по которым можно создать планы
+        /// </summary>
+        /// <param name="viewPlanIds">Id шаблонов видов</param>
+        public ICollection<ViewPlan> GetViewPlans(ICollection<ElementId> viewPlanIds) {
+            var enabledViewTypes = GetAllUsedViewTypes();
+            return new FilteredElementCollector(Document, viewPlanIds)
+                .OfClass(typeof(ViewPlan))
+                .Cast<ViewPlan>()
+                .Where(plan => plan.IsTemplate && enabledViewTypes.Any(vt => vt == plan.ViewType))
+                .ToArray();
+        }
+
+        public ICollection<Apartment> GetApartments(string paramName) {
+            if(string.IsNullOrWhiteSpace(paramName)) { throw new ArgumentException(nameof(paramName)); }
+
+            return new FilteredElementCollector(Document, Document.ActiveView.Id)
+                .WherePasses(new RoomFilter())
+                .Cast<Room>()
+                .Where(r => r.Area > 0 && !string.IsNullOrWhiteSpace(r.GetParamValue<string>(paramName)))
+                .GroupBy(r => r.GetParamValue<string>(paramName))
+                .Select(g => new Apartment(g.ToArray(), g.Key))
+                .ToArray();
+        }
+
+        /// <summary>
         /// TODO debug only method
         /// </summary>
         /// <returns></returns>
@@ -59,11 +94,11 @@ namespace RevitApartmentPlans.Models {
         /// </summary>
         /// <returns></returns>
         public ICollection<ViewPlan> GetDebugTemplates() {
+            var enabledViewTypes = GetAllUsedViewTypes();
             return new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewPlan))
                 .Cast<ViewPlan>()
-                .Where(plan => plan.IsTemplate
-                    && (plan.ViewType == ViewType.FloorPlan || plan.ViewType == ViewType.CeilingPlan))
+                .Where(plan => plan.IsTemplate && enabledViewTypes.Any(vt => vt == plan.ViewType))
                 .ToArray();
         }
 
@@ -98,6 +133,19 @@ namespace RevitApartmentPlans.Models {
                 default:
                     throw new NotSupportedException($"Тип шаблона {template.ViewType} не поддерживается");
             }
+        }
+
+
+        /// <summary>
+        /// Возвращает уровень, привязанный к активному виду, который должен быть планом
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Исключение, если активный вид - не план</exception>
+        private Level GetLevelOfActivePlan() {
+            var view = Document.ActiveView as ViewPlan;
+            if(view is null) {
+                throw new InvalidOperationException("Активный вид не является планом");
+            }
+            return view.GenLevel;
         }
 
         private ElementId GetViewFamilyTypeId(ViewFamily viewFamily) {

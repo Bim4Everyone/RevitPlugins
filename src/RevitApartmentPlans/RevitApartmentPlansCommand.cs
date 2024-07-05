@@ -46,8 +46,18 @@ namespace RevitApartmentPlans {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                kernel.Bind<MainViewModel>().ToSelf();
-                kernel.Bind<MainWindow>().ToSelf()
+                kernel.Bind<ApartmentsViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ViewTemplatesViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<MainViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<MainWindow>()
+                    .ToSelf()
+                    .InSingletonScope()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
 

@@ -9,14 +9,22 @@ namespace RevitApartmentPlans.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private const double _maxOffsetMm = 1000;
 
-        private string _errorText;
-        private string _saveProperty;
 
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
-            _pluginConfig = pluginConfig;
-            _revitRepository = revitRepository;
+        public MainViewModel(
+            PluginConfig pluginConfig,
+            RevitRepository revitRepository,
+            ViewTemplatesViewModel viewTemplatesViewModel,
+            ApartmentsViewModel apartmentsViewModel) {
 
+            _pluginConfig = pluginConfig ?? throw new System.ArgumentNullException(nameof(pluginConfig));
+            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+
+            ViewTemplatesViewModel = viewTemplatesViewModel
+                ?? throw new System.ArgumentNullException(nameof(viewTemplatesViewModel));
+            ApartmentsViewModel = apartmentsViewModel
+                ?? throw new System.ArgumentNullException(nameof(apartmentsViewModel));
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
@@ -24,15 +32,23 @@ namespace RevitApartmentPlans.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
+        private string _errorText;
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
+
+        public ViewTemplatesViewModel ViewTemplatesViewModel { get; }
+
+        public ApartmentsViewModel ApartmentsViewModel { get; }
+
+        private double _offsetMm;
+        public double OffsetMm {
+            get => _offsetMm;
+            set => RaiseAndSetIfChanged(ref _offsetMm, value);
         }
+
 
         private void LoadView() {
             LoadConfig();
@@ -41,10 +57,14 @@ namespace RevitApartmentPlans.ViewModels {
         private void AcceptView() {
             SaveConfig();
         }
-        
+
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText = "Введите значение сохраняемого свойства.";
+            if(OffsetMm < 0) {
+                ErrorText = "Отступ не должен быть меньше 0.";
+                return false;
+            }
+            if(OffsetMm > _maxOffsetMm) {
+                ErrorText = "Отступ не может быть больше 1000 мм.";
                 return false;
             }
 
@@ -55,14 +75,13 @@ namespace RevitApartmentPlans.ViewModels {
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            SaveProperty = setting?.SaveProperty ?? "Привет Revit!";
+            OffsetMm = setting.OffsetMm;
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                     ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.SaveProperty = SaveProperty;
             _pluginConfig.SaveProjectConfig();
         }
     }
