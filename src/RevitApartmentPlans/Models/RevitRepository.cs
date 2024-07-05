@@ -61,6 +61,10 @@ namespace RevitApartmentPlans.Models {
         /// </summary>
         /// <param name="viewPlanIds">Id шаблонов видов</param>
         public ICollection<ViewPlan> GetViewPlans(ICollection<ElementId> viewPlanIds) {
+            if(viewPlanIds is null || viewPlanIds.Count == 0) {
+                return Array.Empty<ViewPlan>();
+            }
+
             var enabledViewTypes = GetAllUsedViewTypes();
             return new FilteredElementCollector(Document, viewPlanIds)
                 .OfClass(typeof(ViewPlan))
@@ -69,15 +73,40 @@ namespace RevitApartmentPlans.Models {
                 .ToArray();
         }
 
+        /// <summary>
+        /// Возвращает коллекцию квартир, видимых на активном виде (плане) по значению параметра для группировки.
+        /// </summary>
+        /// <param name="paramName">Название параметра для группировки помещений по квартирам.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Исключение, если название параметра пустое.</exception>
         public ICollection<Apartment> GetApartments(string paramName) {
             if(string.IsNullOrWhiteSpace(paramName)) { throw new ArgumentException(nameof(paramName)); }
+            Level level = GetLevelOfActivePlan();
 
             return new FilteredElementCollector(Document, Document.ActiveView.Id)
                 .WherePasses(new RoomFilter())
                 .Cast<Room>()
-                .Where(r => r.Area > 0 && !string.IsNullOrWhiteSpace(r.GetParamValue<string>(paramName)))
-                .GroupBy(r => r.GetParamValue<string>(paramName))
+                .Where(r => r.Area > 0
+                    && r.LevelId == level.Id
+                    && r.IsExistsParamValue(paramName))
+                .GroupBy(r => r.GetParam(paramName).AsValueString())
                 .Select(g => new Apartment(g.ToArray(), g.Key))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Находит все параметры, по которым можно группировать помещения в квартиры
+        /// </summary>
+        public ICollection<ParameterElement> GetRoomGroupingParameters() {
+            Room room = new FilteredElementCollector(Document)
+                .WherePasses(new RoomFilter())
+                .FirstElement() as Room;
+
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(ParameterElement))
+                .Cast<ParameterElement>()
+                .Where(p => room.IsExistsParam(p.Name))
                 .ToArray();
         }
 

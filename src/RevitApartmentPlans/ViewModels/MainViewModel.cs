@@ -75,7 +75,7 @@ namespace RevitApartmentPlans.ViewModels {
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            OffsetMm = setting.OffsetMm;
+            OffsetMm = setting?.OffsetMm ?? 0;
         }
 
         private void SaveConfig() {

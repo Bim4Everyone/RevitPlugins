@@ -1,69 +1,144 @@
-<base:ThemedPlatformWindow
-    x:Class="RevitApartmentPlans.Views.MainWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+<base:ThemedPlatformWindow x:Class="RevitApartmentPlans.Views.MainWindow"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:base="clr-namespace:dosymep.WPF.Views"
+                           xmlns:local="clr-namespace:RevitApartmentPlans.Views"
+                           xmlns:vms="clr-namespace:RevitApartmentPlans.ViewModels"
+                           xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                           xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+                           mc:Ignorable="d"
+                           WindowStartupLocation="CenterOwner"
+                           Title="MainWindow"
+                           Height="450"
+                           Width="800"
+                           d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitApartmentPlans.Views"
-    xmlns:vms="clr-namespace:RevitApartmentPlans.ViewModels"
-    
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    
-    mc:Ignorable="d"
-    WindowStartupLocation="CenterOwner"
-    
-    Title="MainWindow"
-    Height="450" Width="800"    
-
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
     <dxmvvm:Interaction.Behaviors>
-        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding LoadViewCommand}"/>
+        <dxmvvm:EventToCommand EventName="Loaded"
+                               Command="{Binding LoadViewCommand}" />
     </dxmvvm:Interaction.Behaviors>
-    
+
+    <Window.Resources>
+        <Style TargetType="dxg:TableView">
+            <Setter Property="ShowDataNavigator"
+                    Value="False" />
+            <Setter Property="ShowSearchPanelMode"
+                    Value="Never" />
+            <Setter Property="NavigationStyle"
+                    Value="Cell" />
+            <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping"
+                    Value="True" />
+            <Setter Property="VirtualizingPanel.VirtualizationMode"
+                    Value="Recycling" />
+            <Setter Property="VirtualizingPanel.IsVirtualizing"
+                    Value="True" />
+            <Setter Property="AllowEditing"
+                    Value="False" />
+            <Setter Property="ShowGroupPanel"
+                    Value="False" />
+            <Setter Property="AllowGrouping"
+                    Value="False" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <dxe:TextEdit
-            Grid.Row="0"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
 
-            Text="{Binding SaveProperty}" />
+        <DockPanel Grid.Row="0"
+                   HorizontalAlignment="Left">
+            <TextBlock Text="Отступ: "
+                       TextAlignment="Center"
+                       VerticalAlignment="Center" />
+            <dxe:TextEdit Width="200"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Center"
+                          Text="{Binding OffsetMm}"
+                          MaskType="RegEx"
+                          MaskShowPlaceHolders="True"
+                          Mask=".* мм"
+                          MaskUseAsDisplayFormat="True">
+            </dxe:TextEdit>
+            <dxe:ComboBoxEdit ItemsSource="{Binding ApartmentsViewModel.Parameters}"
+                              SelectedItem="{Binding ApartmentsViewModel.SelectedParam}"
+                              IsTextEditable="False"
+                              DisplayMember="Name"
+                              NullText="Выберите параметр..." />
+        </DockPanel>
 
-        <StackPanel
-            Grid.Row="1"
-            Height="45"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-            <TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
 
-            <dx:SimpleButton
-                Margin="10"
-                Width="80"
-                Content="ОК"
-                IsDefault="True"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
+            <dxg:GridControl ItemsSource="{Binding ApartmentsViewModel.Apartments}"
+                             AutoGenerateColumns="None"
+                             DefaultSorting="Name"
+                             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                             VirtualizingPanel.VirtualizationMode="Recycling"
+                             VirtualizingPanel.IsVirtualizing="True"
+                             SelectionMode="Cell">
+                <dxg:GridControl.View>
+                    <dxg:TableView VerticalScrollbarVisibility="Auto"
+                                   HorizontalScrollbarVisibility="Auto"/>
+                </dxg:GridControl.View>
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn Width="1*"
+                                    Header="Номер"
+                                    FieldName="Name"
+                                    AllowEditing="False"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn Width="1*"
+                                    Header="Этаж"
+                                    FieldName="LevelName"
+                                    AllowEditing="False"
+                                    ReadOnly="True" />
+                    <dxg:GridColumn Width="1*"
+                                    Header="Выбрать"
+                                    FieldName="IsSelected"
+                                    ReadOnly="False">
+                        <dxg:GridColumn.CellTemplate>
+                            <DataTemplate>
+                                <dxe:CheckEdit IsChecked="{Binding RowData.Row.IsSelected}"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </dxg:GridColumn.CellTemplate>
+                    </dxg:GridColumn>
+                </dxg:GridControl.Columns>
+            </dxg:GridControl>
+        </Grid>
 
-            <dx:SimpleButton
-                Margin="10"
-                Width="80"
-                Content="Отмена"
-                IsCancel="True"
-                Click="ButtonCancel_Click" />
+        <StackPanel Grid.Row="2"
+                    Height="45"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <TextBlock Margin="10"
+                       Foreground="Orange"
+                       VerticalAlignment="Center"
+                       Text="{Binding ErrorText}" />
+
+            <dx:SimpleButton Margin="10"
+                             Width="80"
+                             Content="ОК"
+                             IsDefault="True"
+                             Click="ButtonOk_Click"
+                             Command="{Binding AcceptViewCommand}" />
+
+            <dx:SimpleButton Margin="10"
+                             Width="80"
+                             Content="Отмена"
+                             IsCancel="True"
+                             Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>

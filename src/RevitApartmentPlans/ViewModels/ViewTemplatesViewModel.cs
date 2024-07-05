@@ -51,7 +51,8 @@ namespace RevitApartmentPlans.ViewModels {
             if(_revitRepository == null) { throw new ArgumentNullException(nameof(_revitRepository)); }
 
             ViewTemplates.Clear();
-            ElementId[] templatesIds = _pluginConfig.GetSettings(_revitRepository.Document).ViewTemplates;
+            ElementId[] templatesIds = _pluginConfig.GetSettings(_revitRepository.Document)?.ViewTemplates
+                ?? Array.Empty<ElementId>();
             ICollection<ViewPlan> templates = _revitRepository.GetViewPlans(templatesIds);
             foreach(ViewPlan template in templates) {
                 ViewTemplates.Add(new ViewTemplateViewModel(template));
