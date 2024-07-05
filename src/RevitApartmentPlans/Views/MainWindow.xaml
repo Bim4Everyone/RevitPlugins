@@ -25,6 +25,18 @@
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
+        <Style TargetType="dxdo:LayoutGroup">
+            <Setter Property="AllowSplitters"
+                    Value="True" />
+            <Setter Property="Orientation"
+                    Value="Horizontal" />
+        </Style>
+        <Style TargetType="dxdo:LayoutPanel">
+            <Setter Property="ShowPinButton"
+                    Value="False" />
+            <Setter Property="ShowCloseButton"
+                    Value="False" />
+        </Style>
         <Style TargetType="dxg:TableView">
             <Setter Property="ShowDataNavigator"
                     Value="False" />
@@ -44,6 +56,10 @@
                     Value="False" />
             <Setter Property="AllowGrouping"
                     Value="False" />
+            <Setter Property="VerticalScrollbarVisibility"
+                    Value="Auto" />
+            <Setter Property="HorizontalScrollbarVisibility"
+                    Value="Auto" />
         </Style>
     </Window.Resources>
 
@@ -55,11 +71,13 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0"
+                   Margin="5"
                    HorizontalAlignment="Left">
             <TextBlock Text="Отступ: "
                        TextAlignment="Center"
                        VerticalAlignment="Center" />
-            <dxe:TextEdit Width="200"
+            <dxe:TextEdit Width="100"
+                          Margin="0 0 5 0"
                           VerticalAlignment="Top"
                           HorizontalAlignment="Center"
                           Text="{Binding OffsetMm}"
@@ -72,50 +90,77 @@
                               SelectedItem="{Binding ApartmentsViewModel.SelectedParam}"
                               IsTextEditable="False"
                               DisplayMember="Name"
-                              NullText="Выберите параметр..." />
+                              NullText="Выберите параметр для группировки" />
         </DockPanel>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1"
+              Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <dxg:GridControl ItemsSource="{Binding ApartmentsViewModel.Apartments}"
-                             AutoGenerateColumns="None"
-                             DefaultSorting="Name"
-                             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                             VirtualizingPanel.VirtualizationMode="Recycling"
-                             VirtualizingPanel.IsVirtualizing="True"
-                             SelectionMode="Cell">
-                <dxg:GridControl.View>
-                    <dxg:TableView VerticalScrollbarVisibility="Auto"
-                                   HorizontalScrollbarVisibility="Auto"/>
-                </dxg:GridControl.View>
-                <dxg:GridControl.Columns>
-                    <dxg:GridColumn Width="1*"
-                                    Header="Номер"
-                                    FieldName="Name"
-                                    AllowEditing="False"
-                                    ReadOnly="True" />
-                    <dxg:GridColumn Width="1*"
-                                    Header="Этаж"
-                                    FieldName="LevelName"
-                                    AllowEditing="False"
-                                    ReadOnly="True" />
-                    <dxg:GridColumn Width="1*"
-                                    Header="Выбрать"
-                                    FieldName="IsSelected"
-                                    ReadOnly="False">
-                        <dxg:GridColumn.CellTemplate>
-                            <DataTemplate>
-                                <dxe:CheckEdit IsChecked="{Binding RowData.Row.IsSelected}"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center" />
-                            </DataTemplate>
-                        </dxg:GridColumn.CellTemplate>
-                    </dxg:GridColumn>
-                </dxg:GridControl.Columns>
-            </dxg:GridControl>
+            <dxdo:DockLayoutManager x:Name="Manager">
+                <dxdo:LayoutGroup x:Name="layoutRoot">
+                    <dxdo:LayoutPanel Caption="Квартиры">
+
+                        <dxg:GridControl ItemsSource="{Binding ApartmentsViewModel.Apartments}"
+                                         AutoGenerateColumns="None"
+                                         DefaultSorting="Name"
+                                         SelectionMode="Cell">
+                            <dxg:GridControl.View>
+                                <dxg:TableView />
+                            </dxg:GridControl.View>
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn Width="1*"
+                                                Header="Номер"
+                                                FieldName="Name"
+                                                AllowEditing="False"
+                                                ReadOnly="True" />
+                                <dxg:GridColumn Width="1*"
+                                                Header="Этаж"
+                                                FieldName="LevelName"
+                                                AllowEditing="False"
+                                                ReadOnly="True" />
+                                <dxg:GridColumn Width="1*"
+                                                Header="Выбрать"
+                                                FieldName="IsSelected"
+                                                ReadOnly="False">
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxe:CheckEdit IsChecked="{Binding RowData.Row.IsSelected}"
+                                                           VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                            </dxg:GridControl.Columns>
+                        </dxg:GridControl>
+                    </dxdo:LayoutPanel>
+
+                    <dxdo:LayoutPanel Caption="Шаблоны видов">
+                        <dxg:GridControl ItemsSource="{Binding ViewTemplatesViewModel.ViewTemplates}"
+                                         AutoGenerateColumns="None"
+                                         DefaultSorting="Name"
+                                         SelectionMode="Cell">
+                            <dxg:GridControl.View>
+                                <dxg:TableView />
+                            </dxg:GridControl.View>
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn Width="1*"
+                                                Header="Тип"
+                                                FieldName="ViewTemplateType"
+                                                AllowEditing="False"
+                                                ReadOnly="True" />
+                                <dxg:GridColumn Width="3*"
+                                                Header="Название"
+                                                FieldName="Name"
+                                                AllowEditing="False"
+                                                ReadOnly="True" />
+                            </dxg:GridControl.Columns>
+                        </dxg:GridControl>
+                    </dxdo:LayoutPanel>
+                </dxdo:LayoutGroup>
+            </dxdo:DockLayoutManager>
         </Grid>
 
         <StackPanel Grid.Row="2"
