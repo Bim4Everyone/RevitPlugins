@@ -9,6 +9,7 @@ namespace RevitApartmentPlans.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private const double _minOffsetMm = 0;
         private const double _maxOffsetMm = 1000;
 
 
@@ -59,12 +60,12 @@ namespace RevitApartmentPlans.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(OffsetMm < 0) {
-                ErrorText = "Отступ не должен быть меньше 0.";
+            if(OffsetMm < _minOffsetMm) {
+                ErrorText = $"Отступ не должен быть меньше {_minOffsetMm} мм.";
                 return false;
             }
             if(OffsetMm > _maxOffsetMm) {
-                ErrorText = "Отступ не может быть больше 1000 мм.";
+                ErrorText = $"Отступ не может быть больше {_maxOffsetMm} мм.";
                 return false;
             }
 

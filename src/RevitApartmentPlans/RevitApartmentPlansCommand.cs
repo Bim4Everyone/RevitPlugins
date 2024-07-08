@@ -3,6 +3,9 @@ using System.Windows;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using DevExpress.Mvvm;
+using DevExpress.Xpf.WindowsUI;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 
@@ -45,11 +48,17 @@ namespace RevitApartmentPlans {
                     .InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
+                kernel.Bind<IDialogService>()
+                    .To<WinUIDialogService>()
+                    .InSingletonScope();
 
                 kernel.Bind<ApartmentsViewModel>()
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<ViewTemplatesViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ViewTemplateAdditionViewModel>()
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<MainViewModel>()

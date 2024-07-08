@@ -7,6 +7,7 @@
                            xmlns:local="clr-namespace:RevitApartmentPlans.Views"
                            xmlns:vms="clr-namespace:RevitApartmentPlans.ViewModels"
                            xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           xmlns:dxwui="http://schemas.devexpress.com/winfx/2008/xaml/windowsui"
                            xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
@@ -22,6 +23,13 @@
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand EventName="Loaded"
                                Command="{Binding LoadViewCommand}" />
+        <dxwui:WinUIDialogService>
+            <dxwui:WinUIDialogService.ViewTemplate>
+                <DataTemplate>
+                    <local:AddViewTemplateView />
+                </DataTemplate>
+            </dxwui:WinUIDialogService.ViewTemplate>
+        </dxwui:WinUIDialogService>
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
@@ -156,7 +164,7 @@
                                                      Width="30"
                                                      Glyph="{dx:DXImage 'Office2013/Actions/Add_32x32.png'}"
                                                      GlyphHeight="18"
-                                                     Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.ViewTemplatesViewModel.AddViewTemplate}" />
+                                                     Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.ViewTemplatesViewModel.AddViewTemplateCommand}" />
                                 </DockPanel>
                             </DataTemplate>
                         </dxdo:LayoutPanel.CaptionTemplate>

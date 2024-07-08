@@ -60,13 +60,25 @@ namespace RevitApartmentPlans.Models {
         /// По заданным Id находит все шаблоны видов из активного документа, по которым можно создать планы
         /// </summary>
         /// <param name="viewPlanIds">Id шаблонов видов</param>
-        public ICollection<ViewPlan> GetViewPlans(ICollection<ElementId> viewPlanIds) {
+        public ICollection<ViewPlan> GetViewTemplates(ICollection<ElementId> viewPlanIds) {
             if(viewPlanIds is null || viewPlanIds.Count == 0) {
                 return Array.Empty<ViewPlan>();
             }
 
             var enabledViewTypes = GetAllUsedViewTypes();
             return new FilteredElementCollector(Document, viewPlanIds)
+                .OfClass(typeof(ViewPlan))
+                .Cast<ViewPlan>()
+                .Where(plan => plan.IsTemplate && enabledViewTypes.Any(vt => vt == plan.ViewType))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Находит все шаблоны видов из активного документа, по которым можно создать планы
+        /// </summary>
+        public ICollection<ViewPlan> GetViewTemplates() {
+            var enabledViewTypes = GetAllUsedViewTypes();
+            return new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewPlan))
                 .Cast<ViewPlan>()
                 .Where(plan => plan.IsTemplate && enabledViewTypes.Any(vt => vt == plan.ViewType))
