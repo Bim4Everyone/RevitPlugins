@@ -21,9 +21,9 @@ using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
-using RevitPlugins.Models;
-using RevitPlugins.ViewModels;
-using RevitPlugins.Views;
+using RevitPluginTemplate.Models;
+using RevitPluginTemplate.ViewModels;
+using RevitPluginTemplate.Views;
 
 namespace RevitPluginTemplate {
     [Transaction(TransactionMode.Manual)]
