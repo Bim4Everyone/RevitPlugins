@@ -25,6 +25,10 @@
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
+        <Style TargetType="dx:SimpleButton">
+            <Setter Property="Width"
+                    Value="80" />
+        </Style>
         <Style TargetType="dxdo:LayoutGroup">
             <Setter Property="AllowSplitters"
                     Value="True" />
@@ -35,6 +39,14 @@
             <Setter Property="ShowPinButton"
                     Value="False" />
             <Setter Property="ShowCloseButton"
+                    Value="False" />
+            <Setter Property="AllowDrag"
+                    Value="False" />
+            <Setter Property="AllowMaximize"
+                    Value="False" />
+            <Setter Property="AllowMinimize"
+                    Value="False" />
+            <Setter Property="AllowFloat"
                     Value="False" />
         </Style>
         <Style TargetType="dxg:TableView">
@@ -80,11 +92,8 @@
                           Margin="0 0 5 0"
                           VerticalAlignment="Top"
                           HorizontalAlignment="Center"
-                          Text="{Binding OffsetMm}"
-                          MaskType="RegEx"
-                          MaskShowPlaceHolders="True"
-                          Mask=".* мм"
-                          MaskUseAsDisplayFormat="True">
+                          Text="{Binding OffsetMm, UpdateSourceTrigger=PropertyChanged}"
+                          DisplayFormatString="{}{0} мм">
             </dxe:TextEdit>
             <dxe:ComboBoxEdit ItemsSource="{Binding ApartmentsViewModel.Parameters}"
                               SelectedItem="{Binding ApartmentsViewModel.SelectedParam}"
@@ -94,7 +103,7 @@
         </DockPanel>
 
         <Grid Grid.Row="1"
-              Margin="5">
+              Margin="5 5 5 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
@@ -137,7 +146,20 @@
                         </dxg:GridControl>
                     </dxdo:LayoutPanel>
 
-                    <dxdo:LayoutPanel Caption="Шаблоны видов">
+                    <dxdo:LayoutPanel>
+                        <dxdo:LayoutPanel.CaptionTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <TextBlock Text="Шаблоны видов" />
+                                    <dx:SimpleButton Margin="5 0"
+                                                     FontSize="12"
+                                                     Width="30"
+                                                     Glyph="{dx:DXImage 'Office2013/Actions/Add_32x32.png'}"
+                                                     GlyphHeight="18"
+                                                     Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.ViewTemplatesViewModel.AddViewTemplate}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </dxdo:LayoutPanel.CaptionTemplate>
                         <dxg:GridControl ItemsSource="{Binding ViewTemplatesViewModel.ViewTemplates}"
                                          AutoGenerateColumns="None"
                                          DefaultSorting="Name"
@@ -156,6 +178,18 @@
                                                 FieldName="Name"
                                                 AllowEditing="False"
                                                 ReadOnly="True" />
+                                <dxg:GridColumn Width="1*"
+                                                AllowResizing="False">
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dx:SimpleButton Width="Auto"
+                                                             GlyphHeight="16"
+                                                             Glyph="{dx:DXImage 'Office2013/Actions/Cancel_32x32.png'}"
+                                                             Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.ViewTemplatesViewModel.RemoveViewTemplateCommand}"
+                                                             CommandParameter="{Binding Row}" />
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
                             </dxg:GridControl.Columns>
                         </dxg:GridControl>
                     </dxdo:LayoutPanel>
@@ -173,14 +207,12 @@
                        Text="{Binding ErrorText}" />
 
             <dx:SimpleButton Margin="10"
-                             Width="80"
                              Content="ОК"
                              IsDefault="True"
                              Click="ButtonOk_Click"
                              Command="{Binding AcceptViewCommand}" />
 
             <dx:SimpleButton Margin="10"
-                             Width="80"
                              Content="Отмена"
                              IsCancel="True"
                              Click="ButtonCancel_Click" />
