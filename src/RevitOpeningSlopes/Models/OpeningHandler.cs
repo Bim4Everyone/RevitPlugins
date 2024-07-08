@@ -4,8 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit.Geometry;
-
 using RevitOpeningSlopes.Models.Enums;
 
 namespace RevitOpeningSlopes.Models {
@@ -203,37 +201,12 @@ namespace RevitOpeningSlopes.Models {
         /// Функция создает объединенный Solid из элементов, находящихся внутри увеличенного BoundingBox семейства окна
         /// </summary>
         /// <returns>Объединенный Solid из Solid элементов вокруг окна</returns>
-        private Solid GetUnitedSolidFromBoundingBox() {
+        private Solid GetNearestElementsSolid() {
             if(_nearestElementsSolid != null) {
                 return _nearestElementsSolid;
             } else {
                 Outline outlineWithOffset = GetOutlineWithOffset();
-                if(outlineWithOffset != null) {
-
-                    ElementFilter categoryFilter = new ElementMulticategoryFilter(
-                    new BuiltInCategory[] {
-                    BuiltInCategory.OST_Walls,
-                    BuiltInCategory.OST_Columns,
-                    BuiltInCategory.OST_StructuralColumns,
-                    BuiltInCategory.OST_StructuralFraming,
-                    BuiltInCategory.OST_Floors});
-
-                    BoundingBoxIntersectsFilter bboxIntersectFilter =
-                    new BoundingBoxIntersectsFilter(outlineWithOffset);
-
-                    IEnumerable<Element> nearestElements = new FilteredElementCollector(_revitRepository.Document)
-                        .WhereElementIsNotElementType()
-                        .WherePasses(categoryFilter)
-                        .WherePasses(bboxIntersectFilter)
-                        .ToElements();
-
-                    IList<Solid> nearestSolids = nearestElements
-                        .Select(el => _solidOperations.GetUnitedSolid(el.GetSolids()))
-                        .ToList();
-
-                    _nearestElementsSolid = _solidOperations.GetUnitedSolid(nearestSolids);
-                    //_solidOperations.CreateDirectShape(_nearestElementsSolid);
-                }
+                _nearestElementsSolid = _solidOperations.GetUnitedSolidFromBoundingBox(outlineWithOffset);
             }
             return _nearestElementsSolid;
         }
@@ -332,7 +305,7 @@ namespace RevitOpeningSlopes.Models {
             } else {
                 XYZ centralOpeningDepthPoint = GetCentralOpeningDepthPoint();
                 XYZ frontOffsetPoint = GetFrontOffsetPoint();
-                Solid nearestElementsSolid = GetUnitedSolidFromBoundingBox();
+                Solid nearestElementsSolid = GetNearestElementsSolid();
                 XYZ openingVector = GetOpeningVector();
 
                 if(centralOpeningDepthPoint != null && frontOffsetPoint != null && nearestElementsSolid != null) {
@@ -381,7 +354,7 @@ namespace RevitOpeningSlopes.Models {
             } else {
                 XYZ rightPoint = GetRightPoint();
                 XYZ openingVector = GetOpeningVector();
-                Solid nearestElementsSolid = GetUnitedSolidFromBoundingBox();
+                Solid nearestElementsSolid = GetNearestElementsSolid();
                 if(rightPoint != null && openingVector != null & nearestElementsSolid != null) {
                     const double backLineLength = 1000;
                     const double pointForwardOffset = 800;
@@ -498,7 +471,7 @@ namespace RevitOpeningSlopes.Models {
             } else {
                 XYZ rightFrontpoint = GetRightFrontPoint();
                 XYZ openingVector = GetOpeningVector();
-                Solid nearestElementsSolid = GetUnitedSolidFromBoundingBox();
+                Solid nearestElementsSolid = GetNearestElementsSolid();
 
                 if(rightFrontpoint != null && openingVector != null && nearestElementsSolid != null) {
                     const double leftLineLength = 4000;
@@ -572,7 +545,7 @@ namespace RevitOpeningSlopes.Models {
                 return _topPoint;
             } else {
                 XYZ horizontalDepthPoint = GetHorizontalDepthPoint();
-                Solid nearestElementsSolid = GetUnitedSolidFromBoundingBox();
+                Solid nearestElementsSolid = GetNearestElementsSolid();
                 XYZ openingVector = GetOpeningVector();
 
                 if(horizontalDepthPoint != null && nearestElementsSolid != null) {
@@ -619,7 +592,7 @@ namespace RevitOpeningSlopes.Models {
                 return _bottomPoint;
             } else {
                 XYZ horizontalDepthPoint = GetHorizontalDepthPoint();
-                Solid nearestElementsSolid = GetUnitedSolidFromBoundingBox();
+                Solid nearestElementsSolid = GetNearestElementsSolid();
                 XYZ openingVector = GetOpeningVector();
 
                 if(horizontalDepthPoint != null && nearestElementsSolid != null) {
@@ -678,9 +651,6 @@ namespace RevitOpeningSlopes.Models {
                 XYZ bottomPoint = GetBottomPoint();
 
                 if(topPoint != null && bottomPoint != null) {
-                    //double x = (topPoint.X + bottomPoint.X) / 2;
-                    //double y = (topPoint.Y + bottomPoint.Y) / 2;
-                    //double z = (topPoint.Z + bottomPoint.Z) / 2;
                     double x = bottomPoint.X;
                     double y = bottomPoint.Y;
                     double z = (topPoint.Z + bottomPoint.Z) / 2;
@@ -704,9 +674,7 @@ namespace RevitOpeningSlopes.Models {
                 XYZ bottomPoint = GetBottomPoint();
 
                 if(topPoint != null && bottomPoint != null) {
-                    //_openingHeight = bottomPoint.DistanceTo(topPoint);
                     _openingHeight = Math.Abs(bottomPoint.Z - topPoint.Z);
-
                 } else {
                     throw new ArgumentException("Не удалось рассчитать высоту проема");
                 }
@@ -733,7 +701,6 @@ namespace RevitOpeningSlopes.Models {
                     throw new ArgumentException("не удалось рассчитать ширину проема");
                 }
                 return _openingWidth;
-
             }
         }
 

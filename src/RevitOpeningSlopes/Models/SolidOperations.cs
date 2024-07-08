@@ -42,6 +42,40 @@ namespace RevitOpeningSlopes.Models {
         }
 
         /// <summary>
+        /// Функция создает объединенный Solid из элементов, находящихся внутри увеличенного BoundingBox семейства окна
+        /// </summary>
+        /// <returns>Объединенный Solid из Solid элементов вокруг окна</returns>
+        public Solid GetUnitedSolidFromBoundingBox(Outline outlineWithOffset) {
+            Solid nearestElementSolid = null;
+            if(outlineWithOffset != null) {
+                ElementFilter categoryFilter = new ElementMulticategoryFilter(
+                new BuiltInCategory[] {
+                BuiltInCategory.OST_Walls,
+                BuiltInCategory.OST_Columns,
+                BuiltInCategory.OST_StructuralColumns,
+                BuiltInCategory.OST_StructuralFraming,
+                BuiltInCategory.OST_Floors});
+
+                BoundingBoxIntersectsFilter bboxIntersectFilter =
+                new BoundingBoxIntersectsFilter(outlineWithOffset);
+
+                IEnumerable<Element> nearestElements = new FilteredElementCollector(_revitRepository.Document)
+                    .WhereElementIsNotElementType()
+                    .WherePasses(categoryFilter)
+                    .WherePasses(bboxIntersectFilter)
+                    .ToElements();
+
+                IList<Solid> nearestSolids = nearestElements
+                    .Select(el => GetUnitedSolid(el.GetSolids()))
+                    .ToList();
+
+                nearestElementSolid = GetUnitedSolid(nearestSolids);
+                //CreateDirectShape(nearestElementsSolid);
+            }
+            return nearestElementSolid;
+        }
+
+        /// <summary>
         /// Вспомогательная функция для теста
         /// </summary>
         /// <param name="solid"></param>
@@ -49,27 +83,6 @@ namespace RevitOpeningSlopes.Models {
             DirectShape ds = DirectShape.CreateElement(_revitRepository.Document,
                 new ElementId(BuiltInCategory.OST_GenericModel));
             ds.SetShape(new GeometryObject[] { solid });
-        }
-
-        public Solid GetUnitedSolidFromHostElement(Element element) {
-            if(element == null) {
-                throw new ArgumentNullException(nameof(element));
-            } else {
-                Solid hostSolid = element.GetSolids().FirstOrDefault();
-                ICollection<ElementId> elementIds = JoinGeometryUtils
-                    .GetJoinedElements(_revitRepository.Document, element);
-
-                IList<Solid> solids = elementIds
-                    .Select(el => _revitRepository.Document.GetElement(el).GetSolids())
-                    .SelectMany(els => els)
-                    .ToList();
-
-                solids.Add(hostSolid);
-
-                IList<Solid> unitedSolids = SolidExtensions.CreateUnitedSolids(solids);
-                return unitedSolids.OrderByDescending(s => s.Volume)
-                    .FirstOrDefault();
-            }
         }
     }
 }
