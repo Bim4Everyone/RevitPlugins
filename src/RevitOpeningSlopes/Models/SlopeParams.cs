@@ -18,6 +18,7 @@ namespace RevitOpeningSlopes.Models {
             Parameter depthParam = ElementExtensions.GetParam(slope, "Глубина");
             depthParam.Set(slopeCreationData.Depth);
 
+
             //Поворот элемента
             double rotationAngle = slopeCreationData.RotationRadiansAngle;
             Transform openingTransform = slope.GetTotalTransform();

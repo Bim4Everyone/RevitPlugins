@@ -1,7 +1,7 @@
 using System.ComponentModel;
 
 namespace RevitOpeningSlopes.Models.Enums {
-    internal enum DirectionEnum {
+    internal enum Direction {
         [Description("Запуск линии вправо")]
         Right,
         [Description("Запуск линии влево")]
@@ -9,7 +9,7 @@ namespace RevitOpeningSlopes.Models.Enums {
         [Description("Запуск линии вперед")]
         Forward,
         [Description("Запуск линии назад")]
-        Back,
+        Backward,
         [Description("Запуск линии вверх")]
         Top,
         [Description("Запуск линии вниз")]

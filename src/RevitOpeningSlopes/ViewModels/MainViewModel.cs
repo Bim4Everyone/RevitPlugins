@@ -14,7 +14,6 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningSlopes.Models;
-using RevitOpeningSlopes.Models.Enums;
 using RevitOpeningSlopes.Models.Services;
 
 namespace RevitOpeningSlopes.ViewModels {
@@ -24,10 +23,12 @@ namespace RevitOpeningSlopes.ViewModels {
         private readonly CreationOpeningSlopes _creationOpeningSlopes;
         private readonly IMessageBoxService _messageBoxService;
 
-
         public MainViewModel(PluginConfig pluginConfig,
             RevitRepository revitRepository,
             CreationOpeningSlopes creationOpeningSlopes,
+            AlreadySelectedWindowsGetter alreadySelectedWindowsGetter,
+            ManuallySelectedWindowsGetter manuallySelectedWindowsGetter,
+            OnActiveViewWindowsGetter onActiveViewWindowsGetter,
             IMessageBoxService messageBoxService
             ) {
             _revitRepository = revitRepository;
@@ -37,17 +38,18 @@ namespace RevitOpeningSlopes.ViewModels {
             _messageBoxService = messageBoxService
                 ?? throw new ArgumentNullException(nameof(messageBoxService));
 
-
-            WindowGetterModes = new ObservableCollection<WindowsGetterMode>(
-                Enum.GetValues(typeof(WindowsGetterMode)).Cast<WindowsGetterMode>());
-
             SlopeTypes = new ObservableCollection<SlopeTypeViewModel>(
                 _revitRepository.GetSlopeTypes()
                 .Select(fs => new SlopeTypeViewModel(fs))
                 .OrderBy(fs => fs.Name));
 
-            SelectedWindows = _revitRepository.GetSelectedWindows();
-            WindowsOnActiveView = _revitRepository.GetWindowsOnActiveView();
+            WindowsGetters = new ObservableCollection<IWindowsGetter>() {
+                alreadySelectedWindowsGetter,
+                manuallySelectedWindowsGetter,
+                onActiveViewWindowsGetter
+            };
+
+            SelectedWindowsGetter = WindowsGetters.First();
 
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             LoadViewCommand = RelayCommand.Create(LoadView);
@@ -56,6 +58,8 @@ namespace RevitOpeningSlopes.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public IMessageBoxService MessageBoxService => _messageBoxService;
+        public ObservableCollection<IWindowsGetter> WindowsGetters { get; }
+
         public string ErrorText => Error;
         public string Error => GetType()
             .GetProperties()
@@ -83,27 +87,13 @@ namespace RevitOpeningSlopes.ViewModels {
             }
         }
 
-        private bool _isCheckedSelect;
-        public bool IsCheckedSelect {
-            get => _isCheckedSelect;
-            set => RaiseAndSetIfChanged(ref _isCheckedSelect, value);
+        private IWindowsGetter _selectedWindowsGetter;
+        public IWindowsGetter SelectedWindowsGetter {
+            get => _selectedWindowsGetter;
+            set => RaiseAndSetIfChanged(ref _selectedWindowsGetter, value);
         }
 
-        private bool _isCheckedOnView;
-        public bool IsCheckedOnView {
-            get => _isCheckedOnView;
-            set => RaiseAndSetIfChanged(ref _isCheckedOnView, value);
-        }
-
-        private bool _isCheckedSelected;
-        public bool IsCheckedSelected {
-            get => _isCheckedSelected;
-            set => RaiseAndSetIfChanged(ref _isCheckedSelected, value);
-        }
-        public bool IsEnabledAlreadySelected => SelectedWindows?.Count > 0;
-        public ObservableCollection<WindowsGetterMode> WindowGetterModes { get; }
-        public WindowsGetterMode SelectedWindowGetterMode { get; set; }
-        public ICollection<FamilyInstance> SelectedWindows { get; }
+        public ICollection<FamilyInstance> SelectedOpenings { get; }
         public ICollection<FamilyInstance> WindowsOnActiveView { get; }
         public ObservableCollection<SlopeTypeViewModel> SlopeTypes { get; }
 
@@ -133,8 +123,7 @@ namespace RevitOpeningSlopes.ViewModels {
         private void AcceptView() {
             SaveConfig();
             string errorMsg;
-            ICollection<FamilyInstance> openings = _revitRepository
-                    .GetWindows(_pluginConfig.WindowsGetterMode);
+            ICollection<FamilyInstance> openings = SelectedWindowsGetter.GetOpenings();
             using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
                 progressDialogService.MaxValue = openings.Count;
                 progressDialogService.StepValue = progressDialogService.MaxValue / 10;
@@ -154,39 +143,7 @@ namespace RevitOpeningSlopes.ViewModels {
         }
 
         private void LoadConfig() {
-            SelectedWindowGetterMode = _pluginConfig.WindowsGetterMode;
 
-            if(SelectedWindows.Count > 0) {
-                switch(SelectedWindowGetterMode) {
-                    case WindowsGetterMode.AlreadySelectedWindows:
-                        IsCheckedSelected = true;
-                        break;
-                    case WindowsGetterMode.ManuallySelectedWindows:
-                        IsCheckedSelect = true;
-                        break;
-                    case WindowsGetterMode.WindowsOnActiveView:
-                        IsCheckedOnView = true;
-                        break;
-                    default:
-                        IsCheckedSelect = true;
-                        break;
-                }
-            } else {
-                switch(SelectedWindowGetterMode) {
-                    case WindowsGetterMode.AlreadySelectedWindows:
-                        IsCheckedSelect = true;
-                        break;
-                    case WindowsGetterMode.ManuallySelectedWindows:
-                        IsCheckedSelect = true;
-                        break;
-                    case WindowsGetterMode.WindowsOnActiveView:
-                        IsCheckedOnView = true;
-                        break;
-                    default:
-                        IsCheckedSelect = true;
-                        break;
-                }
-            }
             if(string.IsNullOrEmpty(_pluginConfig.SlopeFrontOffset)) {
                 SlopeFrontOffset = "0";
             } else {
@@ -203,15 +160,7 @@ namespace RevitOpeningSlopes.ViewModels {
         }
 
         private void SaveConfig() {
-            if(IsCheckedSelected) {
-                SelectedWindowGetterMode = WindowsGetterMode.AlreadySelectedWindows;
-            } else if(IsCheckedSelect) {
-                SelectedWindowGetterMode = WindowsGetterMode.ManuallySelectedWindows;
-            } else {
-                SelectedWindowGetterMode = WindowsGetterMode.WindowsOnActiveView;
-            }
             _pluginConfig.SlopeTypeId = SelectedSlopeType.SlopeTypeId;
-            _pluginConfig.WindowsGetterMode = SelectedWindowGetterMode;
             _pluginConfig.SlopeFrontOffset = SlopeFrontOffset;
             _pluginConfig.SaveProjectConfig();
         }

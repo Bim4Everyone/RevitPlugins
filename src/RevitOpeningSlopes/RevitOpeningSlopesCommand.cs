@@ -32,7 +32,15 @@ namespace RevitOpeningSlopes {
                     .InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
-
+                kernel.Bind<AlreadySelectedWindowsGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ManuallySelectedWindowsGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<OnActiveViewWindowsGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
                 //kernel.UseXtraProgressDialog<MainViewModel>();
 
                 kernel.Bind<MainViewModel>().ToSelf();

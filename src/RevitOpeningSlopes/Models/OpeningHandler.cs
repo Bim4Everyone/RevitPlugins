@@ -183,10 +183,10 @@ namespace RevitOpeningSlopes.Models {
             XYZ openingVector = GetOpeningVector();
 
             Line forwardLine = _linesFromOpening.CreateLineFromOpening(
-                originPoint, openingVector, lineLength, DirectionEnum.Forward);
+                originPoint, openingVector, lineLength, Direction.Forward);
 
             Line backwardLine = _linesFromOpening.CreateLineFromOpening(
-                originPoint, openingVector, lineLength, DirectionEnum.Back);
+                originPoint, openingVector, lineLength, Direction.Backward);
 
             IList<Element> forwardElements = _nearestElements.GetElementsByRay(forwardLine);
             IList<Element> backwardElements = _nearestElements.GetElementsByRay(backwardLine);
@@ -259,13 +259,13 @@ namespace RevitOpeningSlopes.Models {
                     //Создание линии вправо и разделения ее на точки для запуска массива линий из этих точек
                     //в сторону окна
                     Line rightLine = _linesFromOpening.CreateLineFromOpening(
-                        frontOffsetPoint, openingVector, halfWidthLength, DirectionEnum.Right);
+                        frontOffsetPoint, openingVector, halfWidthLength, Direction.Right);
                     ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(rightLine, step);
                     Solid openingSolid = GetOpeningSolid();
 
                     foreach(XYZ point in points) {
                         Line backWardLine = _linesFromOpening.CreateLineFromOpening(
-                            point, openingVector, backWardLength, DirectionEnum.Back);
+                            point, openingVector, backWardLength, Direction.Backward);
                         SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
                             ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside
                         };
@@ -306,9 +306,9 @@ namespace RevitOpeningSlopes.Models {
 
                     //Создание линий влево из точки P3 и в сторону окна из центральной точки P2
                     Line lineFromDepthPointToLeft = _linesFromOpening.CreateLineFromOpening(
-                        openingDepthPoint, openingVector, halfWidthLength, DirectionEnum.Left);
+                        openingDepthPoint, openingVector, halfWidthLength, Direction.Left);
                     Line backwardLineFromOffsetPoint = _linesFromOpening.CreateLineFromOpening(
-                        frontOffsetPoint, openingVector, backWardLength, DirectionEnum.Back);
+                        frontOffsetPoint, openingVector, backWardLength, Direction.Backward);
 
                     IList<ClosestPointsPairBetweenTwoCurves> closestPoints =
                         new List<ClosestPointsPairBetweenTwoCurves>();
@@ -346,7 +346,7 @@ namespace RevitOpeningSlopes.Models {
                     foreach(XYZ point in points) {
                         Line rightLine = _linesFromOpening.CreateLineFromOpening(point, openingVector,
                             rightLineLength,
-                            DirectionEnum.Right);
+                            Direction.Right);
                         SolidCurveIntersectionOptions intersectOptInside = new SolidCurveIntersectionOptions() {
                             ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
                         };
@@ -391,7 +391,7 @@ namespace RevitOpeningSlopes.Models {
                     Line backLine = _linesFromOpening.CreateLineFromOpening(
                         rightPointWithForwardOffset,
                         openingVector, backLineLength,
-                        DirectionEnum.Back);
+                        Direction.Backward);
 
                     SolidCurveIntersectionOptions intersectOptInside = new SolidCurveIntersectionOptions() {
                         ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
@@ -428,7 +428,7 @@ namespace RevitOpeningSlopes.Models {
                     //Создание линии влево от точки P6 и разделение ее на точки для создания линий в направлении внутрь
                     //здания
                     Line alongsideLine = _linesFromOpening.CreateLineFromOpening(
-                        rightFrontPoint, openingVector, alongsideLineLength, DirectionEnum.Left);
+                        rightFrontPoint, openingVector, alongsideLineLength, Direction.Left);
                     ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(alongsideLine, step);
                     SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
                         ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside
@@ -436,7 +436,7 @@ namespace RevitOpeningSlopes.Models {
 
                     foreach(XYZ point in points) {
                         Line backwardLine = _linesFromOpening.CreateLineFromOpening(
-                    point, openingVector, depthLineLength, DirectionEnum.Back);
+                    point, openingVector, depthLineLength, Direction.Backward);
                         SolidCurveIntersection intersection = openingSolid.IntersectWithCurve(
                                 backwardLine, intersectOptOutside);
                         if(intersection.SegmentCount > 0) {
@@ -474,9 +474,9 @@ namespace RevitOpeningSlopes.Models {
                     //Создание линий из точки внешней границы фасада P6 в направлении внутрь здания и из точки
                     //глубины P7 вправо для нахождения точки пересечения между ними - P8
                     Line depthLine = _linesFromOpening.CreateLineFromOpening(
-                        rightFrontPoint, openingVector, depthLineLength, DirectionEnum.Back);
+                        rightFrontPoint, openingVector, depthLineLength, Direction.Backward);
                     Line lineFromClosestPoint = _linesFromOpening.CreateLineFromOpening(
-                        depthPoint, openingVector, alongsideLineLength, DirectionEnum.Right);
+                        depthPoint, openingVector, alongsideLineLength, Direction.Right);
 
                     IList<ClosestPointsPairBetweenTwoCurves> closestPoints =
                         new List<ClosestPointsPairBetweenTwoCurves>();
@@ -512,7 +512,7 @@ namespace RevitOpeningSlopes.Models {
                             * offset;
                     Line leftLine = _linesFromOpening.CreateLineFromOpening(startPoint, openingVector,
                             leftLineLength,
-                            DirectionEnum.Left);
+                            Direction.Left);
 
                     SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
                         ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside
@@ -549,9 +549,9 @@ namespace RevitOpeningSlopes.Models {
                     const double halfWidthLength = 2000;
 
                     Line lineFromHorizontalPoint = _linesFromOpening.CreateLineFromOpening(
-                        horizontalCenterPoint, openingVector, depthLength, DirectionEnum.Back);
+                        horizontalCenterPoint, openingVector, depthLength, Direction.Backward);
                     Line lineFromRightPoint = _linesFromOpening.CreateLineFromOpening(
-                        rightDepthPoint, openingVector, halfWidthLength, DirectionEnum.Left);
+                        rightDepthPoint, openingVector, halfWidthLength, Direction.Left);
 
                     IList<ClosestPointsPairBetweenTwoCurves> closestPoints =
                         new List<ClosestPointsPairBetweenTwoCurves>();
@@ -584,7 +584,7 @@ namespace RevitOpeningSlopes.Models {
                     //Создание линии из точки горизонтального центра P10 в направлении от фасада и разделение
                     //ее на точки для построения линий в направлении наверх
                     Line forwardLine = _linesFromOpening.CreateLineFromOpening(horizontalDepthPoint, openingVector,
-                        forwardLineLength, DirectionEnum.Forward);
+                        forwardLineLength, Direction.Forward);
                     ICollection<XYZ> points = _linesFromOpening.SplitCurveToPoints(forwardLine, step);
                     SolidCurveIntersectionOptions intersectOptInside = new SolidCurveIntersectionOptions() {
                         ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
@@ -592,7 +592,7 @@ namespace RevitOpeningSlopes.Models {
 
                     foreach(XYZ point in points) {
                         Line upwardLine = _linesFromOpening.CreateLineFromOpening(point,
-                            openingVector, lineLength, DirectionEnum.Top);
+                            openingVector, lineLength, Direction.Top);
                         SolidCurveIntersection topIntersection = nearestElementsSolid.IntersectWithCurve(
                             upwardLine, intersectOptInside);
                         if(topIntersection.SegmentCount > 0) {
@@ -625,7 +625,7 @@ namespace RevitOpeningSlopes.Models {
                 if(horizontalDepthPoint != null && nearestElementsSolid != null) {
                     const double lineLength = 6000;
                     Line bottomLine = _linesFromOpening.CreateLineFromOpening(horizontalDepthPoint,
-                        openingVector, lineLength, DirectionEnum.Down);
+                        openingVector, lineLength, Direction.Down);
 
                     SolidCurveIntersectionOptions intersectOptOutside = new SolidCurveIntersectionOptions() {
                         ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside

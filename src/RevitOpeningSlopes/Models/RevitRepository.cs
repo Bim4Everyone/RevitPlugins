@@ -9,8 +9,6 @@ using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 
-using RevitOpeningSlopes.Models.Enums;
-
 namespace RevitOpeningSlopes.Models {
     internal class RevitRepository {
 
@@ -59,12 +57,10 @@ namespace RevitOpeningSlopes.Models {
         /// </summary>
         /// <returns></returns>
         public IList<FamilySymbol> GetSlopeTypes() {
-            //string familyName = "ОбщМд_Откос_Отлив_New";
-            string familyName = "ОбщМд_Откос_Отлив_New";
+            string familyName = "ОбщМд_Откос_Отлив_Примыкание";
             return new FilteredElementCollector(Document)
                 .WhereElementIsElementType()
                 .OfCategory(BuiltInCategory.OST_GenericModel)
-                //.Where(el => el is FamilySymbol fs && fs.Family.Name.ToLower().Contains(familyName.ToLower()))
                 .Where(el => el is FamilySymbol fs && fs.Family.Name == familyName)
                 .Cast<FamilySymbol>()
                 .OrderBy(el => el.Name)
@@ -76,23 +72,6 @@ namespace RevitOpeningSlopes.Models {
                 throw new ArgumentNullException(nameof(slopeTypeId));
             }
             return Document.GetElement(slopeTypeId) as FamilySymbol ?? throw new ArgumentException(nameof(slopeTypeId));
-        }
-
-        public ICollection<FamilyInstance> GetWindows(WindowsGetterMode windowsGetterMode) {
-            switch(windowsGetterMode) {
-                case WindowsGetterMode.AlreadySelectedWindows: {
-                    return GetSelectedWindows();
-                }
-                case WindowsGetterMode.ManuallySelectedWindows: {
-                    return SelectWindowsOnView();
-                }
-                case WindowsGetterMode.WindowsOnActiveView: {
-                    return GetWindowsOnActiveView();
-                }
-                default: {
-                    return Array.Empty<FamilyInstance>();
-                }
-            }
         }
 
         public ICollection<FamilyInstance> SelectWindowsOnView() {

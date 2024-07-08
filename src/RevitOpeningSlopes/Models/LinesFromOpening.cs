@@ -63,7 +63,7 @@ namespace RevitOpeningSlopes.Models {
         /// <param name="direction">Направление линии (Enum)</param>
         /// <returns>Линия, созданная из указанного начала координат</returns>
         public Line CreateLineFromOpening(XYZ origin, XYZ openingVector, double length = 1000,
-            DirectionEnum direction = DirectionEnum.Right) {
+            Direction direction = Direction.Right) {
 
             XYZ normalVector = XYZ.BasisZ.CrossProduct(openingVector).Normalize();
             length = _revitRepository.ConvertToFeet(length);
@@ -73,25 +73,30 @@ namespace RevitOpeningSlopes.Models {
             XYZ endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) + normalVector
                 * length;
 
-            if(direction == DirectionEnum.Left) {
+            if(direction == Direction.Left) {
                 endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) - normalVector
                     * length;
             }
-            if(direction == DirectionEnum.Forward) {
+
+            if(direction == Direction.Forward) {
                 endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) + openingVector
                     * length;
 
             }
-            if(direction == DirectionEnum.Back) {
+
+            if(direction == Direction.Backward) {
                 endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) - openingVector
                     * length;
             }
-            if(direction == DirectionEnum.Top) {
+
+            if(direction == Direction.Top) {
                 endPoint = new XYZ(origin.X, origin.Y, openingLocationZ + length);
             }
-            if(direction == DirectionEnum.Down) {
+
+            if(direction == Direction.Down) {
                 endPoint = new XYZ(origin.X, origin.Y, openingLocationZ - length);
             }
+
             Line line = Line.CreateBound(startPoint, endPoint);
 
             return line;

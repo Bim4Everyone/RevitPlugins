@@ -6,15 +6,12 @@ using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
-using RevitOpeningSlopes.Models.Enums;
-
 namespace RevitOpeningSlopes.Models {
     internal class PluginConfig : ProjectConfig {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
 
-        public WindowsGetterMode WindowsGetterMode { get; set; }
         public ElementId SlopeTypeId { get; set; } = ElementId.InvalidElementId;
         public string SlopeFrontOffset { get; set; } //Вылет откоса от фасада здания наружу
         public static PluginConfig GetPluginConfig() {
