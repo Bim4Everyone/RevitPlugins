@@ -32,7 +32,7 @@ namespace RevitDeclarations.Models {
         public string DeclarationPath { get; set; }
         public bool ExportToExcel { get; set; }
         public string Phase { get; set; }
-        public List<string> RevitDocuments { get; set; }
+        public List<string> RevitDocuments { get; set; } = new List<string>();
 
         public string FilterRoomsParam { get; set; }
         public string FilterRoomsValue { get; set; }
