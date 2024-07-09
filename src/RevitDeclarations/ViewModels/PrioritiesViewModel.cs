@@ -3,8 +3,6 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -73,16 +71,13 @@ namespace RevitDeclarations.ViewModels {
         }
 
         public void ExportConfig(object obj) {
-            string path;
-
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog() {
-                IsFolderPicker = true
+            CommonSaveFileDialog dialog = new CommonSaveFileDialog() { 
+                Filters = { new CommonFileDialogFilter("Json", "*.json") }
             };
 
             if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-                path = dialog.FileName + "\\ExportedConfig";
                 JsonExporter<RoomPriority> exporter = new JsonExporter<RoomPriority>();
-                exporter.Export(path, _prioritiesConfig.Priorities);
+                exporter.Export(dialog.FileName, _prioritiesConfig.Priorities);
                 Autodesk.Revit.UI.TaskDialog.Show(
                     "Декларации", 
                     "Файл конфигурации приоритетов создан");
