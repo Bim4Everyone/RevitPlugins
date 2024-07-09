@@ -22,7 +22,7 @@ namespace RevitApartmentPlans.Models {
                 SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Finish,
                 StoreFreeBoundaryFaces = false
             };
-            UIApplication = uiApplication;
+            UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
         }
 
 
@@ -178,13 +178,13 @@ namespace RevitApartmentPlans.Models {
             }
         }
 
-
         /// <summary>
         /// Возвращает True, если активный вид - план, иначе False
         /// </summary>
         public bool ActiveViewIsPlan() {
             return Document.ActiveView as ViewPlan != null;
         }
+
 
         /// <summary>
         /// Возвращает уровень, привязанный к активному виду, который должен быть планом

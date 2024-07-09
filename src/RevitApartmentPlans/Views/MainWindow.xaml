@@ -129,6 +129,24 @@
                                 <dxg:TableView />
                             </dxg:GridControl.View>
                             <dxg:GridControl.Columns>
+                                <dxg:GridColumn Width="60"
+                                                AllowResizing="False">
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dx:SimpleButton Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.ApartmentsViewModel.ShowApartmentCommand}"
+                                                             CommandParameter="{Binding Row}"
+                                                             Glyph="{dx:DXImage 'SvgImages/HybridDemoIcons/Editors/HybridDemo_Search Button.svg'}"
+                                                             GlyphHeight="16"
+                                                             Width="Auto">
+                                                <dx:SimpleButton.Content>
+                                                    <DockPanel>
+                                                        <TextBlock Text="{Binding RowData.Row.RoomId}" />
+                                                    </DockPanel>
+                                                </dx:SimpleButton.Content>
+                                            </dx:SimpleButton>
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
                                 <dxg:GridColumn Width="1*"
                                                 Header="Номер"
                                                 FieldName="Name"
@@ -139,9 +157,10 @@
                                                 FieldName="LevelName"
                                                 AllowEditing="False"
                                                 ReadOnly="True" />
-                                <dxg:GridColumn Width="1*"
+                                <dxg:GridColumn Width="60"
                                                 Header="Выбрать"
                                                 FieldName="IsSelected"
+                                                AllowResizing="False"
                                                 ReadOnly="False">
                                     <dxg:GridColumn.CellTemplate>
                                         <DataTemplate>
@@ -187,7 +206,7 @@
                                                 FieldName="Name"
                                                 AllowEditing="False"
                                                 ReadOnly="True" />
-                                <dxg:GridColumn Width="1*"
+                                <dxg:GridColumn Width="60"
                                                 AllowResizing="False">
                                     <dxg:GridColumn.CellTemplate>
                                         <DataTemplate>
