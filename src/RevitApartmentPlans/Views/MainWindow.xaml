@@ -8,6 +8,7 @@
                            xmlns:vms="clr-namespace:RevitApartmentPlans.ViewModels"
                            xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            xmlns:dxwui="http://schemas.devexpress.com/winfx/2008/xaml/windowsui"
+                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
                            xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
@@ -23,13 +24,6 @@
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand EventName="Loaded"
                                Command="{Binding LoadViewCommand}" />
-        <dxwui:WinUIDialogService>
-            <dxwui:WinUIDialogService.ViewTemplate>
-                <DataTemplate>
-                    <local:AddViewTemplateView />
-                </DataTemplate>
-            </dxwui:WinUIDialogService.ViewTemplate>
-        </dxwui:WinUIDialogService>
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>

@@ -34,6 +34,8 @@ namespace RevitApartmentPlans.ViewModels {
                 .Select(t => new ViewTemplateViewModel(t)));
             _addedViewTemplates = new HashSet<ViewTemplateViewModel>();
             EnabledViewTemplates = new ObservableCollection<ViewTemplateViewModel>();
+            EnabledViewTypes = new ObservableCollection<ViewType>(_revitRepository.GetAllUsedViewTypes());
+            SelectedViewType = EnabledViewTypes.First();
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
@@ -60,13 +62,7 @@ namespace RevitApartmentPlans.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _selectedViewType, value);
                 SelectedViewTemplate = null;
-                EnabledViewTemplates.Clear();
-                var viewTemplatesToAdd = _allViewTemplatesFromDoc
-                    .Where(t => t.ViewTemplateType == value)
-                    .Except(_addedViewTemplates);
-                foreach(var viewTemplate in viewTemplatesToAdd) {
-                    EnabledViewTemplates.Add(viewTemplate);
-                }
+                UpdateEnabledViewTemplates();
             }
         }
 
@@ -95,9 +91,9 @@ namespace RevitApartmentPlans.ViewModels {
 
             _addedViewTemplates.Clear();
             foreach(var template in addedViewTemplates) {
-                addedViewTemplates.Add(template);
-                EnabledViewTemplates.Remove(template);
+                _addedViewTemplates.Add(template);
             }
+            UpdateEnabledViewTemplates();
         }
 
         private void AcceptView() {
@@ -112,6 +108,17 @@ namespace RevitApartmentPlans.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+
+        private void UpdateEnabledViewTemplates() {
+            EnabledViewTemplates.Clear();
+            var viewTemplatesToAdd = _allViewTemplatesFromDoc
+                .Where(t => t.ViewTemplateType == _selectedViewType)
+                .Except(_addedViewTemplates)
+                .OrderBy(t => t.Name);
+            foreach(var viewTemplate in viewTemplatesToAdd) {
+                EnabledViewTemplates.Add(viewTemplate);
+            }
         }
     }
 }

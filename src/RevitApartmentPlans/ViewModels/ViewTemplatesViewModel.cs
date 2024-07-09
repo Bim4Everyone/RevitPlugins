@@ -5,10 +5,11 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.Mvvm;
-
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+
+using Ninject;
+using Ninject.Syntax;
 
 using RevitApartmentPlans.Models;
 using RevitApartmentPlans.Views;
@@ -18,12 +19,13 @@ namespace RevitApartmentPlans.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ViewTemplateAdditionViewModel _viewTemplateAdditionViewModel;
+        private readonly IResolutionRoot _container;
 
         public ViewTemplatesViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
             ViewTemplateAdditionViewModel viewTemplateAdditionViewModel,
-            IDialogService dialogService) {
+            IResolutionRoot container) {
 
             _pluginConfig = pluginConfig
                 ?? throw new ArgumentNullException(nameof(pluginConfig));
@@ -31,9 +33,7 @@ namespace RevitApartmentPlans.ViewModels {
                 ?? throw new ArgumentNullException(nameof(revitRepository));
             _viewTemplateAdditionViewModel = viewTemplateAdditionViewModel
                 ?? throw new ArgumentNullException(nameof(viewTemplateAdditionViewModel));
-            DialogService = dialogService
-                ?? throw new ArgumentNullException(nameof(dialogService));
-
+            _container = container ?? throw new ArgumentNullException(nameof(container));
             AddViewTemplateCommand = RelayCommand.Create(AddViewTemplate);
             RemoveViewTemplateCommand
                 = RelayCommand.Create<ViewTemplateViewModel>(RemoveViewTemplate, CanRemoveViewTemplate);
@@ -41,8 +41,6 @@ namespace RevitApartmentPlans.ViewModels {
             LoadConfig();
         }
 
-
-        public IDialogService DialogService { get; }
 
         public ICommand AddViewTemplateCommand { get; }
 
@@ -52,10 +50,10 @@ namespace RevitApartmentPlans.ViewModels {
 
         private void AddViewTemplate() {
             _viewTemplateAdditionViewModel.SetAlreadyAddedViewTemplates(ViewTemplates);
-
-            var result = DialogService.ShowDialog(MessageButton.OKCancel, "Добавление шаблона", nameof(AddViewTemplateView), _viewTemplateAdditionViewModel);
-            if(result == MessageResult.OK) {
-
+            var window = _container.Get<ViewTemplateAdditionWindow>();
+            var success = window.ShowDialog() ?? false;
+            if(success && _viewTemplateAdditionViewModel.SelectedViewTemplate != null) {
+                ViewTemplates.Add(_viewTemplateAdditionViewModel.SelectedViewTemplate);
             }
         }
 
