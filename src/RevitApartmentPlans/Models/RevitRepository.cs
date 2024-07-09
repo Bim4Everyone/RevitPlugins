@@ -125,7 +125,7 @@ namespace RevitApartmentPlans.Models {
         }
 
         /// <summary>
-        /// TODO debug only method
+        /// Метод для отладки. Создает квартиру из выбранных помещений
         /// </summary>
         /// <returns></returns>
         public Apartment GetDebugApartment() {
@@ -133,7 +133,7 @@ namespace RevitApartmentPlans.Models {
         }
 
         /// <summary>
-        /// TODO debug only method
+        /// Метод для отладки. Возвращает все шаблоны видов в активном документе
         /// </summary>
         /// <returns></returns>
         public ICollection<ViewPlan> GetDebugTemplates() {
@@ -146,20 +146,20 @@ namespace RevitApartmentPlans.Models {
         }
 
         /// <summary>
-        /// TODO debug only method
+        /// Метод для отладки. Создает линии модели из заданного контура
         /// </summary>
         /// <param name="curveLoop"></param>
         public void CreateDebugLines(CurveLoop curveLoop) {
-            using(Transaction t = Document.StartTransaction("Создание тестового контура")) {
-                Plane geomPlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, curveLoop.First().GetEndPoint(0));
-                SketchPlane sketch = SketchPlane.Create(Document, geomPlane);
+            //using(Transaction t = Document.StartTransaction("Создание тестового контура")) {
+            Plane geomPlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, curveLoop.First().GetEndPoint(0));
+            SketchPlane sketch = SketchPlane.Create(Document, geomPlane);
 
-                foreach(var item in curveLoop) {
-                    Document.Create.NewModelCurve(item, sketch);
-                }
-
-                t.Commit();
+            foreach(var item in curveLoop) {
+                Document.Create.NewModelCurve(item, sketch);
             }
+
+            //    t.Commit();
+            //}
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace RevitApartmentPlans.Models {
         }
 
         /// <summary>
-        /// TODO debug only method
+        /// Метод для отладки. Возвращает помещения, выбранные в GUI Revit
         /// </summary>
         /// <returns></returns>
         private ICollection<Room> PickRooms() {

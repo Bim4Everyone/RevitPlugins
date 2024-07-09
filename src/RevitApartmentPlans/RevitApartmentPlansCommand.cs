@@ -37,6 +37,9 @@ namespace RevitApartmentPlans {
                 kernel.Bind<ICurveLoopsOffsetter>()
                     .To<CurveLoopsOffsetter>()
                     .InSingletonScope();
+                kernel.Bind<ICurveLoopsSimplifier>()
+                    .To<CurveLoopsSimplifier>()
+                    .InSingletonScope();
                 kernel.Bind<IRectangleLoopProvider>()
                     .To<RectangleLoopProvider>()
                     .InSingletonScope();

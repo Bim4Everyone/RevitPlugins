@@ -11,14 +11,22 @@ namespace RevitApartmentPlans.Services {
         private readonly RevitRepository _revitRepository;
         private readonly ICurveLoopsMerger _curveLoopsMerger;
         private readonly ICurveLoopsOffsetter _curveLoopsOffsetter;
+        private readonly ICurveLoopsSimplifier _curveLoopsSimplifier;
 
         public BoundsCalculationService(
             RevitRepository revitRepository,
             ICurveLoopsMerger curveLoopsMerger,
-            ICurveLoopsOffsetter curveLoopsOffsetter) {
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            _curveLoopsMerger = curveLoopsMerger ?? throw new ArgumentNullException(nameof(curveLoopsMerger));
-            _curveLoopsOffsetter = curveLoopsOffsetter ?? throw new ArgumentNullException(nameof(curveLoopsOffsetter));
+            ICurveLoopsOffsetter curveLoopsOffsetter,
+            ICurveLoopsSimplifier curveLoopsSimplifier) {
+
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _curveLoopsMerger = curveLoopsMerger
+                ?? throw new ArgumentNullException(nameof(curveLoopsMerger));
+            _curveLoopsOffsetter = curveLoopsOffsetter
+                ?? throw new ArgumentNullException(nameof(curveLoopsOffsetter));
+            _curveLoopsSimplifier = curveLoopsSimplifier
+                ?? throw new ArgumentNullException(nameof(curveLoopsSimplifier));
         }
 
 
@@ -26,7 +34,12 @@ namespace RevitApartmentPlans.Services {
             var curveLoops = apartment.GetRooms()
                 .Select(r => GetOuterRoomBound(r))
                 .ToArray();
-            return _curveLoopsOffsetter.CreateOffsetLoop(_curveLoopsMerger.Merge(curveLoops), feetOffset);
+            var loop = _curveLoopsOffsetter.CreateOffsetLoop(_curveLoopsMerger.Merge(curveLoops), feetOffset);
+            try {
+                return _curveLoopsSimplifier.Simplify(loop);
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                return loop;
+            }
         }
 
         /// <summary>
