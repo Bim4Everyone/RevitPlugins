@@ -5,6 +5,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -46,6 +47,7 @@ namespace RevitApartmentPlans {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
+                kernel.UseXtraProgressDialog<MainViewModel>();
                 kernel.Bind<ApartmentsViewModel>()
                     .ToSelf()
                     .InSingletonScope();

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -13,6 +14,7 @@ namespace RevitApartmentPlans.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly IViewPlanCreationService _viewPlanCreationService;
         private readonly ILengthConverter _lengthConverter;
+        private readonly IProgressDialogFactory _progressDialogFactory;
         private const double _minOffsetMm = 0;
         private const double _maxOffsetMm = 1000;
 
@@ -23,7 +25,8 @@ namespace RevitApartmentPlans.ViewModels {
             ViewTemplatesViewModel viewTemplatesViewModel,
             ApartmentsViewModel apartmentsViewModel,
             IViewPlanCreationService viewPlanCreationService,
-            ILengthConverter lengthConverter
+            ILengthConverter lengthConverter,
+            IProgressDialogFactory progressDialogFactory
             ) {
 
             _pluginConfig = pluginConfig
@@ -38,10 +41,13 @@ namespace RevitApartmentPlans.ViewModels {
                 ?? throw new System.ArgumentNullException(nameof(viewPlanCreationService));
             _lengthConverter = lengthConverter
                 ?? throw new System.ArgumentNullException(nameof(lengthConverter));
+            _progressDialogFactory = progressDialogFactory
+                ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
+        public IProgressDialogFactory ProgressDialogFactory => _progressDialogFactory;
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
@@ -69,15 +75,29 @@ namespace RevitApartmentPlans.ViewModels {
 
         private void AcceptView() {
             SaveConfig();
-            _viewPlanCreationService.CreateViews(
-                ApartmentsViewModel.Apartments
+            var selectedApartments = ApartmentsViewModel.Apartments
                     .Where(a => a.IsSelected)
                     .Select(vm => vm.GetApartment())
-                    .ToArray(),
-                ViewTemplatesViewModel.ViewTemplates
+                    .ToArray();
+            var selectedTemplates = ViewTemplatesViewModel.ViewTemplates
                     .Select(t => t.GetTemplate())
-                    .ToArray(),
-                _lengthConverter.ConvertToInternal(OffsetMm));
+                    .ToArray();
+            using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
+                progressDialogService.StepValue = 1;
+                progressDialogService.DisplayTitleFormat = "Обработка квартир... [{0}]\\[{1}]";
+                var progress = progressDialogService.CreateProgress();
+                progressDialogService.MaxValue = selectedApartments.Length;
+                var ct = progressDialogService.CreateCancellationToken();
+                progressDialogService.Show();
+
+                _viewPlanCreationService.CreateViews(
+                    selectedApartments,
+                    selectedTemplates,
+                    _lengthConverter.ConvertToInternal(OffsetMm),
+                    progress,
+                    ct);
+            }
+
         }
 
         private bool CanAcceptView() {

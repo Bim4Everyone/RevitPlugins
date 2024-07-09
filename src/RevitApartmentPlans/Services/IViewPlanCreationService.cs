@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using Autodesk.Revit.DB;
 
@@ -17,10 +19,14 @@ namespace RevitApartmentPlans.Services {
         /// <param name="apartments">Квартиры</param>
         /// <param name="templates">Шаблоны видов - планы этажей/планы потолков</param>
         /// <param name="feetOffset">Наружный отступ от контура квартиры для подрезки вида</param>
+        /// <param name="progress">Уведомитель процесса</param>
+        /// <param name="ct">Токен отмены</param>
         /// <returns>Коллекция созданных планов этажей/планов потолков по квартирам</returns>
         ICollection<ViewPlan> CreateViews(
             ICollection<Apartment> apartments,
             ICollection<ViewPlan> templates,
-            double feetOffset);
+            double feetOffset,
+            IProgress<int> progress = null,
+            CancellationToken ct = default);
     }
 }

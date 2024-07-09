@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Autodesk.Revit.DB;
 
@@ -27,12 +28,17 @@ namespace RevitApartmentPlans.Services {
         public ICollection<ViewPlan> CreateViews(
             ICollection<Apartment> apartments,
             ICollection<ViewPlan> templates,
-            double feetOffset) {
+            double feetOffset,
+            IProgress<int> progress = null,
+            CancellationToken ct = default) {
 
             List<ViewPlan> views = new List<ViewPlan>();
             using(Transaction t = _revitRepository.Document.StartTransaction("Создание планов квартир")) {
+                var i = 0;
                 foreach(var apartment in apartments) {
+                    ct.ThrowIfCancellationRequested();
                     views.AddRange(CreateViews(apartment, templates, feetOffset));
+                    progress.Report(++i);
                 }
                 t.Commit();
             }
