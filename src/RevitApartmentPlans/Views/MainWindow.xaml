@@ -25,6 +25,7 @@
         <dxmvvm:EventToCommand EventName="Loaded"
                                Command="{Binding LoadViewCommand}" />
         <common:AttachServiceBehavior AttachableService="{Binding ProgressDialogFactory}" />
+        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>

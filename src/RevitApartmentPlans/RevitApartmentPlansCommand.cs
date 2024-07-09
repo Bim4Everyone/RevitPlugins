@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -5,6 +6,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -48,6 +50,7 @@ namespace RevitApartmentPlans {
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
                 kernel.UseXtraProgressDialog<MainViewModel>();
+                kernel.UseXtraMessageBox<MainViewModel>();
                 kernel.Bind<ApartmentsViewModel>()
                     .ToSelf()
                     .InSingletonScope();
@@ -72,7 +75,22 @@ namespace RevitApartmentPlans {
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
 
+                var repo = kernel.Get<RevitRepository>();
+                var msg = kernel.Get<IMessageBoxService>();
+                CheckViews(repo, msg);
                 Notification(kernel.Get<MainWindow>());
+            }
+        }
+
+
+        private void CheckViews(RevitRepository revitRepository, IMessageBoxService messageBoxService) {
+            if(!revitRepository.ActiveViewIsPlan()) {
+                var result = messageBoxService.Show(
+                    "Активный вид должен быть планом",
+                    PluginName,
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
+                throw new OperationCanceledException();
             }
         }
     }

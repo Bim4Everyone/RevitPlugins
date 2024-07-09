@@ -178,6 +178,13 @@ namespace RevitApartmentPlans.Models {
 
 
         /// <summary>
+        /// Возвращает True, если активный вид - план, иначе False
+        /// </summary>
+        public bool ActiveViewIsPlan() {
+            return Document.ActiveView as ViewPlan != null;
+        }
+
+        /// <summary>
         /// Возвращает уровень, привязанный к активному виду, который должен быть планом
         /// </summary>
         /// <exception cref="InvalidOperationException">Исключение, если активный вид - не план</exception>
