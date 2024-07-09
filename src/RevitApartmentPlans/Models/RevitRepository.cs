@@ -113,12 +113,14 @@ namespace RevitApartmentPlans.Models {
             Room room = new FilteredElementCollector(Document)
                 .WherePasses(new RoomFilter())
                 .FirstElement() as Room;
+            //Текстовые параметры и параметры ключевых спецификаций
+            ForgeTypeId[] paramTypes = { SpecTypeId.String.Text, new ForgeTypeId() };
 
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(ParameterElement))
                 .Cast<ParameterElement>()
-                .Where(p => room.IsExistsParam(p.Name))
+                .Where(p => room.IsExistsParam(p.Name) && paramTypes.Contains(p.GetUnitType()))
                 .ToArray();
         }
 

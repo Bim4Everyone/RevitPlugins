@@ -54,6 +54,7 @@ namespace RevitApartmentPlans.ViewModels {
         private void LoadConfig() {
             if(_pluginConfig == null) { throw new ArgumentNullException(nameof(_pluginConfig)); }
             if(_revitRepository == null) { throw new ArgumentNullException(nameof(_revitRepository)); }
+            if(Parameters == null) { throw new ArgumentNullException(nameof(Parameters)); }
 
             string paramName = _pluginConfig.GetSettings(_revitRepository.Document)?.ParamName ?? string.Empty;
             SelectedParam = Parameters.FirstOrDefault(p => p.Name == paramName);

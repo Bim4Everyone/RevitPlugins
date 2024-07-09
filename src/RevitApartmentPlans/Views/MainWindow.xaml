@@ -101,8 +101,13 @@
             </dxe:TextEdit>
             <dxe:ComboBoxEdit ItemsSource="{Binding ApartmentsViewModel.Parameters}"
                               SelectedItem="{Binding ApartmentsViewModel.SelectedParam}"
-                              IsTextEditable="False"
                               DisplayMember="Name"
+                              AutoComplete="True"
+                              IncrementalSearch="True"
+                              ImmediatePopup="True"
+                              IncrementalFiltering="True"
+                              IsCaseSensitiveFilter="False"
+                              PopupMaxHeight="250"
                               NullText="Выберите параметр для группировки" />
         </DockPanel>
 
