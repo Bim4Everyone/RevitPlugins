@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
@@ -82,7 +83,9 @@ namespace RevitApartmentPlans.ViewModels {
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                     ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
+            setting.OffsetMm = OffsetMm;
+            setting.ParamName = ApartmentsViewModel?.SelectedParam?.Name ?? string.Empty;
+            setting.ViewTemplates = ViewTemplatesViewModel?.ViewTemplates?.Select(t => t.GetTemplate().Id).ToArray();
             _pluginConfig.SaveProjectConfig();
         }
     }

@@ -37,5 +37,9 @@ namespace RevitApartmentPlans.ViewModels {
             hashCode = hashCode * -1521134295 + ViewTemplateType.GetHashCode();
             return hashCode;
         }
+
+        public ViewPlan GetTemplate() {
+            return _template;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,9 +9,11 @@ using RevitApartmentPlans.Models;
 
 namespace RevitApartmentPlans.ViewModels {
     internal class ApartmentsViewModel : BaseViewModel {
+        private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
-        public ApartmentsViewModel(RevitRepository revitRepository) {
+        public ApartmentsViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+            _pluginConfig = pluginConfig ?? throw new System.ArgumentNullException(nameof(pluginConfig));
             _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
 
             Apartments = new ObservableCollection<ApartmentViewModel>();
@@ -18,6 +21,7 @@ namespace RevitApartmentPlans.ViewModels {
                 .GetRoomGroupingParameters()
                 .OrderBy(x => x.Name)
                 .Select(p => new ParamViewModel(p)));
+            LoadConfig();
         }
 
 
@@ -45,6 +49,14 @@ namespace RevitApartmentPlans.ViewModels {
                     Apartments.Add(new ApartmentViewModel(item));
                 }
             }
+        }
+
+        private void LoadConfig() {
+            if(_pluginConfig == null) { throw new ArgumentNullException(nameof(_pluginConfig)); }
+            if(_revitRepository == null) { throw new ArgumentNullException(nameof(_revitRepository)); }
+
+            string paramName = _pluginConfig.GetSettings(_revitRepository.Document)?.ParamName ?? string.Empty;
+            SelectedParam = Parameters.FirstOrDefault(p => p.Name == paramName);
         }
     }
 }
