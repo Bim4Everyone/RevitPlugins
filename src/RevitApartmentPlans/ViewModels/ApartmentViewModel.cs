@@ -43,5 +43,9 @@ namespace RevitApartmentPlans.ViewModels {
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(LevelName);
             return hashCode;
         }
+
+        public Apartment GetApartment() {
+            return _apartment;
+        }
     }
 }

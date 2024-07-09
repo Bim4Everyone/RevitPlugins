@@ -5,11 +5,14 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitApartmentPlans.Models;
+using RevitApartmentPlans.Services;
 
 namespace RevitApartmentPlans.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly IViewPlanCreationService _viewPlanCreationService;
+        private readonly ILengthConverter _lengthConverter;
         private const double _minOffsetMm = 0;
         private const double _maxOffsetMm = 1000;
 
@@ -18,15 +21,23 @@ namespace RevitApartmentPlans.ViewModels {
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
             ViewTemplatesViewModel viewTemplatesViewModel,
-            ApartmentsViewModel apartmentsViewModel) {
+            ApartmentsViewModel apartmentsViewModel,
+            IViewPlanCreationService viewPlanCreationService,
+            ILengthConverter lengthConverter
+            ) {
 
-            _pluginConfig = pluginConfig ?? throw new System.ArgumentNullException(nameof(pluginConfig));
-            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
-
+            _pluginConfig = pluginConfig
+                ?? throw new System.ArgumentNullException(nameof(pluginConfig));
+            _revitRepository = revitRepository
+                ?? throw new System.ArgumentNullException(nameof(revitRepository));
             ViewTemplatesViewModel = viewTemplatesViewModel
                 ?? throw new System.ArgumentNullException(nameof(viewTemplatesViewModel));
             ApartmentsViewModel = apartmentsViewModel
                 ?? throw new System.ArgumentNullException(nameof(apartmentsViewModel));
+            _viewPlanCreationService = viewPlanCreationService
+                ?? throw new System.ArgumentNullException(nameof(viewPlanCreationService));
+            _lengthConverter = lengthConverter
+                ?? throw new System.ArgumentNullException(nameof(lengthConverter));
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
@@ -58,6 +69,15 @@ namespace RevitApartmentPlans.ViewModels {
 
         private void AcceptView() {
             SaveConfig();
+            _viewPlanCreationService.CreateViews(
+                ApartmentsViewModel.Apartments
+                    .Where(a => a.IsSelected)
+                    .Select(vm => vm.GetApartment())
+                    .ToArray(),
+                ViewTemplatesViewModel.ViewTemplates
+                    .Select(t => t.GetTemplate())
+                    .ToArray(),
+                _lengthConverter.ConvertToInternal(OffsetMm));
         }
 
         private bool CanAcceptView() {

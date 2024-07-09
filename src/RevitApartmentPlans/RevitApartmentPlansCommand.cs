@@ -70,15 +70,6 @@ namespace RevitApartmentPlans {
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
 
-                //TODO Debug only code
-                //var repo = kernel.Get<RevitRepository>();
-                //var apartment = repo.GetDebugApartment();
-                //var planCreationService = kernel.Get<IViewPlanCreationService>();
-                //var lengthConverter = kernel.Get<ILengthConverter>();
-                //planCreationService.CreateViews(
-                //    new Apartment[] { apartment },
-                //    repo.GetDebugTemplates(),
-                //    lengthConverter.ConvertToInternal(200));
                 Notification(kernel.Get<MainWindow>());
             }
         }
