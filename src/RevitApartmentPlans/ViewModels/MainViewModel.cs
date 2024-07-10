@@ -17,7 +17,7 @@ namespace RevitApartmentPlans.ViewModels {
         private readonly ILengthConverter _lengthConverter;
         private readonly IProgressDialogFactory _progressDialogFactory;
         private const double _minOffsetMm = 0;
-        private const double _maxOffsetMm = 1000;
+        private const double _maxOffsetMm = 2000;
 
 
         public MainViewModel(
@@ -114,6 +114,18 @@ namespace RevitApartmentPlans.ViewModels {
                 ErrorText = $"Отступ не может быть больше {_maxOffsetMm} мм.";
                 return false;
             }
+            if(ApartmentsViewModel?.SelectedParam is null) {
+                ErrorText = "Выберите параметр для группировки.";
+                return false;
+            }
+            if(ViewTemplatesViewModel?.ViewTemplates?.Count() == 0) {
+                ErrorText = "Добавьте шаблоны видов.";
+                return false;
+            }
+            if(ApartmentsViewModel?.Apartments?.Where(a => a.IsSelected).Count() == 0) {
+                ErrorText = "Выберите квартиры.";
+                return false;
+            }
 
             ErrorText = null;
             return true;
@@ -122,7 +134,7 @@ namespace RevitApartmentPlans.ViewModels {
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            OffsetMm = setting?.OffsetMm ?? 0;
+            OffsetMm = setting?.OffsetMm ?? 200;
         }
 
         private void SaveConfig() {
