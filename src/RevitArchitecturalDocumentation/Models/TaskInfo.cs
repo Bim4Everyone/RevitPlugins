@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using RevitArchitecturalDocumentation.Models.Exceptions;
-using RevitArchitecturalDocumentation.ViewModels;
-
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 
 namespace RevitArchitecturalDocumentation.Models {
     internal class TaskInfo {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -49,7 +49,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => this.RaiseAndSetIfChanged(ref _clashes, value);
         }
 
-        public ICommand SelectClashCommand { get; set; }
 
         public ICommand SaveCommand { get; set; }
 
@@ -74,7 +73,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             InitializeTimer();
 
-            SelectClashCommand = new RelayCommand(SelectClash, CanSelectClash);
             SaveCommand = new RelayCommand(Save);
             SaveAsCommand = new RelayCommand(SaveAs);
         }
@@ -110,20 +108,6 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private bool IsValid(List<string> documentNames, ClashViewModel clash) {
             return clash.Clash.IsValid(documentNames);
-        }
-
-        private void SelectClash(object p) {
-            var clash = (ClashViewModel) p;
-
-            var elements = new[] {
-                clash.Clash.MainElement,
-                clash.Clash.OtherElement
-            };
-            _revitRepository.SelectAndShowElement(elements.Where(item => item != null));
-        }
-
-        private bool CanSelectClash(object p) {
-            return p != null && p is ClashViewModel;
         }
 
         private void InitializeTimer() {

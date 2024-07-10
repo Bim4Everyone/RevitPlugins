@@ -1,18 +1,16 @@
-﻿using System;
-
-using Autodesk.Revit.DB;
+using System;
 
 using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
-    internal class BottomOffsetValueGetter : IValueGetter<DoubleParamValue> {
+    internal class BottomOffsetValueGetter : LengthConverter, IValueGetter<DoubleParamValue> {
         private readonly IPointFinder _pointFinder;
         private readonly IValueGetter<DoubleParamValue> _heightInFeetParamGetter;
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение высотной отметки низа отверстия, кроме прямоугольных отверстий в стенах и кроме отверстий в перекрытиях
+        /// Конструктор класса, предоставляющего значение высотной отметки низа отверстия в мм от начала проекта, кроме прямоугольных отверстий в стенах и кроме отверстий в перекрытиях
         /// Для прямоугольных отверстий в стенах использовать <see cref="BottomOffsetOfRectangleOpeningInWallValueGetter"/>
         /// Для отверстий в перекрытиях использовать <see cref="BottomOffsetOfOpeningInFloorValueGetter"/>
         /// </summary>
@@ -32,12 +30,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
 
         public DoubleParamValue GetValue() {
             double offsetInFeet = _pointFinder.GetPoint().Z - (_heightInFeetParamGetter.GetValue().TValue / 2);
-            double offsetInMm = 0;
-#if REVIT_2020_OR_LESS
-            offsetInMm = UnitUtils.ConvertFromInternalUnits(offsetInFeet, DisplayUnitType.DUT_MILLIMETERS);
-#else
-            offsetInMm = UnitUtils.ConvertFromInternalUnits(offsetInFeet, UnitTypeId.Millimeters);
-#endif
+            double offsetInMm = ConvertFromInternal(offsetInFeet);
             return new DoubleParamValue(Math.Round(offsetInMm));
         }
     }

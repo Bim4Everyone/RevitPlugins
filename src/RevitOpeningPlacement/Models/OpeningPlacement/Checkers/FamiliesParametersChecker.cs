@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -123,26 +123,29 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
                 RevitRepository.OpeningAuthor,
                 RevitRepository.OpeningThickness,
                 RevitRepository.OpeningOffsetBottom,
-                RevitRepository.OpeningIsManuallyPlaced
+                RevitRepository.OpeningIsManuallyPlaced,
+                RevitRepository.OpeningOffsetBottomAdsk,
+                RevitRepository.OpeningOffsetFromLevelAdsk,
+                RevitRepository.OpeningLevelOffsetAdsk
             };
             // добавление специфических параметров семейств
             switch(openingType) {
                 case OpeningType.WallRound:
-                paramNames.Add(RevitRepository.OpeningDiameter);
-                paramNames.Add(RevitRepository.OpeningOffsetCenter);
-                break;
+                    paramNames.Add(RevitRepository.OpeningDiameter);
+                    paramNames.Add(RevitRepository.OpeningOffsetCenter);
+                    break;
                 case OpeningType.WallRectangle:
-                paramNames.Add(RevitRepository.OpeningHeight);
-                paramNames.Add(RevitRepository.OpeningWidth);
-                paramNames.Add(RevitRepository.OpeningOffsetCenter);
-                break;
+                    paramNames.Add(RevitRepository.OpeningHeight);
+                    paramNames.Add(RevitRepository.OpeningWidth);
+                    paramNames.Add(RevitRepository.OpeningOffsetCenter);
+                    break;
                 case OpeningType.FloorRound:
-                paramNames.Add(RevitRepository.OpeningDiameter);
-                break;
+                    paramNames.Add(RevitRepository.OpeningDiameter);
+                    break;
                 case OpeningType.FloorRectangle:
-                paramNames.Add(RevitRepository.OpeningHeight);
-                paramNames.Add(RevitRepository.OpeningWidth);
-                break;
+                    paramNames.Add(RevitRepository.OpeningHeight);
+                    paramNames.Add(RevitRepository.OpeningWidth);
+                    break;
             }
             return paramNames;
         }

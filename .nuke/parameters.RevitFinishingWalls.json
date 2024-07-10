@@ -1,0 +1,11 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitFinishingWalls",
+  "PublishDirectory": "02.AR.extension\\АР.tab\\bin",
+  "RevitVersions": ["Rv2022", "Rv2023", "Rv2024"],
+  "IconUrl": "https://icons8.com/icon/20145/corridor",
+  "BundleName": "Отделка стен",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "02.AR.extension\\АР.tab\\РД.panel"
+}
