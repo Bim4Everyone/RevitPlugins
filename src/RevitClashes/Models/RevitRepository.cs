@@ -319,7 +319,7 @@ namespace RevitClashDetective.Models {
                             } else {
                                 ClearViewFilters(view);
                             }
-                        } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
+                        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                             ShowErrorMessage("Не удалось выделить элементы коллизии");
                         }
                     };
@@ -483,7 +483,7 @@ namespace RevitClashDetective.Models {
 
         private void HighlightClashElements(View3D view, ClashModel clash) {
             using(Transaction t = _document.StartTransaction("Выделение элементов коллизии")) {
-                var filtersToHide = GetHighlightFilters(clash);
+                var filtersToHide = GetHighlightFilters(clash, view);
                 view = RemoveFilters(view);
                 foreach(var filter in filtersToHide) {
                     view.AddFilter(filter.Id);
@@ -493,11 +493,12 @@ namespace RevitClashDetective.Models {
             }
         }
 
-        private ICollection<ParameterFilterElement> GetHighlightFilters(ClashModel clash) {
+        private ICollection<ParameterFilterElement> GetHighlightFilters(ClashModel clash, View view) {
             string username = _document.Application.Username;
             var filters = new List<ParameterFilterElement>() {
                 _parameterFilterProvider.GetExceptCategoriesFilter(
                     _document,
+                    view,
                     GetClashCategories(clash),
                     $"{_filtersNamePrefix}не_категории_элементов_коллизии_{username}")
             };
