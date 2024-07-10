@@ -103,6 +103,7 @@
             </dxe:TextEdit>
             <dxe:ComboBoxEdit ItemsSource="{Binding ApartmentsViewModel.Parameters}"
                               SelectedItem="{Binding ApartmentsViewModel.SelectedParam}"
+                              Width="240"
                               DisplayMember="Name"
                               AutoComplete="True"
                               IncrementalSearch="True"
