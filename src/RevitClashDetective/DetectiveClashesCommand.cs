@@ -1,10 +1,13 @@
-﻿using System.IO;
+using System.IO;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.SimpleServices;
+
+using Ninject;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
@@ -24,23 +27,37 @@ namespace RevitClashDetective {
         }
 
         public void ExecuteCommand(UIApplication uiApplication) {
-            var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<FiltersConfig>()
+                    .ToMethod(c => {
+                        var repo = c.Kernel.Get<RevitRepository>();
+                        var path = GetConfigPath(repo);
+                        return FiltersConfig.GetFiltersConfig(path, repo.Doc);
+                    });
+                kernel.Bind<ChecksConfig>()
+                    .ToMethod(c => {
+                        var repo = c.Kernel.Get<RevitRepository>();
+                        var path = GetConfigPath(repo);
+                        return ChecksConfig.GetChecksConfig(path, repo.Doc);
+                    });
 
-            var revitFilePath = Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName());
-            var filterConfig = FiltersConfig.GetFiltersConfig(revitFilePath, revitRepository.Doc);
+                kernel.Bind<MainViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<MainWindow>()
+                    .ToSelf()
+                    .InSingletonScope()
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
 
-            var checkConfig = ChecksConfig.GetChecksConfig(revitFilePath, revitRepository.Doc);
-            var mainViewModlel = new MainViewModel(checkConfig, filterConfig, revitRepository);
-            var window = new MainWindow() { DataContext = mainViewModlel };
-            if(window.ShowDialog() == true) {
-                GetPlatformService<INotificationService>()
-                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                    .ShowAsync();
-            } else {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                    .ShowAsync();
+                Notification(kernel.Get<MainWindow>());
             }
+        }
+
+        private string GetConfigPath(RevitRepository revitRepository) {
+            return Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName());
         }
     }
 }

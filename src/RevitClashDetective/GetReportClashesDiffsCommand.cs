@@ -3,6 +3,9 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+
+using Ninject;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.RevitClashReport;
@@ -18,22 +21,28 @@ namespace RevitClashDetective {
         }
 
         protected override void Execute(UIApplication uiApplication) {
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
 
-            var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
 
-            var pluginClashPath = @"";
-            var pluginClashes = ReportLoader.GetClashes(revitRepository, pluginClashPath);
+                var revitRepository = kernel.Get<RevitRepository>();
 
-            var revitFilePath = @"";
-            var revitClashes = ReportLoader.GetClashes(revitRepository, revitFilePath);
+                var pluginClashPath = @"";
+                var pluginClashes = ReportLoader.GetClashes(revitRepository, pluginClashPath);
 
-            var navisFilePath = @"";
-            var navisClashes = ReportLoader.GetClashes(revitRepository, navisFilePath);
+                var revitFilePath = @"";
+                var revitClashes = ReportLoader.GetClashes(revitRepository, revitFilePath);
 
-            var mainViewModlel = new ClashReportDiffViewModel(revitRepository, revitClashes, pluginClashes);
+                var navisFilePath = @"";
+                var navisClashes = ReportLoader.GetClashes(revitRepository, navisFilePath);
 
-            var window = new ClashReportDiffView() { DataContext = mainViewModlel };
-            window.Show();
+                var mainViewModlel = new ClashReportDiffViewModel(revitRepository, revitClashes, pluginClashes);
+
+                var window = new ClashReportDiffView() { DataContext = mainViewModlel };
+                window.Show();
+            }
         }
     }
 }

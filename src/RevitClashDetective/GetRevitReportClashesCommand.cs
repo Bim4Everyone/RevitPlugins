@@ -2,6 +2,9 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+
+using Ninject;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.ViewModels.Navigator;
@@ -16,10 +19,17 @@ namespace RevitClashDetective {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var mainViewModlel = new RevitReportClashesViewModel(revitRepository);
-            var window = new RevitReportClashNavigator() { DataContext = mainViewModlel };
-            window.Show();
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                var repo = kernel.Get<RevitRepository>();
+                var revitRepository = repo;
+                var mainViewModlel = new RevitReportClashesViewModel(revitRepository);
+                var window = new RevitReportClashNavigator() { DataContext = mainViewModlel };
+                window.Show();
+            }
         }
     }
 }
