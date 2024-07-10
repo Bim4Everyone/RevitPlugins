@@ -13,15 +13,19 @@ namespace RevitApartmentPlans.Services {
     internal class ViewPlanCreationService : IViewPlanCreationService {
         private readonly RevitRepository _revitRepository;
         private readonly IBoundsCalculationService _boundsCalculateService;
+        private readonly IRectangleLoopProvider _rectangleLoopProvider;
 
         public ViewPlanCreationService(
             RevitRepository revitRepository,
-            IBoundsCalculationService boundsCalculateService) {
+            IBoundsCalculationService boundsCalculateService,
+            IRectangleLoopProvider rectangleLoopProvider) {
 
             _revitRepository = revitRepository
                 ?? throw new ArgumentNullException(nameof(revitRepository));
             _boundsCalculateService = boundsCalculateService
                 ?? throw new ArgumentNullException(nameof(boundsCalculateService));
+            _rectangleLoopProvider = rectangleLoopProvider
+                ?? throw new ArgumentNullException(nameof(rectangleLoopProvider));
         }
 
 
@@ -70,7 +74,13 @@ namespace RevitApartmentPlans.Services {
             try {
                 viewPlan.GetCropRegionShapeManager().SetCropShape(cropShape);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                //pass
+                try {
+                    //Нельзя чтобы в контуре были дуги окружностей и т.п. Только прямые отрезки
+                    viewPlan.GetCropRegionShapeManager()
+                        .SetCropShape(_rectangleLoopProvider.CreateRectCounterClockwise(cropShape));
+                } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                    //pass
+                }
             }
             return viewPlan;
         }
