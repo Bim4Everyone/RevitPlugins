@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -24,11 +24,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
 
             CategoryInfo = categoriesInfo;
 
-            AddRuleCommand = new RelayCommand(AddRule);
-            RemoveRuleCommand = new RelayCommand(RemoveRule);
+            AddRuleCommand = RelayCommand.Create(AddRule);
+            RemoveRuleCommand = RelayCommand.Create<RuleViewModel>(RemoveRule);
 
-            AddSetCommand = new RelayCommand(AddSet);
-            RemoveSetCommand = new RelayCommand(RemoveSet);
+            AddSetCommand = RelayCommand.Create(AddSet);
+            RemoveSetCommand = RelayCommand.Create<SetViewModel>(RemoveSet);
 
             Evaluators = new ObservableCollection<EvaluatorViewModel>(SetEvaluatorUtils.GetEvaluators().Select(item => new EvaluatorViewModel() { SetEvaluator = item }));
             if(set == null) {
@@ -80,20 +80,20 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
         }
 
-        private void AddRule(object p) {
+        private void AddRule() {
             Criterions.Add(new RuleViewModel(_revitRepository, _categoryInfo));
         }
 
-        private void AddSet(object p) {
+        private void AddSet() {
             Criterions.Add(new SetViewModel(_revitRepository, _categoryInfo));
         }
 
-        private void RemoveSet(object p) {
-            Criterions.Remove(p as SetViewModel);
+        private void RemoveSet(SetViewModel p) {
+            Criterions.Remove(p);
         }
 
-        private void RemoveRule(object p) {
-            Criterions.Remove(p as RuleViewModel);
+        private void RemoveRule(RuleViewModel p) {
+            Criterions.Remove(p);
         }
 
         public void Renew() {

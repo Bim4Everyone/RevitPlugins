@@ -11,9 +11,9 @@ using RevitClashDetective.Models.FilterModel;
 namespace RevitClashDetective.ViewModels.SearchSet {
     internal class SearchSetsViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly SearchSetViewModel _straightSearchSet;
+        private readonly SearchSetViewModel _invertedSearchSet;
         private SearchSetViewModel _searchSet;
-        private SearchSetViewModel _straightSearchSet;
-        private SearchSetViewModel _invertedSearchSet;
 
         public SearchSetsViewModel(RevitRepository revitRepository, Filter filter) {
             _revitRepository = revitRepository;
@@ -24,8 +24,8 @@ namespace RevitClashDetective.ViewModels.SearchSet {
 
             SearchSet = _straightSearchSet;
 
-            InversionChangedCommand = new RelayCommand(InversionChanged);
-            CloseCommand = new RelayCommand(Close);
+            InversionChangedCommand = RelayCommand.Create(InversionChanged);
+            CloseCommand = RelayCommand.Create(Close);
         }
 
         public bool Inverted { get; set; }
@@ -40,7 +40,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
 
         public Filter Filter { get; }
 
-        private void InversionChanged(object p) {
+        private void InversionChanged() {
             if(Inverted) {
                 SearchSet = _invertedSearchSet;
             } else {
@@ -48,7 +48,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             }
         }
 
-        private void Close(object p) {
+        private void Close() {
             Action action = () => {
                 var command = new CreateFiltersCommand();
                 command.ExecuteCommand(_revitRepository.UiApplication, Filter.Name);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
@@ -34,7 +34,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             InitializeRows();
             AddCommonInfo();
 
-            SelectCommand = new RelayCommand(p => SelectElement(p));
+            SelectCommand = RelayCommand.Create<ExpandoObject>(SelectElement, CanSelectElement);
         }
 
         public ObservableCollection<ColumnViewModel> Columns { get; set; }
@@ -104,9 +104,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             Columns.Insert(0, new ColumnViewModel() { FieldName = "File", Header = "Файл" });
         }
 
-        private void SelectElement(object p) {
-            if(!(p is ExpandoObject row))
-                return;
+        private void SelectElement(ExpandoObject row) {
             ((IDictionary<string, object>) row).TryGetValue("Id", out object resultId);
             ((IDictionary<string, object>) row).TryGetValue("File", out object resultFile);
             ((IDictionary<string, object>) row).TryGetValue("Transform", out object transform);
@@ -122,6 +120,10 @@ namespace RevitClashDetective.ViewModels.SearchSet {
                     _revitRepository.SelectAndShowElement(new[] { element });
                 }
             }
+        }
+
+        private bool CanSelectElement(ExpandoObject row) {
+            return row != null;
         }
 
         private ElementModel GetElement(ElementId id, string documentName, TransformModel transform) {
