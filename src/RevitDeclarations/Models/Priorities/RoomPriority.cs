@@ -10,7 +10,7 @@ namespace RevitDeclarations.Models
             Name = name;
             IsSummer = false;
             IsLiving = false;
-            IsOther = false;
+            IsNonConfig = false;
             AreaCoefficient = 1;
         }
 
@@ -21,7 +21,7 @@ namespace RevitDeclarations.Models
         public bool IsSummer { get; set; }
         public bool IsLiving { get; set; }
         [JsonIgnore]
-        public bool IsOther { get; set; } = false;
+        public bool IsNonConfig { get; set; } = false;
         public double AreaCoefficient { get; set; }
         [JsonIgnore]
         public int MaxRoomAmount { get; set; }

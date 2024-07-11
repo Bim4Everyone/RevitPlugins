@@ -73,7 +73,7 @@ namespace RevitDeclarations.Models {
             newNames.Sort();
             foreach(var name in newNames) {
                 PrioritiesConfig.Priorities.Add(new RoomPriority(prioritiesLength, name) {
-                    IsOther = true
+                    IsNonConfig = true
                 });
                 prioritiesLength++;
             }

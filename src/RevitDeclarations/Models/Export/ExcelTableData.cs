@@ -59,21 +59,21 @@ namespace RevitDeclarations.Models {
             int mainRoomsWidth = _settings
                 .UsedPriorities
                 .Where(x => !x.IsSummer)
-                .Where(x => !x.IsOther)
+                .Where(x => !x.IsNonConfig)
                 .Select(x => x.MaxRoomAmount * MainRoomCells)
                 .Sum();
 
             int summerRoomsWidth = _settings
                 .UsedPriorities
                 .Where(x => x.IsSummer)
-                .Where(x => !x.IsOther)
+                .Where(x => !x.IsNonConfig)
                 .Select(x => x.MaxRoomAmount * SummerRoomCells)
                 .Sum();
 
             int otherRoomsWidth = _settings
                 .UsedPriorities
                 .Where(x => !x.IsSummer)
-                .Where(x => x.IsOther)
+                .Where(x => x.IsNonConfig)
                 .Select(x => x.MaxRoomAmount * MainRoomCells)
                 .Sum();
 
