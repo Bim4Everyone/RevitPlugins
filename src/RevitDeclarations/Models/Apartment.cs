@@ -182,6 +182,7 @@ namespace RevitDeclarations.Models {
                 .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy))
                 .Distinct()
                 .Count();
+
             if(amountOfAreas > 1) {
                 return false;
             }
