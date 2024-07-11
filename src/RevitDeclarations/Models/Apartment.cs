@@ -118,7 +118,7 @@ namespace RevitDeclarations.Models {
         [JsonIgnore]
         public string UtpExtraBalconyArea => _utpExtraBalconyArea;
 
-        // Calculates apartment areas based on the current system room area property
+        // Рассчитывает площади квартир на основе актуальных системных площадей помещений
         public void CalculateRevitAreas() {
             _areaMainRevit = _rooms
                 .Select(x => x.AreaRevit)
@@ -175,8 +175,8 @@ namespace RevitDeclarations.Models {
             return true;
         }
 
-        // This method compares the areas calculated by rooms script.
-        // Every room in the apartment should have the same area value.
+        // Сравнивает площади квартир, рассчитанные квартирографией.
+        // Все помещения в одной квартире должны иметь одинаковые значения.
         public bool CheckEqualityOfRoomAreas() {
             int amountOfAreas = _rooms
                 .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy))
