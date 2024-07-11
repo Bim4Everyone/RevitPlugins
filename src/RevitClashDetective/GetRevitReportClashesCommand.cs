@@ -7,6 +7,8 @@ using dosymep.Bim4Everyone.SimpleServices;
 using Ninject;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
 
@@ -21,6 +23,12 @@ namespace RevitClashDetective {
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitEventHandler>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ParameterFilterProvider>()
                     .ToSelf()
                     .InSingletonScope();
 

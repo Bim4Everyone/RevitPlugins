@@ -11,6 +11,8 @@ using Ninject;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.Views;
 
@@ -29,6 +31,12 @@ namespace RevitClashDetective {
         public void ExecuteCommand(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitEventHandler>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ParameterFilterProvider>()
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<FiltersConfig>()

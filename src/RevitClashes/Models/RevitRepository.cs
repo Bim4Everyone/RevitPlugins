@@ -54,6 +54,27 @@ namespace RevitClashDetective.Models {
             InitializeDocInfos();
         }
 
+        public RevitRepository(
+            UIApplication uiApplication,
+            RevitEventHandler revitEventHandler,
+            ParameterFilterProvider parameterFilterProvider) {
+
+            _uiApplication = uiApplication
+                ?? throw new ArgumentNullException(nameof(uiApplication));
+            _revitEventHandler = revitEventHandler
+                ?? throw new ArgumentNullException(nameof(revitEventHandler));
+            _parameterFilterProvider = parameterFilterProvider
+                ?? throw new ArgumentNullException(nameof(parameterFilterProvider));
+
+            _application = _uiApplication.Application;
+            _uiDocument = _uiApplication.ActiveUIDocument;
+            _document = _uiDocument.Document;
+            _endings.Add("_" + _application.Username);
+            _view = GetClashView();
+            CommonConfig = RevitClashDetectiveConfig.GetRevitClashDetectiveConfig();
+            InitializeDocInfos();
+        }
+
         public static string ProfilePath {
             get {
                 var path = @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
