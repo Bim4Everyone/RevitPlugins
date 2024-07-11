@@ -257,9 +257,8 @@ namespace RevitClashDetective.Models {
         }
 
         public List<Category> GetCategories() {
-            return ParameterFilterUtilities.GetAllFilterableCategories()
-                .Select(item => Category.GetCategory(_document, item))
-                .OfType<Category>()
+            return _parameterFilterProvider.GetAllModelCategories(Doc, _view)
+                .Select(c => Category.GetCategory(Doc, c))
                 .ToList();
         }
 
