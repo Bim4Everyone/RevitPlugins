@@ -54,7 +54,7 @@ namespace RevitOpeningPlacement.Models {
             _document = document ?? throw new ArgumentNullException(nameof(document));
             _uiDocument = new UIDocument(document);
 
-            _clashRevitRepository = new RevitClashDetective.Models.RevitRepository(_uiApplication);
+            _clashRevitRepository = new RevitClashDetective.Models.RevitRepository(_application, _document);
             _revitEventHandler = new RevitEventHandler();
 
             _view3DProvider = new View3DProvider();

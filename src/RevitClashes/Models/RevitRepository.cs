@@ -36,12 +36,12 @@ namespace RevitClashDetective.Models {
         private readonly View3D _view;
         private readonly ParameterFilterProvider _parameterFilterProvider;
 
-        public RevitRepository(UIApplication uiApplication) {
-            _uiApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
-            _application = _uiApplication.Application;
+        public RevitRepository(Application application, Document document) {
+            _application = application ?? throw new ArgumentNullException(nameof(application));
+            _uiApplication = new UIApplication(application);
 
-            _uiDocument = _uiApplication.ActiveUIDocument;
-            _document = _uiDocument.Document;
+            _document = document ?? throw new ArgumentNullException(nameof(document));
+            _uiDocument = new UIDocument(document);
 
             _revitEventHandler = new RevitEventHandler();
             _endings.Add("_" + _application.Username);
