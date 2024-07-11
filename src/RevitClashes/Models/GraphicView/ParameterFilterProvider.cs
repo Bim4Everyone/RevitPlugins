@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitClashDetective.Models.FilterGenerators;
+using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Visiter;
 
 namespace RevitClashDetective.Models.GraphicView {
@@ -110,10 +112,40 @@ namespace RevitClashDetective.Models.GraphicView {
             return modelCategories;
         }
 
-        private ParameterFilterElement CreateFilter(
-            Document document,
-            string filterName,
-            BuiltInCategory category) {
+        /// <summary>
+        /// Создает новый фильтр инвертированный для настроек графики на виде, удаляя старый
+        /// </summary>
+        /// <param name="document">Документ, в котором нужно получить фильтр</param>
+        /// <param name="filterName">Название фильтра</param>
+        /// <param name="filter">Внутренний фильтр элементов плагина, который будет инвертирован</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public ParameterFilterElement CreateInvertedFilter(Document document, string filterName, Filter filter) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(string.IsNullOrWhiteSpace(filterName)) { throw new ArgumentNullException(nameof(filterName)); }
+            if(filter is null) { throw new ArgumentNullException(nameof(filter)); }
+
+            var parameterFilter = CreateFilter(
+                document,
+                filterName,
+                filter.CategoryIds
+                    .Select(id => id.AsBuiltInCategory())
+                    .ToArray());
+            parameterFilter.SetElementFilter(filter.GetRevitFilter(document, new InvertedRevitFilterGenerator()));
+            return parameterFilter;
+        }
+
+        /// <summary>
+        /// Создает новый фильтр для настроек графики на виде, удаляя старый
+        /// </summary>
+        /// <param name="document">Документ, в котором нужно получить фильтр</param>
+        /// <param name="filterName">Название фильтра</param>
+        /// <param name="category">Категория элементов для фильтра</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public ParameterFilterElement CreateFilter(Document document, string filterName, BuiltInCategory category) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(string.IsNullOrWhiteSpace(filterName)) { throw new ArgumentNullException(nameof(filterName)); }
 
             return CreateFilter(document, filterName, new BuiltInCategory[] { category });
         }
@@ -125,10 +157,15 @@ namespace RevitClashDetective.Models.GraphicView {
         /// <param name="filterName">Название фильтра</param>
         /// <param name="categories">Категории элементов для фильтра</param>
         /// <returns></returns>
-        private ParameterFilterElement CreateFilter(
+        /// <exception cref="ArgumentNullException"></exception>
+        public ParameterFilterElement CreateFilter(
             Document document,
             string filterName,
             ICollection<BuiltInCategory> categories) {
+
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(string.IsNullOrWhiteSpace(filterName)) { throw new ArgumentNullException(nameof(filterName)); }
+            if(categories is null) { throw new ArgumentNullException(nameof(categories)); }
 
             var categoriesIds = categories
                 .Select(item => new ElementId(item))
@@ -143,6 +180,7 @@ namespace RevitClashDetective.Models.GraphicView {
             }
             return ParameterFilterElement.Create(document, filterName, categoriesIds);
         }
+
 
         /// <summary>
         /// Задает критерии фильтрации на виде, который нужен для скрытия элементов той же категории, 

@@ -17,6 +17,7 @@ using dosymep.SimpleServices;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterableValueProviders;
+using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 
@@ -253,6 +254,16 @@ namespace RevitClashDetective.Models {
                 .WherePasses(filter);
         }
 
+        public void ShowErrorMessage(string message) {
+            var dialog = GetPlatformService<IMessageBoxService>();
+            dialog.Show(
+                message,
+                $"BIM",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Error,
+                System.Windows.MessageBoxResult.OK);
+        }
+
         /// <summary>
         /// Выбирает элементы на 3D виде и делает подрезку
         /// </summary>
@@ -299,6 +310,65 @@ namespace RevitClashDetective.Models {
                 ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.");
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
                 ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.");
+            }
+        }
+
+        public void ShowFilter(Filter filter) {
+            if(filter is null) { throw new ArgumentNullException(nameof(filter)); }
+
+            try {
+                var view = GetClashView();
+                _uiApplication.ActiveUIDocument.ActiveView = view;
+
+                _revitEventHandler.TransactAction = () => {
+                    view.IsSectionBoxActive = false;
+                    try {
+                        HighlightFilter(filter, view);
+                    } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                        throw new InvalidOperationException("Не удалось изолировать поисковый набор");
+                    }
+                };
+                _revitEventHandler.Raise();
+            } catch(AccessViolationException) {
+                throw new InvalidOperationException(
+                    "Окно плагина было открыто в другом документе Revit, который был закрыт, " +
+                    "нельзя показать элемент.");
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                throw new InvalidOperationException(
+                    "Окно плагина было открыто в другом документе Revit, который сейчас не активен, " +
+                    "нельзя показать элемент.");
+            }
+        }
+
+
+        private ICollection<ParameterFilterElement> GetHighlightFilters(Filter filter, View3D view) {
+            string username = Doc.Application.Username;
+            List<ParameterFilterElement> parameterFilters = new List<ParameterFilterElement>();
+            try {
+                parameterFilters.Add(_parameterFilterProvider.CreateInvertedFilter(
+                    Doc,
+                    $"{FiltersNamePrefix}поисковый_набор_инвертированный_{username}",
+                    filter));
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                //pass
+            }
+            parameterFilters.Add(_parameterFilterProvider.GetExceptCategoriesFilter(
+                Doc,
+                view,
+                filter.CategoryIds.Select(id => id.AsBuiltInCategory()).ToArray(),
+                $"{FiltersNamePrefix}категории_не_поискового_набора_{username}"));
+            return parameterFilters;
+        }
+
+        private void HighlightFilter(Filter filter, View3D view) {
+            using(Transaction t = Doc.StartTransaction("Выделение элементов коллизии")) {
+                var parameterFiltersToHide = GetHighlightFilters(filter, view);
+                view = RemoveFilters(view);
+                foreach(var parameterFilter in parameterFiltersToHide) {
+                    view.AddFilter(parameterFilter.Id);
+                    view.SetFilterVisibility(parameterFilter.Id, false);
+                }
+                t.Commit();
             }
         }
 
@@ -380,16 +450,6 @@ namespace RevitClashDetective.Models {
                 var view3d = view ?? _view;
                 return view3d.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox));
             }
-        }
-
-        private void ShowErrorMessage(string message) {
-            var dialog = GetPlatformService<IMessageBoxService>();
-            dialog.Show(
-                message,
-                $"BIM",
-                System.Windows.MessageBoxButton.OK,
-                System.Windows.MessageBoxImage.Error,
-                System.Windows.MessageBoxResult.OK);
         }
 
         private BoundingBoxXYZ GetCommonBoundingBox(ClashModel clashModel) {

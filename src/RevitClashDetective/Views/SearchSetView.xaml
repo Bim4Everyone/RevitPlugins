@@ -17,6 +17,8 @@
                            Width="800"
                            d:DataContext="{d:DesignInstance vm:SearchSetsViewModel, IsDesignTimeCreatable=False}">
     <mvvm:Interaction.Behaviors>
+        <mvvm:EventToCommand EventName="Loaded"
+                             Command="{Binding ShowSetCommand}" />
         <mvvm:EventToCommand EventName="Closing"
                              Command="{Binding CloseCommand}" />
     </mvvm:Interaction.Behaviors>

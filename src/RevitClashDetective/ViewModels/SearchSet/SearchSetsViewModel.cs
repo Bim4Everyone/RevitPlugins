@@ -59,9 +59,17 @@ namespace RevitClashDetective.ViewModels.SearchSet {
         }
 
         private void ShowSet() {
-            Action action = () => {
-
-            };
+            try {
+                Filter filter;
+                if(Inverted) {
+                    filter = _invertedSearchSet.Filter;
+                } else {
+                    filter = _straightSearchSet.Filter;
+                }
+                _revitRepository.ShowFilter(filter);
+            } catch(InvalidOperationException ex) {
+                _revitRepository.ShowErrorMessage(ex.Message);
+            }
         }
     }
 }
