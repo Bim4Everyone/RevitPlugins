@@ -32,9 +32,9 @@ namespace RevitClashDetective.Models {
         private readonly RevitEventHandler _revitEventHandler;
         private static readonly HashSet<string> _endings = new HashSet<string> { "_отсоединено", "_detached" };
         private const string _clashViewName = "BIM_Проверка на коллизии";
-        private const string _filtersNamePrefix = "BIM_коллизии_";
         private readonly View3D _view;
         private readonly ParameterFilterProvider _parameterFilterProvider;
+        public const string FiltersNamePrefix = "BIM_коллизии_";
 
         public RevitRepository(Application application, Document document) {
             _application = application ?? throw new ArgumentNullException(nameof(application));
@@ -65,7 +65,6 @@ namespace RevitClashDetective.Models {
                 ?? throw new ArgumentNullException(nameof(revitEventHandler));
             _parameterFilterProvider = parameterFilterProvider
                 ?? throw new ArgumentNullException(nameof(parameterFilterProvider));
-
             _application = _uiApplication.Application;
             _uiDocument = _uiApplication.ActiveUIDocument;
             _document = _uiDocument.Document;
@@ -351,6 +350,15 @@ namespace RevitClashDetective.Models {
             return null;
         }
 
+        public T RemoveFilters<T>(T view) where T : View {
+            var existedFilterIds = view.GetFilters();
+            foreach(var filter in existedFilterIds) {
+                view.RemoveFilter(filter);
+            }
+            return view;
+        }
+
+
         private ICollection<ElementId> GetElementsToSelect(ClashModel clashModel, View3D view = null) {
             return GetElementsToSelect(
                 new Element[] {
@@ -460,7 +468,7 @@ namespace RevitClashDetective.Models {
                     _document,
                     view,
                     GetClashCategories(clash),
-                    $"{_filtersNamePrefix}не_категории_элементов_коллизии_{username}")
+                    $"{FiltersNamePrefix}не_категории_элементов_коллизии_{username}")
             };
             var firstEl = clash.MainElement.GetElement(DocInfos);
             var secondEl = clash.OtherElement.GetElement(DocInfos);
@@ -470,18 +478,18 @@ namespace RevitClashDetective.Models {
                         _document,
                         firstEl,
                         secondEl,
-                        $"{_filtersNamePrefix}не_элементы_категории_коллизии_{username}"));
+                        $"{FiltersNamePrefix}не_элементы_категории_коллизии_{username}"));
             } else {
                 filters.Add(
                     _parameterFilterProvider.GetHighlightFilter(
                         _document,
                         firstEl,
-                        $"{_filtersNamePrefix}не_первый_элемент_{username}"));
+                        $"{FiltersNamePrefix}не_первый_элемент_{username}"));
                 filters.Add(
                     _parameterFilterProvider.GetHighlightFilter(
                         _document,
                         secondEl,
-                        $"{_filtersNamePrefix}не_второй_элемент_{username}"));
+                        $"{FiltersNamePrefix}не_второй_элемент_{username}"));
             }
             return filters;
         }
@@ -499,14 +507,6 @@ namespace RevitClashDetective.Models {
                 RemoveFilters(view);
                 t.Commit();
             }
-        }
-
-        private T RemoveFilters<T>(T view) where T : View {
-            var existedFilterIds = view.GetFilters();
-            foreach(var filter in existedFilterIds) {
-                view.RemoveFilter(filter);
-            }
-            return view;
         }
 
         protected T GetPlatformService<T>() {
