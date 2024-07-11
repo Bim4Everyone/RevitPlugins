@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -52,8 +52,9 @@ namespace RevitClashDetective.Models.FilterGenerators {
             var creator = SetEvaluatorUtils.GetRevitLogicalFilterCreator(set.SetEvaluator.Evaluator);
             if(filters.Count > 0) {
                 Filter = creator.Create(filters);
-            } else
+            } else {
                 Filter = new ElementIsElementTypeFilter(true);
+            }
             return this;
         }
     }
@@ -69,8 +70,9 @@ namespace RevitClashDetective.Models.FilterGenerators {
             var creator = SetEvaluatorUtils.GetInvertedRevitLogicalFilterCreator(set.SetEvaluator.Evaluator);
             if(filters.Count > 0) {
                 Filter = creator.Create(filters);
-            } else
-                Filter = new ElementIsElementTypeFilter(true);
+            } else {
+                Filter = new ElementIsElementTypeFilter(false);
+            }
             return this;
         }
     }
