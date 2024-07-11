@@ -100,7 +100,6 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             Columns.Insert(0, new ColumnViewModel() { FieldName = "FamilyName", Header = "Имя семейства" });
             Columns.Insert(0, new ColumnViewModel() { FieldName = "Category", Header = "Категория" });
             Columns.Insert(0, new ColumnViewModel() { FieldName = "Id", Header = "Id" });
-            Columns.Insert(0, new ColumnViewModel() { FieldName = "Transform", Header = "Трансформация файла" });
             Columns.Insert(0, new ColumnViewModel() { FieldName = "File", Header = "Файл" });
         }
 
