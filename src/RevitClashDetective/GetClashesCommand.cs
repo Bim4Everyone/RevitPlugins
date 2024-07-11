@@ -41,7 +41,7 @@ namespace RevitClashDetective {
                     .InSingletonScope()
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportsViewModel>());
 
-                Notification(kernel.Get<NavigatorView>());
+                kernel.Get<NavigatorView>().Show();
             }
         }
     }
