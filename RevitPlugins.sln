@@ -148,7 +148,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 		src\RevitClashes\Models\Interfaces\IVisiter.cs = src\RevitClashes\Models\Interfaces\IVisiter.cs
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src\RevitClashReport", "src\RevitClashReport", "{C9F52F92-6BD2-4A45-8297-8775E5FE371A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitClashReport", "RevitClashReport", "{C9F52F92-6BD2-4A45-8297-8775E5FE371A}"
 	ProjectSection(SolutionItems) = preProject
 		src\RevitClashes\Models\RevitClashReport\BaseClashesLoader.cs = src\RevitClashes\Models\RevitClashReport\BaseClashesLoader.cs
 		src\RevitClashes\Models\RevitClashReport\NavisHtmlClashesLoader.cs = src\RevitClashes\Models\RevitClashReport\NavisHtmlClashesLoader.cs
