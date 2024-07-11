@@ -91,8 +91,11 @@ namespace RevitClashDetective.Models.GraphicView {
         /// <param name="document">Документ с категориями</param>
         /// <param name="view">Вид, на котором нужно управлять видимостью категорий</param>
         /// <returns>Все категории модели, видимостью которых можно управлять на данном виде</returns>
-        private static HashSet<BuiltInCategory> GetAllModelCategories(Document document, View view) {
-            Categories allCategories = document.Settings.Categories;
+        public HashSet<BuiltInCategory> GetAllModelCategories(Document document, View view) {
+            var allCategories = ParameterFilterUtilities.GetAllFilterableCategories()
+                .Select(item => Category.GetCategory(document, item))
+                .OfType<Category>()
+                .ToList();
             HashSet<BuiltInCategory> modelCategories = new HashSet<BuiltInCategory>();
             foreach(Category category in allCategories) {
                 if(category.CategoryType == CategoryType.Model
