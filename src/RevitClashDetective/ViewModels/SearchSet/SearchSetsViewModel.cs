@@ -25,6 +25,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             SearchSet = _straightSearchSet;
 
             InversionChangedCommand = RelayCommand.Create(InversionChanged);
+            ShowSetCommand = RelayCommand.Create(ShowSet);
             CloseCommand = RelayCommand.Create(Close);
         }
 
@@ -32,6 +33,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
 
         public ICommand InversionChangedCommand { get; }
         public ICommand CloseCommand { get; }
+        public ICommand ShowSetCommand { get; }
 
         public SearchSetViewModel SearchSet {
             get => _searchSet;
@@ -54,6 +56,12 @@ namespace RevitClashDetective.ViewModels.SearchSet {
                 command.ExecuteCommand(_revitRepository.UiApplication, Filter.Name);
             };
             _revitRepository.DoAction(action);
+        }
+
+        private void ShowSet() {
+            Action action = () => {
+
+            };
         }
     }
 }
