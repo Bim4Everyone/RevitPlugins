@@ -13,5 +13,10 @@ namespace RevitOpeningSlopes.Models {
         /// Наименование метода
         /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Экземпляры окон
+        /// </summary>
+        ICollection<FamilyInstance> Openings { get; }
     }
 }

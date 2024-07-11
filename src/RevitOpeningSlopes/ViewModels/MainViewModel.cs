@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -17,7 +16,7 @@ using RevitOpeningSlopes.Models;
 using RevitOpeningSlopes.Models.Services;
 
 namespace RevitOpeningSlopes.ViewModels {
-    internal class MainViewModel : BaseViewModel, IDataErrorInfo {
+    internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly CreationOpeningSlopes _creationOpeningSlopes;
@@ -31,25 +30,21 @@ namespace RevitOpeningSlopes.ViewModels {
             OnActiveViewWindowsGetter onActiveViewWindowsGetter,
             IMessageBoxService messageBoxService
             ) {
-            _revitRepository = revitRepository;
-            _creationOpeningSlopes = creationOpeningSlopes;
+
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _creationOpeningSlopes = creationOpeningSlopes
+                ?? throw new ArgumentNullException(nameof(creationOpeningSlopes));
             _pluginConfig = pluginConfig
                 ?? throw new ArgumentNullException(nameof(pluginConfig));
             _messageBoxService = messageBoxService
                 ?? throw new ArgumentNullException(nameof(messageBoxService));
-
-            SlopeTypes = new ObservableCollection<SlopeTypeViewModel>(
-                _revitRepository.GetSlopeTypes()
-                .Select(fs => new SlopeTypeViewModel(fs))
-                .OrderBy(fs => fs.Name));
 
             WindowsGetters = new ObservableCollection<IWindowsGetter>() {
                 alreadySelectedWindowsGetter,
                 manuallySelectedWindowsGetter,
                 onActiveViewWindowsGetter
             };
-
-            SelectedWindowsGetter = WindowsGetters.First();
 
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             LoadViewCommand = RelayCommand.Create(LoadView);
@@ -60,31 +55,10 @@ namespace RevitOpeningSlopes.ViewModels {
         public IMessageBoxService MessageBoxService => _messageBoxService;
         public ObservableCollection<IWindowsGetter> WindowsGetters { get; }
 
-        public string ErrorText => Error;
-        public string Error => GetType()
-            .GetProperties()
-            .Select(prop => this[prop.Name])
-            .FirstOrDefault(error => !string.IsNullOrWhiteSpace(error)) ?? string.Empty;
-
-        public string this[string columnName] {
-            get {
-                var error = string.Empty;
-                switch(columnName) {
-                    case nameof(SelectedSlopeType): {
-                        if(SelectedSlopeType is null) {
-                            error = "Задайте тип создаваемого откоса";
-                        }
-                        break;
-                    }
-                    case nameof(SlopeFrontOffset): {
-                        if(!double.TryParse(SlopeFrontOffset, out double result)) {
-                            error = "Смещение не должно содержать символов или букв";
-                        }
-                        break;
-                    }
-                }
-                return error;
-            }
+        private string _errorText;
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         private IWindowsGetter _selectedWindowsGetter;
@@ -92,10 +66,6 @@ namespace RevitOpeningSlopes.ViewModels {
             get => _selectedWindowsGetter;
             set => RaiseAndSetIfChanged(ref _selectedWindowsGetter, value);
         }
-
-        public ICollection<FamilyInstance> SelectedOpenings { get; }
-        public ICollection<FamilyInstance> WindowsOnActiveView { get; }
-        public ObservableCollection<SlopeTypeViewModel> SlopeTypes { get; }
 
         private string _slopeFrontOffset;
         public string SlopeFrontOffset {
@@ -105,7 +75,11 @@ namespace RevitOpeningSlopes.ViewModels {
                 OnPropertyChanged(nameof(ErrorText));
             }
         }
-
+        private ObservableCollection<SlopeTypeViewModel> _slopeTypes;
+        public ObservableCollection<SlopeTypeViewModel> SlopeTypes {
+            get => _slopeTypes;
+            set => this.RaiseAndSetIfChanged(ref _slopeTypes, value);
+        }
 
         private SlopeTypeViewModel _selectedSlopeType;
         public SlopeTypeViewModel SelectedSlopeType {
@@ -139,10 +113,25 @@ namespace RevitOpeningSlopes.ViewModels {
         }
 
         private bool CanAcceptView() {
-            return string.IsNullOrWhiteSpace(ErrorText);
+            if(SelectedSlopeType is null) {
+                ErrorText = "Задайте тип создаваемого откоса";
+                return false;
+            }
+            if(!double.TryParse(SlopeFrontOffset, out double result)) {
+                ErrorText = "Смещение не должно содержать символов или букв";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
         }
 
         private void LoadConfig() {
+            SelectedWindowsGetter = WindowsGetters.First();
+            SlopeTypes = new ObservableCollection<SlopeTypeViewModel>(
+                _revitRepository.GetSlopeTypes()
+                .Select(fs => new SlopeTypeViewModel(fs))
+                .OrderBy(fs => fs.Name));
 
             if(string.IsNullOrEmpty(_pluginConfig.SlopeFrontOffset)) {
                 SlopeFrontOffset = "0";

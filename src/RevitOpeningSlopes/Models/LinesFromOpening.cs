@@ -22,7 +22,6 @@ namespace RevitOpeningSlopes.Models {
         /// <param name="geomLine"></param>
         public void CreateTestModelLine(Line geomLine) {
             XYZ dir = geomLine.Direction.Normalize();
-            XYZ dir1 = geomLine.Direction;
             double x = dir.X;
             double y = dir.Y;
             double z = dir.Z;
@@ -30,7 +29,7 @@ namespace RevitOpeningSlopes.Models {
             XYZ normal = new XYZ(z - y, x - z, y - x);
             Plane plane = Plane.CreateByNormalAndOrigin(normal, origin);
             SketchPlane sketch = SketchPlane.Create(_revitRepository.Document, plane);
-            ModelLine line = _revitRepository.Document.Create.NewModelCurve(geomLine, sketch) as ModelLine;
+            _revitRepository.Document.Create.NewModelCurve(geomLine, sketch);
         }
 
         /// <summary>

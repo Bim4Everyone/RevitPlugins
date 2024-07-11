@@ -8,12 +8,12 @@ namespace RevitOpeningSlopes.ViewModels {
         private readonly FamilySymbol _slopeType;
 
         public SlopeTypeViewModel(FamilySymbol slopeType) {
-            _slopeType = slopeType;
+            _slopeType = slopeType ?? throw new ArgumentNullException(nameof(slopeType));
         }
 
-        public string Name => _slopeType?.Name ?? string.Empty;
+        public string Name => _slopeType.Name;
 
-        public ElementId SlopeTypeId => _slopeType?.Id ?? ElementId.InvalidElementId;
+        public ElementId SlopeTypeId => _slopeType.Id;
 
         public override bool Equals(object obj) {
             return Equals(obj as SlopeTypeViewModel);
@@ -21,7 +21,7 @@ namespace RevitOpeningSlopes.ViewModels {
         public bool Equals(SlopeTypeViewModel other) {
             if(ReferenceEquals(null, other)) { return false; };
             if(ReferenceEquals(this, other)) { return true; };
-            return _slopeType?.Id == other._slopeType?.Id;
+            return _slopeType.Id == other._slopeType.Id;
         }
 
         public override int GetHashCode() {

@@ -10,7 +10,7 @@ namespace RevitOpeningSlopes.Models {
             _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
         }
         public string Name => "По выбранным вручную окнам";
-
+        public ICollection<FamilyInstance> Openings => GetOpenings();
         public ICollection<FamilyInstance> GetOpenings() {
             return _revitRepository.SelectWindowsOnView();
         }

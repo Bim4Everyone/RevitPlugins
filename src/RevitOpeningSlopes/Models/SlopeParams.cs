@@ -9,15 +9,9 @@ namespace RevitOpeningSlopes.Models {
             _revitRepository = revitRepository;
         }
         public void SetSlopeParams(FamilyInstance slope, SlopeCreationData slopeCreationData) {
-            Parameter heightParam = ElementExtensions.GetParam(slope, "Высота");
-            heightParam.Set(slopeCreationData.Height);
-
-            Parameter widthParam = ElementExtensions.GetParam(slope, "Ширина");
-            widthParam.Set(slopeCreationData.Width);
-
-            Parameter depthParam = ElementExtensions.GetParam(slope, "Глубина");
-            depthParam.Set(slopeCreationData.Depth);
-
+            ElementExtensions.SetParamValue(slope, "Высота", slopeCreationData.Height);
+            ElementExtensions.SetParamValue(slope, "Ширина", slopeCreationData.Width);
+            ElementExtensions.SetParamValue(slope, "Глубина", slopeCreationData.Depth);
 
             //Поворот элемента
             double rotationAngle = slopeCreationData.RotationRadiansAngle;

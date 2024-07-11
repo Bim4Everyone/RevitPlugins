@@ -49,7 +49,7 @@ namespace RevitOpeningSlopes.Models {
             _solidOperations = new SolidOperations(revitRepository);
 
             //Запуск функции для проверки правильного направления вектора семейства окна
-            CheckVectorDirection();
+            RecalculationVectorDirection();
         }
 
         private XYZ GetOpeningVector() {
@@ -175,7 +175,7 @@ namespace RevitOpeningSlopes.Models {
         /// <summary>
         /// Проверка вектора окна, размещенного в проекте и установка направления вектора окна в сторону от фасада
         /// </summary>
-        private void CheckVectorDirection() {
+        private void RecalculationVectorDirection() {
             const double lineLength = 100;
             XYZ originPoint = GetOpeningBoundingBoxOrigin();
             XYZ openingVector = GetOpeningVector();

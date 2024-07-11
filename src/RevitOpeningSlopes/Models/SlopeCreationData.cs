@@ -2,11 +2,6 @@ using Autodesk.Revit.DB;
 
 namespace RevitOpeningSlopes.Models {
     internal class SlopeCreationData {
-        public SlopeCreationData(Document document) {
-            Document = document ?? throw new System.ArgumentNullException(nameof(document));
-        }
-        public Document Document { get; }
-
         /// <summary>
         /// Высота откоса
         /// </summary>

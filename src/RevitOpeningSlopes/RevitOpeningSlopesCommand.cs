@@ -41,7 +41,6 @@ namespace RevitOpeningSlopes {
                 kernel.Bind<OnActiveViewWindowsGetter>()
                     .ToSelf()
                     .InSingletonScope();
-                //kernel.UseXtraProgressDialog<MainViewModel>();
 
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()

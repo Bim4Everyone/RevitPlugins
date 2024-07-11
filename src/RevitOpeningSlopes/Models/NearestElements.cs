@@ -11,14 +11,7 @@ namespace RevitOpeningSlopes.Models {
             _revitRepository = revitRepository;
         }
 
-        /// <summary>
-        /// Функция возвращает список элементов, которых пересек луч в направлении указанной кривой
-        /// </summary>
-        /// <param name="curve">Кривая для направления луча</param>
-        /// <returns>Элементы, которые пересек луч</returns>
-        public IList<Element> GetElementsByRay(Curve curve) {
-            XYZ lineDirection = (curve.GetEndPoint(1) - curve.GetEndPoint(0)).Normalize();
-            ElementFilter categoryFilter = new ElementMulticategoryFilter(
+        private ElementFilter CategoryFilter => new ElementMulticategoryFilter(
                 new BuiltInCategory[] {
                     BuiltInCategory.OST_Walls,
                     BuiltInCategory.OST_Columns,
@@ -28,9 +21,17 @@ namespace RevitOpeningSlopes.Models {
                     BuiltInCategory.OST_GenericModel,
                     BuiltInCategory.OST_Doors});
 
+        /// <summary>
+        /// Функция возвращает список элементов, которых пересек луч в направлении указанной кривой
+        /// </summary>
+        /// <param name="curve">Кривая для направления луча</param>
+        /// <returns>Элементы, которые пересек луч</returns>
+        public IList<Element> GetElementsByRay(Curve curve) {
+            XYZ lineDirection = (curve.GetEndPoint(1) - curve.GetEndPoint(0)).Normalize();
+
             IList<Element> elements = new List<Element>();
             ReferenceIntersector intersector
-                = new ReferenceIntersector(categoryFilter, FindReferenceTarget.All,
+                = new ReferenceIntersector(CategoryFilter, FindReferenceTarget.All,
                 _revitRepository.Default3DView) {
                     FindReferencesInRevitLinks = false
                 };

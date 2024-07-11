@@ -5,10 +5,7 @@ using Autodesk.Revit.DB;
 namespace RevitOpeningSlopes.Models {
     internal class SlopesDataGetter {
         private readonly RevitRepository _revitRepository;
-
-
         public SlopesDataGetter(RevitRepository revitRepository) {
-
             _revitRepository = revitRepository;
         }
 
@@ -26,8 +23,7 @@ namespace RevitOpeningSlopes.Models {
             XYZ center = openingParameters.GetVerticalCenterPoint();
             double rotationAngle = openingParameters.GetRotationAngle();
 
-
-            SlopeCreationData slopeData = new SlopeCreationData(_revitRepository.Document) {
+            SlopeCreationData slopeData = new SlopeCreationData() {
                 Height = height,
                 Width = width,
                 Depth = depth,
