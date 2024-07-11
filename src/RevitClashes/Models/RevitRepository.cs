@@ -183,10 +183,6 @@ namespace RevitClashDetective.Models {
             return _document.Title.Split('_').FirstOrDefault();
         }
 
-        public Element GetElement(ElementId id) {
-            return _document.GetElement(id);
-        }
-
         public Element GetElement(string fileName, ElementId id) {
             Document doc;
             if(fileName == null) {
@@ -202,42 +198,9 @@ namespace RevitClashDetective.Models {
             return doc.GetElement(elementId);
         }
 
-        public Element GetElement(Document doc, ElementId id) {
-            return doc.GetElement(id);
-        }
-
         public List<Collector> GetCollectors() {
             return DocInfos
                 .Select(item => new Collector(item.Doc))
-                .ToList();
-        }
-
-        public List<WorksetCollector> GetWorksetCollectors() {
-            return DocInfos
-                .Select(item => new WorksetCollector(item.Doc))
-                .ToList();
-        }
-
-        public View3D GetNavisworksView(Document doc) {
-            return new FilteredElementCollector(doc)
-                .OfClass(typeof(View3D))
-                .Cast<View3D>()
-                .FirstOrDefault(item => item.Name == "Navisworks");
-        }
-
-        public View3D Get3DView(Document doc) {
-            return GetNavisworksView(doc) ?? new FilteredElementCollector(doc).OfClass(typeof(View3D)).Cast<View3D>().Where(item => !item.IsTemplate).FirstOrDefault();
-        }
-
-        public LanguageType GetLanguage() {
-            return _application.Language;
-        }
-
-        public List<ParameterFilterElement> GetFilters() {
-            return new FilteredElementCollector(_document)
-                .OfClass(typeof(ParameterFilterElement))
-                .Cast<ParameterFilterElement>()
-                .Where(item => item.Name.StartsWith("BIM"))
                 .ToList();
         }
 
@@ -268,23 +231,10 @@ namespace RevitClashDetective.Models {
             DocInfos.Add(new DocInfo(GetDocumentName(), _document, Transform.Identity));
         }
 
-        public bool IsValidElement(Document doc, ElementId elementId) {
-            return doc.GetElement(elementId) != null;
-        }
-
-        public void SelectElements(IEnumerable<Element> elements) {
-            var selection = _uiApplication.ActiveUIDocument.Selection;
-            selection.SetElementIds(elements.Select(e => e.Id).ToList());
-        }
-
         public List<Category> GetCategories() {
             return _parameterFilterProvider.GetAllModelCategories(Doc, _view)
                 .Select(c => Category.GetCategory(Doc, c))
                 .ToList();
-        }
-
-        public Category GetCategory(BuiltInCategory builtInCategory) {
-            return Category.GetCategory(_document, builtInCategory);
         }
 
         public List<ParameterValueProvider> GetParameters(Document doc, IEnumerable<Category> categories) {
@@ -399,16 +349,6 @@ namespace RevitClashDetective.Models {
                 return element.Document.GetElement(element.LevelId) as Level;
             }
             return null;
-        }
-
-
-        private Transform GetDocumentTransform(string docTitle) {
-            if(docTitle.Equals(GetDocumentName(), StringComparison.CurrentCultureIgnoreCase))
-                return Transform.Identity;
-            return GetRevitLinkInstances()
-                .FirstOrDefault(item => GetDocumentName(item.GetLinkDocument())
-                                        .Equals(docTitle, StringComparison.CurrentCultureIgnoreCase))
-                ?.GetTotalTransform();
         }
 
         private ICollection<ElementId> GetElementsToSelect(ClashModel clashModel, View3D view = null) {
