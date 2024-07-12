@@ -113,7 +113,7 @@ namespace RevitApartmentPlans.Models {
                 .WherePasses(new RoomFilter())
                 .FirstElement() as Room;
             //Текстовые параметры и параметры ключевых спецификаций
-            ForgeTypeId[] paramTypes = { SpecTypeId.String.Text, new ForgeTypeId() };
+            ForgeTypeId[] paramTypes = { SpecTypeId.String.Text, ForgeTypeIdExtensions.EmptyForgeTypeId };
 
             return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
