@@ -325,14 +325,16 @@ namespace RevitClashDetective.Models {
                 var view = GetClashView();
                 _uiApplication.ActiveUIDocument.ActiveView = view;
 
+                string msg = string.Empty;
                 _revitEventHandler.TransactAction = () => {
                     try {
                         HighlightFilter(view, filterToHide, categoriesToShow);
                     } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                        throw new InvalidOperationException("Не удалось изолировать поисковый набор");
+                        msg = "Не удалось изолировать поисковый набор";
                     }
                 };
                 _revitEventHandler.Raise();
+                error = msg;
             } catch(AccessViolationException) {
                 error = "Окно плагина было открыто в другом документе Revit, который был закрыт, " +
                     "нельзя показать элемент.";
