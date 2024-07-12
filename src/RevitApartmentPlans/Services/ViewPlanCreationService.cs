@@ -41,8 +41,11 @@ namespace RevitApartmentPlans.Services {
                 var i = 0;
                 foreach(var apartment in apartments) {
                     ct.ThrowIfCancellationRequested();
-                    views.AddRange(CreateViews(apartment, templates, feetOffset));
-                    progress.Report(++i);
+                    var createdViews = CreateViews(apartment, templates, feetOffset);
+                    if(createdViews.Count > 0) {
+                        views.AddRange(createdViews);
+                    }
+                    progress?.Report(++i);
                 }
                 t.Commit();
             }
