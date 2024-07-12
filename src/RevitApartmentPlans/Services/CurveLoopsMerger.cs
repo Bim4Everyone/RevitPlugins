@@ -100,8 +100,16 @@ namespace RevitApartmentPlans.Services {
         /// Создает солид путем выдавливания вверх на 1 фут заданного замкнутого контура.
         /// </summary>
         private Solid CreateSolid(CurveLoop bottomLoop) {
-            CurveLoop topLoop = CurveLoop.CreateViaTransform(bottomLoop, Transform.CreateTranslation(new XYZ(0, 0, 1)));
-            return GeometryCreationUtilities.CreateLoftGeometry(new CurveLoop[] { bottomLoop, topLoop }, _solidOptions);
+            try {
+                CurveLoop topLoop = CurveLoop.CreateViaTransform(bottomLoop, Transform.CreateTranslation(new XYZ(0, 0, 1)));
+                return GeometryCreationUtilities.CreateLoftGeometry(new CurveLoop[] { bottomLoop, topLoop }, _solidOptions);
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                CurveLoop bottomRectangleLoop = _rectangleLoopProvider.CreateRectCounterClockwise(bottomLoop);
+                CurveLoop topRectangleLoop = CurveLoop.CreateViaTransform(
+                    bottomRectangleLoop, Transform.CreateTranslation(new XYZ(0, 0, 1)));
+                return GeometryCreationUtilities.CreateLoftGeometry(
+                    new CurveLoop[] { bottomRectangleLoop, topRectangleLoop }, _solidOptions);
+            }
         }
 
         /// <summary>
