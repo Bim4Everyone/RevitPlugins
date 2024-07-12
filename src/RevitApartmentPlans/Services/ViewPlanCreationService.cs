@@ -68,18 +68,18 @@ namespace RevitApartmentPlans.Services {
             try {
                 viewPlan.ViewTemplateId = template.Id;
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                //pass
+                // pass
             }
 
             try {
                 viewPlan.GetCropRegionShapeManager().SetCropShape(cropShape);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 try {
-                    //Нельзя чтобы в контуре были дуги окружностей и т.п. Только прямые отрезки
+                    // Нельзя чтобы в контуре были дуги окружностей и т.п. Только прямые отрезки
                     viewPlan.GetCropRegionShapeManager()
                         .SetCropShape(_rectangleLoopProvider.CreateRectCounterClockwise(cropShape));
                 } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                    //pass
+                    // pass
                 }
             }
             return viewPlan;

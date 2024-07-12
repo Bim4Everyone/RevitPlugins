@@ -112,7 +112,7 @@ namespace RevitApartmentPlans.Models {
             Room room = new FilteredElementCollector(Document)
                 .WherePasses(new RoomFilter())
                 .FirstElement() as Room;
-            //Текстовые параметры и параметры ключевых спецификаций
+            // Текстовые параметры и параметры ключевых спецификаций
             ForgeTypeId[] paramTypes = { SpecTypeId.String.Text, ForgeTypeIdExtensions.EmptyForgeTypeId };
 
             return new FilteredElementCollector(Document)
@@ -145,7 +145,6 @@ namespace RevitApartmentPlans.Models {
         /// <summary>
         /// Метод для отладки. Создает линии модели из заданного контура
         /// </summary>
-        /// <param name="curveLoop"></param>
         public void CreateDebugLines(CurveLoop curveLoop) {
             //using(Transaction t = Document.StartTransaction("Создание тестового контура")) {
             Plane geomPlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, curveLoop.First().GetEndPoint(0));

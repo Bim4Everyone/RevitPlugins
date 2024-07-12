@@ -15,18 +15,18 @@ namespace RevitApartmentPlans.Services {
             var simplifiedLoop = new CurveLoop();
             Curve curvePrev = curves[0];
             for(int i = 1; i < curves.Count; i++) {
-                //проверяем, дошли ли мы до угла
+                // проверяем, дошли ли мы до угла
                 bool isContinuation = IsContinuation(curvePrev, curves[i]);
                 if(isContinuation) {
-                    //объединяем линии на прямом участке
+                    // объединяем линии на прямом участке
                     curvePrev = CombineCurves(curvePrev, curves[i]);
                 } else {
-                    //если линии не являются продолжением, значит мы дошли до угла и нужно добавить предыдущий кусок
+                    // если линии не являются продолжением, значит мы дошли до угла и нужно добавить предыдущий кусок
                     simplifiedLoop.Append(curvePrev);
                     curvePrev = curves[i];
                 }
                 if(i == curves.Count - 1) {
-                    //если мы дошли до конца списка, добавляем объединенный хвост
+                    // если мы дошли до конца списка, добавляем объединенный хвост
                     simplifiedLoop.Append(curvePrev);
                 }
             }
@@ -44,7 +44,7 @@ namespace RevitApartmentPlans.Services {
             var curves = curveLoop.ToList();
             int startIndex = 0;
             for(int previous = 0, current = 1; current < curves.Count; current++, previous++) {
-                //находим первый индекс линии, которая образует угол
+                // находим первый индекс линии, которая образует угол
                 if(!IsContinuation(curves[previous], curves[current])) {
                     startIndex = current;
                     break;

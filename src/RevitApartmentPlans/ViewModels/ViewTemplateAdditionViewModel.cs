@@ -97,7 +97,7 @@ namespace RevitApartmentPlans.ViewModels {
         }
 
         private void AcceptView() {
-            //nothing
+            // nothing
         }
 
         private bool CanAcceptView() {

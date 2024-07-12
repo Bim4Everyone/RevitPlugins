@@ -19,8 +19,8 @@ namespace RevitApartmentPlans.Services {
         /// </summary>
         public CurveLoop CreateOffsetLoop(CurveLoop curveLoop, double feetOffset) {
             try {
-                //если ориентация линий в контуре против часовой стрелки, то положительный оффсет увеличивает контур
-                //если ориентация линий в контуре по часовой стрелке, то отрицательный оффсет увеличивает контур
+                // если ориентация линий в контуре против часовой стрелки, то положительный оффсет увеличивает контур
+                // если ориентация линий в контуре по часовой стрелке, то отрицательный оффсет увеличивает контур
                 double offset = curveLoop.IsCounterclockwise(XYZ.BasisZ)
                     ? feetOffset
                     : -feetOffset;
