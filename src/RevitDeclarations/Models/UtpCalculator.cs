@@ -6,9 +6,13 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
 
 using RevitDeclarations.ViewModels;
+using Microsoft.Office.Interop.Excel;
 
 namespace RevitDeclarations.Models {
     internal class UtpCalculator {
+        private readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
+        private readonly StringComparison _strComparison = StringComparison.OrdinalIgnoreCase;
+
         private readonly DeclarationProject _project;
         private readonly DeclarationSettings _settings;
         private readonly DefaultPrioritiesConfig _priorities;
@@ -38,26 +42,26 @@ namespace RevitDeclarations.Models {
         public void CalculateRoomsForUtp() {
             var bedroomBathroom = GetRoomsByDoors(_priorities.LivingRoom, _priorities.Bathroom);
             // Жилые комната, соединенные с санузлами
-            List<ElementId> bedroomsWithBathroom = bedroomBathroom[_priorities.LivingRoom.NameLower];
+            List<ElementId> bedroomsWithBathroom = bedroomBathroom[_priorities.LivingRoom.Name];
 
             var pantryBedroom = GetRoomsByDoors(_priorities.Pantry, _priorities.LivingRoom);
             var pantryBathroom = GetRoomsByDoors(_priorities.Pantry, _priorities.Bathroom);
             // Гардеробные, соединенные с жилыми комнатами (не учитываются для УТП Гардеробная)
-            _pantriesWithBedroom = pantryBedroom[_priorities.Pantry.NameLower];
+            _pantriesWithBedroom = pantryBedroom[_priorities.Pantry.Name];
             // Гардеробные, соединенные с санузлами
-            List<ElementId> pantriesWithBathroom = pantryBathroom[_priorities.Pantry.NameLower];
+            List<ElementId> pantriesWithBathroom = pantryBathroom[_priorities.Pantry.Name];
             // Мастер-гардеробные (имеющие дверь в санузел) для определения мастер-спален
             List<ElementId> masterPantries = _pantriesWithBedroom.Intersect(pantriesWithBathroom).ToList();
 
             var bedroomPantry = GetRoomsByDoors(_priorities.LivingRoom, masterPantries);
             // Жилые комнаты, соединенные с мастер-гврдеробными
-            var bedroomsWithPantryAndBathroom = bedroomPantry[_priorities.LivingRoom.NameLower];
+            var bedroomsWithPantryAndBathroom = bedroomPantry[_priorities.LivingRoom.Name];
             _masterBedrooms = bedroomsWithBathroom.Concat(bedroomsWithPantryAndBathroom).ToList();
 
-            List<ElementId> bathroomsWithBedroom = bedroomBathroom[_priorities.Bathroom.NameLower];
+            List<ElementId> bathroomsWithBedroom = bedroomBathroom[_priorities.Bathroom.Name];
             var bathroomPantry = GetRoomsByDoors(_priorities.Bathroom, masterPantries);
             // Санузлы, соединенные с мастер-гардеробными
-            var bathroomsWithMasterPantry = bathroomPantry[_priorities.Bathroom.NameLower];
+            var bathroomsWithMasterPantry = bathroomPantry[_priorities.Bathroom.Name];
             // Санузлы, относящиеся к мастер-спальням для определение УТП Две ванны
             _masterBathrooms = bathroomsWithBedroom.Concat(bathroomsWithMasterPantry).ToList();
         }
@@ -273,12 +277,12 @@ namespace RevitDeclarations.Models {
         }
 
         private Dictionary<string, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, RoomPriority priority2) {
-            string name1 = priority1.NameLower;
-            string name2 = priority2.NameLower;
+            string name1 = priority1.Name;
+            string name2 = priority2.Name;
             BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
             IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
 
-            Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>> {
+            Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>>(_strComparer) {
                 [name1] = new List<ElementId>(),
                 [name2] = new List<ElementId>()
             };
@@ -291,12 +295,14 @@ namespace RevitDeclarations.Models {
                     string roomName1 = room1.get_Parameter(bltParam).AsString().ToLower();
                     string roomName2 = room2.get_Parameter(bltParam).AsString().ToLower();
 
-                    if(roomName1 == name1 && roomName2 == name2) {
+                    if(string.Equals(roomName1, name1, _strComparison) && 
+                       string.Equals(roomName2, name2, _strComparison)) {
                         roomByNames[name1].Add(room1.Id);
                         roomByNames[name2].Add(room2.Id);
                     }
 
-                    if(roomName1 == name2 && roomName2 == name1) {
+                    if(string.Equals(roomName1, name2, _strComparison) && 
+                       string.Equals(roomName2, name1, _strComparison)) {
                         roomByNames[name1].Add(room2.Id);
                         roomByNames[name2].Add(room1.Id);
                     }                
@@ -307,11 +313,11 @@ namespace RevitDeclarations.Models {
         }
 
         private Dictionary<string, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, List<ElementId> rooms) {
-            string name1 = priority1.NameLower;
+            string name1 = priority1.Name;
             BuiltInParameter bltParam = BuiltInParameter.ROOM_NAME;
             IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
 
-            Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>> {
+            Dictionary<string, List<ElementId>> roomByNames = new Dictionary<string, List<ElementId>>(_strComparer) {
                 [name1] = new List<ElementId>(),
             };
 
@@ -323,11 +329,11 @@ namespace RevitDeclarations.Models {
                     string roomName1 = room1.get_Parameter(bltParam).AsString().ToLower();
                     string roomName2 = room2.get_Parameter(bltParam).AsString().ToLower();
 
-                    if(roomName1 == name1 && rooms.Contains(room2.Id)) {
+                    if(string.Equals(roomName1, name1, _strComparison) && rooms.Contains(room2.Id)) {
                         roomByNames[name1].Add(room1.Id);
                     }
 
-                    if(roomName2 == name1 && rooms.Contains(room1.Id)) {
+                    if(string.Equals(roomName2, name1, _strComparison) && rooms.Contains(room1.Id)) {
                         roomByNames[name1].Add(room2.Id);
                     }
                 }

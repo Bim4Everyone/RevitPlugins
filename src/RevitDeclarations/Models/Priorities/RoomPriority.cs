@@ -16,8 +16,6 @@ namespace RevitDeclarations.Models
 
         public int OrdinalNumber { get; set; }
         public string Name { get; set; }
-        [JsonIgnore]
-        public string NameLower => Name.ToLower();
         public bool IsSummer { get; set; }
         public bool IsLiving { get; set; }
         [JsonIgnore]

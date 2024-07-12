@@ -19,7 +19,7 @@ namespace RevitDeclarations.Models {
         public bool LoadUtp { get; set; }
         public IReadOnlyCollection<string> MainRoomNames => PrioritiesConfig
                 .Priorities
-                .Select(x => x.NameLower)
+                .Select(x => x.Name)
                 .ToList();
         public string[] BannedRoomNames => PrioritiesConfig.BannedRoomNames;
         public ParametersViewModel ParametersVM { get; set; }
