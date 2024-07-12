@@ -12,7 +12,7 @@ using RevitOpeningSlopes.Models;
 using RevitOpeningSlopes.Models.Exceptions;
 
 namespace RevitOpeningSlopes.Services {
-    internal class CreationOpeningSlopes : ICreationOpeningSlopes {
+    internal class CreationOpeningSlopes {
         private readonly RevitRepository _revitRepository;
 
         private readonly SlopeParams _slopeParams;
@@ -47,23 +47,24 @@ namespace RevitOpeningSlopes.Services {
             CancellationToken ct = default) {
             if(config is null) { throw new ArgumentNullException(nameof(config)); }
             StringBuilder sb = new StringBuilder();
-
             using(var transaction = _revitRepository.Document.StartTransaction("Размещение откосов")) {
                 int i = 0;
-                foreach(FamilyInstance opening in openings) {
-                    ct.ThrowIfCancellationRequested();
-                    progress.Report(i++);
-                    try {
-                        SlopeCreationData slopeCreationData = _slopesDataGetter
-                            .GetOpeningSlopeCreationData(config, opening);
-                        CreateSlope(slopeCreationData);
-                    } catch(OpeningNullSolidException e) {
-                        sb.AppendLine($"{e.Message}, Id = {opening.Id}");
-                    } catch(ArgumentException e) {
-                        sb.AppendLine($"{e.Message}, Id = {opening.Id}");
+                if(openings != null) {
+                    foreach(FamilyInstance opening in openings) {
+                        ct.ThrowIfCancellationRequested();
+                        progress.Report(i++);
+                        try {
+                            SlopeCreationData slopeCreationData = _slopesDataGetter
+                                .GetOpeningSlopeCreationData(config, opening);
+                            CreateSlope(slopeCreationData);
+                        } catch(OpeningNullSolidException e) {
+                            sb.AppendLine($"{e.Message}, Id = {opening.Id}");
+                        } catch(ArgumentException e) {
+                            sb.AppendLine($"{e.Message}, Id = {opening.Id}");
+                        }
                     }
+                    transaction.Commit();
                 }
-                transaction.Commit();
             }
             error = sb.ToString();
         }
