@@ -40,7 +40,6 @@ namespace RevitApartmentPlans.Services {
         /// Порядок линий соответствует замкнутому контуру.
         /// </summary>
         /// <param name="curveLoop">Замкнутый контур</param>
-        /// <returns></returns>
         private IList<Curve> MakeList(CurveLoop curveLoop) {
             var curves = curveLoop.ToList();
             int startIndex = 0;
@@ -68,7 +67,6 @@ namespace RevitApartmentPlans.Services {
         /// <param name="second">Вторая линия</param>
         /// <returns>Вторая линия является продолжением первой только если обе линии - отрезки 
         /// и если начало второго отрезка - это конец первого отрезка или наоборот</returns>
-        /// <exception cref="ArgumentNullException"></exception>
         private bool IsContinuation(Curve first, Curve second) {
             if(first is null || second is null) { return false; }
 
@@ -86,8 +84,7 @@ namespace RevitApartmentPlans.Services {
         /// </summary>
         /// <param name="curveFirst">Первая линия</param>
         /// <param name="curveSecond">Вторая линия</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если один из обязательных параметров null</exception>
         private Curve CombineCurves(Curve curveFirst, Curve curveSecond) {
             if(curveFirst is null) { throw new ArgumentNullException(nameof(curveFirst)); }
             if(curveSecond is null) { throw new ArgumentNullException(nameof(curveSecond)); }

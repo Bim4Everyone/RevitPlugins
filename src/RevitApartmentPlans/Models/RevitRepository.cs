@@ -37,7 +37,7 @@ namespace RevitApartmentPlans.Models {
         /// </summary>
         /// <param name="room">Помещение</param>
         /// <returns>Список всех замкнутых контуров границ помещения</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public IList<CurveLoop> GetBoundaryCurveLoops(Room room) {
             if(room is null) { throw new ArgumentNullException(nameof(room)); }
 
@@ -89,7 +89,6 @@ namespace RevitApartmentPlans.Models {
         /// Возвращает коллекцию квартир, видимых на активном виде (плане) по значению параметра для группировки.
         /// </summary>
         /// <param name="paramName">Название параметра для группировки помещений по квартирам.</param>
-        /// <returns></returns>
         /// <exception cref="ArgumentException">Исключение, если название параметра пустое.</exception>
         public ICollection<Apartment> GetApartments(string paramName) {
             if(string.IsNullOrWhiteSpace(paramName)) { throw new ArgumentException(nameof(paramName)); }
@@ -127,7 +126,6 @@ namespace RevitApartmentPlans.Models {
         /// <summary>
         /// Метод для отладки. Создает квартиру из выбранных помещений
         /// </summary>
-        /// <returns></returns>
         public Apartment GetDebugApartment() {
             return new Apartment(PickRooms(), "test");
         }
@@ -135,7 +133,6 @@ namespace RevitApartmentPlans.Models {
         /// <summary>
         /// Метод для отладки. Возвращает все шаблоны видов в активном документе
         /// </summary>
-        /// <returns></returns>
         public ICollection<ViewPlan> GetDebugTemplates() {
             var enabledViewTypes = GetAllUsedViewTypes();
             return new FilteredElementCollector(Document)
@@ -210,7 +207,6 @@ namespace RevitApartmentPlans.Models {
         /// <summary>
         /// Метод для отладки. Возвращает помещения, выбранные в GUI Revit
         /// </summary>
-        /// <returns></returns>
         private ICollection<Room> PickRooms() {
             ISelectionFilter filter = new SelectionFilterRooms(Document);
             IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
