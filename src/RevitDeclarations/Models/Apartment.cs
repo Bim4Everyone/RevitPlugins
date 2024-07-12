@@ -8,6 +8,8 @@ namespace RevitDeclarations.Models {
     internal class Apartment {
         private const double _maxAreaDeviation = 0.2;
 
+        private readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
+
         private readonly DeclarationSettings _settings;
         private readonly int _accuracy;
 
@@ -40,11 +42,11 @@ namespace RevitDeclarations.Models {
             _rooms = rooms.ToList();
             _firstRoom = rooms.FirstOrDefault();
 
-            _mainRooms = new Dictionary<string, List<RoomElement>>();
-            _nonConfigRooms = new Dictionary<string, List<RoomElement>>();
+            _mainRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
+            _nonConfigRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
 
             foreach(RoomElement room in _rooms) {
-                if(settings.MainRoomNames.Contains(room.NameLower)) {
+                if(settings.MainRoomNames.Contains(room.Name, _strComparer)) {
                     AddToDictionary(_mainRooms, room);
                 } else {
                     AddToDictionary(_nonConfigRooms, room);
@@ -70,13 +72,13 @@ namespace RevitDeclarations.Models {
             }
         }
         [JsonProperty("floor_number")]
-        public string Level { 
+        public string Level {
             get {
                 var levelNames = _rooms
                     .Select(x => x.GetTextParamValue(_settings.LevelParam))
                     .Distinct();
-                return string.Join(",", levelNames); 
-            } 
+                return string.Join(",", levelNames);
+            }
         }
         [JsonProperty("section")]
         public string Section => _firstRoom.GetTextParamValue(_settings.SectionParam);
@@ -216,17 +218,17 @@ namespace RevitDeclarations.Models {
         }
 
         private void AddToDictionary(Dictionary<string, List<RoomElement>> roomDictionary, RoomElement room) {
-            if(roomDictionary.ContainsKey(room.NameLower)) {
-                roomDictionary[room.NameLower].Add(room);
+            if(roomDictionary.ContainsKey(room.Name)) {
+                roomDictionary[room.Name].Add(room);
             } else {
-                roomDictionary.Add(room.NameLower, new List<RoomElement> { room });
+                roomDictionary.Add(room.Name, new List<RoomElement> { room });
             }
         }
 
         public IReadOnlyList<RoomElement> GetRoomsByPrior(RoomPriority priority) {
-            string name = priority.NameLower;
+            string name = priority.Name;
 
-            if(_mainRooms.Keys.Contains(name)) {
+            if(_mainRooms.Keys.Contains(name, _strComparer)) {
                 return _mainRooms[name];
             } else if(_nonConfigRooms.Keys.Contains(name)) {
                 return _nonConfigRooms[name];

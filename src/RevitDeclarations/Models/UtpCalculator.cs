@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -265,8 +266,8 @@ namespace RevitDeclarations.Models {
         private IEnumerable<string> GetBannedUtpRoomNames() {
             return _project
                 .Rooms
-                .Select(x => x.NameLower)
-                .Where(x => _settings.BannedRoomNames.Contains(x))
+                .Select(x => x.Name)
+                .Where(x => _settings.BannedRoomNames.Contains(x, StringComparer.OrdinalIgnoreCase))
                 .Distinct()
                 .ToList();
         }

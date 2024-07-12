@@ -39,8 +39,6 @@ namespace RevitDeclarations.Models
         [JsonProperty("room_type")]
         public string Name => _name;
         [JsonIgnore]
-        public string NameLower => _name.ToLower();
-        [JsonIgnore]
         public string DeclarationName => $"{Name}_{Number}";
 
         [JsonIgnore]
