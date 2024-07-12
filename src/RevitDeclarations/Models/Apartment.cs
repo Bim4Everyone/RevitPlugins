@@ -9,14 +9,13 @@ namespace RevitDeclarations.Models {
         private const double _maxAreaDeviation = 0.2;
 
         private readonly DeclarationSettings _settings;
-        private readonly PrioritiesConfig _priorConfig;
         private readonly int _accuracy;
 
         private readonly IEnumerable<RoomElement> _rooms;
         // Словарь для группировки помещений, входящих в исходные приоритеты
         private readonly Dictionary<string, List<RoomElement>> _mainRooms;
         // Словарь для группировки помещений, не входящих в исходные приоритеты
-        private readonly Dictionary<string, List<RoomElement>> _otherRooms;
+        private readonly Dictionary<string, List<RoomElement>> _nonConfigRooms;
         private readonly RoomElement _firstRoom;
 
         private double _areaMainRevit;
@@ -37,19 +36,18 @@ namespace RevitDeclarations.Models {
         public Apartment(IEnumerable<RoomElement> rooms, DeclarationSettings settings) {
             _settings = settings;
             _accuracy = settings.Accuracy;
-            _priorConfig = _settings.PrioritiesConfig;
 
             _rooms = rooms.ToList();
             _firstRoom = rooms.FirstOrDefault();
 
             _mainRooms = new Dictionary<string, List<RoomElement>>();
-            _otherRooms = new Dictionary<string, List<RoomElement>>();
+            _nonConfigRooms = new Dictionary<string, List<RoomElement>>();
 
             foreach(RoomElement room in _rooms) {
                 if(settings.MainRoomNames.Contains(room.NameLower)) {
                     AddToDictionary(_mainRooms, room);
                 } else {
-                    AddToDictionary(_otherRooms, room);
+                    AddToDictionary(_nonConfigRooms, room);
                 }
             }
 
@@ -230,15 +228,15 @@ namespace RevitDeclarations.Models {
 
             if(_mainRooms.Keys.Contains(name)) {
                 return _mainRooms[name];
-            } else if(_otherRooms.Keys.Contains(name)) {
-                return _otherRooms[name];
+            } else if(_nonConfigRooms.Keys.Contains(name)) {
+                return _nonConfigRooms[name];
             } else {
                 return new List<RoomElement>();
             }
         }
 
         public IEnumerable<string> GetOtherPriorityNames() {
-            return _otherRooms.Keys;
+            return _nonConfigRooms.Keys;
         }
 
         public void CalculateUtp(UtpCalculator calculator) {
