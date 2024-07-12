@@ -17,7 +17,6 @@ using dosymep.SimpleServices;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterableValueProviders;
-using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 
@@ -313,56 +312,81 @@ namespace RevitClashDetective.Models {
             }
         }
 
-        public void ShowFilter(Filter filter) {
-            if(filter is null) { throw new ArgumentNullException(nameof(filter)); }
+        public void ShowElements(
+            ElementFilter filterToHide,
+            ICollection<BuiltInCategory> categoriesToShow,
+            out string error) {
+
+            if(filterToHide is null) { throw new ArgumentNullException(nameof(filterToHide)); }
+            if(categoriesToShow is null) { throw new ArgumentNullException(nameof(categoriesToShow)); }
+            error = string.Empty;
 
             try {
                 var view = GetClashView();
                 _uiApplication.ActiveUIDocument.ActiveView = view;
 
                 _revitEventHandler.TransactAction = () => {
-                    view.IsSectionBoxActive = false;
                     try {
-                        HighlightFilter(filter, view);
+                        HighlightFilter(view, filterToHide, categoriesToShow);
                     } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                         throw new InvalidOperationException("Не удалось изолировать поисковый набор");
                     }
                 };
                 _revitEventHandler.Raise();
             } catch(AccessViolationException) {
-                throw new InvalidOperationException(
-                    "Окно плагина было открыто в другом документе Revit, который был закрыт, " +
-                    "нельзя показать элемент.");
-            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                throw new InvalidOperationException(
-                    "Окно плагина было открыто в другом документе Revit, который сейчас не активен, " +
-                    "нельзя показать элемент.");
+                error = "Окно плагина было открыто в другом документе Revit, который был закрыт, " +
+                    "нельзя показать элемент.";
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                error = "Окно плагина было открыто в другом документе Revit, который сейчас не активен, " +
+                    "нельзя показать элемент.";
             }
         }
 
 
-        private ICollection<ParameterFilterElement> GetHighlightFilters(Filter filter, View3D view) {
+        /// <summary>
+        /// Возвращает коллекцию фильтров по параметрам элементов, в которые попадают элементы, попадающие в фильтр по элементам,
+        /// и элементы всех категорий кроме заданных
+        /// </summary>
+        /// <param name="view">Вид, на котором должны сформироваться фильтры</param>
+        /// <param name="filterToHide">Фильтр по параметрам элементов, который надо скрыть</param>
+        /// <param name="categoriesToShow">Заданные категории, которые должны оставаться видимыми</param>
+        /// <returns></returns>
+        private ICollection<ParameterFilterElement> GetHighlightFilters(
+            View3D view,
+            ElementFilter filterToHide,
+            ICollection<BuiltInCategory> categoriesToShow) {
+
             string username = Doc.Application.Username;
             List<ParameterFilterElement> parameterFilters = new List<ParameterFilterElement>();
             try {
-                parameterFilters.Add(_parameterFilterProvider.CreateInvertedFilter(
+                parameterFilters.Add(_parameterFilterProvider.CreateParameterFilter(
                     Doc,
                     $"{FiltersNamePrefix}поисковый_набор_инвертированный_{username}",
-                    filter));
+                    filterToHide,
+                    categoriesToShow));
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 //pass
             }
             parameterFilters.Add(_parameterFilterProvider.GetExceptCategoriesFilter(
                 Doc,
                 view,
-                filter.CategoryIds.Select(id => id.AsBuiltInCategory()).ToArray(),
+                categoriesToShow,
                 $"{FiltersNamePrefix}категории_не_поискового_набора_{username}"));
             return parameterFilters;
         }
 
-        private void HighlightFilter(Filter filter, View3D view) {
+        private void HighlightFilter(
+            View3D view,
+            ElementFilter filterToHide,
+            ICollection<BuiltInCategory> categoriesToShow) {
+
             using(Transaction t = Doc.StartTransaction("Выделение элементов коллизии")) {
-                var parameterFiltersToHide = GetHighlightFilters(filter, view);
+                view.IsSectionBoxActive = false;
+                var uiView = _uiDocument.GetOpenUIViews().FirstOrDefault(item => item.ViewId == view.Id);
+                if(uiView != null) {
+                    uiView.ZoomToFit();
+                }
+                var parameterFiltersToHide = GetHighlightFilters(view, filterToHide, categoriesToShow);
                 view = RemoveFilters(view);
                 foreach(var parameterFilter in parameterFiltersToHide) {
                     view.AddFilter(parameterFilter.Id);

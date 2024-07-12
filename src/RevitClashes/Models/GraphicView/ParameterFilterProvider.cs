@@ -6,8 +6,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitClashDetective.Models.FilterGenerators;
-using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Visiter;
 
 namespace RevitClashDetective.Models.GraphicView {
@@ -113,14 +111,20 @@ namespace RevitClashDetective.Models.GraphicView {
         }
 
         /// <summary>
-        /// Создает новый фильтр инвертированный для настроек графики на виде, удаляя старый
+        /// Создает новый фильтр инвертированный для настроек графики на виде, удаляя старый.
         /// </summary>
         /// <param name="document">Документ, в котором нужно получить фильтр</param>
         /// <param name="filterName">Название фильтра</param>
-        /// <param name="filter">Внутренний фильтр элементов плагина, который будет инвертирован</param>
+        /// <param name="filter">Фильтр элементов, из которого будет создан фильтр по параметрам для настроек видимости</param>
+        /// <param name="categories">Категории для фильтрации</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public ParameterFilterElement CreateInvertedFilter(Document document, string filterName, Filter filter) {
+        public ParameterFilterElement CreateParameterFilter(
+            Document document,
+            string filterName,
+            ElementFilter filter,
+            ICollection<BuiltInCategory> categories) {
+
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
             if(string.IsNullOrWhiteSpace(filterName)) { throw new ArgumentNullException(nameof(filterName)); }
             if(filter is null) { throw new ArgumentNullException(nameof(filter)); }
@@ -128,10 +132,8 @@ namespace RevitClashDetective.Models.GraphicView {
             var parameterFilter = CreateFilter(
                 document,
                 filterName,
-                filter.CategoryIds
-                    .Select(id => id.AsBuiltInCategory())
-                    .ToArray());
-            parameterFilter.SetElementFilter(filter.GetRevitFilter(document, new InvertedRevitFilterGenerator()));
+                categories);
+            parameterFilter.SetElementFilter(filter);
             return parameterFilter;
         }
 

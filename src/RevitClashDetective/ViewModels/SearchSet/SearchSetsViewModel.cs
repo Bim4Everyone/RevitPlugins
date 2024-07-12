@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Windows.Input;
 
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -48,6 +50,7 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             } else {
                 SearchSet = _straightSearchSet;
             }
+            ShowSet();
         }
 
         private void Close() {
@@ -59,16 +62,18 @@ namespace RevitClashDetective.ViewModels.SearchSet {
         }
 
         private void ShowSet() {
-            try {
-                Filter filter;
-                if(Inverted) {
-                    filter = _invertedSearchSet.Filter;
-                } else {
-                    filter = _straightSearchSet.Filter;
-                }
-                _revitRepository.ShowFilter(filter);
-            } catch(InvalidOperationException ex) {
-                _revitRepository.ShowErrorMessage(ex.Message);
+            SearchSetViewModel invertedSelectedSet;
+            if(Inverted) {
+                invertedSelectedSet = _straightSearchSet;
+            } else {
+                invertedSelectedSet = _invertedSearchSet;
+            }
+            _revitRepository.ShowElements(
+                invertedSelectedSet.Filter.GetRevitFilter(_revitRepository.Doc, invertedSelectedSet.FilterGenerator),
+                invertedSelectedSet.Filter.CategoryIds.Select(c => c.AsBuiltInCategory()).ToHashSet(),
+                out string error);
+            if(!string.IsNullOrWhiteSpace(error)) {
+                _revitRepository.ShowErrorMessage(error);
             }
         }
     }
