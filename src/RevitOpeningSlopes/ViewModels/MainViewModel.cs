@@ -13,7 +13,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningSlopes.Models;
-using RevitOpeningSlopes.Models.Services;
+using RevitOpeningSlopes.Services;
 
 namespace RevitOpeningSlopes.ViewModels {
     internal class MainViewModel : BaseViewModel {

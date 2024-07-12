@@ -8,10 +8,10 @@ using Autodesk.Revit.DB.Structure;
 
 using dosymep.Revit;
 
+using RevitOpeningSlopes.Models;
 using RevitOpeningSlopes.Models.Exceptions;
-using RevitOpeningSlopes.Services;
 
-namespace RevitOpeningSlopes.Models.Services {
+namespace RevitOpeningSlopes.Services {
     internal class CreationOpeningSlopes : ICreationOpeningSlopes {
         private readonly RevitRepository _revitRepository;
 
