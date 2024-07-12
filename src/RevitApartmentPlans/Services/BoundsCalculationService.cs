@@ -34,7 +34,8 @@ namespace RevitApartmentPlans.Services {
             var curveLoops = apartment.GetRooms()
                 .Select(r => GetOuterRoomBound(r))
                 .ToArray();
-            var loop = _curveLoopsOffsetter.CreateOffsetLoop(_curveLoopsMerger.Merge(curveLoops), feetOffset);
+            var mergedLoop = _curveLoopsMerger.Merge(curveLoops);
+            var loop = _curveLoopsOffsetter.CreateOffsetLoop(mergedLoop, feetOffset);
             try {
                 return _curveLoopsSimplifier.Simplify(loop);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
