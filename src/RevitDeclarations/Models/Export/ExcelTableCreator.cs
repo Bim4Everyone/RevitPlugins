@@ -1,10 +1,17 @@
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 using Microsoft.Office.Interop.Excel;
 
 namespace RevitDeclarations.Models {
     internal class ExcelTableCreator {
+        private readonly Color _apartInfoColor = Color.FromArgb(221, 235, 247);
+        private readonly Color _mainRoomsColor = Color.FromArgb(248, 203, 173);
+        private readonly Color _summerRoomsColor = Color.FromArgb(217, 235, 205);
+        private readonly Color _nonConfigRoomsColor = Color.FromArgb(237, 237, 237);
+        private readonly Color _utpColor = Color.FromArgb(226, 207, 245);
+
         private readonly ExcelTableData _excelTableData;
         private readonly DeclarationSettings _settings;
 
@@ -180,7 +187,7 @@ namespace RevitDeclarations.Models {
             range.RowHeight = 60;
             range.WrapText = true;
 
-            Font font = range.Font;
+            Microsoft.Office.Interop.Excel.Font font = range.Font;
             font.Bold = true;
 
             workSheet.Columns[1].NumberFormat = "@";
@@ -195,10 +202,10 @@ namespace RevitDeclarations.Models {
             for(int i = 1; i <= _excelTableData.FullTableWidth; i++) {
                 if(i <= ExcelTableData.InfoWidth) {
                     workSheet.Columns[i].ColumnWidth = 15.5;
-                    workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(221, 235, 247);
+                    workSheet.Cells[1, i].Interior.Color = _apartInfoColor;
                 } else if(i > ExcelTableData.InfoWidth && i <= _excelTableData.SummerRoomsStart) {
                     workSheet.Columns[i].ColumnWidth = 10;
-                    workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(248, 203, 173);
+                    workSheet.Cells[1, i].Interior.Color = _mainRoomsColor;
 
                     int checkColumnNumber = (i - ExcelTableData.InfoWidth) % 3;
                     if(checkColumnNumber == 0) {
@@ -208,7 +215,7 @@ namespace RevitDeclarations.Models {
                     }
                 } else if(i > _excelTableData.SummerRoomsStart && i <= _excelTableData.OtherRoomsStart) {
                     workSheet.Columns[i].ColumnWidth = 10;
-                    workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(217, 235, 205);
+                    workSheet.Cells[1, i].Interior.Color = _summerRoomsColor;
 
                     int checkColumnNumber = (i - _excelTableData.SummerRoomsStart) % 4;
                     if(checkColumnNumber == 0) {
@@ -219,7 +226,7 @@ namespace RevitDeclarations.Models {
                     }
                 } else if(i > _excelTableData.OtherRoomsStart && i <= _excelTableData.UtpStart) {
                     workSheet.Columns[i].ColumnWidth = 10;
-                    workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(237, 237, 237);
+                    workSheet.Cells[1, i].Interior.Color = _nonConfigRoomsColor;
 
                     int checkColumnNumber = (i - _excelTableData.OtherRoomsStart) % 3;
                     if(checkColumnNumber == 0) {
@@ -229,7 +236,7 @@ namespace RevitDeclarations.Models {
                     }
                 } else {
                     workSheet.Columns[i].ColumnWidth = 12;
-                    workSheet.Cells[1, i].Interior.Color = System.Drawing.Color.FromArgb(226, 207, 245);
+                    workSheet.Cells[1, i].Interior.Color = _utpColor;
                 }
             }
         }
