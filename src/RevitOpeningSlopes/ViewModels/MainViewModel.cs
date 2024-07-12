@@ -21,7 +21,6 @@ namespace RevitOpeningSlopes.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly CreationOpeningSlopes _creationOpeningSlopes;
         private readonly IMessageBoxService _messageBoxService;
-
         public MainViewModel(PluginConfig pluginConfig,
             RevitRepository revitRepository,
             CreationOpeningSlopes creationOpeningSlopes,
@@ -45,7 +44,6 @@ namespace RevitOpeningSlopes.ViewModels {
                 manuallySelectedWindowsGetter,
                 onActiveViewWindowsGetter
             };
-
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             LoadViewCommand = RelayCommand.Create(LoadView);
         }
@@ -75,6 +73,7 @@ namespace RevitOpeningSlopes.ViewModels {
                 OnPropertyChanged(nameof(ErrorText));
             }
         }
+
         private ObservableCollection<SlopeTypeViewModel> _slopeTypes;
         public ObservableCollection<SlopeTypeViewModel> SlopeTypes {
             get => _slopeTypes;
@@ -121,7 +120,6 @@ namespace RevitOpeningSlopes.ViewModels {
                 ErrorText = "Смещение не должно содержать символов или букв";
                 return false;
             }
-
             ErrorText = null;
             return true;
         }

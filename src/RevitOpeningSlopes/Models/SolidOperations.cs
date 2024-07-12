@@ -23,6 +23,7 @@ namespace RevitOpeningSlopes.Models {
                 BuiltInCategory.OST_StructuralColumns,
                 BuiltInCategory.OST_StructuralFraming,
                 BuiltInCategory.OST_Floors});
+
         public Solid GetUnitedSolid(IEnumerable<Solid> solids) {
             return SolidExtensions.CreateUnitedSolids((IList<Solid>) solids)
                 .OrderByDescending(s => s.Volume)
@@ -32,15 +33,18 @@ namespace RevitOpeningSlopes.Models {
         public Solid GetUnitedSolidFromOpening(Element opening) {
             if(opening == null)
                 throw new ArgumentNullException(nameof(opening));
+
             ElementCategoryFilter openingCategoryFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows);
             IList<ElementId> dependingElements = opening.GetDependentElements(openingCategoryFilter);
             IList<Solid> totalSolids = new List<Solid>();
+
             foreach(ElementId depEl in dependingElements) {
                 Solid openingSolid = GetUnitedSolid(_revitRepository.Document.GetElement(depEl).GetSolids());
                 if(openingSolid.Volume > 0) {
                     totalSolids.Add(openingSolid);
                 }
             }
+
             if(totalSolids.Count > 0) {
                 return GetUnitedSolid(totalSolids);
             } else {
@@ -70,7 +74,6 @@ namespace RevitOpeningSlopes.Models {
                     .ToList();
 
                 nearestElementSolid = GetUnitedSolid(nearestSolids);
-                //CreateDirectShape(nearestElementsSolid);
             }
             return nearestElementSolid;
         }

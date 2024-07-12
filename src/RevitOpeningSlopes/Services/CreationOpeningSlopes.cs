@@ -14,7 +14,6 @@ using RevitOpeningSlopes.Models.Exceptions;
 namespace RevitOpeningSlopes.Services {
     internal class CreationOpeningSlopes {
         private readonly RevitRepository _revitRepository;
-
         private readonly SlopeParams _slopeParams;
         private readonly SlopesDataGetter _slopesDataGetter;
 
@@ -28,6 +27,10 @@ namespace RevitOpeningSlopes.Services {
             _slopeParams = new SlopeParams(revitRepository);
         }
 
+        /// <summary>
+        /// Метод для создания откоса с заданными параметрами
+        /// </summary>
+        /// <param name="slopeCreationData">Информация с необходимыми параметрами для откоса</param>
         public void CreateSlope(SlopeCreationData slopeCreationData) {
             FamilySymbol slopeType = _revitRepository.GetSlopeType(slopeCreationData.SlopeTypeId);
             if(!slopeType.IsActive) {
@@ -40,6 +43,15 @@ namespace RevitOpeningSlopes.Services {
             _slopeParams.SetSlopeParams(slope, slopeCreationData);
         }
 
+        /// <summary>
+        /// Метод по созданию откосов по коллекции окон, выбранных пользователем со шкалой прогресса
+        /// </summary>
+        /// <param name="config">Настройки плагина</param>
+        /// <param name="openings">Экземпляры окон, выбранные пользователем</param>
+        /// <param name="error">Текст ошибок построения откосов</param>
+        /// <param name="progress">Прогресс шкалы выполнения</param>
+        /// <param name="ct">Отмена выполнения со шкалой прогресса</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void CreateSlopes(PluginConfig config,
             ICollection<FamilyInstance> openings,
             out string error,

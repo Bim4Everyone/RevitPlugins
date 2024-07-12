@@ -6,7 +6,6 @@ namespace RevitOpeningSlopes.Models {
     internal class NearestElements {
         private readonly RevitRepository _revitRepository;
 
-
         public NearestElements(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }

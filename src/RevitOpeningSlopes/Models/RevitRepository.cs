@@ -11,15 +11,15 @@ using dosymep.Revit;
 
 namespace RevitOpeningSlopes.Models {
     internal class RevitRepository {
+        private readonly WindowSelectionFilter _selectionFilter;
 
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
         public View ActiveView => ActiveUIDocument.ActiveView;
         public View3D Default3DView => GetDefaultView3D();
-        private readonly WindowSelectionFilter _selectionFilter;
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
             _selectionFilter = new WindowSelectionFilter();
@@ -64,6 +64,7 @@ namespace RevitOpeningSlopes.Models {
                 .Cast<FamilyInstance>()
                 .ToList();
         }
+
         public ICollection<FamilyInstance> GetSelectedWindows() {
             return ActiveUIDocument.Selection.GetElementIds()
                 .Where(id => Document.GetElement(id).Category.GetBuiltInCategory()
@@ -73,6 +74,7 @@ namespace RevitOpeningSlopes.Models {
                 .Cast<FamilyInstance>()
                 .ToList();
         }
+
         public ICollection<FamilyInstance> GetWindowsOnActiveView() {
             return new FilteredElementCollector(Document, ActiveView.Id)
                 .WhereElementIsNotElementType()
@@ -81,6 +83,7 @@ namespace RevitOpeningSlopes.Models {
                 .Where(el => el.SuperComponent == null)
                 .ToArray();
         }
+
         public double ConvertToFeet(double value) {
 #if REVIT_2020_OR_LESS
             return UnitUtils.ConvertToInternalUnits(value, DisplayUnitType.DUT_MILLIMETERS);
@@ -88,6 +91,7 @@ namespace RevitOpeningSlopes.Models {
             return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.Millimeters);
 #endif
         }
+
         public double ConvertToMillimeters(double value) {
 #if REVIT_2020_OR_LESS
             return UnitUtils.ConvertFromInternalUnits(value, DisplayUnitType.DUT_MILLIMETERS);
@@ -101,23 +105,24 @@ namespace RevitOpeningSlopes.Models {
         /// </summary>
         /// <returns></returns>
         private View3D GetDefaultView3D() {
-            //хоть в ревите по умолчанию и присутствует "{3D}" вид, фигурные скобки запрещены в названиях
+            // хоть в ревите по умолчанию и присутствует "{3D}" вид, фигурные скобки запрещены в названиях
             const string defaultRevitView3dName = "{3D}";
             const string defaultView3dName = "3D";
             var views3D = new FilteredElementCollector(Document)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
                 .ToArray();
-            //ищем 3D вид ревита по умолчанию
+
+            // ищем 3D вид ревита по умолчанию
             var view = views3D.FirstOrDefault(
                 item => item.Name.Equals(defaultRevitView3dName, StringComparison.CurrentCultureIgnoreCase));
             if(view == null) {
-                //ищем наш 3D вид по умолчанию
+                // ищем наш 3D вид по умолчанию
                 view = views3D.FirstOrDefault(
                     item => item.Name.Equals(defaultView3dName, StringComparison.CurrentCultureIgnoreCase));
             }
             if(view == null) {
-                //создаем наш 3D вид по умолчанию
+                // создаем наш 3D вид по умолчанию
                 var type = new FilteredElementCollector(Document)
                     .OfClass(typeof(ViewFamilyType))
                     .Cast<ViewFamilyType>()

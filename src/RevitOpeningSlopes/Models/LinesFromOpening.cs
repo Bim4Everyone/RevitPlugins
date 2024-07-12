@@ -9,7 +9,6 @@ namespace RevitOpeningSlopes.Models {
     [Transaction(TransactionMode.Manual)]
 
     internal class LinesFromOpening {
-
         private readonly RevitRepository _revitRepository;
 
         public LinesFromOpening(RevitRepository revitRepository) {
@@ -25,6 +24,7 @@ namespace RevitOpeningSlopes.Models {
             double x = dir.X;
             double y = dir.Y;
             double z = dir.Z;
+
             XYZ origin = geomLine.Origin;
             XYZ normal = new XYZ(z - y, x - z, y - x);
             Plane plane = Plane.CreateByNormalAndOrigin(normal, origin);
@@ -41,7 +41,7 @@ namespace RevitOpeningSlopes.Models {
         public ICollection<XYZ> SplitCurveToPoints(Curve curve, double step) {
             double curveLength = curve.Length;
             if(step >= curveLength) {
-                //Если шаг больше длины линии, то возвращаем середину линии
+                // Если шаг больше длины линии, то возвращаем середину линии
                 return new XYZ[] { curve.Evaluate(0.5, true) };
             } else {
                 List<XYZ> points = new List<XYZ>();
@@ -69,8 +69,7 @@ namespace RevitOpeningSlopes.Models {
             double openingLocationZ = origin.Z;
 
             XYZ startPoint = new XYZ(origin.X, origin.Y, openingLocationZ);
-            XYZ endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) + normalVector
-                * length;
+            XYZ endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) + normalVector * length;
 
             if(direction == Direction.Left) {
                 endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) - normalVector
@@ -80,7 +79,6 @@ namespace RevitOpeningSlopes.Models {
             if(direction == Direction.Forward) {
                 endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) + openingVector
                     * length;
-
             }
 
             if(direction == Direction.Backward) {
@@ -100,7 +98,5 @@ namespace RevitOpeningSlopes.Models {
 
             return line;
         }
-
     }
-
 }

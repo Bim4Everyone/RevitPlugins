@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 namespace RevitOpeningSlopes.Models {
     internal class SlopesDataGetter {
         private readonly RevitRepository _revitRepository;
+
         public SlopesDataGetter(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }

@@ -47,7 +47,6 @@ namespace RevitOpeningSlopes {
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
 
-
                 Notification(kernel.Get<MainWindow>());
             }
         }

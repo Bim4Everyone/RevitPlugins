@@ -9,6 +9,7 @@ namespace RevitOpeningSlopes.Models {
         public OnActiveViewWindowsGetter(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
         }
+
         public string Name => "По окнам на активном виде";
         public ICollection<FamilyInstance> Openings => GetOpenings();
         public ICollection<FamilyInstance> GetOpenings() {

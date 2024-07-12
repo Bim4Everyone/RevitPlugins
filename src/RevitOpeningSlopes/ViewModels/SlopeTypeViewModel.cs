@@ -12,12 +12,12 @@ namespace RevitOpeningSlopes.ViewModels {
         }
 
         public string Name => _slopeType.Name;
-
         public ElementId SlopeTypeId => _slopeType.Id;
 
         public override bool Equals(object obj) {
             return Equals(obj as SlopeTypeViewModel);
         }
+
         public bool Equals(SlopeTypeViewModel other) {
             if(ReferenceEquals(null, other)) { return false; };
             if(ReferenceEquals(this, other)) { return true; };
@@ -27,6 +27,7 @@ namespace RevitOpeningSlopes.ViewModels {
         public override int GetHashCode() {
             return 1226191301 + EqualityComparer<ElementId>.Default.GetHashCode(SlopeTypeId);
         }
+
         public override string ToString() {
             return Name;
         }
