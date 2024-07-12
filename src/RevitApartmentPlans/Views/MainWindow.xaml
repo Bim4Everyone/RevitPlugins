@@ -14,7 +14,7 @@
                            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                            xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                            xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
-                           xmlns:converters="clr-namespace:RevitApartmentPlans.Converters"
+                           xmlns:converters="clr-namespace:dosymep.WPF.Converters"
                            mc:Ignorable="d"
                            WindowStartupLocation="CenterOwner"
                            Title="MainWindow"
@@ -30,7 +30,7 @@
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
-        <converters:ViewTypeConverter x:Key="ViewTypeConverter" />
+        <converters:RevitViewTypeConverter x:Key="RevitViewTypeConverter" />
         <Style TargetType="dx:SimpleButton">
             <Setter Property="Width"
                     Value="80" />
@@ -202,7 +202,7 @@
                                 <dxg:GridColumn Width="1*"
                                                 AllowEditing="False"
                                                 Header="Тип"
-                                                Binding="{Binding ViewTemplateType, Converter={StaticResource ViewTypeConverter}}"
+                                                Binding="{Binding ViewTemplateType, Converter={StaticResource RevitViewTypeConverter}}"
                                                 ReadOnly="True">
                                 </dxg:GridColumn>
                                 <dxg:GridColumn Width="3*"

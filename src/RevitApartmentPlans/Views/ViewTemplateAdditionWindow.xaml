@@ -8,7 +8,7 @@
                            xmlns:vms="clr-namespace:RevitApartmentPlans.ViewModels"
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                            xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-                           xmlns:converters="clr-namespace:RevitApartmentPlans.Converters"
+                           xmlns:converters="clr-namespace:dosymep.WPF.Converters"
                            mc:Ignorable="d"
                            Title="ViewTemplateAdditionWindow"
                            MinHeight="200"
@@ -20,7 +20,7 @@
                            ResizeMode="NoResize"
                            WindowStartupLocation="CenterOwner">
     <Window.Resources>
-        <converters:ViewTypeConverter x:Key="ViewTypeConverter" />
+        <converters:RevitViewTypeConverter x:Key="RevitViewTypeConverter" />
         <Style TargetType="dx:SimpleButton">
             <Setter Property="Width"
                     Value="80" />
@@ -42,7 +42,7 @@
                               NullText="Тип шаблона">
                 <dxe:ComboBoxEdit.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource ViewTypeConverter}}"/>
+                        <TextBlock Text="{Binding Converter={StaticResource RevitViewTypeConverter}}"/>
                     </DataTemplate>
                 </dxe:ComboBoxEdit.ItemTemplate>
             </dxe:ComboBoxEdit>
