@@ -171,9 +171,7 @@ namespace RevitApartmentPlans.Services {
         }
 
         private IEnumerable<Face> GetFaces(Solid solid) {
-            foreach(Face face in solid.Faces) {
-                yield return face;
-            }
+            return solid.Faces.OfType<Face>();
         }
     }
 }
