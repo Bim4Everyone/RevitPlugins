@@ -170,7 +170,8 @@ namespace RevitApartmentPlans.Models {
                 case ViewType.CeilingPlan:
                     return GetViewFamilyTypeId(ViewFamily.CeilingPlan);
                 default:
-                    throw new NotSupportedException($"Тип шаблона {template.ViewType} не поддерживается");
+                    throw new NotSupportedException($"Тип шаблона {template.ViewType} не поддерживается. " +
+                        $"Название шаблона: \'{template.Name}\'");
             }
         }
 
