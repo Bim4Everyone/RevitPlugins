@@ -20,9 +20,15 @@ namespace RevitApartmentPlans.Models {
         /// <exception cref="ArgumentOutOfRangeException">Исключение, если коллекция помещений пустая</exception>
         /// <exception cref="ArgumentException">Исключение, если помещения расположены на разных уровнях</exception>
         public Apartment(ICollection<Room> rooms, string name) {
-            if(rooms is null) { throw new ArgumentNullException(nameof(rooms)); }
-            if(string.IsNullOrWhiteSpace(name)) { throw new ArgumentNullException(nameof(name)); }
-            if(rooms.Count == 0) { throw new ArgumentOutOfRangeException(nameof(rooms)); }
+            if(rooms is null) {
+                throw new ArgumentNullException(nameof(rooms));
+            }
+            if(string.IsNullOrWhiteSpace(name)) {
+                throw new ArgumentNullException(nameof(name));
+            }
+            if(rooms.Count == 0) {
+                throw new ArgumentOutOfRangeException(nameof(rooms));
+            }
             if(rooms.Select(r => r.LevelId).Distinct().Count() != 1) {
                 throw new ArgumentException($"Помещения квартиры {name} расположены на разных уровнях.");
             }
