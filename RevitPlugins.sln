@@ -37,6 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{0647
 		src\dosymep\PlatformWindow.cs = src\dosymep\PlatformWindow.cs
 		src\dosymep\RelayCommand.cs = src\dosymep\RelayCommand.cs
 		src\dosymep\RelayCommand.T.cs = src\dosymep\RelayCommand.T.cs
+		src\dosymep\RevitViewTypeConverter.cs = src\dosymep\RevitViewTypeConverter.cs
 		src\dosymep\ThemedPlatformWindow.cs = src\dosymep\ThemedPlatformWindow.cs
 	EndProjectSection
 EndProject
@@ -295,6 +296,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitFinishingWalls", "src\RevitFinishingWalls\RevitFinishingWalls.csproj", "{6EDA98F4-285F-47A1-BEBA-6EAE9323D9DF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitReinforcementCoefficient", "src\RevitReinforcementCoefficient\RevitReinforcementCoefficient.csproj", "{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitApartmentPlans", "src\RevitApartmentPlans\RevitApartmentPlans.csproj", "{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -805,6 +808,20 @@ Global
 		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.Debug|x64.Build.0 = Debug|x64
 		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.Release|x64.ActiveCfg = Release|x64
 		{BA555C42-F0F2-4C1F-9AC7-0B5E76B1B4A9}.Release|x64.Build.0 = Release|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2020|x64.ActiveCfg = D2020|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2020|x64.Build.0 = D2020|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2021|x64.ActiveCfg = D2021|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2021|x64.Build.0 = D2021|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2022|x64.ActiveCfg = D2022|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2022|x64.Build.0 = D2022|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2023|x64.ActiveCfg = D2023|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2023|x64.Build.0 = D2023|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2024|x64.ActiveCfg = D2024|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.D2024|x64.Build.0 = D2024|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.Debug|x64.ActiveCfg = D2020|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.Debug|x64.Build.0 = D2020|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.Release|x64.ActiveCfg = D2020|x64
+		{C2BD63D9-4E08-4DBC-8945-1495D92E1A7B}.Release|x64.Build.0 = D2020|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -37,6 +37,7 @@
 | 24. | Удалить марки помещений   | [RevitRemoveRoomTags](src/RevitRemoveRoomTags)           | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Прочее         |
 | 25. | Отделка стен              | [RevitFinishingWalls](src/RevitFinishingWalls)           | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
 | 26. | Конструктор секций        | [RevitSectionsConstructor](src/RevitSectionsConstructor) | [Confluence]()                                                          | [BIM](https://github.com/Bim4Everyone/BIMExtensions)| ОПП            |
+| 27. | Планы квартир             | [RevitApartmentPlans](src/RevitApartmentPlans)           | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | Документация   |
 
 # Сборка проекта
 
