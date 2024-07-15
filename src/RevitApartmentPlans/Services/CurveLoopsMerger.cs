@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit.Geometry;
+
 namespace RevitApartmentPlans.Services {
     /// <summary>
     /// Реализация алгоритма по объединению нескольких замкнутых плоских контуров в один плоский внешний контур.
@@ -58,7 +60,11 @@ namespace RevitApartmentPlans.Services {
             while(offset <= _offsetMax) {
                 ICollection<CurveLoop> offsettedLoops = CreateOffsetLoop(curveLoopsXOY, offset);
                 IList<Solid> solids = CreateSolids(offsettedLoops);
-                if(TryMergeSolids(solids, out Solid mergedSolid)) {
+                var unitedSolids = SolidExtensions.CreateUnitedSolids(solids)
+                    .SelectMany(s => SolidUtils.SplitVolumes(s))
+                    .ToArray();
+                if(unitedSolids.Length == 1) {
+                    var mergedSolid = unitedSolids.First();
                     Face bottomFace = GetBottomFace(mergedSolid);
                     CurveLoop bottomLoop = GetOuterCurveLoop(bottomFace);
                     Transform transform = GetVerticalTransformFromZero(curveLoops.First());
@@ -110,28 +116,6 @@ namespace RevitApartmentPlans.Services {
                 return GeometryCreationUtilities.CreateLoftGeometry(
                     new CurveLoop[] { bottomRectangleLoop, topRectangleLoop }, _solidOptions);
             }
-        }
-
-        /// <summary>
-        /// Пробует объединить список солидов в один солид.
-        /// </summary>
-        /// <param name="solids">Список солидов для объединения</param>
-        /// <param name="mergedSolid">Объединенный солид</param>
-        /// <returns>True, если удалось создать объединенный солид, иначе False</returns>
-        private bool TryMergeSolids(IList<Solid> solids, out Solid mergedSolid) {
-            mergedSolid = solids[0];
-            for(int i = 1; i < solids.Count; i++) {
-                try {
-                    mergedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(
-                        mergedSolid,
-                        solids[i],
-                        BooleanOperationsType.Union);
-                } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                    mergedSolid = default;
-                    return false;
-                }
-            }
-            return SolidUtils.SplitVolumes(mergedSolid).Count == 1;
         }
 
         /// <summary>
