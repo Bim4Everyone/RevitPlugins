@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -92,7 +92,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             name: RevitRepository.MepCategoryNames[MepCategoryEnum.Pipe],
             minSizesParameters: new Parameters[] { Parameters.Diameter },
             isRound: true,
-            imageSource: "../Resources/pipe.png"
+            imageSource: MepCategory.PipeImageSource
             );
 
 
@@ -101,7 +101,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             name: RevitRepository.MepCategoryNames[MepCategoryEnum.RectangleDuct],
             minSizesParameters: new Parameters[] { Parameters.Width, Parameters.Height },
             isRound: false,
-            imageSource: "../Resources/rectangleDuct.png"
+            imageSource: MepCategory.RectDuctImageSource
             );
 
 
@@ -110,7 +110,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             name: RevitRepository.MepCategoryNames[MepCategoryEnum.RoundDuct],
             minSizesParameters: new Parameters[] { Parameters.Diameter },
             isRound: true,
-            imageSource: "../Resources/roundDuct.png"
+            imageSource: MepCategory.RoundDuctImageSource
             );
 
         private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel(
@@ -118,7 +118,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             name: RevitRepository.MepCategoryNames[MepCategoryEnum.CableTray],
             minSizesParameters: new Parameters[] { Parameters.Width, Parameters.Height },
             isRound: false,
-            imageSource: "../Resources/tray.png"
+            imageSource: MepCategory.CableTrayImageSource
             );
 
         private MepCategoryViewModel GetConduit() => new MepCategoryViewModel(
@@ -126,7 +126,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             name: RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
             minSizesParameters: new Parameters[] { Parameters.Diameter },
             isRound: true,
-            imageSource: "../Resources/conduit.png"
+            imageSource: MepCategory.ConduitImageSource
             );
 
         private void AddMissingCategories() {
@@ -159,17 +159,17 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private MepCategoryViewModel GetMissingCategory(MepCategoryEnum missingCategory) {
             switch(missingCategory) {
                 case MepCategoryEnum.Pipe:
-                return GetPipe();
+                    return GetPipe();
                 case MepCategoryEnum.RectangleDuct:
-                return GetRectangleDuct();
+                    return GetRectangleDuct();
                 case MepCategoryEnum.RoundDuct:
-                return GetRoundDuct();
+                    return GetRoundDuct();
                 case MepCategoryEnum.CableTray:
-                return GetCableTray();
+                    return GetCableTray();
                 case MepCategoryEnum.Conduit:
-                return GetConduit();
+                    return GetConduit();
                 default:
-                throw new ArgumentException($"Не найдена категория \"{missingCategory}\".", nameof(missingCategory));
+                    throw new ArgumentException($"Не найдена категория \"{missingCategory}\".", nameof(missingCategory));
             }
         }
         private void InitializeTimer() {
