@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
@@ -7,7 +6,7 @@ using System.Windows.Markup;
 using Autodesk.Revit.DB;
 
 namespace dosymep.WPF.Converters {
-    [ValueConversion(typeof(ViewType), typeof(IEnumerable<string>))]
+    [ValueConversion(typeof(ViewType), typeof(string))]
     internal class RevitViewTypeConverter : MarkupExtension, IValueConverter {
         private const string _areaPlan = "План зонирования";
         private const string _ceilingPlan = "План потолка";
