@@ -394,8 +394,20 @@ namespace RevitClashDetective.Models {
                     view.AddFilter(parameterFilter.Id);
                     view.SetFilterVisibility(parameterFilter.Id, false);
                 }
+                foreach(var category in GetLineCategoriesToHide()) {
+                    view.SetCategoryHidden(category, true);
+                }
                 t.Commit();
             }
+        }
+
+
+        private ICollection<ElementId> GetLineCategoriesToHide() {
+            return new ElementId[] {
+                new ElementId(BuiltInCategory.OST_MEPSpaceSeparationLines),
+                new ElementId(BuiltInCategory.OST_RoomSeparationLines),
+                new ElementId(BuiltInCategory.OST_Lines)
+            };
         }
 
         private void SelectAndShowElement(
