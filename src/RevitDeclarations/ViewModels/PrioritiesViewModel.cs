@@ -46,7 +46,7 @@ namespace RevitDeclarations.ViewModels {
         public PrioritiesConfig PrioritiesConfig => _prioritiesConfig;
 
         public void SetDefaultConfig(object obj) {
-            _prioritiesConfig = new DefaultPrioritiesConfig();
+            _prioritiesConfig = PrioritiesConfig.GetDefaultConfig();
 
             _mainViewModel.CanLoadUtp = true;
             _mainViewModel.CanLoadUtpText = "";
