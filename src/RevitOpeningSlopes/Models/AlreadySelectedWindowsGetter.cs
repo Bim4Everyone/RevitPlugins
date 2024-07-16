@@ -7,7 +7,8 @@ namespace RevitOpeningSlopes.Models {
         private readonly RevitRepository _revitRepository;
 
         public AlreadySelectedWindowsGetter(RevitRepository revitRepository) {
-            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+            _revitRepository = revitRepository
+                ?? throw new System.ArgumentNullException(nameof(revitRepository));
         }
 
         public string Name => $"По предварительно выбранным окнам ({Openings.Count})";

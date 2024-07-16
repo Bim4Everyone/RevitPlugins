@@ -21,6 +21,13 @@ namespace RevitOpeningSlopes.Models {
                 ?? throw new ArgumentNullException(nameof(solidOperations));
         }
 
+        /// <summary>
+        /// Возвращает информацию для размещения экземпляра откоса
+        /// </summary>
+        /// <param name="config">Настройки плагина</param>
+        /// <param name="opening">Окно</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Срабатывает, если глубина проема равна или меньше нуля</exception>
         public SlopeCreationData GetOpeningSlopeCreationData(PluginConfig config, FamilyInstance opening) {
 
             OpeningHandler openingParameters = new OpeningHandler(_revitRepository, _linesFromOpening,

@@ -30,6 +30,14 @@ namespace RevitOpeningSlopes.Models {
                 .FirstOrDefault();
         }
 
+        /// <summary>
+        /// Возвращает объединенный Solid из твердотельной геометрии семейства категории "Окна"
+        /// </summary>
+        /// <param name="opening">Окно</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Срабатывает, если экземпляр окна равен null</exception>
+        /// <exception cref="OpeningNullSolidException">Срабатывает, если внутри семейства окна не 
+        /// обнаружена твердотельная геометрия (отверстия)</exception>
         public Solid GetUnitedSolidFromOpening(Element opening) {
             if(opening == null)
                 throw new ArgumentNullException(nameof(opening));

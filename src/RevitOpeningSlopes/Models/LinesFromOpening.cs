@@ -72,18 +72,15 @@ namespace RevitOpeningSlopes.Models {
             XYZ endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) + normalVector * length;
 
             if(direction == Direction.Left) {
-                endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) - normalVector
-                    * length;
+                endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) - normalVector * length;
             }
 
             if(direction == Direction.Forward) {
-                endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) + openingVector
-                    * length;
+                endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) + openingVector * length;
             }
 
             if(direction == Direction.Backward) {
-                endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) - openingVector
-                    * length;
+                endPoint = new XYZ(origin.X, origin.Y, openingLocationZ) - openingVector * length;
             }
 
             if(direction == Direction.Top) {
