@@ -64,22 +64,20 @@ namespace RevitOpeningSlopes.Services {
             StringBuilder sb = new StringBuilder();
             using(var transaction = _revitRepository.Document.StartTransaction("Размещение откосов")) {
                 int i = 0;
-                if(openings != null) {
-                    foreach(FamilyInstance opening in openings) {
-                        ct.ThrowIfCancellationRequested();
-                        progress.Report(i++);
-                        try {
-                            SlopeCreationData slopeCreationData = _slopesDataGetter
-                                .GetOpeningSlopeCreationData(config, opening);
-                            CreateSlope(slopeCreationData);
-                        } catch(OpeningNullSolidException e) {
-                            sb.AppendLine($"{e.Message}, Id = {opening.Id}");
-                        } catch(ArgumentException e) {
-                            sb.AppendLine($"{e.Message}, Id = {opening.Id}");
-                        }
+                foreach(FamilyInstance opening in openings) {
+                    ct.ThrowIfCancellationRequested();
+                    progress.Report(i++);
+                    try {
+                        SlopeCreationData slopeCreationData = _slopesDataGetter
+                            .GetOpeningSlopeCreationData(config, opening);
+                        CreateSlope(slopeCreationData);
+                    } catch(OpeningNullSolidException e) {
+                        sb.AppendLine($"{e.Message}, Id = {opening.Id}");
+                    } catch(ArgumentException e) {
+                        sb.AppendLine($"{e.Message}, Id = {opening.Id}");
                     }
-                    transaction.Commit();
                 }
+                transaction.Commit();
             }
             error = sb.ToString();
         }
