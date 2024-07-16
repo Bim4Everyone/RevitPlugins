@@ -5,8 +5,9 @@ using System.Linq;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
 
+using dosymep.WPF.Extensions;
+
 using RevitDeclarations.ViewModels;
-using Microsoft.Office.Interop.Excel;
 
 namespace RevitDeclarations.Models {
     internal class UtpCalculator {
