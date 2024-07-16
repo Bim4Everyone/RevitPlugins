@@ -8,6 +8,9 @@
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
+    <system:String x:Key="GeneralSettings.Title">Основные</system:String>
+    <system:String x:Key="AboutSettings.Title">О программе</system:String>
+    
     <system:String x:Key="ExtensionSettings.Title">Расширения</system:String>
     <system:String x:Key="ExtensionSettings.CategoryGridColumn">Категория</system:String>
     <system:String x:Key="ExtensionSettings.NameGridColumn">Имя</system:String>

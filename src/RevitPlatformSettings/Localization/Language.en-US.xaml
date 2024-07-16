@@ -7,6 +7,9 @@
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+    <system:String x:Key="GeneralSettings.Title">General</system:String>
+    <system:String x:Key="AboutSettings.Title">About</system:String>
 
     <system:String x:Key="ExtensionSettings.Title">Extensions</system:String>
     <system:String x:Key="ExtensionSettings.CategoryGridColumn">Category</system:String>
