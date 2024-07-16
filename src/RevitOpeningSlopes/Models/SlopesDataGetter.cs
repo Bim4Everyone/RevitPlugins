@@ -5,14 +5,26 @@ using Autodesk.Revit.DB;
 namespace RevitOpeningSlopes.Models {
     internal class SlopesDataGetter {
         private readonly RevitRepository _revitRepository;
+        private readonly LinesFromOpening _linesFromOpening;
+        private readonly NearestElements _nearestElements;
+        private readonly SolidOperations _solidOperations;
 
-        public SlopesDataGetter(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
+        public SlopesDataGetter(RevitRepository revitRepository, LinesFromOpening linesFromOpening,
+            NearestElements nearestElements, SolidOperations solidOperations) {
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _linesFromOpening = linesFromOpening
+                ?? throw new ArgumentNullException(nameof(linesFromOpening));
+            _nearestElements = nearestElements
+                ?? throw new ArgumentNullException(nameof(nearestElements));
+            _solidOperations = solidOperations
+                ?? throw new ArgumentNullException(nameof(solidOperations));
         }
 
         public SlopeCreationData GetOpeningSlopeCreationData(PluginConfig config, FamilyInstance opening) {
 
-            OpeningHandler openingParameters = new OpeningHandler(_revitRepository, opening);
+            OpeningHandler openingParameters = new OpeningHandler(_revitRepository, _linesFromOpening,
+                _nearestElements, _solidOperations, opening);
             double height = openingParameters.GetOpeningHeight();
             double width = openingParameters.GetOpeningWidth();
             double depth = openingParameters.GetOpeningDepth()

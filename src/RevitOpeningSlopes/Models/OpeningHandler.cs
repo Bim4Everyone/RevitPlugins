@@ -39,14 +39,18 @@ namespace RevitOpeningSlopes.Models {
         private double _openingDepth = 0;
         private double _rotationAngle = 0;
 
-        public OpeningHandler(RevitRepository revitRepository, FamilyInstance opening) {
+        public OpeningHandler(RevitRepository revitRepository, LinesFromOpening linesFromOpening,
+            NearestElements nearestElements, SolidOperations solidOperations, FamilyInstance opening) {
             _revitRepository = revitRepository
                 ?? throw new ArgumentNullException(nameof(revitRepository));
-            _linesFromOpening = new LinesFromOpening(revitRepository);
-            _nearestElements = new NearestElements(revitRepository);
+            _linesFromOpening = linesFromOpening
+                ?? throw new ArgumentNullException(nameof(linesFromOpening));
+            _nearestElements = nearestElements
+                ?? throw new ArgumentNullException(nameof(nearestElements));
+            _solidOperations = solidOperations
+                ?? throw new ArgumentNullException(nameof(solidOperations));
             _opening = opening
                 ?? throw new ArgumentNullException(nameof(opening));
-            _solidOperations = new SolidOperations(revitRepository);
 
             // Запуск функции перерасчета направления вектора семейства окна
             RecalculationVectorDirection();

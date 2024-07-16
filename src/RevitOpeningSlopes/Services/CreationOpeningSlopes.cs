@@ -19,12 +19,15 @@ namespace RevitOpeningSlopes.Services {
 
         public CreationOpeningSlopes(
             RevitRepository revitRepository,
-            SlopesDataGetter slopesDataGetter) {
+            SlopesDataGetter slopesDataGetter,
+            SlopeParams slopeParams) {
 
             _revitRepository = revitRepository
                 ?? throw new ArgumentNullException(nameof(revitRepository));
-            _slopesDataGetter = slopesDataGetter ?? throw new ArgumentNullException(nameof(slopesDataGetter));
-            _slopeParams = new SlopeParams(revitRepository);
+            _slopesDataGetter = slopesDataGetter
+                ?? throw new ArgumentNullException(nameof(slopesDataGetter));
+            _slopeParams = slopeParams
+                ?? throw new ArgumentNullException(nameof(slopeParams));
         }
 
         /// <summary>

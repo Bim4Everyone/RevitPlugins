@@ -9,6 +9,7 @@ using dosymep.Bim4Everyone.SimpleServices;
 using Ninject;
 
 using RevitOpeningSlopes.Models;
+using RevitOpeningSlopes.Services;
 using RevitOpeningSlopes.ViewModels;
 using RevitOpeningSlopes.Views;
 
@@ -30,6 +31,12 @@ namespace RevitOpeningSlopes {
                 kernel.Bind<SlopesDataGetter>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<CreationOpeningSlopes>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<SlopeParams>()
+                    .ToSelf()
+                    .InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
                 kernel.Bind<AlreadySelectedWindowsGetter>()
@@ -39,6 +46,12 @@ namespace RevitOpeningSlopes {
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<OnActiveViewWindowsGetter>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<NearestElements>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<SolidOperations>()
                     .ToSelf()
                     .InSingletonScope();
 
