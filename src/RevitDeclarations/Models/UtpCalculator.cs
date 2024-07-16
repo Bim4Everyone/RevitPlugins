@@ -11,6 +11,8 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class UtpCalculator {
+        private const int _highFlatHeight = 3400;
+
         private readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
         private readonly StringComparison _strComparison = StringComparison.OrdinalIgnoreCase;
 
@@ -114,7 +116,7 @@ namespace RevitDeclarations.Models {
         public string CalculateHighflat(Apartment apartment) {
             foreach(var room in apartment.Rooms) {
                 double height = room.GetLengthParamValue(_settings.RoomsHeightParam, _settings.Accuracy);
-                if(height < 3400) {
+                if(height < _highFlatHeight) {
                     return "Нет";
                 }
             }
