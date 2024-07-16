@@ -6,8 +6,8 @@ namespace RevitMechanicalSpecification.Views {
             InitializeComponent();
         }
 
-        public override string PluginName => nameof(RevitMechanicalSpecification);
-        public override string ProjectConfigName => nameof(MainWindow);
+        //public override string PluginName => nameof(RevitMechanicalSpecification);
+        //public override string ProjectConfigName => nameof(MainWindow);
         
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
