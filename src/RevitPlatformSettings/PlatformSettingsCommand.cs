@@ -16,6 +16,7 @@ using RevitPlatformSettings.Factories;
 using RevitPlatformSettings.Model;
 using RevitPlatformSettings.Services;
 using RevitPlatformSettings.ViewModels;
+using RevitPlatformSettings.ViewModels.Settings;
 using RevitPlatformSettings.Views;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;

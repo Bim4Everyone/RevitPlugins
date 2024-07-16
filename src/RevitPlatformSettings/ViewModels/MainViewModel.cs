@@ -6,6 +6,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPlatformSettings.Factories;
+using RevitPlatformSettings.ViewModels.Settings;
 
 namespace RevitPlatformSettings.ViewModels {
     internal class MainViewModel : BaseViewModel {
