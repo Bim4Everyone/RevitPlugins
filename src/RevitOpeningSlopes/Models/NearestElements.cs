@@ -5,12 +5,7 @@ using Autodesk.Revit.DB;
 namespace RevitOpeningSlopes.Models {
     internal class NearestElements {
         private readonly RevitRepository _revitRepository;
-
-        public NearestElements(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
-        }
-
-        private ElementFilter CategoryFilter => new ElementMulticategoryFilter(
+        private readonly ElementFilter _categoryFilter = new ElementMulticategoryFilter(
                 new BuiltInCategory[] {
                     BuiltInCategory.OST_Walls,
                     BuiltInCategory.OST_Columns,
@@ -19,6 +14,9 @@ namespace RevitOpeningSlopes.Models {
                     BuiltInCategory.OST_Floors,
                     BuiltInCategory.OST_GenericModel,
                     BuiltInCategory.OST_Doors});
+        public NearestElements(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
+        }
 
         /// <summary>
         /// Функция возвращает список элементов, которых пересек луч в направлении указанной кривой
@@ -30,7 +28,7 @@ namespace RevitOpeningSlopes.Models {
 
             IList<Element> elements = new List<Element>();
             ReferenceIntersector intersector
-                = new ReferenceIntersector(CategoryFilter, FindReferenceTarget.All,
+                = new ReferenceIntersector(_categoryFilter, FindReferenceTarget.All,
                 _revitRepository.Default3DView) {
                     FindReferencesInRevitLinks = false
                 };

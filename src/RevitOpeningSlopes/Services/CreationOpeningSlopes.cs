@@ -54,7 +54,7 @@ namespace RevitOpeningSlopes.Services {
         /// <param name="error">Текст ошибок построения откосов</param>
         /// <param name="progress">Прогресс шкалы выполнения</param>
         /// <param name="ct">Отмена выполнения со шкалой прогресса</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Срабатывает, если настройки плагина равны null</exception>
         public void CreateSlopes(PluginConfig config,
             ICollection<FamilyInstance> openings,
             out string error,

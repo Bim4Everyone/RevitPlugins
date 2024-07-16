@@ -11,18 +11,19 @@ using RevitOpeningSlopes.Models.Exceptions;
 namespace RevitOpeningSlopes.Models {
     internal class SolidOperations {
         private readonly RevitRepository _revitRepository;
-
-        public SolidOperations(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
-        }
-
-        private ElementFilter CategoryFilter => new ElementMulticategoryFilter(
+        private readonly ElementFilter _categoryFilter = new ElementMulticategoryFilter(
                 new BuiltInCategory[] {
                 BuiltInCategory.OST_Walls,
                 BuiltInCategory.OST_Columns,
                 BuiltInCategory.OST_StructuralColumns,
                 BuiltInCategory.OST_StructuralFraming,
                 BuiltInCategory.OST_Floors});
+        private readonly ElementCategoryFilter _openingCategoryFilter =
+            new ElementCategoryFilter(BuiltInCategory.OST_Windows);
+
+        public SolidOperations(RevitRepository revitRepository) {
+            _revitRepository = revitRepository;
+        }
 
         public Solid GetUnitedSolid(IEnumerable<Solid> solids) {
             return SolidExtensions.CreateUnitedSolids((IList<Solid>) solids)
@@ -42,8 +43,7 @@ namespace RevitOpeningSlopes.Models {
             if(opening == null)
                 throw new ArgumentNullException(nameof(opening));
 
-            ElementCategoryFilter openingCategoryFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows);
-            IList<ElementId> dependingElements = opening.GetDependentElements(openingCategoryFilter);
+            IList<ElementId> dependingElements = opening.GetDependentElements(_openingCategoryFilter);
             IList<Solid> totalSolids = new List<Solid>();
 
             foreach(ElementId depEl in dependingElements) {
@@ -73,7 +73,7 @@ namespace RevitOpeningSlopes.Models {
 
                 IEnumerable<Element> nearestElements = new FilteredElementCollector(_revitRepository.Document)
                     .WhereElementIsNotElementType()
-                    .WherePasses(CategoryFilter)
+                    .WherePasses(_categoryFilter)
                     .WherePasses(bboxIntersectFilter)
                     .ToElements();
 

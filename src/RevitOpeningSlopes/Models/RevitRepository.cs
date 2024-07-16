@@ -56,21 +56,24 @@ namespace RevitOpeningSlopes.Models {
         }
 
         public ICollection<FamilyInstance> SelectWindowsOnView() {
-            return ActiveUIDocument
+            IList<Reference> pickedElementsReference = ActiveUIDocument
                 .Selection
-                .PickObjects(ObjectType.Element, _selectionFilter, "Выберите экземпляры окон")
-                .Select(reference => Document.GetElement(reference))
-                .Where(el => el is Element)
+                .PickObjects(ObjectType.Element, _selectionFilter, "Выберите экземпляры окон");
+
+            return pickedElementsReference
+                .Where(r => r != null)
+                .Select(r => Document.GetElement(r))
+                .Where(el => el is FamilyInstance)
                 .Cast<FamilyInstance>()
                 .ToList();
         }
 
         public ICollection<FamilyInstance> GetSelectedWindows() {
-            return ActiveUIDocument.Selection.GetElementIds()
-                .Where(id => Document.GetElement(id).Category.GetBuiltInCategory()
-                == BuiltInCategory.OST_Windows)
+            return ActiveUIDocument
+                .Selection
+                .GetElementIds()
                 .Select(id => Document.GetElement(id))
-                .Where(el => el is Element)
+                .Where(el => el.Category.GetBuiltInCategory() == BuiltInCategory.OST_Windows)
                 .Cast<FamilyInstance>()
                 .ToList();
         }
@@ -79,9 +82,10 @@ namespace RevitOpeningSlopes.Models {
             return new FilteredElementCollector(Document, ActiveView.Id)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Windows)
+                .OfClass(typeof(FamilyInstance))
                 .Cast<FamilyInstance>()
                 .Where(el => el.SuperComponent == null)
-                .ToArray();
+                .ToList();
         }
 
         public double ConvertToFeet(double value) {
