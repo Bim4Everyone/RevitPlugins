@@ -12,7 +12,7 @@
                            xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            xmlns:base="clr-namespace:dosymep.WPF.Views"
                            mc:Ignorable="d"
-                           Title="Проверка поискового набора"
+                           Title="{Binding Name}"
                            Height="450"
                            Width="800"
                            d:DataContext="{d:DesignInstance vm:SearchSetsViewModel, IsDesignTimeCreatable=False}">

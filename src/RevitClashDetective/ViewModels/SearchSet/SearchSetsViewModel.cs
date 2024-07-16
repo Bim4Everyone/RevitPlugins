@@ -25,11 +25,14 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             _invertedSearchSet = new SearchSetViewModel(_revitRepository, Filter, new InvertedRevitFilterGenerator());
 
             SearchSet = _straightSearchSet;
+            Name = filter.Name;
 
             InversionChangedCommand = RelayCommand.Create(InversionChanged);
             ShowSetCommand = RelayCommand.Create(ShowSet);
             CloseCommand = RelayCommand.Create(Close);
         }
+
+        public string Name { get; }
 
         public bool Inverted { get; set; }
 
