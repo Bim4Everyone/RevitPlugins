@@ -5,6 +5,8 @@ using Autodesk.Revit.DB.Architecture;
 using RevitDeclarations.Models;
 
 using dosymep.WPF.ViewModels;
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
 
 namespace RevitDeclarations.ViewModels {
     internal class RevitDocumentViewModel : BaseViewModel {
@@ -75,12 +77,13 @@ namespace RevitDeclarations.ViewModels {
                 DocumentName = _name
             };
 
-            RoomForChecks roomForCheck = new RoomForChecks(_room);
+            //RoomForChecks roomForCheck = new RoomForChecks(_room);
 
             errorListVM.Errors = _settings
                 .AllParameters
-                .Where(x => !roomForCheck.HasParameter(x))
-                .Select(x => new ErrorElement(x.Definition.Name, "Отсутствует параметр в проекте"))
+                .Select(x => x.Definition.Name)
+                .Where(x => !_room.IsExistsParam(x))
+                .Select(x => new ErrorElement(x, "Отсутствует параметр в проекте"))
                 .ToList();
 
             return errorListVM;
