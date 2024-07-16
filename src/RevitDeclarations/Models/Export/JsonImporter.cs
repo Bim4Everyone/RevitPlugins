@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
+
 using pyRevitLabs.Json;
 
 namespace RevitDeclarations.Models {
@@ -12,9 +15,10 @@ namespace RevitDeclarations.Models {
             List<T> elements = new List<T>();
 
             using(StreamReader file = File.OpenText(path)) {
-                JsonSerializer serializer = new JsonSerializer();
-                try {
-                    elements = (List<T>)serializer.Deserialize(file, typeof(List<T>));
+                try {                  
+                    ISerializationService service = ServicesProvider.GetPlatformService<ISerializationService>();
+                    string allText = file.ReadToEnd();
+                    elements = service.Deserialize<List<T>>(allText);
                 }
                 catch(JsonSerializationException e) {
                     ErrorInfo = $"Ошибка сериализации json файла: {e.Message}";
