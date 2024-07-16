@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitMechanicalSpecification",
+  "PublishDirectory": "04.OV-VK.extension\\ОВиВК.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.ru/icon/gAUDhWVcYLgj/list-of-specification-of-engineering-material-guide-template-format",
+  "BundleName": "Обновить спецификацию",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "04.OV-VK.extension\\ОВиВК.tab\\Спецификация Test.panel"
+}
