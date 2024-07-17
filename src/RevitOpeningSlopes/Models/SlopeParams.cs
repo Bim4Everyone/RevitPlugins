@@ -1,5 +1,6 @@
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 namespace RevitOpeningSlopes.Models {
@@ -11,9 +12,9 @@ namespace RevitOpeningSlopes.Models {
         }
 
         public void SetSlopeParams(FamilyInstance slope, SlopeCreationData slopeCreationData) {
-            ElementExtensions.SetParamValue(slope, "Высота", slopeCreationData.Height);
-            ElementExtensions.SetParamValue(slope, "Ширина", slopeCreationData.Width);
-            ElementExtensions.SetParamValue(slope, "Глубина", slopeCreationData.Depth);
+            slope.SetParamValue("Высота", slopeCreationData.Height);
+            slope.SetParamValue("Ширина", slopeCreationData.Width);
+            slope.SetParamValue("Глубина", slopeCreationData.Depth);
 
             //Поворот элемента
             double rotationAngle = slopeCreationData.RotationRadiansAngle;

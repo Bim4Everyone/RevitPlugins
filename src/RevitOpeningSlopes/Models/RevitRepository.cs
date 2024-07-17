@@ -70,10 +70,8 @@ namespace RevitOpeningSlopes.Models {
 
         public ICollection<FamilyInstance> GetSelectedWindows() {
             return ActiveUIDocument
-                .Selection
-                .GetElementIds()
-                .Select(id => Document.GetElement(id))
-                .Where(el => el.Category.GetBuiltInCategory() == BuiltInCategory.OST_Windows)
+                .GetSelectedElements()
+                .Where(el => el.Category.IsId(BuiltInCategory.OST_Windows))
                 .Cast<FamilyInstance>()
                 .ToList();
         }
