@@ -37,8 +37,8 @@
 | 24. | Удалить марки помещений   | [RevitRemoveRoomTags](src/RevitRemoveRoomTags)           | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Прочее         |
 | 25. | Отделка стен              | [RevitFinishingWalls](src/RevitFinishingWalls)           | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
 | 26. | Конструктор секций        | [RevitSectionsConstructor](src/RevitSectionsConstructor) | [Confluence]()                                                          | [BIM](https://github.com/Bim4Everyone/BIMExtensions)| ОПП            |
-| 27. | Откосы                    | [RevitOpeningSlopes](src/RevitOpeningSlopes)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134086806) | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
-
+| 27. | Планы квартир             | [RevitApartmentPlans](src/RevitApartmentPlans)           | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | Документация   |
+| 28. | Откосы                    | [RevitOpeningSlopes](src/RevitOpeningSlopes)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134086806) | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
 # Сборка проекта
 
 Установка nuke-build:

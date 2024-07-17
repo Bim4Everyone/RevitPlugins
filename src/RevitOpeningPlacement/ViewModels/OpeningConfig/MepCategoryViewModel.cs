@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -55,9 +55,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             IsSelected = true; // категория выбрана для создания заданий на отверстия
             SelectedRounding = Roundings.Last(); // округление 50 мм
             var firstOffset = Offsets.First();
-            firstOffset.To = 10000; // максимальный габарит сечения элемента для зазора в мм
+            firstOffset.To = MepCategory.DefaultMaxSizeMm; // максимальный габарит сечения элемента для зазора в мм
             firstOffset.SelectedOpeningType = firstOffset.OpeningTypeNames.Last(); // тип задания на  отверстие по умолчанию прямоугольный
-            firstOffset.Offset = 50; // зазор 50 мм для прямоугольных заданий на отверстия
+            firstOffset.Offset = MepCategory.DefaultOffsetMm; // зазор 50 мм для прямоугольных заданий на отверстия
             foreach(var structureCategory in StructureCategories) {
                 structureCategory.IsSelected = true; // все категории конструкций выбраны для создания заданий на отверстия
             }

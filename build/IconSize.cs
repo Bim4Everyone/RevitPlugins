@@ -28,12 +28,12 @@ class IconSize : Enumeration {
 
             CreateBitmap(
                 image,
-                Color.FromArgb(250, 176, 5),
+                Color.FromArgb(250, 82, 82),
                 target.Parent / target.NameWithoutExtension + ".fail.png");
 
             CreateBitmap(
                 image,
-                Color.FromArgb(250, 82, 82),
+                Color.FromArgb(250, 176, 5),
                 target.Parent / target.NameWithoutExtension + ".warning.png");
         }
     }
