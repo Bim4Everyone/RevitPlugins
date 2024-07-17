@@ -15,7 +15,6 @@ namespace RevitClashDetective.ViewModels.SearchSet {
         private readonly RevitRepository _revitRepository;
         private readonly SearchSetViewModel _straightSearchSet;
         private readonly SearchSetViewModel _invertedSearchSet;
-        private readonly InvertedVisibilityRevitFilterGenerator _invertedVisibilityFilterGenerator;
         private SearchSetViewModel _searchSet;
 
         public SearchSetsViewModel(RevitRepository revitRepository, Filter filter) {
@@ -24,7 +23,6 @@ namespace RevitClashDetective.ViewModels.SearchSet {
             Filter = filter;
             _straightSearchSet = new SearchSetViewModel(_revitRepository, Filter, new StraightRevitFilterGenerator());
             _invertedSearchSet = new SearchSetViewModel(_revitRepository, Filter, new InvertedRevitFilterGenerator());
-            _invertedVisibilityFilterGenerator = new InvertedVisibilityRevitFilterGenerator();
 
             SearchSet = _straightSearchSet;
             Name = filter.Name;
@@ -68,16 +66,13 @@ namespace RevitClashDetective.ViewModels.SearchSet {
 
         private void ShowSet() {
             SearchSetViewModel invertedSelectedSet;
-            RevitFilterGenerator generator;
             if(Inverted) {
                 invertedSelectedSet = _straightSearchSet;
-                generator = invertedSelectedSet.FilterGenerator;
             } else {
                 invertedSelectedSet = _invertedSearchSet;
-                generator = _invertedVisibilityFilterGenerator;
             }
             _revitRepository.ShowElements(
-                invertedSelectedSet.Filter.GetRevitFilter(_revitRepository.Doc, generator),
+                invertedSelectedSet.Filter.GetRevitFilter(_revitRepository.Doc, invertedSelectedSet.FilterGenerator),
                 invertedSelectedSet.Filter.CategoryIds.Select(c => c.AsBuiltInCategory()).ToHashSet(),
                 out string error);
             if(!string.IsNullOrWhiteSpace(error)) {
