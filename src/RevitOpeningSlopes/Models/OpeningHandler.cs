@@ -39,13 +39,40 @@ namespace RevitOpeningSlopes.Models {
         private double _openingDepth = 0;
         private double _rotationAngle = 0;
 
-        private const double _step = 0.032; // Шаг, на который делятся линии для поиска пересечений, ~10мм
-        private const double _halfWidthLength = 3000; // Максимальная величина половины ширины окна, мм
-        private const double _alongsideLineLength = 300; // Длина линии, запускаемой вдоль окна из точки P6, мм
-        private const double _depthLineLength = 600; // Длина линий, запускаемых внутрь здания для P7 и P8, мм
-        private const double _widthLength = _halfWidthLength * 2; // Максимальная ширина окна, мм
-        private const double _upperLineLength = 5000; // Длина линии, запущенной вверх, мм
-        private const double _bottomLineLength = 6000; // Длина линии, запущенной вниз, мм
+        /// <summary>
+        /// Шаг, на который делятся линии для поиска пересечений, ~10мм
+        /// </summary>
+        private const double _step = 0.032;
+
+        /// <summary>
+        /// Максимальная величина половины ширины окна, мм
+        /// </summary>
+        private const double _halfWidthLength = 3000;
+
+        /// <summary>
+        /// Длина линии, запускаемой вдоль окна для P7 и P8, мм
+        /// </summary>
+        private const double _alongsideLineLength = 300;
+
+        /// <summary>
+        /// Длина линий, запускаемых внутрь здания для P7 и P8, мм
+        /// </summary>
+        private const double _depthLineLength = 600;
+
+        /// <summary>
+        /// Максимальная ширина окна, мм
+        /// </summary>
+        private const double _widthLength = _halfWidthLength * 2;
+
+        /// <summary>
+        /// Длина линии, запущенной вверх, мм
+        /// </summary>
+        private const double _upperLineLength = 5000;
+
+        /// <summary>
+        /// Длина линии, запущенной вниз, мм
+        /// </summary>
+        private const double _bottomLineLength = 6000;
 
         public OpeningHandler(RevitRepository revitRepository, LinesFromOpening linesFromOpening,
             NearestElements nearestElements, SolidOperations solidOperations, FamilyInstance opening) {
