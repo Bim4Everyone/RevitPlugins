@@ -27,7 +27,7 @@
                     Margin="0 15"
                     Foreground="Gray"
                     TextWrapping="Wrap"
-                    Text="{DynamicResource AboutSettings.PlatformDesciption}" />
+                    Text="{Binding PlatformDesciption}" />
 
                 <views:HyperLinkEditWithImage
                     EditValue="{DynamicResource AboutSettings.PlatformLinkText}"
