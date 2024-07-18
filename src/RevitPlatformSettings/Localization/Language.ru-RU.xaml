@@ -9,7 +9,13 @@
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
     <system:String x:Key="GeneralSettings.Title">Основные</system:String>
+    
     <system:String x:Key="AboutSettings.Title">О программе</system:String>
+    <system:String x:Key="AboutSettings.PlatformDesciption">Bim4Everyone - это платформа созданная для упрощения разработки проектной документации в Autodesk Revit.</system:String>
+    <system:String x:Key="AboutSettings.PlatformLinkText">Ссылка на проект</system:String>
+    <system:String x:Key="AboutSettings.PlatformNewsChannel">Канал новостей</system:String>
+    <system:String x:Key="AboutSettings.PlatformMainChat">Обсуждение платформы</system:String>
+    <system:String x:Key="AboutSettings.PlatformDownload">Загрузка установщика платформы</system:String>
     
     <system:String x:Key="ExtensionSettings.Title">Расширения</system:String>
     <system:String x:Key="ExtensionSettings.CategoryGridColumn">Категория</system:String>
