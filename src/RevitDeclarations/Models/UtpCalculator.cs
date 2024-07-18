@@ -11,7 +11,10 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class UtpCalculator {
-        private const int _highFlatHeight = 3400;
+        private const int _minHighFlatHeight = 3400;
+        private const int _minBalconyDepth = 1200;
+        private const int _minPantryDepth = 1000;
+        private const double _minPantryArea = 1.8;
 
         private readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
         private readonly StringComparison _strComparison = StringComparison.OrdinalIgnoreCase;
@@ -116,7 +119,7 @@ namespace RevitDeclarations.Models {
         public string CalculateHighflat(Apartment apartment) {
             foreach(var room in apartment.Rooms) {
                 double height = room.GetLengthParamValue(_settings.RoomsHeightParam, _settings.Accuracy);
-                if(height < _highFlatHeight) {
+                if(height < _minHighFlatHeight) {
                     return "Нет";
                 }
             }
@@ -214,7 +217,7 @@ namespace RevitDeclarations.Models {
 
             if(summerRooms.Any()) {
                 return ContourChecker
-                    .CheckAnyRoomSizes(summerRevitRooms, _settings.Accuracy, 0, 1200)
+                    .CheckAnyRoomSizes(summerRevitRooms, _settings.Accuracy, 0, _minBalconyDepth)
                     .GetDescription();
             } else {
                 return "Нет";
@@ -223,7 +226,7 @@ namespace RevitDeclarations.Models {
 
         // УТП Гардеробная.
         // Наличие в квартире минимум одного помещения с именем "Гардеробная".
-        // Одна сторона помещения должна быть не менее 1000 мм, площадь от 1,5 м2.
+        // Одна сторона помещения должна быть не менее 1000 мм, площадь от 1,8 м2.
         // Помещения, которые связаны дверью с жилой комнатой не учитываются.
         public string CalculatePantry(Apartment apartment) {
             if(_hasNullAreas) {
@@ -237,12 +240,12 @@ namespace RevitDeclarations.Models {
                 .GetRoomsByPrior(_priorities.Pantry)
                 .Select(x => x.RevitRoom)
                 .Where(x => !_pantriesWithBedroom.Contains(x.Id))
-                .Where(x => ContourChecker.CheckArea(x, _settings.Accuracy, 1.8))
+                .Where(x => ContourChecker.CheckArea(x, _settings.Accuracy, _minPantryArea))
                 .ToList();
 
             if(pantriesWithoutBedrooms.Any()) {
                 return ContourChecker
-                    .CheckAnyRoomSizes(pantriesWithoutBedrooms, _settings.Accuracy, 1000)
+                    .CheckAnyRoomSizes(pantriesWithoutBedrooms, _settings.Accuracy, _minPantryDepth)
                     .GetDescription();
             } else {
                 return "Нет";
