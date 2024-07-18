@@ -7,6 +7,6 @@
             VerticalAlignment="Center"
             FontSize="20"
             FontWeight="Bold"
-            Text="Выберите настройки слева в дереве." />
+            Text="{DynamicResource SettingsView.Prompt}" />
     </DataTemplate>
 </ResourceDictionary>

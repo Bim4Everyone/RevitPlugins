@@ -43,8 +43,12 @@ namespace RevitOpeningPlacement {
 
 
         protected override void Execute(UIApplication uiApplication) {
-            _duplicatedInstancesToRemoveIds.Clear();
             RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+            PlaceOpeningTasks(uiApplication, revitRepository, Array.Empty<ElementId>());
+        }
+
+        private protected void PlaceOpeningTasks(UIApplication uiApplication, RevitRepository revitRepository, ElementId[] mepElements) {
+            _duplicatedInstancesToRemoveIds.Clear();
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();
             }
@@ -57,13 +61,16 @@ namespace RevitOpeningPlacement {
             var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
             if(openingConfig.Categories.Count > 0) {
                 var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
-                var placers = placementConfigurator.GetPlacersMepOutcomingTasks()
+                var placers = placementConfigurator.GetPlacersMepOutcomingTasks(mepElements)
                                                    .ToList();
                 uiApplication.Application.FailuresProcessing += FailureProcessor;
-                var unplacedClashes = InitializePlacing(revitRepository, placers)
-                    .Concat(placementConfigurator.GetUnplacedClashes());
-                uiApplication.Application.FailuresProcessing -= FailureProcessor;
-                InitializeReport(revitRepository, unplacedClashes);
+                try {
+                    var unplacedClashes = InitializePlacing(revitRepository, placers)
+                        .Concat(placementConfigurator.GetUnplacedClashes());
+                    InitializeReport(revitRepository, unplacedClashes);
+                } finally {
+                    uiApplication.Application.FailuresProcessing -= FailureProcessor;
+                }
             }
             _duplicatedInstancesToRemoveIds.Clear();
         }

@@ -28,6 +28,8 @@ namespace dosymep.WPF.Views {
     public class PlatformWindow : Window {
         private readonly WindowInteropHelper _windowInteropHelper;
         public PlatformWindow() {
+            LanguageService = GetPlatformService<ILanguageService>();
+            
             _windowInteropHelper = new WindowInteropHelper(this) {
                 Owner = Process.GetCurrentProcess().MainWindowHandle
             };
@@ -41,17 +43,29 @@ namespace dosymep.WPF.Views {
         /// Наименование файла конфигурации.
         /// </summary>
         public virtual string ProjectConfigName { get; }
+        
+        /// <summary>
+        /// Сервис локализации окон.
+        /// </summary>
+        public virtual ILocalizationService LocalizationService { get; set; }
 
         /// <summary>
         /// Предоставляет доступ к логгеру платформы.
         /// </summary>
         protected ILoggerService LoggerService => GetPlatformService<ILoggerService>();
+        
+        /// <summary>
+        /// Предоставляет доступ к текущему языку платформы.
+        /// </summary>
+        protected ILanguageService LanguageService { get; }
 
         protected T GetPlatformService<T>() {
             return ServicesProvider.GetPlatformService<T>();
         }
 
         protected override void OnSourceInitialized(EventArgs e) {
+            LocalizationService?.SetLocalization(LanguageService.HostLanguage, this);
+            
             base.OnSourceInitialized(e);
 
             PlatformWindowConfig config = GetProjectConfig();

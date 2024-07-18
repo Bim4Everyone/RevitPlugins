@@ -15,9 +15,12 @@
                     EnableImmediatePosting="True" />
             </dxg:GridControl.View>
 
-            <dxg:GridColumn Header="Id" FieldName="Id" />
-            <dxg:GridColumn Header="Имя" FieldName="Name" />
-            <dxg:GridColumn Header="StorageType" FieldName="StorageType" />
+            <dxg:GridColumn
+                Header="{DynamicResource RevitParamsSettings.IdGridColumn}" FieldName="Id" />
+            <dxg:GridColumn
+                Header="{DynamicResource RevitParamsSettings.NameGridColumn}" FieldName="Name" />
+            <dxg:GridColumn
+                Header="{DynamicResource RevitParamsSettings.StorageTypeGridColumn}" FieldName="StorageType" />
         </dxg:GridControl>
     </DataTemplate>
 </ResourceDictionary>

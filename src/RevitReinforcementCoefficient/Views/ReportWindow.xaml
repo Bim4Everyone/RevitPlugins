@@ -1,0 +1,110 @@
+﻿<Window x:Class="RevitReinforcementCoefficient.Views.ReportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        
+        xmlns:base="clr-namespace:dosymep.WPF.Views"
+        xmlns:local="clr-namespace:RevitReinforcementCoefficient.Views"
+        xmlns:vms="clr-namespace:RevitReinforcementCoefficient.ViewModels"
+        
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        
+        Title="Отчет об ошибках" 
+        Height="450" Width="800"
+        MinHeight="450" MinWidth="800"
+        
+        d:DataContext="{d:DesignInstance vms:ReportViewModel, IsDesignTimeCreatable=False}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label 
+            Grid.Row="0" 
+            Margin="10 10 10 0"
+            VerticalAlignment="Center"
+            Content="Ниже представлены элементы, работа с которыми привела к ошибкам (они подсчитаны не были):"/>
+        
+        <ListView
+            Grid.Row="1" 
+            Margin="10 5"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            ScrollViewer.CanContentScroll="False"
+            ItemsSource="{Binding Path=ReportItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            SelectionMode="Multiple">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Выбор">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsCheck}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Наименование" Width="300" DisplayMemberBinding="{Binding Path=ErrorName}"/>
+
+                    <GridViewColumn Header="ID элементов" Width="400" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock 
+                                    TextWrapping="Wrap"
+                                    Text="{Binding Path=ElementIdsAsString}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="IsSelected" Value="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" 
+                            Value="WhiteSmoke" />
+                            <Setter Property="BorderBrush"
+                            Value="LightGray" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="False">
+                            <Setter Property="Background" 
+                            Value="{x:Null}" />
+                            <Setter Property="BorderBrush"
+                            Value="LightGray" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+
+
+        <StackPanel
+            Grid.Row="3"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <Button
+                Margin="10"
+                Width="140"
+                Padding="3"
+                Content="Выделить выбранное"
+                Command="{Binding Path=ShowSelectedErrorElementsCommand}" />
+
+            <Button
+                Margin="10"
+                Width="100"
+                Content="Закрыть"
+                IsDefault="True"
+                Click="ButtonTestForHide_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -17,6 +17,7 @@ using dosymep.SimpleServices;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterableValueProviders;
+using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
@@ -30,8 +31,10 @@ namespace RevitClashDetective.Models {
         private readonly UIDocument _uiDocument;
         private readonly RevitEventHandler _revitEventHandler;
         private static readonly HashSet<string> _endings = new HashSet<string> { "_отсоединено", "_detached" };
-        private readonly string _clashViewName = "BIM_Проверка на коллизии";
+        private const string _clashViewName = "BIM_Проверка на коллизии";
+        private const string _filtersNamePrefix = "BIM_коллизии_";
         private readonly View3D _view;
+        private readonly ParameterFilterProvider _parameterFilterProvider;
 
         public RevitRepository(Application application, Document document) {
             _application = application;
@@ -44,6 +47,7 @@ namespace RevitClashDetective.Models {
             _endings.Add("_" + _application.Username);
 
             _view = GetClashView();
+            _parameterFilterProvider = new ParameterFilterProvider();
 
             CommonConfig = RevitClashDetectiveConfig.GetRevitClashDetectiveConfig();
 
@@ -120,6 +124,7 @@ namespace RevitClashDetective.Models {
                     if(bimGroup != null) {
                         view.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, bimGroup);
                     }
+                    view.DisplayStyle = DisplayStyle.FlatColors;
 
                     t.Commit();
                 }
@@ -295,6 +300,39 @@ namespace RevitClashDetective.Models {
             SelectAndShowElement(elements.Select(item => item.GetElement(DocInfos)), bbox, additionalSize, view);
         }
 
+        public void SelectAndShowElement(ClashModel clashModel, bool isolateClashElements) {
+            if(clashModel is null || clashModel.OtherElement is null || clashModel.MainElement is null) {
+                throw new ArgumentNullException(nameof(clashModel));
+            }
+
+            try {
+                var view = _view;
+                _uiDocument.ActiveView = view;
+                var bbox = GetCommonBoundingBox(clashModel);
+
+                if(bbox != null) {
+                    _revitEventHandler.TransactAction = () => {
+                        SetSectionBox(bbox, view, 10);
+                        try {
+                            if(isolateClashElements) {
+                                HighlightClashElements(view, clashModel);
+                            } else {
+                                ClearViewFilters(view);
+                            }
+                        } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
+                            ShowErrorMessage("Не удалось выделить элементы коллизии");
+                        }
+                    };
+                    _revitEventHandler.Raise();
+                }
+                _uiDocument.Selection.SetElementIds(GetElementsToSelect(clashModel, view));
+            } catch(AccessViolationException) {
+                ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.");
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.");
+            }
+        }
+
         private void SelectAndShowElement(
             IEnumerable<Element> elements,
             BoundingBoxXYZ elementsBBox,
@@ -353,6 +391,14 @@ namespace RevitClashDetective.Models {
                 ?.GetTotalTransform();
         }
 
+        private ICollection<ElementId> GetElementsToSelect(ClashModel clashModel, View3D view = null) {
+            return GetElementsToSelect(
+                new Element[] {
+                    clashModel.MainElement.GetElement(DocInfos),
+                    clashModel.OtherElement.GetElement(DocInfos) },
+                view);
+        }
+
         private ICollection<ElementId> GetElementsToSelect(IEnumerable<Element> elements, View3D view = null) {
             if(elements is null) { throw new ArgumentNullException(nameof(elements)); }
 
@@ -376,6 +422,10 @@ namespace RevitClashDetective.Models {
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error,
                 System.Windows.MessageBoxResult.OK);
+        }
+
+        private BoundingBoxXYZ GetCommonBoundingBox(ClashModel clashModel) {
+            return GetCommonBoundingBox(new ElementModel[] { clashModel.MainElement, clashModel.OtherElement });
         }
 
         private BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<ElementModel> elements) {
@@ -429,6 +479,73 @@ namespace RevitClashDetective.Models {
                 }
                 t.Commit();
             }
+        }
+
+        private void HighlightClashElements(View3D view, ClashModel clash) {
+            using(Transaction t = _document.StartTransaction("Выделение элементов коллизии")) {
+                var filtersToHide = GetHighlightFilters(clash);
+                view = RemoveFilters(view);
+                foreach(var filter in filtersToHide) {
+                    view.AddFilter(filter.Id);
+                    view.SetFilterVisibility(filter.Id, false);
+                }
+                t.Commit();
+            }
+        }
+
+        private ICollection<ParameterFilterElement> GetHighlightFilters(ClashModel clash) {
+            string username = _document.Application.Username;
+            var filters = new List<ParameterFilterElement>() {
+                _parameterFilterProvider.GetExceptCategoriesFilter(
+                    _document,
+                    GetClashCategories(clash),
+                    $"{_filtersNamePrefix}не_категории_элементов_коллизии_{username}")
+            };
+            var firstEl = clash.MainElement.GetElement(DocInfos);
+            var secondEl = clash.OtherElement.GetElement(DocInfos);
+            if(firstEl.Category.GetBuiltInCategory() == secondEl.Category.GetBuiltInCategory()) {
+                filters.Add(
+                    _parameterFilterProvider.GetHighlightFilter(
+                        _document,
+                        firstEl,
+                        secondEl,
+                        $"{_filtersNamePrefix}не_элементы_категории_коллизии_{username}"));
+            } else {
+                filters.Add(
+                    _parameterFilterProvider.GetHighlightFilter(
+                        _document,
+                        firstEl,
+                        $"{_filtersNamePrefix}не_первый_элемент_{username}"));
+                filters.Add(
+                    _parameterFilterProvider.GetHighlightFilter(
+                        _document,
+                        secondEl,
+                        $"{_filtersNamePrefix}не_второй_элемент_{username}"));
+            }
+            return filters;
+        }
+
+        private ICollection<BuiltInCategory> GetClashCategories(ClashModel clash) {
+            return new HashSet<BuiltInCategory>(
+                new BuiltInCategory[] {
+                    clash.MainElement.GetElement(DocInfos).Category.GetBuiltInCategory(),
+                    clash.OtherElement.GetElement(DocInfos).Category.GetBuiltInCategory()
+                });
+        }
+
+        private void ClearViewFilters(View3D view) {
+            using(Transaction t = _document.StartTransaction("Сброс фильтров элементов коллизии")) {
+                RemoveFilters(view);
+                t.Commit();
+            }
+        }
+
+        private T RemoveFilters<T>(T view) where T : View {
+            var existedFilterIds = view.GetFilters();
+            foreach(var filter in existedFilterIds) {
+                view.RemoveFilter(filter);
+            }
+            return view;
         }
 
         protected T GetPlatformService<T>() {

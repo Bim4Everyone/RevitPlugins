@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -20,9 +20,10 @@ namespace RevitOpeningPlacement.Models {
         public static IEnumerable<ClashModel> GetClashes(
             RevitRepository revitRepository,
             Filter mepFilter,
-            Filter architectureFilter) {
+            Filter architectureFilter,
+            params ElementId[] mepElements) {
 
-            var mainProvider = new FilterProvider(revitRepository.Doc, mepFilter, Transform.Identity);
+            var mainProvider = new FilterProvider(revitRepository.Doc, mepFilter, Transform.Identity, mepElements);
             var mainCount = mainProvider.GetElements().Count;
             if(mainCount == 0) {
                 return Enumerable.Empty<ClashModel>();

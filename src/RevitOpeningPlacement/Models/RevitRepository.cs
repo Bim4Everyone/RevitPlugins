@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
@@ -17,6 +19,7 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Handlers;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement;
@@ -96,6 +99,15 @@ namespace RevitOpeningPlacement.Models {
         };
 
         /// <summary>
+        /// Названия вложенных общих семейств, по которым берется солид инженерного элемента, если его надо переопределить.
+        /// </summary>
+        public static IReadOnlyCollection<string> CustomGeometryFamilies { get; }
+            = new ReadOnlyCollection<string>(new string[] {
+                "ОбщМд_Отв_Принудительный габарит_Прямоугольный",
+                "ОбщМд_Отв_Принудительный габарит_Круглый"
+            });
+
+        /// <summary>
         /// Словарь типов проемов и названий семейств заданий на отверстия
         /// </summary>
         public static Dictionary<OpeningType, string> OpeningTaskFamilyName { get; }
@@ -154,6 +166,95 @@ namespace RevitOpeningPlacement.Models {
             {OpeningType.WallRound, "Отверстие круглое" }
         };
 
+        /// <summary>
+        /// Используемые в плагине линейные категории для труб: Трубы
+        /// </summary>
+        public static BuiltInCategory MepPipeLinearCategory { get; } = BuiltInCategory.OST_PipeCurves;
+
+        /// <summary>
+        /// Используемые в плагине нелинейные категории для труб: Соединительные детали трубопроводов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepPipeFittingCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_PipeFitting
+            });
+
+        /// <summary>
+        /// Все используемые в плагине категории для труб: Трубы, Соединительные детали трубопроводов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepPipeCategories { get; } =
+           new ReadOnlyCollection<BuiltInCategory>(
+               new List<BuiltInCategory>(MepPipeFittingCategories)
+               .Append(MepPipeLinearCategory)
+               .ToArray());
+
+        /// <summary>
+        /// Используемые в плагине линейные категории для воздуховодов: Воздуховоды
+        /// </summary>
+        public static BuiltInCategory MepDuctLinearCategory { get; } = BuiltInCategory.OST_DuctCurves;
+
+        /// <summary>
+        /// Используемые в плагине нелинейные категории для воздуховодов: Соединители детали воздуховодов, Арматура воздуховодов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepDuctFittingCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_DuctFitting,
+                BuiltInCategory.OST_DuctAccessory
+            });
+
+        /// <summary>
+        /// Все используемые в плагине категории для воздуховодов: Воздуховоды, Соединители детали воздуховодов, Арматура воздуховодов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepDuctCategories { get; } =
+           new ReadOnlyCollection<BuiltInCategory>(
+               new List<BuiltInCategory>(MepDuctFittingCategories)
+               .Append(MepDuctLinearCategory)
+               .ToArray());
+
+        /// <summary>
+        /// Используемые в плагине линейные категории для кабельных лотков: Кабельные лотки
+        /// </summary>
+        public static BuiltInCategory MepCableTrayLinearCategory { get; } = BuiltInCategory.OST_CableTray;
+
+        /// <summary>
+        /// Используемые в плагине нелинейные категории для кабельных лотков: Соединители детали кабельных лотков
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepCableTrayFittingCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_CableTrayFitting
+            });
+
+        /// <summary>
+        /// Все используемые в плагине категории для кабельных лотков: Кабельные лотки, Соединители детали кабельных лотков
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepCableTrayCategories { get; } =
+           new ReadOnlyCollection<BuiltInCategory>(
+               new List<BuiltInCategory>(MepCableTrayFittingCategories)
+               .Append(MepCableTrayLinearCategory)
+               .ToArray());
+
+        /// <summary>
+        /// Используемые в плагине линейные категории для коробов: Короба
+        /// </summary>
+        public static BuiltInCategory MepConduitLinearCategory { get; } = BuiltInCategory.OST_Conduit;
+
+        /// <summary>
+        /// Используемые в плагине нелинейные категории для коробов: Соединители детали коробов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepConduitFittingCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_ConduitFitting
+            });
+
+        /// <summary>
+        /// Все используемые в плагине категории для коробов: Короба, Соединители детали коробов
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> MepConduitCategories { get; } =
+           new ReadOnlyCollection<BuiltInCategory>(
+               new List<BuiltInCategory>(MepConduitFittingCategories)
+               .Append(MepConduitLinearCategory)
+               .ToArray());
+
 
         public const string OpeningDiameter = "ADSK_Размер_Диаметр";
         public const string OpeningThickness = "ADSK_Размер_Глубина";
@@ -166,6 +267,9 @@ namespace RevitOpeningPlacement.Models {
         public const string OpeningOffsetBottom = "ФОП_ВИС_Отметка низа от нуля";
         public const string OpeningAuthor = "ФОП_Автор задания";
         public const string OpeningIsManuallyPlaced = "ФОП_Размещено вручную";
+        public const string OpeningOffsetBottomAdsk = "ADSK_Отверстие_Отметка от нуля";
+        public const string OpeningOffsetFromLevelAdsk = "ADSK_Отверстие_Отметка от этажа";
+        public const string OpeningLevelOffsetAdsk = "ADSK_Отверстие_Отметка этажа";
 
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
@@ -569,32 +673,53 @@ namespace RevitOpeningPlacement.Models {
         /// <exception cref="NotImplementedException">Исключение, 
         /// если поданная категория <paramref name="mepCategory"/> не поддерживается</exception>
         public Category[] GetCategories(MepCategoryEnum mepCategory) {
+            IReadOnlyCollection<BuiltInCategory> categoryCollection;
             switch(mepCategory) {
                 case MepCategoryEnum.Pipe:
-                return new Category[] {
-                    Category.GetCategory(_document, BuiltInCategory.OST_PipeCurves),
-                    Category.GetCategory(_document, BuiltInCategory.OST_PipeFitting)
-                };
+                    categoryCollection = MepPipeCategories;
+                    break;
                 case MepCategoryEnum.RectangleDuct:
                 case MepCategoryEnum.RoundDuct:
-                return new Category[] {
-                    Category.GetCategory(_document, BuiltInCategory.OST_DuctCurves),
-                    Category.GetCategory(_document, BuiltInCategory.OST_DuctFitting),
-                    Category.GetCategory(_document, BuiltInCategory.OST_DuctAccessory)
-                };
+                    categoryCollection = MepDuctCategories;
+                    break;
                 case MepCategoryEnum.CableTray:
-                return new Category[] {
-                    Category.GetCategory(_document, BuiltInCategory.OST_CableTray),
-                    Category.GetCategory(_document, BuiltInCategory.OST_CableTrayFitting)
-                };
+                    categoryCollection = MepCableTrayCategories;
+                    break;
                 case MepCategoryEnum.Conduit:
-                return new Category[] {
-                    Category.GetCategory(_document, BuiltInCategory.OST_Conduit),
-                    Category.GetCategory(_document, BuiltInCategory.OST_ConduitFitting)
-                };
+                    categoryCollection = MepConduitCategories;
+                    break;
                 default:
-                throw new NotImplementedException(nameof(mepCategory));
+                    throw new NotImplementedException(nameof(mepCategory));
             }
+            return categoryCollection.Select(c => Category.GetCategory(_document, c)).ToArray();
+        }
+
+        public bool ElementBelongsToMepCategory(MepCategoryEnum mepCategory, Element element) {
+            BuiltInCategory elCategory = element.Category.GetBuiltInCategory();
+            switch(mepCategory) {
+                case MepCategoryEnum.Pipe:
+                    return MepPipeCategories.Contains(elCategory);
+                case MepCategoryEnum.RectangleDuct: {
+                    //либо это элемент из категории для воздуховодов и не Воздуховод, либо это Воздуховод только прямоугольного сечения
+                    return MepDuctCategories.Contains(elCategory)
+                        && (!(element is Duct)
+                        || ((element is Duct duct)
+                        && (duct.DuctType.Shape == ConnectorProfileType.Rectangular)));
+                }
+                case MepCategoryEnum.RoundDuct: {
+                    //либо это элемент из категории для воздуховодов и не Воздуховод, либо это Воздуховод только круглого сечения
+                    return MepDuctCategories.Contains(elCategory)
+                        && (!(element is Duct)
+                        || ((element is Duct duct)
+                        && (duct.DuctType.Shape == ConnectorProfileType.Round)));
+                }
+                case MepCategoryEnum.CableTray:
+                    return MepCableTrayCategories.Contains(elCategory);
+                case MepCategoryEnum.Conduit:
+                    return MepConduitCategories.Contains(elCategory);
+                default:
+                    throw new NotImplementedException(nameof(mepCategory));
+            };
         }
 
         /// <summary>
@@ -977,7 +1102,7 @@ namespace RevitOpeningPlacement.Models {
 
         /// <summary>
         /// Предлагает пользователю выбрать экземпляры семейств заданий на отверстия из связанных файлов АР, 
-        /// подгруженных в активный документ КР, и вохвращает его выбор
+        /// подгруженных в активный документ КР, и возвращает его выбор
         /// </summary>
         /// <returns>Выбранная пользователем коллекция элементов</returns>
         /// <exception cref="OperationCanceledException"></exception>
@@ -1000,6 +1125,35 @@ namespace RevitOpeningPlacement.Models {
                 }
             }
             return openingTasks;
+        }
+
+        /// <summary>
+        /// Предлагает пользователю выбрать экземпляры элементов ВИС, категории которых выбраны в настройках плагина,
+        /// и возвращает его выбор
+        /// </summary>
+        /// <param name="mepCategories">Категории из настроек плагина</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public ElementId[] PickMepElements(MepCategoryCollection mepCategories) {
+            if(mepCategories is null) { throw new ArgumentNullException(nameof(mepCategories)); }
+
+            var categories = mepCategories
+                .Where(c => c.IsSelected)
+                .Select(c => GetMepCategoryEnum(c.Name))
+                .ToArray();
+            ISelectionFilter filter = new SelectionFilterMepElements(this, categories);
+
+            IList<Reference> references = _uiDocument.Selection
+                .PickObjects(ObjectType.Element, filter, "Выберите элементы ВИС и нажмите \"Готово\"");
+
+            HashSet<ElementId> mepElements = new HashSet<ElementId>();
+            foreach(var reference in references) {
+                if(reference != null) {
+                    ElementId elId = reference.ElementId;
+                    mepElements.Add(elId);
+                }
+            }
+            return mepElements.ToArray();
         }
 
         /// <summary>
