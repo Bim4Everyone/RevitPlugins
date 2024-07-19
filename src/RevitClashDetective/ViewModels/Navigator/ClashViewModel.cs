@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -124,20 +125,16 @@ namespace RevitClashDetective.ViewModels.Navigator {
             }
 
             try {
-                Solid firstSolid = GetFirstSolid(clashModel);
-                Solid secondSolid = GetSecondSolid(clashModel);
+                List<Solid> firstSolids = GetFirstSolids(clashModel);
+                List<Solid> secondSolids = GetSecondSolids(clashModel);
 
-                Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
-                    firstSolid,
-                    secondSolid,
-                    BooleanOperationsType.Intersect);
+                double intersectionVolume = GetIntersectionVolume(firstSolids, secondSolids);
 
-                double minVolume = firstSolid.Volume < secondSolid.Volume
-                    ? firstSolid.Volume
-                    : secondSolid.Volume;
-                double intersectionVolume = intersection.Volume;
+                double firstSolidsV = firstSolids.Sum(s => s.Volume);
+                double secondSolidsV = secondSolids.Sum(s => s.Volume);
+                double minVolume = Math.Min(firstSolidsV, secondSolidsV);
                 return (Math.Round(intersectionVolume / minVolume * 100, 2),
-                    Math.Round(ConvertToM3(intersection.Volume), 6));
+                    Math.Round(ConvertToM3(intersectionVolume), 6));
             } catch(NullReferenceException) {
                 return (0, 0);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
@@ -145,18 +142,37 @@ namespace RevitClashDetective.ViewModels.Navigator {
             }
         }
 
-        private Solid GetFirstSolid(ClashModel clashModel) {
-            return clashModel.MainElement.GetElement(_revitRepository.DocInfos).GetSolid();
+        private double GetIntersectionVolume(List<Solid> first, List<Solid> second) {
+            double intersection = 0;
+            try {
+                foreach(var solid1 in first) {
+                    foreach(var solid2 in second) {
+                        intersection += BooleanOperationsUtils.ExecuteBooleanOperation(
+                            solid1,
+                            solid2,
+                            BooleanOperationsType.Intersect).Volume;
+                    }
+                }
+            } catch(NullReferenceException) {
+                intersection = 0;
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                intersection = 0;
+            }
+            return intersection;
         }
 
-        private Solid GetSecondSolid(ClashModel clashModel) {
-            return SolidUtils.CreateTransformed(
-                clashModel.OtherElement
+        private List<Solid> GetFirstSolids(ClashModel clashModel) {
+            return clashModel.MainElement.GetElement(_revitRepository.DocInfos).GetSolids();
+        }
+
+        private List<Solid> GetSecondSolids(ClashModel clashModel) {
+            Transform transform = GetFirstTransform(clashModel)
+                    .GetTransitionMatrix(GetSecondTransform(clashModel));
+            return clashModel.OtherElement
                     .GetElement(_revitRepository.DocInfos)
-                    .GetSolid(),
-                GetFirstTransform(clashModel)
-                    .GetTransitionMatrix(GetSecondTransform(clashModel))
-                );
+                    .GetSolids()
+                    .Select(s => SolidUtils.CreateTransformed(s, transform))
+                    .ToList();
         }
 
         private Transform GetFirstTransform(ClashModel clashModel) {
