@@ -92,6 +92,7 @@ namespace RevitMechanicalSpecification.Models {
             return false;
         }
 
+        
         private List<Element> MakeColl(BuiltInCategory category) {
             List<Element> defColl = (List<Element>) new FilteredElementCollector(_document)
                 .OfCategory(category)
