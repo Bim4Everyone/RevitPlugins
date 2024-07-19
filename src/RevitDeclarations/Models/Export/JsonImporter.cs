@@ -18,7 +18,7 @@ namespace RevitDeclarations.Models {
                 try {                  
                     ISerializationService service = ServicesProvider.GetPlatformService<ISerializationService>();
                     string allText = file.ReadToEnd();
-                    elements = service.Deserialize<List<T>>(allText);
+                    return service.Deserialize<List<T>>(allText);
                 }
                 catch(JsonSerializationException e) {
                     ErrorInfo = $"Ошибка сериализации json файла: {e.Message}";

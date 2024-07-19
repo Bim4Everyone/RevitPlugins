@@ -6,10 +6,12 @@ using dosymep.SimpleServices;
 
 namespace RevitDeclarations.Models {
     internal class JsonExporter<T> {
+        private readonly ISerializationService _serializationService = 
+            ServicesProvider.GetPlatformService<ISerializationService>();
+
         public void Export(string path, IEnumerable<T> elements) {
-            ISerializationService service = ServicesProvider.GetPlatformService<ISerializationService>();
-            string text = service.Serialize(elements);
-            path += ".json";
+            string text = _serializationService.Serialize(elements);
+            path = Path.ChangeExtension(path, "json");
 
             using(StreamWriter file = File.CreateText(path)) {
                 file.Write(text);
