@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -7,6 +7,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.ViewModels.Navigator {
     internal class ClashViewModel : BaseViewModel, IEquatable<ClashViewModel> {
@@ -25,6 +26,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SecondName = clash.OtherElement.Name;
             SecondLevel = clash.OtherElement.Level;
             SecondDocumentName = clash.OtherElement.DocumentName;
+
+            (IntersectionPercentage, IntersectionVolume) = GetIntersectionData(clash);
 
             ClashStatus = clash.ClashStatus;
             Clash = clash;
@@ -51,7 +54,18 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public string SecondDocumentName { get; }
 
-        public string SecondCategory { get; set; }
+        public string SecondCategory { get; }
+
+        /// <summary>
+        /// Процент пересечения относительно объема меньшего элемента коллизии
+        /// </summary>
+        public double IntersectionPercentage { get; }
+
+        /// <summary>
+        /// Объем пересечения в м3
+        /// </summary>
+        public double IntersectionVolume { get; }
+
         public ClashModel Clash { get; }
 
         public IEnumerable<ElementId> GetElementIds(string docTitle) {
@@ -101,6 +115,78 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 && SecondLevel == other.SecondLevel
                 && SecondDocumentName == other.SecondDocumentName
                 && SecondCategory == other.SecondCategory;
+        }
+
+
+        private (double Percentage, double Volume) GetIntersectionData(ClashModel clashModel) {
+            if(clashModel is null) {
+                throw new ArgumentNullException(nameof(clashModel));
+            }
+
+            try {
+                Solid firstSolid = GetFirstSolid(clashModel);
+                Solid secondSolid = GetSecondSolid(clashModel);
+
+                Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
+                    firstSolid,
+                    secondSolid,
+                    BooleanOperationsType.Intersect);
+
+                double minVolume = firstSolid.Volume < secondSolid.Volume
+                    ? firstSolid.Volume
+                    : secondSolid.Volume;
+                double intersectionVolume = intersection.Volume;
+                return (Math.Round(intersectionVolume / minVolume * 100, 2),
+                    Math.Round(ConvertToM3(intersection.Volume), 6));
+            } catch(NullReferenceException) {
+                return (0, 0);
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                return (0, 0);
+            }
+        }
+
+        private Solid GetFirstSolid(ClashModel clashModel) {
+            return clashModel.MainElement.GetElement(_revitRepository.DocInfos).GetSolid();
+        }
+
+        private Solid GetSecondSolid(ClashModel clashModel) {
+            return SolidUtils.CreateTransformed(
+                clashModel.OtherElement
+                    .GetElement(_revitRepository.DocInfos)
+                    .GetSolid(),
+                GetFirstTransform(clashModel)
+                    .GetTransitionMatrix(GetSecondTransform(clashModel))
+                );
+        }
+
+        private Transform GetFirstTransform(ClashModel clashModel) {
+            return GetTransform(clashModel.MainElement.TransformModel);
+        }
+
+        private Transform GetSecondTransform(ClashModel clashModel) {
+            return GetTransform(clashModel.OtherElement.TransformModel);
+        }
+
+        private Transform GetTransform(TransformModel transformModel) {
+            Transform transform = Transform.Identity;
+            transform.Origin = transformModel.Origin.GetXYZ();
+            transform.BasisX = transformModel.BasisX.GetXYZ();
+            transform.BasisY = transformModel.BasisY.GetXYZ();
+            transform.BasisZ = transformModel.BasisZ.GetXYZ();
+            return transform;
+        }
+
+        /// <summary>
+        /// Конвертирует кубические футы в кубические метры
+        /// </summary>
+        /// <param name="cubeFeet">Кубические футы</param>
+        /// <returns>Кубические метры</returns>
+        public double ConvertToM3(double cubeFeet) {
+#if REVIT_2020_OR_LESS
+            return UnitUtils.ConvertFromInternalUnits(cubeFeet, DisplayUnitType.DUT_CUBIC_METERS);
+#else
+            return UnitUtils.ConvertFromInternalUnits(cubeFeet, UnitTypeId.CubicMeters);
+#endif
         }
     }
 }
