@@ -38,6 +38,7 @@
 | 25. | Отделка стен              | [RevitFinishingWalls](src/RevitFinishingWalls)           | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
 | 26. | Конструктор секций        | [RevitSectionsConstructor](src/RevitSectionsConstructor) | [Confluence]()                                                          | [BIM](https://github.com/Bim4Everyone/BIMExtensions)| ОПП            |
 | 27. | Планы квартир             | [RevitApartmentPlans](src/RevitApartmentPlans)           | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | Документация   |
+| 28. | Декларации                | [RevitDeclarations](src/RevitDeclarations)               | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | Декларации     |
 
 # Сборка проекта
 
