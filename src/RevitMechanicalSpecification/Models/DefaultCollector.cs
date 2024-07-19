@@ -71,8 +71,8 @@ namespace RevitMechanicalSpecification.Models {
                 MechanicalSystem mechanicalSystem = new MechanicalSystem {
                     SystemElement = element as MEPSystem,
                     SystemName = element.Name,
-                    SystemFunction = _document.GetElement(element.GetTypeId()).GetParamValueOrDefault("ФОП_ВИС_ЭФ для системы", "Null").ToString(),
-                    SystemShortName = _document.GetElement(element.GetTypeId()).GetParamValueOrDefault("ФОП_ВИС_Сокращение для системы", "Null").ToString()
+                    SystemFunction = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_ЭФ для системы"),
+                    SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_Сокращение для системы")
                 };
 
                 mechanicalSystems.Add(mechanicalSystem);

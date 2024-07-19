@@ -33,9 +33,7 @@ namespace RevitMechanicalSpecification.Models {
             DefaultCollector collector = new DefaultCollector(Document);
             Elements = collector.GetDefElementColls();
             MechanicalSystems = collector.GetDefSystemColl();
-            SpecConfiguration specConfiguration = new SpecConfiguration(Document);
-
-
+            SpecConfiguration specConfiguration = new SpecConfiguration(Document.ProjectInformation);
         }
     }
 }
