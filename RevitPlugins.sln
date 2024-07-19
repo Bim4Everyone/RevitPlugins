@@ -126,8 +126,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FilterModel", "FilterModel"
 		src\RevitClashes\Models\FilterModel\Criterion.cs = src\RevitClashes\Models\FilterModel\Criterion.cs
 		src\RevitClashes\Models\FilterModel\Filter.cs = src\RevitClashes\Models\FilterModel\Filter.cs
 		src\RevitClashes\Models\FilterModel\FiltersConfig.cs = src\RevitClashes\Models\FilterModel\FiltersConfig.cs
-		src\RevitClashes\Models\FilterModel\src\RevitClashConfigSerializer.cs = src\RevitClashes\Models\FilterModel\src\RevitClashConfigSerializer.cs
-		src\RevitClashes\Models\FilterModel\src\RevitClashesSerializationBinder.cs = src\RevitClashes\Models\FilterModel\src\RevitClashesSerializationBinder.cs
+		src\RevitClashes\Models\FilterModel\RevitClashConfigSerializer.cs = src\RevitClashes\Models\FilterModel\RevitClashConfigSerializer.cs
+		src\RevitClashes\Models\FilterModel\RevitClashesSerializationBinder.cs = src\RevitClashes\Models\FilterModel\RevitClashesSerializationBinder.cs
 		src\RevitClashes\Models\FilterModel\Rule.cs = src\RevitClashes\Models\FilterModel\Rule.cs
 		src\RevitClashes\Models\FilterModel\Set.cs = src\RevitClashes\Models\FilterModel\Set.cs
 	EndProjectSection
@@ -149,13 +149,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 		src\RevitClashes\Models\Interfaces\IVisiter.cs = src\RevitClashes\Models\Interfaces\IVisiter.cs
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src\RevitClashReport", "src\RevitClashReport", "{C9F52F92-6BD2-4A45-8297-8775E5FE371A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RevitClashReport", "RevitClashReport", "{C9F52F92-6BD2-4A45-8297-8775E5FE371A}"
 	ProjectSection(SolutionItems) = preProject
-		src\RevitClashes\Models\src\RevitClashReport\BaseClashesLoader.cs = src\RevitClashes\Models\src\RevitClashReport\BaseClashesLoader.cs
-		src\RevitClashes\Models\src\RevitClashReport\NavisHtmlClashesLoader.cs = src\RevitClashes\Models\src\RevitClashReport\NavisHtmlClashesLoader.cs
-		src\RevitClashes\Models\src\RevitClashReport\PluginClashesLoader.cs = src\RevitClashes\Models\src\RevitClashReport\PluginClashesLoader.cs
-		src\RevitClashes\Models\src\RevitClashReport\ReportLoader.cs = src\RevitClashes\Models\src\RevitClashReport\ReportLoader.cs
-		src\RevitClashes\Models\src\RevitClashReport\src\RevitClashesLoader.cs = src\RevitClashes\Models\src\RevitClashReport\src\RevitClashesLoader.cs
+		src\RevitClashes\Models\RevitClashReport\BaseClashesLoader.cs = src\RevitClashes\Models\RevitClashReport\BaseClashesLoader.cs
+		src\RevitClashes\Models\RevitClashReport\NavisHtmlClashesLoader.cs = src\RevitClashes\Models\RevitClashReport\NavisHtmlClashesLoader.cs
+		src\RevitClashes\Models\RevitClashReport\PluginClashesLoader.cs = src\RevitClashes\Models\RevitClashReport\PluginClashesLoader.cs
+		src\RevitClashes\Models\RevitClashReport\ReportLoader.cs = src\RevitClashes\Models\RevitClashReport\ReportLoader.cs
+		src\RevitClashes\Models\RevitClashReport\RevitClashesLoader.cs = src\RevitClashes\Models\RevitClashReport\RevitClashesLoader.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{53A474C0-AD86-4DA3-B140-86344DF32811}"

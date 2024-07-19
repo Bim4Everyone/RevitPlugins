@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -19,7 +19,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         private readonly RevitRepository _revitRepository;
         private readonly FiltersConfig _filtersConfig;
         private string _name;
-        private string errorText;
+        private string _errorText;
         private bool _hasReport;
         private bool _isSelected;
         private SelectionViewModel _firstSelection;
@@ -39,7 +39,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
                 InitializeFilterProviders(check);
             }
 
-            ShowClashesCommand = new RelayCommand(ShowClashes, CanShowClashes);
+            ShowClashesCommand = RelayCommand.Create(ShowClashes, CanShowClashes);
         }
 
         public ICommand SelectMainProviderCommand { get; }
@@ -63,8 +63,8 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         }
 
         public string ErrorText {
-            get => errorText;
-            set => this.RaiseAndSetIfChanged(ref errorText, value);
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         public SelectionViewModel FirstSelection {
@@ -142,12 +142,12 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
             }
         }
 
-        private void ShowClashes(object p) {
+        private void ShowClashes() {
             var view = new NavigatorView() { DataContext = new ReportsViewModel(_revitRepository, ReportName) { OpenFromClashDetector = true } };
             view.Show();
         }
 
-        private bool CanShowClashes(object p) {
+        private bool CanShowClashes() {
             return HasReport;
         }
     }

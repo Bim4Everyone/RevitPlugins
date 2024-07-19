@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -47,6 +47,7 @@ namespace RevitClashDetective.Models.Extensions {
 
         public static bool IsIntersected(this IEnumerable<BoundingBoxXYZ> bbs) {
             var boundings = bbs.ToArray();
+            if(boundings.Length == 0) { return false; }
             var currentBb = boundings[0];
             for(int i = 1; i < boundings.Length; i++) {
                 if(!currentBb.IntersectedWith(boundings[i])) {
