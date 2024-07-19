@@ -50,9 +50,9 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
 
-        public ICommand SaveCommand { get; set; }
+        public ICommand SaveCommand { get; private set; }
 
-        public ICommand SaveAsCommand { get; set; }
+        public ICommand SaveAsCommand { get; private set; }
 
         public ClashesConfig GetUpdatedConfig() {
             var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), Name);
