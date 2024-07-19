@@ -38,7 +38,7 @@ namespace RevitDeclarations.Models {
                 workBooks = excelApp.Workbooks;
                 workBook = workBooks.Add();
                 workSheets = workBook.Worksheets;
-                workSheet = workSheets["Лист1"];
+                workSheet = (Worksheet) workSheets["Лист1"];
 
                 new ExcelTableCreator(tableData, _settings).Create(workSheet);
                 TaskDialog.Show("Декларации", "Файл Excel создан");

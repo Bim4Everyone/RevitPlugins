@@ -182,7 +182,7 @@ namespace RevitDeclarations.Models {
 
         private void SetGraphicSettings(Worksheet workSheet) {
             workSheet.StandardWidth = 12;
-            Range range = workSheet.Rows[1];
+            Range range = (Range) workSheet.Rows[1];
 
             range.RowHeight = 60;
             range.WrapText = true;
@@ -190,10 +190,10 @@ namespace RevitDeclarations.Models {
             Microsoft.Office.Interop.Excel.Font font = range.Font;
             font.Bold = true;
 
-            workSheet.Columns[1].NumberFormat = "@";
+            ((Range) workSheet.Columns[1]).NumberFormat = "@";
 
-            Range firstCell = workSheet.Cells[1, 1];
-            Range lastCell = workSheet.Cells[_excelTableData.Apartments.Count + 1, _excelTableData.FullTableWidth];
+            Range firstCell = (Range) workSheet.Cells[1, 1];
+            Range lastCell = (Range) workSheet.Cells[_excelTableData.Apartments.Count + 1, _excelTableData.FullTableWidth];
 
             workSheet.Range[firstCell, lastCell].Borders.ColorIndex = 0;
             workSheet.Range[firstCell, lastCell].HorizontalAlignment = XlHAlign.xlHAlignCenter;
@@ -201,42 +201,42 @@ namespace RevitDeclarations.Models {
 
             for(int i = 1; i <= _excelTableData.FullTableWidth; i++) {
                 if(i <= ExcelTableData.InfoWidth) {
-                    workSheet.Columns[i].ColumnWidth = 15.5;
-                    workSheet.Cells[1, i].Interior.Color = _apartInfoColor;
+                    ((Range) workSheet.Columns[i]).ColumnWidth = 15.5;
+                    ((Range) workSheet.Cells[1, i]).Interior.Color = _apartInfoColor;
                 } else if(i > ExcelTableData.InfoWidth && i <= _excelTableData.SummerRoomsStart) {
-                    workSheet.Columns[i].ColumnWidth = 10;
-                    workSheet.Cells[1, i].Interior.Color = _mainRoomsColor;
+                    ((Range)workSheet.Columns[i]).ColumnWidth = 10;
+                    ((Range)workSheet.Cells[1, i]).Interior.Color = _mainRoomsColor;
 
                     int checkColumnNumber = (i - ExcelTableData.InfoWidth) % 3;
                     if(checkColumnNumber == 0) {
-                        workSheet.Columns[i - 2].NumberFormat = "@";
-                        workSheet.Columns[i - 1].ColumnWidth = 17;
-                        workSheet.Columns[i].NumberFormat = "0,0";
+                        ((Range)workSheet.Columns[i - 2]).NumberFormat = "@";
+                        ((Range)workSheet.Columns[i - 1]).ColumnWidth = 17;
+                        ((Range)workSheet.Columns[i]).NumberFormat = "0,0";
                     }
                 } else if(i > _excelTableData.SummerRoomsStart && i <= _excelTableData.OtherRoomsStart) {
-                    workSheet.Columns[i].ColumnWidth = 10;
-                    workSheet.Cells[1, i].Interior.Color = _summerRoomsColor;
+                    ((Range)workSheet.Columns[i]).ColumnWidth = 10;
+                    ((Range)workSheet.Cells[1, i]).Interior.Color = _summerRoomsColor;
 
                     int checkColumnNumber = (i - _excelTableData.SummerRoomsStart) % 4;
                     if(checkColumnNumber == 0) {
-                        workSheet.Columns[i - 3].NumberFormat = "@";
-                        workSheet.Columns[i - 2].ColumnWidth = 17;
-                        workSheet.Columns[i - 1].NumberFormat = "0,0";
-                        workSheet.Columns[i].NumberFormat = "0,0";
+                        ((Range)workSheet.Columns[i - 3]).NumberFormat = "@";
+                        ((Range)workSheet.Columns[i - 2]).ColumnWidth = 17;
+                        ((Range)workSheet.Columns[i - 1]).NumberFormat = "0,0";
+                        ((Range)workSheet.Columns[i]).NumberFormat = "0,0";
                     }
                 } else if(i > _excelTableData.OtherRoomsStart && i <= _excelTableData.UtpStart) {
-                    workSheet.Columns[i].ColumnWidth = 10;
-                    workSheet.Cells[1, i].Interior.Color = _nonConfigRoomsColor;
+                    ((Range)workSheet.Columns[i]).ColumnWidth = 10;
+                    ((Range)workSheet.Cells[1, i]).Interior.Color = _nonConfigRoomsColor;
 
                     int checkColumnNumber = (i - _excelTableData.OtherRoomsStart) % 3;
                     if(checkColumnNumber == 0) {
-                        workSheet.Columns[i - 2].NumberFormat = "@";
-                        workSheet.Columns[i - 1].ColumnWidth = 17;
-                        workSheet.Columns[i].NumberFormat = "0,0";
+                        ((Range)workSheet.Columns[i - 2]).NumberFormat = "@";
+                        ((Range)workSheet.Columns[i - 1]).ColumnWidth = 17;
+                        ((Range)workSheet.Columns[i]).NumberFormat = "0,0";
                     }
                 } else {
-                    workSheet.Columns[i].ColumnWidth = 12;
-                    workSheet.Cells[1, i].Interior.Color = _utpColor;
+                    ((Range)workSheet.Columns[i]).ColumnWidth = 12;
+                    ((Range)workSheet.Cells[1, i]).Interior.Color = _utpColor;
                 }
             }
         }
