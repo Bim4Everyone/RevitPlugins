@@ -312,35 +312,46 @@ namespace RevitClashDetective.Models {
             }
         }
 
+        /// <summary>
+        /// Скрывает элементы на 3D виде коллизий, которые попадают в заданный фильтр.
+        /// Использовать для изоляции элементов инвертированного фильтра на виде.
+        /// </summary>
+        /// <param name="filterToHide">Фильтр, элементы в котором будут скрыты</param>
+        /// <param name="categoriesToShow">Категории, которые должны остаться видимыми</param>
+        /// <exception cref="ArgumentNullException">Исключение, если один из обязательных параметров null</exception>
+        /// <exception cref="InvalidOperationException">Исключение, если не удалось применить настройки видимости</exception>
         public void ShowElements(
             ElementFilter filterToHide,
-            ICollection<BuiltInCategory> categoriesToShow,
-            out string error) {
+            ICollection<BuiltInCategory> categoriesToShow) {
 
             if(filterToHide is null) { throw new ArgumentNullException(nameof(filterToHide)); }
             if(categoriesToShow is null) { throw new ArgumentNullException(nameof(categoriesToShow)); }
-            error = string.Empty;
+            string error = string.Empty;
 
             try {
                 var view = GetClashView();
                 _uiApplication.ActiveUIDocument.ActiveView = view;
 
-                string msg = string.Empty;
                 _revitEventHandler.TransactAction = () => {
                     try {
                         HighlightFilter(view, filterToHide, categoriesToShow);
                     } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                        msg = "Не удалось изолировать поисковый набор";
+                        // если здесь выбросить исключение, оно заглушится в RevitEventHandler.Execute
+                        error = "Не удалось изолировать поисковый набор";
                     }
                 };
                 _revitEventHandler.Raise();
-                error = msg;
+                if(!string.IsNullOrWhiteSpace(error)) {
+                    throw new InvalidOperationException(error);
+                }
             } catch(AccessViolationException) {
                 error = "Окно плагина было открыто в другом документе Revit, который был закрыт, " +
                     "нельзя показать элемент.";
+                throw new InvalidOperationException(error);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 error = "Окно плагина было открыто в другом документе Revit, который сейчас не активен, " +
                     "нельзя показать элемент.";
+                throw new InvalidOperationException(error);
             }
         }
 

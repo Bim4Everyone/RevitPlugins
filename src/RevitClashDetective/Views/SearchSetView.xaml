@@ -10,6 +10,7 @@
                            xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                            xmlns:dxci="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
                            xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
                            xmlns:base="clr-namespace:dosymep.WPF.Views"
                            mc:Ignorable="d"
                            Title="{Binding Name}"
@@ -21,6 +22,7 @@
                              Command="{Binding ShowSetCommand}" />
         <mvvm:EventToCommand EventName="Closing"
                              Command="{Binding CloseCommand}" />
+        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
     </mvvm:Interaction.Behaviors>
     <base:ThemedPlatformWindow.Resources>
         <Style TargetType="dxg:GridControl">
