@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
-    internal interface IElementParamFiller {
-        void Fill(Element element, string paramName, string value);
+    internal class ElementParamNameFiller : ElementParamDefaultFiller {
+        public ElementParamNameFiller(Document doc, SpecConfiguration config) : base(doc, config) 
+        {
+        }
     }
 }

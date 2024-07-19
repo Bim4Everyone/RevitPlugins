@@ -36,14 +36,6 @@ namespace RevitMechanicalSpecification.Models {
             SpecConfiguration specConfiguration = new SpecConfiguration(Document);
 
 
-
-            //foreach(Element element in Elements) {
-            //   MessageBox.Show(element.GetType().Name);
-            //}
-            //foreach (MechanicalSystem mechanicalSystem in MechanicalSystems) 
-            //    {
-            //    //MessageBox.Show(mechanicalSystem.SystemName + " " + mechanicalSystem.SystemShortName); 
-            //}
         }
     }
 }
