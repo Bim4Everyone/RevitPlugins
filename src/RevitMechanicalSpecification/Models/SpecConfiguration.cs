@@ -35,7 +35,7 @@ namespace RevitMechanicalSpecification.Models {
         private readonly string _changedNameCreator = "ФОП_ВИС_Замена параметра_Завод-изготовитель";
 
         private readonly string _paramNameIsSpecifyPipeFittings = "ФОП_ВИС_Учитывать фитинги труб";
-        private readonly string _paramNameIsSpecifyDuctFittings = "ФОП_ВИС_Учитывать фитинги воздуховодов"
+        private readonly string _paramNameIsSpecifyDuctFittings = "ФОП_ВИС_Учитывать фитинги воздуховодов";
 
         private readonly string _paramNameInsulationStock = "ФОП_ВИС_Запас изоляции";
         private readonly string _paramNameDuctPipeStock = "ФОП_ВИС_Запас воздуховодов/труб";
