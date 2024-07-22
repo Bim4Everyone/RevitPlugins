@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -8,7 +7,6 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.ViewModels.Navigator {
     internal class ClashViewModel : BaseViewModel, IEquatable<ClashViewModel> {
@@ -124,85 +122,14 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 throw new ArgumentNullException(nameof(clashModel));
             }
 
-            try {
-                List<Solid> firstSolids = GetFirstSolids(clashModel);
-                List<Solid> secondSolids = GetSecondSolids(clashModel);
+            ClashData clashData = clashModel
+                .SetRevitRepository(_revitRepository)
+                .GetClashData();
 
-                double intersectionVolume = GetIntersectionVolume(firstSolids, secondSolids);
-
-                double firstSolidsV = firstSolids.Sum(s => s.Volume);
-                double secondSolidsV = secondSolids.Sum(s => s.Volume);
-                double minVolume = Math.Min(firstSolidsV, secondSolidsV);
-                return (Math.Round(intersectionVolume / minVolume * 100, 2),
-                    Math.Round(ConvertToM3(intersectionVolume), 6));
-            } catch(NullReferenceException) {
-                return (0, 0);
-            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                return (0, 0);
-            }
-        }
-
-        private double GetIntersectionVolume(List<Solid> first, List<Solid> second) {
-            double intersection = 0;
-            try {
-                foreach(var solid1 in first) {
-                    foreach(var solid2 in second) {
-                        intersection += BooleanOperationsUtils.ExecuteBooleanOperation(
-                            solid1,
-                            solid2,
-                            BooleanOperationsType.Intersect).Volume;
-                    }
-                }
-            } catch(NullReferenceException) {
-                intersection = 0;
-            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                intersection = 0;
-            }
-            return intersection;
-        }
-
-        private List<Solid> GetFirstSolids(ClashModel clashModel) {
-            return clashModel.MainElement.GetElement(_revitRepository.DocInfos).GetSolids();
-        }
-
-        private List<Solid> GetSecondSolids(ClashModel clashModel) {
-            Transform transform = GetFirstTransform(clashModel)
-                    .GetTransitionMatrix(GetSecondTransform(clashModel));
-            return clashModel.OtherElement
-                    .GetElement(_revitRepository.DocInfos)
-                    .GetSolids()
-                    .Select(s => SolidUtils.CreateTransformed(s, transform))
-                    .ToList();
-        }
-
-        private Transform GetFirstTransform(ClashModel clashModel) {
-            return GetTransform(clashModel.MainElement.TransformModel);
-        }
-
-        private Transform GetSecondTransform(ClashModel clashModel) {
-            return GetTransform(clashModel.OtherElement.TransformModel);
-        }
-
-        private Transform GetTransform(TransformModel transformModel) {
-            Transform transform = Transform.Identity;
-            transform.Origin = transformModel.Origin.GetXYZ();
-            transform.BasisX = transformModel.BasisX.GetXYZ();
-            transform.BasisY = transformModel.BasisY.GetXYZ();
-            transform.BasisZ = transformModel.BasisZ.GetXYZ();
-            return transform;
-        }
-
-        /// <summary>
-        /// Конвертирует кубические футы в кубические метры
-        /// </summary>
-        /// <param name="cubeFeet">Кубические футы</param>
-        /// <returns>Кубические метры</returns>
-        public double ConvertToM3(double cubeFeet) {
-#if REVIT_2020_OR_LESS
-            return UnitUtils.ConvertFromInternalUnits(cubeFeet, DisplayUnitType.DUT_CUBIC_METERS);
-#else
-            return UnitUtils.ConvertFromInternalUnits(cubeFeet, UnitTypeId.CubicMeters);
-#endif
+            double minVolume = Math.Min(clashData.MainElementVolume, clashData.OtherElementVolume);
+            return (
+                Math.Round(clashData.ClashVolume / minVolume * 100, 2),
+                Math.Round(_revitRepository.ConvertToM3(clashData.ClashVolume), 6));
         }
     }
 }

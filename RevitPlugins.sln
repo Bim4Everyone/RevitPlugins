@@ -78,6 +78,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClashDetection", "ClashDete
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clashes", "Clashes", "{4526DA81-105F-41F7-8EA9-EBC495EEEBD6}"
 	ProjectSection(SolutionItems) = preProject
+		src\RevitClashes\Models\Clashes\ClashData.cs = src\RevitClashes\Models\Clashes\ClashData.cs
 		src\RevitClashes\Models\Clashes\ClashesConfig.cs = src\RevitClashes\Models\Clashes\ClashesConfig.cs
 		src\RevitClashes\Models\Clashes\ClashModel.cs = src\RevitClashes\Models\Clashes\ClashModel.cs
 		src\RevitClashes\Models\Clashes\ElementModel.cs = src\RevitClashes\Models\Clashes\ElementModel.cs

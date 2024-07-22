@@ -355,6 +355,19 @@ namespace RevitClashDetective.Models {
             }
         }
 
+        /// <summary>
+        /// Конвертирует кубические футы в кубические метры
+        /// </summary>
+        /// <param name="cubeFeet">Кубические футы</param>
+        /// <returns>Кубические метры</returns>
+        public double ConvertToM3(double cubeFeet) {
+#if REVIT_2020_OR_LESS
+            return UnitUtils.ConvertFromInternalUnits(cubeFeet, DisplayUnitType.DUT_CUBIC_METERS);
+#else
+            return UnitUtils.ConvertFromInternalUnits(cubeFeet, UnitTypeId.CubicMeters);
+#endif
+        }
+
 
         /// <summary>
         /// Возвращает коллекцию фильтров по параметрам элементов, в которые попадают элементы, попадающие в фильтр по элементам,
@@ -565,6 +578,9 @@ namespace RevitClashDetective.Models {
                 foreach(var filter in filtersToHide) {
                     view.AddFilter(filter.Id);
                     view.SetFilterVisibility(filter.Id, false);
+                }
+                foreach(var category in GetLineCategoriesToHide()) {
+                    view.SetCategoryHidden(category, true);
                 }
                 t.Commit();
             }

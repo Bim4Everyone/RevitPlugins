@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -61,6 +61,15 @@ namespace RevitClashDetective.Models.Clashes {
                 && BasisX.GetXYZ().IsAlmostEqualTo(transform.BasisX)
                 && BasisY.GetXYZ().IsAlmostEqualTo(transform.BasisY)
                 && BasisZ.GetXYZ().IsAlmostEqualTo(transform.BasisZ);
+        }
+
+        public Transform GetTransform() {
+            Transform transform = Transform.Identity;
+            transform.Origin = Origin.GetXYZ();
+            transform.BasisX = BasisX.GetXYZ();
+            transform.BasisY = BasisY.GetXYZ();
+            transform.BasisZ = BasisZ.GetXYZ();
+            return transform;
         }
     }
 }
