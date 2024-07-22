@@ -46,6 +46,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                     } catch(CannotCreateWallException ex) {
                         roomErrors.Errors.Add(
                             new ErrorViewModel("Ошибки обработки контура помещения", ex.Message, room.Id));
+                        errors.Add(roomErrors);
                         continue;
                     }
                     for(int i = 0; i < datas.Count; i++) {
