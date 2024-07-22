@@ -6,8 +6,12 @@ using System.Windows.Controls;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-
+using RevitMechanicalSpecification.Models.Classes;
 using dosymep.Revit;
+using RevitMechanicalSpecification.Models.Fillers;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties;
+
+
 
 namespace RevitMechanicalSpecification.Models {
     internal class RevitRepository {
@@ -22,18 +26,33 @@ namespace RevitMechanicalSpecification.Models {
 
         public UIApplication UIApplication { get; }
 
-        public UIDocument ActiveUIDocument =>  UIApplication.ActiveUIDocument;
+        public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
         public Document Document => ActiveUIDocument.Document;
 
 
 
-        public void ExecuteSpecificationRefresh() 
-        {
+
+        public void ExecuteSpecificationRefresh() {
             DefaultCollector collector = new DefaultCollector(Document);
             Elements = collector.GetDefElementColls();
             MechanicalSystems = collector.GetDefSystemColl();
             SpecConfiguration specConfiguration = new SpecConfiguration(Document.ProjectInformation);
+            using(Transaction t = Document.StartTransaction("Обновление спецификации")) {
+
+                foreach(Element element in Elements) {
+                    new ElementParamDefaultFiller(
+                        fromParamName: specConfiguration.ParamNameMark,
+                        toParamName: specConfiguration.TargetNameMark).Fill(element);
+                    new ElementParamDefaultFiller(
+                        fromParamName: specConfiguration.ParamNameCode,
+                        toParamName: specConfiguration.TargetNameCode).Fill(element);
+                    new ElementParamDefaultFiller(
+                        fromParamName: specConfiguration.ParamNameCreator,
+                        toParamName: specConfiguration.TargetNameCreator).Fill(element);
+                }
+                t.Commit();
+            }
         }
     }
 }

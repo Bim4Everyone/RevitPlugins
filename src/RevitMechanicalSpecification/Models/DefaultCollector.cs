@@ -5,20 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-
+using RevitMechanicalSpecification.Models.Classes;
 using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models {
-
-    internal class MechanicalSystem
-        {
-        public MechanicalSystem() { }
-        public string SystemName {  get; set; }
-        public string SystemFunction {  get; set; }
-        public string SystemShortName { get; set; }
-        public MEPSystem SystemElement { get; set; }
-
-        }
 
     internal class DefaultCollector {
 
