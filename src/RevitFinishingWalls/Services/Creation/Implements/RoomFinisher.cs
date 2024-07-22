@@ -39,8 +39,15 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                 failOpt.SetFailuresPreprocessor(new WallAndRoomSeparationLineOverlapHandler());
                 transaction.SetFailureHandlingOptions(failOpt);
                 foreach(var room in rooms) {
-                    IList<WallCreationData> datas = _wallCreationDataProvider.GetWallCreationData(room, config);
                     RoomErrorsViewModel roomErrors = new RoomErrorsViewModel(room);
+                    IList<WallCreationData> datas;
+                    try {
+                        datas = _wallCreationDataProvider.GetWallCreationData(room, config);
+                    } catch(CannotCreateWallException ex) {
+                        roomErrors.Errors.Add(
+                            new ErrorViewModel("Ошибки обработки контура помещения", ex.Message, room.Id));
+                        continue;
+                    }
                     for(int i = 0; i < datas.Count; i++) {
                         try {
                             var wall = _revitRepository.CreateWall(

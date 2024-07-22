@@ -42,6 +42,11 @@ namespace RevitFinishingWalls.Models {
         /// </summary>
         public double WallBaseOffsetMm { get; set; } = 0;
 
+        /// <summary>
+        /// Смещение стены внутрь помещения
+        /// </summary>
+        public double WallSideOffsetMm { get; set; } = 0;
+
 
         public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()

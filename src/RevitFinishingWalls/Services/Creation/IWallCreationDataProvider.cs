@@ -11,7 +11,6 @@ namespace RevitFinishingWalls.Services.Creation {
         /// </summary>
         /// <param name="room">Помещение, в котором нужно создать отделочные стены</param>
         /// <param name="config">Настройки создания отделочных стен</param>
-        /// <returns></returns>
         IList<WallCreationData> GetWallCreationData(Room room, PluginConfig config);
     }
 }

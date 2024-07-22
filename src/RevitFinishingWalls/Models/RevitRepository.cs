@@ -152,27 +152,57 @@ namespace RevitFinishingWalls.Models {
         }
 
         /// <summary>
+        /// Метод для отладки. Создает линии модели из заданного контура
+        /// </summary>
+        public void CreateDebugLine(Curve curve) {
+            Plane geomPlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, curve.GetEndPoint(0));
+            SketchPlane sketch = SketchPlane.Create(Document, geomPlane);
+            Document.Create.NewModelCurve(curve, sketch);
+        }
+
+        /// <summary>
         /// Определяет пары "сегмент границы помещения"-"элемент", который образует этот сегмент.
         /// </summary>
         /// <param name="segmentsLoop">Исходная коллекция сегментов границ помещения</param>
         /// <param name="finishingWallTypeId">Id типа отделочной стены</param>
+        /// <param name="offset">Дополнительное смещение отделочной стены.
+        /// При отрицательном значении линии будут смещены внутрь помещения, при положительном наружу.</param>
         /// <returns>Коллекция классов, в которых содержатся линия границы помещения, 
-        /// смещенная влево на 1/2 толщины отделочной стены и элемент(ы), который(ые) образует эту границу</returns>
+        /// смещенная влево на 1/2 толщины отделочной стены + дополнительное смещение 
+        /// и элемент(ы), который(ые) образует эту границу</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Исключение, если не удалось построить оси отделочных стен</exception>
         public IList<CurveSegmentElement> GetCurveSegmentsElements(
             IList<BoundarySegment> segmentsLoop,
-            ElementId finishingWallTypeId) {
+            ElementId finishingWallTypeId,
+            double offset = 0) {
 
+            double finishingWallTypeHalfWidth = GetWallTypeWidth(finishingWallTypeId) / 2;
             List<CurveSegmentElement> curveSegmentsElements = new List<CurveSegmentElement>();
+
+            CurveLoop segmentsCurveLoop = CurveLoop.Create(segmentsLoop.Select(s => s.GetCurve()).ToArray());
+            // получение линий осей отделочных стен,
+            // смещенной влево на 1/2 толщины отделочной стены относительно исходной границы помещения,
+            // затем смещенной на заданное расстояние в футах
+            Curve[] offsetCurves;
+            try {
+                offsetCurves = CurveLoop.CreateViaOffset(
+                        segmentsCurveLoop,
+                        offset - finishingWallTypeHalfWidth,
+                        XYZ.BasisZ)
+                    .ToArray();
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                throw new InvalidOperationException("Не удалось построить оси отделочных стен в помещении");
+            }
+            if(offsetCurves.Length != segmentsLoop.Count) {
+                throw new InvalidOperationException("Не удалось построить оси отделочных стен в помещении");
+            }
 
             for(int i = 0; i < segmentsLoop.Count; i++) {
                 BoundarySegment segment = segmentsLoop[i];
                 ICollection<Element> segmentElements = GetBoundaryElement(segment);
                 if(segmentElements.Count > 0) {
-                    // получение линии оси отделочной стены,
-                    // смещенной влево на 1/2 толщины отделочной стены относительно исходной границы помещения
-                    double finishingWallTypeHalfWidth = GetWallTypeWidth(finishingWallTypeId) / 2;
-                    Curve curveWithOffset = segment.GetCurve().CreateOffset(-finishingWallTypeHalfWidth, XYZ.BasisZ);
-                    curveSegmentsElements.Add(new CurveSegmentElement(segmentElements, curveWithOffset));
+                    curveSegmentsElements.Add(new CurveSegmentElement(segmentElements, offsetCurves[i]));
                 }
             }
             return curveSegmentsElements;
