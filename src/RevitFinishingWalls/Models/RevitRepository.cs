@@ -434,7 +434,7 @@ namespace RevitFinishingWalls.Models {
 
             ReferenceIntersector intersector
                 = new ReferenceIntersector(elementFilter, FindReferenceTarget.Element, view3D) {
-                    FindReferencesInRevitLinks = false
+                    FindReferencesInRevitLinks = true
                 };
             //получить вектор направления луча, который должен перечь элемент, который задает границу помещения
             XYZ toElementDirection = GetRightDirection(lineDirection);
