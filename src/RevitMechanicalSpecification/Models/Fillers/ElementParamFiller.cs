@@ -30,6 +30,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             return null;
         }
         private bool IsTypeOrInstanceExists(Element element, string paramName) {
+            if(paramName == "Skip") { return true; }
             if(element.IsExistsParam(paramName)) { return true; }
             if(element.GetElementType().IsExistsParam(paramName)) { return true; }
             return false;

@@ -60,6 +60,11 @@ namespace RevitMechanicalSpecification.Models {
         private readonly string _paramNameInsulationStock = "ФОП_ВИС_Запас изоляции";
         private readonly string _paramNameDuctPipeStock = "ФОП_ВИС_Запас воздуховодов/труб";
 
+        public readonly string SingleUnit = "шт.";
+        public readonly string KitUnit = "компл.";
+        public readonly string MeterUnit = "м.п.";
+        public readonly string SquareUnit = "м²";
+
 
         public SpecConfiguration(ProjectInfo info) {
             _paramNameName = info.GetParamValueOrDefault(_changedNameName, "ADSK_Наименование");

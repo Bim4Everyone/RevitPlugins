@@ -40,12 +40,6 @@ namespace RevitMechanicalSpecification.Models {
             using(Transaction t = Document.StartTransaction("Обновление спецификации")) {
 
                 foreach(Element element in Elements) {
-                    if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
-
-                        DuctElementsCalculator calculator = new DuctElementsCalculator();
-                        calculator.GetFittingArea(element);
-                    }
-
                     new ElementParamDefaultFiller(
                         fromParamName: specConfiguration.ParamNameMark,
                         toParamName: specConfiguration.TargetNameMark).Fill(element);
@@ -58,7 +52,14 @@ namespace RevitMechanicalSpecification.Models {
                     new ElementParamUnitFiller(
                         fromParamName: specConfiguration.ParamNameUnit,
                         toParamName: specConfiguration.TargetNameUnit,
-                        isSpecifyDuctFittings: specConfiguration.IsSpecifyDuctFittings).Fill(element);
+                        specConfiguration: specConfiguration).Fill(element);
+
+                    new ElementParamNumberFiller(
+                        fromParamName: "Skip",
+                        toParamName: specConfiguration.TargetNameNumber,
+                        specConfiguration: specConfiguration,
+                        document: Document).Fill(element);
+
                 }
                 t.Commit();
             }
