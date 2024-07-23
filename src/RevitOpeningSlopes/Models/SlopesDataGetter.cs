@@ -35,7 +35,7 @@ namespace RevitOpeningSlopes.Models {
             double height = openingParameters.GetOpeningHeight();
             double width = openingParameters.GetOpeningWidth();
             double depth = openingParameters.GetOpeningDepth()
-                + _revitRepository.ConvertToFeet(double.Parse(config.SlopeFrontOffset));
+                + _revitRepository.ConvertToFeet(config.SlopeFrontOffset.Value);
 
             if(_revitRepository.ConvertToMillimeters(depth) < 1) {
                 throw new ArgumentException("Глубина проема не может быть равна или меньше нуля");

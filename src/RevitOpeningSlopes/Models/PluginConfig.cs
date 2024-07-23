@@ -13,7 +13,7 @@ namespace RevitOpeningSlopes.Models {
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
 
         public ElementId SlopeTypeId { get; set; } = ElementId.InvalidElementId;
-        public string SlopeFrontOffset { get; set; } // Вылет откоса от фасада здания наружу, мм
+        public double? SlopeFrontOffset { get; set; } = null; // Вылет откоса от фасада здания наружу, мм
         public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())

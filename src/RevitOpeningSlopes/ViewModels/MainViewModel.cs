@@ -131,11 +131,7 @@ namespace RevitOpeningSlopes.ViewModels {
                 .Select(fs => new SlopeTypeViewModel(fs))
                 .OrderBy(fs => fs.Name));
 
-            if(string.IsNullOrEmpty(_pluginConfig.SlopeFrontOffset)) {
-                SlopeFrontOffset = "0";
-            } else {
-                SlopeFrontOffset = _pluginConfig.SlopeFrontOffset;
-            }
+            SlopeFrontOffset = _pluginConfig.SlopeFrontOffset.GetValueOrDefault(0).ToString();
 
             if(_pluginConfig.SlopeTypeId == ElementId.InvalidElementId) {
                 SelectedSlopeType = SlopeTypes.FirstOrDefault();
@@ -148,7 +144,7 @@ namespace RevitOpeningSlopes.ViewModels {
 
         private void SaveConfig() {
             _pluginConfig.SlopeTypeId = SelectedSlopeType.SlopeTypeId;
-            _pluginConfig.SlopeFrontOffset = SlopeFrontOffset;
+            _pluginConfig.SlopeFrontOffset = double.Parse(SlopeFrontOffset);
             _pluginConfig.SaveProjectConfig();
         }
 
