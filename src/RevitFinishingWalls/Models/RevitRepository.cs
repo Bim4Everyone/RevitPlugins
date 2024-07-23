@@ -23,6 +23,10 @@ namespace RevitFinishingWalls.Models {
         private readonly View3D _defaultView3D;
         private readonly Dictionary<ElementId, double> _wallTypesWidthById;
         private readonly RevitEventHandler _revitEventHandler;
+        /// <summary>
+        /// Минимально допустимая длина линии в ревите. 1/32 дюйма
+        /// </summary>
+        private const double _minLineLength = 0.002604;
 
         public RevitRepository(UIApplication uiApplication, RevitEventHandler revitEventHandler) {
             UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
@@ -165,7 +169,7 @@ namespace RevitFinishingWalls.Models {
         /// </summary>
         /// <param name="segmentsLoop">Исходная коллекция сегментов границ помещения</param>
         /// <param name="finishingWallTypeId">Id типа отделочной стены</param>
-        /// <param name="offset">Дополнительное смещение отделочной стены.
+        /// <param name="sideOffset">Дополнительное смещение отделочной стены в сторону помещения.
         /// При отрицательном значении линии будут смещены внутрь помещения, при положительном наружу.</param>
         /// <returns>Коллекция классов, в которых содержатся линия границы помещения, 
         /// смещенная влево на 1/2 толщины отделочной стены + дополнительное смещение 
@@ -175,7 +179,7 @@ namespace RevitFinishingWalls.Models {
         public IList<CurveSegmentElement> GetCurveSegmentsElements(
             IList<BoundarySegment> segmentsLoop,
             ElementId finishingWallTypeId,
-            double offset = 0) {
+            double sideOffset = 0) {
 
             double finishingWallTypeHalfWidth = GetWallTypeWidth(finishingWallTypeId) / 2;
             List<CurveSegmentElement> curveSegmentsElements = new List<CurveSegmentElement>();
@@ -186,15 +190,23 @@ namespace RevitFinishingWalls.Models {
             // затем смещенной на заданное расстояние в футах
             Curve[] offsetCurves;
             try {
-                offsetCurves = CurveLoop.CreateViaOffset(
-                        segmentsCurveLoop,
-                        offset - finishingWallTypeHalfWidth,
-                        XYZ.BasisZ)
-                    .ToArray();
+                if(Math.Abs(sideOffset) > _minLineLength) {
+                    offsetCurves = CurveLoop.CreateViaOffset(
+                            segmentsCurveLoop,
+                            sideOffset - finishingWallTypeHalfWidth,
+                            XYZ.BasisZ)
+                        .ToArray();
+                } else {
+                    offsetCurves = segmentsCurveLoop
+                        .Select(c => c.CreateOffset(-finishingWallTypeHalfWidth, XYZ.BasisZ))
+                        .ToArray();
+                }
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 throw new InvalidOperationException("Не удалось построить оси отделочных стен в помещении");
             }
             if(offsetCurves.Length != segmentsLoop.Count) {
+                // при создании петли CurveLoop через метод CurveLoop.CreateViaOffset
+                // количество линий в контуре может измениться
                 throw new InvalidOperationException("Не удалось построить оси отделочных стен в помещении");
             }
 
