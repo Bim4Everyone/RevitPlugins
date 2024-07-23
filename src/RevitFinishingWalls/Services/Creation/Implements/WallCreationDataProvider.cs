@@ -37,8 +37,9 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
 
             foreach(IList<BoundarySegment> loop in _revitRepository.GetBoundarySegments(room)) {
                 try {
-                    IList<CurveSegmentElement> curveSegmentsElements
+                    IList<CurveSegmentElement> segments
                         = _revitRepository.GetCurveSegmentsElements(loop, config.WallTypeId, -wallSideOffset);
+                    IList<CurveSegmentElement> curveSegmentsElements = ReorderFromCorner(segments);
                     for(int i = 0; i < curveSegmentsElements.Count; i++) {
                         CurveSegmentElement curveSegmentElement = curveSegmentsElements[i];
                         if((lastWallCreationData != null)
@@ -66,6 +67,31 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
             return wallCreationData;
         }
 
+
+        /// <summary>
+        /// Возвращает список объектов линий замкнутого контура границы помещения. 
+        /// Список линий начинается с угла (или сопряжения непрямых линий, например - окружностей). 
+        /// Порядок линий соответствует порядку исходного замкнутого контура.
+        /// </summary>
+        /// <param name="roomBorderLoop">Замкнутый контур границы помещения</param>
+        private IList<CurveSegmentElement> ReorderFromCorner(IList<CurveSegmentElement> roomBorderLoop) {
+            int startIndex = 0;
+            for(int previous = 0, current = 1; current < roomBorderLoop.Count; current++, previous++) {
+                // находим первый индекс линии, которая образует угол
+                if(!_revitRepository.IsContinuation(roomBorderLoop[previous].Curve, roomBorderLoop[current].Curve)) {
+                    startIndex = current;
+                    break;
+                }
+            }
+            var result = new List<CurveSegmentElement>();
+            for(int i = startIndex; i < roomBorderLoop.Count; i++) {
+                result.Add(roomBorderLoop[i]);
+            }
+            for(int i = 0; i < startIndex; i++) {
+                result.Add(roomBorderLoop[i]);
+            }
+            return result;
+        }
 
         /// <summary>
         /// Вычисляет высоту стены, чтобы ее верхняя отметка от уровня была в соответствии с настройками
