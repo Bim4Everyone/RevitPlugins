@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
@@ -9,14 +9,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
     internal class FilterNameViewModel : BaseViewModel {
         private string _name;
 
-        private List<string> _oldFilterNames;
+        private readonly List<string> _oldFilterNames;
         private string _errorText;
-        private string _currentName;
+        private readonly string _currentName;
 
         public FilterNameViewModel(IEnumerable<string> oldFilterNames) {
             _oldFilterNames = oldFilterNames.ToList();
 
-            Create = new RelayCommand(p => { }, CanCreate);
+            Create = RelayCommand.Create(() => { }, CanCreate);
         }
 
         public FilterNameViewModel(IEnumerable<string> oldFilterNames, string currentName) {
@@ -24,7 +24,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             Name = currentName;
             _currentName = currentName;
 
-            Create = new RelayCommand(p => { }, CanCreate);
+            Create = RelayCommand.Create(() => { }, CanCreate);
         }
 
         public ICommand Create { get; }
@@ -39,7 +39,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        private bool CanCreate(object p) {
+        private bool CanCreate() {
             if(string.IsNullOrEmpty(Name)) {
                 ErrorText = "Введите имя поискового набора.";
                 return false;

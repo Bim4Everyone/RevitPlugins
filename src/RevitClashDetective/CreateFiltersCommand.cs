@@ -1,15 +1,20 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.SimpleServices;
+
+using Ninject;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels;
 using RevitClashDetective.Views;
 
@@ -26,22 +31,39 @@ namespace RevitClashDetective {
         }
 
         public void ExecuteCommand(UIApplication uiApplication, string selectedFilter = null) {
-            var revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitEventHandler>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ParameterFilterProvider>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<FiltersConfig>()
+                    .ToMethod(c => {
+                        var repo = c.Kernel.Get<RevitRepository>();
+                        var path = Path.Combine(repo.GetObjectName(), repo.GetDocumentName());
+                        return FiltersConfig.GetFiltersConfig(path, repo.Doc);
+                    });
 
-            var revitFilePath = Path.Combine(revitRepository.GetObjectName(), revitRepository.GetDocumentName());
-            var viewModlel = new FiltersViewModel(revitRepository, FiltersConfig.GetFiltersConfig(revitFilePath, revitRepository.Doc));
-            var window = new FilterCreatorView() { DataContext = viewModlel };
-            if(selectedFilter != null) {
-                viewModlel.SelectedFilter = viewModlel.Filters.FirstOrDefault(item => item.Name.Equals(selectedFilter, StringComparison.CurrentCultureIgnoreCase));
-            }
-            if(window.ShowDialog() == true) {
-                GetPlatformService<INotificationService>()
-                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                    .ShowAsync();
-            } else {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                    .ShowAsync();
+                kernel.Bind<FiltersViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<FilterCreatorView>()
+                    .ToSelf()
+                    .InSingletonScope()
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<FiltersViewModel>());
+
+                if(selectedFilter != null) {
+                    var viewModel = kernel.Get<FiltersViewModel>();
+                    viewModel.SelectedFilter = viewModel.Filters
+                        .FirstOrDefault(item => item.Name
+                        .Equals(selectedFilter, StringComparison.CurrentCultureIgnoreCase));
+                }
+
+                Notification(kernel.Get<FilterCreatorView>());
             }
         }
     }

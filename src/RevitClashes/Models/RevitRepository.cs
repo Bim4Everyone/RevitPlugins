@@ -32,15 +32,15 @@ namespace RevitClashDetective.Models {
         private readonly RevitEventHandler _revitEventHandler;
         private static readonly HashSet<string> _endings = new HashSet<string> { "_отсоединено", "_detached" };
         private const string _clashViewName = "BIM_Проверка на коллизии";
-        private const string _filtersNamePrefix = "BIM_коллизии_";
         private readonly View3D _view;
         private readonly ParameterFilterProvider _parameterFilterProvider;
+        public const string FiltersNamePrefix = "BIM_коллизии_";
 
         public RevitRepository(Application application, Document document) {
-            _application = application;
+            _application = application ?? throw new ArgumentNullException(nameof(application));
             _uiApplication = new UIApplication(application);
 
-            _document = document;
+            _document = document ?? throw new ArgumentNullException(nameof(document));
             _uiDocument = new UIDocument(document);
 
             _revitEventHandler = new RevitEventHandler();
@@ -51,6 +51,26 @@ namespace RevitClashDetective.Models {
 
             CommonConfig = RevitClashDetectiveConfig.GetRevitClashDetectiveConfig();
 
+            InitializeDocInfos();
+        }
+
+        public RevitRepository(
+            UIApplication uiApplication,
+            RevitEventHandler revitEventHandler,
+            ParameterFilterProvider parameterFilterProvider) {
+
+            _uiApplication = uiApplication
+                ?? throw new ArgumentNullException(nameof(uiApplication));
+            _revitEventHandler = revitEventHandler
+                ?? throw new ArgumentNullException(nameof(revitEventHandler));
+            _parameterFilterProvider = parameterFilterProvider
+                ?? throw new ArgumentNullException(nameof(parameterFilterProvider));
+            _application = _uiApplication.Application;
+            _uiDocument = _uiApplication.ActiveUIDocument;
+            _document = _uiDocument.Document;
+            _endings.Add("_" + _application.Username);
+            _view = GetClashView();
+            CommonConfig = RevitClashDetectiveConfig.GetRevitClashDetectiveConfig();
             InitializeDocInfos();
         }
 
@@ -162,10 +182,6 @@ namespace RevitClashDetective.Models {
             return _document.Title.Split('_').FirstOrDefault();
         }
 
-        public Element GetElement(ElementId id) {
-            return _document.GetElement(id);
-        }
-
         public Element GetElement(string fileName, ElementId id) {
             Document doc;
             if(fileName == null) {
@@ -181,42 +197,9 @@ namespace RevitClashDetective.Models {
             return doc.GetElement(elementId);
         }
 
-        public Element GetElement(Document doc, ElementId id) {
-            return doc.GetElement(id);
-        }
-
         public List<Collector> GetCollectors() {
             return DocInfos
                 .Select(item => new Collector(item.Doc))
-                .ToList();
-        }
-
-        public List<WorksetCollector> GetWorksetCollectors() {
-            return DocInfos
-                .Select(item => new WorksetCollector(item.Doc))
-                .ToList();
-        }
-
-        public View3D GetNavisworksView(Document doc) {
-            return new FilteredElementCollector(doc)
-                .OfClass(typeof(View3D))
-                .Cast<View3D>()
-                .FirstOrDefault(item => item.Name == "Navisworks");
-        }
-
-        public View3D Get3DView(Document doc) {
-            return GetNavisworksView(doc) ?? new FilteredElementCollector(doc).OfClass(typeof(View3D)).Cast<View3D>().Where(item => !item.IsTemplate).FirstOrDefault();
-        }
-
-        public LanguageType GetLanguage() {
-            return _application.Language;
-        }
-
-        public List<ParameterFilterElement> GetFilters() {
-            return new FilteredElementCollector(_document)
-                .OfClass(typeof(ParameterFilterElement))
-                .Cast<ParameterFilterElement>()
-                .Where(item => item.Name.StartsWith("BIM"))
                 .ToList();
         }
 
@@ -247,24 +230,10 @@ namespace RevitClashDetective.Models {
             DocInfos.Add(new DocInfo(GetDocumentName(), _document, Transform.Identity));
         }
 
-        public bool IsValidElement(Document doc, ElementId elementId) {
-            return doc.GetElement(elementId) != null;
-        }
-
-        public void SelectElements(IEnumerable<Element> elements) {
-            var selection = _uiApplication.ActiveUIDocument.Selection;
-            selection.SetElementIds(elements.Select(e => e.Id).ToList());
-        }
-
         public List<Category> GetCategories() {
-            return ParameterFilterUtilities.GetAllFilterableCategories()
-                .Select(item => Category.GetCategory(_document, item))
-                .OfType<Category>()
+            return _parameterFilterProvider.GetAllModelCategories(Doc, _view)
+                .Select(c => Category.GetCategory(Doc, c))
                 .ToList();
-        }
-
-        public Category GetCategory(BuiltInCategory builtInCategory) {
-            return Category.GetCategory(_document, builtInCategory);
         }
 
         public List<ParameterValueProvider> GetParameters(Document doc, IEnumerable<Category> categories) {
@@ -282,6 +251,16 @@ namespace RevitClashDetective.Models {
                 .WherePasses(new ElementMulticategoryFilter(categories.ToList()))
                 .WhereElementIsNotElementType()
                 .WherePasses(filter);
+        }
+
+        public void ShowErrorMessage(string message) {
+            var dialog = GetPlatformService<IMessageBoxService>();
+            dialog.Show(
+                message,
+                $"BIM",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Error,
+                System.Windows.MessageBoxResult.OK);
         }
 
         /// <summary>
@@ -319,7 +298,7 @@ namespace RevitClashDetective.Models {
                             } else {
                                 ClearViewFilters(view);
                             }
-                        } catch(Exception ex) when(ex.GetType().Namespace.Contains(nameof(Autodesk))) {
+                        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                             ShowErrorMessage("Не удалось выделить элементы коллизии");
                         }
                     };
@@ -331,6 +310,115 @@ namespace RevitClashDetective.Models {
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
                 ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.");
             }
+        }
+
+        /// <summary>
+        /// Скрывает элементы на 3D виде коллизий, которые попадают в заданный фильтр.
+        /// Использовать для изоляции элементов инвертированного фильтра на виде.
+        /// </summary>
+        /// <param name="filterToHide">Фильтр, элементы в котором будут скрыты</param>
+        /// <param name="categoriesToShow">Категории, которые должны остаться видимыми</param>
+        /// <exception cref="ArgumentNullException">Исключение, если один из обязательных параметров null</exception>
+        /// <exception cref="InvalidOperationException">Исключение, если не удалось применить настройки видимости</exception>
+        public void ShowElements(
+            ElementFilter filterToHide,
+            ICollection<BuiltInCategory> categoriesToShow) {
+
+            if(filterToHide is null) { throw new ArgumentNullException(nameof(filterToHide)); }
+            if(categoriesToShow is null) { throw new ArgumentNullException(nameof(categoriesToShow)); }
+            string error = string.Empty;
+
+            try {
+                var view = GetClashView();
+                _uiApplication.ActiveUIDocument.ActiveView = view;
+
+                _revitEventHandler.TransactAction = () => {
+                    try {
+                        HighlightFilter(view, filterToHide, categoriesToShow);
+                    } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                        // если здесь выбросить исключение, оно заглушится в RevitEventHandler.Execute
+                        error = "Не удалось изолировать поисковый набор";
+                    }
+                };
+                _revitEventHandler.Raise();
+                if(!string.IsNullOrWhiteSpace(error)) {
+                    throw new InvalidOperationException(error);
+                }
+            } catch(AccessViolationException) {
+                error = "Окно плагина было открыто в другом документе Revit, который был закрыт, " +
+                    "нельзя показать элемент.";
+                throw new InvalidOperationException(error);
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                error = "Окно плагина было открыто в другом документе Revit, который сейчас не активен, " +
+                    "нельзя показать элемент.";
+                throw new InvalidOperationException(error);
+            }
+        }
+
+
+        /// <summary>
+        /// Возвращает коллекцию фильтров по параметрам элементов, в которые попадают элементы, попадающие в фильтр по элементам,
+        /// и элементы всех категорий кроме заданных
+        /// </summary>
+        /// <param name="view">Вид, на котором должны сформироваться фильтры</param>
+        /// <param name="filterToHide">Фильтр по параметрам элементов, который надо скрыть</param>
+        /// <param name="categoriesToShow">Заданные категории, которые должны оставаться видимыми</param>
+        /// <returns></returns>
+        private ICollection<ParameterFilterElement> GetHighlightFilters(
+            View3D view,
+            ElementFilter filterToHide,
+            ICollection<BuiltInCategory> categoriesToShow) {
+
+            string username = Doc.Application.Username;
+            List<ParameterFilterElement> parameterFilters = new List<ParameterFilterElement>();
+            try {
+                parameterFilters.Add(_parameterFilterProvider.CreateParameterFilter(
+                    Doc,
+                    $"{FiltersNamePrefix}поисковый_набор_инвертированный_{username}",
+                    filterToHide,
+                    categoriesToShow));
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                //pass
+            }
+            parameterFilters.Add(_parameterFilterProvider.GetExceptCategoriesFilter(
+                Doc,
+                view,
+                categoriesToShow,
+                $"{FiltersNamePrefix}категории_не_поискового_набора_{username}"));
+            return parameterFilters;
+        }
+
+        private void HighlightFilter(
+            View3D view,
+            ElementFilter filterToHide,
+            ICollection<BuiltInCategory> categoriesToShow) {
+
+            using(Transaction t = Doc.StartTransaction("Выделение элементов коллизии")) {
+                view.IsSectionBoxActive = false;
+                var uiView = _uiDocument.GetOpenUIViews().FirstOrDefault(item => item.ViewId == view.Id);
+                if(uiView != null) {
+                    uiView.ZoomToFit();
+                }
+                var parameterFiltersToHide = GetHighlightFilters(view, filterToHide, categoriesToShow);
+                view = RemoveFilters(view);
+                foreach(var parameterFilter in parameterFiltersToHide) {
+                    view.AddFilter(parameterFilter.Id);
+                    view.SetFilterVisibility(parameterFilter.Id, false);
+                }
+                foreach(var category in GetLineCategoriesToHide()) {
+                    view.SetCategoryHidden(category, true);
+                }
+                t.Commit();
+            }
+        }
+
+
+        private ICollection<ElementId> GetLineCategoriesToHide() {
+            return new ElementId[] {
+                new ElementId(BuiltInCategory.OST_MEPSpaceSeparationLines),
+                new ElementId(BuiltInCategory.OST_RoomSeparationLines),
+                new ElementId(BuiltInCategory.OST_Lines)
+            };
         }
 
         private void SelectAndShowElement(
@@ -381,15 +469,14 @@ namespace RevitClashDetective.Models {
             return null;
         }
 
-
-        private Transform GetDocumentTransform(string docTitle) {
-            if(docTitle.Equals(GetDocumentName(), StringComparison.CurrentCultureIgnoreCase))
-                return Transform.Identity;
-            return GetRevitLinkInstances()
-                .FirstOrDefault(item => GetDocumentName(item.GetLinkDocument())
-                                        .Equals(docTitle, StringComparison.CurrentCultureIgnoreCase))
-                ?.GetTotalTransform();
+        public T RemoveFilters<T>(T view) where T : View {
+            var existedFilterIds = view.GetFilters();
+            foreach(var filter in existedFilterIds) {
+                view.RemoveFilter(filter);
+            }
+            return view;
         }
+
 
         private ICollection<ElementId> GetElementsToSelect(ClashModel clashModel, View3D view = null) {
             return GetElementsToSelect(
@@ -412,16 +499,6 @@ namespace RevitClashDetective.Models {
                 var view3d = view ?? _view;
                 return view3d.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox));
             }
-        }
-
-        private void ShowErrorMessage(string message) {
-            var dialog = GetPlatformService<IMessageBoxService>();
-            dialog.Show(
-                message,
-                $"BIM",
-                System.Windows.MessageBoxButton.OK,
-                System.Windows.MessageBoxImage.Error,
-                System.Windows.MessageBoxResult.OK);
         }
 
         private BoundingBoxXYZ GetCommonBoundingBox(ClashModel clashModel) {
@@ -483,7 +560,7 @@ namespace RevitClashDetective.Models {
 
         private void HighlightClashElements(View3D view, ClashModel clash) {
             using(Transaction t = _document.StartTransaction("Выделение элементов коллизии")) {
-                var filtersToHide = GetHighlightFilters(clash);
+                var filtersToHide = GetHighlightFilters(clash, view);
                 view = RemoveFilters(view);
                 foreach(var filter in filtersToHide) {
                     view.AddFilter(filter.Id);
@@ -493,13 +570,14 @@ namespace RevitClashDetective.Models {
             }
         }
 
-        private ICollection<ParameterFilterElement> GetHighlightFilters(ClashModel clash) {
+        private ICollection<ParameterFilterElement> GetHighlightFilters(ClashModel clash, View view) {
             string username = _document.Application.Username;
             var filters = new List<ParameterFilterElement>() {
                 _parameterFilterProvider.GetExceptCategoriesFilter(
                     _document,
+                    view,
                     GetClashCategories(clash),
-                    $"{_filtersNamePrefix}не_категории_элементов_коллизии_{username}")
+                    $"{FiltersNamePrefix}не_категории_элементов_коллизии_{username}")
             };
             var firstEl = clash.MainElement.GetElement(DocInfos);
             var secondEl = clash.OtherElement.GetElement(DocInfos);
@@ -509,18 +587,18 @@ namespace RevitClashDetective.Models {
                         _document,
                         firstEl,
                         secondEl,
-                        $"{_filtersNamePrefix}не_элементы_категории_коллизии_{username}"));
+                        $"{FiltersNamePrefix}не_элементы_категории_коллизии_{username}"));
             } else {
                 filters.Add(
                     _parameterFilterProvider.GetHighlightFilter(
                         _document,
                         firstEl,
-                        $"{_filtersNamePrefix}не_первый_элемент_{username}"));
+                        $"{FiltersNamePrefix}не_первый_элемент_{username}"));
                 filters.Add(
                     _parameterFilterProvider.GetHighlightFilter(
                         _document,
                         secondEl,
-                        $"{_filtersNamePrefix}не_второй_элемент_{username}"));
+                        $"{FiltersNamePrefix}не_второй_элемент_{username}"));
             }
             return filters;
         }
@@ -538,14 +616,6 @@ namespace RevitClashDetective.Models {
                 RemoveFilters(view);
                 t.Commit();
             }
-        }
-
-        private T RemoveFilters<T>(T view) where T : View {
-            var existedFilterIds = view.GetFilters();
-            foreach(var filter in existedFilterIds) {
-                view.RemoveFilter(filter);
-            }
-            return view;
         }
 
         protected T GetPlatformService<T>() {

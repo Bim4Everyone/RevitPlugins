@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -26,7 +26,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             Clashes = new ObservableCollection<DiffClashViewModel>(extraRevitClashes.Union(extraPluginClashes));
 
-            SelectClashCommand = new RelayCommand(Select, CanSelect);
+            SelectClashCommand = RelayCommand.Create<DiffClashViewModel>(Select, CanSelect);
         }
 
         public ICommand SelectClashCommand { get; }
@@ -36,8 +36,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => this.RaiseAndSetIfChanged(ref _clashes, value);
         }
 
-        private void Select(object p) {
-            var clash = (DiffClashViewModel) p;
+        private void Select(DiffClashViewModel clash) {
             var elements = new[] {
                 clash.Clash.MainElement,
                 clash.Clash.OtherElement
@@ -45,8 +44,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             _revitRepository.SelectAndShowElement(elements.Where(item => item != null));
         }
 
-        private bool CanSelect(object p) {
-            return p != null && p is DiffClashViewModel;
+        private bool CanSelect(DiffClashViewModel p) {
+            return p != null;
         }
     }
 
