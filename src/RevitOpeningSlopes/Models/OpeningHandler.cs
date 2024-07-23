@@ -794,19 +794,15 @@ namespace RevitOpeningSlopes.Models {
         /// <exception cref="ArgumentException">Срабатывает, если не удалось рассчитать верхнюю 
         /// и нижнюю точку окна</exception>
         public double GetOpeningHeight() {
-            if(_openingHeight > 0) {
-                return _openingHeight;
-            } else {
-                XYZ topPoint = GetTopPoint();
-                XYZ bottomPoint = GetBottomPoint();
+            XYZ topPoint = GetTopPoint();
+            XYZ bottomPoint = GetBottomPoint();
 
-                if(topPoint != null && bottomPoint != null) {
-                    _openingHeight = Math.Abs(bottomPoint.Z - topPoint.Z);
-                } else {
-                    throw new ArgumentException("Не удалось рассчитать высоту проема");
-                }
-                return _openingHeight;
+            if(topPoint != null && bottomPoint != null) {
+                _openingHeight = Math.Abs(bottomPoint.Z - topPoint.Z);
+            } else {
+                throw new ArgumentException("Не удалось рассчитать высоту проема");
             }
+            return _openingHeight;
         }
 
         /// <summary>
@@ -816,20 +812,16 @@ namespace RevitOpeningSlopes.Models {
         /// <exception cref="ArgumentException">Срабатывает, если не была найдена точка справа и 
         /// вертикальный центр окна</exception>
         public double GetOpeningWidth() {
-            if(_openingWidth > 0) {
-                return _openingWidth;
-            } else {
-                XYZ verticalCenterPoint = GetVerticalCenterPoint();
-                XYZ rightDepthPoint = GetRightDepthPoint();
+            XYZ verticalCenterPoint = GetVerticalCenterPoint();
+            XYZ rightDepthPoint = GetRightDepthPoint();
 
-                if(verticalCenterPoint != null && rightDepthPoint != null) {
-                    _openingWidth = Math.Sqrt(Math.Pow(verticalCenterPoint.X - rightDepthPoint.X, 2)
-                        + Math.Pow(verticalCenterPoint.Y - rightDepthPoint.Y, 2)) * 2;
-                } else {
-                    throw new ArgumentException("не удалось рассчитать ширину проема");
-                }
-                return _openingWidth;
+            if(verticalCenterPoint != null && rightDepthPoint != null) {
+                _openingWidth = Math.Sqrt(Math.Pow(verticalCenterPoint.X - rightDepthPoint.X, 2)
+                    + Math.Pow(verticalCenterPoint.Y - rightDepthPoint.Y, 2)) * 2;
+            } else {
+                throw new ArgumentException("не удалось рассчитать ширину проема");
             }
+            return _openingWidth;
         }
 
         /// <summary>
@@ -839,19 +831,16 @@ namespace RevitOpeningSlopes.Models {
         /// <exception cref="ArgumentException">Срабатывает, если не удалось рассчитать точку глубины и 
         /// вылета окна справа</exception>
         public double GetOpeningDepth() {
-            if(_openingDepth > 0) {
-                return _openingDepth;
-            } else {
-                XYZ rightDepthPoint = GetRightDepthPoint();
-                XYZ rightFrontPoint = GetRightFrontPoint();
 
-                if(rightDepthPoint != null && rightFrontPoint != null) {
-                    _openingDepth = rightDepthPoint.DistanceTo(rightFrontPoint);
-                } else {
-                    throw new ArgumentException("Не удалось рассчитать глубину проема");
-                }
-                return _openingDepth;
+            XYZ rightDepthPoint = GetRightDepthPoint();
+            XYZ rightFrontPoint = GetRightFrontPoint();
+
+            if(rightDepthPoint != null && rightFrontPoint != null) {
+                _openingDepth = rightDepthPoint.DistanceTo(rightFrontPoint);
+            } else {
+                throw new ArgumentException("Не удалось рассчитать глубину проема");
             }
+            return _openingDepth;
         }
 
         /// <summary>
@@ -859,27 +848,23 @@ namespace RevitOpeningSlopes.Models {
         /// </summary>
         /// <returns>Угол поворота для откоса, в радианах</returns>
         public double GetRotationAngle() {
-            if(_rotationAngle > 0) {
-                return _rotationAngle;
-            } else {
-                XYZ openingVector = GetOpeningVector();
+            XYZ openingVector = GetOpeningVector();
 
-                if(openingVector != null) {
-                    XYZ originVector = new XYZ(0, -1, 0);
-                    double scalarMultiply = ScalarMultiply(originVector, openingVector);
-                    double originMagnitude = Magnitude(originVector.X, originVector.Y);
-                    double openingMagnitude = Magnitude(openingVector.X, openingVector.Y);
-                    double cosTheta = scalarMultiply / (originMagnitude * openingMagnitude);
+            if(openingVector != null) {
+                XYZ originVector = new XYZ(0, -1, 0);
+                double scalarMultiply = ScalarMultiply(originVector, openingVector);
+                double originMagnitude = Magnitude(originVector.X, originVector.Y);
+                double openingMagnitude = Magnitude(openingVector.X, openingVector.Y);
+                double cosTheta = scalarMultiply / (originMagnitude * openingMagnitude);
 
-                    _rotationAngle = Math.Acos(cosTheta);
-                    if(openingVector.X < 0) {
-                        return -_rotationAngle;
-                    } else {
-                        return _rotationAngle;
-                    }
+                _rotationAngle = Math.Acos(cosTheta);
+                if(openingVector.X < 0) {
+                    return -_rotationAngle;
+                } else {
+                    return _rotationAngle;
                 }
-                return _rotationAngle;
             }
+            return _rotationAngle;
         }
     }
 }
