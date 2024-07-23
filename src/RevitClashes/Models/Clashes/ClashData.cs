@@ -7,6 +7,12 @@ namespace RevitClashDetective.Models.Clashes {
     /// </summary>
     internal class ClashData : IEquatable<ClashData> {
         /// <summary>
+        /// Точность сравнения объемов в кубических футах ~0.028 мм3
+        /// </summary>
+        private const double _precision = 0.000001;
+
+
+        /// <summary>
         /// Конструирует объект информации о коллизии с заданными параметрами
         /// </summary>
         /// <param name="mainElementVolume">Объем первого элемента коллизии в единицах ревита (кубических футах)</param>
@@ -58,9 +64,9 @@ namespace RevitClashDetective.Models.Clashes {
             if(ReferenceEquals(null, other)) { return false; }
             if(ReferenceEquals(this, other)) { return true; }
 
-            return MainElementVolume == other.MainElementVolume
-                && OtherElementVolume == other.OtherElementVolume
-                && ClashVolume == other.ClashVolume;
+            return Math.Abs(MainElementVolume - other.MainElementVolume) < _precision
+                && Math.Abs(OtherElementVolume - other.OtherElementVolume) < _precision
+                && Math.Abs(ClashVolume - other.ClashVolume) < _precision;
         }
     }
 }
