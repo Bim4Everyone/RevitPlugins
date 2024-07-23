@@ -307,7 +307,8 @@ namespace RevitOpeningSlopes.Models {
                             if(currentDist < closestDist) {
                                 closestDist = currentDist;
 
-                                // Назначаем полю ближайшую точку пересечения к точке, откуда была запущена линия
+                                // Назначаем полю последнюю ближайшую точку пересечения к точке, откуда была запущена
+                                // линия
                                 _openingDepthPoint = intersectCoord;
                             }
                         }
@@ -358,7 +359,7 @@ namespace RevitOpeningSlopes.Models {
                         false,
                         false,
                         out closestPoints);
-                    _centralOpeningDepthPoint = closestPoints.FirstOrDefault().XYZPointOnFirstCurve;
+                    _centralOpeningDepthPoint = closestPoints.First().XYZPointOnFirstCurve;
                 }
                 return _centralOpeningDepthPoint;
             }
@@ -403,7 +404,8 @@ namespace RevitOpeningSlopes.Models {
                             if(currentDist < closestDist) {
                                 closestDist = currentDist;
 
-                                // Назначаем полю ближайшую точку пересечения к точке, откуда была запущена линия
+                                // Назначаем полю последнюю ближайшую точку пересечения к точке, откуда была запущена
+                                // линия
                                 _rightPoint = intersectCoord;
                             }
                         }
@@ -499,7 +501,8 @@ namespace RevitOpeningSlopes.Models {
                             if(currentDist < closestDist) {
                                 closestDist = currentDist;
 
-                                // Назначаем полю ближайшую точку пересечения к точке, откуда была запущена линия
+                                // Назначаем полю последнюю ближайшую точку пересечения к точке, откуда была запущена
+                                // линия
                                 _depthPoint = intersectCoord;
                             }
                         }
@@ -546,7 +549,7 @@ namespace RevitOpeningSlopes.Models {
                         false,
                         false,
                         out closestPoints);
-                    _rightDepthPoint = closestPoints.FirstOrDefault().XYZPointOnFirstCurve;
+                    _rightDepthPoint = closestPoints.First().XYZPointOnFirstCurve;
                 }
                 return _rightDepthPoint;
             }
@@ -639,7 +642,7 @@ namespace RevitOpeningSlopes.Models {
                         false,
                         out closestPoints);
 
-                    _horizontalDepthPoint = closestPoints.FirstOrDefault().XYZPointOnFirstCurve;
+                    _horizontalDepthPoint = closestPoints.First().XYZPointOnFirstCurve;
                 }
                 return _horizontalDepthPoint;
             }
@@ -691,7 +694,8 @@ namespace RevitOpeningSlopes.Models {
                             if(currentDist < closestDist) {
                                 closestDist = currentDist;
 
-                                // Назначаем полю ближайшую точку пересечения к точке, откуда была запущена линия
+                                // Назначаем полю последнюю ближайшую точку пересечения к точке, откуда была запущена
+                                // линия
                                 _topPoint = intersectCoord;
                             }
                         }

@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 
-using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 
 using RevitOpeningSlopes.Models.Enums;
 
 namespace RevitOpeningSlopes.Models {
-    [Transaction(TransactionMode.Manual)]
 
     internal class LinesFromOpening {
         private readonly RevitRepository _revitRepository;
