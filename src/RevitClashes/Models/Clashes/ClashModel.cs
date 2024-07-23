@@ -97,14 +97,16 @@ namespace RevitClashDetective.Models.Clashes {
             }
 
             try {
-                List<Solid> mainSolids = GetMainSolids();
-                List<Solid> otherSolids = GetOtherSolids();
+                IList<Solid> mainSolids = GetMainSolids();
+                IList<Solid> otherSolids = GetOtherSolids();
 
                 double intersectionVolume = GetIntersectionVolume(mainSolids, otherSolids);
 
                 double mainSolidsV = mainSolids.Sum(s => s.Volume);
                 double otherSolidsV = otherSolids.Sum(s => s.Volume);
                 return new ClashData(mainSolidsV, otherSolidsV, intersectionVolume);
+            } catch(ArgumentNullException) {
+                return new ClashData();
             } catch(NullReferenceException) {
                 return new ClashData();
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
@@ -113,7 +115,7 @@ namespace RevitClashDetective.Models.Clashes {
         }
 
 
-        private double GetIntersectionVolume(List<Solid> first, List<Solid> second) {
+        private double GetIntersectionVolume(IEnumerable<Solid> first, IEnumerable<Solid> second) {
             double intersection = 0;
             try {
                 foreach(var solid1 in first) {
@@ -132,26 +134,16 @@ namespace RevitClashDetective.Models.Clashes {
             return intersection;
         }
 
-        private List<Solid> GetMainSolids() {
-            return MainElement.GetElement(_revitRepository.DocInfos).GetSolids();
+        private IList<Solid> GetMainSolids() {
+            return MainElement.GetSolids(_revitRepository.DocInfos);
         }
 
-        private List<Solid> GetOtherSolids() {
-            Transform transform = GetMainTransform()
-                    .GetTransitionMatrix(GetOtherTransform());
-            return OtherElement
-                    .GetElement(_revitRepository.DocInfos)
-                    .GetSolids()
+        private IList<Solid> GetOtherSolids() {
+            Transform transform = MainElement.GetTransform()
+                    .GetTransitionMatrix(OtherElement.GetTransform());
+            return OtherElement.GetSolids(_revitRepository.DocInfos)
                     .Select(s => SolidUtils.CreateTransformed(s, transform))
                     .ToList();
-        }
-
-        private Transform GetMainTransform() {
-            return MainElement.TransformModel.GetTransform();
-        }
-
-        private Transform GetOtherTransform() {
-            return OtherElement.TransformModel.GetTransform();
         }
     }
 
