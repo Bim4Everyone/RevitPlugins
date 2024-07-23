@@ -406,13 +406,13 @@ namespace RevitFinishingWalls.Models {
             if(borderEl is ModelLine || borderEl is null) {
                 // в фильтр должны попадать элементы категорий: стены, несущие колонны, колонны,
                 // у которых значение параметра "Граница помещения" не равен 0, если параметр есть у элемента.
-                var categoryFilter = new LogicalAndFilter(new List<ElementFilter>(){
+                var categoryFilter = new LogicalAndFilter(new ElementFilter[] {
                     new ElementMulticategoryFilter(
                         new BuiltInCategory[] {
                             BuiltInCategory.OST_Walls,
                             BuiltInCategory.OST_StructuralColumns,
                             BuiltInCategory.OST_Columns }),
-                    new LogicalOrFilter(new List<ElementFilter>() {
+                    new LogicalOrFilter(new ElementFilter[] {
                         new ElementParameterFilter(
                             ParameterFilterRuleFactory.CreateNotEqualsRule(
                                 new ElementId(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING), 0))
