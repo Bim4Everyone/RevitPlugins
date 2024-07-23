@@ -23,6 +23,7 @@
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand EventName="Loaded"
                                Command="{Binding LoadConfigCommand}" />
+        <common:AttachServiceBehavior AttachableService="{Binding ProgressDialogFactory}" />
     </dxmvvm:Interaction.Behaviors>
     <Window.Resources>
         <converters:EnumConverter x:Key="EnumConverter" />

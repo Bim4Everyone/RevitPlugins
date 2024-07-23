@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Revit;
 
@@ -28,17 +30,24 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
         }
 
 
-        public ICollection<RoomErrorsViewModel> CreateWallsFinishing(PluginConfig config) {
-            if(config is null) { throw new ArgumentNullException(nameof(config)); }
+        public ICollection<RoomErrorsViewModel> CreateWallsFinishing(
+            ICollection<Room> rooms,
+            PluginConfig config,
+            IProgress<int> progress = null,
+            CancellationToken ct = default) {
 
-            var rooms = _revitRepository.GetRooms(config.RoomGetterMode);
+            if(rooms is null) { throw new ArgumentNullException(nameof(rooms)); }
+            if(config is null) { throw new ArgumentNullException(nameof(config)); }
             List<RoomErrorsViewModel> errors = new List<RoomErrorsViewModel>();
 
             using(var transaction = _revitRepository.Document.StartTransaction("Создание отделочных стен")) {
                 FailureHandlingOptions failOpt = transaction.GetFailureHandlingOptions();
                 failOpt.SetFailuresPreprocessor(new WallAndRoomSeparationLineOverlapHandler());
                 transaction.SetFailureHandlingOptions(failOpt);
+                var iteration = 0;
                 foreach(var room in rooms) {
+                    ct.ThrowIfCancellationRequested();
+                    progress?.Report(iteration++);
                     RoomErrorsViewModel roomErrors = new RoomErrorsViewModel(room);
                     IList<WallCreationData> datas;
                     try {

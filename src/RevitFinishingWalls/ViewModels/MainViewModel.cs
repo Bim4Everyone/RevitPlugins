@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -17,6 +19,7 @@ namespace RevitFinishingWalls.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly IRoomFinisher _roomFinisher;
+        private readonly IProgressDialogFactory _progressDialogFactory;
 
         /// <summary>Максимальная допустимая отметка верха отделочной стены в мм</summary>
         private const int _wallTopMaxElevationMM = 50000;
@@ -31,11 +34,17 @@ namespace RevitFinishingWalls.ViewModels {
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
-            IRoomFinisher roomFinisher
+            IRoomFinisher roomFinisher,
+            IProgressDialogFactory progressDialogFactory
             ) {
-            _pluginConfig = pluginConfig ?? throw new ArgumentNullException(nameof(pluginConfig));
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            _roomFinisher = roomFinisher ?? throw new ArgumentNullException(nameof(roomFinisher));
+            _pluginConfig = pluginConfig
+                ?? throw new ArgumentNullException(nameof(pluginConfig));
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _roomFinisher = roomFinisher
+                ?? throw new ArgumentNullException(nameof(roomFinisher));
+            _progressDialogFactory = progressDialogFactory
+                ?? throw new ArgumentNullException(nameof(progressDialogFactory));
 
             RoomGetterModes = new ObservableCollection<RoomGetterMode>(
                 Enum.GetValues(typeof(RoomGetterMode)).Cast<RoomGetterMode>());
@@ -51,6 +60,8 @@ namespace RevitFinishingWalls.ViewModels {
         public ICommand LoadConfigCommand { get; }
 
         public ICommand AcceptViewCommand { get; }
+
+        public IProgressDialogFactory ProgressDialogFactory => _progressDialogFactory;
 
 
         private string _errorText;
@@ -114,7 +125,18 @@ namespace RevitFinishingWalls.ViewModels {
 
         private void AcceptView() {
             SaveConfig();
-            var errors = _roomFinisher.CreateWallsFinishing(_pluginConfig);
+            ICollection<RoomErrorsViewModel> errors;
+            using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
+                var rooms = _revitRepository.GetRooms(_pluginConfig.RoomGetterMode);
+                progressDialogService.StepValue = 5;
+                progressDialogService.DisplayTitleFormat = "Обработка квартир... [{0}]\\[{1}]";
+                var progress = progressDialogService.CreateProgress();
+                progressDialogService.MaxValue = rooms.Count;
+                var ct = progressDialogService.CreateCancellationToken();
+                progressDialogService.Show();
+
+                errors = _roomFinisher.CreateWallsFinishing(rooms, _pluginConfig, progress, ct);
+            }
             if(errors.Count > 0) {
                 var errorMsgService = ServicesProvider.GetPlatformService<RichErrorMessageService>();
                 errorMsgService.ShowErrorWindow(errors);
