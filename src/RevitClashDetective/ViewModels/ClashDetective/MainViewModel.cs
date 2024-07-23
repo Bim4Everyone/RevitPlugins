@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -34,13 +34,13 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
             } else {
                 InitializeEmptyCheck();
             }
-            AddCheckCommand = new RelayCommand(AddCheck);
-            RemoveCheckCommand = new RelayCommand(RemoveCheck, CanRemove);
-            FindClashesCommand = new RelayCommand(FindClashes, CanFindClashes);
+            AddCheckCommand = RelayCommand.Create(AddCheck);
+            RemoveCheckCommand = RelayCommand.Create<CheckViewModel>(RemoveCheck, CanRemove);
+            FindClashesCommand = RelayCommand.Create(FindClashes, CanFindClashes);
 
-            SaveClashesCommand = new RelayCommand(SaveConfig);
-            SaveAsClashesCommand = new RelayCommand(SaveAsConfig);
-            LoadClashCommand = new RelayCommand(LoadConfig);
+            SaveClashesCommand = RelayCommand.Create(SaveConfig);
+            SaveAsClashesCommand = RelayCommand.Create(SaveAsConfig);
+            LoadClashCommand = RelayCommand.Create(LoadConfig);
         }
 
         public bool CanCancel {
@@ -86,21 +86,21 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
             };
         }
 
-        private void AddCheck(object p) {
+        private void AddCheck() {
             Checks.Add(new CheckViewModel(_revitRepository, _filtersConfig));
         }
 
-        private void RemoveCheck(object p) {
+        private void RemoveCheck(CheckViewModel p) {
             if(Checks.Count > 0) {
-                Checks.Remove(p as CheckViewModel);
+                Checks.Remove(p);
             }
         }
 
-        private bool CanRemove(object p) {
-            return (p as CheckViewModel) != null;
+        private bool CanRemove(CheckViewModel p) {
+            return p != null;
         }
 
-        private void FindClashes(object p) {
+        private void FindClashes() {
             CanCancel = false;
             RenewConfig();
             _checksConfig.SaveProjectConfig();
@@ -116,7 +116,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
                     check.IsSelected = false;
                 }
                 MessageText = null;
-                CanFindClashes(null);
+                CanFindClashes();
             });
         }
 
@@ -132,14 +132,14 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
             _checksConfig.RevitVersion = ModuleEnvironment.RevitVersion;
         }
 
-        private void SaveConfig(object p) {
+        private void SaveConfig() {
             RenewConfig();
             _checksConfig.SaveProjectConfig();
             MessageText = "Файл проверок успешно сохранен";
             Wait(() => { MessageText = null; });
         }
 
-        private void SaveAsConfig(object p) {
+        private void SaveAsConfig() {
             RenewConfig();
             ConfigSaverService s = new ConfigSaverService(_revitRepository);
             s.Save(_checksConfig);
@@ -148,7 +148,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
 
         }
 
-        private void LoadConfig(object p) {
+        private void LoadConfig() {
             var cl = new ConfigLoaderService(_revitRepository);
             var config = cl.Load<ChecksConfig>();
             cl.CheckConfig(config);
@@ -166,7 +166,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
                 .Any(item => item.Count() > 1);
         }
 
-        private bool CanFindClashes(object p) {
+        private bool CanFindClashes() {
             if(HasSameNames()) {
                 ErrorText = $"У проверок должны быть разные имена.";
                 return false;
