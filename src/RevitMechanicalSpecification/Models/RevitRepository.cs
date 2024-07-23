@@ -32,7 +32,6 @@ namespace RevitMechanicalSpecification.Models {
 
 
 
-
         public void ExecuteSpecificationRefresh() {
             DefaultCollector collector = new DefaultCollector(Document);
             Elements = collector.GetDefElementColls();
@@ -41,15 +40,25 @@ namespace RevitMechanicalSpecification.Models {
             using(Transaction t = Document.StartTransaction("Обновление спецификации")) {
 
                 foreach(Element element in Elements) {
+                    if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
+
+                        DuctElementsCalculator calculator = new DuctElementsCalculator();
+                        calculator.GetFittingArea(element);
+                    }
+
                     new ElementParamDefaultFiller(
                         fromParamName: specConfiguration.ParamNameMark,
                         toParamName: specConfiguration.TargetNameMark).Fill(element);
-                    new ElementParamDefaultFiller(
+                    new ElementParamDefaultFiller( 
                         fromParamName: specConfiguration.ParamNameCode,
                         toParamName: specConfiguration.TargetNameCode).Fill(element);
                     new ElementParamDefaultFiller(
                         fromParamName: specConfiguration.ParamNameCreator,
                         toParamName: specConfiguration.TargetNameCreator).Fill(element);
+                    new ElementParamUnitFiller(
+                        fromParamName: specConfiguration.ParamNameUnit,
+                        toParamName: specConfiguration.TargetNameUnit,
+                        isSpecifyDuctFittings: specConfiguration.IsSpecifyDuctFittings).Fill(element);
                 }
                 t.Commit();
             }
