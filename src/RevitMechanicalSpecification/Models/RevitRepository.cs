@@ -36,29 +36,35 @@ namespace RevitMechanicalSpecification.Models {
             DefaultCollector collector = new DefaultCollector(Document);
             Elements = collector.GetDefElementColls();
             MechanicalSystems = collector.GetDefSystemColl();
-            SpecConfiguration specConfiguration = new SpecConfiguration(Document.ProjectInformation);
+            SpecConfiguration specConfiguration = new SpecConfiguration(Document);
             using(Transaction t = Document.StartTransaction("Обновление спецификации")) {
 
                 foreach(Element element in Elements) {
                     new ElementParamDefaultFiller(
-                        fromParamName: specConfiguration.ParamNameMark,
-                        toParamName: specConfiguration.TargetNameMark).Fill(element);
+                        fromParamName: specConfiguration.OriginalParamNameMark,
+                        toParamName: specConfiguration.TargetNameMark,
+                        specConfiguration: specConfiguration).Fill(element);
                     new ElementParamDefaultFiller( 
-                        fromParamName: specConfiguration.ParamNameCode,
-                        toParamName: specConfiguration.TargetNameCode).Fill(element);
+                        fromParamName: specConfiguration.OriginalParamNameCode,
+                        toParamName: specConfiguration.TargetNameCode,
+                        specConfiguration: specConfiguration).Fill(element);
                     new ElementParamDefaultFiller(
-                        fromParamName: specConfiguration.ParamNameCreator,
-                        toParamName: specConfiguration.TargetNameCreator).Fill(element);
+                        fromParamName: specConfiguration.OriginalParamNameCreator,
+                        toParamName: specConfiguration.TargetNameCreator, 
+                        specConfiguration: specConfiguration).Fill(element);
                     new ElementParamUnitFiller(
-                        fromParamName: specConfiguration.ParamNameUnit,
+                        fromParamName: specConfiguration.OriginalParamNameUnit,
                         toParamName: specConfiguration.TargetNameUnit,
                         specConfiguration: specConfiguration).Fill(element);
-
                     new ElementParamNumberFiller(
                         fromParamName: "Skip",
                         toParamName: specConfiguration.TargetNameNumber,
                         specConfiguration: specConfiguration,
                         document: Document).Fill(element);
+                    new ElementParamNameFiller(
+                        fromParamName: specConfiguration.OriginalParamNameName,
+                        toParamName: specConfiguration.TargetNameName,
+                        specConfiguration: specConfiguration).Fill(element);
 
                 }
                 t.Commit();

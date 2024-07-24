@@ -10,10 +10,8 @@ using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models {
-    internal class SpecConfiguration {
-        //private readonly Document _document;
-
-
+    public class SpecConfiguration {
+        private readonly Document _document;
 
         private readonly string _paramNameName;
         private readonly string _paramNameMark;
@@ -25,14 +23,12 @@ namespace RevitMechanicalSpecification.Models {
         private readonly bool _isSpecifyDuctFittings;
         private readonly bool _isSpecifyPipeFittings;
 
-
-
-
-        public string ParamNameName { get { return _paramNameName; } }
-        public string ParamNameMark { get { return _paramNameMark; } }
-        public string ParamNameCode { get { return _paramNameCode; } }
-        public string ParamNameUnit {  get { return _paramNameUnit; } }
-        public string ParamNameCreator { get { return _paramNameCreator; } }
+        public Document Document { get { return _document; } }
+        public string OriginalParamNameName { get { return _paramNameName; } }
+        public string OriginalParamNameMark { get { return _paramNameMark; } }
+        public string OriginalParamNameCode { get { return _paramNameCode; } }
+        public string OriginalParamNameUnit {  get { return _paramNameUnit; } }
+        public string OriginalParamNameCreator { get { return _paramNameCreator; } }
         public double InsulationStock { get { return _insulationStock; } }
         public double DuctAndPipeStock { get { return _ductAndPipeStock; } }
         public bool IsSpecifyDuctFittings { get { return _isSpecifyDuctFittings; } }
@@ -48,6 +44,14 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string TargetNameCreator = "ФОП_ВИС_Завод-изготовитель";
         public readonly string TargetNameNumber = "ФОП_ВИС_Число";
 
+        public readonly string ForcedName = "ФОП_ВИС_Наименование принудительное";
+        public readonly string ForcedSystemName = "ФОП_ВИС_Имя системы принудительное";
+        public readonly string ForcedGroup = "ФОП_ВИС_Группирование принудительное";
+
+        public readonly string MinDuctThikness = "ФОП_ВИС_Минимальная толщина воздуховода";
+        public readonly string MaxDuctThikness = "ФОП_ВИС_Максимальная толщина воздуховода";
+
+
         private readonly string _changedNameName = "ФОП_ВИС_Замена параметра_Наименование";
         private readonly string _changedNameMark = "ФОП_ВИС_Замена параметра_Марка";
         private readonly string _changedNameCode = "ФОП_ВИС_Замена параметра_Код изделия";
@@ -57,8 +61,11 @@ namespace RevitMechanicalSpecification.Models {
         private readonly string _paramNameIsSpecifyPipeFittings = "ФОП_ВИС_Учитывать фитинги труб";
         private readonly string _paramNameIsSpecifyDuctFittings = "ФОП_ВИС_Учитывать фитинги воздуховодов";
 
+
         private readonly string _paramNameInsulationStock = "ФОП_ВИС_Запас изоляции";
         private readonly string _paramNameDuctPipeStock = "ФОП_ВИС_Запас воздуховодов/труб";
+        public readonly string IndividualStock = "ФОП_ВИС_Индивидуальный запас";
+
 
         public readonly string SingleUnit = "шт.";
         public readonly string KitUnit = "компл.";
@@ -66,7 +73,9 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string SquareUnit = "м²";
 
 
-        public SpecConfiguration(ProjectInfo info) {
+        public SpecConfiguration(Document document) {
+            _document = document;
+            ProjectInfo info = document.ProjectInformation;
             _paramNameName = info.GetParamValueOrDefault(_changedNameName, "ADSK_Наименование");
             _paramNameMark = info.GetParamValueOrDefault(_changedNameMark, "ADSK_Марка");
             _paramNameCode = info.GetParamValueOrDefault(_changedNameCode, "ADSK_Код изделия");

@@ -15,10 +15,19 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         protected string ToParamName { get { return _toParamName; } }
         protected string FromParamName { get { return _fromParamName; } }
 
+        protected SpecConfiguration Config { get { return _config; } }
+
         private readonly string _toParamName;
         private readonly string _fromParamName;
+        private readonly SpecConfiguration _config;
 
-        public ElementParamFiller(string toParamName, string fromParamName) {
+        public ElementParamFiller(string toParamName, string fromParamName, SpecConfiguration specConfiguration) {
+            _toParamName = toParamName;
+            _fromParamName = fromParamName;
+            _config = specConfiguration;
+        }
+
+        protected ElementParamFiller(string toParamName, string fromParamName) {
             _toParamName = toParamName;
             _fromParamName = fromParamName;
         }

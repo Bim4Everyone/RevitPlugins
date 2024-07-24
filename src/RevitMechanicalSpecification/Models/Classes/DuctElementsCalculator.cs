@@ -7,12 +7,68 @@ using System.Windows;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
 namespace RevitMechanicalSpecification.Models.Classes {
     internal class DuctElementsCalculator {
+
+        private readonly SpecConfiguration _specConfiguration;
+        private readonly UnitConverter _unitConverter;
         
-        public DuctElementsCalculator() { }
+        public DuctElementsCalculator(SpecConfiguration config) {
+            _specConfiguration = config;
+            _unitConverter = new UnitConverter();
+        }
+
+        public string GetDuctThikness(Element element) {
+            MEPCurve curve = element as MEPCurve;
+            double thikness = 0;
+
+            double minDuctThikness = element.GetSharedParamValueOrDefault(_specConfiguration.MinDuctThikness, 0);
+            double maxDuctThikness = element.GetSharedParamValueOrDefault(_specConfiguration.MaxDuctThikness, 0);
+            double minInsulThikness = 0;
+            double maxInsulThikness = 0;
+
+
+            ElementCategoryFilter filter = new ElementCategoryFilter(BuiltInCategory.OST_DuctInsulations);
+            List<ElementId> dependent = element.GetDependentElements(filter).ToList();
+            if(dependent.Count > 0) 
+                {
+                Element insulation = _specConfiguration.Document.GetElement(dependent[0]);
+                minInsulThikness = insulation.GetSharedParamValueOrDefault(_specConfiguration.MinDuctThikness, 0);
+                maxInsulThikness = insulation.GetSharedParamValueOrDefault(_specConfiguration.MaxDuctThikness, 0);
+            }
+
+
+            if(GetConnectors(element)[0].Shape == ConnectorProfileType.Rectangular || GetConnectors(element)[0].Shape == ConnectorProfileType.Oval) {
+                double sizeA = curve.Width;
+                double sizeB = curve.Height;
+                double size = Math.Max(sizeA, sizeB);
+
+                if(size < 251) { thikness = 0.5; }
+                if(size < 1001) { thikness = 0.7; }
+                if(size < 2001) { thikness = 0.9; }
+                if(size > 2001) { thikness = 1.4; }
+            }
+            if(GetConnectors(element)[0].Shape == ConnectorProfileType.Round) {
+                double size = curve.Diameter;
+                if(size < 201) { thikness = 0.5; }
+                if(size < 451) { thikness = 0.6; }
+                if(size < 801) { thikness = 0.7; }
+                if(size < 1251) { thikness = 1.0; }
+                if(size < 1601) { thikness = 1.2; }
+                if(size > 1601) { thikness = 1.4; }
+            }
+
+            double upCriteria = Math.Max(maxInsulThikness, maxDuctThikness);
+            double minCriteria = Math.Max(minInsulThikness, minDuctThikness);
+
+            if(thikness > upCriteria && upCriteria!=0) { return Math.Max(maxInsulThikness, maxDuctThikness).ToString(); }
+            if(thikness < minCriteria && minCriteria!=0) { return Math.Max(minInsulThikness, minDuctThikness).ToString(); }
+
+            return thikness.ToString();
+        }
 
         public void GetFittingThikness() {}
 
@@ -27,7 +83,7 @@ namespace RevitMechanicalSpecification.Models.Classes {
                 ConnectorSetIterator set = instance.MEPModel.ConnectorManager.Connectors.ForwardIterator();
                 while(set.MoveNext()) { connectors.Add(set.Current as Connector); }
             }
-            if (element.GetType().Name == "MEPCurve") { 
+            if (element.Category.IsId(BuiltInCategory.OST_DuctCurves)||element.Category.IsId(BuiltInCategory.OST_PipeCurves)) { 
                 MEPCurve curve = element as MEPCurve;
                 ConnectorSetIterator set = curve.ConnectorManager.Connectors.ForwardIterator();
                 while(set.MoveNext()) { connectors.Add(set.Current as Connector); }
@@ -39,14 +95,13 @@ namespace RevitMechanicalSpecification.Models.Classes {
         public double GetFittingArea(Element element) {
 
             double area = 0;
-            UnitConverter unitConverter = new UnitConverter();
             List<Solid> solids = element.GetSolids().ToList();
 
             foreach(Solid solid in solids) 
                 foreach(Face face in solid.Faces)
                     area += face.Area;
 
-            area = unitConverter.DoubleToSquareMeters(area);
+            area = _unitConverter.DoubleToSquareMeters(area);
 
             if (area > 0) 
                 { 
@@ -54,9 +109,9 @@ namespace RevitMechanicalSpecification.Models.Classes {
                 List<Connector> connectors = GetConnectors(element);
                 foreach(Connector connector in connectors) {
                     if(connector.Shape == ConnectorProfileType.Rectangular) 
-                        { falseArea += unitConverter.DoubleToSquareMeters(connector.Height * connector.Width); }
+                        { falseArea += _unitConverter.DoubleToSquareMeters(connector.Height * connector.Width); }
                     if(connector.Shape == ConnectorProfileType.Round) 
-                        { falseArea += unitConverter.DoubleToSquareMeters(connector.Radius * connector.Radius * 3.14); }  
+                        { falseArea += _unitConverter.DoubleToSquareMeters(connector.Radius * connector.Radius * 3.14); }  
                 }
                     
                 area -= falseArea;

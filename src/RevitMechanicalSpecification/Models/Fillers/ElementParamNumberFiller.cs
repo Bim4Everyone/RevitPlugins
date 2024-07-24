@@ -13,15 +13,13 @@ using RevitMechanicalSpecification.Models.Classes;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNumberFiller : ElementParamFiller {
-        private readonly SpecConfiguration _specConfiguration;
         private readonly Document _document;
 
         public ElementParamNumberFiller(string toParamName, 
             string fromParamName, 
             SpecConfiguration specConfiguration,
-            Document document) : base(toParamName, fromParamName) 
+            Document document) : base(toParamName, fromParamName, specConfiguration) 
             {
-            _specConfiguration = specConfiguration;
             _document = document;
         }
 
@@ -39,13 +37,13 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private double GetNumber(Element element) {
             double number = 0;
             string unit;
-            DuctElementsCalculator calculator = new DuctElementsCalculator();
+            DuctElementsCalculator calculator = new DuctElementsCalculator(Config);
             UnitConverter converter = new UnitConverter();
 
-            unit = element.GetSharedParamValue<string>(_specConfiguration.TargetNameUnit);
+            unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);
 
-            if(unit == _specConfiguration.SingleUnit || unit == _specConfiguration.KitUnit) { return 1; }
-            if(unit == _specConfiguration.SquareUnit) {
+            if(unit == Config.SingleUnit || unit == Config.KitUnit) { return 1; }
+            if(unit == Config.SquareUnit) {
                 if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) 
                     { 
                     InsulationLiningBase insulation =  element as InsulationLiningBase;
@@ -57,7 +55,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 if(LinearLogicalFilter(element)) 
                     { return converter.DoubleToSquareMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA, 0)); }
             }
-            if(unit == _specConfiguration.MeterUnit) {
+            if(unit == Config.MeterUnit) {
                 if(LinearLogicalFilter(element)) 
                     {
                     return converter.DoubleToMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH, 0)); }
