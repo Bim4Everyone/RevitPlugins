@@ -418,6 +418,15 @@ namespace RevitFinishingWalls.Models {
                         view3D.SetCategoryHidden(categoryId, false);
                     }
                 }
+                ElementId[] links = new FilteredElementCollector(Document)
+                    .OfCategory(BuiltInCategory.OST_RvtLinks)
+                    .ToElements()
+                    .Where(e => e.IsHidden(view3D))
+                    .Select(e => e.Id)
+                    .ToArray(); // типы и экземпляры связей
+                if(links.Length > 0) {
+                    view3D.UnhideElements(links);
+                }
                 t.Commit();
             }
         }
