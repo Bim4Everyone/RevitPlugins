@@ -391,7 +391,35 @@ namespace RevitFinishingWalls.Models {
                     t.Commit();
                 }
             }
+            ResetDefaultView3D(view);
             return view;
+        }
+
+        /// <summary>
+        /// Сбрасывает настройки видимости вида до настроек по умолчанию.
+        /// </summary>
+        /// <param name="view3D">3D вид, использующийся в алгоритме <see cref="GetElementByRay"/></param>
+        private void ResetDefaultView3D(View3D view3D) {
+            using(Transaction t = Document.StartTransaction("Сброс настроек 3D вида")) {
+                view3D.IsSectionBoxActive = false;
+                view3D.ViewTemplateId = ElementId.InvalidElementId;
+                view3D.Discipline = ViewDiscipline.Coordination;
+                view3D.DetailLevel = ViewDetailLevel.Medium;
+                view3D.DisplayStyle = DisplayStyle.HLR;
+                foreach(var filter in view3D.GetFilters()) {
+                    view3D.RemoveFilter(filter);
+                }
+                var modelCategories = Document.Settings.Categories
+                    .OfType<Category>()
+                    .Where(c => c.CategoryType == CategoryType.Model)
+                    .Select(c => c.Id);
+                foreach(ElementId categoryId in modelCategories) {
+                    if(view3D.GetCategoryHidden(categoryId)) {
+                        view3D.SetCategoryHidden(categoryId, false);
+                    }
+                }
+                t.Commit();
+            }
         }
 
         /// <summary>
@@ -430,10 +458,11 @@ namespace RevitFinishingWalls.Models {
         /// Метод предполагает, что помещение расположено слева от линии границы помещения, 
         /// если смотреть из начала линии в конец.
         /// </summary>
-        /// <param name="view3D"></param>
-        /// <param name="curve"></param>
-        /// <param name="elementFilter"></param>
-        /// <returns></returns>
+        /// <param name="view3D">3D вид с настройками по умолчанию.<br/>
+        /// Обязательно настройки по умолчанию. Настройки видимости могут влиять на алгоритм.</param>
+        /// <param name="curve">Линия границы помещения, за которой могут быть элементы, которые будут найдены</param>
+        /// <param name="elementFilter">Фильтр по элементам, которые могут быть найдены за разделителем</param>
+        /// <returns>Коллекция элементов, перекрытых разделителем помещений. Элементы удовлетворяют заданному фильтру.</returns>
         //Исходный алгоритм метода по нахождению элемента, который перекрывается разделителем помещений:
         //https://thebuildingcoder.typepad.com/blog/2013/10/determining-a-room-boundary-segment-generating-element.html
         private ICollection<Element> GetElementByRay(View3D view3D, Curve curve, ElementFilter elementFilter) {
