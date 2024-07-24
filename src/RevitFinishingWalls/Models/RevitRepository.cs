@@ -189,6 +189,7 @@ namespace RevitFinishingWalls.Models {
             // смещенной влево на 1/2 толщины отделочной стены относительно исходной границы помещения,
             // затем смещенной на заданное расстояние в футах
             Curve[] offsetCurves;
+            IList<BoundarySegment> segmentsToProcess = segmentsLoop;
             try {
                 if(Math.Abs(sideOffset) > _minLineLength) {
                     offsetCurves = CurveLoop.CreateViaOffset(
@@ -205,13 +206,16 @@ namespace RevitFinishingWalls.Models {
                 throw new InvalidOperationException("Не удалось построить оси отделочных стен в помещении");
             }
             if(offsetCurves.Length != segmentsLoop.Count) {
-                // при создании петли CurveLoop через метод CurveLoop.CreateViaOffset
-                // количество линий в контуре может измениться
-                throw new InvalidOperationException("Не удалось построить оси отделочных стен в помещении");
+                try {
+                    segmentsToProcess = MapOffsetCurves(offsetCurves, segmentsLoop, sideOffset);
+                } catch(InvalidOperationException) {
+                    // при создании петли CurveLoop через метод CurveLoop.CreateViaOffset
+                    // количество линий в контуре может измениться
+                    throw new InvalidOperationException("Не удалось построить оси отделочных стен в помещении");
+                }
             }
-
-            for(int i = 0; i < segmentsLoop.Count; i++) {
-                BoundarySegment segment = segmentsLoop[i];
+            for(int i = 0; i < segmentsToProcess.Count; i++) {
+                BoundarySegment segment = segmentsToProcess[i];
                 ICollection<Element> segmentElements = GetBoundaryElement(segment);
                 if(segmentElements.Count > 0) {
                     curveSegmentsElements.Add(new CurveSegmentElement(segmentElements, offsetCurves[i]));
@@ -318,6 +322,58 @@ namespace RevitFinishingWalls.Models {
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
                 throw new InvalidOperationException(
                     "Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.");
+            }
+        }
+
+
+        /// <summary>
+        /// Метод для сопоставления линий в уменьшенном контуре помещения, в котором все углы прямые,
+        /// с линиями исходного контура помещения.
+        /// </summary>
+        /// <param name="offsetCurves">Замкнутый уменьшенный контур помещения</param>
+        /// <param name="originLoop">Исходный замкнутый контур помещения</param>
+        /// <param name="offset">Значение оффсета уменьшенного контура в единицах ревита</param>
+        /// <returns>
+        /// Список исходных линий сегментов границ помещения, которым соответствуют линии в уменьшенном контуре
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Исключение, если один из обязательных параметров null</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Исключение, если не удалось сопоставить уменьшенный контур с исходным</exception>
+        private IList<BoundarySegment> MapOffsetCurves(
+            IList<Curve> offsetCurves,
+            IList<BoundarySegment> originLoop,
+            double offset) {
+
+            if(offsetCurves is null) {
+                throw new ArgumentNullException(nameof(offsetCurves));
+            }
+            if(originLoop is null) {
+                throw new ArgumentNullException(nameof(originLoop));
+            }
+            if(originLoop.Count <= offsetCurves.Count) {
+                throw new InvalidOperationException(
+                    "Нельзя замапить список линий, " +
+                    "количество элементов в котором меньше либо равно количеству линий в исходной петле");
+            }
+            if(offset >= 0) {
+                throw new InvalidOperationException("Можно замапить только список уменьшенных линий");
+            }
+
+            List<BoundarySegment> result = new List<BoundarySegment>();
+            for(int i = 0, j = 0; i < originLoop.Count && j < offsetCurves.Count; i++) {
+                double originLength = originLoop[i].GetCurve().Length;
+                double offsetLength = offsetCurves[j].Length;
+                double lengthDiff = Math.Abs(originLength - offsetLength);
+                if(lengthDiff < Math.Min(originLength, offsetLength)) {
+                    result.Add(originLoop[i]);
+                    j++;
+                }
+            }
+            if(result.Count == offsetCurves.Count) {
+                return result;
+            } else {
+                throw new InvalidOperationException("Не удалось замапить список линий");
             }
         }
 
