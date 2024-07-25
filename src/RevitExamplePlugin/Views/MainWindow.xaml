@@ -71,6 +71,16 @@
                   ItemsSource="{Binding Walls}">
             <ListView.View>
                 <GridView>
+                    <GridViewColumn Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.ShowWallCommand}"
+                                        CommandParameter="{Binding}"
+                                        Width="80"
+                                        Content="{DynamicResource MainWindow.ShowWall}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="{DynamicResource IdColumn}"
                                     DisplayMemberBinding="{Binding Path=Id}" />
                     <GridViewColumn Header="{DynamicResource NameColumn}"

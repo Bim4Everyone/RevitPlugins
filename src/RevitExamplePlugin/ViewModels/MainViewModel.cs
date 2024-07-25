@@ -40,11 +40,15 @@ namespace RevitExamplePlugin.ViewModels {
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             SelectLocationCommand = RelayCommand.Create<Window>(SelectLocation);
+            ShowWallCommand = RelayCommand.Create<WallViewModel>(ShowWall, CanShowWall);
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand SelectLocationCommand { get; set; }
+        public ICommand ShowWallCommand { get; set; }
+
+
 
         public string ErrorText {
             get => _errorText;
@@ -157,6 +161,14 @@ namespace RevitExamplePlugin.ViewModels {
             setting.WallTypeId = WallType.Id;
 
             _pluginConfig.SaveProjectConfig();
+        }
+
+        private void ShowWall(WallViewModel wallViewModel) {
+            _wallRevitRepository.ActiveUIDocument.Selection.SetElementIds(new ElementId[] { wallViewModel.Id });
+        }
+
+        private bool CanShowWall(WallViewModel wallViewModel) {
+            return wallViewModel != null;
         }
     }
 }

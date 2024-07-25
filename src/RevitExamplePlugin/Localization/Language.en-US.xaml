@@ -6,6 +6,7 @@
     
     <system:String x:Key="MainWindow.Title">Sample command</system:String>
     <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
+    <system:String x:Key="MainWindow.ShowWall">Show</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
     <system:String x:Key="MainWindow.HeightCheck">Height can't be negative</system:String>
     <system:String x:Key="MainWindow.CustomLocationCheck">Please select points</system:String>
