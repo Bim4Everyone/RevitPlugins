@@ -29,7 +29,7 @@ namespace RevitExamplePlugin.Models {
         }
 
         public IEnumerable<WallType> GetWallTypes() {
-            return new FilteredElementCollector(Document, Document.ActiveView.Id)
+            return new FilteredElementCollector(Document)
                 .OfClass(typeof(WallType))
                 .WhereElementIsElementType()
                 .OfType<WallType>();
