@@ -41,6 +41,13 @@ namespace RevitExamplePlugin.Models {
                 curve, wallType.Id, GetLevel().Id, height, 0, false, false);
         }
 
+        /// <summary>
+        /// Возвращает True, если активный вид - план, иначе False
+        /// </summary>
+        public bool ActiveViewIsPlan() {
+            return Document.ActiveView as ViewPlan != null;
+        }
+
         private Level GetLevel() {
             return Document.ActiveView.GenLevel;
         }
