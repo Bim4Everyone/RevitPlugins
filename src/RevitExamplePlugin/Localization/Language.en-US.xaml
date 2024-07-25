@@ -17,4 +17,5 @@
     <system:String x:Key="SelectPoints">Select points</system:String>
     <system:String x:Key="IdColumn">Id</system:String>
     <system:String x:Key="NameColumn">Name</system:String>
+    <system:String x:Key="HeightLabel">Wall height in feet:</system:String>
 </ResourceDictionary>

@@ -17,4 +17,5 @@
     <system:String x:Key="SelectPoints">Выберите точки</system:String>
     <system:String x:Key="IdColumn">Id</system:String>
     <system:String x:Key="NameColumn">Название</system:String>
+    <system:String x:Key="HeightLabel">Высота стены в футах:</system:String>
 </ResourceDictionary>
