@@ -147,7 +147,10 @@ namespace RevitFinishingWalls.Models {
             notJoinedElements = new List<ElementId>();
             foreach(Element item in wallCreationData.ElementsForJoin) {
                 try {
-                    JoinGeometryUtils.JoinGeometry(Document, wall, item);
+                    if(!(item is RevitLinkInstance)) {
+                        // нельзя соединить элементы из связей
+                        JoinGeometryUtils.JoinGeometry(Document, wall, item);
+                    }
                 } catch(Autodesk.Revit.Exceptions.ArgumentException) {
                     notJoinedElements.Add(item.Id);
                 }
