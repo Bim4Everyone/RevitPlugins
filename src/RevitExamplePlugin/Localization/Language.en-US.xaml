@@ -19,4 +19,7 @@
     <system:String x:Key="IdColumn">Id</system:String>
     <system:String x:Key="NameColumn">Name</system:String>
     <system:String x:Key="HeightLabel">Wall height in feet:</system:String>
+    
+    <system:String x:Key="TaskDialog.ActiveViewTitle">Error</system:String>
+    <system:String x:Key="TaskDialog.ActiveViewUserPromt">Active view must be a view plan</system:String>
 </ResourceDictionary>

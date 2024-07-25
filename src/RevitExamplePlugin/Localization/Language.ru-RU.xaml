@@ -19,4 +19,7 @@
     <system:String x:Key="IdColumn">Id</system:String>
     <system:String x:Key="NameColumn">Название</system:String>
     <system:String x:Key="HeightLabel">Высота стены в футах:</system:String>
+    
+    <system:String x:Key="TaskDialog.ActiveViewTitle">Ошибка</system:String>
+    <system:String x:Key="TaskDialog.ActiveViewUserPromt">Активный вид должен быть планом</system:String>
 </ResourceDictionary>

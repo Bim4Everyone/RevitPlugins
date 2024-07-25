@@ -144,6 +144,14 @@ namespace RevitExamplePlugin.ViewModels {
                 view.ShowDialog();
             }
         }
+        
+        private void ShowWall(WallViewModel wallViewModel) {
+            _wallRevitRepository.ShowElements(wallViewModel.Wall);
+        }
+        
+        private bool CanShowWall(WallViewModel wallViewModel) {
+            return wallViewModel != null;
+        }
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_wallRevitRepository.Document);
@@ -161,14 +169,6 @@ namespace RevitExamplePlugin.ViewModels {
             setting.WallTypeId = WallType.Id;
 
             _pluginConfig.SaveProjectConfig();
-        }
-
-        private void ShowWall(WallViewModel wallViewModel) {
-            _wallRevitRepository.ActiveUIDocument.Selection.SetElementIds(new ElementId[] { wallViewModel.Id });
-        }
-
-        private bool CanShowWall(WallViewModel wallViewModel) {
-            return wallViewModel != null;
         }
     }
 }

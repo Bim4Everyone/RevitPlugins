@@ -21,6 +21,15 @@ namespace RevitExamplePlugin.Models {
             return ActiveUIDocument.Selection.PickPoint(statusPrompt);
         }
 
+        public void ShowElements(params Element[] elements) {
+            ElementId[] elementIds = elements
+                .Select(item => item.Id)
+                .ToArray();
+            
+            ActiveUIDocument.ShowElements(elementIds);
+            ActiveUIDocument.Selection.SetElementIds(elementIds);
+        }
+
         public IEnumerable<Wall> GetWalls() {
             return new FilteredElementCollector(Document, Document.ActiveView.Id)
                 .OfClass(typeof(Wall))
@@ -40,12 +49,9 @@ namespace RevitExamplePlugin.Models {
             return Wall.Create(Document,
                 curve, wallType.Id, GetLevel().Id, height, 0, false, false);
         }
-
-        /// <summary>
-        /// Возвращает True, если активный вид - план, иначе False
-        /// </summary>
+        
         public bool ActiveViewIsPlan() {
-            return Document.ActiveView as ViewPlan != null;
+            return Document.ActiveView is ViewPlan;
         }
 
         private Level GetLevel() {

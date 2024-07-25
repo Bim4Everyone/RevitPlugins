@@ -23,7 +23,7 @@ namespace RevitExamplePlugin {
     [Transaction(TransactionMode.Manual)]
     public class RevitExamplePluginCommand : BasePluginCommand {
         public RevitExamplePluginCommand() {
-            PluginName = "RevitExamplePlugin";
+            PluginName = "C# Button";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -47,18 +47,19 @@ namespace RevitExamplePlugin {
                 kernel.UseXtraLocalization(
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
-
-                var repo = kernel.Get<WallRevitRepository>();
-                CheckViews(repo);
+                
+                CheckViews(kernel);
                 Notification(kernel.Get<MainWindow>());
             }
         }
 
-        private void CheckViews(WallRevitRepository revitRepository) {
-            if(!revitRepository.ActiveViewIsPlan()) {
+        private void CheckViews(IKernel kernel) {
+            var wallRepository = kernel.Get<WallRevitRepository>();
+            var localizationService = kernel.Get<ILocalizationService>();
+            if(!wallRepository.ActiveViewIsPlan()) {
                 TaskDialog.Show(
-                    "Ошибка",
-                    "Активный вид должен быть планом",
+                    localizationService.GetLocalizedString("TaskDialog.ActiveViewTitle"),
+                    localizationService.GetLocalizedString("TaskDialog.ActiveViewUserPromt"),
                     TaskDialogCommonButtons.Ok,
                     TaskDialogResult.Ok);
                 throw new OperationCanceledException();
