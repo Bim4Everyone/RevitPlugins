@@ -126,8 +126,9 @@ namespace RevitFinishingWalls.ViewModels {
         private void AcceptView() {
             SaveConfig();
             ICollection<RoomErrorsViewModel> errors;
+            RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
             using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
-                var rooms = _revitRepository.GetRooms(_pluginConfig.RoomGetterMode);
+                var rooms = _revitRepository.GetRooms(settings.RoomGetterMode);
                 progressDialogService.StepValue = 5;
                 progressDialogService.DisplayTitleFormat = "Обработка квартир... [{0}]\\[{1}]";
                 var progress = progressDialogService.CreateProgress();
@@ -135,7 +136,7 @@ namespace RevitFinishingWalls.ViewModels {
                 var ct = progressDialogService.CreateCancellationToken();
                 progressDialogService.Show();
 
-                errors = _roomFinisher.CreateWallsFinishing(rooms, _pluginConfig, progress, ct);
+                errors = _roomFinisher.CreateWallsFinishing(rooms, settings, progress, ct);
             }
             if(errors.Count > 0) {
                 var errorMsgService = ServicesProvider.GetPlatformService<RichErrorMessageService>();
@@ -195,23 +196,27 @@ namespace RevitFinishingWalls.ViewModels {
         }
 
         private void LoadConfig() {
-            SelectedRoomGetterMode = _pluginConfig.RoomGetterMode;
-            SelectedWallElevationMode = _pluginConfig.WallElevationMode;
-            WallElevationByUser = _pluginConfig.WallElevationMm.ToString();
-            WallBaseOffset = _pluginConfig.WallBaseOffsetMm.ToString();
-            WallSideOffset = _pluginConfig.WallSideOffsetMm.ToString();
-            SelectedWallType = WallTypes.FirstOrDefault(wtvm => wtvm.WallTypeId == _pluginConfig.WallTypeId);
+            RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
+                ?? _pluginConfig.AddSettings(_revitRepository.Document);
+            SelectedRoomGetterMode = settings.RoomGetterMode;
+            SelectedWallElevationMode = settings.WallElevationMode;
+            WallElevationByUser = settings.WallElevationMm.ToString();
+            WallBaseOffset = settings.WallBaseOffsetMm.ToString();
+            WallSideOffset = settings.WallSideOffsetMm.ToString();
+            SelectedWallType = WallTypes.FirstOrDefault(wtvm => wtvm.WallTypeId == settings.WallTypeId);
 
             OnPropertyChanged(nameof(ErrorText));
         }
 
         private void SaveConfig() {
-            _pluginConfig.RoomGetterMode = SelectedRoomGetterMode;
-            _pluginConfig.WallElevationMode = SelectedWallElevationMode;
-            _pluginConfig.WallBaseOffsetMm = double.TryParse(WallBaseOffset, out double baseOffset) ? baseOffset : 0;
-            _pluginConfig.WallSideOffsetMm = double.TryParse(WallSideOffset, out double sideOffset) ? sideOffset : 0;
-            _pluginConfig.WallElevationMm = double.TryParse(WallElevationByUser, out double height) ? height : 0;
-            _pluginConfig.WallTypeId = SelectedWallType.WallTypeId;
+            RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
+                ?? _pluginConfig.AddSettings(_revitRepository.Document);
+            settings.RoomGetterMode = SelectedRoomGetterMode;
+            settings.WallElevationMode = SelectedWallElevationMode;
+            settings.WallBaseOffsetMm = double.TryParse(WallBaseOffset, out double baseOffset) ? baseOffset : 0;
+            settings.WallSideOffsetMm = double.TryParse(WallSideOffset, out double sideOffset) ? sideOffset : 0;
+            settings.WallElevationMm = double.TryParse(WallElevationByUser, out double height) ? height : 0;
+            settings.WallTypeId = SelectedWallType.WallTypeId;
             _pluginConfig.SaveProjectConfig();
         }
     }

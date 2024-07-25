@@ -32,12 +32,12 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
 
         public ICollection<RoomErrorsViewModel> CreateWallsFinishing(
             ICollection<Room> rooms,
-            PluginConfig config,
+            RevitSettings settings,
             IProgress<int> progress = null,
             CancellationToken ct = default) {
 
             if(rooms is null) { throw new ArgumentNullException(nameof(rooms)); }
-            if(config is null) { throw new ArgumentNullException(nameof(config)); }
+            if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
             List<RoomErrorsViewModel> errors = new List<RoomErrorsViewModel>();
 
             using(var transaction = _revitRepository.Document.StartTransaction("Создание отделочных стен")) {
@@ -51,7 +51,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                     RoomErrorsViewModel roomErrors = new RoomErrorsViewModel(room);
                     IList<WallCreationData> datas;
                     try {
-                        datas = _wallCreationDataProvider.GetWallCreationData(room, config);
+                        datas = _wallCreationDataProvider.GetWallCreationData(room, settings);
                     } catch(CannotCreateWallException ex) {
                         roomErrors.Errors.Add(
                             new ErrorViewModel("Ошибки обработки контура помещения", ex.Message, room.Id));

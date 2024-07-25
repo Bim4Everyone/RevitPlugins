@@ -21,24 +21,24 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
         /// Возвращает список объектов с данными для создания отделочных стен
         /// </summary>
         /// <param name="room">Помещение для обработки</param>
-        /// <param name="config">Настройки создания отделочных стен</param>
+        /// <param name="settings">Настройки создания отделочных стен</param>
         /// <exception cref="ArgumentNullException">Исключение, если один из обязательных параметров null</exception>
         /// <exception cref="CannotCreateWallException">Исключение, 
         /// если не удалось получить данные для построения отделочных стен в помещении</exception>
-        public IList<WallCreationData> GetWallCreationData(Room room, PluginConfig config) {
+        public IList<WallCreationData> GetWallCreationData(Room room, RevitSettings settings) {
             if(room is null) { throw new ArgumentNullException(nameof(room)); }
-            if(config is null) { throw new ArgumentNullException(nameof(config)); }
+            if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
 
             List<WallCreationData> wallCreationData = new List<WallCreationData>();
             WallCreationData lastWallCreationData = null;
-            double wallHeight = CalculateFinishingWallHeight(room, config);
-            double wallBaseOffset = _revitRepository.ConvertMmToFeet(config.WallBaseOffsetMm);
-            double wallSideOffset = _revitRepository.ConvertMmToFeet(config.WallSideOffsetMm);
+            double wallHeight = CalculateFinishingWallHeight(room, settings);
+            double wallBaseOffset = _revitRepository.ConvertMmToFeet(settings.WallBaseOffsetMm);
+            double wallSideOffset = _revitRepository.ConvertMmToFeet(settings.WallSideOffsetMm);
 
             foreach(IList<BoundarySegment> loop in _revitRepository.GetBoundarySegments(room)) {
                 try {
                     IList<CurveSegmentElement> segments
-                        = _revitRepository.GetCurveSegmentsElements(loop, config.WallTypeId, -wallSideOffset);
+                        = _revitRepository.GetCurveSegmentsElements(loop, settings.WallTypeId, -wallSideOffset);
                     IList<CurveSegmentElement> curveSegmentsElements = ReorderFromCorner(segments);
                     for(int i = 0; i < curveSegmentsElements.Count; i++) {
                         CurveSegmentElement curveSegmentElement = curveSegmentsElements[i];
@@ -53,7 +53,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                                 Curve = curveSegmentElement.Curve,
                                 LevelId = room.LevelId,
                                 Height = wallHeight,
-                                WallTypeId = config.WallTypeId,
+                                WallTypeId = settings.WallTypeId,
                                 BaseOffset = wallBaseOffset
                             };
                             lastWallCreationData.AddRangeElementsForJoin(curveSegmentElement.Elements);
@@ -96,19 +96,18 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
         /// <summary>
         /// Вычисляет высоту стены, чтобы ее верхняя отметка от уровня была в соответствии с настройками
         /// </summary>
-        /// <param name="room"></param>
-        /// <param name="config"></param>
-        /// <returns></returns>
+        /// <param name="room">Помещение</param>
+        /// <param name="settings">Настройки расстановки отделочных стен</param>
         /// <exception cref="ArgumentNullException"></exception>
-        private double CalculateFinishingWallHeight(Room room, PluginConfig config) {
+        private double CalculateFinishingWallHeight(Room room, RevitSettings settings) {
             if(room is null) { throw new ArgumentNullException(nameof(room)); }
-            if(config is null) { throw new ArgumentNullException(nameof(config)); }
+            if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
 
-            if(config.WallElevationMode == WallElevationMode.ManualHeight) {
-                return _revitRepository.ConvertMmToFeet(config.WallElevationMm - config.WallBaseOffsetMm);
+            if(settings.WallElevationMode == WallElevationMode.ManualHeight) {
+                return _revitRepository.ConvertMmToFeet(settings.WallElevationMm - settings.WallBaseOffsetMm);
             } else {
                 double roomTopElevation = _revitRepository.GetRoomTopElevation(room);
-                double roomBaseOffset = _revitRepository.ConvertMmToFeet(config.WallBaseOffsetMm);
+                double roomBaseOffset = _revitRepository.ConvertMmToFeet(settings.WallBaseOffsetMm);
                 return roomTopElevation - roomBaseOffset;
             }
         }
