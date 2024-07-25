@@ -1,5 +1,11 @@
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -9,67 +15,147 @@ using RevitExamplePlugin.Models;
 namespace RevitExamplePlugin.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
-        private readonly RevitRepository _revitRepository;
+        private readonly WallRevitRepository _wallRevitRepository;
         private readonly ILocalizationService _localizationService;
 
         private string _errorText;
-        private string _saveProperty;
+        
+        private double _height;
+        private CustomLocation _customLocation;
+        
+        private ObservableCollection<WallViewModel> _walls;
+        
+        private WallTypeViewModel _wallType;
+        private ObservableCollection<WallTypeViewModel> _wallTypes;
 
         public MainViewModel(
             PluginConfig pluginConfig, 
-            RevitRepository revitRepository, 
+            WallRevitRepository wallRevitRepository, 
             ILocalizationService localizationService) {
             
             _pluginConfig = pluginConfig;
-            _revitRepository = revitRepository;
+            _wallRevitRepository = wallRevitRepository;
             _localizationService = localizationService;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+            SelectLocationCommand = RelayCommand.Create<Window>(SelectLocation);
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
+        public ICommand SelectLocationCommand { get; set; }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
+        
+        public double Height {
+            get => _height;
+            set => this.RaiseAndSetIfChanged(ref _height, value);
+        }
+        
+        public CustomLocation CustomLocation {
+            get => _customLocation;
+            set => this.RaiseAndSetIfChanged(ref _customLocation, value);
+        }
 
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
+        public ObservableCollection<WallViewModel> Walls {
+            get => _walls;
+            set => this.RaiseAndSetIfChanged(ref _walls, value);
+        }
+
+        public WallTypeViewModel WallType {
+            get => _wallType;
+            set => this.RaiseAndSetIfChanged(ref _wallType, value);
+        }
+
+        public ObservableCollection<WallTypeViewModel> WallTypes {
+            get => _wallTypes;
+            set => this.RaiseAndSetIfChanged(ref _wallTypes, value);
         }
 
         private void LoadView() {
+            Walls = new ObservableCollection<WallViewModel>(
+                _wallRevitRepository.GetWalls()
+                    .Select(item => new WallViewModel(item)));
+
+            WallTypes = new ObservableCollection<WallTypeViewModel>(
+                _wallRevitRepository.GetWallTypes()
+                    .Select(item => new WallTypeViewModel(item)));
+            
             LoadConfig();
         }
 
         private void AcceptView() {
             SaveConfig();
+
+            using(Transaction transaction = _wallRevitRepository.Document.StartTransaction("Create wall")) {
+                Wall wall = _wallRevitRepository.CreateWall(CustomLocation, WallType.WallType, Height);
+                Walls.Add(new WallViewModel(wall));
+
+                transaction.Commit();
+            }
         }
-        
+
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText =  _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+            if(Height < 0) {
+                ErrorText = "Height can't be negative";
                 return false;
             }
-
+            
+            if(CustomLocation == null) {
+                ErrorText = "Please select points";
+                return false;
+            }
+            
+            if(WallType == null) {
+                ErrorText = "Please select wall type";
+                return false;
+            }
+            
             ErrorText = null;
             return true;
         }
+        
+        private void SelectLocation(Window view) {
+            view.Hide();
+            try {
+                XYZ start = null;
+                XYZ finish = null;
+
+                while(start == null || finish == null) {
+                    if(start == null) {
+                        start = _wallRevitRepository.PickPoint("Please select start point");
+                    }
+
+                    if(finish == null) {
+                        finish = _wallRevitRepository.PickPoint("Please select finish point");
+                    }
+
+                    CustomLocation = new CustomLocation(start, finish);
+                }
+            } finally {
+                view.ShowDialog();
+            }
+        }
 
         private void LoadConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+            RevitSettings setting = _pluginConfig.GetSettings(_wallRevitRepository.Document);
 
-            SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+            Height = setting?.Height ?? 20;
+            WallType = WallTypes.FirstOrDefault(item => item.Id == setting?.WallTypeId)
+                       ?? WallTypes.FirstOrDefault();
         }
 
         private void SaveConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                    ?? _pluginConfig.AddSettings(_revitRepository.Document);
+            RevitSettings setting = _pluginConfig.GetSettings(_wallRevitRepository.Document)
+                                    ?? _pluginConfig.AddSettings(_wallRevitRepository.Document);
 
-            setting.SaveProperty = SaveProperty;
+            setting.Height = Height;
+            setting.WallTypeId = WallType.Id;
+
             _pluginConfig.SaveProjectConfig();
         }
     }

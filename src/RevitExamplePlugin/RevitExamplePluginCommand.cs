@@ -34,7 +34,7 @@ namespace RevitExamplePlugin {
 
         protected override void Execute(UIApplication uiApplication) {
 			using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
+                kernel.Bind<WallRevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
 					

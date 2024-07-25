@@ -1,3 +1,5 @@
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -22,6 +24,8 @@ namespace RevitExamplePlugin.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public string SaveProperty { get; set; }
+        
+        public double Height { get; set; }
+        public ElementId WallTypeId { get; set; }
     }
 }
