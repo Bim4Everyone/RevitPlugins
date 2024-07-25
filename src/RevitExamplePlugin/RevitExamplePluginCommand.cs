@@ -56,12 +56,14 @@ namespace RevitExamplePlugin {
         private void CheckViews(IKernel kernel) {
             var wallRepository = kernel.Get<WallRevitRepository>();
             var localizationService = kernel.Get<ILocalizationService>();
+            
             if(!wallRepository.ActiveViewIsPlan()) {
-                TaskDialog.Show(
-                    localizationService.GetLocalizedString("TaskDialog.ActiveViewTitle"),
+                var messageBoxService = kernel.Get<IMessageBoxService>();
+                messageBoxService.Show(
                     localizationService.GetLocalizedString("TaskDialog.ActiveViewUserPromt"),
-                    TaskDialogCommonButtons.Ok,
-                    TaskDialogResult.Ok);
+                    localizationService.GetLocalizedString("TaskDialog.ActiveViewTitle"),
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Error);
                 throw new OperationCanceledException();
             }
         }
