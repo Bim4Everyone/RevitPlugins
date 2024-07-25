@@ -1,7 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitExamplePlugin.Models
-{
+namespace RevitExamplePlugin.Models {
     internal class CustomLocation {
         public CustomLocation(XYZ start, XYZ finish) {
             Start = start;
@@ -10,5 +9,10 @@ namespace RevitExamplePlugin.Models
 
         public XYZ Start { get; }
         public XYZ Finish { get; }
+
+
+        public override string ToString() {
+            return $"Start: ({Start.X}; {Start.Y}; {Start.Z}); Finish: ({Finish.X}; {Finish.Y}; {Finish.Z})";
+        }
     }
 }
