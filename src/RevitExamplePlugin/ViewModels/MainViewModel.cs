@@ -19,20 +19,20 @@ namespace RevitExamplePlugin.ViewModels {
         private readonly ILocalizationService _localizationService;
 
         private string _errorText;
-        
+
         private double _height;
         private CustomLocation _customLocation;
-        
+
         private ObservableCollection<WallViewModel> _walls;
-        
+
         private WallTypeViewModel _wallType;
         private ObservableCollection<WallTypeViewModel> _wallTypes;
 
         public MainViewModel(
-            PluginConfig pluginConfig, 
-            WallRevitRepository wallRevitRepository, 
+            PluginConfig pluginConfig,
+            WallRevitRepository wallRevitRepository,
             ILocalizationService localizationService) {
-            
+
             _pluginConfig = pluginConfig;
             _wallRevitRepository = wallRevitRepository;
             _localizationService = localizationService;
@@ -50,12 +50,12 @@ namespace RevitExamplePlugin.ViewModels {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
-        
+
         public double Height {
             get => _height;
             set => this.RaiseAndSetIfChanged(ref _height, value);
         }
-        
+
         public CustomLocation CustomLocation {
             get => _customLocation;
             set => this.RaiseAndSetIfChanged(ref _customLocation, value);
@@ -84,7 +84,7 @@ namespace RevitExamplePlugin.ViewModels {
             WallTypes = new ObservableCollection<WallTypeViewModel>(
                 _wallRevitRepository.GetWallTypes()
                     .Select(item => new WallTypeViewModel(item)));
-            
+
             LoadConfig();
         }
 
@@ -101,24 +101,24 @@ namespace RevitExamplePlugin.ViewModels {
 
         private bool CanAcceptView() {
             if(Height < 0) {
-                ErrorText = "Height can't be negative";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.HeightCheck");
                 return false;
             }
-            
+
             if(CustomLocation == null) {
-                ErrorText = "Please select points";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.CustomLocationCheck");
                 return false;
             }
-            
+
             if(WallType == null) {
-                ErrorText = "Please select wall type";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.WallTypeCheck");
                 return false;
             }
-            
+
             ErrorText = null;
             return true;
         }
-        
+
         private void SelectLocation(Window view) {
             view.Hide();
             try {

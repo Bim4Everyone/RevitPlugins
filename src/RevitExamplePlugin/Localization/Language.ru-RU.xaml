@@ -7,7 +7,14 @@
     <system:String x:Key="MainWindow.Title">Пример команды</system:String>
     <system:String x:Key="MainWindow.Hello">Привет Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+    <system:String x:Key="MainWindow.HeightCheck">Высота не может быть отрицательной</system:String>
+    <system:String x:Key="MainWindow.CustomLocationCheck">Выберите точки</system:String>
+    <system:String x:Key="MainWindow.WallTypeCheck">Выберите тип стены</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="SelectPoints">Выберите точки</system:String>
+    <system:String x:Key="IdColumn">Id</system:String>
+    <system:String x:Key="NameColumn">Название</system:String>
 </ResourceDictionary>
