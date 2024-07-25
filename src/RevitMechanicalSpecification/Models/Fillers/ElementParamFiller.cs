@@ -12,40 +12,59 @@ using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     public abstract class ElementParamFiller : IElementParamFiller {
-        protected string ToParamName { get { return _toParamName; } }
-        protected string FromParamName { get { return _fromParamName; } }
 
         protected SpecConfiguration Config { get { return _config; } }
 
-        private readonly string _toParamName;
-        private readonly string _fromParamName;
+        protected Parameter ToParam;
+        protected Parameter FromParam;
+
+        protected readonly string ToParamName;
+        protected readonly string FromParamName;
+        protected readonly Document Document;
         private readonly SpecConfiguration _config;
 
-        public ElementParamFiller(string toParamName, string fromParamName, SpecConfiguration specConfiguration) {
-            _toParamName = toParamName;
-            _fromParamName = fromParamName;
+        public ElementParamFiller(string toParamName, string fromParamName, SpecConfiguration specConfiguration, Document document) {
+            ToParamName = toParamName;
+            FromParamName = fromParamName;
             _config = specConfiguration;
-        }
-
-        protected ElementParamFiller(string toParamName, string fromParamName) {
-            _toParamName = toParamName;
-            _fromParamName = fromParamName;
+            Document = document;
         }
 
         public abstract void SetParamValue(Element element);
+
         protected string GetTypeOrInstanceParamValue(Element element) {
-            if(element.IsExistsParam(_fromParamName)) { return element.GetSharedParamValueOrDefault(_fromParamName, ""); }
-            if(element.GetElementType().IsExistsParam(_fromParamName)) { return element.GetElementType().GetSharedParamValueOrDefault(_fromParamName, ""); }
+            if(element.IsExistsParam(FromParamName)) 
+                { return element.GetSharedParamValue<string>(FromParamName); }
+            Element elemType = element.GetElementType();
+            if(elemType.IsExistsParam(FromParamName)) 
+                { return elemType.GetSharedParamValue<string>(FromParamName); }
             return null;
         }
+
         private bool IsTypeOrInstanceExists(Element element, string paramName) {
-            if(paramName == "Skip") { return true; }
-            if(element.IsExistsParam(paramName)) { return true; }
-            if(element.GetElementType().IsExistsParam(paramName)) { return true; }
+            if(paramName is null) 
+                { return true; }
+            if(element.IsExistsParam(paramName)) 
+                { return true; }
+            if(element.GetElementType().IsExistsParam(paramName)) 
+                { return true; }
             return false;
         }
         public void Fill(Element element) {
-            if(!IsTypeOrInstanceExists(element, FromParamName) || !element.IsExistsParam(ToParamName)) { return; } 
+
+            if(!IsTypeOrInstanceExists(element, FromParamName) || !element.IsExistsParam(ToParamName)) 
+                { return; }
+
+            
+
+            ToParam = element.GetParam(ToParamName);
+            if(!(FromParamName is null)) {
+                FromParam = element.GetParam(FromParamName);
+            }
+
+            if(ToParam.IsReadOnly) 
+                { return; }
+
             this.SetParamValue(element);
         }
     }

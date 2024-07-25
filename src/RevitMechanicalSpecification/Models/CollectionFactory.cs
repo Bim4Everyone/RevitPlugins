@@ -10,19 +10,18 @@ using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models {
 
-    internal class DefaultCollector {
+    internal class CollectionFactory {
 
         private readonly Document _document;
 
-        public DefaultCollector(Document doc) 
+        public CollectionFactory(Document doc) 
             {
             _document = doc;
             }
 
-        public List<Element> GetDefElementColls() {
+        public List<Element> GetMechanicalElements() {
 
-            List<Element> defColls = new List<Element>();
-            List<BuiltInCategory> allCategories = new List<BuiltInCategory>()
+            List<BuiltInCategory> mechanicalCategories = new List<BuiltInCategory>()
             {
                 BuiltInCategory.OST_DuctFitting,
                 BuiltInCategory.OST_PipeFitting,
@@ -39,51 +38,58 @@ namespace RevitMechanicalSpecification.Models {
                 BuiltInCategory.OST_PlumbingFixtures,
                 BuiltInCategory.OST_Sprinklers,
                 BuiltInCategory.OST_GenericModel
+                
             };
-
-            foreach(BuiltInCategory category in allCategories) {
-                defColls.AddRange(MakeColl(category));
-            }
-
-            return defColls;
+            return GetElements(mechanicalCategories);
+            
         }
 
-        public List<MechanicalSystem> GetDefSystemColl() 
+
+
+
+        public List<MechanicalSystem> GetMechanicalSystemColl() 
         {
             List<Element> elements = new List<Element>();
             List<MechanicalSystem> mechanicalSystems = new List<MechanicalSystem>();
 
-            elements.AddRange(MakeColl(BuiltInCategory.OST_PipingSystem));
-            elements.AddRange(MakeColl(BuiltInCategory.OST_DuctSystem));
-
-            foreach(Element element in elements) 
-            {
-                MechanicalSystem mechanicalSystem = new MechanicalSystem {
+            elements.AddRange(GetElements(BuiltInCategory.OST_PipingSystem));
+            elements.AddRange(GetElements(BuiltInCategory.OST_DuctSystem));
+            elements.Select(element => {
+                var elementType = element.GetElementType();
+                return new MechanicalSystem {
                     SystemElement = element as MEPSystem,
                     SystemName = element.Name,
-                    SystemFunction = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_ЭФ для системы"),
-                    SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_Сокращение для системы")
+                    SystemFunction = elementType.GetSharedParamValueOrDefault<string>("ФОП_ВИС_ЭФ для системы"),
+                    SystemShortName = elementType.GetSharedParamValueOrDefault<string>("ФОП_ВИС_Сокращение для системы")
                 };
-
-                mechanicalSystems.Add(mechanicalSystem);
-            }
-
+            });
             return mechanicalSystems;
         }
 
+
         private bool LogicalFilter(Element element) {
 
-            if(element.Category.IsId(BuiltInCategory.OST_GenericModel) && element.GetType().Name == "ModelText") {
+            if(element is ModelText) {
                 return false;
             }
-            if(element.GroupId.ToString() == "-1") {
+
+            if(element.GroupId.IsNull()) {
                 return true;
             }
             return false;
         }
 
-        
-        private List<Element> MakeColl(BuiltInCategory category) {
+        private List<Element> GetElements(List<BuiltInCategory> builtInCategories) 
+            {
+            ElementMulticategoryFilter filter = new ElementMulticategoryFilter(builtInCategories);
+            List<Element> elements = (List<Element>) new FilteredElementCollector(_document)
+                .WherePasses(filter)
+                .WhereElementIsNotElementType()
+                .ToElements();
+            return elements.Where(e => LogicalFilter(e)).ToList();
+        }
+
+        private List<Element> GetElements(BuiltInCategory category) {
             List<Element> defColl = (List<Element>) new FilteredElementCollector(_document)
                 .OfCategory(category)
                 .WhereElementIsNotElementType()

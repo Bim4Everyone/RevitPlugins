@@ -11,8 +11,8 @@ using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models {
     public class SpecConfiguration {
-        private readonly Document _document;
 
+        //константы сделать константами
         private readonly string _paramNameName;
         private readonly string _paramNameMark;
         private readonly string _paramNameCode;
@@ -22,8 +22,6 @@ namespace RevitMechanicalSpecification.Models {
         private readonly double _ductAndPipeStock;
         private readonly bool _isSpecifyDuctFittings;
         private readonly bool _isSpecifyPipeFittings;
-
-        public Document Document { get { return _document; } }
         public string OriginalParamNameName { get { return _paramNameName; } }
         public string OriginalParamNameMark { get { return _paramNameMark; } }
         public string OriginalParamNameCode { get { return _paramNameCode; } }
@@ -73,9 +71,7 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string SquareUnit = "м²";
 
 
-        public SpecConfiguration(Document document) {
-            _document = document;
-            ProjectInfo info = document.ProjectInformation;
+        public SpecConfiguration(ProjectInfo info) {
             _paramNameName = info.GetParamValueOrDefault(_changedNameName, "ADSK_Наименование");
             _paramNameMark = info.GetParamValueOrDefault(_changedNameMark, "ADSK_Марка");
             _paramNameCode = info.GetParamValueOrDefault(_changedNameCode, "ADSK_Код изделия");

@@ -13,59 +13,66 @@ using RevitMechanicalSpecification.Models.Classes;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNumberFiller : ElementParamFiller {
-        private readonly Document _document;
 
         public ElementParamNumberFiller(string toParamName, 
             string fromParamName, 
             SpecConfiguration specConfiguration,
-            Document document) : base(toParamName, fromParamName, specConfiguration) 
+            Document document) : 
+            base(toParamName, fromParamName, specConfiguration, document) 
             {
-            _document = document;
         }
 
         private bool LinearLogicalFilter(Element element) 
             {
-            if(element.Category.IsId(BuiltInCategory.OST_DuctCurves) ||
-                        element.Category.IsId(BuiltInCategory.OST_FlexDuctCurves) ||
-                        element.Category.IsId(BuiltInCategory.OST_PipeCurves) ||
-                        element.Category.IsId(BuiltInCategory.OST_FlexPipeCurves) ||
-                        element.Category.IsId(BuiltInCategory.OST_DuctInsulations) ||
-                        element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) { return true; }
-            return false;
+            return element.InAnyCategory(new List<BuiltInCategory>() { BuiltInCategory.OST_DuctCurves,
+                        BuiltInCategory.OST_FlexDuctCurves,
+                        BuiltInCategory.OST_PipeCurves,
+                        BuiltInCategory.OST_FlexPipeCurves,
+                        BuiltInCategory.OST_DuctInsulations,
+                        BuiltInCategory.OST_PipeInsulations  });
             }
 
         private double GetNumber(Element element) {
+            //написать зачем нужно
+
+
             double number = 0;
             string unit;
-            DuctElementsCalculator calculator = new DuctElementsCalculator(Config);
-            UnitConverter converter = new UnitConverter();
+            try {
+                DuctElementsCalculator calculator = new DuctElementsCalculator(Config, Document);
+                UnitConverter converter = new UnitConverter();
 
-            unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);
+                unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);
+                //расписать почему что возвращается
+                if(unit == Config.SingleUnit || unit == Config.KitUnit) { return 1; }
+                if(unit == Config.SquareUnit) {
+                    if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
+                        InsulationLiningBase insulation = element as InsulationLiningBase;
+                        Element host = Document.GetElement(insulation.HostElementId);
+                        return calculator.GetFittingArea(host);
 
-            if(unit == Config.SingleUnit || unit == Config.KitUnit) { return 1; }
-            if(unit == Config.SquareUnit) {
-                if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) 
-                    { 
-                    InsulationLiningBase insulation =  element as InsulationLiningBase;
-                    Element host = _document.GetElement(insulation.HostElementId);
-                    return calculator.GetFittingArea(host);
-                    
-                        }
-                if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) { return calculator.GetFittingArea(element); }
-                if(LinearLogicalFilter(element)) 
-                    { return converter.DoubleToSquareMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA, 0)); }
-            }
-            if(unit == Config.MeterUnit) {
-                if(LinearLogicalFilter(element)) 
-                    {
-                    return converter.DoubleToMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH, 0)); }
-            }
+                    }
+                    if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) { return calculator.GetFittingArea(element); }
+                    if(LinearLogicalFilter(element)) { return converter.DoubleToSquareMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA)); }
+                }
+                if(unit == Config.MeterUnit) {
+                    if(LinearLogicalFilter(element)) {
+                        return converter.DoubleToMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH));
+                    }
+                }
+            } 
+            catch { MessageBox.Show(element.Id.ToString()); }
+            
             return number;
         }
 
 
         public override void SetParamValue(Element element) {
-            if(!element.GetSharedParam(ToParamName).IsReadOnly) { element.GetSharedParam(ToParamName).Set(GetNumber(element)); }
+            if(element.IsExistsParam(Config.TargetNameUnit)) 
+                {
+                ToParam.Set(GetNumber(element));
+            }
+            
         }
     }
 }

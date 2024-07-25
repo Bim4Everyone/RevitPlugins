@@ -34,8 +34,7 @@ namespace RevitMechanicalSpecification {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            RevitRepository revitRepository = new RevitRepository(uiApplication);
-            revitRepository.ExecuteSpecificationRefresh();
+            new RevitRepository(uiApplication).ExecuteSpecificationRefresh();
         
         }
     }

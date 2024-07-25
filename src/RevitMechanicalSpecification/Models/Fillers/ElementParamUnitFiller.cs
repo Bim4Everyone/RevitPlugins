@@ -34,6 +34,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
             if(unit == null) { return defaultUnit; }
 
+            //Заменить на хэшсет все листы
             if(_linearNames.Contains(unit)) { return Config.MeterUnit; }
             if(_squareNames.Contains(unit)) { return Config.SquareUnit; }
             if(_singleNames.Contains(unit)) { return Config.SingleUnit; }
@@ -42,28 +43,37 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         public string GetUnit(Element element) {
-            if(element.Category.IsId(BuiltInCategory.OST_DuctCurves)
-                || element.Category.IsId(BuiltInCategory.OST_PipeCurves)
-                || element.Category.IsId(BuiltInCategory.OST_FlexDuctCurves)
-                || element.Category.IsId(BuiltInCategory.OST_FlexPipeCurves)) { return DefaultCheck(element, Config.MeterUnit); }
+            if(element.InAnyCategory(new List<BuiltInCategory>() { 
+                BuiltInCategory.OST_DuctCurves, 
+                BuiltInCategory.OST_PipeCurves, 
+                BuiltInCategory.OST_FlexDuctCurves, 
+                BuiltInCategory.OST_FlexPipeCurves }))
+                { return DefaultCheck(element, Config.MeterUnit); }
 
             if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
                 if(Config.IsSpecifyDuctFittings) { return Config.SingleUnit; }
                 return Config.SquareUnit;
             }
 
-            if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) { return DefaultCheck(element, Config.SquareUnit); }
-            if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) { return DefaultCheck(element, Config.MeterUnit); }
+            if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) 
+                { return DefaultCheck(element, Config.SquareUnit); }
+            if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) 
+                { return DefaultCheck(element, Config.MeterUnit); }
 
             return Config.SingleUnit;
         }
 
 
-        public ElementParamUnitFiller(string toParamName, string fromParamName, SpecConfiguration specConfiguration) : base(toParamName, fromParamName, specConfiguration) {
+        public ElementParamUnitFiller(
+            string toParamName, 
+            string fromParamName, 
+            SpecConfiguration specConfiguration,
+            Document document) : 
+            base(toParamName, fromParamName, specConfiguration, document) {
         }
 
         public override void SetParamValue(Element element) {
-            if(!element.GetSharedParam(ToParamName).IsReadOnly) { element.GetSharedParam(ToParamName).Set(GetUnit(element)); }
+            ToParam.Set(GetUnit(element)); 
         }
     }
 }

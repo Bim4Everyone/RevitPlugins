@@ -10,6 +10,7 @@ using RevitMechanicalSpecification.Models.Classes;
 using dosymep.Revit;
 using RevitMechanicalSpecification.Models.Fillers;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties;
+using System.Xml.Linq;
 
 
 
@@ -19,9 +20,9 @@ namespace RevitMechanicalSpecification.Models {
             UIApplication = uiApplication;
 
         }
-
+        //убрать
         public List<Element> Elements { get; set; }
-
+        //убрать
         public List<MechanicalSystem> MechanicalSystems { get; set; }
 
         public UIApplication UIApplication { get; }
@@ -30,42 +31,63 @@ namespace RevitMechanicalSpecification.Models {
 
         public Document Document => ActiveUIDocument.Document;
 
+        private List<ElementParamFiller> _fillers; 
+        
 
 
         public void ExecuteSpecificationRefresh() {
-            DefaultCollector collector = new DefaultCollector(Document);
-            Elements = collector.GetDefElementColls();
-            MechanicalSystems = collector.GetDefSystemColl();
-            SpecConfiguration specConfiguration = new SpecConfiguration(Document);
+            CollectionFactory collector = new CollectionFactory(Document);
+            Elements = collector.GetMechanicalElements();
+            MechanicalSystems = collector.GetMechanicalSystemColl();
+            SpecConfiguration specConfiguration = new SpecConfiguration(Document.ProjectInformation);
+
+            _fillers = new List<ElementParamFiller>() 
+            {
+                //Заполнение ФОП_ВИС_Марка
+                new ElementParamDefaultFiller(
+                specConfiguration.OriginalParamNameMark,
+                specConfiguration.TargetNameMark,
+                specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Код изделия
+                new ElementParamDefaultFiller(
+                specConfiguration.OriginalParamNameCode,
+                specConfiguration.TargetNameCode,
+                specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Завод-изготовитель
+                new ElementParamDefaultFiller(
+                specConfiguration.OriginalParamNameCreator,
+                specConfiguration.TargetNameCreator,
+                specConfiguration, 
+                Document),
+                //Заполнение ФОП_ВИС_Единица измерения
+                new ElementParamUnitFiller(
+                specConfiguration.OriginalParamNameUnit,
+                specConfiguration.TargetNameUnit,
+                specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Число - у него нет исходного параметра, набор идет из системных, так что на вход идет null
+                new ElementParamNumberFiller(
+                specConfiguration.TargetNameNumber,
+                null,
+                specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Наименование комбинированное
+                new ElementParamNameFiller(
+                specConfiguration.OriginalParamNameName,
+                specConfiguration.TargetNameName,
+                specConfiguration, 
+                Document)
+        };
+
+
             using(Transaction t = Document.StartTransaction("Обновление спецификации")) {
 
                 foreach(Element element in Elements) {
-                    new ElementParamDefaultFiller(
-                        fromParamName: specConfiguration.OriginalParamNameMark,
-                        toParamName: specConfiguration.TargetNameMark,
-                        specConfiguration: specConfiguration).Fill(element);
-                    new ElementParamDefaultFiller( 
-                        fromParamName: specConfiguration.OriginalParamNameCode,
-                        toParamName: specConfiguration.TargetNameCode,
-                        specConfiguration: specConfiguration).Fill(element);
-                    new ElementParamDefaultFiller(
-                        fromParamName: specConfiguration.OriginalParamNameCreator,
-                        toParamName: specConfiguration.TargetNameCreator, 
-                        specConfiguration: specConfiguration).Fill(element);
-                    new ElementParamUnitFiller(
-                        fromParamName: specConfiguration.OriginalParamNameUnit,
-                        toParamName: specConfiguration.TargetNameUnit,
-                        specConfiguration: specConfiguration).Fill(element);
-                    new ElementParamNumberFiller(
-                        fromParamName: "Skip",
-                        toParamName: specConfiguration.TargetNameNumber,
-                        specConfiguration: specConfiguration,
-                        document: Document).Fill(element);
-                    new ElementParamNameFiller(
-                        fromParamName: specConfiguration.OriginalParamNameName,
-                        toParamName: specConfiguration.TargetNameName,
-                        specConfiguration: specConfiguration).Fill(element);
-
+                    foreach(ElementParamFiller filler in _fillers) {
+                        filler.Fill(element);
+                    }
                 }
                 t.Commit();
             }
