@@ -45,26 +45,26 @@ namespace RevitMechanicalSpecification.Models {
             {
                 //Заполнение ФОП_ВИС_Марка
                 new ElementParamDefaultFiller(
-                specConfiguration.OriginalParamNameMark,
                 specConfiguration.TargetNameMark,
+                specConfiguration.OriginalParamNameMark,
                 specConfiguration,
                 Document),
                 //Заполнение ФОП_ВИС_Код изделия
                 new ElementParamDefaultFiller(
-                specConfiguration.OriginalParamNameCode,
                 specConfiguration.TargetNameCode,
+                specConfiguration.OriginalParamNameCode,
                 specConfiguration,
                 Document),
                 //Заполнение ФОП_ВИС_Завод-изготовитель
                 new ElementParamDefaultFiller(
-                specConfiguration.OriginalParamNameCreator,
                 specConfiguration.TargetNameCreator,
-                specConfiguration, 
+                specConfiguration.OriginalParamNameCreator,
+                specConfiguration,
                 Document),
                 //Заполнение ФОП_ВИС_Единица измерения
                 new ElementParamUnitFiller(
-                specConfiguration.OriginalParamNameUnit,
                 specConfiguration.TargetNameUnit,
+                specConfiguration.OriginalParamNameUnit,
                 specConfiguration,
                 Document),
                 //Заполнение ФОП_ВИС_Число - у него нет исходного параметра, набор идет из системных, так что на вход идет null
@@ -75,8 +75,8 @@ namespace RevitMechanicalSpecification.Models {
                 Document),
                 //Заполнение ФОП_ВИС_Наименование комбинированное
                 new ElementParamNameFiller(
-                specConfiguration.OriginalParamNameName,
                 specConfiguration.TargetNameName,
+                specConfiguration.OriginalParamNameName,
                 specConfiguration, 
                 Document)
         };

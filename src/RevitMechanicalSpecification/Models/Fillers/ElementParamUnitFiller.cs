@@ -21,11 +21,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             "К-т",
             "К-т." };
 
-        private readonly List<string> _linearNames = new List<string>() { "м.п.", "м.", "мп", "м", "м.п" };
+        private readonly HashSet<string> _linearNames = new HashSet<string>() { "м.п.", "м.", "мп", "м", "м.п" };
 
-        private readonly List<string> _singleNames = new List<string>() { "шт", "шт.", "Шт", "Шт.", "Ш", "ш" };
+        private readonly HashSet<string> _singleNames = new HashSet<string>() { "шт", "шт.", "Шт", "Шт.", "Ш", "ш" };
 
-        private readonly List<string> _squareNames = new List<string>() { "м2", "м²" };
+        private readonly HashSet<string> _squareNames = new HashSet<string>() { "м2", "м²" };
 
 
 
@@ -34,7 +34,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
             if(unit == null) { return defaultUnit; }
 
-            //Заменить на хэшсет все листы
             if(_linearNames.Contains(unit)) { return Config.MeterUnit; }
             if(_squareNames.Contains(unit)) { return Config.SquareUnit; }
             if(_singleNames.Contains(unit)) { return Config.SingleUnit; }

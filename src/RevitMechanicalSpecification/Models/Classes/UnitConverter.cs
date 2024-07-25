@@ -19,6 +19,10 @@ namespace RevitMechanicalSpecification.Models.Classes {
             return Math.Round(number * 0.092903, 2);
         }
 
+        public double DoubleToDegree(double number) {
+            return Math.Round(number/0.0175, 2);
+        }
+
 
     }
 }

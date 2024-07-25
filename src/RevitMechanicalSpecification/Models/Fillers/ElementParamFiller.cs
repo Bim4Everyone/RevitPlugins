@@ -32,6 +32,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public abstract void SetParamValue(Element element);
 
+
+
         protected string GetTypeOrInstanceParamValue(Element element) {
             if(element.IsExistsParam(FromParamName)) 
                 { return element.GetSharedParamValue<string>(FromParamName); }
@@ -41,27 +43,39 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             return null;
         }
 
-        private bool IsTypeOrInstanceExists(Element element, string paramName) {
+        private Parameter GetTypeOrInstanceParam(Element element, Element elemType, string paramName) 
+            {
+            if(element.IsExistsParam(paramName)) 
+                { return element.GetParam(paramName); }
+            if(elemType.IsExistsParam(paramName)) 
+                { return elemType.GetParam(paramName); }
+            return null;
+        }
+
+        private bool IsTypeOrInstanceExists(Element element, Element elemType, string paramName) {
             if(paramName is null) 
                 { return true; }
             if(element.IsExistsParam(paramName)) 
                 { return true; }
-            if(element.GetElementType().IsExistsParam(paramName)) 
+            if(elemType.IsExistsParam(paramName)) 
                 { return true; }
             return false;
         }
         public void Fill(Element element) {
+            Element elemType = element.GetElementType();
 
-            if(!IsTypeOrInstanceExists(element, FromParamName) || !element.IsExistsParam(ToParamName)) 
+            //Проверяем, если существует исходный параметр в типе или экземпляре, или целевой ТОЛЬКО в экземпляре
+            if(!IsTypeOrInstanceExists(element, elemType, FromParamName) || !element.IsExistsParam(ToParamName)) 
                 { return; }
-
             
-
+            //Если параметры существуют создаем их экземпляры чтоб не пересоздавать
             ToParam = element.GetParam(ToParamName);
+            //Проверка на нулл - для ситуаций где нет имени исходного(ФОП_ВИС_Число), тогда исходный парам так и остается пустым 
             if(!(FromParamName is null)) {
-                FromParam = element.GetParam(FromParamName);
+                FromParam = GetTypeOrInstanceParam(element, elemType, FromParamName);
             }
 
+            //Если целевой параметр ридонли - можно сразу идти дальше
             if(ToParam.IsReadOnly) 
                 { return; }
 
