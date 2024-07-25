@@ -184,10 +184,16 @@ namespace RevitFinishingWalls.Models {
             ElementId finishingWallTypeId,
             double sideOffset = 0) {
 
+            const string error = "Не удалось построить оси отделочных стен в помещении";
             double finishingWallTypeHalfWidth = GetWallTypeWidth(finishingWallTypeId) / 2;
             List<CurveSegmentElement> curveSegmentsElements = new List<CurveSegmentElement>();
 
-            CurveLoop segmentsCurveLoop = CurveLoop.Create(segmentsLoop.Select(s => s.GetCurve()).ToArray());
+            CurveLoop segmentsCurveLoop;
+            try {
+                segmentsCurveLoop = CurveLoop.Create(segmentsLoop.Select(s => s.GetCurve()).ToArray());
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                throw new InvalidOperationException(error);
+            }
             // получение линий осей отделочных стен,
             // смещенной влево на 1/2 толщины отделочной стены относительно исходной границы помещения,
             // затем смещенной на заданное расстояние в футах
@@ -206,15 +212,29 @@ namespace RevitFinishingWalls.Models {
                         .ToArray();
                 }
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                throw new InvalidOperationException("Не удалось построить оси отделочных стен в помещении");
+                throw new InvalidOperationException(error);
             }
             if(offsetCurves.Length != segmentsLoop.Count) {
+                // при создании петли CurveLoop через метод CurveLoop.CreateViaOffset
+                // количество линий в контуре может измениться
                 try {
                     segmentsToProcess = MapOffsetCurves(offsetCurves, segmentsLoop, sideOffset);
                 } catch(InvalidOperationException) {
-                    // при создании петли CurveLoop через метод CurveLoop.CreateViaOffset
-                    // количество линий в контуре может измениться
-                    throw new InvalidOperationException("Не удалось построить оси отделочных стен в помещении");
+                    try {
+                        CurveLoop loop = CurveLoop.Create(offsetCurves);
+                        CurveLoop loopWithRevertOffset = CurveLoop.CreateViaOffset(loop, -sideOffset, XYZ.BasisZ);
+                        if(offsetCurves.Length == loopWithRevertOffset.Count()) {
+                            try {
+                                segmentsToProcess = MapOffsetCurves(loopWithRevertOffset.ToArray(), segmentsLoop, 0);
+                            } catch(InvalidOperationException) {
+                                throw new InvalidOperationException(error);
+                            }
+                        } else {
+                            throw new InvalidOperationException(error);
+                        }
+                    } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                        throw new InvalidOperationException(error);
+                    }
                 }
             }
             for(int i = 0; i < segmentsToProcess.Count; i++) {
@@ -359,7 +379,7 @@ namespace RevitFinishingWalls.Models {
                     "Нельзя замапить список линий, " +
                     "количество элементов в котором меньше либо равно количеству линий в исходной петле");
             }
-            if(offset >= 0) {
+            if(offset > 0) {
                 throw new InvalidOperationException("Можно замапить только список уменьшенных линий");
             }
 
