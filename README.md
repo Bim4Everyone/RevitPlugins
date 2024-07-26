@@ -39,6 +39,7 @@
 | 26. | Конструктор секций        | [RevitSectionsConstructor](src/RevitSectionsConstructor) | [Confluence]()                                                          | [BIM](https://github.com/Bim4Everyone/BIMExtensions)| ОПП            |
 | 27. | Планы квартир             | [RevitApartmentPlans](src/RevitApartmentPlans)           | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | Документация   |
 | 28. | Декларации                | [RevitDeclarations](src/RevitDeclarations)               | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | Декларации     |
+| 29. | Откосы                    | [RevitOpeningSlopes](src/RevitOpeningSlopes)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134086806) | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
 
 # Сборка проекта
 
