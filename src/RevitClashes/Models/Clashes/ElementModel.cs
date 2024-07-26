@@ -80,9 +80,7 @@ namespace RevitClashDetective.Models.Clashes {
 
         public IList<Solid> GetSolids(IEnumerable<DocInfo> documents) {
             return GetElement(documents)?.GetSolids()
-                ?? throw new ArgumentNullException(
-                    nameof(documents),
-                    $"Элемент с Id={Id} не найден в заданных документах");
+                ?? throw new ArgumentException($"Элемент с Id={Id} не найден в заданных документах");
         }
 
         public override bool Equals(object obj) {

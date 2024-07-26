@@ -88,12 +88,11 @@ namespace RevitClashDetective.Models.Clashes {
         /// Назначить это поле можно через метод <see cref="SetRevitRepository(RevitRepository)"/>
         /// </summary>
         /// <returns>Объект с данными о коллизии</returns>
-        /// <exception cref="ArgumentNullException">Исключение, если <see cref="_revitRepository"/> null</exception>
+        /// <exception cref="InvalidOperationException">Исключение, если <see cref="_revitRepository"/> null</exception>
         public ClashData GetClashData() {
             if(_revitRepository is null) {
-                throw new ArgumentNullException(
-                    "Для получения данных о коллизии необходимо назначить репозиторий активного документа Ревита",
-                    nameof(_revitRepository));
+                throw new InvalidOperationException(
+                    "Для получения данных о коллизии необходимо назначить репозиторий активного документа Ревита");
             }
 
             try {
@@ -108,6 +107,8 @@ namespace RevitClashDetective.Models.Clashes {
             } catch(ArgumentNullException) {
                 return new ClashData();
             } catch(NullReferenceException) {
+                return new ClashData();
+            } catch(ArgumentException) {
                 return new ClashData();
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 return new ClashData();
