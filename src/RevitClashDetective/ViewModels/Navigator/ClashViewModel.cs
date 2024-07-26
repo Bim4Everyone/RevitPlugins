@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -26,6 +26,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SecondLevel = clash.OtherElement.Level;
             SecondDocumentName = clash.OtherElement.DocumentName;
 
+            (IntersectionPercentage, IntersectionVolume) = GetIntersectionData(clash);
+
             ClashStatus = clash.ClashStatus;
             Clash = clash;
             Clash.SetRevitRepository(_revitRepository);
@@ -51,7 +53,18 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public string SecondDocumentName { get; }
 
-        public string SecondCategory { get; set; }
+        public string SecondCategory { get; }
+
+        /// <summary>
+        /// Процент пересечения относительно объема меньшего элемента коллизии
+        /// </summary>
+        public double IntersectionPercentage { get; }
+
+        /// <summary>
+        /// Объем пересечения в м3
+        /// </summary>
+        public double IntersectionVolume { get; }
+
         public ClashModel Clash { get; }
 
         public IEnumerable<ElementId> GetElementIds(string docTitle) {
@@ -101,6 +114,22 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 && SecondLevel == other.SecondLevel
                 && SecondDocumentName == other.SecondDocumentName
                 && SecondCategory == other.SecondCategory;
+        }
+
+
+        private (double Percentage, double Volume) GetIntersectionData(ClashModel clashModel) {
+            if(clashModel is null) {
+                throw new ArgumentNullException(nameof(clashModel));
+            }
+
+            ClashData clashData = clashModel
+                .SetRevitRepository(_revitRepository)
+                .GetClashData();
+
+            double minVolume = Math.Min(clashData.MainElementVolume, clashData.OtherElementVolume);
+            return (
+                Math.Round(clashData.ClashVolume / minVolume * 100, 2),
+                Math.Round(_revitRepository.ConvertToM3(clashData.ClashVolume), 6));
         }
     }
 }
