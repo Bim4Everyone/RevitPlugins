@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Revit;
 
@@ -28,19 +30,34 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
         }
 
 
-        public ICollection<RoomErrorsViewModel> CreateWallsFinishing(PluginConfig config) {
-            if(config is null) { throw new ArgumentNullException(nameof(config)); }
+        public ICollection<RoomErrorsViewModel> CreateWallsFinishing(
+            ICollection<Room> rooms,
+            RevitSettings settings,
+            IProgress<int> progress = null,
+            CancellationToken ct = default) {
 
-            var rooms = _revitRepository.GetRooms(config.RoomGetterMode);
+            if(rooms is null) { throw new ArgumentNullException(nameof(rooms)); }
+            if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
             List<RoomErrorsViewModel> errors = new List<RoomErrorsViewModel>();
 
             using(var transaction = _revitRepository.Document.StartTransaction("Создание отделочных стен")) {
                 FailureHandlingOptions failOpt = transaction.GetFailureHandlingOptions();
                 failOpt.SetFailuresPreprocessor(new WallAndRoomSeparationLineOverlapHandler());
                 transaction.SetFailureHandlingOptions(failOpt);
+                var iteration = 0;
                 foreach(var room in rooms) {
-                    IList<WallCreationData> datas = _wallCreationDataProvider.GetWallCreationData(room, config);
+                    ct.ThrowIfCancellationRequested();
+                    progress?.Report(iteration++);
                     RoomErrorsViewModel roomErrors = new RoomErrorsViewModel(room);
+                    IList<WallCreationData> datas;
+                    try {
+                        datas = _wallCreationDataProvider.GetWallCreationData(room, settings);
+                    } catch(CannotCreateWallException ex) {
+                        roomErrors.Errors.Add(
+                            new ErrorViewModel("Ошибки обработки контура помещения", ex.Message, room.Id));
+                        errors.Add(roomErrors);
+                        continue;
+                    }
                     for(int i = 0; i < datas.Count; i++) {
                         try {
                             var wall = _revitRepository.CreateWall(

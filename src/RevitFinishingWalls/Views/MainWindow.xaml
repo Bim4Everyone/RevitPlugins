@@ -14,15 +14,16 @@
                            xmlns:enums="clr-namespace:RevitFinishingWalls.Models.Enums"
                            mc:Ignorable="d"
                            WindowStartupLocation="CenterOwner"
-                           MinHeight="250"
+                           MinHeight="275"
                            MinWidth="600"
-                           MaxHeight="250"
+                           MaxHeight="275"
                            MaxWidth="600"
                            d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
                            ResizeMode="NoResize">
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:EventToCommand EventName="Loaded"
                                Command="{Binding LoadConfigCommand}" />
+        <common:AttachServiceBehavior AttachableService="{Binding ProgressDialogFactory}" />
     </dxmvvm:Interaction.Behaviors>
     <Window.Resources>
         <converters:EnumConverter x:Key="EnumConverter" />
@@ -130,6 +131,15 @@
                 <TextBlock Text="Смещение снизу от уровня:"
                            Style="{StaticResource InputDescription}" />
                 <dxe:TextEdit Text="{Binding WallBaseOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
+                <TextBlock Text="мм"
+                           Width="Auto"
+                           Style="{StaticResource InputDescription}" />
+            </DockPanel>
+            
+            <DockPanel Style="{StaticResource DockPanelInput}">
+                <TextBlock Text="Смещение внутрь помещения:"
+                           Style="{StaticResource InputDescription}" />
+                <dxe:TextEdit Text="{Binding WallSideOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
                 <TextBlock Text="мм"
                            Width="Auto"
                            Style="{StaticResource InputDescription}" />
