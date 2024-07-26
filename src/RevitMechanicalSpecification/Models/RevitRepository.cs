@@ -78,7 +78,14 @@ namespace RevitMechanicalSpecification.Models {
                 specConfiguration.TargetNameName,
                 specConfiguration.OriginalParamNameName,
                 specConfiguration, 
+                Document),
+                //Заполнение ФОП_ВИС_Группирование
+                new ElementParamGroupFiller(
+                specConfiguration.TargetNameGroup,
+                null,
+                specConfiguration,
                 Document)
+
         };
 
 
@@ -87,6 +94,7 @@ namespace RevitMechanicalSpecification.Models {
                 foreach(Element element in Elements) {
                     foreach(ElementParamFiller filler in _fillers) {
                         filler.Fill(element);
+
                     }
                 }
                 t.Commit();

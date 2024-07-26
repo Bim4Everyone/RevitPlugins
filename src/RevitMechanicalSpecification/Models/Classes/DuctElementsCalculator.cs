@@ -26,7 +26,60 @@ namespace RevitMechanicalSpecification.Models.Classes {
             _document = document;
         }
 
-        private double GetBaseThikness(Element element) 
+        public string GetDuctName(Element element) {
+            return ", с толщиной стенки " +
+                    GetDuctThikness(element) +
+                    " мм, " +
+                    element.GetParamValue(BuiltInParameter.RBS_CALCULATED_SIZE);
+        }
+
+        //Формируем диаметр трубы для наименования в зависимости от того что включено у нее в типе
+        public string GetPipeSize(Element element) {
+            Element elemType = element.GetElementType();
+
+            bool dy = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Ду") == 1;
+            bool dyWall = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Ду х Стенка") == 1;
+            bool dExternalWall = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Днар х Стенка") == 1;
+
+
+            double externalSize = _unitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER));
+            double internalSize = _unitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_INNER_DIAM_PARAM));
+
+            string pipeThickness = ((externalSize - internalSize) / 2).ToString();
+            string pipeDiameter = _unitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM)).ToString();
+
+            if(dy) 
+                { return " ⌀" + pipeDiameter; }
+            if (dyWall) 
+                { return " ⌀" + pipeDiameter + "x" + pipeThickness; }
+            if(dExternalWall) 
+                { return " ⌀" + externalSize.ToString() + "x" + pipeThickness; }
+
+            return " НЕ ЗАДАН ТИП ДИАМЕТРА";
+        }
+
+        //Проверяем по галочкам в проекте и типе нужно ли специфицировать фиттинг трубы
+        public bool IsSpecifyPipeFittingName(Element element) 
+            {
+            List<Connector> connectors = GetConnectors(element);
+
+            if(_specConfiguration.IsSpecifyPipeFittings) {
+                foreach(Connector connector in connectors) {
+                    foreach(Connector reference in connector.AllRefs) {
+
+                        if(reference.Owner.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
+                            Element elemType = reference.Owner.GetElementType();
+                            return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.ParamNameIsSpecifyPipeFittingsFromPype) == 1;
+                        }
+                    }
+                }
+            }
+
+            return _specConfiguration.IsSpecifyPipeFittings;
+        }
+
+        //Базовая толщина воздуховодов по ГОСТ
+        private double GetBaseDuctThikness(Element element) 
             {
             MEPCurve curve = element as MEPCurve;
             Connector connector = GetConnectors(element).FirstOrDefault();
@@ -62,11 +115,14 @@ namespace RevitMechanicalSpecification.Models.Classes {
             return 0;
         }
 
+        //Толщина воздуховодов с учетом ограничителей в изоляции и в типе воздуховода
         public string GetDuctThikness(Element element) {
             ElementCategoryFilter filter = new ElementCategoryFilter(BuiltInCategory.OST_DuctInsulations);
+            Element elemType = element.GetElementType();
 
-            double minDuctThikness = element.GetSharedParamValueOrDefault(_specConfiguration.MinDuctThikness, 0);
-            double maxDuctThikness = element.GetSharedParamValueOrDefault(_specConfiguration.MaxDuctThikness, 0);
+
+            double minDuctThikness = elemType.GetSharedParamValueOrDefault<double>(_specConfiguration.MinDuctThikness, 0);
+            double maxDuctThikness = elemType.GetSharedParamValueOrDefault<double>(_specConfiguration.MaxDuctThikness, 0);
             double minInsulThikness = 0;
             double maxInsulThikness = 0;
 
@@ -75,16 +131,20 @@ namespace RevitMechanicalSpecification.Models.Classes {
             //Возвращается лист элементID, но тяжело представить ситуацию, где у нас больше изоляции на воздуховоде, чем 1 штука
             List<ElementId> dependent = element.GetDependentElements(filter).ToList();
             ElementId insulationId = dependent.FirstOrDefault();
+            
+
             if(insulationId.IsNotNull()) 
                 {
                 Element insulation = _document.GetElement(insulationId);
-                minInsulThikness = insulation.GetSharedParamValueOrDefault(_specConfiguration.MinDuctThikness, 0);
-                maxInsulThikness = insulation.GetSharedParamValueOrDefault(_specConfiguration.MaxDuctThikness, 0);
+                Element insulType = insulation.GetElementType();
+                minInsulThikness = insulType.GetSharedParamValueOrDefault<double>(_specConfiguration.MinDuctThikness, 0);
+                maxInsulThikness = insulType.GetSharedParamValueOrDefault<double>(_specConfiguration.MaxDuctThikness, 0);
             }
 
-            double thikness = GetBaseThikness(element);
+            double thikness = GetBaseDuctThikness(element);
             double upCriteria = Math.Max(maxInsulThikness, maxDuctThikness);
             double minCriteria = Math.Max(minInsulThikness, minDuctThikness);
+
 
             //currentculture передаем
             if(thikness > upCriteria && upCriteria!=0) 
@@ -95,9 +155,47 @@ namespace RevitMechanicalSpecification.Models.Classes {
             return thikness.ToString();
         }
 
-        public void GetFittingThikness() {}
+        //поиск воздуховода из коннекторов фитинга
+        private Element GetDuctFromFitting(List<Connector> connectors) 
+            {
+            List<Connector> subConnectors = new List<Connector>();
+            foreach(Connector connector in connectors) {
+                foreach(Connector reference in connector.AllRefs) 
+                    {
+                    if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) 
+                        { return reference.Owner; }
+                    if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
+                        subConnectors.AddRange(GetConnectors(reference.Owner));
+                    }
+                }
 
-        private string GetFittingAngle(Element element) 
+            //Мы ищем воздуховод сначала среди коннекторов фитинга, а потом, если не находим, среди коннекторов возможных фитингов вокруг
+            //если там какая-то дикая конструкция из 4 соединенных фитингов - лучше вернуть нулл, а не искать дальше, таких мест вряд ли будет много
+            foreach(Connector subConnector in subConnectors) 
+                    {
+                    foreach(Connector reference in subConnector.AllRefs) 
+                        {
+                        if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) 
+                            { return reference.Owner; }
+                    }
+
+                }
+            }
+            return null;
+        }
+
+        //получение толщины фитинга воздуховода
+        public string GetDuctFittingThikness(Element element) 
+            {
+            List<Connector> connectors = GetConnectors(element);
+            Element duct = GetDuctFromFitting(connectors);
+            if(duct is null) 
+                { return null; }
+
+            return GetDuctThikness(duct);
+        }
+        //получение угла фитинга воздуховода
+        private string GetDuctFittingAngle(Element element) 
             {
             double angle = _unitConverter.DoubleToDegree(GetConnectors(element).First().Angle);
             if(angle <= 15.1) 
@@ -114,8 +212,17 @@ namespace RevitMechanicalSpecification.Models.Classes {
                 { return "90"; }
             return "0";
         }
-        public string GetFittingName(Element element) 
+
+        //получение имени фитинга воздуховода
+        public string GetDuctFittingName(Element element) 
             {
+            string thikness = GetDuctFittingThikness(element);
+            if(thikness is null) {
+                return "!Не учитывать";
+            }
+
+            if(!_specConfiguration.IsSpecifyDuctFittings) 
+                { return "Металл для фасонных деталей воздуховодов с толщиной стенки " + thikness + " мм"; }
 
             string startName = "Не удалось определить тип фитинга";
             FamilyInstance instanse = element as FamilyInstance;
@@ -136,7 +243,7 @@ namespace RevitMechanicalSpecification.Models.Classes {
             if(fitting.PartType == PartType.Elbow) 
                 {
                 Connector connector = GetConnectors(element).First();
-                string angle = GetFittingAngle(element);
+                string angle = GetDuctFittingAngle(element);
                 if(connector.Shape == ConnectorProfileType.Round) 
                     { startName = "Отвод "+angle+ "° круглого сечения"; }
                 if(connector.Shape == ConnectorProfileType.Rectangular)
@@ -148,21 +255,28 @@ namespace RevitMechanicalSpecification.Models.Classes {
             if( !(fitting.PartType is PartType.Transition) || !(fitting.PartType is PartType.Tee)) 
                 { size = size.Split('-').First(); }
 
-            return startName + " " + size;
+
+
+            return startName + " " + size + ", с толщиной стенки " + thikness + " мм";
         }
 
+        //получение коннекторов элемента
         public List<Connector> GetConnectors(Element element) {
             List<Connector> connectors = new List<Connector>();
 
             if (element is FamilyInstance) 
                 {
                 FamilyInstance instance = element as FamilyInstance;
+                if(instance.MEPModel.ConnectorManager is null) 
+                    { return connectors; }
                 ConnectorSetIterator set = instance.MEPModel.ConnectorManager.Connectors.ForwardIterator();
                 while(set.MoveNext()) { connectors.Add(set.Current as Connector); }
             }
 
             if (element.InAnyCategory(new List<BuiltInCategory>() { BuiltInCategory.OST_DuctCurves, BuiltInCategory.OST_PipeCurves })) { 
                 MEPCurve curve = element as MEPCurve;
+                if(curve.ConnectorManager is null) 
+                    { return connectors; }
                 ConnectorSetIterator set = curve.ConnectorManager.Connectors.ForwardIterator();
                 while(set.MoveNext()) { connectors.Add(set.Current as Connector); }
             }
@@ -170,6 +284,7 @@ namespace RevitMechanicalSpecification.Models.Classes {
             return connectors;
         }
 
+        //получение площади фитинга воздуховода
         public double GetFittingArea(Element element) {
 
             double area = 0;
