@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using pyRevitLabs.Json;
+
+using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.Models.Clashes {
     internal class ElementModel : IEquatable<ElementModel> {
@@ -70,6 +72,15 @@ namespace RevitClashDetective.Models.Clashes {
                     .FirstOrDefault(item => TransformModel.IsAlmostEqualTo(item.Transform))
                     ?? docsWithTheSameTitle.FirstOrDefault();
             }
+        }
+
+        public Transform GetTransform() {
+            return TransformModel.GetTransform();
+        }
+
+        public IList<Solid> GetSolids(IEnumerable<DocInfo> documents) {
+            return GetElement(documents)?.GetSolids()
+                ?? throw new ArgumentException($"Элемент с Id={Id} не найден в заданных документах");
         }
 
         public override bool Equals(object obj) {

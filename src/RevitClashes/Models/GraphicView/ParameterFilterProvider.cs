@@ -31,8 +31,8 @@ namespace RevitClashDetective.Models.GraphicView {
             if(element is null) { throw new ArgumentNullException(nameof(element)); }
             if(string.IsNullOrWhiteSpace(filterName)) { throw new ArgumentException(nameof(filterName)); }
 
-            var elementFilter = GetOrCreateFilter(document, filterName, element.Category.GetBuiltInCategory());
-            return UpdateHighlightFilter(elementFilter, element);
+            var elementFilter = CreateFilter(document, filterName, element.Category.GetBuiltInCategory());
+            return SetFilterRules(elementFilter, element);
         }
 
         /// <summary>
@@ -62,63 +62,112 @@ namespace RevitClashDetective.Models.GraphicView {
                 throw new InvalidOperationException($"У элементов разные категории");
             }
 
-            var filter = GetOrCreateFilter(document, filterName, firstEl.Category.GetBuiltInCategory());
-            return UpdateHighlightFilter(filter, firstEl, secondEl);
+            var filter = CreateFilter(document, filterName, firstEl.Category.GetBuiltInCategory());
+            return SetFilterRules(filter, firstEl, secondEl);
         }
 
         /// <summary>
         /// Возвращает фильтр с заданным названием по всем категориям элементов модели, кроме заданных категорий
         /// </summary>
         /// <param name="document">Документ, в котором должен быть получен фильтр</param>
+        /// <param name="view">Вид, для которого нужно создать фильтр</param>
         /// <param name="exceptCategories">Категории, которых не должно быть в фильтре</param>
         /// <param name="filterName">Название фильтра</param>
         /// <returns>Существующий фильтр с переназначенными категориями или созданный фильтр</returns>
         public ParameterFilterElement GetExceptCategoriesFilter(
             Document document,
+            View view,
             ICollection<BuiltInCategory> exceptCategories,
             string filterName) {
 
-            var categoriesToFilter = GetAllModelCategories(document);
+            var categoriesToFilter = GetAllModelCategories(document, view);
             categoriesToFilter.ExceptWith(exceptCategories);
-            var filter = GetOrCreateFilter(document, filterName, categoriesToFilter);
-            return UpdateHighlightFilter(filter, categoriesToFilter);
+            return CreateFilter(document, filterName, categoriesToFilter);
         }
 
         /// <summary>
         /// Возвращает все категории модели из документа
         /// </summary>
         /// <param name="document">Документ с категориями</param>
-        /// <returns></returns>
-        private static HashSet<BuiltInCategory> GetAllModelCategories(Document document) {
-            Categories allCategories = document.Settings.Categories;
+        /// <param name="view">Вид, на котором нужно управлять видимостью категорий</param>
+        /// <returns>Все категории модели, видимостью которых можно управлять на данном виде</returns>
+        public HashSet<BuiltInCategory> GetAllModelCategories(Document document, View view) {
+            var allCategories = ParameterFilterUtilities.GetAllFilterableCategories()
+                .Select(item => Category.GetCategory(document, item))
+                .OfType<Category>()
+                .ToList();
             HashSet<BuiltInCategory> modelCategories = new HashSet<BuiltInCategory>();
             foreach(Category category in allCategories) {
-                if(category.CategoryType == CategoryType.Model && category.IsVisibleInUI) {
-                    modelCategories.Add(category.GetBuiltInCategory());
+                if(category.CategoryType == CategoryType.Model
+                    && category.IsVisibleInUI
+                    && category.get_AllowsVisibilityControl(view)) {
+                    var builtInCategory = category.GetBuiltInCategory();
+                    if(builtInCategory != BuiltInCategory.INVALID) {
+                        modelCategories.Add(builtInCategory);
+                    }
                 }
             }
             return modelCategories;
         }
 
-        private ParameterFilterElement GetOrCreateFilter(
+        /// <summary>
+        /// Создает новый фильтр инвертированный для настроек графики на виде, удаляя старый.
+        /// </summary>
+        /// <param name="document">Документ, в котором нужно получить фильтр</param>
+        /// <param name="filterName">Название фильтра</param>
+        /// <param name="filter">Фильтр элементов, из которого будет создан фильтр по параметрам для настроек видимости</param>
+        /// <param name="categories">Категории для фильтрации</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public ParameterFilterElement CreateParameterFilter(
             Document document,
             string filterName,
-            BuiltInCategory category) {
+            ElementFilter filter,
+            ICollection<BuiltInCategory> categories) {
 
-            return GetOrCreateFilter(document, filterName, new BuiltInCategory[] { category });
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(string.IsNullOrWhiteSpace(filterName)) { throw new ArgumentNullException(nameof(filterName)); }
+            if(filter is null) { throw new ArgumentNullException(nameof(filter)); }
+
+            var parameterFilter = CreateFilter(
+                document,
+                filterName,
+                categories);
+            parameterFilter.SetElementFilter(filter);
+            return parameterFilter;
         }
 
         /// <summary>
-        /// Возвращает существующий или создает новый фильтр для настроек графики на виде
+        /// Создает новый фильтр для настроек графики на виде, удаляя старый
+        /// </summary>
+        /// <param name="document">Документ, в котором нужно получить фильтр</param>
+        /// <param name="filterName">Название фильтра</param>
+        /// <param name="category">Категория элементов для фильтра</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public ParameterFilterElement CreateFilter(Document document, string filterName, BuiltInCategory category) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(string.IsNullOrWhiteSpace(filterName)) { throw new ArgumentNullException(nameof(filterName)); }
+
+            return CreateFilter(document, filterName, new BuiltInCategory[] { category });
+        }
+
+        /// <summary>
+        /// Создает новый фильтр для настроек графики на виде, удаляя старый
         /// </summary>
         /// <param name="document">Документ, в котором нужно получить фильтр</param>
         /// <param name="filterName">Название фильтра</param>
         /// <param name="categories">Категории элементов для фильтра</param>
         /// <returns></returns>
-        private ParameterFilterElement GetOrCreateFilter(
+        /// <exception cref="ArgumentNullException"></exception>
+        public ParameterFilterElement CreateFilter(
             Document document,
             string filterName,
             ICollection<BuiltInCategory> categories) {
+
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(string.IsNullOrWhiteSpace(filterName)) { throw new ArgumentNullException(nameof(filterName)); }
+            if(categories is null) { throw new ArgumentNullException(nameof(categories)); }
 
             var categoriesIds = categories
                 .Select(item => new ElementId(item))
@@ -128,50 +177,31 @@ namespace RevitClashDetective.Models.GraphicView {
                 .OfClass(typeof(ParameterFilterElement))
                 .OfType<ParameterFilterElement>()
                 .FirstOrDefault(item => item.Name.Equals(filterName));
-            if(filter == null) {
-                filter = ParameterFilterElement.Create(document, filterName, categoriesIds);
+            if(filter != null) {
+                document.Delete(filter.Id);
             }
-
-            return filter;
+            return ParameterFilterElement.Create(document, filterName, categoriesIds);
         }
 
-        /// <summary>
-        /// Переназначает категории для фильтра и сбрасывает критерии фильтрации
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="categoriesToFilter"></param>
-        /// <returns></returns>
-        private ParameterFilterElement UpdateHighlightFilter(
-            ParameterFilterElement filter,
-            ICollection<BuiltInCategory> categoriesToFilter) {
-
-            //переназначить категории элементов, если пользователь изменил их
-            filter.SetCategories(categoriesToFilter.Select(c => new ElementId(c)).ToArray());
-            //сбросить все критерии фильтрации
-            filter.ClearRules();
-            return filter;
-        }
 
         /// <summary>
-        /// Обновляет фильтр по параметрам элементов на виде, который нужен для скрытия элементов той же категории, 
+        /// Задает критерии фильтрации на виде, который нужен для скрытия элементов той же категории, 
         /// что и заданный элемент, но отличных от него
         /// </summary>
         /// <param name="filter">Фильтр по параметрам элементов на виде, который надо обновить</param>
         /// <param name="element">Элемент, который выделяется фильтром. То есть элемент, который не попадает в фильтр.</param>
         /// <returns></returns>
-        private ParameterFilterElement UpdateHighlightFilter(
+        private ParameterFilterElement SetFilterRules(
             ParameterFilterElement filter,
             Element element) {
 
-            //переназначить категории элементов, если пользователь изменил их
-            filter.SetCategories(new ElementId[] { new ElementId(element.Category.GetBuiltInCategory()) });
-            //переназначить критерии фильтрации
+            //назначить критерии фильтрации
             filter.SetElementFilter(GetHighlightElementFilter(element, filter));
             return filter;
         }
 
         /// <summary>
-        /// Обновляет фильтр по параметрам элементов на виде, который нужен для скрытия элементов той же категории, 
+        /// Задает критерии фильтрации элементов на виде, который нужен для скрытия элементов той же категории, 
         /// что и заданные элементы, но отличные от них.
         /// При этом заданные элементы должны быть строго одной и той же категории
         /// </summary>
@@ -180,7 +210,7 @@ namespace RevitClashDetective.Models.GraphicView {
         /// <param name="secondEl">Второй элемент</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        private ParameterFilterElement UpdateHighlightFilter(
+        private ParameterFilterElement SetFilterRules(
             ParameterFilterElement filter,
             Element firstEl,
             Element secondEl) {

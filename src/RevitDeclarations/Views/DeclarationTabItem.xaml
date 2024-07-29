@@ -1,0 +1,189 @@
+﻿<UserControl 
+    x:Class="RevitDeclarations.Views.DeclarationTabItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:RevitDeclarations.Views"
+    Background="White"
+    Height="650" Width="630">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="Styles/StyleResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" MinHeight="25"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="210"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock 
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Style="{StaticResource HeaderName}"
+                Text="Формат выгрузки"/>
+
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="10, 0"
+                Style="{StaticResource ParameterName}"
+                Text="Название файла:"/>
+            <TextBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button
+                Grid.Row="1"
+                Grid.Column="2"
+                Margin="0, 0, 10, 0"
+                Content = "Выбрать папку"
+                Command="{Binding SelectFolderCommand}"/>
+
+            <TextBlock
+                Grid.Row="2"  
+                Grid.Column="0"
+                Margin="10,0"
+                Style="{StaticResource ParameterName}"
+                Text="Папка выгрузки:"/>
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="0, 5, 10, 5"
+                VerticalAlignment="Center"
+                TextWrapping="Wrap"
+                Text="{Binding FilePath}"/>
+
+            <TextBlock
+                Grid.Row="3"
+                Grid.Column="0"
+                Margin="10, 0"
+                Style="{StaticResource ParameterName}"
+                Text="Формат файла:"/>
+            <StackPanel
+                Grid.Row="3"
+                Grid.Column="1"
+                Margin="0, 0, 10, 0"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
+                <RadioButton
+                    GroupName="DeclarationFormat"
+                    VerticalAlignment="Center"
+                    Content="Excel"
+                    IsChecked="{Binding ExportToExcel}"/>
+                <RadioButton
+                    Margin="10, 0"
+                    GroupName="DeclarationFormat"
+                    VerticalAlignment="Center"
+                    Content="JSON"/>
+            </StackPanel>
+
+            <TextBlock 
+                Grid.Row="4"
+                Grid.ColumnSpan="2"
+                Style="{StaticResource HeaderName}"
+                Text="Настройки выгрузки декларации"/>
+
+            <TextBlock 
+                Grid.Row="5"
+                Grid.Column="0"
+                Margin="10, 0"
+                Style="{StaticResource ParameterName}"
+                Text="Стадия:"/>
+            <ComboBox
+                Grid.Row="5"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="0, 0, 10, 0"
+                ItemsSource="{Binding Phases}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding SelectedPhase}"/>
+
+            <TextBlock 
+                Grid.Row="6"
+                Grid.Column="0"                    
+                Margin="10, 0"
+                Style="{StaticResource ParameterName}"
+                Text="Количество знаков после запятой:"/>
+            <TextBox
+                Grid.Row="6"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="0, 0, 10, 0"
+                PreviewTextInput="IndentValidation"
+                PreviewKeyDown="TextBox_PreviewKeyDown"
+                Text="{Binding Accuracy}"/>
+
+            <TextBlock 
+                Grid.Row="7"
+                Style="{StaticResource HeaderName}"
+                Text="Настройки УТП"/>
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="8"
+                Margin="10, 0"
+                Style="{StaticResource ParameterName}"
+                Text="Рассчитывать УТП:"/>
+            <StackPanel
+                Grid.Row="8"
+                Grid.Column="1"
+                Orientation="Horizontal">
+                <CheckBox
+                    VerticalAlignment="Center"
+                    IsEnabled="{Binding CanLoadUtp}"
+                    IsChecked="{Binding LoadUtp}"/>
+                <TextBlock
+                    Margin="5,0,0,0"
+                    Foreground="Orange"
+                    Padding="0,2"
+                    VerticalAlignment="Center"
+                    Text="{Binding CanLoadUtpText}"/>
+            </StackPanel>
+
+            <TextBlock 
+                Grid.Row="9"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Style="{StaticResource HeaderName}"
+                Text="Проекты с помещениями, доступные для выгрузки:"/>
+
+            <ListBox                    
+                Grid.Row="10"
+                Grid.ColumnSpan="3"
+                Margin="10, 0, 10, 10"
+                ItemsSource="{Binding RevitDocuments}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox 
+                            Content="{Binding Name}" 
+                            IsChecked="{Binding IsChecked}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Grid>
+</UserControl>
