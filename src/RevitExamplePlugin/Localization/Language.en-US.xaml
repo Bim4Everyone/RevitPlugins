@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <!-- Пример перевода на английский американский язык (google translate) -->
+    
+    <system:String x:Key="MainWindow.Title">Sample command</system:String>
+    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
+    <system:String x:Key="MainWindow.ShowWall">Show</system:String>
+    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
+    <system:String x:Key="MainWindow.HeightCheck">Height can't be negative</system:String>
+    <system:String x:Key="MainWindow.CustomLocationCheck">Please select points</system:String>
+    <system:String x:Key="MainWindow.WallTypeCheck">Please select wall type</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="SelectPoints">Select points</system:String>
+    <system:String x:Key="IdColumn">Id</system:String>
+    <system:String x:Key="NameColumn">Name</system:String>
+    <system:String x:Key="HeightLabel">Wall height in feet:</system:String>
+    
+    <system:String x:Key="TaskDialog.ActiveViewTitle">Error</system:String>
+    <system:String x:Key="TaskDialog.ActiveViewUserPromt">Active view must be a view plan</system:String>
+</ResourceDictionary>
