@@ -17,7 +17,6 @@ using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
@@ -35,32 +34,29 @@ using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProvide
 namespace RevitOpeningPlacement.Models {
     internal class RevitRepository {
         private readonly Application _application;
-        private readonly UIApplication _uiApplication;
 
         private readonly Document _document;
         private readonly UIDocument _uiDocument;
 
         private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
-        private readonly RevitEventHandler _revitEventHandler;
 
         private readonly View3DProvider _view3DProvider;
         private readonly View3D _view;
 
-        public RevitRepository(Application application, Document document) {
+        public RevitRepository(
+            UIApplication uiApplication,
+            RevitClashDetective.Models.RevitRepository clashRepository) {
 
-            _application = application ?? throw new ArgumentNullException(nameof(application));
-            _uiApplication = new UIApplication(application);
+            UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
+            _clashRevitRepository = clashRepository ?? throw new ArgumentNullException(nameof(clashRepository));
 
-            _document = document ?? throw new ArgumentNullException(nameof(document));
-            _uiDocument = new UIDocument(document);
-
-            _clashRevitRepository = new RevitClashDetective.Models.RevitRepository(_application, _document);
-            _revitEventHandler = new RevitEventHandler();
+            _application = UIApplication.Application;
+            _uiDocument = UIApplication.ActiveUIDocument;
+            _document = _uiDocument.Document;
 
             _view3DProvider = new View3DProvider();
             _view = _view3DProvider.GetView(_document, $"BIM_Задания на отверстия_{_application.Username}");
 
-            UIApplication = _uiApplication;
             DocInfos = GetDocInfos();
         }
 
@@ -646,8 +642,7 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public void DoAction(Action action) {
-            _revitEventHandler.TransactAction = action;
-            _revitEventHandler.Raise();
+            _clashRevitRepository.DoAction(action);
         }
 
         public List<ParameterValueProvider> GetParameters(Document doc, IEnumerable<Category> categories) {

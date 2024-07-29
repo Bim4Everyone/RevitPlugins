@@ -1,6 +1,13 @@
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.SimpleServices;
+
+using Ninject;
+
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
+
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement;
@@ -24,33 +31,48 @@ namespace RevitOpeningPlacement {
 
 
         protected override void Execute(UIApplication uiApplication) {
-            RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var docType = revitRepository.GetDocumentType();
-            switch(docType) {
-                case DocTypeEnum.AR: {
-                    if(!ModelCorrect(new RealOpeningsArChecker(revitRepository))) {
-                        return;
-                    }
-                    var placer = new RealOpeningArPlacer(revitRepository);
-                    placer.PlaceSingleOpeningsInOneHost();
-                    break;
-                }
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitEventHandler>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ParameterFilterProvider>()
+                    .ToSelf()
+                    .InSingletonScope();
 
-                case DocTypeEnum.KR: {
-                    if(!ModelCorrect(new RealOpeningsKrChecker(revitRepository))) {
-                        return;
+                var revitRepository = kernel.Get<RevitRepository>();
+                var docType = revitRepository.GetDocumentType();
+                switch(docType) {
+                    case DocTypeEnum.AR: {
+                        if(!ModelCorrect(new RealOpeningsArChecker(revitRepository))) {
+                            return;
+                        }
+                        var placer = new RealOpeningArPlacer(revitRepository);
+                        placer.PlaceSingleOpeningsInOneHost();
+                        break;
                     }
-                    var config = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
-                    var placer = new RealOpeningKrPlacer(revitRepository, config);
-                    placer.PlaceSingleOpeningsInOneHost();
-                    break;
-                }
 
-                default: {
-                    revitRepository.ShowErrorMessage(
-                        "Команда предназначена только для АР/КР." +
-                        "\nПроверьте наименование файла на соответствие BIM-стандарту A101 или откройте другой файл.");
-                    break;
+                    case DocTypeEnum.KR: {
+                        if(!ModelCorrect(new RealOpeningsKrChecker(revitRepository))) {
+                            return;
+                        }
+                        var config = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
+                        var placer = new RealOpeningKrPlacer(revitRepository, config);
+                        placer.PlaceSingleOpeningsInOneHost();
+                        break;
+                    }
+
+                    default: {
+                        revitRepository.ShowErrorMessage(
+                            "Команда предназначена только для АР/КР." +
+                            "\nПроверьте наименование файла на соответствие BIM-стандарту A101 или откройте другой файл.");
+                        break;
+                    }
                 }
             }
         }

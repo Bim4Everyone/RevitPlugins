@@ -8,7 +8,13 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
+
+using Ninject;
+
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
@@ -40,14 +46,27 @@ namespace RevitOpeningPlacement {
 
 
         protected override void Execute(UIApplication uiApplication) {
-            RevitRepository revitRepository = new RevitRepository(
-                uiApplication.Application,
-                uiApplication.ActiveUIDocument.Document);
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitEventHandler>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ParameterFilterProvider>()
+                    .ToSelf()
+                    .InSingletonScope();
 
-            if(!ModelCorrect(revitRepository)) {
-                return;
+                var repo = kernel.Get<RevitRepository>();
+
+                if(!ModelCorrect(repo)) {
+                    return;
+                }
+                GetOpeningsTask(uiApplication, repo);
             }
-            GetOpeningsTask(uiApplication, revitRepository);
         }
 
 
@@ -60,20 +79,20 @@ namespace RevitOpeningPlacement {
             var docType = revitRepository.GetDocumentType();
             switch(docType) {
                 case DocTypeEnum.AR:
-                GetOpeningsTaskInDocumentAR(uiApplication, revitRepository);
-                break;
+                    GetOpeningsTaskInDocumentAR(uiApplication, revitRepository);
+                    break;
                 case DocTypeEnum.KR:
-                GetOpeningsTaskInDocumentKR(uiApplication, revitRepository);
-                break;
+                    GetOpeningsTaskInDocumentKR(uiApplication, revitRepository);
+                    break;
                 case DocTypeEnum.MEP:
-                GetOpeningsTaskInDocumentMEP(uiApplication, revitRepository);
-                break;
+                    GetOpeningsTaskInDocumentMEP(uiApplication, revitRepository);
+                    break;
                 case DocTypeEnum.KOORD:
-                GetOpeningsTaskInDocumentKoord(revitRepository);
-                break;
+                    GetOpeningsTaskInDocumentKoord(revitRepository);
+                    break;
                 default:
-                GetOpeningsTaskInDocumentNotDefined(revitRepository);
-                break;
+                    GetOpeningsTaskInDocumentNotDefined(revitRepository);
+                    break;
             }
         }
 
@@ -358,11 +377,11 @@ namespace RevitOpeningPlacement {
             TaskDialogResult result = navigatorModeDialog.Show();
             switch(result) {
                 case TaskDialogResult.CommandLink1:
-                return KrNavigatorMode.IncomingAr;
+                    return KrNavigatorMode.IncomingAr;
                 case TaskDialogResult.CommandLink2:
-                return KrNavigatorMode.IncomingMep;
+                    return KrNavigatorMode.IncomingMep;
                 default:
-                throw new OperationCanceledException();
+                    throw new OperationCanceledException();
             }
         }
 
@@ -388,7 +407,7 @@ namespace RevitOpeningPlacement {
                     break;
                 }
                 default:
-                throw new OperationCanceledException();
+                    throw new OperationCanceledException();
             }
         }
 
