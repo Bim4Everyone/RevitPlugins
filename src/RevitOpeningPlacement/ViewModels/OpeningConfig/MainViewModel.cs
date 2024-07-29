@@ -28,6 +28,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public MainViewModel(RevitRepository revitRepository, Models.Configs.OpeningConfig openingConfig) {
             _revitRepository = revitRepository;
             if(openingConfig.Categories.Any()) {
+                ShowPlacingErrors = openingConfig.ShowPlacingErrors;
                 MepCategories = new ObservableCollection<MepCategoryViewModel>(openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
                 if(MepCategories.All(item => !item.IsRound)) {
                     SetShape();
@@ -59,6 +60,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public ObservableCollection<MepCategoryViewModel> MepCategories {
             get => _mepCategories;
             set => RaiseAndSetIfChanged(ref _mepCategories, value);
+        }
+
+        private bool _showPlacingErrors;
+        public bool ShowPlacingErrors {
+            get => _showPlacingErrors;
+            set => RaiseAndSetIfChanged(ref _showPlacingErrors, value);
         }
 
         public string ErrorText {
@@ -199,6 +206,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private Models.Configs.OpeningConfig GetOpeningConfig() {
             var config = Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc);
             config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
+            config.ShowPlacingErrors = ShowPlacingErrors;
             return config;
         }
 
@@ -220,6 +228,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var cls = new ConfigLoaderService();
             var config = cls.Load<Models.Configs.OpeningConfig>(_revitRepository.Doc);
             if(config != null) {
+                ShowPlacingErrors = config.ShowPlacingErrors;
                 MepCategories = new ObservableCollection<MepCategoryViewModel>(config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
             }
             MessageText = "Файл настроек успешно загружен.";

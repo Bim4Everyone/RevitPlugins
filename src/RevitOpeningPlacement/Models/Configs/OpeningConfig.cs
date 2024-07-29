@@ -21,6 +21,11 @@ namespace RevitOpeningPlacement.Models.Configs {
         public override IConfigSerializer Serializer { get; set; }
         public MepCategoryCollection Categories { get; set; } = new MepCategoryCollection();
 
+        /// <summary>
+        /// Флаг для вывода ошибок расстановки заданий на отверстия пользователю
+        /// </summary>
+        public bool ShowPlacingErrors { get; set; } = false;
+
         public static OpeningConfig GetOpeningConfig(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
