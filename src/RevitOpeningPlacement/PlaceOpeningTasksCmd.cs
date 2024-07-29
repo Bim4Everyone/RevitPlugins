@@ -88,7 +88,9 @@ namespace RevitOpeningPlacement {
                 try {
                     var unplacedClashes = InitializePlacing(revitRepository, placers)
                         .Concat(placementConfigurator.GetUnplacedClashes());
-                    InitializeReport(revitRepository, unplacedClashes);
+                    if(openingConfig.ShowPlacingErrors) {
+                        InitializeReport(revitRepository, unplacedClashes);
+                    }
                 } finally {
                     uiApplication.Application.FailuresProcessing -= FailureProcessor;
                 }
