@@ -12,12 +12,10 @@
                            mc:Ignorable="d"
                            WindowStartupLocation="CenterOwner"
                            x:Name="_this"
-                           d:DesignHeight="800"
-                           d:DesignWidth="800"
-                           Height="800"
-                           Width="800"
-                           MinHeight="720"
-                           MinWidth="550"
+                           Height="700"
+                           Width="1250"
+                           MinHeight="700"
+                           MinWidth="1250"
                            d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -52,9 +50,8 @@
         </StackPanel>
 
         <dxdo:DockLayoutManager Grid.Row="1">
-            <dxdo:LayoutGroup AllowSplitters="True"
-                              LastChildFill="True">
-                <dxdo:LayoutControlItem ItemWidth="0.4*">
+            <dxdo:LayoutGroup LastChildFill="True">
+                <dxdo:LayoutControlItem ItemWidth="310">
                     <local:CategoryView x:Name="_categoryView"
                                         DataContext="{Binding ElementName=_this, Path=DataContext}" />
                 </dxdo:LayoutControlItem>

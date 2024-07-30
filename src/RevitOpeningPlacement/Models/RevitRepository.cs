@@ -163,6 +163,16 @@ namespace RevitOpeningPlacement.Models {
         };
 
         /// <summary>
+        /// Используемые в плагине категории для стен: Стены
+        /// </summary>
+        public static BuiltInCategory WallCategory { get; } = BuiltInCategory.OST_Walls;
+
+        /// <summary>
+        /// Используемые в плагине категории для перекрытий: Перекрытия
+        /// </summary>
+        public static BuiltInCategory FloorCategory { get; } = BuiltInCategory.OST_Floors;
+
+        /// <summary>
         /// Используемые в плагине линейные категории для труб: Трубы
         /// </summary>
         public static BuiltInCategory MepPipeLinearCategory { get; } = BuiltInCategory.OST_PipeCurves;
@@ -653,7 +663,6 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает значение элемента перечисления категорий инженерных систем
         /// </summary>
         /// <param name="mepCategoryName">Название категории инженерных систем</param>
-        /// <returns></returns>
         public MepCategoryEnum GetMepCategoryEnum(string mepCategoryName) {
             return MepCategoryNames
                 .First(pair => pair.Value.Equals(mepCategoryName, StringComparison.CurrentCultureIgnoreCase))
@@ -661,11 +670,20 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Возвращает значение элемента перечисления категорий конструкций
+        /// </summary>
+        /// <param name="structureCategoryName">Название категории конструкций</param>
+        public StructureCategoryEnum GetStructureCategoryEnum(string structureCategoryName) {
+            return StructureCategoryNames
+                .First(pair => pair.Value.Equals(structureCategoryName, StringComparison.CurrentCultureIgnoreCase))
+                .Key;
+        }
+
+        /// <summary>
         /// Возвращает массив категорий Revit, которые соответствуют заданному <see cref="MepCategoryEnum"/>
         /// </summary>
         /// <param name="mepCategory">Категория элементов инженерных систем</param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException">Исключение, 
+        /// <exception cref="NotSupportedException">Исключение, 
         /// если поданная категория <paramref name="mepCategory"/> не поддерживается</exception>
         public Category[] GetCategories(MepCategoryEnum mepCategory) {
             IReadOnlyCollection<BuiltInCategory> categoryCollection;
@@ -684,9 +702,30 @@ namespace RevitOpeningPlacement.Models {
                     categoryCollection = MepConduitCategories;
                     break;
                 default:
-                    throw new NotImplementedException(nameof(mepCategory));
+                    throw new NotSupportedException(nameof(mepCategory));
             }
             return categoryCollection.Select(c => Category.GetCategory(_document, c)).ToArray();
+        }
+
+        /// <summary>
+        /// Возвращает массив категорий Revit, которые соответствуют заданному <see cref="StructureCategoryEnum"/>
+        /// </summary>
+        /// <param name="structureCategory">Категория элементов конструкций</param>
+        /// <exception cref="NotSupportedException">Исключение, 
+        /// если поданная категория <paramref name="structureCategory"/> не поддерживается</exception>
+        public Category[] GetCategories(StructureCategoryEnum structureCategory) {
+            BuiltInCategory category;
+            switch(structureCategory) {
+                case StructureCategoryEnum.Wall:
+                    category = WallCategory;
+                    break;
+                case StructureCategoryEnum.Floor:
+                    category = FloorCategory;
+                    break;
+                default:
+                    throw new NotSupportedException(nameof(structureCategory));
+            }
+            return new Category[] { Category.GetCategory(_document, category) };
         }
 
         public bool ElementBelongsToMepCategory(MepCategoryEnum mepCategory, Element element) {

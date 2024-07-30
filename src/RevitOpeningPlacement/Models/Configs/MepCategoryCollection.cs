@@ -19,8 +19,8 @@ namespace RevitOpeningPlacement.Models.Configs {
         }
 
 
-        public List<MepCategory> Categories { get; set; }
-        public int Count => Categories.Count;
+        public IList<MepCategory> Categories { get; }
+        public int Count => Categories?.Count ?? 0;
         public MepCategory this[MepCategoryEnum category] => Categories
             .FirstOrDefault(item => item.Name.Equals(RevitRepository.MepCategoryNames[category]));
 
