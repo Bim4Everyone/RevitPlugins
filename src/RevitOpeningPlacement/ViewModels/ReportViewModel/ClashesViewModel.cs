@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -18,24 +18,15 @@ namespace RevitOpeningPlacement.ViewModels.ReportViewModel {
             Clashes = new List<ClashViewModel>(clashes.Select(item => new ClashViewModel(item)));
             ClashesViewSource = new CollectionViewSource() { Source = Clashes };
 
-            SelectCommand = new RelayCommand(Select, CanSelect);
-            SelectionDataChangedCommand = new RelayCommand(SelectionChanged);
+            SelectCommand = RelayCommand.Create<ClashViewModel>(Select, CanSelect);
         }
 
         public List<ClashViewModel> Clashes { get; set; }
         public CollectionViewSource ClashesViewSource { get; set; }
         public ICommand SelectCommand { get; }
-        public ICommand SelectionDataChangedCommand { get; }
 
-        private void SelectionChanged(object p) {
-            if(ClashesViewSource.View.CurrentPosition > -1
-                && ClashesViewSource.View.CurrentPosition < Clashes.Count) {
-                Select(ClashesViewSource.View.CurrentItem);
-            }
-        }
 
-        private void Select(object p) {
-            var clash = (ClashViewModel) p;
+        private void Select(ClashViewModel clash) {
             var elements = new[]{
                 clash.Clash.MainElement,
                 clash.Clash.OtherElement
@@ -43,8 +34,8 @@ namespace RevitOpeningPlacement.ViewModels.ReportViewModel {
             _revitRepository.SelectAndShowElement(elements);
         }
 
-        private bool CanSelect(object p) {
-            return (p as ClashViewModel) != null;
+        private bool CanSelect(ClashViewModel p) {
+            return p != null;
         }
     }
 }

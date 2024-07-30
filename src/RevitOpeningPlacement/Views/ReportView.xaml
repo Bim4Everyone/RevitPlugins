@@ -27,9 +27,6 @@
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
-            <mvvm:Interaction.Behaviors>
-                <mvvm:EventToCommand EventName="SelectedItemChanged" Command="{Binding SelectionDataChangedCommand}"/>
-            </mvvm:Interaction.Behaviors>
             <dxg:GridControl.View>
                 <dxg:TableView Name="_gridView" 
                                AutoWidth="True" 

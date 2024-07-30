@@ -37,8 +37,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
             SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel, mepCategory.Set);
 
-            AddOffsetCommand = new RelayCommand(AddOffset);
-            RemoveOffsetCommand = new RelayCommand(RemoveOffset, CanRemoveOffset);
+            AddOffsetCommand = RelayCommand.Create(AddOffset);
+            RemoveOffsetCommand = RelayCommand.Create<OffsetViewModel>(RemoveOffset, CanRemoveOffset);
         }
 
 
@@ -129,16 +129,16 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
 
-        private void AddOffset(object p) {
+        private void AddOffset() {
             Offsets.Add(new OffsetViewModel(new TypeNamesProvider(IsRound)));
         }
 
-        private void RemoveOffset(object p) {
-            Offsets.Remove(p as OffsetViewModel);
+        private void RemoveOffset(OffsetViewModel p) {
+            Offsets.Remove(p);
         }
 
-        private bool CanRemoveOffset(object p) {
-            return (p as OffsetViewModel) != null;
+        private bool CanRemoveOffset(OffsetViewModel p) {
+            return p != null;
         }
 
         private string GetIntersectionOffsetError() {

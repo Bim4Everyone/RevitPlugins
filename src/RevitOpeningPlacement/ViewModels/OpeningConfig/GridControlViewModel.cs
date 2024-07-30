@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
@@ -41,7 +41,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             InitializeRows();
             AddCommonInfo();
 
-            SelectCommand = new RelayCommand(p => SelectElement(p));
+            SelectCommand = RelayCommand.Create<ExpandoObject>(SelectElement, CanSelect);
         }
 
         public ObservableCollection<ColumnViewModel> Columns { get; set; }
@@ -107,9 +107,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
 
-        private void SelectElement(object p) {
-            if(!(p is ExpandoObject row))
-                return;
+        private void SelectElement(ExpandoObject row) {
             ((IDictionary<string, object>) row).TryGetValue("Id", out object resultId);
             if(resultId == null) {
                 return;
@@ -118,6 +116,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             if(element != null) {
                 _revitRepository.SelectAndShowElement(new[] { new ElementModel(element) });
             }
+        }
+
+        private bool CanSelect(ExpandoObject row) {
+            return row != null;
         }
 
         private Element GetElement(object id) {

@@ -37,10 +37,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
             InitializeTimer();
 
-            SaveConfigCommand = new RelayCommand(SaveConfig, CanSaveConfig);
-            SaveAsConfigCommand = new RelayCommand(SaveAsConfig, CanSaveConfig);
-            LoadConfigCommand = new RelayCommand(LoadConfig);
-            CheckSearchSearchSetCommand = new RelayCommand(CheckSearchSet, CanSaveConfig);
+            SaveConfigCommand = RelayCommand.Create(SaveConfig, CanSaveConfig);
+            SaveAsConfigCommand = RelayCommand.Create(SaveAsConfig, CanSaveConfig);
+            LoadConfigCommand = RelayCommand.Create(LoadConfig);
+            CheckSearchSearchSetCommand = RelayCommand.Create(CheckSearchSet, CanSaveConfig);
 
             SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
                 ?? MepCategories.First();
@@ -91,8 +91,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             };
         }
 
-        private void CheckSearchSet(object p) {
-            SaveConfig(null);
+        private void CheckSearchSet() {
+            SaveConfig();
 
             var categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
             var configurator = new PlacementConfigurator(_revitRepository, categories);
@@ -113,13 +113,13 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             return config;
         }
 
-        private void SaveConfig(object p) {
+        private void SaveConfig() {
             GetOpeningConfig().SaveProjectConfig();
             MessageText = "Файл настроек успешно сохранен.";
             _timer.Start();
         }
 
-        private void SaveAsConfig(object p) {
+        private void SaveAsConfig() {
             var config = GetOpeningConfig();
             var css = new ConfigSaverService();
             css.Save(config, _revitRepository.Doc);
@@ -127,7 +127,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             _timer.Start();
         }
 
-        private void LoadConfig(object p) {
+        private void LoadConfig() {
             var cls = new ConfigLoaderService();
             var config = cls.Load<Models.Configs.OpeningConfig>(_revitRepository.Doc);
             if(config != null) {
@@ -141,7 +141,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             _timer.Start();
         }
 
-        private bool CanSaveConfig(object p) {
+        private bool CanSaveConfig() {
             ErrorText = MepCategories.FirstOrDefault(item => !string.IsNullOrEmpty(item.GetErrorText()))
                 ?.GetErrorText();
             return string.IsNullOrEmpty(ErrorText);

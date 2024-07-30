@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
@@ -17,15 +17,15 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class MepCategoryFilterViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
-        private Filter _linearElementsFilter;
+        private readonly Filter _linearElementsFilter;
+        private readonly SearchSetViewModel _straightSearchSetLinearElements;
+        private readonly SearchSetViewModel _invertedSearchSetLinearElements;
         private SearchSetViewModel _searchSetLinearElements;
-        private SearchSetViewModel _straightSearchSetLinearElements;
-        private SearchSetViewModel _invertedSearchSetLinearElements;
 
-        private Filter _nonLinearElementsFilter;
+        private readonly Filter _nonLinearElementsFilter;
+        private readonly SearchSetViewModel _straightSearchSetNonLinearElements;
+        private readonly SearchSetViewModel _invertedSearchSetNonLinearElements;
         private SearchSetViewModel _searchSetNonLinearElements;
-        private SearchSetViewModel _straightSearchSetNonLinearElements;
-        private SearchSetViewModel _invertedSearchSetNonLinearElements;
 
 
         /// <summary>
@@ -47,8 +47,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             _invertedSearchSetNonLinearElements = new SearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new InvertedRevitFilterGenerator());
             NonLinearElementsSearchSet = _straightSearchSetNonLinearElements;
 
-            InversionChangedCommand = new RelayCommand(InversionChanged);
-            CloseCommand = new RelayCommand(Close);
+            InversionChangedCommand = RelayCommand.Create(InversionChanged);
+            CloseCommand = RelayCommand.Create(Close);
         }
 
 
@@ -68,7 +68,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
 
-        private void InversionChanged(object p) {
+        private void InversionChanged() {
             if(Inverted) {
                 LinearElementsSearchSet = _invertedSearchSetLinearElements;
                 NonLinearElementsSearchSet = _invertedSearchSetNonLinearElements;
@@ -78,7 +78,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
         }
 
-        private void Close(object p) {
+        private void Close() {
             Action action = () => {
                 var command = new SetOpeningTasksPlacementConfigCmd();
                 command.ExecuteCommand(_revitRepository.UIApplication);
