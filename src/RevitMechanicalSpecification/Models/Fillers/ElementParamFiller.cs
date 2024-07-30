@@ -43,6 +43,15 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             return null;
         }
 
+        protected string GetTypeOrInstanceParamValue(Element element, string paramName) {
+            if(element.IsExistsParam(paramName)) 
+                { return element.GetSharedParamValue<string>(paramName); }
+            Element elemType = element.GetElementType();
+            if(elemType.IsExistsParam(paramName)) 
+                { return elemType.GetSharedParamValue<string>(paramName); }
+            return null;
+        }
+
         private Parameter GetTypeOrInstanceParam(Element element, Element elemType, string paramName) 
             {
             if(element.IsExistsParam(paramName)) 

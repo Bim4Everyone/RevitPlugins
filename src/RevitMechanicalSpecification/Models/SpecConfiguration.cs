@@ -34,6 +34,7 @@ namespace RevitMechanicalSpecification.Models {
 
         public readonly string TargetNameGroup = "ФОП_ВИС_Группирование";
         public readonly string TargetNameFunction = "ФОП_Экономическая функция";
+        public readonly string TargetNameSystem = "ФОП_ВИС_Имя системы";
         public readonly string TargetNameVisFunction = "ФОП_ВИС_Экономическая функция";
         public readonly string TargetNameName = "ФОП_ВИС_Наименование комбинированное";
         public readonly string TargetNameMark = "ФОП_ВИС_Марка";
@@ -45,6 +46,7 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string ForcedName = "ФОП_ВИС_Наименование принудительное";
         public readonly string ForcedSystemName = "ФОП_ВИС_Имя системы принудительное";
         public readonly string ForcedGroup = "ФОП_ВИС_Группирование принудительное";
+        public readonly string ForcedFunction = "ФОП_ВИС_Функция принудительная";
 
         public readonly string MinDuctThikness = "ФОП_ВИС_Минимальная толщина воздуховода";
         public readonly string MaxDuctThikness = "ФОП_ВИС_Максимальная толщина воздуховода";
@@ -65,6 +67,9 @@ namespace RevitMechanicalSpecification.Models {
         private readonly string _paramNameDuctPipeStock = "ФОП_ВИС_Запас воздуховодов/труб";
         public readonly string IndividualStock = "ФОП_ВИС_Индивидуальный запас";
 
+
+        public readonly string IsManiFoldParamName = "ФОП_ВИС_Узел";
+        public readonly string IsOutSideOfManifold = "ФОП_ВИС_Исключить из узла";
 
         public readonly string SingleUnit = "шт.";
         public readonly string KitUnit = "компл.";

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using RevitMechanicalSpecification.Models.Classes;
 using dosymep.Revit;
+using System.Windows.Forms;
 
 namespace RevitMechanicalSpecification.Models {
 
@@ -45,24 +46,24 @@ namespace RevitMechanicalSpecification.Models {
         }
 
 
-
-
-        public List<MechanicalSystem> GetMechanicalSystemColl() 
+        public List<VisSystem> GetMechanicalSystemColl() 
         {
-            List<Element> elements = new List<Element>();
-            List<MechanicalSystem> mechanicalSystems = new List<MechanicalSystem>();
+            List<Element> elements = GetElements(
+                new List<BuiltInCategory>() { 
+                BuiltInCategory.OST_PipingSystem, 
+                BuiltInCategory.OST_DuctSystem });
 
-            elements.AddRange(GetElements(BuiltInCategory.OST_PipingSystem));
-            elements.AddRange(GetElements(BuiltInCategory.OST_DuctSystem));
-            elements.Select(element => {
-                var elementType = element.GetElementType();
-                return new MechanicalSystem {
+            List<VisSystem> mechanicalSystems = new List<VisSystem>();
+            mechanicalSystems.AddRange(elements.Select(element => new VisSystem {
+                
                     SystemElement = element as MEPSystem,
-                    SystemName = element.Name,
-                    SystemFunction = elementType.GetSharedParamValueOrDefault<string>("ФОП_ВИС_ЭФ для системы"),
-                    SystemShortName = elementType.GetSharedParamValueOrDefault<string>("ФОП_ВИС_Сокращение для системы")
-                };
-            });
+                    SystemSystemName = element.Name,
+                    SystemFunction = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_ЭФ для системы"),
+                    SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_Сокращение для системы"),
+                    SystemTargetName = element.Name.Split(' ').First()
+            }));
+
+
             return mechanicalSystems;
         }
 
