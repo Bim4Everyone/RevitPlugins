@@ -6,12 +6,14 @@ using System.Windows.Controls;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitMechanicalSpecification.Models.Classes;
 using dosymep.Revit;
 using RevitMechanicalSpecification.Models.Fillers;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties;
 using System.Xml.Linq;
 using Autodesk.Revit.DB.Mechanical;
+using RevitMechanicalSpecification.Service;
+using System.Diagnostics;
+using System;
 
 
 
@@ -44,9 +46,33 @@ namespace RevitMechanicalSpecification.Models {
 
 
             SpecConfiguration specConfiguration = new SpecConfiguration(Document.ProjectInformation);
-            DuctElementsCalculator calculator = new DuctElementsCalculator(specConfiguration, Document);
-            ManiFoldOperator maniFoldOperator = new ManiFoldOperator(specConfiguration, Document, calculator);
+            VisElementsCalculator calculator = new VisElementsCalculator(specConfiguration, Document);
+            NameAndGroupFactory nameAndGruopFactory = new NameAndGroupFactory(specConfiguration, Document, calculator);
 
+
+            List<ElementParamFiller>  testFillers = new List<ElementParamFiller>()
+            {
+
+                //Заполнение ФОП_ВИС_Марка
+                new ElementParamDefaultFiller(
+                specConfiguration.TargetNameMark,
+                specConfiguration.OriginalParamNameMark,
+                specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Код изделия
+                new ElementParamDefaultFiller(
+                specConfiguration.TargetNameCode,
+                specConfiguration.OriginalParamNameCode,
+                specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Завод-изготовитель
+                new ElementParamDefaultFiller(
+                specConfiguration.TargetNameCreator,
+                specConfiguration.OriginalParamNameCreator,
+                specConfiguration,
+                Document),
+
+        };
             _fillers = new List<ElementParamFiller>() 
             {
                 //Заполнение ФОП_ВИС_Группирование
@@ -55,7 +81,7 @@ namespace RevitMechanicalSpecification.Models {
                 null,
                 specConfiguration,
                 Document,
-                maniFoldOperator),
+                nameAndGruopFactory),
                 //Заполнение ФОП_ВИС_Марка
                 new ElementParamDefaultFiller(
                 specConfiguration.TargetNameMark,
@@ -90,35 +116,47 @@ namespace RevitMechanicalSpecification.Models {
                 new ElementParamNameFiller(
                 specConfiguration.TargetNameName,
                 specConfiguration.OriginalParamNameName,
-                specConfiguration, 
-                Document,
-                maniFoldOperator),
-                //Заполнение ФОП_ВИС_Имя системы
-                new ElementParamSystemFiller(
-                specConfiguration.TargetNameSystem,
-                null,
                 specConfiguration,
                 Document,
-                VisSystems),
-                //Заполнение ФОП_ВИС_Экономическая функция
-                new ElementParamSystemFiller(
-                specConfiguration.TargetNameFunction,
-                null,
-                specConfiguration,
-                Document,
-                VisSystems)
+                nameAndGruopFactory),
+                ////Заполнение ФОП_ВИС_Имя системы
+                //new ElementParamSystemFiller(
+                //specConfiguration.TargetNameSystem,
+                //null,
+                //specConfiguration,
+                //Document,
+                //VisSystems),
+                ////Заполнение ФОП_ВИС_Экономическая функция
+                //new ElementParamSystemFiller(
+                //specConfiguration.TargetNameFunction,
+                //null,
+                //specConfiguration,
+                //Document,
+                //VisSystems)
 
         };
 
+            
+
 
             using(Transaction t = Document.StartTransaction("Обновление спецификации")) {
-
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
                 foreach(Element element in Elements) {
                     foreach(ElementParamFiller filler in _fillers) {
                         filler.Fill(element);
 
                     }
                 }
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+
+                // Format and display the TimeSpan value.
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds,
+                    ts.Milliseconds / 10);
+                MessageBox.Show(elapsedTime.ToString());
+
                 t.Commit();
             }
         }

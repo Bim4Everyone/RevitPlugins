@@ -9,13 +9,15 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-namespace RevitMechanicalSpecification.Models.Classes {
-    internal class ManiFoldOperator {
+using RevitMechanicalSpecification.Models;
+
+namespace RevitMechanicalSpecification.Service {
+    internal class NameAndGroupFactory {
         private readonly SpecConfiguration _config;
         private readonly Document _document;
-        private readonly DuctElementsCalculator _calculator;
+        private readonly VisElementsCalculator _calculator;
 
-        public ManiFoldOperator(SpecConfiguration configuration, Document document, DuctElementsCalculator calculator) {
+        public NameAndGroupFactory(SpecConfiguration configuration, Document document, VisElementsCalculator calculator) {
             _document = document;
             _config = configuration;
             _calculator = calculator;
@@ -24,9 +26,10 @@ namespace RevitMechanicalSpecification.Models.Classes {
         //Ниже операции с именами
         //Базовое имя без учета узла
         private string GetBaseName(Element element) {
-            string name = GetTypeOrInstanceParamValue(element, _config.OriginalParamNameName);
+            Element elemType = element.GetElementType();
+            string name = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameName);
 
-            if(String.IsNullOrEmpty(name)) { name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ"; }
+            if(string.IsNullOrEmpty(name)) { name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ"; }
             if(element.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
                 { name += _calculator.GetDuctName(element); }
             }
@@ -44,7 +47,7 @@ namespace RevitMechanicalSpecification.Models.Classes {
             }
             if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) {
 
-                InsulationLiningBase insulation = element as InsulationLiningBase;
+                var insulation = element as InsulationLiningBase;
                 Element pipe = _document.GetElement(insulation.HostElementId);
 
                 if(!(pipe is null)) { name += " (Для: " + GetName(pipe) + ")"; }
@@ -55,16 +58,15 @@ namespace RevitMechanicalSpecification.Models.Classes {
         public string GetName(Element element) {
             string name = GetBaseName(element);
 
-            if(element is FamilyInstance) {
-
+            if(element is FamilyInstance instance) {
                 if(!IsOutSideOfManifold(element)) {
-                    FamilyInstance familyInstance = (FamilyInstance) element;
+                    FamilyInstance familyInstance = instance;
                     if(!(familyInstance.SuperComponent is null)) {
                         familyInstance = GetSuperComponentIfExist(familyInstance);
 
                         if(IsManifold(familyInstance)) {
                             string num = GetNumeration(familyInstance, element);
-                            if(!String.IsNullOrEmpty(num)) { name = num + name; }
+                            if(!string.IsNullOrEmpty(num)) { name = num + name; }
                         }
                     }
                 }
@@ -78,7 +80,7 @@ namespace RevitMechanicalSpecification.Models.Classes {
             if(element.InAnyCategory(new HashSet<BuiltInCategory>() {
                 BuiltInCategory.OST_MechanicalEquipment,
                 BuiltInCategory.OST_PlumbingFixtures,
-                BuiltInCategory.OST_Sprinklers})) { return "1.Оборудование"; }
+                BuiltInCategory.OST_Sprinklers})) { return "1. Оборудование"; }
 
             if(element.Category.IsId(BuiltInCategory.OST_DuctAccessory)) { return "2. Арматура воздуховодов"; }
             if(element.Category.IsId(BuiltInCategory.OST_DuctTerminal)) { return "3. Воздухораспределители"; }
@@ -96,48 +98,43 @@ namespace RevitMechanicalSpecification.Models.Classes {
         }
         //Детализированная - имя + марка + код + завод
         private string GetDetailedGroup(Element element) {
+            Element elemType = element.GetElementType();
 
-            string name = GetTypeOrInstanceParamValue(element, _config.OriginalParamNameName);
-            string mark = GetTypeOrInstanceParamValue(element, _config.OriginalParamNameMark);
-            string code = GetTypeOrInstanceParamValue(element, _config.OriginalParamNameCode);
-            string creator = GetTypeOrInstanceParamValue(element, _config.OriginalParamNameCreator);
+            string name = GetBaseName(element);
+            string mark = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameMark);
+            string code = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameCode);
+            string creator = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameCreator);
             return "_" + name + "_" + mark + "_" + code + "_" + creator;
         }
         //Базовая + детализированная + модификация если узел
         public string GetGroup(Element element) {
             string detailedGroup = GetDetailedGroup(element);
-            if(element is FamilyInstance) {
 
-                if(!IsOutSideOfManifold(element)) {
-                    FamilyInstance familyInstance = (FamilyInstance) element;
-                    if(!(familyInstance.SuperComponent is null)) {
-                        familyInstance = GetSuperComponentIfExist(familyInstance);
-                        if(IsManifold(familyInstance)) {
-                            return
-                                GetBaseGroup(familyInstance) +
-                                "_Узел_" +
-                                familyInstance.GetParamValue(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM) +
-                                detailedGroup;
-                        }
+            if(element is FamilyInstance instance && !IsOutSideOfManifold(element)) {
+                if(instance.SuperComponent != null) {
+                    FamilyInstance familyInstance = GetSuperComponentIfExist(instance);
+
+                    if(IsManifold(familyInstance)) {
+                        return
+                            $"{GetBaseGroup(familyInstance)}" +
+                            $"_Узел_" +
+                            $"{familyInstance.GetParamValue(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM)}{detailedGroup}";
                     }
                 }
             }
-            
-            return GetBaseGroup(element)
-            + detailedGroup;
+            return $"{GetBaseGroup(element)}{detailedGroup}";
         }
-
         //Получает нумерацию вложения в коллектор
         public string GetNumeration(FamilyInstance family, Element currentObj) {
             int num = 1;
             string lastGroup = string.Empty;
 
-            List<Element> elementsOfManifold = GetSub(family).OrderBy(e => GetGroup(e)).ToList();
+            var elementsOfManifold = GetSub(family).OrderBy(e => GetGroup(e)).ToList();
 
             foreach(Element element in elementsOfManifold) {
                 string name = GetBaseName(element);
 
-                if(!(String.IsNullOrEmpty(name)) && name != "!Не учитывать") {
+                if(!string.IsNullOrEmpty(name) && name != "!Не учитывать") {
                     string currentGroup = GetGroup(currentObj);
                     string elemGroup = GetGroup(element);
                     if(lastGroup != elemGroup) {
@@ -145,11 +142,9 @@ namespace RevitMechanicalSpecification.Models.Classes {
                         if(currentGroup == elemGroup) {
                             return "‎    " + num.ToString() + ". ";
                         }
-                        num += 1;
+                        num++;
                     }
                 }
-
-
             }
             return null;
         }
@@ -167,22 +162,20 @@ namespace RevitMechanicalSpecification.Models.Classes {
 
         //возвращает субкомпоненты и субкомпоненты субкомпонентов
         private List<Element> GetSub(FamilyInstance element) {
-            List<Element> subs = new List<Element>();
+            var subs = new List<Element>();
 
             foreach(ElementId elementId in element.GetSubComponentIds()) {
                 Element subElement = _document.GetElement(elementId);
                 subs.Add(subElement);
 
-                FamilyInstance subInst = subElement as FamilyInstance;
-                if(subInst.GetSubComponentIds().Count > 0) 
-                    { subs.AddRange(GetSub(subInst)); }
+                var subInst = subElement as FamilyInstance;
+                if(subInst.GetSubComponentIds().Count > 0) { subs.AddRange(GetSub(subInst)); }
             }
             return subs;
         }
 
         //возвращает значение параметра по типу или экземпляру, если существует, иначе null
-        private string GetTypeOrInstanceParamValue(Element element, string paraName) {
-            Element elemType = element.GetElementType();
+        private string GetTypeOrInstanceParamValue(Element element, Element elemType, string paraName) {
             if(element.IsExistsParam(paraName)) { return element.GetSharedParamValueOrDefault<string>(paraName); }
             if(elemType.IsExistsParam(paraName)) { return elemType.GetSharedParamValueOrDefault<string>(paraName); }
             return null;
@@ -192,16 +185,14 @@ namespace RevitMechanicalSpecification.Models.Classes {
         private bool IsManifold(Element element) {
             Element elemType = element.GetElementType();
 
-            if(!(elemType.GetSharedParamValueOrDefault<int>(_config.IsManiFoldParamName) == 1)) 
-                { return false; }
+            if(!(elemType.GetSharedParamValueOrDefault<int>(_config.IsManiFoldParamName) == 1)) { return false; }
 
             return true;
-            }
+        }
 
-        private bool IsOutSideOfManifold(Element element) 
-            {
+        private bool IsOutSideOfManifold(Element element) {
             Element elemType = element.GetElementType();
-            if((elemType.GetSharedParamValueOrDefault<int>(_config.IsOutSideOfManifold) == 1)) {
+            if(elemType.GetSharedParamValueOrDefault<int>(_config.IsOutSideOfManifold) == 1) {
                 return true;
             }
             return false;

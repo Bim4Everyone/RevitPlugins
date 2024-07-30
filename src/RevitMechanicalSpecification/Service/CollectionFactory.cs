@@ -5,24 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-using RevitMechanicalSpecification.Models.Classes;
 using dosymep.Revit;
 using System.Windows.Forms;
 
-namespace RevitMechanicalSpecification.Models {
+namespace RevitMechanicalSpecification.Service {
 
     internal class CollectionFactory {
 
         private readonly Document _document;
 
-        public CollectionFactory(Document doc) 
-            {
+        public CollectionFactory(Document doc) {
             _document = doc;
-            }
+        }
 
         public List<Element> GetMechanicalElements() {
 
-            List<BuiltInCategory> mechanicalCategories = new List<BuiltInCategory>()
+            var mechanicalCategories = new List<BuiltInCategory>()
             {
                 BuiltInCategory.OST_DuctFitting,
                 BuiltInCategory.OST_PipeFitting,
@@ -39,28 +37,27 @@ namespace RevitMechanicalSpecification.Models {
                 BuiltInCategory.OST_PlumbingFixtures,
                 BuiltInCategory.OST_Sprinklers,
                 BuiltInCategory.OST_GenericModel
-                
+
             };
             return GetElements(mechanicalCategories);
-            
+
         }
 
 
-        public List<VisSystem> GetMechanicalSystemColl() 
-        {
+        public List<VisSystem> GetMechanicalSystemColl() {
             List<Element> elements = GetElements(
-                new List<BuiltInCategory>() { 
-                BuiltInCategory.OST_PipingSystem, 
+                new List<BuiltInCategory>() {
+                BuiltInCategory.OST_PipingSystem,
                 BuiltInCategory.OST_DuctSystem });
 
-            List<VisSystem> mechanicalSystems = new List<VisSystem>();
+            var mechanicalSystems = new List<VisSystem>();
             mechanicalSystems.AddRange(elements.Select(element => new VisSystem {
-                
-                    SystemElement = element as MEPSystem,
-                    SystemSystemName = element.Name,
-                    SystemFunction = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_ЭФ для системы"),
-                    SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_Сокращение для системы"),
-                    SystemTargetName = element.Name.Split(' ').First()
+
+                SystemElement = element as MEPSystem,
+                SystemSystemName = element.Name,
+                SystemFunction = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_ЭФ для системы"),
+                SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_Сокращение для системы"),
+                SystemTargetName = element.Name.Split(' ').First()
             }));
 
 
@@ -80,10 +77,9 @@ namespace RevitMechanicalSpecification.Models {
             return false;
         }
 
-        private List<Element> GetElements(List<BuiltInCategory> builtInCategories) 
-            {
-            ElementMulticategoryFilter filter = new ElementMulticategoryFilter(builtInCategories);
-            List<Element> elements = (List<Element>) new FilteredElementCollector(_document)
+        private List<Element> GetElements(List<BuiltInCategory> builtInCategories) {
+            var filter = new ElementMulticategoryFilter(builtInCategories);
+            var elements = (List<Element>) new FilteredElementCollector(_document)
                 .WherePasses(filter)
                 .WhereElementIsNotElementType()
                 .ToElements();
@@ -91,7 +87,7 @@ namespace RevitMechanicalSpecification.Models {
         }
 
         private List<Element> GetElements(BuiltInCategory category) {
-            List<Element> defColl = (List<Element>) new FilteredElementCollector(_document)
+            var defColl = (List<Element>) new FilteredElementCollector(_document)
                 .OfCategory(category)
                 .WhereElementIsNotElementType()
                 .ToElements();

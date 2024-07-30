@@ -11,7 +11,7 @@ using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamUnitFiller : ElementParamFiller {
-        private readonly List<string> _kitNames = new List<string>() {
+        private readonly HashSet<string> _kitNames = new HashSet<string>() {
             "компл",
             "компл.",
             "Компл.",
@@ -30,7 +30,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
 
         private string DefaultCheck(Element element, string defaultUnit) {
-            string unit = GetTypeOrInstanceParamValue(element);
+            //string unit = GetTypeOrInstanceParamValue(element);
+            string unit = FromParam.AsValueString();
 
             if(unit == null) { return defaultUnit; }
 

@@ -9,7 +9,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitMechanicalSpecification.Models.Classes;
+using RevitMechanicalSpecification.Service;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNumberFiller : ElementParamFiller {
@@ -39,7 +39,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             double number = 0;
             string unit;
             try {
-                DuctElementsCalculator calculator = new DuctElementsCalculator(Config, Document);
+                VisElementsCalculator calculator = new VisElementsCalculator(Config, Document);
                 UnitConverter converter = new UnitConverter();
 
                 unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);

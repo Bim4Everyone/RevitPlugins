@@ -23,49 +23,49 @@ namespace RevitMechanicalSpecification.Models {
         public bool IsSpecifyDuctFittings;
         public bool IsSpecifyPipeFittings;
 
-        public const string TargetNameGroup = "ФОП_ВИС_Группирование";
-        public const string TargetNameFunction = "ФОП_Экономическая функция";
-        public const string TargetNameSystem = "ФОП_ВИС_Имя системы";
-        public const string TargetNameVisFunction = "ФОП_ВИС_Экономическая функция";
-        public const string TargetNameName = "ФОП_ВИС_Наименование комбинированное";
-        public const string TargetNameMark = "ФОП_ВИС_Марка";
-        public const string TargetNameCode = "ФОП_ВИС_Код изделия";
-        public const string TargetNameUnit = "ФОП_ВИС_Единица измерения";
-        public const string TargetNameCreator = "ФОП_ВИС_Завод-изготовитель";
-        public const string TargetNameNumber = "ФОП_ВИС_Число";
+        public readonly string TargetNameGroup = "ФОП_ВИС_Группирование";
+        public readonly string TargetNameFunction = "ФОП_Экономическая функция";
+        public readonly string TargetNameSystem = "ФОП_ВИС_Имя системы";
+        public readonly string TargetNameVisFunction = "ФОП_ВИС_Экономическая функция";
+        public readonly string TargetNameName = "ФОП_ВИС_Наименование комбинированное";
+        public readonly string TargetNameMark = "ФОП_ВИС_Марка";
+        public readonly string TargetNameCode = "ФОП_ВИС_Код изделия";
+        public readonly string TargetNameUnit = "ФОП_ВИС_Единица измерения";
+        public readonly string TargetNameCreator = "ФОП_ВИС_Завод-изготовитель";
+        public readonly string TargetNameNumber = "ФОП_ВИС_Число";
 
-        public const string ForcedName = "ФОП_ВИС_Наименование принудительное";
-        public const string ForcedSystemName = "ФОП_ВИС_Имя системы принудительное";
-        public const string ForcedGroup = "ФОП_ВИС_Группирование принудительное";
-        public const string ForcedFunction = "ФОП_ВИС_Функция принудительная";
+        public readonly string ForcedName = "ФОП_ВИС_Наименование принудительное";
+        public readonly string ForcedSystemName = "ФОП_ВИС_Имя системы принудительное";
+        public readonly string ForcedGroup = "ФОП_ВИС_Группирование принудительное";
+        public readonly string ForcedFunction = "ФОП_ВИС_Функция принудительная";
 
-        public const string MinDuctThikness = "ФОП_ВИС_Минимальная толщина воздуховода";
-        public const string MaxDuctThikness = "ФОП_ВИС_Максимальная толщина воздуховода";
-
-
-        private const string _changedNameName = "ФОП_ВИС_Замена параметра_Наименование";
-        private const string _changedNameMark = "ФОП_ВИС_Замена параметра_Марка";
-        private const string _changedNameCode = "ФОП_ВИС_Замена параметра_Код изделия";
-        private const string _changedNameUnit = "ФОП_ВИС_Замена параметра_Единица измерения";
-        private const string _changedNameCreator = "ФОП_ВИС_Замена параметра_Завод-изготовитель";
-
-        private const string _paramNameIsSpecifyPipeFittings = "ФОП_ВИС_Учитывать фитинги труб";
-        public const string ParamNameIsSpecifyPipeFittingsFromPype = "ФОП_ВИС_Учитывать фитинги труб по типу трубы";
-        private const string _paramNameIsSpecifyDuctFittings = "ФОП_ВИС_Учитывать фитинги воздуховодов";
+        public readonly string MinDuctThikness = "ФОП_ВИС_Минимальная толщина воздуховода";
+        public readonly string MaxDuctThikness = "ФОП_ВИС_Максимальная толщина воздуховода";
 
 
-        private const string _paramNameInsulationStock = "ФОП_ВИС_Запас изоляции";
-        private const string _paramNameDuctPipeStock = "ФОП_ВИС_Запас воздуховодов/труб";
-        public const string IndividualStock = "ФОП_ВИС_Индивидуальный запас";
+        private readonly string _changedNameName = "ФОП_ВИС_Замена параметра_Наименование";
+        private readonly string _changedNameMark = "ФОП_ВИС_Замена параметра_Марка";
+        private readonly string _changedNameCode = "ФОП_ВИС_Замена параметра_Код изделия";
+        private readonly string _changedNameUnit = "ФОП_ВИС_Замена параметра_Единица измерения";
+        private readonly string _changedNameCreator = "ФОП_ВИС_Замена параметра_Завод-изготовитель";
+
+        private readonly string _paramNameIsSpecifyPipeFittings = "ФОП_ВИС_Учитывать фитинги труб";
+        public readonly string ParamNameIsSpecifyPipeFittingsFromPype = "ФОП_ВИС_Учитывать фитинги труб по типу трубы";
+        private readonly string _paramNameIsSpecifyDuctFittings = "ФОП_ВИС_Учитывать фитинги воздуховодов";
 
 
-        public const string IsManiFoldParamName = "ФОП_ВИС_Узел";
-        public const string IsOutSideOfManifold = "ФОП_ВИС_Исключить из узла";
+        private readonly string _paramNameInsulationStock = "ФОП_ВИС_Запас изоляции";
+        private readonly string _paramNameDuctPipeStock = "ФОП_ВИС_Запас воздуховодов/труб";
+        public readonly string IndividualStock = "ФОП_ВИС_Индивидуальный запас";
 
-        public const string SingleUnit = "шт.";
-        public const string KitUnit = "компл.";
-        public const string MeterUnit = "м.п.";
-        public const string SquareUnit = "м²";
+
+        public readonly string IsManiFoldParamName = "ФОП_ВИС_Узел";
+        public readonly string IsOutSideOfManifold = "ФОП_ВИС_Исключить из узла";
+
+        public readonly string SingleUnit = "шт.";
+        public readonly string KitUnit = "компл.";
+        public readonly string MeterUnit = "м.п.";
+        public readonly string SquareUnit = "м²";
 
 
         public SpecConfiguration(ProjectInfo info) {

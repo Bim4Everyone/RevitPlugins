@@ -8,7 +8,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitMechanicalSpecification.Models.Classes;
+using RevitMechanicalSpecification.Service;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamSystemFiller : ElementParamFiller {

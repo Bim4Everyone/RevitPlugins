@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevitMechanicalSpecification.Models.Classes {
+namespace RevitMechanicalSpecification.Service {
     internal class UnitConverter {
 
         public double DoubleToMeters(double number) {
-            return Math.Round((number * 304.8) / 1000, 2);
+            return Math.Round(number * 304.8 / 1000, 2);
         }
 
         public double DoubleToMilimeters(double number) {
@@ -20,7 +20,7 @@ namespace RevitMechanicalSpecification.Models.Classes {
         }
 
         public double DoubleToDegree(double number) {
-            return Math.Round(number/0.0175, 2);
+            return Math.Round(number / 0.0175, 2);
         }
 
 

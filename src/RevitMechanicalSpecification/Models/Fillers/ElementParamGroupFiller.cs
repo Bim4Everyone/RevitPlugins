@@ -9,27 +9,27 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using RevitMechanicalSpecification.Models.Classes;
+using RevitMechanicalSpecification.Service;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamGroupFiller : ElementParamFiller {
 
-        private readonly ManiFoldOperator _maniFoldOperator;
+        private readonly NameAndGroupFactory _nameAndGroupFactory;
         
         public ElementParamGroupFiller(
             string toParamName, 
             string fromParamName, 
             SpecConfiguration specConfiguration, 
             Document document,
-            ManiFoldOperator maniFoldOperator) : 
+            NameAndGroupFactory nameAndGroupFactory) : 
             base(toParamName, fromParamName, specConfiguration, document) 
             
             {
-            _maniFoldOperator = maniFoldOperator;
+            _nameAndGroupFactory = nameAndGroupFactory;
         }
 
         public override void SetParamValue(Element element) {
-            ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedGroup, _maniFoldOperator.GetGroup(element)));
+            ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedGroup, _nameAndGroupFactory.GetGroup(element)));
         }
     }
 }

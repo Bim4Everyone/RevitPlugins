@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
-namespace RevitMechanicalSpecification.Models.Classes {
+namespace RevitMechanicalSpecification.Service {
     public class VisSystem {
         public string SystemSystemName { get; set; }
         public string SystemFunction { get; set; }

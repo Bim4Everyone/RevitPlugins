@@ -8,22 +8,32 @@ using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     public abstract class ElementParamFiller : IElementParamFiller {
 
-        protected SpecConfiguration Config { get { return _config; } }
+        protected SpecConfiguration Config => _config;
 
         protected Parameter ToParam;
         protected Parameter FromParam;
 
         protected readonly string ToParamName;
         protected readonly string FromParamName;
+
+        protected Element ElemType;
+
         protected readonly Document Document;
         private readonly SpecConfiguration _config;
 
-        public ElementParamFiller(string toParamName, string fromParamName, SpecConfiguration specConfiguration, Document document) {
+
+        public ElementParamFiller(
+            string toParamName, 
+            string fromParamName, 
+            SpecConfiguration specConfiguration, 
+            Document document) 
+        {
             ToParamName = toParamName;
             FromParamName = fromParamName;
             _config = specConfiguration;
@@ -32,56 +42,50 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public abstract void SetParamValue(Element element);
 
+        //protected string GetTypeOrInstanceParamValue(Element element) {
+        //    if(element.IsExistsParam(FromParamName)) 
+        //        { return element.GetSharedParamValue<string>(FromParamName); }
+        //    if(ElemType.IsExistsParam(FromParamName)) 
+        //        { return ElemType.GetSharedParamValue<string>(FromParamName); }
+        //    return null;
+        //}
 
-
-        protected string GetTypeOrInstanceParamValue(Element element) {
-            if(element.IsExistsParam(FromParamName)) 
-                { return element.GetSharedParamValue<string>(FromParamName); }
-            Element elemType = element.GetElementType();
-            if(elemType.IsExistsParam(FromParamName)) 
-                { return elemType.GetSharedParamValue<string>(FromParamName); }
-            return null;
-        }
-
-        protected string GetTypeOrInstanceParamValue(Element element, string paramName) {
-            if(element.IsExistsParam(paramName)) 
-                { return element.GetSharedParamValue<string>(paramName); }
-            Element elemType = element.GetElementType();
-            if(elemType.IsExistsParam(paramName)) 
-                { return elemType.GetSharedParamValue<string>(paramName); }
-            return null;
-        }
-
-        private Parameter GetTypeOrInstanceParam(Element element, Element elemType, string paramName) 
+        private Parameter GetTypeOrInstanceParam(Element element, string paramName) 
             {
+            if(paramName is null) 
+                { return null; }
             if(element.IsExistsParam(paramName)) 
                 { return element.GetParam(paramName); }
-            if(elemType.IsExistsParam(paramName)) 
-                { return elemType.GetParam(paramName); }
+            if(ElemType.IsExistsParam(paramName)) 
+                { return ElemType.GetParam(paramName); }
             return null;
         }
 
-        private bool IsTypeOrInstanceExists(Element element, Element elemType, string paramName) {
-            if(paramName is null) 
-                { return true; }
-            if(element.IsExistsParam(paramName)) 
-                { return true; }
-            if(elemType.IsExistsParam(paramName)) 
-                { return true; }
-            return false;
-        }
-        public void Fill(Element element) {
-            Element elemType = element.GetElementType();
 
-            //Проверяем, если существует исходный параметр в типе или экземпляре, или целевой ТОЛЬКО в экземпляре
-            if(!IsTypeOrInstanceExists(element, elemType, FromParamName) || !element.IsExistsParam(ToParamName)) 
-                { return; }
+        public void Fill(Element element) {
             
+            ElemType = element.GetElementType();
+
+            //Существует ли целевой параметр в экземпляре
             //Если параметры существуют создаем их экземпляры чтоб не пересоздавать
-            ToParam = element.GetParam(ToParamName);
-            //Проверка на нулл - для ситуаций где нет имени исходного(ФОП_ВИС_Число), тогда исходный парам так и остается пустым 
+            //все методы GetParam крашат, если null
+            try 
+            {
+                ToParam = element.GetSharedParam(ToParamName);
+            } 
+            catch(System.ArgumentException) 
+            { 
+                return; 
+            }
+            
+
+
+            //Проверка на нулл - для ситуаций где нет имени исходного(ФОП_ВИС_Число, Группирование), тогда исходный парам так и остается пустым 
             if(!(FromParamName is null)) {
-                FromParam = GetTypeOrInstanceParam(element, elemType, FromParamName);
+                //Проверяем, если существует исходный параметр в типе или экземпляре
+                FromParam = GetTypeOrInstanceParam(element, FromParamName);
+                if(FromParam is null) 
+                    {return; }
             }
 
             //Если целевой параметр ридонли - можно сразу идти дальше

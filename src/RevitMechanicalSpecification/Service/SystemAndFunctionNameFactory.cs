@@ -10,49 +10,42 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
-namespace RevitMechanicalSpecification.Models.Classes {
+namespace RevitMechanicalSpecification.Service {
     internal class SystemAndFunctionNameFactory {
         private readonly Document _document;
         private readonly List<VisSystem> _systems;
         private readonly string _noneSystemValue = "Нет системы";
         private readonly string _noneFunctionValue = "Нет функции";
 
-        public SystemAndFunctionNameFactory(Document document, List<VisSystem> systems)
-            { 
+        public SystemAndFunctionNameFactory(Document document, List<VisSystem> systems) {
             _document = document;
             _systems = systems;
         }
 
-        private string GetParamSystemValue(Element element) 
-            {return element.GetParamValueOrDefault<string>(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue ); }
+        private string GetParamSystemValue(Element element) { return element.GetParamValueOrDefault(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue); }
 
-        private string GetInsulationSystem(InsulationLiningBase insulation) 
-            {
+        private string GetInsulationSystem(InsulationLiningBase insulation) {
 
             Element host = _document.GetElement(insulation.HostElementId);
 
             return GetParamSystemValue(host);
         }
 
-        private FamilyInstance GetSuperComponentIfExist(FamilyInstance instance) 
-            {
-            if(!(instance.SuperComponent is null)) 
-                {
-                instance = (FamilyInstance)instance.SuperComponent;
-                instance = GetSuperComponentIfExist(instance);    
+        private FamilyInstance GetSuperComponentIfExist(FamilyInstance instance) {
+            if(!(instance.SuperComponent is null)) {
+                instance = (FamilyInstance) instance.SuperComponent;
+                instance = GetSuperComponentIfExist(instance);
             }
 
             return instance;
         }
 
-        private VisSystem GetVisSystem(Element element) 
-            {
-            if(element is FamilyInstance) 
-                {
-                element = GetSuperComponentIfExist((FamilyInstance)element);
+        private VisSystem GetVisSystem(Element element) {
+            if(element is FamilyInstance instance) {
+                element = GetSuperComponentIfExist(instance);
             }
 
-            string systemName = element.GetParamValueOrDefault<string>(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue);
+            string systemName = element.GetParamValueOrDefault(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue);
 
             systemName = systemName.Split(',').FirstOrDefault();
 
@@ -64,31 +57,26 @@ namespace RevitMechanicalSpecification.Models.Classes {
 
         }
 
-        public string GetFunctionValue(Element element) 
-            {
+        public string GetFunctionValue(Element element) {
             VisSystem visSystem = GetVisSystem(element);
-            if(visSystem is null) 
-                {
+            if(visSystem is null) {
                 return _noneFunctionValue;
             }
 
-            if(!String.IsNullOrEmpty(visSystem.SystemFunction)) 
-                { return visSystem.SystemFunction; }
+            if(!string.IsNullOrEmpty(visSystem.SystemFunction)) { return visSystem.SystemFunction; }
 
             return _noneFunctionValue;
         }
 
 
-        public string GetSystemValue(Element element) 
-            {
+        public string GetSystemValue(Element element) {
 
             VisSystem visSystem = GetVisSystem(element);
             if(visSystem is null) {
                 return _noneSystemValue;
             }
 
-            if(!String.IsNullOrEmpty(visSystem.SystemShortName)) 
-                { return visSystem.SystemShortName; }
+            if(!string.IsNullOrEmpty(visSystem.SystemShortName)) { return visSystem.SystemShortName; }
 
             return visSystem.SystemTargetName;
         }
