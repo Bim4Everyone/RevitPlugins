@@ -9,6 +9,29 @@
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
     <system:String x:Key="GeneralSettings.Title">Основные</system:String>
+    
+    <system:String x:Key="GeneralSettings.CorpSettings">Корпоративные настройки</system:String>
+    <system:String x:Key="GeneralSettings.CorpName">Имя настроек</system:String>
+    <system:String x:Key="GeneralSettings.SettingsPath">Путь до корпоративных настроек</system:String>
+    <system:String x:Key="GeneralSettings.SettingsImagePath">Путь до корпоративного изображения</system:String>
+    
+    <system:String x:Key="GeneralSettings.AppearanceSettings">Внешний вид</system:String>
+    <system:String x:Key="GeneralSettings.HostTheme">Тема интерфейса</system:String>
+    <system:String x:Key="GeneralSettings.HostLanguage">Используемый язык</system:String>
+    
+    <system:String x:Key="TelemetrySettings.Title">Телеметрия</system:String>
+    <system:String x:Key="TelemetrySettings.LogTrace">Трассировка</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceIsActive">Включить</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceLogLevel">Уровень трассировки</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceServerName">URL сервера</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournal">Журнал Revit</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalIsActive">Включить</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtc">Использовать часовой пояс UTC</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevel">Уровень журналирования</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplate">Шаблон событий журналирования</system:String>
+    
+    
     <system:String x:Key="GeneralSettings.Notification">Уведомления</system:String>
     <system:String x:Key="GeneralSettings.NotificationIsActive">Включить</system:String>
     <system:String x:Key="GeneralSettings.NotificationVisibleMaxCount">Количество</system:String>

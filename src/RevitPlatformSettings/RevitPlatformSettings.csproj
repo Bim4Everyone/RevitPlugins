@@ -2,6 +2,15 @@
     <PropertyGroup>
         <UseDevExpress>true</UseDevExpress>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Serilog" Version="2.10.0">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+    </ItemGroup>
+    
+    
     <ItemGroup>
 
         <Resource Include="assets\theme-win10dark\icons8-download-96.png" />

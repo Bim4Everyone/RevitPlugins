@@ -27,6 +27,7 @@
                 <ResourceDictionary Source="../ViewTemplates/GeneralSettingsViewTemplate.xaml" />
                 <ResourceDictionary Source="../ViewTemplates/ExtensionSettingsViewTemplate.xaml" />
                 <ResourceDictionary Source="../ViewTemplates/RevitParamsSettingsViewTemplate.xaml" />
+                <ResourceDictionary Source="../ViewTemplates/TelemetrySettingsViewTemplate.xaml" />
                 <ResourceDictionary Source="../ViewTemplates/AboutSettingsViewTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

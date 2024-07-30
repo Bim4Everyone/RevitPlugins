@@ -60,7 +60,10 @@ namespace RevitPlatformSettings.ViewModels {
                 _settingsViewModelFactory.Create<RevitParamsSettingsViewModel>(3, 0, 
                     _localizationService.GetLocalizedString("RevitParamsSettings.Title")),
                 
-                _settingsViewModelFactory.Create<AboutSettingsViewModel>(4, 0, 
+                _settingsViewModelFactory.Create<TelemetrySettingsViewModel>(4, 0, 
+                    _localizationService.GetLocalizedString("TelemetrySettings.Title")),
+                
+                _settingsViewModelFactory.Create<AboutSettingsViewModel>(5, 0, 
                     _localizationService.GetLocalizedString("AboutSettings.Title")),
             };
 
