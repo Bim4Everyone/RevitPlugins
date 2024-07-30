@@ -68,7 +68,11 @@ namespace RevitOpeningPlacement {
             }
         }
 
-        private protected void PlaceOpeningTasks(UIApplication uiApplication, RevitRepository revitRepository, ElementId[] mepElements) {
+        private protected void PlaceOpeningTasks(
+            UIApplication uiApplication,
+            RevitRepository revitRepository,
+            ElementId[] mepElements) {
+
             _duplicatedInstancesToRemoveIds.Clear();
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();

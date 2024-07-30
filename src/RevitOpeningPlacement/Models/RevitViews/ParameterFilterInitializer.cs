@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -163,12 +163,12 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         private static ParameterFilterElement GetWallHighlightFilter(Document doc, Wall wall = null) {
             var wallsFilter = CreateFilter(doc,
                 $"BIM_Стены_НЕ_Хост_Отверстия_{doc.Application.Username}",
-                new BuiltInCategory[] { BuiltInCategory.OST_Walls },
+                new BuiltInCategory[] { RevitRepository.WallCategory },
                 new FilterRule[] { }
                 );
             using(Transaction t = doc.StartTransaction("Обновление фильтра стен")) {
                 // переназначить категории элементов, если пользователь изменил их
-                wallsFilter.SetCategories(new ElementId[] { new ElementId(BuiltInCategory.OST_Walls) });
+                wallsFilter.SetCategories(new ElementId[] { new ElementId(RevitRepository.WallCategory) });
                 // сбросить все существующие критерии фильтрации
                 wallsFilter.ClearRules();
                 if(wall != null) {
@@ -188,12 +188,12 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         private static ParameterFilterElement GetFloorHighlightFilter(Document doc, Floor floor = null) {
             var floorsFilter = CreateFilter(doc,
                 $"BIM_Перекрытия_НЕ_Хост_Отверстия_{doc.Application.Username}",
-                new BuiltInCategory[] { BuiltInCategory.OST_Floors },
+                new BuiltInCategory[] { RevitRepository.FloorCategory },
                 new FilterRule[] { }
                 );
             using(Transaction t = doc.StartTransaction("Обновление фильтра перекрытий")) {
                 // переназначить категории элементов, если пользователь изменил их
-                floorsFilter.SetCategories(new ElementId[] { new ElementId(BuiltInCategory.OST_Floors) });
+                floorsFilter.SetCategories(new ElementId[] { new ElementId(RevitRepository.FloorCategory) });
                 // сбросить все существующие критерии фильтрации
                 floorsFilter.ClearRules();
                 if(floor != null) {

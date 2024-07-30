@@ -24,7 +24,7 @@ namespace RevitOpeningPlacement.Models {
         public static Filter GetWallFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
             return GetArchitectureFilter(RevitRepository.StructureCategoryNames[StructureCategoryEnum.Wall],
                                  revitRepository,
-                                 BuiltInCategory.OST_Walls);
+                                 RevitRepository.WallCategory);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace RevitOpeningPlacement.Models {
         public static Filter GetFloorFilter(RevitClashDetective.Models.RevitRepository revitRepository) {
             return GetArchitectureFilter(RevitRepository.StructureCategoryNames[StructureCategoryEnum.Floor],
                                  revitRepository,
-                                 BuiltInCategory.OST_Floors);
+                                 RevitRepository.FloorCategory);
         }
 
         /// <summary>
@@ -206,8 +206,8 @@ namespace RevitOpeningPlacement.Models {
         /// <returns></returns>
         public static ICollection<BuiltInCategory> GetAllUsedStructureCategories() {
             return new BuiltInCategory[] {
-                BuiltInCategory.OST_Walls,
-                BuiltInCategory.OST_Floors
+                RevitRepository.WallCategory,
+                RevitRepository.FloorCategory
             };
         }
 
