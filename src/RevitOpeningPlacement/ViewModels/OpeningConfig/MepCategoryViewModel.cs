@@ -40,32 +40,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             RemoveOffsetCommand = new RelayCommand(RemoveOffset, CanRemoveOffset);
         }
 
-        public MepCategoryViewModel(RevitRepository revitRepository, string name, Parameters[] minSizesParameters, bool isRound, string imageSource) {
-            InitializeStructureCategories();
-
-            Name = name;
-            ImageSource = imageSource;
-            MinSizes = GetMinSizes(minSizesParameters);
-            IsRound = isRound;
-            Offsets = new ObservableCollection<OffsetViewModel>() { new OffsetViewModel(new TypeNamesProvider(isRound)) };
-            var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
-            SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel);
-
-            // инициализация значений по умолчанию
-            IsSelected = true; // категория выбрана для создания заданий на отверстия
-            SelectedRounding = Roundings.Last(); // округление 50 мм
-            var firstOffset = Offsets.First();
-            firstOffset.To = MepCategory.DefaultMaxSizeMm; // максимальный габарит сечения элемента для зазора в мм
-            firstOffset.SelectedOpeningType = firstOffset.OpeningTypeNames.Last(); // тип задания на  отверстие по умолчанию прямоугольный
-            firstOffset.Offset = MepCategory.DefaultOffsetMm; // зазор 50 мм для прямоугольных заданий на отверстия
-            foreach(var structureCategory in StructureCategories) {
-                structureCategory.IsSelected = true; // все категории конструкций выбраны для создания заданий на отверстия
-            }
-
-            AddOffsetCommand = new RelayCommand(AddOffset);
-            RemoveOffsetCommand = new RelayCommand(RemoveOffset, CanRemoveOffset);
-        }
-
 
         public bool IsRound { get; set; }
 
@@ -179,14 +153,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 }
             }
             return error;
-        }
-
-        private ObservableCollection<SizeViewModel> GetMinSizes(Parameters[] minSizesParameters) {
-            var collection = new ObservableCollection<SizeViewModel>();
-            foreach(Parameters parameter in minSizesParameters) {
-                collection.Add(new SizeViewModel() { Name = RevitRepository.ParameterNames[parameter] });
-            }
-            return collection;
         }
 
         private CategoriesInfoViewModel GetCategoriesInfoViewModel(RevitRepository revitRepository, string mepCategoryName) {

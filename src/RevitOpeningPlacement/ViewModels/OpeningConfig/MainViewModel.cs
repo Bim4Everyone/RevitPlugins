@@ -13,7 +13,6 @@ using RevitClashDetective.Models.FilterModel;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
-using RevitOpeningPlacement.Models.TypeNamesProviders;
 using RevitOpeningPlacement.ViewModels.Services;
 using RevitOpeningPlacement.Views;
 
@@ -26,17 +25,15 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private readonly RevitRepository _revitRepository;
 
         public MainViewModel(RevitRepository revitRepository, Models.Configs.OpeningConfig openingConfig) {
-            _revitRepository = revitRepository;
-            if(openingConfig.Categories.Any()) {
-                ShowPlacingErrors = openingConfig.ShowPlacingErrors;
-                MepCategories = new ObservableCollection<MepCategoryViewModel>(openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
-                if(MepCategories.All(item => !item.IsRound)) {
-                    SetShape();
-                }
-            } else {
-                InitializeCategories();
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            if(openingConfig is null) {
+                throw new ArgumentNullException(nameof(openingConfig));
             }
-            AddMissingCategories();
+            if(openingConfig.Categories.Count != new MepCategoryCollection().Count) {
+                throw new ArgumentException("Файл конфигурации некорректен, нужно удалить его.", nameof(openingConfig));
+            }
+            MepCategories = new ObservableCollection<MepCategoryViewModel>(
+                openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
 
             InitializeTimer();
 
@@ -45,7 +42,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             LoadConfigCommand = new RelayCommand(LoadConfig);
             CheckSearchSearchSetCommand = new RelayCommand(CheckSearchSet, CanSaveConfig);
 
-            SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected) ?? MepCategories.First();
+            SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
+                ?? MepCategories.First();
             foreach(MepCategoryViewModel mepCategoryViewModel in MepCategories) {
                 mepCategoryViewModel.PropertyChanged += MepCategoryIsSelectedPropertyChanged;
             }
@@ -84,101 +82,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public ICommand CheckSearchSearchSetCommand { get; }
 
 
-        private void InitializeCategories() {
-            MepCategories = new ObservableCollection<MepCategoryViewModel>() {
-                GetPipe(),
-                GetRectangleDuct(),
-                GetRoundDuct(),
-                GetCableTray(),
-                GetConduit()
-            };
-        }
-
-        private MepCategoryViewModel GetPipe() => new MepCategoryViewModel(
-            revitRepository: _revitRepository,
-            name: RevitRepository.MepCategoryNames[MepCategoryEnum.Pipe],
-            minSizesParameters: new Parameters[] { Parameters.Diameter },
-            isRound: true,
-            imageSource: MepCategory.PipeImageSource
-            );
-
-
-        private MepCategoryViewModel GetRectangleDuct() => new MepCategoryViewModel(
-            revitRepository: _revitRepository,
-            name: RevitRepository.MepCategoryNames[MepCategoryEnum.RectangleDuct],
-            minSizesParameters: new Parameters[] { Parameters.Width, Parameters.Height },
-            isRound: false,
-            imageSource: MepCategory.RectDuctImageSource
-            );
-
-
-        private MepCategoryViewModel GetRoundDuct() => new MepCategoryViewModel(
-            revitRepository: _revitRepository,
-            name: RevitRepository.MepCategoryNames[MepCategoryEnum.RoundDuct],
-            minSizesParameters: new Parameters[] { Parameters.Diameter },
-            isRound: true,
-            imageSource: MepCategory.RoundDuctImageSource
-            );
-
-        private MepCategoryViewModel GetCableTray() => new MepCategoryViewModel(
-            revitRepository: _revitRepository,
-            name: RevitRepository.MepCategoryNames[MepCategoryEnum.CableTray],
-            minSizesParameters: new Parameters[] { Parameters.Width, Parameters.Height },
-            isRound: false,
-            imageSource: MepCategory.CableTrayImageSource
-            );
-
-        private MepCategoryViewModel GetConduit() => new MepCategoryViewModel(
-            revitRepository: _revitRepository,
-            name: RevitRepository.MepCategoryNames[MepCategoryEnum.Conduit],
-            minSizesParameters: new Parameters[] { Parameters.Diameter },
-            isRound: true,
-            imageSource: MepCategory.ConduitImageSource
-            );
-
-        private void AddMissingCategories() {
-            if(RevitRepository.MepCategoryNames.Count <= MepCategories.Count) {
-                return;
-            }
-            foreach(var mepCategoryName in RevitRepository.MepCategoryNames) {
-                if(!MepCategories.Any(item => item.Name.Equals(mepCategoryName.Value, StringComparison.CurrentCulture))) {
-                    MepCategories.Add(GetMissingCategory(mepCategoryName.Key));
-                }
-            }
-        }
-
-        private void SetShape() {
-            SetRoundShape(MepCategoryEnum.Pipe);
-            SetRoundShape(MepCategoryEnum.RoundDuct);
-            SetRoundShape(MepCategoryEnum.Conduit);
-        }
-
-        private void SetRoundShape(MepCategoryEnum category) {
-            var mep = MepCategories.FirstOrDefault(item => item.Name.Equals(RevitRepository.MepCategoryNames[category]));
-            if(mep != null) {
-                mep.IsRound = true;
-                foreach(var offset in mep.Offsets) {
-                    offset.Update(new TypeNamesProvider(mep.IsRound));
-                }
-            }
-        }
-
-        private MepCategoryViewModel GetMissingCategory(MepCategoryEnum missingCategory) {
-            switch(missingCategory) {
-                case MepCategoryEnum.Pipe:
-                    return GetPipe();
-                case MepCategoryEnum.RectangleDuct:
-                    return GetRectangleDuct();
-                case MepCategoryEnum.RoundDuct:
-                    return GetRoundDuct();
-                case MepCategoryEnum.CableTray:
-                    return GetCableTray();
-                case MepCategoryEnum.Conduit:
-                    return GetConduit();
-                default:
-                    throw new ArgumentException($"Не найдена категория \"{missingCategory}\".", nameof(missingCategory));
-            }
-        }
         private void InitializeTimer() {
             _timer = new DispatcherTimer();
             _timer.Interval = new TimeSpan(0, 0, 0, 3);
@@ -229,14 +132,18 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var config = cls.Load<Models.Configs.OpeningConfig>(_revitRepository.Doc);
             if(config != null) {
                 ShowPlacingErrors = config.ShowPlacingErrors;
-                MepCategories = new ObservableCollection<MepCategoryViewModel>(config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
+                MepCategories = new ObservableCollection<MepCategoryViewModel>(
+                    config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
+                SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
+                    ?? MepCategories.First();
             }
             MessageText = "Файл настроек успешно загружен.";
             _timer.Start();
         }
 
         private bool CanSaveConfig(object p) {
-            ErrorText = MepCategories.FirstOrDefault(item => !string.IsNullOrEmpty(item.GetErrorText()))?.GetErrorText();
+            ErrorText = MepCategories.FirstOrDefault(item => !string.IsNullOrEmpty(item.GetErrorText()))
+                ?.GetErrorText();
             return string.IsNullOrEmpty(ErrorText);
         }
 

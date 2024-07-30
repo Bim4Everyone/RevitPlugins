@@ -29,12 +29,19 @@ namespace RevitOpeningPlacement.Models.Configs {
         public static OpeningConfig GetOpeningConfig(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
-            return new ProjectConfigBuilder()
+            var config = new ProjectConfigBuilder()
                 .SetSerializer(new RevitClashConfigSerializer(new OpeningSerializationBinder(), document))
                 .SetPluginName(nameof(RevitOpeningPlacement))
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(nameof(OpeningConfig) + ".json")
                 .Build<OpeningConfig>();
+            MepCategoryCollection defaultCollection = new MepCategoryCollection();
+            if(config.Categories.Count == defaultCollection.Categories.Count) {
+                return config;
+            } else {
+                config.Categories = defaultCollection;
+                return config;
+            }
         }
     }
 }
