@@ -1,9 +1,57 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings">
+                    xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
+                    xmlns:views="clr-namespace:RevitPlatformSettings.Views"
+                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <DataTemplate DataType="{x:Type settings:GeneralSettingsViewModel}">
-        <GroupBox Content="Notification">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             
-        </GroupBox>
+            <GroupBox
+                Grid.Row="0"
+                Margin="10"
+                Header="{DynamicResource GeneralSettings.Notification}">
+                
+                <StackPanel>
+
+                    <views:CustomEditControl
+                        EditText="{DynamicResource GeneralSettings.NotificationIsActive}">
+
+                        <dxe:CheckEdit
+                            HorizontalAlignment="Right"
+                            EditValue="{Binding Path=NotificationIsActive}" />
+
+                    </views:CustomEditControl>
+
+                    <views:CustomEditControl
+                        EditText="{DynamicResource GeneralSettings.NotificationVisibleMaxCount}">
+
+                        <dxe:TextEdit
+                            Mask="0000"
+                            EditValue="{Binding Path=NotificationVisibleMaxCount}" />
+
+                    </views:CustomEditControl>
+
+                    <views:CustomEditControl
+                        EditText="{DynamicResource GeneralSettings.NotificationScreen}">
+
+                        <dxe:ComboBoxEdit
+                            EditValue="{Binding Path=NotificationScreen}" />
+
+                    </views:CustomEditControl>
+
+                    <views:CustomEditControl
+                        EditText="{DynamicResource GeneralSettings.NotificationPosition}">
+
+                        <dxe:ComboBoxEdit
+                            EditValue="{Binding Path=NotificationPosition}" />
+
+                    </views:CustomEditControl>
+                </StackPanel>
+
+            </GroupBox>
+        </Grid>
     </DataTemplate>
 </ResourceDictionary>

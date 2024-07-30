@@ -9,6 +9,11 @@
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
     <system:String x:Key="GeneralSettings.Title">Основные</system:String>
+    <system:String x:Key="GeneralSettings.Notification">Уведомления</system:String>
+    <system:String x:Key="GeneralSettings.NotificationIsActive">Включить</system:String>
+    <system:String x:Key="GeneralSettings.NotificationVisibleMaxCount">Количество</system:String>
+    <system:String x:Key="GeneralSettings.NotificationScreen">Основной экран</system:String>
+    <system:String x:Key="GeneralSettings.NotificationPosition">Позиция на экране</system:String>
     
     <system:String x:Key="AboutSettings.Title">О программе</system:String>
     <system:String x:Key="AboutSettings.PlatformDesciption">{0} - это платформа созданная для упрощения разработки проектной документации в Autodesk Revit.</system:String>
