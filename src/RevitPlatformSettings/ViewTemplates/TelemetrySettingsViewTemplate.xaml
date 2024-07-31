@@ -3,6 +3,7 @@
                     xmlns:views="clr-namespace:RevitPlatformSettings.Views"
                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings">
+    
     <DataTemplate DataType="{x:Type settings:TelemetrySettingsViewModel}">
 
         <ScrollViewer

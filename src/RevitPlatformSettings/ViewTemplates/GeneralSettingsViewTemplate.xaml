@@ -2,7 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
                     xmlns:views="clr-namespace:RevitPlatformSettings.Views"
-                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors">
+                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                    xmlns:services="clr-namespace:dosymep.SimpleServices;assembly=dosymep.SimpleServices">
     <DataTemplate DataType="{x:Type settings:GeneralSettingsViewModel}">
         
         <ScrollViewer 
@@ -63,16 +65,17 @@
                         <views:CustomEditControl
                             EditText="{DynamicResource GeneralSettings.HostTheme}">
 
-                            <dxe:TextEdit
+                            <dxe:ComboBoxEdit
                                 IsReadOnly="True"
-                                EditValue="{Binding Path=HostTheme, Mode=OneWay}" />
+                                EditValue="{Binding Path=HostTheme, Mode=OneWay}"
+                                ItemsSource="{dxe:EnumItemsSource EnumType=services:UIThemes}" />
 
                         </views:CustomEditControl>
 
                         <views:CustomEditControl
                             EditText="{DynamicResource GeneralSettings.HostLanguage}">
 
-                            <dxe:TextEdit
+                            <dxe:ComboBoxEdit
                                 IsReadOnly="True"
                                 EditValue="{Binding Path=HostLanguage, Mode=OneWay}" />
 
@@ -110,7 +113,8 @@
                             EditText="{DynamicResource GeneralSettings.NotificationScreen}">
 
                             <dxe:ComboBoxEdit
-                                EditValue="{Binding Path=NotificationScreen}" />
+                                EditValue="{Binding Path=NotificationScreen}"
+                                ItemsSource="{dxe:EnumItemsSource EnumType=dxmvvm:NotificationScreen}" />
 
                         </views:CustomEditControl>
 
@@ -118,7 +122,8 @@
                             EditText="{DynamicResource GeneralSettings.NotificationPosition}">
 
                             <dxe:ComboBoxEdit
-                                EditValue="{Binding Path=NotificationPosition}" />
+                                EditValue="{Binding Path=NotificationPosition}"
+                                ItemsSource="{dxe:EnumItemsSource EnumType=dxmvvm:NotificationPosition}" />
 
                         </views:CustomEditControl>
                         
