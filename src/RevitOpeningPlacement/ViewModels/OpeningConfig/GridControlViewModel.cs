@@ -114,7 +114,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
             var element = GetElement(resultId);
             if(element != null) {
-                _revitRepository.SelectAndShowElement(new[] { new ElementModel(element) });
+                _revitRepository.GetClashRevitRepository().SelectAndShowElement(new[] { new ElementModel(element) });
             }
         }
 
