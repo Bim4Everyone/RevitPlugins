@@ -23,6 +23,8 @@
                            x:Name="_this"
                            d:DataContext="{d:DesignInstance vm:MepCategoryFilterViewModel, IsDesignTimeCreatable=False}">
     <mvvm:Interaction.Behaviors>
+        <mvvm:EventToCommand EventName="Loaded"
+                             Command="{Binding ShowLinearSetCommand}" />
         <mvvm:EventToCommand EventName="Closing"
                              Command="{Binding CloseCommand}" />
         <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />

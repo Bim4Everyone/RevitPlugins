@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
+
+using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -111,11 +114,34 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         private void CheckWallFilter() {
-
+            SaveConfig();
+            ShowStructureFilter(StructureCategoryEnum.Wall);
         }
 
         private void CheckFloorFilter() {
+            SaveConfig();
+            ShowStructureFilter(StructureCategoryEnum.Floor);
+        }
 
+        private void ShowStructureFilter(StructureCategoryEnum structureCategory) {
+            Filter filter = GetCurrentStructureFilter(structureCategory);
+            var vm = new StructureCategoryFilterViewModel(_revitRepository, filter);
+            var view = new StructureCategoryFilterView() { DataContext = vm };
+            view.Show();
+        }
+
+        private Filter GetCurrentStructureFilter(StructureCategoryEnum structureCategory) {
+            MepCategory mepCategory = SelectedMepCategoryViewModel.GetMepCategory();
+            string structureName = RevitRepository.StructureCategoryNames[structureCategory];
+            return new Filter(_revitRepository.GetClashRevitRepository()) {
+                CategoryIds = new List<ElementId>(
+                    _revitRepository.GetCategories(structureCategory)
+                    .Select(c => c.Id)),
+                Name = structureName,
+                Set = mepCategory.Intersections
+                    .First(c => c.Name.Equals(structureName, StringComparison.CurrentCultureIgnoreCase))
+                    .Set
+            };
         }
 
         private Models.Configs.OpeningConfig GetOpeningConfig() {

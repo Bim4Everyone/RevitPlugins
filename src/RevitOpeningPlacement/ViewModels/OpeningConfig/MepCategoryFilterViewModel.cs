@@ -42,13 +42,13 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             MessageBoxService = GetPlatformService<IMessageBoxService>();
 
             _linearElementsFilter = linearElementsFilter;
-            _straightSearchSetLinearElements = new SearchSetViewModel(_revitRepository, _linearElementsFilter, new StraightRevitFilterGenerator());
-            _invertedSearchSetLinearElements = new SearchSetViewModel(_revitRepository, _linearElementsFilter, new InvertedRevitFilterGenerator());
+            _straightSearchSetLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _linearElementsFilter, new StraightRevitFilterGenerator());
+            _invertedSearchSetLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _linearElementsFilter, new InvertedRevitFilterGenerator());
             LinearElementsSearchSet = _straightSearchSetLinearElements;
 
             _nonLinearElementsFilter = nonLinearElementsFilter;
-            _straightSearchSetNonLinearElements = new SearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new StraightRevitFilterGenerator());
-            _invertedSearchSetNonLinearElements = new SearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new InvertedRevitFilterGenerator());
+            _straightSearchSetNonLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new StraightRevitFilterGenerator());
+            _invertedSearchSetNonLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new InvertedRevitFilterGenerator());
             NonLinearElementsSearchSet = _straightSearchSetNonLinearElements;
 
             InversionChangedCommand = RelayCommand.Create(InversionChanged);
@@ -85,6 +85,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 LinearElementsSearchSet = _straightSearchSetLinearElements;
                 NonLinearElementsSearchSet = _straightSearchSetNonLinearElements;
             }
+            ShowLinearSet();
         }
 
         private void ShowLinearSet() {
