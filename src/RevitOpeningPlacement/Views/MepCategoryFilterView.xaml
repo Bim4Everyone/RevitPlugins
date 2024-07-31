@@ -1,45 +1,59 @@
-﻿<base:ThemedPlatformWindow
-    x:Class="RevitOpeningPlacement.Views.MepCategoryFilterView"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
-    xmlns:m="clr-namespace:RevitClashDetective.Models.Value"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:dxci="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
-    xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
-    xmlns:local="clr-namespace:RevitOpeningPlacement.Views"
-    xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    mc:Ignorable="d"
-    Title="Проверка настроек фильтрации" Height="600" Width="600"
-    MinHeight="400"
-    MinWidth="300"
-    d:DataContext="{d:DesignInstance vm:MepCategoryFilterViewModel, IsDesignTimeCreatable=False}">
+﻿<base:ThemedPlatformWindow x:Class="RevitOpeningPlacement.Views.MepCategoryFilterView"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
+                           xmlns:m="clr-namespace:RevitClashDetective.Models.Value"
+                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                           xmlns:dxci="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
+                           xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+                           xmlns:local="clr-namespace:RevitOpeningPlacement.Views"
+                           xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
+                           xmlns:base="clr-namespace:dosymep.WPF.Views"
+                           mc:Ignorable="d"
+                           Title="Проверка настроек фильтрации"
+                           Height="600"
+                           Width="600"
+                           MinHeight="400"
+                           MinWidth="300"
+                           d:DataContext="{d:DesignInstance vm:MepCategoryFilterViewModel, IsDesignTimeCreatable=False}">
     <mvvm:Interaction.Behaviors>
         <mvvm:EventToCommand EventName="Closing"
                              Command="{Binding CloseCommand}" />
+        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
     </mvvm:Interaction.Behaviors>
     <base:ThemedPlatformWindow.Resources>
-        <Style TargetType="{x:Type dxg:GridControl}">
-            <Setter Property="AutoGenerateColumns"
-                    Value="None" />
-            <Setter Property="EnableSmartColumnsGeneration"
+        <Style TargetType="dxg:GridControl">
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
+                    Value="Auto" />
+            <Setter Property="SelectionMode"
+                    Value="Row" />
+            <Setter Property="AutoExpandAllGroups"
                     Value="True" />
-            <Setter Property="ColumnGeneratorTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <ContentControl>
-                            <dxg:GridColumn AllowEditing="False"
-                                            FieldName="{Binding (dxci:DependencyObjectExtensions.DataContext).FieldName, RelativeSource={RelativeSource Self}}"
-                                            Header="{Binding (dxci:DependencyObjectExtensions.DataContext).Header, RelativeSource={RelativeSource Self}}" />
-                        </ContentControl>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
+        </Style>
+        <Style TargetType="dxg:TableView">
+            <Setter Property="ShowDataNavigator"
+                    Value="False" />
+            <Setter Property="ShowSearchPanelMode"
+                    Value="Never" />
+            <Setter Property="NavigationStyle"
+                    Value="Cell" />
+            <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping"
+                    Value="True" />
+            <Setter Property="VirtualizingPanel.VirtualizationMode"
+                    Value="Recycling" />
+            <Setter Property="VirtualizingPanel.IsVirtualizing"
+                    Value="True" />
+            <Setter Property="AllowEditing"
+                    Value="False" />
+            <Setter Property="ShowGroupPanel"
+                    Value="True" />
+            <Setter Property="AllowGrouping"
+                    Value="True" />
         </Style>
         <DataTemplate DataType="{x:Type m:ParamValue}">
             <dxe:TextEdit IsReadOnly="True"
@@ -47,7 +61,7 @@
                           EditValue="{Binding DisplayValue}" />
         </DataTemplate>
     </base:ThemedPlatformWindow.Resources>
-    
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -56,6 +70,7 @@
 
         <dxe:CheckEdit EditValue="{Binding Inverted}"
                        Content="Инвертировать"
+                       Margin="2 0"
                        Grid.Row="0">
             <mvvm:Interaction.Triggers>
                 <mvvm:EventToCommand EventName="EditValueChanged"
@@ -64,14 +79,26 @@
         </dxe:CheckEdit>
 
         <dxdo:DockLayoutManager x:Name="Manager"
-                                Grid.Row="1">
+                                Grid.Row="1"
+                                Grid.RowSpan="2">
             <dxdo:LayoutGroup x:Name="layoutRoot"
                               AllowSplitters="True"
                               Orientation="Vertical">
 
-                <dxdo:LayoutPanel Caption="Линейные элементы"
-                                  ShowPinButton="False"
+                <dxdo:LayoutPanel ShowPinButton="False"
                                   ShowCloseButton="False">
+                    <dxdo:LayoutPanel.Caption>
+                        <DockPanel>
+                            <TextBlock Text="Линейные элементы" />
+                            <dx:SimpleButton DockPanel.Dock="Left"
+                                             Margin="10 0"
+                                             ToolTip="Показать весь набор линейных элементов на виде целиком"
+                                             Command="{Binding ShowLinearSetCommand}"
+                                             Content="Показать весь набор"
+                                             Width="150"
+                                             FontSize="11" />
+                        </DockPanel>
+                    </dxdo:LayoutPanel.Caption>
                     <dxg:GridControl x:Name="_dgLinearElements"
                                      AllowCollectionView="False"
                                      AutoGenerateColumns="AddNew"
@@ -95,10 +122,21 @@
                         </mvvm:Interaction.Behaviors>
                     </dxg:GridControl>
                 </dxdo:LayoutPanel>
-                    
-                <dxdo:LayoutPanel Caption="Нелинейные элементы"
-                                  ShowPinButton="False"
+
+                <dxdo:LayoutPanel ShowPinButton="False"
                                   ShowCloseButton="False">
+                    <dxdo:LayoutPanel.Caption>
+                        <DockPanel>
+                            <TextBlock Text="Нелинейные элементы" />
+                            <dx:SimpleButton DockPanel.Dock="Left"
+                                             Margin="10 0"
+                                             ToolTip="Показать весь набор нелинейных элементов на виде целиком"
+                                             Command="{Binding ShowNonLinearSetCommand}"
+                                             Content="Показать весь набор"
+                                             Width="150"
+                                             FontSize="11" />
+                        </DockPanel>
+                    </dxdo:LayoutPanel.Caption>
                     <dxg:GridControl x:Name="_dgNonLinearElements"
                                      AllowCollectionView="False"
                                      AutoGenerateColumns="AddNew"
@@ -125,6 +163,6 @@
 
             </dxdo:LayoutGroup>
         </dxdo:DockLayoutManager>
-        
+
     </Grid>
 </base:ThemedPlatformWindow>

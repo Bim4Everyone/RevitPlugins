@@ -40,7 +40,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             SaveConfigCommand = RelayCommand.Create(SaveConfig, CanSaveConfig);
             SaveAsConfigCommand = RelayCommand.Create(SaveAsConfig, CanSaveConfig);
             LoadConfigCommand = RelayCommand.Create(LoadConfig);
-            CheckSearchSearchSetCommand = RelayCommand.Create(CheckSearchSet, CanSaveConfig);
+            CheckMepFilterCommand = RelayCommand.Create(CheckMepFilter, CanSaveConfig);
+            CheckWallFilterCommand = RelayCommand.Create(CheckWallFilter, CanSaveConfig);
+            CheckFloorFilterCommand = RelayCommand.Create(CheckFloorFilter, CanSaveConfig);
 
             SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
                 ?? MepCategories.First();
@@ -79,7 +81,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public ICommand SaveConfigCommand { get; }
         public ICommand SaveAsConfigCommand { get; }
         public ICommand LoadConfigCommand { get; }
-        public ICommand CheckSearchSearchSetCommand { get; }
+        public ICommand CheckMepFilterCommand { get; }
+        public ICommand CheckWallFilterCommand { get; }
+        public ICommand CheckFloorFilterCommand { get; }
 
 
         private void InitializeTimer() {
@@ -91,7 +95,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             };
         }
 
-        private void CheckSearchSet() {
+        private void CheckMepFilter() {
             SaveConfig();
 
             var categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
@@ -104,6 +108,14 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var vm = new MepCategoryFilterViewModel(_revitRepository, linearFilter, nonLinearFilter);
             var view = new MepCategoryFilterView() { DataContext = vm };
             view.Show();
+        }
+
+        private void CheckWallFilter() {
+
+        }
+
+        private void CheckFloorFilter() {
+
         }
 
         private Models.Configs.OpeningConfig GetOpeningConfig() {

@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
 using System.Windows.Input;
 
+using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -36,6 +39,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         /// <param name="nonLinearElementsFilter">Фильтр для нелинейных элементов инженерных систем (соединительные детали воздуховодов, соединительные детали трубопроводов и т.п.)</param>
         public MepCategoryFilterViewModel(RevitRepository revitRepository, Filter linearElementsFilter, Filter nonLinearElementsFilter) {
             _revitRepository = revitRepository;
+            MessageBoxService = GetPlatformService<IMessageBoxService>();
 
             _linearElementsFilter = linearElementsFilter;
             _straightSearchSetLinearElements = new SearchSetViewModel(_revitRepository, _linearElementsFilter, new StraightRevitFilterGenerator());
@@ -49,6 +53,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
             InversionChangedCommand = RelayCommand.Create(InversionChanged);
             CloseCommand = RelayCommand.Create(Close);
+            ShowLinearSetCommand = RelayCommand.Create(ShowLinearSet);
+            ShowNonLinearSetCommand = RelayCommand.Create(ShowNonLinearSet);
         }
 
 
@@ -56,6 +62,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         public ICommand InversionChangedCommand { get; }
         public ICommand CloseCommand { get; }
+        public ICommand ShowLinearSetCommand { get; }
+        public ICommand ShowNonLinearSetCommand { get; }
+        public IMessageBoxService MessageBoxService { get; }
 
         public SearchSetViewModel LinearElementsSearchSet {
             get => _searchSetLinearElements;
@@ -75,6 +84,44 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             } else {
                 LinearElementsSearchSet = _straightSearchSetLinearElements;
                 NonLinearElementsSearchSet = _straightSearchSetNonLinearElements;
+            }
+        }
+
+        private void ShowLinearSet() {
+            SearchSetViewModel invertedSet;
+            if(Inverted) {
+                invertedSet = _straightSearchSetLinearElements;
+            } else {
+                invertedSet = _invertedSearchSetLinearElements;
+            }
+            HideSet(invertedSet);
+        }
+
+        private void ShowNonLinearSet() {
+            SearchSetViewModel invertedSet;
+            if(Inverted) {
+                invertedSet = _straightSearchSetNonLinearElements;
+            } else {
+                invertedSet = _invertedSearchSetNonLinearElements;
+            }
+            HideSet(invertedSet);
+        }
+
+        private void HideSet(SearchSetViewModel setToHide) {
+            try {
+                _revitRepository.GetClashRevitRepository().ShowElements(
+                    setToHide.Filter.GetRevitFilter(_revitRepository.Doc, setToHide.FilterGenerator),
+                    setToHide.Filter
+                        .CategoryIds
+                        .Select(c => c.AsBuiltInCategory())
+                        .ToHashSet());
+            } catch(InvalidOperationException ex) {
+                MessageBoxService.Show(
+                    ex.Message,
+                    $"BIM",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
             }
         }
 
