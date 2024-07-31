@@ -79,8 +79,8 @@
                            Margin="0 0 10 0"
                            IsChecked="{Binding ShowPlacingErrors}" />
             <dx:DropDownButton Height="25"
-                               Width="150"
-                               Content="Принять фильтр">
+                               Width="160"
+                               Content="Проверить фильтр">
                 <StackPanel Orientation="Vertical">
                     <dx:SimpleButton Content="Проверить фильтр ВИС"
                                      HorizontalContentAlignment="Left"

@@ -15,11 +15,12 @@
                            xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
                            xmlns:base="clr-namespace:dosymep.WPF.Views"
                            mc:Ignorable="d"
-                           Title="Проверка настроек фильтрации"
+                           Title="Проверка настроек фильтрации элементов ВИС"
                            Height="600"
-                           Width="600"
-                           MinHeight="400"
-                           MinWidth="300"
+                           Width="650"
+                           MinHeight="500"
+                           MinWidth="500"
+                           x:Name="_this"
                            d:DataContext="{d:DesignInstance vm:MepCategoryFilterViewModel, IsDesignTimeCreatable=False}">
     <mvvm:Interaction.Behaviors>
         <mvvm:EventToCommand EventName="Closing"
@@ -29,6 +30,8 @@
     <base:ThemedPlatformWindow.Resources>
         <Style TargetType="dxg:GridControl">
             <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
+                    Value="Auto" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
                     Value="Auto" />
             <Setter Property="SelectionMode"
                     Value="Row" />
@@ -54,6 +57,24 @@
                     Value="True" />
             <Setter Property="AllowGrouping"
                     Value="True" />
+            <Setter Property="VerticalScrollbarVisibility"
+                    Value="Auto" />
+            <Setter Property="HorizontalScrollbarVisibility"
+                    Value="Auto" />
+        </Style>
+        <Style TargetType="dxdo:LayoutPanel">
+            <Setter Property="ShowPinButton"
+                    Value="False" />
+            <Setter Property="ShowCloseButton"
+                    Value="False" />
+            <Setter Property="AllowDrag"
+                    Value="False" />
+            <Setter Property="AllowMaximize"
+                    Value="False" />
+            <Setter Property="AllowMinimize"
+                    Value="False" />
+            <Setter Property="AllowFloat"
+                    Value="False" />
         </Style>
         <DataTemplate DataType="{x:Type m:ParamValue}">
             <dxe:TextEdit IsReadOnly="True"
@@ -82,82 +103,93 @@
                                 Grid.Row="1"
                                 Grid.RowSpan="2">
             <dxdo:LayoutGroup x:Name="layoutRoot"
-                              AllowSplitters="True"
                               Orientation="Vertical">
 
-                <dxdo:LayoutPanel ShowPinButton="False"
-                                  ShowCloseButton="False">
-                    <dxdo:LayoutPanel.Caption>
-                        <DockPanel>
-                            <TextBlock Text="Линейные элементы" />
-                            <dx:SimpleButton DockPanel.Dock="Left"
-                                             Margin="10 0"
-                                             ToolTip="Показать весь набор линейных элементов на виде целиком"
-                                             Command="{Binding ShowLinearSetCommand}"
-                                             Content="Показать весь набор"
-                                             Width="150"
-                                             FontSize="11" />
-                        </DockPanel>
-                    </dxdo:LayoutPanel.Caption>
+                <dxdo:LayoutPanel Caption="Линейные элементы">
+                    <dxdo:LayoutPanel.ControlBoxContent>
+                        <dx:SimpleButton ToolTip="Показать весь набор линейных элементов на виде целиком"
+                                         Command="{Binding ElementName=_this, Path=DataContext.ShowLinearSetCommand}"
+                                         Content="Показать весь набор"
+                                         Width="150"
+                                         FontSize="11" />
+                    </dxdo:LayoutPanel.ControlBoxContent>
                     <dxg:GridControl x:Name="_dgLinearElements"
-                                     AllowCollectionView="False"
-                                     AutoGenerateColumns="AddNew"
-                                     ItemsSource="{Binding LinearElementsSearchSet.Grid.Rows, UpdateSourceTrigger=PropertyChanged}"
-                                     ColumnsSource="{Binding LinearElementsSearchSet.Grid.Columns}"
-                                     Loaded="GridControl_Loaded">
+                                     ItemsSource="{Binding LinearElementsSearchSet.Grid.Rows, UpdateSourceTrigger=PropertyChanged}">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem SummaryType="Count" />
                         </dxg:GridControl.GroupSummary>
                         <dxg:GridControl.View>
-                            <dxg:TableView x:Name="_gridLinearView"
-                                           AutoWidth="True"
-                                           DataNavigatorButtons="EditFocusedRow"
-                                           ShowDataNavigator="True"
-                                           AllowMergedGrouping="True" />
+                            <dxg:TableView x:Name="_gridLinearView" />
                         </dxg:GridControl.View>
-                        <mvvm:Interaction.Behaviors>
-                            <mvvm:EventToCommand EventName="MouseLeftButtonDown"
-                                                 Command="{Binding LinearElementsSearchSet.Grid.SelectCommand}"
-                                                 CommandParameter="{Binding ElementName=_dgLinearElements, Path=SelectedItem}" />
-                        </mvvm:Interaction.Behaviors>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn Width="80"
+                                            AllowResizing="False">
+                                <dxg:GridColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <dx:SimpleButton Command="{Binding ElementName=_this, Path=DataContext.LinearElementsSearchSet.Grid.SelectCommand}"
+                                                         CommandParameter="{Binding Row}"
+                                                         Glyph="{dx:DXImage 'SvgImages/HybridDemoIcons/Editors/HybridDemo_Search Button.svg'}"
+                                                         GlyphHeight="16" />
+                                    </DataTemplate>
+                                </dxg:GridColumn.CellTemplate>
+                            </dxg:GridColumn>
+                            <dxg:GridColumn Width="1*"
+                                            Header="Категория"
+                                            FieldName="Category" />
+                            <dxg:GridColumn Width="1*"
+                                            Header="Id"
+                                            FieldName="Id" />
+                            <dxg:GridColumn Width="3*"
+                                            Header="Имя семейства"
+                                            FieldName="FamilyName" />
+                            <dxg:GridColumn Width="3*"
+                                            Header="Имя типоразмера"
+                                            FieldName="Name" />
+                        </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </dxdo:LayoutPanel>
 
-                <dxdo:LayoutPanel ShowPinButton="False"
-                                  ShowCloseButton="False">
-                    <dxdo:LayoutPanel.Caption>
-                        <DockPanel>
-                            <TextBlock Text="Нелинейные элементы" />
-                            <dx:SimpleButton DockPanel.Dock="Left"
-                                             Margin="10 0"
-                                             ToolTip="Показать весь набор нелинейных элементов на виде целиком"
-                                             Command="{Binding ShowNonLinearSetCommand}"
-                                             Content="Показать весь набор"
-                                             Width="150"
-                                             FontSize="11" />
-                        </DockPanel>
-                    </dxdo:LayoutPanel.Caption>
+                <dxdo:LayoutPanel Caption="Нелинейные элементы">
+                    <dxdo:LayoutPanel.ControlBoxContent>
+                        <dx:SimpleButton ToolTip="Показать весь набор нелинейных элементов на виде целиком"
+                                         Command="{Binding ElementName=_this, Path=DataContext.ShowNonLinearSetCommand}"
+                                         Content="Показать весь набор"
+                                         Width="150"
+                                         FontSize="11" />
+                    </dxdo:LayoutPanel.ControlBoxContent>
                     <dxg:GridControl x:Name="_dgNonLinearElements"
-                                     AllowCollectionView="False"
-                                     AutoGenerateColumns="AddNew"
-                                     ItemsSource="{Binding NonLinearElementsSearchSet.Grid.Rows, UpdateSourceTrigger=PropertyChanged}"
-                                     ColumnsSource="{Binding NonLinearElementsSearchSet.Grid.Columns}"
-                                     Loaded="GridControl_Loaded">
+                                     ItemsSource="{Binding NonLinearElementsSearchSet.Grid.Rows, UpdateSourceTrigger=PropertyChanged}">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem SummaryType="Count" />
                         </dxg:GridControl.GroupSummary>
                         <dxg:GridControl.View>
-                            <dxg:TableView x:Name="_gridNonLinearView"
-                                           AutoWidth="True"
-                                           DataNavigatorButtons="EditFocusedRow"
-                                           ShowDataNavigator="True"
-                                           AllowMergedGrouping="True" />
+                            <dxg:TableView x:Name="_gridNonLinearView" />
                         </dxg:GridControl.View>
-                        <mvvm:Interaction.Behaviors>
-                            <mvvm:EventToCommand EventName="MouseLeftButtonDown"
-                                                 Command="{Binding NonLinearElementsSearchSet.Grid.SelectCommand}"
-                                                 CommandParameter="{Binding ElementName=_dgNonLinearElements, Path=SelectedItem}" />
-                        </mvvm:Interaction.Behaviors>
+                        <dxg:GridControl.Columns>
+                            <dxg:GridColumn Width="80"
+                                            AllowResizing="False">
+                                <dxg:GridColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <dx:SimpleButton Command="{Binding ElementName=_this, Path=DataContext.NonLinearElementsSearchSet.Grid.SelectCommand}"
+                                                         CommandParameter="{Binding Row}"
+                                                         Glyph="{dx:DXImage 'SvgImages/HybridDemoIcons/Editors/HybridDemo_Search Button.svg'}"
+                                                         GlyphHeight="16" />
+                                    </DataTemplate>
+                                </dxg:GridColumn.CellTemplate>
+                            </dxg:GridColumn>
+                            <dxg:GridColumn Width="1*"
+                                            Header="Категория"
+                                            FieldName="Category" />
+                            <dxg:GridColumn Width="1*"
+                                            Header="Id"
+                                            FieldName="Id" />
+                            <dxg:GridColumn Width="3*"
+                                            Header="Имя семейства"
+                                            FieldName="FamilyName" />
+                            <dxg:GridColumn Width="3*"
+                                            Header="Имя типоразмера"
+                                            FieldName="Name" />
+                        </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </dxdo:LayoutPanel>
 
