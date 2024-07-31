@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -15,14 +16,14 @@ namespace RevitOpeningPlacement.ViewModels.ReportViewModel {
 
         public ClashesViewModel(RevitRepository revitRepository, IEnumerable<UnplacedClashModel> clashes) {
             _revitRepository = revitRepository;
-            Clashes = new List<ClashViewModel>(clashes.Select(item => new ClashViewModel(item)));
+            Clashes = new ObservableCollection<ClashViewModel>(clashes.Select(item => new ClashViewModel(item)));
             ClashesViewSource = new CollectionViewSource() { Source = Clashes };
 
             SelectCommand = RelayCommand.Create<ClashViewModel>(Select, CanSelect);
         }
 
-        public List<ClashViewModel> Clashes { get; set; }
-        public CollectionViewSource ClashesViewSource { get; set; }
+        public ObservableCollection<ClashViewModel> Clashes { get; }
+        public CollectionViewSource ClashesViewSource { get; }
         public ICommand SelectCommand { get; }
 
 
