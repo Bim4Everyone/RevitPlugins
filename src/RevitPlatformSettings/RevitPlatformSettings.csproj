@@ -16,9 +16,11 @@
         <Resource Include="assets\theme-win10dark\icons8-download-96.png" />
         <Resource Include="assets\theme-win10dark\icons8-message-96.png" />
         <Resource Include="assets\theme-win10dark\icons8-news-96.png" />
+        <Resource Include="assets\theme-win10dark\icons8-github-96.png" />
 
         <Resource Include="assets\theme-win10light\icons8-download-96.png" />
         <Resource Include="assets\theme-win10light\icons8-message-96.png" />
         <Resource Include="assets\theme-win10light\icons8-news-96.png" />
+        <Resource Include="assets\theme-win10light\icons8-github-96.png" />
     </ItemGroup>
 </Project>

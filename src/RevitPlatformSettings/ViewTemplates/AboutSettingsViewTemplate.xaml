@@ -4,7 +4,8 @@
                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                     xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
                     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-                    xmlns:views="clr-namespace:RevitPlatformSettings.Views">
+                    xmlns:views="clr-namespace:RevitPlatformSettings.Views"
+                    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm">
     <DataTemplate DataType="{x:Type settings:AboutSettingsViewModel}">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -15,6 +16,7 @@
             <Image
                 Grid.Column="0"
                 Height="200"
+                Margin="10"
                 VerticalAlignment="Top"
                 Source="{Binding Path=ImagePath}" />
 
@@ -48,6 +50,12 @@
                     EditValue="{DynamicResource AboutSettings.PlatformDownload}"
                     NavigationUrl="{Binding Path=DownloadLinkUrl}"
                     ImageSource="{dx:QualifiedImage Uri=../assets/icons8-download-96.png}" />
+
+                <views:HyperLinkEditWithImage
+                    EditValue="{DynamicResource AboutSettings.OpenSource}"
+                    ImageSource="{dx:QualifiedImage Uri=../assets/icons8-github-96.png}"
+                    Command="{Binding ShowOpenSourceDialogCommand}" />
+
             </StackPanel>
         </Grid>
     </DataTemplate>

@@ -13,6 +13,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <dxe:HyperlinkEdit
         AllowAutoNavigate="True"
+        Command="{Binding Command, ElementName=_this}"
         EditValue="{Binding EditValue, ElementName=_this}"
         NavigationUrl="{Binding NavigationUrl, ElementName=_this}">
         <dxe:HyperlinkEdit.EditTemplate>

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace RevitPlatformSettings.Views {
@@ -14,6 +15,14 @@ namespace RevitPlatformSettings.Views {
         public static readonly DependencyProperty NavigationUrlProperty = DependencyProperty.Register(
             nameof(NavigationUrl), typeof(string), typeof(HyperLinkEditWithImage),
             new PropertyMetadata(default(string)));
+
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
+            nameof(Command), typeof(ICommand), typeof(HyperLinkEditWithImage), new PropertyMetadata(default(ICommand)));
+
+        public ICommand Command {
+            get => (ICommand) GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
 
         public string NavigationUrl {
             get => (string) GetValue(NavigationUrlProperty);
