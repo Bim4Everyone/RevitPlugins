@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -16,16 +17,23 @@ namespace RevitMechanicalSpecification.Service {
         private readonly SpecConfiguration _config;
         private readonly Document _document;
         private readonly VisElementsCalculator _calculator;
+        private readonly List<Element> _fullElementsList;
 
-        public NameAndGroupFactory(SpecConfiguration configuration, Document document, VisElementsCalculator calculator) {
+
+        public NameAndGroupFactory(SpecConfiguration configuration, Document document, VisElementsCalculator calculator, List<Element> elements) {
             _document = document;
             _config = configuration;
             _calculator = calculator;
+            _fullElementsList = elements;
         }
 
+
+
+
         //Ниже операции с именами
-        //Базовое имя без учета узла
-        private string GetBaseName(Element element) {
+
+        //Базовое имя
+        public string GetName(Element element) {
             Element elemType = element.GetElementType();
             string name = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameName);
 
@@ -51,25 +59,6 @@ namespace RevitMechanicalSpecification.Service {
                 Element pipe = _document.GetElement(insulation.HostElementId);
 
                 if(!(pipe is null)) { name += " (Для: " + GetName(pipe) + ")"; }
-            }
-            return name;
-        }
-        //Базовое имя + модификация если узел
-        public string GetName(Element element) {
-            string name = GetBaseName(element);
-
-            if(element is FamilyInstance instance) {
-                if(!IsOutSideOfManifold(element)) {
-                    FamilyInstance familyInstance = instance;
-                    if(!(familyInstance.SuperComponent is null)) {
-                        familyInstance = GetSuperComponentIfExist(familyInstance);
-
-                        if(IsManifold(familyInstance)) {
-                            string num = GetNumeration(familyInstance, element);
-                            if(!string.IsNullOrEmpty(num)) { name = num + name; }
-                        }
-                    }
-                }
             }
             return name;
         }
@@ -100,55 +89,17 @@ namespace RevitMechanicalSpecification.Service {
         private string GetDetailedGroup(Element element) {
             Element elemType = element.GetElementType();
 
-            string name = GetBaseName(element);
+            string name = GetName(element);
             string mark = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameMark);
             string code = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameCode);
             string creator = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameCreator);
             return "_" + name + "_" + mark + "_" + code + "_" + creator;
         }
-        //Базовая + детализированная + модификация если узел
+        //Базовая + детализированная
         public string GetGroup(Element element) {
             string detailedGroup = GetDetailedGroup(element);
-
-            if(element is FamilyInstance instance && !IsOutSideOfManifold(element)) {
-                if(instance.SuperComponent != null) {
-                    FamilyInstance familyInstance = GetSuperComponentIfExist(instance);
-
-                    if(IsManifold(familyInstance)) {
-                        return
-                            $"{GetBaseGroup(familyInstance)}" +
-                            $"_Узел_" +
-                            $"{familyInstance.GetParamValue(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM)}{detailedGroup}";
-                    }
-                }
-            }
             return $"{GetBaseGroup(element)}{detailedGroup}";
         }
-        //Получает нумерацию вложения в коллектор
-        public string GetNumeration(FamilyInstance family, Element currentObj) {
-            int num = 1;
-            string lastGroup = string.Empty;
-
-            var elementsOfManifold = GetSub(family).OrderBy(e => GetGroup(e)).ToList();
-
-            foreach(Element element in elementsOfManifold) {
-                string name = GetBaseName(element);
-
-                if(!string.IsNullOrEmpty(name) && name != "!Не учитывать") {
-                    string currentGroup = GetGroup(currentObj);
-                    string elemGroup = GetGroup(element);
-                    if(lastGroup != elemGroup) {
-                        lastGroup = elemGroup;
-                        if(currentGroup == elemGroup) {
-                            return "‎    " + num.ToString() + ". ";
-                        }
-                        num++;
-                    }
-                }
-            }
-            return null;
-        }
-
 
         //Ниже операции с узлами
         //если есть суперкомпонент - возвращает его. Иначе возвращает исходник
@@ -161,7 +112,7 @@ namespace RevitMechanicalSpecification.Service {
         }
 
         //возвращает субкомпоненты и субкомпоненты субкомпонентов
-        private List<Element> GetSub(FamilyInstance element) {
+        public List<Element> GetSub(FamilyInstance element) {
             var subs = new List<Element>();
 
             foreach(ElementId elementId in element.GetSubComponentIds()) {
@@ -176,21 +127,62 @@ namespace RevitMechanicalSpecification.Service {
 
         //возвращает значение параметра по типу или экземпляру, если существует, иначе null
         private string GetTypeOrInstanceParamValue(Element element, Element elemType, string paraName) {
-            if(element.IsExistsParam(paraName)) { return element.GetSharedParamValueOrDefault<string>(paraName); }
-            if(elemType.IsExistsParam(paraName)) { return elemType.GetSharedParamValueOrDefault<string>(paraName); }
+            if(element.IsExistsParam(paraName)) 
+                { 
+                return element.GetSharedParamValueOrDefault<string>(paraName); 
+                }
+
+            if(elemType.IsExistsParam(paraName)) 
+                { 
+                return elemType.GetSharedParamValueOrDefault<string>(paraName); 
+                }
             return null;
         }
 
 
-        private bool IsManifold(Element element) {
+        public string GetManifoldGroup(FamilyInstance familyInstance, Element element) {
+            return
+                    $"{GetBaseGroup(familyInstance)}" +
+                    $"{familyInstance.get_Parameter(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString()}" +
+                    $"_Узел_" +
+                    "_" +
+                    $"{GetDetailedGroup(element)}";
+        }
+
+
+        public bool IsIncreaseIndex(List<Element> manifoldElements, int index) {
+
+            Element element = manifoldElements[index];
+
+            string name = GetName(element);
+
+            if(string.IsNullOrEmpty(name) || name == "!Не учитывать") 
+                {
+                return false;
+            }
+
+            if(index == 0) {
+                return false;
+            }
+
+            if(GetGroup(element) == GetGroup(manifoldElements[index - 1])) {
+                return false;
+            } else {
+                return true;
+            }
+
+        }
+
+        public bool IsManifold(Element element) {
             Element elemType = element.GetElementType();
 
-            if(!(elemType.GetSharedParamValueOrDefault<int>(_config.IsManiFoldParamName) == 1)) { return false; }
+            if(!(elemType.GetSharedParamValueOrDefault<int>(_config.IsManiFoldParamName) == 1)) 
+                { return false; }
 
             return true;
         }
 
-        private bool IsOutSideOfManifold(Element element) {
+        public bool IsOutSideOfManifold(Element element) {
             Element elemType = element.GetElementType();
             if(elemType.GetSharedParamValueOrDefault<int>(_config.IsOutSideOfManifold) == 1) {
                 return true;

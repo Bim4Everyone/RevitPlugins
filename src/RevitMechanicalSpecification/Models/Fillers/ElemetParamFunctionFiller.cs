@@ -32,9 +32,13 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private string GetFunction(Element element) {
             return _nameFactory.GetFunctionValue(element);
         }
-        public override void SetParamValue(Element element) {
 
+        public override void SetParamValue(Element element) {
             ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedFunction, GetFunction(element)));
+
+
+
+
         }
     }
 }

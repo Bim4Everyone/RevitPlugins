@@ -8,6 +8,6 @@ using Autodesk.Revit.DB;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal interface IElementParamFiller {
-        void Fill(Element element);
+        void Fill(Element element, FamilyInstance familyInstance, int count = 0);
     }
 }

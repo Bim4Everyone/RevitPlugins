@@ -18,6 +18,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         protected Parameter ToParam;
         protected Parameter FromParam;
+        protected FamilyInstance ManifoldInstance;
+        protected int Count;
 
         protected readonly string ToParamName;
         protected readonly string FromParamName;
@@ -54,45 +56,45 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             {
             if(paramName is null) 
                 { return null; }
-            if(element.IsExistsParam(paramName)) 
-                { return element.GetParam(paramName); }
-            if(ElemType.IsExistsParam(paramName)) 
-                { return ElemType.GetParam(paramName); }
+            if(element.IsExistsParam(paramName))
+                //{ return element.GetParam(paramName); }
+                {  return element.LookupParameter(paramName); }
+            if(ElemType.IsExistsParam(paramName))
+                //{ return ElemType.GetParam(paramName); }
+                { return ElemType.LookupParameter(paramName); }
             return null;
         }
 
+        public void Fill(Element manifoldElement, FamilyInstance familyInstance, int count = 0)
+        {
+            //ElemType = element.GetElementType();
+            ElemType = Document.GetElement(manifoldElement.GetTypeId());
 
-        public void Fill(Element element) {
-            
-            ElemType = element.GetElementType();
 
             //Существует ли целевой параметр в экземпляре
             //Если параметры существуют создаем их экземпляры чтоб не пересоздавать
             //все методы GetParam крашат, если null
-            try 
-            {
-                ToParam = element.GetSharedParam(ToParamName);
-            } 
-            catch(System.ArgumentException) 
-            { 
-                return; 
+            try {
+                ToParam = manifoldElement.GetSharedParam(ToParamName);
+            } catch(System.ArgumentException) {
+                return;
             }
-            
-
 
             //Проверка на нулл - для ситуаций где нет имени исходного(ФОП_ВИС_Число, Группирование), тогда исходный парам так и остается пустым 
             if(!(FromParamName is null)) {
                 //Проверяем, если существует исходный параметр в типе или экземпляре
-                FromParam = GetTypeOrInstanceParam(element, FromParamName);
-                if(FromParam is null) 
-                    {return; }
+                FromParam = GetTypeOrInstanceParam(manifoldElement, FromParamName);
+                if(FromParam is null) { return; }
             }
 
             //Если целевой параметр ридонли - можно сразу идти дальше
-            if(ToParam.IsReadOnly) 
-                { return; }
+            if(ToParam.IsReadOnly) { return; }
 
-            this.SetParamValue(element);
+
+            ManifoldInstance = familyInstance;
+            Count = count;
+            this.SetParamValue(manifoldElement);
         }
+
     }
 }

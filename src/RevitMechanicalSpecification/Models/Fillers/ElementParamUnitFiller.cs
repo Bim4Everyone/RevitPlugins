@@ -29,7 +29,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
 
 
-        private string DefaultCheck(Element element, string defaultUnit) {
+        private string DefaultCheck(string defaultUnit) {
             //string unit = GetTypeOrInstanceParamValue(element);
             string unit = FromParam.AsValueString();
 
@@ -48,7 +48,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 BuiltInCategory.OST_PipeCurves, 
                 BuiltInCategory.OST_FlexDuctCurves, 
                 BuiltInCategory.OST_FlexPipeCurves }))
-                { return DefaultCheck(element, Config.MeterUnit); }
+                { return DefaultCheck(Config.MeterUnit); }
 
             if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
                 if(Config.IsSpecifyDuctFittings) { return Config.SingleUnit; }
@@ -56,9 +56,9 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             }
 
             if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) 
-                { return DefaultCheck(element, Config.SquareUnit); }
+                { return DefaultCheck(Config.SquareUnit); }
             if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) 
-                { return DefaultCheck(element, Config.MeterUnit); }
+                { return DefaultCheck(Config.MeterUnit); }
 
             return Config.SingleUnit;
         }
