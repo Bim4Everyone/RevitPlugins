@@ -6,11 +6,11 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.WPF.Extensions;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
@@ -44,7 +44,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Thickness = _openingTask.DisplayThickness;
             FamilyShortName = _openingTask.FamilyShortName;
             HostName = _openingTask.HostName;
-            Status = _openingTask.Status.GetEnumDescription();
+            Status = _openingTask.Status.GetDescription();
             Comment = _openingTask.Comment;
             Username = _openingTask.Username;
         }

@@ -1,15 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.WPF.Extensions;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
@@ -39,7 +39,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Comment = _openingTask.Comment;
             Username = _openingTask.Username;
 
-            Status = _openingTask.Status.GetEnumDescription();
+            Status = _openingTask.Status.GetDescription();
         }
 
 
