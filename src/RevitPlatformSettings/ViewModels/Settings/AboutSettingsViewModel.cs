@@ -4,6 +4,8 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
+using RevitPlatformSettings.Views;
+
 namespace RevitPlatformSettings.ViewModels.Settings {
     internal sealed class AboutSettingsViewModel : SettingsViewModel {
         private readonly ILocalizationService _localizationService;
@@ -27,7 +29,7 @@ namespace RevitPlatformSettings.ViewModels.Settings {
             NewsChatUrl = _platformSettingsService.SocialsSettings?.NewsChatUrl;
             MainChatUrl = _platformSettingsService.SocialsSettings?.MainChatUrl;
             DownloadLinkUrl = _platformSettingsService.SocialsSettings?.DownloadLinkUrl;
-            
+
             ShowOpenSourceDialogCommand = RelayCommand.Create(ShowOpenSourceDialog);
         }
 
@@ -43,9 +45,9 @@ namespace RevitPlatformSettings.ViewModels.Settings {
 
         public string PlatformDesciption =>
             _localizationService.GetLocalizedString("AboutSettings.PlatformDesciption", PlatformName);
-        
+
         private void ShowOpenSourceDialog() {
-            throw new System.NotImplementedException();
+            new OpenSourceWindow(_localizationService).ShowDialog();
         }
     }
 }
