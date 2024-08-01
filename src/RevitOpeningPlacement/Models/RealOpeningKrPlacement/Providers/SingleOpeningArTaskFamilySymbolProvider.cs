@@ -18,8 +18,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
         /// <param name="revitRepository">Репозиторий активного документа КР, в котором будет происходить размещение чистового семейства отверстия</param>
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
         /// <param name="openingTaskType">Тип проема входящего задания на отверстие</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentNullException"><Исключение, если обязательный параметр null/exception>
+        /// <exception cref="ArgumentException">Исключение, если тип хоста не поддерживается</exception>
         public SingleOpeningArTaskFamilySymbolProvider(RevitRepository revitRepository, Element host, OpeningType openingTaskType) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             if(host is null) {
@@ -33,20 +33,20 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
         }
 
 
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">Исключение, если обязательный параметр null</exception>
         public FamilySymbol GetFamilySymbol() {
             if(_host is Wall) {
                 switch(_openingTaskType) {
                     case OpeningType.WallRound:
-                    return _revitRepository.GetOpeningRealKrType(OpeningType.WallRound);
+                        return _revitRepository.GetOpeningRealKrType(OpeningType.WallRound);
                     case OpeningType.WallRectangle:
                     default:
-                    return _revitRepository.GetOpeningRealKrType(OpeningType.WallRectangle);
+                        return _revitRepository.GetOpeningRealKrType(OpeningType.WallRectangle);
                 }
             } else if(_host is Floor) {
                 switch(_openingTaskType) {
                     default:
-                    return _revitRepository.GetOpeningRealKrType(OpeningType.FloorRectangle);
+                        return _revitRepository.GetOpeningRealKrType(OpeningType.FloorRectangle);
                 }
             } else {
                 throw new ArgumentException(nameof(_host));

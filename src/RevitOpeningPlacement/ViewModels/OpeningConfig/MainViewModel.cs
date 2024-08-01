@@ -188,8 +188,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         /// <summary>
         /// Если пользователь включил CheckBox у категории инженерных элементов, то сделать ее выбранной
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void MepCategoryIsSelectedPropertyChanged(object sender, PropertyChangedEventArgs e) {
             if((e != null)
                 && string.Equals(e.PropertyName, nameof(MepCategoryViewModel.IsSelected))

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,8 +11,8 @@ namespace RevitOpeningPlacement.Models.Configs {
             Sizes = new List<Size>(sizes);
         }
 
-        List<Size> Sizes { get; set; }
         public Size this[Parameters index] => Sizes.FirstOrDefault(item => item.Name.Equals(RevitRepository.ParameterNames[index]));
+        private List<Size> Sizes { get; }
 
         public IEnumerator<Size> GetEnumerator() => Sizes.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();

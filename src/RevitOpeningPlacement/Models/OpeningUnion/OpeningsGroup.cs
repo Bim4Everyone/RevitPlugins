@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,9 +39,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <summary>
         /// Возвращает генератор задания на отверстие, 
         /// </summary>
-        /// <param name="revitRepository"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="InvalidOperationException">Исключение, если не удалось выполнить операцию</exception>
         /// <exception cref="ArgumentOutOfRangeException">В группе находится менее 2-х заданий на отверстия</exception>
         public OpeningPlacer GetOpeningPlacer(RevitRepository revitRepository) {
             try {
@@ -76,7 +74,6 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <summary>
         /// Добавляет те исходящие задания на отверстия в группу, которых еще нет в группе
         /// </summary>
-        /// <param name="openingTasks"></param>
         public void AddOpenings(ICollection<OpeningMepTaskOutcoming> openingTasks) {
             foreach(var openingTask in openingTasks) {
                 AddOpening(openingTask);
@@ -84,19 +81,8 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         }
 
         /// <summary>
-        /// Проверяет, содержится ли данное исходящее задание на отверстие в группе
-        /// </summary>
-        /// <param name="openingTask"></param>
-        /// <returns></returns>
-        public bool Contains(OpeningMepTaskOutcoming openingTask) {
-            return _elements.Contains(openingTask);
-        }
-
-        /// <summary>
         /// Проверяет, содержится ли какое-либо исходящее задание на отверстие в группе
         /// </summary>
-        /// <param name="openingMepTasks"></param>
-        /// <returns></returns>
         public bool ContainsAny(ICollection<OpeningMepTaskOutcoming> openingMepTasks) {
             return _elements.Overlaps(openingMepTasks);
         }
@@ -104,7 +90,6 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <summary>
         /// Возвращает объединенное значение имен систем группы заданий на отверстия
         /// </summary>
-        /// <returns></returns>
         public string GetMepSystems() {
             return string.Join("; ", _elements.Select(element => element.MepSystem.Trim()).Distinct());
         }
@@ -112,7 +97,6 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <summary>
         /// Возвращает объединенное значение описания группы заданий на отверстия
         /// </summary>
-        /// <returns></returns>
         public string GetDescription() {
             HashSet<string> result = new HashSet<string>();
             foreach(var opening in _elements) {

@@ -11,7 +11,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
     /// <summary>
     /// Класс, предоставляющий точку вставки для задания на отверстие по пересечению элемента и плиты
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Класс второго элемента пересечения</typeparam>
     internal class FloorPointFinder<T> : IPointFinder where T : Element {
         private readonly Clash<T, CeilingAndFloor> _clash;
 
@@ -34,7 +34,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         /// Алгоритм предполагает, что поверхность плоская и горизонтальная
         /// </summary>
         /// <param name="horizontalFace">Горизонтальная плоская поверхность</param>
-        /// <returns></returns>
         public double GetMaxZ(Face horizontalFace) {
             return horizontalFace.EdgeLoops.get_Item(0).get_Item(0).AsCurve().GetEndPoint(0).Z;
         }
@@ -44,8 +43,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         /// и срединной плоскости перекрытия. В остальных случаях возвращает центр солида пересечения.
         /// Точность координаты Z не гарантируется.
         /// </summary>
-        /// <param name="clash"></param>
-        /// <returns></returns>
         private XYZ GetPointXY(Clash<T, CeilingAndFloor> clash) {
             if(clash is null) {
                 throw new ArgumentNullException(nameof(clash));
@@ -82,9 +79,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         /// <summary>
         /// Возвращает точку, которая принадлежит заданной поверхности
         /// </summary>
-        /// <param name="face"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private XYZ GetPointFromFace(Face face) {
             if(face is null) {
                 throw new ArgumentNullException(nameof(face));
@@ -97,10 +92,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         /// Возвращает горизонтальную плоскость, 
         /// полученную из заданной поверхности и трансформированную по заданному пересечению
         /// </summary>
-        /// <param name="clash"></param>
-        /// <param name="face"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private Plane CreateTransformedPlaneByFace(Clash<T, CeilingAndFloor> clash, Face face) {
             if(clash is null) {
                 throw new ArgumentNullException(nameof(clash));

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -27,7 +27,7 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// <param name="view3D">3D вид, на котором нужно выделить элемент</param>
         /// <param name="elementToHighlight">Элемент, который нужно выделить. Это должна быть стена или перекрытие</param>
         /// <exception cref="ArgumentNullException">Элемент должен быть стеной или перекрытием</exception>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">Исключение, если класс элемента не поддерживается</exception>
         public ElementHighlighter(RevitRepository revitRepository, View3D view3D, Element elementToHighlight) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _view3D = view3D ?? throw new ArgumentNullException(nameof(view3D));

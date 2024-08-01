@@ -279,8 +279,6 @@ namespace RevitOpeningPlacement {
         /// Метод для подписки на событие <see cref="UIApplication.Application.FailuresProcessing"/>
         /// Используется для запоминания расставленных экземпляров семейств заданий на отверстия, которые дают дублирование с уже размещенными
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void FailureProcessor(object sender, FailuresProcessingEventArgs e) {
             FailuresAccessor fas = e.GetFailuresAccessor();
 

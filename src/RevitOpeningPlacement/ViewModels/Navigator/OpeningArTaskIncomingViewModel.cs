@@ -85,7 +85,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие, которое надо выделить на виде
         /// </summary>
-        /// <returns></returns>
         public ICollection<ElementModel> GetElementsToSelect() {
             return new ElementModel[] {
                 new ElementModel(_openingTask.GetFamilyInstance(), _openingTask.Transform)
@@ -95,7 +94,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Возвращает хост входящего задания на отверстие
         /// </summary>
-        /// <returns></returns>
         public Element GetElementToHighlight() {
             return _openingTask.GetHost();
         }

@@ -1,4 +1,4 @@
-﻿using RevitClashDetective.Models.Value;
+using RevitClashDetective.Models.Value;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
@@ -14,7 +14,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// Конструктор класса, предоставляющего значение диаметра чистового отверстия АР/КР в перекрытии в единицах Revit
         /// </summary>
         /// <param name="openingTaskIncoming">Входящее задание на отверстие</param>
-        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RoundOpeningInFloorDiameterValueGetter(IOpeningTaskIncoming openingTaskIncoming) {
             _openingTaskIncoming = openingTaskIncoming ?? throw new System.ArgumentNullException(nameof(openingTaskIncoming));
         }

@@ -82,7 +82,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Возвращает хост чистового отверстия
         /// </summary>
-        /// <returns></returns>
         public Element GetElementToHighlight() {
             return _openingReal.GetHost();
         }
@@ -90,7 +89,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Возвращает коллекцию, в которой находится чистовое отверстие, которое надо выделить на виде
         /// </summary>
-        /// <returns></returns>
         public ICollection<ElementModel> GetElementsToSelect() {
             return new ElementModel[] {
                 new ElementModel(_openingReal.GetFamilyInstance())

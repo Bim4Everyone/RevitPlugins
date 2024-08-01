@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ValueGetters {
         /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningKrPlacer.RealOpeningTaskId"/>
         /// </summary>
         /// <param name="openingArTaskIncoming">Входящее задание на отверстие</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public KrTaskIdValueGetter(IOpeningTaskIncoming openingArTaskIncoming) {
             if(openingArTaskIncoming == null) { throw new ArgumentNullException(nameof(openingArTaskIncoming)); }
 
@@ -31,8 +31,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ValueGetters {
         /// Конструктор класса, предоставляющего значение параметра <see cref="RealOpeningKrPlacer.RealOpeningTaskId"/>
         /// </summary>
         /// <param name="openingArTaskIncoming">Входящие задания на отверстия</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в коллекции меньше 1</exception>
         public KrTaskIdValueGetter(ICollection<IOpeningTaskIncoming> openingArTaskIncoming) {
             if(openingArTaskIncoming == null) { throw new ArgumentNullException(nameof(openingArTaskIncoming)); }
             if(openingArTaskIncoming.Count < 1) { throw new ArgumentOutOfRangeException(nameof(openingArTaskIncoming)); }

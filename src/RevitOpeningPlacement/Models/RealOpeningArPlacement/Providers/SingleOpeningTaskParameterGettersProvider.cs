@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters;
@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleOpeningTaskParameterGettersProvider(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
             if(pointFinder is null) { throw new ArgumentNullException(nameof(pointFinder)); }
@@ -28,19 +28,19 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         }
 
 
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">Исключение, если тип проема задания на отверстие не поддерживается</exception>
         public IParametersGetter GetParametersGetter() {
             switch(_openingMepTaskIncoming.OpeningType) {
                 case OpeningType.WallRectangle:
-                return new SingleRectangleOpeningTaskInWallParameterGetter(_openingMepTaskIncoming, _pointFinder);
+                    return new SingleRectangleOpeningTaskInWallParameterGetter(_openingMepTaskIncoming, _pointFinder);
                 case OpeningType.FloorRectangle:
-                return new SingleRectangleOpeningTaskInFloorParameterGetter(_openingMepTaskIncoming);
+                    return new SingleRectangleOpeningTaskInFloorParameterGetter(_openingMepTaskIncoming);
                 case OpeningType.WallRound:
-                return new SingleRoundOpeningTaskInWallParameterGetter(_openingMepTaskIncoming, _pointFinder);
+                    return new SingleRoundOpeningTaskInWallParameterGetter(_openingMepTaskIncoming, _pointFinder);
                 case OpeningType.FloorRound:
-                return new SingleRoundOpeningTaskInFloorParameterGetter(_openingMepTaskIncoming);
+                    return new SingleRoundOpeningTaskInFloorParameterGetter(_openingMepTaskIncoming);
                 default:
-                throw new ArgumentException(nameof(_openingMepTaskIncoming.OpeningType));
+                    throw new ArgumentException(nameof(_openingMepTaskIncoming.OpeningType));
             }
         }
     }

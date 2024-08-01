@@ -88,7 +88,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         /// </summary>
         /// <param name="mepCategory">Настройки фильтрации элементов инженерной системы</param>
         /// <returns>Фильтр по линейным элементам из заданной конфигурации настроек</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public Filter GetLinearFilter(MepCategory mepCategory) {
             if(mepCategory is null) {
                 throw new ArgumentNullException(nameof(mepCategory));
@@ -111,7 +111,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         /// </summary>
         /// <param name="mepCategory">Настройки фильтрации элементов инженерной системы</param>
         /// <returns>Фильтр по нелинейным элементам из заданной конфигурации настроек</returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public Filter GetFittingFilter(MepCategory mepCategory) {
             if(mepCategory is null) {
                 throw new ArgumentNullException(nameof(mepCategory));
@@ -305,7 +305,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         /// <param name="revitRepository">Репозиторий Revit, в котором будут расставляться отверстия</param>
         /// <param name="mepFilterToAdd">Фильтр инженерных элементов, к которому нужно добавить поисковые наборы из настроек категорий инженерных элементов</param>
         /// <param name="mepCategories">Настройки расстановки отверстий для категорий инженерных элементов</param>
-        /// <returns></returns>
         private Filter CreateMepCategoriesAndFilterSet(RevitClashDetective.Models.RevitRepository revitRepository, Filter mepFilterToAdd, params MepCategory[] mepCategories) {
             var mepCategoriesAndFilterSet = new Set() {
                 SetEvaluator = SetEvaluatorUtils.GetEvaluators().First(item => item.Evaluator == SetEvaluators.Or),
@@ -372,8 +371,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         /// </summary>
         /// <param name="revitRepository">Репозиторий ревита</param>
         /// <param name="mepCategory">Конфигурация настроек инженерной системы</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private Set GetMepFilterSet(RevitClashDetective.Models.RevitRepository revitRepository, MepCategory mepCategory) {
             if(mepCategory is null) {
                 throw new ArgumentNullException(nameof(mepCategory));

@@ -118,7 +118,6 @@ namespace RevitOpeningPlacement.Models.Configs {
         /// Возвращает значение отступа (суммарно с двух сторон) от габаритов элемента инженерной системы в единицах Revit
         /// </summary>
         /// <param name="size">Габарит инженерного элемента в единицах Revit</param>
-        /// <returns></returns>
         public double GetOffsetValue(double size) {
             return GetOffsetTransformedToInternalUnit(size)?.OffsetValue * 2 ?? 0;
         }
@@ -127,7 +126,6 @@ namespace RevitOpeningPlacement.Models.Configs {
         /// Возвращает настройки отступов для заданного габарита инженерной системы с размерами в единицах Revit
         /// </summary>
         /// <param name="size">Габарит инженерного элемента в единицах Revit</param>
-        /// <returns></returns>
         public Offset GetOffsetTransformedToInternalUnit(double size) {
             return Offsets.Select(item => item.GetTransformedToInternalUnit())
                 .FirstOrDefault(item => item.From <= size && item.To >= size);

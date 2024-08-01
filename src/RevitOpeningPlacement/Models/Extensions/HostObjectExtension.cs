@@ -12,27 +12,30 @@ namespace RevitOpeningPlacement.Models.Extensions {
     /// </summary>
     internal static class HostObjectExtension {
         /// <summary>
-        /// Возвращает "оригинальный" Solid элемента, являющегося <see cref="Autodesk.Revit.DB.HostObject">основой</see> без вырезаний.
+        /// Возвращает "оригинальный" Solid элемента, являющегося <see cref="Autodesk.Revit.DB.HostObject">основой</see> без вырезов.
         /// Реализовано для элементов следующих типов: Wall | Floor | Ceiling | RoofBase
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="Autodesk.Revit.Exceptions.InvalidOperationException"></exception>
+        /// <returns>Исходный солид хоста</returns>
+        /// <exception cref="System.InvalidOperationException">Исключение, если не удалось определить исходный солид</exception>
         public static Solid GetHostElementOriginalSolid(this HostObject hostObject) {
-            IList<IList<CurveLoop>> loops = GetHostBoundCurveLoops(hostObject);
+            try {
+                IList<IList<CurveLoop>> loops = GetHostBoundCurveLoops(hostObject);
 
-            SolidOptions opts = new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId);
-            Solid solid = default;
-            foreach(IList<CurveLoop> loopsPair in loops) {
-                Solid currentSolid = GeometryCreationUtilities.CreateLoftGeometry(loopsPair, opts);
-                if(solid is null) {
-                    solid = currentSolid;
-                } else {
-                    // сложение солидов, чтобы исключить пересечения
-                    solid = BooleanOperationsUtils.ExecuteBooleanOperation(solid, currentSolid, BooleanOperationsType.Union);
+                SolidOptions opts = new SolidOptions(ElementId.InvalidElementId, ElementId.InvalidElementId);
+                Solid solid = default;
+                foreach(IList<CurveLoop> loopsPair in loops) {
+                    Solid currentSolid = GeometryCreationUtilities.CreateLoftGeometry(loopsPair, opts);
+                    if(solid is null) {
+                        solid = currentSolid;
+                    } else {
+                        // сложение солидов, чтобы исключить пересечения
+                        solid = BooleanOperationsUtils.ExecuteBooleanOperation(solid, currentSolid, BooleanOperationsType.Union);
+                    }
                 }
+                return solid;
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                throw new InvalidOperationException();
             }
-            return solid;
         }
 
         /// <summary>
@@ -88,9 +91,9 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <summary>
         /// Возвращает список, в каждом элементе которого содержатся по 2 CurveLoop для создания солида по ним
         /// </summary>
-        /// <param name="hostObject"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <param name="hostObject">Хост</param>
+        /// <returns>Наружные контуры верхней и нижней поверхности хоста для перекрытий или передней и задней поверхности для стен</returns>
+        /// <exception cref="InvalidOperationException">Исключение, если не удалось определить наружные контуры граничных поверхностей</exception>
         private static IList<IList<CurveLoop>> GetHostBoundCurveLoops(this HostObject hostObject) {
             Face[] faces = GetHostBoundFaces(hostObject);
             if(faces.Length != 2) { throw new InvalidOperationException(); }
@@ -122,8 +125,8 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <summary>
         /// Возвращает контур, в котором отрезки, идущие друг за другом и лежащие на одной прямой превращены в один
         /// </summary>
-        /// <param name="curveLoopRaw"></param>
-        /// <returns></returns>
+        /// <param name="curveLoopRaw">Замкнутый контур</param>
+        /// <returns>Замкнутый контур с объединенными линиями</returns>
         public static CurveLoop SimplifyCurveLoop(CurveLoop curveLoopRaw) {
             CurveLoop simplifiedCurves = new CurveLoop();
             List<Curve> curveLoopList = curveLoopRaw.ToList();
@@ -160,7 +163,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// </summary>
         /// <param name="curveStart">Первый отрезок</param>
         /// <param name="curveEnd">Второй отрезок</param>
-        /// <returns></returns>
+        /// <returns>True, если второй отрезок добавлен к первому, иначе False</returns>
         private static bool AppendCurve(ref Curve curveStart, Curve curveEnd) {
             if(curveStart is null || curveEnd is null) {
                 return false;
@@ -186,7 +189,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// Возвращает список CurveLoop из заданной грани, которые находятся снаружи друг друга
         /// </summary>
         /// <param name="face">Грань для получения CurveLoop</param>
-        /// <returns></returns>
+        /// <returns>Список наружных контуров поверхности</returns>
         private static IList<CurveLoop> GetOuterCurveLoops(Face face) {
             // Полученные CurveLoop из наружных граней хост элемента находятся либо внутри друг друга, либо снаружи.
             // Поэтому, чтобы определить, лежит ли CurveLoop внутри другой, достаточно проверить, лежит ли хотя бы одна точка первой CurveLoop внутри другой.
@@ -227,7 +230,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// Возвращает список, содержащий нижнюю и верхнюю поверхности <see cref="Autodesk.Revit.DB.HostObject">хоста</see>, 
         /// если хост - "плитный" элемент, или содержащий внутреннюю и внешнюю поверхности, если хост - стена.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Массив граничных поверхностей хоста</returns>
         /// <exception cref="ArgumentException">Исключение, если <paramref name="hostObject"/> не Стена | Потолок | Перекрытие | Крыша</exception>
         private static Face[] GetHostBoundFaces(this HostObject hostObject) {
             // TODO скорректировать алгоритм:
@@ -247,7 +250,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <summary>
         /// Определяет, является ли <paramref name="hostObject"/> стеной.
         /// </summary>
-        /// <param name="hostObject"></param>
+        /// <param name="hostObject">Хост</param>
         /// <returns>True, если <paramref name="hostObject"/> - стена, иначе False (перекрытия, крыши, потолки)</returns>
         private static bool IsVerticallyCompound(this HostObject hostObject) {
             return hostObject.GetElementType<HostObjAttributes>().GetCompoundStructure()?.IsVerticallyCompound ?? false;

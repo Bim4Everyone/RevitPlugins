@@ -24,7 +24,7 @@ namespace RevitOpeningPlacement.Models {
         /// Конструктор обертки провайдера элементов конструкций из связанного файла
         /// </summary>
         /// <param name="linkDocument">Связанный файл с конструкциями</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public ConstructureLinkElementsProvider(RevitRepository revitRepository, RevitLinkInstance linkDocument) {
             if(revitRepository is null) {
                 throw new ArgumentNullException(nameof(revitRepository));
