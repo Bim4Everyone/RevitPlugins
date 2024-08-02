@@ -40,7 +40,7 @@
     
     <system:String x:Key="AboutSettings.Title">О программе</system:String>
     <system:String x:Key="AboutSettings.OpenSource">Стороннее ПО</system:String>
-    <system:String x:Key="AboutSettings.PlatformDesciption">{0} - это платформа созданная для упрощения разработки проектной документации в Autodesk Revit.</system:String>
+    <system:String x:Key="AboutSettings.PlatformDescription">{0} - это платформа созданная для упрощения разработки проектной документации в Autodesk Revit.</system:String>
     <system:String x:Key="AboutSettings.PlatformLinkText">Ссылка на проект</system:String>
     <system:String x:Key="AboutSettings.PlatformNewsChannel">Канал новостей</system:String>
     <system:String x:Key="AboutSettings.PlatformMainChat">Обсуждение платформы</system:String>

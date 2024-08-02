@@ -43,8 +43,8 @@ namespace RevitPlatformSettings.ViewModels.Settings {
         public string MainChatUrl { get; }
         public string DownloadLinkUrl { get; }
 
-        public string PlatformDesciption =>
-            _localizationService.GetLocalizedString("AboutSettings.PlatformDesciption", PlatformName);
+        public string PlatformDescription =>
+            _localizationService.GetLocalizedString("AboutSettings.PlatformDescription", PlatformName);
 
         private void ShowOpenSourceDialog() {
             new OpenSourceWindow(_localizationService).ShowDialog();

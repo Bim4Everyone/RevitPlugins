@@ -39,7 +39,7 @@
     
     <system:String x:Key="AboutSettings.Title">About</system:String>
     <system:String x:Key="AboutSettings.OpenSource">Third-party Software</system:String>
-    <system:String x:Key="AboutSettings.PlatformDesciption">{0} is a platform created to simplify the development of design documentation in Autodesk Revit.</system:String>
+    <system:String x:Key="AboutSettings.PlatformDescription">{0} is a platform created to simplify the development of design documentation in Autodesk Revit.</system:String>
     <system:String x:Key="AboutSettings.PlatformLinkText">Project website</system:String>
     <system:String x:Key="AboutSettings.PlatformNewsChannel">News channel</system:String>
     <system:String x:Key="AboutSettings.PlatformMainChat">Main group chat</system:String>
