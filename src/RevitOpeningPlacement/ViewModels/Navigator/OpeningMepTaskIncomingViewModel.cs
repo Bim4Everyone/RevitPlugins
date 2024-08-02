@@ -6,11 +6,11 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.WPF.Extensions;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
@@ -44,7 +44,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Thickness = _openingTask.DisplayThickness;
             FamilyShortName = _openingTask.FamilyShortName;
             HostName = _openingTask.HostName;
-            Status = _openingTask.Status.GetEnumDescription();
+            Status = _openingTask.Status.GetDescription();
             Comment = _openingTask.Comment;
             Username = _openingTask.Username;
         }
@@ -150,7 +150,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Возвращает хост входящего задания на отверстие
         /// </summary>
-        /// <returns></returns>
         public Element GetElementToHighlight() {
             return _openingTask.Host;
         }
@@ -158,7 +157,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие, которое надо выделить на виде
         /// </summary>
-        /// <returns></returns>
         public ICollection<ElementModel> GetElementsToSelect() {
             return new ElementModel[] {
                 new ElementModel(_openingTask.GetFamilyInstance(), _openingTask.Transform)

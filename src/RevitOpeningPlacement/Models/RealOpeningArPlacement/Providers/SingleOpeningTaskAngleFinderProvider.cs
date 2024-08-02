@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
@@ -25,21 +25,17 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">Исключение, если тип проема задания на отверстие не поддерживается</exception>
         public IAngleFinder GetAngleFinder() {
             switch(_openingMepTaskIncoming.OpeningType) {
                 case OpeningType.WallRound:
                 case OpeningType.WallRectangle:
                 case OpeningType.FloorRound:
-                return new ZeroAngleFinder();
+                    return new ZeroAngleFinder();
                 case OpeningType.FloorRectangle:
-                return new SingleRectangleOpeningTaskInFloorAngleFinder(_openingMepTaskIncoming);
+                    return new SingleRectangleOpeningTaskInFloorAngleFinder(_openingMepTaskIncoming);
                 default:
-                throw new ArgumentException(nameof(_openingMepTaskIncoming.OpeningType));
+                    throw new ArgumentException(nameof(_openingMepTaskIncoming.OpeningType));
             }
         }
     }

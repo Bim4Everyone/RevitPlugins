@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -24,11 +24,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             _revitRepository = revitRepository;
             CategoryInfo = categoriesInfo;
 
-            AddRuleCommand = new RelayCommand(AddRule);
-            RemoveRuleCommand = new RelayCommand(RemoveRule);
+            AddRuleCommand = RelayCommand.Create(AddRule);
+            RemoveRuleCommand = RelayCommand.Create<RuleViewModel>(RemoveRule, CanRemoveRule);
 
-            AddSetCommand = new RelayCommand(AddSet);
-            RemoveSetCommand = new RelayCommand(RemoveSet);
+            AddSetCommand = RelayCommand.Create(AddSet);
+            RemoveSetCommand = RelayCommand.Create<SetViewModel>(RemoveSet, CanRemoveSet);
 
             Evaluators = new ObservableCollection<EvaluatorViewModel>(SetEvaluatorUtils.GetEvaluators().Select(item => new EvaluatorViewModel() { SetEvaluator = item }));
             if(set == null) {
@@ -86,20 +86,28 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
         }
 
-        private void AddRule(object p) {
+        private void AddRule() {
             Criterions.Add(new RuleViewModel(_categoryInfo));
         }
 
-        private void AddSet(object p) {
+        private void AddSet() {
             Criterions.Add(new SetViewModel(_revitRepository, _categoryInfo));
         }
 
-        private void RemoveSet(object p) {
-            Criterions.Remove(p as SetViewModel);
+        private void RemoveSet(SetViewModel p) {
+            Criterions.Remove(p);
         }
 
-        private void RemoveRule(object p) {
-            Criterions.Remove(p as RuleViewModel);
+        private bool CanRemoveSet(SetViewModel p) {
+            return p != null;
+        }
+
+        private void RemoveRule(RuleViewModel p) {
+            Criterions.Remove(p);
+        }
+
+        private bool CanRemoveRule(RuleViewModel p) {
+            return p != null;
         }
 
         public void Renew() {

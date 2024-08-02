@@ -39,7 +39,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного КР документа ревита, в котором будет происходить размещение чистовых отверстий</param>
         /// <param name="config">Конфигурация расстановки заданий на отверстия в файле КР, в которой задается обработка заданий ВИС или АР</param>
-        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RealOpeningKrPlacer(RevitRepository revitRepository, OpeningRealsKrConfig config) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _config = config ?? throw new ArgumentNullException(nameof(config));
@@ -79,9 +79,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Возвращает входящее задание на отверстие, выбранное пользователем в соответствии с настройками
         /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        /// <exception cref="OperationCanceledException"></exception>
+        /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
         private IOpeningTaskIncoming PickOpeningTaskIncoming(OpeningRealsKrConfig config) {
             if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
                 return _revitRepository.PickSingleOpeningArTaskIncoming();
@@ -96,9 +94,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Возвращает входящие задания на отверстия, выбранные пользователем в соответствии с настройками
         /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        /// <exception cref="OperationCanceledException"></exception>
+        /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
         private ICollection<IOpeningTaskIncoming> PickOpeningsTaskIncoming(OpeningRealsKrConfig config) {
             if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
                 return _revitRepository.PickManyOpeningArTasksIncoming().ToArray<IOpeningTaskIncoming>();
@@ -113,9 +109,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Возвращает все входящие задания на отверстия в соответствии с заданными настройками
         /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        /// <exception cref="OperationCanceledException"></exception>
+        /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
         private ICollection<IOpeningTaskIncoming> GetAllOpeningsTaskIncoming(OpeningRealsKrConfig config) {
             if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
                 return _revitRepository.GetOpeningsArTasksIncoming().ToArray<IOpeningTaskIncoming>();
@@ -240,7 +234,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// </summary>
         /// <param name="host">Основа для чистового отверстия КР - стена или перекрытие</param>
         /// <param name="openingTask">Входящее задание на отверстие</param>
-        /// <exception cref="OpeningNotPlacedException"></exception>
+        /// <exception cref="OpeningNotPlacedException">Исключение, если не получилось разместить отверстие</exception>
         private void PlaceByOneTask(Element host, IOpeningTaskIncoming openingTask) {
             try {
                 var symbol = GetFamilySymbol(host, openingTask.OpeningType);
@@ -274,7 +268,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// </summary>
         /// <param name="host">Основа для чистового отверстия КР</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        /// <exception cref="OpeningNotPlacedException"></exception>
+        /// <exception cref="OpeningNotPlacedException">Исключение, если не удалось разместить отверстие</exception>
         private void PlaceUnitedByManyTasks(Element host, ICollection<IOpeningTaskIncoming> incomingTasks) {
             try {
                 var symbol = GetFamilySymbol(host);
@@ -303,7 +297,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// Возвращает интерфейс, предоставляющий угол поворота размещаемого КР отверстия
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <returns></returns>
         private IAngleFinder GetAngleFinder(IOpeningTaskIncoming incomingTask) {
             var provider = new SingleOpeningArTaskAngleFinderProvider(incomingTask);
             return provider.GetAngleFinder();
@@ -314,7 +307,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// </summary>
         /// <param name="opening">Размещенное чистовое отверстие</param>
         /// <param name="parameterGetter">Класс, предоставляющий параметры</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private void SetParamValues(FamilyInstance opening, IParametersGetter parameterGetter) {
             if(opening is null) { throw new ArgumentNullException(nameof(opening)); }
             if(parameterGetter is null) { throw new ArgumentNullException(nameof(parameterGetter)); }
@@ -327,9 +320,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Возвращает интерфейс, предоставляющий значения параметров для размещаемого отверстия КР
         /// </summary>
-        /// <param name="incomingTask"></param>
-        /// <param name="pointFinder"></param>
-        /// <returns></returns>
         private IParametersGetter GetParameterGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder) {
             var provider = new SingleOpeningArTaskParameterGettersProvider(incomingTask, pointFinder);
             return provider.GetParametersGetter();
@@ -340,8 +330,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// </summary>
         /// <param name="host">Основа для отверстия КР</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        /// <param name="pointFinder"></param>
-        /// <returns></returns>
         private IParametersGetter GetParameterGetter(Element host, ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder) {
             var provider = new ManyOpeningArTasksParameterGettersProvider(host, incomingTasks, pointFinder);
             return provider.GetParametersGetter();
@@ -351,7 +339,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР
         /// </summary>
         /// <param name="openingTask">Входящее задание на отверстие</param>
-        /// <returns></returns>
         private IPointFinder GetPointFinder(IOpeningTaskIncoming openingTask) {
             return new SingleOpeningArTaskPointFinder(openingTask);
         }
@@ -361,7 +348,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// </summary>
         /// <param name="host">Основа для отверстия КР</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        /// <returns></returns>
         private IPointFinder GetPointFinder(Element host, ICollection<IOpeningTaskIncoming> incomingTasks) {
             var provider = new ManyOpeningArTasksPointFinderProvider(host, incomingTasks);
             return provider.GetPointFinder();
@@ -370,9 +356,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Возвращает типоразмер чистового отверстия КР на основе хоста и типа входящего задания на отверстие
         /// </summary>
-        /// <param name="host"></param>
-        /// <param name="openingTaskType"></param>
-        /// <returns></returns>
         private FamilySymbol GetFamilySymbol(Element host, OpeningType openingTaskType) {
             var provider = new SingleOpeningArTaskFamilySymbolProvider(_revitRepository, host, openingTaskType);
             return provider.GetFamilySymbol();
@@ -381,8 +364,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Возвращает типоразмер чистового отверстия КР на основе хоста
         /// </summary>
-        /// <param name="host"></param>
-        /// <returns></returns>
         private FamilySymbol GetFamilySymbol(Element host) {
             var provider = new ManyOpeningArTasksFamilySymbolProvider(_revitRepository, host);
             return provider.GetFamilySymbol();

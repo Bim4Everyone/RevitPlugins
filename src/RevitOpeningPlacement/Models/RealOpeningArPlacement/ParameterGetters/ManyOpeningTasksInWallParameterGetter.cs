@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,8 +25,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
         /// Конструктор класса, предоставляющего параметры для чистового прямоугольного отверстия в стене для нескольких заданий на отверстия
         /// </summary>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        /// <exception cref="System.ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentException">Исключение, если в коллекции меньше одного элемента</exception>
         public ManyOpeningTasksInWallParameterGetter(Wall wall, ICollection<OpeningMepTaskIncoming> incomingTasks, IPointFinder pointFinder) {
             _wall = wall ?? throw new ArgumentNullException(nameof(wall));
             _incomingTasks = incomingTasks ?? throw new System.ArgumentNullException(nameof(incomingTasks));

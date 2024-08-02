@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement.PointFinders;
@@ -16,7 +16,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         /// Конструктор класса, предоставляющего <see cref="IPointFinder"/> для чистового отверстия для размещения по одному заданию на отверстие
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleOpeningTaskPointFinderProvider(OpeningMepTaskIncoming incomingTask) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
 

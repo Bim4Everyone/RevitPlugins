@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,7 +12,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ValueGetters {
     /// Класс, предоставляющий значение параметра <see cref="RealOpeningArPlacer.RealOpeningIsTs"/>
     /// </summary>
     internal class IsTsValueGetter : IValueGetter<IntParamValue> {
-        private ICollection<OpeningMepTaskIncoming> _incomingMepTasks;
+        private readonly ICollection<OpeningMepTaskIncoming> _incomingMepTasks;
 
 
         /// <summary>

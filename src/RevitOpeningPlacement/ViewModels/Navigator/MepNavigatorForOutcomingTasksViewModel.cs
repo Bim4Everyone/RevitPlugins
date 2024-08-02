@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
@@ -32,9 +32,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             OpeningsMepTaskOutcoming = new ObservableCollection<OpeningMepTaskOutcomingViewModel>(openingsMepTasksOutcoming);
             OpeningsMepTasksOutcomingViewSource = new CollectionViewSource() { Source = OpeningsMepTaskOutcoming };
 
-            SelectCommand = new RelayCommand(SelectElement);
-            SelectionChangedCommand = new RelayCommand(SelectionChanged, CanSelect);
-            RenewCommand = new RelayCommand(Renew);
+            SelectCommand = RelayCommand.Create<ISelectorAndHighlighter>(SelectElement, CanSelect);
+            RenewCommand = RelayCommand.Create(Renew);
         }
 
 
@@ -50,28 +49,18 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public ICommand SelectCommand { get; }
 
-        public ICommand SelectionChangedCommand { get; }
-
         public ICommand RenewCommand { get; }
 
 
-        private void SelectElement(object p) {
-            if(!(p is ISelectorAndHighlighter selectorAndHighlighter)) { return; }
-            _revitRepository.SelectAndShowElement(selectorAndHighlighter);
+        private void SelectElement(ISelectorAndHighlighter p) {
+            _revitRepository.SelectAndShowElement(p);
         }
 
-        private void SelectionChanged(object p) {
-            if(OpeningsMepTasksOutcomingViewSource.View.CurrentPosition > -1
-                && OpeningsMepTasksOutcomingViewSource.View.CurrentPosition < OpeningsMepTaskOutcoming.Count) {
-                SelectElement((ISelectorAndHighlighter) p);
-            }
+        private bool CanSelect(ISelectorAndHighlighter p) {
+            return p != null;
         }
 
-        private bool CanSelect(object p) {
-            return p is ISelectorAndHighlighter;
-        }
-
-        private void Renew(object p) {
+        private void Renew() {
             Action action = () => {
                 var command = new GetOpeningTasksCmd();
                 command.ExecuteCommand(_revitRepository.UIApplication);

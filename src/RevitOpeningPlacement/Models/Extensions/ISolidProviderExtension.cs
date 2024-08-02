@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -141,9 +141,9 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// Проверяет объемы солидов на равенство.
         /// Если абсолютная разность объемов солидов не превышает 1% объема меньшего солида, возвращается True, иначе False
         /// </summary>
-        /// <param name="solid1"></param>
-        /// <param name="solid2"></param>
-        /// <returns></returns>
+        /// <param name="solid1">Первый солид</param>
+        /// <param name="solid2">Второй солид</param>
+        /// <returns>True, если разница объемов не превышает процент объема <see cref="_toleranceVolumePercentage"/> меньшего солида</returns>
         private static bool SolidsVolumesEqual(Solid solid1, Solid solid2) {
             if((solid1 is null) || (solid2 is null)) {
                 return false;

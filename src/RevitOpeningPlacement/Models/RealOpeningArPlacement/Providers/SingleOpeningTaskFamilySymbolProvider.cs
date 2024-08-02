@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         /// <param name="revitRepository">Репозиторий активного документа, в котором будет происходить размещение чистового семейства отверстия</param>
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleOpeningTaskFamilySymbolProvider(RevitRepository revitRepository, Element host, OpeningMepTaskIncoming incomingTask) {
             if(revitRepository is null) { throw new ArgumentNullException(nameof(revitRepository)); }
             if(host is null) { throw new ArgumentNullException(nameof(host)); }
@@ -31,29 +31,25 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">Исключение, если тип проема задания на отверстие не поддерживается</exception>
         public FamilySymbol GetFamilySymbol() {
             if(_host is Wall) {
                 switch(_openingMepTaskIncoming.OpeningType) {
                     case OpeningType.WallRectangle:
-                    return _revitRepository.GetOpeningRealArType(OpeningType.WallRectangle);
+                        return _revitRepository.GetOpeningRealArType(OpeningType.WallRectangle);
                     case OpeningType.WallRound:
-                    return _revitRepository.GetOpeningRealArType(OpeningType.WallRound);
+                        return _revitRepository.GetOpeningRealArType(OpeningType.WallRound);
                     default:
-                    throw new ArgumentException("Тип основы задания на отверстие не является стеной");
+                        throw new ArgumentException("Тип основы задания на отверстие не является стеной");
                 }
             } else if(_host is Floor) {
                 switch(_openingMepTaskIncoming.OpeningType) {
                     case OpeningType.FloorRectangle:
-                    return _revitRepository.GetOpeningRealArType(OpeningType.FloorRectangle);
+                        return _revitRepository.GetOpeningRealArType(OpeningType.FloorRectangle);
                     case OpeningType.FloorRound:
-                    return _revitRepository.GetOpeningRealArType(OpeningType.FloorRound);
+                        return _revitRepository.GetOpeningRealArType(OpeningType.FloorRound);
                     default:
-                    throw new ArgumentException("Тип основы задания на отверстие не является перекрытием");
+                        throw new ArgumentException("Тип основы задания на отверстие не является перекрытием");
                 }
             } else {
                 throw new ArgumentException(nameof(_host));

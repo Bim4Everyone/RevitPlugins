@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -137,7 +137,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Возвращает экземпляр семейства задания на отверстие
         /// </summary>
-        /// <returns></returns>
         public FamilyInstance GetFamilyInstance() {
             return _familyInstance;
         }
@@ -212,7 +211,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает Solid экземпляра семейства задания на отверстие с трансформированными координатами, 
         /// если элемент был удален из документа, будет возвращено значение по умолчанию
         /// </summary>
-        /// <returns></returns>
         public Solid GetSolid() {
             if(IsRemoved) {
                 return default;
@@ -224,7 +222,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает BoundingBoxXYZ с учетом расположения <see cref="_familyInstance">элемента</see> в файле Revit, 
         /// если элемент был удален из документа, будет возвращено значение по умолчанию
         /// </summary>
-        /// <returns></returns>
         public BoundingBoxXYZ GetTransformedBBoxXYZ() {
             if(IsRemoved) {
                 return default;
@@ -241,8 +238,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// либо экземпляр семейства задания на отверстие, которое полностью содержит в себе текущее задание.
         /// </summary>
         /// <param name="placedOpenings">Существующие задания на отверстия в проекте</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public bool IsAlreadyPlaced(ICollection<OpeningMepTaskOutcoming> placedOpenings) {
             if(IsRemoved || placedOpenings.Count == 0) {
                 return false;
@@ -281,7 +277,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Использовать для создания фильтра <see cref="Autodesk.Revit.DB.BoundingBoxIntersectsFilter"/>, в который должны попадать элементы, которые касаются текущего задания на отверстие.
         /// </para>
         /// </summary>
-        /// <returns></returns>
         public BoundingBoxXYZ GetExtendedBoxXYZ() {
             if(IsRemoved) {
                 return default;
@@ -303,7 +298,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Использовать для определения заданий на отверстия в многослойных конструкциях, которые надо объединить.
         /// </summary>
         /// <param name="otherOpening">Другое задание на отверстие из активного файла для проверки</param>
-        /// <returns></returns>
         public bool HasCommonFace(OpeningMepTaskOutcoming otherOpening) {
             if(IsRemoved || otherOpening.IsRemoved) {
                 return false;
@@ -357,8 +351,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает угловые точки плоской грани.
         /// Если грань - круг, будут возвращены 2 крайние точки диаметра
         /// </summary>
-        /// <param name="planarFace"></param>
-        /// <returns></returns>
         private ICollection<XYZ> GetCornerPoints(PlanarFace planarFace) {
             CurveLoop longestLoop = planarFace.GetEdgesAsCurveLoops().OrderByDescending(cLoop => cLoop.GetExactLength()).FirstOrDefault();
             if(longestLoop != null) {
@@ -376,8 +368,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает коллекцию плоских поверхностей солида
         /// </summary>
         /// <param name="solid">Солид</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private ICollection<PlanarFace> GetPlanarFaces(Solid solid) {
             if(solid is null) { throw new ArgumentNullException(nameof(solid)); }
             HashSet<PlanarFace> result = new HashSet<PlanarFace>();
@@ -395,8 +386,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Первоначальная быстрая проверка поданной коллекции заданий на отверстия из текущего файла на пересечение с текущим заданием на отверстие
         /// </summary>
-        /// <param name="openingTasks"></param>
-        /// <returns></returns>
         private ICollection<OpeningMepTaskOutcoming> GetIntersectingTasksRaw(ICollection<OpeningMepTaskOutcoming> openingTasks) {
             if(!IsRemoved) {
                 var intersects = new FilteredElementCollector(GetDocument(), GetTasksIds(openingTasks))
@@ -454,7 +443,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Если экземпляр семейства удален, будет выброшено исключение <see cref="Autodesk.Revit.Exceptions.InvalidObjectException"/>
         /// Проверку на удаление делать через <see cref="IsRemoved"/>
         /// </summary>
-        /// <returns></returns>
         private Document GetDocument() {
             if(IsRemoved) {
                 return default;
@@ -469,9 +457,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Возвращает строковое значение параметра по названию или пустую строку, если параметр отсутствует у текущего экземпляра семейства задания на отверстие
         /// </summary>
-        /// <param name="paramName"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
             if(_familyInstance is null) {
                 throw new ArgumentNullException(nameof(_familyInstance));
@@ -489,8 +475,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Возвращает статус задания на отверстие по отношению объема пересечения задания на отверстие с элементом инженерной системы к исходному объему задания на отверстие
         /// </summary>
-        /// <param name="volumeRatio"></param>
-        /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException">Исключение, если коэффициент отношения объемов меньше 0 или больше 1</exception>
         private OpeningTaskOutcomingStatus GetOpeningTaskOutcomingStatus(double volumeRatio) {
             if((volumeRatio < 0) || (volumeRatio > 1)) {
@@ -547,8 +531,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Назначает хост задания на отверстие
         /// </summary>
-        /// <param name="thisOpeningTaskSolid"></param>
-        /// <param name="constructureLinkElementsProviders"></param>
         private void FindAndSetHost(Solid thisOpeningTaskSolid, ICollection<IConstructureLinkElementsProvider> constructureLinkElementsProviders) {
             foreach(var link in constructureLinkElementsProviders) {
                 var hostConstructions = GetHostConstructionsForThisOpeningTask(thisOpeningTaskSolid, link, out _);
@@ -564,7 +546,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
         /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
-        /// <returns></returns>
         private ICollection<Solid> GetIntersectingMepSolids(Solid thisOpeningTaskSolid, ICollection<ElementId> allMepElementsIds) {
             if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
                 return Array.Empty<Solid>();
@@ -578,9 +559,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Возвращает список Id элементов инженерных систем, которые пересекаются с данным заданием на отверстие, из текущего документа
         /// </summary>
-        /// <param name="thisOpeningSolid"></param>
-        /// <param name="allMepElementsIds"></param>
-        /// <returns></returns>
         private ICollection<ElementId> GetIntersectingMepElementsIds(Solid thisOpeningSolid, ICollection<ElementId> allMepElementsIds) {
             if(!IsRemoved && (thisOpeningSolid != null) && (allMepElementsIds != null) && allMepElementsIds.Any()) {
                 if((_intersectingMepElementsCache.Value != null) && (_intersectingMepElementsCache.CacheTime.CompareTo(DateTime.Now) >= 0)) {
@@ -603,7 +581,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
         /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
-        /// <returns></returns>
         /// <exception cref="InvalidOperationException">Исключение, если не удалось выполнить вычитание солида отверстия и солида элемента инженерной системы</exception>
         private Solid GetOpeningAndMepsSolidsDifference(Solid thisOpeningSolid, ICollection<ElementId> allMepElementsIds) {
             var intersectingMepSolids = GetIntersectingMepSolids(thisOpeningSolid, allMepElementsIds);
@@ -743,7 +720,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="thisOpeningSolidInLinkCoordinates">Солид текущего задания на отверстие в координатах связанного файла <paramref name="constructureLinkElementsProvider"/></param>
         /// <param name="constructureLinkElementsProvider">Связанный файл для проверки на пересечение</param>
-        /// <returns></returns>
         private ICollection<ElementId> GetIntersectingLinkConstructionElementsIds(Solid thisOpeningSolidInLinkCoordinates, IConstructureLinkElementsProvider constructureLinkElementsProvider) {
             ICollection<ElementId> ids = constructureLinkElementsProvider.GetConstructureElementIds();
             if(!ids.Any()) {

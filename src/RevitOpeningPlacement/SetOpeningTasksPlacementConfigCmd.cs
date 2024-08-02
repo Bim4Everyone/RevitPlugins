@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
@@ -5,6 +6,12 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+
+using Ninject;
+
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
@@ -28,14 +35,38 @@ namespace RevitOpeningPlacement {
 
 
         protected override void Execute(UIApplication uiApplication) {
-            RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
-            var viewModel = new MainViewModel(revitRepository, openingConfig);
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitEventHandler>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ParameterFilterProvider>()
+                    .ToSelf()
+                    .InSingletonScope();
 
-            var window = new MainWindow() { Title = PluginName, DataContext = viewModel };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+                kernel.Bind<MainViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<MainWindow>()
+                    .ToSelf()
+                    .WithPropertyValue(nameof(Window.Title), PluginName)
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<MainViewModel>());
+                kernel.Bind<WindowInteropHelper>()
+                    .ToConstructor(c => new WindowInteropHelper(kernel.Get<MainWindow>()))
+                    .WithPropertyValue(nameof(Window.Owner), uiApplication.MainWindowHandle);
+                kernel.Bind<OpeningConfig>()
+                    .ToMethod(c =>
+                        OpeningConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
+                    );
 
-            window.ShowDialog();
+                Notification(kernel.Get<MainWindow>());
+            }
         }
     }
 }

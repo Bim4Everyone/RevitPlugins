@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.WPF.Extensions;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
@@ -28,7 +28,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Diameter = _openingReal.Diameter;
             Width = _openingReal.Width;
             Height = _openingReal.Height;
-            Status = _openingReal.Status.GetEnumDescription();
+            Status = _openingReal.Status.GetDescription();
             Comment = _openingReal.Comment;
         }
 

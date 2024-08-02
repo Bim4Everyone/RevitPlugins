@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
         /// Конструктор класса, предоставляющего значения параметров для КР отверстия, размещаемого по одному заданию на отверстие
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleOpeningArTaskInFloorParameterGetter(IOpeningTaskIncoming incomingTask) {
             _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
         }

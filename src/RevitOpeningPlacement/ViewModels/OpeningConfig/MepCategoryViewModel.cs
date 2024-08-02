@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -19,51 +18,27 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private ObservableCollection<SizeViewModel> _minSizes;
         private ObservableCollection<OffsetViewModel> _offsets;
         private bool _isSelected;
-        private List<StructureCategoryViewModel> _structureCategories;
+        private ObservableCollection<StructureCategoryViewModel> _structureCategories;
         private SetViewModel _setViewModel;
 
         public MepCategoryViewModel(RevitRepository revitRepository, MepCategory mepCategory) {
-            InitializeStructureCategories();
-
             Name = mepCategory.Name;
             ImageSource = mepCategory.ImageSource;
-            MinSizes = new ObservableCollection<SizeViewModel>(mepCategory.MinSizes.Select(item => new SizeViewModel(item)));
+            MinSizes = new ObservableCollection<SizeViewModel>(
+                mepCategory.MinSizes.Select(item => new SizeViewModel(item)));
             IsRound = mepCategory.IsRound;
             IsSelected = mepCategory.IsSelected;
-            Offsets = new ObservableCollection<OffsetViewModel>(mepCategory.Offsets.Select(item => new OffsetViewModel(item, new TypeNamesProvider(mepCategory.IsRound))));
-            SetSelectedCategories(mepCategory);
+            Offsets = new ObservableCollection<OffsetViewModel>(
+                mepCategory.Offsets.Select(
+                    item => new OffsetViewModel(item, new TypeNamesProvider(mepCategory.IsRound))));
+            StructureCategories = new ObservableCollection<StructureCategoryViewModel>(
+                mepCategory.Intersections.Select(c => new StructureCategoryViewModel(revitRepository, c)));
             SelectedRounding = mepCategory.Rounding;
             var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
             SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel, mepCategory.Set);
 
-            AddOffsetCommand = new RelayCommand(AddOffset);
-            RemoveOffsetCommand = new RelayCommand(RemoveOffset, CanRemoveOffset);
-        }
-
-        public MepCategoryViewModel(RevitRepository revitRepository, string name, Parameters[] minSizesParameters, bool isRound, string imageSource) {
-            InitializeStructureCategories();
-
-            Name = name;
-            ImageSource = imageSource;
-            MinSizes = GetMinSizes(minSizesParameters);
-            IsRound = isRound;
-            Offsets = new ObservableCollection<OffsetViewModel>() { new OffsetViewModel(new TypeNamesProvider(isRound)) };
-            var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
-            SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel);
-
-            // инициализация значений по умолчанию
-            IsSelected = true; // категория выбрана для создания заданий на отверстия
-            SelectedRounding = Roundings.Last(); // округление 50 мм
-            var firstOffset = Offsets.First();
-            firstOffset.To = MepCategory.DefaultMaxSizeMm; // максимальный габарит сечения элемента для зазора в мм
-            firstOffset.SelectedOpeningType = firstOffset.OpeningTypeNames.Last(); // тип задания на  отверстие по умолчанию прямоугольный
-            firstOffset.Offset = MepCategory.DefaultOffsetMm; // зазор 50 мм для прямоугольных заданий на отверстия
-            foreach(var structureCategory in StructureCategories) {
-                structureCategory.IsSelected = true; // все категории конструкций выбраны для создания заданий на отверстия
-            }
-
-            AddOffsetCommand = new RelayCommand(AddOffset);
-            RemoveOffsetCommand = new RelayCommand(RemoveOffset, CanRemoveOffset);
+            AddOffsetCommand = RelayCommand.Create(AddOffset);
+            RemoveOffsetCommand = RelayCommand.Create<OffsetViewModel>(RemoveOffset, CanRemoveOffset);
         }
 
 
@@ -93,7 +68,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             set => RaiseAndSetIfChanged(ref _offsets, value);
         }
 
-        public List<StructureCategoryViewModel> StructureCategories {
+        public ObservableCollection<StructureCategoryViewModel> StructureCategories {
             get => _structureCategories;
             set => RaiseAndSetIfChanged(ref _structureCategories, value);
         }
@@ -125,7 +100,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 return $"Для категории \"{Name}\" выберите категории для пересечения";
             }
             if(SetViewModel.IsEmpty()) {
-                return $"Все поля в критериях фильтрации категории \'{Name}\' должны быть заполнены.";
+                return $"Поля фильтра для ВИС категории \'{Name}\' должны быть заполнены.";
+            }
+            var structureEmptyFilter = StructureCategories.FirstOrDefault(item => item.SetViewModel.IsEmpty());
+            if(structureEmptyFilter != null) {
+                return $"Поля фильтра категории \'{structureEmptyFilter.Name}\' для ВИС категории \'{Name}\' должны быть заполнены.";
             }
             if(!string.IsNullOrEmpty(SetViewModel.GetErrorText())) {
                 return SetViewModel.GetErrorText();
@@ -138,35 +117,28 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 Offsets = Offsets.Select(item => item.GetOffset()).ToList(),
                 MinSizes = new SizeCollection(MinSizes.Select(item => item.GetSize())),
                 IsSelected = IsSelected,
-                Intersections = StructureCategories.Select(item => new StructureCategory() { Name = item.Name, IsSelected = item.IsSelected }).ToList(),
+                Intersections = StructureCategories.Select(item => new StructureCategory() {
+                    Name = item.Name,
+                    IsSelected = item.IsSelected,
+                    Set = item.SetViewModel.GetSet()
+                })
+                .ToList(),
                 Rounding = SelectedRounding,
                 Set = SetViewModel.GetSet()
             };
         }
 
-        private void InitializeStructureCategories() {
-            StructureCategories = new List<StructureCategoryViewModel>() {
-                new StructureCategoryViewModel(){Name = RevitRepository.StructureCategoryNames[StructureCategoryEnum.Wall]},
-                new StructureCategoryViewModel(){Name = RevitRepository.StructureCategoryNames[StructureCategoryEnum.Floor]},
-            };
-        }
 
-        private void SetSelectedCategories(MepCategory mepCategory) {
-            foreach(var category in StructureCategories) {
-                category.IsSelected = mepCategory.Intersections.FirstOrDefault(item => item.Name.Equals(category.Name, StringComparison.CurrentCulture))?.IsSelected == true;
-            }
-        }
-
-        private void AddOffset(object p) {
+        private void AddOffset() {
             Offsets.Add(new OffsetViewModel(new TypeNamesProvider(IsRound)));
         }
 
-        private void RemoveOffset(object p) {
-            Offsets.Remove(p as OffsetViewModel);
+        private void RemoveOffset(OffsetViewModel p) {
+            Offsets.Remove(p);
         }
 
-        private bool CanRemoveOffset(object p) {
-            return (p as OffsetViewModel) != null;
+        private bool CanRemoveOffset(OffsetViewModel p) {
+            return p != null;
         }
 
         private string GetIntersectionOffsetError() {
@@ -179,14 +151,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 }
             }
             return error;
-        }
-
-        private ObservableCollection<SizeViewModel> GetMinSizes(Parameters[] minSizesParameters) {
-            var collection = new ObservableCollection<SizeViewModel>();
-            foreach(Parameters parameter in minSizesParameters) {
-                collection.Add(new SizeViewModel() { Name = RevitRepository.ParameterNames[parameter] });
-            }
-            return collection;
         }
 
         private CategoriesInfoViewModel GetCategoriesInfoViewModel(RevitRepository revitRepository, string mepCategoryName) {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.Selection {
         /// Конструктор фильтра выбора пользователем экземпляров семейств заданий на отверстия от АР из связанных файлов АР, подгруженных в активный документ
         /// </summary>
         /// <param name="activeDocument">Активный документ КР, в который подгружены связи АР с заданиями на отверстия</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SelectionFilterOpeningArTasksIncoming(Document activeDocument) {
             _activeDocument = activeDocument ?? throw new ArgumentNullException(nameof(activeDocument));
         }

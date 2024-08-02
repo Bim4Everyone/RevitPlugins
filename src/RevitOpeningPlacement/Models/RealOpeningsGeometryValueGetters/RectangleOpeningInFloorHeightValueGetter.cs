@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// Конструктор класса, предоставляющего значение высоты для чистового прямоугольного отверстия АР/КР в перекрытии в единицах ревита
         /// </summary>
         /// <param name="openingTaskIncoming">Входящее задание на отверстие</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RectangleOpeningInFloorHeightValueGetter(IOpeningTaskIncoming openingTaskIncoming) {
             if(openingTaskIncoming is null) { throw new ArgumentNullException(nameof(openingTaskIncoming)); }
 
@@ -32,8 +32,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// Конструктор класса, предоставляющего значение высоты для чистового прямоугольного отверстия АР/КР в перекрытии в единицах ревита
         /// </summary>
         /// <param name="openingTasksIncoming">Входящие задания на отверстия</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в коллекции меньше 1</exception>
         public RectangleOpeningInFloorHeightValueGetter(ICollection<IOpeningTaskIncoming> openingTasksIncoming) {
             if(openingTasksIncoming == null) { throw new ArgumentNullException(nameof(openingTasksIncoming)); }
             if(openingTasksIncoming.Count < 1) { throw new ArgumentOutOfRangeException(nameof(openingTasksIncoming.Count)); }

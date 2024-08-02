@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.WPF.Extensions;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 
@@ -28,7 +28,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Diameter = _openingReal.Diameter;
             Width = _openingReal.Width;
             Height = _openingReal.Height;
-            Status = _openingReal.Status.GetEnumDescription();
+            Status = _openingReal.Status.GetDescription();
             Comment = _openingReal.Comment;
         }
 
@@ -82,7 +82,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Возвращает хост чистового отверстия
         /// </summary>
-        /// <returns></returns>
         public Element GetElementToHighlight() {
             return _openingReal.GetHost();
         }
@@ -90,7 +89,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// <summary>
         /// Возвращает коллекцию, в которой находится чистовое отверстие, которое надо выделить на виде
         /// </summary>
-        /// <returns></returns>
         public ICollection<ElementModel> GetElementsToSelect() {
             return new ElementModel[] {
                 new ElementModel(_openingReal.GetFamilyInstance())

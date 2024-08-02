@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -16,7 +16,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного документа Revit, в котором будет происходить расстановка чистовых отверстий</param>
         /// <param name="host">Хост для чистового отверстия - стена или перекрытие</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RectangleFamilySymbolProvider(RevitRepository revitRepository, Element host) {
             if(revitRepository == null) { throw new ArgumentNullException(nameof(revitRepository)); }
             if(host == null) { throw new ArgumentNullException(nameof(host)); }
@@ -29,8 +29,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         /// <summary>
         /// Возвращает типоразмер семейства прямоугольного чистового отверстия
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentException">Исключение, если <see cref="_host"/> не стена или перекрытие</exception>
         public FamilySymbol GetFamilySymbol() {
             if(_host is Wall) {
                 return _revitRepository.GetOpeningRealArType(OpeningType.WallRectangle);

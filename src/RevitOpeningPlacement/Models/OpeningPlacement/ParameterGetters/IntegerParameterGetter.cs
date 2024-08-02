@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using RevitClashDetective.Models.Value;
 
@@ -16,8 +16,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         /// </summary>
         /// <param name="paramName">Название параметра</param>
         /// <param name="valueGetter">Значение параметра</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentException">Исключение, если передан некорректный строковый параметр</exception>
         public IntegerParameterGetter(string paramName, IValueGetter<IntParamValue> valueGetter) {
             if(paramName is null) {
                 throw new ArgumentNullException(nameof(paramName));

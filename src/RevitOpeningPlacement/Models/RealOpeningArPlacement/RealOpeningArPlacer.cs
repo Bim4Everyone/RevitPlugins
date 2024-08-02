@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,7 +40,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// Конструктор класса для размещения чистовых отверстий АР в активном документе в местах расположений заданий на отверстия из связанных файлов ВИС
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного АР документа ревита, в котором будет происходить размещение чистовых отверстий</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RealOpeningArPlacer(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         }
@@ -208,7 +208,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         /// <param name="host">Основа для чистового отверстия</param>
         /// <param name="openingTasks">Входящие задания на отверстия</param>
-        /// <exception cref="OpeningNotPlacedException"></exception>
+        /// <exception cref="OpeningNotPlacedException">Исключение, если не удалось разместить объединенное отверстие</exception>
         private void PlaceUnitedByManyTasks(Element host, ICollection<OpeningMepTaskIncoming> openingTasks) {
             try {
                 var symbol = GetFamilySymbol(host);
@@ -238,7 +238,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <returns></returns>
         private FamilySymbol GetFamilySymbol(Element host, OpeningMepTaskIncoming incomingTask) {
             var provider = new SingleOpeningTaskFamilySymbolProvider(_revitRepository, host, incomingTask);
             return provider.GetFamilySymbol();
@@ -248,7 +247,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// Возвращает типоразмер семейства чистового отверстия на основе хоста
         /// </summary>
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
-        /// <returns></returns>
         private FamilySymbol GetFamilySymbol(Element host) {
             var provider = new RectangleFamilySymbolProvider(_revitRepository, host);
             return provider.GetFamilySymbol();
@@ -259,7 +257,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         /// <param name="opening">Размещенное чистовое отверстие</param>
         /// <param name="parameterGetter">Класс, предоставляющий параметры</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private void SetParamValues(FamilyInstance opening, IParametersGetter parameterGetter) {
             if(opening is null) { throw new ArgumentNullException(nameof(opening)); }
             if(parameterGetter is null) { throw new ArgumentNullException(nameof(parameterGetter)); }
@@ -274,7 +272,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
-        /// <returns></returns>
         private IParametersGetter GetParameterGetter(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder) {
             var provider = new SingleOpeningTaskParameterGettersProvider(incomingTask, pointFinder);
             return provider.GetParametersGetter();
@@ -286,7 +283,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
-        /// <returns></returns>
         private IParametersGetter GetParameterGetter(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks, IPointFinder pointFinder) {
             return new ManyOpeningTasksParameterGettersProvider(host, incomingTasks, pointFinder).GetParametersGetter();
         }
@@ -295,7 +291,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// Возвращает интерфейс, предоставляющий угол поворота чистового отверстия для размещения по одному входящему заданию
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <returns></returns>
         private IAngleFinder GetAngleFinder(OpeningMepTaskIncoming incomingTask) {
             var provider = new SingleOpeningTaskAngleFinderProvider(incomingTask);
             return provider.GetAngleFinder();
@@ -305,7 +300,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// Возвращает интерфейс, предоставляющий точку вставки
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <returns></returns>
         private IPointFinder GetPointFinder(OpeningMepTaskIncoming incomingTask) {
             var provider = new SingleOpeningTaskPointFinderProvider(incomingTask);
             return provider.GetPointFinder();
@@ -317,7 +311,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        /// <returns></returns>
         private IPointFinder GetPointFinder(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks) {
             var provider = new ManyOpeningTasksPointFinderProvider(host, incomingTasks);
             return provider.GetPointFinder();

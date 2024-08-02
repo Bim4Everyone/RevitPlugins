@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -21,13 +21,11 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// <summary>
         /// Возвращает коллекцию Id элементов категорий "Стены" и "Перекрытия" из <see cref="Document">связанного файла</see>
         /// </summary>
-        /// <returns></returns>
         ICollection<ElementId> GetConstructureElementIds();
 
         /// <summary>
         /// Возвращает коллекцию чистовых отверстий из <see cref="Document">связанного файла</see>
         /// </summary>
-        /// <returns></returns>
         ICollection<IOpeningReal> GetOpeningsReal();
     }
 }

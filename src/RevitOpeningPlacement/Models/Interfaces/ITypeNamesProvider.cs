@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace RevitOpeningPlacement.Models.Interfaces {
-    interface ITypeNamesProvider {
+    internal interface ITypeNamesProvider {
         IEnumerable<string> GetTypeNames();
     }
 }

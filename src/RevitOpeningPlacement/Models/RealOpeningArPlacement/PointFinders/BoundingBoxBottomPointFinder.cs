@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -16,8 +16,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.PointFinders {
         /// <summary>
         /// Конструктор класса, предоставляющего точку вставки чистового отверстия по заданному боксу. Использовать для получения точки вставки чистового отверстия по нескольким заданиям на отверстия в стене
         /// </summary>
-        /// <param name="bbox"></param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public BoundingBoxBottomPointFinder(BoundingBoxXYZ bbox) {
             _bbox = bbox ?? throw new ArgumentNullException(nameof(bbox));
         }

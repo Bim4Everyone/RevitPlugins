@@ -15,7 +15,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// </summary>
         /// <param name="bottomOffsetValueGetter">Провайдер отметки низа отверстия в мм от начала проекта</param>
         /// <param name="levelFinder">Провайдер уровня, на котором размещается отверстие</param>
-        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public BottomOffsetFromLevelValueGetter(
             IValueGetter<DoubleParamValue> bottomOffsetValueGetter,
             ILevelFinder levelFinder) {
