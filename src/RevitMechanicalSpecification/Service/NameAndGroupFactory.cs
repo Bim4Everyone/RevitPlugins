@@ -17,29 +17,27 @@ namespace RevitMechanicalSpecification.Service {
         private readonly SpecConfiguration _config;
         private readonly Document _document;
         private readonly VisElementsCalculator _calculator;
-        private readonly List<Element> _fullElementsList;
-
-
-        public NameAndGroupFactory(SpecConfiguration configuration, Document document, VisElementsCalculator calculator, List<Element> elements) {
+        public NameAndGroupFactory(
+            SpecConfiguration configuration, 
+            Document document, 
+            VisElementsCalculator calculator 
+            ) {
             _document = document;
             _config = configuration;
             _calculator = calculator;
-            _fullElementsList = elements;
         }
 
-
-
-
         //Ниже операции с именами
-
         //Базовое имя
-        public string GetName(Element element) {
-            Element elemType = element.GetElementType();
+        public string GetName(Element element, Element elemType) {
+            //Element elemType = element.GetElementType();
             string name = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameName);
 
-            if(string.IsNullOrEmpty(name)) { name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ"; }
+            if(string.IsNullOrEmpty(name)) {
+                name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ";
+            }
             if(element.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
-                { name += _calculator.GetDuctName(element); }
+                { name += _calculator.GetDuctName(element, elemType); }
             }
             if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
                 { name = _calculator.GetDuctFittingName(element); }
@@ -51,14 +49,14 @@ namespace RevitMechanicalSpecification.Service {
                 if(!isSpecifyPipeFitting) { name = "!Не учитывать"; }
             }
             if(element.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
-                name += _calculator.GetPipeSize(element);
+                name += _calculator.GetPipeSize(element, elemType);
             }
             if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) {
 
                 var insulation = element as InsulationLiningBase;
                 Element pipe = _document.GetElement(insulation.HostElementId);
 
-                if(!(pipe is null)) { name += " (Для: " + GetName(pipe) + ")"; }
+                if(!(pipe is null)) { name += " (Для: " + GetName(pipe, pipe.GetElementType()) + ")"; }
             }
             return name;
         }
@@ -89,7 +87,7 @@ namespace RevitMechanicalSpecification.Service {
         private string GetDetailedGroup(Element element) {
             Element elemType = element.GetElementType();
 
-            string name = GetName(element);
+            string name = GetName(element, elemType);
             string mark = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameMark);
             string code = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameCode);
             string creator = GetTypeOrInstanceParamValue(element, elemType, _config.OriginalParamNameCreator);
@@ -120,25 +118,24 @@ namespace RevitMechanicalSpecification.Service {
                 subs.Add(subElement);
 
                 var subInst = subElement as FamilyInstance;
-                if(subInst.GetSubComponentIds().Count > 0) { subs.AddRange(GetSub(subInst)); }
+                if(subInst.GetSubComponentIds().Count > 0) {
+                    subs.AddRange(GetSub(subInst));
+                }
             }
             return subs;
         }
 
         //возвращает значение параметра по типу или экземпляру, если существует, иначе null
         private string GetTypeOrInstanceParamValue(Element element, Element elemType, string paraName) {
-            if(element.IsExistsParam(paraName)) 
-                { 
-                return element.GetSharedParamValueOrDefault<string>(paraName); 
-                }
+            if(element.IsExistsParam(paraName)) {
+                return element.GetSharedParamValueOrDefault<string>(paraName);
+            }
 
-            if(elemType.IsExistsParam(paraName)) 
-                { 
-                return elemType.GetSharedParamValueOrDefault<string>(paraName); 
-                }
+            if(elemType.IsExistsParam(paraName)) {
+                return elemType.GetSharedParamValueOrDefault<string>(paraName);
+            }
             return null;
         }
-
 
         public string GetManifoldGroup(FamilyInstance familyInstance, Element element) {
             return
@@ -150,14 +147,11 @@ namespace RevitMechanicalSpecification.Service {
         }
 
 
-        public bool IsIncreaseIndex(List<Element> manifoldElements, int index) {
+        public bool IsIncreaseIndex(List<Element> manifoldElements, int index, Element element, Element elemType) {
+            //Element element = manifoldElements[index];
+            string name = GetName(element, elemType);//element.GetElementType());
 
-            Element element = manifoldElements[index];
-
-            string name = GetName(element);
-
-            if(string.IsNullOrEmpty(name) || name == "!Не учитывать") 
-                {
+            if(string.IsNullOrEmpty(name) || name == "!Не учитывать") {
                 return false;
             }
 
@@ -170,26 +164,14 @@ namespace RevitMechanicalSpecification.Service {
             } else {
                 return true;
             }
-
         }
 
-        public bool IsManifold(Element element) {
-            Element elemType = element.GetElementType();
-
-            if(!(elemType.GetSharedParamValueOrDefault<int>(_config.IsManiFoldParamName) == 1)) 
-                { return false; }
-
-            return true;
+        public bool IsManifold(Element elemType) {
+            return elemType.GetSharedParamValueOrDefault<int>(_config.IsManiFoldParamName) == 1;
         }
 
-        public bool IsOutSideOfManifold(Element element) {
-            Element elemType = element.GetElementType();
-            if(elemType.GetSharedParamValueOrDefault<int>(_config.IsOutSideOfManifold) == 1) {
-                return true;
-            }
-            return false;
-
+        public bool IsOutSideOfManifold(Element elemType) {
+            return elemType.GetSharedParamValueOrDefault<int>(_config.IsOutSideOfManifold) == 1;
         }
-
     }
 }

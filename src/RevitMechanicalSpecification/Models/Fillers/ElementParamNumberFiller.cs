@@ -14,28 +14,24 @@ using RevitMechanicalSpecification.Service;
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNumberFiller : ElementParamFiller {
 
-        public ElementParamNumberFiller(string toParamName, 
-            string fromParamName, 
+        public ElementParamNumberFiller(string toParamName,
+            string fromParamName,
             SpecConfiguration specConfiguration,
-            Document document) : 
-            base(toParamName, fromParamName, specConfiguration, document) 
-            {
+            Document document) :
+            base(toParamName, fromParamName, specConfiguration, document) {
         }
 
-        private bool LinearLogicalFilter(Element element) 
-            {
+        private bool LinearLogicalFilter(Element element) {
             return element.InAnyCategory(new List<BuiltInCategory>() { BuiltInCategory.OST_DuctCurves,
                         BuiltInCategory.OST_FlexDuctCurves,
                         BuiltInCategory.OST_PipeCurves,
                         BuiltInCategory.OST_FlexPipeCurves,
                         BuiltInCategory.OST_DuctInsulations,
                         BuiltInCategory.OST_PipeInsulations  });
-            }
+        }
 
         private double GetNumber(Element element) {
             //написать зачем нужно
-
-
             double number = 0;
             string unit;
             try {
@@ -60,19 +56,17 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                         return converter.DoubleToMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH));
                     }
                 }
-            } 
-            catch { MessageBox.Show(element.Id.ToString()); }
-            
+            } catch { MessageBox.Show(element.Id.ToString()); }
+
             return number;
         }
 
 
         public override void SetParamValue(Element element) {
-            if(element.IsExistsParam(Config.TargetNameUnit)) 
-                {
+            if(element.IsExistsParam(Config.TargetNameUnit)) {
                 ToParam.Set(GetNumber(element));
             }
-            
+
         }
     }
 }

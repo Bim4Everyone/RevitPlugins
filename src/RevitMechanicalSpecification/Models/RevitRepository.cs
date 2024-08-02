@@ -23,7 +23,6 @@ namespace RevitMechanicalSpecification.Models {
             UIApplication = uiApplication;
 
         }
-        
 
         public UIApplication UIApplication { get; }
 
@@ -33,8 +32,6 @@ namespace RevitMechanicalSpecification.Models {
 
         private List<ElementParamFiller> _fillers;
 
-
-
         public void ExecuteSpecificationRefresh() {
             CollectionFactory collector = new CollectionFactory(Document);
             List<Element> elements = collector.GetMechanicalElements();
@@ -42,7 +39,7 @@ namespace RevitMechanicalSpecification.Models {
 
             SpecConfiguration specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             VisElementsCalculator calculator = new VisElementsCalculator(specConfiguration, Document);
-            NameAndGroupFactory nameAndGruopFactory = new NameAndGroupFactory(specConfiguration, Document, calculator, elements);
+            NameAndGroupFactory nameAndGruopFactory = new NameAndGroupFactory(specConfiguration, Document, calculator);
 
 
             List<ElementParamFiller> testFillers = new List<ElementParamFiller>()
@@ -128,63 +125,60 @@ namespace RevitMechanicalSpecification.Models {
         };
 
             HashSet<ElementId> manifoldElementIds = new HashSet<ElementId>();
-
-
-
-        
-
-
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             using(Transaction t = Document.StartTransaction("Обновление спецификации")) {
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
 
 
                 foreach(Element element in elements) {
-                    if(manifoldElementIds.Contains(element.Id)) 
+                    if(manifoldElementIds.Contains(element.Id))
                         continue;
 
-                    foreach(ElementParamFiller filler in testFillers) {
+                    Element elemType = element.GetElementType();
+
+                    foreach(ElementParamFiller filler in _fillers) {
                         filler.Fill(element, null, 0);
                     }
-                    
-                    if(nameAndGruopFactory.IsManifold(element)) {
+
+                    if(nameAndGruopFactory.IsManifold(elemType)) {
                         int count = 1;
                         FamilyInstance familyInstance = element as FamilyInstance;
                         List<Element> manifoldElements =
                             nameAndGruopFactory.GetSub(familyInstance).OrderBy
                             (e => nameAndGruopFactory.GetGroup(e)).ToList();
-                        
 
                         foreach(Element manifoldElement in manifoldElements) {
-                            
+                            Element maniElemType = manifoldElement.GetElementType();
 
-                            
-
-                            if(!nameAndGruopFactory.IsOutSideOfManifold(manifoldElement)) {
-                                foreach(ElementParamFiller filler in testFillers) {
+                            if(!nameAndGruopFactory.IsOutSideOfManifold(maniElemType)) {
+                                foreach(ElementParamFiller filler in _fillers) {
                                     filler.Fill(manifoldElement, familyInstance, count);
                                     manifoldElementIds.Add(manifoldElement.Id);
-                                    if(nameAndGruopFactory.IsIncreaseIndex(manifoldElements, manifoldElements.IndexOf(manifoldElement))) {
+
+                                    if(nameAndGruopFactory.IsIncreaseIndex(
+                                        manifoldElements,
+                                        manifoldElements.IndexOf(manifoldElement),
+                                        manifoldElement,
+                                        maniElemType
+                                        )) {
                                         count++;
                                     }
-
                                 }
                             }
                         }
                     }
-
-
                 }
+
+                
+
+                t.Commit();
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
-
                 // Format and display the TimeSpan value.
                 string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
                     ts.Hours, ts.Minutes, ts.Seconds,
                     ts.Milliseconds / 10);
                 MessageBox.Show(elapsedTime.ToString());
-
-                t.Commit();
             }
         }
     }

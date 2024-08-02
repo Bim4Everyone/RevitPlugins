@@ -22,7 +22,10 @@ namespace RevitMechanicalSpecification.Service {
             _systems = systems;
         }
 
-        private string GetParamSystemValue(Element element) { return element.GetParamValueOrDefault(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue); }
+        private string GetParamSystemValue(Element element) {
+            return element.GetParamValueOrDefault
+                (BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue);
+        }
 
         private string GetInsulationSystem(InsulationLiningBase insulation) {
 
@@ -51,7 +54,9 @@ namespace RevitMechanicalSpecification.Service {
 
             if(element.InAnyCategory(new HashSet<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctInsulations,
-                BuiltInCategory.OST_PipeInsulations})) { systemName = GetInsulationSystem(element as InsulationLiningBase); }
+                BuiltInCategory.OST_PipeInsulations})) {
+                systemName = GetInsulationSystem(element as InsulationLiningBase);
+            }
 
             return _systems.Where(s => s.SystemSystemName == systemName).FirstOrDefault();
 
@@ -76,7 +81,9 @@ namespace RevitMechanicalSpecification.Service {
                 return _noneSystemValue;
             }
 
-            if(!string.IsNullOrEmpty(visSystem.SystemShortName)) { return visSystem.SystemShortName; }
+            if(!string.IsNullOrEmpty(visSystem.SystemShortName)) {
+                return visSystem.SystemShortName;
+            }
 
             return visSystem.SystemTargetName;
         }

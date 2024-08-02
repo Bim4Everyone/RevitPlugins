@@ -28,17 +28,15 @@ namespace RevitMechanicalSpecification.Service {
             _document = document;
         }
 
-        public string GetDuctName(Element element) {
+        public string GetDuctName(Element element, Element elemType) {
             return ", с толщиной стенки " +
-                    GetDuctThikness(element) +
+                    GetDuctThikness(element, elemType) +
                     " мм, " +
                     element.GetParamValue(BuiltInParameter.RBS_CALCULATED_SIZE);
         }
 
         //Формируем диаметр трубы для наименования в зависимости от того что включено у нее в типе
-        public string GetPipeSize(Element element) {
-            Element elemType = element.GetElementType();
-
+        public string GetPipeSize(Element element, Element elemType) {
             bool dy = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Ду") == 1;
             bool dyWall = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Ду х Стенка") == 1;
             bool dExternalWall = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Днар х Стенка") == 1;
@@ -103,9 +101,9 @@ namespace RevitMechanicalSpecification.Service {
         }
 
         //Толщина воздуховодов с учетом ограничителей в изоляции и в типе воздуховода
-        public string GetDuctThikness(Element element) {
+        public string GetDuctThikness(Element element, Element elemType) {
             var filter = new ElementCategoryFilter(BuiltInCategory.OST_DuctInsulations);
-            Element elemType = element.GetElementType();
+
 
 
             double minDuctThikness = elemType.GetSharedParamValueOrDefault<double>(_specConfiguration.MinDuctThikness, 0);
@@ -133,8 +131,12 @@ namespace RevitMechanicalSpecification.Service {
 
 
             //currentculture передаем
-            if(thikness > upCriteria && upCriteria != 0) { return Math.Max(maxInsulThikness, maxDuctThikness).ToString(); }
-            if(thikness < minCriteria && minCriteria != 0) { return Math.Max(minInsulThikness, minDuctThikness).ToString(); }
+            if(thikness > upCriteria && upCriteria != 0) { 
+                return Math.Max(maxInsulThikness, maxDuctThikness).ToString(); 
+            }
+            if(thikness < minCriteria && minCriteria != 0) { 
+                return Math.Max(minInsulThikness, minDuctThikness).ToString(); 
+            }
 
             return thikness.ToString();
         }
@@ -168,7 +170,7 @@ namespace RevitMechanicalSpecification.Service {
             Element duct = GetDuctFromFitting(connectors);
             if(duct is null) { return null; }
 
-            return GetDuctThikness(duct);
+            return GetDuctThikness(duct, duct.GetElementType());
         }
         //получение угла фитинга воздуховода
         private string GetDuctFittingAngle(Element element) {

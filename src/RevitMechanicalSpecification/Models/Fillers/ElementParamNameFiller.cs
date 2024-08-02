@@ -31,12 +31,14 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
 
         public override void SetParamValue(Element element) {
-            ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedName, _nameAndGroupFactory.GetName(element)));
+            //ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedName, _nameAndGroupFactory.GetName(element)));
+
+            //Element elemType = element.GetElementType();
 
             if(ManifoldInstance != null) {
-                ToParam.Set("‎    " + Count.ToString() + ". " + _nameAndGroupFactory.GetName(element));
+                ToParam.Set("‎    " + Count.ToString() + ". " + _nameAndGroupFactory.GetName(element, ElemType));
             } else {
-                ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedName, _nameAndGroupFactory.GetName(element)));
+                ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedName, _nameAndGroupFactory.GetName(element, ElemType)));
                 ;
             }
 
