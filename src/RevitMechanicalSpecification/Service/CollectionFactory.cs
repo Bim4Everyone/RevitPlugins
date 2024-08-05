@@ -36,7 +36,8 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInCategory.OST_PipeInsulations,
                 BuiltInCategory.OST_PlumbingFixtures,
                 BuiltInCategory.OST_Sprinklers,
-                BuiltInCategory.OST_GenericModel
+                //Я пока не уверен, что оно вообще тут нужно
+                //BuiltInCategory.OST_GenericModel
 
             };
             return GetElements(mechanicalCategories);
@@ -86,14 +87,5 @@ namespace RevitMechanicalSpecification.Service {
             return elements.Where(e => LogicalFilter(e)).ToList();
         }
 
-        private List<Element> GetElements(BuiltInCategory category) {
-            var defColl = (List<Element>) new FilteredElementCollector(_document)
-                .OfCategory(category)
-                .WhereElementIsNotElementType()
-                .ToElements();
-
-            return defColl.Where(e => LogicalFilter(e)).ToList();
-            ;
-        }
     }
 }

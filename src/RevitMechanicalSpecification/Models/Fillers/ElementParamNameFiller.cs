@@ -15,7 +15,6 @@ using RevitMechanicalSpecification.Service;
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNameFiller : ElementParamFiller {
 
-        private readonly VisElementsCalculator _calculator;
         private readonly NameAndGroupFactory _nameAndGroupFactory;
 
         public ElementParamNameFiller(
@@ -25,7 +24,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             Document document,
             NameAndGroupFactory nameAndGroupFactory) : 
             base(toParamName, fromParamName, specConfiguration, document) {
-            _calculator = new VisElementsCalculator(Config, Document);
             _nameAndGroupFactory = nameAndGroupFactory;
         }
 

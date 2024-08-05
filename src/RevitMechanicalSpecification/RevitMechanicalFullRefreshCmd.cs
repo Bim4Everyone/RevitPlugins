@@ -28,13 +28,13 @@ using RevitMechanicalSpecification.Views;
 
 namespace RevitMechanicalSpecification {
     [Transaction(TransactionMode.Manual)]
-    public class RevitMechanicalSpecificationCommand : BasePluginCommand {
-        public RevitMechanicalSpecificationCommand() {
+    public class RevitMechanicalFullRefreshCmd : BasePluginCommand {
+        public RevitMechanicalFullRefreshCmd() {
             PluginName = "RevitMechanicalSpecification";
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            new RevitRepository(uiApplication).ExecuteSpecificationRefresh();
+            new RevitRepository(uiApplication).FullRefresh();
         }
     }
 }

@@ -12,12 +12,12 @@ using dosymep.Revit;
 using RevitMechanicalSpecification.Service;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
-    internal class ElemetParamFunctionFiller : ElementParamFiller {
+    internal class ElementParamFunctionFiller : ElementParamFiller {
         private readonly List<VisSystem> _systemList;
         private readonly SystemAndFunctionNameFactory _nameFactory;
 
 
-        public ElemetParamFunctionFiller(
+        public ElementParamFunctionFiller(
             string toParamName, 
             string fromParamName, 
             SpecConfiguration specConfiguration, 

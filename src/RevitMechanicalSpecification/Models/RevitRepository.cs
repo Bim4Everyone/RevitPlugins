@@ -22,6 +22,81 @@ namespace RevitMechanicalSpecification.Models {
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
 
+            _collector = new CollectionFactory(Document);
+            _elements = _collector.GetMechanicalElements();
+            _visSystems = _collector.GetMechanicalSystemColl();
+            _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
+            _calculator = new VisElementsCalculator(_specConfiguration, Document);
+            _nameAndGroupFactory = new NameAndGroupFactory(_specConfiguration, Document, _calculator);
+            _manifoldElementIds = new HashSet<ElementId>();
+            _fillersSpecRefresh = new List<ElementParamFiller>()
+{
+                //Заполнение ФОП_ВИС_Группирование
+                new ElementParamGroupFiller(
+                _specConfiguration.TargetNameGroup,
+                null,
+                _specConfiguration,
+                Document,
+                _nameAndGroupFactory),
+                //Заполнение ФОП_ВИС_Марка
+                new ElementParamDefaultFiller(
+                _specConfiguration.TargetNameMark,
+                _specConfiguration.OriginalParamNameMark,
+                _specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Код изделия
+                new ElementParamDefaultFiller(
+                _specConfiguration.TargetNameCode,
+                _specConfiguration.OriginalParamNameCode,
+                _specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Завод-изготовитель
+                new ElementParamDefaultFiller(
+                _specConfiguration.TargetNameCreator,
+                _specConfiguration.OriginalParamNameCreator,
+                _specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Единица измерения
+                new ElementParamUnitFiller(
+                _specConfiguration.TargetNameUnit,
+                _specConfiguration.OriginalParamNameUnit,
+                _specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Число - у него нет исходного параметра, набор идет из системных, так что на вход идет null
+                new ElementParamNumberFiller(
+                _specConfiguration.TargetNameNumber,
+                null,
+                _specConfiguration,
+                Document),
+                //Заполнение ФОП_ВИС_Наименование комбинированное
+                new ElementParamNameFiller(
+                _specConfiguration.TargetNameName,
+                _specConfiguration.OriginalParamNameName,
+                _specConfiguration,
+                Document,
+                _nameAndGroupFactory)
+
+        };
+            _fillersSystemRefresh = new List<ElementParamFiller>() 
+            { 
+                //Заполнение ФОП_ВИС_Имя системы
+                new ElementParamSystemFiller(
+                _specConfiguration.TargetNameSystem,
+                null,
+                _specConfiguration,
+                Document,
+                _visSystems)
+            };
+            _fillersFunctionRefresh = new List<ElementParamFiller>() 
+            { 
+                //Заполнение ФОП_ВИС_Экономическая функция
+                new ElementParamFunctionFiller(
+                _specConfiguration.TargetNameFunction,
+                null,
+                _specConfiguration,
+                Document,
+                _visSystems)
+            };
         }
 
         public UIApplication UIApplication { get; }
@@ -30,156 +105,92 @@ namespace RevitMechanicalSpecification.Models {
 
         public Document Document => ActiveUIDocument.Document;
 
-        private List<ElementParamFiller> _fillers;
 
-        public void ExecuteSpecificationRefresh() {
-            CollectionFactory collector = new CollectionFactory(Document);
-            List<Element> elements = collector.GetMechanicalElements();
-            List<VisSystem> visSystems = collector.GetMechanicalSystemColl();
-
-            SpecConfiguration specConfiguration = new SpecConfiguration(Document.ProjectInformation);
-            VisElementsCalculator calculator = new VisElementsCalculator(specConfiguration, Document);
-            NameAndGroupFactory nameAndGruopFactory = new NameAndGroupFactory(specConfiguration, Document, calculator);
+        private readonly List<ElementParamFiller> _fillersSpecRefresh;
+        private readonly List<ElementParamFiller> _fillersSystemRefresh;
+        private readonly List<ElementParamFiller> _fillersFunctionRefresh;
 
 
-            List<ElementParamFiller> testFillers = new List<ElementParamFiller>()
-            {
-
-                //Заполнение ФОП_ВИС_Группирование
-                new ElementParamGroupFiller(
-                specConfiguration.TargetNameGroup,
-                null,
-                specConfiguration,
-                Document,
-                nameAndGruopFactory),
-                //Заполнение ФОП_ВИС_Наименование комбинированное
-                new ElementParamNameFiller(
-                specConfiguration.TargetNameName,
-                specConfiguration.OriginalParamNameName,
-                specConfiguration,
-                Document,
-                nameAndGruopFactory)
-
-        };
-            _fillers = new List<ElementParamFiller>()
-            {
-                //Заполнение ФОП_ВИС_Группирование
-                new ElementParamGroupFiller(
-                specConfiguration.TargetNameGroup,
-                null,
-                specConfiguration,
-                Document,
-                nameAndGruopFactory),
-                //Заполнение ФОП_ВИС_Марка
-                new ElementParamDefaultFiller(
-                specConfiguration.TargetNameMark,
-                specConfiguration.OriginalParamNameMark,
-                specConfiguration,
-                Document),
-                //Заполнение ФОП_ВИС_Код изделия
-                new ElementParamDefaultFiller(
-                specConfiguration.TargetNameCode,
-                specConfiguration.OriginalParamNameCode,
-                specConfiguration,
-                Document),
-                //Заполнение ФОП_ВИС_Завод-изготовитель
-                new ElementParamDefaultFiller(
-                specConfiguration.TargetNameCreator,
-                specConfiguration.OriginalParamNameCreator,
-                specConfiguration,
-                Document),
-                //Заполнение ФОП_ВИС_Единица измерения
-                new ElementParamUnitFiller(
-                specConfiguration.TargetNameUnit,
-                specConfiguration.OriginalParamNameUnit,
-                specConfiguration,
-                Document),
-                //Заполнение ФОП_ВИС_Число - у него нет исходного параметра, набор идет из системных, так что на вход идет null
-                new ElementParamNumberFiller(
-                specConfiguration.TargetNameNumber,
-                null,
-                specConfiguration,
-                Document),
-                //Заполнение ФОП_ВИС_Наименование комбинированное
-                new ElementParamNameFiller(
-                specConfiguration.TargetNameName,
-                specConfiguration.OriginalParamNameName,
-                specConfiguration,
-                Document,
-                nameAndGruopFactory),
-                //Заполнение ФОП_ВИС_Имя системы
-                new ElementParamSystemFiller(
-                specConfiguration.TargetNameSystem,
-                null,
-                specConfiguration,
-                Document,
-                visSystems),
-                //Заполнение ФОП_ВИС_Экономическая функция
-                new ElementParamSystemFiller(
-                specConfiguration.TargetNameFunction,
-                null,
-                specConfiguration,
-                Document,
-                visSystems)
-
-        };
-
-            HashSet<ElementId> manifoldElementIds = new HashSet<ElementId>();
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
-            using(Transaction t = Document.StartTransaction("Обновление спецификации")) {
+        private readonly HashSet<ElementId> _manifoldElementIds;
+        private readonly NameAndGroupFactory _nameAndGroupFactory;
+        private readonly CollectionFactory _collector;
+        private readonly List<Element> _elements;
+        private readonly List<VisSystem> _visSystems;
+        private readonly SpecConfiguration _specConfiguration;
+        private readonly VisElementsCalculator _calculator;
 
 
-                foreach(Element element in elements) {
-                    if(manifoldElementIds.Contains(element.Id))
-                        continue;
 
-                    Element elemType = element.GetElementType();
+        private void ProcessElement(Element element, List<ElementParamFiller> fillers) {
+            foreach(var filler in fillers) {
+                filler.Fill(element, null, 0);
+            }
+        }
 
-                    foreach(ElementParamFiller filler in _fillers) {
-                        filler.Fill(element, null, 0);
-                    }
+        private void ProcessManifoldSubElement(List<ElementParamFiller> fillers, Element manifoldElement, FamilyInstance familyInstance, int count) {
+            foreach(var filler in fillers) {
+                filler.Fill(manifoldElement, familyInstance, count);
+            }
+        }
 
-                    if(nameAndGruopFactory.IsManifold(elemType)) {
-                        int count = 1;
-                        FamilyInstance familyInstance = element as FamilyInstance;
-                        List<Element> manifoldElements =
-                            nameAndGruopFactory.GetSub(familyInstance).OrderBy
-                            (e => nameAndGruopFactory.GetGroup(e)).ToList();
 
-                        foreach(Element manifoldElement in manifoldElements) {
-                            Element maniElemType = manifoldElement.GetElementType();
+        private void ProcessManifoldElement(Element element, List<ElementParamFiller> fillers) {
+            if(_nameAndGroupFactory.IsManifold(element)) {
+                int count = 1;
+                FamilyInstance familyInstance = element as FamilyInstance;
+                Element elemType = element.GetElementType();
 
-                            if(!nameAndGruopFactory.IsOutSideOfManifold(maniElemType)) {
-                                foreach(ElementParamFiller filler in _fillers) {
-                                    filler.Fill(manifoldElement, familyInstance, count);
-                                    manifoldElementIds.Add(manifoldElement.Id);
+                List<Element> manifoldElements =
+                    _nameAndGroupFactory.GetSub(familyInstance).OrderBy
+                    (e => _nameAndGroupFactory.GetGroup(e)).ToList();
 
-                                    if(nameAndGruopFactory.IsIncreaseIndex(
-                                        manifoldElements,
-                                        manifoldElements.IndexOf(manifoldElement),
-                                        manifoldElement,
-                                        maniElemType
-                                        )) {
-                                        count++;
-                                    }
-                                }
-                            }
+                foreach(var manifoldElement in manifoldElements) {
+                    if(!_nameAndGroupFactory.IsOutSideOfManifold(manifoldElement)) {
+                        ProcessManifoldSubElement(fillers, manifoldElement, familyInstance, count);
+                        _manifoldElementIds.Add(manifoldElement.Id);
+
+                        if(_nameAndGroupFactory.IsIncreaseIndex(manifoldElements, count, manifoldElement, elemType)) {
+                            count++;
                         }
                     }
                 }
+            }
+        }
 
-                
+
+        private void ProcessElements(List<ElementParamFiller> fillers) {
+            using(var t = Document.StartTransaction("Обновление спецификации")) {
+                foreach(var element in _elements) {
+                    if(_manifoldElementIds.Contains(element.Id)) {
+                        continue;
+                    }
+                    ProcessElement(element, fillers);
+                    ProcessManifoldElement(element, fillers);
+                }
 
                 t.Commit();
-                stopWatch.Stop();
-                TimeSpan ts = stopWatch.Elapsed;
-                // Format and display the TimeSpan value.
-                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                    ts.Hours, ts.Minutes, ts.Seconds,
-                    ts.Milliseconds / 10);
-                MessageBox.Show(elapsedTime.ToString());
             }
+        }
+
+
+        public void SpecificationRefresh() {
+            ProcessElements(_fillersSpecRefresh);
+        }
+
+        public void RefreshSystemName() {
+            ProcessElements(_fillersSystemRefresh);
+        }
+
+        public void RefreshSystemFunction() {
+            ProcessElements(_fillersFunctionRefresh);
+        }
+
+        public void FullRefresh() {
+            List<ElementParamFiller> fillers = new List<ElementParamFiller>();
+            fillers.AddRange(_fillersSpecRefresh);
+            fillers.AddRange(_fillersFunctionRefresh);
+            fillers.AddRange(_fillersSystemRefresh);
+            ProcessElements(fillers);
         }
     }
 }
