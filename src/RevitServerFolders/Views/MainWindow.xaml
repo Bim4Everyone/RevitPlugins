@@ -14,6 +14,7 @@
                            xmlns:converters="clr-namespace:RevitServerFolders.Converters"
                            xmlns:dosymepConverters="clr-namespace:dosymep.WPF.Converters"
                            mc:Ignorable="d"
+                           x:Name="_this"
                            WindowStartupLocation="CenterOwner"
                            Title="MainWindow"
                            Height="450"
@@ -44,6 +45,23 @@
                                        Empty="{dx:DXImage 'Office2013/Actions/New_16x16.png'}"
                                        Model="..\Resources\Revit.png"
                                        Folder="{dx:DXImage 'Office2013/Support/Article_16x16.png'}" />
+
+        <Style TargetType="dxg:GridControl">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.OpenFromFoldersCommand.IsExecuting, ElementName=_this}"
+                             Value="True">
+                    <Setter Property="ShowLoadingPanel"
+                            Value="True" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding DataContext.SourceFolderChangedCommand.IsExecuting, ElementName=_this}"
+                             Value="True">
+                    <Setter Property="ShowLoadingPanel"
+                            Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+            <Setter Property="ShowLoadingPanel"
+                    Value="False" />
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -108,7 +126,6 @@
 
         <dxg:GridControl Grid.Row="4"
                          Margin="5"
-                         ShowLoadingPanel="{Binding SourceFolderChangedCommand.IsExecuting}"
                          ItemsSource="{Binding ModelObjects}"
                          SelectedItem="{Binding SelectedObject}">
 

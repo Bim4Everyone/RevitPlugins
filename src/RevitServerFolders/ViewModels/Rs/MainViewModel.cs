@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 using DevExpress.Xpf.Grid.TreeList;
 
@@ -23,16 +22,16 @@ namespace RevitServerFolders.ViewModels.Rs {
             _serverClients = serverClients;
             LoadViewCommand = RelayCommand.CreateAsync(LoadView);
             AcceptViewCommand = RelayCommand.CreateAsync(AcceptView, CanAcceptView);
-            
+
             LoadChildrenCommand = RelayCommand.CreateAsync<TreeListNodeEventArgs>(LoadChildren, CanLoadChildren);
             ReloadChildrenCommand = RelayCommand.CreateAsync(ReloadChildren, CanReloadChildren);
         }
 
-        public ICommand LoadViewCommand { get; }
-        public ICommand AcceptViewCommand { get; }
-        
-        public ICommand LoadChildrenCommand { get; }
-        public ICommand ReloadChildrenCommand { get; }
+        public IAsyncCommand LoadViewCommand { get; }
+        public IAsyncCommand AcceptViewCommand { get; }
+
+        public IAsyncCommand LoadChildrenCommand { get; }
+        public IAsyncCommand ReloadChildrenCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -75,7 +74,7 @@ namespace RevitServerFolders.ViewModels.Rs {
             return args.Row is RsModelObjectViewModel rsModelObject
                    && rsModelObject.LoadChildrenCommand.CanExecute(default);
         }
-        
+
         private async Task ReloadChildren() {
             await SelectedItem.ReloadChildrenCommand.ExecuteAsync(default);
         }
