@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows.Input;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -51,9 +50,9 @@ namespace RevitServerFolders.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
-        public ICommand OpenFromFoldersCommand { get; }
+        public IAsyncCommand OpenFromFoldersCommand { get; }
         public ICommand OpenFolderDialogCommand { get; }
-        public ICommand SourceFolderChangedCommand { get; }
+        public IAsyncCommand SourceFolderChangedCommand { get; }
 
         public IOpenFolderDialogService OpenFolderDialogService { get; }
         public IProgressDialogFactory ProgressDialogFactory { get; }
@@ -96,7 +95,7 @@ namespace RevitServerFolders.ViewModels {
             get => _isExportRoomsVisible;
             set => this.RaiseAndSetIfChanged(ref _isExportRoomsVisible, value);
         }
-        
+
         protected virtual void LoadConfigImpl() { }
         protected virtual void SaveConfigImpl() { }
         protected virtual void AcceptViewImpl() { }
