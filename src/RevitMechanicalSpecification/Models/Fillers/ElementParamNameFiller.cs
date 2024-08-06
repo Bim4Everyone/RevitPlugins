@@ -19,13 +19,16 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public ElementParamNameFiller(
             string toParamName,
-            string fromParamName, 
+            string fromParamName,
             SpecConfiguration specConfiguration,
             Document document,
-            NameAndGroupFactory nameAndGroupFactory) : 
+            NameAndGroupFactory nameAndGroupFactory) :
             base(toParamName, fromParamName, specConfiguration, document) {
             _nameAndGroupFactory = nameAndGroupFactory;
         }
+
+
+
 
 
         public override void SetParamValue(Element element) {
@@ -36,6 +39,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             if(ManifoldInstance != null) {
                 ToParam.Set("‎    " + Count.ToString() + ". " + _nameAndGroupFactory.GetName(element, ElemType));
             } else {
+                Console.WriteLine(element.GetSharedParamValueOrDefault(Config.ForcedName, _nameAndGroupFactory.GetName(element, ElemType)));
+
                 ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedName, _nameAndGroupFactory.GetName(element, ElemType)));
                 ;
             }

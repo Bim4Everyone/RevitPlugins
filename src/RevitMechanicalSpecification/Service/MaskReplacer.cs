@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 
@@ -10,16 +11,19 @@ using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Service {
-    internal class MaskReplacer {
+    public static class MaskReplacer {
 
-        private string GetStringValue(Element element, Element elemType, string paramName) {
-            return DataOperator.GetTypeOrInstanceParamDoubleValue(element, elemType, paramName).ToString();
+        private static string GetStringValue(Element element, Element elemType, string paramName) {
+            double value = DataOperator.GetTypeOrInstanceParamDoubleValue(element, elemType, paramName);
+
+            value = UnitConverter.DoubleToMilimeters(value);
+
+            return value.ToString();
         }
 
-        public string ReplaceMask(Element element, string maskName) {
+        public static string ReplaceMask(Element element, string maskName) {
             Element elemType = element.GetElementType();
             string mask = DataOperator.GetTypeOrInstanceParamStringValue(element, elemType, maskName);
-
 
             if(mask == null) {
                 return null;
@@ -33,19 +37,19 @@ namespace RevitMechanicalSpecification.Service {
             string diameter = GetStringValue(element, elemType, "ADSK_Размер_Диаметр");
 
             if(mask.Contains("ВЫСОТА")){
-                mask.Replace("ВЫСОТА", height);
+                mask = mask.Replace("ВЫСОТА", height);
             }
             if(mask.Contains("ДЛИНА")) {
-                mask.Replace("ДЛИНА", lenght);
+                mask = mask.Replace("ДЛИНА", lenght);
             }
             if(mask.Contains("ШИРИНА")) {
-                mask.Replace("ШИРИНА", width);
+                mask = mask.Replace("ШИРИНА", width);
             }
             if(mask.Contains("ДИАМЕТР")) {
-                mask.Replace("ДИАМЕТР", diameter);
+                mask = mask.Replace("ДИАМЕТР", diameter);
             }
 
-            return null;
+            return mask;
         }
 
     }

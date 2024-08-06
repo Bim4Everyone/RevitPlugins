@@ -130,11 +130,11 @@ namespace RevitMechanicalSpecification.Service {
 
 
             //currentculture передаем
-            if(thikness > upCriteria && upCriteria != 0) { 
-                return Math.Max(maxInsulThikness, maxDuctThikness).ToString(); 
+            if(thikness > upCriteria && upCriteria != 0) {
+                return Math.Max(maxInsulThikness, maxDuctThikness).ToString();
             }
-            if(thikness < minCriteria && minCriteria != 0) { 
-                return Math.Max(minInsulThikness, minDuctThikness).ToString(); 
+            if(thikness < minCriteria && minCriteria != 0) {
+                return Math.Max(minInsulThikness, minDuctThikness).ToString();
             }
 
             return thikness.ToString();
@@ -183,6 +183,16 @@ namespace RevitMechanicalSpecification.Service {
             return "0";
         }
 
+
+        public string GetDuctFittingMark(Element element) {
+            List<Connector> connectors = GetConnectors(element);
+            Element duct = GetDuctFromFitting(connectors);
+            if(duct is null) {
+                return "!Не учитывать";
+            }
+            return DataOperator.GetTypeOrInstanceParamStringValue(duct, duct.GetElementType(), _specConfiguration.OriginalParamNameMark);
+        }
+
         //получение имени фитинга воздуховода
         public string GetDuctFittingName(Element element) {
             string thikness = GetDuctFittingThikness(element);
@@ -190,29 +200,47 @@ namespace RevitMechanicalSpecification.Service {
                 return "!Не учитывать";
             }
 
-            if(!_specConfiguration.IsSpecifyDuctFittings) { return "Металл для фасонных деталей воздуховодов с толщиной стенки " + thikness + " мм"; }
+            if(!_specConfiguration.IsSpecifyDuctFittings) {
+                return "Металл для фасонных деталей воздуховодов с толщиной стенки " + thikness + " мм";
+            }
 
             string startName = "Не удалось определить тип фитинга";
             var instanse = element as FamilyInstance;
             var fitting = instanse.MEPModel as MechanicalFitting;
 
 
-            if(fitting.PartType is PartType.Transition) { startName = "Переход между сечениями воздуховода "; }
-            if(fitting.PartType is PartType.Tee) { startName = "Тройник "; }
-            if(fitting.PartType is PartType.TapAdjustable) { startName = "Врезка в воздуховод "; }
-            if(fitting.PartType is PartType.Cross) { startName = "Крестовина "; }
-            if(fitting.PartType is PartType.Union) { return "!Не учитывать"; }
+            if(fitting.PartType is PartType.Transition) {
+                startName = "Переход между сечениями воздуховода ";
+            }
+            if(fitting.PartType is PartType.Tee) {
+                startName = "Тройник ";
+            }
+            if(fitting.PartType is PartType.TapAdjustable) {
+                startName = "Врезка в воздуховод ";
+            }
+            if(fitting.PartType is PartType.Cross) {
+                startName = "Крестовина ";
+            }
+            if(fitting.PartType is PartType.Union) {
+                return "!Не учитывать";
+            }
 
             if(fitting.PartType == PartType.Elbow) {
                 Connector connector = GetConnectors(element).First();
                 string angle = GetDuctFittingAngle(element);
-                if(connector.Shape == ConnectorProfileType.Round) { startName = "Отвод " + angle + "° круглого сечения"; }
-                if(connector.Shape == ConnectorProfileType.Rectangular) { startName = "Отвод " + angle + "° прямоугольного сечения"; }
+                if(connector.Shape == ConnectorProfileType.Round) {
+                    startName = "Отвод " + angle + "° круглого сечения";
+                }
+                if(connector.Shape == ConnectorProfileType.Rectangular) {
+                    startName = "Отвод " + angle + "° прямоугольного сечения";
+                }
             }
 
             string size = element.GetParamValue<string>(BuiltInParameter.RBS_CALCULATED_SIZE);
             //Ревит пишет размеры всех коннекторов. Для всего кроме тройника и перехода нам хватит первого размера
-            if(!(fitting.PartType is PartType.Transition) || !(fitting.PartType is PartType.Tee)) { size = size.Split('-').First(); }
+            if(!(fitting.PartType is PartType.Transition) || !(fitting.PartType is PartType.Tee)) {
+                size = size.Split('-').First();
+            }
 
 
 

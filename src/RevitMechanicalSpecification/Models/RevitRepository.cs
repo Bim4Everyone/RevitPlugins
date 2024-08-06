@@ -39,10 +39,11 @@ namespace RevitMechanicalSpecification.Models {
                 Document,
                 _nameAndGroupFactory),
                 //Заполнение ФОП_ВИС_Марка
-                new ElementParamDefaultFiller(
+                new ElementParamMarkFiller(
                 _specConfiguration.TargetNameMark,
                 _specConfiguration.OriginalParamNameMark,
                 _specConfiguration,
+                _calculator,
                 Document),
                 //Заполнение ФОП_ВИС_Код изделия
                 new ElementParamDefaultFiller(
@@ -75,7 +76,6 @@ namespace RevitMechanicalSpecification.Models {
                 _specConfiguration,
                 Document,
                 _nameAndGroupFactory)
-
         };
             _fillersSystemRefresh = new List<ElementParamFiller>()
             { 

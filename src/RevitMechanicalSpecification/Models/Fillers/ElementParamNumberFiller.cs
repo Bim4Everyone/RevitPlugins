@@ -34,29 +34,33 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             //написать зачем нужно
             double number = 0;
             string unit;
-            try {
-                VisElementsCalculator calculator = new VisElementsCalculator(Config, Document);
+            VisElementsCalculator calculator = new VisElementsCalculator(Config, Document);
 
 
-                unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);
-                //расписать почему что возвращается
-                if(unit == Config.SingleUnit || unit == Config.KitUnit) { return 1; }
-                if(unit == Config.SquareUnit) {
-                    if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
-                        InsulationLiningBase insulation = element as InsulationLiningBase;
-                        Element host = Document.GetElement(insulation.HostElementId);
-                        return calculator.GetFittingArea(host);
+            unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);
+            //расписать почему что возвращается
+            if(unit == Config.SingleUnit || unit == Config.KitUnit) {
+                return 1;
+            }
+            if(unit == Config.SquareUnit) {
+                if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
+                    InsulationLiningBase insulation = element as InsulationLiningBase;
+                    Element host = Document.GetElement(insulation.HostElementId);
+                    return calculator.GetFittingArea(host);
 
-                    }
-                    if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) { return calculator.GetFittingArea(element); }
-                    if(LinearLogicalFilter(element)) { return UnitConverter.DoubleToSquareMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA)); }
                 }
-                if(unit == Config.MeterUnit) {
-                    if(LinearLogicalFilter(element)) {
-                        return UnitConverter.DoubleToMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH));
-                    }
+                if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
+                    return calculator.GetFittingArea(element);
                 }
-            } catch { MessageBox.Show(element.Id.ToString()); }
+                if(LinearLogicalFilter(element)) {
+                    return UnitConverter.DoubleToSquareMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA));
+                }
+            }
+            if(unit == Config.MeterUnit) {
+                if(LinearLogicalFilter(element)) {
+                    return UnitConverter.DoubleToMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH));
+                }
+            }
 
             return number;
         }

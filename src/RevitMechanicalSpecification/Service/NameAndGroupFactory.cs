@@ -58,6 +58,15 @@ namespace RevitMechanicalSpecification.Service {
 
                 if(!(pipe is null)) { name += " (Для: " + GetName(pipe, pipe.GetElementType()) + ")"; }
             }
+
+            if(element.Category.IsId(BuiltInCategory.OST_DuctAccessory)) {
+                string mask = MaskReplacer.ReplaceMask(element, "ФОП_ВИС_Маска наименования");
+                if(mask != null) {
+                    name = mask;
+                    Console.WriteLine(name);
+                }
+            }
+
             return name;
         }
 
