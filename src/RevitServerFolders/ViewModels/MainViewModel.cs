@@ -17,6 +17,7 @@ namespace RevitServerFolders.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly IModelObjectService _objectService;
+        private readonly object _locker = new object();
 
         private string _errorText;
         private string _targetFolder;
@@ -206,20 +207,23 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private async Task AddModelObjects(ModelObject modelObject) {
-            ModelObjects.Clear();
             if(modelObject != null) {
                 IEnumerable<ModelObject> modelObjects = await modelObject.GetChildrenObjects();
 
-                modelObjects = modelObjects
-                    .OrderBy(item => item.Name);
+                lock(_locker) {
+                    ModelObjects.Clear();
 
-                foreach(ModelObject child in modelObjects) {
-                    ModelObjects.Add(new ModelObjectViewModel(child));
-                }
+                    modelObjects = modelObjects
+                        .OrderBy(item => item.Name);
 
-                foreach(ModelObjectViewModel modelObjectViewModel in ModelObjects) {
-                    modelObjectViewModel.SkipObject = _pluginConfig.SkippedObjects?
-                        .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
+                    foreach(ModelObject child in modelObjects) {
+                        ModelObjects.Add(new ModelObjectViewModel(child));
+                    }
+
+                    foreach(ModelObjectViewModel modelObjectViewModel in ModelObjects) {
+                        modelObjectViewModel.SkipObject = _pluginConfig.SkippedObjects?
+                            .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
+                    }
                 }
             }
         }
