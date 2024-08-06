@@ -5,24 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace RevitMechanicalSpecification.Service {
-    internal class UnitConverter {
+    public static class UnitConverter {
 
-        public double DoubleToMeters(double number) {
+        public static double DoubleToMeters(double number) {
             return Math.Round(number * 304.8 / 1000, 2);
         }
 
-        public double DoubleToMilimeters(double number) {
+        public static double DoubleToMilimeters(double number) {
             return Math.Round(number * 304.8, 2);
         }
 
-        public double DoubleToSquareMeters(double number) {
+        public static double DoubleToSquareMeters(double number) {
             return Math.Round(number * 0.092903, 2);
         }
 
-        public double DoubleToDegree(double number) {
+        public static double DoubleToDegree(double number) {
             return Math.Round(number / 0.0175, 2);
         }
-
-
     }
 }

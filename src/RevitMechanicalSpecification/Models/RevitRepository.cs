@@ -77,7 +77,7 @@ namespace RevitMechanicalSpecification.Models {
                 _nameAndGroupFactory)
 
         };
-            _fillersSystemRefresh = new List<ElementParamFiller>() 
+            _fillersSystemRefresh = new List<ElementParamFiller>()
             { 
                 //Заполнение ФОП_ВИС_Имя системы
                 new ElementParamSystemFiller(
@@ -87,7 +87,7 @@ namespace RevitMechanicalSpecification.Models {
                 Document,
                 _visSystems)
             };
-            _fillersFunctionRefresh = new List<ElementParamFiller>() 
+            _fillersFunctionRefresh = new List<ElementParamFiller>()
             { 
                 //Заполнение ФОП_ВИС_Экономическая функция
                 new ElementParamFunctionFiller(
@@ -120,6 +120,19 @@ namespace RevitMechanicalSpecification.Models {
         private readonly VisElementsCalculator _calculator;
 
 
+
+        private string IsEditedBy(string userName, Element element) {
+
+            string editedBy = element.GetParamValueOrDefault<string>(BuiltInParameter.EDITED_BY);
+
+            if(!string.IsNullOrEmpty(editedBy)) {
+                editedBy = editedBy.ToLower();
+                if(editedBy != userName) {
+                    return editedBy;
+                }
+            }
+            return null;
+        }
 
         private void ProcessElement(Element element, List<ElementParamFiller> fillers) {
             foreach(var filler in fillers) {
@@ -159,8 +172,21 @@ namespace RevitMechanicalSpecification.Models {
 
 
         private void ProcessElements(List<ElementParamFiller> fillers) {
+            string userName = UIApplication.Application.Username.ToLower();
+            List<string> editors = new List<string>();
+
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             using(var t = Document.StartTransaction("Обновление спецификации")) {
                 foreach(var element in _elements) {
+                    string editor = IsEditedBy(userName, element);
+                    if(!string.IsNullOrEmpty(editor)) {
+                        if(!editors.Contains(editor)) {
+                            editors.Add(editor);
+                        }
+                        continue;
+                    }
+
                     if(_manifoldElementIds.Contains(element.Id)) {
                         continue;
                     }
@@ -169,9 +195,29 @@ namespace RevitMechanicalSpecification.Models {
                 }
 
                 t.Commit();
+
+                ShowReport(editors);
+
+                stopWatch.Stop();
+                // Get the elapsed time as a TimeSpan value.
+                TimeSpan ts = stopWatch.Elapsed;
+
+                // Format and display the TimeSpan value.
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds,
+                    ts.Milliseconds / 10);
+                MessageBox.Show(elapsedTime);
+
             }
         }
 
+
+        public void ShowReport(List<string> editors) {
+            if(editors.Count != 0) {
+                MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
+                    + string.Join(", ", editors.ToArray()));
+            }
+        }
 
         public void SpecificationRefresh() {
             ProcessElements(_fillersSpecRefresh);

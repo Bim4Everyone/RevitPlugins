@@ -19,12 +19,11 @@ namespace RevitMechanicalSpecification.Service {
     internal class VisElementsCalculator {
 
         private readonly SpecConfiguration _specConfiguration;
-        private readonly UnitConverter _unitConverter;
+
         private readonly Document _document;
 
         public VisElementsCalculator(SpecConfiguration config, Document document) {
             _specConfiguration = config;
-            _unitConverter = new UnitConverter();
             _document = document;
         }
 
@@ -42,11 +41,11 @@ namespace RevitMechanicalSpecification.Service {
             bool dExternalWall = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Днар х Стенка") == 1;
 
 
-            double externalSize = _unitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER));
-            double internalSize = _unitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_INNER_DIAM_PARAM));
+            double externalSize = UnitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER));
+            double internalSize = UnitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_INNER_DIAM_PARAM));
 
             string pipeThickness = ((externalSize - internalSize) / 2).ToString();
-            string pipeDiameter = _unitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM)).ToString();
+            string pipeDiameter = UnitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM)).ToString();
 
             if(dy) { return " ⌀" + pipeDiameter; }
             if(dyWall) { return " ⌀" + pipeDiameter + "x" + pipeThickness; }
@@ -174,7 +173,7 @@ namespace RevitMechanicalSpecification.Service {
         }
         //получение угла фитинга воздуховода
         private string GetDuctFittingAngle(Element element) {
-            double angle = _unitConverter.DoubleToDegree(GetConnectors(element).First().Angle);
+            double angle = UnitConverter.DoubleToDegree(GetConnectors(element).First().Angle);
             if(angle <= 15.1) { return "15"; }
             if(angle <= 30.1) { return "30"; }
             if(angle <= 45.1) { return "45"; }
@@ -250,14 +249,14 @@ namespace RevitMechanicalSpecification.Service {
                 foreach(Face face in solid.Faces)
                     area += face.Area;
 
-            area = _unitConverter.DoubleToSquareMeters(area);
+            area = UnitConverter.DoubleToSquareMeters(area);
 
             if(area > 0) {
                 double falseArea = 0;
                 List<Connector> connectors = GetConnectors(element);
                 foreach(Connector connector in connectors) {
-                    if(connector.Shape == ConnectorProfileType.Rectangular) { falseArea += _unitConverter.DoubleToSquareMeters(connector.Height * connector.Width); }
-                    if(connector.Shape == ConnectorProfileType.Round) { falseArea += _unitConverter.DoubleToSquareMeters(connector.Radius * connector.Radius * 3.14); }
+                    if(connector.Shape == ConnectorProfileType.Rectangular) { falseArea += UnitConverter.DoubleToSquareMeters(connector.Height * connector.Width); }
+                    if(connector.Shape == ConnectorProfileType.Round) { falseArea += UnitConverter.DoubleToSquareMeters(connector.Radius * connector.Radius * 3.14); }
                 }
                 //Вычетаем площадь пустоты на местах коннекторов
                 area -= falseArea;
