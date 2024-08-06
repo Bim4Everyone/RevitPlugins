@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -54,11 +54,12 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private void ExportDocument(string modelName) {
+            // https://help.autodesk.com/view/RVT/2022/ENU/?guid=GUID-77F62A96-8A61-4539-9664-0DD0AB08B6ED
             Uri uri = new Uri(modelName);
-            
-            string arguments = 
+
+            string arguments =
                 $@"createLocalRvt ""{uri.LocalPath.Trim('\\').Trim('/')}"" -s ""{uri.Host}"" -d ""{TargetFolder}/"" -o";
-            
+
             string fileName =
                 $@"C:\Program Files\Autodesk\Revit {ModuleEnvironment.RevitVersion}\RevitServerToolCommand\RevitServerTool.exe";
 
