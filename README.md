@@ -22,8 +22,8 @@
 | Раскрасить элементы        | [RevitOverridingGraphicsInViews](src/RevitOverridingGraphicsInViews)   | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110560978) | Анализ         |
 | Создание фильтров          | [RevitCreatingFiltersByValues](src/RevitCreatingFiltersByValues)       | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110560978) | Анализ         |
 | Суперфильтр                | [RevitSuperfilter](src/RevitSuperfilter)                               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829991)  | Выборка        |
-| Задания на отверстия       | [RevitOpeningPlacement](src/RevitOpeningPlacement)                     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110562449) | Отверстия      |
 | Конструктор секций         | [RevitSectionsConstructor](src/RevitSectionsConstructor)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134094948) | ОПП            |
+| Задания на отверстия       | [RevitOpeningPlacement](src/RevitOpeningPlacement)                     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110562449) | Отверстия      |
 | Поиск коллизий             | [RevitClashDetective](src/RevitClashDetective)                         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830002)  | Проверки       |
 | Удалить неиспользуемые     | [RevitDeleteUnused](src/RevitDeleteUnused)                             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830008)  | Прочее         |
 | Копирование стандартов     | [RevitCopyStandarts](src/RevitCopyStandarts)                           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67846251)  | Прочее         |
@@ -74,7 +74,6 @@
 |----------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------|----------------|
 | Шаблон плагинов Revit      | [RevitPlugins](src/RevitPlugins)                                       | [GitHub](https://github.com/dosymep/RevitPluginTemplate)                | ###            |
 | Пример плагина             | [RevitExamplePlugin](src/RevitExamplePlugin)                           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134094900) | Example        |
-| Расстановщик проемов окон  | [RevitWindowGapPlacement](src/RevitWindowGapPlacement)                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829981)  | ###            |
 
 # Сборка проекта
 
