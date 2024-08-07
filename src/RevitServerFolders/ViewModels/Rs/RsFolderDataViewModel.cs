@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,7 +29,9 @@ namespace RevitServerFolders.ViewModels.Rs {
 
         protected override async Task<IEnumerable<RsModelObjectViewModel>> GetChildrenObjects() {
             string relativePath = _folderContents.GetRelativeModelPath(_folderData);
-            FolderContents folderContents = await _serverClient.GetFolderContentsAsync(relativePath);
+            FolderContents folderContents = await _serverClient.GetFolderContentsAsync(
+                relativePath, _cancellationTokenSource.Token);
+            _cancellationTokenSource.Token.ThrowIfCancellationRequested();
             return folderContents.Folders
                 .Select(item => new RsFolderDataViewModel(_serverClient, item, folderContents))
                 .ToArray();

@@ -48,6 +48,12 @@ namespace RevitServerFolders.ViewModels.Rs {
             set => this.RaiseAndSetIfChanged(ref _items, value);
         }
 
+        public void CancelCommands() {
+            foreach(var item in Items) {
+                item.Cancel();
+            }
+        }
+
         private Task LoadView() {
             Items = new ObservableCollection<RsModelObjectViewModel>(
                 _serverClients
