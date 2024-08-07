@@ -43,9 +43,9 @@ namespace RevitServerFolders.ViewModels {
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
-            OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder, CanOpenFromFolder);
-            OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog, CanOpenFolderDialog);
-            SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged, CanSourceFolderChanged);
+            OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder);
+            OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog);
+            SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -137,6 +137,11 @@ namespace RevitServerFolders.ViewModels {
                 return false;
             }
 
+            if(OpenFromFoldersCommand.IsExecuting || SourceFolderChangedCommand.IsExecuting) {
+                ErrorText = "Дождитесь завершения загрузки";
+                return false;
+            }
+
             string duplicateModelObject = ModelObjects
                 .Where(item => !item.SkipObject)
                 .GroupBy(item => item.Name)
@@ -159,18 +164,10 @@ namespace RevitServerFolders.ViewModels {
             await AddModelObjects(modelObject);
         }
 
-        private bool CanOpenFromFolder() {
-            return true;
-        }
-
         private void OpenFolderDialog() {
             if(OpenFolderDialogService.ShowDialog(TargetFolder)) {
                 TargetFolder = OpenFolderDialogService.Folder.FullName;
             }
-        }
-
-        private bool CanOpenFolderDialog() {
-            return true;
         }
 
         private async Task SourceFolderChanged() {
@@ -180,10 +177,6 @@ namespace RevitServerFolders.ViewModels {
             } catch {
                 // pass
             }
-        }
-
-        private bool CanSourceFolderChanged() {
-            return true;
         }
 
         private void LoadConfig() {
