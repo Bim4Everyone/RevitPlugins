@@ -61,7 +61,13 @@ namespace RevitServerFolders.ViewModels.Rs {
         }
 
         private bool CanAcceptView() {
-            return SelectedItem is RsFolderDataViewModel;
+            if(!(SelectedItem is RsFolderDataViewModel)) {
+                ErrorText = "Выберите папку с моделями";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
         }
 
         private async Task LoadChildren(TreeListNodeEventArgs args) {
