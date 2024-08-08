@@ -202,20 +202,24 @@ namespace RevitServerFolders.ViewModels {
             if(modelObject != null) {
                 IEnumerable<ModelObject> modelObjects = await modelObject.GetChildrenObjects();
 
-                lock(_locker) {
-                    ModelObjects.Clear();
+                AddModelObjects(modelObjects);
+            }
+        }
 
-                    modelObjects = modelObjects
-                        .OrderBy(item => item.Name);
+        private void AddModelObjects(IEnumerable<ModelObject> modelObjects) {
+            lock(_locker) {
+                ModelObjects.Clear();
 
-                    foreach(ModelObject child in modelObjects) {
-                        ModelObjects.Add(new ModelObjectViewModel(child));
-                    }
+                modelObjects = modelObjects
+                    .OrderBy(item => item.Name);
 
-                    foreach(ModelObjectViewModel modelObjectViewModel in ModelObjects) {
-                        modelObjectViewModel.SkipObject = _pluginConfig.SkippedObjects?
-                            .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
-                    }
+                foreach(ModelObject child in modelObjects) {
+                    ModelObjects.Add(new ModelObjectViewModel(child));
+                }
+
+                foreach(ModelObjectViewModel modelObjectViewModel in ModelObjects) {
+                    modelObjectViewModel.SkipObject = _pluginConfig.SkippedObjects?
+                        .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
                 }
             }
         }
