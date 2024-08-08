@@ -65,11 +65,7 @@ namespace RevitServerFolders.ViewModels {
 
         public string TargetFolder {
             get => _targetFolder;
-            set {
-                if(Directory.Exists(value)) {
-                    this.RaiseAndSetIfChanged(ref _targetFolder, value);
-                }
-            }
+            set => this.RaiseAndSetIfChanged(ref _targetFolder, value);
         }
 
         public string SourceFolder {
