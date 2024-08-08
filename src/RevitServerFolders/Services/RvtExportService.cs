@@ -44,8 +44,12 @@ namespace RevitServerFolders.Services {
                 progress?.Report(i);
                 ct.ThrowIfCancellationRequested();
 
-                ExportDocument(modelFiles[i], targetFolder);
-                dosymep.Revit.DocumentExtensions.UnloadAllLinks(Directory.GetFiles(targetFolder, _rvtSearchPattern));
+                try {
+                    ExportDocument(modelFiles[i], targetFolder);
+                    dosymep.Revit.DocumentExtensions.UnloadAllLinks(Directory.GetFiles(targetFolder, _rvtSearchPattern));
+                } catch(Exception) {
+                    // pass
+                }
             }
         }
 

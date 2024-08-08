@@ -51,7 +51,11 @@ namespace RevitServerFolders.Services {
                 ct.ThrowIfCancellationRequested();
 
                 var config = FileModelObjectConfig.GetPluginConfig();
-                ExportDocument(modelFiles[i], targetFolder, config.IsExportRooms);
+                try {
+                    ExportDocument(modelFiles[i], targetFolder, config.IsExportRooms);
+                } catch(Exception) {
+                    // pass
+                }
             }
         }
 
