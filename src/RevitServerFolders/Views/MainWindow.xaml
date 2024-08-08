@@ -79,6 +79,28 @@
                 Property="ShowLoadingPanel"
                 Value="False" />
         </Style>
+        <Style
+            TargetType="dxe:ButtonEdit" x:Key="SourceFolderEditStyle">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding DataContext.OpenFromFoldersCommand.IsExecuting, ElementName=_this}"
+                    Value="True">
+                    <Setter
+                        Property="IsEnabled"
+                        Value="False" />
+                </DataTrigger>
+                <DataTrigger
+                    Binding="{Binding DataContext.SourceFolderChangedCommand.IsExecuting, ElementName=_this}"
+                    Value="True">
+                    <Setter
+                        Property="IsEnabled"
+                        Value="False" />
+                </DataTrigger>
+            </Style.Triggers>
+            <Setter
+                Property="IsEnabled"
+                Value="True" />
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -130,6 +152,7 @@
             Grid.Row="3"
             x:Name="_sourceFolderEdit"
             Margin="5"
+            Style="{StaticResource SourceFolderEditStyle}"
             AllowDefaultButton="False"
             EditValuePostDelay="250"
             EditValuePostMode="Delayed"
