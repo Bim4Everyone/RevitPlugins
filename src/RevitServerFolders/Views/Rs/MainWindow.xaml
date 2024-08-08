@@ -109,13 +109,13 @@
                     AutoWidth="True"
                     AllowEditing="False"
                     AllowChildNodeSourceUpdates="True"
-                    
+
                     ShowNodeImages="True"
                     NodeImageSelector="{StaticResource RsNodeImageSelector}"
-                    
+
                     ShowCheckboxes="False"
                     ExpandStateFieldName="IsExpanded"
-                    
+
                     NavigationStyle="Row"
                     ChildNodesPath="Children"
                     TreeDerivationMode="ChildNodesSelector" />
