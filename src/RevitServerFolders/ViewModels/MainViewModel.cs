@@ -172,7 +172,9 @@ namespace RevitServerFolders.ViewModels {
 
         private async Task SourceFolderChanged() {
             try {
-                await AddModelObjects(await _objectService.GetFromString(SourceFolder));
+                if(!OpenFromFoldersCommand.IsExecuting) {
+                    await AddModelObjects(await _objectService.GetFromString(SourceFolder));
+                }
             } catch {
                 // pass
             }
@@ -207,20 +209,18 @@ namespace RevitServerFolders.ViewModels {
         }
 
         private void AddModelObjects(IEnumerable<ModelObject> modelObjects, string[] skippedObjects) {
-            lock(_locker) {
-                ModelObjects.Clear();
+            ModelObjects.Clear();
 
-                modelObjects = modelObjects
-                    .OrderBy(item => item.Name);
+            modelObjects = modelObjects
+                .OrderBy(item => item.Name);
 
-                foreach(ModelObject child in modelObjects) {
-                    ModelObjects.Add(new ModelObjectViewModel(child));
-                }
+            foreach(ModelObject child in modelObjects) {
+                ModelObjects.Add(new ModelObjectViewModel(child));
+            }
 
-                foreach(ModelObjectViewModel modelObjectViewModel in ModelObjects) {
-                    modelObjectViewModel.SkipObject = skippedObjects?
-                        .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
-                }
+            foreach(ModelObjectViewModel modelObjectViewModel in ModelObjects) {
+                modelObjectViewModel.SkipObject = skippedObjects?
+                    .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
             }
         }
     }
