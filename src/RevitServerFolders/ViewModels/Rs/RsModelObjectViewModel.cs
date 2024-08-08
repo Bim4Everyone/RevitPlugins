@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -79,10 +80,17 @@ namespace RevitServerFolders.ViewModels.Rs {
         }
 
         private async Task LoadChildrenObjects() {
+            bool isCancelled = false;
             try {
                 Children = new ObservableCollection<RsModelObjectViewModel>(await GetChildrenObjects());
+            } catch(OperationCanceledException) {
+                isCancelled = true;
+                IsLoadedChildren = false;
+                IsExpanded = false;
             } finally {
-                IsLoadedChildren = true;
+                if(!isCancelled) {
+                    IsLoadedChildren = true;
+                }
             }
         }
 
