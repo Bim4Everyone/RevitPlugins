@@ -172,7 +172,6 @@ namespace RevitServerFolders.ViewModels {
 
         private async Task SourceFolderChanged() {
             try {
-                ModelObjects.Clear();
                 await AddModelObjects(await _objectService.GetFromString(SourceFolder));
             } catch {
                 // pass
