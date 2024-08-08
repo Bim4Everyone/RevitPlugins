@@ -27,6 +27,7 @@ namespace RevitServerFolders.Services {
         }
 
         public Task<ModelObject> SelectModelObjectDialog(string rootFolder) {
+            _mainViewModel.RemoveCancellation();
             MainWindow window = new MainWindow() { DataContext = _mainViewModel, Title = "Выберите папку" };
             if(window.ShowDialog() == true) {
                 return Task.FromResult(_mainViewModel.SelectedItem.GetModelObject());

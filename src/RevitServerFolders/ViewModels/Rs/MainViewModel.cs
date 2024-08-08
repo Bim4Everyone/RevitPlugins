@@ -49,15 +49,27 @@ namespace RevitServerFolders.ViewModels.Rs {
         }
 
         public void CancelCommands() {
-            foreach(var item in Items) {
-                item.Cancel();
+            if(Items != null) {
+                foreach(var item in Items) {
+                    item?.Cancel();
+                }
+            }
+        }
+
+        public void RemoveCancellation() {
+            if(Items != null) {
+                foreach(var item in Items) {
+                    item?.RemoveCancellation();
+                }
             }
         }
 
         private Task LoadView() {
-            Items = new ObservableCollection<RsModelObjectViewModel>(
-                _serverClients
-                    .Select(item => new RsServerDataViewModel(item)));
+            if(Items is null) {
+                Items = new ObservableCollection<RsModelObjectViewModel>(
+                    _serverClients
+                        .Select(item => new RsServerDataViewModel(item)));
+            }
 
             return Task.CompletedTask;
         }

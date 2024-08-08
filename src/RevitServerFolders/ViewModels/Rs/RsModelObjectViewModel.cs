@@ -12,8 +12,7 @@ using RevitServerFolders.Models;
 
 namespace RevitServerFolders.ViewModels.Rs {
     internal class RsModelObjectViewModel : BaseViewModel {
-        protected readonly IServerClient _serverClient;
-        protected readonly CancellationTokenSource _cancellationTokenSource;
+        private protected readonly IServerClient _serverClient;
 
         private string _size;
         private ObservableCollection<RsModelObjectViewModel> _children;
@@ -23,7 +22,7 @@ namespace RevitServerFolders.ViewModels.Rs {
 
         protected RsModelObjectViewModel(IServerClient serverClient) {
             _serverClient = serverClient;
-            _cancellationTokenSource = new CancellationTokenSource();
+            CancellationTokenSource = new CancellationTokenSource();
 
             Children = new ObservableCollection<RsModelObjectViewModel>() { null };
             LoadChildrenCommand = RelayCommand.CreateAsync(LoadChildrenObjects, CanLoadChildrenObjects);
@@ -32,6 +31,8 @@ namespace RevitServerFolders.ViewModels.Rs {
 
         public AsyncRelayCommand LoadChildrenCommand { get; }
         public AsyncRelayCommand ReloadChildrenCommand { get; }
+
+        protected CancellationTokenSource CancellationTokenSource { get; private set; }
 
         public virtual string Name => "";
         public virtual string FullName => "";
@@ -64,7 +65,13 @@ namespace RevitServerFolders.ViewModels.Rs {
         }
 
         public void Cancel() {
-            _cancellationTokenSource.Cancel(true);
+            CancellationTokenSource.Cancel(true);
+        }
+
+        public void RemoveCancellation() {
+            if(CancellationTokenSource.IsCancellationRequested) {
+                CancellationTokenSource = new CancellationTokenSource();
+            }
         }
 
         protected virtual Task<IEnumerable<RsModelObjectViewModel>> GetChildrenObjects() {
