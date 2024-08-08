@@ -70,9 +70,7 @@ namespace RevitServerFolders.ViewModels.Rs {
         }
 
         public void RemoveCancellation() {
-            if(CancellationTokenSource.IsCancellationRequested) {
-                CancellationTokenSource = new CancellationTokenSource();
-            }
+            CancellationTokenSource = new CancellationTokenSource();
         }
 
         protected virtual Task<IEnumerable<RsModelObjectViewModel>> GetChildrenObjects() {
