@@ -7,39 +7,73 @@
 
 Решение проектов плагинов для Autodesk Revit.
 
-# Список плагинов
+# [Плагины вкладки "2D"](https://github.com/Bim4Everyone/2DExtensions) 
 
-| #   | Плагин                    | Проект                                                   | Справка                                                                 | Вкладка                                             | Панель         |
-|-----|---------------------------|----------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------|----------------|
-| 1.  | Настройки                 | [RevitPlatformSettings](src/RevitPlatformSettings)       | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829987)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Установки      |
-| 2.  | Печать                    | [RevitBatchPrint](src/RevitBatchPrint)                   | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829996)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Листы          |
-| 3.  | Поиск коллизий            | [RevitClashDetective](src/RevitClashDetective)           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830002)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Проверки       |
-| 4.  | Копирование стандартов    | [RevitCopyStandarts](src/RevitCopyStandarts)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67846251)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Прочее         |
-| 5.  | Управление видами         | [RevitCopyViews](src/RevitCopyViews)                     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829994)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Виды           |
-| 6.  | Управление листами        | [RevitCreateViewSheet](src/RevitCreateViewSheet)         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829996)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Листы          |
-| 7.  | Обозреватель семейств     | [RevitFamilyExplorer](src/RevitFamilyExplorer)           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829981)  | [Admin](https://github.com/dosymep/AdminExtensions) | Доработка      |
-| 8.  | Генерация таблиц выбора   | [RevitGenLookupTables](src/RevitGenLookupTables)         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829981)  | [Admin](https://github.com/dosymep/AdminExtensions) | Доработка      |
-| 9.  | Расстановщик перемычек    | [RevitLintelPlacement](src/RevitLintelPlacement)         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829981)  | [Admin](https://github.com/dosymep/AdminExtensions) | Доработка      |
-| 10. | Расстановщик отметок      | [RevitMarkPlacement](src/RevitMarkPlacement)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829985)  | [КР](https://github.com/dosymep/KRExtensions)       | Отметки        |
-| 11. | Задания на отверстия      | [RevitOpeningPlacement](src/RevitOpeningPlacement)       | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=116065713) | [BIM](https://github.com/dosymep/BIMExtensions)     | Отверстия      |
-| 12. | Шаблон плагинов Revit     | [RevitPlugins](src/RevitPlugins)                         | [GitHub](https://github.com/dosymep/RevitPluginTemplate)                | ###                                                 | ###            |
-| 13. | Квартирография            | [RevitRooms](src/RevitRooms)                             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67841778)  | [АР](https://github.com/dosymep/ARExtensions)       | Квартирография |
-| 14. | Экспорт Revit файлов      | [RevitServerFolders](src/RevitServerFolders)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830006)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Экспорт        |
-| 15. | Плагин СМР                | [RevitSetLevelSection](src/RevitSetLevelSection)         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=82619824)  | [BIM](https://github.com/dosymep/BIMExtensions)     | СМР            |
-| 16. | Супер фильтр              | [RevitSuperfilter](src/RevitSuperfilter)                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829991)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Выборка        |
-| 17. | Расстановщик проемов окон | [RevitWindowGapPlacement](src/RevitWindowGapPlacement)   | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829981)  | [BIM](https://github.com/dosymep/BIMExtensions)     | ###            |
-| 18. | Проверка уровней          | [RevitCheckingLevels](src/RevitCheckingLevels)           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | [BIM](https://github.com/dosymep/BIMExtensions)     | СМР            |
-| 19. | Копирование зон СМР       | [RevitCopingZones](src/RevitCopingZones)                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | [BIM](https://github.com/dosymep/BIMExtensions)     | СМР            |
-| 20. | Документация пилонов      | [RevitPylonDocumentation](src/RevitPylonDocumentation)   | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829985)  | [КР](https://github.com/dosymep/KRExtensions)       | Документация   |
-| 21. | Удалить неиспользуемые    | [RevitDeleteUnused](src/RevitDeleteUnused)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830008)  | [BIM](https://github.com/dosymep/BIMExtensions)     | Прочее         |
-| 22. | Выгрузить объемы          | [RevitMepTotals](src/RevitMepTotals)                     | [Confluence]()                                                          | [BIM](https://github.com/dosymep/BIMExtensions)     | Экспорт        |
-| 23. | Маркировать помещения     | [RevitRoomTagPlacement](src/RevitRoomTagPlacement)       | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Квартирография |
-| 24. | Удалить марки помещений   | [RevitRemoveRoomTags](src/RevitRemoveRoomTags)           | [Confluence]()                                                          | [АР](https://github.com/dosymep/ARExtensions)       | Прочее         |
-| 25. | Отделка стен              | [RevitFinishingWalls](src/RevitFinishingWalls)           | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
-| 26. | Конструктор секций        | [RevitSectionsConstructor](src/RevitSectionsConstructor) | [Confluence]()                                                          | [BIM](https://github.com/Bim4Everyone/BIMExtensions)| ОПП            |
-| 27. | Планы квартир             | [RevitApartmentPlans](src/RevitApartmentPlans)           | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | Документация   |
-| 28. | Декларации                | [RevitDeclarations](src/RevitDeclarations)               | [Confluence]()                                                          | [АР](https://github.com/Bim4Everyone/ARExtensions)  | Декларации     |
-| 29. | Откосы                    | [RevitOpeningSlopes](src/RevitOpeningSlopes)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134086806) | [АР](https://github.com/Bim4Everyone/ARExtensions)  | РД             |
+| Плагин                     | Проект                                                                 | Справка                                                                 | Панель         |
+|----------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------|----------------|
+| Управление видами          | [RevitCopyViews](src/RevitCopyViews)                                   | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829994)  | Виды           |
+| Печать                     | [RevitBatchPrint](src/RevitBatchPrint)                                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829996)  | Листы          |
+| Управление листами         | [RevitCreateViewSheet](src/RevitCreateViewSheet)                       | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829996)  | Листы          |
+
+# [Плагины вкладки "BIM"](https://github.com/dosymep/BIMExtensions) 
+
+| Плагин                     | Проект                                                                 | Справка                                                                 | Панель         |
+|----------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------|----------------|
+| Раскрасить элементы        | [RevitOverridingGraphicsInViews](src/RevitOverridingGraphicsInViews)   | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110560978) | Анализ         |
+| Создание фильтров          | [RevitCreatingFiltersByValues](src/RevitCreatingFiltersByValues)       | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110560978) | Анализ         |
+| Суперфильтр                | [RevitSuperfilter](src/RevitSuperfilter)                               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829991)  | Выборка        |
+| Конструктор секций         | [RevitSectionsConstructor](src/RevitSectionsConstructor)               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134094948) | ОПП            |
+| Задания на отверстия       | [RevitOpeningPlacement](src/RevitOpeningPlacement)                     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110562449) | Отверстия      |
+| Поиск коллизий             | [RevitClashDetective](src/RevitClashDetective)                         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830002)  | Проверки       |
+| Удалить неиспользуемые     | [RevitDeleteUnused](src/RevitDeleteUnused)                             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830008)  | Прочее         |
+| Копирование стандартов     | [RevitCopyStandarts](src/RevitCopyStandarts)                           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67846251)  | Прочее         |
+| Плагин СМР                 | [RevitSetLevelSection](src/RevitSetLevelSection)                       | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | СМР            |
+| Проверка уровней           | [RevitCheckingLevels](src/RevitCheckingLevels)                         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | СМР            |
+| Копирование зон СМР        | [RevitCopingZones](src/RevitCopingZones)                               | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | СМР            |
+| Редактор зон СМР           | [RevitEditingZones](src/RevitEditingZones)                             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | СМР            |
+| Изолировать по параметру   | [RevitIsolateByParameter](src/RevitIsolateByParameter)                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67844245)  | СМР            |
+| Настройки                  | [RevitPlatformSettings](src/RevitPlatformSettings)                     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829987)  | Установки      |
+| Выгрузить объемы           | [RevitMepTotals](src/RevitMepTotals)                                   | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830006)  | Экспорт        |
+| Экспорт Revit файлов       | [RevitServerFolders](src/RevitServerFolders)                           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67830006)  | Экспорт        |
+
+# [Плагины вкладки "АР"](https://github.com/Bim4Everyone/ARExtensions) 
+
+| Плагин                     | Проект                                                                 | Справка                                                                 | Панель         |
+|----------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------|----------------|
+| ВОР кладка                 | [RevitVolumeOfWork](src/RevitVolumeOfWork)                             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110564557) | ВОР            |
+| Декларации                 | [RevitDeclarations](src/RevitDeclarations)                             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134087701) | Декларации     |
+| Архитектурная документация | [RevitArchitecturalDocumentation](src/RevitArchitecturalDocumentation) | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=124914407) | Документация   |
+| Планы квартир              | [RevitApartmentPlans](src/RevitApartmentPlans)                         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=124914407) | Документация   |
+| Квартирография             | [RevitRooms](src/RevitRooms)                                           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67841778)  | Квартирография |
+| Маркировать помещения      | [RevitRoomTagPlacement](src/RevitRoomTagPlacement)                     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67841778)  | Квартирография |
+| Удалить марки помещений    | [RevitRemoveRoomTags](src/RevitRemoveRoomTags)                         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67841778)  | Прочее         |
+| Отделка стен               | [RevitFinishingWalls](src/RevitFinishingWalls)                         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134086800) | РД             |
+| Откосы                     | [RevitOpeningSlopes](src/RevitOpeningSlopes)                           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134086806) | РД             |
+
+# [Плагины вкладки "КР"](https://github.com/dosymep/KRExtensions) 
+
+| Плагин                     | Проект                                                                 | Справка                                                                 | Панель         |
+|----------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------|----------------|
+| Коэффициент армирования    | [RevitReinforcementCoefficient](src/RevitReinforcementCoefficient)     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134086754) | ВОР            |
+| Документация пилонов       | [RevitPylonDocumentation](src/RevitPylonDocumentation)                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110562599) | Документация   |
+| Встряхнуть спецификации    | [RevitShakeSpecs](src/RevitShakeSpecs)                                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110562599) | Документация   |
+| Расстановщик отметок       | [RevitMarkPlacement](src/RevitMarkPlacement)                           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110563932) | Отметки        |
+| Параметры в семейство      | [RevitFamilyParameterAdder](src/RevitFamilyParameterAdder)             | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110563791) | Параметры      |
+
+# [Плагины вкладки "Admin"](https://github.com/dosymep/AdminExtensions) 
+
+| Плагин                     | Проект                                                                 | Справка                                                                 | Панель         |
+|----------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------|----------------|
+| Обозреватель семейств      | [RevitFamilyExplorer](src/RevitFamilyExplorer)                         | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829981)  | Доработка      |
+| Генерация таблиц выбора    | [RevitGenLookupTables](src/RevitGenLookupTables)                       | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67829981)  | Доработка      |
+| Расстановщик перемычек     | [RevitLintelPlacement](src/RevitLintelPlacement)                       | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=67841780)  | Доработка      |
+
+# Прочие плагины
+
+| Плагин                     | Проект                                                                 | Справка                                                                 | Панель         |
+|----------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------|----------------|
+| Шаблон плагинов Revit      | [RevitPlugins](src/RevitPlugins)                                       | [GitHub](https://github.com/dosymep/RevitPluginTemplate)                | ###            |
+| Пример плагина             | [RevitExamplePlugin](src/RevitExamplePlugin)                           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134094900) | Example        |
 
 # Сборка проекта
 
