@@ -173,63 +173,61 @@
                 </dxg:TableView>
             </dxg:GridControl.View>
 
-            <dxg:GridControl.Columns>
-                <dxg:GridColumn
-                    Binding="{Binding SkipObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
-                    Header=""
-                    AllowEditing="True"
-                    AllowMoving="False"
-                    AllowResizing="False"
-                    AllowSorting="False"
-                    AllowGrouping="False"
-                    AllowAutoFilter="False"
-                    AllowColumnFiltering="False"
-                    Width="43"
-                    MinWidth="43"
-                    MaxWidth="43"
-                    ShowCheckBoxInHeader="True">
+            <dxg:GridColumn
+                Binding="{Binding SkipObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
+                Header=""
+                AllowEditing="True"
+                AllowMoving="False"
+                AllowResizing="False"
+                AllowSorting="False"
+                AllowGrouping="False"
+                AllowAutoFilter="False"
+                AllowColumnFiltering="False"
+                Width="43"
+                MinWidth="43"
+                MaxWidth="43"
+                ShowCheckBoxInHeader="True">
 
-                    <dxg:GridColumn.CellTemplate>
-                        <DataTemplate>
-                            <dxe:CheckEdit
-                                x:Name="PART_Editor"
-                                EditValue="{Binding RowData.Row.SkipObject, 
-                            UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center" />
-                        </DataTemplate>
-                    </dxg:GridColumn.CellTemplate>
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate>
+                        <dxe:CheckEdit
+                            x:Name="PART_Editor"
+                            EditValue="{Binding RowData.Row.SkipObject, 
+                        UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
 
-                </dxg:GridColumn>
+            </dxg:GridColumn>
 
-                <dxg:GridColumn
-                    Width="25"
-                    MinWidth="25"
-                    MaxWidth="25"
-                    AllowMoving="False"
-                    AllowSorting="False"
-                    AllowResizing="False"
-                    AllowGrouping="False"
-                    UnboundType="Object"
-                    Header="">
+            <dxg:GridColumn
+                Width="25"
+                MinWidth="25"
+                MaxWidth="25"
+                AllowMoving="False"
+                AllowSorting="False"
+                AllowResizing="False"
+                AllowGrouping="False"
+                UnboundType="Object"
+                Header="">
 
-                    <dxg:GridColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type dxg:EditGridCellData}">
-                            <Image
-                                Source="{Binding RowData.Row, 
-                                    Converter={StaticResource CellImageConverter}}" />
-                        </DataTemplate>
-                    </dxg:GridColumn.CellTemplate>
+                <dxg:GridColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type dxg:EditGridCellData}">
+                        <Image
+                            Source="{Binding RowData.Row, 
+                                Converter={StaticResource CellImageConverter}}" />
+                    </DataTemplate>
+                </dxg:GridColumn.CellTemplate>
 
-                </dxg:GridColumn>
+            </dxg:GridColumn>
 
-                <dxg:GridColumn
-                    FieldName="Name"
-                    Header="Наименование" />
-                <dxg:GridColumn
-                    FieldName="FullName"
-                    Header="Полное наименование" />
-            </dxg:GridControl.Columns>
+            <dxg:GridColumn
+                FieldName="Name"
+                Header="Наименование" />
+            <dxg:GridColumn
+                FieldName="FullName"
+                Header="Полное наименование" />
         </dxg:GridControl>
 
         <StackPanel
