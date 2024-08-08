@@ -202,11 +202,11 @@ namespace RevitServerFolders.ViewModels {
             if(modelObject != null) {
                 IEnumerable<ModelObject> modelObjects = await modelObject.GetChildrenObjects();
 
-                AddModelObjects(modelObjects);
+                AddModelObjects(modelObjects, _pluginConfig.SkippedObjects);
             }
         }
 
-        private void AddModelObjects(IEnumerable<ModelObject> modelObjects) {
+        private void AddModelObjects(IEnumerable<ModelObject> modelObjects, string[] skippedObjects) {
             lock(_locker) {
                 ModelObjects.Clear();
 
@@ -218,7 +218,7 @@ namespace RevitServerFolders.ViewModels {
                 }
 
                 foreach(ModelObjectViewModel modelObjectViewModel in ModelObjects) {
-                    modelObjectViewModel.SkipObject = _pluginConfig.SkippedObjects?
+                    modelObjectViewModel.SkipObject = skippedObjects?
                         .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
                 }
             }
