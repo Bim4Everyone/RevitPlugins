@@ -45,7 +45,7 @@ namespace RevitMechanicalSpecification.Service {
 
         private VisSystem GetVisSystem(Element element) {
             if(element is FamilyInstance instance) {
-                element = GetSuperComponentIfExist(instance);
+                element = instance.GetSuperComponentIfExist();
             }
 
             string systemName = element.GetParamValueOrDefault(BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue);

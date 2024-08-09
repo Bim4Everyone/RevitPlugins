@@ -14,7 +14,7 @@ namespace RevitMechanicalSpecification.Service {
     public static class MaskReplacer {
 
         private static string GetStringValue(Element element, Element elemType, string paramName) {
-            double value = DataOperator.GetTypeOrInstanceParamDoubleValue(element, elemType, paramName);
+            double value = element.GetTypeOrInstanceParamDoubleValue(elemType, paramName);
 
             value = UnitConverter.DoubleToMilimeters(value);
 
@@ -23,7 +23,7 @@ namespace RevitMechanicalSpecification.Service {
 
         public static string ReplaceMask(Element element, string maskName) {
             Element elemType = element.GetElementType();
-            string mask = DataOperator.GetTypeOrInstanceParamStringValue(element, elemType, maskName);
+            string mask = element.GetTypeOrInstanceParamStringValue(elemType, maskName);
 
             if(mask == null) {
                 return null;

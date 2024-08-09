@@ -190,7 +190,8 @@ namespace RevitMechanicalSpecification.Service {
             if(duct is null) {
                 return "!Не учитывать";
             }
-            return DataOperator.GetTypeOrInstanceParamStringValue(duct, duct.GetElementType(), _specConfiguration.OriginalParamNameMark);
+
+            return duct.GetTypeOrInstanceParamStringValue(duct.GetElementType(), _specConfiguration.OriginalParamNameMark);
         }
 
         //получение имени фитинга воздуховода

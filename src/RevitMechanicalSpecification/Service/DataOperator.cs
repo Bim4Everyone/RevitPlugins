@@ -11,17 +11,18 @@ using dosymep.Revit;
 namespace RevitMechanicalSpecification.Service {
     public static class DataOperator {
         //возвращает значение параметра по типу или экземпляру, если существует, иначе null
-        public static string GetTypeOrInstanceParamStringValue(Element element, Element elemType, string paraName) {
+        public static string GetTypeOrInstanceParamStringValue(this Element element, Element elemType, string paraName) {
             if(element.IsExistsParam(paraName)) {
                 return element.GetSharedParamValueOrDefault<string>(paraName);
             }
             if(elemType.IsExistsParam(paraName)) {
                 return elemType.GetSharedParamValueOrDefault<string>(paraName);
             }
+
             return null;
         }
 
-        public static double GetTypeOrInstanceParamDoubleValue(Element element, Element elemType, string paraName) {
+        public static double GetTypeOrInstanceParamDoubleValue(this Element element, Element elemType, string paraName) {
             if(element.IsExistsParam(paraName)) {
                 return element.GetSharedParamValueOrDefault<double>(paraName);
             }
@@ -31,7 +32,20 @@ namespace RevitMechanicalSpecification.Service {
             return 0;
         }
 
+
+        //если есть суперкомпонент - возвращает его. Иначе возвращает исходник
+        public static FamilyInstance GetSuperComponentIfExist(this FamilyInstance instance) {
+            if(!(instance.SuperComponent is null)) {
+                instance = (FamilyInstance) instance.SuperComponent;
+                instance = GetSuperComponentIfExist(instance);
+            }
+
+            return instance;
+        }
+
     }
+
+
 
 
 
