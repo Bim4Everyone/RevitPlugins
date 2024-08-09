@@ -159,8 +159,8 @@ namespace RevitRoomTagPlacement.Models {
                         if(newTag?.get_BoundingBox(activeView) == null) {
                             Document.Delete(newTag.Id);
                         }
-                        else if(newTag != null) { 
-                            newTag.ChangeTypeId(selectedTagType);
+                        else { 
+                            newTag?.ChangeTypeId(selectedTagType);
                         }
                     }
                 }
