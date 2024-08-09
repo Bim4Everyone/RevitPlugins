@@ -18,7 +18,6 @@ namespace RevitMechanicalSpecification.Service {
             if(elemType.IsExistsParam(paraName)) {
                 return elemType.GetSharedParamValueOrDefault<string>(paraName);
             }
-
             return null;
         }
 

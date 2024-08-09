@@ -30,50 +30,60 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
 
         private string DefaultCheck(string defaultUnit) {
-            //string unit = GetTypeOrInstanceParamValue(element);
             string unit = FromParam.AsValueString();
 
-            if(unit == null) { return defaultUnit; }
-
-            if(_linearNames.Contains(unit)) { return Config.MeterUnit; }
-            if(_squareNames.Contains(unit)) { return Config.SquareUnit; }
-            if(_singleNames.Contains(unit)) { return Config.SingleUnit; }
-            if(_kitNames.Contains(unit)) { return Config.SingleUnit; }
+            if(unit == null) {
+                return defaultUnit;
+            }
+            if(_linearNames.Contains(unit)) {
+                return Config.MeterUnit;
+            }
+            if(_squareNames.Contains(unit)) {
+                return Config.SquareUnit;
+            }
+            if(_singleNames.Contains(unit)) {
+                return Config.SingleUnit;
+            }
+            if(_kitNames.Contains(unit)) {
+                return Config.SingleUnit;
+            }
             return defaultUnit;
         }
 
         public string GetUnit(Element element) {
-            if(element.InAnyCategory(new List<BuiltInCategory>() { 
-                BuiltInCategory.OST_DuctCurves, 
-                BuiltInCategory.OST_PipeCurves, 
-                BuiltInCategory.OST_FlexDuctCurves, 
-                BuiltInCategory.OST_FlexPipeCurves }))
-                { return DefaultCheck(Config.MeterUnit); }
+            if(element.InAnyCategory(new List<BuiltInCategory>() {
+                BuiltInCategory.OST_DuctCurves,
+                BuiltInCategory.OST_PipeCurves,
+                BuiltInCategory.OST_FlexDuctCurves,
+                BuiltInCategory.OST_FlexPipeCurves })) {
+                return DefaultCheck(Config.MeterUnit);
+            }
 
             if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
                 if(Config.IsSpecifyDuctFittings) { return Config.SingleUnit; }
                 return Config.SquareUnit;
             }
-
-            if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) 
-                { return DefaultCheck(Config.SquareUnit); }
-            if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) 
-                { return DefaultCheck(Config.MeterUnit); }
+            if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
+                return DefaultCheck(Config.SquareUnit);
+            }
+            if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) {
+                return DefaultCheck(Config.MeterUnit);
+            }
 
             return Config.SingleUnit;
         }
 
 
         public ElementParamUnitFiller(
-            string toParamName, 
-            string fromParamName, 
+            string toParamName,
+            string fromParamName,
             SpecConfiguration specConfiguration,
-            Document document) : 
+            Document document) :
             base(toParamName, fromParamName, specConfiguration, document) {
         }
 
         public override void SetParamValue(Element element) {
-            ToParam.Set(GetUnit(element)); 
+            ToParam.Set(GetUnit(element));
         }
     }
 }

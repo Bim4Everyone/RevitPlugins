@@ -14,11 +14,14 @@ using RevitMechanicalSpecification.Service;
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNumberFiller : ElementParamFiller {
 
+        private readonly VisElementsCalculator _calculator;
+
         public ElementParamNumberFiller(string toParamName,
             string fromParamName,
             SpecConfiguration specConfiguration,
             Document document) :
             base(toParamName, fromParamName, specConfiguration, document) {
+            _calculator = new VisElementsCalculator(Config, Document);
         }
 
         private bool LinearLogicalFilter(Element element) {
@@ -34,10 +37,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             //написать зачем нужно
             double number = 0;
             string unit;
-            VisElementsCalculator calculator = new VisElementsCalculator(Config, Document);
-
-
             unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);
+
             //расписать почему что возвращается
             if(unit == Config.SingleUnit || unit == Config.KitUnit) {
                 return 1;
@@ -46,11 +47,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
                     InsulationLiningBase insulation = element as InsulationLiningBase;
                     Element host = Document.GetElement(insulation.HostElementId);
-                    return calculator.GetFittingArea(host);
+                    return _calculator.GetFittingArea(host);
 
                 }
                 if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
-                    return calculator.GetFittingArea(element);
+                    return _calculator.GetFittingArea(element);
                 }
                 if(LinearLogicalFilter(element)) {
                     return UnitConverter.DoubleToSquareMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA));

@@ -27,17 +27,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             _nameAndGroupFactory = nameAndGroupFactory;
         }
 
-
-
-
-
         public override void SetParamValue(Element element) {
             if(ManifoldInstance != null) {
                 ToParam.Set("‎    " + Count.ToString() + ". " + _nameAndGroupFactory.GetName(element, ElemType));
             } else {
                 ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedName, _nameAndGroupFactory.GetName(element, ElemType)));
             }
-
         }
     }
 }

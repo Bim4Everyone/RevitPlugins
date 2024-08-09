@@ -25,12 +25,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             { 
             _systemList = systemList;
             _nameFactory = new SystemAndFunctionNameFactory(Document, _systemList);
-
-
         } 
             
-        
-
         private string GetSystemName(Element element) 
             {
             return _nameFactory.GetSystemValue(element);
@@ -38,7 +34,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public override void SetParamValue(Element element) {
             ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedSystemName, GetSystemName(element)));
-            ;
         }
     }
 }

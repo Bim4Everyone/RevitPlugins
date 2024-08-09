@@ -30,42 +30,40 @@ namespace RevitMechanicalSpecification.Service {
         //Ниже операции с именами
         //Базовое имя
         public string GetName(Element element, Element elemType) {
-            //Element elemType = element.GetElementType();
             string name = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameName);
 
             if(string.IsNullOrEmpty(name)) {
                 name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ";
             }
-            if(element.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
-                { name += _calculator.GetDuctName(element, elemType); }
-            }
-            if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
-                { name = _calculator.GetDuctFittingName(element); }
-            }
-            if(element.Category.IsId(BuiltInCategory.OST_PipeFitting)) {
-                //Если учет фитингов труб отключен в проекте, не учитываем. Если включен в проекте, но выключен в трубе - не учитываем
-                bool isSpecifyPipeFitting = _calculator.IsSpecifyPipeFittingName(element);
-
-                if(!isSpecifyPipeFitting) {
-                    name = "!Не учитывать";
-                }
-            }
-            if(element.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
-                name += _calculator.GetPipeSize(element, elemType);
-            }
-            if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) {
-
-                var insulation = element as InsulationLiningBase;
-                Element pipe = _document.GetElement(insulation.HostElementId);
-
-                if(!(pipe is null)) { name += " (Для: " + GetName(pipe, pipe.GetElementType()) + ")"; }
-            }
-
-            if(element.Category.IsId(BuiltInCategory.OST_DuctAccessory)) {
-                string mask = MaskReplacer.ReplaceMask(element, "ФОП_ВИС_Маска наименования");
-                if(mask != null) {
-                    name = mask;
-                }
+            Category category = element.Category;
+            switch(category.GetBuiltInCategory()) {
+                case BuiltInCategory.OST_DuctCurves:
+                    return name += _calculator.GetDuctName(element, elemType);
+                case BuiltInCategory.OST_DuctFitting:
+                    return _calculator.GetDuctFittingName(element);
+                case BuiltInCategory.OST_PipeFitting:
+                    //Если учет фитингов труб отключен в проекте, не учитываем. Если включен в проекте, но выключен в трубе - не учитываем
+                    bool isSpecifyPipeFitting = _calculator.IsSpecifyPipeFittingName(element);
+                    if(!isSpecifyPipeFitting) {
+                        return "!Не учитывать";
+                    }
+                    break;
+                case BuiltInCategory.OST_PipeCurves:
+                    return name += _calculator.GetPipeSize(element, elemType);
+                case BuiltInCategory.OST_PipeInsulations:
+                    InsulationLiningBase insulation = element as InsulationLiningBase;
+                    Element pipe = _document.GetElement(insulation.HostElementId);
+                    if(pipe is null) {
+                        return "!Не учитывать";
+                    } else {
+                        return name += " (Для: " + GetName(pipe, pipe.GetElementType()) + ")";
+                    }
+                case BuiltInCategory.OST_DuctAccessory:
+                    string mask = MaskReplacer.ReplaceMask(element, "ФОП_ВИС_Маска наименования");
+                    if(mask != null) {
+                        return mask;
+                    }
+                    break;
             }
 
             return name;
@@ -113,6 +111,10 @@ namespace RevitMechanicalSpecification.Service {
             Element elemType = element.GetElementType();
 
             string name = GetName(element, elemType);
+
+            //string mark = "mark";
+            //string code = "code";
+            //string creator = "creator";
 
             string mark = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameMark);
             string code = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameCode);

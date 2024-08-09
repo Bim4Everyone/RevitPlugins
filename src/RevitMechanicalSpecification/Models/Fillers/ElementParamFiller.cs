@@ -31,11 +31,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
 
         public ElementParamFiller(
-            string toParamName, 
-            string fromParamName, 
-            SpecConfiguration specConfiguration, 
-            Document document) 
-        {
+            string toParamName,
+            string fromParamName,
+            SpecConfiguration specConfiguration,
+            Document document) {
             ToParamName = toParamName;
             FromParamName = fromParamName;
             _config = specConfiguration;
@@ -44,30 +43,19 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public abstract void SetParamValue(Element element);
 
-        //protected string GetTypeOrInstanceParamValue(Element element) {
-        //    if(element.IsExistsParam(FromParamName)) 
-        //        { return element.GetSharedParamValue<string>(FromParamName); }
-        //    if(ElemType.IsExistsParam(FromParamName)) 
-        //        { return ElemType.GetSharedParamValue<string>(FromParamName); }
-        //    return null;
-        //}
 
-        private Parameter GetTypeOrInstanceParam(Element element, string paramName) 
-            {
-            if(paramName is null) 
-                { return null; }
-            if(element.IsExistsParam(paramName))
-                //{ return element.GetParam(paramName); }
-                {  return element.LookupParameter(paramName); }
-            if(ElemType.IsExistsParam(paramName))
-                //{ return ElemType.GetParam(paramName); }
-                { return ElemType.LookupParameter(paramName); }
-            return null;
+        private Parameter GetTypeOrInstanceParam(Element element, string paramName) {
+            if(paramName is null) {
+                return null;
+            } 
+            Parameter parameter = element.LookupParameter(paramName) ?? ElemType.LookupParameter(paramName);
+            if(parameter == null) {
+                return null;
+            }
+            return parameter;
         }
 
-        public void Fill(Element manifoldElement, FamilyInstance familyInstance, int count = 0)
-        {
-            //ElemType = element.GetElementType();
+        public void Fill(Element manifoldElement, FamilyInstance familyInstance, int count = 0) {
             ElemType = Document.GetElement(manifoldElement.GetTypeId());
 
 
