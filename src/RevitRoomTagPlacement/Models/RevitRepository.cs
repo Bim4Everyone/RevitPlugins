@@ -152,17 +152,21 @@ namespace RevitRoomTagPlacement.Models {
                         RoomTag newTag;
 
                         if(room.LinkId == null) {
-                            newTag = Document.Create.NewRoomTag(new LinkElementId(room.RoomObject.Id), point, activeView.Id);
+                            LinkElementId linkElementId = new LinkElementId(room.RoomObject.Id);
+                            newTag = Document.Create.NewRoomTag(linkElementId, point, activeView.Id);
                         } 
                         else {
-                            newTag = Document.Create.NewRoomTag(new LinkElementId(room.LinkId, room.RoomObject.Id), point, activeView.Id);
+                            LinkElementId linkElementId = new LinkElementId(room.LinkId, room.RoomObject.Id);
+                            newTag = Document.Create.NewRoomTag(linkElementId, point, activeView.Id);
                         }
 
-                        if(newTag?.get_BoundingBox(activeView) == null) {
-                            Document.Delete(newTag.Id);
-                        }
-                        else { 
-                            newTag?.ChangeTypeId(selectedTagType);
+                        if(newTag != null) {
+                            if(newTag.get_BoundingBox(activeView) == null) {
+                                Document.Delete(newTag.Id);
+                            }
+                            else {
+                                newTag.ChangeTypeId(selectedTagType);
+                            }
                         }
                     }
                 }
