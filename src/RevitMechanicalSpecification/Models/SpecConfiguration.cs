@@ -67,6 +67,9 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string MeterUnit = "м.п.";
         public readonly string SquareUnit = "м²";
 
+        public readonly string MaskMarkName = "ФОП_ВИС_Маска марки";
+        public readonly string MaskNameName = "ФОП_ВИС_Маска наименования";
+
 
         public SpecConfiguration(ProjectInfo info) {
             OriginalParamNameName = info.GetParamValueOrDefault(_changedNameName, "ADSK_Наименование");

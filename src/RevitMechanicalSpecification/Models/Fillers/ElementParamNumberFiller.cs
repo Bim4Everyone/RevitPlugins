@@ -37,7 +37,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         private double GetNumber(Element element) {
-
+            //Если в проекте уже есть обработанные части узлов, и элемент не является линейным, проверяем встречался ли он.
+            //Если встречался и идет одиночная обработка вложений в узел - зануляем
             if(ManifoldParts != null) { 
                 if(!element.InAnyCategory(new HashSet<BuiltInCategory>() {
                     BuiltInCategory.OST_DuctCurves,
@@ -52,15 +53,15 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 }
             }
 
-            //написать зачем нужно
             double number = 0;
             string unit;
             unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);
 
-            //расписать почему что возвращается
+            //Если единица измерения штуки или комплекты - возвращаем 1
             if(unit == Config.SingleUnit || unit == Config.KitUnit) {
                 return 1;
             }
+            //Если единица измерения метры квадратные - забираем или высчитываем(для фитингов) площадь в дабл и переводим в метры квадратные
             if(unit == Config.SquareUnit) {
                 if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
                     InsulationLiningBase insulation = element as InsulationLiningBase;
@@ -75,6 +76,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return UnitConverter.DoubleToSquareMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA));
                 }
             }
+            //Если единица измерения метры погонные - забираем длину и переводим в метры
             if(unit == Config.MeterUnit) {
                 if(LinearLogicalFilter(element)) {
                     return UnitConverter.DoubleToMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH));

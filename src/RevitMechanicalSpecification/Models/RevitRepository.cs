@@ -122,7 +122,12 @@ namespace RevitMechanicalSpecification.Models {
         private readonly SpecConfiguration _specConfiguration;
         private readonly VisElementsCalculator _calculator;
 
-
+        public void ShowReport(List<string> editors) {
+            if(editors.Count != 0) {
+                MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
+                    + string.Join(", ", editors.ToArray()));
+            }
+        }
 
         private string IsEditedBy(string userName, Element element) {
 
@@ -137,17 +142,6 @@ namespace RevitMechanicalSpecification.Models {
             return null;
         }
 
-        private void ProcessElement(Element element, List<ElementParamFiller> fillers) {
-            if(!_nameAndGroupFactory.IsManifold(element)) {
-                foreach(var filler in fillers) {
-                    filler.Fill(element);
-                }
-            }
-        }
-
-
-
-
         private ManifoldPart CreateManifoldParts(Element element, string group) {
             Element elemType = element.GetElementType();
             if(!_nameAndGroupFactory.IsOutSideOfManifold(elemType)) {
@@ -159,35 +153,86 @@ namespace RevitMechanicalSpecification.Models {
             return null;
         }
 
+        private void ProcessElements(List<ElementParamFiller> fillers) {
+            string userName = UIApplication.Application.Username.ToLower();
+            List<string> editors = new List<string>();
+
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+            using(var t = Document.StartTransaction("Обновление спецификации")) {
+                foreach(var element in _elements) {
+                    string editor = IsEditedBy(userName, element);
+                    if(!string.IsNullOrEmpty(editor)) {
+                        if(!editors.Contains(editor)) {
+                            editors.Add(editor);
+                        }
+                        continue;
+                    }
+
+                    if(ManifoldParts.Where(part => part.Id == element.Id).ToHashSet().Count > 0) {
+                        continue;
+                    };
+
+                    ProcessElement(element, fillers);
+                    ProcessManifoldElement(element, fillers);
+                }
+
+                t.Commit();
+
+                ShowReport(editors);
+
+                stopWatch.Stop();
+                // Get the elapsed time as a TimeSpan value.
+                TimeSpan ts = stopWatch.Elapsed;
+
+                // Format and display the TimeSpan value.
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds,
+                    ts.Milliseconds / 10);
+                MessageBox.Show(elapsedTime);
+
+            }
+        }
+
+        private void ProcessElement(Element element, List<ElementParamFiller> fillers) {
+            if(!_nameAndGroupFactory.IsManifold(element)) {
+                foreach(var filler in fillers) {
+                    filler.Fill(element);
+                }
+            }
+        }
+
         private void ProcessManifoldElement(Element element, List<ElementParamFiller> fillers) {
             Element elemType = element.GetElementType();
             if(_nameAndGroupFactory.IsManifold(elemType)) {
-                int count = 1;
+                int positionNumber = 1;
                 FamilyInstance familyInstance = element as FamilyInstance;
 
+                //Сортируем по параметру группирования, чтоб присвоить нумерацию узлу
+                List<Element> manifoldElements = _nameAndGroupFactory.GetSub(familyInstance)
+                    .OrderBy(e => _nameAndGroupFactory.GetGroup(e))
+                    .Where(e => !_nameAndGroupFactory.IsOutSideOfManifold(e.GetElementType()))
+                    .ToList();
 
-                List<Element> manifoldElements =
-                    _nameAndGroupFactory.GetSub(familyInstance).OrderBy
-                    (e => {
-                        string group = _nameAndGroupFactory.GetGroup(e);
-                        return group;
-                    }
-                    ).ToList();
+                //Если не стоит галочка "Исключить из узла", проверяем меняется ли номер элемента в узле и отправляем элемент в филлеры
+                foreach(Element subElement in manifoldElements) {
+                    Element subElementType = subElement.GetElementType();
+                    int index = manifoldElements.IndexOf(subElement);
 
-                foreach(Element manifoldElement in manifoldElements) {
-                    Element manifoldElemType = manifoldElement.GetElementType();
-                    if(!_nameAndGroupFactory.IsOutSideOfManifold(manifoldElemType)) {
-                        int index = manifoldElements.IndexOf(manifoldElement);
-                        if(_nameAndGroupFactory.IsIncreaseCount(manifoldElements, index, manifoldElement, elemType)) {
-                            count++;
-                        }
-                        ProcessManifoldSubElement(fillers, manifoldElement, familyInstance, count);
+                    if(_nameAndGroupFactory.IsIncreaseCount(manifoldElements, index, subElement, subElementType)) {
+                        positionNumber++;
                     }
+
+                    ProcessManifoldSubElement(fillers, subElement, familyInstance, positionNumber);
                 }
 
-                foreach(Element manifoldElement in manifoldElements) {
-                    string group = _nameAndGroupFactory.GetGroup(manifoldElement);
-                    ManifoldPart part = CreateManifoldParts(manifoldElement, group);
+                //После того как сабэлементы узла были отработаны филлерами - закидываем их в экземпляры класса части узла,
+                //чтоб при следующей встрече в узловой обработке иметь возможность занулить их число в филлере числа
+                //И проигнорировать при встрече в обработке вне узловой
+                foreach(Element subElement in manifoldElements) {
+                    string group = _nameAndGroupFactory.GetGroup(subElement);
+                    ManifoldPart part = CreateManifoldParts(subElement, group);
+
                     if(part != null) {
                         ManifoldParts.Add(part);
                     }
@@ -195,82 +240,44 @@ namespace RevitMechanicalSpecification.Models {
             }
         }
 
-            private void ProcessManifoldSubElement(
-                List<ElementParamFiller> fillers,
-                Element manifoldElement,
-                FamilyInstance familyInstance,
-                int count) {
-                foreach(var filler in fillers) {
-                    filler.Fill(manifoldElement, familyInstance, count, ManifoldParts);
+        private void ProcessManifoldSubElement(
+            List<ElementParamFiller> fillers,
+            Element manifoldElement,
+            FamilyInstance familyInstance,
+            int count) {
+            foreach(var filler in fillers) {
+                filler.Fill(manifoldElement, familyInstance, count, ManifoldParts);
+            }
+        }
+
+        public void SpecificationRefresh() {
+            ProcessElements(_fillersSpecRefresh);
+        }
+
+        public void RefreshSystemName() {
+            ProcessElements(_fillersSystemRefresh);
+        }
+
+        public void RefreshSystemFunction() {
+            ProcessElements(_fillersFunctionRefresh);
+        }
+
+        public void FullRefresh() {
+            List<ElementParamFiller> fillers = new List<ElementParamFiller>();
+            fillers.AddRange(_fillersSpecRefresh);
+            fillers.AddRange(_fillersFunctionRefresh);
+            fillers.AddRange(_fillersSystemRefresh);
+            ProcessElements(fillers);
+        }
+
+        public void ReplaceMask() {
+            using(var t = Document.StartTransaction("Сформировать имя")) {
+                foreach(Element element in _elements) {
+                    MaskReplacer.ReplaceMask(element, _specConfiguration.MaskMarkName, "ADSK_Марка");
+                    MaskReplacer.ReplaceMask(element, _specConfiguration.MaskNameName, "ADSK_Наименование");
                 }
-            }
-            private void ProcessElements(List<ElementParamFiller> fillers) {
-                string userName = UIApplication.Application.Username.ToLower();
-                List<string> editors = new List<string>();
-
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
-                using(var t = Document.StartTransaction("Обновление спецификации")) {
-                    foreach(var element in _elements) {
-                        string editor = IsEditedBy(userName, element);
-                        if(!string.IsNullOrEmpty(editor)) {
-                            if(!editors.Contains(editor)) {
-                                editors.Add(editor);
-                            }
-                            continue;
-                        }
-
-                        if(ManifoldParts.Where(part => part.Id == element.Id).ToHashSet().Count > 0) {
-                            continue;
-                        };
-
-                        ProcessElement(element, fillers);
-                        ProcessManifoldElement(element, fillers);
-                    }
-
-                    t.Commit();
-
-                    ShowReport(editors);
-
-                    stopWatch.Stop();
-                    // Get the elapsed time as a TimeSpan value.
-                    TimeSpan ts = stopWatch.Elapsed;
-
-                    // Format and display the TimeSpan value.
-                    string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                        ts.Hours, ts.Minutes, ts.Seconds,
-                        ts.Milliseconds / 10);
-                    MessageBox.Show(elapsedTime);
-
-                }
-            }
-
-
-            public void ShowReport(List<string> editors) {
-                if(editors.Count != 0) {
-                    MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
-                        + string.Join(", ", editors.ToArray()));
-                }
-            }
-
-            public void SpecificationRefresh() {
-                ProcessElements(_fillersSpecRefresh);
-            }
-
-            public void RefreshSystemName() {
-                ProcessElements(_fillersSystemRefresh);
-            }
-
-            public void RefreshSystemFunction() {
-                ProcessElements(_fillersFunctionRefresh);
-            }
-
-            public void FullRefresh() {
-                List<ElementParamFiller> fillers = new List<ElementParamFiller>();
-                fillers.AddRange(_fillersSpecRefresh);
-                fillers.AddRange(_fillersFunctionRefresh);
-                fillers.AddRange(_fillersSystemRefresh);
-                ProcessElements(fillers);
+                t.Commit();
             }
         }
     }
+}

@@ -28,7 +28,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             string mark = element.GetTypeOrInstanceParamStringValue(ElemType, FromParamName);
 
             if(element.Category.IsId(BuiltInCategory.OST_DuctAccessory)) {
-                string mask = MaskReplacer.ReplaceMask(element, "ФОП_ВИС_Маска марки");
+                string mask = MaskReplacer.ReplaceMask(element, Config.MaskMarkName, "ADSK_Марка");
 
                 if(mask != null) {
                     mark = mask;

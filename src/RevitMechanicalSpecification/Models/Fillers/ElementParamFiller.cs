@@ -67,11 +67,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
 
             //Существует ли целевой параметр в экземпляре
-            //Если параметры существуют создаем их экземпляры чтоб не пересоздавать
-            //все методы GetParam крашат, если null
-            try {
-                ToParam = manifoldElement.GetSharedParam(ToParamName);
-            } catch(System.ArgumentException) {
+            ToParam = manifoldElement.LookupParameter(ToParamName);
+            if(ToParam == null) {
                 return;
             }
 
