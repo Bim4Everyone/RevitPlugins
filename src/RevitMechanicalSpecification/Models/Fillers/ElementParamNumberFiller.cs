@@ -15,13 +15,16 @@ namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNumberFiller : ElementParamFiller {
 
         private readonly VisElementsCalculator _calculator;
+        private readonly NameAndGroupFactory _nameAndGroupFactory;
 
         public ElementParamNumberFiller(string toParamName,
             string fromParamName,
             SpecConfiguration specConfiguration,
-            Document document) :
+            Document document, NameAndGroupFactory nameAndGroupFactory
+            ) :
             base(toParamName, fromParamName, specConfiguration, document) {
             _calculator = new VisElementsCalculator(Config, Document);
+            _nameAndGroupFactory = nameAndGroupFactory;
         }
 
         private bool LinearLogicalFilter(Element element) {
@@ -34,6 +37,21 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         private double GetNumber(Element element) {
+
+            if(ManifoldParts != null) { 
+                if(!element.InAnyCategory(new HashSet<BuiltInCategory>() {
+                    BuiltInCategory.OST_DuctCurves,
+                    BuiltInCategory.OST_PipeCurves,
+                    BuiltInCategory.OST_DuctInsulations,
+                    BuiltInCategory.OST_PipeInsulations})) {
+                    string group = _nameAndGroupFactory.GetGroup(element);
+                
+                    if(ManifoldParts.Where(part => part.Group == group).ToHashSet().Count > 0) {
+                        return 0;
+                    };
+                }
+            }
+
             //написать зачем нужно
             double number = 0;
             string unit;
@@ -68,10 +86,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
 
         public override void SetParamValue(Element element) {
-            if(element.IsExistsParam(Config.TargetNameUnit)) {
-                ToParam.Set(GetNumber(element));
-            }
-
+            ToParam.Set(GetNumber(element));
         }
     }
 }

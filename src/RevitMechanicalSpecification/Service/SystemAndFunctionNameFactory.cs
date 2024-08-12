@@ -10,6 +10,8 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using RevitMechanicalSpecification.Entities;
+
 namespace RevitMechanicalSpecification.Service {
     internal class SystemAndFunctionNameFactory {
         private readonly Document _document;

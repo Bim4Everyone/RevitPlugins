@@ -14,6 +14,7 @@ using Autodesk.Revit.DB.Mechanical;
 using RevitMechanicalSpecification.Service;
 using System.Diagnostics;
 using System;
+using RevitMechanicalSpecification.Entities;
 
 
 
@@ -22,13 +23,14 @@ namespace RevitMechanicalSpecification.Models {
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
 
+
+            ManifoldParts = new HashSet<ManifoldPart> { };
             _collector = new CollectionFactory(Document);
             _elements = _collector.GetMechanicalElements();
             _visSystems = _collector.GetMechanicalSystemColl();
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
             _nameAndGroupFactory = new NameAndGroupFactory(_specConfiguration, Document, _calculator);
-            _manifoldElementIds = new HashSet<ElementId>();
             _fillersSpecRefresh = new List<ElementParamFiller>()
 {
                 //Заполнение ФОП_ВИС_Группирование
@@ -68,7 +70,8 @@ namespace RevitMechanicalSpecification.Models {
                 _specConfiguration.TargetNameNumber,
                 null,
                 _specConfiguration,
-                Document),
+                Document,
+                _nameAndGroupFactory),
                 //Заполнение ФОП_ВИС_Наименование комбинированное
                 new ElementParamNameFiller(
                 _specConfiguration.TargetNameName,
@@ -111,7 +114,7 @@ namespace RevitMechanicalSpecification.Models {
         private readonly List<ElementParamFiller> _fillersFunctionRefresh;
 
 
-        private readonly HashSet<ElementId> _manifoldElementIds;
+        internal HashSet<ManifoldPart> ManifoldParts;
         private readonly NameAndGroupFactory _nameAndGroupFactory;
         private readonly CollectionFactory _collector;
         private readonly List<Element> _elements;
@@ -135,108 +138,139 @@ namespace RevitMechanicalSpecification.Models {
         }
 
         private void ProcessElement(Element element, List<ElementParamFiller> fillers) {
-            foreach(var filler in fillers) {
-                filler.Fill(element, null, 0);
+            if(!_nameAndGroupFactory.IsManifold(element)) {
+                foreach(var filler in fillers) {
+                    filler.Fill(element);
+                }
             }
         }
 
-        private void ProcessManifoldSubElement(List<ElementParamFiller> fillers, Element manifoldElement, FamilyInstance familyInstance, int count) {
-            foreach(var filler in fillers) {
-                filler.Fill(manifoldElement, familyInstance, count);
-            }
-        }
 
+
+
+        private ManifoldPart CreateManifoldParts(Element element, string group) {
+            Element elemType = element.GetElementType();
+            if(!_nameAndGroupFactory.IsOutSideOfManifold(elemType)) {
+                ManifoldPart part = new ManifoldPart();
+                part.Group = group;
+                part.Id = element.Id;
+                return part;
+            }
+            return null;
+        }
 
         private void ProcessManifoldElement(Element element, List<ElementParamFiller> fillers) {
-            if(_nameAndGroupFactory.IsManifold(element)) {
+            Element elemType = element.GetElementType();
+            if(_nameAndGroupFactory.IsManifold(elemType)) {
                 int count = 1;
                 FamilyInstance familyInstance = element as FamilyInstance;
-                Element elemType = element.GetElementType();
+
 
                 List<Element> manifoldElements =
                     _nameAndGroupFactory.GetSub(familyInstance).OrderBy
-                    (e => _nameAndGroupFactory.GetGroup(e)).ToList();
+                    (e => {
+                        string group = _nameAndGroupFactory.GetGroup(e);
+                        return group;
+                    }
+                    ).ToList();
 
-                foreach(var manifoldElement in manifoldElements) {
-                    if(!_nameAndGroupFactory.IsOutSideOfManifold(manifoldElement)) {
-                        ProcessManifoldSubElement(fillers, manifoldElement, familyInstance, count);
-                        _manifoldElementIds.Add(manifoldElement.Id);
-
-                        if(_nameAndGroupFactory.IsIncreaseIndex(manifoldElements, count, manifoldElement, elemType)) {
+                foreach(Element manifoldElement in manifoldElements) {
+                    Element manifoldElemType = manifoldElement.GetElementType();
+                    if(!_nameAndGroupFactory.IsOutSideOfManifold(manifoldElemType)) {
+                        int index = manifoldElements.IndexOf(manifoldElement);
+                        if(_nameAndGroupFactory.IsIncreaseCount(manifoldElements, index, manifoldElement, elemType)) {
                             count++;
                         }
+                        ProcessManifoldSubElement(fillers, manifoldElement, familyInstance, count);
+                    }
+                }
+
+                foreach(Element manifoldElement in manifoldElements) {
+                    string group = _nameAndGroupFactory.GetGroup(manifoldElement);
+                    ManifoldPart part = CreateManifoldParts(manifoldElement, group);
+                    if(part != null) {
+                        ManifoldParts.Add(part);
                     }
                 }
             }
         }
 
+            private void ProcessManifoldSubElement(
+                List<ElementParamFiller> fillers,
+                Element manifoldElement,
+                FamilyInstance familyInstance,
+                int count) {
+                foreach(var filler in fillers) {
+                    filler.Fill(manifoldElement, familyInstance, count, ManifoldParts);
+                }
+            }
+            private void ProcessElements(List<ElementParamFiller> fillers) {
+                string userName = UIApplication.Application.Username.ToLower();
+                List<string> editors = new List<string>();
 
-        private void ProcessElements(List<ElementParamFiller> fillers) {
-            string userName = UIApplication.Application.Username.ToLower();
-            List<string> editors = new List<string>();
-
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
-            using(var t = Document.StartTransaction("Обновление спецификации")) {
-                foreach(var element in _elements) {
-                    string editor = IsEditedBy(userName, element);
-                    if(!string.IsNullOrEmpty(editor)) {
-                        if(!editors.Contains(editor)) {
-                            editors.Add(editor);
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+                using(var t = Document.StartTransaction("Обновление спецификации")) {
+                    foreach(var element in _elements) {
+                        string editor = IsEditedBy(userName, element);
+                        if(!string.IsNullOrEmpty(editor)) {
+                            if(!editors.Contains(editor)) {
+                                editors.Add(editor);
+                            }
+                            continue;
                         }
-                        continue;
+
+                        if(ManifoldParts.Where(part => part.Id == element.Id).ToHashSet().Count > 0) {
+                            continue;
+                        };
+
+                        ProcessElement(element, fillers);
+                        ProcessManifoldElement(element, fillers);
                     }
 
-                    if(_manifoldElementIds.Contains(element.Id)) {
-                        continue;
-                    }
-                    ProcessElement(element, fillers);
-                    ProcessManifoldElement(element, fillers);
+                    t.Commit();
+
+                    ShowReport(editors);
+
+                    stopWatch.Stop();
+                    // Get the elapsed time as a TimeSpan value.
+                    TimeSpan ts = stopWatch.Elapsed;
+
+                    // Format and display the TimeSpan value.
+                    string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                        ts.Hours, ts.Minutes, ts.Seconds,
+                        ts.Milliseconds / 10);
+                    MessageBox.Show(elapsedTime);
+
                 }
-
-                t.Commit();
-
-                ShowReport(editors);
-
-                stopWatch.Stop();
-                // Get the elapsed time as a TimeSpan value.
-                TimeSpan ts = stopWatch.Elapsed;
-
-                // Format and display the TimeSpan value.
-                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                    ts.Hours, ts.Minutes, ts.Seconds,
-                    ts.Milliseconds / 10);
-                MessageBox.Show(elapsedTime);
-
             }
-        }
 
 
-        public void ShowReport(List<string> editors) {
-            if(editors.Count != 0) {
-                MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
-                    + string.Join(", ", editors.ToArray()));
+            public void ShowReport(List<string> editors) {
+                if(editors.Count != 0) {
+                    MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
+                        + string.Join(", ", editors.ToArray()));
+                }
             }
-        }
 
-        public void SpecificationRefresh() {
-            ProcessElements(_fillersSpecRefresh);
-        }
+            public void SpecificationRefresh() {
+                ProcessElements(_fillersSpecRefresh);
+            }
 
-        public void RefreshSystemName() {
-            ProcessElements(_fillersSystemRefresh);
-        }
+            public void RefreshSystemName() {
+                ProcessElements(_fillersSystemRefresh);
+            }
 
-        public void RefreshSystemFunction() {
-            ProcessElements(_fillersFunctionRefresh);
-        }
+            public void RefreshSystemFunction() {
+                ProcessElements(_fillersFunctionRefresh);
+            }
 
-        public void FullRefresh() {
-            List<ElementParamFiller> fillers = new List<ElementParamFiller>();
-            fillers.AddRange(_fillersSpecRefresh);
-            fillers.AddRange(_fillersFunctionRefresh);
-            fillers.AddRange(_fillersSystemRefresh);
-            ProcessElements(fillers);
+            public void FullRefresh() {
+                List<ElementParamFiller> fillers = new List<ElementParamFiller>();
+                fillers.AddRange(_fillersSpecRefresh);
+                fillers.AddRange(_fillersFunctionRefresh);
+                fillers.AddRange(_fillersSystemRefresh);
+                ProcessElements(fillers);
+            }
         }
     }
-}

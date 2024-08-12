@@ -154,8 +154,7 @@ namespace RevitMechanicalSpecification.Service {
         }
 
 
-        public bool IsIncreaseIndex(List<Element> manifoldElements, int index, Element element, Element elemType) {
-            //Element element = manifoldElements[index];
+        public bool IsIncreaseCount(List<Element> manifoldElements, int index, Element element, Element elemType) {
             string name = GetName(element, elemType);//element.GetElementType());
 
             if(string.IsNullOrEmpty(name) || name == "!Не учитывать") {
@@ -165,7 +164,7 @@ namespace RevitMechanicalSpecification.Service {
             if(index == 0) {
                 return false;
             }
-
+            
             if(GetGroup(element) == GetGroup(manifoldElements[index - 1])) {
                 return false;
             } else {

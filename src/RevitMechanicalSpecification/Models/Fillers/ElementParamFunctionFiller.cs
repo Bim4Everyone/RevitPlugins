@@ -9,6 +9,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Service;
 
 namespace RevitMechanicalSpecification.Models.Fillers {

@@ -11,6 +11,8 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using RevitMechanicalSpecification.Entities;
+
 namespace RevitMechanicalSpecification.Models.Fillers {
     public abstract class ElementParamFiller : IElementParamFiller {
 
@@ -19,6 +21,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         protected Parameter ToParam;
         protected Parameter FromParam;
         protected FamilyInstance ManifoldInstance;
+        protected HashSet<ManifoldPart> ManifoldParts;
         protected int Count;
 
         protected readonly string ToParamName;
@@ -47,7 +50,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private Parameter GetTypeOrInstanceParam(Element element, string paramName) {
             if(paramName is null) {
                 return null;
-            } 
+            }
             Parameter parameter = element.LookupParameter(paramName) ?? ElemType.LookupParameter(paramName);
             if(parameter == null) {
                 return null;
@@ -55,7 +58,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             return parameter;
         }
 
-        public void Fill(Element manifoldElement, FamilyInstance familyInstance, int count = 0) {
+        public void Fill(
+            Element manifoldElement, 
+            FamilyInstance familyInstance = null, 
+            int count = 0, 
+            HashSet<ManifoldPart> manfifoldParts = null) {
             ElemType = Document.GetElement(manifoldElement.GetTypeId());
 
 
@@ -72,15 +79,21 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             if(!(FromParamName is null)) {
                 //Проверяем, если существует исходный параметр в типе или экземпляре
                 FromParam = GetTypeOrInstanceParam(manifoldElement, FromParamName);
-                if(FromParam is null) { return; }
+                if(FromParam is null) {
+                    return;
+                }
             }
 
             //Если целевой параметр ридонли - можно сразу идти дальше
-            if(ToParam.IsReadOnly) { return; }
+            if(ToParam.IsReadOnly) {
+                return;
+            }
 
 
             ManifoldInstance = familyInstance;
             Count = count;
+            ManifoldParts = manfifoldParts;
+
             this.SetParamValue(manifoldElement);
         }
 
