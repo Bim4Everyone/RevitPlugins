@@ -51,10 +51,12 @@ namespace RevitRoomTagPlacement.Models {
                 .ToList();
 
             foreach(var link in links) {
+                Transform transform = link.GetTotalTransform();
+
                 List<RoomFromRevit> rooms = new FilteredElementCollector(link.GetLinkDocument())
                 .OfCategory(BuiltInCategory.OST_Rooms)
                 .OfType<Room>()
-                .Select(x => new RoomFromRevit(x, link.Id))
+                .Select(x => new RoomFromRevit(x, link.Id, transform))
                 .ToList();
 
                 allRooms.AddRange(rooms);
@@ -181,9 +183,8 @@ namespace RevitRoomTagPlacement.Models {
         }
 
         private UV TransformUvPoint(RoomFromRevit room, UV point) {
-            if(room.LinkId != null) {
-                Transform transform = ((RevitLinkInstance) Document.GetElement(room.LinkId)).GetTotalTransform();
-                XYZ transformedPointXYZ = transform.OfPoint(new XYZ(point.U, point.V, room.CenterPoint.Z));
+            if(room.Transform != null) {
+                XYZ transformedPointXYZ = room.Transform.OfPoint(new XYZ(point.U, point.V, room.CenterPoint.Z));
                 return new UV(transformedPointXYZ.X, transformedPointXYZ.Y);
             }
 
