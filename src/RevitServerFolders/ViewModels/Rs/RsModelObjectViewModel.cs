@@ -13,7 +13,7 @@ using RevitServerFolders.Models;
 
 namespace RevitServerFolders.ViewModels.Rs {
     internal class RsModelObjectViewModel : BaseViewModel {
-        private protected readonly IServerClient _serverClient;
+        protected readonly IServerClient _serverClient;
 
         private string _size;
         private ObservableCollection<RsModelObjectViewModel> _children;
