@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit.ServerClient;
+using dosymep.SimpleServices;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -44,6 +45,9 @@ namespace RevitServerFolders {
                     .To<RsModelObjectService>();
                 kernel.Bind<IModelsExportService>()
                     .To<RvtExportService>()
+                    .InSingletonScope();
+                kernel.Bind<ILoggerService>()
+                    .ToMethod(c => PluginLoggerService)
                     .InSingletonScope();
 
                 kernel.UseXtraOpenFolderDialog<MainWindow>(
