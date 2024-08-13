@@ -6,7 +6,7 @@ using Autodesk.Revit.UI;
 
 namespace RevitServerFolders.Models {
     internal class RevitRepository {
-        private const string _roomsSuffix = "_ROOMS.rvt";
+        private const string _roomsSuffix = "_ROOMS";
 
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
