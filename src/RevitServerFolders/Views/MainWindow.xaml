@@ -197,7 +197,8 @@
             </dxg:GridControl.View>
 
             <dxg:GridColumn
-                Binding="{Binding SkipObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
+                Binding="{Binding SkipObject, Mode=TwoWay, 
+                    UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
                 Header=""
                 AllowEditing="True"
                 AllowMoving="False"
