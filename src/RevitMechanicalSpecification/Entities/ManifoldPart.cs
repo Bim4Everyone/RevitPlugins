@@ -10,6 +10,5 @@ namespace RevitMechanicalSpecification.Entities {
     public class ManifoldPart {
         public ElementId Id { get; set; }
         public string Group { get; set; }
-
     }
 }

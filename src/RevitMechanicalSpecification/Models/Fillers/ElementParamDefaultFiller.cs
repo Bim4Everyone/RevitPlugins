@@ -10,12 +10,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             base(toParamName, fromParamName, specConfiguration, document) { }
 
         public override void SetParamValue(Element element) {
-            //string originalValue = GetTypeOrInstanceParamValue(element);
-
-            //ToParam.Set(originalValue);
             ToParam.Set(FromParam.AsValueString());
         }
     }
-
 }
 

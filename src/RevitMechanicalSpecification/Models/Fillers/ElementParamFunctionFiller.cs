@@ -17,7 +17,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private readonly List<VisSystem> _systemList;
         private readonly SystemAndFunctionNameFactory _nameFactory;
 
-
         public ElementParamFunctionFiller(
             string toParamName, 
             string fromParamName, 
@@ -36,10 +35,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public override void SetParamValue(Element element) {
             ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedFunction, GetFunction(element)));
-
-
-
-
         }
     }
 }

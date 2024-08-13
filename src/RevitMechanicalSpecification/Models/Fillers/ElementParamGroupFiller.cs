@@ -15,7 +15,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamGroupFiller : ElementParamFiller {
 
         private readonly NameAndGroupFactory _nameAndGroupFactory;
-        
 
         public ElementParamGroupFiller(
             string toParamName, 
@@ -30,16 +29,9 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         public override void SetParamValue(Element element) {
-
-            if(ManifoldInstance != null) 
-                {
-                ToParam.Set(_nameAndGroupFactory.GetManifoldGroup(ManifoldInstance, element));
-            } 
-            else 
-            {
-                ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedGroup, _nameAndGroupFactory.GetGroup(element)));
-            }
-            
+            ToParam.Set(ManifoldInstance != null
+                ? _nameAndGroupFactory.GetManifoldGroup(ManifoldInstance, element)
+                : element.GetSharedParamValueOrDefault(Config.ForcedGroup, _nameAndGroupFactory.GetGroup(element)));
         }
     }
 }

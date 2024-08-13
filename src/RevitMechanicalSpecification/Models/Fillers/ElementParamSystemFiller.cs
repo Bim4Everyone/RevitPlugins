@@ -27,7 +27,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             _systemList = systemList;
             _nameFactory = new SystemAndFunctionNameFactory(Document, _systemList);
         } 
-            
+
         private string GetSystemName(Element element) 
             {
             return _nameFactory.GetSystemValue(element);

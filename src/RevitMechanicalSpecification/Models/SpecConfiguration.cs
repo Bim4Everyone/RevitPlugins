@@ -34,6 +34,7 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string TargetNameCreator = "ФОП_ВИС_Завод-изготовитель";
         public readonly string TargetNameNumber = "ФОП_ВИС_Число";
 
+        public readonly string NameAddition = "ФОП_ВИС_Дополнение к имени";
         public readonly string ForcedName = "ФОП_ВИС_Наименование принудительное";
         public readonly string ForcedSystemName = "ФОП_ВИС_Имя системы принудительное";
         public readonly string ForcedGroup = "ФОП_ВИС_Группирование принудительное";
@@ -41,7 +42,6 @@ namespace RevitMechanicalSpecification.Models {
 
         public readonly string MinDuctThikness = "ФОП_ВИС_Минимальная толщина воздуховода";
         public readonly string MaxDuctThikness = "ФОП_ВИС_Максимальная толщина воздуховода";
-
 
         private readonly string _changedNameName = "ФОП_ВИС_Замена параметра_Наименование";
         private readonly string _changedNameMark = "ФОП_ВИС_Замена параметра_Марка";
@@ -53,11 +53,9 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string ParamNameIsSpecifyPipeFittingsFromPype = "ФОП_ВИС_Учитывать фитинги труб по типу трубы";
         private readonly string _paramNameIsSpecifyDuctFittings = "ФОП_ВИС_Учитывать фитинги воздуховодов";
 
-
         private readonly string _paramNameInsulationStock = "ФОП_ВИС_Запас изоляции";
         private readonly string _paramNameDuctPipeStock = "ФОП_ВИС_Запас воздуховодов/труб";
         public readonly string IndividualStock = "ФОП_ВИС_Индивидуальный запас";
-
 
         public readonly string IsManiFoldParamName = "ФОП_ВИС_Узел";
         public readonly string IsOutSideOfManifold = "ФОП_ВИС_Исключить из узла";
@@ -69,7 +67,6 @@ namespace RevitMechanicalSpecification.Models {
 
         public readonly string MaskMarkName = "ФОП_ВИС_Маска марки";
         public readonly string MaskNameName = "ФОП_ВИС_Маска наименования";
-
 
         public SpecConfiguration(ProjectInfo info) {
             OriginalParamNameName = info.GetParamValueOrDefault(_changedNameName, "ADSK_Наименование");

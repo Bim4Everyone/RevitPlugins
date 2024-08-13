@@ -20,7 +20,6 @@ namespace RevitMechanicalSpecification.Service {
         }
 
         public List<Element> GetMechanicalElements() {
-
             var mechanicalCategories = new List<BuiltInCategory>()
             {
                 BuiltInCategory.OST_DuctFitting,
@@ -36,15 +35,11 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInCategory.OST_DuctInsulations,
                 BuiltInCategory.OST_PipeInsulations,
                 BuiltInCategory.OST_PlumbingFixtures,
-                BuiltInCategory.OST_Sprinklers,
-                //Я пока не уверен, что оно вообще тут нужно
-                //BuiltInCategory.OST_GenericModel
-
+                BuiltInCategory.OST_Sprinklers
             };
             return GetElements(mechanicalCategories);
 
         }
-
 
         public List<VisSystem> GetMechanicalSystemColl() {
             List<Element> elements = GetElements(
@@ -62,10 +57,8 @@ namespace RevitMechanicalSpecification.Service {
                 SystemTargetName = element.Name.Split(' ').First()
             }));
 
-
             return mechanicalSystems;
         }
-
 
         private bool LogicalFilter(Element element) {
 

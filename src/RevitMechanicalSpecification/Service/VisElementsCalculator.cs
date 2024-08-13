@@ -183,14 +183,12 @@ namespace RevitMechanicalSpecification.Service {
             return "0";
         }
 
-
         public string GetDuctFittingMark(Element element) {
             List<Connector> connectors = GetConnectors(element);
             Element duct = GetDuctFromFitting(connectors);
             if(duct is null) {
                 return "!Не учитывать";
             }
-
             return duct.GetTypeOrInstanceParamStringValue(duct.GetElementType(), _specConfiguration.OriginalParamNameMark);
         }
 
@@ -243,8 +241,6 @@ namespace RevitMechanicalSpecification.Service {
                 size = size.Split('-').First();
             }
 
-
-
             return startName + " " + size + ", с толщиной стенки " + thikness + " мм";
         }
 
@@ -292,6 +288,5 @@ namespace RevitMechanicalSpecification.Service {
             }
             return area;
         }
-
     }
 }

@@ -14,6 +14,16 @@ using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     public static class MaskReplacer {
+        //должно работать только с шаблонизированными семействами, так что оставляем только ADSK_Параметры, объявляем их тут же
+        private static readonly string _length = "ДЛИНА";
+        private static readonly string _adskLength = "ADSK_Размер_Длина";
+        private static readonly string _width = "ШИРИНА";
+        private static readonly string _adskWidth = "ADSK_Размер_Ширина";
+        private static readonly string _height = "ВЫСОТА";
+        private static readonly string _adskHeight = "ADSK_Размер_Высота";
+        private static readonly string _diameter = "ДИАМЕТР";
+        private static readonly string _adskDiameter = "ADSK_Размер_Диаметр";
+
         private static string GetStringValue(Element element, Element elemType, string paramName) {
             double value = element.GetTypeOrInstanceParamDoubleValue(elemType, paramName);
 
@@ -30,23 +40,23 @@ namespace RevitMechanicalSpecification.Service {
                 return null;
             }
 
-            string width = GetStringValue(element, elemType, "ADSK_Размер_Ширина");
-            string height = GetStringValue(element, elemType, "ADSK_Размер_Высота");
-            string lenght = GetStringValue(element, elemType, "ADSK_Размер_Длина");
+            string width = GetStringValue(element, elemType, _adskWidth);
+            string height = GetStringValue(element, elemType, _adskHeight);
+            string lenght = GetStringValue(element, elemType, _adskLength);
 
-            string diameter = GetStringValue(element, elemType, "ADSK_Размер_Диаметр");
+            string diameter = GetStringValue(element, elemType, _adskDiameter);
 
-            if(mask.Contains("ВЫСОТА")) {
-                mask = mask.Replace("ВЫСОТА", height);
+            if(mask.Contains(_height)) {
+                mask = mask.Replace(_height, height);
             }
-            if(mask.Contains("ДЛИНА")) {
-                mask = mask.Replace("ДЛИНА", lenght);
+            if(mask.Contains(_length)) {
+                mask = mask.Replace(_length, lenght);
             }
-            if(mask.Contains("ШИРИНА")) {
-                mask = mask.Replace("ШИРИНА", width);
+            if(mask.Contains(_width)) {
+                mask = mask.Replace(_width, width);
             }
-            if(mask.Contains("ДИАМЕТР")) {
-                mask = mask.Replace("ДИАМЕТР", diameter);
+            if(mask.Contains(_diameter)) {
+                mask = mask.Replace(_diameter, diameter);
             }
 
             //Здесь нужно обновить значение ADSK_Наименование-Марка для шаблонных семейств с масками

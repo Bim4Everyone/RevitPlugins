@@ -31,6 +31,7 @@ namespace RevitMechanicalSpecification.Service {
         //Базовое имя
         public string GetName(Element element, Element elemType) {
             string name = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameName);
+            string nameAddon = element.GetTypeOrInstanceParamStringValue(elemType, _config.NameAddition);
 
             if(string.IsNullOrEmpty(name)) {
                 name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ";
@@ -38,35 +39,26 @@ namespace RevitMechanicalSpecification.Service {
             Category category = element.Category;
             switch(category.GetBuiltInCategory()) {
                 case BuiltInCategory.OST_DuctCurves:
-                    return name += _calculator.GetDuctName(element, elemType);
+                    return $"{name} {_calculator.GetDuctName(element, elemType)} {nameAddon}";
                 case BuiltInCategory.OST_DuctFitting:
-                    return _calculator.GetDuctFittingName(element);
+                    return $"{_calculator.GetDuctFittingName(element)} {nameAddon}";
                 case BuiltInCategory.OST_PipeFitting:
                     //Если учет фитингов труб отключен в проекте, не учитываем. Если включен в проекте, но выключен в трубе - не учитываем
-                    bool isSpecifyPipeFitting = _calculator.IsSpecifyPipeFittingName(element);
-                    if(!isSpecifyPipeFitting) {
-                        return "!Не учитывать";
-                    }
-                    break;
+                    return _calculator.IsSpecifyPipeFittingName(element) ? 
+                        $"{name} {nameAddon}" : "!Не учитывать";
                 case BuiltInCategory.OST_PipeCurves:
-                    return name += _calculator.GetPipeSize(element, elemType);
+                    return $"{name} {_calculator.GetPipeSize(element, elemType)} {nameAddon}";
                 case BuiltInCategory.OST_PipeInsulations:
                     InsulationLiningBase insulation = element as InsulationLiningBase;
                     Element pipe = _document.GetElement(insulation.HostElementId);
-                    if(pipe is null) {
-                        return "!Не учитывать";
-                    } else {
-                        return name += " (Для: " + GetName(pipe, pipe.GetElementType()) + ")";
-                    }
+                    return pipe != null ? 
+                        $"{name} (Для: {GetName(pipe, pipe.GetElementType())}) {nameAddon}" : "!Не учитывать";
                 case BuiltInCategory.OST_DuctAccessory:
                     string mask = MaskReplacer.ReplaceMask(element, _config.MaskNameName, "ADSK_Наименование");
-                    if(mask != null) {
-                        return mask;
-                    }
-                    break;
+                    return mask != null ? $"{mask} {nameAddon}" : $"{name} {nameAddon}";
             }
 
-            return name;
+            return $"{name} {nameAddon}";
         }
 
         //Ниже операции с группами
@@ -111,15 +103,10 @@ namespace RevitMechanicalSpecification.Service {
             Element elemType = element.GetElementType();
 
             string name = GetName(element, elemType);
-
-            //string mark = "mark";
-            //string code = "code";
-            //string creator = "creator";
-
             string mark = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameMark);
             string code = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameCode);
             string creator = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameCreator);
-            return "_" + name + "_" + mark + "_" + code + "_" + creator;
+            return $"_{name}_{mark}_{code}_{creator}";
         }
         //Базовая + детализированная
         public string GetGroup(Element element) {
@@ -153,23 +140,14 @@ namespace RevitMechanicalSpecification.Service {
                     $"{GetDetailedGroup(element)}";
         }
 
-
         public bool IsIncreaseCount(List<Element> manifoldElements, int index, Element element, Element elemType) {
-            string name = GetName(element, elemType);//element.GetElementType());
+            string name = GetName(element, elemType);
 
-            if(string.IsNullOrEmpty(name) || name == "!Не учитывать") {
+            if(string.IsNullOrEmpty(name) || name == "!Не учитывать" || index == 0) {
                 return false;
             }
 
-            if(index == 0) {
-                return false;
-            }
-            
-            if(GetGroup(element) == GetGroup(manifoldElements[index - 1])) {
-                return false;
-            } else {
-                return true;
-            }
+            return GetGroup(element) != GetGroup(manifoldElements[index - 1]);
         }
 
         public bool IsManifold(Element elemType) {

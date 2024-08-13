@@ -13,10 +13,8 @@ using RevitMechanicalSpecification.Service;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNumberFiller : ElementParamFiller {
-
         private readonly VisElementsCalculator _calculator;
         private readonly NameAndGroupFactory _nameAndGroupFactory;
-
         public ElementParamNumberFiller(string toParamName,
             string fromParamName,
             SpecConfiguration specConfiguration,
@@ -39,14 +37,14 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private double GetNumber(Element element) {
             //Если в проекте уже есть обработанные части узлов, и элемент не является линейным, проверяем встречался ли он.
             //Если встречался и идет одиночная обработка вложений в узел - зануляем
-            if(ManifoldParts != null) { 
+            if(ManifoldParts != null) {
                 if(!element.InAnyCategory(new HashSet<BuiltInCategory>() {
                     BuiltInCategory.OST_DuctCurves,
                     BuiltInCategory.OST_PipeCurves,
                     BuiltInCategory.OST_DuctInsulations,
                     BuiltInCategory.OST_PipeInsulations})) {
                     string group = _nameAndGroupFactory.GetGroup(element);
-                
+
                     if(ManifoldParts.Where(part => part.Group == group).ToHashSet().Count > 0) {
                         return 0;
                     };
@@ -85,7 +83,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
             return number;
         }
-
 
         public override void SetParamValue(Element element) {
             ToParam.Set(GetNumber(element));

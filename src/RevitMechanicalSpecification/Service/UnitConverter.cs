@@ -18,7 +18,6 @@ namespace RevitMechanicalSpecification.Service {
         public static double DoubleToSquareMeters(double number) {
             return Math.Round(number * 0.092903, 2);
         }
-
         public static double DoubleToDegree(double number) {
             return Math.Round(number / 0.0175, 2);
         }

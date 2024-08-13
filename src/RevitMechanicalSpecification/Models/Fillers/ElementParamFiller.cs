@@ -46,7 +46,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public abstract void SetParamValue(Element element);
 
-
         private Parameter GetTypeOrInstanceParam(Element element, string paramName) {
             if(paramName is null) {
                 return null;
@@ -59,9 +58,9 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         public void Fill(
-            Element manifoldElement, 
-            FamilyInstance familyInstance = null, 
-            int count = 0, 
+            Element manifoldElement,
+            FamilyInstance familyInstance = null,
+            int count = 0,
             HashSet<ManifoldPart> manfifoldParts = null) {
             ElemType = Document.GetElement(manifoldElement.GetTypeId());
 
@@ -85,7 +84,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             if(ToParam.IsReadOnly) {
                 return;
             }
-
 
             ManifoldInstance = familyInstance;
             Count = count;
