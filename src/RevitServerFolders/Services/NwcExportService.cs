@@ -67,55 +67,58 @@ namespace RevitServerFolders.Services {
             _revitRepository.Application.FailuresProcessing += ApplicationOnFailuresProcessing;
             _revitRepository.UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
 
-            DocumentExtensions.UnloadAllLinks(fileName);
-            using(Document document = _revitRepository.OpenDocumentFile(fileName)) {
-                try {
-                    View3D navisView = new FilteredElementCollector(document)
-                        .OfClass(typeof(View3D))
-                        .OfType<View3D>()
-                        .Where(item => !item.IsTemplate)
-                        .FirstOrDefault(item =>
-                            item.Name.Equals(_navisworksViewName, StringComparison.OrdinalIgnoreCase));
+            try {
+                DocumentExtensions.UnloadAllLinks(fileName);
+                using(Document document = _revitRepository.OpenDocumentFile(fileName)) {
+                    try {
+                        View3D navisView = new FilteredElementCollector(document)
+                            .OfClass(typeof(View3D))
+                            .OfType<View3D>()
+                            .Where(item => !item.IsTemplate)
+                            .FirstOrDefault(item =>
+                                item.Name.Equals(_navisworksViewName, StringComparison.OrdinalIgnoreCase));
 
-                    if(navisView == null) {
-                        return;
-                    }
+                        if(navisView == null) {
+                            return;
+                        }
 
-                    var hasElements = new FilteredElementCollector(document, navisView.Id)
-                            .WhereElementIsNotElementType()
+                        var hasElements = new FilteredElementCollector(document, navisView.Id)
+                                .WhereElementIsNotElementType()
 #if REVIT_2021_OR_LESS
                         .Where(item =>
                             item.get_Geometry(new Options() {View = navisView})?.Any() == true)
 #else
-                            .WherePasses(new VisibleInViewFilter(document, navisView.Id))
+                                .WherePasses(new VisibleInViewFilter(document, navisView.Id))
 #endif
-                            .Any();
+                                .Any();
 
-                    if(!hasElements) {
-                        return;
-                    }
-
-                    ProjectLocation[] projectLocations = document.ProjectLocations
-                        .OfType<ProjectLocation>()
-                        .ToArray();
-
-                    if(projectLocations.Length == 1) {
-                        ExportDocument(fileName, navisView, document, targetFolder, isExportRooms);
-                    } else if(projectLocations.Length > 1) {
-                        foreach(ProjectLocation projectLocation in projectLocations) {
-                            using(Transaction transaction = document.StartTransaction(_transactionName)) {
-                                document.ActiveProjectLocation = projectLocation;
-                                transaction.Commit();
-                            }
-
-                            ExportDocument(fileName, navisView, document, targetFolder, isExportRooms, projectLocation);
+                        if(!hasElements) {
+                            return;
                         }
+
+                        ProjectLocation[] projectLocations = document.ProjectLocations
+                            .OfType<ProjectLocation>()
+                            .ToArray();
+
+                        if(projectLocations.Length == 1) {
+                            ExportDocument(fileName, navisView, document, targetFolder, isExportRooms);
+                        } else if(projectLocations.Length > 1) {
+                            foreach(ProjectLocation projectLocation in projectLocations) {
+                                using(Transaction transaction = document.StartTransaction(_transactionName)) {
+                                    document.ActiveProjectLocation = projectLocation;
+                                    transaction.Commit();
+                                }
+
+                                ExportDocument(fileName, navisView, document, targetFolder, isExportRooms, projectLocation);
+                            }
+                        }
+                    } finally {
+                        document.Close(false);
                     }
-                } finally {
-                    document.Close(false);
-                    _revitRepository.Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
-                    _revitRepository.UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
                 }
+            } finally {
+                _revitRepository.Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
+                _revitRepository.UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
             }
         }
 
@@ -141,10 +144,12 @@ namespace RevitServerFolders.Services {
         }
 
         private void UIApplicationOnDialogBoxShowing(object sender, DialogBoxShowingEventArgs e) {
+            _loggerService.Information($"Event handler: {nameof(UIApplicationOnDialogBoxShowing)}");
             e.OverrideResult(1);
         }
 
         private void ApplicationOnFailuresProcessing(object sender, FailuresProcessingEventArgs e) {
+            _loggerService.Information($"Event handler: {nameof(ApplicationOnFailuresProcessing)}");
             FailuresAccessor accessor = e.GetFailuresAccessor();
             accessor.DeleteAllWarnings();
             accessor.ResolveFailures(accessor.GetFailureMessages());
