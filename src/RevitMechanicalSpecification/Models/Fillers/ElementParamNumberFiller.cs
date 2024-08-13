@@ -71,7 +71,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return _calculator.GetFittingArea(element);
                 }
                 if(LinearLogicalFilter(element)) {
-                    return UnitConverter.DoubleToSquareMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA));
+                    double area = element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+                    double convArea = UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters);
+                    
+                    return Math.Round(convArea, 2);
+                    
                 }
             }
             //Если единица измерения метры погонные - забираем длину и переводим в метры
