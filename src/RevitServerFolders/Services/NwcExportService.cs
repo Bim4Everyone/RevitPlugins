@@ -8,6 +8,7 @@ using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI.Events;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitServerFolders.Models;
 
@@ -20,9 +21,11 @@ namespace RevitServerFolders.Services {
         private const string _navisworksViewName = "Navisworks";
         private const string _transactionName = "Смена площадки";
         private readonly RevitRepository _revitRepository;
+        private readonly ILoggerService _loggerService;
 
-        public NwcExportService(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
+        public NwcExportService(RevitRepository revitRepository, ILoggerService loggerService) {
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
 
@@ -53,8 +56,8 @@ namespace RevitServerFolders.Services {
                 var config = FileModelObjectConfig.GetPluginConfig();
                 try {
                     ExportDocument(modelFiles[i], targetFolder, config.IsExportRooms);
-                } catch(Exception) {
-                    // pass
+                } catch(Exception ex) {
+                    _loggerService.Warning(ex, $"Ошибка экспорта в nwc в файле: {modelFiles[i]}");
                 }
             }
         }

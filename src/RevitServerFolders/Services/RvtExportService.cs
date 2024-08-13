@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 namespace RevitServerFolders.Services {
     /// <summary>
@@ -14,9 +15,10 @@ namespace RevitServerFolders.Services {
             = @"C:\Program Files\Autodesk\Revit {0}\RevitServerToolCommand\RevitServerTool.exe";
         private const string _revitServerToolArgs = @"createLocalRvt ""{0}"" -s ""{1}"" -d ""{2}/"" -o";
         private const string _rvtSearchPattern = "*.rvt";
+        private readonly ILoggerService _loggerService;
 
-
-        public RvtExportService() {
+        public RvtExportService(ILoggerService loggerService) {
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
 
@@ -47,8 +49,8 @@ namespace RevitServerFolders.Services {
                 try {
                     ExportDocument(modelFiles[i], targetFolder);
                     dosymep.Revit.DocumentExtensions.UnloadAllLinks(Directory.GetFiles(targetFolder, _rvtSearchPattern));
-                } catch(Exception) {
-                    // pass
+                } catch(Exception ex) {
+                    _loggerService.Warning(ex, $"Ошибка экспорта в rvt в файле: {modelFiles[i]}");
                 }
             }
         }
