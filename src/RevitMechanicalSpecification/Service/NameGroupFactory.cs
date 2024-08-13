@@ -13,11 +13,11 @@ using dosymep.Revit;
 using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
-    internal class NameAndGroupFactory {
+    internal class NameGroupFactory {
         private readonly SpecConfiguration _config;
         private readonly Document _document;
         private readonly VisElementsCalculator _calculator;
-        public NameAndGroupFactory(
+        public NameGroupFactory(
             SpecConfiguration configuration,
             Document document,
             VisElementsCalculator calculator

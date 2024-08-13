@@ -65,6 +65,10 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string MeterUnit = "м.п.";
         public readonly string SquareUnit = "м²";
 
+        public readonly string Dy = "ФОП_ВИС_Ду";
+        public readonly string DyWall = "ФОП_ВИС_Ду х Стенка";
+        public readonly string DExternalWall = "ФОП_ВИС_Днар х Стенка";
+
         public readonly string MaskMarkName = "ФОП_ВИС_Маска марки";
         public readonly string MaskNameName = "ФОП_ВИС_Маска наименования";
 

@@ -36,10 +36,10 @@ namespace RevitMechanicalSpecification.Service {
 
         //Формируем диаметр трубы для наименования в зависимости от того что включено у нее в типе
         public string GetPipeSize(Element element, Element elemType) {
-            bool dy = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Ду") == 1;
-            bool dyWall = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Ду х Стенка") == 1;
-            bool dExternalWall = elemType.GetSharedParamValueOrDefault<int>("ФОП_ВИС_Днар х Стенка") == 1;
-
+            
+            bool dy = elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.Dy) == 1;
+            bool dyWall = elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.DyWall) == 1;
+            bool dExternalWall = elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.DExternalWall) == 1;
 
             double externalSize = UnitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER));
             double internalSize = UnitConverter.DoubleToMilimeters(element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_INNER_DIAM_PARAM));
@@ -81,20 +81,40 @@ namespace RevitMechanicalSpecification.Service {
                 double sizeA = curve.Width;
                 double sizeB = curve.Height;
                 double size = Math.Max(sizeA, sizeB);
-                //ссылка откуда цифры
-                if(size < 251) { return 0.5; }
-                if(size < 1001) { return 0.7; }
-                if(size < 2001) { return 0.9; }
-                if(size > 2001) { return 1.4; }
+                //Толщины по СП 60.13330.2020 Отопление, вентиляция и кондиционирование воздуха. Приложение К
+                if(size < 251) {
+                    return 0.5;
+                }
+                if(size < 1001) {
+                    return 0.7;
+                }
+                if(size < 2001) {
+                    return 0.9;
+                }
+                if(size > 2001) {
+                    return 1.4;
+                }
             }
             if(connector.Shape == ConnectorProfileType.Round) {
                 double size = curve.Diameter;
-                if(size < 201) { return 0.5; }
-                if(size < 451) { return 0.6; }
-                if(size < 801) { return 0.7; }
-                if(size < 1251) { return 1.0; }
-                if(size < 1601) { return 1.2; }
-                if(size > 1601) { return 1.4; }
+                if(size < 201) {
+                    return 0.5;
+                }
+                if(size < 451) {
+                    return 0.6;
+                }
+                if(size < 801) {
+                    return 0.7;
+                }
+                if(size < 1251) {
+                    return 1.0;
+                }
+                if(size < 1601) {
+                    return 1.2;
+                }
+                if(size > 1601) {
+                    return 1.4;
+                }
             }
             return 0;
         }
@@ -103,19 +123,14 @@ namespace RevitMechanicalSpecification.Service {
         public string GetDuctThikness(Element element, Element elemType) {
             var filter = new ElementCategoryFilter(BuiltInCategory.OST_DuctInsulations);
 
-
-
             double minDuctThikness = elemType.GetSharedParamValueOrDefault<double>(_specConfiguration.MinDuctThikness, 0);
             double maxDuctThikness = elemType.GetSharedParamValueOrDefault<double>(_specConfiguration.MaxDuctThikness, 0);
             double minInsulThikness = 0;
             double maxInsulThikness = 0;
 
-
-
             //Возвращается лист элементID, но тяжело представить ситуацию, где у нас больше изоляции на воздуховоде, чем 1 штука
             var dependent = element.GetDependentElements(filter).ToList();
             ElementId insulationId = dependent.FirstOrDefault();
-
 
             if(insulationId.IsNotNull()) {
                 Element insulation = _document.GetElement(insulationId);
@@ -127,7 +142,6 @@ namespace RevitMechanicalSpecification.Service {
             double thikness = GetBaseDuctThikness(element);
             double upCriteria = Math.Max(maxInsulThikness, maxDuctThikness);
             double minCriteria = Math.Max(minInsulThikness, minDuctThikness);
-
 
             //currentculture передаем
             if(thikness > upCriteria && upCriteria != 0) {
@@ -145,7 +159,9 @@ namespace RevitMechanicalSpecification.Service {
             var subConnectors = new List<Connector>();
             foreach(Connector connector in connectors) {
                 foreach(Connector reference in connector.AllRefs) {
-                    if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) { return reference.Owner; }
+                    if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
+                        return reference.Owner;
+                    }
                     if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
                         subConnectors.AddRange(GetConnectors(reference.Owner));
                     }
@@ -155,9 +171,10 @@ namespace RevitMechanicalSpecification.Service {
                 //если там какая-то дикая конструкция из 4 соединенных фитингов - лучше вернуть нулл, а не искать дальше, таких мест вряд ли будет много
                 foreach(Connector subConnector in subConnectors) {
                     foreach(Connector reference in subConnector.AllRefs) {
-                        if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) { return reference.Owner; }
+                        if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
+                            return reference.Owner;
+                        }
                     }
-
                 }
             }
             return null;
@@ -167,19 +184,33 @@ namespace RevitMechanicalSpecification.Service {
         public string GetDuctFittingThikness(Element element) {
             List<Connector> connectors = GetConnectors(element);
             Element duct = GetDuctFromFitting(connectors);
-            if(duct is null) { return null; }
+            if(duct is null) {
+                return null;
+            }
 
             return GetDuctThikness(duct, duct.GetElementType());
         }
         //получение угла фитинга воздуховода
         private string GetDuctFittingAngle(Element element) {
             double angle = UnitConverter.DoubleToDegree(GetConnectors(element).First().Angle);
-            if(angle <= 15.1) { return "15"; }
-            if(angle <= 30.1) { return "30"; }
-            if(angle <= 45.1) { return "45"; }
-            if(angle <= 60.1) { return "60"; }
-            if(angle <= 75.1) { return "75"; }
-            if(angle <= 90.1) { return "90"; }
+            if(angle <= 15.1) {
+                return "15";
+            }
+            if(angle <= 30.1) {
+                return "30";
+            }
+            if(angle <= 45.1) {
+                return "45";
+            }
+            if(angle <= 60.1) {
+                return "60";
+            }
+            if(angle <= 75.1) {
+                return "75";
+            }
+            if(angle <= 90.1) {
+                return "90";
+            }
             return "0";
         }
 
@@ -206,7 +237,6 @@ namespace RevitMechanicalSpecification.Service {
             string startName = "Не удалось определить тип фитинга";
             var instanse = element as FamilyInstance;
             var fitting = instanse.MEPModel as MechanicalFitting;
-
 
             if(fitting.PartType is PartType.Transition) {
                 startName = "Переход между сечениями воздуховода ";
@@ -240,7 +270,6 @@ namespace RevitMechanicalSpecification.Service {
             if(!(fitting.PartType is PartType.Transition) || !(fitting.PartType is PartType.Tee)) {
                 size = size.Split('-').First();
             }
-
             return startName + " " + size + ", с толщиной стенки " + thikness + " мм";
         }
 
@@ -250,12 +279,15 @@ namespace RevitMechanicalSpecification.Service {
 
             if(element is FamilyInstance) {
                 var instance = element as FamilyInstance;
-                if(instance.MEPModel.ConnectorManager is null) { return connectors; }
+                if(instance.MEPModel.ConnectorManager is null) {
+                    return connectors;
+                }
                 ConnectorSetIterator set = instance.MEPModel.ConnectorManager.Connectors.ForwardIterator();
                 while(set.MoveNext()) { connectors.Add(set.Current as Connector); }
             }
 
-            if(element.InAnyCategory(new List<BuiltInCategory>() { BuiltInCategory.OST_DuctCurves, BuiltInCategory.OST_PipeCurves })) {
+            if(element.InAnyCategory(new List<BuiltInCategory>()
+            { BuiltInCategory.OST_DuctCurves, BuiltInCategory.OST_PipeCurves })) {
                 var curve = element as MEPCurve;
                 if(curve.ConnectorManager is null) { return connectors; }
                 ConnectorSetIterator set = curve.ConnectorManager.Connectors.ForwardIterator();
@@ -267,7 +299,6 @@ namespace RevitMechanicalSpecification.Service {
 
         //получение площади фитинга воздуховода
         public double GetFittingArea(Element element) {
-
             double area = 0;
 
             foreach(Solid solid in element.GetSolids())
@@ -280,8 +311,12 @@ namespace RevitMechanicalSpecification.Service {
                 double falseArea = 0;
                 List<Connector> connectors = GetConnectors(element);
                 foreach(Connector connector in connectors) {
-                    if(connector.Shape == ConnectorProfileType.Rectangular) { falseArea += UnitConverter.DoubleToSquareMeters(connector.Height * connector.Width); }
-                    if(connector.Shape == ConnectorProfileType.Round) { falseArea += UnitConverter.DoubleToSquareMeters(connector.Radius * connector.Radius * 3.14); }
+                    if(connector.Shape == ConnectorProfileType.Rectangular) {
+                        falseArea += UnitConverter.DoubleToSquareMeters(connector.Height * connector.Width);
+                    }
+                    if(connector.Shape == ConnectorProfileType.Round) {
+                        falseArea += UnitConverter.DoubleToSquareMeters(connector.Radius * connector.Radius * 3.14);
+                    }
                 }
                 //Вычетаем площадь пустоты на местах коннекторов
                 area -= falseArea;

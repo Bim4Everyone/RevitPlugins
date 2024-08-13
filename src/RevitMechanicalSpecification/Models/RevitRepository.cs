@@ -30,7 +30,7 @@ namespace RevitMechanicalSpecification.Models {
             _visSystems = _collector.GetMechanicalSystemColl();
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
-            _nameAndGroupFactory = new NameAndGroupFactory(_specConfiguration, Document, _calculator);
+            _nameAndGroupFactory = new NameGroupFactory(_specConfiguration, Document, _calculator);
             _fillersSpecRefresh = new List<ElementParamFiller>()
 {
                 //Заполнение ФОП_ВИС_Группирование
@@ -115,7 +115,7 @@ namespace RevitMechanicalSpecification.Models {
 
 
         internal HashSet<ManifoldPart> ManifoldParts;
-        private readonly NameAndGroupFactory _nameAndGroupFactory;
+        private readonly NameGroupFactory _nameAndGroupFactory;
         private readonly CollectionFactory _collector;
         private readonly List<Element> _elements;
         private readonly List<VisSystem> _visSystems;

@@ -14,14 +14,14 @@ using RevitMechanicalSpecification.Service;
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamGroupFiller : ElementParamFiller {
 
-        private readonly NameAndGroupFactory _nameAndGroupFactory;
+        private readonly NameGroupFactory _nameAndGroupFactory;
 
         public ElementParamGroupFiller(
             string toParamName, 
             string fromParamName, 
             SpecConfiguration specConfiguration, 
             Document document,
-            NameAndGroupFactory nameAndGroupFactory) : 
+            NameGroupFactory nameAndGroupFactory) : 
             base(toParamName, fromParamName, specConfiguration, document) 
             
             {
