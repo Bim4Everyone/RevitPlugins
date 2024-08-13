@@ -32,6 +32,10 @@ namespace RevitMechanicalSpecification.Service {
         private string GetInsulationSystem(InsulationLiningBase insulation) {
 
             Element host = _document.GetElement(insulation.HostElementId);
+            //изоляция может баговать и висеть на трубе или воздуховоде не имея хоста
+            if (host == null) {
+                return _noneSystemValue;
+            }
 
             return GetParamSystemValue(host);
         }
