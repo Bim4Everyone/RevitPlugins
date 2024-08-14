@@ -55,7 +55,12 @@ namespace RevitServerFolders.Services {
 
                 var config = FileModelObjectConfig.GetPluginConfig();
                 try {
+                    _loggerService.Information($"Запуск экспорта в nwc\n" +
+                        $"Файл: {modelFiles[i]}\n" +
+                        $"TargetFolder: {targetFolder}\n" +
+                        $"IsExportRooms: {config.IsExportRooms}");
                     ExportDocument(modelFiles[i], targetFolder, config.IsExportRooms);
+                    _loggerService.Information($"Файл {modelFiles[i]} успешно экспортирован в nwc");
                 } catch(Exception ex) {
                     _loggerService.Warning(ex, $"Ошибка экспорта в nwc в файле: {modelFiles[i]}");
                 }
@@ -145,12 +150,22 @@ namespace RevitServerFolders.Services {
 
         private void UIApplicationOnDialogBoxShowing(object sender, DialogBoxShowingEventArgs e) {
             _loggerService.Information($"Event handler: {nameof(UIApplicationOnDialogBoxShowing)}");
+            _loggerService.Information($"DialogId: {e.DialogId}");
             e.OverrideResult(1);
         }
 
         private void ApplicationOnFailuresProcessing(object sender, FailuresProcessingEventArgs e) {
             _loggerService.Information($"Event handler: {nameof(ApplicationOnFailuresProcessing)}");
             FailuresAccessor accessor = e.GetFailuresAccessor();
+            _loggerService.Information($"Failure document path: {accessor.GetDocument().PathName}");
+            var failureMessages = accessor.GetFailureMessages()
+                .GroupBy(m => m.GetDescriptionText())
+                .Select(g => new { Name = g.Key, Count = g.Count(), Severity = g.FirstOrDefault()?.GetSeverity() })
+                .ToArray();
+            foreach(var failure in failureMessages) {
+                _loggerService.Information(
+                    $"Failure message: {failure.Name}; Severity: {failure.Severity}; Total count: {failure.Count}");
+            }
             accessor.DeleteAllWarnings();
             accessor.ResolveFailures(accessor.GetFailureMessages());
 
@@ -159,7 +174,13 @@ namespace RevitServerFolders.Services {
                 .ToArray();
 
             if(elementIds.Length > 0) {
-                accessor.DeleteElements(elementIds);
+                try {
+                    accessor.DeleteElements(elementIds);
+                } catch(Exception ex) {
+                    _loggerService.Warning(ex, $"Не удалось удалить элементы, вызывающие ошибки");
+                    e.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
+                    return;
+                }
                 e.SetProcessingResult(FailureProcessingResult.ProceedWithCommit);
             } else {
                 e.SetProcessingResult(FailureProcessingResult.Continue);
