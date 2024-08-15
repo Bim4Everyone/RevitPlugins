@@ -161,16 +161,14 @@ namespace RevitMechanicalSpecification.Models {
                 foreach(Element element in _elements) {
                     string editor = IsEditedBy(userName, element);
                     if(!string.IsNullOrEmpty(editor)) {
-                        if(!editors.Contains(editor)) {
-                            editors.Add(editor);
-                        }
+                        editors.Add(editor);
                         continue;
                     }
 
                     //Если элемент уже встречался в обработке вложений узлов - переходим к следующему
-                    if(ManifoldParts.Where(part => part.Id == element.Id).ToHashSet().Count > 0) {
+                    if(ManifoldParts.Any(part => part.Id == element.Id)) {
                         continue;
-                    };
+                    }
 
                     ProcessElement(element, fillers);
                     ProcessManifoldElement(element, fillers);

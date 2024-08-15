@@ -30,11 +30,28 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         private string GetSystemName(Element element) 
             {
+            //return _nameFactory.GetSystemValue(element);
+
+            string forcedSystem = _nameFactory.GetForcedParamValue(element, ElemType, Config.ForcedSystemName);
+            if(!string.IsNullOrEmpty(forcedSystem)) {
+                return forcedSystem;
+            }
             return _nameFactory.GetSystemValue(element);
+
         }
 
+        //public override void SetParamValue(Element element) {
+        //    ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedSystemName, GetSystemName(element)));
+        //}
+
         public override void SetParamValue(Element element) {
-            ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedSystemName, GetSystemName(element)));
+            string calculatedSystem = GetSystemName(element);
+            if(!(string.IsNullOrEmpty(calculatedSystem))) {
+                ToParam.Set(GetSystemName(element));
+                return;
+            }
+
+            ToParam.Set(Config.GlobalSystem);
         }
     }
 }

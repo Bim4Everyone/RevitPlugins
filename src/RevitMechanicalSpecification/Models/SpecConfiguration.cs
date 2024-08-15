@@ -19,6 +19,7 @@ namespace RevitMechanicalSpecification.Models {
         public string OriginalParamNameCode;
         public string OriginalParamNameUnit;
         public string OriginalParamNameCreator;
+        public string GlobalSystem;
         public double InsulationStock;
         public double DuctAndPipeStock;
         public bool IsSpecifyDuctFittings;
@@ -39,6 +40,7 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string ForcedSystemName = "ФОП_ВИС_Имя системы принудительное";
         public readonly string ForcedGroup = "ФОП_ВИС_Группирование принудительное";
         public readonly string ForcedFunction = "ФОП_ВИС_Экономическая функция";
+        
 
         public readonly string MinDuctThikness = "ФОП_ВИС_Минимальная толщина воздуховода";
         public readonly string MaxDuctThikness = "ФОП_ВИС_Максимальная толщина воздуховода";
@@ -48,6 +50,7 @@ namespace RevitMechanicalSpecification.Models {
         private readonly string _changedNameCode = "ФОП_ВИС_Замена параметра_Код изделия";
         private readonly string _changedNameUnit = "ФОП_ВИС_Замена параметра_Единица измерения";
         private readonly string _changedNameCreator = "ФОП_ВИС_Замена параметра_Завод-изготовитель";
+        private readonly string _outSystemNameParam = "ФОП_ВИС_Имя внесистемных элементов";
 
         private readonly string _paramNameIsSpecifyPipeFittings = "ФОП_ВИС_Учитывать фитинги труб";
         public readonly string ParamNameIsSpecifyPipeFittingsFromPype = "ФОП_ВИС_Учитывать фитинги труб по типу трубы";
@@ -73,12 +76,13 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string MaskNameName = "ФОП_ВИС_Маска наименования";
 
         public SpecConfiguration(ProjectInfo info) {
+            GlobalSystem = info.GetParamValueOrDefault(_outSystemNameParam, "!Нет системы");
             OriginalParamNameName = info.GetParamValueOrDefault(_changedNameName, "ADSK_Наименование");
             OriginalParamNameMark = info.GetParamValueOrDefault(_changedNameMark, "ADSK_Марка");
             OriginalParamNameCode = info.GetParamValueOrDefault(_changedNameCode, "ADSK_Код изделия");
             OriginalParamNameUnit = info.GetParamValueOrDefault(_changedNameUnit, "ADSK_Единица измерения");
             OriginalParamNameCreator = info.GetParamValueOrDefault(_changedNameCreator, "ADSK_Завод-изготовитель");
-            GlobalFunction = info.GetParamValueOrDefault(TargetNameFunction, "Нет функции");
+            GlobalFunction = info.GetParamValueOrDefault(TargetNameFunction, "!Нет функции");
             InsulationStock = info.GetParamValueOrDefault<double>(_paramNameInsulationStock, 0);
             DuctAndPipeStock = info.GetParamValueOrDefault<double>(_paramNameDuctPipeStock, 0);
 

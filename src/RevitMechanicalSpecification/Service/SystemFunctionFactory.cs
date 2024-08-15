@@ -68,7 +68,14 @@ namespace RevitMechanicalSpecification.Service {
 
         }
 
-        public string GetForcedFunctionValue(Element element, Element elemType, string paraName) {
+        //Если есть принудительное значение на типе - возвращаем.
+        //Если нет, но есть суперкомпонент - проверяем принудительное на нем.
+        public string GetForcedParamValue(Element element, Element elemType, string paraName) {
+            string result = DataOperator.GetTypeOrInstanceParamStringValue(element, elemType, paraName);
+
+            if(!string.IsNullOrEmpty(result)) {
+                return result;
+            }
             if(element is FamilyInstance instance) {
                 Element superComponent = GetSuperComponentIfExist(instance);
                 if(superComponent != null && element != superComponent) {
@@ -86,23 +93,22 @@ namespace RevitMechanicalSpecification.Service {
             }
 
             VisSystem visSystem = GetVisSystem(element);
-            if(visSystem is null) {
+            if(visSystem == null || string.IsNullOrEmpty(visSystem.SystemFunction)) {
                 return null;
             }
 
-            if(!string.IsNullOrEmpty(visSystem.SystemFunction)) { 
-                return visSystem.SystemFunction; 
-            }
-
-            return null;
+            return visSystem.SystemFunction;
         }
 
 
         public string GetSystemValue(Element element) {
+            if(element is FamilyInstance instance) {
+                element = GetSuperComponentIfExist(instance);
+            }
 
             VisSystem visSystem = GetVisSystem(element);
             if(visSystem is null) {
-                return _noneSystemValue;
+                return null;
             }
 
             if(!string.IsNullOrEmpty(visSystem.SystemShortName)) {

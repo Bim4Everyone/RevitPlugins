@@ -30,11 +30,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         private string GetFunction(Element element) {
-            string forcedFunction = _nameFactory.GetForcedFunctionValue(element, ElemType, Config.ForcedFunction);
-            //if (string.IsNullOrEmpty(forcedFunction)) {
-            //    Console.WriteLine("None");
-            //}
-            //Console.WriteLine(forcedFunction);
+            string forcedFunction = _nameFactory.GetForcedParamValue(element, ElemType, Config.ForcedFunction);
             if(!string.IsNullOrEmpty(forcedFunction)) { 
                 return forcedFunction;
             }
