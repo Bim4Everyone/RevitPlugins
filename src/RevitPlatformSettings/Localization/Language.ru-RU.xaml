@@ -63,7 +63,7 @@
     <system:String x:Key="OpenSourceWindow.ButtonCancel">Выход</system:String>
     <system:String x:Key="OpenSourceWindow.ItemType">Тип</system:String>
     <system:String x:Key="OpenSourceWindow.Author">Автор</system:String>
-    <system:String x:Key="OpenSourceWindow.Software">Програмное обеспечение</system:String>
+    <system:String x:Key="OpenSourceWindow.Software">Программное обеспечение</system:String>
     <system:String x:Key="OpenSourceWindow.License">Лицензионное соглашение</system:String>
     
     <system:String x:Key="OpenSourceWindow.SiteType">Сайты</system:String>
