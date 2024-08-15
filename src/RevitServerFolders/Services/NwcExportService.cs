@@ -55,14 +55,9 @@ namespace RevitServerFolders.Services {
 
                 var config = FileModelObjectConfig.GetPluginConfig();
                 try {
-                    _loggerService.Information($"Запуск экспорта в nwc\n" +
-                        $"Файл: {modelFiles[i]}\n" +
-                        $"TargetFolder: {targetFolder}\n" +
-                        $"IsExportRooms: {config.IsExportRooms}");
                     ExportDocument(modelFiles[i], targetFolder, config.IsExportRooms);
-                    _loggerService.Information($"Файл {modelFiles[i]} успешно экспортирован в nwc");
                 } catch(Exception ex) {
-                    _loggerService.Warning(ex, $"Ошибка экспорта в nwc в файле: {modelFiles[i]}");
+                    _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFiles[i]);
                 }
             }
         }
@@ -149,23 +144,27 @@ namespace RevitServerFolders.Services {
         }
 
         private void UIApplicationOnDialogBoxShowing(object sender, DialogBoxShowingEventArgs e) {
-            _loggerService.Information($"Event handler: {nameof(UIApplicationOnDialogBoxShowing)}");
-            _loggerService.Information($"DialogId: {e.DialogId}");
+            _loggerService.Information(
+                "Event handler: {@EventHandler}; DialogId: {@DialogId}",
+                nameof(UIApplicationOnDialogBoxShowing), e.DialogId);
             e.OverrideResult(1);
         }
 
         private void ApplicationOnFailuresProcessing(object sender, FailuresProcessingEventArgs e) {
-            _loggerService.Information($"Event handler: {nameof(ApplicationOnFailuresProcessing)}");
             FailuresAccessor accessor = e.GetFailuresAccessor();
-            _loggerService.Information($"Failure document path: {accessor.GetDocument().PathName}");
             var failureMessages = accessor.GetFailureMessages()
                 .GroupBy(m => m.GetDescriptionText())
-                .Select(g => new { Name = g.Key, Count = g.Count(), Severity = g.FirstOrDefault()?.GetSeverity() })
+                .Select(g => new {
+                    Description = g.Key,
+                    Count = g.Count(),
+                    Severity = g.FirstOrDefault()?.GetSeverity().ToString()
+                })
                 .ToArray();
-            foreach(var failure in failureMessages) {
-                _loggerService.Information(
-                    $"Failure message: {failure.Name}; Severity: {failure.Severity}; Total count: {failure.Count}");
-            }
+
+            _loggerService.Information(
+                "Event handler: {@EventHandler}; title: {@DocTitle}; Failures: {@Failures}",
+                nameof(ApplicationOnFailuresProcessing), accessor.GetDocument().Title, failureMessages);
+
             accessor.DeleteAllWarnings();
             accessor.ResolveFailures(accessor.GetFailureMessages());
 
