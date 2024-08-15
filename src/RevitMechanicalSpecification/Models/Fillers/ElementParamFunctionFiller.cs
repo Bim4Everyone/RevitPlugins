@@ -18,11 +18,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private readonly SystemFunctionFactory _nameFactory;
 
         public ElementParamFunctionFiller(
-            string toParamName, 
-            string fromParamName, 
-            SpecConfiguration specConfiguration, 
+            string toParamName,
+            string fromParamName,
+            SpecConfiguration specConfiguration,
             Document document,
-            List<VisSystem> systemList) : 
+            List<VisSystem> systemList) :
             base(toParamName, fromParamName, specConfiguration, document) {
 
             _systemList = systemList;
@@ -30,11 +30,25 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         private string GetFunction(Element element) {
+            string forcedFunction = _nameFactory.GetForcedFunctionValue(element, ElemType, Config.ForcedFunction);
+            //if (string.IsNullOrEmpty(forcedFunction)) {
+            //    Console.WriteLine("None");
+            //}
+            //Console.WriteLine(forcedFunction);
+            if(!string.IsNullOrEmpty(forcedFunction)) { 
+                return forcedFunction;
+            }
             return _nameFactory.GetFunctionValue(element);
         }
 
         public override void SetParamValue(Element element) {
-            ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedFunction, GetFunction(element)));
+            string calculatedFunction = GetFunction(element);
+            if(!(string.IsNullOrEmpty(calculatedFunction))) {
+                ToParam.Set(GetFunction(element));
+                return;
+            }
+
+            ToParam.Set(Config.GlobalFunction);
         }
     }
 }

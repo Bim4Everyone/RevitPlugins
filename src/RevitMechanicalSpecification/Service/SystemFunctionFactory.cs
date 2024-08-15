@@ -17,7 +17,7 @@ namespace RevitMechanicalSpecification.Service {
         private readonly Document _document;
         private readonly List<VisSystem> _systems;
         private readonly string _noneSystemValue = "Нет системы";
-        private readonly string _noneFunctionValue = "Нет функции";
+        
 
         public SystemFunctionFactory(Document document, List<VisSystem> systems) {
             _document = document;
@@ -68,15 +68,33 @@ namespace RevitMechanicalSpecification.Service {
 
         }
 
-        public string GetFunctionValue(Element element) {
-            VisSystem visSystem = GetVisSystem(element);
-            if(visSystem is null) {
-                return _noneFunctionValue;
+        public string GetForcedFunctionValue(Element element, Element elemType, string paraName) {
+            if(element is FamilyInstance instance) {
+                Element superComponent = GetSuperComponentIfExist(instance);
+                if(superComponent != null && element != superComponent) {
+                    element = superComponent;
+                    elemType = superComponent.GetElementType();
+                }
             }
 
-            if(!string.IsNullOrEmpty(visSystem.SystemFunction)) { return visSystem.SystemFunction; }
+            return DataOperator.GetTypeOrInstanceParamStringValue(element, elemType, paraName);
+        }
 
-            return _noneFunctionValue;
+        public string GetFunctionValue(Element element) {
+            if(element is FamilyInstance instance) {
+                element = GetSuperComponentIfExist(instance);
+            }
+
+            VisSystem visSystem = GetVisSystem(element);
+            if(visSystem is null) {
+                return null;
+            }
+
+            if(!string.IsNullOrEmpty(visSystem.SystemFunction)) { 
+                return visSystem.SystemFunction; 
+            }
+
+            return null;
         }
 
 

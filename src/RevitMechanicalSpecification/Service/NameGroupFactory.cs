@@ -134,10 +134,10 @@ namespace RevitMechanicalSpecification.Service {
         public string GetManifoldGroup(FamilyInstance familyInstance, Element element) {
             return
                     $"{GetBaseGroup(familyInstance)}" +
+                    $"{GetDetailedGroup(familyInstance)}"+
                     $"{familyInstance.get_Parameter(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString()}" +
                     $"_Узел_" +
-                    "_" +
-                    $"{GetDetailedGroup(element)}";
+                    $"_{GetDetailedGroup(element)}";
         }
 
         public bool IsIncreaseCount(List<Element> manifoldElements, int index, Element element, Element elemType) {

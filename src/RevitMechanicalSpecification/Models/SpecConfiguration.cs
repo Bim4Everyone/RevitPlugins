@@ -13,6 +13,7 @@ namespace RevitMechanicalSpecification.Models {
     public class SpecConfiguration {
 
         //константы сделать константами
+        public string GlobalFunction;
         public string OriginalParamNameName;
         public string OriginalParamNameMark;
         public string OriginalParamNameCode;
@@ -26,7 +27,6 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string TargetNameGroup = "ФОП_ВИС_Группирование";
         public readonly string TargetNameFunction = "ФОП_Экономическая функция";
         public readonly string TargetNameSystem = "ФОП_ВИС_Имя системы";
-        public readonly string TargetNameVisFunction = "ФОП_ВИС_Экономическая функция";
         public readonly string TargetNameName = "ФОП_ВИС_Наименование комбинированное";
         public readonly string TargetNameMark = "ФОП_ВИС_Марка";
         public readonly string TargetNameCode = "ФОП_ВИС_Код изделия";
@@ -38,7 +38,7 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string ForcedName = "ФОП_ВИС_Наименование принудительное";
         public readonly string ForcedSystemName = "ФОП_ВИС_Имя системы принудительное";
         public readonly string ForcedGroup = "ФОП_ВИС_Группирование принудительное";
-        public readonly string ForcedFunction = "ФОП_ВИС_Функция принудительная";
+        public readonly string ForcedFunction = "ФОП_ВИС_Экономическая функция";
 
         public readonly string MinDuctThikness = "ФОП_ВИС_Минимальная толщина воздуховода";
         public readonly string MaxDuctThikness = "ФОП_ВИС_Максимальная толщина воздуховода";
@@ -78,6 +78,7 @@ namespace RevitMechanicalSpecification.Models {
             OriginalParamNameCode = info.GetParamValueOrDefault(_changedNameCode, "ADSK_Код изделия");
             OriginalParamNameUnit = info.GetParamValueOrDefault(_changedNameUnit, "ADSK_Единица измерения");
             OriginalParamNameCreator = info.GetParamValueOrDefault(_changedNameCreator, "ADSK_Завод-изготовитель");
+            GlobalFunction = info.GetParamValueOrDefault(TargetNameFunction, "Нет функции");
             InsulationStock = info.GetParamValueOrDefault<double>(_paramNameInsulationStock, 0);
             DuctAndPipeStock = info.GetParamValueOrDefault<double>(_paramNameDuctPipeStock, 0);
 

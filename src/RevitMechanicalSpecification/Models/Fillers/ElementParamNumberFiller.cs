@@ -35,22 +35,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         private double GetNumber(Element element) {
-            //Если в проекте уже есть обработанные части узлов, и элемент не является линейным, проверяем встречался ли он.
-            //Если встречался и идет одиночная обработка вложений в узел - зануляем
-            if(ManifoldParts != null) {
-                if(!element.InAnyCategory(new HashSet<BuiltInCategory>() {
-                    BuiltInCategory.OST_DuctCurves,
-                    BuiltInCategory.OST_PipeCurves,
-                    BuiltInCategory.OST_DuctInsulations,
-                    BuiltInCategory.OST_PipeInsulations})) {
-                    string group = _nameAndGroupFactory.GetGroup(element);
-
-                    if(ManifoldParts.Where(part => part.Group == group).ToHashSet().Count > 0) {
-                        return 0;
-                    };
-                }
-            }
-
             double number = 0;
             string unit;
             unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);
@@ -65,7 +49,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     InsulationLiningBase insulation = element as InsulationLiningBase;
                     Element host = Document.GetElement(insulation.HostElementId);
                     return _calculator.GetFittingArea(host);
-
                 }
                 if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
                     return _calculator.GetFittingArea(element);
@@ -73,9 +56,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 if(LinearLogicalFilter(element)) {
                     double area = element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
                     double convArea = UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters);
-                    
                     return Math.Round(convArea, 2);
-                    
                 }
             }
             //Если единица измерения метры погонные - забираем длину и переводим в метры

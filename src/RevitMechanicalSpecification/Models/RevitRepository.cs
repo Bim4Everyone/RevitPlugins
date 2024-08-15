@@ -194,13 +194,14 @@ namespace RevitMechanicalSpecification.Models {
                 int positionNumber = 1;
                 FamilyInstance familyInstance = element as FamilyInstance;
 
-                //Сортируем по параметру группирования, чтоб присвоить нумерацию узлу
+                //Сортируем лист по параметру группирования, чтоб присвоить нумерацию узлу от его индексов
                 List<Element> manifoldElements = _nameAndGroupFactory.GetSub(familyInstance)
                     .OrderBy(e => _nameAndGroupFactory.GetGroup(e))
                     .Where(e => !_nameAndGroupFactory.IsOutSideOfManifold(e.GetElementType()))
                     .ToList();
 
-                //Если не стоит галочка "Исключить из узла", проверяем меняется ли номер элемента в узле и отправляем элемент в филлеры
+                //Если не стоит галочка "Исключить из узла"(проверяется в сортировке выше),
+                //проверяем меняется ли номер элемента в узле и отправляем элемент в филлеры
                 foreach(Element subElement in manifoldElements) {
                     Element subElementType = subElement.GetElementType();
                     int index = manifoldElements.IndexOf(subElement);
@@ -213,8 +214,7 @@ namespace RevitMechanicalSpecification.Models {
                 }
 
                 //После того как сабэлементы узла были отработаны филлерами - закидываем их в экземпляры класса части узла,
-                //чтоб при следующей встрече в узловой обработке иметь возможность занулить их число в филлере числа
-                //И проигнорировать при встрече в обработке вне узловой
+                //чтоб при следующей встрече в узловой обработке иметь возможность проигнорировать при встрече в обработке вне узловой
                 foreach(Element subElement in manifoldElements) {
                     string group = _nameAndGroupFactory.GetGroup(subElement);
                     ManifoldPart part = CreateManifoldParts(subElement, group);
