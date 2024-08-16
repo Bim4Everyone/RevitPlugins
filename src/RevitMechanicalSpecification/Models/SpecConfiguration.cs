@@ -85,14 +85,13 @@ namespace RevitMechanicalSpecification.Models {
             OriginalParamNameUnit = info.GetParamValueOrDefault(_changedNameUnit, "ADSK_Единица измерения");
             OriginalParamNameCreator = info.GetParamValueOrDefault(_changedNameCreator, "ADSK_Завод-изготовитель");
             GlobalFunction = info.GetParamValueOrDefault(TargetNameFunction, "!Нет функции");
-            PipeInsulationStock = info.GetParamValueOrDefault<double>(_paramNamePipeInsulationStock, 0);
-            DuctInsulationStock = info.GetParamValueOrDefault<double>(_paramNameDuctInsulationStock, 0);
+            PipeInsulationStock = 1 + (info.GetParamValueOrDefault<double>(_paramNamePipeInsulationStock, 0))/100;
+            DuctInsulationStock = 1 + (info.GetParamValueOrDefault<double>(_paramNameDuctInsulationStock, 0))/100;
 
-            DuctAndPipeStock = info.GetParamValueOrDefault<double>(_paramNameDuctPipeStock, 0);
+            DuctAndPipeStock = 1 + (info.GetParamValueOrDefault<double>(_paramNameDuctPipeStock, 0))/100;
 
             IsSpecifyDuctFittings = info.GetSharedParamValueOrDefault<int>(_paramNameIsSpecifyDuctFittings) == 1;
             IsSpecifyPipeFittings = info.GetSharedParamValueOrDefault<int>(_paramNameIsSpecifyPipeFittings) == 1;
         }
-
     }
 }
