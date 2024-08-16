@@ -20,7 +20,8 @@ namespace RevitMechanicalSpecification.Models {
         public string OriginalParamNameUnit;
         public string OriginalParamNameCreator;
         public string GlobalSystem;
-        public double InsulationStock;
+        public double PipeInsulationStock;
+        public double DuctInsulationStock;
         public double DuctAndPipeStock;
         public bool IsSpecifyDuctFittings;
         public bool IsSpecifyPipeFittings;
@@ -56,7 +57,8 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string ParamNameIsSpecifyPipeFittingsFromPype = "ФОП_ВИС_Учитывать фитинги труб по типу трубы";
         private readonly string _paramNameIsSpecifyDuctFittings = "ФОП_ВИС_Учитывать фитинги воздуховодов";
 
-        private readonly string _paramNameInsulationStock = "ФОП_ВИС_Запас изоляции";
+        private readonly string _paramNamePipeInsulationStock = "ФОП_ВИС_Запас изоляции труб";
+        private readonly string _paramNameDuctInsulationStock = "ФОП_ВИС_Запас изоляции воздуховодов";
         private readonly string _paramNameDuctPipeStock = "ФОП_ВИС_Запас воздуховодов/труб";
         public readonly string IndividualStock = "ФОП_ВИС_Индивидуальный запас";
 
@@ -83,7 +85,9 @@ namespace RevitMechanicalSpecification.Models {
             OriginalParamNameUnit = info.GetParamValueOrDefault(_changedNameUnit, "ADSK_Единица измерения");
             OriginalParamNameCreator = info.GetParamValueOrDefault(_changedNameCreator, "ADSK_Завод-изготовитель");
             GlobalFunction = info.GetParamValueOrDefault(TargetNameFunction, "!Нет функции");
-            InsulationStock = info.GetParamValueOrDefault<double>(_paramNameInsulationStock, 0);
+            PipeInsulationStock = info.GetParamValueOrDefault<double>(_paramNamePipeInsulationStock, 0);
+            DuctInsulationStock = info.GetParamValueOrDefault<double>(_paramNameDuctInsulationStock, 0);
+
             DuctAndPipeStock = info.GetParamValueOrDefault<double>(_paramNameDuctPipeStock, 0);
 
             IsSpecifyDuctFittings = info.GetSharedParamValueOrDefault<int>(_paramNameIsSpecifyDuctFittings) == 1;

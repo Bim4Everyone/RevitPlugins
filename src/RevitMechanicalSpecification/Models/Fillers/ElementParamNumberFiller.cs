@@ -65,7 +65,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return UnitConverter.DoubleToMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH));
                 }
             }
-
             return number;
         }
 
