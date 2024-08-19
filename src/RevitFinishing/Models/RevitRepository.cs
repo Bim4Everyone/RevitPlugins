@@ -34,7 +34,10 @@ namespace RevitFinishing.Models {
         public Document Document => ActiveUIDocument.Document;
 
         public List<Phase> GetPhases() {
-            return Document.Phases.OfType<Phase>().ToList();
+            return Document
+                .Phases
+                .OfType<Phase>()
+                .ToList();
         }
 
         public ObservableCollection<ElementsGroupViewModel> GetRoomsOnPhase(Phase phase) {
@@ -57,7 +60,6 @@ namespace RevitFinishing.Models {
 
         public ICollection<Element> GetFinishingElementsOnPhase(FinishingCategory finishingCategory, Phase phase) {
             ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, _phaseStatuses);
-
             ElementId parameterId = new ElementId(BuiltInParameter.ELEM_TYPE_PARAM);
             ParameterValueProvider valueProvider = new ParameterValueProvider(parameterId);
             FilterStringContains ruleEvaluator = new FilterStringContains();
@@ -77,11 +79,15 @@ namespace RevitFinishing.Models {
         }
 
         public void SetAll(IList<ElementsGroupViewModel> allLevels, bool value) {
-            foreach(var level in allLevels) { level.IsChecked = value; }
+            foreach(var level in allLevels) {
+                level.IsChecked = value; 
+            }
         }
 
         public void InvertAll(IList<ElementsGroupViewModel> allLevels) {
-            foreach(var level in allLevels) { level.IsChecked = !level.IsChecked; }
+            foreach(var level in allLevels) { 
+                level.IsChecked = !level.IsChecked; 
+            }
         }
     }
 }

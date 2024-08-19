@@ -28,14 +28,15 @@ namespace RevitFinishing.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
 
-            ProjectSettingsLoader settings = new ProjectSettingsLoader(_revitRepository.Application, _revitRepository.Document);
+            ProjectSettingsLoader settings = new ProjectSettingsLoader(_revitRepository.Application,
+                                                                       _revitRepository.Document);
             settings.CopyKeySchedule();
             settings.CopyParameters();
 
             _phases = _revitRepository.GetPhases();
             SelectedPhase = _phases[_phases.Count - 1];
 
-            CalculateFinishingCommand = RelayCommand.Create(CalculateFinishing, CanCalculateFinishing);
+            CalculateFinishingCommand = new RelayCommand(CalculateFinishing, CanCalculateFinishing);
             CheckAllCommand = new RelayCommand(CheckAll);
             UnCheckAllCommand = new RelayCommand(UnCheckAll);
             InvertAllCommand = new RelayCommand(InvertAll);
@@ -50,7 +51,7 @@ namespace RevitFinishing.ViewModels {
         public Phase SelectedPhase {
             get => _selectedPhase;
             set {
-                this.RaiseAndSetIfChanged(ref _selectedPhase, value);
+                RaiseAndSetIfChanged(ref _selectedPhase, value);
                 _rooms = _revitRepository.GetRoomsOnPhase(_selectedPhase);
                 OnPropertyChanged("Rooms");
             }
@@ -58,10 +59,10 @@ namespace RevitFinishing.ViewModels {
 
         public ObservableCollection<ElementsGroupViewModel> Rooms {
             get => _rooms;
-            set => this.RaiseAndSetIfChanged(ref _rooms, value);
+            set => RaiseAndSetIfChanged(ref _rooms, value);
         }
 
-        private void CalculateFinishing() {
+        private void CalculateFinishing(object p) {
             IEnumerable<Element> selectedRooms = Rooms
                 .Where(x => x.IsChecked)
                 .SelectMany(x => x.Elements);
@@ -93,8 +94,8 @@ namespace RevitFinishing.ViewModels {
             }
         }
 
-        private bool CanCalculateFinishing() {
-            if(Rooms.Count == 0) {
+        private bool CanCalculateFinishing(object p) {
+            if(!Rooms.Any()) {
                 ErrorText = "Помещения отсутствуют на выбранной стадии";
                 return false;
             }
@@ -121,7 +122,7 @@ namespace RevitFinishing.ViewModels {
 
         public string ErrorText {
             get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+            set => RaiseAndSetIfChanged(ref _errorText, value);
         }
     }
 }
