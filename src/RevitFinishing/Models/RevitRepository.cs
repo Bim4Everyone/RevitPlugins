@@ -40,7 +40,7 @@ namespace RevitFinishing.Models {
                 .ToList();
         }
 
-        public ObservableCollection<ElementsGroupViewModel> GetRoomsOnPhase(Phase phase) {
+        public ObservableCollection<RoomGroupViewModel> GetRoomsOnPhase(Phase phase) {
             ParameterValueProvider valueProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
             FilterNumericEquals ruleEvaluator = new FilterNumericEquals();
             FilterElementIdRule filterRule = new FilterElementIdRule(valueProvider, ruleEvaluator, phase.Id);
@@ -51,11 +51,11 @@ namespace RevitFinishing.Models {
                 .WherePasses(parameterFilter)
                 .OfType<Room>()
                 .GroupBy(x => x.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Без имени>"))
-                .Select(x => new ElementsGroupViewModel(x.Key.ToString(), x))
+                .Select(x => new RoomGroupViewModel(x.Key.ToString(), x))
                 .OrderBy(x => x.Name)
                 .ToList();
 
-            return new ObservableCollection<ElementsGroupViewModel>(rooms);
+            return new ObservableCollection<RoomGroupViewModel>(rooms);
         }
 
         public ICollection<Element> GetFinishingElementsOnPhase(FinishingCategory finishingCategory, Phase phase) {
@@ -78,13 +78,13 @@ namespace RevitFinishing.Models {
                 .ToElements();
         }
 
-        public void SetAll(IList<ElementsGroupViewModel> allLevels, bool value) {
+        public void SetAll(IList<RoomGroupViewModel> allLevels, bool value) {
             foreach(var level in allLevels) {
                 level.IsChecked = value; 
             }
         }
 
-        public void InvertAll(IList<ElementsGroupViewModel> allLevels) {
+        public void InvertAll(IList<RoomGroupViewModel> allLevels) {
             foreach(var level in allLevels) { 
                 level.IsChecked = !level.IsChecked; 
             }

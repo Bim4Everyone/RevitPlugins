@@ -20,7 +20,7 @@ namespace RevitFinishing.ViewModels {
         private readonly List<Phase> _phases;
         private Phase _selectedPhase;
 
-        private ObservableCollection<ElementsGroupViewModel> _rooms;
+        private ObservableCollection<RoomGroupViewModel> _rooms;
 
         private string _errorText;
 
@@ -57,7 +57,7 @@ namespace RevitFinishing.ViewModels {
             }
         }
 
-        public ObservableCollection<ElementsGroupViewModel> Rooms {
+        public ObservableCollection<RoomGroupViewModel> Rooms {
             get => _rooms;
             set => RaiseAndSetIfChanged(ref _rooms, value);
         }
@@ -65,7 +65,7 @@ namespace RevitFinishing.ViewModels {
         private void CalculateFinishing(object p) {
             IEnumerable<Element> selectedRooms = Rooms
                 .Where(x => x.IsChecked)
-                .SelectMany(x => x.Elements);
+                .SelectMany(x => x.Rooms);
 
             FinishingInProject finishing = new FinishingInProject(_revitRepository, SelectedPhase);
             FinishingCalculator calculator = new FinishingCalculator(selectedRooms, finishing, SelectedPhase);
