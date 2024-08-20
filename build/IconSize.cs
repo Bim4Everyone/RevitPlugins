@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Net.Http;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 
+[TypeConverter(typeof(TypeConverter<IconSize>))]
 class IconSize : Enumeration {
     public static readonly IconSize Size32 = new() {Value = nameof(Size32), Size = 32};
     public static readonly IconSize Size64 = new() {Value = nameof(Size64), Size = 64};
@@ -26,12 +28,12 @@ class IconSize : Enumeration {
 
             CreateBitmap(
                 image,
-                Color.FromArgb(250, 176, 5),
+                Color.FromArgb(250, 82, 82),
                 target.Parent / target.NameWithoutExtension + ".fail.png");
 
             CreateBitmap(
                 image,
-                Color.FromArgb(250, 82, 82),
+                Color.FromArgb(250, 176, 5),
                 target.Parent / target.NameWithoutExtension + ".warning.png");
         }
     }

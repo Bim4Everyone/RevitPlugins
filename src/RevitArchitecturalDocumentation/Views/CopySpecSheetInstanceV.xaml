@@ -1,0 +1,170 @@
+﻿<base:PlatformWindow
+    x:Class="RevitArchitecturalDocumentation.Views.CopySpecSheetInstanceV"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitArchitecturalDocumentation.Views"
+    xmlns:vms="clr-namespace:RevitArchitecturalDocumentation.ViewModels"
+
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="CopySpecSheetInstanceV"
+    Height="280" Width="450"    
+    MinHeight="280" MinWidth="450"    
+
+    d:DataContext="{d:DesignInstance vms:CopySpecSheetInstanceVM, IsDesignTimeCreatable=False}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel
+            Grid.Row="0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Left">
+
+            <TextBlock
+                Margin="10 3"
+                VerticalAlignment="Center"
+                Text="Выбрано листов:" />
+
+            <TextBlock
+                Margin="5 3"
+                VerticalAlignment="Center"
+                Text="{Binding Path=SelectedSheets.Count}" />
+        </StackPanel>
+
+        <Rectangle 
+            Grid.Row="0"
+            HorizontalAlignment="Right"
+            Margin="10"
+            Fill="WhiteSmoke"
+            Stroke="Black"
+            Width="20"
+            Height="20"
+            RadiusX="8"
+            RadiusY="8">
+            <Rectangle.ToolTip>
+                <TextBlock 
+                        Text="Плагин позволяет копировать видовые экраны спецификаций и размещать их на листах.&#10;Имя листа и спецификации должно:&#10;- разделяться на блоки при помощи &quot;_&quot;;&#10;- иметь в блоке имени, где указан номер этажа слово &quot;этаж&quot; (при этом &quot;этаж&quot; может быть как до, так и после номера);&#10;&#10;Пример для листа: &quot;ПСО_корпус 1_секция 1_этаж 4&quot;&#10;&#10;Пример для спецификации: &quot;О_ПСО_05 этаж_Жилье Корпуса 1-3&quot;.&#10;Здесь блок имени с номером этажа - &quot;05 этаж&quot;.&#10;&#10;Принцип работы:&#10;- пользователь выбирает листы через диспетчер проекта перед запуском плагина;&#10;- запускает плагин;&#10;- плагин анализирует выбранные листы и выводит ошибку, если не удалось получить номер этажа одного из листов;&#10;- пользователь нажимает кнопку Выбрать спецификации и выбирает видовые экраны спецификаций на листах;&#10;- плагин анализирует выбранные спецификации и выводит ошибку, если не удалось получить номер этажа одной из спецификаций;&#10;- пользователь выбирает из выпадающего списка поле фильтра, где указан этаж;&#10;- пользователь нажимает кнопку Ок;&#10;Далее плагин перебирает листы и формирует имена спецификаций, которые он должен разместить на эти листы.&#10;Затем, если в проекте есть спецификации с необходимым именем, то он использует их, если нет, то создает новые и задает фильтрацию по нужному этажу.&#10;После этого плагин размещает спецификации на лист в тех же местах, что и выбранные." 
+                        TextWrapping="Wrap"
+                        Width="400"
+                        TextAlignment="Justify"
+                        FlowDirection="LeftToRight"
+                        ToolTipService.InitialShowDelay="500"
+                        ToolTipService.ShowDuration="40000"
+                        ToolTipService.BetweenShowDelay="1"/>
+            </Rectangle.ToolTip>
+        </Rectangle>
+
+        <TextBlock
+            Grid.Row="0"
+            HorizontalAlignment="Right"
+            Margin="10 10 18.5 10"
+            VerticalAlignment="Center"
+            FontSize="16"
+            Text="i" FontFamily="Arial">
+            <TextBlock.ToolTip>
+                <TextBlock 
+                        Text="Плагин позволяет переносить или удалять совпадающие марки помещений на разных видах.&#10;Совпадающими считаются те марки, которые имеют абсолютно одинаковые координаты на виде, например,&#10;когда вы произвели копирование марок с одного вида на другой.&#10;Принцип работы:&#10;- выберите виды через диспетчер проекта, а затем запустите плагин;&#10;- в строке задания выберите марки на одном из видов;&#10;- если вы хотите переместить совпадающие марки, то введите значения смещений, отличные от нуля;&#10;- если вы хотите удалить совпадающие марки, то поставьте галочку в столбце &quot;Удалить?&quot;;&#10;- чтобы добавить еще одну строку задания нажмите кнопки &quot;Добавить задачу&quot;&#10;- чтобы удалить лишнюю задачу, выберите ее в списке и нажмите кнопку &quot;Удалить задачу&quot;;&#10;- запустите плагин нажав кнопку &quot;Ок&quot;;&#10;- плагин переберет все выбранные до запуска виды, найдет на них марки помещений и, если они совпадают по координатам с марками из заданий, произведет с ними манипуляции." 
+                        TextWrapping="Wrap"
+                        Width="400"
+                        TextAlignment="Justify"
+                        FlowDirection="LeftToRight"
+                        ToolTipService.InitialShowDelay="500"
+                        ToolTipService.ShowDuration="40000"
+                        ToolTipService.BetweenShowDelay="1"/>
+            </TextBlock.ToolTip>
+        </TextBlock>
+
+
+        <Button
+            Grid.Row="1"
+            Margin="10 5"
+            Content="Выбрать спецификации"
+            FontSize="14"
+            Click="ButtonOk_Click"
+            Command="{Binding Path=SelectSpecsCommand}"/>
+
+
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Left">
+
+            <TextBlock
+                Margin="10 3"
+                VerticalAlignment="Center"
+                Text="Выбрано спецификаций:" />
+
+            <TextBlock
+                Margin="5 3"
+                VerticalAlignment="Center"
+                Text="{Binding Path=ScheduleSheetInstances.Count}" />
+        </StackPanel>
+
+
+        <TextBlock
+            Grid.Row="3"
+            Margin="10 10 10 3"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Left"
+            Text="Выберите поле фильтрации этажа:" />
+
+
+        <ComboBox
+            Grid.Row="4"
+            Margin="10 5"
+            ItemsSource="{Binding Path=FilterNamesFromSpecs, UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding Path=SelectedFilterNameForSpecs}">
+        </ComboBox>
+
+
+        <TextBlock
+            Grid.Row="5"
+            Margin="10 3"
+            Foreground="Orange"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            Text="{Binding ErrorText}" />
+
+        <StackPanel
+            Grid.Row="6"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                Click="ButtonOk_Click"
+                Command="{Binding Path=AcceptViewCommand}"/>
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Отмена"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>

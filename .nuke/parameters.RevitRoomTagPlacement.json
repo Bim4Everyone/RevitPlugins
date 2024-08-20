@@ -1,0 +1,11 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitRoomTagPlacement",
+  "PublishDirectory": "02.AR.extension\\АР.tab\\bin",
+  "RevitVersions": ["Rv2020", "Rv2021", "Rv2022", "Rv2023", "Rv2024"],
+  "IconUrl": "https://icons8.com/icon/22177/add-tag",
+  "BundleName": "Маркировать помещения",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "02.AR.extension\\АР.tab\\Квартирография.panel\\Помещения.pulldown"
+}

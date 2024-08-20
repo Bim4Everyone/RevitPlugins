@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                    xmlns:vms="clr-namespace:RevitPlatformSettings.ViewModels">
+    <DataTemplate DataType="{x:Type vms:RevitParamsSettingsViewModel}">
+        <dxg:GridControl
+            ItemsSource="{Binding RevitParams}">
+
+            <dxg:GridControl.View>
+                <dxg:TableView
+                    AutoWidth="True"
+                    AllowEditing="False"
+                    AllowGrouping="False"
+                    ShowGroupPanel="False"
+                    EnableImmediatePosting="True" />
+            </dxg:GridControl.View>
+
+            <dxg:GridColumn
+                Header="{DynamicResource RevitParamsSettings.IdGridColumn}" FieldName="Id" />
+            <dxg:GridColumn
+                Header="{DynamicResource RevitParamsSettings.NameGridColumn}" FieldName="Name" />
+            <dxg:GridColumn
+                Header="{DynamicResource RevitParamsSettings.StorageTypeGridColumn}" FieldName="StorageType" />
+        </dxg:GridControl>
+    </DataTemplate>
+</ResourceDictionary>

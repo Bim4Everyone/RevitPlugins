@@ -1,0 +1,129 @@
+﻿<base:ThemedPlatformWindow x:Class="RevitClashDetective.Views.SearchSetView"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:vm="clr-namespace:RevitClashDetective.ViewModels.SearchSet"
+                           xmlns:m="clr-namespace:RevitClashDetective.Models.Value"
+                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                           xmlns:dxci="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
+                           xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
+                           xmlns:base="clr-namespace:dosymep.WPF.Views"
+                           mc:Ignorable="d"
+                           Title="{Binding Name}"
+                           Height="450"
+                           Width="800"
+                           d:DataContext="{d:DesignInstance vm:SearchSetsViewModel, IsDesignTimeCreatable=False}">
+    <mvvm:Interaction.Behaviors>
+        <mvvm:EventToCommand EventName="Loaded"
+                             Command="{Binding ShowSetCommand}" />
+        <mvvm:EventToCommand EventName="Closing"
+                             Command="{Binding CloseCommand}" />
+        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
+    </mvvm:Interaction.Behaviors>
+    <base:ThemedPlatformWindow.Resources>
+        <Style TargetType="dxg:GridControl">
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
+                    Value="Auto" />
+            <Setter Property="SelectionMode"
+                    Value="Row" />
+            <Setter Property="AutoExpandAllGroups"
+                    Value="True" />
+        </Style>
+        <Style TargetType="dxg:TableView">
+            <Setter Property="ShowDataNavigator"
+                    Value="False" />
+            <Setter Property="ShowSearchPanelMode"
+                    Value="Never" />
+            <Setter Property="NavigationStyle"
+                    Value="Cell" />
+            <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping"
+                    Value="True" />
+            <Setter Property="VirtualizingPanel.VirtualizationMode"
+                    Value="Recycling" />
+            <Setter Property="VirtualizingPanel.IsVirtualizing"
+                    Value="True" />
+            <Setter Property="AllowEditing"
+                    Value="False" />
+            <Setter Property="ShowGroupPanel"
+                    Value="True" />
+            <Setter Property="AllowGrouping"
+                    Value="True" />
+        </Style>
+        <DataTemplate DataType="{x:Type m:ParamValue}">
+            <dxe:TextEdit IsReadOnly="True"
+                          EditMode="InplaceActive"
+                          EditValue="{Binding DisplayValue}" />
+        </DataTemplate>
+    </base:ThemedPlatformWindow.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel HorizontalAlignment="Left">
+            <dx:SimpleButton DockPanel.Dock="Left"
+                             ToolTip="Показать весь набор элементов на виде целиком"
+                             Command="{Binding ShowSetCommand}"
+                             Content="Показать весь набор"
+                             Width="150" />
+        </DockPanel>
+
+        <dxg:GridControl Grid.Row="1"
+                         x:Name="_gridControl"
+                         ItemsSource="{Binding SearchSet.Grid.Rows, UpdateSourceTrigger=PropertyChanged}">
+            <dxg:GridControl.GroupSummary>
+                <dxg:GridSummaryItem SummaryType="Count" />
+            </dxg:GridControl.GroupSummary>
+            <dxg:GridControl.View>
+                <dxg:TableView x:Name="_gridView" />
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn Width="80"
+                                AllowResizing="False">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dx:SimpleButton Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SearchSet.Grid.SelectCommand}"
+                                             CommandParameter="{Binding Row}"
+                                             Glyph="{dx:DXImage 'SvgImages/HybridDemoIcons/Editors/HybridDemo_Search Button.svg'}"
+                                             GlyphHeight="16" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+                <dxg:GridColumn Width="2*"
+                                Header="Файл"
+                                FieldName="File" />
+                <dxg:GridColumn Width="1*"
+                                Header="Категория"
+                                FieldName="Category" />
+                <dxg:GridColumn Width="1*"
+                                Header="Id"
+                                FieldName="Id" />
+                <dxg:GridColumn Width="3*"
+                                Header="Имя семейства"
+                                FieldName="FamilyName" />
+                <dxg:GridColumn Width="3*"
+                                Header="Имя типоразмера"
+                                FieldName="Name" />
+            </dxg:GridControl.Columns>
+        </dxg:GridControl>
+        <DockPanel Grid.Row="2">
+            <dxe:CheckEdit EditValue="{Binding Inverted}"
+                           Content="Инвертировать"
+                           DockPanel.Dock="Left"
+                           HorizontalAlignment="Left">
+                <mvvm:Interaction.Triggers>
+                    <mvvm:EventToCommand EventName="EditValueChanged"
+                                         Command="{Binding InversionChangedCommand}" />
+                </mvvm:Interaction.Triggers>
+            </dxe:CheckEdit>
+        </DockPanel>
+
+    </Grid>
+</base:ThemedPlatformWindow>

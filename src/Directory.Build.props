@@ -1,0 +1,162 @@
+<Project>
+    <PropertyGroup>     
+        <Platforms>x64</Platforms>
+        <OutputType>Library</OutputType>
+        <NoWarn>1701;1702;MSB3246;MSB3277</NoWarn>
+        <TargetFramework>net48</TargetFramework>
+        
+        <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+        <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>
+        
+        <UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
+        <RevitVersion Condition="'$(RevitVersion)' == ''">2024</RevitVersion>
+        
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Configurations>D2020;D2021;D2022;D2023;D2024;Debug;Release</Configurations>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration.StartsWith(`D`))'">
+        <Optimization>false</Optimization>
+        <DebugSymbols>true</DebugSymbols>
+        <OutputPath>bin\x64\Debug</OutputPath>
+        <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration.StartsWith(`R`))'">
+        <Optimize>true</Optimize>
+        <DebugSymbols>false</DebugSymbols>
+        <OutputPath>bin\x64\Release</OutputPath>
+        <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(RevitVersion) != ''">
+        <Version>$(RevitVersion).2.4</Version>
+        <FileVersion>$(RevitVersion).2.4</FileVersion>
+        <Company>dosymep</Company>
+        <Authors>dosymep, budaevaler, sssenya, DivinN, vlastroG</Authors>
+        <PackageTags>dosymep, revit, plugins</PackageTags>
+        <Copyright>Copyright © 2024</Copyright>
+        <PackageProjectUrl>https://github.com/dosymep/RevitPlugins.git</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/dosymep/RevitPlugins.git</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\dosymep\AppDomainExtensions.cs" Link="dosymep\AppDomainExtensions.cs"/>
+        <Compile Include="..\dosymep\BaseViewModel.cs" Link="dosymep\BaseViewModel.cs"/>
+        <Compile Include="..\dosymep\ObservableObject.cs" Link="dosymep\ObservableObject.cs"/>
+        <Compile Include="..\dosymep\BoolToVisibilityConverter.cs" Link="dosymep\Converters\BoolToVisibilityConverter.cs"/>
+        <Compile Include="..\dosymep\BoolToStringConverter.cs" Link="dosymep\Converters\BoolToStringConverter.cs"/>
+        <Compile Include="..\dosymep\NullToStringConverter.cs" Link="dosymep\Converters\NullToStringConverter.cs"/>
+        <Compile Include="..\dosymep\ConfigSerializer.cs" Link="dosymep\ConfigSerializer.cs"/>
+        <Compile Include="..\dosymep\ConvertibleExtention.cs" Link="dosymep\ConvertibleExtention.cs"/>
+        <Compile Include="..\dosymep\BasePluginCommand.cs" Link="dosymep\BasePluginCommand.cs"/>
+        <Compile Include="..\dosymep\EnumConverter.cs" Link="dosymep\Converters\EnumConverter.cs"/>
+        <Compile Include="..\dosymep\IndexConverter.cs" Link="dosymep\Converters\IndexConverter.cs"/>
+        <Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\Converters\InverseBooleanConverter.cs"/>
+        <Compile Include="..\dosymep\ElementIdConverter.cs" Link="dosymep\Converters\ElementIdConverter.cs"/>
+        <Compile Include="..\dosymep\EnumToItemsSource.cs" Link="dosymep\MarkupExtensions\EnumToItemsSource.cs"/>
+        <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
+        <Compile Include="..\dosymep\ICommand.cs" Link="dosymep\BaseCommands\ICommand.cs"/>
+        <Compile Include="..\dosymep\IAsyncCommand.cs" Link="dosymep\BaseCommands\IAsyncCommand.cs"/>
+        <Compile Include="..\dosymep\IAsyncCommand.T.cs" Link="dosymep\BaseCommands\IAsyncCommand.T.cs"/>
+        <Compile Include="..\dosymep\RelayCommand.cs" Link="dosymep\BaseCommands\RelayCommand.cs"/>
+        <Compile Include="..\dosymep\RelayCommand.T.cs" Link="dosymep\BaseCommands\RelayCommand.T.cs"/>
+        <Compile Include="..\dosymep\AsyncRelayCommand.cs" Link="dosymep\BaseCommands\AsyncRelayCommand.cs"/>
+        <Compile Include="..\dosymep\AsyncRelayCommand.T.cs" Link="dosymep\BaseCommands\AsyncRelayCommand.T.cs"/>
+        <Compile Include="..\dosymep\RevitViewTypeConverter.cs" Link="dosymep\Converters\RevitViewTypeConverter.cs"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="$(RevitVersion) != ''">
+        <PackageReference Include="Autodesk.Revit.Sdk.Refs.$(RevitVersion)" Version="*" />
+        
+        <Reference Include="dosymep.Bim4Everyone">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\$(RevitVersion)\dosymep.Bim4Everyone.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Revit">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\$(RevitVersion)\dosymep.Revit.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Reference Include="dosymep.SimpleServices">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.SimpleServices.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Xpf.Core">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.Xpf.Core.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Xpf.Core.Ninject">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.Xpf.Core.Ninject.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.AutodeskApps">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.AutodeskApps.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.AutodeskApps.FileInfo">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.AutodeskApps.FileInfo.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Revit.FileInfo">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.Revit.FileInfo.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Revit.Journaling">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.Revit.Journaling.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.Revit.ServerClient">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.Revit.ServerClient.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="Ninject">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\Ninject.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="pyRevitLabs.Json">
+            <HintPath>..\..\libs\pyRevitLabs.Json.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="pyRevitLabs.PyRevit.Runtime.Shared">
+            <HintPath>..\..\libs\pyRevitLabs.PyRevit.Runtime.Shared.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="System.Web"/>
+        <Reference Include="WindowsBase"/>
+        <Reference Include="PresentationCore"/>
+        <Reference Include="PresentationFramework"/>
+        <Reference Include="System.ComponentModel.DataAnnotations"/>
+
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
+        <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0"/>
+
+        <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+
+        <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>

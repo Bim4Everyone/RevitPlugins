@@ -1,0 +1,171 @@
+<base:ThemedPlatformWindow x:Class="RevitFinishingWalls.Views.MainWindow"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:base="clr-namespace:dosymep.WPF.Views"
+                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
+                           xmlns:local="clr-namespace:RevitFinishingWalls.Views"
+                           xmlns:vms="clr-namespace:RevitFinishingWalls.ViewModels"
+                           xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                           xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+                           xmlns:enums="clr-namespace:RevitFinishingWalls.Models.Enums"
+                           mc:Ignorable="d"
+                           WindowStartupLocation="CenterOwner"
+                           MinHeight="275"
+                           MinWidth="600"
+                           MaxHeight="275"
+                           MaxWidth="600"
+                           d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
+                           ResizeMode="NoResize">
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded"
+                               Command="{Binding LoadConfigCommand}" />
+        <common:AttachServiceBehavior AttachableService="{Binding ProgressDialogFactory}" />
+    </dxmvvm:Interaction.Behaviors>
+    <Window.Resources>
+        <converters:EnumConverter x:Key="EnumConverter" />
+        <Style TargetType="dxe:TextEdit">
+            <Setter Property="Width"
+                    Value="50" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+        </Style>
+        <Style TargetType="Control"
+               x:Key="ComboBoxInput">
+            <Setter Property="Width"
+                    Value="250" />
+            <Setter Property="Margin"
+                    Value="0 0 5 0" />
+        </Style>
+        <Style TargetType="DockPanel"
+               x:Key="DockPanelInput">
+            <Setter Property="Margin"
+                    Value="5" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Left" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+        </Style>
+        <Style TargetType="TextBlock"
+               x:Key="InputDescription">
+            <Setter Property="Margin"
+                    Value="5 0" />
+            <Setter Property="Width"
+                    Value="200" />
+            <Setter Property="TextAlignment"
+                    Value="Justify" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <StackPanel.ToolTip>
+                <TextBlock Text="Отделочные стены создаются только для помещений из активного документа.&#10;У создаваемых отделочных стен будет отключена галочка 'Граница помещения'.&#10;Также созданные стены будут соединены с элементами из активного файла,&#10;которые образуют границу помещения: стены, колонны, несущие колонны.&#10;Важно: соединение с элементами из связанных файлов осуществлено не будет!"
+                           FontSize="14" />
+            </StackPanel.ToolTip>
+            <DockPanel Style="{StaticResource DockPanelInput}">
+                <TextBlock Text="Создавать стены:"
+                           Style="{StaticResource InputDescription}" />
+                <dxe:ComboBoxEdit ItemsSource="{Binding RoomGetterModes}"
+                                  SelectedItem="{Binding SelectedRoomGetterMode}"
+                                  Style="{StaticResource ComboBoxInput}"
+                                  ApplyItemTemplateToSelectedItem="True"
+                                  IsTextEditable="False">
+                    <dxe:ComboBoxEdit.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:RoomGetterMode}}" />
+                        </DataTemplate>
+                    </dxe:ComboBoxEdit.ItemTemplate>
+                </dxe:ComboBoxEdit>
+            </DockPanel>
+
+            <DockPanel Style="{StaticResource DockPanelInput}">
+                <TextBlock Text="Тип отделочных стен:"
+                           Style="{StaticResource InputDescription}" />
+                <dxe:ComboBoxEdit ItemsSource="{Binding WallTypes}"
+                                  SelectedItem="{Binding SelectedWallType}"
+                                  Style="{StaticResource ComboBoxInput}"
+                                  AutoComplete="True"
+                                  IncrementalSearch="True"
+                                  ImmediatePopup="True"
+                                  IncrementalFiltering="True"
+                                  IsCaseSensitiveFilter="False"
+                                  PopupMaxHeight="250"
+                                  DisplayMember="Name">
+                </dxe:ComboBoxEdit>
+            </DockPanel>
+            <DockPanel Style="{StaticResource DockPanelInput}">
+                <TextBlock Text="Отметка верха от уровня:"
+                           Style="{StaticResource InputDescription}" />
+                <dxe:ComboBoxEdit ItemsSource="{Binding WallElevationModes}"
+                                  SelectedItem="{Binding SelectedWallElevationMode}"
+                                  Style="{StaticResource ComboBoxInput}"
+                                  ApplyItemTemplateToSelectedItem="True"
+                                  IsTextEditable="False">
+                    <dxe:ComboBoxEdit.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:WallElevationMode}}" />
+                        </DataTemplate>
+                    </dxe:ComboBoxEdit.ItemTemplate>
+                </dxe:ComboBoxEdit>
+                <dxe:TextEdit Text="{Binding WallElevationByUser, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                              IsEnabled="{Binding IsWallHeightByUserEnabled}" />
+                <TextBlock Text="мм"
+                           Width="Auto"
+                           Style="{StaticResource InputDescription}" />
+            </DockPanel>
+
+            <DockPanel Style="{StaticResource DockPanelInput}">
+                <TextBlock Text="Смещение снизу от уровня:"
+                           Style="{StaticResource InputDescription}" />
+                <dxe:TextEdit Text="{Binding WallBaseOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
+                <TextBlock Text="мм"
+                           Width="Auto"
+                           Style="{StaticResource InputDescription}" />
+            </DockPanel>
+            
+            <DockPanel Style="{StaticResource DockPanelInput}">
+                <TextBlock Text="Смещение внутрь помещения:"
+                           Style="{StaticResource InputDescription}" />
+                <dxe:TextEdit Text="{Binding WallSideOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
+                <TextBlock Text="мм"
+                           Width="Auto"
+                           Style="{StaticResource InputDescription}" />
+            </DockPanel>
+        </StackPanel>
+
+        <DockPanel Grid.Row="1"
+                   Height="45"
+                   HorizontalAlignment="Right">
+            <TextBlock Margin="10"
+                       Foreground="Orange"
+                       VerticalAlignment="Center"
+                       Text="{Binding ErrorText}" />
+
+            <dx:SimpleButton Margin="10"
+                             Width="80"
+                             Content="ОК"
+                             IsDefault="True"
+                             Click="ButtonOk_Click"
+                             Command="{Binding AcceptViewCommand}" />
+
+            <dx:SimpleButton Margin="10"
+                             Width="80"
+                             Content="Отмена"
+                             IsCancel="True"
+                             Click="ButtonCancel_Click" />
+        </DockPanel>
+    </Grid>
+</base:ThemedPlatformWindow>

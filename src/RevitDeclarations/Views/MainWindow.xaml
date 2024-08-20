@@ -1,0 +1,89 @@
+<base:PlatformWindow
+    x:Class="RevitDeclarations.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitDeclarations.Views"
+    xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
+    xmlns:tabData="clr-namespace:RevitDeclarations.Views"
+    
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    
+    Title="Декларации"
+    Height="760" Width="650"
+    ResizeMode="NoResize"
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="Styles/StyleResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TabControl>
+            <TabItem 
+                Header="Декларация">
+                <tabData:DeclarationTabItem/>
+            </TabItem>
+
+            <TabItem
+                Header="Параметры"
+                DataContext="{Binding ParametersViewModel}">
+                <tabData:ParametersTabItem/>
+            </TabItem>
+
+            <TabItem 
+                Header="Приоритеты"
+                DataContext="{Binding PrioritiesViewModel}">
+                <tabData:PrioritiesTabItem/>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel
+            Grid.Row="1"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}"/>
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                IsDefault="True"
+                Click="ButtonOk_Click"
+                Command="{Binding ExportDeclarationCommand}"/>
+
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Отмена"
+                IsCancel="True"
+                Click="ButtonCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>

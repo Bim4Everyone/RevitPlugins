@@ -6,5 +6,9 @@
         <UseWPF>true</UseWPF>
         <Platforms>x64</Platforms>
         <Configurations>D2020;D2021;D2022;D2023;D2024;R2020;R2021;R2022;R2023;R2024</Configurations>
+        
+        <!-- Чтобы студия не переименовывала гуиды проекта
+         когда меняется структура решения, гуид для С# .NET Core Project -->
+        <ProjectTypeGuids>{9A19103F-16F7-4668-BE54-9A1E7A4F7556}</ProjectTypeGuids>
     </PropertyGroup>
 </Project>
