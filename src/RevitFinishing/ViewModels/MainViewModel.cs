@@ -5,11 +5,13 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitFinishing.Models;
+using RevitFinishing.Models.Finishing;
 using RevitFinishing.Views;
 
 namespace RevitFinishing.ViewModels {
@@ -68,26 +70,70 @@ namespace RevitFinishing.ViewModels {
                 .SelectMany(x => x.Rooms);
 
             FinishingInProject finishing = new FinishingInProject(_revitRepository, SelectedPhase);
-            FinishingCalculator calculator = new FinishingCalculator(selectedRooms, finishing, SelectedPhase);
+            FinishingChecker checker = new FinishingChecker(SelectedPhase);
 
-            if(calculator.ErrorElements.ErrorLists.Any()) {
+            ErrorsViewModel errors = new ErrorsViewModel();
+            errors.AddElements(new ErrorsListViewModel() {
+                Message = "Ошибка",
+                Description = "Экземпляры отделки являются границами помещений",
+                Elements = new ObservableCollection<ErrorElement>(checker.CheckFinishingByRoomBounding(finishing))
+            });
+            string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
+            errors.AddElements(new ErrorsListViewModel() {
+                Message = "Ошибка",
+                Description = "У помещений не заполнен ключевой параметр отделки",
+                Elements = new ObservableCollection<ErrorElement>(
+                    checker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam))
+            });
+
+            if(errors.ErrorLists.Any()) {
                 var window = new ErrorsWindow() {
-                    DataContext = calculator.ErrorElements
+                    DataContext = errors
                 };
                 window.Show();
                 return;
             }
 
-            if(calculator.WarningElements.ErrorLists.Any()) {
+            FinishingCalculator calculator = new FinishingCalculator(selectedRooms, finishing);
+
+            ErrorsViewModel errorsNew = new ErrorsViewModel();
+            ErrorsViewModel warnings = new ErrorsViewModel();
+
+            errorsNew.AddElements(new ErrorsListViewModel() {
+                Message = "Ошибка",
+                Description = "Элементы отделки относятся к помещениям с разными типами отделки",
+                Elements = new ObservableCollection<ErrorElement>(checker.CheckFinishingByRoom(calculator.FinishingElements))
+            });
+
+            warnings.AddElements(new ErrorsListViewModel() {
+                Message = "Предупреждение",
+                Description = "У помещений не заполнен параметр \"Номер\"",
+                Elements = new ObservableCollection<ErrorElement>(checker.CheckRoomsByParameter(selectedRooms, "Номер"))
+            });
+
+            warnings.AddElements(new ErrorsListViewModel() {
+                Message = "Предупреждение",
+                Description = "У помещений не заполнен параметр \"Имя\"",
+                Elements = new ObservableCollection<ErrorElement>(checker.CheckRoomsByParameter(selectedRooms, "Имя"))
+            });
+
+            if(errorsNew.ErrorLists.Any()) {
                 var window = new ErrorsWindow() {
-                    DataContext = calculator.WarningElements
+                    DataContext = errorsNew
+                };
+                window.Show();
+                return;
+            }
+
+            if(warnings.ErrorLists.Any()) {
+                var window = new ErrorsWindow() {
+                    DataContext = warnings
                 };
                 window.Show();
             }
 
-            List<FinishingElement> finishings = calculator.Finishings;
             using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры отделки")) {
-                foreach(var element in finishings) {
+                foreach(var element in calculator.FinishingElements) {
                     element.UpdateFinishingParameters();
                 }
                 t.Commit();
