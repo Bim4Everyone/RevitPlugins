@@ -84,7 +84,6 @@ namespace RevitFinishing.ViewModels {
                 ErrorElements = new ObservableCollection<ErrorElement>(
                     checker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam))
             });
-
             if(mainErrors.ErrorLists.Any()) {
                 var window = new ErrorsWindow(mainErrors);
                 window.Show();
@@ -100,24 +99,24 @@ namespace RevitFinishing.ViewModels {
                 ErrorElements = new ObservableCollection<ErrorElement>(
                     checker.CheckFinishingByRoom(calculator.FinishingElements))
             });
-
             if(otherErrors.ErrorLists.Any()) {
                 var window = new ErrorsWindow(otherErrors);
                 window.Show();
                 return;
             }
 
+            string numberParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER);
             warnings.AddElements(new ErrorsListViewModel("Предупреждение") {
-                Description = "У помещений не заполнен параметр \"Номер\"",
+                Description = $"У помещений не заполнен параметр \"{numberParamName}\"",
                 ErrorElements = new ObservableCollection<ErrorElement>(
-                    checker.CheckRoomsByParameter(selectedRooms, "Номер"))
+                    checker.CheckRoomsByParameter(selectedRooms, numberParamName))
             });
+            string nameParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME);
             warnings.AddElements(new ErrorsListViewModel("Предупреждение") {
-                Description = "У помещений не заполнен параметр \"Имя\"",
+                Description = $"У помещений не заполнен параметр \"{nameParamName}\"",
                 ErrorElements = new ObservableCollection<ErrorElement>(
-                    checker.CheckRoomsByParameter(selectedRooms, "Имя"))
+                    checker.CheckRoomsByParameter(selectedRooms, nameParamName))
             });
-
             if(warnings.ErrorLists.Any()) {
                 var window = new ErrorsWindow(warnings);
                 window.Show();
