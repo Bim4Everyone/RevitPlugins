@@ -14,27 +14,9 @@ using Revit3DvikSchemas.ViewModels;
 namespace Revit3DvikSchemas.Models {
 
     internal class RevitRepository {
-
-
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
-            List<BuiltInCategory> systemAndFopCats = new List<BuiltInCategory>() {
-                BuiltInCategory.OST_DuctFitting,
-                BuiltInCategory.OST_PipeFitting,
-                BuiltInCategory.OST_PipeCurves,
-                BuiltInCategory.OST_DuctCurves,
-                BuiltInCategory.OST_FlexDuctCurves,
-                BuiltInCategory.OST_FlexPipeCurves,
-                BuiltInCategory.OST_DuctTerminal,
-                BuiltInCategory.OST_DuctAccessory,
-                BuiltInCategory.OST_PipeAccessory,
-                BuiltInCategory.OST_MechanicalEquipment,
-                BuiltInCategory.OST_DuctInsulations,
-                BuiltInCategory.OST_PipeInsulations,
-                BuiltInCategory.OST_PlumbingFixtures,
-                BuiltInCategory.OST_Sprinklers,
-                BuiltInCategory.OST_GenericModel
-            };
+
 
             List<BuiltInCategory> fopNameCategoriesBIC = GetfopNameCategoriesBIC();
 
@@ -47,7 +29,7 @@ namespace Revit3DvikSchemas.Models {
             bool isFopNameCatsIsOk = true;
             string missingCat = "";
             if(isFopNameInProject) {
-                foreach(BuiltInCategory fopCat in systemAndFopCats) {
+                foreach(BuiltInCategory fopCat in Cofiguration.SystemAndFopCats) {
                     if(!fopNameCategoriesBIC.Contains(fopCat)) {
                         isFopNameCatsIsOk = false;
                         missingCat = fopCat.ToString();
@@ -65,7 +47,6 @@ namespace Revit3DvikSchemas.Models {
             IsView3D = isView3D;
         }
 
-
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
@@ -75,6 +56,8 @@ namespace Revit3DvikSchemas.Models {
         public bool IsFopNameCatsIsOk { get; }
 
         public bool IsView3D { get; }
+
+        public Document Document => ActiveUIDocument.Document;
 
         private List<BuiltInCategory> GetfopNameCategoriesBIC() {
             if(Document.IsExistsSharedParam("ФОП_ВИС_Имя системы")) {
@@ -93,11 +76,6 @@ namespace Revit3DvikSchemas.Models {
 
         }
 
-
-
-        //public Application Application => UIApplication.Application;
-        public Document Document => ActiveUIDocument.Document;
-
         public List<Element> GetCollection(BuiltInCategory category) {
             List<Element> col = (List<Element>) new FilteredElementCollector(Document)
                 .OfCategory(category)
@@ -107,7 +85,6 @@ namespace Revit3DvikSchemas.Models {
         }
 
         public string GetSystemFopName(Element system) {
-            string fopName = "None";
             if(Document.IsExistsSharedParam("ФОП_ВИС_Имя системы")) {
                 if(system.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
                     MechanicalSystem ductSystemElement = system as MechanicalSystem;
@@ -120,6 +97,7 @@ namespace Revit3DvikSchemas.Models {
                     }
                 }
                 if(system.Category.IsId(BuiltInCategory.OST_PipingSystem)) {
+                    
                     PipingSystem pipeSystemElement = system as PipingSystem;
                     foreach(Element pipe in pipeSystemElement.PipingNetwork) {
                         if(pipe.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
@@ -131,9 +109,9 @@ namespace Revit3DvikSchemas.Models {
                 }
             }
 
-            return fopName;
-
+            return "Нет имени";
         }
+
         public ObservableCollection<HvacSystemViewModel> GetHVACSystems() {
             List<Element> ductSystems = GetCollection(BuiltInCategory.OST_DuctSystem);
 

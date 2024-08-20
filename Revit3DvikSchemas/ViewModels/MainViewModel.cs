@@ -136,10 +136,7 @@ namespace Revit3DvikSchemas.ViewModels {
             ErrorText = "";
             return true;
         }
-
     }
-
-
 }
 
 
