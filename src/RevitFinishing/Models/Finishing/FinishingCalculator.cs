@@ -9,6 +9,7 @@ using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitFinishing.ViewModels;
+using dosymep.Bim4Everyone.ProjectParams;
 
 namespace RevitFinishing.Models
 {
@@ -41,10 +42,11 @@ namespace RevitFinishing.Models
                 Description = "Экземпляры отделки являются границами помещений",
                 Elements = new ObservableCollection<ErrorElement>(CheckFinishingByRoomBounding())
             });
+            string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
             _errors.AddElements(new ErrorsListViewModel() {
                 Message = "Ошибка",
                 Description = "У помещений не заполнен ключевой параметр отделки",
-                Elements = new ObservableCollection<ErrorElement>(CheckRoomsByKeyParameter("ОТД_Тип отделки"))
+                Elements = new ObservableCollection<ErrorElement>(CheckRoomsByKeyParameter(finishingKeyParam))
             });
 
             if(!_errors.ErrorLists.Any()) {

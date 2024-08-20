@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
+using dosymep.Bim4Everyone.ProjectParams;
 
 namespace RevitFinishing.Models
 {
@@ -27,7 +28,7 @@ namespace RevitFinishing.Models
         public RoomElement(Room room, FinishingInProject finishingElements) {
             _revitRoom = room;
             _document = room.Document;
-            _roomFinishingType = _revitRoom.GetParam("ОТД_Тип отделки").AsValueString();
+            _roomFinishingType = _revitRoom.GetParamValueString(ProjectParamsConfig.Instance.RoomFinishingType);
 
             Solid roomSolid = room
                 .ClosedShell
