@@ -58,7 +58,7 @@ namespace RevitFinishing.Models {
             return new ObservableCollection<RoomGroupViewModel>(rooms);
         }
 
-        public ICollection<Element> GetFinishingElementsOnPhase(FinishingCategory finishingCategory, Phase phase) {
+        public IReadOnlyCollection<Element> GetFinishingElementsOnPhase(FinishingCategory finishingCategory, Phase phase) {
             ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, _phaseStatuses);
             ElementId parameterId = new ElementId(BuiltInParameter.ELEM_TYPE_PARAM);
             ParameterValueProvider valueProvider = new ParameterValueProvider(parameterId);
@@ -75,7 +75,8 @@ namespace RevitFinishing.Models {
                 .WhereElementIsNotElementType()
                 .WherePasses(parameterFilter)
                 .WherePasses(phaseFilter)
-                .ToElements();
+                .ToElements()
+                .ToList();
         }
 
         public void SetAll(IList<RoomGroupViewModel> allLevels, bool value) {

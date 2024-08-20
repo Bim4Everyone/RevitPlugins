@@ -18,10 +18,10 @@ namespace RevitFinishing.Models
         private readonly IReadOnlyCollection<Element> _allFinishing;
 
         public FinishingInProject(RevitRepository revitRepository, Phase phase) {
-            _walls = revitRepository.GetFinishingElementsOnPhase(FinishingCategory.Walls, phase).ToList();
-            _floors = revitRepository.GetFinishingElementsOnPhase(FinishingCategory.Floors, phase).ToList();
-            _ceilings = revitRepository.GetFinishingElementsOnPhase(FinishingCategory.Ceilings, phase).ToList();
-            _baseboards = revitRepository.GetFinishingElementsOnPhase(FinishingCategory.Baseboards, phase).ToList();
+            _walls = revitRepository.GetFinishingElementsOnPhase(FinishingCategory.Walls, phase);
+            _floors = revitRepository.GetFinishingElementsOnPhase(FinishingCategory.Floors, phase);
+            _ceilings = revitRepository.GetFinishingElementsOnPhase(FinishingCategory.Ceilings, phase);
+            _baseboards = revitRepository.GetFinishingElementsOnPhase(FinishingCategory.Baseboards, phase);
 
             _allFinishing = _walls
                 .Concat(_baseboards)
