@@ -16,7 +16,7 @@ namespace RevitFinishing.ViewModels
         public ObservableCollection<ErrorsListViewModel> ErrorLists => _errorLists;
 
         public void AddElements(ErrorsListViewModel errorsList) {
-            if(errorsList.Elements.Any()) {
+            if(errorsList.ErrorElements.Any()) {
                 _errorLists.Add(errorsList);
             }
         }

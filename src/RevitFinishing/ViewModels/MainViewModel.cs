@@ -69,66 +69,57 @@ namespace RevitFinishing.ViewModels {
                 .Where(x => x.IsChecked)
                 .SelectMany(x => x.Rooms);
 
-            FinishingInProject finishing = new FinishingInProject(_revitRepository, SelectedPhase);
+            FinishingInProject allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
             FinishingChecker checker = new FinishingChecker(SelectedPhase);
+            ErrorsViewModel mainErrors = new ErrorsViewModel();
 
-            ErrorsViewModel errors = new ErrorsViewModel();
-            errors.AddElements(new ErrorsListViewModel() {
-                Message = "Ошибка",
+            mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
                 Description = "Экземпляры отделки являются границами помещений",
-                Elements = new ObservableCollection<ErrorElement>(checker.CheckFinishingByRoomBounding(finishing))
+                ErrorElements = new ObservableCollection<ErrorElement>(
+                    checker.CheckFinishingByRoomBounding(allFinishing))
             });
             string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
-            errors.AddElements(new ErrorsListViewModel() {
-                Message = "Ошибка",
+            mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
                 Description = "У помещений не заполнен ключевой параметр отделки",
-                Elements = new ObservableCollection<ErrorElement>(
+                ErrorElements = new ObservableCollection<ErrorElement>(
                     checker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam))
             });
 
-            if(errors.ErrorLists.Any()) {
-                var window = new ErrorsWindow() {
-                    DataContext = errors
-                };
+            if(mainErrors.ErrorLists.Any()) {
+                var window = new ErrorsWindow(mainErrors);
                 window.Show();
                 return;
             }
 
-            FinishingCalculator calculator = new FinishingCalculator(selectedRooms, finishing);
-
-            ErrorsViewModel errorsNew = new ErrorsViewModel();
+            FinishingCalculator calculator = new FinishingCalculator(selectedRooms, allFinishing);
+            ErrorsViewModel otherErrors = new ErrorsViewModel();
             ErrorsViewModel warnings = new ErrorsViewModel();
 
-            errorsNew.AddElements(new ErrorsListViewModel() {
-                Message = "Ошибка",
+            otherErrors.AddElements(new ErrorsListViewModel("Ошибка") {
                 Description = "Элементы отделки относятся к помещениям с разными типами отделки",
-                Elements = new ObservableCollection<ErrorElement>(checker.CheckFinishingByRoom(calculator.FinishingElements))
+                ErrorElements = new ObservableCollection<ErrorElement>(
+                    checker.CheckFinishingByRoom(calculator.FinishingElements))
             });
 
-            warnings.AddElements(new ErrorsListViewModel() {
-                Message = "Предупреждение",
-                Description = "У помещений не заполнен параметр \"Номер\"",
-                Elements = new ObservableCollection<ErrorElement>(checker.CheckRoomsByParameter(selectedRooms, "Номер"))
-            });
-
-            warnings.AddElements(new ErrorsListViewModel() {
-                Message = "Предупреждение",
-                Description = "У помещений не заполнен параметр \"Имя\"",
-                Elements = new ObservableCollection<ErrorElement>(checker.CheckRoomsByParameter(selectedRooms, "Имя"))
-            });
-
-            if(errorsNew.ErrorLists.Any()) {
-                var window = new ErrorsWindow() {
-                    DataContext = errorsNew
-                };
+            if(otherErrors.ErrorLists.Any()) {
+                var window = new ErrorsWindow(otherErrors);
                 window.Show();
                 return;
             }
 
+            warnings.AddElements(new ErrorsListViewModel("Предупреждение") {
+                Description = "У помещений не заполнен параметр \"Номер\"",
+                ErrorElements = new ObservableCollection<ErrorElement>(
+                    checker.CheckRoomsByParameter(selectedRooms, "Номер"))
+            });
+            warnings.AddElements(new ErrorsListViewModel("Предупреждение") {
+                Description = "У помещений не заполнен параметр \"Имя\"",
+                ErrorElements = new ObservableCollection<ErrorElement>(
+                    checker.CheckRoomsByParameter(selectedRooms, "Имя"))
+            });
+
             if(warnings.ErrorLists.Any()) {
-                var window = new ErrorsWindow() {
-                    DataContext = warnings
-                };
+                var window = new ErrorsWindow(warnings);
                 window.Show();
             }
 
