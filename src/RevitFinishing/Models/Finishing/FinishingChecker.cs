@@ -6,9 +6,7 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
-using RevitFinishing.ViewModels;
-
-namespace RevitFinishing.Models.Finishing {
+namespace RevitFinishing.Models {
     internal class FinishingChecker {
         private readonly string _phaseName;
 

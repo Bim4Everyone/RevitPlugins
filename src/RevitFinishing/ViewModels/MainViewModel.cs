@@ -11,7 +11,6 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitFinishing.Models;
-using RevitFinishing.Models.Finishing;
 using RevitFinishing.Views;
 
 namespace RevitFinishing.ViewModels {
