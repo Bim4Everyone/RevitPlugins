@@ -6,15 +6,15 @@ namespace RevitAxonometryViews.Views {
             InitializeComponent();
         }
 
-        public override string PluginName => nameof(RevitAxonometryViews);
-        public override string ProjectConfigName => nameof(MainWindow);
-        
-        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-            DialogResult = true;
-        }
+        //public override string PluginName => nameof(RevitAxonometryViews);
+        //public override string ProjectConfigName => nameof(MainWindow);
 
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-            DialogResult = false;
-        }
+        //private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+        //    DialogResult = true;
+        //}
+
+        //private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+        //    DialogResult = false;
+        //}
     }
 }
