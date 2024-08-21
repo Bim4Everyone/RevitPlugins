@@ -28,7 +28,7 @@
                     <GridViewColumn
                         Header="Тип"
                         Width="120"
-                        DisplayMemberBinding="{Binding Message}"/>
+                        DisplayMemberBinding="{Binding Status}"/>
                     <GridViewColumn
                         Header="Описание"
                         Width="210">
@@ -48,7 +48,7 @@
             Grid.Column="1"
             Margin="10"
             DataContext="{Binding SelectedList}"
-            ItemsSource="{Binding Elements}">
+            ItemsSource="{Binding ErrorElements}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn
