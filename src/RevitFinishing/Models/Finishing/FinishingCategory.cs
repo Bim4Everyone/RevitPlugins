@@ -36,5 +36,12 @@ namespace RevitFinishing.Models
             Category = BuiltInCategory.OST_Ceilings
         };
 
+        public bool CheckCategory(Element element, FinishingCategory category) {
+            if(element.Name.Contains(category.KeyWord)) {
+                return true;
+            }
+            return false;
+        }
+
     }
 }

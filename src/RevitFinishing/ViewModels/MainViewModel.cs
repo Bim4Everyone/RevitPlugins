@@ -124,6 +124,7 @@ namespace RevitFinishing.ViewModels {
             using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры отделки")) {
                 foreach(var element in calculator.FinishingElements) {
                     element.UpdateFinishingParameters();
+                    element.UpdateCategoryParameters();
                 }
                 t.Commit();
             }
