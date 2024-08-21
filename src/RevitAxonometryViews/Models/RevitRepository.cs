@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
@@ -10,6 +11,8 @@ using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+
+using RevitAxonometryViews.ViewModels;
 
 namespace RevitAxonometryViews.Models {
     internal class RevitRepository {
@@ -23,7 +26,8 @@ namespace RevitAxonometryViews.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-
+        //Если существует ФОП_ВИС_Имя системы, проверяет во всех ли нужных категориях он. Если нет - возвращает в строке в каких нет,
+        //если все окей - возвращает null
         public string CheckVisNameCategories() {
             if(!Document.IsExistsSharedParam(AxonometryConfig.FopVisSystemName)) {
                 return $"Параметр {"ФОП_ВИС_Имя системы"} не существует в проекте.";
@@ -32,30 +36,25 @@ namespace RevitAxonometryViews.Models {
                 (Definition Definition, Binding Binding) fopVisNameParam = Document.GetSharedParamBinding(AxonometryConfig.FopVisSystemName);
                 Binding parameterBinding = fopVisNameParam.Binding;
                 IEnumerable<Category> fopVisNameCategories = parameterBinding.GetCategories();
+
                 HashSet<BuiltInCategory> builtInCategories = new HashSet<BuiltInCategory>(
                     fopVisNameCategories.Select(category => category.GetBuiltInCategory())
                 );
 
-                List<string> reportList = new List<string>();
+                List<string> missingCategories = AxonometryConfig.SystemCategories
+                    .Where(builtInCategory => !builtInCategories.Contains(builtInCategory))
+                    .Select(builtInCategory => Category.GetCategory(Document, builtInCategory).Name)
+                    .ToList();
 
-                foreach(BuiltInCategory builtInCategory in AxonometryConfig.SystemAndFopCats) {
-                    if(!builtInCategories.Contains(builtInCategory)) {
-                        Console.WriteLine(builtInCategory);
-                    }
+                if(missingCategories.Any()) {
+                    string result = $"Параметр {AxonometryConfig.FopVisSystemName} не назначен для категорий: ";
+                    result += string.Join(", ", missingCategories);
+                    return result;
                 }
+
                 return null;
             }
         }
-
-
-        public List<Element> GetCollection(BuiltInCategory category) {
-            List<Element> col = (List<Element>) new FilteredElementCollector(Document)
-                .OfCategory(category)
-                .WhereElementIsNotElementType()
-                .ToElements();
-            return col;
-        }
-
 
         //Получаем ФОП_ВИС_Имя системы если оно есть в проекте
         public string GetSystemFopName(Element system) {
@@ -79,10 +78,37 @@ namespace RevitAxonometryViews.Models {
             return "Нет имени";
         }
 
-        public void Execute() {
+        public List<Element> GetCollection(BuiltInCategory category) {
+            return new FilteredElementCollector(Document)
+                .OfCategory(category)
+                .WhereElementIsNotElementType()
+                .ToElements()
+                .Cast<Element>()
+                .ToList();
+        }
 
-            string test = CheckVisNameCategories();
-            //Console.WriteLine(test);
+        //Создаем коллекцию объектов систем с именами для создания по ним фильтров
+        public ObservableCollection<HvacSystem> GetHvacSystems() {
+            List<Element> ductSystems = GetCollection(BuiltInCategory.OST_DuctSystem);
+            List<Element> pipeSystems = GetCollection(BuiltInCategory.OST_PipingSystem);
+            List<Element> allSystems = ductSystems.Concat(pipeSystems).ToList();
+
+            ObservableCollection<HvacSystem> newSystems = new ObservableCollection<HvacSystem>();
+
+            return new ObservableCollection<HvacSystem>(
+                allSystems.Select(system => new HvacSystem {
+                    SystemElement = system,
+                    SystemName = system.Name,
+                    FopName = GetSystemFopName(system)
+                })
+           );
+        }
+
+        public void Execute() {
+            ObservableCollection<HvacSystem> hvacSystems = GetHvacSystems();
+
+            MainViewModel viewModel = new MainViewModel(this);
+            viewModel.ShowWindow();
         }
     }
 }

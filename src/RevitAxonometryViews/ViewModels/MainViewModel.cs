@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -5,27 +7,17 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitAxonometryViews.Models;
+using RevitAxonometryViews.Views;
 
 namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-        private readonly ILocalizationService _localizationService;
 
         private string _errorText;
         private string _saveProperty;
 
-        public MainViewModel(
-            PluginConfig pluginConfig, 
-            RevitRepository revitRepository, 
-            ILocalizationService localizationService) {
-            
-            _pluginConfig = pluginConfig;
+        public MainViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
-            _localizationService = localizationService;
-
-            LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -41,17 +33,9 @@ namespace RevitAxonometryViews.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
         }
 
-        private void LoadView() {
-            LoadConfig();
-        }
-
-        private void AcceptView() {
-            SaveConfig();
-        }
-        
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText =  _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+                ErrorText =  "MainWindow.HelloCheck";
                 return false;
             }
 
@@ -59,18 +43,14 @@ namespace RevitAxonometryViews.ViewModels {
             return true;
         }
 
-        private void LoadConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        public ObservableCollection<HvacSystem> GetDataSource() {
+            return _revitRepository.GetHvacSystems();
         }
 
-        private void SaveConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                    ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-            setting.SaveProperty = SaveProperty;
-            _pluginConfig.SaveProjectConfig();
+        public void ShowWindow() {
+            MainWindow mainWindow = new MainWindow(this);
+            mainWindow.Show();
         }
     }
 }

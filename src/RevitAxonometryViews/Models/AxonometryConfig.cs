@@ -9,7 +9,7 @@ using Autodesk.Revit.DB;
 namespace RevitAxonometryViews.Models {
     public static class AxonometryConfig {
 
-        public static List<BuiltInCategory> SystemAndFopCats = new List<BuiltInCategory>() {
+        public static List<BuiltInCategory> SystemCategories = new List<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctFitting,
                 BuiltInCategory.OST_PipeFitting,
                 BuiltInCategory.OST_PipeCurves,

@@ -1,9 +1,17 @@
+using System.Collections.ObjectModel;
 using System.Windows;
+
+using RevitAxonometryViews.Models;
+using RevitAxonometryViews.ViewModels;
 
 namespace RevitAxonometryViews.Views {
     public partial class MainWindow {
-        public MainWindow() {
+        private readonly MainViewModel _viewModel;
+
+        internal MainWindow(MainViewModel viewModel) {
             InitializeComponent();
+            _viewModel = viewModel;
+            lvSystems.ItemsSource = viewModel.GetDataSource();
         }
 
         //public override string PluginName => nameof(RevitAxonometryViews);
