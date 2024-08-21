@@ -33,34 +33,8 @@ namespace RevitAxonometryViews {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            MessageBox.Show("1");
-            //using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-            //             kernel.Bind<RevitRepository>()
-            //                 .ToSelf()
-            //                 .InSingletonScope();
-
-            //	kernel.Bind<PluginConfig>()
-            //                 .ToMethod(c => PluginConfig.GetPluginConfig());
-
-            //	kernel.Bind<MainViewModel>().ToSelf();
-            //	kernel.Bind<MainWindow>().ToSelf()
-            //                 .WithPropertyValue(nameof(Window.DataContext), 
-            //                     c => c.Kernel.Get<MainViewModel>())
-            //                 .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-            //                     c => c.Kernel.Get<ILocalizationService>());
-
-            //             string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-
-            //             kernel.UseXtraLocalization(
-            //                 $"/{assemblyName};component/Localization/Language.xaml",
-            //                 CultureInfo.GetCultureInfo("ru-RU"));
-
-
-
-
+            RevitRepository repo = new RevitRepository(uiApplication);
+            repo.Execute();
         }
     }
 }
-//        }
-//    }
-//}
