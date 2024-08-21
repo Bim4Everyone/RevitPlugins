@@ -14,9 +14,9 @@ namespace RevitFinishing.Models
     /// Класс для экземпляра отделки.
     /// Каждый элемент отделки хранит список всех помещений, к которым он относится.
     /// </summary>
-    internal class FinishingElement {
-        private readonly Element _revitElement;
-        private readonly FinishingCalculator _calculator;
+    internal abstract class FinishingElement {
+        private protected readonly Element _revitElement;
+        private protected readonly FinishingCalculator _calculator;
 
         public FinishingElement(Element element, FinishingCalculator calculator) {
             _revitElement = element;
@@ -120,28 +120,8 @@ namespace RevitFinishing.Models
                                         _revitElement.GetParamValue<double>(BuiltInParameter.HOST_AREA_COMPUTED));
             _revitElement.SetParamValue(paramConfig.SizeVolume,
                                         _revitElement.GetParamValue<double>(BuiltInParameter.HOST_VOLUME_COMPUTED));
-
-            if(_revitElement.Name.Contains(FinishingCategory.Walls.KeyWord)) {
-                _revitElement.SetParamValue(paramConfig.SizeLengthAdditional,
-                                            _revitElement.GetParamValue<double>(BuiltInParameter.CURVE_ELEM_LENGTH));
-                _revitElement.SetParamValue(paramConfig.WallFinishingOrder,
-                                            finishingType.GetWallOrder(_revitElement.Name));
-            } else if(_revitElement.Name.Contains(FinishingCategory.Baseboards.KeyWord)) {
-                _revitElement.SetParamValue(paramConfig.SizeLengthAdditional,
-                                            _revitElement.GetParamValue<double>(BuiltInParameter.CURVE_ELEM_LENGTH));
-                _revitElement.SetParamValue(paramConfig.BaseboardFinishingOrder,
-                                            finishingType.GetBaseboardOrder(_revitElement.Name));
-            } else if(_revitElement.Name.Contains(FinishingCategory.Floors.KeyWord)) {
-                _revitElement.SetParamValue(paramConfig.SizeLengthAdditional,
-                                            _revitElement.GetParamValue<double>(BuiltInParameter.HOST_PERIMETER_COMPUTED));
-                _revitElement.SetParamValue(paramConfig.FloorFinishingOrder,
-                                            finishingType.GetFloorOrder(_revitElement.Name));
-            } else if(_revitElement.Name.Contains(FinishingCategory.Ceilings.KeyWord)) {
-                _revitElement.SetParamValue(paramConfig.SizeLengthAdditional,
-                                            _revitElement.GetParamValue<double>(BuiltInParameter.HOST_PERIMETER_COMPUTED));
-                _revitElement.SetParamValue(paramConfig.CeilingFinishingOrder,
-                                            finishingType.GetCeilingOrder(_revitElement.Name));
-            }
         }
+
+        public abstract void UpdateCategoryParameters();
     }
 }
