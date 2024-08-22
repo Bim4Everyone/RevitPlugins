@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -48,9 +50,14 @@ namespace RevitAxonometryViews.ViewModels {
             return _revitRepository.GetHvacSystems();
         }
 
+        public void CreateViews(List<HvacSystem> hvacSystems, bool? useFopName, bool? useOneView) {
+            _revitRepository.ExecuteViewCreation(hvacSystems, useFopName, useOneView);
+            
+        }
+
         public void ShowWindow() {
             MainWindow mainWindow = new MainWindow(this);
-            mainWindow.Show();
+            mainWindow.ShowDialog();
         }
     }
 }

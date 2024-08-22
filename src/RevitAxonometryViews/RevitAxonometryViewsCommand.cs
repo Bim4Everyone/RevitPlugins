@@ -34,7 +34,7 @@ namespace RevitAxonometryViews {
 
         protected override void Execute(UIApplication uiApplication) {
             RevitRepository revitRepository = new RevitRepository(uiApplication);
-            revitRepository.Execute();
+            revitRepository.Initialize();
         }
     }
 }

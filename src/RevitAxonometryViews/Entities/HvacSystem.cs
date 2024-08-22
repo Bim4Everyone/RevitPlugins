@@ -8,13 +8,12 @@ namespace RevitAxonometryViews.Models {
         public string FopName { get; set; }
         public Element SystemElement { get; set; }
 
-        private bool _isChecked;
+        public bool IsSelected { get; set; }
 
-
-        public bool IsChecked {
-            get => _isChecked;
-            set => RaiseAndSetIfChanged(ref _isChecked, value);
-
-        }
+        //private bool _isChecked;
+        //public bool IsChecked {
+        //    get => _isChecked;
+        //    set => RaiseAndSetIfChanged(ref _isChecked, value);
+        //}
     }
 }

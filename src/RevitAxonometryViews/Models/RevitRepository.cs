@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Windows.Forms;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -13,6 +14,9 @@ using Autodesk.Revit.UI;
 using dosymep.Revit;
 
 using RevitAxonometryViews.ViewModels;
+
+using Application = Autodesk.Revit.ApplicationServices.Application;
+using Binding = Autodesk.Revit.DB.Binding;
 
 namespace RevitAxonometryViews.Models {
     internal class RevitRepository {
@@ -78,19 +82,12 @@ namespace RevitAxonometryViews.Models {
             return "Нет имени";
         }
 
-        public List<Element> GetCollection(BuiltInCategory category) {
-            return new FilteredElementCollector(Document)
-                .OfCategory(category)
-                .WhereElementIsNotElementType()
-                .ToElements()
-                .Cast<Element>()
-                .ToList();
-        }
+
 
         //Создаем коллекцию объектов систем с именами для создания по ним фильтров
         public ObservableCollection<HvacSystem> GetHvacSystems() {
-            List<Element> ductSystems = GetCollection(BuiltInCategory.OST_DuctSystem);
-            List<Element> pipeSystems = GetCollection(BuiltInCategory.OST_PipingSystem);
+            List<Element> ductSystems = Document.GetCollection(BuiltInCategory.OST_DuctSystem);
+            List<Element> pipeSystems = Document.GetCollection(BuiltInCategory.OST_PipingSystem);
             List<Element> allSystems = ductSystems.Concat(pipeSystems).ToList();
 
             ObservableCollection<HvacSystem> newSystems = new ObservableCollection<HvacSystem>();
@@ -104,11 +101,25 @@ namespace RevitAxonometryViews.Models {
            );
         }
 
-        public void Execute() {
-            ObservableCollection<HvacSystem> hvacSystems = GetHvacSystems();
+        public void ExecuteViewCreation(List<HvacSystem> hvacSystems, bool? useFopName, bool? useOneView) {
 
-            MainViewModel viewModel = new MainViewModel(this);
-            viewModel.ShowWindow();
+            ViewFactory viewFactory = new ViewFactory(Document, ActiveUIDocument, useFopName, useOneView);
+            using(Transaction t = Document.StartTransaction("Создать схемы")) {
+                viewFactory.CreateSelected(hvacSystems);
+                t.Commit();
+            }
+        }
+
+        public void Initialize() {
+            string report = CheckVisNameCategories();
+
+            if(string.IsNullOrEmpty(report)) {
+                MainViewModel viewModel = new MainViewModel(this);
+                viewModel.ShowWindow();
+
+            } else {
+                MessageBox.Show(report);
+            }
         }
     }
 }

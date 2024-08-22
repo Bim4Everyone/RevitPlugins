@@ -1,5 +1,10 @@
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+
+using Autodesk.Revit.DB;
 
 using RevitAxonometryViews.Models;
 using RevitAxonometryViews.ViewModels;
@@ -7,22 +12,23 @@ using RevitAxonometryViews.ViewModels;
 namespace RevitAxonometryViews.Views {
     public partial class MainWindow {
         private readonly MainViewModel _viewModel;
+        internal ObservableCollection<HvacSystem> Items;
 
         internal MainWindow(MainViewModel viewModel) {
             InitializeComponent();
             _viewModel = viewModel;
-            lvSystems.ItemsSource = viewModel.GetDataSource();
+            Items = viewModel.GetDataSource();
+            lvSystems.ItemsSource = Items;
         }
 
-        //public override string PluginName => nameof(RevitAxonometryViews);
-        //public override string ProjectConfigName => nameof(MainWindow);
+        private void Button_Click_Ok(object sender, RoutedEventArgs e) {
+            var selectedItems = Items.Where(item => item.IsSelected).ToList();
+            _viewModel.CreateViews(selectedItems, useFopVisName.IsChecked, useOneView.IsChecked);
+            DialogResult = true;
+        }
 
-        //private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-        //    DialogResult = true;
-        //}
-
-        //private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-        //    DialogResult = false;
-        //}
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
+        }
     }
 }

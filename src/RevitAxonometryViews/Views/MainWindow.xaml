@@ -19,13 +19,30 @@
             <RowDefinition Height="43"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <TextBlock Width="108" Height="20" Margin="25,0,0,0"/>
+        <StackPanel Grid.Row="0" 
+                    Orientation="Horizontal">
+            <TextBlock Width="108" 
+                       Height="20" 
+                       Margin="25,0,0,0"/>
+        </StackPanel>
+        
+        <StackPanel
+            Grid.Row="0"
+            Orientation="Horizontal">
+            <TextBlock
+                Width="108" Height="20"
+                Margin="25,0,0,0" Text="Фильтровать по:">
+            </TextBlock>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <ComboBox SelectedIndex="0" Width="170" Height="20" Margin="25,0,0,0"/>
-            <TextBox Width="150" Height="20" Margin="25,0,0,0"/>
+            <ComboBox SelectedIndex="0" 
+                      Width="170" 
+                      Height="20" 
+                      Margin="25,0,0,0"/>
+            <TextBox Width="150" 
+                     Height="20" 
+                     Margin="25,0,0,0"/>
         </StackPanel>
 
         <ListView
@@ -35,21 +52,21 @@
             SelectionMode="Extended"
             >
             <ListView.View>
-                <GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Test">
+                <GridView AllowsColumnReorder="False" 
+                          ColumnHeaderToolTip="Test">
                     <GridView.Columns>
                         <GridViewColumn Header="Имя системы" 
                                         DisplayMemberBinding="{Binding SystemName}"
                                         Width="150"/>
                         <GridViewColumn Header="_ФОП_ВИС_Имя системы" 
-                                        DisplayMemberBinding="{Binding SystemName}"
+                                        DisplayMemberBinding="{Binding FopName}"
                                         Width="150"/>
                         <GridViewColumn Header="Создать" 
-                                        DisplayMemberBinding="{Binding IsChecked}"
                                         Width="150">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <CheckBox
-                                        />
+                                        IsChecked="{Binding IsSelected}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -57,5 +74,47 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <StackPanel
+            Grid.Row="3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox
+                        x:Name="useOneView"
+                        Grid.Column="0"
+                        Margin="10 5"
+                        FlowDirection="RightToLeft"
+                        Content="Все выделенные на один вид">
+                </CheckBox>
+
+                <CheckBox
+                        x:Name="useFopVisName"
+                        Grid.Column="1"
+                        Margin="10 5"
+                        Content="Схемы по ФОП__ВИС__Имя системы"/>
+            </Grid>
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="4"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <Button
+                Margin="5,0,5,10"
+                Width="80"
+                Content="ОК"
+                IsDefault="True"
+                Height="30" 
+                Click="Button_Click_Ok" />
+            <Button
+                Margin="5,0,25,10"
+                Width="80"
+                Content="Отмена"
+                IsCancel="True"
+                Height="30"
+                Click="ButtonCancel_Click"/>
+        </StackPanel>
     </Grid>
 </Window>
