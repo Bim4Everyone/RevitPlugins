@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -17,56 +19,68 @@ namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
-        private string _errorText;
-        private string _saveProperty;
-        //private ICollectionView _categoriesView;
-        //private string _categoriesFilter = string.Empty;
+        public ObservableCollection<string> FilterCriterion {  get; }
+        public ObservableCollection<HvacSystem> DataSource { get; set; }
+
+        public bool UseFopVisName {get; set;}
+        public bool UseOneView { get; set;} 
+
+        public string SelectedCriteria { get; set;}
+
+        private ICollectionView _categoriesView;
+        private string _categoriesFilter = string.Empty;
 
         public MainViewModel(RevitRepository revitRepository) {
+            SelectedCriteria = AxonometryConfig.SystemName;
             _revitRepository = revitRepository;
+            FilterCriterion = new ObservableCollection<string>() {
+                AxonometryConfig.SystemName,
+                AxonometryConfig.FopVisSystemName
+            };
+
+            DataSource = GetDataSource();
+            SetCategoriesFilters();
+            CreateViewsCommand = RelayCommand.Create(CreateViews);
+            SelectionFilterCommand = RelayCommand.Create(SetCategoriesFilters);
         }
+
+        public ICommand CreateViewsCommand { get; }
+
+        public ICommand SelectionFilterCommand { get; }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
 
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
-        }
-
-        private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText =  "MainWindow.HelloCheck";
-                return false;
+        public string CategoriesFilter {
+            get => _categoriesFilter;
+            set {
+                if(value != _categoriesFilter) {
+                    _categoriesFilter = value;
+                    _categoriesView.Refresh();
+                    OnPropertyChanged(nameof(CategoriesFilter));
+                }
             }
-
-            ErrorText = null;
-            return true;
         }
-
+        private void SetCategoriesFilters() {
+            // Организуем фильтрацию списка категорий
+            _categoriesView = CollectionViewSource.GetDefaultView(DataSource);
+            if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
+                _categoriesView.Filter = item => string.IsNullOrEmpty(CategoriesFilter) ? true :
+                ((HvacSystem) item).FopName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+            } else {
+                _categoriesView.Filter = item => string.IsNullOrEmpty(CategoriesFilter) ? true :
+                ((HvacSystem) item).SystemName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+        }
 
         public ObservableCollection<HvacSystem> GetDataSource() {
             return _revitRepository.GetHvacSystems();
         }
 
-        public ObservableCollection<HvacSystem> UpdateDataSourceByFilter(ObservableCollection<HvacSystem> originalCollection, string filterValue, string filterCriterion) {
-
-            if(filterCriterion == AxonometryConfig.FopVisSystemName) {
-                return new ObservableCollection<HvacSystem>(
-                originalCollection.Where(item => item.FopName.Contains(filterValue)));
-            }                
-            return new ObservableCollection<HvacSystem>(
-                originalCollection.Where(item => item.SystemName.Contains(filterValue)));
-        }
-
-        public void CreateViews(List<HvacSystem> hvacSystems, bool? useFopName, bool? useOneView) {
-            _revitRepository.ExecuteViewCreation(hvacSystems, useFopName, useOneView);
-            
+        public void CreateViews() {
+            var selectedItems = DataSource.Where(item => item.IsSelected).ToList();
+            _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView);
         }
 
         public void ShowWindow() {

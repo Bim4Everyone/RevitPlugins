@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,39 +15,40 @@ using RevitAxonometryViews.ViewModels;
 namespace RevitAxonometryViews.Views {
     public partial class MainWindow {
         private readonly MainViewModel _viewModel;
-        internal ObservableCollection<HvacSystem> Items;
         protected CollectionViewSource SystemsCollection;
 
         internal MainWindow(MainViewModel viewModel) {
-            InitializeComponent();
-            filterCriterion.ItemsSource = new List<string>() {
-                AxonometryConfig.SystemName, 
-                AxonometryConfig.FopVisSystemName 
-            };
-            filterCriterion.SelectedIndex = 0;
-
+            InitializeComponent();            
             _viewModel = viewModel;
-            Items = viewModel.GetDataSource();
-            lvSystems.ItemsSource = Items;
-
-        }
-
-        private void FilterUpdated(object sender, TextChangedEventArgs e) {
-            Items = _viewModel.GetDataSource();
-            if(!string.IsNullOrEmpty(filter.Text)){
-                Items = _viewModel.UpdateDataSourceByFilter(Items, filter.Text, filterCriterion.Text);
-            }
-            lvSystems.ItemsSource = Items;
+            this.DataContext = viewModel;
         }
 
         private void Button_Click_Ok(object sender, RoutedEventArgs e) {
-            var selectedItems = Items.Where(item => item.IsSelected).ToList();
-            _viewModel.CreateViews(selectedItems, useFopVisName.IsChecked, useOneView.IsChecked);
             DialogResult = true;
         }
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
         }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e) {
+            ChangeSelected(true);
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
+            ChangeSelected(false);
+        }
+
+        private void ChangeSelected(bool state) {
+            var listView = (ListView) FindName("lvSystems");
+            var hvacSystems = listView.SelectedItems;
+            foreach(HvacSystem hvacSystem in hvacSystems) {
+                hvacSystem.IsSelected = state;
+            }
+            foreach(HvacSystem test in lvSystems.Items) {
+                MessageBox.Show(test.IsSelected.ToString());
+            }
+        }
     }
 }
+
