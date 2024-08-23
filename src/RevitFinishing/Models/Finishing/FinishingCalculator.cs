@@ -43,11 +43,23 @@ namespace RevitFinishing.Models
         /// <returns></returns>
         private List<FinishingElement> SetRoomsForFinishing() {
             Dictionary<ElementId, FinishingElement> allFinishings = new Dictionary<ElementId, FinishingElement>();
+            string wallName = FinishingCategory.Walls.Name;
+            string floorName = FinishingCategory.Floors.Name;
+            string ceilingName = FinishingCategory.Ceilings.Name;
+            string baseboarName = FinishingCategory.Baseboards.Name;
 
             foreach(var room in _finishingRooms) {
-                foreach(var finishingRevitElement in room.AllFinishing) {
-
-                    allFinishings = AddToDictionary(allFinishings, room, finishingRevitElement);
+                foreach(var finishingRevitElement in room.Walls) {
+                    allFinishings = UpdateDictionary(allFinishings, room, wallName, finishingRevitElement);
+                }
+                foreach(var finishingRevitElement in room.Baseboards) {
+                    allFinishings = UpdateDictionary(allFinishings, room, baseboarName, finishingRevitElement);
+                }
+                foreach(var finishingRevitElement in room.Floors) {
+                    allFinishings = UpdateDictionary(allFinishings, room, floorName, finishingRevitElement);
+                }
+                foreach(var finishingRevitElement in room.Ceilings) {
+                    allFinishings = UpdateDictionary(allFinishings, room, ceilingName, finishingRevitElement);
                 }
             }
             return allFinishings.Values.ToList();
@@ -59,41 +71,19 @@ namespace RevitFinishing.Models
                 .ToDictionary(x => x.Key, x => new FinishingType(x.ToList()));
         }
 
-        private Dictionary<ElementId, FinishingElement> AddToDictionary  (
+        private Dictionary<ElementId, FinishingElement> UpdateDictionary (
                                      Dictionary<ElementId, FinishingElement> allFinishings, 
                                      RoomElement room,
+                                     string finishingName,
                                      Element finishingRevitElement) {
-            ElementId finishingElementId = finishingRevitElement.Id;
-            FinishingCategory categoryInstance = new FinishingCategory();
+            ElementId finishingId = finishingRevitElement.Id;
 
-            if(allFinishings.TryGetValue(finishingElementId, out FinishingElement elementInDict)) {
-                elementInDict.Rooms.Add(room);
+            if(allFinishings.TryGetValue(finishingId, out FinishingElement finishing)) {
+                finishing.Rooms.Add(room);
             } else {
-                if(categoryInstance.CheckCategory(finishingRevitElement, FinishingCategory.Walls)) {
-                    var newFinishing = new FinishingWall(finishingRevitElement, this) {
-                        Rooms = new List<RoomElement> { room }
-                    };
-                    allFinishings.Add(finishingElementId, newFinishing);
-                };
-                if(categoryInstance.CheckCategory(finishingRevitElement, FinishingCategory.Ceilings)) {
-                    var newFinishing = new FinishingCeiling(finishingRevitElement, this) {
-                        Rooms = new List<RoomElement> { room }
-                    };
-                    allFinishings.Add(finishingElementId, newFinishing);
-                };
-                if(categoryInstance.CheckCategory(finishingRevitElement, FinishingCategory.Floors)) {
-                    var newFinishing = new FinishingFloor(finishingRevitElement, this) {
-                        Rooms = new List<RoomElement> { room }
-                    };
-                    allFinishings.Add(finishingElementId, newFinishing);
-                };
-                if(categoryInstance.CheckCategory(finishingRevitElement, FinishingCategory.Baseboards)) {
-                    var newFinishing = new FinishingBaseboard(finishingRevitElement, this) {
-                        Rooms = new List<RoomElement> { room }
-                    };
-                    allFinishings.Add(finishingElementId, newFinishing);
-                };
-
+                var newFinishing = FinishingFactory.Create(finishingName, finishingRevitElement, this);
+                newFinishing.Rooms = new List<RoomElement> { room };
+                allFinishings.Add(finishingId, newFinishing);
             }
 
             return allFinishings;
