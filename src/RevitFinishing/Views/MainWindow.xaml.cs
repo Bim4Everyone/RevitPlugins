@@ -1,6 +1,8 @@
 using System.Windows;
 using System.Windows.Controls;
 
+using RevitFinishing.ViewModels;
+
 namespace RevitFinishing.Views {
     public partial class MainWindow {
         public MainWindow() {
@@ -19,19 +21,19 @@ namespace RevitFinishing.Views {
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e) {
-            ChangeSelected();
+            ChangeSelected(true);
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
-            ChangeSelected();
+            ChangeSelected(false);
         }
 
-        private void ChangeSelected() {
+        private void ChangeSelected(bool state) {
             var listBox = (ListBox) FindName("RoomGroups");
             var groups = listBox.SelectedItems;
-            //foreach(RoomGroupViewModel group in groups) {
-            //    group.IsChecked = state;
-            //}
+            foreach(RoomGroupViewModel group in groups) {
+                group.IsChecked = state;
+            }
         }
     }
 }
