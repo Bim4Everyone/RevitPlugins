@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,6 +19,8 @@ namespace RevitAxonometryViews.ViewModels {
 
         private string _errorText;
         private string _saveProperty;
+        //private ICollectionView _categoriesView;
+        //private string _categoriesFilter = string.Empty;
 
         public MainViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -48,6 +52,16 @@ namespace RevitAxonometryViews.ViewModels {
 
         public ObservableCollection<HvacSystem> GetDataSource() {
             return _revitRepository.GetHvacSystems();
+        }
+
+        public ObservableCollection<HvacSystem> UpdateDataSourceByFilter(ObservableCollection<HvacSystem> originalCollection, string filterValue, string filterCriterion) {
+
+            if(filterCriterion == AxonometryConfig.FopVisSystemName) {
+                return new ObservableCollection<HvacSystem>(
+                originalCollection.Where(item => item.FopName.Contains(filterValue)));
+            }                
+            return new ObservableCollection<HvacSystem>(
+                originalCollection.Where(item => item.SystemName.Contains(filterValue)));
         }
 
         public void CreateViews(List<HvacSystem> hvacSystems, bool? useFopName, bool? useOneView) {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Windows.Data;
 using System.Windows.Forms;
 
 using Autodesk.Revit.ApplicationServices;
@@ -86,6 +87,7 @@ namespace RevitAxonometryViews.Models {
 
         //Создаем коллекцию объектов систем с именами для создания по ним фильтров
         public ObservableCollection<HvacSystem> GetHvacSystems() {
+            
             List<Element> ductSystems = Document.GetCollection(BuiltInCategory.OST_DuctSystem);
             List<Element> pipeSystems = Document.GetCollection(BuiltInCategory.OST_PipingSystem);
             List<Element> allSystems = ductSystems.Concat(pipeSystems).ToList();

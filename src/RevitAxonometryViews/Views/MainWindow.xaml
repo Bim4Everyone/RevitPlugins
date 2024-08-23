@@ -36,13 +36,18 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <ComboBox SelectedIndex="0" 
-                      Width="170" 
-                      Height="20" 
-                      Margin="25,0,0,0"/>
-            <TextBox Width="150" 
-                     Height="20" 
-                     Margin="25,0,0,0"/>
+            <ComboBox
+                Name="filterCriterion"
+                SelectedIndex="0" 
+                Width="170" 
+                Height="20" 
+                Margin="25,0,0,0"/>
+            <TextBox 
+                Name="filter"
+                Width="150" 
+                Height="20" 
+                Margin="25,0,0,0" 
+                TextChanged="FilterUpdated"/>
         </StackPanel>
 
         <ListView
@@ -84,8 +89,7 @@
                 <CheckBox
                         x:Name="useOneView"
                         Grid.Column="0"
-                        Margin="10 5"
-                        FlowDirection="RightToLeft"
+                        Margin="26,5,26,5"
                         Content="Все выделенные на один вид">
                 </CheckBox>
 
