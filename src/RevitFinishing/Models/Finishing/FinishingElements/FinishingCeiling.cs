@@ -6,7 +6,7 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
-namespace RevitFinishing.Models.Finishing.FinishingElements {
+namespace RevitFinishing.Models {
     internal class FinishingCeiling : FinishingElement {
         public FinishingCeiling(Element element, FinishingCalculator calculator)
             : base(element, calculator) {

@@ -11,7 +11,7 @@ using dosymep.Revit;
 namespace RevitFinishing.Models
 {
     /// <summary>
-    /// Класс для экземпляра отделки.
+    /// Абстрактный класс для экземпляра отделки.
     /// Каждый элемент отделки хранит список всех помещений, к которым он относится.
     /// </summary>
     internal abstract class FinishingElement {
@@ -54,7 +54,6 @@ namespace RevitFinishing.Models
         /// Проверка типов отделки помещений.
         /// Все помещения, к которым относятся экземпляр отделки должны иметь одинаковый тип отделки.
         /// </summary>
-        /// <returns></returns>
         public bool CheckFinishingTypes() {
             List<string> finishingTypes = Rooms
                 .Select(x => x.RoomFinishingType)

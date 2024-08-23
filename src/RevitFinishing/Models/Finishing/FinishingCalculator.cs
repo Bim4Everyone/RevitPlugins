@@ -4,10 +4,6 @@ using System.Linq;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-
-using RevitFinishing.Models.Finishing.FinishingElements;
-
 namespace RevitFinishing.Models
 {
     /// <summary>

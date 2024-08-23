@@ -2,7 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
-namespace RevitFinishing.Models.Finishing.FinishingElements {
+namespace RevitFinishing.Models {
     internal class FinishingFactory {
         public static FinishingElement Create(string name, Element element, FinishingCalculator calculator) {
             switch(name) {
