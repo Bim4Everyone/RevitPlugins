@@ -27,23 +27,34 @@ namespace RevitAxonometryViews.Models {
             _useFopNames = useFopNames;
             _combineViews = combineViews;
         }
-        public void CreateSelected(List<HvacSystem> selectedSystems) {
-            CopyView(selectedSystems);
+
+        //Копирует виды для каждого элемента выделенных систем, или поодиночно, или создавая один вид для всех выделенных.
+        public void CreateSelected(List<HvacSystem> systemList) {
+
+            if(_combineViews == true) {
+                CopyCombinedViews(systemList);
+            } else {
+                foreach(var hvacSystem in systemList) {
+                    CopySingleView(hvacSystem);
+                }
+            }
         }
 
+        //Создает фильтр для применения к видам
         public ParameterFilterElement CreateFilter(string filterName, List<string> systemNameList) {
             List<ElementId> categories = AxonometryConfig.SystemCategories
                 .Select(category => new ElementId(category))
                 .ToList();
 
             //создаем лист из фильтров по именам систем
-            List<ElementFilter> elementFilterList = CreateElementFilterList(systemNameList);
+            List<ElementFilter> elementFilterList = CreateFilterRules(systemNameList);
 
             return ParameterFilterElement.Create(
                 _document, filterName, categories, new LogicalAndFilter(elementFilterList));
         }
 
-        public List<ElementFilter> CreateElementFilterList(List<string> systemNameList) {
+        //Создает правила фильтрации для применени в фильтре
+        public List<ElementFilter> CreateFilterRules(List<string> systemNameList) {
             ElementId parameter = _criterionId;
             if(_useFopNames == true) {
                 parameter = _fopCriterionId;
@@ -61,8 +72,6 @@ namespace RevitAxonometryViews.Models {
             return elementFilterList;
         }
 
-
-
         //Возвращает уникальное имя, если в проекте уже есть такие имена - добавляет "копия" и счетчик
         private string GetUniqName(string name, List<Element> elements) {
             string baseName = name;
@@ -75,17 +84,7 @@ namespace RevitAxonometryViews.Models {
             return name;
         }
 
-        private void CopyView(List<HvacSystem> systemList) {
-
-            if(_combineViews == true) {
-                CopyCombinedViews(systemList);
-            } else {
-                foreach(var hvacSystem in systemList) {
-                    CopySingleView(hvacSystem);
-                }
-            }
-        }
-
+        //Создает один вид для всех выделенных систем и применяет фильтр
         private void CopyCombinedViews(List<HvacSystem> systemList) {
             List<Element> views = _document.GetCollection(BuiltInCategory.OST_Views);
 
@@ -107,6 +106,7 @@ namespace RevitAxonometryViews.Models {
             newView.SetFilterVisibility(filter.Id, false);
         }
 
+        //Копирует одиночный вид и применяет к нему фильтры
         private void CopySingleView(HvacSystem hvacSystem) {
             List<Element> views = _document.GetCollection(BuiltInCategory.OST_Views);
             string viewName = GetUniqName((bool) _useFopNames ? 

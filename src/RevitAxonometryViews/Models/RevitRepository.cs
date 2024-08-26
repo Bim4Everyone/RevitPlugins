@@ -83,8 +83,6 @@ namespace RevitAxonometryViews.Models {
             return "Нет имени";
         }
 
-
-
         //Создаем коллекцию объектов систем с именами для создания по ним фильтров
         public ObservableCollection<HvacSystem> GetHvacSystems() {
             
@@ -103,8 +101,8 @@ namespace RevitAxonometryViews.Models {
            );
         }
 
+        //Транзакция с созданием видов через класс ViewFactory
         public void ExecuteViewCreation(List<HvacSystem> hvacSystems, bool? useFopName, bool? useOneView) {
-
             ViewFactory viewFactory = new ViewFactory(Document, ActiveUIDocument, useFopName, useOneView);
             using(Transaction t = Document.StartTransaction("Создать схемы")) {
                 viewFactory.CreateSelected(hvacSystems);
@@ -112,6 +110,7 @@ namespace RevitAxonometryViews.Models {
             }
         }
 
+        //Точка старта. Перед инициализацией проверям корректность "ФОП_ВИС_Имя системы". Если где-то ее нет, пишем и закрываемся.
         public void Initialize() {
             string report = CheckVisNameCategories();
 

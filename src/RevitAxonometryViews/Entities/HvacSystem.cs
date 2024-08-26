@@ -9,11 +9,5 @@ namespace RevitAxonometryViews.Models {
         public Element SystemElement { get; set; }
 
         public bool IsSelected { get; set; }
-
-        //private bool _isChecked;
-        //public bool IsChecked {
-        //    get => _isChecked;
-        //    set => RaiseAndSetIfChanged(ref _isChecked, value);
-        //}
     }
 }

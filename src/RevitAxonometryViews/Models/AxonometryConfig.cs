@@ -29,6 +29,5 @@ namespace RevitAxonometryViews.Models {
 
         public const string FopVisSystemName = "ФОП_ВИС_Имя системы";
         public const string SystemName = "Имя системы";
-
     }
 }

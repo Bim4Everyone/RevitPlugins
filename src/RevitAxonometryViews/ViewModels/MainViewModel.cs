@@ -21,37 +21,29 @@ namespace RevitAxonometryViews.ViewModels {
         private ICollectionView _categoriesView;
         private string _categoriesFilter = string.Empty;
 
-        public ObservableCollection<string> FilterCriterion {  get; }
+        public ObservableCollection<string> FilterCriterion { get; }
         public ObservableCollection<HvacSystem> DataSource { get; set; }
-
-        public bool UseFopVisName {get; set;}
-        public bool UseOneView { get; set;} 
-
-        public string SelectedCriteria { get; set;}
-
-
+        public bool UseFopVisName { get; set; }
+        public bool UseOneView { get; set; }
+        public string SelectedCriteria { get; set; }
+        public ICommand CreateViewsCommand { get; }
+        public ICommand SelectionFilterCommand { get; }
+        public ICommand LoadViewCommand { get; }
+        public ICommand AcceptViewCommand { get; }
 
         public MainViewModel(RevitRepository revitRepository) {
-            SelectedCriteria = AxonometryConfig.SystemName;
             _revitRepository = revitRepository;
+            SelectedCriteria = AxonometryConfig.SystemName;
             FilterCriterion = new ObservableCollection<string>() {
                 AxonometryConfig.SystemName,
                 AxonometryConfig.FopVisSystemName
             };
 
-            DataSource = GetDataSource();
+            DataSource = _revitRepository.GetHvacSystems();
             SetCategoriesFilters();
             CreateViewsCommand = RelayCommand.Create(CreateViews);
             SelectionFilterCommand = RelayCommand.Create(SetCategoriesFilters);
         }
-
-        public ICommand CreateViewsCommand { get; }
-
-        public ICommand SelectionFilterCommand { get; }
-
-        public ICommand LoadViewCommand { get; }
-        public ICommand AcceptViewCommand { get; }
-
 
         public string CategoriesFilter {
             get => _categoriesFilter;
@@ -63,9 +55,15 @@ namespace RevitAxonometryViews.ViewModels {
                 }
             }
         }
+
+        //Организуем фильтрацию списка категорий
+        //Реализуется через SelectionFilterCommand
         private void SetCategoriesFilters() {
-            // Организуем фильтрацию списка категорий
             _categoriesView = CollectionViewSource.GetDefaultView(DataSource);
+            if(_categoriesView == null) {
+                return;
+            }
+
             if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
                 _categoriesView.Filter = item => string.IsNullOrEmpty(CategoriesFilter) ? true :
                 ((HvacSystem) item).FopName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
@@ -75,24 +73,22 @@ namespace RevitAxonometryViews.ViewModels {
             }
         }
 
-        public ObservableCollection<HvacSystem> GetDataSource() {
-            return _revitRepository.GetHvacSystems();
-        }
-
+        //Обновление листа
         public void Refresh() {
             _categoriesView.Refresh();
         }
 
-
+        //Получаем выбранные объекты из листа и отправляем на создание в репозиторий. 
+        //Реализуется через CreateViewsCommand
         public void CreateViews() {
             var selectedItems = DataSource.Where(item => item.IsSelected).ToList();
             _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView);
         }
 
+        //Открытие окна навигатора
         public void ShowWindow() {
             MainWindow mainWindow = new MainWindow(this);
             mainWindow.ShowDialog();
         }
-
     }
 }

@@ -9,7 +9,6 @@ using Autodesk.Revit.DB;
 
 namespace RevitAxonometryViews.Models {
     public static class CollectorOperator {
-
         public static List<Element> GetParameterFilterElements(this Document document) {
             return new FilteredElementCollector(document).OfClass(typeof(ParameterFilterElement)).ToList();
         }
