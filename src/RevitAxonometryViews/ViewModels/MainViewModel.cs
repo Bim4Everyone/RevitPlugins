@@ -40,11 +40,13 @@ namespace RevitAxonometryViews.ViewModels {
             };
 
             DataSource = _revitRepository.GetHvacSystems();
-            SetCategoriesFilters();
+            SetListViewFilter();
             CreateViewsCommand = RelayCommand.Create(CreateViews);
-            SelectionFilterCommand = RelayCommand.Create(SetCategoriesFilters);
+            SelectionFilterCommand = RelayCommand.Create(SetListViewFilter);
         }
 
+        //Текст, который подаестся в свойство фильтра для вида.
+        //Нужен для SetCategoriesFilters, переопределяется каждый раз при редактировании.
         public string CategoriesFilter {
             get => _categoriesFilter;
             set {
@@ -58,7 +60,10 @@ namespace RevitAxonometryViews.ViewModels {
 
         //Организуем фильтрацию списка категорий
         //Реализуется через SelectionFilterCommand
-        private void SetCategoriesFilters() {
+        //Здесь мы определяем источник данных для листа и в его свойстве фильтров указываем актуальный критерий фильтра
+        //сформированный по CategoriesFilter. В дальнейшем обновляем актуальный критерий при переключении комбобокса
+        //Если комбобокс не переключен, нужно просто обновлять CategoriesFilter при введении туда текста
+        private void SetListViewFilter() {
             _categoriesView = CollectionViewSource.GetDefaultView(DataSource);
             if(_categoriesView == null) {
                 return;

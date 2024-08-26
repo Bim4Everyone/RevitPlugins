@@ -52,9 +52,14 @@
             <ListView.View>
                 <GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Test">
                     <GridView.Columns>
-                        <GridViewColumn Header="Имя системы" DisplayMemberBinding="{Binding Path=SystemName}" Width="150"/>
-                        <GridViewColumn Header="_ФОП_ВИС_Имя системы" DisplayMemberBinding="{Binding Path=FopName}" Width="150"/>
-                        <GridViewColumn Header="Создать" Width="150">
+                        <GridViewColumn Header="Имя системы" 
+                                        DisplayMemberBinding="{Binding Path=SystemName}"
+                                        Width="150"/>
+                        <GridViewColumn Header="_ФОП_ВИС_Имя системы" 
+                                        DisplayMemberBinding="{Binding Path=FopName}" 
+                                        Width="150"/>
+                        <GridViewColumn Header="Создать" 
+                                        Width="150">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <CheckBox Checked="CheckBox_Checked"

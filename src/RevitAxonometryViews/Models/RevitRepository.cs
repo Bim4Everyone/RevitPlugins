@@ -24,10 +24,8 @@ namespace RevitAxonometryViews.Models {
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
-
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
@@ -105,7 +103,7 @@ namespace RevitAxonometryViews.Models {
         public void ExecuteViewCreation(List<HvacSystem> hvacSystems, bool? useFopName, bool? useOneView) {
             ViewFactory viewFactory = new ViewFactory(Document, ActiveUIDocument, useFopName, useOneView);
             using(Transaction t = Document.StartTransaction("Создать схемы")) {
-                viewFactory.CreateSelected(hvacSystems);
+                viewFactory.CreateViewsBySelectedSystems(hvacSystems);
                 t.Commit();
             }
         }
