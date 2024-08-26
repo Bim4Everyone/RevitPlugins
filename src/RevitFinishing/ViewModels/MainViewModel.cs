@@ -72,6 +72,12 @@ namespace RevitFinishing.ViewModels {
             FinishingChecker checker = new FinishingChecker(SelectedPhase);
             ErrorsViewModel mainErrors = new ErrorsViewModel();
 
+
+            mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
+                Description = "На выбранной стадии не найдены экземпляры отделки",
+                ErrorElements = new ObservableCollection<ErrorElement>(
+                    checker.CheckPhaseContainsFinishing(allFinishing))
+            });
             mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
                 Description = "Экземпляры отделки являются границами помещений",
                 ErrorElements = new ObservableCollection<ErrorElement>(

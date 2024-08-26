@@ -8,12 +8,11 @@ namespace RevitFinishing.Models {
 
         public ErrorElement(Element element, string phaseName) {
             _element = element;
-
             _phaseName = phaseName;
-            _levelName = _element
-                .Document
-                .GetElement(_element.LevelId)
-                .Name;
+
+            ElementId levelId = _element.LevelId;
+            _levelName = levelId != ElementId.InvalidElementId 
+                ? _element.Document.GetElement(levelId).Name : "Без уровня";
         }
 
         public ElementId ElementId => _element.Id;

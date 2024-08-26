@@ -8,10 +8,22 @@ using dosymep.Revit;
 
 namespace RevitFinishing.Models {
     internal class FinishingChecker {
+        private readonly Phase _phase;
         private readonly string _phaseName;
 
         public FinishingChecker(Phase phase) {
+            _phase = phase;
             _phaseName = phase.Name;
+        }
+
+        public List<ErrorElement> CheckPhaseContainsFinishing(FinishingInProject finishings) {
+            if(!finishings.AllFinishing.Any()) {
+                return new List<ErrorElement>() { 
+                    new ErrorElement(_phase, _phaseName) 
+                };
+            }
+
+            return new List<ErrorElement>();
         }
 
         public List<ErrorElement> CheckFinishingByRoomBounding(FinishingInProject finishings) {
