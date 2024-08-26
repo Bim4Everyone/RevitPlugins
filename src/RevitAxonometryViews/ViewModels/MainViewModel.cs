@@ -18,6 +18,8 @@ using RevitAxonometryViews.Views;
 namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private ICollectionView _categoriesView;
+        private string _categoriesFilter = string.Empty;
 
         public ObservableCollection<string> FilterCriterion {  get; }
         public ObservableCollection<HvacSystem> DataSource { get; set; }
@@ -27,8 +29,7 @@ namespace RevitAxonometryViews.ViewModels {
 
         public string SelectedCriteria { get; set;}
 
-        private ICollectionView _categoriesView;
-        private string _categoriesFilter = string.Empty;
+
 
         public MainViewModel(RevitRepository revitRepository) {
             SelectedCriteria = AxonometryConfig.SystemName;
@@ -57,7 +58,7 @@ namespace RevitAxonometryViews.ViewModels {
             set {
                 if(value != _categoriesFilter) {
                     _categoriesFilter = value;
-                    _categoriesView.Refresh();
+                    Refresh();
                     OnPropertyChanged(nameof(CategoriesFilter));
                 }
             }
@@ -78,6 +79,11 @@ namespace RevitAxonometryViews.ViewModels {
             return _revitRepository.GetHvacSystems();
         }
 
+        public void Refresh() {
+            _categoriesView.Refresh();
+        }
+
+
         public void CreateViews() {
             var selectedItems = DataSource.Where(item => item.IsSelected).ToList();
             _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView);
@@ -87,5 +93,6 @@ namespace RevitAxonometryViews.ViewModels {
             MainWindow mainWindow = new MainWindow(this);
             mainWindow.ShowDialog();
         }
+
     }
 }

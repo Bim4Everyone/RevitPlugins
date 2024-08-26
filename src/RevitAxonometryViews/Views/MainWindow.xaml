@@ -1,22 +1,17 @@
-<Window
-    x:Class="RevitAxonometryViews.Views.MainWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitAxonometryViews.Views"
-    xmlns:vms="clr-namespace:RevitAxonometryViews.ViewModels"
-    
-    mc:Ignorable="d"
-    WindowStartupLocation="CenterOwner"
-    Title="Сформировать схемы"
-    Height="450" Width="500"
-    ResizeMode="NoResize"
-    
-    >
+<Window x:Class="RevitAxonometryViews.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:base="clr-namespace:dosymep.WPF.Views"
+        xmlns:local="clr-namespace:RevitAxonometryViews.Views"
+        xmlns:vms="clr-namespace:RevitAxonometryViews.ViewModels"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        Title="Сформировать схемы"
+        Height="450" Width="500"
+        ResizeMode="NoResize">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -27,78 +22,44 @@
             <RowDefinition Height="43"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" 
-                    Orientation="Horizontal">
-            <TextBlock Width="108" 
-                       Height="20" 
-                       Margin="25,0,0,0"/>
-        </StackPanel>
-        
-        <StackPanel
-            Grid.Row="0"
-            Orientation="Horizontal">
-            <TextBlock
-                Width="108" Height="20"
-                Margin="25,0,0,0" 
-                Text="Фильтровать по:">
-            </TextBlock>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <TextBlock Width="108" Height="20" Margin="25,0,0,0" Text="Фильтровать по:"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal">
-
-            <ComboBox
-                Name="FilterCriterion"
-                ItemsSource="{Binding FilterCriterion }"
-                SelectedItem="{Binding SelectedCriteria}"
-                SelectedIndex="0"
-                Width="170" 
-                Height="20" 
-                Margin="25,0,0,0">
-
+            <ComboBox Name="FilterCriterion"
+                      ItemsSource="{Binding FilterCriterion}"
+                      SelectedItem="{Binding SelectedCriteria}"
+                      SelectedIndex="0"
+                      Width="170" Height="20" Margin="25,0,0,0">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding Path=SelectionFilterCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-
             </ComboBox>
 
-
-            <TextBox 
-                Name="filter"
-                Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
-                Width="150" 
-                Height="20" 
-                Margin="25,0,0,0" 
-                />
+            <TextBox Name="filter"
+                     Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
+                     Width="150" Height="20" Margin="25,0,0,0"/>
         </StackPanel>
 
-        <ListView
-            x:Name="lvSystems"
-            Margin="25,0,25,0"
-            Grid.Row="2"
-            SelectionMode="Extended"
-            ItemsSource="{Binding DataSource, UpdateSourceTrigger=PropertyChanged }"
-            >
+        <ListView x:Name="lvSystems"
+                  Margin="25,0,25,0"
+                  Grid.Row="2"
+                  SelectionMode="Extended"
+                  ItemsSource="{Binding DataSource, UpdateSourceTrigger=PropertyChanged}">
             <ListView.View>
-                <GridView AllowsColumnReorder="False" 
-                          ColumnHeaderToolTip="Test"
-                          >
+                <GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Test">
                     <GridView.Columns>
-                        <GridViewColumn Header="Имя системы" 
-                                        DisplayMemberBinding="{Binding Path=SystemName}"
-                                        Width="150"/>
-                        <GridViewColumn Header="_ФОП_ВИС_Имя системы" 
-                                        DisplayMemberBinding="{Binding Path=FopName}"
-                                        Width="150"/>
-                        <GridViewColumn Header="Создать" 
-                                        Width="150">
+                        <GridViewColumn Header="Имя системы" DisplayMemberBinding="{Binding Path=SystemName}" Width="150"/>
+                        <GridViewColumn Header="_ФОП_ВИС_Имя системы" DisplayMemberBinding="{Binding Path=FopName}" Width="150"/>
+                        <GridViewColumn Header="Создать" Width="150">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox
-                                        Checked="CheckBox_Checked"
-                                        Unchecked="CheckBox_Unchecked"
-                                        IsChecked="{Binding IsSelected}"/>
+                                    <CheckBox Checked="CheckBox_Checked"
+                                              Unchecked="CheckBox_Unchecked"
+                                              IsChecked="{Binding IsSelected}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -106,50 +67,40 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <StackPanel
-            Grid.Row="3">
+
+        <StackPanel Grid.Row="3">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <CheckBox
-                        x:Name="useOneView"
-                        IsChecked="{Binding UseOneView}"
-                        Grid.Column="0"
-                        Margin="26,5,26,5"
-                        Content="Все выделенные на один вид">
-                </CheckBox>
-
-                <CheckBox
-                        x:Name="useFopVisName"
-                        IsChecked="{Binding UseFopVisName}"
-                        Grid.Column="1"
-                        Margin="10 5"
-                        Content="Схемы по ФОП__ВИС__Имя системы"/>
+                <CheckBox x:Name="useOneView"
+                          IsChecked="{Binding UseOneView}"
+                          Grid.Column="0"
+                          Margin="26,5,26,5"
+                          Content="Все выделенные на один вид"/>
+                <CheckBox x:Name="useFopVisName"
+                          IsChecked="{Binding UseFopVisName}"
+                          Grid.Column="1"
+                          Margin="10,5"
+                          Content="Схемы по ФОП__ВИС__Имя системы"/>
             </Grid>
         </StackPanel>
 
-        <StackPanel
-            Grid.Row="4"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-            <Button
-                Margin="5,0,5,10"
-                Width="80"
-                Content="ОК"
-                IsDefault="True"
-                Height="30" 
-                Click="Button_Click_Ok"
-                Command="{Binding CreateViewsCommand}"
-                />
-            <Button
-                Margin="5,0,25,10"
-                Width="80"
-                Content="Отмена"
-                IsCancel="True"
-                Height="30"
-                Click="ButtonCancel_Click"/>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="5,0,5,10"
+                    Width="80"
+                    Content="ОК"
+                    IsDefault="True"
+                    Height="30"
+                    Click="Button_Click_Ok"
+                    Command="{Binding CreateViewsCommand}"/>
+            <Button Margin="5,0,25,10"
+                    Width="80"
+                    Content="Отмена"
+                    IsCancel="True"
+                    Height="30"
+                    Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
 </Window>

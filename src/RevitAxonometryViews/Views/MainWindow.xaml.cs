@@ -40,13 +40,9 @@ namespace RevitAxonometryViews.Views {
         }
 
         private void ChangeSelected(bool state) {
-            var listView = (ListView) FindName("lvSystems");
-            var hvacSystems = listView.SelectedItems;
-            foreach(HvacSystem hvacSystem in hvacSystems) {
+            foreach(HvacSystem hvacSystem in lvSystems.SelectedItems) {
                 hvacSystem.IsSelected = state;
-            }
-            foreach(HvacSystem test in lvSystems.Items) {
-                MessageBox.Show(test.IsSelected.ToString());
+                _viewModel.Refresh();
             }
         }
     }
