@@ -9,7 +9,6 @@ using System.Windows.Data;
 
 using Autodesk.Revit.DB;
 
-using RevitAxonometryViews.Models;
 using RevitAxonometryViews.ViewModels;
 
 namespace RevitAxonometryViews.Views {
@@ -40,7 +39,7 @@ namespace RevitAxonometryViews.Views {
         }
 
         private void ChangeSelected(bool state) {
-            foreach(HvacSystem hvacSystem in lvSystems.SelectedItems) {
+            foreach(HvacSystemViewModel hvacSystem in lvSystems.SelectedItems) {
                 hvacSystem.IsSelected = state;
                 _viewModel.Refresh();
             }

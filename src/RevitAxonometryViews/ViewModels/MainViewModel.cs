@@ -22,7 +22,7 @@ namespace RevitAxonometryViews.ViewModels {
         private string _categoriesFilter = string.Empty;
 
         public ObservableCollection<string> FilterCriterion { get; }
-        public ObservableCollection<HvacSystem> DataSource { get; set; }
+        public ObservableCollection<HvacSystemViewModel> DataSource { get; set; }
         public bool UseFopVisName { get; set; }
         public bool UseOneView { get; set; }
         public string SelectedCriteria { get; set; }
@@ -71,10 +71,10 @@ namespace RevitAxonometryViews.ViewModels {
 
             if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
                 _categoriesView.Filter = item => string.IsNullOrEmpty(CategoriesFilter) ? true :
-                ((HvacSystem) item).FopName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+                ((HvacSystemViewModel) item).FopName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
             } else {
                 _categoriesView.Filter = item => string.IsNullOrEmpty(CategoriesFilter) ? true :
-                ((HvacSystem) item).SystemName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+                ((HvacSystemViewModel) item).SystemName.IndexOf(CategoriesFilter, StringComparison.OrdinalIgnoreCase) >= 0;
             }
         }
 

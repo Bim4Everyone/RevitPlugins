@@ -2,8 +2,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
-namespace RevitAxonometryViews.Models {
-    internal class HvacSystem : BaseViewModel {
+namespace RevitAxonometryViews.ViewModels {
+    internal class HvacSystemViewModel : BaseViewModel {
 
         private bool _isSelected;
 

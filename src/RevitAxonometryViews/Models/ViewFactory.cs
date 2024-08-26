@@ -11,6 +11,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
+using RevitAxonometryViews.ViewModels;
+
 namespace RevitAxonometryViews.Models {
     internal class ViewFactory {
         private readonly Document _document;
@@ -29,7 +31,7 @@ namespace RevitAxonometryViews.Models {
         }
 
         //Копирует виды для каждого элемента выделенных систем, или поодиночно, или создавая один вид для всех выделенных.
-        public void CreateViewsBySelectedSystems(List<HvacSystem> systemList) {
+        public void CreateViewsBySelectedSystems(List<HvacSystemViewModel> systemList) {
 
             if(_combineViews == true) {
                 CopyCombinedViews(systemList);
@@ -85,7 +87,7 @@ namespace RevitAxonometryViews.Models {
         }
 
         //Создает один вид для всех выделенных систем и применяет фильтр
-        private void CopyCombinedViews(List<HvacSystem> systemList) {
+        private void CopyCombinedViews(List<HvacSystemViewModel> systemList) {
             List<Element> views = _document.GetCollection(BuiltInCategory.OST_Views);
 
             List<string> nameList = (bool) _useFopNames
@@ -107,7 +109,7 @@ namespace RevitAxonometryViews.Models {
         }
 
         //Копирует одиночный вид и применяет к нему фильтры
-        private void CopySingleView(HvacSystem hvacSystem) {
+        private void CopySingleView(HvacSystemViewModel hvacSystem) {
             List<Element> views = _document.GetCollection(BuiltInCategory.OST_Views);
             string viewName = GetUniqName((bool) _useFopNames ? 
                 hvacSystem.FopName : hvacSystem.SystemName, views);

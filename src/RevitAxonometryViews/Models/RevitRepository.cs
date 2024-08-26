@@ -82,16 +82,16 @@ namespace RevitAxonometryViews.Models {
         }
 
         //Создаем коллекцию объектов систем с именами для создания по ним фильтров
-        public ObservableCollection<HvacSystem> GetHvacSystems() {
+        public ObservableCollection<HvacSystemViewModel> GetHvacSystems() {
             
             List<Element> ductSystems = Document.GetCollection(BuiltInCategory.OST_DuctSystem);
             List<Element> pipeSystems = Document.GetCollection(BuiltInCategory.OST_PipingSystem);
             List<Element> allSystems = ductSystems.Concat(pipeSystems).ToList();
 
-            ObservableCollection<HvacSystem> newSystems = new ObservableCollection<HvacSystem>();
+            ObservableCollection<HvacSystemViewModel> newSystems = new ObservableCollection<HvacSystemViewModel>();
 
-            return new ObservableCollection<HvacSystem>(
-                allSystems.Select(system => new HvacSystem {
+            return new ObservableCollection<HvacSystemViewModel>(
+                allSystems.Select(system => new HvacSystemViewModel {
                     SystemElement = system,
                     SystemName = system.Name,
                     FopName = GetSystemFopName(system)
@@ -100,7 +100,7 @@ namespace RevitAxonometryViews.Models {
         }
 
         //Транзакция с созданием видов через класс ViewFactory
-        public void ExecuteViewCreation(List<HvacSystem> hvacSystems, bool? useFopName, bool? useOneView) {
+        public void ExecuteViewCreation(List<HvacSystemViewModel> hvacSystems, bool? useFopName, bool? useOneView) {
             ViewFactory viewFactory = new ViewFactory(Document, ActiveUIDocument, useFopName, useOneView);
             using(Transaction t = Document.StartTransaction("Создать схемы")) {
                 viewFactory.CreateViewsBySelectedSystems(hvacSystems);
