@@ -22,7 +22,7 @@ namespace RevitAxonometryViews.ViewModels {
         private string _categoriesFilter = string.Empty;
 
         public ObservableCollection<string> FilterCriterion { get; }
-        public ObservableCollection<HvacSystemViewModel> DataSource { get; set; }
+        public ObservableCollection<HvacSystemViewModel> HvacSystems { get; set; }
         public bool UseFopVisName { get; set; }
         public bool UseOneView { get; set; }
         public string SelectedCriteria { get; set; }
@@ -39,7 +39,7 @@ namespace RevitAxonometryViews.ViewModels {
                 AxonometryConfig.FopVisSystemName
             };
 
-            DataSource = _revitRepository.GetHvacSystems();
+            HvacSystems = _revitRepository.GetHvacSystems();
             SetListViewFilter();
             CreateViewsCommand = RelayCommand.Create(CreateViews);
             SelectionFilterCommand = RelayCommand.Create(SetListViewFilter);
@@ -64,7 +64,7 @@ namespace RevitAxonometryViews.ViewModels {
         //сформированный по CategoriesFilter. В дальнейшем обновляем актуальный критерий при переключении комбобокса
         //Если комбобокс не переключен, нужно просто обновлять CategoriesFilter при введении туда текста
         private void SetListViewFilter() {
-            _categoriesView = CollectionViewSource.GetDefaultView(DataSource);
+            _categoriesView = CollectionViewSource.GetDefaultView(HvacSystems);
             if(_categoriesView == null) {
                 return;
             }
@@ -86,7 +86,7 @@ namespace RevitAxonometryViews.ViewModels {
         //Получаем выбранные объекты из листа и отправляем на создание в репозиторий. 
         //Реализуется через CreateViewsCommand
         public void CreateViews() {
-            var selectedItems = DataSource.Where(item => item.IsSelected).ToList();
+            var selectedItems = HvacSystems.Where(item => item.IsSelected).ToList();
             _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView);
         }
 
