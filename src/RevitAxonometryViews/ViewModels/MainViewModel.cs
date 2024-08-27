@@ -20,6 +20,7 @@ namespace RevitAxonometryViews.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly ObservableCollection<HvacSystemViewModel> _hvacSystems;
         private string _categoriesFilter = string.Empty;
+        private string _errorText;
         private ICollectionView _categoriesView;
         public MainViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -33,7 +34,7 @@ namespace RevitAxonometryViews.ViewModels {
             };
 
             ApplyViewFilter();
-            CreateViewsCommand = RelayCommand.Create(CreateViews);
+            CreateViewsCommand = RelayCommand.Create(CreateViews, CanCreateViews);
             //ЗАМЕЧАНИЕ: ПЕРЕИМЕНОВАТЬ В АППЛАЙ ФИЛЬТЕР КОМАНД
             SelectionFilterCommand = RelayCommand.Create(ApplyViewFilter);
         }
@@ -44,6 +45,11 @@ namespace RevitAxonometryViews.ViewModels {
         public string SelectedCriteria { get; set; }
         public ICommand CreateViewsCommand { get; }
         public ICommand SelectionFilterCommand { get; }
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
         public ICollectionView FilteredView => _categoriesView;
 
         //Текст, который подаестся в свойство фильтра для вида.
@@ -90,6 +96,16 @@ namespace RevitAxonometryViews.ViewModels {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
             _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView);
         }
+
+        private bool CanCreateViews() {
+            var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
+            if(selectedItems.Count == 0) {
+                ErrorText = "Не выделены системы";
+                return false;
+            }
+            return true;
+        }
+
 
         //Открытие окна навигатора
         public void ShowWindow() {
