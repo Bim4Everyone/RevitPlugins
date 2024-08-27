@@ -47,6 +47,11 @@ namespace RevitAxonometryViews.Models {
             List<ElementId> categories = AxonometryConfig.SystemCategories
                 .Select(category => new ElementId(category))
                 .ToList();
+            //Если фильтруем по ФОП_ВИС_Имя системы - оставляем обобщенки, они есть в оборудовании.
+            //Системного имени системы у них нет, будет ошибка.
+            if(_useFopNames != true) {
+                categories.Remove(new ElementId(BuiltInCategory.OST_GenericModel));
+            }
 
             //создаем лист из фильтров по именам систем
             List<ElementFilter> elementFilterList = CreateFilterRules(systemNameList);
