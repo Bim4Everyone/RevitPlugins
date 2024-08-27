@@ -41,7 +41,10 @@ namespace RevitFinishing.ViewModels {
             CheckAllCommand = new RelayCommand(CheckAll);
             UnCheckAllCommand = new RelayCommand(UnCheckAll);
             InvertAllCommand = new RelayCommand(InvertAll);
+
+            SetPluginConfig();
         }
+
         public ICommand CalculateFinishingCommand { get; }
         public ICommand CheckAllCommand { get; }
         public ICommand UnCheckAllCommand { get; }
@@ -61,6 +64,11 @@ namespace RevitFinishing.ViewModels {
         public ObservableCollection<RoomGroupViewModel> Rooms {
             get => _rooms;
             set => RaiseAndSetIfChanged(ref _rooms, value);
+        }
+
+        public string ErrorText {
+            get => _errorText;
+            set => RaiseAndSetIfChanged(ref _errorText, value);
         }
 
         private void CalculateFinishing(object p) {
@@ -134,6 +142,8 @@ namespace RevitFinishing.ViewModels {
                 }
                 t.Commit();
             }
+
+            SavePluginConfig();
         }
 
         private bool CanCalculateFinishing(object p) {
@@ -162,9 +172,35 @@ namespace RevitFinishing.ViewModels {
             _revitRepository.InvertAll(Rooms);
         }
 
-        public string ErrorText {
-            get => _errorText;
-            set => RaiseAndSetIfChanged(ref _errorText, value);
+        public void SavePluginConfig() {
+            var config = PluginConfig.GetPluginConfig();
+            var settings = config.GetSettings(_revitRepository.Document);
+
+            if(settings is null) {
+                settings = config.AddSettings(_revitRepository.Document);
+            }
+
+            settings.Phase = SelectedPhase.Name;
+            settings.RoomNames = Rooms
+                .Where(x => x.IsChecked)
+                .Select(x => x.Name)
+                .ToList();
+
+            config.SaveProjectConfig();
+        }
+
+        public void SetPluginConfig() {
+            var config = PluginConfig.GetPluginConfig();
+            var settings = config.GetSettings(_revitRepository.Document);
+
+            if(settings == null) { return; }
+
+            SelectedPhase = Phases.FirstOrDefault(x => x.Name == settings.Phase);
+            foreach(var room in Rooms.Where(x => settings.RoomNames.Contains(x.Name))) {
+                room.IsChecked = true;
+            }
+
+            config.SaveProjectConfig();
         }
     }
 }

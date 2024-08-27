@@ -65,7 +65,7 @@
                     <CheckBox Content="{Binding Name}"
                               Checked="CheckBox_Checked"
                               Unchecked="CheckBox_Unchecked"
-                              IsChecked="{Binding IsChecked}"/>
+                              IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
