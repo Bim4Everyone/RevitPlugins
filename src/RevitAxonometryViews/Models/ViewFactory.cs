@@ -32,12 +32,13 @@ namespace RevitAxonometryViews.Models {
 
         //Копирует виды для каждого элемента выделенных систем, или поодиночно, или создавая один вид для всех выделенных.
         public void CreateViewsBySelectedSystems(List<HvacSystemViewModel> systemList) {
-
-            if(_combineViews == true) {
-                CopyCombinedViews(systemList);
-            } else {
-                foreach(var hvacSystem in systemList) {
-                    CopySingleView(hvacSystem);
+            if(systemList.Count > 0) {
+                if(_combineViews == true) {
+                    CopyCombinedViews(systemList);
+                } else {
+                    foreach(var hvacSystem in systemList) {
+                        CopySingleView(hvacSystem);
+                    }
                 }
             }
         }
