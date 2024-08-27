@@ -44,7 +44,6 @@
             <ComboBox 
                 Name="FilterCriterion"
                 ItemsSource="{Binding FilterCriterion}"
-                SelectedItem="{Binding SelectedCriteria}"
                 SelectedIndex="0"
                 Margin="10,5,10,10"
                 Grid.Column="0">
@@ -52,7 +51,7 @@
                     <i:EventTrigger 
                         EventName="SelectionChanged">
                         <i:InvokeCommandAction 
-                            Command="{Binding Path=SelectionFilterCommand}" />
+                            Command="{Binding Path=ApplyViewFilterComamnd}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>

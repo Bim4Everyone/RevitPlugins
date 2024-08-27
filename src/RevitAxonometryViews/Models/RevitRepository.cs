@@ -12,6 +12,7 @@ using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 using RevitAxonometryViews.ViewModels;
@@ -32,7 +33,7 @@ namespace RevitAxonometryViews.Models {
         //Если существует ФОП_ВИС_Имя системы, проверяет во всех ли нужных категориях он. Если нет - возвращает в строке в каких нет,
         //если все окей - возвращает null
         public string CheckVisNameCategories() {
-            //ЗАМЕЧАНИЕ: ТАК НЕ ДЕЛАЕМ, ДОБАВЛЯЕМ ПАРАМЕТР ЕСЛИ НЕ СУЩЕСТВУЕТ
+            //ЗАМЕЧАНИЕ: ТАК НЕ ДЕЛАЕМ, ДОБАВЛЯЕМ ПАРАМЕТР ЕСЛИ НЕ СУЩЕСТВУЕТ(Ждем финализации параметров)
             if(!Document.IsExistsSharedParam(AxonometryConfig.FopVisSystemName)) {
                 return $"Параметр {"ФОП_ВИС_Имя системы"} не существует в проекте.";
             } else {
@@ -91,11 +92,8 @@ namespace RevitAxonometryViews.Models {
             ObservableCollection<HvacSystemViewModel> newSystems = new ObservableCollection<HvacSystemViewModel>();
 
             return new ObservableCollection<HvacSystemViewModel>(
-                allSystems.Select(system => new HvacSystemViewModel {
-                    SystemName = system.Name,
-                    FopName = GetSystemFopName(system)
-                })
-           );
+                allSystems.Select(
+                    system => new HvacSystemViewModel (system.Name, GetSystemFopName(system))));
         }
 
         //Транзакция с созданием видов через класс ViewFactory
@@ -104,19 +102,6 @@ namespace RevitAxonometryViews.Models {
             using(Transaction t = Document.StartTransaction("Создать схемы")) {
                 viewFactory.CreateViewsBySelectedSystems(hvacSystems);
                 t.Commit();
-            }
-        }
-
-        //Точка старта. Перед инициализацией проверям корректность "ФОП_ВИС_Имя системы". Если где-то ее нет, пишем и закрываемся.
-        public void Initialize() {
-            string report = CheckVisNameCategories();
-
-            if(string.IsNullOrEmpty(report)) {
-                MainViewModel viewModel = new MainViewModel(this);
-                viewModel.ShowWindow();
-
-            } else {
-                MessageBox.Show(report);
             }
         }
     }

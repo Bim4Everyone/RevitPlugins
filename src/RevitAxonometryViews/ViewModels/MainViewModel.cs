@@ -26,8 +26,6 @@ namespace RevitAxonometryViews.ViewModels {
             _revitRepository = revitRepository;
             _hvacSystems = _revitRepository.GetHvacSystems();
 
-            //ЗАМЕЧАНИЕ: КРИТЕРИЙ НУЖНО ПОДАВАТЬ ПОСЛЕ СПИСКА
-            SelectedCriteria = AxonometryConfig.SystemName;
             FilterCriterion = new ObservableCollection<string>() {
                 AxonometryConfig.SystemName,
                 AxonometryConfig.FopVisSystemName
@@ -35,8 +33,8 @@ namespace RevitAxonometryViews.ViewModels {
 
             ApplyViewFilter();
             CreateViewsCommand = RelayCommand.Create(CreateViews, CanCreateViews);
-            //ЗАМЕЧАНИЕ: ПЕРЕИМЕНОВАТЬ В АППЛАЙ ФИЛЬТЕР КОМАНД
-            SelectionFilterCommand = RelayCommand.Create(ApplyViewFilter);
+            ApplyViewFilterComamnd = RelayCommand.Create(ApplyViewFilter);
+            
         }
 
         public ObservableCollection<string> FilterCriterion { get; }
@@ -44,7 +42,7 @@ namespace RevitAxonometryViews.ViewModels {
         public bool UseOneView { get; set; }
         public string SelectedCriteria { get; set; }
         public ICommand CreateViewsCommand { get; }
-        public ICommand SelectionFilterCommand { get; }
+        public ICommand ApplyViewFilterComamnd { get; }
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -66,7 +64,7 @@ namespace RevitAxonometryViews.ViewModels {
         }
 
         //Организуем фильтрацию списка категорий
-        //Реализуется через SelectionFilterCommand
+        //Реализуется через ApplyViewFilterCommand
         //Здесь мы определяем источник данных для листа и в его свойстве фильтров указываем актуальный критерий фильтра
         //сформированный по CategoriesFilter. В дальнейшем обновляем актуальный критерий при переключении комбобокса
         //Если комбобокс не переключен, нужно просто обновлять CategoriesFilter при введении туда текста
@@ -103,14 +101,8 @@ namespace RevitAxonometryViews.ViewModels {
                 ErrorText = "Не выделены системы";
                 return false;
             }
+            ErrorText = string.Empty;
             return true;
-        }
-
-
-        //Открытие окна навигатора
-        public void ShowWindow() {
-            MainWindow mainWindow = new MainWindow(this);
-            mainWindow.ShowDialog();
         }
     }
 }
