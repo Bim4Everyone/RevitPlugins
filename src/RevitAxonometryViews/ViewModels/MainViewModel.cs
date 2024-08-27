@@ -19,10 +19,8 @@ namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly ObservableCollection<HvacSystemViewModel> _hvacSystems;
-
-        private ICollectionView _categoriesView;
         private string _categoriesFilter = string.Empty;
-
+        private ICollectionView _categoriesView;
         public MainViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
             _hvacSystems = _revitRepository.GetHvacSystems();
@@ -39,7 +37,6 @@ namespace RevitAxonometryViews.ViewModels {
         }
 
         public ObservableCollection<string> FilterCriterion { get; }
-
         public bool UseFopVisName { get; set; }
         public bool UseOneView { get; set; }
         public string SelectedCriteria { get; set; }

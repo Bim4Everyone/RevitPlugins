@@ -92,7 +92,6 @@ namespace RevitAxonometryViews.Models {
 
             return new ObservableCollection<HvacSystemViewModel>(
                 allSystems.Select(system => new HvacSystemViewModel {
-                    SystemElement = system,
                     SystemName = system.Name,
                     FopName = GetSystemFopName(system)
                 })
