@@ -136,23 +136,27 @@
                 Text="{Binding ErrorText}" 
                 Grid.Column="0"/>
 
-            <Button 
-                Margin="5,5,95,5"  
-                Width="80"
-                Content="ОК"  
-                IsDefault="True" 
-                Height="20"   
-                Click="Button_Click_Ok"
-                Command="{Binding CreateViewsCommand}"
-                Grid.Column="1"/>
-            <Button 
-                Margin="90,5,10,5" 
-                Width="80"  
-                Content="Отмена"  
-                IsCancel="True"  
-                Height="20"
-                Click="ButtonCancel_Click"
-                Grid.Column="1"/>
+            <StackPanel 
+                Grid.Row="4" 
+                Grid.Column="1" 
+                Orientation="Horizontal" 
+                HorizontalAlignment="Right">
+                <Button 
+                    Margin="5"
+                    Width="80"
+                    Content="ОК"
+                    IsDefault="True"
+                    Height="20"
+                    Click="Button_Click_Ok"
+                    Command="{Binding CreateViewsCommand}"/>
+                <Button 
+                    Margin="5"
+                    Width="80"
+                    Content="Отмена"
+                    IsCancel="True"
+                    Height="20"
+                    Click="ButtonCancel_Click"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>
