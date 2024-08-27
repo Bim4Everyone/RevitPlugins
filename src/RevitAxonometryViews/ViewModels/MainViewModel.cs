@@ -20,6 +20,7 @@ namespace RevitAxonometryViews.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly List<HvacSystemViewModel> _hvacSystems;
         private string _filterValue = string.Empty;
+        private string _selectedCriteria = string.Empty;
         private string _errorText;
 
         public MainViewModel(RevitRepository revitRepository) {
@@ -36,28 +37,12 @@ namespace RevitAxonometryViews.ViewModels {
         }
 
         public ObservableCollection<string> FilterCriterion { get; }
+        public ICommand CreateViewsCommand { get; }
         public bool UseFopVisName { get; set; }
         public bool UseOneView { get; set; }
-        public string SelectedCriteria { get; set; }
-        public ICommand CreateViewsCommand { get; }
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-
-        public List<HvacSystemViewModel> FilteredView => 
-            _hvacSystems.Where(x => LogicalFilter(x)).ToList();
-
-        //Логический фильтр по которому осуществляется фильтрация списка систем, в зависимости от выбранного критерия фильтрации
-        private bool LogicalFilter(HvacSystemViewModel system) {
-            if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
-                return system.FopName.Contains(FilterValue);
-            }
-            return system.SystemName.Contains(FilterValue);
-        }
 
         //Текст, который подаестся в свойство фильтра для вида.
-        //Нужен для SetCategoriesFilters, переопределяется каждый раз при редактировании.
+        //Каждый раз при редактировании обновляет FilteredView
         public string FilterValue {
             get => _filterValue;
             set {
@@ -67,6 +52,42 @@ namespace RevitAxonometryViews.ViewModels {
                     OnPropertyChanged(nameof(FilteredView));
                 }
             }
+        }
+
+        //Критерий по которому идет фильтрация/сортировка вида.
+        //Каждый раз при редактировании обновляет FilteredView
+        public string SelectedCriteria {
+            get => _selectedCriteria;
+            set {
+                if(value != _selectedCriteria) {
+                    _selectedCriteria = value;
+                    RaiseAndSetIfChanged(ref _selectedCriteria, value);
+                    OnPropertyChanged(nameof(FilteredView));
+                }
+            }
+        }
+
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+        public List<HvacSystemViewModel> FilteredView =>
+            _hvacSystems.Where(x => LogicalFilterByName(x)).OrderBy(x => LogicalOrderByName(x)).ToList();
+
+        //Логический фильтр для сортировки
+        private string LogicalOrderByName(HvacSystemViewModel system) {
+            if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
+                return system.FopName;
+            }
+            return system.SystemName;
+        }
+
+        //Логический фильтр по которому осуществляется фильтрация списка систем, в зависимости от выбранного критерия фильтрации
+        private bool LogicalFilterByName(HvacSystemViewModel system) {
+            if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
+                return system.FopName.Contains(FilterValue);
+            }
+            return system.SystemName.Contains(FilterValue);
         }
 
         //Получаем выбранные объекты из листа и отправляем на создание в репозиторий. 

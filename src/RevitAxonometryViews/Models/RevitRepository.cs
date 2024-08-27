@@ -54,7 +54,6 @@ namespace RevitAxonometryViews.Models {
                     result += string.Join(", ", missingCategories);
                     return result;
                 }
-
                 return null;
             }
         }
