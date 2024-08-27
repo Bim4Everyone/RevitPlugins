@@ -33,6 +33,10 @@ namespace RevitAxonometryViews {
         }
 
         protected override void Execute(UIApplication uiApplication) {
+            //ЗАМЕЧАНИЕ: ЗДЕСЬ ПОДАЕМ КОМАНДЫ ВСЕ, VM НЕ ДОЛЖЕН ВЫЗЫВАТЬСЯ ИЗ ЕПОЗИТОРИЯ, ВИД ТОЖЕ ВЫЗЫВАЕМ ИЗ КОМАНДЫ
+            //ПРОВЕРКИ ТОЖЕ ИДУТ ТУТ ПО ОЧЕРЕДИ
+            //СДЕЛАТЬ ШИРИНУ ТЕКСТБОКСТА ПО КОЛОНКЕ
+            //ЧЕКБОКСЫ СЛЕВА
             new RevitRepository(uiApplication).Initialize();
         }
     }

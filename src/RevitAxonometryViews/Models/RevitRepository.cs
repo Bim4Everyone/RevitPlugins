@@ -32,10 +32,10 @@ namespace RevitAxonometryViews.Models {
         //Если существует ФОП_ВИС_Имя системы, проверяет во всех ли нужных категориях он. Если нет - возвращает в строке в каких нет,
         //если все окей - возвращает null
         public string CheckVisNameCategories() {
+            //ЗАМЕЧАНИЕ: ТАК НЕ ДЕЛАЕМ, ДОБАВЛЯЕМ ПАРАМЕТР ЕСЛИ НЕ СУЩЕСТВУЕТ
             if(!Document.IsExistsSharedParam(AxonometryConfig.FopVisSystemName)) {
                 return $"Параметр {"ФОП_ВИС_Имя системы"} не существует в проекте.";
             } else {
-
                 (Definition Definition, Binding Binding) fopVisNameParam = Document.GetSharedParamBinding(AxonometryConfig.FopVisSystemName);
                 Binding parameterBinding = fopVisNameParam.Binding;
                 IEnumerable<Category> fopVisNameCategories = parameterBinding.GetCategories();

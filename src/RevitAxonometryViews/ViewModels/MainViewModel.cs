@@ -25,6 +25,7 @@ namespace RevitAxonometryViews.ViewModels {
             _revitRepository = revitRepository;
             _hvacSystems = _revitRepository.GetHvacSystems();
 
+            //ЗАМЕЧАНИЕ: КРИТЕРИЙ НУЖНО ПОДАВАТЬ ПОСЛЕ СПИСКА
             SelectedCriteria = AxonometryConfig.SystemName;
             FilterCriterion = new ObservableCollection<string>() {
                 AxonometryConfig.SystemName,
@@ -32,7 +33,8 @@ namespace RevitAxonometryViews.ViewModels {
             };
 
             ApplyViewFilter();
-            CreateViewsCommand = RelayCommand.Create(CreateViewsBySelectedSystems);
+            CreateViewsCommand = RelayCommand.Create(CreateViews);
+            //ЗАМЕЧАНИЕ: ПЕРЕИМЕНОВАТЬ В АППЛАЙ ФИЛЬТЕР КОМАНД
             SelectionFilterCommand = RelayCommand.Create(ApplyViewFilter);
         }
 
@@ -84,7 +86,7 @@ namespace RevitAxonometryViews.ViewModels {
 
         //Получаем выбранные объекты из листа и отправляем на создание в репозиторий. 
         //Реализуется через CreateViewsCommand
-        public void CreateViewsBySelectedSystems() {
+        public void CreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
             _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView);
         }

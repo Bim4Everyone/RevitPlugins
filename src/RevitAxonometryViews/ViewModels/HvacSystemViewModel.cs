@@ -5,7 +5,7 @@ using dosymep.WPF.ViewModels;
 namespace RevitAxonometryViews.ViewModels {
     internal class HvacSystemViewModel : BaseViewModel {
         private bool _isSelected;
-
+        //ЗАМЕЧАНИЕ: ДОБАВИТЬ КОНСТРУКТОР, ИНИЦИАЛИЗИРОВАТЬ ЧЕРЕЗ НЕГО
         public string SystemName { get; set; }
         public string FopName { get; set; }
 
