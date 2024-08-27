@@ -33,7 +33,6 @@ namespace RevitAxonometryViews.Models {
         //Если существует ФОП_ВИС_Имя системы, проверяет во всех ли нужных категориях он. Если нет - возвращает в строке в каких нет,
         //если все окей - возвращает null
         public string CheckVisNameCategories() {
-            //ЗАМЕЧАНИЕ: ТАК НЕ ДЕЛАЕМ, ДОБАВЛЯЕМ ПАРАМЕТР ЕСЛИ НЕ СУЩЕСТВУЕТ(Ждем финализации параметров)
             if(!Document.IsExistsSharedParam(AxonometryConfig.FopVisSystemName)) {
                 return $"Параметр {"ФОП_ВИС_Имя системы"} не существует в проекте.";
             } else {
@@ -83,15 +82,15 @@ namespace RevitAxonometryViews.Models {
         }
 
         //Создаем коллекцию объектов систем с именами для создания по ним фильтров
-        public ObservableCollection<HvacSystemViewModel> GetHvacSystems() {
+        public List<HvacSystemViewModel> GetHvacSystems() {
             
             List<Element> ductSystems = Document.GetCollection(BuiltInCategory.OST_DuctSystem);
             List<Element> pipeSystems = Document.GetCollection(BuiltInCategory.OST_PipingSystem);
             List<Element> allSystems = ductSystems.Concat(pipeSystems).ToList();
 
-            ObservableCollection<HvacSystemViewModel> newSystems = new ObservableCollection<HvacSystemViewModel>();
+            List<HvacSystemViewModel> newSystems = new List<HvacSystemViewModel>();
 
-            return new ObservableCollection<HvacSystemViewModel>(
+            return new List<HvacSystemViewModel>(
                 allSystems.Select(
                     system => new HvacSystemViewModel (system.Name, GetSystemFopName(system))));
         }

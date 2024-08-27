@@ -32,12 +32,6 @@ namespace RevitAxonometryViews.Models {
 
         //Копирует виды для каждого элемента выделенных систем, или поодиночно, или создавая один вид для всех выделенных.
         public void CreateViewsBySelectedSystems(List<HvacSystemViewModel> selectedSystemsList) {
-            //Если системы не были выделены - возвращаемся
-            //ЗАМЕЧАНИЕ: ПЕРЕНОСИМ В РЕЛЭЙ КОМАНД И ПИШЕМ ОРАНЖЕВЫМ ТЕКСТОМ 
-            if(selectedSystemsList.Count == 0) {
-                return;
-            }
-
             if(_combineViews == true) {
                 CopyCombinedViews(selectedSystemsList);
             } else {
@@ -79,9 +73,9 @@ namespace RevitAxonometryViews.Models {
                     new ElementParameterFilter(
                         ParameterFilterRuleFactory.CreateNotEqualsRule(parameter, systemName, true));
 #else
-            ElementParameterFilter filterRule = 
-            new ElementParameterFilter(
-            ParameterFilterRuleFactory.CreateNotEqualsRule(parameter, systemName));
+                ElementParameterFilter filterRule = 
+                    new ElementParameterFilter(
+                        ParameterFilterRuleFactory.CreateNotEqualsRule(parameter, systemName));
 #endif
                 elementFilterList.Add(filterRule);
             }

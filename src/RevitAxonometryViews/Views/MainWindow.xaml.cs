@@ -41,7 +41,6 @@ namespace RevitAxonometryViews.Views {
         private void ChangeSelected(bool state) {
             foreach(HvacSystemViewModel hvacSystem in lvSystems.SelectedItems) {
                 hvacSystem.IsSelected = state;
-                _viewModel.Refresh();
             }
         }
     }
