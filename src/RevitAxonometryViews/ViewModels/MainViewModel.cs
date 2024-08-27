@@ -18,32 +18,34 @@ using RevitAxonometryViews.Views;
 namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly ObservableCollection<HvacSystemViewModel> _hvacSystems;
+
         private ICollectionView _categoriesView;
         private string _categoriesFilter = string.Empty;
 
-        public ObservableCollection<string> FilterCriterion { get; }
-        public ObservableCollection<HvacSystemViewModel> HvacSystems { get; set; }
-        public bool UseFopVisName { get; set; }
-        public bool UseOneView { get; set; }
-        public string SelectedCriteria { get; set; }
-        public ICommand CreateViewsCommand { get; }
-        public ICommand SelectionFilterCommand { get; }
-        public ICommand LoadViewCommand { get; }
-        public ICommand AcceptViewCommand { get; }
-
         public MainViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
+            _hvacSystems = _revitRepository.GetHvacSystems();
+
             SelectedCriteria = AxonometryConfig.SystemName;
             FilterCriterion = new ObservableCollection<string>() {
                 AxonometryConfig.SystemName,
                 AxonometryConfig.FopVisSystemName
             };
 
-            HvacSystems = _revitRepository.GetHvacSystems();
-            SetListViewFilter();
-            CreateViewsCommand = RelayCommand.Create(CreateViews);
-            SelectionFilterCommand = RelayCommand.Create(SetListViewFilter);
+            ApplyViewFilter();
+            CreateViewsCommand = RelayCommand.Create(CreateViewsBySelectedSystems);
+            SelectionFilterCommand = RelayCommand.Create(ApplyViewFilter);
         }
+
+        public ObservableCollection<string> FilterCriterion { get; }
+
+        public bool UseFopVisName { get; set; }
+        public bool UseOneView { get; set; }
+        public string SelectedCriteria { get; set; }
+        public ICommand CreateViewsCommand { get; }
+        public ICommand SelectionFilterCommand { get; }
+        public ICollectionView FilteredView => _categoriesView;
 
         //Текст, который подаестся в свойство фильтра для вида.
         //Нужен для SetCategoriesFilters, переопределяется каждый раз при редактировании.
@@ -63,8 +65,8 @@ namespace RevitAxonometryViews.ViewModels {
         //Здесь мы определяем источник данных для листа и в его свойстве фильтров указываем актуальный критерий фильтра
         //сформированный по CategoriesFilter. В дальнейшем обновляем актуальный критерий при переключении комбобокса
         //Если комбобокс не переключен, нужно просто обновлять CategoriesFilter при введении туда текста
-        private void SetListViewFilter() {
-            _categoriesView = CollectionViewSource.GetDefaultView(HvacSystems);
+        private void ApplyViewFilter() {
+            _categoriesView = CollectionViewSource.GetDefaultView(_hvacSystems);
             if(_categoriesView == null) {
                 return;
             }
@@ -80,13 +82,13 @@ namespace RevitAxonometryViews.ViewModels {
 
         //Обновление листа
         public void Refresh() {
-            _categoriesView.Refresh();
+            FilteredView.Refresh();
         }
 
         //Получаем выбранные объекты из листа и отправляем на создание в репозиторий. 
         //Реализуется через CreateViewsCommand
-        public void CreateViews() {
-            var selectedItems = HvacSystems.Where(item => item.IsSelected).ToList();
+        public void CreateViewsBySelectedSystems() {
+            var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
             _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView);
         }
 

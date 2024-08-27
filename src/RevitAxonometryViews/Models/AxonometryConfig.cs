@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
+
 namespace RevitAxonometryViews.Models {
     public static class AxonometryConfig {
+        public const string FopVisSystemName = "ФОП_ВИС_Имя системы";
+
+        public const string SystemName = "Имя системы";
 
         public static List<BuiltInCategory> SystemCategories = new List<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctFitting,
@@ -26,8 +32,5 @@ namespace RevitAxonometryViews.Models {
                 BuiltInCategory.OST_Sprinklers,
                 //BuiltInCategory.OST_GenericModel
             };
-
-        public const string FopVisSystemName = "ФОП_ВИС_Имя системы";
-        public const string SystemName = "Имя системы";
     }
 }
