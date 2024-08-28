@@ -30,8 +30,14 @@ namespace RevitAxonometryViews.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        //Если существует ФОП_ВИС_Имя системы, проверяет во всех ли нужных категориях он. Если нет - возвращает в строке в каких нет,
-        //если все окей - возвращает null
+
+
+
+        /// <summary>
+        /// Если существует ФОП_ВИС_Имя системы, проверяет во всех ли нужных категориях он. Если нет - возвращает в строке в каких нет,
+        /// если все окей - возвращает null
+        /// </summary>
+        /// <returns></returns>
         public string CheckVisNameCategories() {
             if(!Document.IsExistsSharedParam(AxonometryConfig.FopVisSystemName)) {
                 return $"Параметр {"ФОП_ВИС_Имя системы"} не существует в проекте.";
@@ -58,7 +64,11 @@ namespace RevitAxonometryViews.Models {
             }
         }
 
-        //Получаем ФОП_ВИС_Имя системы если оно есть в проекте
+        /// <summary>
+        /// Получаем ФОП_ВИС_Имя системы если оно есть в проекте
+        /// </summary>
+        /// <param name="system"></param>
+        /// <returns></returns>
         public string GetSystemFopName(Element system) {
             ElementSet elementSet = new ElementSet();
             if(system.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
@@ -67,8 +77,8 @@ namespace RevitAxonometryViews.Models {
             if(system.Category.IsId(BuiltInCategory.OST_PipingSystem)) {
                 elementSet = (system as PipingSystem).PipingNetwork;
             }
-            //Нужно перебирать элементы пока не встретим заплненный параметр, могут быть не до конца обработаны элементы.
-            //Выбрасываем первое встреченное заполненное значение
+            // Нужно перебирать элементы пока не встретим заполненный параметр, могут быть не до конца обработаны элементы.
+            // Выбрасываем первое встреченное заполненное значение
             if(elementSet != null && !elementSet.IsEmpty) {
                 foreach(Element element in elementSet) {
                     string result = element.GetSharedParamValueOrDefault<string>(AxonometryConfig.FopVisSystemName, null);
@@ -80,11 +90,14 @@ namespace RevitAxonometryViews.Models {
             return "Нет имени";
         }
 
-        //Создаем коллекцию объектов систем с именами для создания по ним фильтров
+        /// <summary>
+        /// Создаем коллекцию объектов систем с именами для создания по ним фильтров
+        /// </summary>
+        /// <returns></returns>
         public List<HvacSystemViewModel> GetHvacSystems() {
             
-            List<Element> ductSystems = Document.GetCollection(BuiltInCategory.OST_DuctSystem);
-            List<Element> pipeSystems = Document.GetCollection(BuiltInCategory.OST_PipingSystem);
+            List<Element> ductSystems = Document.GetElementsByCategory(BuiltInCategory.OST_DuctSystem);
+            List<Element> pipeSystems = Document.GetElementsByCategory(BuiltInCategory.OST_PipingSystem);
             List<Element> allSystems = ductSystems.Concat(pipeSystems).ToList();
 
             List<HvacSystemViewModel> newSystems = new List<HvacSystemViewModel>();
@@ -94,7 +107,11 @@ namespace RevitAxonometryViews.Models {
                     system => new HvacSystemViewModel (system.Name, GetSystemFopName(system))));
         }
 
-        //Транзакция с созданием видов через класс ViewFactory
+
+        /// <summary>
+        /// Транзакция с созданием видов через класс ViewFactory
+        /// </summary>
+        /// <returns></returns>
         public void ExecuteViewCreation(List<HvacSystemViewModel> hvacSystems, bool? useFopName, bool? useOneView) {
             ViewFactory viewFactory = new ViewFactory(Document, ActiveUIDocument, useFopName, useOneView);
             using(Transaction t = Document.StartTransaction("Создать схемы")) {

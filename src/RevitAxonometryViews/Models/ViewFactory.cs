@@ -30,7 +30,10 @@ namespace RevitAxonometryViews.Models {
             _combineViews = combineViews;
         }
 
-        //Копирует виды для каждого элемента выделенных систем, или поодиночно, или создавая один вид для всех выделенных.
+        /// <summary>
+        /// Копирует виды для каждого элемента выделенных систем, или поодиночно, или создавая один вид для всех выделенных.
+        /// </summary>
+        /// <param name="selectedSystemsList"></param>
         public void CreateViewsBySelectedSystems(List<HvacSystemViewModel> selectedSystemsList) {
             if(_combineViews == true) {
                 CopyCombinedViews(selectedSystemsList);
@@ -41,25 +44,31 @@ namespace RevitAxonometryViews.Models {
             }
         }
 
-        //Создает фильтр для применения к видам
+        /// <summary>
+        /// Создает фильтр для применения к видам
+        /// </summary>
+        /// <returns></returns>
         public ParameterFilterElement CreateFilter(string filterName, List<string> systemNameList) {
             List<ElementId> categories = AxonometryConfig.SystemCategories
                 .Select(category => new ElementId(category))
                 .ToList();
-            //Если фильтруем по ФОП_ВИС_Имя системы - оставляем обобщенки, они есть в оборудовании.
-            //Системного имени системы у них нет, будет ошибка.
+            // Если фильтруем по ФОП_ВИС_Имя системы - оставляем обобщенки, они есть в оборудовании.
+            // Системного имени системы у них нет, будет ошибка.
             if(_useFopNames != true) {
                 categories.Remove(new ElementId(BuiltInCategory.OST_GenericModel));
             }
 
-            //создаем лист из фильтров по именам систем
+            // создаем лист из фильтров по именам систем
             List<ElementFilter> elementFilterList = CreateFilterRules(systemNameList);
 
             return ParameterFilterElement.Create(
                 _document, filterName, categories, new LogicalAndFilter(elementFilterList));
         }
 
-        //Создает правила фильтрации для применени в фильтре
+        /// <summary>
+        /// Создает правила фильтрации для применени в фильтре
+        /// </summary>
+        /// <returns></returns>
         public List<ElementFilter> CreateFilterRules(List<string> systemNameList) {
             ElementId parameter = _criterionId;
             if(_useFopNames == true) {
@@ -82,7 +91,10 @@ namespace RevitAxonometryViews.Models {
             return elementFilterList;
         }
 
-        //Возвращает уникальное имя, если в проекте уже есть такие имена - добавляет "копия" и счетчик
+        /// <summary>
+        /// Возвращает уникальное имя, если в проекте уже есть такие имена - добавляет "копия" и счетчик
+        /// </summary>
+        /// <returns></returns>
         private string GetUniqName(string name, List<Element> elements) {
             string baseName = name;
             int counter = 1;
@@ -94,9 +106,12 @@ namespace RevitAxonometryViews.Models {
             return name;
         }
 
-        //Создает один вид для всех выделенных систем и применяет фильтр
+        /// <summary>
+        /// Создает один вид для всех выделенных систем и применяет фильтр
+        /// </summary>
+        /// <returns></returns>
         private void CopyCombinedViews(List<HvacSystemViewModel> systemList) {
-            List<Element> views = _document.GetCollection(BuiltInCategory.OST_Views);
+            List<Element> views = _document.GetElementsByCategory(BuiltInCategory.OST_Views);
 
             List<string> nameList = (bool) _useFopNames
                 ? systemList.Select(x => x.FopName).ToList()
@@ -116,9 +131,12 @@ namespace RevitAxonometryViews.Models {
             newView.SetFilterVisibility(filter.Id, false);
         }
 
-        //Копирует одиночный вид и применяет к нему фильтры
+        /// <summary>
+        /// Копирует одиночный вид и применяет к нему фильтры
+        /// </summary>
+        /// <returns></returns>
         private void CopySingleView(HvacSystemViewModel hvacSystem) {
-            List<Element> views = _document.GetCollection(BuiltInCategory.OST_Views);
+            List<Element> views = _document.GetElementsByCategory(BuiltInCategory.OST_Views);
             string viewName = GetUniqName((bool) _useFopNames ? 
                 hvacSystem.FopName : hvacSystem.SystemName, views);
 

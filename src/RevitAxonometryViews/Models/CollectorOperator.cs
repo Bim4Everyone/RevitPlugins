@@ -13,7 +13,7 @@ namespace RevitAxonometryViews.Models {
             return new FilteredElementCollector(document).OfClass(typeof(ParameterFilterElement)).ToList();
         }
 
-        public static List<Element> GetCollection(this Document document, BuiltInCategory category) {
+        public static List<Element> GetElementsByCategory(this Document document, BuiltInCategory category) {
             return new FilteredElementCollector(document)
                 .OfCategory(category)
                 .WhereElementIsNotElementType()

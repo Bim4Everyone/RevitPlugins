@@ -13,7 +13,7 @@ using RevitAxonometryViews.ViewModels;
 
 namespace RevitAxonometryViews.Views {
     public partial class MainWindow {
-        //private readonly MainViewModel _viewModel;
+        // private readonly MainViewModel _viewModel;
         protected CollectionViewSource SystemsCollection;
 
         public MainWindow() {
@@ -22,7 +22,7 @@ namespace RevitAxonometryViews.Views {
             //this.DataContext = viewModel;
         }
 
-        //override-ы нужны потому что мы удалили конфиг, в котором переопределяются эти вещи
+        // override-ы нужны потому что мы удалили конфиг, в котором переопределяются эти вещи
         public override string PluginName => nameof(RevitAxonometryViews);
 
         public override string ProjectConfigName => nameof(MainWindow);

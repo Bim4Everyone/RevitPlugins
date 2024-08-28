@@ -34,6 +34,10 @@ namespace RevitAxonometryViews {
             PluginName = "RevitAxonometryViews";
         }
         protected override void Execute(UIApplication uiApplication) {
+
+            // Здесь мы биндим классы в словарь Kernel, который сам будет их инициализировать через Get<Имя из словаря>, без вызова конструкторов
+            // Которые он обрабатывает самостоятельно
+            // Например Kernel.Get<MainViewModel>() требует на вход RevitRepository. Kernel самостоятельно ищет его по биндингам и подает в конструктор
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<UIApplication>()
                     .ToConstant(uiApplication)

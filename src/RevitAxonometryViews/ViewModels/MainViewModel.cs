@@ -41,8 +41,10 @@ namespace RevitAxonometryViews.ViewModels {
         public bool UseFopVisName { get; set; }
         public bool UseOneView { get; set; }
 
-        //Текст, который подаестся в свойство фильтра для вида.
-        //Каждый раз при редактировании обновляет FilteredView
+        /// <summary>
+        /// Текст, который подаестся в свойство фильтра для вида.
+        /// Каждый раз при редактировании обновляет FilteredView
+        /// </summary>
         public string FilterValue {
             get => _filterValue;
             set {
@@ -54,8 +56,11 @@ namespace RevitAxonometryViews.ViewModels {
             }
         }
 
-        //Критерий по которому идет фильтрация/сортировка вида.
-        //Каждый раз при редактировании обновляет FilteredView
+
+        /// <summary>
+        /// Критерий по которому идет фильтрация/сортировка вида.
+        /// Каждый раз при редактировании обновляет FilteredView
+        /// </summary>
         public string SelectedCriteria {
             get => _selectedCriteria;
             set {
@@ -74,7 +79,11 @@ namespace RevitAxonometryViews.ViewModels {
         public List<HvacSystemViewModel> FilteredView =>
             _hvacSystems.Where(x => LogicalFilterByName(x)).OrderBy(x => LogicalOrderByName(x)).ToList();
 
-        //Логический фильтр для сортировки
+        /// <summary>
+        /// Логический фильтр для сортировки
+        /// </summary>
+        /// <param name="system"></param>
+        /// <returns></returns>
         private string LogicalOrderByName(HvacSystemViewModel system) {
             if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
                 return system.FopName;
@@ -82,7 +91,11 @@ namespace RevitAxonometryViews.ViewModels {
             return system.SystemName;
         }
 
-        //Логический фильтр по которому осуществляется фильтрация списка систем, в зависимости от выбранного критерия фильтрации
+        /// <summary>
+        /// Логический фильтр по которому осуществляется фильтрация списка систем, в зависимости от выбранного критерия фильтрации
+        /// </summary>
+        /// <param name="system"></param>
+        /// <returns></returns>
         private bool LogicalFilterByName(HvacSystemViewModel system) {
             if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
                 return system.FopName.Contains(FilterValue);
@@ -90,14 +103,20 @@ namespace RevitAxonometryViews.ViewModels {
             return system.SystemName.Contains(FilterValue);
         }
 
-        //Получаем выбранные объекты из листа и отправляем на создание в репозиторий. 
-        //Реализуется через CreateViewsCommand
+        /// <summary>
+        /// Получаем выбранные объекты из листа и отправляем на создание в репозиторий. 
+        /// Реализуется через CreateViewsCommand
+        /// </summary>
         public void CreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
             _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView);
         }
 
-        //Проверка, выбраны ли системы. Если не выбраны - пишем предупреждение
+
+        /// <summary>
+        /// Проверка, выбраны ли системы. Если не выбраны - пишем предупреждение
+        /// </summary>
+        /// <returns></returns>
         private bool CanCreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
             if(selectedItems.Count == 0) {
