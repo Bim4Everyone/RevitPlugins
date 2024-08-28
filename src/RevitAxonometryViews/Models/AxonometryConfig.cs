@@ -11,8 +11,10 @@ using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitAxonometryViews.Models {
     public static class AxonometryConfig {
+        //Добавляем через параметры
         public const string FopVisSystemName = "ФОП_ВИС_Имя системы";
 
+        //Добавляем через параметры
         public const string SystemName = "Имя системы";
 
         public static List<BuiltInCategory> SystemCategories = new List<BuiltInCategory>() {
