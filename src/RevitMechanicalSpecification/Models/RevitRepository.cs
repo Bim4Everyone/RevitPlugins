@@ -23,7 +23,6 @@ namespace RevitMechanicalSpecification.Models {
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
 
-
             ManifoldParts = new HashSet<ManifoldPart> { };
             _collector = new CollectionFactory(Document);
             _elements = _collector.GetMechanicalElements();
@@ -31,6 +30,7 @@ namespace RevitMechanicalSpecification.Models {
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
             _nameAndGroupFactory = new NameGroupFactory(_specConfiguration, Document, _calculator);
+            _parameterChecker = new ParameterChecker(Document, _specConfiguration);
             _fillersSpecRefresh = new List<ElementParamFiller>()
 {
                 //Заполнение ФОП_ВИС_Группирование
@@ -108,12 +108,9 @@ namespace RevitMechanicalSpecification.Models {
 
         public Document Document => ActiveUIDocument.Document;
 
-
         private readonly List<ElementParamFiller> _fillersSpecRefresh;
         private readonly List<ElementParamFiller> _fillersSystemRefresh;
         private readonly List<ElementParamFiller> _fillersFunctionRefresh;
-
-
         internal HashSet<ManifoldPart> ManifoldParts;
         private readonly NameGroupFactory _nameAndGroupFactory;
         private readonly CollectionFactory _collector;
@@ -121,6 +118,7 @@ namespace RevitMechanicalSpecification.Models {
         private readonly List<VisSystem> _visSystems;
         private readonly SpecConfiguration _specConfiguration;
         private readonly VisElementsCalculator _calculator;
+        private readonly ParameterChecker _parameterChecker;
 
         public void ShowReport(List<string> editors) {
             if(editors.Count != 0) {
@@ -154,6 +152,8 @@ namespace RevitMechanicalSpecification.Models {
         }
 
         private void ProcessElements(List<ElementParamFiller> fillers) {
+            _parameterChecker.ExecuteParameterCheck();
+
             string userName = UIApplication.Application.Username.ToLower();
             List<string> editors = new List<string>();
 
