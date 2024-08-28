@@ -1,18 +1,24 @@
-<Window x:Class="RevitAxonometryViews.Views.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:base="clr-namespace:dosymep.WPF.Views"
-        xmlns:local="clr-namespace:RevitAxonometryViews.Views"
-        xmlns:vms="clr-namespace:RevitAxonometryViews.ViewModels"
-        mc:Ignorable="d"
-        WindowStartupLocation="CenterScreen"
-        Title="Сформировать схемы"
-        Height="450" 
-        Width="500"
-        ResizeMode="NoResize">
+<base:PlatformWindow 
+    x:Class="RevitAxonometryViews.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+       
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitAxonometryViews.Views"
+    xmlns:vms="clr-namespace:RevitAxonometryViews.ViewModels"  
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterScreen"
+                     
+    Height="450" 
+    Width="500"  
+    ResizeMode="NoResize"
+    
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    
 
     <Grid>
         <Grid.RowDefinitions>
@@ -155,4 +161,4 @@
             </StackPanel>
         </Grid>
     </Grid>
-</Window>
+</base:PlatformWindow>

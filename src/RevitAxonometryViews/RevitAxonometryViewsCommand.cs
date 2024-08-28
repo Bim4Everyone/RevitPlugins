@@ -25,23 +25,42 @@ using RevitAxonometryViews.Models;
 using RevitAxonometryViews.ViewModels;
 using RevitAxonometryViews.Views;
 
+using Application = Autodesk.Revit.ApplicationServices.Application;
+
 namespace RevitAxonometryViews {
     [Transaction(TransactionMode.Manual)]
     public class RevitAxonometryViewsCommand : BasePluginCommand {
         public RevitAxonometryViewsCommand() {
             PluginName = "RevitAxonometryViews";
         }
-
         protected override void Execute(UIApplication uiApplication) {
-            RevitRepository revitRepository = new RevitRepository(uiApplication);
-            string report = revitRepository.CheckVisNameCategories();
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<UIApplication>()
+                    .ToConstant(uiApplication)
+                    .InSingletonScope();
+                kernel.Bind<RevitRepository>().ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<MainViewModel>().ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<MainWindow>().ToSelf()
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<MainViewModel>())
+                    .WithPropertyValue(nameof(Window.Title), PluginName);
 
-            if(string.IsNullOrEmpty(report)) {
-                MainViewModel viewModel = new MainViewModel(revitRepository);
-                MainWindow mainWindow = new MainWindow(viewModel);
-                mainWindow.ShowDialog();
-            } else {
-                MessageBox.Show(report);
+                var revitRepository = kernel.Get<RevitRepository>();
+                var servise = GetPlatformService<IMessageBoxService>();
+
+                CheckParameter(revitRepository, servise);
+
+                Notification(kernel.Get<MainWindow>());
+            }
+        }
+
+        private void CheckParameter(RevitRepository revitRepository, IMessageBoxService service) {
+            string report = revitRepository.CheckVisNameCategories();
+            if(!string.IsNullOrEmpty(report)) {
+                service.Show(report, "Генерация схем", MessageBoxButton.OK, MessageBoxImage.Error);
+                throw new OperationCanceledException();
             }
         }
     }

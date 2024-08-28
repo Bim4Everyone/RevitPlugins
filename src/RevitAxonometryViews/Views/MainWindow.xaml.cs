@@ -13,14 +13,19 @@ using RevitAxonometryViews.ViewModels;
 
 namespace RevitAxonometryViews.Views {
     public partial class MainWindow {
-        private readonly MainViewModel _viewModel;
+        //private readonly MainViewModel _viewModel;
         protected CollectionViewSource SystemsCollection;
 
-        internal MainWindow(MainViewModel viewModel) {
+        public MainWindow() {
             InitializeComponent();            
-            _viewModel = viewModel;
-            this.DataContext = viewModel;
+            //_viewModel = viewModel;
+            //this.DataContext = viewModel;
         }
+
+        //override-ы нужны потому что мы удалили конфиг, в котором переопределяются эти вещи
+        public override string PluginName => nameof(RevitAxonometryViews);
+
+        public override string ProjectConfigName => nameof(MainWindow);
 
         private void Button_Click_Ok(object sender, RoutedEventArgs e) {
             DialogResult = true;
