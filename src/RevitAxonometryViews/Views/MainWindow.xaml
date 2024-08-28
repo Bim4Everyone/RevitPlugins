@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:RevitAxonometryViews.Views"
         xmlns:vms="clr-namespace:RevitAxonometryViews.ViewModels"
         mc:Ignorable="d"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         Title="Сформировать схемы"
         Height="450" 
         Width="500"
@@ -28,7 +28,6 @@
             Orientation="Horizontal">
             <TextBlock 
                 Width="108" 
-                Height="20" 
                 Margin="10,5,10,10" 
                 Text="Фильтровать по:"/>
         </StackPanel>
@@ -55,7 +54,6 @@
                 Grid.Column="1"/>
         </Grid>
 
-
         <ListView 
             x:Name="lvSystems"
             Margin="10,0,10,10"
@@ -68,8 +66,7 @@
                     ColumnHeaderToolTip="Test">
                     <GridView.Columns>
                         <GridViewColumn Header=""
-                                        Width="35"
-                                        >
+                                        Width="35">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <CheckBox 
@@ -87,7 +84,6 @@
                             Header="_ФОП_ВИС_Имя системы"
                             DisplayMemberBinding="{Binding Path=FopName}"
                             Width="220"/>
-
                     </GridView.Columns>
                 </GridView>
             </ListView.View>
