@@ -21,13 +21,15 @@ namespace RevitAxonometryViews.Models {
         private readonly ElementId _fopCriterionId;
         private readonly bool? _useFopNames;
         private readonly bool? _combineViews;
-        public ViewFactory(Document document, UIDocument uIDocument, bool? useFopNames, bool? combineViews) {
+        private readonly CreationViewRules _creationViewRules;
+        public ViewFactory(Document document, UIDocument uIDocument, bool? useFopNames, bool? combineViews, CreationViewRules creationViewRules) {
             _document = document;
             _uiDoc = uIDocument;
             _criterionId = new ElementId(BuiltInParameter.RBS_SYSTEM_NAME_PARAM);
             _fopCriterionId = _document.GetSharedParam(AxonometryConfig.FopVisSystemName).Id;
             _useFopNames = useFopNames;
             _combineViews = combineViews;
+            _creationViewRules = creationViewRules;
         }
 
         /// <summary>
@@ -35,7 +37,7 @@ namespace RevitAxonometryViews.Models {
         /// </summary>
         /// <param name="selectedSystemsList"></param>
         public void CreateViewsBySelectedSystems(List<HvacSystemViewModel> selectedSystemsList) {
-            if(_combineViews == true) {
+            if(_creationViewRules.IsCombined) {
                 CopyCombinedViews(selectedSystemsList);
             } else {
                 foreach(var hvacSystem in selectedSystemsList) {

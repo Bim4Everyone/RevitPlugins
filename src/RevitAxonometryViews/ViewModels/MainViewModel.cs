@@ -61,7 +61,7 @@ namespace RevitAxonometryViews.ViewModels {
                 AxonometryConfig.SystemName,
                 AxonometryConfig.FopVisSystemName
             };
-            
+
             FilteredView = _hvacSystems;
         }
 
@@ -107,7 +107,7 @@ namespace RevitAxonometryViews.ViewModels {
         /// </summary>
         public List<HvacSystemViewModel> FilteredView {
             get {
-                return _hvacSystems.Where(x => 
+                return _hvacSystems.Where(x =>
                 (x.SystemName.Contains(FilterValue) || x.FopName.Contains(FilterValue)))
                     .OrderBy(x => LogicalOrderByName(x)).ToList();
             }
@@ -134,7 +134,9 @@ namespace RevitAxonometryViews.ViewModels {
         /// </summary>
         public void CreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
-            _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView);
+            CreationViewRules parameterRule = new CreationViewRules(UseOneView, UseFopVisName);
+
+            _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView, new CreationViewRules(UseOneView, UseFopVisName));
         }
 
 
@@ -145,7 +147,7 @@ namespace RevitAxonometryViews.ViewModels {
         private bool CanCreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
             if(selectedItems.Count == 0) {
-                ErrorText = "Не выделены системы" + FilteredView.Count.ToString();
+                ErrorText = "Не выделены системы";
                 return false;
             }
             ErrorText = string.Empty;
