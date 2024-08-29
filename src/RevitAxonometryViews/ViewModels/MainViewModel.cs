@@ -18,26 +18,25 @@ using RevitAxonometryViews.Views;
 namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private List<HvacSystemViewModel> _hvacSystems;
+        private List<HvacSystemViewModel> _hvacSystems = new List<HvacSystemViewModel>();
+        private List<HvacSystemViewModel> _filteredView = new List<HvacSystemViewModel>();
+        private List<string> _filterCriterion = new List<string>();
         private string _filterValue = string.Empty;
-        private string _selectedCriteria = string.Empty;
+        private string _selectedCriteria = AxonometryConfig.SystemName;
         private string _errorText;
 
         public MainViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
             _hvacSystems = _revitRepository.GetHvacSystems();
 
-            FilterCriterion = new ObservableCollection<string>() {
-                AxonometryConfig.SystemName,
-                AxonometryConfig.FopVisSystemName
-            };
-            SelectedCriteria = FilterCriterion[0];
+
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(CreateViews, CanCreateViews);
         }
 
-        public ObservableCollection<string> FilterCriterion { get; set; }
+
+
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand CreateViewsCommand { get; }
@@ -45,15 +44,27 @@ namespace RevitAxonometryViews.ViewModels {
         public bool UseOneView { get; set; }
 
         /// <summary>
+        /// Список критериев для фильтрации
+        /// </summary>
+        public List<string> FilterCriterion {
+            get => _filterCriterion;
+            set {
+                this.RaiseAndSetIfChanged(ref _filterCriterion, value);
+                SelectedCriteria = _filterCriterion[0];
+            }
+
+        }
+
+        /// <summary>
         /// Загрузка данных для вывода в окно через LoadViewCommand
         /// </summary>
         private void LoadView() {
-            //_hvacSystems = _revitRepository.GetHvacSystems();
-            //FilterCriterion = new ObservableCollection<string>() {
-            //    AxonometryConfig.SystemName,
-            //    AxonometryConfig.FopVisSystemName
-            //};
-            //SelectedCriteria = FilterCriterion[0];
+            FilterCriterion = new List<string>() {
+                AxonometryConfig.SystemName,
+                AxonometryConfig.FopVisSystemName
+            };
+            
+            FilteredView = _hvacSystems;
         }
 
         /// <summary>
@@ -85,13 +96,25 @@ namespace RevitAxonometryViews.ViewModels {
                 }
             }
         }
-
+        /// <summary>
+        /// Текст ошибки выводимый внизу окна
+        /// </summary>
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
-        public List<HvacSystemViewModel> FilteredView =>
-            _hvacSystems.Where(x => LogicalFilterByName(x)).OrderBy(x => LogicalOrderByName(x)).ToList();
+
+        /// <summary>
+        /// Отфильтрованный список систем, выводящийся на ГУИ
+        /// </summary>
+        public List<HvacSystemViewModel> FilteredView {
+            get {
+                return _hvacSystems.Where(x => LogicalFilterByName(x)).OrderBy(x => LogicalOrderByName(x)).ToList();
+            }
+            set {
+                this.RaiseAndSetIfChanged(ref _hvacSystems, value);
+            }
+        }
 
 
         /// <summary>
@@ -135,7 +158,7 @@ namespace RevitAxonometryViews.ViewModels {
         private bool CanCreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
             if(selectedItems.Count == 0) {
-                ErrorText = "Не выделены системы";
+                ErrorText = "Не выделены системы" + FilteredView.Count.ToString();
                 return false;
             }
             ErrorText = string.Empty;
