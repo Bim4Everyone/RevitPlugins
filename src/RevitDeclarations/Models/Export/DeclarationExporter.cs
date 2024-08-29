@@ -29,10 +29,10 @@ namespace RevitDeclarations.Models {
                 Visible = false,
                 DisplayAlerts = false
             };
-            Workbooks workBooks = null;
-            Workbook workBook = null;
-            Sheets workSheets = null;
-            Worksheet workSheet = null;
+            Workbooks workBooks;
+            Workbook workBook;
+            Sheets workSheets;
+            Worksheet workSheet;
 
             try {
                 workBooks = excelApp.Workbooks;
@@ -45,20 +45,40 @@ namespace RevitDeclarations.Models {
 
                 workBook.SaveAs(path);
                 workBook.Close(false);
-            } finally {
+
                 excelApp.Quit();
                 if(workSheet != null) { Marshal.ReleaseComObject(workSheet); }
                 if(workSheets != null) { Marshal.ReleaseComObject(workSheets); }
                 if(workBook != null) { Marshal.ReleaseComObject(workBook); }
                 if(workBooks != null) { Marshal.ReleaseComObject(workBooks); }
                 if(excelApp != null) { Marshal.ReleaseComObject(excelApp); }
-            }
+            } catch(Exception e) {
+                var taskDialog = new TaskDialog("Ошибка выгрузки") {
+                    CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
+                    MainContent = "Произошла ошибка Excel.\nВыгрузить декларацию в формате csv?",
+                    ExpandedContent = $"Описание ошибки: {e.Message}"
+                };
+
+                TaskDialogResult dialogResult = taskDialog.Show();
+
+                if(dialogResult == TaskDialogResult.Ok) {
+                    ExportToCSV(path, tableData);
+                }
+            } 
         }
 
         public void ExportToJson(string path, IEnumerable<Apartment> apartments) {
             JsonExporter<Apartment> exporter = new JsonExporter<Apartment>();
             exporter.Export(path, apartments);
             TaskDialog.Show("Декларации", "Файл JSON создан");
+        }
+
+        public void ExportToCSV(string path, ExcelTableData tableData) {
+            CsvExporter exporter = new CsvExporter();
+
+            ExcelTableData tableData1 = tableData;
+
+            exporter.Export(path, "");
         }
     }
 }
