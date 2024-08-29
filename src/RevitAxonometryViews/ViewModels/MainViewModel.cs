@@ -29,8 +29,6 @@ namespace RevitAxonometryViews.ViewModels {
             _revitRepository = revitRepository;
             _hvacSystems = _revitRepository.GetHvacSystems();
 
-
-
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(CreateViews, CanCreateViews);
         }
@@ -109,13 +107,14 @@ namespace RevitAxonometryViews.ViewModels {
         /// </summary>
         public List<HvacSystemViewModel> FilteredView {
             get {
-                return _hvacSystems.Where(x => LogicalFilterByName(x)).OrderBy(x => LogicalOrderByName(x)).ToList();
+                return _hvacSystems.Where(x => 
+                (x.SystemName.Contains(FilterValue) || x.FopName.Contains(FilterValue)))
+                    .OrderBy(x => LogicalOrderByName(x)).ToList();
             }
             set {
                 this.RaiseAndSetIfChanged(ref _hvacSystems, value);
             }
         }
-
 
         /// <summary>
         /// Логический фильтр для сортировки
@@ -127,18 +126,6 @@ namespace RevitAxonometryViews.ViewModels {
                 return system.FopName;
             }
             return system.SystemName;
-        }
-
-        /// <summary>
-        /// Логический фильтр по которому осуществляется фильтрация списка систем, в зависимости от выбранного критерия фильтрации
-        /// </summary>
-        /// <param name="system"></param>
-        /// <returns></returns>
-        private bool LogicalFilterByName(HvacSystemViewModel system) {
-            if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
-                return system.FopName.Contains(FilterValue);
-            }
-            return system.SystemName.Contains(FilterValue);
         }
 
         /// <summary>
