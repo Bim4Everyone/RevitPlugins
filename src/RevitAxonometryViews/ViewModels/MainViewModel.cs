@@ -18,7 +18,7 @@ using RevitAxonometryViews.Views;
 namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-        private readonly List<HvacSystemViewModel> _hvacSystems;
+        private List<HvacSystemViewModel> _hvacSystems;
         private string _filterValue = string.Empty;
         private string _selectedCriteria = string.Empty;
         private string _errorText;
@@ -33,13 +33,28 @@ namespace RevitAxonometryViews.ViewModels {
             };
             SelectedCriteria = FilterCriterion[0];
 
-            CreateViewsCommand = RelayCommand.Create(CreateViews, CanCreateViews);
+            LoadViewCommand = RelayCommand.Create(LoadView);
+            AcceptViewCommand = RelayCommand.Create(CreateViews, CanCreateViews);
         }
 
-        public ObservableCollection<string> FilterCriterion { get; }
+        public ObservableCollection<string> FilterCriterion { get; set; }
+        public ICommand LoadViewCommand { get; }
+        public ICommand AcceptViewCommand { get; }
         public ICommand CreateViewsCommand { get; }
         public bool UseFopVisName { get; set; }
         public bool UseOneView { get; set; }
+
+        /// <summary>
+        /// Загрузка данных для вывода в окно через LoadViewCommand
+        /// </summary>
+        private void LoadView() {
+            //_hvacSystems = _revitRepository.GetHvacSystems();
+            //FilterCriterion = new ObservableCollection<string>() {
+            //    AxonometryConfig.SystemName,
+            //    AxonometryConfig.FopVisSystemName
+            //};
+            //SelectedCriteria = FilterCriterion[0];
+        }
 
         /// <summary>
         /// Текст, который подаестся в свойство фильтра для вида.
@@ -55,7 +70,6 @@ namespace RevitAxonometryViews.ViewModels {
                 }
             }
         }
-
 
         /// <summary>
         /// Критерий по которому идет фильтрация/сортировка вида.
@@ -78,6 +92,7 @@ namespace RevitAxonometryViews.ViewModels {
         }
         public List<HvacSystemViewModel> FilteredView =>
             _hvacSystems.Where(x => LogicalFilterByName(x)).OrderBy(x => LogicalOrderByName(x)).ToList();
+
 
         /// <summary>
         /// Логический фильтр для сортировки

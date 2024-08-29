@@ -18,8 +18,6 @@ namespace RevitAxonometryViews.Views {
 
         public MainWindow() {
             InitializeComponent();            
-            //_viewModel = viewModel;
-            //this.DataContext = viewModel;
         }
 
         // override-ы нужны потому что мы удалили конфиг, в котором переопределяются эти вещи

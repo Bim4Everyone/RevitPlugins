@@ -18,7 +18,13 @@
     ResizeMode="NoResize"
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -150,7 +156,7 @@
                     IsDefault="True"
                     Height="20"
                     Click="Button_Click_Ok"
-                    Command="{Binding CreateViewsCommand}"/>
+                    Command="{Binding AcceptViewCommand}" />
                 <Button 
                     Margin="5"
                     Width="80"
