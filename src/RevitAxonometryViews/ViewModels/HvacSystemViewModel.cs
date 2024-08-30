@@ -6,13 +6,13 @@ namespace RevitAxonometryViews.ViewModels {
     internal class HvacSystemViewModel : BaseViewModel {
         private bool _isSelected;
 
-        public HvacSystemViewModel(string systemName, string fopName) {
+        public HvacSystemViewModel(string systemName, string sharedName) {
             SystemName = systemName;
-            FopName = fopName;
+            SharedName = sharedName;
         }
 
         public string SystemName { get; set; }
-        public string FopName { get; set; }
+        public string SharedName { get; set; }
 
         public bool IsSelected {
             get => _isSelected;

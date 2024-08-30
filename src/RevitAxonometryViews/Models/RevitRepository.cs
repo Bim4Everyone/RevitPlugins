@@ -39,15 +39,15 @@ namespace RevitAxonometryViews.Models {
         /// </summary>
         /// <returns></returns>
         public string CheckVisNameCategories() {
-            if(!Document.IsExistsSharedParam(AxonometryConfig.FopVisSystemName)) {
+            if(!Document.IsExistsSharedParam(AxonometryConfig.SharedVisSystemName)) {
                 return $"Параметр {"ФОП_ВИС_Имя системы"} не существует в проекте.";
             } else {
-                (Definition Definition, Binding Binding) fopVisNameParam = Document.GetSharedParamBinding(AxonometryConfig.FopVisSystemName);
-                Binding parameterBinding = fopVisNameParam.Binding;
-                IEnumerable<Category> fopVisNameCategories = parameterBinding.GetCategories();
+                (Definition Definition, Binding Binding) sharedVisNameParam = Document.GetSharedParamBinding(AxonometryConfig.SharedVisSystemName);
+                Binding parameterBinding = sharedVisNameParam.Binding;
+                IEnumerable<Category> sharedVisNameCategories = parameterBinding.GetCategories();
 
                 HashSet<BuiltInCategory> builtInCategories = new HashSet<BuiltInCategory>(
-                    fopVisNameCategories.Select(category => category.GetBuiltInCategory())
+                    sharedVisNameCategories.Select(category => category.GetBuiltInCategory())
                 );
 
                 List<string> missingCategories = AxonometryConfig.SystemCategories
@@ -56,7 +56,7 @@ namespace RevitAxonometryViews.Models {
                     .ToList();
 
                 if(missingCategories.Any()) {
-                    string result = $"Параметр {AxonometryConfig.FopVisSystemName} не назначен для категорий: ";
+                    string result = $"Параметр {AxonometryConfig.SharedVisSystemName} не назначен для категорий: ";
                     result += string.Join(", ", missingCategories);
                     return result;
                 }
@@ -69,8 +69,8 @@ namespace RevitAxonometryViews.Models {
         /// </summary>
         /// <param name="system"></param>
         /// <returns></returns>
-        public string GetSystemFopName(Element system) {
-            ElementSet elementSet = new ElementSet();
+        public string GetSharedSystemName(Element system) {
+            ElementSet elementSet = null;
             if(system.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
                 elementSet = ((MechanicalSystem)system).DuctNetwork;
             }
@@ -81,7 +81,7 @@ namespace RevitAxonometryViews.Models {
             // Выбрасываем первое встреченное заполненное значение
             if(elementSet != null && !elementSet.IsEmpty) {
                 foreach(Element element in elementSet) {
-                    string result = element.GetSharedParamValueOrDefault<string>(AxonometryConfig.FopVisSystemName, null);
+                    string result = element.GetSharedParamValueOrDefault<string>(AxonometryConfig.SharedVisSystemName, null);
                     if(result != null) {
                         return result;
                     }
@@ -104,7 +104,7 @@ namespace RevitAxonometryViews.Models {
 
             return new List<HvacSystemViewModel>(
                 allSystems.Select(
-                    system => new HvacSystemViewModel (system.Name, GetSystemFopName(system))));
+                    system => new HvacSystemViewModel (system.Name, GetSharedSystemName(system))));
         }
 
 

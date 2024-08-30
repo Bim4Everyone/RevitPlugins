@@ -17,7 +17,7 @@ namespace RevitAxonometryViews.Models {
 
 
         //Добавляем через параметры
-        public const string FopVisSystemName = "ФОП_ВИС_Имя системы";
+        public const string SharedVisSystemName = "ФОП_ВИС_Имя системы";
 
         //Добавляем через параметры
         public const string SystemName = "Имя системы";

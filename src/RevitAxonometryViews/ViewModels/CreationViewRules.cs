@@ -32,7 +32,7 @@ namespace RevitAxonometryViews.ViewModels {
 
         private ElementId GetFilterParameter() {
             return UseSharedSystemName
-                ? _document.GetSharedParam(AxonometryConfig.FopVisSystemName).Id
+                ? _document.GetSharedParam(AxonometryConfig.SharedVisSystemName).Id
                 : new ElementId(BuiltInParameter.RBS_SYSTEM_NAME_PARAM);
         }
 
@@ -49,7 +49,7 @@ namespace RevitAxonometryViews.ViewModels {
         }
 
         public string GetSystemName(HvacSystemViewModel hvacSystem) {
-            return UseSharedSystemName ? hvacSystem.FopName : hvacSystem.SystemName;
+            return UseSharedSystemName ? hvacSystem.SharedName : hvacSystem.SystemName;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace RevitAxonometryViews.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand CreateViewsCommand { get; }
-        public bool UseFopVisName { get; set; }
+        public bool UseSharedVisName { get; set; }
         public bool UseOneView { get; set; }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace RevitAxonometryViews.ViewModels {
         private void LoadView() {
             FilterCriterion = new List<string>() {
                 AxonometryConfig.SystemName,
-                AxonometryConfig.FopVisSystemName
+                AxonometryConfig.SharedVisSystemName
             };
 
             FilteredView = _hvacSystems;
@@ -116,7 +116,7 @@ namespace RevitAxonometryViews.ViewModels {
         public List<HvacSystemViewModel> FilteredView {
             get {
                 return _hvacSystems.Where(x =>
-                (x.SystemName.Contains(FilterValue) || x.FopName.Contains(FilterValue)))
+                (x.SystemName.Contains(FilterValue) || x.SharedName.Contains(FilterValue)))
                     .OrderBy(x => LogicalOrderByName(x)).ToList();
             }
             set {
@@ -130,8 +130,8 @@ namespace RevitAxonometryViews.ViewModels {
         /// <param name="system"></param>
         /// <returns></returns>
         private string LogicalOrderByName(HvacSystemViewModel system) {
-            if(SelectedCriteria == AxonometryConfig.FopVisSystemName) {
-                return system.FopName;
+            if(SelectedCriteria == AxonometryConfig.SharedVisSystemName) {
+                return system.SharedName;
             }
             return system.SystemName;
         }
@@ -144,7 +144,7 @@ namespace RevitAxonometryViews.ViewModels {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
 
             _revitRepository.ExecuteViewCreation(selectedItems, 
-                new CreationViewRules(UseOneView, UseFopVisName, _revitRepository.Document));
+                new CreationViewRules(UseOneView, UseSharedVisName, _revitRepository.Document));
         }
 
         /// <summary>

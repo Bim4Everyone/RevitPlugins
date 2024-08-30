@@ -94,7 +94,7 @@
                             Width="220"/>
                         <GridViewColumn 
                             Header="_ФОП_ВИС_Имя системы"
-                            DisplayMemberBinding="{Binding Path=FopName}"
+                            DisplayMemberBinding="{Binding Path=SharedName}"
                             Width="220"/>
                     </GridView.Columns>
                 </GridView>
@@ -111,14 +111,12 @@
                         Width="*"/>
                 </Grid.ColumnDefinitions>
                 <CheckBox 
-                    x:Name="useOneView"
                     IsChecked="{Binding UseOneView}"    
                     Grid.Column="0" 
                     Margin="10,5,26,5" 
                     Content="Все выделенные на один вид"/>
                 <CheckBox 
-                    x:Name="useFopVisName"   
-                    IsChecked="{Binding UseFopVisName}"  
+                    IsChecked="{Binding UseSharedVisName}"  
                     Grid.Column="1" 
                     Margin="0,5,10,5"
                     Content="Схемы по ФОП__ВИС__Имя системы"/>
