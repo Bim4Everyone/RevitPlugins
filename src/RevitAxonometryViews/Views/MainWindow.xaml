@@ -13,9 +13,10 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterScreen"
                      
+    MinHeight="450" 
+    MinWidth="500"  
     Height="450" 
     Width="500"  
-    ResizeMode="NoResize"
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -28,21 +29,30 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="3"/>
             <RowDefinition Height="38"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
 
-        <StackPanel 
-            Grid.Row="0" 
-            Orientation="Horizontal">
+        <Grid 
+            Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
             <TextBlock 
-                Width="108" 
-                Margin="10,5,10,10" 
-                Text="Фильтровать по:"/>
-        </StackPanel>
+                Grid.Column="0"
+                Margin="10" 
+                ><Run Language="ru-ru" Text="Схемы "/><Run Text="по:"/></TextBlock>
+            <TextBlock 
+                Grid.Column="1"
+
+                Margin="10">
+                <Run Language="ru-ru" Text="Поиск системы"/><Run Text=":"/></TextBlock>
+        </Grid>
 
         <Grid
             Grid.Row="1" >
@@ -72,97 +82,107 @@
             Grid.Row="2"
             SelectionMode="Extended"
             ItemsSource="{Binding FilteredView}">
+
+
             <ListView.View>
                 <GridView 
                     AllowsColumnReorder="False" 
                     ColumnHeaderToolTip="Test">
-                    <GridView.Columns>
-                        <GridViewColumn Header=""
-                                        Width="35">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox 
+
+                    <GridViewColumn 
+                        Header=""  
+                        Width="35">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox 
                                         Checked="CheckBox_Checked"
                                         Unchecked="CheckBox_Unchecked"
                                         IsChecked="{Binding IsSelected}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn 
-                            Header="Имя системы"
-                            DisplayMemberBinding="{Binding Path=SystemName}"
-                            Width="220"/>
-                        <GridViewColumn 
-                            Header="_ФОП_ВИС_Имя системы"
-                            DisplayMemberBinding="{Binding Path=SharedName}"
-                            Width="220"/>
-                    </GridView.Columns>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn 
+                        x:Name="col1"
+                        Header="Имя системы"
+                        Width="200"
+                        DisplayMemberBinding="{Binding Path=SystemName}"
+                            />
+
+                    <GridViewColumn 
+                        Header="_ФОП_ВИС_Имя системы"
+                        Width="{Binding ElementName=helperField, Path=ActualWidth}"
+                        DisplayMemberBinding="{Binding Path=SharedName}"
+                            />
                 </GridView>
             </ListView.View>
         </ListView>
 
+        <!--This is the hidden helper Grid which does the resizing -->
+        <Grid Visibility="Hidden">
+            <Grid.ColumnDefinitions>
+                <!--Width is bound to width of the first GridViewColumn -->
+                <ColumnDefinition Width="{Binding ElementName=col1, Path=ActualWidth}"/>
+                <!--Width is set to "Fill"-->
+                <ColumnDefinition Width="*"/>
+                <!--Correction Width-->
+                <ColumnDefinition Width="10"/>
+            </Grid.ColumnDefinitions>
+            <!--This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid-->
+            <Grid Grid.Column="1" x:Name="helperField"/>
+        </Grid>
+
+
         <StackPanel 
-            Grid.Row="3">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition 
-                        Width="*"/>
-                    <ColumnDefinition 
-                        Width="*"/>
-                </Grid.ColumnDefinitions>
-                <CheckBox 
+            Grid.Row="3"
+            >
+            <CheckBox 
                     IsChecked="{Binding UseOneView}"    
-                    Grid.Column="0" 
-                    Margin="10,5,26,5" 
+                    Margin="10,0,0,0"
                     Content="Все выделенные на один вид"/>
-                <CheckBox 
-                    IsChecked="{Binding UseSharedVisName}"  
-                    Grid.Column="1" 
-                    Margin="0,5,10,5"
+            <CheckBox 
+
+                    IsChecked="{Binding UseSharedVisName}"
+                Margin="10,0,0,0"
                     Content="Схемы по ФОП__ВИС__Имя системы"/>
-            </Grid>
         </StackPanel>
 
         <Grid 
             Grid.Row="3" 
-            HorizontalAlignment="Center" 
+            HorizontalAlignment="Right" 
             Margin="0,30,0,0" 
             Grid.RowSpan="2" 
-            Width="480">
+            >
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            
+            <StackPanel
+            Grid.Row="3"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
 
-            <TextBlock
-                Margin="10,0,0,0"
+                <TextBlock
+                Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{Binding ErrorText}" 
-                Grid.Column="0"/>
+                Text="{Binding ErrorText}" />
 
-            <StackPanel 
-                Grid.Row="4" 
-                Grid.Column="1" 
-                Orientation="Horizontal" 
-                HorizontalAlignment="Right">
-                <Button 
-                    Margin="5"
-                    Width="80"
-                    Content="ОК"
-                    IsDefault="True"
-                    Height="20"
-                    Click="Button_Click_Ok"
-                    Command="{Binding AcceptViewCommand}" />
-                <Button 
-                    Margin="5"
-                    Width="80"
-                    Content="Отмена"
-                    IsCancel="True"
-                    Height="20"
-                    Click="ButtonCancel_Click"/>
+                <Button
+                Content="Ok"
+                Width="80"
+                Margin="10"
+                Click="Button_Click_Ok"
+                Command="{Binding AcceptViewCommand}" />
+
+                <Button
+                Content="Отмена"
+                Width="80"
+                Margin="10"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
             </StackPanel>
+
+
+
         </Grid>
     </Grid>
 </base:PlatformWindow>
