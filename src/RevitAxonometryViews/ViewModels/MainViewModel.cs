@@ -19,7 +19,7 @@ namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private List<HvacSystemViewModel> _hvacSystems = new List<HvacSystemViewModel>();
-        private List<HvacSystemViewModel> _filteredView = new List<HvacSystemViewModel>();
+        private readonly List<HvacSystemViewModel> _filteredView = new List<HvacSystemViewModel>();
         private List<string> _filterCriterion = new List<string>();
         private string _filterValue = string.Empty;
         private string _selectedCriteria = AxonometryConfig.SystemName;
@@ -134,11 +134,10 @@ namespace RevitAxonometryViews.ViewModels {
         /// </summary>
         public void CreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
-            CreationViewRules parameterRule = new CreationViewRules(UseOneView, UseFopVisName);
 
-            _revitRepository.ExecuteViewCreation(selectedItems, UseFopVisName, UseOneView, new CreationViewRules(UseOneView, UseFopVisName));
+            _revitRepository.ExecuteViewCreation(selectedItems, 
+                new CreationViewRules(UseOneView, UseFopVisName, _revitRepository.Document));
         }
-
 
         /// <summary>
         /// Проверка, выбраны ли системы. Если не выбраны - пишем предупреждение

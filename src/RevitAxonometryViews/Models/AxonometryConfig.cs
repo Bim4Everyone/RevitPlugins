@@ -11,6 +11,9 @@ using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitAxonometryViews.Models {
     public static class AxonometryConfig {
+        //Нужно это сделать через SharedParameterConfig
+        //public const Parameter SharedSystemParameter = _document.GetSharedParam(AxonometryConfig.FopVisSystemName).Id;
+
         //Добавляем через параметры
         public const string FopVisSystemName = "ФОП_ВИС_Имя системы";
 

@@ -17,18 +17,10 @@ namespace RevitAxonometryViews.Models {
     internal class ViewFactory {
         private readonly Document _document;
         private readonly UIDocument _uiDoc;
-        private readonly ElementId _criterionId;
-        private readonly ElementId _fopCriterionId;
-        private readonly bool? _useFopNames;
-        private readonly bool? _combineViews;
         private readonly CreationViewRules _creationViewRules;
-        public ViewFactory(Document document, UIDocument uIDocument, bool? useFopNames, bool? combineViews, CreationViewRules creationViewRules) {
+        public ViewFactory(Document document, UIDocument uIDocument, CreationViewRules creationViewRules) {
             _document = document;
             _uiDoc = uIDocument;
-            _criterionId = new ElementId(BuiltInParameter.RBS_SYSTEM_NAME_PARAM);
-            _fopCriterionId = _document.GetSharedParam(AxonometryConfig.FopVisSystemName).Id;
-            _useFopNames = useFopNames;
-            _combineViews = combineViews;
             _creationViewRules = creationViewRules;
         }
 
@@ -51,20 +43,14 @@ namespace RevitAxonometryViews.Models {
         /// </summary>
         /// <returns></returns>
         public ParameterFilterElement CreateFilter(string filterName, List<string> systemNameList) {
-            List<ElementId> categories = AxonometryConfig.SystemCategories
-                .Select(category => new ElementId(category))
-                .ToList();
-            // Если фильтруем по ФОП_ВИС_Имя системы - оставляем обобщенки, они есть в оборудовании.
-            // Системного имени системы у них нет, будет ошибка.
-            if(_useFopNames != true) {
-                categories.Remove(new ElementId(BuiltInCategory.OST_GenericModel));
-            }
-
             // создаем лист из фильтров по именам систем
             List<ElementFilter> elementFilterList = CreateFilterRules(systemNameList);
 
             return ParameterFilterElement.Create(
-                _document, filterName, categories, new LogicalAndFilter(elementFilterList));
+                _document, 
+                filterName, 
+                _creationViewRules.Categories, 
+                new LogicalAndFilter(elementFilterList));
         }
 
         /// <summary>
@@ -72,21 +58,16 @@ namespace RevitAxonometryViews.Models {
         /// </summary>
         /// <returns></returns>
         public List<ElementFilter> CreateFilterRules(List<string> systemNameList) {
-            ElementId parameter = _criterionId;
-            if(_useFopNames == true) {
-                parameter = _fopCriterionId;
-            }
-
             List<ElementFilter> elementFilterList = new List<ElementFilter>();
             foreach(string systemName in systemNameList) {
 #if REVIT_2022_OR_LESS
                 ElementParameterFilter filterRule = 
                     new ElementParameterFilter(
-                        ParameterFilterRuleFactory.CreateNotEqualsRule(parameter, systemName, true));
+                        ParameterFilterRuleFactory.CreateNotEqualsRule(_creationViewRules.FilterParameter, systemName, true));
 #else
                 ElementParameterFilter filterRule = 
                     new ElementParameterFilter(
-                        ParameterFilterRuleFactory.CreateNotEqualsRule(parameter, systemName));
+                        ParameterFilterRuleFactory.CreateNotEqualsRule(_creationViewRules.FilterParameter, systemName));
 #endif
                 elementFilterList.Add(filterRule);
             }
@@ -115,9 +96,7 @@ namespace RevitAxonometryViews.Models {
         private void CopyCombinedViews(List<HvacSystemViewModel> systemList) {
             List<Element> views = _document.GetElementsByCategory(BuiltInCategory.OST_Views);
 
-            List<string> nameList = (bool) _useFopNames
-                ? systemList.Select(x => x.FopName).ToList()
-                : systemList.Select(x => x.SystemName).ToList();
+            List<string> nameList = systemList.Select(x => _creationViewRules.GetSystemName(x)).ToList();
 
             string viewName = GetUniqName(string.Join(" ,", nameList), views);
 
@@ -139,8 +118,7 @@ namespace RevitAxonometryViews.Models {
         /// <returns></returns>
         private void CopySingleView(HvacSystemViewModel hvacSystem) {
             List<Element> views = _document.GetElementsByCategory(BuiltInCategory.OST_Views);
-            string viewName = GetUniqName((bool) _useFopNames ? 
-                hvacSystem.FopName : hvacSystem.SystemName, views);
+            string viewName = GetUniqName(_creationViewRules.GetSystemName(hvacSystem), views);
 
             List<Element> filters = _document.GetParameterFilterElements();
             string filterName = GetUniqName("B4E_" + viewName, filters);
@@ -149,8 +127,10 @@ namespace RevitAxonometryViews.Models {
             View newView = _document.GetElement(newViewId) as View;
             newView.Name = viewName;
 
-            ParameterFilterElement filter = CreateFilter(filterName, new List<string> {
-                (bool) _useFopNames ? hvacSystem.FopName : hvacSystem.SystemName });
+            ParameterFilterElement filter =
+                CreateFilter(filterName, 
+                new List<string> {
+                _creationViewRules.GetSystemName(hvacSystem)});
             newView.AddFilter(filter.Id);
             newView.SetFilterVisibility(filter.Id, false);
         }
