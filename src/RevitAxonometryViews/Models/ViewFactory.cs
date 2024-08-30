@@ -41,7 +41,6 @@ namespace RevitAxonometryViews.Models {
         /// <summary>
         /// Создает фильтр для применения к видам
         /// </summary>
-        /// <returns></returns>
         public ParameterFilterElement CreateFilter(string filterName, List<string> systemNameList) {
             // создаем лист из фильтров по именам систем
             List<ElementFilter> elementFilterList = CreateFilterRules(systemNameList);
@@ -56,7 +55,6 @@ namespace RevitAxonometryViews.Models {
         /// <summary>
         /// Создает правила фильтрации для применени в фильтре
         /// </summary>
-        /// <returns></returns>
         public List<ElementFilter> CreateFilterRules(List<string> systemNameList) {
             List<ElementFilter> elementFilterList = new List<ElementFilter>();
             foreach(string systemName in systemNameList) {
@@ -77,13 +75,12 @@ namespace RevitAxonometryViews.Models {
         /// <summary>
         /// Возвращает уникальное имя, если в проекте уже есть такие имена - добавляет "копия" и счетчик
         /// </summary>
-        /// <returns></returns>
         private string GetUniqName(string name, List<Element> elements) {
             string baseName = name;
             int counter = 1;
 
             while(elements.Any(view => view.Name == name)) {
-                name = $"{baseName}_копия{counter}";
+                name = $"{baseName}_копия {counter}";
                 counter++;
             }
             return name;
@@ -92,7 +89,6 @@ namespace RevitAxonometryViews.Models {
         /// <summary>
         /// Создает один вид для всех выделенных систем и применяет фильтр
         /// </summary>
-        /// <returns></returns>
         private void CopyCombinedViews(List<HvacSystemViewModel> systemList) {
             List<Element> views = _document.GetElementsByCategory(BuiltInCategory.OST_Views);
 
@@ -115,7 +111,6 @@ namespace RevitAxonometryViews.Models {
         /// <summary>
         /// Копирует одиночный вид и применяет к нему фильтры
         /// </summary>
-        /// <returns></returns>
         private void CopySingleView(HvacSystemViewModel hvacSystem) {
             List<Element> views = _document.GetElementsByCategory(BuiltInCategory.OST_Views);
             string viewName = GetUniqName(_creationViewRules.GetSystemName(hvacSystem), views);
@@ -124,7 +119,7 @@ namespace RevitAxonometryViews.Models {
             string filterName = GetUniqName("B4E_" + viewName, filters);
 
             ElementId newViewId = _uiDoc.ActiveView.Duplicate(ViewDuplicateOption.WithDetailing);
-            View newView = _document.GetElement(newViewId) as View;
+            View newView = (View)_document.GetElement(newViewId);
             newView.Name = viewName;
 
             ParameterFilterElement filter =

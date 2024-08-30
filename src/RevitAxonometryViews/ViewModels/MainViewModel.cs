@@ -129,8 +129,6 @@ namespace RevitAxonometryViews.ViewModels {
         /// <summary>
         /// Логический фильтр для сортировки
         /// </summary>
-        /// <param name="system"></param>
-        /// <returns></returns>
         private string LogicalOrderByName(HvacSystemViewModel system) {
             if(SelectedCriteria == AxonometryConfig.SharedVisSystemName) {
                 return system.SharedName;
@@ -152,7 +150,6 @@ namespace RevitAxonometryViews.ViewModels {
         /// <summary>
         /// Создаем коллекцию объектов систем с именами для создания по ним фильтров
         /// </summary>
-        /// <returns></returns>
         public List<HvacSystemViewModel> GetHvacSystems() {
             List<Element> allSystems = _revitRepository.Document.GetElementsByMultiCategory(new List<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctSystem,
@@ -168,7 +165,6 @@ namespace RevitAxonometryViews.ViewModels {
         /// <summary>
         /// Проверка, выбраны ли системы. Если не выбраны - пишем предупреждение
         /// </summary>
-        /// <returns></returns>
         private bool CanCreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
             if(selectedItems.Count == 0) {

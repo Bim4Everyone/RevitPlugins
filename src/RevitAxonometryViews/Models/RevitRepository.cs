@@ -37,7 +37,6 @@ namespace RevitAxonometryViews.Models {
         /// Если существует ФОП_ВИС_Имя системы, проверяет во всех ли нужных категориях он. Если нет - возвращает в строке в каких нет,
         /// если все окей - возвращает null
         /// </summary>
-        /// <returns></returns>
         public string CheckVisNameCategories() {
             if(!Document.IsExistsSharedParam(AxonometryConfig.SharedVisSystemName)) {
                 return $"Параметр {AxonometryConfig.SharedVisSystemName} не существует в проекте.";
@@ -67,8 +66,6 @@ namespace RevitAxonometryViews.Models {
         /// <summary>
         /// Получаем ФОП_ВИС_Имя системы если оно есть в проекте
         /// </summary>
-        /// <param name="system"></param>
-        /// <returns></returns>
         public string GetSharedSystemName(Element system) {
             ElementSet elementSet = null;
             if(system.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
@@ -96,7 +93,6 @@ namespace RevitAxonometryViews.Models {
         /// <summary>
         /// Транзакция с созданием видов через класс ViewFactory
         /// </summary>
-        /// <returns></returns>
         public void ExecuteViewCreation(List<HvacSystemViewModel> hvacSystems, CreationViewRules creationViewRules) {
             ViewFactory viewFactory = new ViewFactory(Document, ActiveUIDocument, creationViewRules);
             using(Transaction t = Document.StartTransaction("Создать схемы")) {

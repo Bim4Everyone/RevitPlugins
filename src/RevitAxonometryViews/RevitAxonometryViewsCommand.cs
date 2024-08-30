@@ -31,7 +31,7 @@ namespace RevitAxonometryViews {
     [Transaction(TransactionMode.Manual)]
     public class RevitAxonometryViewsCommand : BasePluginCommand {
         public RevitAxonometryViewsCommand() {
-            PluginName = "RevitAxonometryViews";
+            PluginName = "Создать схемы";
         }
         protected override void Execute(UIApplication uiApplication) {
 
