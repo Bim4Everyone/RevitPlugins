@@ -40,7 +40,7 @@ namespace RevitAxonometryViews.Models {
         /// <returns></returns>
         public string CheckVisNameCategories() {
             if(!Document.IsExistsSharedParam(AxonometryConfig.SharedVisSystemName)) {
-                return $"Параметр {"ФОП_ВИС_Имя системы"} не существует в проекте.";
+                return $"Параметр {AxonometryConfig.SharedVisSystemName} не существует в проекте.";
             } else {
                 (Definition Definition, Binding Binding) sharedVisNameParam = Document.GetSharedParamBinding(AxonometryConfig.SharedVisSystemName);
                 Binding parameterBinding = sharedVisNameParam.Binding;
@@ -95,10 +95,9 @@ namespace RevitAxonometryViews.Models {
         /// </summary>
         /// <returns></returns>
         public List<HvacSystemViewModel> GetHvacSystems() {
-            
-            List<Element> ductSystems = Document.GetElementsByCategory(BuiltInCategory.OST_DuctSystem);
-            List<Element> pipeSystems = Document.GetElementsByCategory(BuiltInCategory.OST_PipingSystem);
-            List<Element> allSystems = ductSystems.Concat(pipeSystems).ToList();
+            List<Element> allSystems = Document.GetElementsByMultiCategory(new List<BuiltInCategory>() { 
+                BuiltInCategory.OST_DuctSystem, 
+                BuiltInCategory.OST_PipingSystem });
 
             List<HvacSystemViewModel> newSystems = new List<HvacSystemViewModel>();
 

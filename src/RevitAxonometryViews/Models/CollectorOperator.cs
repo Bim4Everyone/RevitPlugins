@@ -19,5 +19,14 @@ namespace RevitAxonometryViews.Models {
                 .WhereElementIsNotElementType()
                 .ToList();
         }
+
+        public static List<Element> GetElementsByMultiCategory(this Document document, List<BuiltInCategory> multiCategory) {
+            ElementMulticategoryFilter multiCategoryFilter = new ElementMulticategoryFilter(multiCategory);
+
+            return new FilteredElementCollector(document)
+                .WherePasses(multiCategoryFilter)
+                .WhereElementIsNotElementType()
+                .ToList();
+        }
     }
 }
