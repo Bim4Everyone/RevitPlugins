@@ -90,21 +90,7 @@ namespace RevitAxonometryViews.Models {
             return "Нет имени";
         }
 
-        /// <summary>
-        /// Создаем коллекцию объектов систем с именами для создания по ним фильтров
-        /// </summary>
-        /// <returns></returns>
-        public List<HvacSystemViewModel> GetHvacSystems() {
-            List<Element> allSystems = Document.GetElementsByMultiCategory(new List<BuiltInCategory>() { 
-                BuiltInCategory.OST_DuctSystem, 
-                BuiltInCategory.OST_PipingSystem });
 
-            List<HvacSystemViewModel> newSystems = new List<HvacSystemViewModel>();
-
-            return new List<HvacSystemViewModel>(
-                allSystems.Select(
-                    system => new HvacSystemViewModel (system.Name, GetSharedSystemName(system))));
-        }
 
 
         /// <summary>

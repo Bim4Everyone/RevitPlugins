@@ -8,6 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
@@ -34,7 +36,7 @@ namespace RevitAxonometryViews.ViewModels {
             
 
             _revitRepository = revitRepository;
-            _hvacSystems = _revitRepository.GetHvacSystems();
+            _hvacSystems = GetHvacSystems();
 
             _projectParameters = ProjectParameters.Create(_revitRepository.Application);
             //_projectParameters.SetupRevitParam(_revitRepository.Document, SharedParamsConfig.Instance.FinishingRoomName);
@@ -145,6 +147,22 @@ namespace RevitAxonometryViews.ViewModels {
 
             _revitRepository.ExecuteViewCreation(selectedItems, 
                 new CreationViewRules(UseOneView, UseSharedVisName, _revitRepository.Document));
+        }
+
+        /// <summary>
+        /// Создаем коллекцию объектов систем с именами для создания по ним фильтров
+        /// </summary>
+        /// <returns></returns>
+        public List<HvacSystemViewModel> GetHvacSystems() {
+            List<Element> allSystems = _revitRepository.Document.GetElementsByMultiCategory(new List<BuiltInCategory>() {
+                BuiltInCategory.OST_DuctSystem,
+                BuiltInCategory.OST_PipingSystem });
+
+            List<HvacSystemViewModel> newSystems = new List<HvacSystemViewModel>();
+
+            return new List<HvacSystemViewModel>(
+                allSystems.Select(
+                    system => new HvacSystemViewModel(system.Name, _revitRepository.GetSharedSystemName(system))));
         }
 
         /// <summary>
