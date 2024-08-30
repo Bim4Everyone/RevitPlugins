@@ -17,8 +17,6 @@ namespace RevitAxonometryViews.Models {
             return new FilteredElementCollector(document)
                 .OfCategory(category)
                 .WhereElementIsNotElementType()
-                .ToElements()
-                .Cast<Element>()
                 .ToList();
         }
     }
