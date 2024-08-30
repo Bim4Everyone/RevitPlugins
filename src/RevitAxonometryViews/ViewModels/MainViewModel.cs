@@ -8,6 +8,9 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.Templates;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -24,16 +27,21 @@ namespace RevitAxonometryViews.ViewModels {
         private string _filterValue = string.Empty;
         private string _selectedCriteria = AxonometryConfig.SystemName;
         private string _errorText;
+        private readonly ProjectParameters _projectParameters;
+
 
         public MainViewModel(RevitRepository revitRepository) {
+            
+
             _revitRepository = revitRepository;
             _hvacSystems = _revitRepository.GetHvacSystems();
+
+            _projectParameters = ProjectParameters.Create(_revitRepository.Application);
+            //_projectParameters.SetupRevitParam(_revitRepository.Document, SharedParamsConfig.Instance.FinishingRoomName);
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(CreateViews, CanCreateViews);
         }
-
-
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }

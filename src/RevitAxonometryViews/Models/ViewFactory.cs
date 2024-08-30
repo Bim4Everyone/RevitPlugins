@@ -104,7 +104,7 @@ namespace RevitAxonometryViews.Models {
             string filterName = GetUniqName("B4E_" + viewName, filters);
 
             ElementId newViewId = _uiDoc.ActiveView.Duplicate(ViewDuplicateOption.WithDetailing);
-            View newView = _document.GetElement(newViewId) as View;
+            View newView = (View)_document.GetElement(newViewId);
             newView.Name = viewName;
 
             ParameterFilterElement filter = CreateFilter(filterName, nameList);

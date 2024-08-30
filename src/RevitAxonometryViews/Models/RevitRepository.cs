@@ -72,10 +72,10 @@ namespace RevitAxonometryViews.Models {
         public string GetSystemFopName(Element system) {
             ElementSet elementSet = new ElementSet();
             if(system.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
-                elementSet = (system as MechanicalSystem).DuctNetwork;
+                elementSet = ((MechanicalSystem)system).DuctNetwork;
             }
             if(system.Category.IsId(BuiltInCategory.OST_PipingSystem)) {
-                elementSet = (system as PipingSystem).PipingNetwork;
+                elementSet = ((PipingSystem)system).PipingNetwork;
             }
             // Нужно перебирать элементы пока не встретим заполненный параметр, могут быть не до конца обработаны элементы.
             // Выбрасываем первое встреченное заполненное значение
