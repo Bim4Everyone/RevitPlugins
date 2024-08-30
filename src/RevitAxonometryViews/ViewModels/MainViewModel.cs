@@ -24,11 +24,12 @@ namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private List<HvacSystemViewModel> _hvacSystems = new List<HvacSystemViewModel>();
-        private readonly List<HvacSystemViewModel> _filteredView = new List<HvacSystemViewModel>();
         private List<string> _filterCriterion = new List<string>();
         private string _filterValue = string.Empty;
         private string _selectedCriteria = AxonometryConfig.SystemName;
         private string _errorText;
+        private bool _useSharedVisName;
+        private bool _useOneView;
         private readonly ProjectParameters _projectParameters;
 
 
@@ -48,8 +49,22 @@ namespace RevitAxonometryViews.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand CreateViewsCommand { get; }
-        public bool UseSharedVisName { get; set; }
-        public bool UseOneView { get; set; }
+
+        /// <summary>
+        /// С этим свойством связана галочка "Использовать ФОП_ВИС_Имя сисемы"
+        /// </summary>
+        public bool UseSharedVisName {
+            get => _useSharedVisName;
+            set => this.RaiseAndSetIfChanged(ref _useSharedVisName, value);
+        }
+
+        /// <summary>
+        /// С этим свойством связана галочка "Все выделенные на один вид"
+        /// </summary>
+        public bool UseOneView {
+            get => _useOneView;
+            set => this.RaiseAndSetIfChanged(ref _useOneView, value);
+        }
 
         /// <summary>
         /// Список критериев для фильтрации
