@@ -29,7 +29,6 @@ namespace RevitDeclarations.Models.Export.Exporters {
             Worksheet workSheet = null;
 
             try {
-
                 workBooks = excelApp.Workbooks;
                 workBook = workBooks.Add();
                 workSheets = workBook.Worksheets;
