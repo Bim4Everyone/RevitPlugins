@@ -12,12 +12,13 @@ namespace RevitAxonometryViews.ViewModels {
     internal class CreationViewRules {
         private readonly Document _document;
 
-        public CreationViewRules(bool isCombined, bool useSharedSystemName, Document document) {
+        public CreationViewRules(string selectedCriterion, bool isCombined, Document document) {
             _document = document;
             IsCombined = isCombined;
             IsSingle = !isCombined;
-            UseSharedSystemName = useSharedSystemName;
-            UseSystemName = !useSharedSystemName;
+
+            UseSharedSystemName = selectedCriterion == AxonometryConfig.SharedVisSystemName;
+            UseSystemName = !UseSharedSystemName;
 
             Categories = GetCategories();
             FilterParameter = GetFilterParameter();

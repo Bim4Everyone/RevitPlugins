@@ -28,7 +28,6 @@ namespace RevitAxonometryViews.ViewModels {
         private string _filterValue = string.Empty;
         private string _selectedCriteria = AxonometryConfig.SystemName;
         private string _errorText;
-        private bool _useSharedVisName;
         private bool _useOneView;
         private readonly ProjectParameters _projectParameters;
 
@@ -49,14 +48,6 @@ namespace RevitAxonometryViews.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand CreateViewsCommand { get; }
-
-        /// <summary>
-        /// С этим свойством связана галочка "Использовать ФОП_ВИС_Имя сисемы"
-        /// </summary>
-        public bool UseSharedVisName {
-            get => _useSharedVisName;
-            set => this.RaiseAndSetIfChanged(ref _useSharedVisName, value);
-        }
 
         /// <summary>
         /// С этим свойством связана галочка "Все выделенные на один вид"
@@ -159,7 +150,10 @@ namespace RevitAxonometryViews.ViewModels {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
 
             _revitRepository.ExecuteViewCreation(selectedItems, 
-                new CreationViewRules(UseOneView, UseSharedVisName, _revitRepository.Document));
+                new CreationViewRules(
+                SelectedCriteria,
+                UseOneView, 
+                _revitRepository.Document));
         }
 
         /// <summary>
@@ -186,6 +180,14 @@ namespace RevitAxonometryViews.ViewModels {
                 ErrorText = "Не выделены системы";
                 return false;
             }
+
+
+            if(!(_revitRepository.ActiveUIDocument.ActiveView is View3D || 
+                _revitRepository.ActiveUIDocument.ActiveView is ViewPlan)) {
+                ErrorText = "Должен быть активным 2D/3D вид";
+                return false;
+            }
+
             ErrorText = string.Empty;
             return true;
         }

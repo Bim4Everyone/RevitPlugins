@@ -29,7 +29,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="3"/>
+            <RowDefinition Height="35"/>
             <RowDefinition Height="38"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="35"/>
@@ -140,11 +140,6 @@
                     IsChecked="{Binding UseOneView}"    
                     Margin="10,0,0,0"
                     Content="Все выделенные на один вид"/>
-            <CheckBox 
-
-                    IsChecked="{Binding UseSharedVisName}"
-                Margin="10,0,0,0"
-                    Content="Схемы по ФОП__ВИС__Имя системы"/>
         </StackPanel>
 
         <Grid 
