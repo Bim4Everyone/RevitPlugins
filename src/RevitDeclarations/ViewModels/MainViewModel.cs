@@ -236,11 +236,12 @@ namespace RevitDeclarations.ViewModels {
                 .ThenBy(x => x.FullNumber)
                 .ToList();
 
-            DeclarationExporter exporter = new DeclarationExporter(_settings);
+            DeclarationExporter exporter = new DeclarationExporter();
 
             if(ExportToExcel) {
                 DeclarationTableInfo tableData = new DeclarationTableInfo(apartments, _settings);
-                exporter.ExportToExcel(FullPath, tableData);
+                DeclarationDataTable table = new DeclarationDataTable(tableData, _settings);
+                exporter.ExportToExcel(FullPath, table);
             } else {
                 exporter.ExportToJson(FullPath, apartments);
             }

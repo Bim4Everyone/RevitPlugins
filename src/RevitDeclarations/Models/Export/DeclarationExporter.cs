@@ -1,25 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 
 using Autodesk.Revit.UI;
 
-using RevitDeclarations.Models.Export.Exporters;
-
 namespace RevitDeclarations.Models {
     internal class DeclarationExporter {
-        private readonly DeclarationSettings _settings;
-
-        public DeclarationExporter(DeclarationSettings settings) {
-            _settings = settings;
-        }
-
-        public void ExportToExcel(string path, DeclarationTableInfo tableData) {
-            DeclarationDataTable table = new DeclarationDataTable(tableData, _settings);
-
+        public void ExportToExcel(string path, DeclarationDataTable table) {
             try {
-                ExcelExporter excel = new ExcelExporter();
-                excel.Export(path, table);
+                ExcelExporter exporter = new ExcelExporter();
+                exporter.Export(path, table);
                 TaskDialog.Show("Декларации", "Файл Excel создан");
             } catch(Exception e) {
                 var taskDialog = new TaskDialog("Ошибка выгрузки") {
@@ -36,16 +25,16 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        public void ExportToJson(string path, IEnumerable<Apartment> apartments) {
-            JsonExporter<Apartment> exporter = new JsonExporter<Apartment>();
-            exporter.Export(path, apartments);
-            TaskDialog.Show("Декларации", "Файл JSON создан");
-        }
-
         public void ExportToCSV(string path, DeclarationDataTable table) {
             CsvExporter exporter = new CsvExporter();
             exporter.Export(path, table);
             TaskDialog.Show("Декларации", "Файл CSV создан");
+        }
+
+        public void ExportToJson(string path, IEnumerable<Apartment> apartments) {
+            JsonExporter<Apartment> exporter = new JsonExporter<Apartment>();
+            exporter.Export(path, apartments);
+            TaskDialog.Show("Декларации", "Файл JSON создан");
         }
     }
 }

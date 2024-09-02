@@ -8,7 +8,7 @@ using Microsoft.Office.Interop.Excel;
 
 using DataTable = System.Data.DataTable;
 
-namespace RevitDeclarations.Models.Export.Exporters {
+namespace RevitDeclarations.Models {
     internal class ExcelExporter : ITableExporter {
         private readonly Color _apartInfoColor = Color.FromArgb(221, 235, 247);
         private readonly Color _mainRoomsColor = Color.FromArgb(248, 203, 173);
