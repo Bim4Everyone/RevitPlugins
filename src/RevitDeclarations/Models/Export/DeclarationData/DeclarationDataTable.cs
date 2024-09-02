@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
     internal class DeclarationDataTable {
-        private readonly DeclarationTableInfo _excelTableData;
+        private readonly DeclarationTableInfo _tableInfo;
         private readonly DeclarationSettings _settings;
         private readonly DataTable _table;
 
         public DeclarationDataTable(DeclarationTableInfo tableData, DeclarationSettings settings) {
-            _excelTableData = tableData;
+            _tableInfo = tableData;
             _settings = settings;
 
             _table = new DataTable();
@@ -25,14 +25,14 @@ namespace RevitDeclarations.Models {
         }
 
         public DataTable DataTable => _table;
-
+        public DeclarationTableInfo TableInfo => _tableInfo;
 
         private void CreateColumnsAndRows() {
-            for(int i = 0; i <= _excelTableData.FullTableWidth; i++) {
+            for(int i = 0; i <= _tableInfo.FullTableWidth; i++) {
                 _table.Columns.Add();
             }
 
-            for(int i = 0; i <= _excelTableData.Apartments.Count; i++) {
+            for(int i = 0; i <= _tableInfo.Apartments.Count; i++) {
                 _table.Rows.Add();
             }
         }
@@ -53,15 +53,15 @@ namespace RevitDeclarations.Models {
             _table.Rows[0][12] = "Высота потолка, м";
 
             if(_settings.LoadUtp) {
-                _table.Rows[0][_excelTableData.UtpStart] = "Две ванны";
-                _table.Rows[0][_excelTableData.UtpStart + 1] = "Хайфлет";
-                _table.Rows[0][_excelTableData.UtpStart + 2] = "Лоджия/ балкон";
-                _table.Rows[0][_excelTableData.UtpStart + 3] = "Доп. летние помещения";
-                _table.Rows[0][_excelTableData.UtpStart + 4] = "Терраса";
-                _table.Rows[0][_excelTableData.UtpStart + 5] = "Мастер-спальня";
-                _table.Rows[0][_excelTableData.UtpStart + 6] = "Гардеробная";
-                _table.Rows[0][_excelTableData.UtpStart + 7] = "Постирочная";
-                _table.Rows[0][_excelTableData.UtpStart + 8] = "Увеличенная площадь балкона/ лоджии";
+                _table.Rows[0][_tableInfo.UtpStart] = "Две ванны";
+                _table.Rows[0][_tableInfo.UtpStart + 1] = "Хайфлет";
+                _table.Rows[0][_tableInfo.UtpStart + 2] = "Лоджия/ балкон";
+                _table.Rows[0][_tableInfo.UtpStart + 3] = "Доп. летние помещения";
+                _table.Rows[0][_tableInfo.UtpStart + 4] = "Терраса";
+                _table.Rows[0][_tableInfo.UtpStart + 5] = "Мастер-спальня";
+                _table.Rows[0][_tableInfo.UtpStart + 6] = "Гардеробная";
+                _table.Rows[0][_tableInfo.UtpStart + 7] = "Постирочная";
+                _table.Rows[0][_tableInfo.UtpStart + 8] = "Увеличенная площадь балкона/ лоджии";
             }
         }
 
@@ -91,7 +91,7 @@ namespace RevitDeclarations.Models {
         private void FillTableApartmentsInfo() {
             int rowNumber = 1;
 
-            foreach(Apartment apartment in _excelTableData.Apartments) {
+            foreach(Apartment apartment in _tableInfo.Apartments) {
                 _table.Rows[rowNumber][0] = apartment.FullNumber;
                 _table.Rows[rowNumber][1] = apartment.Department;
                 _table.Rows[rowNumber][2] = apartment.Level;
@@ -124,9 +124,9 @@ namespace RevitDeclarations.Models {
 
         private void FillTableUtpInfo() {
             int rowNumber = 1;
-            int columnNumber = _excelTableData.UtpStart;
+            int columnNumber = _tableInfo.UtpStart;
 
-            foreach(Apartment apartment in _excelTableData.Apartments) {
+            foreach(Apartment apartment in _tableInfo.Apartments) {
                 _table.Rows[rowNumber][columnNumber] = apartment.UtpTwoBaths;
                 _table.Rows[rowNumber][columnNumber + 1] = apartment.UtpHighflat;
                 _table.Rows[rowNumber][columnNumber + 2] = apartment.UtpBalcony;
