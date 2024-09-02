@@ -239,7 +239,7 @@ namespace RevitDeclarations.ViewModels {
             DeclarationExporter exporter = new DeclarationExporter(_settings);
 
             if(ExportToExcel) {
-                ExcelTableData tableData = new ExcelTableData(apartments, _settings);
+                DeclarationTableInfo tableData = new DeclarationTableInfo(apartments, _settings);
                 exporter.ExportToExcel(FullPath, tableData);
             } else {
                 exporter.ExportToJson(FullPath, apartments);

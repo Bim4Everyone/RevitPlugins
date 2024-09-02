@@ -13,7 +13,7 @@ namespace RevitDeclarations.Models {
             _settings = settings;
         }
 
-        public void ExportToExcel(string path, ExcelTableData tableData) {
+        public void ExportToExcel(string path, DeclarationTableInfo tableData) {
             try {
                 ExcelExporter excel = new ExcelExporter();
                 excel.Export(path, tableData, _settings);
@@ -39,7 +39,7 @@ namespace RevitDeclarations.Models {
             TaskDialog.Show("Декларации", "Файл JSON создан");
         }
 
-        public void ExportToCSV(string path, ExcelTableData tableData) {
+        public void ExportToCSV(string path, DeclarationTableInfo tableData) {
             CsvTableCreator csvTableCreator = new CsvTableCreator(tableData, _settings);
 
             CsvExporter exporter = new CsvExporter();

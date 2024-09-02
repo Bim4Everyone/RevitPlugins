@@ -7,7 +7,7 @@ using Microsoft.Office.Interop.Excel;
 
 namespace RevitDeclarations.Models.Export.Exporters {
     internal class ExcelExporter {
-        public void Export(string path, ExcelTableData tableData, DeclarationSettings settings) {
+        public void Export(string path, DeclarationTableInfo tableData, DeclarationSettings settings) {
             /* Releasing all COM objects was made on the basis of the article:
              * https://www.add-in-express.com/creating-addins-blog/release-excel-com-objects/
              */

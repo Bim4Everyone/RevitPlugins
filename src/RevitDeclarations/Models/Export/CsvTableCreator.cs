@@ -4,11 +4,11 @@ using System.Text;
 
 namespace RevitDeclarations.Models {
     internal class CsvTableCreator {
-        private readonly ExcelTableData _excelTableData;
+        private readonly DeclarationTableInfo _excelTableData;
         private readonly DeclarationSettings _settings;
         private readonly DataTable _table;
 
-        public CsvTableCreator(ExcelTableData tableData, DeclarationSettings settings) {
+        public CsvTableCreator(DeclarationTableInfo tableData, DeclarationSettings settings) {
             _excelTableData = tableData;
             _settings = settings;
 
