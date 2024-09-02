@@ -1,17 +1,14 @@
-<base:ThemedPlatformWindow
+<base:PlatformWindow
     x:Class="RevitValueModifier.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitValueModifier.Views"
     xmlns:vms="clr-namespace:RevitValueModifier.ViewModels"
-    
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -20,25 +17,21 @@
     Height="450" Width="800"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    
-    <dxmvvm:Interaction.Behaviors>
-        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding LoadViewCommand}"/>
-    </dxmvvm:Interaction.Behaviors>
-    
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <dxe:TextEdit
-            Grid.Row="0"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
 
-            Text="{Binding SaveProperty,
-                UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel
             Grid.Row="1"
@@ -51,7 +44,7 @@
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
-            <dx:SimpleButton
+            <Button
                 Margin="10"
                 Width="80"
                 Content="{DynamicResource MainWindow.ButtonOk}"
@@ -59,7 +52,7 @@
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
-            <dx:SimpleButton
+            <Button
                 Margin="10"
                 Width="80"
                 Content="{DynamicResource MainWindow.ButtonCancel}"
@@ -67,4 +60,4 @@
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:ThemedPlatformWindow>
+</base:PlatformWindow>
