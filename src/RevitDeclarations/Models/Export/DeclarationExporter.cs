@@ -15,11 +15,11 @@ namespace RevitDeclarations.Models {
         }
 
         public void ExportToExcel(string path, DeclarationTableInfo tableData) {
-            DataTable table = new DeclarationDataTable(tableData, _settings).DataTable;
+            DeclarationDataTable table = new DeclarationDataTable(tableData, _settings);
 
             try {
                 ExcelExporter excel = new ExcelExporter();
-                excel.Export(path, table, tableData);
+                excel.Export(path, table);
                 TaskDialog.Show("Декларации", "Файл Excel создан");
             } catch(Exception e) {
                 var taskDialog = new TaskDialog("Ошибка выгрузки") {
@@ -42,12 +42,9 @@ namespace RevitDeclarations.Models {
             TaskDialog.Show("Декларации", "Файл JSON создан");
         }
 
-        public void ExportToCSV(string path, DataTable table) {
-            CsvTableCreator csvTableCreator = new CsvTableCreator();
-            string declarationData = csvTableCreator.Create(table);
-
+        public void ExportToCSV(string path, DeclarationDataTable table) {
             CsvExporter exporter = new CsvExporter();
-            exporter.Export(path, declarationData);
+            exporter.Export(path, table);
             TaskDialog.Show("Декларации", "Файл CSV создан");
         }
     }

@@ -9,14 +9,14 @@ using Microsoft.Office.Interop.Excel;
 using DataTable = System.Data.DataTable;
 
 namespace RevitDeclarations.Models.Export.Exporters {
-    internal class ExcelExporter {
+    internal class ExcelExporter : ITableExporter {
         private readonly Color _apartInfoColor = Color.FromArgb(221, 235, 247);
         private readonly Color _mainRoomsColor = Color.FromArgb(248, 203, 173);
         private readonly Color _summerRoomsColor = Color.FromArgb(217, 235, 205);
         private readonly Color _nonConfigRoomsColor = Color.FromArgb(237, 237, 237);
         private readonly Color _utpColor = Color.FromArgb(226, 207, 245);
 
-        public void Export(string path, DataTable table, DeclarationTableInfo tableData) {
+        public void Export(string path, DeclarationDataTable declarationTable) {
             /* Releasing all COM objects was made on the basis of the article:
              * https://www.add-in-express.com/creating-addins-blog/release-excel-com-objects/
              */
@@ -43,12 +43,14 @@ namespace RevitDeclarations.Models.Export.Exporters {
                 workSheets = workBook.Worksheets;
                 workSheet = (Worksheet) workSheets["Лист1"];
 
+
+                DataTable table = declarationTable.DataTable; 
                 for(int i = 0; i < table.Rows.Count; i++) {
                     for(int j = 0; j < table.Columns.Count; j++) {
                         workSheet.Cells[i + 1, j + 1] = table.Rows[i][j];
                     }
                 }
-                SetGraphicSettings(workSheet, tableData);
+                SetGraphicSettings(workSheet, declarationTable.TableInfo);
 
                 workBook.SaveAs(path);
                 workBook.Close(false);
