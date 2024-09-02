@@ -25,19 +25,20 @@ namespace RevitAxonometryViews.ViewModels {
         private readonly RevitRepository _revitRepository;
         private List<HvacSystemViewModel> _hvacSystems = new List<HvacSystemViewModel>();
         private List<string> _filterCriterion = new List<string>();
+        private readonly AxonometryConfig _axonometryConfig;
         private string _filterValue = string.Empty;
-        private string _selectedCriteria = AxonometryConfig.SystemName;
+        private string _selectedCriteria = string.Empty;
         private string _errorText;
         private bool _useOneView;
         private readonly ProjectParameters _projectParameters;
 
 
         public MainViewModel(RevitRepository revitRepository) {
-            
-
             _revitRepository = revitRepository;
+            _axonometryConfig = _revitRepository.AxonometryConfig;
             _hvacSystems = GetHvacSystems();
-
+            _selectedCriteria = _axonometryConfig.SystemName;
+            
             _projectParameters = ProjectParameters.Create(_revitRepository.Application);
             //_projectParameters.SetupRevitParam(_revitRepository.Document, SharedParamsConfig.Instance.FinishingRoomName);
 
@@ -45,6 +46,7 @@ namespace RevitAxonometryViews.ViewModels {
             AcceptViewCommand = RelayCommand.Create(CreateViews, CanCreateViews);
         }
 
+        public ICommand SortViewCommand { get; }
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand CreateViewsCommand { get; }
@@ -74,8 +76,8 @@ namespace RevitAxonometryViews.ViewModels {
         /// </summary>
         private void LoadView() {
             FilterCriterion = new List<string>() {
-                AxonometryConfig.SystemName,
-                AxonometryConfig.SharedVisSystemName
+                _axonometryConfig.SystemName,
+                _axonometryConfig.SharedVisSystemName
             };
 
             FilteredView = _hvacSystems;
@@ -126,6 +128,10 @@ namespace RevitAxonometryViews.ViewModels {
                 return _hvacSystems.Where(x =>
                 (x.SystemName.Contains(FilterValue) || x.SharedName.Contains(FilterValue)))
                     .OrderBy(x => LogicalOrderByName(x)).ToList();
+                //return _hvacSystems.Where(x =>
+                //(x.SystemName.Contains(FilterValue) || x.SharedName.Contains(FilterValue)))
+                //    .ToList();
+
             }
             set {
                 this.RaiseAndSetIfChanged(ref _hvacSystems, value);
@@ -136,7 +142,7 @@ namespace RevitAxonometryViews.ViewModels {
         /// Логический фильтр для сортировки
         /// </summary>
         private string LogicalOrderByName(HvacSystemViewModel system) {
-            if(SelectedCriteria == AxonometryConfig.SharedVisSystemName) {
+            if(SelectedCriteria == _axonometryConfig.SharedVisSystemName) {
                 return system.SharedName;
             }
             return system.SystemName;
@@ -153,7 +159,7 @@ namespace RevitAxonometryViews.ViewModels {
                 new CreationViewRules(
                 SelectedCriteria,
                 UseOneView, 
-                _revitRepository.Document));
+                _revitRepository));
         }
 
         /// <summary>
@@ -170,6 +176,7 @@ namespace RevitAxonometryViews.ViewModels {
                 allSystems.Select(
                     system => new HvacSystemViewModel(system.Name, _revitRepository.GetSharedSystemName(system))));
         }
+
 
         /// <summary>
         /// Проверка, выбраны ли системы. Если не выбраны - пишем предупреждение

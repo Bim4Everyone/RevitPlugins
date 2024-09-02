@@ -11,13 +11,15 @@ using RevitAxonometryViews.Models;
 namespace RevitAxonometryViews.ViewModels {
     internal class CreationViewRules {
         private readonly Document _document;
+        private readonly AxonometryConfig _config;
 
-        public CreationViewRules(string selectedCriterion, bool isCombined, Document document) {
-            _document = document;
+        public CreationViewRules(string selectedCriterion, bool isCombined, RevitRepository revitRepository) {
+            _document = revitRepository.Document;
+            _config = revitRepository.AxonometryConfig;
             IsCombined = isCombined;
             IsSingle = !isCombined;
 
-            UseSharedSystemName = selectedCriterion == AxonometryConfig.SharedVisSystemName;
+            UseSharedSystemName = selectedCriterion == _config.SharedVisSystemName;
             UseSystemName = !UseSharedSystemName;
 
             Categories = GetCategories();
@@ -33,8 +35,8 @@ namespace RevitAxonometryViews.ViewModels {
 
         private ElementId GetFilterParameter() {
             return UseSharedSystemName
-                ? _document.GetSharedParam(AxonometryConfig.SharedVisSystemName).Id
-                : new ElementId(BuiltInParameter.RBS_SYSTEM_NAME_PARAM);
+                ? _config.SystemSharedNameParam.Id
+                : new ElementId(_config.SystemNameBuiltInParam);
         }
 
         private List<ElementId> GetCategories() {

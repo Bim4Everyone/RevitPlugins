@@ -22,13 +22,17 @@ using Binding = Autodesk.Revit.DB.Binding;
 
 namespace RevitAxonometryViews.Models {
     internal class RevitRepository {
+        private readonly AxonometryConfig _axonometryConfig;
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
+            _axonometryConfig = new AxonometryConfig(Document);
         }
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
+
+        public AxonometryConfig AxonometryConfig => _axonometryConfig;
 
 
 

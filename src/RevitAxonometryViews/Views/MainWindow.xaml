@@ -176,8 +176,6 @@
                 Click="ButtonCancel_Click" />
             </StackPanel>
 
-
-
         </Grid>
     </Grid>
 </base:PlatformWindow>
