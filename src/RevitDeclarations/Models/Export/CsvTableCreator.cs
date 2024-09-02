@@ -4,21 +4,10 @@ using System.Text;
 
 namespace RevitDeclarations.Models {
     internal class CsvTableCreator {
-        private readonly DeclarationTableInfo _excelTableData;
-        private readonly DeclarationSettings _settings;
-        private readonly DataTable _table;
-
-        public CsvTableCreator(DeclarationTableInfo tableData, DeclarationSettings settings) {
-            _excelTableData = tableData;
-            _settings = settings;
-
-            _table = new DeclarationDataTable(_excelTableData, _settings).DataTable;
-        }
-
-        public string Create() {
+        public string Create(DataTable table) {
             StringBuilder strBuilder = new StringBuilder();
 
-            foreach(DataRow dataRow in _table.Rows) {
+            foreach(DataRow dataRow in table.Rows) {
                 string[] fields = dataRow
                     .ItemArray
                     .Select(field => field.ToString())
