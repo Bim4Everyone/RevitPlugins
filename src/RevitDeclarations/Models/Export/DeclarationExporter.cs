@@ -19,7 +19,7 @@ namespace RevitDeclarations.Models {
 
             try {
                 ExcelExporter excel = new ExcelExporter();
-                excel.Export(path, table);
+                excel.Export(path, table, tableData);
                 TaskDialog.Show("Декларации", "Файл Excel создан");
             } catch(Exception e) {
                 var taskDialog = new TaskDialog("Ошибка выгрузки") {
@@ -44,11 +44,9 @@ namespace RevitDeclarations.Models {
 
         public void ExportToCSV(string path, DataTable table) {
             CsvTableCreator csvTableCreator = new CsvTableCreator();
-
-            CsvExporter exporter = new CsvExporter();
-
             string declarationData = csvTableCreator.Create(table);
 
+            CsvExporter exporter = new CsvExporter();
             exporter.Export(path, declarationData);
             TaskDialog.Show("Декларации", "Файл CSV создан");
         }
