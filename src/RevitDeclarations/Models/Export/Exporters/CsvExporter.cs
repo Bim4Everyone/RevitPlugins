@@ -20,15 +20,19 @@ namespace RevitDeclarations.Models {
         private string ConvertDataTableToString(DeclarationDataTable table) {
             StringBuilder strBuilder = new StringBuilder();
 
-            strBuilder.AppendLine(string.Join("\t", table.HeaderDataTable.Rows[0]));
+            string[] headerFields = table.HeaderDataTable.Rows[0]
+                    .ItemArray
+                    .Select(field => field.ToString())
+                    .ToArray();
+            strBuilder.AppendLine(string.Join("\t", headerFields));
 
             foreach(DataRow dataRow in table.MainDataTable.Rows) {
-                string[] fields = dataRow
+                string[] mainFields = dataRow
                     .ItemArray
                     .Select(field => field.ToString())
                     .ToArray();
 
-                strBuilder.AppendLine(string.Join("\t", fields));
+                strBuilder.AppendLine(string.Join("\t", mainFields));
             }
 
             return strBuilder.ToString();
