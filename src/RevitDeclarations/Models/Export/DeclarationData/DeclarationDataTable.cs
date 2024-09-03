@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
     internal class DeclarationDataTable {
@@ -59,13 +56,15 @@ namespace RevitDeclarations.Models {
             foreach(RoomPriority priority in _settings.UsedPriorities) {
                 if(priority.IsSummer) {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        _mainTable.Columns[columnNumber + k * DeclarationTableInfo.SummerRoomCells + 2].DataType = typeof(double);
-                        _mainTable.Columns[columnNumber + k * DeclarationTableInfo.SummerRoomCells + 3].DataType = typeof(double);
+                        int columnIndex = columnNumber + k * DeclarationTableInfo.SummerRoomCells;
+                        _mainTable.Columns[columnIndex + 2].DataType = typeof(double);
+                        _mainTable.Columns[columnIndex + 3].DataType = typeof(double);
                     }
                     columnNumber += priority.MaxRoomAmount * DeclarationTableInfo.SummerRoomCells;
                 } else {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        _mainTable.Columns[columnNumber + k * DeclarationTableInfo.MainRoomCells + 2].DataType = typeof(double);
+                        int columnIndex = columnNumber + k * DeclarationTableInfo.MainRoomCells;
+                        _mainTable.Columns[columnIndex + 2].DataType = typeof(double);
                     }
                     columnNumber += priority.MaxRoomAmount * DeclarationTableInfo.MainRoomCells;
                 }
@@ -106,17 +105,19 @@ namespace RevitDeclarations.Models {
             foreach(RoomPriority priority in _settings.UsedPriorities) {
                 if(priority.IsSummer) {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        _headerTable.Rows[0][columnNumber + k * DeclarationTableInfo.SummerRoomCells] = "№ Пом.";
-                        _headerTable.Rows[0][columnNumber + k * DeclarationTableInfo.SummerRoomCells + 1] = "Наименование на планировке";
-                        _headerTable.Rows[0][columnNumber + k * DeclarationTableInfo.SummerRoomCells + 2] = $"{priority.Name}_{k + 1}, площадь без коэф.";
-                        _headerTable.Rows[0][columnNumber + k * DeclarationTableInfo.SummerRoomCells + 3] = $"{priority.Name}_{k + 1}, площадь с коэф.";
+                        int columnIndex = columnNumber + k * DeclarationTableInfo.SummerRoomCells;
+                        _headerTable.Rows[0][columnIndex] = "№ Пом.";
+                        _headerTable.Rows[0][columnIndex + 1] = "Наименование на планировке";
+                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name}_{k + 1}, площадь без коэф.";
+                        _headerTable.Rows[0][columnIndex + 3] = $"{priority.Name}_{k + 1}, площадь с коэф.";
                     }
                     columnNumber += priority.MaxRoomAmount * DeclarationTableInfo.SummerRoomCells;
                 } else {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        _headerTable.Rows[0][columnNumber + k * DeclarationTableInfo.MainRoomCells] = "№ Пом.";
-                        _headerTable.Rows[0][columnNumber + k * DeclarationTableInfo.MainRoomCells + 1] = "Наименование на планировке";
-                        _headerTable.Rows[0][columnNumber + k * DeclarationTableInfo.MainRoomCells + 2] = $"{priority.Name}_{k + 1}";
+                        int columnIndex = columnNumber + k * DeclarationTableInfo.MainRoomCells;
+                        _headerTable.Rows[0][columnIndex] = "№ Пом.";
+                        _headerTable.Rows[0][columnIndex + 1] = "Наименование на планировке";
+                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name}_{k + 1}";
                     }
                     columnNumber += priority.MaxRoomAmount * DeclarationTableInfo.MainRoomCells;
                 }
@@ -182,14 +183,11 @@ namespace RevitDeclarations.Models {
                                               int startColumn) {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
-                    _mainTable.Rows[rowNumber][startColumn + k * DeclarationTableInfo.SummerRoomCells]
-                        = rooms[k].Number;
-                    _mainTable.Rows[rowNumber][startColumn + k * DeclarationTableInfo.SummerRoomCells + 1]
-                        = rooms[k].DeclarationName;
-                    _mainTable.Rows[rowNumber][startColumn + k * DeclarationTableInfo.SummerRoomCells + 2]
-                        = rooms[k].Area;
-                    _mainTable.Rows[rowNumber][startColumn + k * DeclarationTableInfo.SummerRoomCells + 3]
-                        = rooms[k].AreaCoef;
+                    int columnIndex = startColumn + k * DeclarationTableInfo.SummerRoomCells;
+                    _mainTable.Rows[rowNumber][columnIndex] = rooms[k].Number;
+                    _mainTable.Rows[rowNumber][columnIndex + 1] = rooms[k].DeclarationName;
+                    _mainTable.Rows[rowNumber][columnIndex + 2] = rooms[k].Area;
+                    _mainTable.Rows[rowNumber][columnIndex + 3] = rooms[k].AreaCoef;
                 }
             }
 
@@ -203,12 +201,10 @@ namespace RevitDeclarations.Models {
                                             int startColumn) {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
-                    _mainTable.Rows[rowNumber][startColumn + k * DeclarationTableInfo.MainRoomCells]
-                        = rooms[k].Number;
-                    _mainTable.Rows[rowNumber][startColumn + k * DeclarationTableInfo.MainRoomCells + 1]
-                        = rooms[k].DeclarationName;
-                    _mainTable.Rows[rowNumber][startColumn + k * DeclarationTableInfo.MainRoomCells + 2]
-                        = rooms[k].Area;
+                    int columnIndex = startColumn + k * DeclarationTableInfo.MainRoomCells;
+                    _mainTable.Rows[rowNumber][columnIndex] = rooms[k].Number;
+                    _mainTable.Rows[rowNumber][columnIndex + 1] = rooms[k].DeclarationName;
+                    _mainTable.Rows[rowNumber][columnIndex + 2] = rooms[k].Area;
                 }
             }
 
