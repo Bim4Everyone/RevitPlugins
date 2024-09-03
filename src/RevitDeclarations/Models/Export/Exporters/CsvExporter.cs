@@ -3,8 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using Autodesk.Revit.DB.ExtensibleStorage;
-
 namespace RevitDeclarations.Models {
     internal class CsvExporter : ITableExporter {
         public void Export(string path, DeclarationDataTable table) {
