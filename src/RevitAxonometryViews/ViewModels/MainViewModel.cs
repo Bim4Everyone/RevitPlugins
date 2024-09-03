@@ -28,17 +28,17 @@ namespace RevitAxonometryViews.ViewModels {
         private readonly AxonometryConfig _axonometryConfig;
         private string _filterValue = string.Empty;
         private string _selectedCriteria = string.Empty;
+        private string _clickedHeaderName = string.Empty;
         private string _errorText;
         private bool _useOneView;
         private readonly ProjectParameters _projectParameters;
-
 
         public MainViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
             _axonometryConfig = _revitRepository.AxonometryConfig;
             _hvacSystems = GetHvacSystems();
             _selectedCriteria = _axonometryConfig.SystemName;
-            
+
             _projectParameters = ProjectParameters.Create(_revitRepository.Application);
             //_projectParameters.SetupRevitParam(_revitRepository.Document, SharedParamsConfig.Instance.FinishingRoomName);
 
@@ -50,6 +50,22 @@ namespace RevitAxonometryViews.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
         public ICommand CreateViewsCommand { get; }
+
+        private ICommand _headerClickCommand;
+        public ICommand HeaderClickCommand {
+            get {
+                if(_headerClickCommand == null) {
+                    _headerClickCommand = new RelayCommand(param => this.HeaderClick(param));
+                }
+                return _headerClickCommand;
+            }
+        }
+
+        private void HeaderClick(object param) {
+            string columnName = param as string;
+            _clickedHeaderName = columnName;
+            UpdateFilteredView();
+        }
 
         /// <summary>
         /// С этим свойством связана галочка "Все выделенные на один вид"
@@ -68,7 +84,6 @@ namespace RevitAxonometryViews.ViewModels {
                 this.RaiseAndSetIfChanged(ref _filterCriterion, value);
                 SelectedCriteria = _filterCriterion[0];
             }
-
         }
 
         /// <summary>
@@ -80,7 +95,7 @@ namespace RevitAxonometryViews.ViewModels {
                 _axonometryConfig.SharedVisSystemName
             };
 
-            FilteredView = _hvacSystems;
+            UpdateFilteredView();
         }
 
         /// <summary>
@@ -93,7 +108,7 @@ namespace RevitAxonometryViews.ViewModels {
                 if(value != _filterValue) {
                     _filterValue = value;
                     RaiseAndSetIfChanged(ref _filterValue, value);
-                    OnPropertyChanged(nameof(FilteredView));
+                    UpdateFilteredView();
                 }
             }
         }
@@ -108,10 +123,11 @@ namespace RevitAxonometryViews.ViewModels {
                 if(value != _selectedCriteria) {
                     _selectedCriteria = value;
                     RaiseAndSetIfChanged(ref _selectedCriteria, value);
-                    OnPropertyChanged(nameof(FilteredView));
+                    UpdateFilteredView();
                 }
             }
         }
+
         /// <summary>
         /// Текст ошибки выводимый внизу окна
         /// </summary>
@@ -123,42 +139,36 @@ namespace RevitAxonometryViews.ViewModels {
         /// <summary>
         /// Отфильтрованный список систем, выводящийся на ГУИ
         /// </summary>
-        public List<HvacSystemViewModel> FilteredView {
-            get {
-                return _hvacSystems.Where(x =>
+        public List<HvacSystemViewModel> FilteredView { get; private set; }
+
+        private void UpdateFilteredView() {
+            FilteredView = _hvacSystems.Where(x =>
                 (x.SystemName.Contains(FilterValue) || x.SharedName.Contains(FilterValue)))
                     .OrderBy(x => LogicalOrderByName(x)).ToList();
-                //return _hvacSystems.Where(x =>
-                //(x.SystemName.Contains(FilterValue) || x.SharedName.Contains(FilterValue)))
-                //    .ToList();
-
-            }
-            set {
-                this.RaiseAndSetIfChanged(ref _hvacSystems, value);
-            }
+            OnPropertyChanged(nameof(FilteredView));
         }
 
         /// <summary>
         /// Логический фильтр для сортировки
         /// </summary>
         private string LogicalOrderByName(HvacSystemViewModel system) {
-            if(SelectedCriteria == _axonometryConfig.SharedVisSystemName) {
-                return system.SharedName;
+            if(_clickedHeaderName == _axonometryConfig.SystemName || string.IsNullOrEmpty(_clickedHeaderName)) {
+                return system.SystemName;
             }
-            return system.SystemName;
+            return system.SharedName;
         }
 
         /// <summary>
-        /// Получаем выбранные объекты из листа и отправляем на создание в репозиторий. 
+        /// Получаем выбранные объекты из листа и отправляем на создание в репозиторий.
         /// Реализуется через CreateViewsCommand
         /// </summary>
         public void CreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
 
-            _revitRepository.ExecuteViewCreation(selectedItems, 
+            _revitRepository.ExecuteViewCreation(selectedItems,
                 new CreationViewRules(
                 SelectedCriteria,
-                UseOneView, 
+                UseOneView,
                 _revitRepository));
         }
 
@@ -177,7 +187,6 @@ namespace RevitAxonometryViews.ViewModels {
                     system => new HvacSystemViewModel(system.Name, _revitRepository.GetSharedSystemName(system))));
         }
 
-
         /// <summary>
         /// Проверка, выбраны ли системы. Если не выбраны - пишем предупреждение
         /// </summary>
@@ -188,8 +197,7 @@ namespace RevitAxonometryViews.ViewModels {
                 return false;
             }
 
-
-            if(!(_revitRepository.ActiveUIDocument.ActiveView is View3D || 
+            if(!(_revitRepository.ActiveUIDocument.ActiveView is View3D ||
                 _revitRepository.ActiveUIDocument.ActiveView is ViewPlan)) {
                 ErrorText = "Должен быть активным 2D/3D вид";
                 return false;

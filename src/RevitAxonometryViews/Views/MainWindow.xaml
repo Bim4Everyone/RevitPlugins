@@ -27,6 +27,15 @@
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
+    <Window.Resources>
+        <Style TargetType="{x:Type GridViewColumnHeader}">
+            <Setter 
+                Property="Command" 
+                Value="{Binding DataContext.HeaderClickCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <Setter Property="CommandParameter" Value="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
@@ -46,12 +55,11 @@
             <TextBlock 
                 Grid.Column="0"
                 Margin="10" 
-                ><Run Language="ru-ru" Text="Схемы "/><Run Text="по:"/></TextBlock>
+                ><Run Language="ru-ru" Text="Схемы по:"/></TextBlock>
             <TextBlock 
                 Grid.Column="1"
-
                 Margin="10">
-                <Run Language="ru-ru" Text="Поиск системы"/><Run Text=":"/></TextBlock>
+                <Run Language="ru-ru" Text="Поиск системы:"/></TextBlock>
         </Grid>
 
         <Grid
