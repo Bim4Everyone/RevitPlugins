@@ -43,13 +43,18 @@ namespace RevitDeclarations.Models {
                 workSheets = workBook.Worksheets;
                 workSheet = (Worksheet) workSheets["Лист1"];
 
+                DataTable headerTable = declarationTable.HeaderDataTable;
+                for(int i = 0; i < headerTable.Columns.Count; i++) {
+                    workSheet.Cells[1, i + 1] = headerTable.Rows[0][i];
+                }
 
-                DataTable table = declarationTable.DataTable; 
-                for(int i = 0; i < table.Rows.Count; i++) {
-                    for(int j = 0; j < table.Columns.Count; j++) {
-                        workSheet.Cells[i + 1, j + 1] = table.Rows[i][j];
+                DataTable mainTable = declarationTable.MainDataTable;
+                for(int i = 0; i < mainTable.Rows.Count; i++) {
+                    for(int j = 0; j < mainTable.Columns.Count; j++) {
+                        workSheet.Cells[i + 2, j + 1] = mainTable.Rows[i][j];
                     }
                 }
+
                 SetGraphicSettings(workSheet, declarationTable.TableInfo);
 
                 workBook.SaveAs(path);
@@ -95,7 +100,6 @@ namespace RevitDeclarations.Models {
                     if(checkColumnNumber == 0) {
                         ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
-                        ((Range) workSheet.Columns[i]).NumberFormat = "0,0";
                     }
                 } else if(i > tableInfo.SummerRoomsStart && i <= tableInfo.OtherRoomsStart) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 10;
@@ -105,8 +109,6 @@ namespace RevitDeclarations.Models {
                     if(checkColumnNumber == 0) {
                         ((Range) workSheet.Columns[i - 3]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 2]).ColumnWidth = 17;
-                        ((Range) workSheet.Columns[i - 1]).NumberFormat = "0,0";
-                        ((Range) workSheet.Columns[i]).NumberFormat = "0,0";
                     }
                 } else if(i > tableInfo.OtherRoomsStart && i <= tableInfo.UtpStart) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 10;
@@ -116,7 +118,6 @@ namespace RevitDeclarations.Models {
                     if(checkColumnNumber == 0) {
                         ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
-                        ((Range) workSheet.Columns[i]).NumberFormat = "0,0";
                     }
                 } else {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 12;
