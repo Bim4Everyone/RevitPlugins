@@ -55,7 +55,7 @@ namespace RevitAxonometryViews.Models {
                 BuiltInCategory.OST_PipeInsulations,
                 BuiltInCategory.OST_PlumbingFixtures,
                 BuiltInCategory.OST_Sprinklers,
-                BuiltInCategory.OST_GenericModel
+                //BuiltInCategory.OST_GenericModel
             };
     }
 }

@@ -54,7 +54,7 @@ namespace RevitAxonometryViews {
                 var revitRepository = kernel.Get<RevitRepository>();
                 var servise = GetPlatformService<IMessageBoxService>();
 
-                CheckParameter(revitRepository, servise);
+                //CheckParameter(revitRepository, servise);
 
                 Notification(kernel.Get<MainWindow>());
             }

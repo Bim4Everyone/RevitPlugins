@@ -39,16 +39,23 @@ namespace RevitAxonometryViews.ViewModels {
                 : new ElementId(_config.SystemNameBuiltInParam);
         }
 
+
+        private List<ElementId> GetSharedVisNameCategories() {
+            (Definition Definition, Binding Binding) sharedVisNameParam = _document.GetSharedParamBinding(_config.SharedVisSystemName);
+            Binding parameterBinding = sharedVisNameParam.Binding;
+            IEnumerable<Category> sharedVisNameCategories = parameterBinding.GetCategories();
+
+            return new List<ElementId>(
+                sharedVisNameCategories.Select(category => new ElementId(category.GetBuiltInCategory())));
+        }
+
+
+
         private List<ElementId> GetCategories() {
-            var categories = AxonometryConfig.SystemCategories
-                .Select(category => new ElementId(category))
-                .ToList();
-
-            if(!UseSharedSystemName) {
-                categories.Remove(new ElementId(BuiltInCategory.OST_GenericModel));
-            }
-
-            return categories;
+            return UseSharedSystemName ? 
+                GetSharedVisNameCategories() : AxonometryConfig.SystemCategories
+                    .Select(category => new ElementId(category))
+                    .ToList();
         }
 
         public string GetSystemName(HvacSystemViewModel hvacSystem) {
