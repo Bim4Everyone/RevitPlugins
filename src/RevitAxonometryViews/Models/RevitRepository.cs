@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Forms;
 
@@ -14,6 +15,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitAxonometryViews.ViewModels;
 
@@ -25,7 +27,7 @@ namespace RevitAxonometryViews.Models {
         private readonly AxonometryConfig _axonometryConfig;
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
-            _axonometryConfig = new AxonometryConfig(this);
+            _axonometryConfig = new AxonometryConfig(Document);
         }
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;

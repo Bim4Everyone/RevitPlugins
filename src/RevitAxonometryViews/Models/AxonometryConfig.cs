@@ -21,13 +21,11 @@ namespace RevitAxonometryViews.Models {
         private readonly BuiltInParameter _systemNameBuiltInParam;
         private readonly ProjectParameters _projectParameters;
 
-        internal AxonometryConfig(RevitRepository revitRepository) {
-            _projectParameters = ProjectParameters.Create(revitRepository.Application);
+        internal AxonometryConfig(Document document) {
+            _projectParameters = ProjectParameters.Create(document.Application);
+            _projectParameters.SetupRevitParam(document, SharedParamsConfig.Instance.VISSystemName);
 
-            
-            _projectParameters.SetupRevitParam(revitRepository.Document, SharedParamsConfig.Instance.VISSystemName);
-
-            _systemSharedNameParam = revitRepository.Document.GetSharedParam("ФОП_ВИС_Имя системы");
+            _systemSharedNameParam = SharedParamsConfig.Instance.VISSystemName.GetRevitParamElement(document);
             _systemNameBuiltInParam = BuiltInParameter.RBS_SYSTEM_NAME_PARAM;
 
             _sharedVisSystemName = _systemSharedNameParam.Name;

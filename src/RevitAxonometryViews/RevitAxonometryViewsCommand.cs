@@ -52,33 +52,25 @@ namespace RevitAxonometryViews {
                     .WithPropertyValue(nameof(Window.Title), PluginName);
 
                 var servise = GetPlatformService<IMessageBoxService>();
-                CheckParameter(uiApplication.ActiveUIDocument.Document, servise);
+                CheckDocument(uiApplication.ActiveUIDocument.Document, servise);
 
                 var revitRepository = kernel.Get<RevitRepository>();
                 Notification(kernel.Get<MainWindow>());
             }
         }
 
-        private void ShowReport(string report, IMessageBoxService service) {
+        /// <summary>
+        /// Проверяет, не в семействе ли мы
+        /// </summary>
+        private void CheckDocument(Document document, IMessageBoxService service) {
+            string report = string.Empty;
+            if(document.IsFamilyDocument) {
+                report = "Плагин не предназначен для работы с семействами";
+            }
             if(!string.IsNullOrEmpty(report)) {
                 service.Show(report, "Генерация схем", MessageBoxButton.OK, MessageBoxImage.Error);
                 throw new OperationCanceledException();
             }
-        }
-
-        // Проверка нужна до финализации вопроса с параметрами, пока что возможна ситуация без параметра в проекте
-        // По добавлению параметров проверка уйдет в репозиторий
-        private void CheckParameter(Document document, IMessageBoxService service) {
-            string report = string.Empty;
-            if(document.IsFamilyDocument) {
-                report = "Плагин не предназначен для работы с семействами";
-                ShowReport(report, service);
-            }
-
-            //if(!document.IsExistsParam("ФОП_ВИС_Имя системы")) {
-            //    report = "ФОП_ВИС_Имя системы отсутствует в проекте";
-            //    ShowReport(report, service);
-            //}
         }
     }
 }
