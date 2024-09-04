@@ -75,10 +75,10 @@ namespace RevitAxonometryViews {
                 ShowReport(report, service);
             }
 
-            if(!document.IsExistsParam("ФОП_ВИС_Имя системы")) {
-                report = "ФОП_ВИС_Имя системы отсутствует в проекте";
-                ShowReport(report, service);
-            }
+            //if(!document.IsExistsParam("ФОП_ВИС_Имя системы")) {
+            //    report = "ФОП_ВИС_Имя системы отсутствует в проекте";
+            //    ShowReport(report, service);
+            //}
         }
     }
 }

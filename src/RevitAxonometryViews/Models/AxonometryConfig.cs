@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 
 namespace RevitAxonometryViews.Models {
@@ -18,11 +19,15 @@ namespace RevitAxonometryViews.Models {
         private readonly string _systemName;
         private readonly ParameterElement _systemSharedNameParam;
         private readonly BuiltInParameter _systemNameBuiltInParam;
+        private readonly ProjectParameters _projectParameters;
 
-        public AxonometryConfig(Document document) {
-            // Данный пункт будет делается через SharedSystemParameter после релиза
-            SharedParamsConfig.Instance.
-            _systemSharedNameParam = document.GetSharedParam("ФОП_ВИС_Имя системы");
+        internal AxonometryConfig(RevitRepository revitRepository) {
+            _projectParameters = ProjectParameters.Create(revitRepository.Application);
+
+            
+            _projectParameters.SetupRevitParam(revitRepository.Document, SharedParamsConfig.Instance.VISSystemName);
+
+            _systemSharedNameParam = revitRepository.Document.GetSharedParam("ФОП_ВИС_Имя системы");
             _systemNameBuiltInParam = BuiltInParameter.RBS_SYSTEM_NAME_PARAM;
 
             _sharedVisSystemName = _systemSharedNameParam.Name;

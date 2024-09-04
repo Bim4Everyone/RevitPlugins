@@ -25,7 +25,7 @@ namespace RevitAxonometryViews.Models {
         private readonly AxonometryConfig _axonometryConfig;
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
-            _axonometryConfig = new AxonometryConfig(Document);
+            _axonometryConfig = new AxonometryConfig(this);
         }
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
