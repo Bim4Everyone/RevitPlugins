@@ -1,5 +1,7 @@
 <base:PlatformWindow 
     x:Class="RevitAxonometryViews.Views.MainWindow"
+    x:Name="SelectSystemsWindow"
+    
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -31,7 +33,7 @@
         <Style TargetType="{x:Type GridViewColumnHeader}">
             <Setter 
                 Property="Command" 
-                Value="{Binding DataContext.HeaderClickCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                Value="{Binding DataContext.HeaderClickCommand, ElementName=SelectSystemsWindow}"/>
             <Setter Property="CommandParameter" Value="{Binding Content, RelativeSource={RelativeSource Self}}"/>
         </Style>
     </Window.Resources>
