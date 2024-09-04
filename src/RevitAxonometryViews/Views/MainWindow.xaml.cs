@@ -13,7 +13,6 @@ using RevitAxonometryViews.ViewModels;
 
 namespace RevitAxonometryViews.Views {
     public partial class MainWindow {
-        // private readonly MainViewModel _viewModel;
         protected CollectionViewSource SystemsCollection;
 
         public MainWindow() {
