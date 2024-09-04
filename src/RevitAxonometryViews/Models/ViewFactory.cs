@@ -46,9 +46,9 @@ namespace RevitAxonometryViews.Models {
             List<ElementFilter> elementFilterList = CreateFilterRules(systemNameList);
 
             return ParameterFilterElement.Create(
-                _document, 
-                filterName, 
-                _creationViewRules.Categories, 
+                _document,
+                filterName,
+                _creationViewRules.Categories,
                 new LogicalAndFilter(elementFilterList));
         }
 
@@ -59,7 +59,7 @@ namespace RevitAxonometryViews.Models {
             List<ElementFilter> elementFilterList = new List<ElementFilter>();
             foreach(string systemName in systemNameList) {
 #if REVIT_2022_OR_LESS
-                ElementParameterFilter filterRule = 
+                ElementParameterFilter filterRule =
                     new ElementParameterFilter(
                         ParameterFilterRuleFactory.CreateNotEqualsRule(_creationViewRules.FilterParameter, systemName, true));
 #else
@@ -100,7 +100,7 @@ namespace RevitAxonometryViews.Models {
             string filterName = GetUniqName("B4E_" + viewName, filters);
 
             ElementId newViewId = _uiDoc.ActiveView.Duplicate(ViewDuplicateOption.WithDetailing);
-            View newView = (View)_document.GetElement(newViewId);
+            View newView = (View) _document.GetElement(newViewId);
             newView.Name = viewName;
 
             ParameterFilterElement filter = CreateFilter(filterName, nameList);
@@ -119,11 +119,11 @@ namespace RevitAxonometryViews.Models {
             string filterName = GetUniqName("B4E_" + viewName, filters);
 
             ElementId newViewId = _uiDoc.ActiveView.Duplicate(ViewDuplicateOption.WithDetailing);
-            View newView = (View)_document.GetElement(newViewId);
+            View newView = (View) _document.GetElement(newViewId);
             newView.Name = viewName;
 
             ParameterFilterElement filter =
-                CreateFilter(filterName, 
+                CreateFilter(filterName,
                 new List<string> {
                 _creationViewRules.GetSystemName(hvacSystem)});
             newView.AddFilter(filter.Id);

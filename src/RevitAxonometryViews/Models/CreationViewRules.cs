@@ -33,13 +33,18 @@ namespace RevitAxonometryViews.ViewModels {
         public List<ElementId> Categories { get; }
         public ElementId FilterParameter { get; }
 
+        /// <summary>
+        /// Возвращает Id параметра для фильтрации
+        /// </summary>
         private ElementId GetFilterParameter() {
             return UseSharedSystemName
                 ? _config.SystemSharedNameParam.Id
                 : new ElementId(_config.SystemNameBuiltInParam);
         }
 
-
+        /// <summary>
+        /// Получает список параметров ФОП_ВИС_Имя системы
+        /// </summary>
         private List<ElementId> GetSharedVisNameCategories() {
             (Definition Definition, Binding Binding) sharedVisNameParam = _document.GetSharedParamBinding(_config.SharedVisSystemName);
             Binding parameterBinding = sharedVisNameParam.Binding;
@@ -49,15 +54,20 @@ namespace RevitAxonometryViews.ViewModels {
                 sharedVisNameCategories.Select(category => new ElementId(category.GetBuiltInCategory())));
         }
 
-
-
+        /// <summary>
+        /// В зависимости от выбранного критерия фильтрации вернет или параметры назначенные ФОП_ВИС_Имя системы
+        /// или предварительно определенный список категорий
+        /// </summary>
         private List<ElementId> GetCategories() {
-            return UseSharedSystemName ? 
+            return UseSharedSystemName ?
                 GetSharedVisNameCategories() : AxonometryConfig.SystemCategories
                     .Select(category => new ElementId(category))
                     .ToList();
         }
 
+        /// <summary>
+        /// Возвращает имя выбранного параметра наименования системы
+        /// </summary>
         public string GetSystemName(HvacSystemViewModel hvacSystem) {
             return UseSharedSystemName ? hvacSystem.SharedName : hvacSystem.SystemName;
         }

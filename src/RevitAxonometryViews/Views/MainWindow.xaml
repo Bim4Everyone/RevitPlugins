@@ -157,7 +157,7 @@
             Grid.RowSpan="2" 
             >
 
-            
+
             <StackPanel
             Grid.Row="3"
             Orientation="Horizontal"

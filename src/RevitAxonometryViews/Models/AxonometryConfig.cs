@@ -20,21 +20,15 @@ namespace RevitAxonometryViews.Models {
         private readonly BuiltInParameter _systemNameBuiltInParam;
 
         public AxonometryConfig(Document document) {
-            //ParameterElement systemNameParam = document.GetProjectParam("Имя системы");
+            // Данный пункт будет делается через SharedSystemParameter после релиза
+            SharedParamsConfig.Instance.
             _systemSharedNameParam = document.GetSharedParam("ФОП_ВИС_Имя системы");
             _systemNameBuiltInParam = BuiltInParameter.RBS_SYSTEM_NAME_PARAM;
 
             _sharedVisSystemName = _systemSharedNameParam.Name;
             _systemName = LabelUtils.GetLabelFor(_systemNameBuiltInParam);
-
         }
-        //Нужно это сделать через SharedParameterConfig
 
-        // public SharedParam SharedSystemParameter = SharedParamsConfig.Instance.ApartmentArea;
-        
-
-
-        //Добавляем через параметры
         public string SharedVisSystemName => _sharedVisSystemName;
         public string SystemName => _systemName;
         public BuiltInParameter SystemNameBuiltInParam => _systemNameBuiltInParam;
@@ -54,8 +48,7 @@ namespace RevitAxonometryViews.Models {
                 BuiltInCategory.OST_DuctInsulations,
                 BuiltInCategory.OST_PipeInsulations,
                 BuiltInCategory.OST_PlumbingFixtures,
-                BuiltInCategory.OST_Sprinklers,
-                //BuiltInCategory.OST_GenericModel
+                BuiltInCategory.OST_Sprinklers
             };
     }
 }

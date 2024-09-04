@@ -15,6 +15,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
 using dosymep.Xpf.Core.Ninject;
@@ -34,7 +35,6 @@ namespace RevitAxonometryViews {
             PluginName = "Создать схемы";
         }
         protected override void Execute(UIApplication uiApplication) {
-
             // Здесь мы биндим классы в словарь Kernel, который сам будет их инициализировать через Get<Имя из словаря>, без вызова конструкторов
             // Которые он обрабатывает самостоятельно
             // Например Kernel.Get<MainViewModel>() требует на вход RevitRepository. Kernel самостоятельно ищет его по биндингам и подает в конструктор
@@ -51,21 +51,35 @@ namespace RevitAxonometryViews {
                         c => c.Kernel.Get<MainViewModel>())
                     .WithPropertyValue(nameof(Window.Title), PluginName);
 
-                var revitRepository = kernel.Get<RevitRepository>();
                 var servise = GetPlatformService<IMessageBoxService>();
+                CheckParameter(uiApplication.ActiveUIDocument.Document, servise);
 
-                //CheckParameter(revitRepository, servise);
-
+                var revitRepository = kernel.Get<RevitRepository>();
                 Notification(kernel.Get<MainWindow>());
             }
         }
 
-        private void CheckParameter(RevitRepository revitRepository, IMessageBoxService service) {
-            string report = revitRepository.CheckVisNameCategories();
+        private void ShowReport(string report, IMessageBoxService service) {
             if(!string.IsNullOrEmpty(report)) {
                 service.Show(report, "Генерация схем", MessageBoxButton.OK, MessageBoxImage.Error);
                 throw new OperationCanceledException();
             }
         }
+
+        // Проверка нужна до финализации вопроса с параметрами, пока что возможна ситуация без параметра в проекте
+        // По добавлению параметров проверка уйдет в репозиторий
+        private void CheckParameter(Document document, IMessageBoxService service) {
+            string report = string.Empty;
+            if(document.IsFamilyDocument) {
+                report = "Плагин не предназначен для работы с семействами";
+                ShowReport(report, service);
+            }
+
+            if(!document.IsExistsParam("ФОП_ВИС_Имя системы")) {
+                report = "ФОП_ВИС_Имя системы отсутствует в проекте";
+                ShowReport(report, service);
+            }
+        }
     }
 }
+

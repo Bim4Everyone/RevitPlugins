@@ -34,39 +34,6 @@ namespace RevitAxonometryViews.Models {
 
         public AxonometryConfig AxonometryConfig => _axonometryConfig;
 
-
-
-
-        /// <summary>
-        /// Если существует ФОП_ВИС_Имя системы, проверяет во всех ли нужных категориях он. Если нет - возвращает в строке в каких нет,
-        /// если все окей - возвращает null
-        /// </summary>
-        public string CheckVisNameCategories() {
-            if(!Document.IsExistsSharedParam(AxonometryConfig.SharedVisSystemName)) {
-                return $"Параметр {AxonometryConfig.SharedVisSystemName} не существует в проекте.";
-            } else {
-                (Definition Definition, Binding Binding) sharedVisNameParam = Document.GetSharedParamBinding(AxonometryConfig.SharedVisSystemName);
-                Binding parameterBinding = sharedVisNameParam.Binding;
-                IEnumerable<Category> sharedVisNameCategories = parameterBinding.GetCategories();
-
-                HashSet<BuiltInCategory> builtInCategories = new HashSet<BuiltInCategory>(
-                    sharedVisNameCategories.Select(category => category.GetBuiltInCategory())
-                );
-
-                List<string> missingCategories = AxonometryConfig.SystemCategories
-                    .Where(builtInCategory => !builtInCategories.Contains(builtInCategory))
-                    .Select(builtInCategory => Category.GetCategory(Document, builtInCategory).Name)
-                    .ToList();
-
-                if(missingCategories.Any()) {
-                    string result = $"Параметр {AxonometryConfig.SharedVisSystemName} не назначен для категорий: ";
-                    result += string.Join(", ", missingCategories);
-                    return result;
-                }
-                return null;
-            }
-        }
-
         /// <summary>
         /// Получаем ФОП_ВИС_Имя системы если оно есть в проекте
         /// </summary>
@@ -90,9 +57,6 @@ namespace RevitAxonometryViews.Models {
             }
             return "Нет имени";
         }
-
-
-
 
         /// <summary>
         /// Транзакция с созданием видов через класс ViewFactory
