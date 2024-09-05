@@ -1,4 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
+
+using Autodesk.Revit.UI;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -16,10 +22,10 @@ namespace RevitValueModifier.ViewModels {
         private string _saveProperty;
 
         public MainViewModel(
-            PluginConfig pluginConfig, 
-            RevitRepository revitRepository, 
+            PluginConfig pluginConfig,
+            RevitRepository revitRepository,
             ILocalizationService localizationService) {
-            
+
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _localizationService = localizationService;
@@ -42,16 +48,55 @@ namespace RevitValueModifier.ViewModels {
         }
 
         private void LoadView() {
+
+            ICollection<ElementId> selectedIds = _revitRepository.ActiveUIDocument.Selection.GetElementIds();
+
+            if(0 == selectedIds.Count) {
+                TaskDialog.Show("Ошибка!", "Не выбрано ни одного элемента");
+                return;
+            }
+
+            var selectedElems = new List<Element>();
+            foreach(ElementId selectedId in selectedIds) {
+                selectedElems.Add(_revitRepository.Document.GetElement(selectedId));
+            }
+
+            Element element = selectedElems.First();
+
+            RevitElemHelper elemHelper = new RevitElemHelper(_revitRepository.Document);
+
+
+            List<RevitElem> revitElems = new List<RevitElem>();
+            foreach(Element selectedElem in selectedElems) {
+                RevitElem revitElem = elemHelper.GetRevitElem(element);
+                revitElems.Add(revitElem);
+            }
+
+
+            //List<RevitParameter> parameters = revitElems.First().ParamValuePairs;
+
+            //foreach(RevitElem revitElem in revitElems) {
+            //    parameters = revitElem.ParamValuePairs.Intersect(parameters);
+            //}
+
+
+
+
             LoadConfig();
         }
 
         private void AcceptView() {
             SaveConfig();
         }
-        
+
+
+
+
+
+
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText =  _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
                 return false;
             }
 
