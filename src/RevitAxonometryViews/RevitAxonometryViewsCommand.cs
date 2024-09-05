@@ -60,10 +60,16 @@ namespace RevitAxonometryViews {
         }
 
         /// <summary>
-        /// Проверяет, не в семействе ли мы
+        /// Проверяет, не в семействе ли мы и что активен нужный вид
         /// </summary>
         private void CheckDocument(Document document, IMessageBoxService service) {
             string report = string.Empty;
+
+            if(!(document.ActiveView is View3D ||
+                document.ActiveView is ViewPlan)) {
+                report = "Должен быть активным 2D/3D вид";
+            }
+
             if(document.IsFamilyDocument) {
                 report = "Плагин не предназначен для работы с семействами";
             }

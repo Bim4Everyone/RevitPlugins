@@ -162,18 +162,11 @@ namespace RevitAxonometryViews.ViewModels {
         /// </summary>
         private bool CanCreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
+
             if(selectedItems.Count == 0) {
                 ErrorText = "Не выделены системы";
                 return false;
             }
-
-            if(!(_revitRepository.ActiveUIDocument.ActiveView is View3D ||
-                _revitRepository.ActiveUIDocument.ActiveView is ViewPlan)) {
-                ErrorText = "Должен быть активным 2D/3D вид";
-                return false;
-            }
-
-
 
             ErrorText = string.Empty;
             return true;
