@@ -147,7 +147,7 @@ namespace RevitAxonometryViews.ViewModels {
 
             return new List<HvacSystemViewModel>(
                 allSystems.Select(
-                    system => new HvacSystemViewModel(system.Name, _revitRepository.GetSharedSystemName(system))));
+                    system => new HvacSystemViewModel(system.Name, _revitRepository.GetSharedSystemName((MEPSystem)system))));
         }
 
         /// <summary>

@@ -39,7 +39,7 @@ namespace RevitAxonometryViews.Models {
         /// <summary>
         /// Получаем ФОП_ВИС_Имя системы если оно есть в проекте
         /// </summary>
-        public string GetSharedSystemName(Element system) {
+        public string GetSharedSystemName(MEPSystem system) {
             ElementSet elementSet = null;
             if(system.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
                 elementSet = ((MechanicalSystem)system).DuctNetwork;
