@@ -21,23 +21,7 @@ namespace RevitAxonometryViews.Models {
         private readonly BuiltInParameter _systemNameBuiltInParam;
         private readonly ProjectParameters _projectParameters;
 
-        internal AxonometryConfig(Document document) {
-            _projectParameters = ProjectParameters.Create(document.Application);
-            _projectParameters.SetupRevitParam(document, SharedParamsConfig.Instance.VISSystemName);
-
-            _systemSharedNameParam = SharedParamsConfig.Instance.VISSystemName.GetRevitParamElement(document);
-            _systemNameBuiltInParam = BuiltInParameter.RBS_SYSTEM_NAME_PARAM;
-
-            _sharedVisSystemName = _systemSharedNameParam.Name;
-            _systemName = LabelUtils.GetLabelFor(_systemNameBuiltInParam);
-        }
-
-        public string SharedVisSystemName => _sharedVisSystemName;
-        public string SystemName => _systemName;
-        public BuiltInParameter SystemNameBuiltInParam => _systemNameBuiltInParam;
-        public ParameterElement SystemSharedNameParam => _systemSharedNameParam;    
-
-        public static List<BuiltInCategory> SystemCategories = new List<BuiltInCategory>() {
+        private static readonly IReadOnlyCollection<BuiltInCategory> _systemCategories = new List<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctFitting,
                 BuiltInCategory.OST_PipeFitting,
                 BuiltInCategory.OST_PipeCurves,
@@ -52,6 +36,24 @@ namespace RevitAxonometryViews.Models {
                 BuiltInCategory.OST_PipeInsulations,
                 BuiltInCategory.OST_PlumbingFixtures,
                 BuiltInCategory.OST_Sprinklers
-            };
+        };
+
+        internal AxonometryConfig(Document document) {
+            _projectParameters = ProjectParameters.Create(document.Application);
+            _projectParameters.SetupRevitParam(document, SharedParamsConfig.Instance.VISSystemName);
+
+            _systemSharedNameParam = SharedParamsConfig.Instance.VISSystemName.GetRevitParamElement(document);
+            _systemNameBuiltInParam = BuiltInParameter.RBS_SYSTEM_NAME_PARAM;
+
+            _sharedVisSystemName = _systemSharedNameParam.Name;
+            _systemName = LabelUtils.GetLabelFor(_systemNameBuiltInParam);
+        }
+
+        public string SharedVisSystemName => _sharedVisSystemName;
+        public string SystemName => _systemName;
+        public BuiltInParameter SystemNameBuiltInParam => _systemNameBuiltInParam;
+        public ParameterElement SystemSharedNameParam => _systemSharedNameParam;
+
+        public static IReadOnlyCollection<BuiltInCategory> SystemCategories => _systemCategories;
     }
 }
