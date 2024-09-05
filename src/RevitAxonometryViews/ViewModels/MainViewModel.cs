@@ -43,12 +43,10 @@ namespace RevitAxonometryViews.ViewModels {
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(CreateViews, CanCreateViews);
-            HeaderClickCommand = new RelayCommand(param => this.HeaderClick(param));
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
-        public ICommand HeaderClickCommand { get; }
 
         /// <summary>
         /// Отфильтрованный список систем, выводящийся на ГУИ
@@ -135,15 +133,6 @@ namespace RevitAxonometryViews.ViewModels {
                 _axonometryConfig.SharedVisSystemName
             };
 
-            UpdateFilteredView();
-        }
-
-        /// <summary>
-        /// Событие клика по заголовку, по которому происходит смена сортировки
-        /// </summary>
-        private void HeaderClick(object param) {
-            string columnName = param as string;
-            _clickedHeaderName = columnName;
             UpdateFilteredView();
         }
 
