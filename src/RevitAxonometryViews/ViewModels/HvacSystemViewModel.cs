@@ -11,8 +11,8 @@ namespace RevitAxonometryViews.ViewModels {
             SharedName = sharedName;
         }
 
-        public string SystemName { get; set; }
-        public string SharedName { get; set; }
+        public string SystemName { get; }
+        public string SharedName { get; }
 
         public bool IsSelected {
             get => _isSelected;
