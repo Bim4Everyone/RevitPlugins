@@ -60,15 +60,6 @@ namespace RevitAxonometryViews.Models {
             return "Нет имени";
         }
 
-        /// <summary>
-        /// Транзакция с созданием видов через класс ViewFactory
-        /// </summary>
-        public void ExecuteViewCreation(List<HvacSystemViewModel> hvacSystems, CreationViewRules creationViewRules) {
-            ViewFactory viewFactory = new ViewFactory(Document, ActiveUIDocument, creationViewRules);
-            using(Transaction t = Document.StartTransaction("Создать схемы")) {
-                viewFactory.CreateViewsBySelectedSystems(hvacSystems);
-                t.Commit();
-            }
-        }
+
     }
 }

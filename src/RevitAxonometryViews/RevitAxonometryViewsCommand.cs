@@ -50,7 +50,10 @@ namespace RevitAxonometryViews {
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>())
                     .WithPropertyValue(nameof(Window.Title), PluginName);
-
+                kernel.Bind<CollectorOperator>().ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ViewFactory>().ToSelf()
+                    .InSingletonScope();
                 var servise = GetPlatformService<IMessageBoxService>();
                 CheckDocument(uiApplication.ActiveUIDocument.Document, servise);
 

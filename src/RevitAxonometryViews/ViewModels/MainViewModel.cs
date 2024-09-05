@@ -23,10 +23,11 @@ using RevitAxonometryViews.Views;
 namespace RevitAxonometryViews.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly ViewFactory _viewFactory;
+        private readonly CollectorOperator _collectorOperator;
         private readonly AxonometryConfig _axonometryConfig;
 
-        private readonly List<HvacSystemViewModel> _hvacSystems = new List<HvacSystemViewModel>();
-        private List<HvacSystemViewModel> _filteredView = new List<HvacSystemViewModel>();
+        private readonly IReadOnlyCollection<HvacSystemViewModel> _hvacSystems;
         private List<string> _filterCriterion = new List<string>();
 
         private string _filterValue = string.Empty;
@@ -34,12 +35,16 @@ namespace RevitAxonometryViews.ViewModels {
         private string _errorText;
         private bool _useOneView;
 
-        public MainViewModel(RevitRepository revitRepository) {
+        public MainViewModel(RevitRepository revitRepository, ViewFactory viewFactory, CollectorOperator collectorOperator) {
+            
             _revitRepository = revitRepository;
+            _viewFactory = viewFactory;
+            _collectorOperator = collectorOperator;
             _axonometryConfig = _revitRepository.AxonometryConfig;
             _hvacSystems = GetHvacSystems();
             _selectedCriteria = _axonometryConfig.SystemName;
 
+            FilteredView = new ObservableCollection<HvacSystemViewModel>(_hvacSystems);
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(CreateViews, CanCreateViews);
         }
@@ -50,9 +55,8 @@ namespace RevitAxonometryViews.ViewModels {
         /// <summary>
         /// Отфильтрованный список систем, выводящийся на ГУИ
         /// </summary>
-        public List<HvacSystemViewModel> FilteredView {
-            get => _filteredView;
-            set => this.RaiseAndSetIfChanged(ref _filteredView, value);
+        public ObservableCollection<HvacSystemViewModel> FilteredView {
+            get;
         }
 
         /// <summary>
@@ -110,10 +114,13 @@ namespace RevitAxonometryViews.ViewModels {
         /// Обновление отсортированного списка для вывода на экран
         /// </summary>
         private void UpdateFilteredView() {
-            FilteredView = _hvacSystems.Where(x =>
+            FilteredView.Clear();
+            var systems = _hvacSystems.Where(x =>
                 (x.SystemName.Contains(FilterValue) || x.SharedName.Contains(FilterValue)))
-                    .OrderBy(x => x.SystemName).ToList();
-            OnPropertyChanged(nameof(FilteredView));
+                    .OrderBy(x => x.SystemName);
+            foreach(var system in systems) {
+                FilteredView.Add(system);
+            }
         }
 
         /// <summary>
@@ -132,7 +139,7 @@ namespace RevitAxonometryViews.ViewModels {
         /// Создаем коллекцию объектов систем с именами для создания по ним фильтров
         /// </summary>
         public List<HvacSystemViewModel> GetHvacSystems() {
-            List<Element> allSystems = _revitRepository.Document.GetElementsByMultiCategory(new List<BuiltInCategory>() {
+            List<Element> allSystems = _collectorOperator.GetElementsByMultiCategory(_revitRepository.Document, new List<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctSystem,
                 BuiltInCategory.OST_PipingSystem });
 
@@ -150,7 +157,7 @@ namespace RevitAxonometryViews.ViewModels {
         public void CreateViews() {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
 
-            _revitRepository.ExecuteViewCreation(selectedItems,
+            _viewFactory.ExecuteViewCreation(selectedItems,
                 new CreationViewRules(
                 SelectedCriteria,
                 UseOneView,

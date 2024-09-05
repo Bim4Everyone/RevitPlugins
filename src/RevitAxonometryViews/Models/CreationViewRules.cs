@@ -51,7 +51,7 @@ namespace RevitAxonometryViews.ViewModels {
             IEnumerable<Category> sharedVisNameCategories = parameterBinding.GetCategories();
 
             return new List<ElementId>(
-                sharedVisNameCategories.Select(category => new ElementId(category.GetBuiltInCategory())));
+                sharedVisNameCategories.Select(category => category.Id));
         }
 
         /// <summary>
