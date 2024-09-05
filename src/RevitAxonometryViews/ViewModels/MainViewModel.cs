@@ -31,7 +31,6 @@ namespace RevitAxonometryViews.ViewModels {
 
         private string _filterValue = string.Empty;
         private string _selectedCriteria = string.Empty;
-        private string _clickedHeaderName = string.Empty;
         private string _errorText;
         private bool _useOneView;
 
@@ -64,7 +63,6 @@ namespace RevitAxonometryViews.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _useOneView, value);
         }
 
-
         /// <summary>
         /// Список критериев для фильтрации
         /// </summary>
@@ -83,11 +81,8 @@ namespace RevitAxonometryViews.ViewModels {
         public string FilterValue {
             get => _filterValue;
             set {
-                if(value != _filterValue) {
-                    _filterValue = value;
-                    RaiseAndSetIfChanged(ref _filterValue, value);
-                    UpdateFilteredView();
-                }
+                RaiseAndSetIfChanged(ref _filterValue, value);
+                UpdateFilteredView();
             }
         }
 
@@ -98,11 +93,8 @@ namespace RevitAxonometryViews.ViewModels {
         public string SelectedCriteria {
             get => _selectedCriteria;
             set {
-                if(value != _selectedCriteria) {
-                    _selectedCriteria = value;
-                    RaiseAndSetIfChanged(ref _selectedCriteria, value);
-                    UpdateFilteredView();
-                }
+                RaiseAndSetIfChanged(ref _selectedCriteria, value);
+                UpdateFilteredView();
             }
         }
 
@@ -120,7 +112,7 @@ namespace RevitAxonometryViews.ViewModels {
         private void UpdateFilteredView() {
             FilteredView = _hvacSystems.Where(x =>
                 (x.SystemName.Contains(FilterValue) || x.SharedName.Contains(FilterValue)))
-                    .OrderBy(x => LogicalOrderByName(x)).ToList();
+                    .OrderBy(x => x.SystemName).ToList();
             OnPropertyChanged(nameof(FilteredView));
         }
 
@@ -134,16 +126,6 @@ namespace RevitAxonometryViews.ViewModels {
             };
 
             UpdateFilteredView();
-        }
-
-        /// <summary>
-        /// Логический фильтр для сортировки
-        /// </summary>
-        private string LogicalOrderByName(HvacSystemViewModel system) {
-            if(_clickedHeaderName == _axonometryConfig.SystemName || string.IsNullOrEmpty(_clickedHeaderName)) {
-                return system.SystemName;
-            }
-            return system.SharedName;
         }
 
         /// <summary>
