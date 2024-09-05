@@ -29,15 +29,6 @@
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
-    <Window.Resources>
-        <Style TargetType="{x:Type GridViewColumnHeader}">
-            <Setter 
-                Property="Command" 
-                Value="{Binding DataContext.HeaderClickCommand, ElementName=SelectSystemsWindow}"/>
-            <Setter Property="CommandParameter" Value="{Binding Content, RelativeSource={RelativeSource Self}}"/>
-        </Style>
-    </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
@@ -57,11 +48,11 @@
             <TextBlock 
                 Grid.Column="0"
                 Margin="10" 
-                ><Run Language="ru-ru" Text="Схемы по:"/></TextBlock>
+                ><Run Text="Схемы по:"/></TextBlock>
             <TextBlock 
                 Grid.Column="1"
                 Margin="10">
-                <Run Language="ru-ru" Text="Поиск системы:"/></TextBlock>
+                <Run Text="Поиск системы:"/></TextBlock>
         </Grid>
 
         <Grid
@@ -86,66 +77,43 @@
                 Grid.Column="1"/>
         </Grid>
 
-        <ListView 
-            x:Name="lvSystems"
+        <DataGrid
+            x:Name="dgSystems"
             Margin="10,0,10,10"
             Grid.Row="2"
             SelectionMode="Extended"
-            ItemsSource="{Binding FilteredView}">
+            ItemsSource="{Binding FilteredView}"
+            AutoGenerateColumns="False">
 
+            <DataGrid.Columns>
+                <DataGridTemplateColumn 
+                    Header="" 
+                    Width="35">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox
+                                Checked="CheckBox_Checked"
+                                Unchecked="CheckBox_Unchecked"
+                                IsChecked="{Binding IsSelected}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-            <ListView.View>
-                <GridView 
-                    AllowsColumnReorder="False" 
-                    ColumnHeaderToolTip="Test">
+                <DataGridTextColumn
+                    x:Name="col1"
+                    Header="Имя системы"
+                    Width="*"
+                    Binding="{Binding Path=SystemName}"/>
 
-                    <GridViewColumn 
-                        Header=""  
-                        Width="35">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox 
-                                        Checked="CheckBox_Checked"
-                                        Unchecked="CheckBox_Unchecked"
-                                        IsChecked="{Binding IsSelected}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-
-                    <GridViewColumn 
-                        x:Name="col1"
-                        Header="Имя системы"
-                        Width="200"
-                        DisplayMemberBinding="{Binding Path=SystemName}"
-                            />
-
-                    <GridViewColumn 
-                        Header="_ФОП_ВИС_Имя системы"
-                        Width="{Binding ElementName=helperField, Path=ActualWidth}"
-                        DisplayMemberBinding="{Binding Path=SharedName}"
-                            />
-                </GridView>
-            </ListView.View>
-        </ListView>
-
-        <!--This is the hidden helper Grid which does the resizing -->
-        <Grid Visibility="Hidden">
-            <Grid.ColumnDefinitions>
-                <!--Width is bound to width of the first GridViewColumn -->
-                <ColumnDefinition Width="{Binding ElementName=col1, Path=ActualWidth}"/>
-                <!--Width is set to "Fill"-->
-                <ColumnDefinition Width="*"/>
-                <!--Correction Width-->
-                <ColumnDefinition Width="10"/>
-            </Grid.ColumnDefinitions>
-            <!--This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid-->
-            <Grid Grid.Column="1" x:Name="helperField"/>
-        </Grid>
-
-
+                <DataGridTextColumn
+                    Header="_ФОП_ВИС_Имя системы"
+                    Width="*"
+                    Binding="{Binding Path=SharedName}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        
         <StackPanel 
-            Grid.Row="3"
-            >
+            Grid.Row="3">
             <CheckBox 
                     IsChecked="{Binding UseOneView}"    
                     Margin="10,0,0,0"
@@ -156,9 +124,7 @@
             Grid.Row="3" 
             HorizontalAlignment="Right" 
             Margin="0,30,0,0" 
-            Grid.RowSpan="2" 
-            >
-
+            Grid.RowSpan="2">
 
             <StackPanel
             Grid.Row="3"
@@ -175,6 +141,7 @@
                 Content="Ok"
                 Width="80"
                 Margin="10"
+                Height="25"
                 Click="Button_Click_Ok"
                 Command="{Binding AcceptViewCommand}" />
 
@@ -182,6 +149,7 @@
                 Content="Отмена"
                 Width="80"
                 Margin="10"
+                Height="25"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
             </StackPanel>
