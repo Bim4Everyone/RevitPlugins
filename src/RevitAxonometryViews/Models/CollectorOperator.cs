@@ -20,7 +20,8 @@ namespace RevitAxonometryViews.Models {
                 .ToList();
         }
 
-        public IList<Element> GetElementsByMultiCategory(Document document, ICollection<BuiltInCategory> multiCategory) {
+        public IList<Element> GetElementsByMultiCategory(Document document, 
+            ICollection<BuiltInCategory> multiCategory) {
             ElementMulticategoryFilter multiCategoryFilter = new ElementMulticategoryFilter(multiCategory);
 
             return new FilteredElementCollector(document)

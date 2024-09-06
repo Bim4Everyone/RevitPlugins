@@ -46,7 +46,8 @@ namespace RevitAxonometryViews.ViewModels {
         /// Получает список параметров ФОП_ВИС_Имя системы
         /// </summary>
         private IList<ElementId> GetSharedVisNameCategories() {
-            (Definition Definition, Binding Binding) sharedVisNameParam = _document.GetSharedParamBinding(_config.SharedVisSystemName);
+            (Definition Definition, Binding Binding) sharedVisNameParam = 
+                _document.GetSharedParamBinding(_config.SharedVisSystemName);
             Binding parameterBinding = sharedVisNameParam.Binding;
             IEnumerable<Category> sharedVisNameCategories = parameterBinding.GetCategories();
 

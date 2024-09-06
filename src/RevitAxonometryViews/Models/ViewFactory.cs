@@ -76,11 +76,13 @@ namespace RevitAxonometryViews.Models {
 #if REVIT_2022_OR_LESS
                 ElementParameterFilter filterRule =
                     new ElementParameterFilter(
-                        ParameterFilterRuleFactory.CreateNotEqualsRule(_creationViewRules.FilterParameter, systemName, true));
+                        ParameterFilterRuleFactory.CreateNotEqualsRule(
+                            _creationViewRules.FilterParameter, systemName, true));
 #else
                 ElementParameterFilter filterRule = 
                     new ElementParameterFilter(
-                        ParameterFilterRuleFactory.CreateNotEqualsRule(_creationViewRules.FilterParameter, systemName));
+                        ParameterFilterRuleFactory.CreateNotEqualsRule(
+                        _creationViewRules.FilterParameter, systemName));
 #endif
                 elementFilterList.Add(filterRule);
             }

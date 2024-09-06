@@ -53,7 +53,6 @@ namespace RevitAxonometryViews.Models {
         public string SystemName => _systemName;
         public BuiltInParameter SystemNameBuiltInParam => _systemNameBuiltInParam;
         public ParameterElement SystemSharedNameParam => _systemSharedNameParam;
-
         public static IReadOnlyCollection<BuiltInCategory> SystemCategories => _systemCategories;
     }
 }

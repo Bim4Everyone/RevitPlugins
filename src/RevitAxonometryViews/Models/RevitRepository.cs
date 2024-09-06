@@ -42,16 +42,18 @@ namespace RevitAxonometryViews.Models {
         public string GetSharedSystemName(MEPSystem system) {
             ElementSet elementSet = null;
             if(system.Category.IsId(BuiltInCategory.OST_DuctSystem)) {
-                elementSet = ((MechanicalSystem)system).DuctNetwork;
+                elementSet = ((MechanicalSystem) system).DuctNetwork;
             }
             if(system.Category.IsId(BuiltInCategory.OST_PipingSystem)) {
-                elementSet = ((PipingSystem)system).PipingNetwork;
+                elementSet = ((PipingSystem) system).PipingNetwork;
             }
             // Нужно перебирать элементы пока не встретим заполненный параметр, могут быть не до конца обработаны элементы.
             // Выбрасываем первое встреченное заполненное значение
             if(elementSet != null && !elementSet.IsEmpty) {
                 foreach(Element element in elementSet) {
-                    string result = element.GetSharedParamValueOrDefault<string>(AxonometryConfig.SharedVisSystemName, null);
+                    string result = element.GetSharedParamValueOrDefault<string>(
+                        AxonometryConfig.SharedVisSystemName,
+                        null);
                     if(result != null) {
                         return result;
                     }
@@ -59,7 +61,5 @@ namespace RevitAxonometryViews.Models {
             }
             return "Нет имени";
         }
-
-
     }
 }

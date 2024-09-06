@@ -35,7 +35,10 @@ namespace RevitAxonometryViews.ViewModels {
         private string _errorText;
         private bool _useOneView;
 
-        public MainViewModel(RevitRepository revitRepository, ViewFactory viewFactory, CollectorOperator collectorOperator) {
+        public MainViewModel(
+            RevitRepository revitRepository, 
+            ViewFactory viewFactory, 
+            CollectorOperator collectorOperator) {
             _revitRepository = revitRepository;
             _viewFactory = viewFactory;
             _collectorOperator = collectorOperator;
@@ -135,7 +138,7 @@ namespace RevitAxonometryViews.ViewModels {
         /// <summary>
         /// Создаем коллекцию объектов систем с именами для создания по ним фильтров
         /// </summary>
-        public IReadOnlyCollection<HvacSystemViewModel> GetHvacSystems() {
+        private IReadOnlyCollection<HvacSystemViewModel> GetHvacSystems() {
             IList<Element> allSystems = _collectorOperator.GetElementsByMultiCategory(_revitRepository.Document, new List<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctSystem,
                 BuiltInCategory.OST_PipingSystem });
