@@ -45,7 +45,7 @@ namespace RevitServerFolders.ViewModels {
                 CancellationToken ct = dialog.CreateCancellationToken();
                 dialog.Show();
 
-                _exportService.ExportModelObjects(TargetFolder, modelFiles, progress, ct);
+                _exportService.ExportModelObjects(TargetFolder, modelFiles, ClearTargetFolder, progress, ct);
             }
         }
     }

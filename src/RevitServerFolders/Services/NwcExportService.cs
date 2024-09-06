@@ -32,6 +32,7 @@ namespace RevitServerFolders.Services {
         public void ExportModelObjects(
             string targetFolder,
             string[] modelFiles,
+            bool clearTargetFolder = false,
             IProgress<int> progress = null,
             CancellationToken ct = default) {
             if(string.IsNullOrWhiteSpace(targetFolder)) {
@@ -43,10 +44,12 @@ namespace RevitServerFolders.Services {
 
             Directory.CreateDirectory(targetFolder);
 
-            var navisFiles = Directory.GetFiles(targetFolder, _nwcSearchPattern);
-            foreach(var navisFile in navisFiles) {
-                File.SetAttributes(navisFile, FileAttributes.Normal);
-                File.Delete(navisFile);
+            if(clearTargetFolder) {
+                var navisFiles = Directory.GetFiles(targetFolder, _nwcSearchPattern);
+                foreach(var navisFile in navisFiles) {
+                    File.SetAttributes(navisFile, FileAttributes.Normal);
+                    File.Delete(navisFile);
+                }
             }
 
             for(int i = 0; i < modelFiles.Length; i++) {

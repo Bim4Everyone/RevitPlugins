@@ -28,6 +28,7 @@ namespace RevitServerFolders.ViewModels {
 
         private bool _isExportRooms;
         private bool _isExportRoomsVisible;
+        private bool _clearTargetFolder;
 
         public MainViewModel(PluginConfig pluginConfig,
             IModelObjectService objectService,
@@ -66,6 +67,11 @@ namespace RevitServerFolders.ViewModels {
         public string TargetFolder {
             get => _targetFolder;
             set => this.RaiseAndSetIfChanged(ref _targetFolder, value);
+        }
+
+        public bool ClearTargetFolder {
+            get => _clearTargetFolder;
+            set => this.RaiseAndSetIfChanged(ref _clearTargetFolder, value);
         }
 
         public string SourceFolder {
@@ -179,6 +185,7 @@ namespace RevitServerFolders.ViewModels {
         private void LoadConfig() {
             TargetFolder = _pluginConfig.TargetFolder;
             SourceFolder = _pluginConfig.SourceFolder;
+            ClearTargetFolder = _pluginConfig.ClearTargetFolder;
 
             LoadConfigImpl();
         }
@@ -186,6 +193,7 @@ namespace RevitServerFolders.ViewModels {
         private void SaveConfig() {
             _pluginConfig.TargetFolder = TargetFolder;
             _pluginConfig.SourceFolder = SourceFolder;
+            _pluginConfig.ClearTargetFolder = ClearTargetFolder;
             _pluginConfig.SkippedObjects = ModelObjects
                 .Where(item => item.SkipObject)
                 .Select(item => item.FullName)
