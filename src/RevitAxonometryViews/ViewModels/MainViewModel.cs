@@ -80,7 +80,6 @@ namespace RevitAxonometryViews.ViewModels {
         /// Список критериев для фильтрации
         /// </summary>
         public IReadOnlyCollection<string> FilterCriterion => _filterCriterion;
-        
 
         /// <summary>
         /// Текст, который подаестся в свойство фильтра для вида.
@@ -112,6 +111,20 @@ namespace RevitAxonometryViews.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        /// <summary>
+        /// Получаем выбранные объекты из листа и отправляем на создание в репозиторий.
+        /// Реализуется через CreateViewsCommand
+        /// </summary>
+        public void CreateViews() {
+            var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
+
+            _viewFactory.ExecuteViewCreation(selectedItems,
+                new CreationViewRules(
+                SelectedCriteria,
+                UseOneView,
+                _revitRepository));
         }
 
         /// <summary>
@@ -148,20 +161,6 @@ namespace RevitAxonometryViews.ViewModels {
             return new List<HvacSystemViewModel>(
                 allSystems.Select(
                     system => new HvacSystemViewModel(system.Name, _revitRepository.GetSharedSystemName((MEPSystem)system))));
-        }
-
-        /// <summary>
-        /// Получаем выбранные объекты из листа и отправляем на создание в репозиторий.
-        /// Реализуется через CreateViewsCommand
-        /// </summary>
-        public void CreateViews() {
-            var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
-
-            _viewFactory.ExecuteViewCreation(selectedItems,
-                new CreationViewRules(  
-                SelectedCriteria,
-                UseOneView,
-                _revitRepository));
         }
 
         /// <summary>
