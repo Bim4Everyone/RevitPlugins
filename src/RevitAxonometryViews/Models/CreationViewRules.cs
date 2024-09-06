@@ -30,7 +30,7 @@ namespace RevitAxonometryViews.ViewModels {
         public bool IsCombined { get; }
         public bool UseSharedSystemName { get; }
         public bool UseSystemName { get; }
-        public List<ElementId> Categories { get; }
+        public IList<ElementId> Categories { get; }
         public ElementId FilterParameter { get; }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace RevitAxonometryViews.ViewModels {
         /// <summary>
         /// Получает список параметров ФОП_ВИС_Имя системы
         /// </summary>
-        private List<ElementId> GetSharedVisNameCategories() {
+        private IList<ElementId> GetSharedVisNameCategories() {
             (Definition Definition, Binding Binding) sharedVisNameParam = _document.GetSharedParamBinding(_config.SharedVisSystemName);
             Binding parameterBinding = sharedVisNameParam.Binding;
             IEnumerable<Category> sharedVisNameCategories = parameterBinding.GetCategories();
@@ -58,7 +58,7 @@ namespace RevitAxonometryViews.ViewModels {
         /// В зависимости от выбранного критерия фильтрации вернет или параметры назначенные ФОП_ВИС_Имя системы
         /// или предварительно определенный список категорий
         /// </summary>
-        private List<ElementId> GetCategories() {
+        private IList<ElementId> GetCategories() {
             return UseSharedSystemName ?
                 GetSharedVisNameCategories() : AxonometryConfig.SystemCategories
                     .Select(category => new ElementId(category))

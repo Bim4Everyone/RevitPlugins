@@ -128,10 +128,6 @@ namespace RevitAxonometryViews.ViewModels {
         /// Загрузка данных для вывода в окно через LoadViewCommand
         /// </summary>
         private void LoadView() {
-            //FilterCriterion = new List<string>() {
-            //    _axonometryConfig.SystemName,
-            //    _axonometryConfig.SharedVisSystemName
-            //};
 
             UpdateFilteredView();
         }
@@ -139,8 +135,8 @@ namespace RevitAxonometryViews.ViewModels {
         /// <summary>
         /// Создаем коллекцию объектов систем с именами для создания по ним фильтров
         /// </summary>
-        public List<HvacSystemViewModel> GetHvacSystems() {
-            List<Element> allSystems = _collectorOperator.GetElementsByMultiCategory(_revitRepository.Document, new List<BuiltInCategory>() {
+        public IReadOnlyCollection<HvacSystemViewModel> GetHvacSystems() {
+            IList<Element> allSystems = _collectorOperator.GetElementsByMultiCategory(_revitRepository.Document, new List<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctSystem,
                 BuiltInCategory.OST_PipingSystem });
 
@@ -159,7 +155,7 @@ namespace RevitAxonometryViews.ViewModels {
             var selectedItems = _hvacSystems.Where(item => item.IsSelected).ToList();
 
             _viewFactory.ExecuteViewCreation(selectedItems,
-                new CreationViewRules(
+                new CreationViewRules(  
                 SelectedCriteria,
                 UseOneView,
                 _revitRepository));

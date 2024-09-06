@@ -9,18 +9,18 @@ using Autodesk.Revit.DB;
 
 namespace RevitAxonometryViews.Models {
     public class CollectorOperator {
-        public List<Element> GetParameterFilterElements(Document document) {
+        public IList<Element> GetParameterFilterElements(Document document) {
             return new FilteredElementCollector(document).OfClass(typeof(ParameterFilterElement)).ToList();
         }
 
-        public List<Element> GetElementsByCategory(Document document, BuiltInCategory category) {
+        public IList<Element> GetElementsByCategory(Document document, BuiltInCategory category) {
             return new FilteredElementCollector(document)
                 .OfCategory(category)
                 .WhereElementIsNotElementType()
                 .ToList();
         }
 
-        public List<Element> GetElementsByMultiCategory(Document document, List<BuiltInCategory> multiCategory) {
+        public IList<Element> GetElementsByMultiCategory(Document document, ICollection<BuiltInCategory> multiCategory) {
             ElementMulticategoryFilter multiCategoryFilter = new ElementMulticategoryFilter(multiCategory);
 
             return new FilteredElementCollector(document)
