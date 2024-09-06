@@ -28,21 +28,27 @@ namespace RevitAxonometryViews.ViewModels {
         private readonly AxonometryConfig _axonometryConfig;
 
         private readonly IReadOnlyCollection<HvacSystemViewModel> _hvacSystems;
-        private List<string> _filterCriterion = new List<string>();
+        private readonly IReadOnlyCollection<string> _filterCriterion;
 
-        private string _filterValue = string.Empty;
-        private string _selectedCriteria = string.Empty;
+        private string _filterValue;
+        private string _selectedCriteria;
         private string _errorText;
         private bool _useOneView;
 
         public MainViewModel(RevitRepository revitRepository, ViewFactory viewFactory, CollectorOperator collectorOperator) {
-            
             _revitRepository = revitRepository;
             _viewFactory = viewFactory;
             _collectorOperator = collectorOperator;
             _axonometryConfig = _revitRepository.AxonometryConfig;
             _hvacSystems = GetHvacSystems();
             _selectedCriteria = _axonometryConfig.SystemName;
+
+            _filterValue = string.Empty;
+            _selectedCriteria = _axonometryConfig.SystemName;
+            _filterCriterion = new List<string>() {
+                _axonometryConfig.SystemName,
+                _axonometryConfig.SharedVisSystemName
+            };
 
             FilteredView = new ObservableCollection<HvacSystemViewModel>(_hvacSystems);
             LoadViewCommand = RelayCommand.Create(LoadView);
@@ -70,13 +76,8 @@ namespace RevitAxonometryViews.ViewModels {
         /// <summary>
         /// Список критериев для фильтрации
         /// </summary>
-        public List<string> FilterCriterion {
-            get => _filterCriterion;
-            set {
-                this.RaiseAndSetIfChanged(ref _filterCriterion, value);
-                SelectedCriteria = _filterCriterion[0];
-            }
-        }
+        public IReadOnlyCollection<string> FilterCriterion => _filterCriterion;
+        
 
         /// <summary>
         /// Текст, который подаестся в свойство фильтра для вида.
@@ -127,10 +128,10 @@ namespace RevitAxonometryViews.ViewModels {
         /// Загрузка данных для вывода в окно через LoadViewCommand
         /// </summary>
         private void LoadView() {
-            FilterCriterion = new List<string>() {
-                _axonometryConfig.SystemName,
-                _axonometryConfig.SharedVisSystemName
-            };
+            //FilterCriterion = new List<string>() {
+            //    _axonometryConfig.SystemName,
+            //    _axonometryConfig.SharedVisSystemName
+            //};
 
             UpdateFilteredView();
         }
