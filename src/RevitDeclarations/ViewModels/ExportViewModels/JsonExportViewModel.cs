@@ -6,12 +6,11 @@ using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels {
     internal class JsonExportViewModel : ExportViewModel {
-        public JsonExportViewModel(string name) : base(name) {
+        public JsonExportViewModel(string name, DeclarationSettings settings) 
+            : base(name, settings) {
         }
 
-        public override void Export(string path,
-                                    IEnumerable<Apartment> apartments,
-                                    DeclarationSettings settings) {
+        public override void Export(string path, IEnumerable<Apartment> apartments) {
             JsonExporter<Apartment> exporter = new JsonExporter<Apartment>();
             exporter.Export(path, apartments);
             TaskDialog.Show("Декларации", "Файл JSON создан");

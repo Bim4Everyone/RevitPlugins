@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -11,7 +9,6 @@ using Autodesk.Revit.UI;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using Microsoft.Office.Interop.Excel;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using RevitDeclarations.Models;
@@ -32,7 +29,6 @@ namespace RevitDeclarations.ViewModels {
         private readonly CsvExportViewModel _csvExportViewModel;
         private readonly JsonExportViewModel _jsonExportViewModel;
         private readonly List<ExportViewModel> _exportFormats;
-        private ExportViewModel _selectedFormat;
 
         private readonly IList<RevitDocumentViewModel> _revitDocuments;
         private readonly IReadOnlyList<Phase> _phases;
@@ -41,11 +37,12 @@ namespace RevitDeclarations.ViewModels {
         private string _fileName;
         private bool _exportToExcel;
         private string _accuracy;
-        private Phase _selectedPhase;
         private bool _loadUtp;
         private bool _canLoadUtp;
         private string _errorText;
         private string _canLoadUtpText;
+        private Phase _selectedPhase;
+        private ExportViewModel _selectedFormat;
 
         public MainViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
             _revitRepository = revitRepository;
@@ -76,9 +73,9 @@ namespace RevitDeclarations.ViewModels {
             _parametersViewModel = new ParametersViewModel(_revitRepository, this);
             _prioritiesViewModel = new PrioritiesViewModel(this);
 
-            _excelExportViewModel = new ExcelExportViewModel("Excel");
-            _csvExportViewModel = new CsvExportViewModel("csv");
-            _jsonExportViewModel = new JsonExportViewModel("json");
+            _excelExportViewModel = new ExcelExportViewModel("Excel", _settings);
+            _csvExportViewModel = new CsvExportViewModel("csv", _settings);
+            _jsonExportViewModel = new JsonExportViewModel("json", _settings);
 
             _exportFormats = new List<ExportViewModel>() {
                 _excelExportViewModel,
@@ -130,7 +127,7 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _canLoadUtp, value);
         }
 
-        public List<ExportViewModel> ExportFormats => _exportFormats;
+        public IReadOnlyList<ExportViewModel> ExportFormats => _exportFormats;
         public ExportViewModel SelectedFormat {
             get => _selectedFormat;
             set => RaiseAndSetIfChanged(ref _selectedFormat, value);
@@ -266,7 +263,7 @@ namespace RevitDeclarations.ViewModels {
                 .ToList();
 
             try {
-                _selectedFormat.Export(FullPath, apartments, _settings);
+                _selectedFormat.Export(FullPath, apartments);
 
             } catch(Exception e) {
                 var taskDialog = new TaskDialog("Ошибка выгрузки") {
@@ -278,7 +275,7 @@ namespace RevitDeclarations.ViewModels {
                 TaskDialogResult dialogResult = taskDialog.Show();
 
                 if(dialogResult == TaskDialogResult.Yes) {
-                    _csvExportViewModel.Export(FullPath, apartments, _settings);
+                    _csvExportViewModel.Export(FullPath, apartments);
                 }
             }
         }
