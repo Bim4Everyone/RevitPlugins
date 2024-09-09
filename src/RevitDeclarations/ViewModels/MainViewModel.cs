@@ -11,6 +11,7 @@ using Autodesk.Revit.UI;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Microsoft.Office.Interop.Excel;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using RevitDeclarations.Models;
@@ -26,6 +27,13 @@ namespace RevitDeclarations.ViewModels {
 
         private readonly ParametersViewModel _parametersViewModel;
         private readonly PrioritiesViewModel _prioritiesViewModel;
+
+        private readonly ExcelExportViewModel _excelExportViewModel;
+        private readonly CsvExportViewModel _csvExportViewModel;
+        private readonly JsonExportViewModel _jsonExportViewModel;
+        private readonly List<ExportViewModel> _exportFormats;
+        private ExportViewModel _selectedFormat;
+
         private readonly IList<RevitDocumentViewModel> _revitDocuments;
         private readonly IReadOnlyList<Phase> _phases;
 
@@ -67,6 +75,16 @@ namespace RevitDeclarations.ViewModels {
 
             _parametersViewModel = new ParametersViewModel(_revitRepository, this);
             _prioritiesViewModel = new PrioritiesViewModel(this);
+
+            _excelExportViewModel = new ExcelExportViewModel("Excel");
+            _csvExportViewModel = new CsvExportViewModel("csv");
+            _jsonExportViewModel = new JsonExportViewModel("json");
+
+            _exportFormats = new List<ExportViewModel>() {
+                _excelExportViewModel,
+                _csvExportViewModel,
+                _jsonExportViewModel,
+            };
 
             SelectFolderCommand = new RelayCommand(SelectFolder);
             ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
@@ -110,6 +128,12 @@ namespace RevitDeclarations.ViewModels {
         public bool CanLoadUtp {
             get => _canLoadUtp;
             set => RaiseAndSetIfChanged(ref _canLoadUtp, value);
+        }
+
+        public List<ExportViewModel> ExportFormats => _exportFormats;
+        public ExportViewModel SelectedFormat {
+            get => _selectedFormat;
+            set => RaiseAndSetIfChanged(ref _selectedFormat, value);
         }
 
         public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
@@ -241,47 +265,22 @@ namespace RevitDeclarations.ViewModels {
                 .ThenBy(x => x.FullNumber)
                 .ToList();
 
-            if(IsExportToExcel) {
-                DeclarationTableInfo tableData = new DeclarationTableInfo(apartments, _settings);
-                DeclarationDataTable table = new DeclarationDataTable(tableData, _settings);
+            try {
+                _selectedFormat.Export(FullPath, apartments, _settings);
 
-                try { 
-                    ExportToExcel(table);
+            } catch(Exception e) {
+                var taskDialog = new TaskDialog("Ошибка выгрузки") {
+                    CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
+                    MainContent = "Произошла ошибка выгрузки.\nПопробовать выгрузить декларацию в формате csv?",
+                    ExpandedContent = $"Описание ошибки: {e.Message}"
+                };
 
-                } catch(Exception e) {
-                    var taskDialog = new TaskDialog("Ошибка выгрузки") {
-                        CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
-                        MainContent = "Произошла ошибка Excel.\nВыгрузить декларацию в формате csv?",
-                        ExpandedContent = $"Описание ошибки: {e.Message}"
-                    };
+                TaskDialogResult dialogResult = taskDialog.Show();
 
-                    TaskDialogResult dialogResult = taskDialog.Show();
-
-                    if(dialogResult == TaskDialogResult.Yes) {
-                        ExportToCSV(table);
-                    }
+                if(dialogResult == TaskDialogResult.Yes) {
+                    _csvExportViewModel.Export(FullPath, apartments, _settings);
                 }
-            } else {
-                ExportToJson(apartments);
             }
-        }
-
-        private void ExportToExcel(DeclarationDataTable table) {
-            ExcelExporter exporter = new ExcelExporter();
-            exporter.Export(FullPath, table);
-            TaskDialog.Show("Декларации", "Файл Excel создан");
-        }
-
-        private void ExportToCSV(DeclarationDataTable table) {
-            CsvExporter exporter = new CsvExporter();
-            exporter.Export(FullPath, table);
-            TaskDialog.Show("Декларации", "Файл CSV создан");
-        }
-
-        private void ExportToJson(IEnumerable<Apartment> apartments) {
-            JsonExporter<Apartment> exporter = new JsonExporter<Apartment>();
-            exporter.Export(FullPath, apartments);
-            TaskDialog.Show("Декларации", "Файл JSON создан");
         }
 
         public bool CanExport(object obj) {
