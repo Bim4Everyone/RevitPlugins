@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
@@ -5,6 +6,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -13,6 +15,9 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 using RevitDeclarations.Models;
 using RevitDeclarations.Views;
+
+using TaskDialog = Autodesk.Revit.UI.TaskDialog;
+using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels {
     internal class MainViewModel : BaseViewModel {
@@ -241,7 +246,23 @@ namespace RevitDeclarations.ViewModels {
             if(ExportToExcel) {
                 DeclarationTableInfo tableData = new DeclarationTableInfo(apartments, _settings);
                 DeclarationDataTable table = new DeclarationDataTable(tableData, _settings);
-                exporter.ExportToExcel(FullPath, table);
+
+                try { 
+                    exporter.ExportToExcel(FullPath, table);
+
+                } catch(Exception e) {
+                    var taskDialog = new TaskDialog("Ошибка выгрузки") {
+                        CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
+                        MainContent = "Произошла ошибка Excel.\nВыгрузить декларацию в формате csv?",
+                        ExpandedContent = $"Описание ошибки: {e.Message}"
+                    };
+
+                    TaskDialogResult dialogResult = taskDialog.Show();
+
+                    if(dialogResult == TaskDialogResult.Yes) {
+                        exporter.ExportToCSV(FullPath, table);
+                    }
+                }
             } else {
                 exporter.ExportToJson(FullPath, apartments);
             }
