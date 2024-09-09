@@ -246,7 +246,7 @@ namespace RevitDeclarations.ViewModels {
                 DeclarationDataTable table = new DeclarationDataTable(tableData, _settings);
 
                 try { 
-                    ExportToExcel(FullPath, table);
+                    ExportToExcel(table);
 
                 } catch(Exception e) {
                     var taskDialog = new TaskDialog("Ошибка выгрузки") {
@@ -258,29 +258,29 @@ namespace RevitDeclarations.ViewModels {
                     TaskDialogResult dialogResult = taskDialog.Show();
 
                     if(dialogResult == TaskDialogResult.Yes) {
-                        ExportToCSV(FullPath, table);
+                        ExportToCSV(table);
                     }
                 }
             } else {
-                ExportToJson(FullPath, apartments);
+                ExportToJson(apartments);
             }
         }
 
-        private void ExportToExcel(string path, DeclarationDataTable table) {
+        private void ExportToExcel(DeclarationDataTable table) {
             ExcelExporter exporter = new ExcelExporter();
-            exporter.Export(path, table);
+            exporter.Export(FullPath, table);
             TaskDialog.Show("Декларации", "Файл Excel создан");
         }
 
-        private void ExportToCSV(string path, DeclarationDataTable table) {
+        private void ExportToCSV(DeclarationDataTable table) {
             CsvExporter exporter = new CsvExporter();
-            exporter.Export(path, table);
+            exporter.Export(FullPath, table);
             TaskDialog.Show("Декларации", "Файл CSV создан");
         }
 
-        private void ExportToJson(string path, IEnumerable<Apartment> apartments) {
+        private void ExportToJson(IEnumerable<Apartment> apartments) {
             JsonExporter<Apartment> exporter = new JsonExporter<Apartment>();
-            exporter.Export(path, apartments);
+            exporter.Export(FullPath, apartments);
             TaskDialog.Show("Декларации", "Файл JSON создан");
         }
 
