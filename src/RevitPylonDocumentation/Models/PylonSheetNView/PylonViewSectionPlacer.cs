@@ -1,17 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.UI.WebControls;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using RevitPylonDocumentation.ViewModels;
-
-using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewSectionPlacer {
@@ -21,17 +13,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             SheetInfo = pylonSheetInfo;
         }
 
-
         internal MainViewModel ViewModel { get; set; }
         internal RevitRepository Repository { get; set; }
         internal PylonSheetInfo SheetInfo { get; set; }
 
 
-
         // Метод для размещения основного вида пилона.
         // Позиционирование - левый верхний угол листа
         internal bool PlaceGeneralViewport() {
-
             // Проверям вдруг вид не создался
             if(SheetInfo.GeneralView.ViewElement == null) {
                 return false;
@@ -68,10 +57,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     0);
 
             (SheetInfo.GeneralView.ViewportElement as Viewport).SetBoxCenter(newCenter);
-
             SheetInfo.GeneralView.ViewportCenter = newCenter;
-
-
             return true;
         }
 
@@ -79,7 +65,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         // Метод для размещения основного вида пилона.
         // Позиционирование - левый верхний угол листа
         internal bool PlaceGeneralPerpendicularViewport() {
-
             // Проверям вдруг вид не создался
             if(SheetInfo.GeneralViewPerpendicular.ViewElement == null) {
                 return false;
@@ -92,7 +77,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     + SheetInfo.PylonKeyName
                     + ViewModel.ViewSectionSettings.GeneralViewPerpendicularSuffix;
             }
-
 
             // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicular)) {
@@ -113,15 +97,12 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     0);
 
             (SheetInfo.GeneralViewPerpendicular.ViewportElement as Viewport).SetBoxCenter(newCenter);
-
             SheetInfo.GeneralViewPerpendicular.ViewportCenter = newCenter;
-
             return true;
         }
 
 
         internal bool PlaceTransverseFirstViewPorts() {
-
             // Проверям вдруг вид не создался
             if(SheetInfo.TransverseViewFirst.ViewElement == null) {
                 return false;
@@ -132,43 +113,39 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 SheetInfo.TransverseViewFirst.ViewportName = "";
             }
 
-
             // Передаем первый поперечный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewFirst)) {
                 return false;
             }
 
             // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
-            double GeneralViewX = 0;
-            double GeneralViewPerpendicularX = 0;
+            double generalViewX = 0;
+            double generalViewPerpendicularX = 0;
             double newCenterX = 0;
             double newCenterY = 0;
 
-
             // Если видовой экран основного вида размещен на листе, то находим его Х центра
             if(SheetInfo.GeneralView.ViewportElement != null) {
-                GeneralViewX = SheetInfo.GeneralView.ViewportCenter.X;
+                generalViewX = SheetInfo.GeneralView.ViewportCenter.X;
             }
 
             // Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
             if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                GeneralViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
+                generalViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
             }
-
 
             // Определяем координату Х первого поперечного вида пилона
             if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-
-                if(GeneralViewX > GeneralViewPerpendicularX) {
-                    newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
+                if(generalViewX > generalViewPerpendicularX) {
+                    newCenterX = generalViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
                 } else {
-                    newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
+                    newCenterX = generalViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
                 }
 
             } else if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement is null) {
-                newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
+                newCenterX = generalViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
             } else if(SheetInfo.GeneralView.ViewportElement is null && SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
+                newCenterX = generalViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewFirst.ViewportHalfWidth;
             } else {
                 // Когда обоих видовых экранов нет на листе
                 newCenterX = SheetInfo.TitleBlockWidth / 2;
@@ -185,18 +162,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     newCenterY,
                     0);
 
-
             (SheetInfo.TransverseViewFirst.ViewportElement as Viewport).SetBoxCenter(newCenter);
-
             SheetInfo.TransverseViewFirst.ViewportCenter = newCenter;
-
             return true;
         }
 
 
-
         internal bool PlaceTransverseSecondViewPorts() {
-
             // Проверям вдруг вид не создался
             if(SheetInfo.TransverseViewSecond.ViewElement == null) {
                 return false;
@@ -207,40 +179,38 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 SheetInfo.TransverseViewSecond.ViewportName = "";
             }
 
-
             // Передаем второй поперечный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewSecond)) {
                 return false;
             }
 
             // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
-            double GeneralViewX = 0;
-            double GeneralViewPerpendicularX = 0;
+            double generalViewX = 0;
+            double generalViewPerpendicularX = 0;
             double newCenterX = 0;
             double newCenterY = 0;
 
             // Если видовой экран основного вида размещен на листе, то находим его Х центра
             if(SheetInfo.GeneralView.ViewportElement != null) {
-                GeneralViewX = SheetInfo.GeneralView.ViewportCenter.X;
+                generalViewX = SheetInfo.GeneralView.ViewportCenter.X;
             }
 
             // Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
             if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                GeneralViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
+                generalViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
             }
-
 
             // Определяем координату Х первого поперечного вида пилона
             if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                if(GeneralViewX > GeneralViewPerpendicularX) {
-                    newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
+                if(generalViewX > generalViewPerpendicularX) {
+                    newCenterX = generalViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
                 } else {
-                    newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
+                    newCenterX = generalViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
                 }
             } else if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement is null) {
-                newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
+                newCenterX = generalViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
             } else if(SheetInfo.GeneralView.ViewportElement is null && SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
+                newCenterX = generalViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewSecond.ViewportHalfWidth;
             } else {
                 // Когда обоих видовых экранов нет на листе
                 newCenterX = SheetInfo.TitleBlockWidth / 2;
@@ -259,16 +229,12 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     newCenterY,
                     0);
 
-
             (SheetInfo.TransverseViewSecond.ViewportElement as Viewport).SetBoxCenter(newCenter);
-
             SheetInfo.TransverseViewSecond.ViewportCenter = newCenter;
-
             return true;
         }
 
         internal bool PlaceTransverseThirdViewPorts() {
-
             // Проверям вдруг вид не создался
             if(SheetInfo.TransverseViewThird.ViewElement == null) {
                 return false;
@@ -279,40 +245,38 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 SheetInfo.TransverseViewThird.ViewportName = "";
             }
 
-
             // Передаем третий поперечный вид пилона в метод по созданию видов в (0.0.0)
             if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewThird)) {
                 return false;
             }
 
             // Рассчитываем и задаем корректную точку вставки первого поперечного вида пилона
-            double GeneralViewX = 0;
-            double GeneralViewPerpendicularX = 0;
+            double generalViewX = 0;
+            double generalViewPerpendicularX = 0;
             double newCenterX = 0;
             double newCenterY = 0;
 
             // Если видовой экран основного вида размещен на листе, то находим его Х центра
             if(SheetInfo.GeneralView.ViewportElement != null) {
-                GeneralViewX = SheetInfo.GeneralView.ViewportCenter.X;
+                generalViewX = SheetInfo.GeneralView.ViewportCenter.X;
             }
 
             // Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
             if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                GeneralViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
+                generalViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
             }
-
 
             // Определяем координату Х первого поперечного вида пилона
             if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                if(GeneralViewX > GeneralViewPerpendicularX) {
-                    newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+                if(generalViewX > generalViewPerpendicularX) {
+                    newCenterX = generalViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
                 } else {
-                    newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+                    newCenterX = generalViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
                 }
             } else if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement is null) {
-                newCenterX = GeneralViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+                newCenterX = generalViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
             } else if(SheetInfo.GeneralView.ViewportElement is null && SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
-                newCenterX = GeneralViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+                newCenterX = generalViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
             } else {
                 // Когда обоих видовых экранов нет на листе
                 newCenterX = SheetInfo.TitleBlockWidth / 2;
@@ -332,27 +296,20 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     newCenterY,
                     0);
 
-
             (SheetInfo.TransverseViewThird.ViewportElement as Viewport).SetBoxCenter(newCenter);
-
             SheetInfo.TransverseViewThird.ViewportCenter = newCenter;
-
             return true;
         }
 
 
-
         internal bool PlacePylonViewport(ViewSheet viewSheet, PylonView pylonView) {
-
             Document doc = Repository.Document;
             // Проверяем можем ли разместить на листе видовой экран вида
             if(!Viewport.CanAddViewToSheet(doc, viewSheet.Id, pylonView.ViewElement.Id)) {
                 return false;
             }
 
-
             pylonView.ViewElement.get_Parameter(BuiltInParameter.SECTION_COARSER_SCALE_PULLDOWN_METRIC).Set(100);
-
             // Размещаем сечение пилона на листе
             Viewport viewPort = null;
             try {
@@ -372,13 +329,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 if(type == null) {
                     continue;
                 }
-
                 if(type.Name == pylonView.ViewportTypeName) {
                     viewPort.ChangeTypeId(type.Id);
                     break;
                 }
             }
-
             SheetInfo.GetInfoAboutViewport(pylonView, viewPort);
 
             // Задание правильного положения метки видового экрана
@@ -390,7 +345,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 #else
             viewPort.LabelOffset = new XYZ(pylonView.ViewportHalfWidth, 2 * pylonView.ViewportHalfHeight - 0.022, 0);
 #endif
-
             return true;
         }
     }

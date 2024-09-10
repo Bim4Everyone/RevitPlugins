@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using dosymep.WPF.ViewModels;
 
 namespace RevitPylonDocumentation.Models.UserSettings {
     internal class UserSelectionSettings : BaseViewModel {
-
         private bool _needWorkWithGeneralView = false;
         private bool _needWorkWithGeneralPerpendicularView = false;
         private bool _needWorkWithTransverseViewFirst = false;
@@ -17,7 +10,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private bool _needWorkWithRebarSchedule = false;
         private bool _needWorkWithMaterialSchedule = false;
         private bool _needWorkWithSystemPartsSchedule = false;
-        private bool _needWorkWithIFCPartsSchedule = false;
+        private bool _needWorkWithIfcPartsSchedule = false;
         private bool _needWorkWithLegend = false;
 
 
@@ -60,9 +53,9 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _needWorkWithSystemPartsSchedule, value);
         }
 
-        public bool NeedWorkWithIFCPartsSchedule {
-            get => _needWorkWithIFCPartsSchedule;
-            set => RaiseAndSetIfChanged(ref _needWorkWithIFCPartsSchedule, value);
+        public bool NeedWorkWithIfcPartsSchedule {
+            get => _needWorkWithIfcPartsSchedule;
+            set => RaiseAndSetIfChanged(ref _needWorkWithIfcPartsSchedule, value);
         }
 
         public bool NeedWorkWithLegend {
