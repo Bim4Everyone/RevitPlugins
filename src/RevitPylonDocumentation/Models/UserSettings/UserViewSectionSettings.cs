@@ -26,7 +26,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _transverseViewXOffsetTemp = "200";
         private string _transverseViewYOffsetTemp = "200";
 
-        private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Без номера листа";
+        private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Имя вида без номера листа";
 
         public UserViewSectionSettings(MainViewModel mainViewModel) {
 

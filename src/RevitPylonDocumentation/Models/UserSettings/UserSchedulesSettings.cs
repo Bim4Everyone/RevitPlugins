@@ -24,10 +24,10 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _ifcPartsScheduleSuffixTemp = "_IFC";
 
         // Названия эталонных спек
-        private string _rebarScheduleNameTemp = "(КЖ...)_СА_Базовая_(Марка и/или арматурная группа)";
-        private string _materialScheduleNameTemp = "(КЖ...)_СМ_(Марка)";
-        private string _systemPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка и/или арматурная группа)_Системная";
-        private string _ifcPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка и/или арматурная группа)_IFC";
+        private string _rebarScheduleNameTemp = "(КЖ...)_СА_Базовая_(Марка пилона)";
+        private string _materialScheduleNameTemp = "(КЖ...)_СМ_Базовая_(Марка пилона)";
+        private string _systemPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка пилона)_Системная";
+        private string _ifcPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка пилона)_IFC";
 
         // Заполнение параметров диспетчера
         private string _rebarScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
@@ -44,7 +44,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
             new ScheduleFilterParamHelper("обр_ФОП_Орг. уровень", "обр_ФОП_Орг. уровень"),
-            new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка")
+            new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка"),
+            new ScheduleFilterParamHelper("Марка", "Марка")
         };
 
         public string RebarSchedulePrefix { get; set; }
