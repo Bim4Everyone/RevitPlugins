@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.OpeningModels;
@@ -12,7 +12,6 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// Создает коллекцию групп исходящих заданий на отверстия из коллекции исходящих заданий на отверстия
         /// </summary>
         /// <param name="openingTasks">Коллекция исходящих заданий на отверстия из активного документа</param>
-        /// <returns></returns>
         ICollection<OpeningsGroup> GetOpeningsGroups(ICollection<OpeningMepTaskOutcoming> openingTasks);
     }
 }

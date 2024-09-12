@@ -24,11 +24,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         /// <summary>
         /// Конструктор для получения параметров задания на отверстие из группы заданий на отверстия
         /// </summary>
-        /// <param name="solidProvider"></param>
-        /// <param name="pointFinder"></param>
-        /// <param name="levelFinder"></param>
         /// <param name="openingsGroup">Группа заданий на отверстия</param>
-        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public FloorSolidParameterGetter(
             ISolidProvider solidProvider,
             IPointFinder pointFinder,
@@ -45,13 +42,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         /// <summary>
         /// Конструктор для получения параметров задания на отверстие из пересечения элемента ВИС и конструкции
         /// </summary>
-        /// <param name="solidProvider"></param>
-        /// <param name="pointFinder"></param>
-        /// <param name="levelFinder"></param>
         /// <param name="mepElement">Элемент ВИС</param>
         /// <param name="structureElement">Элемент конструкции</param>
-        /// <param name="mepCategories"></param>
-        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public FloorSolidParameterGetter(
             ISolidProvider solidProvider,
             IPointFinder pointFinder,

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
@@ -13,7 +13,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         /// <summary>
         /// Конструктор класса для проверки Revit репозитория на наличие дублированных связей
         /// </summary>
-        /// <param name="revitRepository"></param>
+        /// <param name="revitRepository">Репозиторий активного документа ревита</param>
         public DuplicatedLinksChecker(RevitRepository revitRepository) {
             if(revitRepository is null) { throw new ArgumentNullException(nameof(revitRepository)); }
 

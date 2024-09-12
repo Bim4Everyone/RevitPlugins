@@ -13,10 +13,10 @@ namespace RevitOpeningPlacement.Models {
         /// Находит коллизии между элементами ВИС из активного файла 
         /// и элементами конструкций (стены, перекрытия) из связей АР, КР, КМ
         /// </summary>
-        /// <param name="revitRepository"></param>
-        /// <param name="mepFilter"></param>
-        /// <param name="architectureFilter"></param>
-        /// <returns></returns>
+        /// <param name="revitRepository">Репозиторий активного документа ревита</param>
+        /// <param name="mepFilter">Фильтр элементов ВИС</param>
+        /// <param name="architectureFilter">Фильтр элементов конструкций</param>
+        /// <returns>Перечисление коллизий элементов ВИС из активного файла с конструкциями из связей</returns>
         public static IEnumerable<ClashModel> GetClashes(
             RevitRepository revitRepository,
             Filter mepFilter,

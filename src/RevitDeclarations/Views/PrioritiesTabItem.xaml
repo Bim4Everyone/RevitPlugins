@@ -1,0 +1,133 @@
+﻿<UserControl x:Class="RevitDeclarations.Views.PrioritiesTabItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RevitDeclarations.Views"
+             mc:Ignorable="d" 
+             Background="White"
+             Height="650" Width="630">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="Styles/StyleResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="10"
+            HorizontalAlignment="Left"                     
+            Style="{StaticResource HeaderName}"
+            Text="Приоритеты"/>
+
+        <TextBlock
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="10, 5">
+            <Run Text="Имена помещений квартир в проекте должны соответствовать следующему списку приоритетов."/>
+            <LineBreak/>
+            <Run Text="Столбцы в декларации будут созданы в соответствии с порядковым номером приоритета."/>
+            <LineBreak/>
+            <Run Text="Помещения, для которых не найден приоритет, будут добавлены в конце таблицы."/>
+            <LineBreak/>
+            <Run Text="Приоритеты настраиваются в файле JSON. Вы можете использовать ваш собственный файл приоритетов."/>
+        </TextBlock>
+
+        <Button
+            Grid.Row="2"
+            Grid.Column="0"
+            Content="Приоритеты А101"
+            Margin="10, 5"
+            Height="25"
+            Command="{Binding SetDefaultConfigCommand}"/>
+        <Button
+            Grid.Row="2"
+            Grid.Column="1"
+            Content="Экспорт приоритетов"
+            Margin="10, 5"
+            Height="25"
+            Command="{Binding ExportConfigCommand}"/>
+        <Button
+            Grid.Row="2"
+            Grid.Column="2"
+            Content="Импорт приоритетов"
+            Margin="10, 5"
+            Height="25"
+            Command="{Binding ImportConfigCommand}"/>
+
+        <TextBlock
+                Grid.Row="3"  
+                Grid.Column="0"
+                Margin="10,0"
+                Style="{StaticResource ParameterName}"
+                Text="Путь к файлу приоритетов:"/>
+        <TextBlock
+                Grid.Row="3"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="0, 5, 10, 5"
+                VerticalAlignment="Center"
+                TextWrapping="Wrap"
+                Text="{Binding FilePath}"/>
+
+        <DataGrid
+            Grid.Row="4"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="10"
+            AutoGenerateColumns="False"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False"
+            ItemsSource="{Binding PrioritiesVM}">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Header="Номер"
+                    Width="50"
+                    IsReadOnly="True"
+                    Binding="{Binding OrdinalNumber}"/>
+                <DataGridTextColumn
+                    Header="Имя"
+                    Width="*"
+                    IsReadOnly="True"
+                    Binding="{Binding Name}"/>
+                <DataGridTextColumn
+                    Header="Коэффициент"
+                    Width="90"
+                    IsReadOnly="True"
+                    Binding="{Binding AreaCoefficient}"/>
+                <DataGridTextColumn
+                    Header="Летнее"
+                    Width="90"
+                    IsReadOnly="True"
+                    Binding="{Binding IsSummer}"/>
+                <DataGridTextColumn
+                    Header="Жилое"
+                    Width="90"
+                    IsReadOnly="True"
+                    Binding="{Binding IsLiving}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

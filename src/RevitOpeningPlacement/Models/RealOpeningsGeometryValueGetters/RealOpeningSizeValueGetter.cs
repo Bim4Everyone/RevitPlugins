@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,9 +40,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// <summary>
         /// Возвращает высоту задания на отверстие независимо от его формы
         /// </summary>
-        /// <param name="incomingTask"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private protected double GetOpeningHeight(IOpeningTaskIncoming incomingTask) {
             if(incomingTask is null) {
                 throw new ArgumentNullException(nameof(incomingTask));
@@ -53,9 +51,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// <summary>
         /// Возвращает ширину задания на отверстие независимо от его формы
         /// </summary>
-        /// <param name="incomingTask"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private protected double GetOpeningWidth(IOpeningTaskIncoming incomingTask) {
             if(incomingTask is null) {
                 throw new ArgumentNullException(nameof(incomingTask));
@@ -66,9 +62,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// <summary>
         /// Возвращает диаметр задания на отверстие независимо от его формы
         /// </summary>
-        /// <param name="incomingTask"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private protected double GetOpeningDiameter(IOpeningTaskIncoming incomingTask) {
             if(incomingTask is null) {
                 throw new ArgumentNullException(nameof(incomingTask));

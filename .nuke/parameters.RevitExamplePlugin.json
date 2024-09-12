@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitExamplePlugin",
+  "PublishDirectory": "99.Example.extension\\Example.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/34840/c-sharp-logo",
+  "BundleName": "C# Button",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "99.Example.extension\\Example.tab\\Example.panel"
+}

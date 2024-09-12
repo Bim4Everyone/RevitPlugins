@@ -1,4 +1,4 @@
-﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB;
 
 namespace RevitOpeningPlacement.Models.Interfaces {
     /// <summary>
@@ -8,7 +8,6 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// <summary>
         /// Возвращает экземпляр семейства
         /// </summary>
-        /// <returns></returns>
         FamilyInstance GetFamilyInstance();
     }
 }

@@ -1,6 +1,9 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Windows.Input;
 
+using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -17,15 +20,15 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class MepCategoryFilterViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
-        private Filter _linearElementsFilter;
+        private readonly Filter _linearElementsFilter;
+        private readonly SearchSetViewModel _straightSearchSetLinearElements;
+        private readonly SearchSetViewModel _invertedSearchSetLinearElements;
         private SearchSetViewModel _searchSetLinearElements;
-        private SearchSetViewModel _straightSearchSetLinearElements;
-        private SearchSetViewModel _invertedSearchSetLinearElements;
 
-        private Filter _nonLinearElementsFilter;
+        private readonly Filter _nonLinearElementsFilter;
+        private readonly SearchSetViewModel _straightSearchSetNonLinearElements;
+        private readonly SearchSetViewModel _invertedSearchSetNonLinearElements;
         private SearchSetViewModel _searchSetNonLinearElements;
-        private SearchSetViewModel _straightSearchSetNonLinearElements;
-        private SearchSetViewModel _invertedSearchSetNonLinearElements;
 
 
         /// <summary>
@@ -36,19 +39,22 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         /// <param name="nonLinearElementsFilter">Фильтр для нелинейных элементов инженерных систем (соединительные детали воздуховодов, соединительные детали трубопроводов и т.п.)</param>
         public MepCategoryFilterViewModel(RevitRepository revitRepository, Filter linearElementsFilter, Filter nonLinearElementsFilter) {
             _revitRepository = revitRepository;
+            MessageBoxService = GetPlatformService<IMessageBoxService>();
 
             _linearElementsFilter = linearElementsFilter;
-            _straightSearchSetLinearElements = new SearchSetViewModel(_revitRepository, _linearElementsFilter, new StraightRevitFilterGenerator());
-            _invertedSearchSetLinearElements = new SearchSetViewModel(_revitRepository, _linearElementsFilter, new InvertedRevitFilterGenerator());
+            _straightSearchSetLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _linearElementsFilter, new StraightRevitFilterGenerator());
+            _invertedSearchSetLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _linearElementsFilter, new InvertedRevitFilterGenerator());
             LinearElementsSearchSet = _straightSearchSetLinearElements;
 
             _nonLinearElementsFilter = nonLinearElementsFilter;
-            _straightSearchSetNonLinearElements = new SearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new StraightRevitFilterGenerator());
-            _invertedSearchSetNonLinearElements = new SearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new InvertedRevitFilterGenerator());
+            _straightSearchSetNonLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new StraightRevitFilterGenerator());
+            _invertedSearchSetNonLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new InvertedRevitFilterGenerator());
             NonLinearElementsSearchSet = _straightSearchSetNonLinearElements;
 
-            InversionChangedCommand = new RelayCommand(InversionChanged);
-            CloseCommand = new RelayCommand(Close);
+            InversionChangedCommand = RelayCommand.Create(InversionChanged);
+            CloseCommand = RelayCommand.Create(Close);
+            ShowLinearSetCommand = RelayCommand.Create(ShowLinearSet);
+            ShowNonLinearSetCommand = RelayCommand.Create(ShowNonLinearSet);
         }
 
 
@@ -56,6 +62,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         public ICommand InversionChangedCommand { get; }
         public ICommand CloseCommand { get; }
+        public ICommand ShowLinearSetCommand { get; }
+        public ICommand ShowNonLinearSetCommand { get; }
+        public IMessageBoxService MessageBoxService { get; }
 
         public SearchSetViewModel LinearElementsSearchSet {
             get => _searchSetLinearElements;
@@ -68,7 +77,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
 
-        private void InversionChanged(object p) {
+        private void InversionChanged() {
             if(Inverted) {
                 LinearElementsSearchSet = _invertedSearchSetLinearElements;
                 NonLinearElementsSearchSet = _invertedSearchSetNonLinearElements;
@@ -76,9 +85,48 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 LinearElementsSearchSet = _straightSearchSetLinearElements;
                 NonLinearElementsSearchSet = _straightSearchSetNonLinearElements;
             }
+            ShowLinearSet();
         }
 
-        private void Close(object p) {
+        private void ShowLinearSet() {
+            SearchSetViewModel invertedSet;
+            if(Inverted) {
+                invertedSet = _straightSearchSetLinearElements;
+            } else {
+                invertedSet = _invertedSearchSetLinearElements;
+            }
+            HideSet(invertedSet);
+        }
+
+        private void ShowNonLinearSet() {
+            SearchSetViewModel invertedSet;
+            if(Inverted) {
+                invertedSet = _straightSearchSetNonLinearElements;
+            } else {
+                invertedSet = _invertedSearchSetNonLinearElements;
+            }
+            HideSet(invertedSet);
+        }
+
+        private void HideSet(SearchSetViewModel setToHide) {
+            try {
+                _revitRepository.GetClashRevitRepository().ShowElements(
+                    setToHide.Filter.GetRevitFilter(_revitRepository.Doc, setToHide.FilterGenerator),
+                    setToHide.Filter
+                        .CategoryIds
+                        .Select(c => c.AsBuiltInCategory())
+                        .ToHashSet());
+            } catch(InvalidOperationException ex) {
+                MessageBoxService.Show(
+                    ex.Message,
+                    $"BIM",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error,
+                    System.Windows.MessageBoxResult.OK);
+            }
+        }
+
+        private void Close() {
             Action action = () => {
                 var command = new SetOpeningTasksPlacementConfigCmd();
                 command.ExecuteCommand(_revitRepository.UIApplication);

@@ -16,8 +16,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
         public WallOpeningGroupPlacerInitializer() { }
 
 
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в группе отверстий меньше 2</exception>
         public OpeningPlacer GetPlacer(RevitRepository revitRepository, OpeningsGroup openingsGroup) {
             if(openingsGroup is null) {
                 throw new ArgumentNullException(nameof(openingsGroup));

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -6,6 +6,8 @@ using Autodesk.Revit.UI;
 
 namespace RevitServerFolders.Models {
     internal class RevitRepository {
+        private const string _roomsSuffix = "_ROOMS";
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
@@ -18,13 +20,15 @@ namespace RevitServerFolders.Models {
 
         public Document OpenDocumentFile(string fileName) {
             var modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(fileName);
+            var opts = new OpenOptions() {
+                AllowOpeningLocalByWrongUser = true,
+                OpenForeignOption = OpenForeignOption.Open,
+                DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
+            };
+            opts.SetOpenWorksetsConfiguration(new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets));
             return Application.OpenDocumentFile(
                 modelPath,
-                new OpenOptions() {
-                    AllowOpeningLocalByWrongUser = true,
-                    OpenForeignOption = OpenForeignOption.Open,
-                    DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets,
-                });
+                opts);
         }
 
         public string GetFileName(string fileName) {
@@ -32,7 +36,7 @@ namespace RevitServerFolders.Models {
         }
 
         public string GetRoomsFileName(string fileName) {
-            return Path.GetFileNameWithoutExtension(fileName) + "_ROOMS.rvt";
+            return Path.GetFileNameWithoutExtension(fileName) + _roomsSuffix;
         }
 
         public NavisworksExportOptions GetExportOptions(View exportView) {

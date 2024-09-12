@@ -5,6 +5,9 @@ using dosymep.Bim4Everyone.SimpleServices;
 
 using Ninject;
 
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
+
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 
@@ -19,9 +22,16 @@ namespace RevitOpeningPlacement {
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
-                    .ToMethod(m => new RevitRepository(
-                        uiApplication.Application,
-                        uiApplication.ActiveUIDocument.Document))
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitEventHandler>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ParameterFilterProvider>()
+                    .ToSelf()
                     .InSingletonScope();
 
                 var revitRepository = kernel.Get<RevitRepository>();

@@ -137,7 +137,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="linkOpeningsIntersectConstructions">
         /// Флаг, показывающий, 
         /// полностью ли текущее чистовое отверстие закрывает собой пересекающие его задания на отверстия</param>
-        /// <returns></returns>
         private Solid SubtractLinkOpenings(
             IConstructureLinkElementsProvider link,
             Solid thisOpeningSolidForSubtraction,
@@ -189,7 +188,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// 1 - солид текущего чистового отверстия не пересекается ни с одним элементом из связи
         /// </para>
         /// </param>
-        /// <returns></returns>
         private OpeningRealStatus GetStatusByVolumeRatio(double volumeRatio) {
             if(volumeRatio < 0.01) {
                 return OpeningRealStatus.Empty;

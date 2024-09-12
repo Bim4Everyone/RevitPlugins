@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -17,7 +17,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders {
         /// Конструктор класса, предоставляющего угол поворота для экземпляра семейства задания на отверстие, которое является объединением нескольких заданий
         /// </summary>
         /// <param name="openingsGroup">Группа заданий на отверстия для объединения</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public FloorOpeningsGroupAngleFinder(OpeningsGroup openingsGroup) {
             _openingsGroup = openingsGroup ?? throw new ArgumentNullException(nameof(openingsGroup));
         }

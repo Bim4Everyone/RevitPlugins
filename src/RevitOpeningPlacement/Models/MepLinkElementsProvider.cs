@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models {
         /// Конструктор провайдера элементов ВИС из связанного файла
         /// </summary>
         /// <param name="linkDocument">Связанный файл с элементами ВИС</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public MepLinkElementsProvider(RevitLinkInstance linkDocument) {
             if(linkDocument is null) {
                 throw new ArgumentNullException(nameof(linkDocument));

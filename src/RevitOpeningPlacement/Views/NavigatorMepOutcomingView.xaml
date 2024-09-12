@@ -108,9 +108,6 @@
             <dxg:GridControl.GroupSummary>
                 <dxg:GridSummaryItem SummaryType="Count" />
             </dxg:GridControl.GroupSummary>
-            <mvvm:Interaction.Behaviors>
-                <mvvm:EventToCommand EventName="SelectionChanged" Command="{Binding SelectionChangedCommand}" CommandParameter="{Binding ElementName=_dg}"/>
-            </mvvm:Interaction.Behaviors>
             <dxg:GridControl.View>
                 <dxg:TableView x:Name="view"
                                DataNavigatorButtons="Navigation"

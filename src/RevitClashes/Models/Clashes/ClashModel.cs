@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -10,6 +10,8 @@ using DevExpress.Mvvm.DataAnnotations;
 using dosymep.Revit;
 
 using pyRevitLabs.Json;
+
+using RevitClashDetective.Models.Extensions;
 
 namespace RevitClashDetective.Models.Clashes {
     internal class ClashModel : IEquatable<ClashModel> {
@@ -79,6 +81,70 @@ namespace RevitClashDetective.Models.Clashes {
                 && Equals(OtherElement, other.OtherElement))
                 || (Equals(MainElement, other.OtherElement)
                 && Equals(OtherElement, other.MainElement));
+        }
+
+        /// <summary>
+        /// Возвращает данные о коллизии. Необходимо, чтобы <see cref="_revitRepository"/> не был null.
+        /// Назначить это поле можно через метод <see cref="SetRevitRepository(RevitRepository)"/>
+        /// </summary>
+        /// <returns>Объект с данными о коллизии</returns>
+        /// <exception cref="InvalidOperationException">Исключение, если <see cref="_revitRepository"/> null</exception>
+        public ClashData GetClashData() {
+            if(_revitRepository is null) {
+                throw new InvalidOperationException(
+                    "Для получения данных о коллизии необходимо назначить репозиторий активного документа Ревита");
+            }
+
+            try {
+                IList<Solid> mainSolids = GetMainSolids();
+                IList<Solid> otherSolids = GetOtherSolids();
+
+                double intersectionVolume = GetIntersectionVolume(mainSolids, otherSolids);
+
+                double mainSolidsV = mainSolids.Sum(s => s.Volume);
+                double otherSolidsV = otherSolids.Sum(s => s.Volume);
+                return new ClashData(mainSolidsV, otherSolidsV, intersectionVolume);
+            } catch(ArgumentNullException) {
+                return new ClashData();
+            } catch(NullReferenceException) {
+                return new ClashData();
+            } catch(ArgumentException) {
+                return new ClashData();
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                return new ClashData();
+            }
+        }
+
+
+        private double GetIntersectionVolume(IEnumerable<Solid> first, IEnumerable<Solid> second) {
+            double intersection = 0;
+            try {
+                foreach(var solid1 in first) {
+                    foreach(var solid2 in second) {
+                        intersection += BooleanOperationsUtils.ExecuteBooleanOperation(
+                            solid1,
+                            solid2,
+                            BooleanOperationsType.Intersect).Volume;
+                    }
+                }
+            } catch(NullReferenceException) {
+                intersection = 0;
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                intersection = 0;
+            }
+            return intersection;
+        }
+
+        private IList<Solid> GetMainSolids() {
+            return MainElement.GetSolids(_revitRepository.DocInfos);
+        }
+
+        private IList<Solid> GetOtherSolids() {
+            Transform transform = MainElement.GetTransform()
+                    .GetTransitionMatrix(OtherElement.GetTransform());
+            return OtherElement.GetSolids(_revitRepository.DocInfos)
+                    .Select(s => SolidUtils.CreateTransformed(s, transform))
+                    .ToList();
         }
     }
 

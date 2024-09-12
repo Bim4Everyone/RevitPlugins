@@ -1,0 +1,120 @@
+﻿<Window x:Class="RevitDeclarations.Views.ErrorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitDeclarations.Views"
+        mc:Ignorable="d"
+        Title="Ошибки выгрузки декларации"
+        Height="600" Width="1200"
+        MinHeight="600" MinWidth="1200">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="530"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <ListView
+            Grid.Column="0"
+            Margin="10"
+            ItemsSource="{Binding ErrorLists}"
+            SelectedItem="{Binding SelectedList}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn
+                        Header="Тип"
+                        Width="110"                        
+                        DisplayMemberBinding="{Binding Message}"/>
+                    <GridViewColumn
+                        Header="Документ"
+                        Width="130">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    TextWrapping="Wrap"
+                                    Text="{Binding DocumentName}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn
+                        Header="Описание"
+                        Width="260">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    TextWrapping="Wrap"
+                                    Text="{Binding Description}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <ListView
+            Grid.Column="1"
+            Margin="10"
+            DataContext="{Binding SelectedList}"
+            ItemsSource="{Binding Errors}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn
+                        Header="Элемент"
+                        Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    TextWrapping="Wrap"
+                                    Text="{Binding ElementInfo}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn
+                        Header="Описание"
+                        Width="430">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    TextWrapping="Wrap"
+                                    Text="{Binding ErrorInfo}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Height="45"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}"/>
+            <Button
+                Margin="10"
+                Width="150"
+                Content="Выгрузить декларацию"
+                IsDefault="True"
+                IsEnabled="{Binding IsWarning}"
+                Click="ButtonOk_Click"/>
+            <Button
+                Margin="10"
+                Width="150"
+                Content="Отменить выгрузку"
+                IsCancel="True"
+                IsEnabled="{Binding IsWarning}"
+                Click="ButtonCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

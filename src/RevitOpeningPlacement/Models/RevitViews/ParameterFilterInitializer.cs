@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,9 +12,6 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// <summary>
         /// Возвращает фильтр по заданиям на отверстия
         /// </summary>
-        /// <param name="doc"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         public static ParameterFilterElement GetOpeningFilter(Document doc) {
             var category = Category.GetCategory(doc, BuiltInCategory.OST_GenericModel);
             var nameParameter = ParameterFilterUtilities.GetFilterableParametersInCommon(doc, new[] { category.Id })
@@ -29,6 +26,7 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
 #endif
             }
             if(filterRule == null) {
+                // такого не может быть, но вдруг
                 throw new ArgumentException("Отсутствует параметр \"Имя семейства\".", nameof(nameParameter));
             }
             return CreateFilter(doc, "BIM_Отверстия", new[] { BuiltInCategory.OST_GenericModel }, new[] { filterRule });
@@ -37,8 +35,6 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// <summary>
         /// Возвращает фильтр по всем категориям инженерных систем, использующимся для расстановки заданий на отверстия
         /// </summary>
-        /// <param name="doc"></param>
-        /// <returns></returns>
         public static ParameterFilterElement GetMepFilter(Document doc) {
             return CreateFilter(doc,
                 "BIM_Инж_Системы",
@@ -49,8 +45,6 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// <summary>
         /// Возвращает фильтр по всем категориям конструкций (стены, перекрытия)
         /// </summary>
-        /// <param name="doc"></param>
-        /// <returns></returns>
         public static ParameterFilterElement GetConstructureFilter(Document doc) {
             return CreateFilter(doc,
                 "BIM_Конструкции",
@@ -61,8 +55,6 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// <summary>
         /// Возвращает фильтр по всем неинтересным категориям для работы с заданиями на отверстия
         /// </summary>
-        /// <param name="doc"></param>
-        /// <returns></returns>
         public static ParameterFilterElement GetSecondaryCategoriesFilter(Document doc) {
             // все категории, которые не должны попасть в не интересные
             var mainCategories = new HashSet<BuiltInCategory>();
@@ -88,9 +80,8 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// <para>Если фильтры с такими названиями уже есть в документе, они будут изменены</para>
         /// </summary>
         /// <param name="doc">Документ, в котором происходит фильтрация элементов</param>
-        /// <param name="elementToHighlight"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="elementToHighlight">Элемент который нужно выделить</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         /// <exception cref="ArgumentException">Исключение, если <paramref name="elementToHighlight"/> не стена или перекрытие</exception>
         public static ICollection<ParameterFilterElement> GetHighlightFilters(Document doc, Element elementToHighlight) {
             if(elementToHighlight is null) { throw new ArgumentNullException(nameof(elementToHighlight)); }
@@ -113,11 +104,6 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// <summary>
         /// Возвращает первый существующий фильтр из документа с заданным именем, или создает его и также возвращает
         /// </summary>
-        /// <param name="doc"></param>
-        /// <param name="name"></param>
-        /// <param name="categories"></param>
-        /// <param name="filterRules"></param>
-        /// <returns></returns>
         private static ParameterFilterElement CreateFilter(Document doc, string name, ICollection<BuiltInCategory> categories, ICollection<FilterRule> filterRules) {
             ParameterFilterElement filter = new FilteredElementCollector(doc)
                 .OfClass(typeof(ParameterFilterElement))
@@ -142,7 +128,6 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// Возвращает все категории модели из документа
         /// </summary>
         /// <param name="document">Документ с категориями</param>
-        /// <returns></returns>
         private static HashSet<BuiltInCategory> GetAllModelCategories(Document document) {
             Categories allCategories = document.Settings.Categories;
             HashSet<BuiltInCategory> modelCategories = new HashSet<BuiltInCategory>();
@@ -159,16 +144,15 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// </summary>
         /// <param name="doc">Документ, в котором происходит фильтрация</param>
         /// <param name="wall">Заданная стена, которая не проходит фильтр</param>
-        /// <returns></returns>
         private static ParameterFilterElement GetWallHighlightFilter(Document doc, Wall wall = null) {
             var wallsFilter = CreateFilter(doc,
                 $"BIM_Стены_НЕ_Хост_Отверстия_{doc.Application.Username}",
-                new BuiltInCategory[] { BuiltInCategory.OST_Walls },
+                new BuiltInCategory[] { RevitRepository.WallCategory },
                 new FilterRule[] { }
                 );
             using(Transaction t = doc.StartTransaction("Обновление фильтра стен")) {
                 // переназначить категории элементов, если пользователь изменил их
-                wallsFilter.SetCategories(new ElementId[] { new ElementId(BuiltInCategory.OST_Walls) });
+                wallsFilter.SetCategories(new ElementId[] { new ElementId(RevitRepository.WallCategory) });
                 // сбросить все существующие критерии фильтрации
                 wallsFilter.ClearRules();
                 if(wall != null) {
@@ -184,16 +168,15 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// </summary>
         /// <param name="doc">Документ, в котором происходит фильтрация</param>
         /// <param name="floor">Заданное перекрытие</param>
-        /// <returns></returns>
         private static ParameterFilterElement GetFloorHighlightFilter(Document doc, Floor floor = null) {
             var floorsFilter = CreateFilter(doc,
                 $"BIM_Перекрытия_НЕ_Хост_Отверстия_{doc.Application.Username}",
-                new BuiltInCategory[] { BuiltInCategory.OST_Floors },
+                new BuiltInCategory[] { RevitRepository.FloorCategory },
                 new FilterRule[] { }
                 );
             using(Transaction t = doc.StartTransaction("Обновление фильтра перекрытий")) {
                 // переназначить категории элементов, если пользователь изменил их
-                floorsFilter.SetCategories(new ElementId[] { new ElementId(BuiltInCategory.OST_Floors) });
+                floorsFilter.SetCategories(new ElementId[] { new ElementId(RevitRepository.FloorCategory) });
                 // сбросить все существующие критерии фильтрации
                 floorsFilter.ClearRules();
                 if(floor != null) {
@@ -208,8 +191,7 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// Создает фильтр, в который попадают все стены, кроме заданной
         /// </summary>
         /// <param name="wallToHighlight">Стена, которая не должна проходить фильтр</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private static ElementFilter GetHighlightElementFilter(Wall wallToHighlight) {
             if(wallToHighlight is null) { throw new ArgumentNullException(nameof(wallToHighlight)); }
 
@@ -246,8 +228,7 @@ namespace RevitOpeningPlacement.Models.RevitViews.RevitViewSettings {
         /// Создает фильтр, в который попадают все перекрытия, кроме заданного
         /// </summary>
         /// <param name="floorToHighlight">Перекрытие, которое не должно проходить фильтр</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private static ElementFilter GetHighlightElementFilter(Floor floorToHighlight) {
             if(floorToHighlight is null) { throw new ArgumentNullException(nameof(floorToHighlight)); }
 

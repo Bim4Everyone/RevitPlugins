@@ -24,8 +24,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
         /// </summary>
         /// <param name="incomingTasks">Входящие задания</param>
         /// <param name="pointFinder">Провайдер точки вставки отверстия КР</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentException">Исключение, если количество элементов в коллекции меньше 1</exception>
         public ManyOpeningArTasksInWallParameterGetter(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder, Wall wall) {
             _incomingTasks = incomingTasks ?? throw new ArgumentNullException(nameof(incomingTasks));
             if(_incomingTasks.Count < 1) { throw new ArgumentException(nameof(incomingTasks)); }

@@ -44,6 +44,7 @@ namespace RevitFinishingWalls {
 
                 kernel.UseXtraMessageBox<ErrorWindowViewModel>();
 
+                kernel.UseXtraProgressDialog<MainViewModel>();
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)

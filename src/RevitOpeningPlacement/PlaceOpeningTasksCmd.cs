@@ -10,8 +10,14 @@ using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
+
+using Ninject;
+
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
@@ -43,11 +49,30 @@ namespace RevitOpeningPlacement {
 
 
         protected override void Execute(UIApplication uiApplication) {
-            RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            PlaceOpeningTasks(uiApplication, revitRepository, Array.Empty<ElementId>());
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitEventHandler>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ParameterFilterProvider>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                var revitRepository = kernel.Get<RevitRepository>();
+                PlaceOpeningTasks(uiApplication, revitRepository, Array.Empty<ElementId>());
+            }
         }
 
-        private protected void PlaceOpeningTasks(UIApplication uiApplication, RevitRepository revitRepository, ElementId[] mepElements) {
+        private protected void PlaceOpeningTasks(
+            UIApplication uiApplication,
+            RevitRepository revitRepository,
+            ElementId[] mepElements) {
+
             _duplicatedInstancesToRemoveIds.Clear();
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();
@@ -67,7 +92,9 @@ namespace RevitOpeningPlacement {
                 try {
                     var unplacedClashes = InitializePlacing(revitRepository, placers)
                         .Concat(placementConfigurator.GetUnplacedClashes());
-                    InitializeReport(revitRepository, unplacedClashes);
+                    if(openingConfig.ShowPlacingErrors) {
+                        InitializeReport(revitRepository, unplacedClashes);
+                    }
                 } finally {
                     uiApplication.Application.FailuresProcessing -= FailureProcessor;
                 }
@@ -252,8 +279,6 @@ namespace RevitOpeningPlacement {
         /// Метод для подписки на событие <see cref="UIApplication.Application.FailuresProcessing"/>
         /// Используется для запоминания расставленных экземпляров семейств заданий на отверстия, которые дают дублирование с уже размещенными
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void FailureProcessor(object sender, FailuresProcessingEventArgs e) {
             FailuresAccessor fas = e.GetFailuresAccessor();
 

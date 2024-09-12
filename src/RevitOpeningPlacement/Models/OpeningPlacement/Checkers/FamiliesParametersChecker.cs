@@ -18,8 +18,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         /// <summary>
         /// Конструктор класса для проверки наличия описательных параметров в семействах заданий на отверстия.
         /// </summary>
-        /// <param name="revitRepository"></param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="revitRepository">Репозиторий активного документа ревита</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public FamiliesParametersChecker(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         }
@@ -57,7 +57,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного документа Revit, в который загружено семейство</param>
         /// <param name="family">Семейство для проверки</param>
-        /// <returns></returns>
         private ICollection<string> GetNotExistentParameters(RevitRepository revitRepository, Family family) {
             OpeningType type = RevitRepository.GetOpeningType(family.Name);
             var paramNames = GetRequiredParameters(type);
@@ -77,7 +76,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного документа Revit, в который загружено семейство</param>
         /// <param name="family">Семейство для проверки</param>
-        /// <returns></returns>
         private bool HasAllParameters(RevitRepository revitRepository, Family family) {
             OpeningType type = RevitRepository.GetOpeningType(family.Name);
             var paramNames = GetRequiredParameters(type);
@@ -96,7 +94,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного документа Revit, в который загружено семейство</param>
         /// <param name="family">Семейство, загруженное в активный документ</param>
-        /// <returns></returns>
         private ICollection<string> GetFamilySharedParameterNames(RevitRepository revitRepository, Family family) {
             using(var familyDoc = revitRepository.EditFamily(family)) {
                 string[] paramNames = familyDoc.FamilyManager
@@ -113,7 +110,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
         /// Возвращает коллекцию названий параметров, которые должны присутствовать у семейства с заданным <see cref="OpeningType">типом отверстия</see>
         /// </summary>
         /// <param name="openingType">Тип отверстия</param>
-        /// <returns></returns>
         private ICollection<string> GetRequiredParameters(OpeningType openingType) {
             // начальный список с названиями параметров, присутствующих во всех семействах
             var paramNames = new List<string> {

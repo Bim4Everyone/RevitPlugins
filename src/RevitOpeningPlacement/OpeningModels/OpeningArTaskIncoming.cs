@@ -31,7 +31,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="openingTask">Задание на отверстие от АР</param>
         /// <param name="transform">
         /// Трансформация файла задания на отверстие от АР относительно активного документа КР</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public OpeningArTaskIncoming(RevitRepository revitRepository, FamilyInstance openingTask, Transform transform)
             : base(openingTask) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -136,7 +136,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Возвращает солид архитектурного проема в координатах активного файла (КР) - получателя заданий на отверстия
         /// </summary>
-        /// <returns></returns>
         public override Solid GetSolid() {
             return SolidUtils.CreateTransformed(GetOpeningSolid(), Transform);
         }
@@ -144,7 +143,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Возвращает BBox в координатах активного документа-получателя (КР) заданий на отверстия
         /// </summary>
-        /// <returns></returns>
         public override BoundingBoxXYZ GetTransformedBBoxXYZ() {
             return GetSolid().GetTransformedBoundingBox();
         }
@@ -187,7 +185,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="constructureElementsIds">
         /// Коллекция id элементов конструкций из активного документа ревита</param>
-        /// <returns></returns>
         private ICollection<ElementId> GetIntersectingStructureElementsIds(
             Solid thisOpeningSolid,
             ICollection<ElementId> constructureElementsIds) {
@@ -210,7 +207,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="thisOpeningBBox">
         /// Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
-        /// <returns></returns>
         private ICollection<ElementId> GetIntersectingOpeningsIds(
             ICollection<OpeningRealKr> realOpenings,
             Solid thisOpeningSolid,

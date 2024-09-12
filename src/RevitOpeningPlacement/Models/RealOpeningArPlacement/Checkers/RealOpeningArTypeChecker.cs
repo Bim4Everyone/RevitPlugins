@@ -1,4 +1,4 @@
-﻿using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Checkers {
     /// <summary>
@@ -12,8 +12,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Checkers {
         /// <summary>
         /// Конструктор класса для проверки наличия типоразмеров чистовых отверстий в репозитории активного документа ревита АР
         /// </summary>
-        /// <param name="revitRepository"></param>
-        /// <param name="openingType"></param>
         public RealOpeningArTypeChecker(RevitRepository revitRepository, OpeningType openingType) {
             _revitRepository = revitRepository;
             _openingType = openingType;

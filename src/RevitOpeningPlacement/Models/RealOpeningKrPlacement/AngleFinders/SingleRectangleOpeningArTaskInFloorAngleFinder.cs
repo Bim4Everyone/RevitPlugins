@@ -15,8 +15,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.AngleFinders {
         /// <summary>
         /// Конструктор класса, предоставляющего угол поворота для отверстия КР, размещаемого по заданию на прямоугольное отверстие в перекрытии
         /// </summary>
-        /// <param name="incomingTask"></param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleRectangleOpeningArTaskInFloorAngleFinder(IOpeningTaskIncoming incomingTask) {
             _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
         }

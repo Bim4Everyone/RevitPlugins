@@ -51,7 +51,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает коллекцию элементов ВИС и элементов заданий на отверстия из связанного файла
         /// </summary>
         /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
-        /// <returns></returns>
         private ICollection<ElementId> GetIntersectingLinkElements(IMepLinkElementsProvider mepLink) {
             Solid thisOpeningRealSolidInLinkCoordinates = SolidUtils.CreateTransformed(
                 GetSolid(), mepLink.DocumentTransform.Inverse);
@@ -69,7 +68,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
         /// <param name="thisOpeningRealSolidInLinkCoordinates">Солид текущего чистового отверстия в координатах связанного файла</param>
-        /// <returns></returns>
         private ICollection<ElementId> GetIntersectingLinkMepElements(
             IMepLinkElementsProvider mepLink,
             Solid thisOpeningRealSolidInLinkCoordinates) {
@@ -88,7 +86,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
         /// <param name="thisOpeningRealSolidInLinkCoordinates">Солид текущего чистового отверстия в координатах связанного файла</param>
-        /// <returns></returns>
         private ICollection<ElementId> GetIntersectingLinkOpeningTasks(
             IMepLinkElementsProvider mepLink,
             Solid thisOpeningRealSolidInLinkCoordinates) {
@@ -129,7 +126,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="mepLink">Связанный файл с элементами ВИС и заданиями на отверстия</param>
         /// <param name="linkElementsIds">Id элементов из связанного файла, из которых надо получить солиды</param>
-        /// <returns></returns>
         private ICollection<Solid> GetLinkElementsSolids(
             IMepLinkElementsProvider mepLink,
             ICollection<ElementId> linkElementsIds) {
@@ -145,7 +141,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="thisOpeningRealSolid">Солид текущего чистового отверстия в координатах своего файла</param>
         /// <param name="linkSolidsInThisCoordinates">
         /// Коллекция солидов элементов из связи в координатах файла с чистовыми отверстиями</param>
-        /// <returns></returns>
         private Solid SubtractLinkSolids(Solid thisOpeningRealSolid, ICollection<Solid> linkSolidsInThisCoordinates) {
             var thisOpeningRealSolidAfterIntersection = thisOpeningRealSolid;
             foreach(Solid linkSolid in linkSolidsInThisCoordinates) {
@@ -189,7 +184,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// 1 - солид текущего чистового отверстия не пересекается ни с одним элементом из связи
         /// </para>
         /// </param>
-        /// <returns></returns>
         private OpeningRealStatus GetStatusByVolumeRatio(double volumeRatio) {
             if(volumeRatio < 0.01) {
                 return OpeningRealStatus.Empty;

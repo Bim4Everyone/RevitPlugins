@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using RevitClashDetective.Models.Value;
@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RectangleOpeningInWallHeightValueGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder) {
             if(incomingTask == null) { throw new ArgumentNullException(nameof(incomingTask)); }
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
@@ -31,8 +31,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в коллекции меньше 1</exception>
         public RectangleOpeningInWallHeightValueGetter(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder) {
             if(incomingTasks is null) { throw new ArgumentNullException(nameof(incomingTasks)); }
             if(incomingTasks.Count < 1) { throw new ArgumentOutOfRangeException(nameof(incomingTasks)); }

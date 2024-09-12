@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -55,7 +55,8 @@ namespace RevitClashDetective.Models.Evaluators {
             return visiter;
         }
 
-        private static Dictionary<RuleEvaluators, IVisiter> _evaluatorDictionary = new Dictionary<RuleEvaluators, IVisiter>() {
+
+        private static readonly Dictionary<RuleEvaluators, IVisiter> _evaluatorDictionary = new Dictionary<RuleEvaluators, IVisiter>() {
             {RuleEvaluators.FilterStringBeginsWith,new BeginsWithVisister() },
             {RuleEvaluators.FilterStringNotBeginsWith,new NotBeginsWithVisister() },
             {RuleEvaluators.FilterStringContains,new ContainsVisiter() },

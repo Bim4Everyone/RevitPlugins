@@ -4,6 +4,12 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+
+using Ninject;
+
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
@@ -27,14 +33,29 @@ namespace RevitOpeningPlacement {
 
 
         protected override void Execute(UIApplication uiApplication) {
-            RevitRepository revitRepository = new RevitRepository(uiApplication.Application, uiApplication.ActiveUIDocument.Document);
-            var openingConfig = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
-            var viewModel = new OpeningRealsKrConfigViewModel(revitRepository, openingConfig);
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitEventHandler>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ParameterFilterProvider>()
+                    .ToSelf()
+                    .InSingletonScope();
 
-            var window = new OpeningRealsKrSettingsView() { Title = PluginName, DataContext = viewModel };
-            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+                var revitRepository = kernel.Get<RevitRepository>();
+                var openingConfig = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
+                var viewModel = new OpeningRealsKrConfigViewModel(revitRepository, openingConfig);
 
-            window.ShowDialog();
+                var window = new OpeningRealsKrSettingsView() { Title = PluginName, DataContext = viewModel };
+                var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+
+                window.ShowDialog();
+            }
         }
     }
 }

@@ -21,7 +21,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки отверстия КР</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleRoundOpeningArTaskInWallParameterGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder) {
             _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));

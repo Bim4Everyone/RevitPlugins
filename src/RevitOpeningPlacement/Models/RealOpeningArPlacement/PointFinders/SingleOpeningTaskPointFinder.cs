@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -17,7 +17,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.PointFinders {
         /// Конструктор класса, предоставляющего точку вставки для чистового отверстия по заданию на отверстие
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleOpeningTaskPointFinder(OpeningMepTaskIncoming incomingTask) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
 
@@ -29,10 +29,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.PointFinders {
             switch(_openingMepTaskIncoming.OpeningType) {
                 case OpeningType.WallRound:
                 case OpeningType.WallRectangle:
-                var point = _openingMepTaskIncoming.Location;
-                return new XYZ(point.X, point.Y, RoundToFloorFeetToMillimeters(point.Z, 10));
+                    var point = _openingMepTaskIncoming.Location;
+                    return new XYZ(point.X, point.Y, RoundToFloorFeetToMillimeters(point.Z, 10));
                 default:
-                return _openingMepTaskIncoming.Location;
+                    return _openingMepTaskIncoming.Location;
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using RevitClashDetective.Models.FilterCreators.RevitFilterCreators;
 using RevitClashDetective.Models.Interfaces;
@@ -20,12 +20,12 @@ namespace RevitClashDetective.Models.Evaluators {
             return result;
         }
 
-        private static Dictionary<SetEvaluators, IRevitLogicalFilterCreator> _evaluatorDictionary = new Dictionary<SetEvaluators, IRevitLogicalFilterCreator>() {
+        private static readonly Dictionary<SetEvaluators, IRevitLogicalFilterCreator> _evaluatorDictionary = new Dictionary<SetEvaluators, IRevitLogicalFilterCreator>() {
             {SetEvaluators.And, new RevitLogicalAndFilterCreator() },
             {SetEvaluators.Or, new RevitLogicalOrFilterCreator() },
         };
 
-        private static Dictionary<SetEvaluators, IRevitLogicalFilterCreator> _invertedEvaluatorDictionary = new Dictionary<SetEvaluators, IRevitLogicalFilterCreator>() {
+        private static readonly Dictionary<SetEvaluators, IRevitLogicalFilterCreator> _invertedEvaluatorDictionary = new Dictionary<SetEvaluators, IRevitLogicalFilterCreator>() {
             {SetEvaluators.And, new RevitLogicalOrFilterCreator() },
             {SetEvaluators.Or, new RevitLogicalAndFilterCreator() },
         };

@@ -1,4 +1,4 @@
-﻿
+
 using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.Value;
@@ -26,7 +26,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// <summary>
         /// Возвращает значение высоты в единицах Revit
         /// </summary>
-        /// <returns></returns>
         public DoubleParamValue GetValue() {
             var height = _curve.GetHeight();
             height += _categoryOptions.GetOffsetValue(height);
