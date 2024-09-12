@@ -82,6 +82,7 @@ namespace RevitDeclarations.ViewModels {
                 _csvExportViewModel,
                 _jsonExportViewModel,
             };
+            _selectedFormat = _exportFormats.FirstOrDefault();
 
             SelectFolderCommand = new RelayCommand(SelectFolder);
             ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
@@ -264,7 +265,6 @@ namespace RevitDeclarations.ViewModels {
 
             try {
                 _selectedFormat.Export(FullPath, apartments);
-
             } catch(Exception e) {
                 var taskDialog = new TaskDialog("Ошибка выгрузки") {
                     CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,

@@ -13,7 +13,7 @@ namespace RevitDeclarations.ViewModels {
         public override void Export(string path, IEnumerable<Apartment> apartments) {
             JsonExporter<Apartment> exporter = new JsonExporter<Apartment>();
             exporter.Export(path, apartments);
-            TaskDialog.Show("Декларации", "Файл JSON создан");
+            TaskDialog.Show("Декларации", $"Файл {Name} создан");
         }
     }
 }
