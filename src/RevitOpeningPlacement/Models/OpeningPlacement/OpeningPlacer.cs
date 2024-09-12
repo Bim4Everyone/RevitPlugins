@@ -33,7 +33,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
         /// <summary>
         /// Размещает семейство по заданным настройкам
         /// </summary>
-        /// <returns></returns>
         /// <exception cref="OpeningNotPlacedException">Исключение, если не удалось разместить семейство с заданными настройками</exception>
         public FamilyInstance Place() {
             XYZ point;

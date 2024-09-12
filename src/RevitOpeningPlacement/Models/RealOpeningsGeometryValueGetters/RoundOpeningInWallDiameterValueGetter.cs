@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using RevitClashDetective.Models.Value;
 
@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="openingTaskIncoming">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RoundOpeningInWallDiameterValueGetter(IOpeningTaskIncoming openingTaskIncoming, IPointFinder pointFinder) {
             _openingTaskIncoming = openingTaskIncoming ?? throw new ArgumentNullException(nameof(openingTaskIncoming));
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));

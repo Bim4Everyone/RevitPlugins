@@ -13,7 +13,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// Класс создан для расчета высотной отметки оси и низа отверстия от нуля для семейства задания прямоугольного отверстия в стене, у которого точка размещения находится у нижней грани.
         /// </summary>
         /// <param name="pointFinder">Объект, предоставляющий координату центра отверстия в футах</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public BottomOffsetOfRectangleOpeningInWallValueGetter(IPointFinder pointFinder) {
             if(pointFinder is null) {
                 throw new ArgumentNullException(nameof(pointFinder));

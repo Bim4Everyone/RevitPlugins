@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -32,7 +32,6 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// <summary>
         /// Настройки уровня детализации
         /// </summary>
-        /// <returns></returns>
         private static IView3DSetting GetDetailLevelSetting() {
             return new DetailLevelSetting(ViewDetailLevel.Fine);
         }
@@ -40,7 +39,6 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// <summary>
         /// Настройки визуального стиля
         /// </summary>
-        /// <returns></returns>
         private static IView3DSetting GetDisplayStyleSetting() {
             return new DisplayStyleSetting(DisplayStyle.FlatColors);
         }
@@ -48,7 +46,6 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// <summary>
         /// Настройки дисциплины
         /// </summary>
-        /// <returns></returns>
         private static IView3DSetting GetDisciplineSetting() {
             return new DisciplineSetting();
         }
@@ -56,7 +53,6 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// <summary>
         /// Настройки видимости категорий модели
         /// </summary>
-        /// <returns></returns>
         private static IView3DSetting GetSecondaryCategoriesSetting(Document doc) {
             var filter = ParameterFilterInitializer.GetSecondaryCategoriesFilter(doc);
             var graphicSettings = GraphicSettingsInitializer.GetSecondaryElementsGraphicSettings();
@@ -66,7 +62,6 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// <summary>
         /// Настройки видимости категорий аннотаций
         /// </summary>
-        /// <returns></returns>
         private static IView3DSetting GetHiddenCategoriesSetting() {
             return new HiddenCategoriesSetting(new BuiltInCategory[] {
                 BuiltInCategory.OST_Levels,
@@ -89,8 +84,6 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// <summary>
         /// Фильтр видимости для заданий на отверстия
         /// </summary>
-        /// <param name="doc"></param>
-        /// <returns></returns>
         private static IView3DSetting GetOpeningFilterSetting(Document doc) {
             var filter = ParameterFilterInitializer.GetOpeningFilter(doc);
             var graphicSettings = GraphicSettingsInitializer.GetOpeningGraphicSettings(doc);
@@ -100,8 +93,6 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// <summary>
         /// Фильтр видимости для инженерных элементов
         /// </summary>
-        /// <param name="doc"></param>
-        /// <returns></returns>
         private static IView3DSetting GetMepFilterSetting(Document doc) {
             var filter = ParameterFilterInitializer.GetMepFilter(doc);
             var graphicSettings = GraphicSettingsInitializer.GetMepGraphicSettings(doc);
@@ -111,8 +102,6 @@ namespace RevitOpeningPlacement.Models.RevitViews {
         /// <summary>
         /// Фильтр видимости для элементов конструкций
         /// </summary>
-        /// <param name="doc"></param>
-        /// <returns></returns>
         private static IView3DSetting GetConstructureFilterSetting(Document doc) {
             var filter = ParameterFilterInitializer.GetConstructureFilter(doc);
             var graphicSettings = GraphicSettingsInitializer.GetConstructureGraphicSettings(doc);

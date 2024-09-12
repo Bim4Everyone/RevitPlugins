@@ -1,4 +1,4 @@
-﻿using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.ApplicationServices;
 
 using RevitClashDetective.Models.Value;
 
@@ -15,8 +15,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// <summary>
         /// Конструктор класса, предоставляющего имя пользователя, запустившего плагин
         /// </summary>
-        /// <param name="app"></param>
-        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public UsernameGetter(Application app) {
             _app = app ?? throw new System.ArgumentNullException(nameof(app));
         }

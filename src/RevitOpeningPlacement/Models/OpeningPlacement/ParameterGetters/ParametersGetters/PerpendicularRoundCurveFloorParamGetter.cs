@@ -58,7 +58,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         /// <summary>
         /// True - если размещаемое задание на отверстие - круглое, иначе False - задание на отверстие прямоугольное (квадратное)
         /// </summary>
-        /// <returns></returns>
         private bool OpeningTaskIsRound() {
             return _openingType == OpeningType.FloorRound;
         }

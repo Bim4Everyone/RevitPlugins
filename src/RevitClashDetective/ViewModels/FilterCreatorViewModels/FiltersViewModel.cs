@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -35,14 +35,14 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             InitializeFilters();
             InitializeTimer();
 
-            SelectedFilterChangedCommand = new RelayCommand(SelectedFilterChanged, CanSelectedFilterChanged);
-            CreateCommand = new RelayCommand(Create);
-            DeleteCommand = new RelayCommand(Delete, CanDelete);
-            RenameCommand = new RelayCommand(Rename, CanRename);
-            SaveCommand = new RelayCommand(Save, CanSave);
-            SaveAsCommand = new RelayCommand(SaveAs, CanSave);
-            LoadCommand = new RelayCommand(Load);
-            CheckSearchSetCommand = new RelayCommand(CheckSearchSet, CanSave);
+            SelectedFilterChangedCommand = RelayCommand.Create(SelectedFilterChanged, CanSelectedFilterChanged);
+            CreateCommand = RelayCommand.Create<Window>(Create);
+            DeleteCommand = RelayCommand.Create(Delete, CanDelete);
+            RenameCommand = RelayCommand.Create<Window>(Rename, CanRename);
+            SaveCommand = RelayCommand.Create(Save, CanSave);
+            SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
+            LoadCommand = RelayCommand.Create(Load);
+            CheckSearchSetCommand = RelayCommand.Create(CheckSearchSet, CanSave);
 
             SelectedFilter = Filters.FirstOrDefault();
         }
@@ -94,17 +94,17 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
         }
 
-        private void SelectedFilterChanged(object p) {
+        private void SelectedFilterChanged() {
             SelectedFilter?.InitializeFilter();
         }
 
-        private bool CanSelectedFilterChanged(object p) {
+        private bool CanSelectedFilterChanged() {
             return SelectedFilter != null;
         }
 
-        private void Create(object p) {
+        private void Create(Window p) {
             var newFilterName = new FilterNameViewModel(Filters.Select(f => f.Name));
-            var view = new FilterNameView() { DataContext = newFilterName, Owner = p as Window };
+            var view = new FilterNameView() { DataContext = newFilterName, Owner = p };
             if(view.ShowDialog() == true) {
                 var newFilter = new FilterViewModel(_revitRepository) { Name = newFilterName.Name, IsInitialized = true };
                 Filters.Add(newFilter);
@@ -114,7 +114,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
         }
 
-        private void Delete(object p) {
+        private void Delete() {
             var dialog = GetPlatformService<IMessageBoxService>();
             if(dialog.Show($"Удалить фильтр \"{SelectedFilter.Name}\"?", "BIM", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes) {
                 Filters.Remove(SelectedFilter);
@@ -122,13 +122,13 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
         }
 
-        private bool CanDelete(object p) {
+        private bool CanDelete() {
             return SelectedFilter != null;
         }
 
-        private void Rename(object p) {
+        private void Rename(Window p) {
             var newFilterName = new FilterNameViewModel(Filters.Select(f => f.Name), SelectedFilter.Name);
-            var view = new FilterNameView() { DataContext = newFilterName, Owner = p as Window };
+            var view = new FilterNameView() { DataContext = newFilterName, Owner = p };
             if(view.ShowDialog() == true) {
                 SelectedFilter.Name = newFilterName.Name;
                 Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
@@ -136,11 +136,11 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             }
         }
 
-        private bool CanRename(object p) {
+        private bool CanRename(Window p) {
             return SelectedFilter != null;
         }
 
-        private void Save(object p) {
+        private void Save() {
             var revitFilePath = Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName());
             var filtersConfig = FiltersConfig.GetFiltersConfig(revitFilePath, _revitRepository.Doc);
             filtersConfig.Filters = GetFilters().ToList();
@@ -150,7 +150,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             RefreshMessage();
         }
 
-        private void SaveAs(object p) {
+        private void SaveAs() {
             var revitFilePath = Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName());
             var filtersConfig = FiltersConfig.GetFiltersConfig(revitFilePath, _revitRepository.Doc);
             filtersConfig.Filters = GetFilters().ToList();
@@ -162,7 +162,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             RefreshMessage();
         }
 
-        private bool CanSave(object p) {
+        private bool CanSave() {
             if(SelectedFilter == null || !SelectedFilter.IsInitialized)
                 return false;
 
@@ -179,7 +179,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             return true;
         }
 
-        private void Load(object p) {
+        private void Load() {
             var cl = new ConfigLoaderService(_revitRepository);
             var config = cl.Load<FiltersConfig>();
             cl.CheckConfig(config);
@@ -191,8 +191,8 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
             RefreshMessage();
         }
 
-        private void CheckSearchSet(object p) {
-            Save(null);
+        private void CheckSearchSet() {
+            Save();
             var filter = SelectedFilter.GetFilter();
             var vm = new SearchSetsViewModel(_revitRepository, filter);
             var view = new SearchSetView() { DataContext = vm };

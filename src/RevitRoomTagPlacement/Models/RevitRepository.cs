@@ -9,8 +9,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 using RevitRoomTagPlacement.ViewModels;
@@ -53,10 +51,12 @@ namespace RevitRoomTagPlacement.Models {
                 .ToList();
 
             foreach(var link in links) {
+                Transform transform = link.GetTotalTransform();
+
                 List<RoomFromRevit> rooms = new FilteredElementCollector(link.GetLinkDocument())
                 .OfCategory(BuiltInCategory.OST_Rooms)
                 .OfType<Room>()
-                .Select(x => new RoomFromRevit(x, link.Id))
+                .Select(x => new RoomFromRevit(x, link.Id, transform))
                 .ToList();
 
                 allRooms.AddRange(rooms);
@@ -139,15 +139,7 @@ namespace RevitRoomTagPlacement.Models {
                         .ToList();
 
                     if(!depElements.Contains(selectedTagType)) {
-                        TagPointFinder pathFinder = new TagPointFinder(room.RoomObject, indentFeet);
-                        UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay, activeView);
-
-                        Location roomLocation = room.RoomObject.Location;
-
-                        LocationPoint roomLocationPoint = (LocationPoint) roomLocation;
-                        XYZ testPoint = new XYZ(point.U, point.V, room.CenterPoint.Z);
-
-                        if(!room.RoomObject.IsPointInRoom(testPoint)) point = pathFinder.GetPointByPath();
+                        UV point = FindUvPoint(room, indentFeet, positionPlacementWay);
 
                         /* Невозможно отфильтровать помещения из связанного файла для активного вида.
                            Способ получения помещений через CustomExporter не работает, так как помещения не экспортируются.
@@ -160,22 +152,47 @@ namespace RevitRoomTagPlacement.Models {
                         RoomTag newTag;
 
                         if(room.LinkId == null) {
-                            newTag = Document.Create.NewRoomTag(new LinkElementId(room.RoomObject.Id), point, activeView.Id);
+                            LinkElementId linkElementId = new LinkElementId(room.RoomObject.Id);
+                            newTag = Document.Create.NewRoomTag(linkElementId, point, activeView.Id);
                         } 
                         else {
-                            newTag = Document.Create.NewRoomTag(new LinkElementId(room.LinkId, room.RoomObject.Id), point, activeView.Id);
+                            LinkElementId linkElementId = new LinkElementId(room.LinkId, room.RoomObject.Id);
+                            newTag = Document.Create.NewRoomTag(linkElementId, point, activeView.Id);
                         }
 
-                        if(newTag?.get_BoundingBox(activeView) == null) {
-                            Document.Delete(newTag.Id);
-                        }
-                        else if(newTag != null) { 
-                            newTag.ChangeTypeId(selectedTagType);
+                        if(newTag != null) {
+                            if(newTag.get_BoundingBox(activeView) == null) {
+                                Document.Delete(newTag.Id);
+                            }
+                            else {
+                                newTag.ChangeTypeId(selectedTagType);
+                            }
                         }
                     }
                 }
                 t.Commit();
             }
+        }
+        
+        private UV FindUvPoint(RoomFromRevit room, double indent, PositionPlacementWay positionPlacementWay) {
+            TagPointFinder pathFinder = new TagPointFinder(room.RoomObject, indent);
+            UV point = pathFinder.GetPointByPlacementWay(positionPlacementWay, Document.ActiveView);
+
+            XYZ testPoint = new XYZ(point.U, point.V, room.CenterPoint.Z);
+            if(!room.RoomObject.IsPointInRoom(testPoint)) {
+                point = pathFinder.GetPointByPath();
+            }
+
+            return TransformUvPoint(room, point);
+        }
+
+        private UV TransformUvPoint(RoomFromRevit room, UV point) {
+            if(room.Transform != null) {
+                XYZ transformedPointXYZ = room.Transform.OfPoint(new XYZ(point.U, point.V, room.CenterPoint.Z));
+                return new UV(transformedPointXYZ.X, transformedPointXYZ.Y);
+            }
+
+            return point;
         }
 
 #if REVIT_2020_OR_LESS

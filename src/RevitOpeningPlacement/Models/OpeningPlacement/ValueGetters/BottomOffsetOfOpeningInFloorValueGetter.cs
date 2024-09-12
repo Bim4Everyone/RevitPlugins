@@ -14,7 +14,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// </summary>
         /// <param name="pointFinder">Объект, предоставляющий координату центра отверстия в футах</param>
         /// <param name="heightInFeetParamGetter">Объект, предоставляющий высоту отверстия в футах</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public BottomOffsetOfOpeningInFloorValueGetter(IPointFinder pointFinder, IValueGetter<DoubleParamValue> heightInFeetParamGetter) {
             if(pointFinder is null) {
                 throw new ArgumentNullException(nameof(pointFinder));

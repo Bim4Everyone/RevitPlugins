@@ -1,4 +1,4 @@
-﻿
+
 using System;
 
 using Autodesk.Revit.DB;
@@ -65,7 +65,6 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         /// </summary>
         /// <param name="fittingWallClash">Пересечение элемента инженерной системы из активного документа и стены из связи</param>
         /// <param name="point">Точка, которую надо спроецировать на осевую линию стены в координатах активного документа</param>
-        /// <returns></returns>
         private XYZ ProjectPointOntoWallCenter(FittingClash<Wall> fittingWallClash, XYZ point) {
             // предполагаем, что стена прямая и строим линию по начальной и конечной точке
             Curve wallCurve = (fittingWallClash.Element2.Location as LocationCurve).Curve;

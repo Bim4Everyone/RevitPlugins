@@ -139,11 +139,6 @@
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem SummaryType="Count" />
                         </dxg:GridControl.GroupSummary>
-                        <mvvm:Interaction.Behaviors>
-                            <mvvm:EventToCommand EventName="SelectionChanged"
-                                                 Command="{Binding IncomingTaskSelectionChangedCommand}"
-                                                 CommandParameter="{Binding ElementName=_dgIncomingTasks}" />
-                        </mvvm:Interaction.Behaviors>
                         <dxg:GridControl.View>
                             <dxg:TableView x:Name="viewTasks"
                                            DataNavigatorButtons="Navigation"
@@ -218,11 +213,6 @@
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem SummaryType="Count" />
                         </dxg:GridControl.GroupSummary>
-                        <mvvm:Interaction.Behaviors>
-                            <mvvm:EventToCommand EventName="SelectionChanged"
-                                                 Command="{Binding OpeningRealSelectionChangedCommand}"
-                                                 CommandParameter="{Binding ElementName=_dgOpeningsReal}" />
-                        </mvvm:Interaction.Behaviors>
                         <dxg:GridControl.View>
                             <dxg:TableView x:Name="viewOpenings"
                                            DataNavigatorButtons="Navigation"

@@ -16,7 +16,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
         /// Конструктор класса, предоставляющего интерфейс для определения угла поворота размещаемого отверстия КР
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие от АР</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleOpeningArTaskAngleFinderProvider(IOpeningTaskIncoming incomingTask) {
             _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
         }
@@ -27,13 +27,13 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
                 case OpeningType.WallRound:
                 case OpeningType.WallRectangle:
                 case OpeningType.FloorRound:
-                return new ZeroAngleFinder();
+                    return new ZeroAngleFinder();
 
                 case OpeningType.FloorRectangle:
-                return new SingleRectangleOpeningArTaskInFloorAngleFinder(_incomingTask);
+                    return new SingleRectangleOpeningArTaskInFloorAngleFinder(_incomingTask);
 
                 default:
-                throw new ArgumentException(nameof(_incomingTask.OpeningType));
+                    throw new ArgumentException(nameof(_incomingTask.OpeningType));
             }
         }
     }

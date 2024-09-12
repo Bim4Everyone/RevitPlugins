@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -24,8 +24,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 InitializeClashes(path);
             }
 
-            LoadReportCommand = new RelayCommand(LoadReport);
-            SelectClashCommand = new RelayCommand(SelectClash, CanSelectClash);
+            LoadReportCommand = RelayCommand.Create(LoadReport);
+            SelectClashCommand = RelayCommand.Create<ClashViewModel>(SelectClash, CanSelectClash);
         }
 
         public ICommand LoadReportCommand { get; }
@@ -39,7 +39,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => this.RaiseAndSetIfChanged(ref _name, value);
         }
 
-        private void LoadReport(object p) {
+        private void LoadReport() {
             var openWindow = GetPlatformService<IOpenFileDialogService>();
             openWindow.Filter = "ClashReport |*.html";
 
@@ -61,8 +61,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             }
         }
 
-        private void SelectClash(object p) {
-            var clash = (ClashViewModel) p;
+        private void SelectClash(ClashViewModel clash) {
             var elements = new[] {
                 clash.Clash.MainElement,
                 clash.Clash.OtherElement
@@ -70,8 +69,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             _revitRepository.SelectAndShowElement(elements.Where(item => item != null));
         }
 
-        private bool CanSelectClash(object p) {
-            return p != null && p is ClashViewModel;
+        private bool CanSelectClash(ClashViewModel p) {
+            return p != null;
         }
     }
 }

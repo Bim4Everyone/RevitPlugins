@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -23,8 +23,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         /// <param name="host">Хост чистового отверстия</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <param name="pointFinder">Интерфейс, предоставляющий точку вставки чистового отверстия</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentException">Исключение, если в коллекции меньше 1 элемента</exception>
         public ManyOpeningTasksParameterGettersProvider(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks, IPointFinder pointFinder) {
             if(host is null) { throw new ArgumentNullException(nameof(host)); }
             if(!((host is Wall) || (host is Floor))) { throw new ArgumentException(nameof(host)); }

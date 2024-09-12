@@ -11,8 +11,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// <summary>
         /// Класс, предоставляющий значение отметки уровня, на котором размещается отверстие, в единицах Revit
         /// </summary>
-        /// <param name="levelFinder"></param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public LevelOffsetValueGetter(ILevelFinder levelFinder) {
             _levelFinder = levelFinder ?? throw new ArgumentNullException(nameof(levelFinder));
         }

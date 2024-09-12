@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,8 +17,8 @@ namespace RevitOpeningPlacement.Models.Navigator.Checkers {
         /// <summary>
         /// Конструктор класса для проверки Revit репозитория на корректность для навигации по заданиям на отверстия
         /// </summary>
-        /// <param name="revitRepository"></param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="revitRepository">Репозиторий активного документа ревита</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public NavigatorCheckers(RevitRepository revitRepository) {
             if(revitRepository == null) { throw new ArgumentNullException(nameof(revitRepository)); }
 

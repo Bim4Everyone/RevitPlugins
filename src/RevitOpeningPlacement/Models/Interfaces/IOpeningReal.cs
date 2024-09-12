@@ -8,7 +8,6 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// <summary>
         /// Возвращает хост элемент проема
         /// </summary>
-        /// <returns></returns>
         Element GetHost();
 
         /// <summary>

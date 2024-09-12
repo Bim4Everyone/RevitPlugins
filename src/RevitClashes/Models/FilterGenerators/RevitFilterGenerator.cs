@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -18,11 +18,18 @@ namespace RevitClashDetective.Models.FilterGenerators {
 
         protected IFilterGenerator SetRuleFilter(Document doc, Rule rule, bool inverted) {
             var ruleCreator = RuleEvaluatorUtils.GetRevitRuleCreator(rule.Evaluator.Evaluator);
-            var revitRule = rule.Provider.GetRule(doc, ruleCreator, rule.Value);
+            var providerRule = rule.Provider.GetRule(doc, ruleCreator, rule.Value);
+            var revitRule = inverted
+                ? new FilterInverseRule(providerRule)
+                : providerRule;
             if(revitRule == null) {
                 Filter = new ElementIsElementTypeFilter(inverted);
             } else {
-                Filter = new ElementParameterFilter(revitRule, inverted);
+                // Если создавать ElementParameterFilter с параметром конструктора inverted=true,
+                // то работать не будет нормально, когда нужен инвертированный фильтр.
+                // Надо в параметре filterRule указывать уже инвертированное правило, созданное через FilterInverseRule.
+                // https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/View-Filters-with-OR-rule-does-not-work-on-linked-models-in-Revit.html
+                Filter = new ElementParameterFilter(revitRule, false);
             }
 
             return this;
@@ -52,8 +59,9 @@ namespace RevitClashDetective.Models.FilterGenerators {
             var creator = SetEvaluatorUtils.GetRevitLogicalFilterCreator(set.SetEvaluator.Evaluator);
             if(filters.Count > 0) {
                 Filter = creator.Create(filters);
-            } else
+            } else {
                 Filter = new ElementIsElementTypeFilter(true);
+            }
             return this;
         }
     }
@@ -69,8 +77,9 @@ namespace RevitClashDetective.Models.FilterGenerators {
             var creator = SetEvaluatorUtils.GetInvertedRevitLogicalFilterCreator(set.SetEvaluator.Evaluator);
             if(filters.Count > 0) {
                 Filter = creator.Create(filters);
-            } else
-                Filter = new ElementIsElementTypeFilter(true);
+            } else {
+                Filter = new ElementIsElementTypeFilter(false);
+            }
             return this;
         }
     }

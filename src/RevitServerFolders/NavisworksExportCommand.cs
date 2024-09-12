@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -27,14 +28,20 @@ namespace RevitServerFolders {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-                
+
                 kernel.UseXtraProgressDialog<FileSystemViewModel>();
-                
+
                 kernel.Bind<FileModelObjectConfig>()
                     .ToMethod(c => FileModelObjectConfig.GetPluginConfig());
-                
+
                 kernel.Bind<IModelObjectService>()
                     .To<FileSystemModelObjectService>();
+                kernel.Bind<IModelsExportService>()
+                    .To<NwcExportService>()
+                    .InSingletonScope();
+                kernel.Bind<ILoggerService>()
+                    .ToMethod(c => PluginLoggerService)
+                    .InSingletonScope();
 
                 kernel.UseXtraOpenFolderDialog<MainWindow>(
                     initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));

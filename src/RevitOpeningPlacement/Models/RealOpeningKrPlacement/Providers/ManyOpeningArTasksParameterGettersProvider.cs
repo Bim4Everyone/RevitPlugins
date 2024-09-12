@@ -22,8 +22,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
         /// <param name="host">Основа для отверстия КР</param>
         /// <param name="incomingTasks">Входящие задания</param>
         /// <param name="pointFinder">Провайдер точки вставки отверстия КР</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentException"><Исключение, если тип хоста не поддерживается, или количество элементов в коллекции меньше 1/exception>
         public ManyOpeningArTasksParameterGettersProvider(Element host, ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder) {
             if(host is null) { throw new ArgumentNullException(nameof(host)); }
             if(!((host is Wall) || (host is Floor))) { throw new ArgumentException(nameof(host)); }

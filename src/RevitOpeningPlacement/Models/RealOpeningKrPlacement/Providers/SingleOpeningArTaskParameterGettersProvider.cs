@@ -17,7 +17,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки отверстия КР</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleOpeningArTaskParameterGettersProvider(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder) {
             _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
@@ -27,17 +27,17 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers {
         public IParametersGetter GetParametersGetter() {
             switch(_incomingTask.OpeningType) {
                 case OpeningType.WallRound:
-                return new SingleRoundOpeningArTaskInWallParameterGetter(_incomingTask, _pointFinder);
+                    return new SingleRoundOpeningArTaskInWallParameterGetter(_incomingTask, _pointFinder);
 
                 case OpeningType.WallRectangle:
-                return new SingleRectangleOpeningArTaskInWallParameterGetter(_incomingTask, _pointFinder);
+                    return new SingleRectangleOpeningArTaskInWallParameterGetter(_incomingTask, _pointFinder);
 
                 case OpeningType.FloorRound:
                 case OpeningType.FloorRectangle:
-                return new SingleOpeningArTaskInFloorParameterGetter(_incomingTask);
+                    return new SingleOpeningArTaskInFloorParameterGetter(_incomingTask);
 
                 default:
-                throw new ArgumentException(nameof(_incomingTask.OpeningType));
+                    throw new ArgumentException(nameof(_incomingTask.OpeningType));
             }
         }
     }

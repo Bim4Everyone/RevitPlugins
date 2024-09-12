@@ -63,7 +63,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Возвращает хост экземпляра семейства отверстия
         /// </summary>
-        /// <returns></returns>
         public Element GetHost() {
             return _familyInstance.Host;
         }
@@ -77,9 +76,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Возвращает значение параметра, или пустую строку, если параметра у семейства нет. 
         /// Значения параметров с типом данных "длина" конвертируются в мм и округляются до 1 мм.
         /// </summary>
-        /// <param name="paramName"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         private protected string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
             if(_familyInstance is null) {
                 throw new ArgumentNullException(nameof(_familyInstance));
@@ -124,7 +121,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Возвращает солид отверстия в координатах собственного файла
         /// </summary>
-        /// <returns></returns>
         private protected Solid GetOpeningSolid() {
             _solid = _solid ?? GenerateOpeningSolid();
             return _solid;
@@ -135,7 +131,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// или 0, если параметр отсутствует
         /// </summary>
         /// <param name="paramName">Название параметра</param>
-        /// <returns></returns>
         private protected double GetFamilyInstanceDoubleParamValueOrZero(string paramName) {
             if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
                 return _familyInstance.GetSharedParamValue<double>(paramName);

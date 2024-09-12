@@ -1,4 +1,4 @@
-﻿using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Checkers {
     /// <summary>
@@ -12,8 +12,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Checkers {
         /// <summary>
         /// Конструктор класса для проверки на наличие в репозитории активного документа ревита семейств чистовых отверстий КР
         /// </summary>
-        /// <param name="revitRepository"></param>
-        /// <param name="openingType"></param>
         public RealOpeningKrFamilyChecker(RevitRepository revitRepository, OpeningType openingType) {
             _revitRepository = revitRepository;
             _openingType = openingType;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,7 +22,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// Конструктор класса, предоставляющего значение ширины чистового прямоугольного отверстия АР/КР в стене в единицах Revit
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RectangleOpeningInWallWidthValueGetter(IOpeningTaskIncoming incomingTask) {
             if(incomingTask == null) { throw new ArgumentNullException(nameof(incomingTask)); }
             _incomingTasks = new IOpeningTaskIncoming[] { incomingTask };
@@ -33,8 +33,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <param name="wall">Стена-основа для чистового отверстия АР/КР</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в коллекции меньше 1</exception>
         public RectangleOpeningInWallWidthValueGetter(ICollection<IOpeningTaskIncoming> incomingTasks, Wall wall) {
             if(incomingTasks is null) { throw new ArgumentNullException(nameof(incomingTasks)); }
             if(incomingTasks.Count < 1) { throw new ArgumentOutOfRangeException(nameof(incomingTasks)); }
@@ -72,7 +72,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="wallOrientation">Вектор нормали к стене</param>
         /// <param name="unitedBox">Объединенный бокс входящих заданий на отверстия</param>
-        /// <returns></returns>
         private double GetWidthByBoxAndOrientation(XYZ wallOrientation, BoundingBoxXYZ unitedBox) {
             // вектор нормали к поверхности стены
             // AngleTo возвращает значение от 0 до Pi
@@ -93,7 +92,6 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="line">Ось стены</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        /// <returns></returns>
         /// <exception cref="ArgumentException">Исключение, если в коллекции входящих заданий на отверстия меньше 1 элемента</exception>
         private double GetWidthByPointProjections(Line line, ICollection<IOpeningTaskIncoming> incomingTasks) {
             if(incomingTasks.Count < 1) { throw new ArgumentException(nameof(incomingTasks)); }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders;
@@ -16,7 +16,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.AngleFinders {
         /// Конструктор класса, предоставляющего угол поворота задания на прямоугольное отверстие в перекрытии в горизонтальной плоскости в единицах ревита
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SingleRectangleOpeningTaskInFloorAngleFinder(OpeningMepTaskIncoming incomingTask) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
 

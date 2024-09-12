@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.Checkers {
         /// Конструктор класса для проверки репозитория активного документа ревита на корректность для размещения чистовых отверстий КР
         /// </summary>
         /// <param name="revitRepository">Репозиторий активного документа</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RealOpeningsKrChecker(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             InitializeCheckers();

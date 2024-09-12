@@ -50,9 +50,9 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
 
-        public ICommand SaveCommand { get; set; }
+        public ICommand SaveCommand { get; private set; }
 
-        public ICommand SaveAsCommand { get; set; }
+        public ICommand SaveAsCommand { get; private set; }
 
         public ClashesConfig GetUpdatedConfig() {
             var config = ClashesConfig.GetClashesConfig(_revitRepository.GetObjectName(), Name);
@@ -73,17 +73,17 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             InitializeTimer();
 
-            SaveCommand = new RelayCommand(Save);
-            SaveAsCommand = new RelayCommand(SaveAs);
+            SaveCommand = RelayCommand.Create(Save);
+            SaveAsCommand = RelayCommand.Create(SaveAs);
         }
 
-        private void Save(object p) {
+        private void Save() {
             GetUpdatedConfig().SaveProjectConfig();
             Message = "Файл успешно сохранен";
             RefreshMessage();
         }
 
-        private void SaveAs(object p) {
+        private void SaveAs() {
             var config = GetUpdatedConfig();
             var saver = new ConfigSaverService(_revitRepository);
             saver.Save(config);

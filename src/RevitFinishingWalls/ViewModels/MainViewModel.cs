@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -14,10 +15,11 @@ using RevitFinishingWalls.Services;
 using RevitFinishingWalls.Services.Creation;
 
 namespace RevitFinishingWalls.ViewModels {
-    internal class MainViewModel : BaseViewModel, IDataErrorInfo {
+    internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly IRoomFinisher _roomFinisher;
+        private readonly IProgressDialogFactory _progressDialogFactory;
 
         /// <summary>Максимальная допустимая отметка верха отделочной стены в мм</summary>
         private const int _wallTopMaxElevationMM = 50000;
@@ -25,16 +27,24 @@ namespace RevitFinishingWalls.ViewModels {
         private const int _wallBaseMaxOffsetMM = 5000;
         /// <summary>Минимальное смещение низа стены вниз в мм</summary>
         private const int _wallBaseMinOffsetMM = -5000;
+        /// <summary>Максимальное смещение стены внутрь помещения в мм</summary>
+        private const int _wallSideMaxOffsetMM = 200;
 
 
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
-            IRoomFinisher roomFinisher
+            IRoomFinisher roomFinisher,
+            IProgressDialogFactory progressDialogFactory
             ) {
-            _pluginConfig = pluginConfig ?? throw new ArgumentNullException(nameof(pluginConfig));
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            _roomFinisher = roomFinisher ?? throw new ArgumentNullException(nameof(roomFinisher));
+            _pluginConfig = pluginConfig
+                ?? throw new ArgumentNullException(nameof(pluginConfig));
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _roomFinisher = roomFinisher
+                ?? throw new ArgumentNullException(nameof(roomFinisher));
+            _progressDialogFactory = progressDialogFactory
+                ?? throw new ArgumentNullException(nameof(progressDialogFactory));
 
             RoomGetterModes = new ObservableCollection<RoomGetterMode>(
                 Enum.GetValues(typeof(RoomGetterMode)).Cast<RoomGetterMode>());
@@ -51,7 +61,14 @@ namespace RevitFinishingWalls.ViewModels {
 
         public ICommand AcceptViewCommand { get; }
 
-        public string ErrorText => Error;
+        public IProgressDialogFactory ProgressDialogFactory => _progressDialogFactory;
+
+
+        private string _errorText;
+        public string ErrorText {
+            get => _errorText;
+            set => RaiseAndSetIfChanged(ref _errorText, value);
+        }
 
 
         public ObservableCollection<RoomGetterMode> RoomGetterModes { get; }
@@ -68,21 +85,14 @@ namespace RevitFinishingWalls.ViewModels {
         private WallTypeViewModel _selectedWallType;
         public WallTypeViewModel SelectedWallType {
             get => _selectedWallType;
-            set {
-                RaiseAndSetIfChanged(ref _selectedWallType, value);
-                OnPropertyChanged(nameof(ErrorText));
-            }
+            set => RaiseAndSetIfChanged(ref _selectedWallType, value);
         }
 
 
         private string _wallHeightByUser;
         public string WallElevationByUser {
             get => _wallHeightByUser;
-            set {
-                RaiseAndSetIfChanged(ref _wallHeightByUser, value);
-                OnPropertyChanged(nameof(ErrorText));
-                OnPropertyChanged(nameof(WallBaseOffset));
-            }
+            set => RaiseAndSetIfChanged(ref _wallHeightByUser, value);
         }
 
 
@@ -97,7 +107,6 @@ namespace RevitFinishingWalls.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _selectedWallHeightMode, value);
                 OnPropertyChanged(nameof(IsWallHeightByUserEnabled));
-                OnPropertyChanged(nameof(ErrorText));
             }
         }
 
@@ -105,63 +114,30 @@ namespace RevitFinishingWalls.ViewModels {
         private string _wallBaseOffset;
         public string WallBaseOffset {
             get => _wallBaseOffset;
-            set {
-                RaiseAndSetIfChanged(ref _wallBaseOffset, value);
-                OnPropertyChanged(nameof(ErrorText));
-                OnPropertyChanged(nameof(WallElevationByUser));
-            }
+            set => RaiseAndSetIfChanged(ref _wallBaseOffset, value);
         }
 
-        public string Error => GetType()
-            .GetProperties()
-            .Select(prop => this[prop.Name])
-            .FirstOrDefault(error => !string.IsNullOrWhiteSpace(error)) ?? string.Empty;
-
-        public string this[string columnName] {
-            get {
-                switch(columnName) {
-                    case nameof(SelectedWallType): {
-                        if(SelectedWallType is null) {
-                            return "Задайте тип отделочных стен";
-                        }
-                        break;
-                    }
-                    case nameof(WallElevationByUser): {
-                        if(SelectedWallElevationMode == WallElevationMode.ManualHeight) {
-                            if(double.TryParse(WallElevationByUser, out double height)) {
-                                if(height <= 0) {
-                                    return "Отметка верха должна быть больше 0";
-                                } else if(height > _wallTopMaxElevationMM) {
-                                    return "Слишком большая отметка верха стены";
-                                } else if(double.TryParse(WallBaseOffset, out double offset) && (height <= offset)) {
-                                    return "Отметка верха должна быть больше смещения";
-                                }
-                            } else {
-                                return "Отметка верха должна быть числом";
-                            }
-                        }
-                        break;
-                    }
-                    case nameof(WallBaseOffset): {
-                        if(double.TryParse(WallBaseOffset, out double offset)) {
-                            if(offset < _wallBaseMinOffsetMM) {
-                                return "Слишком большое смещение вниз";
-                            } else if(offset > _wallBaseMaxOffsetMM) {
-                                return "Слишком большое смещение вверх";
-                            }
-                        } else {
-                            return "Смещение должно быть числом";
-                        }
-                        break;
-                    }
-                }
-                return string.Empty;
-            }
+        private string _wallSideOffset;
+        public string WallSideOffset {
+            get => _wallSideOffset;
+            set => RaiseAndSetIfChanged(ref _wallSideOffset, value);
         }
 
         private void AcceptView() {
             SaveConfig();
-            var errors = _roomFinisher.CreateWallsFinishing(_pluginConfig);
+            ICollection<RoomErrorsViewModel> errors;
+            RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
+            using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
+                var rooms = _revitRepository.GetRooms(settings.RoomGetterMode);
+                progressDialogService.StepValue = 5;
+                progressDialogService.DisplayTitleFormat = "Обработка квартир... [{0}]\\[{1}]";
+                var progress = progressDialogService.CreateProgress();
+                progressDialogService.MaxValue = rooms.Count;
+                var ct = progressDialogService.CreateCancellationToken();
+                progressDialogService.Show();
+
+                errors = _roomFinisher.CreateWallsFinishing(rooms, settings, progress, ct);
+            }
             if(errors.Count > 0) {
                 var errorMsgService = ServicesProvider.GetPlatformService<RichErrorMessageService>();
                 errorMsgService.ShowErrorWindow(errors);
@@ -169,25 +145,78 @@ namespace RevitFinishingWalls.ViewModels {
         }
 
         private bool CanAcceptView() {
-            return string.IsNullOrWhiteSpace(ErrorText);
+            if(SelectedWallType is null) {
+                ErrorText = "Задайте тип отделочных стен";
+                return false;
+            }
+            if(double.TryParse(WallBaseOffset, out double baseOffset)) {
+                if(baseOffset < _wallBaseMinOffsetMM) {
+                    ErrorText = "Слишком большое смещение вниз";
+                    return false;
+                } else if(baseOffset > _wallBaseMaxOffsetMM) {
+                    ErrorText = "Слишком большое смещение вверх";
+                    return false;
+                }
+            } else {
+                ErrorText = "Смещение должно быть числом";
+                return false;
+            }
+            if(SelectedWallElevationMode == WallElevationMode.ManualHeight) {
+                if(double.TryParse(WallElevationByUser, out double height)) {
+                    if(height <= 0) {
+                        ErrorText = "Отметка верха должна быть больше 0";
+                        return false;
+                    } else if(height > _wallTopMaxElevationMM) {
+                        ErrorText = "Слишком большая отметка верха стены";
+                        return false;
+                    } else if(height <= baseOffset) {
+                        ErrorText = "Отметка верха должна быть больше смещения";
+                        return false;
+                    }
+                } else {
+                    ErrorText = "Отметка верха должна быть числом";
+                    return false;
+                }
+            }
+            if(double.TryParse(WallSideOffset, out double sideOffset)) {
+                if(sideOffset < 0) {
+                    ErrorText = "Смещение внутрь не должно быть меньше 0";
+                    return false;
+                } else if(sideOffset > _wallSideMaxOffsetMM) {
+                    ErrorText = "Слишком большое смещение внутрь";
+                    return false;
+                }
+            } else {
+                ErrorText = "Смещение внутрь должно быть числом";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
         }
 
         private void LoadConfig() {
-            SelectedRoomGetterMode = _pluginConfig.RoomGetterMode;
-            SelectedWallElevationMode = _pluginConfig.WallElevationMode;
-            WallElevationByUser = _pluginConfig.WallElevationMm.ToString();
-            WallBaseOffset = _pluginConfig.WallBaseOffsetMm.ToString();
-            SelectedWallType = WallTypes.FirstOrDefault(wtvm => wtvm.WallTypeId == _pluginConfig.WallTypeId);
+            RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
+                ?? _pluginConfig.AddSettings(_revitRepository.Document);
+            SelectedRoomGetterMode = settings.RoomGetterMode;
+            SelectedWallElevationMode = settings.WallElevationMode;
+            WallElevationByUser = settings.WallElevationMm.ToString();
+            WallBaseOffset = settings.WallBaseOffsetMm.ToString();
+            WallSideOffset = settings.WallSideOffsetMm.ToString();
+            SelectedWallType = WallTypes.FirstOrDefault(wtvm => wtvm.WallTypeId == settings.WallTypeId);
 
             OnPropertyChanged(nameof(ErrorText));
         }
 
         private void SaveConfig() {
-            _pluginConfig.RoomGetterMode = SelectedRoomGetterMode;
-            _pluginConfig.WallElevationMode = SelectedWallElevationMode;
-            _pluginConfig.WallBaseOffsetMm = double.TryParse(WallBaseOffset, out double offset) ? offset : 0;
-            _pluginConfig.WallElevationMm = double.TryParse(WallElevationByUser, out double height) ? height : 0;
-            _pluginConfig.WallTypeId = SelectedWallType.WallTypeId;
+            RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
+                ?? _pluginConfig.AddSettings(_revitRepository.Document);
+            settings.RoomGetterMode = SelectedRoomGetterMode;
+            settings.WallElevationMode = SelectedWallElevationMode;
+            settings.WallBaseOffsetMm = double.TryParse(WallBaseOffset, out double baseOffset) ? baseOffset : 0;
+            settings.WallSideOffsetMm = double.TryParse(WallSideOffset, out double sideOffset) ? sideOffset : 0;
+            settings.WallElevationMm = double.TryParse(WallElevationByUser, out double height) ? height : 0;
+            settings.WallTypeId = SelectedWallType.WallTypeId;
             _pluginConfig.SaveProjectConfig();
         }
     }

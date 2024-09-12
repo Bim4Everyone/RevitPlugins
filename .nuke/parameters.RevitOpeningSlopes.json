@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitOpeningSlopes",
+  "PublishDirectory": "02.AR.extension\\АР.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/55641/closed-window",
+  "BundleName": "Откосы",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "02.AR.extension\\АР.tab\\РД.panel"
+}
