@@ -35,24 +35,31 @@ namespace RevitDeclarations.ViewModels {
 
         private string _filePath;
         private string _fileName;
-        private bool _exportToExcel;
+        private Phase _selectedPhase;
+        private ExportViewModel _selectedFormat;
         private string _accuracy;
         private bool _loadUtp;
         private bool _canLoadUtp;
         private string _errorText;
         private string _canLoadUtpText;
-        private Phase _selectedPhase;
-        private ExportViewModel _selectedFormat;
 
         public MainViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
             _revitRepository = revitRepository;
             _settings = settings;
 
             _phases = _revitRepository.GetPhases();
-            _selectedPhase = _phases[_phases.Count - 1];
+
+            _excelExportViewModel = new ExcelExportViewModel("Excel", _settings);
+            _csvExportViewModel = new CsvExportViewModel("csv", _settings);
+            _jsonExportViewModel = new JsonExportViewModel("json", _settings);
+
+            _exportFormats = new List<ExportViewModel>() {
+                _excelExportViewModel,
+                _csvExportViewModel,
+                _jsonExportViewModel,
+            };
 
             _accuracy = "1";
-            _exportToExcel = true;
             _loadUtp = true;
             _canLoadUtp = true;
 
@@ -73,17 +80,6 @@ namespace RevitDeclarations.ViewModels {
             _parametersViewModel = new ParametersViewModel(_revitRepository, this);
             _prioritiesViewModel = new PrioritiesViewModel(this);
 
-            _excelExportViewModel = new ExcelExportViewModel("Excel", _settings);
-            _csvExportViewModel = new CsvExportViewModel("csv", _settings);
-            _jsonExportViewModel = new JsonExportViewModel("json", _settings);
-
-            _exportFormats = new List<ExportViewModel>() {
-                _excelExportViewModel,
-                _csvExportViewModel,
-                _jsonExportViewModel,
-            };
-            _selectedFormat = _exportFormats.FirstOrDefault();
-
             SelectFolderCommand = new RelayCommand(SelectFolder);
             ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
 
@@ -102,10 +98,6 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _fileName, value);
         }
         public string FullPath => FilePath + "\\" + FileName;
-        public bool IsExportToExcel {
-            get => _exportToExcel;
-            set => RaiseAndSetIfChanged(ref _exportToExcel, value);
-        }
 
         public IReadOnlyList<Phase> Phases => _phases;
         public Phase SelectedPhase {
@@ -331,7 +323,7 @@ namespace RevitDeclarations.ViewModels {
 
             configSettings.DeclarationName = FileName;
             configSettings.DeclarationPath = FilePath;
-            configSettings.IsExportToExcel = IsExportToExcel;
+            configSettings.ExportFormat = SelectedFormat.Name;
             configSettings.Phase = SelectedPhase.Name;
 
             configSettings.RevitDocuments = RevitDocuments
@@ -376,12 +368,11 @@ namespace RevitDeclarations.ViewModels {
 
             FileName = configSettings.DeclarationName;
             FilePath = configSettings.DeclarationPath;
-            IsExportToExcel = configSettings.IsExportToExcel;
-            SelectedPhase = Phases.FirstOrDefault(x => x.Name == configSettings.Phase);
+            SelectedFormat = ExportFormats
+                .FirstOrDefault(x => x.Name == configSettings.ExportFormat) ?? _exportFormats.FirstOrDefault();
+            SelectedPhase = Phases
+                .FirstOrDefault(x => x.Name == configSettings.Phase) ?? _phases[_phases.Count - 1];
 
-            if(SelectedPhase == null) {
-                SelectedPhase = _selectedPhase = _phases[_phases.Count - 1];
-            }
 
             foreach(var document in RevitDocuments.Where(x => configSettings.RevitDocuments.Contains(x.Name))) {
                 document.IsChecked = true;
