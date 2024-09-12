@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models {
@@ -26,53 +28,54 @@ namespace RevitMechanicalSpecification.Models {
         public bool IsSpecifyDuctFittings;
         public bool IsSpecifyPipeFittings;
 
-        public readonly string TargetNameGroup = "ФОП_ВИС_Группирование";
-        public readonly string TargetNameFunction = "ФОП_Экономическая функция";
-        public readonly string TargetNameSystem = "ФОП_ВИС_Имя системы";
-        public readonly string TargetNameName = "ФОП_ВИС_Наименование комбинированное";
-        public readonly string TargetNameMark = "ФОП_ВИС_Марка";
-        public readonly string TargetNameCode = "ФОП_ВИС_Код изделия";
-        public readonly string TargetNameUnit = "ФОП_ВИС_Единица измерения";
-        public readonly string TargetNameCreator = "ФОП_ВИС_Завод-изготовитель";
-        public readonly string TargetNameNumber = "ФОП_ВИС_Число";
+        public readonly string TargetNameGroup = SharedParamsConfig.Instance.VISGrouping.Name; //ФОП_ВИС_Группирование
+        public readonly string TargetNameFunction = SharedParamsConfig.Instance.EconomicFunction.Name; //"ФОП_Экономическая функция";
+        public readonly string TargetNameSystem = SharedParamsConfig.Instance.VISSystemName.Name;//"ФОП_ВИС_Имя системы";
+        public readonly string TargetNameName = SharedParamsConfig.Instance.VISCombinedName.Name;//"ФОП_ВИС_Наименование комбинированное";
+        public readonly string TargetNameMark = SharedParamsConfig.Instance.VISMarkNumber.Name;//"ФОП_ВИС_Марка";
+        public readonly string TargetNameCode = SharedParamsConfig.Instance.VISItemCode.Name;//"ФОП_ВИС_Код изделия";
+        public readonly string TargetNameUnit = SharedParamsConfig.Instance.VISUnit.Name; //"ФОП_ВИС_Единица измерения";
+        public readonly string TargetNameCreator = SharedParamsConfig.Instance.VISManufacturer.Name; //"ФОП_ВИС_Завод-изготовитель";
+        public readonly string TargetNameNumber = SharedParamsConfig.Instance.VISSpecNumbers.Name; //"ФОП_ВИС_Число";
 
-        public readonly string NameAddition = "ФОП_ВИС_Дополнение к имени";
-        public readonly string ForcedName = "ФОП_ВИС_Наименование принудительное";
-        public readonly string ForcedSystemName = "ФОП_ВИС_Имя системы принудительное";
-        public readonly string ForcedGroup = "ФОП_ВИС_Группирование принудительное";
-        public readonly string ForcedFunction = "ФОП_ВИС_Экономическая функция";
-        
+        public readonly string NameAddition = SharedParamsConfig.Instance.VISNameAddition.Name; //"ФОП_ВИС_Дополнение к имени";
+        public readonly string ForcedName = SharedParamsConfig.Instance.VISNameForced.Name; //"ФОП_ВИС_Наименование принудительное";
+        public readonly string ForcedSystemName = SharedParamsConfig.Instance.VISSystemNameForced.Name; //"ФОП_ВИС_Имя системы принудительное";
+        public readonly string ForcedGroup = SharedParamsConfig.Instance.VISGroupingForced.Name; //"ФОП_ВИС_Группирование принудительное";
+        public readonly string ForcedFunction = SharedParamsConfig.Instance.VISEconomicFunction.Name; //"ФОП_ВИС_Экономическая функция";
 
-        public readonly string MinDuctThikness = "ФОП_ВИС_Минимальная толщина воздуховода";
-        public readonly string MaxDuctThikness = "ФОП_ВИС_Максимальная толщина воздуховода";
 
-        private readonly string _changedNameName = "ФОП_ВИС_Замена параметра_Наименование";
-        private readonly string _changedNameMark = "ФОП_ВИС_Замена параметра_Марка";
-        private readonly string _changedNameCode = "ФОП_ВИС_Замена параметра_Код изделия";
-        private readonly string _changedNameUnit = "ФОП_ВИС_Замена параметра_Единица измерения";
-        private readonly string _changedNameCreator = "ФОП_ВИС_Замена параметра_Завод-изготовитель";
-        private readonly string _outSystemNameParam = "ФОП_ВИС_Имя внесистемных элементов";
 
-        private readonly string _paramNameIsSpecifyPipeFittings = "ФОП_ВИС_Учитывать фитинги труб";
-        public readonly string ParamNameIsSpecifyPipeFittingsFromPype = "ФОП_ВИС_Учитывать фитинги труб по типу трубы";
-        private readonly string _paramNameIsSpecifyDuctFittings = "ФОП_ВИС_Учитывать фитинги воздуховодов";
+        public readonly string MinDuctThikness = SharedParamsConfig.Instance.VISMinDuctThickness.Name; //"ФОП_ВИС_Минимальная толщина воздуховода";
+        public readonly string MaxDuctThikness = SharedParamsConfig.Instance.VISMaxDuctThickness.Name; //"ФОП_ВИС_Максимальная толщина воздуховода";
 
-        private readonly string _paramNamePipeInsulationStock = "ФОП_ВИС_Запас изоляции труб";
-        private readonly string _paramNameDuctInsulationStock = "ФОП_ВИС_Запас изоляции воздуховодов";
-        private readonly string _paramNameDuctPipeStock = "ФОП_ВИС_Запас воздуховодов/труб";
-        public readonly string IndividualStock = "ФОП_ВИС_Индивидуальный запас";
+        private readonly string _changedNameName = SharedParamsConfig.Instance.VISParamReplacementName.Name; //"ФОП_ВИС_Замена параметра_Наименование";
+        private readonly string _changedNameMark = SharedParamsConfig.Instance.VISParamReplacementMarkNumber.Name; //"ФОП_ВИС_Замена параметра_Марка";
+        private readonly string _changedNameCode = SharedParamsConfig.Instance.VISParamReplacementItemCode.Name; //"ФОП_ВИС_Замена параметра_Код изделия";
+        private readonly string _changedNameUnit = SharedParamsConfig.Instance.VISParamReplacementUnit.Name; //"ФОП_ВИС_Замена параметра_Единица измерения";
+        private readonly string _changedNameCreator = SharedParamsConfig.Instance.VISParamReplacementManufacturer.Name; //"ФОП_ВИС_Замена параметра_Завод-изготовитель";
+        private readonly string _outSystemNameParam = SharedParamsConfig.Instance.VISOutSystemName.Name; //"ФОП_ВИС_Имя внесистемных элементов";
 
-        public readonly string IsManiFoldParamName = "ФОП_ВИС_Узел";
-        public readonly string IsOutSideOfManifold = "ФОП_ВИС_Исключить из узла";
+        private readonly string _paramNameIsSpecifyPipeFittings = SharedParamsConfig.Instance.VISConsiderPipeFittings.Name; //"ФОП_ВИС_Учитывать фитинги труб";
+        public readonly string ParamNameIsSpecifyPipeFittingsFromPype = SharedParamsConfig.Instance.VISConsiderPipeFittingsByType.Name; //"ФОП_ВИС_Учитывать фитинги труб по типу трубы";
+        private readonly string _paramNameIsSpecifyDuctFittings = SharedParamsConfig.Instance.VISConsiderDuctFittings.Name; //"ФОП_ВИС_Учитывать фитинги воздуховодов";
+
+        private readonly string _paramNamePipeInsulationStock = SharedParamsConfig.Instance.VISPipeInsulationReserve.Name; //"ФОП_ВИС_Запас изоляции труб";
+        private readonly string _paramNameDuctInsulationStock = SharedParamsConfig.Instance.VISDuctInsulationReserve.Name; //"ФОП_ВИС_Запас изоляции воздуховодов";
+        private readonly string _paramNameDuctPipeStock = SharedParamsConfig.Instance.VISPipeDuctReserve.Name; //"ФОП_ВИС_Запас воздуховодов/труб";
+        public readonly string IndividualStock = SharedParamsConfig.Instance.VISIndividualStock.Name; //"ФОП_ВИС_Индивидуальный запас";
+
+        public readonly string IsManiFoldParamName = SharedParamsConfig.Instance.VISJunction.Name; //"ФОП_ВИС_Узел";
+        public readonly string IsOutSideOfManifold = SharedParamsConfig.Instance.VISExcludeFromJunction.Name; //"ФОП_ВИС_Исключить из узла";
 
         public readonly string SingleUnit = "шт.";
         public readonly string KitUnit = "компл.";
         public readonly string MeterUnit = "м.п.";
         public readonly string SquareUnit = "м²";
 
-        public readonly string Dy = "ФОП_ВИС_Ду";
-        public readonly string DyWall = "ФОП_ВИС_Ду х Стенка";
-        public readonly string DExternalWall = "ФОП_ВИС_Днар х Стенка";
+        public readonly string Dy = SharedParamsConfig.Instance.VISDiameterNominal.Name; //"ФОП_ВИС_Ду";
+        public readonly string DyWall = SharedParamsConfig.Instance.VISDiameterNominalXThikness.Name; //"ФОП_ВИС_Ду х Стенка";
+        public readonly string DExternalWall = SharedParamsConfig.Instance.VISDiameterExternalXThikness.Name; //"ФОП_ВИС_Днар х Стенка";
 
         public readonly string MaskMarkName = "ФОП_ВИС_Маска марки";
         public readonly string MaskNameName = "ФОП_ВИС_Маска наименования";
