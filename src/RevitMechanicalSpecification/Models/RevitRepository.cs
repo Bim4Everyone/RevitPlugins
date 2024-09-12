@@ -152,7 +152,7 @@ namespace RevitMechanicalSpecification.Models {
         }
 
         private void ProcessElements(List<ElementParamFiller> fillers) {
-            _parameterChecker.ExecuteParameterCheck();
+            _parameterChecker.ExecuteParameterCheck(Document);
 
             string userName = UIApplication.Application.Username.ToLower();
             List<string> editors = new List<string>();

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 
 using RevitMechanicalSpecification.Models;
@@ -41,6 +44,41 @@ namespace RevitMechanicalSpecification.Service {
         };
 
 
+        private readonly List<RevitParam> _revitParams = new List<RevitParam>() {
+            SharedParamsConfig.Instance.VISGrouping,
+            SharedParamsConfig.Instance.EconomicFunction,
+            SharedParamsConfig.Instance.VISSystemName,
+            SharedParamsConfig.Instance.VISCombinedName,
+            SharedParamsConfig.Instance.VISMarkNumber,
+            SharedParamsConfig.Instance.VISItemCode,
+            SharedParamsConfig.Instance.VISUnit,
+            SharedParamsConfig.Instance.VISManufacturer,
+            SharedParamsConfig.Instance.VISSpecNumbers,
+            SharedParamsConfig.Instance.VISNameAddition,
+            SharedParamsConfig.Instance.VISNameForced,
+            SharedParamsConfig.Instance.VISSystemNameForced,
+            SharedParamsConfig.Instance.VISGroupingForced,
+            SharedParamsConfig.Instance.VISEconomicFunction,
+            SharedParamsConfig.Instance.VISMinDuctThickness,
+            SharedParamsConfig.Instance.VISMaxDuctThickness,
+            SharedParamsConfig.Instance.VISParamReplacementName,
+            SharedParamsConfig.Instance.VISParamReplacementMarkNumber,
+            SharedParamsConfig.Instance.VISParamReplacementItemCode,
+            SharedParamsConfig.Instance.VISParamReplacementUnit,
+            SharedParamsConfig.Instance.VISParamReplacementManufacturer,
+            SharedParamsConfig.Instance.VISOutSystemName,
+            SharedParamsConfig.Instance.VISConsiderPipeFittings,
+            SharedParamsConfig.Instance.VISConsiderPipeFittingsByType,
+            SharedParamsConfig.Instance.VISConsiderDuctFittings,
+            SharedParamsConfig.Instance.VISPipeInsulationReserve,
+            SharedParamsConfig.Instance.VISDuctInsulationReserve,
+            SharedParamsConfig.Instance.VISPipeDuctReserve,
+            SharedParamsConfig.Instance.VISIndividualStock,
+            SharedParamsConfig.Instance.VISJunction,
+            SharedParamsConfig.Instance.VISExcludeFromJunction
+        };
+        
+
         private string CheckParameterCategories(string paraname, List<BuiltInCategory> designatedBuiltInCategories) {
             if(!_document.IsExistsSharedParam(paraname)) {
                 return $"Параметр {paraname} не существует в проекте.";
@@ -74,22 +112,28 @@ namespace RevitMechanicalSpecification.Service {
             }
         }
 
-        public void ExecuteParameterCheck() {
-            FillReportList(_configuration.TargetNameGroup, _defCatSet); //Проверяем ФОП_ВИС_Группирование
-            FillReportList(_configuration.TargetNameFunction, _defCatSet); //Проверяем ФОП_Экономическая функция
-            FillReportList(_configuration.TargetNameSystem, _defCatSet); //Проверяем ФОП_Экономическая функция
-            FillReportList(_configuration.TargetNameName, _defCatSet); //Проверяем ФОП_ВИС_Наименование комбинированное
-            FillReportList(_configuration.TargetNameMark, _defCatSet); //Проверяем ФОП_ВИС_Марка
-            FillReportList(_configuration.TargetNameCode, _defCatSet); //Проверяем ФОП_ВИС_Код изделия
-            FillReportList(_configuration.TargetNameCreator, _defCatSet); //Проверяем ФОП_ВИС_Код изделия
-            FillReportList(_configuration.TargetNameUnit, _defCatSet); //Проверяем ФОП_ВИС_Единица измерения
-            FillReportList(_configuration.TargetNameNumber, _defCatSet); //Проверяем ФОП_ВИС_Число
+        public void SetupParams(Document document) {
+            ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
+            projectParameters.SetupRevitParams(document, _revitParams);
+        }
 
-            if(_report.Count > 0) {
-                foreach(string report in _report) {
-                    Console.WriteLine(report);
-                }
-            }
+        public void ExecuteParameterCheck(Document document) {
+            SetupParams(document);
+            //FillReportList(_configuration.TargetNameGroup, _defCatSet); //Проверяем ФОП_ВИС_Группирование
+            //FillReportList(_configuration.TargetNameFunction, _defCatSet); //Проверяем ФОП_Экономическая функция
+            //FillReportList(_configuration.TargetNameSystem, _defCatSet); //Проверяем ФОП_Экономическая функция
+            //FillReportList(_configuration.TargetNameName, _defCatSet); //Проверяем ФОП_ВИС_Наименование комбинированное
+            //FillReportList(_configuration.TargetNameMark, _defCatSet); //Проверяем ФОП_ВИС_Марка
+            //FillReportList(_configuration.TargetNameCode, _defCatSet); //Проверяем ФОП_ВИС_Код изделия
+            //FillReportList(_configuration.TargetNameCreator, _defCatSet); //Проверяем ФОП_ВИС_Код изделия
+            //FillReportList(_configuration.TargetNameUnit, _defCatSet); //Проверяем ФОП_ВИС_Единица измерения
+            //FillReportList(_configuration.TargetNameNumber, _defCatSet); //Проверяем ФОП_ВИС_Число
+
+            //if(_report.Count > 0) {
+            //    foreach(string report in _report) {
+            //        Console.WriteLine(report);
+            //    }
+            //}
         }
     }
 }
