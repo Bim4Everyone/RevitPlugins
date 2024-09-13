@@ -49,9 +49,12 @@ namespace RevitDeclarations.ViewModels {
 
             _phases = _revitRepository.GetPhases();
 
-            _excelExportViewModel = new ExcelExportViewModel("Excel", _settings);
-            _csvExportViewModel = new CsvExportViewModel("csv", _settings);
-            _jsonExportViewModel = new JsonExportViewModel("json", _settings);
+            _excelExportViewModel = 
+                new ExcelExportViewModel("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
+            _csvExportViewModel = 
+                new CsvExportViewModel("csv", new Guid("BF1869ED-C5C4-4FCE-9DA9-F8F75A6B190D"), _settings);
+            _jsonExportViewModel = 
+                new JsonExportViewModel("json", new Guid("159FA27A-06E7-4515-9221-0BAFC0008F21"), _settings);
 
             _exportFormats = new List<ExportViewModel>() {
                 _excelExportViewModel,
@@ -323,7 +326,7 @@ namespace RevitDeclarations.ViewModels {
 
             configSettings.DeclarationName = FileName;
             configSettings.DeclarationPath = FilePath;
-            configSettings.ExportFormat = SelectedFormat.Name;
+            configSettings.ExportFormat = SelectedFormat.Id;
             configSettings.Phase = SelectedPhase.Name;
 
             configSettings.RevitDocuments = RevitDocuments
@@ -369,7 +372,7 @@ namespace RevitDeclarations.ViewModels {
             FileName = configSettings.DeclarationName;
             FilePath = configSettings.DeclarationPath;
             SelectedFormat = ExportFormats
-                .FirstOrDefault(x => x.Name == configSettings.ExportFormat) ?? _exportFormats.FirstOrDefault();
+                .FirstOrDefault(x => x.Id == configSettings.ExportFormat) ?? _exportFormats.FirstOrDefault();
             SelectedPhase = Phases
                 .FirstOrDefault(x => x.Name == configSettings.Phase) ?? _phases[_phases.Count - 1];
 
