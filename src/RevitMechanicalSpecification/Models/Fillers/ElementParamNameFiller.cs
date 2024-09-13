@@ -30,8 +30,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         public override void SetParamValue(Element element) {
             string name = _nameAndGroupFactory.GetName(element, ElemType);
 
-            ToParam.Set(ManifoldInstance != null
-                ? $"‎    {Count}. {name}"
+            TargetParameter.Set(ManifoldInstance != null
+                ? $"‎    {PositionNumInManifold}. {name}"
                 : element.GetSharedParamValueOrDefault(Config.ForcedName, name));
         }
     }

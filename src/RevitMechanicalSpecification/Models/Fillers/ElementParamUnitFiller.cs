@@ -28,7 +28,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private readonly HashSet<string> _squareNames = new HashSet<string>() { "м2", "м²" };
 
         private string DefaultCheck(string defaultUnit) {
-            string unit = FromParam.AsValueString();
+            string unit = OriginalParameter.AsValueString();
 
             if(unit == null) {
                 return defaultUnit;
@@ -81,7 +81,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         public override void SetParamValue(Element element) {
-            ToParam.Set(GetUnit(element));
+            TargetParameter.Set(GetUnit(element));
         }
     }
 }

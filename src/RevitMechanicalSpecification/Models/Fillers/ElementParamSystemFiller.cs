@@ -47,11 +47,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         public override void SetParamValue(Element element) {
             string calculatedSystem = GetSystemName(element);
             if(!(string.IsNullOrEmpty(calculatedSystem))) {
-                ToParam.Set(GetSystemName(element));
+                TargetParameter.Set(GetSystemName(element));
                 return;
             }
 
-            ToParam.Set(Config.GlobalSystem);
+            TargetParameter.Set(Config.GlobalSystem);
         }
     }
 }

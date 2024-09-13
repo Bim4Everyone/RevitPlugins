@@ -29,7 +29,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         public override void SetParamValue(Element element) {
-            ToParam.Set(ManifoldInstance != null
+            TargetParameter.Set(ManifoldInstance != null
                 ? _nameAndGroupFactory.GetManifoldGroup(ManifoldInstance, element)
                 : element.GetSharedParamValueOrDefault(Config.ForcedGroup, _nameAndGroupFactory.GetGroup(element)));
         }

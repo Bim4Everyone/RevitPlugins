@@ -100,7 +100,6 @@ namespace RevitMechanicalSpecification.Service {
             return visSystem.SystemFunction;
         }
 
-
         public string GetSystemValue(Element element) {
             if(element is FamilyInstance instance) {
                 element = GetSuperComponentIfExist(instance);

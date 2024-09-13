@@ -25,7 +25,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         private string GetMark(Element element) {
-            string mark = element.GetTypeOrInstanceParamStringValue(ElemType, FromParamName);
+            string mark = element.GetTypeOrInstanceParamStringValue(ElemType, OriginalParamName);
 
             if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
                 mark =  _calculator.GetDuctFittingMark(element);
@@ -35,7 +35,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         public override void SetParamValue(Element element) {
-            ToParam.Set(GetMark(element));
+            TargetParameter.Set(GetMark(element));
         }
     }
 }

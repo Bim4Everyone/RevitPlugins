@@ -15,10 +15,6 @@ using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     internal class ParameterChecker {
-        public ParameterChecker() {
-
-        }
-
         private readonly List<RevitParam> _revitParams = new List<RevitParam>() {
             SharedParamsConfig.Instance.VISGrouping,
             SharedParamsConfig.Instance.EconomicFunction,
@@ -53,6 +49,10 @@ namespace RevitMechanicalSpecification.Service {
             SharedParamsConfig.Instance.VISExcludeFromJunction
         };
 
+        /// <summary>
+        /// Создать недостающие параметры, устранить расхождения по галочкам
+        /// </summary>
+        /// <param name="document"></param>
         public void ExecuteParameterCheck(Document document) {
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
             projectParameters.SetupRevitParams(document, _revitParams);

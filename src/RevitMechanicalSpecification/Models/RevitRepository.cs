@@ -20,8 +20,6 @@ using RevitMechanicalSpecification.Entities;
 
 namespace RevitMechanicalSpecification.Models {
     internal class RevitRepository {
-
-        internal HashSet<ManifoldPart> ManifoldParts;
         private readonly List<ElementParamFiller> _fillersSpecRefresh;
         private readonly List<ElementParamFiller> _fillersSystemRefresh;
         private readonly List<ElementParamFiller> _fillersFunctionRefresh;
@@ -39,8 +37,6 @@ namespace RevitMechanicalSpecification.Models {
 
             ManifoldParts = new HashSet<ManifoldPart>();
 
-            _elements = _collector.GetElementsToSpecificate();
-            _visSystems = _collector.GetVisSystems();
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _collector = new CollectionFactory(Document, _specConfiguration);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
@@ -48,6 +44,9 @@ namespace RevitMechanicalSpecification.Models {
             _parameterChecker = new ParameterChecker();
             _maskReplacer = new MaskReplacer(_specConfiguration);
 
+            _elements = _collector.GetElementsToSpecificate();
+            _visSystems = _collector.GetVisSystems();
+            
             _fillersSpecRefresh = new List<ElementParamFiller>()
 {
                 //Заполнение ФОП_ВИС_Группирование
@@ -118,6 +117,8 @@ namespace RevitMechanicalSpecification.Models {
                 _visSystems)
             };
         }
+
+        internal HashSet<ManifoldPart> ManifoldParts;
 
         public UIApplication UIApplication { get; }
 
