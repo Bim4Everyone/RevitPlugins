@@ -22,7 +22,11 @@ namespace RevitMechanicalSpecification.Service {
             _specConfiguration = specConfiguration;
         }
 
-        public List<Element> GetMechanicalElements() {
+        /// <summary>
+        /// Получение специфицируемых элементов
+        /// </summary>
+        /// <returns></returns>
+        public List<Element> GetElementsToSpecificate() {
             var mechanicalCategories = new List<BuiltInCategory>()
             {
                 BuiltInCategory.OST_DuctFitting,
@@ -40,12 +44,15 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInCategory.OST_PlumbingFixtures,
                 BuiltInCategory.OST_Sprinklers
             };
-            return GetElements(mechanicalCategories);
-
+            return GetElementsByCategories(mechanicalCategories);
         }
 
-        public List<VisSystem> GetMechanicalSystemColl() {
-            List<Element> elements = GetElements(
+        /// <summary>
+        /// Получение списка систем труб и воздуховодов и создание из них списка VisSystem-ов
+        /// </summary>
+        /// <returns></returns>
+        public List<VisSystem> GetVisSystems() {
+            List<Element> elements = GetElementsByCategories(
                 new List<BuiltInCategory>() {
                 BuiltInCategory.OST_PipingSystem,
                 BuiltInCategory.OST_DuctSystem });
@@ -55,14 +62,21 @@ namespace RevitMechanicalSpecification.Service {
 
                 SystemElement = element as MEPSystem,
                 SystemSystemName = element.Name,
-                SystemFunction = element.GetElementType().GetSharedParamValueOrDefault<string>(_specConfiguration.SystemEF),
-                SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>(_specConfiguration.SystemShortName),
+                SystemFunction = element.GetElementType().GetSharedParamValueOrDefault<string>(
+                    _specConfiguration.SystemEF),
+                SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>(
+                    _specConfiguration.SystemShortName),
                 SystemTargetName = element.Name.Split(' ').First()
             }));
 
             return mechanicalSystems;
         }
 
+        /// <summary>
+        /// Логический фильтр на исключение текста модели
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         private bool LogicalFilter(Element element) {
 
             if(element is ModelText) {
@@ -75,7 +89,12 @@ namespace RevitMechanicalSpecification.Service {
             return false;
         }
 
-        private List<Element> GetElements(List<BuiltInCategory> builtInCategories) {
+        /// <summary>
+        /// Получаем элементы по списку категорий
+        /// </summary>
+        /// <param name="builtInCategories"></param>
+        /// <returns></returns>
+        private List<Element> GetElementsByCategories(List<BuiltInCategory> builtInCategories) {
             var filter = new ElementMulticategoryFilter(builtInCategories);
             var elements = (List<Element>) new FilteredElementCollector(_document)
                 .WherePasses(filter)

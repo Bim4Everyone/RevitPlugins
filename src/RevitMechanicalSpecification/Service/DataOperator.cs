@@ -10,7 +10,13 @@ using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Service {
     public static class DataOperator {
-        //возвращает значение параметра по типу или экземпляру, если существует, иначе null
+        /// <summary>
+        /// возвращает значение параметра по типу или экземпляру, если существует, иначе null
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
+        /// <param name="paraName"></param>
+        /// <returns></returns>
         public static string GetTypeOrInstanceParamStringValue(this Element element, Element elemType, string paraName) {
             if(element.IsExistsParam(paraName)) {
                 return element.GetSharedParamValueOrDefault<string>(paraName);
@@ -21,6 +27,13 @@ namespace RevitMechanicalSpecification.Service {
             return null;
         }
 
+        /// <summary>
+        /// Получаем дабл из параметра в экземпляре или типе, иначе возвращает 0
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
+        /// <param name="paraName"></param>
+        /// <returns></returns>
         public static double GetTypeOrInstanceParamDoubleValue(this Element element, Element elemType, string paraName) {
             if(element.IsExistsParam(paraName)) {
                 return element.GetSharedParamValueOrDefault<double>(paraName);
@@ -31,13 +44,16 @@ namespace RevitMechanicalSpecification.Service {
             return 0;
         }
 
-        //если есть суперкомпонент - возвращает его. Иначе возвращает исходник
+        /// <summary>
+        /// Если есть суперкомпонент - возвращает его. Иначе возвращает исходник
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns></returns>
         public static FamilyInstance GetSuperComponentIfExist(this FamilyInstance instance) {
             if(!(instance.SuperComponent is null)) {
                 instance = (FamilyInstance) instance.SuperComponent;
                 instance = GetSuperComponentIfExist(instance);
             }
-
             return instance;
         }
     }

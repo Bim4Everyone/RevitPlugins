@@ -39,8 +39,8 @@ namespace RevitMechanicalSpecification.Models {
 
             ManifoldParts = new HashSet<ManifoldPart>();
 
-            _elements = _collector.GetMechanicalElements();
-            _visSystems = _collector.GetMechanicalSystemColl();
+            _elements = _collector.GetElementsToSpecificate();
+            _visSystems = _collector.GetVisSystems();
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _collector = new CollectionFactory(Document, _specConfiguration);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);

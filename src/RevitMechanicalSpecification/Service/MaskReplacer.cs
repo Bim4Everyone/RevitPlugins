@@ -31,18 +31,32 @@ namespace RevitMechanicalSpecification.Service {
             _specConfiguration = specConfiguration;
         }
 
+        /// <summary>
+        /// Получает текстовое значение параметров размерностей для подстановки в целевые параметры
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
+        /// <param name="paramName"></param>
+        /// <returns></returns>
         private string GetStringValue(Element element, Element elemType, string paramName) {
             double value = element.GetTypeOrInstanceParamDoubleValue(elemType, paramName);
-
             value = UnitConverter.DoubleToMilimeters(value);
 
             return value.ToString();
         }
 
+        /// <summary>
+        /// Замена маской параметров экземпляра ADSK_Наименование и ADSK_Марка
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="maskName"></param>
+        /// <param name="toParamName"></param>
+        /// <returns></returns>
         public string ReplaceMask(Element element, string maskName, string toParamName) {
             Element elemType = element.GetElementType();
             string mask = element.GetTypeOrInstanceParamStringValue(elemType, maskName);
 
+            // Если мы не нашли маску или у нее нет значение, дальнейшие обработки не имеют смысла
             if(mask == null) {
                 return null;
             }
@@ -66,7 +80,7 @@ namespace RevitMechanicalSpecification.Service {
                 mask = mask.Replace(_diameter, diameter);
             }
 
-            //Здесь нужно обновить значение ADSK_Наименование-Марка для шаблонных семейств с масками
+            // Здесь нужно обновить значение ADSK_Наименование-Марка для шаблонных семейств с масками
             Parameter toParam = element.LookupParameter(toParamName);
             if(toParam != null) {
                 if(!toParam.IsReadOnly) {
@@ -79,20 +93,36 @@ namespace RevitMechanicalSpecification.Service {
 
         // Эта часть должна работать на строго шаблонизированных семействах с ADSK_Наименование и ADSK_Марка. Нужно ли 
         // выносить куда-то определения их имен?
+
+        /// <summary>
+        /// Вызов замены ADSK_Марка
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         public string ReplaceMarkMask(Element element) {
             return ReplaceMask(element, _specConfiguration.MaskMarkName, "ADSK_Марка");
         }
 
+        /// <summary>
+        /// Вызов замены параметра ADSK_Наименование
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         public string ReplaceNameMask(Element element) {
             return ReplaceMask(element, _specConfiguration.MaskNameName, "ADSK_Наименование");
         }
 
+        /// <summary>
+        /// Вызывает замену обоих целевых параметров масками. Возвращает бул, 
+        /// чтоб в общей обработке понять была ли замена
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         public bool ExecuteReplacment(Element element) {
             string markMask = ReplaceMarkMask(element);
             string nameMask = ReplaceNameMask(element);
 
             return !string.IsNullOrEmpty(markMask) & !string.IsNullOrEmpty(nameMask);
-
         }
     }
 }

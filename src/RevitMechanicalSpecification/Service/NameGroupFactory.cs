@@ -27,8 +27,94 @@ namespace RevitMechanicalSpecification.Service {
             _calculator = calculator;          
         }
 
-        //Ниже операции с именами
-        //Базовое имя
+        /// <summary>
+        /// Базовая + детализированная группа
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public string GetGroup(Element element) {
+            string detailedGroup = GetDetailedGroup(element);
+            return $"{GetBaseGroup(element)}{detailedGroup}";
+        }
+
+        /// <summary>
+        /// Возвращает субкомпоненты и субкомпоненты субкомпонентов
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public List<Element> GetSub(FamilyInstance element) {
+            var subs = new List<Element>();
+
+            foreach(ElementId elementId in element.GetSubComponentIds()) {
+                Element subElement = _document.GetElement(elementId);
+                subs.Add(subElement);
+
+                var subInst = subElement as FamilyInstance;
+                if(subInst.GetSubComponentIds().Count > 0) {
+                    subs.AddRange(GetSub(subInst));
+                }
+            }
+            return subs;
+        }
+
+        /// <summary>
+        /// Получаем ФОП_ВИС_Группирование для узла
+        /// </summary>
+        /// <param name="familyInstance"></param>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public string GetManifoldGroup(FamilyInstance familyInstance, Element element) {
+            return
+                    $"{GetBaseGroup(familyInstance)}" +
+                    $"{GetDetailedGroup(familyInstance)}" +
+                    $"{familyInstance.get_Parameter(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString()}" +
+                    $"_Узел_" +
+                    $"_{GetDetailedGroup(element)}";
+        }
+
+        /// <summary>
+        /// Проверяем нужно ли увеличивать цифру в наименовании вложений узла, сравнивая группирования этого и прошлого
+        /// по индексу элементов
+        /// </summary>
+        /// <param name="manifoldElements"></param>
+        /// <param name="index"></param>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
+        public bool IsIncreaseCount(List<Element> manifoldElements, int index, Element element, Element elemType) {
+            string name = GetName(element, elemType);
+
+            if(string.IsNullOrEmpty(name) || name == "!Не учитывать" || index == 0) {
+                return false;
+            }
+
+            return GetGroup(element) != GetGroup(manifoldElements[index - 1]);
+        }
+
+        /// <summary>
+        /// Проверяем значение галочки "ФОП_ВИС_Узел"
+        /// </summary>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
+        public bool IsManifold(Element elemType) {
+            return elemType.GetSharedParamValueOrDefault<int>(_config.IsManiFoldParamName) == 1;
+        }
+
+        /// <summary>
+        /// Проверяем значение галочки "ФОП_ВИС_Исключить из узла"
+        /// </summary>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
+        public bool IsOutSideOfManifold(Element elemType) {
+            return elemType.GetSharedParamValueOrDefault<int>(_config.IsOutSideOfManifold) == 1;
+        }
+
+        /// <summary>
+        /// Базовое наименование
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
         public string GetName(Element element, Element elemType) {
             string name = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameName);
             string nameAddon = element.GetTypeOrInstanceParamStringValue(elemType, _config.NameAddition);
@@ -60,8 +146,11 @@ namespace RevitMechanicalSpecification.Service {
             return $"{name} {nameAddon}";
         }
 
-        //Ниже операции с группами
-        //Базовая группа-основа сортировки
+        /// <summary>
+        /// Получаем базовое группирование элемента
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         private string GetBaseGroup(Element element) {
             Category category = element.Category;
             switch(category.GetBuiltInCategory()) {
@@ -97,7 +186,12 @@ namespace RevitMechanicalSpecification.Service {
 
             return "Неизвестная категория";
         }
-        //Детализированная - имя + марка + код + завод
+
+        /// <summary>
+        /// Получаем детализированную группу - имя + марка + код + завод
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         private string GetDetailedGroup(Element element) {
             Element elemType = element.GetElementType();
 
@@ -106,55 +200,6 @@ namespace RevitMechanicalSpecification.Service {
             string code = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameCode);
             string creator = element.GetTypeOrInstanceParamStringValue(elemType, _config.OriginalParamNameCreator);
             return $"_{name}_{mark}_{code}_{creator}";
-        }
-        //Базовая + детализированная
-        public string GetGroup(Element element) {
-            string detailedGroup = GetDetailedGroup(element);
-            return $"{GetBaseGroup(element)}{detailedGroup}";
-        }
-
-        //Ниже операции с узлами
-        //возвращает субкомпоненты и субкомпоненты субкомпонентов
-        public List<Element> GetSub(FamilyInstance element) {
-            var subs = new List<Element>();
-
-            foreach(ElementId elementId in element.GetSubComponentIds()) {
-                Element subElement = _document.GetElement(elementId);
-                subs.Add(subElement);
-
-                var subInst = subElement as FamilyInstance;
-                if(subInst.GetSubComponentIds().Count > 0) {
-                    subs.AddRange(GetSub(subInst));
-                }
-            }
-            return subs;
-        }
-
-        public string GetManifoldGroup(FamilyInstance familyInstance, Element element) {
-            return
-                    $"{GetBaseGroup(familyInstance)}" +
-                    $"{GetDetailedGroup(familyInstance)}"+
-                    $"{familyInstance.get_Parameter(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString()}" +
-                    $"_Узел_" +
-                    $"_{GetDetailedGroup(element)}";
-        }
-
-        public bool IsIncreaseCount(List<Element> manifoldElements, int index, Element element, Element elemType) {
-            string name = GetName(element, elemType);
-
-            if(string.IsNullOrEmpty(name) || name == "!Не учитывать" || index == 0) {
-                return false;
-            }
-
-            return GetGroup(element) != GetGroup(manifoldElements[index - 1]);
-        }
-
-        public bool IsManifold(Element elemType) {
-            return elemType.GetSharedParamValueOrDefault<int>(_config.IsManiFoldParamName) == 1;
-        }
-
-        public bool IsOutSideOfManifold(Element elemType) {
-            return elemType.GetSharedParamValueOrDefault<int>(_config.IsOutSideOfManifold) == 1;
         }
     }
 }
