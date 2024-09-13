@@ -251,8 +251,8 @@ namespace RevitDeclarations.ViewModels {
 
             List<Apartment> apartments = projects
                 .SelectMany(x => x.Apartments)
-                .OrderBy(x => x.Building)
-                .ThenBy(x => x.FullNumber)
+                .OrderBy(x => x.Section)
+                .ThenBy(x => x.GetIntFullNumber())
                 .ToList();
 
             try {
