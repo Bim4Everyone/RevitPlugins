@@ -1,10 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -14,6 +14,9 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using RevitDeclarations.Models;
 using RevitDeclarations.Views;
 
+using TaskDialog = Autodesk.Revit.UI.TaskDialog;
+using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
+
 namespace RevitDeclarations.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
@@ -21,14 +24,20 @@ namespace RevitDeclarations.ViewModels {
 
         private readonly ParametersViewModel _parametersViewModel;
         private readonly PrioritiesViewModel _prioritiesViewModel;
+
+        private readonly ExcelExportViewModel _excelExportViewModel;
+        private readonly CsvExportViewModel _csvExportViewModel;
+        private readonly JsonExportViewModel _jsonExportViewModel;
+        private readonly List<ExportViewModel> _exportFormats;
+
         private readonly IList<RevitDocumentViewModel> _revitDocuments;
         private readonly IReadOnlyList<Phase> _phases;
 
         private string _filePath;
         private string _fileName;
-        private bool _exportToExcel;
-        private string _accuracy;
         private Phase _selectedPhase;
+        private ExportViewModel _selectedFormat;
+        private string _accuracy;
         private bool _loadUtp;
         private bool _canLoadUtp;
         private string _errorText;
@@ -39,10 +48,21 @@ namespace RevitDeclarations.ViewModels {
             _settings = settings;
 
             _phases = _revitRepository.GetPhases();
-            _selectedPhase = _phases[_phases.Count - 1];
+
+            _excelExportViewModel = 
+                new ExcelExportViewModel("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
+            _csvExportViewModel = 
+                new CsvExportViewModel("csv", new Guid("BF1869ED-C5C4-4FCE-9DA9-F8F75A6B190D"), _settings);
+            _jsonExportViewModel = 
+                new JsonExportViewModel("json", new Guid("159FA27A-06E7-4515-9221-0BAFC0008F21"), _settings);
+
+            _exportFormats = new List<ExportViewModel>() {
+                _excelExportViewModel,
+                _csvExportViewModel,
+                _jsonExportViewModel,
+            };
 
             _accuracy = "1";
-            _exportToExcel = true;
             _loadUtp = true;
             _canLoadUtp = true;
 
@@ -81,10 +101,6 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _fileName, value);
         }
         public string FullPath => FilePath + "\\" + FileName;
-        public bool ExportToExcel {
-            get => _exportToExcel;
-            set => RaiseAndSetIfChanged(ref _exportToExcel, value);
-        }
 
         public IReadOnlyList<Phase> Phases => _phases;
         public Phase SelectedPhase {
@@ -105,6 +121,12 @@ namespace RevitDeclarations.ViewModels {
         public bool CanLoadUtp {
             get => _canLoadUtp;
             set => RaiseAndSetIfChanged(ref _canLoadUtp, value);
+        }
+
+        public IReadOnlyList<ExportViewModel> ExportFormats => _exportFormats;
+        public ExportViewModel SelectedFormat {
+            get => _selectedFormat;
+            set => RaiseAndSetIfChanged(ref _selectedFormat, value);
         }
 
         public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
@@ -232,17 +254,24 @@ namespace RevitDeclarations.ViewModels {
 
             List<Apartment> apartments = projects
                 .SelectMany(x => x.Apartments)
-                .OrderBy(x => x.Building)
-                .ThenBy(x => x.FullNumber)
+                .OrderBy(x => x.Section)
+                .ThenBy(x => x.GetIntFullNumber())
                 .ToList();
 
-            DeclarationExporter exporter = new DeclarationExporter(_settings);
+            try {
+                _selectedFormat.Export(FullPath, apartments);
+            } catch(Exception e) {
+                var taskDialog = new TaskDialog("Ошибка выгрузки") {
+                    CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
+                    MainContent = "Произошла ошибка выгрузки.\nПопробовать выгрузить декларацию в формате csv?",
+                    ExpandedContent = $"Описание ошибки: {e.Message}"
+                };
 
-            if(ExportToExcel) {
-                ExcelTableData tableData = new ExcelTableData(apartments, _settings);
-                exporter.ExportToExcel(FullPath, tableData);
-            } else {
-                exporter.ExportToJson(FullPath, apartments);
+                TaskDialogResult dialogResult = taskDialog.Show();
+
+                if(dialogResult == TaskDialogResult.Yes) {
+                    _csvExportViewModel.Export(FullPath, apartments);
+                }
             }
         }
 
@@ -297,7 +326,7 @@ namespace RevitDeclarations.ViewModels {
 
             configSettings.DeclarationName = FileName;
             configSettings.DeclarationPath = FilePath;
-            configSettings.ExportToExcel = ExportToExcel;
+            configSettings.ExportFormat = SelectedFormat.Id;
             configSettings.Phase = SelectedPhase.Name;
 
             configSettings.RevitDocuments = RevitDocuments
@@ -342,12 +371,11 @@ namespace RevitDeclarations.ViewModels {
 
             FileName = configSettings.DeclarationName;
             FilePath = configSettings.DeclarationPath;
-            ExportToExcel = configSettings.ExportToExcel;
-            SelectedPhase = Phases.FirstOrDefault(x => x.Name == configSettings.Phase);
+            SelectedFormat = ExportFormats
+                .FirstOrDefault(x => x.Id == configSettings.ExportFormat) ?? _exportFormats.FirstOrDefault();
+            SelectedPhase = Phases
+                .FirstOrDefault(x => x.Name == configSettings.Phase) ?? _phases[_phases.Count - 1];
 
-            if(SelectedPhase == null) {
-                SelectedPhase = _selectedPhase = _phases[_phases.Count - 1];
-            }
 
             foreach(var document in RevitDocuments.Where(x => configSettings.RevitDocuments.Contains(x.Name))) {
                 document.IsChecked = true;

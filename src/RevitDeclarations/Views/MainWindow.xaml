@@ -21,6 +21,7 @@
     
     Title="Декларации"
     Height="760" Width="650"
+    MinHeight="760" MinWidth="650"
     ResizeMode="NoResize"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -30,7 +31,7 @@ namespace RevitDeclarations.Models {
         public override string ProjectName { get; set; }
         public string DeclarationName { get; set; }
         public string DeclarationPath { get; set; }
-        public bool ExportToExcel { get; set; }
+        public Guid ExportFormat { get; set; }
         public string Phase { get; set; }
         public List<string> RevitDocuments { get; set; } = new List<string>();
 

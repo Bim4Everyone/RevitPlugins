@@ -203,7 +203,7 @@
                 Grid.Column="1"
                 Grid.Row="4"
                 Style="{StaticResource ParameterName}"
-                Text="Параметр группировки многоуровневых квартир::"/>
+                Text="Параметр группировки многоуровневых квартир:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="4"
@@ -435,7 +435,7 @@
                 Grid.Column="2"
                 Grid.Row="10"
                 Margin="10, 0"
-                Text="{Binding ProjectName}"/>
+                Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Button
                 Grid.Column="0"
