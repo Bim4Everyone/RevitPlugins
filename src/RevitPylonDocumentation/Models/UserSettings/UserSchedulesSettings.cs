@@ -24,10 +24,10 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _ifcPartsScheduleSuffixTemp = "_IFC";
 
         // Названия эталонных спек
-        private string _rebarScheduleNameTemp = "(КЖ...)_СА_Базовая_(Марка пилона)";
-        private string _materialScheduleNameTemp = "(КЖ...)_СМ_Базовая_(Марка пилона)";
-        private string _systemPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка пилона)_Системная";
-        private string _ifcPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка пилона)_IFC";
+        private string _rebarScheduleNameTemp = "01_(КЖ...)_СА_Базовая_(Марка пилона)";
+        private string _materialScheduleNameTemp = "01_(КЖ...)_СМ_Базовая_(Марка пилона)";
+        private string _systemPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_Системная";
+        private string _ifcPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_IFC";
 
         // Заполнение параметров диспетчера
         private string _rebarScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
