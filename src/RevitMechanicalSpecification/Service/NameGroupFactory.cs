@@ -24,7 +24,7 @@ namespace RevitMechanicalSpecification.Service {
             ) {
             _document = document;
             _config = configuration;
-            _calculator = calculator;
+            _calculator = calculator;          
         }
 
         //Ниже операции с именами
@@ -54,8 +54,7 @@ namespace RevitMechanicalSpecification.Service {
                     return pipe != null ? 
                         $"{name} (Для: {GetName(pipe, pipe.GetElementType())}) {nameAddon}" : "!Не учитывать";
                 case BuiltInCategory.OST_DuctAccessory:
-                    string mask = MaskReplacer.ReplaceMask(element, _config.MaskNameName, "ADSK_Наименование");
-                    return mask != null ? $"{mask} {nameAddon}" : $"{name} {nameAddon}";
+                    return $"{name} {nameAddon}";
             }
 
             return $"{name} {nameAddon}";

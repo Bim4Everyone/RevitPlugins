@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -13,18 +14,24 @@ using dosymep.Revit;
 using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
-    public static class MaskReplacer {
+    public class MaskReplacer {
         //должно работать только с шаблонизированными семействами, так что оставляем только ADSK_Параметры, объявляем их тут же
-        private static readonly string _length = "ДЛИНА";
-        private static readonly string _adskLength = "ADSK_Размер_Длина";
-        private static readonly string _width = "ШИРИНА";
-        private static readonly string _adskWidth = "ADSK_Размер_Ширина";
-        private static readonly string _height = "ВЫСОТА";
-        private static readonly string _adskHeight = "ADSK_Размер_Высота";
-        private static readonly string _diameter = "ДИАМЕТР";
-        private static readonly string _adskDiameter = "ADSK_Размер_Диаметр";
+        private readonly string _length = "ДЛИНА";
+        private readonly string _adskLength = "ADSK_Размер_Длина";
+        private readonly string _width = "ШИРИНА";
+        private readonly string _adskWidth = "ADSK_Размер_Ширина";
+        private readonly string _height = "ВЫСОТА";
+        private readonly string _adskHeight = "ADSK_Размер_Высота";
+        private readonly string _diameter = "ДИАМЕТР";
+        private readonly string _adskDiameter = "ADSK_Размер_Диаметр";
 
-        private static string GetStringValue(Element element, Element elemType, string paramName) {
+        private readonly SpecConfiguration _specConfiguration;
+
+        public MaskReplacer(SpecConfiguration specConfiguration) {
+            _specConfiguration = specConfiguration;
+        }
+
+        private string GetStringValue(Element element, Element elemType, string paramName) {
             double value = element.GetTypeOrInstanceParamDoubleValue(elemType, paramName);
 
             value = UnitConverter.DoubleToMilimeters(value);
@@ -32,7 +39,7 @@ namespace RevitMechanicalSpecification.Service {
             return value.ToString();
         }
 
-        public static string ReplaceMask(Element element, string maskName, string toParamName) {
+        public string ReplaceMask(Element element, string maskName, string toParamName) {
             Element elemType = element.GetElementType();
             string mask = element.GetTypeOrInstanceParamStringValue(elemType, maskName);
 
@@ -70,5 +77,22 @@ namespace RevitMechanicalSpecification.Service {
             return mask;
         }
 
+        // Эта часть должна работать на строго шаблонизированных семействах с ADSK_Наименование и ADSK_Марка. Нужно ли 
+        // выносить куда-то определения их имен?
+        public string ReplaceMarkMask(Element element) {
+            return ReplaceMask(element, _specConfiguration.MaskMarkName, "ADSK_Марка");
+        }
+
+        public string ReplaceNameMask(Element element) {
+            return ReplaceMask(element, _specConfiguration.MaskNameName, "ADSK_Наименование");
+        }
+
+        public bool ExecuteReplacment(Element element) {
+            string markMask = ReplaceMarkMask(element);
+            string nameMask = ReplaceNameMask(element);
+
+            return !string.IsNullOrEmpty(markMask) & !string.IsNullOrEmpty(nameMask);
+
+        }
     }
 }

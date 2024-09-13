@@ -20,17 +20,34 @@ using RevitMechanicalSpecification.Entities;
 
 namespace RevitMechanicalSpecification.Models {
     internal class RevitRepository {
+
+        internal HashSet<ManifoldPart> ManifoldParts;
+        private readonly List<ElementParamFiller> _fillersSpecRefresh;
+        private readonly List<ElementParamFiller> _fillersSystemRefresh;
+        private readonly List<ElementParamFiller> _fillersFunctionRefresh;
+        private readonly NameGroupFactory _nameAndGroupFactory;
+        private readonly CollectionFactory _collector;
+        private readonly List<Element> _elements;
+        private readonly List<VisSystem> _visSystems;
+        private readonly SpecConfiguration _specConfiguration;
+        private readonly VisElementsCalculator _calculator;
+        private readonly ParameterChecker _parameterChecker;
+        private readonly MaskReplacer _maskReplacer;
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
 
-            ManifoldParts = new HashSet<ManifoldPart> { };
-            _collector = new CollectionFactory(Document);
+            ManifoldParts = new HashSet<ManifoldPart>();
+
             _elements = _collector.GetMechanicalElements();
             _visSystems = _collector.GetMechanicalSystemColl();
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
+            _collector = new CollectionFactory(Document, _specConfiguration);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
             _nameAndGroupFactory = new NameGroupFactory(_specConfiguration, Document, _calculator);
-            _parameterChecker = new ParameterChecker(Document, _specConfiguration);
+            _parameterChecker = new ParameterChecker();
+            _maskReplacer = new MaskReplacer(_specConfiguration);
+
             _fillersSpecRefresh = new List<ElementParamFiller>()
 {
                 //Заполнение ФОП_ВИС_Группирование
@@ -108,18 +125,55 @@ namespace RevitMechanicalSpecification.Models {
 
         public Document Document => ActiveUIDocument.Document;
 
-        private readonly List<ElementParamFiller> _fillersSpecRefresh;
-        private readonly List<ElementParamFiller> _fillersSystemRefresh;
-        private readonly List<ElementParamFiller> _fillersFunctionRefresh;
-        internal HashSet<ManifoldPart> ManifoldParts;
-        private readonly NameGroupFactory _nameAndGroupFactory;
-        private readonly CollectionFactory _collector;
-        private readonly List<Element> _elements;
-        private readonly List<VisSystem> _visSystems;
-        private readonly SpecConfiguration _specConfiguration;
-        private readonly VisElementsCalculator _calculator;
-        private readonly ParameterChecker _parameterChecker;
+        /// <summary>
+        /// Обновление только по филлерам спецификации
+        /// </summary>
+        public void SpecificationRefresh() {
+            ProcessElements(_fillersSpecRefresh);
+        }
 
+        /// <summary>
+        /// Обновление только по филлерам системы
+        /// </summary>
+        public void RefreshSystemName() {
+            ProcessElements(_fillersSystemRefresh);
+        }
+
+        /// <summary>
+        /// Обновление только по филлерам функции
+        /// </summary>
+        public void RefreshSystemFunction() {
+            ProcessElements(_fillersFunctionRefresh);
+        }
+
+        /// <summary>
+        /// Здесь нужно провести полное обновление всех параметров, поэтому будут сложены все филлеры в один лист 
+        /// </summary>
+        public void FullRefresh() {
+            List<ElementParamFiller> fillers = new List<ElementParamFiller>();
+            fillers.AddRange(_fillersSpecRefresh);
+            fillers.AddRange(_fillersFunctionRefresh);
+            fillers.AddRange(_fillersSystemRefresh);
+            ProcessElements(fillers);
+        }
+
+        /// <summary>
+        /// Вызов замены маски в шаблонизированных семействах-генериках. Отдельный мини-плагин, который должен вызываться
+        /// вместе с спекой, поэтому проще его встроить сюда
+        /// </summary>
+        public void ReplaceMask() {
+            using(var t = Document.StartTransaction("Сформировать имя")) {
+                foreach(Element element in _elements) {
+                    _maskReplacer.ExecuteReplacment(element);
+                }
+                t.Commit();
+            }
+        }
+
+        /// <summary>
+        /// Выводит отчет с занявшими элемент пользователями
+        /// </summary>
+        /// <param name="editors"></param>
         public void ShowReport(List<string> editors) {
             if(editors.Count != 0) {
                 MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
@@ -127,6 +181,12 @@ namespace RevitMechanicalSpecification.Models {
             }
         }
 
+        /// <summary>
+        /// Проверка на занятость элемента
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="element"></param>
+        /// <returns></returns>
         private string IsEditedBy(string userName, Element element) {
 
             string editedBy = element.GetParamValueOrDefault<string>(BuiltInParameter.EDITED_BY);
@@ -140,17 +200,29 @@ namespace RevitMechanicalSpecification.Models {
             return null;
         }
 
+        /// <summary>
+        /// После того как сабэлементы узла были отработаны филлерами - закидываем их в экземпляры класса части узла,
+        /// чтоб при следующей встрече в узловой обработке иметь возможность проигнорировать при встрече в обработке вне узловой
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="group"></param>
+        /// <returns></returns>
         private ManifoldPart CreateManifoldParts(Element element, string group) {
             Element elemType = element.GetElementType();
             if(!_nameAndGroupFactory.IsOutSideOfManifold(elemType)) {
-                ManifoldPart part = new ManifoldPart();
-                part.Group = group;
-                part.Id = element.Id;
+                ManifoldPart part = new ManifoldPart {
+                    Group = group,
+                    Id = element.Id
+                };
                 return part;
             }
             return null;
         }
 
+        /// <summary>
+        /// Главный цикл обработки, проверяет в себе занятость элементов, генерики и узел это или нет
+        /// </summary>
+        /// <param name="fillers"></param>
         private void ProcessElements(List<ElementParamFiller> fillers) {
             _parameterChecker.ExecuteParameterCheck(Document);
 
@@ -159,13 +231,27 @@ namespace RevitMechanicalSpecification.Models {
 
             using(var t = Document.StartTransaction("Обновление спецификации")) {
                 foreach(Element element in _elements) {
+                    // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
+                    // редактора в список
                     string editor = IsEditedBy(userName, element);
                     if(!string.IsNullOrEmpty(editor)) {
                         editors.Add(editor);
                         continue;
                     }
 
-                    //Если элемент уже встречался в обработке вложений узлов - переходим к следующему
+                    // На арматуре воздуховодов/труб/оборудовании проверяем наличие шаблонизированных семейств-генериков.
+                    // Если встречаем - заполняем все по маске
+                    if(element.InAnyCategory(new HashSet<BuiltInCategory>() {
+                        BuiltInCategory.OST_DuctAccessory,
+                        BuiltInCategory.OST_PipeAccessory,
+                        BuiltInCategory.OST_MechanicalEquipment})) {
+                        bool maskExist = _maskReplacer.ExecuteReplacment(element);
+                        if(maskExist) {
+                            continue;
+                        }
+                    }
+
+                    // Если элемент уже встречался в обработке вложений узлов - переходим к следующему
                     if(ManifoldParts.Any(part => part.Id == element.Id)) {
                         continue;
                     }
@@ -178,6 +264,11 @@ namespace RevitMechanicalSpecification.Models {
             }
         }
 
+        /// <summary>
+        /// Обработка элемента филлерами, если в них нет пометки что это узел
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="fillers"></param>
         private void ProcessElement(Element element, List<ElementParamFiller> fillers) {
             if(!_nameAndGroupFactory.IsManifold(element)) {
                 foreach(var filler in fillers) {
@@ -186,20 +277,25 @@ namespace RevitMechanicalSpecification.Models {
             }
         }
 
+        /// <summary>
+        /// Обработка филлерами узлов
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="fillers"></param>
         private void ProcessManifoldElement(Element element, List<ElementParamFiller> fillers) {
             Element elemType = element.GetElementType();
             if(_nameAndGroupFactory.IsManifold(elemType)) {
                 int positionNumber = 1;
                 FamilyInstance familyInstance = element as FamilyInstance;
 
-                //Сортируем лист по параметру группирования, чтоб присвоить нумерацию узлу от его индексов
+                // Сортируем лист по параметру группирования, чтоб присвоить нумерацию узлу от его индексов
                 List<Element> manifoldElements = _nameAndGroupFactory.GetSub(familyInstance)
                     .OrderBy(e => _nameAndGroupFactory.GetGroup(e))
                     .Where(e => !_nameAndGroupFactory.IsOutSideOfManifold(e.GetElementType()))
                     .ToList();
 
-                //Если не стоит галочка "Исключить из узла"(проверяется в сортировке выше),
-                //проверяем меняется ли номер элемента в узле и отправляем элемент в филлеры
+                // Если не стоит галочка "Исключить из узла"(проверяется в сортировке выше),
+                // проверяем меняется ли номер элемента в узле и отправляем элемент в филлеры
                 foreach(Element subElement in manifoldElements) {
                     Element subElementType = subElement.GetElementType();
                     int index = manifoldElements.IndexOf(subElement);
@@ -211,8 +307,8 @@ namespace RevitMechanicalSpecification.Models {
                     ProcessManifoldSubElement(fillers, subElement, familyInstance, positionNumber);
                 }
 
-                //После того как сабэлементы узла были отработаны филлерами - закидываем их в экземпляры класса части узла,
-                //чтоб при следующей встрече в узловой обработке иметь возможность проигнорировать при встрече в обработке вне узловой
+                // После того как сабэлементы узла были отработаны филлерами - закидываем их в экземпляры класса части узла,
+                // чтоб при следующей встрече в узловой обработке иметь возможность проигнорировать при встрече в обработке вне узловой
                 foreach(Element subElement in manifoldElements) {
                     string group = _nameAndGroupFactory.GetGroup(subElement);
                     ManifoldPart part = CreateManifoldParts(subElement, group);
@@ -224,6 +320,13 @@ namespace RevitMechanicalSpecification.Models {
             }
         }
 
+        /// <summary>
+        /// Обработка филлерами вложенного элемента узла с простановкой ему нумерации внутри узла
+        /// </summary>
+        /// <param name="fillers"></param>
+        /// <param name="manifoldElement"></param>
+        /// <param name="familyInstance"></param>
+        /// <param name="count"></param>
         private void ProcessManifoldSubElement(
             List<ElementParamFiller> fillers,
             Element manifoldElement,
@@ -234,34 +337,6 @@ namespace RevitMechanicalSpecification.Models {
             }
         }
 
-        public void SpecificationRefresh() {
-            ProcessElements(_fillersSpecRefresh);
-        }
 
-        public void RefreshSystemName() {
-            ProcessElements(_fillersSystemRefresh);
-        }
-
-        public void RefreshSystemFunction() {
-            ProcessElements(_fillersFunctionRefresh);
-        }
-
-        public void FullRefresh() {
-            List<ElementParamFiller> fillers = new List<ElementParamFiller>();
-            fillers.AddRange(_fillersSpecRefresh);
-            fillers.AddRange(_fillersFunctionRefresh);
-            fillers.AddRange(_fillersSystemRefresh);
-            ProcessElements(fillers);
-        }
-
-        public void ReplaceMask() {
-            using(var t = Document.StartTransaction("Сформировать имя")) {
-                foreach(Element element in _elements) {
-                    MaskReplacer.ReplaceMask(element, _specConfiguration.MaskMarkName, "ADSK_Марка");
-                    MaskReplacer.ReplaceMask(element, _specConfiguration.MaskNameName, "ADSK_Наименование");
-                }
-                t.Commit();
-            }
-        }
     }
 }

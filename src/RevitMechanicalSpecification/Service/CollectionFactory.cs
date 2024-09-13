@@ -8,15 +8,18 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using System.Windows.Forms;
 using RevitMechanicalSpecification.Entities;
+using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
 
     internal class CollectionFactory {
 
         private readonly Document _document;
+        private readonly SpecConfiguration _specConfiguration;
 
-        public CollectionFactory(Document doc) {
+        public CollectionFactory(Document doc, SpecConfiguration specConfiguration) {
             _document = doc;
+            _specConfiguration = specConfiguration;
         }
 
         public List<Element> GetMechanicalElements() {
@@ -52,8 +55,8 @@ namespace RevitMechanicalSpecification.Service {
 
                 SystemElement = element as MEPSystem,
                 SystemSystemName = element.Name,
-                SystemFunction = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_ЭФ для системы"),
-                SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>("ФОП_ВИС_Сокращение для системы"),
+                SystemFunction = element.GetElementType().GetSharedParamValueOrDefault<string>(_specConfiguration.SystemEF),
+                SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>(_specConfiguration.SystemShortName),
                 SystemTargetName = element.Name.Split(' ').First()
             }));
 

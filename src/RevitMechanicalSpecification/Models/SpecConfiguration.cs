@@ -44,6 +44,9 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string ForcedGroup = SharedParamsConfig.Instance.VISGroupingForced.Name; //"ФОП_ВИС_Группирование принудительное";
         public readonly string ForcedFunction = SharedParamsConfig.Instance.VISEconomicFunction.Name; //"ФОП_ВИС_Экономическая функция";
 
+        
+        public readonly string SystemEF = SharedParamsConfig.Instance.VISHvacSystemFunction.Name;//"ФОП_ВИС_ЭФ для системы"
+        public readonly string SystemShortName = SharedParamsConfig.Instance.VISSystemShortName.Name;//"ФОП_ВИС_Сокращение для системы"
 
 
         public readonly string MinDuctThikness = SharedParamsConfig.Instance.VISMinDuctThickness.Name; //"ФОП_ВИС_Минимальная толщина воздуховода";

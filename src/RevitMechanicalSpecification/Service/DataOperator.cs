@@ -31,7 +31,6 @@ namespace RevitMechanicalSpecification.Service {
             return 0;
         }
 
-
         //если есть суперкомпонент - возвращает его. Иначе возвращает исходник
         public static FamilyInstance GetSuperComponentIfExist(this FamilyInstance instance) {
             if(!(instance.SuperComponent is null)) {
@@ -41,11 +40,5 @@ namespace RevitMechanicalSpecification.Service {
 
             return instance;
         }
-
     }
-
-
-
-
-
 }
