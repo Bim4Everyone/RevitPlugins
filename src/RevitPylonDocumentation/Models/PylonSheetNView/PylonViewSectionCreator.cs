@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.UI.WebControls;
+using System;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
 using RevitPylonDocumentation.ViewModels;
-
-using Parameter = Autodesk.Revit.DB.Parameter;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewSectionCreator {
@@ -22,15 +14,12 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             SheetInfo = pylonSheetInfo;
         }
 
-
         internal MainViewModel ViewModel { get; set; }
         internal RevitRepository Repository { get; set; }
         internal PylonSheetInfo SheetInfo { get; set; }
 
 
-
-        public bool TryCreateGeneralView(ViewFamilyType SelectedViewFamilyType) {
-
+        public bool TryCreateGeneralView(ViewFamilyType selectedViewFamilyType) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
             int count = 0;
             Element elemForWork = null;
@@ -40,7 +29,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
 
             if(elemForWork is null) { return false; }
-
 
             double hostLength = 0;
             double hostWidth = 0;
@@ -56,14 +44,12 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             XYZ upDir = XYZ.BasisZ;
             XYZ viewDir = hostDir.CrossProduct(upDir);
 
-
             // Передаем данные для объекта Transform
             Transform t = Transform.Identity;
             t.Origin = originPoint;
             t.BasisX = hostDir;
             t.BasisY = upDir;
             t.BasisZ = viewDir;
-
 
             BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
             double minZ = bb.Min.Z;
@@ -73,10 +59,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
             double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
-
             XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
             XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostWidth);
-
 
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
             sectionBox.Transform = t;
@@ -84,10 +68,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             sectionBox.Max = sectionBoxMax;
 
             ViewSection viewSection = null;
-
             try {
-                viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
-
+                viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
                 if(viewSection != null) {
                     viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewSuffix;
                     if(ViewModel.SelectedGeneralViewTemplate != null) {
@@ -95,25 +77,18 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     }
                 }
             } catch(Exception) {
-
                 if(viewSection != null) {
                     Repository.Document.Delete(viewSection.Id);
                 }
                 return false;
             }
 
-
             SheetInfo.GeneralView.ViewElement = viewSection;
-
             return true;
         }
 
 
-
-
-
-        public bool TryCreateGeneralPerpendicularView(ViewFamilyType SelectedViewFamilyType) {
-
+        public bool TryCreateGeneralPerpendicularView(ViewFamilyType selectedViewFamilyType) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
             int count = 0;
             Element elemForWork = null;
@@ -124,23 +99,19 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             if(elemForWork is null) { return false; }
 
-
             double hostLength = 0;
             double hostWidth = 0;
             XYZ midlePoint = null;
             XYZ hostVector = null;
 
-
             // Заполняем нужные для объекта Transform поля
             if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
-
 
             // Формируем данные для объекта Transform
             XYZ originPoint = midlePoint;
             XYZ upDir = XYZ.BasisZ;
             XYZ viewDir = hostVector.Normalize();
             XYZ rightDir = upDir.CrossProduct(viewDir);
-
 
             // Передаем данные для объекта Transform
             Transform t = Transform.Identity;
@@ -149,33 +120,25 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             t.BasisY = upDir;
             t.BasisZ = viewDir;
 
-
-
             BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
             double minZ = bb.Min.Z;
             double maxZ = bb.Max.Z;
-
 
             double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
             double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
             double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
-
             XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.4);
             XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostLength * 0.4);
-
 
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
             sectionBox.Transform = t;
             sectionBox.Min = sectionBoxMin;
             sectionBox.Max = sectionBoxMax;
 
-
             ViewSection viewSection = null;
-
             try {
-                viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
-
+                viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
                 if(viewSection != null) {
                     viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPerpendicularPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewPerpendicularSuffix;
                     if(ViewModel.SelectedGeneralViewTemplate != null) {
@@ -183,22 +146,17 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     }
                 }
             } catch(Exception) {
-
                 if(viewSection != null) {
                     Repository.Document.Delete(viewSection.Id);
                 }
                 return false;
             }
-
-
             SheetInfo.GeneralViewPerpendicular.ViewElement = viewSection;
-
             return true;
         }
 
 
-        public bool TryCreateTransverseView(ViewFamilyType SelectedViewFamilyType, int transverseViewNum) {
-
+        public bool TryCreateTransverseView(ViewFamilyType selectedViewFamilyType, int transverseViewNum) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
             int count = 0;
             Element elemForWork = null;
@@ -209,16 +167,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             if(elemForWork is null) { return false; }
 
-
             double hostLength = 0;
             double hostWidth = 0;
             XYZ midlePoint = null;
             XYZ hostVector = null;
 
-
             // Заполняем нужные для объекта Transform поля
             if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
-
 
             // Формируем данные для объекта Transform
             XYZ originPoint = midlePoint;
@@ -226,14 +181,12 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             XYZ viewDir = XYZ.BasisZ.Negate();
             XYZ upDir = viewDir.CrossProduct(hostDir);
 
-
             // Передаем данные для объекта Transform
             Transform t = Transform.Identity;
             t.Origin = originPoint;
             t.BasisX = hostDir;
             t.BasisY = upDir;
             t.BasisZ = viewDir;
-
 
             BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
             double minZ = bb.Min.Z;
@@ -267,20 +220,16 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             }
 
-
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
             sectionBox.Transform = t;
             sectionBox.Min = sectionBoxMin;
             sectionBox.Max = sectionBoxMax;
 
             ViewSection viewSection = null;
-
             try {
-                viewSection = ViewSection.CreateSection(Repository.Document, SelectedViewFamilyType.Id, sectionBox);
-
+                viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
                 if(viewSection != null) {
                     if(transverseViewNum == 1) {
-
                         viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewFirstPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewFirstSuffix;
                         // Если был выбран шаблон вида, то назначаем
                         if(ViewModel.SelectedTransverseViewTemplate != null) {
@@ -302,22 +251,17 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                         SheetInfo.TransverseViewThird.ViewElement = viewSection;
                     }
                 }
-
             } catch(Exception) {
-
                 if(viewSection != null) {
                     Repository.Document.Delete(viewSection.Id);
                 }
                 return false;
             }
-
             return true;
         }
 
 
-
         public bool PrepareInfoForTransform(Element elemForWork, ref XYZ midlePoint, ref XYZ hostVector, ref double hostLength, ref double hostWidth) {
-
             if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns) {
                 FamilyInstance column = elemForWork as FamilyInstance;
 
@@ -346,8 +290,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 hostWidth = wall.WallType.Width;
                 midlePoint = wallLineStart + 0.5 * hostVector;
             } else { return false; }
-
-
             return true;
         }
     }

@@ -1,31 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Net;
-using System.Runtime;
-using System.Security.Cryptography;
-using System.Text;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using System.Xml.Linq;
 
-using Autodesk.AdvanceSteel.CADAccess;
-using Autodesk.AdvanceSteel.Modelling;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Electrical;
-using Autodesk.Revit.DB.Structure;
-using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+
 using dosymep.Revit;
-using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -34,9 +18,6 @@ using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.Models.UserSettings;
 using RevitPylonDocumentation.Views;
 
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
-
-using Line = Autodesk.Revit.DB.Line;
 using Transaction = Autodesk.Revit.DB.Transaction;
 using View = Autodesk.Revit.DB.View;
 
@@ -55,11 +36,10 @@ namespace RevitPylonDocumentation.ViewModels {
         private FamilySymbol _selectedTitleBlock;
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
 
-        public bool _settingsEdited = false;
+        private bool _settingsEdited = false;
 
         private string _hostsInfoFilter;
         private ICollectionView _hostsInfoView;
-
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
             _pluginConfig = pluginConfig;
@@ -87,8 +67,7 @@ namespace RevitPylonDocumentation.ViewModels {
             GetHostMarksInGUICommand = RelayCommand.Create(GetHostMarksInGUI);
 
             AddScheduleFilterParamCommand = RelayCommand.Create(AddScheduleFilterParam);
-            DeleteScheduleFilterParamCommand =
-                RelayCommand.Create(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
+            DeleteScheduleFilterParamCommand = RelayCommand.Create(DeleteScheduleFilterParam, CanChangeScheduleFilterParam);
             SettingsChangedCommand = RelayCommand.Create(SettingsChanged);
 
             ClearHostsInfoFilterInGUICommand = RelayCommand.Create(ClearHostsInfoFilterInGUI);
@@ -239,7 +218,6 @@ namespace RevitPylonDocumentation.ViewModels {
             }
         }
 
-
         // Инфо по пилонам
         /// <summary>
         /// Список всех марок пилонов (напр., "12.30.25-20⌀32")
@@ -270,7 +248,7 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Эталонная ведомость деталей для IFC арматуры
         /// </summary>
-        public ViewSchedule ReferenceIFCPartsSchedule { get; set; }
+        public ViewSchedule ReferenceIfcPartsSchedule { get; set; }
 
         /// <summary>
         /// Фильтр списка марок пилонов
@@ -391,7 +369,7 @@ namespace RevitPylonDocumentation.ViewModels {
                 SelectedProjectSection = string.Empty;
                 _pylonSelectedManually = true;
 
-                _revitRepository.GetHostData(this, new List<Element> {element});
+                _revitRepository.GetHostData(this, new List<Element> { element });
 
                 HostsInfo = new ObservableCollection<PylonSheetInfo>(_revitRepository.HostsInfo);
                 ProjectSections = new ObservableCollection<string>(_revitRepository.HostProjectSections);
@@ -415,9 +393,8 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithRebarSchedule = false;
             SelectionSettings.NeedWorkWithMaterialSchedule = false;
             SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
-            SelectionSettings.NeedWorkWithIFCPartsSchedule = false;
+            SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
             SelectionSettings.NeedWorkWithLegend = false;
-
 
             MainWindow mainWindow = new MainWindow();
             mainWindow.DataContext = this;
@@ -434,7 +411,6 @@ namespace RevitPylonDocumentation.ViewModels {
             ProjectSettings.ApplyProjectSettings();
             ViewSectionSettings.ApplyViewSectionsSettings();
             SchedulesSettings.ApplySchedulesSettings();
-
 
             // Получаем заново список заполненных разделов проекта
             if(!_pylonSelectedManually) {
@@ -502,7 +478,6 @@ namespace RevitPylonDocumentation.ViewModels {
                 foreach(PylonSheetInfo hostsInfo in SelectedHostsInfo) {
                     hostsInfo.Manager.WorkWithCreation();
                 }
-
                 transaction.Commit();
             }
         }
@@ -520,9 +495,9 @@ namespace RevitPylonDocumentation.ViewModels {
             ReferenceSystemPartsSchedule =
                 _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                     sch.Name.Equals(SchedulesSettings.SytemPartsScheduleName)) as ViewSchedule;
-            ReferenceIFCPartsSchedule =
+            ReferenceIfcPartsSchedule =
                 _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-                    sch.Name.Equals(SchedulesSettings.IFCPartsScheduleName)) as ViewSchedule;
+                    sch.Name.Equals(SchedulesSettings.IfcPartsScheduleName)) as ViewSchedule;
         }
 
         /// <summary>
@@ -695,7 +670,7 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithRebarSchedule = true;
             SelectionSettings.NeedWorkWithMaterialSchedule = true;
             SelectionSettings.NeedWorkWithSystemPartsSchedule = true;
-            SelectionSettings.NeedWorkWithIFCPartsSchedule = true;
+            SelectionSettings.NeedWorkWithIfcPartsSchedule = true;
             SelectionSettings.NeedWorkWithLegend = true;
         }
 
@@ -713,7 +688,7 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithRebarSchedule = false;
             SelectionSettings.NeedWorkWithMaterialSchedule = false;
             SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
-            SelectionSettings.NeedWorkWithIFCPartsSchedule = false;
+            SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
             SelectionSettings.NeedWorkWithLegend = false;
         }
     }
