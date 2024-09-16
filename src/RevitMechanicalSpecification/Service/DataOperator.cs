@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using dosymep.Bim4Everyone;
 using Autodesk.Revit.DB;
 using dosymep.Revit;
+using RevitMechanicalSpecification.Entities;
 
 namespace RevitMechanicalSpecification.Service {
     public static class DataOperator {
@@ -26,6 +27,31 @@ namespace RevitMechanicalSpecification.Service {
             }
             return null;
         }
+
+        public static string GetTypeOrInstanceParamStringValue(
+            this SpecificationElement specificationElement, 
+            string paraName) {
+            if(specificationElement.Element.IsExistsParam(paraName)) {
+                return specificationElement.Element.GetSharedParamValueOrDefault<string>(paraName);
+            }
+            if(specificationElement.ElementType.IsExistsParam(paraName)) {
+                return specificationElement.ElementType.GetSharedParamValueOrDefault<string>(paraName);
+            }
+            return null;
+        }
+
+        public static Parameter GetTypeOrInstanceParam(this SpecificationElement specificationElement, string paramName) {
+            if(paramName is null) {
+                return null;
+            }
+            Parameter parameter = specificationElement.Element.LookupParameter(paramName) ?? 
+                specificationElement.ElementType.LookupParameter(paramName);
+            if(parameter == null) {
+                return null;
+            }
+            return parameter;
+        }
+
 
         /// <summary>
         /// Получаем дабл из параметра в экземпляре или типе, иначе возвращает 0
@@ -55,6 +81,26 @@ namespace RevitMechanicalSpecification.Service {
                 instance = GetSuperComponentIfExist(instance);
             }
             return instance;
+        }
+
+        /// <summary>
+        /// Возвращает субкомпоненты и субкомпоненты субкомпонентов
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public static List<Element> GetSub(FamilyInstance element, Document document) {
+            var subs = new List<Element>();
+
+            foreach(ElementId elementId in element.GetSubComponentIds()) {
+                Element subElement = document.GetElement(elementId);
+                subs.Add(subElement);
+
+                var subInst = subElement as FamilyInstance;
+                if(subInst.GetSubComponentIds().Count > 0) {
+                    subs.AddRange(GetSub(subInst, document));
+                }
+            }
+            return subs;
         }
     }
 }

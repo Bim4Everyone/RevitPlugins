@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -70,21 +71,23 @@ namespace RevitMechanicalSpecification.Service {
 
         //Если есть принудительное значение на типе - возвращаем.
         //Если нет, но есть суперкомпонент - проверяем принудительное на нем.
-        public string GetForcedParamValue(Element element, Element elemType, string paraName) {
-            string result = DataOperator.GetTypeOrInstanceParamStringValue(element, elemType, paraName);
+        public string GetForcedParamValue(SpecificationElement specificationElement, string paraName) {
+            //string result = DataOperator.GetTypeOrInstanceParamStringValue(element, elemType, paraName);
+            string result = specificationElement.GetTypeOrInstanceParamStringValue(paraName);
 
             if(!string.IsNullOrEmpty(result)) {
                 return result;
             }
-            if(element is FamilyInstance instance) {
+            if(specificationElement.Element is FamilyInstance instance) {
                 Element superComponent = GetSuperComponentIfExist(instance);
-                if(superComponent != null && element != superComponent) {
-                    element = superComponent;
-                    elemType = superComponent.GetElementType();
+                if(superComponent != null && specificationElement.Element != superComponent) {
+
+                    return DataOperator
+                        .GetTypeOrInstanceParamStringValue(superComponent, superComponent.GetElementType(), paraName);
                 }
             }
 
-            return DataOperator.GetTypeOrInstanceParamStringValue(element, elemType, paraName);
+            return result;
         }
 
         public string GetFunctionValue(Element element) {

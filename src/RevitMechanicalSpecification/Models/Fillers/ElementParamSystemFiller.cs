@@ -28,26 +28,22 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             _nameFactory = new SystemFunctionFactory(Document, _systemList);
         } 
 
-        private string GetSystemName(Element element) 
+        private string GetSystemName(SpecificationElement specificationElement) 
             {
             //return _nameFactory.GetSystemValue(element);
 
-            string forcedSystem = _nameFactory.GetForcedParamValue(element, ElemType, Config.ForcedSystemName);
+            string forcedSystem = _nameFactory.GetForcedParamValue(specificationElement, Config.ForcedSystemName);
             if(!string.IsNullOrEmpty(forcedSystem)) {
                 return forcedSystem;
             }
-            return _nameFactory.GetSystemValue(element);
+            return _nameFactory.GetSystemValue(specificationElement.Element);
 
         }
 
-        //public override void SetParamValue(Element element) {
-        //    ToParam.Set(element.GetSharedParamValueOrDefault(Config.ForcedSystemName, GetSystemName(element)));
-        //}
-
-        public override void SetParamValue(Element element) {
-            string calculatedSystem = GetSystemName(element);
+        public override void SetParamValue(SpecificationElement specificationElement) {
+            string calculatedSystem = GetSystemName(specificationElement);
             if(!(string.IsNullOrEmpty(calculatedSystem))) {
-                TargetParameter.Set(GetSystemName(element));
+                TargetParameter.Set(GetSystemName(specificationElement));
                 return;
             }
 

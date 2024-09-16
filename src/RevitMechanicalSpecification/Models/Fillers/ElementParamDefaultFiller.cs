@@ -1,5 +1,7 @@
 using Autodesk.Revit.DB;
 
+using RevitMechanicalSpecification.Entities;
+
 namespace RevitMechanicalSpecification.Models.Fillers {
     public class ElementParamDefaultFiller : ElementParamFiller {
         public ElementParamDefaultFiller(
@@ -9,7 +11,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             Document document) :
             base(toParamName, fromParamName, specConfiguration, document) { }
 
-        public override void SetParamValue(Element element) {
+        public override void SetParamValue(SpecificationElement specificationElement) {
             TargetParameter.Set(OriginalParameter.AsValueString());
         }
     }

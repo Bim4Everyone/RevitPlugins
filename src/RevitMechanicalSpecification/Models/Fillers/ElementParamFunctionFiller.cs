@@ -29,21 +29,20 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             _nameFactory = new SystemFunctionFactory(Document, _systemList);
         }
 
-        private string GetFunction(Element element) {
-            string forcedFunction = _nameFactory.GetForcedParamValue(element, ElemType, Config.ForcedFunction);
+        private string GetFunction(SpecificationElement specificationElement) {
+            string forcedFunction = _nameFactory.GetForcedParamValue(specificationElement, Config.ForcedFunction);
             if(!string.IsNullOrEmpty(forcedFunction)) { 
                 return forcedFunction;
             }
-            return _nameFactory.GetFunctionValue(element);
+            return _nameFactory.GetFunctionValue(specificationElement.Element);
         }
 
-        public override void SetParamValue(Element element) {
-            string calculatedFunction = GetFunction(element);
+        public override void SetParamValue(SpecificationElement specificationElement) {
+            string calculatedFunction = GetFunction(specificationElement);
             if(!(string.IsNullOrEmpty(calculatedFunction))) {
-                TargetParameter.Set(GetFunction(element));
+                TargetParameter.Set(GetFunction(specificationElement));
                 return;
             }
-
             TargetParameter.Set(Config.GlobalFunction);
         }
     }

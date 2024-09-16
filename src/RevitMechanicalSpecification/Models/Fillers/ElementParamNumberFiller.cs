@@ -10,20 +10,19 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Service;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNumberFiller : ElementParamFiller {
         private readonly VisElementsCalculator _calculator;
-        private readonly NameGroupFactory _nameAndGroupFactory;
         public ElementParamNumberFiller(string toParamName,
             string fromParamName,
             SpecConfiguration specConfiguration,
-            Document document, NameGroupFactory nameAndGroupFactory
+            Document document
             ) :
             base(toParamName, fromParamName, specConfiguration, document) {
             _calculator = new VisElementsCalculator(Config, Document);
-            _nameAndGroupFactory = nameAndGroupFactory;
         }
 
         private bool LinearLogicalFilter(Element element) {
@@ -102,8 +101,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             return 0;
         }
 
-        public override void SetParamValue(Element element) {
-            TargetParameter.Set(GetNumber(element));
+        public override void SetParamValue(SpecificationElement specificationElement) {
+            TargetParameter.Set(GetNumber(specificationElement.Element));
         }
     }
 }

@@ -9,6 +9,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitMechanicalSpecification.Entities;
+
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamUnitFiller : ElementParamFiller {
         private readonly HashSet<string> _kitNames = new HashSet<string>() {
@@ -80,8 +82,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             base(toParamName, fromParamName, specConfiguration, document) {
         }
 
-        public override void SetParamValue(Element element) {
-            TargetParameter.Set(GetUnit(element));
+        public override void SetParamValue(SpecificationElement specificationElement) {
+            TargetParameter.Set(GetUnit(specificationElement.Element));
         }
     }
 }

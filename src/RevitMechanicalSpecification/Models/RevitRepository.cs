@@ -23,7 +23,6 @@ namespace RevitMechanicalSpecification.Models {
         private readonly List<ElementParamFiller> _fillersSpecRefresh;
         private readonly List<ElementParamFiller> _fillersSystemRefresh;
         private readonly List<ElementParamFiller> _fillersFunctionRefresh;
-        private readonly NameGroupFactory _nameAndGroupFactory;
         private readonly CollectionFactory _collector;
         private readonly List<Element> _elements;
         private readonly List<VisSystem> _visSystems;
@@ -40,7 +39,6 @@ namespace RevitMechanicalSpecification.Models {
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _collector = new CollectionFactory(Document, _specConfiguration);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
-            _nameAndGroupFactory = new NameGroupFactory(_specConfiguration, Document, _calculator);
             _parameterChecker = new ParameterChecker();
             _maskReplacer = new MaskReplacer(_specConfiguration);
 
@@ -49,13 +47,19 @@ namespace RevitMechanicalSpecification.Models {
             
             _fillersSpecRefresh = new List<ElementParamFiller>()
 {
+                //Заполнение ФОП_ВИС_Наименование комбинированное
+                new ElementParamNameFiller(
+                _specConfiguration.TargetNameName,
+                _specConfiguration.OriginalParamNameName,
+                _specConfiguration,
+                Document,
+                _calculator),
                 //Заполнение ФОП_ВИС_Группирование
                 new ElementParamGroupFiller(
                 _specConfiguration.TargetNameGroup,
                 null,
                 _specConfiguration,
-                Document,
-                _nameAndGroupFactory),
+                Document),
                 //Заполнение ФОП_ВИС_Марка
                 new ElementParamMarkFiller(
                 _specConfiguration.TargetNameMark,
@@ -86,15 +90,8 @@ namespace RevitMechanicalSpecification.Models {
                 _specConfiguration.TargetNameNumber,
                 null,
                 _specConfiguration,
-                Document,
-                _nameAndGroupFactory),
-                //Заполнение ФОП_ВИС_Наименование комбинированное
-                new ElementParamNameFiller(
-                _specConfiguration.TargetNameName,
-                _specConfiguration.OriginalParamNameName,
-                _specConfiguration,
-                Document,
-                _nameAndGroupFactory)
+                Document),
+
         };
             _fillersSystemRefresh = new List<ElementParamFiller>()
             { 
@@ -210,7 +207,7 @@ namespace RevitMechanicalSpecification.Models {
         /// <returns></returns>
         private ManifoldPart CreateManifoldParts(Element element, string group) {
             Element elemType = element.GetElementType();
-            if(!_nameAndGroupFactory.IsOutSideOfManifold(elemType)) {
+            if(!IsOutSideOfManifold(elemType)) {
                 ManifoldPart part = new ManifoldPart {
                     Group = group,
                     Id = element.Id
@@ -252,13 +249,21 @@ namespace RevitMechanicalSpecification.Models {
                         }
                     }
 
+                    
+
                     // Если элемент уже встречался в обработке вложений узлов - переходим к следующему
                     if(ManifoldParts.Any(part => part.Id == element.Id)) {
                         continue;
                     }
 
-                    ProcessElement(element, fillers);
-                    ProcessManifoldElement(element, fillers);
+                    SpecificationElement specificationElement = new SpecificationElement {
+                        Element = element,
+                        ElementType = element.GetElementType()
+                    };
+
+                    Element elemType = element.GetElementType();
+                    ProcessElement(specificationElement, fillers);
+                    ProcessManifoldElement(specificationElement, fillers);
                 }
                 t.Commit();
                 ShowReport(editors);
@@ -270,11 +275,9 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         /// <param name="element"></param>
         /// <param name="fillers"></param>
-        private void ProcessElement(Element element, List<ElementParamFiller> fillers) {
-            if(!_nameAndGroupFactory.IsManifold(element)) {
-                foreach(var filler in fillers) {
-                    filler.Fill(element);
-                }
+        private void ProcessElement(SpecificationElement specificationElement, List<ElementParamFiller> fillers) {
+            foreach(var filler in fillers) {
+                filler.Fill(specificationElement);
             }
         }
 
@@ -283,36 +286,44 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         /// <param name="element"></param>
         /// <param name="fillers"></param>
-        private void ProcessManifoldElement(Element element, List<ElementParamFiller> fillers) {
-            Element elemType = element.GetElementType();
-            if(_nameAndGroupFactory.IsManifold(elemType)) {
-                int positionNumber = 1;
-                FamilyInstance familyInstance = element as FamilyInstance;
+        private void ProcessManifoldElement(SpecificationElement specificationElement, List<ElementParamFiller> fillers) {
+            if(IsManifold(specificationElement.ElementType)) {
+
+                FamilyInstance familyInstance = specificationElement.Element as FamilyInstance;
 
                 // Сортируем лист по параметру группирования, чтоб присвоить нумерацию узлу от его индексов
-                List<Element> manifoldElements = _nameAndGroupFactory.GetSub(familyInstance)
-                    .OrderBy(e => _nameAndGroupFactory.GetGroup(e))
-                    .Where(e => !_nameAndGroupFactory.IsOutSideOfManifold(e.GetElementType()))
-                    .ToList();
+                //List<Element> manifoldElements = DataOperator.GetSub(familyInstance, Document)
+                //    .OrderBy(e => _nameAndGroupFactory.GetGroup(e))
+                //    .Where(e => !IsOutSideOfManifold(e.GetElementType()))
+                //    .ToList();
+
+                List<Element> manifoldElements = DataOperator.GetSub(familyInstance, Document);
 
                 // Если не стоит галочка "Исключить из узла"(проверяется в сортировке выше),
                 // проверяем меняется ли номер элемента в узле и отправляем элемент в филлеры
                 foreach(Element subElement in manifoldElements) {
                     Element subElementType = subElement.GetElementType();
-                    int index = manifoldElements.IndexOf(subElement);
 
-                    if(_nameAndGroupFactory.IsIncreaseCount(manifoldElements, index, subElement, subElementType)) {
-                        positionNumber++;
-                    }
+                    //if(_nameAndGroupFactory.IsIncreaseCount(manifoldElements, index, subElement, subElementType)) {
+                    //    positionNumber++;
+                    //}
+                    SpecificationElement subSpecificationElement = new SpecificationElement {
+                        Element = subElement,
+                        ElementType = subElementType,
+                        ManifoldElement = specificationElement.Element,
+                        ManifoldElementType = specificationElement.ElementType,
+                        ManifoldInstance = familyInstance,
+                        ManifoldSpElement = specificationElement
+                    };
 
-                    ProcessManifoldSubElement(fillers, subElement, familyInstance, positionNumber);
+                    ProcessManifoldSubElement(fillers, subSpecificationElement);
                 }
 
                 // После того как сабэлементы узла были отработаны филлерами - закидываем их в экземпляры класса части узла,
                 // чтоб при следующей встрече в узловой обработке иметь возможность проигнорировать при встрече в обработке вне узловой
                 foreach(Element subElement in manifoldElements) {
-                    string group = _nameAndGroupFactory.GetGroup(subElement);
-                    ManifoldPart part = CreateManifoldParts(subElement, group);
+                    //string group = _nameAndGroupFactory.GetGroup(subElement);
+                    ManifoldPart part = CreateManifoldParts(subElement, "1");
 
                     if(part != null) {
                         ManifoldParts.Add(part);
@@ -330,14 +341,29 @@ namespace RevitMechanicalSpecification.Models {
         /// <param name="count"></param>
         private void ProcessManifoldSubElement(
             List<ElementParamFiller> fillers,
-            Element manifoldElement,
-            FamilyInstance familyInstance,
-            int count) {
+            SpecificationElement subSpecificationElement
+            ) {
             foreach(var filler in fillers) {
-                filler.Fill(manifoldElement, familyInstance, count, ManifoldParts);
+                filler.Fill(subSpecificationElement);
             }
         }
 
+        /// <summary>
+        /// Проверяем значение галочки "ФОП_ВИС_Узел"
+        /// </summary>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
+        private bool IsManifold(Element elemType) {
+            return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsManiFoldParamName) == 1;
+        }
 
+        /// <summary>
+        /// Проверяем значение галочки "ФОП_ВИС_Исключить из узла"
+        /// </summary>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
+        private bool IsOutSideOfManifold(Element elemType) {
+            return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsOutSideOfManifold) == 1;
+        }
     }
 }

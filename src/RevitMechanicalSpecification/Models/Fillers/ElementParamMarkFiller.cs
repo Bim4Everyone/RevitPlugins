@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using Autodesk.Revit.DB;
 using dosymep.Revit;
 
+using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Service;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
@@ -34,8 +35,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             return mark;
         }
 
-        public override void SetParamValue(Element element) {
-            TargetParameter.Set(GetMark(element));
+        public override void SetParamValue(SpecificationElement specificationElement) {
+            TargetParameter.Set(GetMark(specificationElement.Element));
         }
     }
 }

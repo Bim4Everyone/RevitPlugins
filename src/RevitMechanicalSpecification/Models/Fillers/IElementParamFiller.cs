@@ -10,9 +10,6 @@ using RevitMechanicalSpecification.Entities;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal interface IElementParamFiller {
-        void Fill(Element element, 
-            FamilyInstance familyInstance = null, 
-            int count = 0,
-            HashSet<ManifoldPart> manfifoldParts = null);
+        void Fill(SpecificationElement specificationElement);
     }
 }
