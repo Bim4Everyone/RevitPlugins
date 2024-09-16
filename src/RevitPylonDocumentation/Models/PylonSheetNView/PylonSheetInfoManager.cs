@@ -1,29 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using RevitPylonDocumentation.Models.UserSettings;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
     internal class PylonSheetInfoManager {
-
-
         public PylonSheetInfoManager(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
             Repository = repository;
             SheetInfo = pylonSheetInfo;
         }
 
-
         internal MainViewModel ViewModel { get; set; }
         internal RevitRepository Repository { get; set; }
         internal PylonSheetInfo SheetInfo { get; set; }
 
         public void WorkWithCreation() {
-
             UserSelectionSettings selectionSettings = ViewModel.SelectionSettings;
 
             // Если текущий PylonSheetInfo не выбран для работы - continue
@@ -33,10 +23,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Если листы был в проекте (когда плагин запускают для создания/размещения видов), то мы об этом знаем из RevitRepository
             if(SheetInfo.PylonViewSheet is null) {
-
                 SheetInfo.CreateSheet();
             } else {
-
                 SheetInfo.FindTitleBlock();
                 SheetInfo.GetTitleBlockSize();
                 SheetInfo.FindViewsNViewportsOnSheet();
@@ -47,15 +35,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             // Если вдруг по какой-то причине лист не был создан, то создание видов/видовых экранов не выполняем 
             if(SheetInfo.PylonViewSheet is null) { return; }
 
-                                        //////////////////
-                                        // ОСНОВНОЙ ВИД //
-                                        //////////////////
-
+            // ОСНОВНОЙ ВИД
             if(selectionSettings.NeedWorkWithGeneralView) {
-
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.GeneralView.ViewElement is null) {
-
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.GeneralView.ViewSectionCreator.TryCreateGeneralView(ViewModel.SelectedViewFamilyType)) {
                         Repository.FindViewSectionInPj(SheetInfo.GeneralView);
@@ -65,16 +48,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
 
 
-                                ///////////////////////////////////
-                                // ОСНОВНОЙ ПЕРПЕНДИКУЛЯРНЫЙ ВИД //
-                                ///////////////////////////////////
-
+            // ОСНОВНОЙ ПЕРПЕНДИКУЛЯРНЫЙ ВИД 
             if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
-
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-
                 if(SheetInfo.GeneralViewPerpendicular.ViewElement is null) {
-
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.GeneralViewPerpendicular.ViewSectionCreator.TryCreateGeneralPerpendicularView(ViewModel.SelectedViewFamilyType)) {
                         Repository.FindViewSectionInPj(SheetInfo.GeneralViewPerpendicular);
@@ -84,16 +61,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
 
 
-                                    ///////////////////////////
-                                    // ПЕРВЫЙ ПОПЕРЕЧНЫЙ ВИД //
-                                    ///////////////////////////
-
+            // ПЕРВЫЙ ПОПЕРЕЧНЫЙ ВИД
             if(selectionSettings.NeedWorkWithTransverseViewFirst) {
-
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-
                 if(SheetInfo.TransverseViewFirst.ViewElement is null) {
-
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.TransverseViewFirst.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 1)) {
                         Repository.FindViewSectionInPj(SheetInfo.TransverseViewFirst);
@@ -102,16 +73,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Тут точно получили вид
             }
 
-                                    ///////////////////////////
-                                    // ВТОРОЙ ПОПЕРЕЧНЫЙ ВИД //
-                                    ///////////////////////////
-
+            // ВТОРОЙ ПОПЕРЕЧНЫЙ ВИД
             if(selectionSettings.NeedWorkWithTransverseViewSecond) {
-
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-
                 if(SheetInfo.TransverseViewSecond.ViewElement is null) {
-
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.TransverseViewSecond.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 2)) {
                         Repository.FindViewSectionInPj(SheetInfo.TransverseViewSecond);
@@ -120,16 +85,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Тут точно получили вид
             }
 
-                                    ///////////////////////////
-                                    // ТРЕТИЙ ПОПЕРЕЧНЫЙ ВИД //
-                                    ///////////////////////////
-
+            // ТРЕТИЙ ПОПЕРЕЧНЫЙ ВИД
             if(selectionSettings.NeedWorkWithTransverseViewThird) {
-
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-
                 if(SheetInfo.TransverseViewThird.ViewElement is null) {
-
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.TransverseViewThird.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 3)) {
                         Repository.FindViewSectionInPj(SheetInfo.TransverseViewThird);
@@ -138,16 +97,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Тут точно получили вид
             }
 
-                                    ///////////////////////////
-                                    // СПЕЦИФИКАЦИЯ АРМАТУРЫ //
-                                    ///////////////////////////
-
+            // СПЕЦИФИКАЦИЯ АРМАТУРЫ
             if(selectionSettings.NeedWorkWithRebarSchedule) {
-
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-
                 if(SheetInfo.RebarSchedule.ViewElement is null) {
-
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.RebarSchedule.ViewScheduleCreator.TryCreateRebarSchedule()) {
                         Repository.FindViewScheduleInPj(SheetInfo.RebarSchedule);
@@ -156,16 +109,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Тут точно получили вид
             }
 
-                                    /////////////////////////////
-                                    // СПЕЦИФИКАЦИЯ МАТЕРИАЛОВ //
-                                    /////////////////////////////
-
+            // СПЕЦИФИКАЦИЯ МАТЕРИАЛОВ
             if(selectionSettings.NeedWorkWithMaterialSchedule) {
-
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-
                 if(SheetInfo.MaterialSchedule.ViewElement is null) {
-
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.MaterialSchedule.ViewScheduleCreator.TryCreateMaterialSchedule()) {
                         Repository.FindViewScheduleInPj(SheetInfo.MaterialSchedule);
@@ -174,16 +121,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Тут точно получили вид
             }
 
-                                    /////////////////////////////////
-                                    // ВЕДОМОСТЬ СИСТЕМНЫХ ДЕТАЛЕЙ //
-                                    /////////////////////////////////
-
+            // ВЕДОМОСТЬ СИСТЕМНЫХ ДЕТАЛЕЙ
             if(selectionSettings.NeedWorkWithSystemPartsSchedule) {
-
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-
                 if(SheetInfo.SystemPartsSchedule.ViewElement is null) {
-
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.SystemPartsSchedule.ViewScheduleCreator.TryCreateSystemPartsSchedule()) {
                         Repository.FindViewScheduleInPj(SheetInfo.SystemPartsSchedule);
@@ -192,110 +133,81 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Тут точно получили вид
             }
 
-                                        ///////////////////////////
-                                        // ВЕДОМОСТЬ IFC ДЕТАЛЕЙ //
-                                        ///////////////////////////
-
-            if(selectionSettings.NeedWorkWithIFCPartsSchedule) {
-
+            // ВЕДОМОСТЬ IFC ДЕТАЛЕЙ
+            if(selectionSettings.NeedWorkWithIfcPartsSchedule) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-
-                if(SheetInfo.IFCPartsSchedule.ViewElement is null) {
-
+                if(SheetInfo.IfcPartsSchedule.ViewElement is null) {
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                    if(!SheetInfo.IFCPartsSchedule.ViewScheduleCreator.TryCreateIFCPartsSchedule()) {
-                        Repository.FindViewScheduleInPj(SheetInfo.IFCPartsSchedule);
+                    if(!SheetInfo.IfcPartsSchedule.ViewScheduleCreator.TryCreateIfcPartsSchedule()) {
+                        Repository.FindViewScheduleInPj(SheetInfo.IfcPartsSchedule);
                     }
                 }
                 // Тут точно получили вид
             }
 
-
             // Принудительно регеним документ, иначе запрашиваемые габариты видовых экранов будут некорректны
             Repository.Document.Regenerate();
 
-
             if(selectionSettings.NeedWorkWithGeneralView) {
-
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.GeneralView.ViewportElement is null) {
-
                     SheetInfo.GeneralView.ViewSectionPlacer.PlaceGeneralViewport();
                 }
             }
             if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
-
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.GeneralViewPerpendicular.ViewportElement is null) {
-
                     SheetInfo.GeneralViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularViewport();
                 }
             }
             if(selectionSettings.NeedWorkWithTransverseViewFirst) {
-
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.TransverseViewFirst.ViewportElement is null) {
-
                     SheetInfo.TransverseViewFirst.ViewSectionPlacer.PlaceTransverseFirstViewPorts();
                 }
             }
             if(selectionSettings.NeedWorkWithTransverseViewSecond) {
-
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.TransverseViewSecond.ViewportElement is null) {
-
                     SheetInfo.TransverseViewSecond.ViewSectionPlacer.PlaceTransverseSecondViewPorts();
                 }
             }
             if(selectionSettings.NeedWorkWithTransverseViewThird) {
-
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.TransverseViewThird.ViewportElement is null) {
-
                     SheetInfo.TransverseViewThird.ViewSectionPlacer.PlaceTransverseThirdViewPorts();
                 }
             }
             if(selectionSettings.NeedWorkWithRebarSchedule) {
-
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.RebarSchedule.ViewportElement is null) {
-
                     SheetInfo.RebarSchedule.ViewSchedulePlacer.PlaceRebarSchedule();
                 }
             }
             if(selectionSettings.NeedWorkWithMaterialSchedule) {
-
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.MaterialSchedule.ViewportElement is null) {
-
                     SheetInfo.MaterialSchedule.ViewSchedulePlacer.PlaceMaterialSchedule();
                 }
             }
             if(selectionSettings.NeedWorkWithSystemPartsSchedule) {
-
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.SystemPartsSchedule.ViewportElement is null) {
-
                     SheetInfo.SystemPartsSchedule.ViewSchedulePlacer.PlaceSystemPartsSchedule();
                 }
             }
-            if(selectionSettings.NeedWorkWithIFCPartsSchedule) {
-
+            if(selectionSettings.NeedWorkWithIfcPartsSchedule) {
                 // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.IFCPartsSchedule.ViewportElement is null) {
-
-                    SheetInfo.IFCPartsSchedule.ViewSchedulePlacer.PlaceIFCPartsSchedule();
+                if(SheetInfo.IfcPartsSchedule.ViewportElement is null) {
+                    SheetInfo.IfcPartsSchedule.ViewSchedulePlacer.PlaceIfcPartsSchedule();
                 }
             }
             if(selectionSettings.NeedWorkWithLegend) {
-
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.LegendView.ViewportElement is null) {
-
                     SheetInfo.LegendView.LegendPlacer.PlaceNoteLegend();
                 }
             }
         }
-
     }
 }

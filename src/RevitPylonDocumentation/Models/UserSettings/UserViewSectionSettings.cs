@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.Revit.UI;
-
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.UserSettings {
-    class UserViewSectionSettings : BaseViewModel {
-
+    internal class UserViewSectionSettings : BaseViewModel {
         private string _generalViewPrefixTemp = "";
         private string _generalViewSuffixTemp = "";
         private string _generalViewPerpendicularPrefixTemp = "";
@@ -35,7 +26,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _transverseViewXOffsetTemp = "200";
         private string _transverseViewYOffsetTemp = "200";
 
-        private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Без номера листа";
+        private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Имя вида без номера листа";
 
         public UserViewSectionSettings(MainViewModel mainViewModel) {
 
@@ -91,7 +82,6 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             get => _generalViewYBottomOffsetTemp;
             set => RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
         }
-
 
         public string TransverseViewFirstPrefix { get; set; }
         public string TransverseViewFirstPrefixTemp {
@@ -173,7 +163,6 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         }
 
         public void ApplyViewSectionsSettings() {
-
             GeneralViewPrefix = GeneralViewPrefixTemp;
             GeneralViewSuffix = GeneralViewSuffixTemp;
             GeneralViewPerpendicularPrefix = GeneralViewPerpendicularPrefixTemp;

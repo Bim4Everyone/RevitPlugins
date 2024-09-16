@@ -25,7 +25,7 @@
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     x:Name="window"
-    Loaded="window_Loaded">
+    Loaded="Window_Loaded">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -2132,7 +2132,7 @@
                                             Text="Маска имени ведомости IFC деталей">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
-                                                    <TextBlock Style="{StaticResource IFCPartsScheduleNameStyle}"/>
+                                                    <TextBlock Style="{StaticResource IfcPartsScheduleNameStyle}"/>
                                                 </ToolTip>
                                             </TextBlock.ToolTip>
                                         </TextBlock>
@@ -2142,14 +2142,14 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=SchedulesSettings.IFCPartsSchedulePrefixTemp,
+                                                Text="{Binding Path=SchedulesSettings.IfcPartsSchedulePrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
 
                                                 <TextBox.ToolTip>
                                                     <ToolTip>
-                                                        <TextBlock Style="{StaticResource IFCPartsSchedulePrefixStyle}"/>
+                                                        <TextBlock Style="{StaticResource IfcPartsSchedulePrefixStyle}"/>
                                                     </ToolTip>
                                                 </TextBox.ToolTip>
 
@@ -2169,14 +2169,14 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left" 
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=SchedulesSettings.IFCPartsScheduleSuffixTemp,
+                                                Text="{Binding Path=SchedulesSettings.IfcPartsScheduleSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}" 
                                                 Width="174" Height="25"
                                                 VerticalContentAlignment="Center">
 
                                                 <TextBox.ToolTip>
                                                     <ToolTip>
-                                                        <TextBlock Style="{StaticResource IFCPartsScheduleSuffixStyle}"/>
+                                                        <TextBlock Style="{StaticResource IfcPartsScheduleSuffixStyle}"/>
                                                     </ToolTip>
                                                 </TextBox.ToolTip>
 
@@ -2198,7 +2198,7 @@
                                             Text="Имя для поиска эталонной ведомости IFC деталей">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
-                                                    <TextBlock Style="{StaticResource ReferenceIFCPartsScheduleNameStyle}"/>
+                                                    <TextBlock Style="{StaticResource ReferenceIfcPartsScheduleNameStyle}"/>
                                                 </ToolTip>
                                             </TextBlock.ToolTip>
                                         </TextBlock>
@@ -2207,14 +2207,14 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.IFCPartsScheduleNameTemp,
+                                            Text="{Binding Path=SchedulesSettings.IfcPartsScheduleNameTemp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
 
                                             <TextBox.ToolTip>
                                                 <ToolTip>
-                                                    <TextBlock Style="{StaticResource ReferenceIFCPartsScheduleNameStyle}"/>
+                                                    <TextBlock Style="{StaticResource ReferenceIfcPartsScheduleNameStyle}"/>
                                                 </ToolTip>
                                             </TextBox.ToolTip>
 
@@ -2233,7 +2233,7 @@
                                             Text="В параметр для группировки диспетчера 1">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
-                                                    <TextBlock Style="{StaticResource IFCPartsScheduleDisp1Style}"/>
+                                                    <TextBlock Style="{StaticResource IfcPartsScheduleDisp1Style}"/>
                                                 </ToolTip>
                                             </TextBlock.ToolTip>
                                         </TextBlock>
@@ -2242,14 +2242,14 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.IFCPartsScheduleDisp1Temp,
+                                            Text="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp1Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
 
                                             <TextBox.ToolTip>
                                                 <ToolTip>
-                                                    <TextBlock Style="{StaticResource IFCPartsScheduleDisp1Style}"/>
+                                                    <TextBlock Style="{StaticResource IfcPartsScheduleDisp1Style}"/>
                                                 </ToolTip>
                                             </TextBox.ToolTip>
 
@@ -2268,7 +2268,7 @@
                                             Text="В параметр для группировки диспетчера 2">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
-                                                    <TextBlock Style="{StaticResource IFCPartsScheduleDisp2Style}"/>
+                                                    <TextBlock Style="{StaticResource IfcPartsScheduleDisp2Style}"/>
                                                 </ToolTip>
                                             </TextBlock.ToolTip>
                                         </TextBlock>
@@ -2277,14 +2277,14 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left" 
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.IFCPartsScheduleDisp2Temp,
+                                            Text="{Binding Path=SchedulesSettings.IfcPartsScheduleDisp2Temp,
                                             UpdateSourceTrigger=PropertyChanged}" 
                                             Width="460" Height="25"
                                             VerticalContentAlignment="Center">
 
                                             <TextBox.ToolTip>
                                                 <ToolTip ToolTipService.ShowDuration="500000">
-                                                    <TextBlock Style="{StaticResource IFCPartsScheduleDisp2Style}"/>
+                                                    <TextBlock Style="{StaticResource IfcPartsScheduleDisp2Style}"/>
                                                 </ToolTip>
                                             </TextBox.ToolTip>
 
@@ -2900,10 +2900,10 @@
                             Grid.Row="8"
                             Grid.Column="0"
                             Style="{DynamicResource ToggleButtonWithTooltipStyle}"
-                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIFCPartsSchedule}">
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithIfcPartsSchedule}">
                             <CheckBox.ToolTip>
                                 <ToolTip>
-                                    <TextBlock Style="{StaticResource IFCPartsScheduleStyle}"/>
+                                    <TextBlock Style="{StaticResource IfcPartsScheduleStyle}"/>
                                 </ToolTip>
                             </CheckBox.ToolTip>
                         </CheckBox>
@@ -2914,7 +2914,7 @@
                             Text="Ведомость IFC деталей">
                             <TextBlock.ToolTip>
                                 <ToolTip>
-                                    <TextBlock Style="{StaticResource IFCPartsScheduleStyle}"/>
+                                    <TextBlock Style="{StaticResource IfcPartsScheduleStyle}"/>
                                 </ToolTip>
                             </TextBlock.ToolTip>
                         </TextBlock>

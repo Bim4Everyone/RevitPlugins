@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.Revit.UI;
 
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.UserSettings {
-    class UserSchedulesSettings : BaseViewModel {
+    internal class UserSchedulesSettings : BaseViewModel {
         public UserSchedulesSettings(MainViewModel mainViewModel) {
 
             ViewModel = mainViewModel;
@@ -27,14 +20,14 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _materialScheduleSuffixTemp = "";
         private string _systemPartsSchedulePrefixTemp = "КЖ..._ВД_";
         private string _systemPartsScheduleSuffixTemp = "_Системная";
-        private string _IFCPartsSchedulePrefixTemp = "КЖ..._ВД_";
-        private string _IFCPartsScheduleSuffixTemp = "_IFC";
+        private string _ifcPartsSchedulePrefixTemp = "КЖ..._ВД_";
+        private string _ifcPartsScheduleSuffixTemp = "_IFC";
 
         // Названия эталонных спек
-        private string _rebarScheduleNameTemp = "(КЖ...)_СА_Базовая_(Марка и/или арматурная группа)";
-        private string _materialScheduleNameTemp = "(КЖ...)_СМ_(Марка)";
-        private string _systemPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка и/или арматурная группа)_Системная";
-        private string _IFCPartsScheduleNameTemp = "(КЖ...)_ВД_(Марка и/или арматурная группа)_IFC";
+        private string _rebarScheduleNameTemp = "01_(КЖ...)_СА_Базовая_(Марка пилона)";
+        private string _materialScheduleNameTemp = "01_(КЖ...)_СМ_Базовая_(Марка пилона)";
+        private string _systemPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_Системная";
+        private string _ifcPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_IFC";
 
         // Заполнение параметров диспетчера
         private string _rebarScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
@@ -43,17 +36,17 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _materialScheduleDisp2Temp = "СМ_Пилоны";
         private string _systemPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
         private string _systemPartsScheduleDisp2Temp = "ВД_СИС_Пилоны";
-        private string _IFCPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
-        private string _IFCPartsScheduleDisp2Temp = "ВД_IFC_Пилоны";
+        private string _ifcPartsScheduleDisp1Temp = "обр_ФОП_Раздел проекта";
+        private string _ifcPartsScheduleDisp2Temp = "ВД_IFC_Пилоны";
 
         // Фильтрация спек
         private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFiltersTemp = new ObservableCollection<ScheduleFilterParamHelper>() {
             new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
             new ScheduleFilterParamHelper("обр_ФОП_Орг. уровень", "обр_ФОП_Орг. уровень"),
-            new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка")
+            new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка"),
+            new ScheduleFilterParamHelper("Марка", "Марка")
         };
-
 
         public string RebarSchedulePrefix { get; set; }
         public string RebarSchedulePrefixTemp {
@@ -92,17 +85,16 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _systemPartsScheduleSuffixTemp, value);
         }
 
-
-        public string IFCPartsSchedulePrefix { get; set; }
-        public string IFCPartsSchedulePrefixTemp {
-            get => _IFCPartsSchedulePrefixTemp;
-            set => RaiseAndSetIfChanged(ref _IFCPartsSchedulePrefixTemp, value);
+        public string IfcPartsSchedulePrefix { get; set; }
+        public string IfcPartsSchedulePrefixTemp {
+            get => _ifcPartsSchedulePrefixTemp;
+            set => RaiseAndSetIfChanged(ref _ifcPartsSchedulePrefixTemp, value);
         }
 
-        public string IFCPartsScheduleSuffix { get; set; }
-        public string IFCPartsScheduleSuffixTemp {
-            get => _IFCPartsScheduleSuffixTemp;
-            set => RaiseAndSetIfChanged(ref _IFCPartsScheduleSuffixTemp, value);
+        public string IfcPartsScheduleSuffix { get; set; }
+        public string IfcPartsScheduleSuffixTemp {
+            get => _ifcPartsScheduleSuffixTemp;
+            set => RaiseAndSetIfChanged(ref _ifcPartsScheduleSuffixTemp, value);
         }
 
         public string RebarScheduleName { get; set; }
@@ -123,10 +115,10 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
         }
 
-        public string IFCPartsScheduleName { get; set; }
-        public string IFCPartsScheduleNameTemp {
-            get => _IFCPartsScheduleNameTemp;
-            set => RaiseAndSetIfChanged(ref _IFCPartsScheduleNameTemp, value);
+        public string IfcPartsScheduleName { get; set; }
+        public string IfcPartsScheduleNameTemp {
+            get => _ifcPartsScheduleNameTemp;
+            set => RaiseAndSetIfChanged(ref _ifcPartsScheduleNameTemp, value);
         }
 
         public string RebarScheduleDisp1 { get; set; }
@@ -144,10 +136,10 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             get => _systemPartsScheduleDisp1Temp;
             set => RaiseAndSetIfChanged(ref _systemPartsScheduleDisp1Temp, value);
         }
-        public string IFCPartsScheduleDisp1 { get; set; }
-        public string IFCPartsScheduleDisp1Temp {
-            get => _IFCPartsScheduleDisp1Temp;
-            set => RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp1Temp, value);
+        public string IfcPartsScheduleDisp1 { get; set; }
+        public string IfcPartsScheduleDisp1Temp {
+            get => _ifcPartsScheduleDisp1Temp;
+            set => RaiseAndSetIfChanged(ref _ifcPartsScheduleDisp1Temp, value);
         }
 
         public string RebarScheduleDisp2 { get; set; }
@@ -166,10 +158,10 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _systemPartsScheduleDisp2Temp, value);
         }
 
-        public string IFCPartsScheduleDisp2 { get; set; }
-        public string IFCPartsScheduleDisp2Temp {
-            get => _IFCPartsScheduleDisp2Temp;
-            set => RaiseAndSetIfChanged(ref _IFCPartsScheduleDisp2Temp, value);
+        public string IfcPartsScheduleDisp2 { get; set; }
+        public string IfcPartsScheduleDisp2Temp {
+            get => _ifcPartsScheduleDisp2Temp;
+            set => RaiseAndSetIfChanged(ref _ifcPartsScheduleDisp2Temp, value);
         }
 
         public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; } = new ObservableCollection<ScheduleFilterParamHelper>();
@@ -179,9 +171,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         }
 
 
-
         public void ApplySchedulesSettings() {
-            
             RebarSchedulePrefix = RebarSchedulePrefixTemp;
             RebarScheduleSuffix = RebarScheduleSuffixTemp;
 
@@ -191,23 +181,23 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             SystemPartsSchedulePrefix = SystemPartsSchedulePrefixTemp;
             SystemPartsScheduleSuffix = SystemPartsScheduleSuffixTemp;
 
-            IFCPartsSchedulePrefix = IFCPartsSchedulePrefixTemp;
-            IFCPartsScheduleSuffix = IFCPartsScheduleSuffixTemp;
+            IfcPartsSchedulePrefix = IfcPartsSchedulePrefixTemp;
+            IfcPartsScheduleSuffix = IfcPartsScheduleSuffixTemp;
 
             RebarScheduleName = RebarScheduleNameTemp;
             MaterialScheduleName = MaterialScheduleNameTemp;
             SytemPartsScheduleName = SytemPartsScheduleNameTemp;
-            IFCPartsScheduleName = IFCPartsScheduleNameTemp;
+            IfcPartsScheduleName = IfcPartsScheduleNameTemp;
 
             RebarScheduleDisp1 = RebarScheduleDisp1Temp;
             MaterialScheduleDisp1 = MaterialScheduleDisp1Temp;
             SystemPartsScheduleDisp1 = SystemPartsScheduleDisp1Temp;
-            IFCPartsScheduleDisp1 = IFCPartsScheduleDisp1Temp;
+            IfcPartsScheduleDisp1 = IfcPartsScheduleDisp1Temp;
 
             RebarScheduleDisp2 = RebarScheduleDisp2Temp;
             MaterialScheduleDisp2 = MaterialScheduleDisp2Temp;
             SystemPartsScheduleDisp2 = SystemPartsScheduleDisp2Temp;
-            IFCPartsScheduleDisp2 = IFCPartsScheduleDisp2Temp;
+            IfcPartsScheduleDisp2 = IfcPartsScheduleDisp2Temp;
 
             ParamsForScheduleFilters = ParamsForScheduleFiltersTemp;
         }
