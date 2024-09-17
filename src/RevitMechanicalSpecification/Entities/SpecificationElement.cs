@@ -8,13 +8,11 @@ using Autodesk.Revit.DB;
 
 namespace RevitMechanicalSpecification.Entities {
     public class SpecificationElement {
-        
         private Element _element;
         private Element _elementType;
         private BuiltInCategory _builtInCategory;
         private string _elementName;
         private FamilyInstance _manifoldInstance = null;
-        private HashSet<ManifoldPart> _manifoldParts = null;
         private SpecificationElement _manifoldSpElement;
 
         public BuiltInCategory BuiltInCategory {
@@ -37,21 +35,14 @@ namespace RevitMechanicalSpecification.Entities {
             set => _elementType = value;
         }
 
-
         public string ElementName {
             get => _elementName;
             set => _elementName = value;
         }
 
-
         public FamilyInstance ManifoldInstance {
                 get => _manifoldInstance;
                 set => _manifoldInstance = value;
-        }
-
-        public HashSet<ManifoldPart> ManifoldParts {
-            get => _manifoldParts;
-            set => _manifoldParts = value;
         }
     }
 }
