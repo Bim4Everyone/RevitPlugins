@@ -29,9 +29,10 @@ namespace RevitMechanicalSpecification.Service {
         }
 
         /// <summary>
-        /// Возвращает сам параметр из типа или экземпляра
+        /// возвращает значение параметра по типу или экземпляру, если существует, иначе null
         /// </summary>
-        /// <param name="specificationElement"></param>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
         /// <param name="paraName"></param>
         /// <returns></returns>
         public static string GetTypeOrInstanceParamStringValue(
@@ -46,6 +47,12 @@ namespace RevitMechanicalSpecification.Service {
             return null;
         }
 
+        /// <summary>
+        /// Возвращает сам параметр из типа или экземпляра
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        /// <param name="paraName"></param>
+        /// <returns></returns>
         public static Parameter GetTypeOrInstanceParam(this SpecificationElement specificationElement, string paramName) {
             if(paramName is null) {
                 return null;
@@ -57,7 +64,6 @@ namespace RevitMechanicalSpecification.Service {
             }
             return parameter;
         }
-
 
         /// <summary>
         /// Получаем дабл из параметра в экземпляре или типе, иначе возвращает 0
