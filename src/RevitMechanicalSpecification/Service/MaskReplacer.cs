@@ -15,7 +15,7 @@ using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     public class MaskReplacer {
-        //должно работать только с шаблонизированными семействами, так что оставляем только ADSK_Параметры, объявляем их тут же
+        // должно работать только с шаблонизированными семействами, так что оставляем только ADSK_Параметры, объявляем их тут же
         private readonly string _length = "ДЛИНА";
         private readonly string _adskLength = "ADSK_Размер_Длина";
         private readonly string _width = "ШИРИНА";

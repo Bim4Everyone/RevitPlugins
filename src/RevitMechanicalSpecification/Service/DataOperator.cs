@@ -28,6 +28,12 @@ namespace RevitMechanicalSpecification.Service {
             return null;
         }
 
+        /// <summary>
+        /// Возвращает сам параметр из типа или экземпляра
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        /// <param name="paraName"></param>
+        /// <returns></returns>
         public static string GetTypeOrInstanceParamStringValue(
             this SpecificationElement specificationElement, 
             string paraName) {
@@ -66,18 +72,6 @@ namespace RevitMechanicalSpecification.Service {
             }
             if(elemType.IsExistsParam(paraName)) {
                 return elemType.GetSharedParamValueOrDefault<double>(paraName);
-            }
-            return 0;
-        }
-
-        public static double GetTypeOrInstanceParamDoubleValue(
-            this SpecificationElement specificationElement, 
-            string paraName) {
-            if(specificationElement.Element.IsExistsParam(paraName)) {
-                return specificationElement.Element.GetSharedParamValueOrDefault<double>(paraName);
-            }
-            if(specificationElement.ElementType.IsExistsParam(paraName)) {
-                return specificationElement.ElementType.GetSharedParamValueOrDefault<double>(paraName);
             }
             return 0;
         }

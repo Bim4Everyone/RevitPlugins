@@ -40,7 +40,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         /// <summary>
-        /// Получаем ФОП_ВИС_Группирование для узла
+        /// Получаем ФОП_ВИС_Группирование для узла. Базовая группа + имя семейства-типа узла + 
+        /// детальная группа узла+ детальная группа элемента
         /// </summary>
         /// <param name="familyInstance"></param>
         /// <param name="element"></param>
@@ -99,8 +100,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <summary>
         /// Получаем детализированную группу - имя + марка + код + завод
         /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
         private string GetDetailedGroup(SpecificationElement specificationElement) {
             string name = specificationElement.ElementName;
             string mark = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameMark);

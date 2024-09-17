@@ -25,13 +25,43 @@ namespace RevitMechanicalSpecification.Service {
             _systems = systems;
         }
 
+        public string GetFunctionValue(Element element) {
+            if(element is FamilyInstance instance) {
+                element = GetSuperComponentIfExist(instance);
+            }
+
+            VisSystem visSystem = GetVisSystem(element);
+            if(visSystem == null || string.IsNullOrEmpty(visSystem.SystemFunction)) {
+                return null;
+            }
+
+            return visSystem.SystemFunction;
+        }
+
+        public string GetSystemValue(Element element) {
+            if(element is FamilyInstance instance) {
+                element = GetSuperComponentIfExist(instance);
+            }
+
+            VisSystem visSystem = GetVisSystem(element);
+            if(visSystem is null) {
+                return null;
+            }
+
+            if(!string.IsNullOrEmpty(visSystem.SystemShortName)) {
+                return visSystem.SystemShortName;
+            }
+
+            return visSystem.SystemTargetName;
+        }
+
+
         private string GetParamSystemValue(Element element) {
             return element.GetParamValueOrDefault
                 (BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue);
         }
 
         private string GetInsulationSystem(InsulationLiningBase insulation) {
-
             Element host = _document.GetElement(insulation.HostElementId);
             //изоляция может баговать и висеть на трубе или воздуховоде не имея хоста
             if (host == null) {
@@ -69,8 +99,8 @@ namespace RevitMechanicalSpecification.Service {
 
         }
 
-        //Если есть принудительное значение на типе - возвращаем.
-        //Если нет, но есть суперкомпонент - проверяем принудительное на нем.
+        // Если есть принудительное значение на типе - возвращаем.
+        // Если нет, но есть суперкомпонент - проверяем принудительное на нем.
         public string GetForcedParamValue(SpecificationElement specificationElement, string paraName) {
             //string result = DataOperator.GetTypeOrInstanceParamStringValue(element, elemType, paraName);
             string result = specificationElement.GetTypeOrInstanceParamStringValue(paraName);
@@ -88,36 +118,6 @@ namespace RevitMechanicalSpecification.Service {
             }
 
             return result;
-        }
-
-        public string GetFunctionValue(Element element) {
-            if(element is FamilyInstance instance) {
-                element = GetSuperComponentIfExist(instance);
-            }
-
-            VisSystem visSystem = GetVisSystem(element);
-            if(visSystem == null || string.IsNullOrEmpty(visSystem.SystemFunction)) {
-                return null;
-            }
-
-            return visSystem.SystemFunction;
-        }
-
-        public string GetSystemValue(Element element) {
-            if(element is FamilyInstance instance) {
-                element = GetSuperComponentIfExist(instance);
-            }
-
-            VisSystem visSystem = GetVisSystem(element);
-            if(visSystem is null) {
-                return null;
-            }
-
-            if(!string.IsNullOrEmpty(visSystem.SystemShortName)) {
-                return visSystem.SystemShortName;
-            }
-
-            return visSystem.SystemTargetName;
         }
     }
 }

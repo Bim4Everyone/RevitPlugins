@@ -55,15 +55,13 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             set => _originalParameterName = value;
         }
 
-
         protected SpecConfiguration Config => _config;
 
         protected Document Document => _document;
 
         public abstract void SetParamValue(SpecificationElement specificationElement);
 
-        public void Fill(
-            SpecificationElement specificationElement) {
+        public void Fill(SpecificationElement specificationElement) {
 
             // Существует ли целевой параметр в экземпляре
             TargetParameter = specificationElement.Element.LookupParameter(TargetParamName);

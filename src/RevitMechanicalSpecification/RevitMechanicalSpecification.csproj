@@ -2,4 +2,7 @@
 	<PropertyGroup>
 		<UseDevExpress>false</UseDevExpress>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Remove="Models\Fillers\ElementParamNameFiller.cs~RF5ecabb3.TMP" />
+	</ItemGroup>
 </Project>

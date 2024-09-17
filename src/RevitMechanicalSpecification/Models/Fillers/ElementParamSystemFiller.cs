@@ -26,18 +26,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             { 
             _systemList = systemList;
             _nameFactory = new SystemFunctionFactory(Document, _systemList);
-        } 
-
-        private string GetSystemName(SpecificationElement specificationElement) 
-            {
-            //return _nameFactory.GetSystemValue(element);
-
-            string forcedSystem = _nameFactory.GetForcedParamValue(specificationElement, Config.ForcedSystemName);
-            if(!string.IsNullOrEmpty(forcedSystem)) {
-                return forcedSystem;
-            }
-            return _nameFactory.GetSystemValue(specificationElement.Element);
-
         }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
@@ -48,6 +36,19 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             }
 
             TargetParameter.Set(Config.GlobalSystem);
+        }
+
+        /// <summary>
+        /// Получает имя системы или принудительное имя системы
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        /// <returns></returns>
+        private string GetSystemName(SpecificationElement specificationElement) {
+            string forcedSystem = _nameFactory.GetForcedParamValue(specificationElement, Config.ForcedSystemName);
+            if(!string.IsNullOrEmpty(forcedSystem)) {
+                return forcedSystem;
+            }
+            return _nameFactory.GetSystemValue(specificationElement.Element);
         }
     }
 }

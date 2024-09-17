@@ -29,14 +29,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             _nameFactory = new SystemFunctionFactory(Document, _systemList);
         }
 
-        private string GetFunction(SpecificationElement specificationElement) {
-            string forcedFunction = _nameFactory.GetForcedParamValue(specificationElement, Config.ForcedFunction);
-            if(!string.IsNullOrEmpty(forcedFunction)) { 
-                return forcedFunction;
-            }
-            return _nameFactory.GetFunctionValue(specificationElement.Element);
-        }
-
         public override void SetParamValue(SpecificationElement specificationElement) {
             string calculatedFunction = GetFunction(specificationElement);
             if(!(string.IsNullOrEmpty(calculatedFunction))) {
@@ -45,5 +37,20 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             }
             TargetParameter.Set(Config.GlobalFunction);
         }
+
+        /// <summary>
+        /// Возвращает экономическую или принудительную экономическую функцию
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        /// <returns></returns>
+        private string GetFunction(SpecificationElement specificationElement) {
+            string forcedFunction = _nameFactory.GetForcedParamValue(specificationElement, Config.ForcedFunction);
+            if(!string.IsNullOrEmpty(forcedFunction)) {
+                return forcedFunction;
+            }
+            return _nameFactory.GetFunctionValue(specificationElement.Element);
+        }
+
+
     }
 }

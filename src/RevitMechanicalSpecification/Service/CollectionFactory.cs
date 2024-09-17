@@ -102,6 +102,5 @@ namespace RevitMechanicalSpecification.Service {
                 .ToElements();
             return elements.Where(e => LogicalFilter(e)).ToList();
         }
-
     }
 }

@@ -29,6 +29,23 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         private readonly HashSet<string> _squareNames = new HashSet<string>() { "м2", "м²" };
 
+        public ElementParamUnitFiller(
+            string toParamName,
+            string fromParamName,
+            SpecConfiguration specConfiguration,
+            Document document) :
+            base(toParamName, fromParamName, specConfiguration, document) {
+        }
+
+        public override void SetParamValue(SpecificationElement specificationElement) {
+            TargetParameter.Set(GetUnit(specificationElement.Element));
+        }
+
+        /// <summary>
+        /// Проверяет использовать ли внесенное в единицы измерение значение или использовать стандартное
+        /// </summary>
+        /// <param name="defaultUnit"></param>
+        /// <returns></returns>
         private string DefaultCheck(string defaultUnit) {
             string unit = OriginalParameter.AsValueString();
 
@@ -50,7 +67,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             return defaultUnit;
         }
 
-        public string GetUnit(Element element) {
+        /// <summary>
+        /// Возвращает единицу измерения в зависимости от категории и внесенных в ADSK_Единицу измерения(или замену) данных
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private string GetUnit(Element element) {
             if(element.InAnyCategory(new List<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctCurves,
                 BuiltInCategory.OST_PipeCurves,
@@ -60,7 +82,9 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             }
 
             if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
-                if(Config.IsSpecifyDuctFittings) { return Config.SingleUnit; }
+                if(Config.IsSpecifyDuctFittings) { 
+                    return Config.SingleUnit; 
+                }
                 return Config.SquareUnit;
             }
             if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
@@ -71,19 +95,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             }
 
             return Config.SingleUnit;
-        }
-
-
-        public ElementParamUnitFiller(
-            string toParamName,
-            string fromParamName,
-            SpecConfiguration specConfiguration,
-            Document document) :
-            base(toParamName, fromParamName, specConfiguration, document) {
-        }
-
-        public override void SetParamValue(SpecificationElement specificationElement) {
-            TargetParameter.Set(GetUnit(specificationElement.Element));
         }
     }
 }

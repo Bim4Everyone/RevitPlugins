@@ -13,8 +13,6 @@ using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models {
     public class SpecConfiguration {
-
-        //константы сделать константами
         public string GlobalFunction;
         public string OriginalParamNameName;
         public string OriginalParamNameMark;

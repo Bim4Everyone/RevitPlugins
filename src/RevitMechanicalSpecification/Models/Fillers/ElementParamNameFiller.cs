@@ -19,7 +19,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private string _name;
         private string _nameAddon;
 
-
         public ElementParamNameFiller(
             string toParamName,
             string fromParamName,

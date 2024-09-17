@@ -27,6 +27,12 @@ namespace RevitMechanicalSpecification.Service {
             _document = document;
         }
 
+        /// <summary>
+        /// Получение имени воздуховода
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
         public string GetDuctName(Element element, Element elemType) {
             return ", с толщиной стенки " +
                     GetDuctThikness(element, elemType) +
@@ -34,9 +40,115 @@ namespace RevitMechanicalSpecification.Service {
                     element.GetParamValue(BuiltInParameter.RBS_CALCULATED_SIZE);
         }
 
-        //Формируем диаметр трубы для наименования в зависимости от того что включено у нее в типе
-        public string GetPipeSize(Element element, Element elemType) {
+        /// <summary>
+        /// Получение марки фитинга воздуховода
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public string GetDuctFittingMark(Element element) {
+            List<Connector> connectors = GetConnectors(element);
+            Element duct = GetDuctFromFitting(connectors);
+            if(duct is null) {
+                return "!Не учитывать";
+            }
+            return duct.GetTypeOrInstanceParamStringValue(duct.GetElementType(), _specConfiguration.OriginalParamNameMark);
+        }
 
+        /// <summary>
+        /// Получение имени фитинга воздуховода
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public string GetDuctFittingName(Element element) {
+            string thikness = GetDuctFittingThikness(element);
+            if(thikness is null) {
+                return "!Не учитывать";
+            }
+
+            if(!_specConfiguration.IsSpecifyDuctFittings) {
+                return "Металл для фасонных деталей воздуховодов с толщиной стенки " + thikness + " мм";
+            }
+
+            string startName = "Не удалось определить тип фитинга";
+            FamilyInstance instanse = element as FamilyInstance;
+            MechanicalFitting fitting = instanse.MEPModel as MechanicalFitting;
+
+            switch(fitting.PartType) {
+                case PartType.Transition:
+                    startName = "Переход между сечениями воздуховода ";
+                    break;
+                case PartType.Tee:
+                    startName = "Тройник ";
+                    break;
+                case PartType.TapAdjustable:
+                    startName = "Врезка в воздуховод ";
+                    break;
+                case PartType.Cross:
+                    startName = "Крестовина ";
+                    break;
+                case PartType.Union:
+                    return "!Не учитывать";
+                case PartType.Elbow:
+                    Connector connector = GetConnectors(element).First();
+                    string angle = GetDuctFittingAngle(element);
+                    if(connector.Shape == ConnectorProfileType.Round) {
+                        startName = "Отвод " + angle + "° круглого сечения";
+                    }
+                    if(connector.Shape == ConnectorProfileType.Rectangular) {
+                        startName = "Отвод " + angle + "° прямоугольного сечения";
+                    }
+                    break;
+                default:
+                    return startName;
+            }
+
+
+            string size = element.GetParamValue<string>(BuiltInParameter.RBS_CALCULATED_SIZE);
+            //Ревит пишет размеры всех коннекторов. Для всего кроме тройника и перехода нам хватит первого размера
+            if(!(fitting.PartType is PartType.Transition) || !(fitting.PartType is PartType.Tee)) {
+                size = size.Split('-').First();
+            }
+            return startName + " " + size + ", с толщиной стенки " + thikness + " мм";
+        }
+
+        /// <summary>
+        /// Получение площади фитинга воздуховода
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public double GetFittingArea(Element element) {
+            double area = 0;
+
+            foreach(Solid solid in element.GetSolids())
+                foreach(Face face in solid.Faces)
+                    area += face.Area;
+
+            area = UnitConverter.DoubleToSquareMeters(area);
+
+            if(area > 0) {
+                double falseArea = 0;
+                List<Connector> connectors = GetConnectors(element);
+                foreach(Connector connector in connectors) {
+                    if(connector.Shape == ConnectorProfileType.Rectangular) {
+                        falseArea += UnitConverter.DoubleToSquareMeters(connector.Height * connector.Width);
+                    }
+                    if(connector.Shape == ConnectorProfileType.Round) {
+                        falseArea += UnitConverter.DoubleToSquareMeters(connector.Radius * connector.Radius * 3.14);
+                    }
+                }
+                //Вычетаем площадь пустоты на местах коннекторов
+                area -= falseArea;
+            }
+            return area;
+        }
+
+        /// <summary>
+        /// Формируем диаметр трубы для наименования в зависимости от того что включено у нее в типе
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
+        public string GetPipeSize(Element element, Element elemType) {
             bool dy = elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.Dy) == 1;
             bool dyWall = elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.DyWall) == 1;
             bool dExternalWall = elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.DExternalWall) == 1;
@@ -67,7 +179,11 @@ namespace RevitMechanicalSpecification.Service {
             return " НЕ ЗАДАН ТИП ДИАМЕТРА";
         }
 
-        //Проверяем по галочкам в проекте и типе нужно ли специфицировать фиттинг трубы
+        /// <summary>
+        /// Проверяем по галочкам в проекте и типе нужно ли специфицировать фиттинг трубы
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         public bool IsSpecifyPipeFittingName(Element element) {
             List<Connector> connectors = GetConnectors(element);
 
@@ -88,7 +204,11 @@ namespace RevitMechanicalSpecification.Service {
             return _specConfiguration.IsSpecifyPipeFittings;
         }
 
-        //Базовая толщина воздуховодов по ГОСТ
+        /// <summary>
+        /// Базовая толщина воздуховодов по ГОСТ
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         private double GetBaseDuctThikness(Element element) {
             var curve = element as MEPCurve;
             Connector connector = GetConnectors(element).FirstOrDefault();
@@ -134,8 +254,13 @@ namespace RevitMechanicalSpecification.Service {
             return 0;
         }
 
-        //Толщина воздуховодов с учетом ограничителей в изоляции и в типе воздуховода
-        public string GetDuctThikness(Element element, Element elemType) {
+        /// <summary>
+        /// Толщина воздуховодов с учетом ограничителей в изоляции и в типе воздуховода
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
+        private string GetDuctThikness(Element element, Element elemType) {
             var filter = new ElementCategoryFilter(BuiltInCategory.OST_DuctInsulations);
 
             double minDuctThikness = elemType.GetSharedParamValueOrDefault<double>(_specConfiguration.MinDuctThikness, 0);
@@ -169,7 +294,11 @@ namespace RevitMechanicalSpecification.Service {
             return thikness.ToString();
         }
 
-        //поиск воздуховода из коннекторов фитинга
+        /// <summary>
+        /// Поиск воздуховода из коннекторов фитинга
+        /// </summary>
+        /// <param name="connectors"></param>
+        /// <returns></returns>
         private Element GetDuctFromFitting(List<Connector> connectors) {
             var subConnectors = new List<Connector>();
             foreach(Connector connector in connectors) {
@@ -195,8 +324,12 @@ namespace RevitMechanicalSpecification.Service {
             return null;
         }
 
-        //получение толщины фитинга воздуховода
-        public string GetDuctFittingThikness(Element element) {
+        /// <summary>
+        /// получение толщины фитинга воздуховода
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private string GetDuctFittingThikness(Element element) {
             List<Connector> connectors = GetConnectors(element);
             Element duct = GetDuctFromFitting(connectors);
             if(duct is null) {
@@ -205,7 +338,12 @@ namespace RevitMechanicalSpecification.Service {
 
             return GetDuctThikness(duct, duct.GetElementType());
         }
-        //получение угла фитинга воздуховода
+
+        /// <summary>
+        /// Получение угла фитинга воздуховода
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         private string GetDuctFittingAngle(Element element) {
             double angle = UnitConverter.DoubleToDegree(GetConnectors(element).First().Angle);
             if(angle <= 15.1) {
@@ -229,70 +367,12 @@ namespace RevitMechanicalSpecification.Service {
             return "0";
         }
 
-        public string GetDuctFittingMark(Element element) {
-            List<Connector> connectors = GetConnectors(element);
-            Element duct = GetDuctFromFitting(connectors);
-            if(duct is null) {
-                return "!Не учитывать";
-            }
-            return duct.GetTypeOrInstanceParamStringValue(duct.GetElementType(), _specConfiguration.OriginalParamNameMark);
-        }
-
-        //получение имени фитинга воздуховода
-        public string GetDuctFittingName(Element element) {
-            string thikness = GetDuctFittingThikness(element);
-            if(thikness is null) {
-                return "!Не учитывать";
-            }
-
-            if(!_specConfiguration.IsSpecifyDuctFittings) {
-                return "Металл для фасонных деталей воздуховодов с толщиной стенки " + thikness + " мм";
-            }
-
-            string startName = "Не удалось определить тип фитинга";
-            FamilyInstance instanse = element as FamilyInstance;
-            MechanicalFitting fitting = instanse.MEPModel as MechanicalFitting;
-
-            switch(fitting.PartType) {
-                case PartType.Transition:
-                    startName = "Переход между сечениями воздуховода ";
-                    break;
-                case PartType.Tee:
-                    startName = "Тройник ";
-                    break;
-                case PartType.TapAdjustable:
-                    startName = "Врезка в воздуховод ";
-                    break;
-                case PartType.Cross:
-                    startName = "Крестовина ";
-                    break;
-                case PartType.Union:
-                    return "!Не учитывать";
-                case PartType.Elbow:
-                    Connector connector = GetConnectors(element).First();
-                    string angle = GetDuctFittingAngle(element);
-                    if(connector.Shape == ConnectorProfileType.Round) {
-                        startName = "Отвод " + angle + "° круглого сечения";
-                    }
-                    if(connector.Shape == ConnectorProfileType.Rectangular) {
-                        startName = "Отвод " + angle + "° прямоугольного сечения";
-                    } 
-                    break;
-                default:
-                    return startName;
-            }
-
-            
-            string size = element.GetParamValue<string>(BuiltInParameter.RBS_CALCULATED_SIZE);
-            //Ревит пишет размеры всех коннекторов. Для всего кроме тройника и перехода нам хватит первого размера
-            if(!(fitting.PartType is PartType.Transition) || !(fitting.PartType is PartType.Tee)) {
-                size = size.Split('-').First();
-            }
-            return startName + " " + size + ", с толщиной стенки " + thikness + " мм";
-        }
-
-        //получение коннекторов элемента
-        public List<Connector> GetConnectors(Element element) {
+        /// <summary>
+        /// Получение коннекторов элемента
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private List<Connector> GetConnectors(Element element) {
             List<Connector> connectors = new List<Connector>();
 
             if(element is FamilyInstance instance && instance.MEPModel.ConnectorManager != null) {
@@ -306,39 +386,16 @@ namespace RevitMechanicalSpecification.Service {
             return connectors;
         }
 
+        /// <summary>
+        /// Наполняет лист коннекторов из сета коннекторов
+        /// </summary>
+        /// <param name="connectors"></param>
+        /// <param name="connectorSet"></param>
         private void AddConnectors(List<Connector> connectors, ConnectorSet connectorSet) {
             ConnectorSetIterator set = connectorSet.ForwardIterator();
             while(set.MoveNext()) {
                 connectors.Add(set.Current as Connector);
             }
-        }
-
-
-        //получение площади фитинга воздуховода
-        public double GetFittingArea(Element element) {
-            double area = 0;
-
-            foreach(Solid solid in element.GetSolids())
-                foreach(Face face in solid.Faces)
-                    area += face.Area;
-
-            area = UnitConverter.DoubleToSquareMeters(area);
-
-            if(area > 0) {
-                double falseArea = 0;
-                List<Connector> connectors = GetConnectors(element);
-                foreach(Connector connector in connectors) {
-                    if(connector.Shape == ConnectorProfileType.Rectangular) {
-                        falseArea += UnitConverter.DoubleToSquareMeters(connector.Height * connector.Width);
-                    }
-                    if(connector.Shape == ConnectorProfileType.Round) {
-                        falseArea += UnitConverter.DoubleToSquareMeters(connector.Radius * connector.Radius * 3.14);
-                    }
-                }
-                //Вычетаем площадь пустоты на местах коннекторов
-                area -= falseArea;
-            }
-            return area;
         }
     }
 }
