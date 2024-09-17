@@ -82,6 +82,9 @@ namespace RevitServerFolders.Services {
                                 item.Name.Equals(_navisworksViewName, StringComparison.OrdinalIgnoreCase));
 
                         if(navisView == null) {
+                            _loggerService.Warning(
+                                "Document {@FileName} doesn't contains {@NavisView} view.",
+                                fileName, navisView);
                             return;
                         }
 
@@ -96,6 +99,9 @@ namespace RevitServerFolders.Services {
                                 .Any();
 
                         if(!hasElements) {
+                            _loggerService.Warning(
+                                "View {@NavisView} in document {@FileName} doesn't contains elements.",
+                                 navisView, fileName);
                             return;
                         }
 
@@ -164,6 +170,9 @@ namespace RevitServerFolders.Services {
                 })
                 .ToArray();
 
+            if(failureMessages.Length == 0) {
+                return;
+            }
             _loggerService.Information(
                 "Event handler: {@EventHandler}; title: {@DocTitle}; Failures: {@Failures}",
                 nameof(ApplicationOnFailuresProcessing), accessor.GetDocument().Title, failureMessages);
