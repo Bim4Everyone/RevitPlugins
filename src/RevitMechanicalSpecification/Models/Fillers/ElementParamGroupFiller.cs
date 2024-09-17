@@ -11,18 +11,23 @@ using RevitMechanicalSpecification.Service;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamGroupFiller : ElementParamFiller {
-
-
-
         public ElementParamGroupFiller(
-            string toParamName, 
-            string fromParamName, 
-            SpecConfiguration specConfiguration, 
-            Document document) : 
-            base(toParamName, fromParamName, specConfiguration, document) 
-            
-            {
+            string toParamName,
+            string fromParamName,
+            SpecConfiguration specConfiguration,
+            Document document) :
+            base(toParamName, fromParamName, specConfiguration, document) {
+        }
 
+        /// <summary>
+        /// Устанавливает значение ФОП_ВИС_Группирование в зависимости от того узел это или нет
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        public override void SetParamValue(SpecificationElement specificationElement) {
+            TargetParameter.Set(specificationElement.ManifoldSpElement != null
+                ? GetManifoldGroup(specificationElement)
+                : specificationElement.Element
+                .GetSharedParamValueOrDefault(Config.ForcedGroup, GetGroup(specificationElement)));
         }
 
         /// <summary>
@@ -30,9 +35,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string GetGroup(SpecificationElement specificationElement) {
-            string detailedGroup = GetDetailedGroup(specificationElement);
-            return $"{GetBaseGroup(specificationElement.Element)}{detailedGroup}";
+        private string GetGroup(SpecificationElement specificationElement) {
+            return $"{GetBaseGroup(specificationElement.Element)}_{GetDetailedGroup(specificationElement)}";
         }
 
         /// <summary>
@@ -41,13 +45,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="familyInstance"></param>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string GetManifoldGroup(SpecificationElement specificationElement) {
+        private string GetManifoldGroup(SpecificationElement specificationElement) {
             string manifoldFamylyTypeName = specificationElement.ManifoldInstance
                 .get_Parameter(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString();
-
             return
-                    
-                    $"{GetBaseGroup(specificationElement.ManifoldElement)}" +
+                    $"{GetBaseGroup(specificationElement.ManifoldSpElement.Element)}" +
                     $"{manifoldFamylyTypeName}" +
                     $"{GetDetailedGroup(specificationElement.ManifoldSpElement)}" +
                     $"{GetDetailedGroup(specificationElement)}";
@@ -106,13 +108,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             string creator = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameCreator);
 
             return $"_{name}_{mark}_{code}_{creator}";
-        }
-
-        public override void SetParamValue(SpecificationElement specificationElement) {
-            TargetParameter.Set(specificationElement.ManifoldInstance != null
-                ? GetManifoldGroup(specificationElement)
-                : specificationElement.Element
-                .GetSharedParamValueOrDefault(Config.ForcedGroup, GetGroup(specificationElement)));
         }
     }
 }

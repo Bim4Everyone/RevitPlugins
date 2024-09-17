@@ -11,13 +11,16 @@ namespace RevitMechanicalSpecification.Entities {
         
         private Element _element;
         private Element _elementType;
-        private Element _manifoldElement;
-        private Element _manifoldElementType;
+        private BuiltInCategory _builtInCategory;
         private string _elementName;
-        private string _manifoldName = null;
         private FamilyInstance _manifoldInstance = null;
         private HashSet<ManifoldPart> _manifoldParts = null;
         private SpecificationElement _manifoldSpElement;
+
+        public BuiltInCategory BuiltInCategory {
+            get => _builtInCategory;
+            set => _builtInCategory = value;
+        }
 
         public SpecificationElement ManifoldSpElement {
             get => _manifoldSpElement;
@@ -34,25 +37,12 @@ namespace RevitMechanicalSpecification.Entities {
             set => _elementType = value;
         }
 
-        public Element ManifoldElement {
-            get => _manifoldElement;
-            set => _manifoldElement = value;
-        }
-
-        public Element ManifoldElementType {
-            get => _manifoldElementType;
-            set => _manifoldElementType = value;
-        }
 
         public string ElementName {
             get => _elementName;
             set => _elementName = value;
         }
 
-        public string ManifoldName {
-            get => _manifoldName;
-            set => _manifoldName = value;
-        }
 
         public FamilyInstance ManifoldInstance {
                 get => _manifoldInstance;

@@ -34,15 +34,14 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                         BuiltInCategory.OST_PipeInsulations  });
         }
 
-        private double UseStock(Element element, double number) {
-            Category category = element.Category;
+        private double UseStock(Element element, Element elemType, BuiltInCategory builtInCategory ,double number) {
 
-            double individualStock = element.GetTypeOrInstanceParamDoubleValue(ElemType, Config.IndividualStock);
+            double individualStock = element.GetTypeOrInstanceParamDoubleValue(elemType, Config.IndividualStock);
             if(individualStock > 0) {
                 return number * (1 + individualStock/100);
             }
 
-            switch(category.GetBuiltInCategory()) {
+            switch(builtInCategory) {
                 case BuiltInCategory.OST_DuctInsulations:
                     return number * Config.DuctInsulationStock;
                 case BuiltInCategory.OST_PipeInsulations:
@@ -58,8 +57,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             }
         }
 
-        private double GetNumber(Element element) {
-            string unit = element.GetSharedParamValue<string>(Config.TargetNameUnit);
+        private double GetNumber(SpecificationElement specificationElement) {
+            string unit = specificationElement.Element.GetSharedParamValue<string>(Config.TargetNameUnit);
 
             // Если единица измерения штуки или комплекты - возвращаем 1
             if(unit == Config.SingleUnit || unit == Config.KitUnit) {
@@ -68,41 +67,58 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
             // Если единица измерения метры квадратные - забираем или высчитываем (для фитингов) площадь в дабл и переводим в метры квадратные
             if(unit == Config.SquareUnit) {
-                if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
-                    InsulationLiningBase insulation = element as InsulationLiningBase;
+                if(specificationElement.BuiltInCategory == BuiltInCategory.OST_DuctInsulations) {
+                    InsulationLiningBase insulation = specificationElement.Element as InsulationLiningBase;
                     Element host = Document.GetElement(insulation.HostElementId);
                     if(host == null) {
                         return 0;
                     }
                     if(host.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
                         double area = _calculator.GetFittingArea(host);
-                        return Math.Round(UseStock(host, area), 2);
+                        return Math.Round(
+                            UseStock(host, host.GetElementType(), BuiltInCategory.OST_DuctFitting, area), 2);
                     } 
                 }
 
-                if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
-                    double area = _calculator.GetFittingArea(element);
-                    return Math.Round(UseStock(element, area), 2);
+                if(specificationElement.BuiltInCategory == BuiltInCategory.OST_DuctFitting) {
+                    double area = _calculator.GetFittingArea(specificationElement.Element);
+                    return Math.Round(
+                        UseStock(
+                            specificationElement.Element, 
+                            specificationElement.ElementType, 
+                            specificationElement.BuiltInCategory, 
+                            area), 2);
                 }
 
-                if(LinearLogicalFilter(element)) {
-                    double area = element.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+                if(LinearLogicalFilter(specificationElement.Element)) {
+                    double area = specificationElement.Element.GetParamValueOrDefault<double>(
+                        BuiltInParameter.RBS_CURVE_SURFACE_AREA);
                     double convArea = UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters);
-                    return Math.Round(UseStock(element, convArea), 2);
-                }
+                    return Math.Round(
+                        UseStock(
+                            specificationElement.Element, 
+                            specificationElement.ElementType, 
+                            specificationElement.BuiltInCategory, 
+                            convArea), 2);
+                }   
             }
 
             // Если единица измерения метры погонные - забираем длину и переводим в метры
-            if(unit == Config.MeterUnit && LinearLogicalFilter(element)) {
-                double len = UnitConverter.DoubleToMeters(element.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH));
-                return Math.Round(UseStock(element, len), 2);
+            if(unit == Config.MeterUnit && LinearLogicalFilter(specificationElement.Element)) {
+                double len = UnitConverter.DoubleToMeters(specificationElement.Element
+                    .GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH));
+                return Math.Round(
+                    UseStock(
+                        specificationElement.Element, 
+                        specificationElement.ElementType, 
+                        specificationElement.BuiltInCategory, 
+                        len), 2);
             }
-
             return 0;
         }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
-            TargetParameter.Set(GetNumber(specificationElement.Element));
+            TargetParameter.Set(GetNumber(specificationElement));
         }
     }
 }

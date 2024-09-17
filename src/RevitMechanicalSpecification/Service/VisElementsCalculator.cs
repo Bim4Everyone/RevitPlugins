@@ -44,6 +44,7 @@ namespace RevitMechanicalSpecification.Service {
             double externalSize = UnitConverter.DoubleToMilimeters(
                 element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER)
                 );
+            
             double internalSize = UnitConverter.DoubleToMilimeters(
                 element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_INNER_DIAM_PARAM)
                 );

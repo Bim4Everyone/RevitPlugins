@@ -18,15 +18,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
     public abstract class ElementParamFiller : IElementParamFiller {
         private readonly SpecConfiguration _config;
         private readonly Document _document;
-
-        private string _elementName;
         private Parameter _targetParameter;
         private Parameter _originalParameter;
         private string _targetParameterName;
         private string _originalParameterName;
-        private Element _elementType;
-        private HashSet<ManifoldPart> _manifoldParts;
-        private int _positionNumInManifold;
 
         public ElementParamFiller(
             string toParamName,
@@ -38,11 +33,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             _originalParameterName = fromParamName;
             _config = specConfiguration;
             _document = document;
-        }
-
-        protected string ElementName { 
-            get => _elementName; 
-            set => _elementName = value; 
         }
 
         protected Parameter TargetParameter {
@@ -65,20 +55,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             set => _originalParameterName = value;
         }
 
-        protected Element ElemType {
-            get => _elementType;
-            set => _elementType = value;
-        }
-
-        protected HashSet<ManifoldPart> ManifoldParts {
-            get => _manifoldParts;
-            set => _manifoldParts = value;
-        }
-
-        protected int PositionNumInManifold {
-            get => _positionNumInManifold;
-            set => _positionNumInManifold = value;
-        }
 
         protected SpecConfiguration Config => _config;
 
@@ -88,8 +64,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public void Fill(
             SpecificationElement specificationElement) {
-            ElemType = specificationElement.ElementType;
-
 
             // Существует ли целевой параметр в экземпляре
             TargetParameter = specificationElement.Element.LookupParameter(TargetParamName);
@@ -110,8 +84,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             if(TargetParameter.IsReadOnly) {
                 return;
             }
-
-            ManifoldParts = specificationElement.ManifoldParts;
 
             this.SetParamValue(specificationElement);
         }

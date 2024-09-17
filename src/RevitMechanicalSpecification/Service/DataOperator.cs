@@ -70,6 +70,18 @@ namespace RevitMechanicalSpecification.Service {
             return 0;
         }
 
+        public static double GetTypeOrInstanceParamDoubleValue(
+            this SpecificationElement specificationElement, 
+            string paraName) {
+            if(specificationElement.Element.IsExistsParam(paraName)) {
+                return specificationElement.Element.GetSharedParamValueOrDefault<double>(paraName);
+            }
+            if(specificationElement.ElementType.IsExistsParam(paraName)) {
+                return specificationElement.ElementType.GetSharedParamValueOrDefault<double>(paraName);
+            }
+            return 0;
+        }
+
         /// <summary>
         /// Если есть суперкомпонент - возвращает его. Иначе возвращает исходник
         /// </summary>

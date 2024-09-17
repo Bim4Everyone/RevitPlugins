@@ -228,6 +228,9 @@ namespace RevitMechanicalSpecification.Models {
             List<string> editors = new List<string>();
 
             using(var t = Document.StartTransaction("Обновление спецификации")) {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+
                 foreach(Element element in _elements) {
                     // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
                     // редактора в список
@@ -258,13 +261,23 @@ namespace RevitMechanicalSpecification.Models {
 
                     SpecificationElement specificationElement = new SpecificationElement {
                         Element = element,
-                        ElementType = element.GetElementType()
+                        ElementType = element.GetElementType(),
+                        BuiltInCategory = element.Category.GetBuiltInCategory()
                     };
 
                     Element elemType = element.GetElementType();
                     ProcessElement(specificationElement, fillers);
                     ProcessManifoldElement(specificationElement, fillers);
                 }
+
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+                // Format and display the TimeSpan value.
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                    ts.Hours, ts.Minutes, ts.Seconds,
+                    ts.Milliseconds / 10);
+                MessageBox.Show("RunTime " + elapsedTime);
+
                 t.Commit();
                 ShowReport(editors);
             }
@@ -310,10 +323,9 @@ namespace RevitMechanicalSpecification.Models {
                     SpecificationElement subSpecificationElement = new SpecificationElement {
                         Element = subElement,
                         ElementType = subElementType,
-                        ManifoldElement = specificationElement.Element,
-                        ManifoldElementType = specificationElement.ElementType,
                         ManifoldInstance = familyInstance,
-                        ManifoldSpElement = specificationElement
+                        ManifoldSpElement = specificationElement,
+                        BuiltInCategory = subElement.Category.GetBuiltInCategory()
                     };
 
                     ProcessManifoldSubElement(fillers, subSpecificationElement);

@@ -25,18 +25,18 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             _calculator = calculator;
         }
 
-        private string GetMark(Element element) {
-            string mark = element.GetTypeOrInstanceParamStringValue(ElemType, OriginalParamName);
+        private string GetMark(SpecificationElement specificationElement) {
+            string mark = specificationElement.GetTypeOrInstanceParamStringValue(OriginalParamName);
 
-            if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
-                mark =  _calculator.GetDuctFittingMark(element);
+            if(specificationElement.BuiltInCategory == BuiltInCategory.OST_DuctFitting) {
+                mark =  _calculator.GetDuctFittingMark(specificationElement.Element);
             }
 
             return mark;
         }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
-            TargetParameter.Set(GetMark(specificationElement.Element));
+            TargetParameter.Set(GetMark(specificationElement));
         }
     }
 }
