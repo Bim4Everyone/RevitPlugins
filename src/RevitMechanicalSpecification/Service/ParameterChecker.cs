@@ -49,6 +49,7 @@ namespace RevitMechanicalSpecification.Service {
             SharedParamsConfig.Instance.VISExcludeFromJunction
         };
 
+
         /// <summary>
         /// Создать недостающие параметры, устранить расхождения по галочкам
         /// </summary>

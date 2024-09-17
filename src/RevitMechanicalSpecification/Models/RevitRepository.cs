@@ -30,6 +30,7 @@ namespace RevitMechanicalSpecification.Models {
         private readonly VisElementsCalculator _calculator;
         private readonly ParameterChecker _parameterChecker;
         private readonly MaskReplacer _maskReplacer;
+        private readonly List<string> _editors;
 
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
@@ -41,6 +42,7 @@ namespace RevitMechanicalSpecification.Models {
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
             _parameterChecker = new ParameterChecker();
             _maskReplacer = new MaskReplacer(_specConfiguration);
+            _editors = new List<string>();
 
             _elements = _collector.GetElementsToSpecificate();
             _visSystems = _collector.GetVisSystems();
@@ -172,10 +174,10 @@ namespace RevitMechanicalSpecification.Models {
         /// Выводит отчет с занявшими элемент пользователями
         /// </summary>
         /// <param name="editors"></param>
-        public void ShowReport(List<string> editors) {
-            if(editors.Count != 0) {
+        public void ShowReport() {
+            if(_editors.Count != 0) {
                 MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
-                    + string.Join(", ", editors.ToArray()));
+                    + string.Join(", ", _editors.ToArray()));
             }
         }
 
@@ -185,17 +187,18 @@ namespace RevitMechanicalSpecification.Models {
         /// <param name="userName"></param>
         /// <param name="element"></param>
         /// <returns></returns>
-        private string IsEditedBy(string userName, Element element) {
+        private bool IsEditedBy(string userName, Element element) {
 
             string editedBy = element.GetParamValueOrDefault<string>(BuiltInParameter.EDITED_BY);
 
             if(!string.IsNullOrEmpty(editedBy)) {
                 editedBy = editedBy.ToLower();
                 if(editedBy != userName) {
-                    return editedBy;
+                    _editors.Add(editedBy);
+                    return true;
                 }
             }
-            return null;
+            return false;
         }
 
         /// <summary>
@@ -225,28 +228,19 @@ namespace RevitMechanicalSpecification.Models {
             _parameterChecker.ExecuteParameterCheck(Document);
 
             string userName = UIApplication.Application.Username.ToLower();
-            List<string> editors = new List<string>();
 
             using(var t = Document.StartTransaction("Обновление спецификации")) {
                 foreach(Element element in _elements) {
                     // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
                     // редактора в список
-                    string editor = IsEditedBy(userName, element);
-                    if(!string.IsNullOrEmpty(editor)) {
-                        editors.Add(editor);
+                    if(IsEditedBy(userName, element)) {
                         continue;
                     }
 
                     // На арматуре воздуховодов/труб/оборудовании проверяем наличие шаблонизированных семейств-генериков.
                     // Если встречаем - заполняем все по маске
-                    if(element.InAnyCategory(new HashSet<BuiltInCategory>() {
-                        BuiltInCategory.OST_DuctAccessory,
-                        BuiltInCategory.OST_PipeAccessory,
-                        BuiltInCategory.OST_MechanicalEquipment})) {
-                        bool maskExist = _maskReplacer.ExecuteReplacment(element);
-                        if(maskExist) {
-                            continue;
-                        }
+                    if(FillIfGeneric(element)) {
+                        continue;
                     }
 
                     // Если элемент уже встречался в обработке вложений узлов - переходим к следующему
@@ -260,12 +254,27 @@ namespace RevitMechanicalSpecification.Models {
                         BuiltInCategory = element.Category.GetBuiltInCategory()
                     };
 
-                    Element elemType = element.GetElementType();
                     ProcessElement(specificationElement, fillers);
                     ProcessManifoldElement(specificationElement, fillers);
                 }
                 t.Commit();
+                ShowReport();
             }
+        }
+
+        /// <summary>
+        /// Если генерик - заполняет его и возвращает True. Иначе возвращает False.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private bool FillIfGeneric(Element element) {
+            if(element.InAnyCategory(new HashSet<BuiltInCategory>() {
+                        BuiltInCategory.OST_DuctAccessory,
+                        BuiltInCategory.OST_PipeAccessory,
+                        BuiltInCategory.OST_MechanicalEquipment})) {
+                return _maskReplacer.ExecuteReplacment(element);
+            }
+            return false;
         }
 
         /// <summary>
