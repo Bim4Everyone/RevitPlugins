@@ -18,14 +18,43 @@ namespace RevitMechanicalSpecification.Service {
         private readonly Document _document;
         private readonly List<VisSystem> _systems;
         private readonly string _noneSystemValue = "Нет системы";
-        
 
         public SystemFunctionFactory(Document document, List<VisSystem> systems) {
             _document = document;
             _systems = systems;
         }
 
-        public string GetFunctionValue(Element element) {
+        /// <summary>
+        /// Если есть принудительное значение на типе - возвращаем.
+        /// Если нет, но есть суперкомпонент - проверяем принудительное на нем.
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        /// <param name="paraName"></param>
+        /// <returns></returns>
+        public string GetForcedParamValue(SpecificationElement specificationElement, string paraName) {
+            string result = specificationElement.GetTypeOrInstanceParamStringValue(paraName);
+
+            if(!string.IsNullOrEmpty(result)) {
+                return result;
+            }
+            if(specificationElement.Element is FamilyInstance instance) {
+                Element superComponent = GetSuperComponentIfExist(instance);
+                if(superComponent != null && specificationElement.Element != superComponent) {
+
+                    return DataOperator
+                        .GetTypeOrInstanceParamStringValue(superComponent, superComponent.GetElementType(), paraName);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Возвращает функцию системы
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public string GetFunctionNameValue(Element element) {
             if(element is FamilyInstance instance) {
                 element = GetSuperComponentIfExist(instance);
             }
@@ -38,7 +67,12 @@ namespace RevitMechanicalSpecification.Service {
             return visSystem.SystemFunction;
         }
 
-        public string GetSystemValue(Element element) {
+        /// <summary>
+        /// Возвращает имя системы
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public string GetSystemNameValue(Element element) {
             if(element is FamilyInstance instance) {
                 element = GetSuperComponentIfExist(instance);
             }
@@ -55,15 +89,24 @@ namespace RevitMechanicalSpecification.Service {
             return visSystem.SystemTargetName;
         }
 
-
+        /// <summary>
+        /// Возвращает системное имя системы. Нужно для определения принадлежности изоляции.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         private string GetParamSystemValue(Element element) {
             return element.GetParamValueOrDefault
                 (BuiltInParameter.RBS_SYSTEM_NAME_PARAM, _noneSystemValue);
         }
 
+        /// <summary>
+        /// Получает системное имя системы материала изоляции
+        /// </summary>
+        /// <param name="insulation"></param>
+        /// <returns></returns>
         private string GetInsulationSystem(InsulationLiningBase insulation) {
             Element host = _document.GetElement(insulation.HostElementId);
-            //изоляция может баговать и висеть на трубе или воздуховоде не имея хоста
+            // изоляция может баговать и висеть на трубе или воздуховоде не имея хоста
             if (host == null) {
                 return _noneSystemValue;
             }
@@ -71,6 +114,11 @@ namespace RevitMechanicalSpecification.Service {
             return GetParamSystemValue(host);
         }
 
+        /// <summary>
+        /// Возвращает суперкомпонент, если он есть. Если нет - возвращает сам элемент.
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns></returns>
         private FamilyInstance GetSuperComponentIfExist(FamilyInstance instance) {
             if(!(instance.SuperComponent is null)) {
                 instance = (FamilyInstance) instance.SuperComponent;
@@ -80,6 +128,11 @@ namespace RevitMechanicalSpecification.Service {
             return instance;
         }
 
+        /// <summary>
+        /// Возвращает первую систему из доступных для элемента
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         private VisSystem GetVisSystem(Element element) {
             if(element is FamilyInstance instance) {
                 element = instance.GetSuperComponentIfExist();
@@ -97,27 +150,6 @@ namespace RevitMechanicalSpecification.Service {
 
             return _systems.Where(s => s.SystemSystemName == systemName).FirstOrDefault();
 
-        }
-
-        // Если есть принудительное значение на типе - возвращаем.
-        // Если нет, но есть суперкомпонент - проверяем принудительное на нем.
-        public string GetForcedParamValue(SpecificationElement specificationElement, string paraName) {
-            //string result = DataOperator.GetTypeOrInstanceParamStringValue(element, elemType, paraName);
-            string result = specificationElement.GetTypeOrInstanceParamStringValue(paraName);
-
-            if(!string.IsNullOrEmpty(result)) {
-                return result;
-            }
-            if(specificationElement.Element is FamilyInstance instance) {
-                Element superComponent = GetSuperComponentIfExist(instance);
-                if(superComponent != null && specificationElement.Element != superComponent) {
-
-                    return DataOperator
-                        .GetTypeOrInstanceParamStringValue(superComponent, superComponent.GetElementType(), paraName);
-                }
-            }
-
-            return result;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             if(!string.IsNullOrEmpty(forcedFunction)) {
                 return forcedFunction;
             }
-            return _nameFactory.GetFunctionValue(specificationElement.Element);
+            return _nameFactory.GetFunctionNameValue(specificationElement.Element);
         }
 
 
