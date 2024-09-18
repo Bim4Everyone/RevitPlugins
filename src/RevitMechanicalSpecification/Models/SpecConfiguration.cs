@@ -61,9 +61,9 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string ParamNameIsSpecifyPipeFittingsFromPype = SharedParamsConfig.Instance.VISConsiderPipeFittingsByType.Name; //"ФОП_ВИС_Учитывать фитинги труб по типу трубы";
         private readonly string _paramNameIsSpecifyDuctFittings = SharedParamsConfig.Instance.VISConsiderDuctFittings.Name; //"ФОП_ВИС_Учитывать фитинги воздуховодов";
 
-        private readonly string _paramNamePipeInsulationStock = SharedParamsConfig.Instance.VISPipeInsulationReserve.Name; //"ФОП_ВИС_Запас изоляции труб";
-        private readonly string _paramNameDuctInsulationStock = SharedParamsConfig.Instance.VISDuctInsulationReserve.Name; //"ФОП_ВИС_Запас изоляции воздуховодов";
-        private readonly string _paramNameDuctPipeStock = SharedParamsConfig.Instance.VISPipeDuctReserve.Name; //"ФОП_ВИС_Запас воздуховодов/труб";
+        public readonly string ParamNamePipeInsulationStock = SharedParamsConfig.Instance.VISPipeInsulationReserve.Name; //"ФОП_ВИС_Запас изоляции труб";
+        public readonly string ParamNameDuctInsulationStock = SharedParamsConfig.Instance.VISDuctInsulationReserve.Name; //"ФОП_ВИС_Запас изоляции воздуховодов";
+        public readonly string ParamNameDuctPipeStock = SharedParamsConfig.Instance.VISPipeDuctReserve.Name; //"ФОП_ВИС_Запас воздуховодов/труб";
         public readonly string IndividualStock = SharedParamsConfig.Instance.VISIndividualStock.Name; //"ФОП_ВИС_Индивидуальный запас";
 
         public readonly string IsManiFoldParamName = SharedParamsConfig.Instance.VISJunction.Name; //"ФОП_ВИС_Узел";
@@ -89,10 +89,10 @@ namespace RevitMechanicalSpecification.Models {
             OriginalParamNameUnit = info.GetParamValueOrDefault(_changedNameUnit, "ADSK_Единица измерения");
             OriginalParamNameCreator = info.GetParamValueOrDefault(_changedNameCreator, "ADSK_Завод-изготовитель");
             GlobalFunction = info.GetParamValueOrDefault(TargetNameFunction, "!Нет функции");
-            PipeInsulationStock = 1 + (info.GetParamValueOrDefault<double>(_paramNamePipeInsulationStock, 0))/100;
-            DuctInsulationStock = 1 + (info.GetParamValueOrDefault<double>(_paramNameDuctInsulationStock, 0))/100;
+            PipeInsulationStock = 1 + (info.GetParamValueOrDefault<double>(ParamNamePipeInsulationStock, 0))/100;
+            DuctInsulationStock = 1 + (info.GetParamValueOrDefault<double>(ParamNameDuctInsulationStock, 0))/100;
 
-            DuctAndPipeStock = 1 + (info.GetParamValueOrDefault<double>(_paramNameDuctPipeStock, 0))/100;
+            DuctAndPipeStock = 1 + (info.GetParamValueOrDefault<double>(ParamNameDuctPipeStock, 0))/100;
 
             IsSpecifyDuctFittings = info.GetSharedParamValueOrDefault<int>(_paramNameIsSpecifyDuctFittings) == 1;
             IsSpecifyPipeFittings = info.GetSharedParamValueOrDefault<int>(_paramNameIsSpecifyPipeFittings) == 1;

@@ -225,11 +225,13 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         /// <param name="fillers"></param>
         private void ProcessElements(List<ElementParamFiller> fillers) {
-            _parameterChecker.ExecuteParameterCheck(Document);
+            _parameterChecker.ExecuteParameterCheck(Document, _specConfiguration);
 
             string userName = UIApplication.Application.Username.ToLower();
 
             using(var t = Document.StartTransaction("Обновление спецификации")) {
+
+
                 foreach(Element element in _elements) {
                     // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
                     // редактора в список

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -48,15 +49,47 @@ namespace RevitMechanicalSpecification.Service {
             SharedParamsConfig.Instance.VISJunction,
             SharedParamsConfig.Instance.VISExcludeFromJunction
         };
+        private SpecConfiguration _specConfiguration;
+        private Document _document;
 
+        /// <summary>
+        /// Если параметр в сведениях о проекте пустой - ставим стандартное значение из согласованных инженерами
+        /// </summary>
+        /// <param name="paraName"></param>
+        /// <param name="defValue"></param>
+        private void FillInfoParamIfEmpty(string paraName, double defValue) {
+            double value = _document.ProjectInformation.GetSharedParamValueOrDefault<double>(paraName, 0);
+            if(value == 0) {
+                _document.ProjectInformation.GetSharedParam(paraName).Set(defValue);
+            } 
+        }
+
+        /// <summary>
+        /// Отдельная транзакция на проверку стандартных значений параметров
+        /// </summary>
+        private void CheckParamterValues() {
+            using(var t = _document.StartTransaction("Установка стандартных значений параметров")) {
+                // Цифры  по запасам получены от Денисенко Юрия, согласованы Карамовым, Воробьевым и Копысовым 
+                // письмом от 08.08.2024 на основании опыта стройки
+                FillInfoParamIfEmpty(_specConfiguration.ParamNameDuctInsulationStock, 20);
+                FillInfoParamIfEmpty(_specConfiguration.ParamNameDuctPipeStock, 5);
+                FillInfoParamIfEmpty(_specConfiguration.ParamNamePipeInsulationStock, 5);
+
+                t.Commit();
+            }
+        }
 
         /// <summary>
         /// Создать недостающие параметры, устранить расхождения по галочкам
         /// </summary>
         /// <param name="document"></param>
-        public void ExecuteParameterCheck(Document document) {
+        public void ExecuteParameterCheck(Document document, SpecConfiguration specConfiguration) {
+            _document = document;
+            _specConfiguration = specConfiguration;
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
             projectParameters.SetupRevitParams(document, _revitParams);
+
+            CheckParamterValues();
         }
     }
 }
