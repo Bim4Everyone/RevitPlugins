@@ -83,8 +83,8 @@ namespace RevitServerFolders.Services {
 
                         if(navisView == null) {
                             _loggerService.Warning(
-                                "Document {@FileName} doesn't contains {@NavisView} view.",
-                                fileName, navisView);
+                                "Файл {@FileName} не содержит вид {@NavisView}.",
+                                fileName, _navisworksViewName);
                             return;
                         }
 
@@ -100,8 +100,8 @@ namespace RevitServerFolders.Services {
 
                         if(!hasElements) {
                             _loggerService.Warning(
-                                "View {@NavisView} in document {@FileName} doesn't contains elements.",
-                                 navisView, fileName);
+                                "Вид {@NavisView} в файле {@FileName} не содержит элементы.",
+                                 navisView.Name, fileName);
                             return;
                         }
 
