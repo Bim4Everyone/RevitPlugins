@@ -230,8 +230,6 @@ namespace RevitMechanicalSpecification.Models {
             string userName = UIApplication.Application.Username.ToLower();
 
             using(var t = Document.StartTransaction("Обновление спецификации")) {
-
-
                 foreach(Element element in _elements) {
                     // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
                     // редактора в список
