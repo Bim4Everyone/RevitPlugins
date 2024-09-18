@@ -13,7 +13,6 @@ using RevitMechanicalSpecification.Models;
 namespace RevitMechanicalSpecification.Service {
 
     internal class CollectionFactory {
-
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
 

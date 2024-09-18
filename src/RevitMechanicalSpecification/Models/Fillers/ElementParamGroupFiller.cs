@@ -36,7 +36,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="element"></param>
         /// <returns></returns>
         private string GetGroup(SpecificationElement specificationElement) {
-            return $"{GetBaseGroup(specificationElement.Element)}_{GetDetailedGroup(specificationElement)}";
+            return $"{GetBaseGroup(specificationElement.Element)}{GetDetailedGroup(specificationElement)}";
         }
 
         /// <summary>
@@ -51,8 +51,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 .get_Parameter(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString();
             return
                     $"{GetBaseGroup(specificationElement.ManifoldSpElement.Element)}" +
-                    $"{manifoldFamylyTypeName}" +
                     $"{GetDetailedGroup(specificationElement.ManifoldSpElement)}" +
+                    $"{manifoldFamylyTypeName}" +
                     $"{GetDetailedGroup(specificationElement)}";
         }
 
@@ -65,33 +65,33 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             Category category = element.Category;
             switch(category.GetBuiltInCategory()) {
                 case BuiltInCategory.OST_MechanicalEquipment:
-                    return "1. Оборудование";
+                    return "1. Оборудование_";
                 case BuiltInCategory.OST_PlumbingFixtures:
-                    return "1. Оборудование";
+                    return "1. Оборудование_";
                 case BuiltInCategory.OST_Sprinklers:
-                    return "1. Оборудование";
+                    return "1. Оборудование_";
                 case BuiltInCategory.OST_DuctAccessory:
-                    return "2. Арматура воздуховодов";
+                    return "2. Арматура воздуховодов_";
                 case BuiltInCategory.OST_DuctTerminal:
-                    return "3. Воздухораспределители";
+                    return "3. Воздухораспределители_";
                 case BuiltInCategory.OST_DuctCurves:
-                    return "4. Воздуховоды";
+                    return "4. Воздуховоды_";
                 case BuiltInCategory.OST_FlexDuctCurves:
-                    return "4. Гибкие воздуховоды";
+                    return "4. Гибкие воздуховоды_";
                 case BuiltInCategory.OST_DuctFitting:
-                    return "5. Фасонные детали воздуховодов";
+                    return "5. Фасонные детали воздуховодов_";
                 case BuiltInCategory.OST_DuctInsulations:
-                    return "6. Материалы изоляции воздуховодов";
+                    return "6. Материалы изоляции воздуховодов_";
                 case BuiltInCategory.OST_PipeAccessory:
-                    return "7. Трубопроводная арматура";
+                    return "7. Трубопроводная арматура_";
                 case BuiltInCategory.OST_PipeCurves:
-                    return "8. Трубопроводы";
+                    return "8. Трубопроводы_";
                 case BuiltInCategory.OST_FlexPipeCurves:
-                    return "9. Гибкие трубопроводы";
+                    return "9. Гибкие трубопроводы_";
                 case BuiltInCategory.OST_PipeFitting:
-                    return "10. Фасонные детали трубопроводов";
+                    return "10. Фасонные детали трубопроводов_";
                 case BuiltInCategory.OST_PipeInsulations:
-                    return "11. Материалы трубопроводной изоляции";
+                    return "11. Материалы трубопроводной изоляции_";
             }
 
             return "Неизвестная категория";
@@ -106,7 +106,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             string code = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameCode);
             string creator = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameCreator);
 
-            return $"_{name}_{mark}_{code}_{creator}";
+            return $"{name}_{mark}_{code}_{creator}";
         }
     }
 }

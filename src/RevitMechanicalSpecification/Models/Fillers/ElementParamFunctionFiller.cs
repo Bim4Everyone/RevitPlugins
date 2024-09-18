@@ -15,7 +15,7 @@ using RevitMechanicalSpecification.Service;
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamFunctionFiller : ElementParamFiller {
         private readonly List<VisSystem> _systemList;
-        private readonly SystemFunctionFactory _nameFactory;
+        private readonly SystemFunctionNameFactory _nameFactory;
 
         public ElementParamFunctionFiller(
             string toParamName,
@@ -26,7 +26,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             base(toParamName, fromParamName, specConfiguration, document) {
 
             _systemList = systemList;
-            _nameFactory = new SystemFunctionFactory(Document, _systemList);
+            _nameFactory = new SystemFunctionNameFactory(Document, _systemList);
         }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
@@ -50,7 +50,5 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             }
             return _nameFactory.GetFunctionNameValue(specificationElement.Element);
         }
-
-
     }
 }

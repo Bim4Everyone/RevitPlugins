@@ -14,12 +14,12 @@ using dosymep.Revit;
 using RevitMechanicalSpecification.Entities;
 
 namespace RevitMechanicalSpecification.Service {
-    internal class SystemFunctionFactory {
+    internal class SystemFunctionNameFactory {
         private readonly Document _document;
         private readonly List<VisSystem> _systems;
         private readonly string _noneSystemValue = "Нет системы";
 
-        public SystemFunctionFactory(Document document, List<VisSystem> systems) {
+        public SystemFunctionNameFactory(Document document, List<VisSystem> systems) {
             _document = document;
             _systems = systems;
         }

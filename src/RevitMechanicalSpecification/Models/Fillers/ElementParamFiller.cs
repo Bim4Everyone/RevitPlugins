@@ -62,7 +62,6 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         public abstract void SetParamValue(SpecificationElement specificationElement);
 
         public void Fill(SpecificationElement specificationElement) {
-
             // Существует ли целевой параметр в экземпляре
             TargetParameter = specificationElement.Element.LookupParameter(TargetParamName);
             if(TargetParameter == null) {
