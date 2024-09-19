@@ -17,6 +17,10 @@ using RevitMechanicalSpecification.Models;
 namespace RevitMechanicalSpecification.Service {
     internal class ParameterChecker {
         private readonly List<RevitParam> _revitParams = new List<RevitParam>() {
+            SharedParamsConfig.Instance.VISHvacSystemFunction,
+            SharedParamsConfig.Instance.VISSystemShortName,
+            SharedParamsConfig.Instance.VISOutSystemName,
+
             SharedParamsConfig.Instance.VISGrouping,
             SharedParamsConfig.Instance.EconomicFunction,
             SharedParamsConfig.Instance.VISSystemName,
@@ -38,7 +42,7 @@ namespace RevitMechanicalSpecification.Service {
             SharedParamsConfig.Instance.VISParamReplacementItemCode,
             SharedParamsConfig.Instance.VISParamReplacementUnit,
             SharedParamsConfig.Instance.VISParamReplacementManufacturer,
-            SharedParamsConfig.Instance.VISOutSystemName,
+            
             SharedParamsConfig.Instance.VISConsiderPipeFittings,
             SharedParamsConfig.Instance.VISConsiderPipeFittingsByType,
             SharedParamsConfig.Instance.VISConsiderDuctFittings,
