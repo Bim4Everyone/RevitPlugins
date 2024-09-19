@@ -216,7 +216,7 @@ namespace RevitMechanicalSpecification.Service {
                 double sizeA = curve.Width;
                 double sizeB = curve.Height;
                 double size = Math.Max(sizeA, sizeB);
-                //Толщины по СП 60.13330.2020 Отопление, вентиляция и кондиционирование воздуха. Приложение К
+                // Толщины по СП 60.13330.2020 Отопление, вентиляция и кондиционирование воздуха. Приложение К
                 if(size < 251) {
                     return 0.5;
                 }
