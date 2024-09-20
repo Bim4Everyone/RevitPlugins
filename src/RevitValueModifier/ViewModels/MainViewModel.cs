@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -63,48 +62,24 @@ namespace RevitValueModifier.ViewModels {
 
 
             RevitParameterHelper paramHelper = new RevitParameterHelper();
-            var intersectedParameterIds = paramHelper.GetIntersectedParameters(selectedElems);
+            List<ElementId> intersectedParameterIds = paramHelper.GetIntersectedParameterIds(selectedElems);
 
-            //var parameters = new List<Parameter>();
-            //parameters.Add(intersectedParameterIds.First());
-
-
-            //RevitElemHelper elemHelper = new RevitElemHelper(_revitRepository.Document);
-            //List<RevitElem> revitElems = elemHelper.GetRevitElements(selectedElems, test);
-
-            var element = selectedElems.First();
-            var parameter = element.LookupParameter("ФОП_Блок СМР");
-
-            var forgeTypeId = parameter.GetTypeId();
-            var sameParameter = element.GetParameter(forgeTypeId);
+            RevitElemHelper elemHelper = new RevitElemHelper(_revitRepository.Document);
+            List<RevitElem> revitElems = elemHelper.GetRevitElements(selectedElems, intersectedParameterIds);
 
 
 
 
+            //var element = selectedElems.First();
+            //var parameter = element.LookupParameter("ФОП_Блок СМР");
 
-            //List<RevitElem> revitElems = new List<RevitElem>();
-            //foreach(Element selectedElem in selectedElems) {
-            //    RevitElem revitElem = elemHelper.GetRevitElem(element);
-            //    revitElems.Add(revitElem);
-            //}
+            //var parameterId = parameter.Id;
 
 
-            //RevitElemHelper elemHelper = new RevitElemHelper(_revitRepository.Document);
-            //RevitElem revitElem = elemHelper.GetRevitElem(element);
+            //var parameters = element.Parameters.Cast<Parameter>();
 
-            //List<RevitElem> revitElems = new List<RevitElem>();
-            // foreach(Element selectedElem in selectedElems) {
-            //    RevitElem revitElem = elemHelper.GetRevitElem(element);
-            //    revitElems.Add(revitElem);
-            //}
-
-
-            //List<RevitParameter> parameters = revitElems.First().ParamValuePairs;
-
-            //foreach(RevitElem revitElem in revitElems) {
-            //    parameters = revitElem.ParamValuePairs.Intersect(parameters);
-            //}
-
+            //var sameParameter = parameters.First(p => p.Id == parameterId);
+            //var val = sameParameter.AsValueString();
 
 
 
