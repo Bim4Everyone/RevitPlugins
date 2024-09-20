@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -12,19 +13,31 @@ namespace RevitValueModifier.Models {
             _document = document;
         }
 
-        public RevitElem GetRevitElem(Element element) {
-
-            List<ParamValuePair> paramList = new List<ParamValuePair>();
-            foreach(Parameter parameter in element.Parameters) {
-
-                paramList.Add(GetParameterInfo(parameter));
-            }
-
-            return new RevitElem(element, paramList);
+        public List<RevitElem> GetRevitElements(List<Element> elements, List<ForgeTypeId> parameterIds) {
+            return elements
+                .Select(element => GetRevitElem(element, parameterIds))
+                .ToList();
         }
 
 
-        private ParamValuePair GetParameterInfo(Parameter parameter) {
+        public RevitElem GetRevitElem(Element element, List<ForgeTypeId> parameterIds) {
+            //var parameters = parameterIds.Select(id => element.GetParameter(id)).ToList();
+
+            foreach(ForgeTypeId parameterId in parameterIds) {
+                var parameter = element.GetParameter(parameterId);
+            }
+
+
+            //List<ParamValuePair> paramValuePairList = parameters
+            //    .Select(param => GetParamValuePair(param))
+            //    .ToList();
+
+            //return new RevitElem(element, paramValuePairList);
+            return null;
+        }
+
+
+        private ParamValuePair GetParamValuePair(Parameter parameter) {
 
             RevitParameter revitParameter = new RevitParameter();
             string value;

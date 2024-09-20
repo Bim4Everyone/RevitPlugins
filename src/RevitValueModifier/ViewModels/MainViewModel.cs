@@ -61,16 +61,42 @@ namespace RevitValueModifier.ViewModels {
                 selectedElems.Add(_revitRepository.Document.GetElement(selectedId));
             }
 
-            Element element = selectedElems.First();
 
-            RevitElemHelper elemHelper = new RevitElemHelper(_revitRepository.Document);
+            RevitParameterHelper paramHelper = new RevitParameterHelper();
+            var intersectedParameterIds = paramHelper.GetIntersectedParameters(selectedElems);
+
+            //var parameters = new List<Parameter>();
+            //parameters.Add(intersectedParameterIds.First());
 
 
-            List<RevitElem> revitElems = new List<RevitElem>();
-            foreach(Element selectedElem in selectedElems) {
-                RevitElem revitElem = elemHelper.GetRevitElem(element);
-                revitElems.Add(revitElem);
-            }
+            //RevitElemHelper elemHelper = new RevitElemHelper(_revitRepository.Document);
+            //List<RevitElem> revitElems = elemHelper.GetRevitElements(selectedElems, test);
+
+            var element = selectedElems.First();
+            var parameter = element.LookupParameter("ФОП_Блок СМР");
+
+            var forgeTypeId = parameter.GetTypeId();
+            var sameParameter = element.GetParameter(forgeTypeId);
+
+
+
+
+
+            //List<RevitElem> revitElems = new List<RevitElem>();
+            //foreach(Element selectedElem in selectedElems) {
+            //    RevitElem revitElem = elemHelper.GetRevitElem(element);
+            //    revitElems.Add(revitElem);
+            //}
+
+
+            //RevitElemHelper elemHelper = new RevitElemHelper(_revitRepository.Document);
+            //RevitElem revitElem = elemHelper.GetRevitElem(element);
+
+            //List<RevitElem> revitElems = new List<RevitElem>();
+            // foreach(Element selectedElem in selectedElems) {
+            //    RevitElem revitElem = elemHelper.GetRevitElem(element);
+            //    revitElems.Add(revitElem);
+            //}
 
 
             //List<RevitParameter> parameters = revitElems.First().ParamValuePairs;
