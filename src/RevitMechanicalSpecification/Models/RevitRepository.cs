@@ -353,7 +353,6 @@ namespace RevitMechanicalSpecification.Models {
             List<ElementParamFiller> fillers,
             SpecificationElement subSpecificationElement
             ) {
-            BuiltInCategory.OST_Windows
             foreach(var filler in fillers) {
                 filler.Fill(subSpecificationElement);
             }

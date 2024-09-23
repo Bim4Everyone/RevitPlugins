@@ -48,10 +48,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public void Fill(SpecificationElement specificationElement) {
             // Существует ли целевой параметр в экземпляре
-            TargetParam = specificationElement.Element.LookupParameter(TargetParamName);
-            if(TargetParam == null) {
+            if(!specificationElement.Element.IsExistsSharedParam(TargetParamName)) {
                 return;
             }
+            TargetParam = specificationElement.Element.GetSharedParam(TargetParamName);
 
             // Проверка на нулл - для ситуаций где нет имени исходного(ФОП_ВИС_Число, Группирование), тогда исходный парам так и остается пустым 
             if(!(OriginalParamName is null)) {
