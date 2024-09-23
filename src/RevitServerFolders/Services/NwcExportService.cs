@@ -96,7 +96,7 @@ namespace RevitServerFolders.Services {
 #else
                                 .WherePasses(new VisibleInViewFilter(document, navisView.Id))
 #endif
-                                .Any();
+                                .Any(e => e.Category != null); // На виде, где выключена видимость всех элементов через GUI ревита, присутствует 1 элемент ExtentElem c категорией null
 
                         if(!hasElements) {
                             _loggerService.Warning(
