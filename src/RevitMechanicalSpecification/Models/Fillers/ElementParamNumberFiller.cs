@@ -26,7 +26,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
-            TargetParameter.Set(GetNumber(specificationElement));
+            TargetParam.Set(GetNumber(specificationElement));
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// </summary>
         /// <param name="specificationElement"></param>
         public override void SetParamValue(SpecificationElement specificationElement) {
-            TargetParameter.Set(specificationElement.ManifoldSpElement != null
+            TargetParam.Set(specificationElement.ManifoldSpElement != null
                 ? GetManifoldGroup(specificationElement)
                 : specificationElement.Element
                 .GetSharedParamValueOrDefault(Config.ForcedGroup, GetGroup(specificationElement)));

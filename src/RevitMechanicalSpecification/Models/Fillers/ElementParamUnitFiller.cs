@@ -38,7 +38,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
-            TargetParameter.Set(GetUnit(specificationElement.Element));
+            TargetParam.Set(GetUnit(specificationElement.Element));
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="defaultUnit"></param>
         /// <returns></returns>
         private string DefaultCheck(string defaultUnit) {
-            string unit = OriginalParameter.AsValueString();
+            string unit = OriginalParam.AsValueString();
 
             if(unit == null) {
                 return defaultUnit;

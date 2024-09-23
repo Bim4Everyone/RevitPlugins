@@ -18,42 +18,27 @@ namespace RevitMechanicalSpecification.Models.Fillers {
     public abstract class ElementParamFiller : IElementParamFiller {
         private readonly SpecConfiguration _config;
         private readonly Document _document;
-        private Parameter _targetParameter;
-        private Parameter _originalParameter;
-        private string _targetParameterName;
-        private string _originalParameterName;
+
 
         public ElementParamFiller(
-            string toParamName,
-            string fromParamName,
+            string targetParamName,
+            string originalParamName,
             SpecConfiguration specConfiguration,
             Document document) {
 
-            _targetParameterName = toParamName;
-            _originalParameterName = fromParamName;
             _config = specConfiguration;
             _document = document;
+            TargetParamName = targetParamName;
+            OriginalParamName = originalParamName;
         }
 
-        protected Parameter TargetParameter {
-            get => _targetParameter;
-            set => _targetParameter = value;
-        }
+        protected Parameter TargetParam { get; set; }
 
-        protected Parameter OriginalParameter {
-            get => _originalParameter;
-            set => _originalParameter = value;
-        }
+        protected Parameter OriginalParam { get; set; }
 
-        protected string TargetParamName {
-            get => _targetParameterName;
-            set => _targetParameterName = value;
-        }
+        protected string TargetParamName { get; set; }
 
-        protected string OriginalParamName {
-            get => _originalParameterName;
-            set => _originalParameterName = value;
-        }
+        protected string OriginalParamName { get; set; }
 
         protected SpecConfiguration Config => _config;
 
@@ -63,22 +48,22 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public void Fill(SpecificationElement specificationElement) {
             // Существует ли целевой параметр в экземпляре
-            TargetParameter = specificationElement.Element.LookupParameter(TargetParamName);
-            if(TargetParameter == null) {
+            TargetParam = specificationElement.Element.LookupParameter(TargetParamName);
+            if(TargetParam == null) {
                 return;
             }
 
             // Проверка на нулл - для ситуаций где нет имени исходного(ФОП_ВИС_Число, Группирование), тогда исходный парам так и остается пустым 
             if(!(OriginalParamName is null)) {
                 // Проверяем, если существует исходный параметр в типе или экземпляре
-                OriginalParameter = specificationElement.GetTypeOrInstanceParam(OriginalParamName);
-                if(OriginalParameter is null) {
+                OriginalParam = specificationElement.GetTypeOrInstanceParam(OriginalParamName);
+                if(OriginalParam is null) {
                     return;
                 }
             }
 
             // Если целевой параметр ридонли - можно сразу идти дальше
-            if(TargetParameter.IsReadOnly) {
+            if(TargetParam.IsReadOnly) {
                 return;
             }
 

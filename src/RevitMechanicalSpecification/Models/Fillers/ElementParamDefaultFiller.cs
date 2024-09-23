@@ -12,7 +12,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             base(toParamName, fromParamName, specConfiguration, document) { }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
-            TargetParameter.Set(OriginalParameter.AsValueString());
+            TargetParam.Set(OriginalParam.AsValueString());
         }
     }
 }

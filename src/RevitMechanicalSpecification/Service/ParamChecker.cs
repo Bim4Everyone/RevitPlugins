@@ -15,7 +15,7 @@ using dosymep.Revit;
 using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
-    internal class ParameterChecker {
+    internal class ParamChecker {
         private readonly List<RevitParam> _revitParams = new List<RevitParam>() {
             SharedParamsConfig.Instance.VISHvacSystemFunction,
             SharedParamsConfig.Instance.VISSystemShortName,
@@ -87,7 +87,7 @@ namespace RevitMechanicalSpecification.Service {
         /// Создать недостающие параметры, устранить расхождения по галочкам
         /// </summary>
         /// <param name="document"></param>
-        public void ExecuteParameterCheck(Document document, SpecConfiguration specConfiguration) {
+        public void ExecuteParamCheck(Document document, SpecConfiguration specConfiguration) {
             _document = document;
             _specConfiguration = specConfiguration;
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);

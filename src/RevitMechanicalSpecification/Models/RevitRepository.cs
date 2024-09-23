@@ -28,7 +28,7 @@ namespace RevitMechanicalSpecification.Models {
         private readonly List<VisSystem> _visSystems;
         private readonly SpecConfiguration _specConfiguration;
         private readonly VisElementsCalculator _calculator;
-        private readonly ParameterChecker _parameterChecker;
+        private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
         private readonly List<string> _editors;
 
@@ -40,7 +40,7 @@ namespace RevitMechanicalSpecification.Models {
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _collector = new CollectionFactory(Document, _specConfiguration);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
-            _parameterChecker = new ParameterChecker();
+            _paramChecker = new ParamChecker();
             _maskReplacer = new MaskReplacer(_specConfiguration);
             _editors = new List<string>();
 
@@ -228,7 +228,7 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         /// <param name="fillers"></param>
         private void ProcessElements(List<ElementParamFiller> fillers) {
-            _parameterChecker.ExecuteParameterCheck(Document, _specConfiguration);
+            _paramChecker.ExecuteParamCheck(Document, _specConfiguration);
 
             string userName = UIApplication.Application.Username.ToLower();
 
@@ -349,9 +349,11 @@ namespace RevitMechanicalSpecification.Models {
         /// <param name="familyInstance"></param>
         /// <param name="count"></param>
         private void ProcessManifoldSubElement(
+            
             List<ElementParamFiller> fillers,
             SpecificationElement subSpecificationElement
             ) {
+            BuiltInCategory.OST_Windows
             foreach(var filler in fillers) {
                 filler.Fill(subSpecificationElement);
             }

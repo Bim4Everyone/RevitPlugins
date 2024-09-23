@@ -32,7 +32,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         public override void SetParamValue(SpecificationElement specificationElement) {
             string name = GetName(specificationElement);
 
-            TargetParameter.Set(specificationElement.ManifoldInstance != null
+            TargetParam.Set(specificationElement.ManifoldInstance != null
                 ? $"‎    •  {name}"
                 : specificationElement.Element.GetSharedParamValueOrDefault(Config.ForcedName, name));
 
