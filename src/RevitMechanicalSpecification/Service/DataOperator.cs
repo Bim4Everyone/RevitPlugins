@@ -36,7 +36,7 @@ namespace RevitMechanicalSpecification.Service {
         /// <param name="paraName"></param>
         /// <returns></returns>
         public static string GetTypeOrInstanceParamStringValue(
-            this SpecificationElement specificationElement, 
+            this SpecificationElement specificationElement,
             string paraName) {
             if(specificationElement.Element.IsExistsParam(paraName)) {
                 return specificationElement.Element.GetSharedParamValueOrDefault<string>(paraName);
@@ -54,25 +54,31 @@ namespace RevitMechanicalSpecification.Service {
         /// <param name="paraName"></param>
         /// <returns></returns>
         public static Parameter GetTypeOrInstanceParam(this SpecificationElement specificationElement, string paramName) {
-            if(paramName is null) {
+            if(!(specificationElement.Element.IsExistsParam(paramName)
+                || specificationElement.ElementType.IsExistsParam(paramName))) {
                 return null;
             }
-            Parameter parameter = specificationElement.Element.LookupParameter(paramName) ?? 
-                specificationElement.ElementType.LookupParameter(paramName);
-            if(parameter == null) {
-                return null;
-            }
+
+            Parameter parameter = specificationElement.Element.GetSharedParam(paramName) ??
+                specificationElement.ElementType.GetSharedParam(paramName);
+
             return parameter;
         }
 
-        /// <summary>
-        /// Получаем дабл из параметра в экземпляре или типе, иначе возвращает 0
-        /// </summary>
-        /// <param name="element"></param>
-        /// <param name="elemType"></param>
-        /// <param name="paraName"></param>
-        /// <returns></returns>
-        public static double GetTypeOrInstanceParamDoubleValue(this Element element, Element elemType, string paraName) {
+        public static bool IsTypeOrInstanceParamExist(this SpecificationElement specificationElement, string paramName) {
+            return specificationElement.Element.IsExistsParam(paramName) 
+                || specificationElement.ElementType.IsExistsParam(paramName);
+        }
+
+
+            /// <summary>
+            /// Получаем дабл из параметра в экземпляре или типе, иначе возвращает 0
+            /// </summary>
+            /// <param name="element"></param>
+            /// <param name="elemType"></param>
+            /// <param name="paraName"></param>
+            /// <returns></returns>
+            public static double GetTypeOrInstanceParamDoubleValue(this Element element, Element elemType, string paraName) {
             if(element.IsExistsParam(paraName)) {
                 return element.GetSharedParamValueOrDefault<double>(paraName);
             }

@@ -34,7 +34,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         protected Parameter TargetParam { get; set; }
 
-        protected Parameter OriginalParam { get; set; }
+        protected string OriginalParamValue { get; set; }
 
         protected string TargetParamName { get; set; }
 
@@ -55,11 +55,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
             // Проверка на нулл - для ситуаций где нет имени исходного(ФОП_ВИС_Число, Группирование), тогда исходный парам так и остается пустым 
             if(!(OriginalParamName is null)) {
-                // Проверяем, если существует исходный параметр в типе или экземпляре
-                OriginalParam = specificationElement.GetTypeOrInstanceParam(OriginalParamName);
-                if(OriginalParam is null) {
+                if(!specificationElement.IsTypeOrInstanceParamExist(OriginalParamName)) {
                     return;
                 }
+                // Получаем значение оригинального параметра
+                OriginalParamValue = specificationElement.GetTypeOrInstanceParamStringValue(OriginalParamName);
             }
 
             // Если целевой параметр ридонли - можно сразу идти дальше

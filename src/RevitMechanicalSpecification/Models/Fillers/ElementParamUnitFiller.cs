@@ -47,7 +47,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="defaultUnit"></param>
         /// <returns></returns>
         private string DefaultCheck(string defaultUnit) {
-            string unit = OriginalParam.AsValueString();
+            string unit = OriginalParamValue;
 
             if(unit == null) {
                 return defaultUnit;
