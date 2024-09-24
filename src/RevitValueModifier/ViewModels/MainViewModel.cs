@@ -1,7 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Windows.Input;
-
-using Autodesk.Revit.DB;
 
 using Autodesk.Revit.UI;
 
@@ -19,6 +18,9 @@ namespace RevitValueModifier.ViewModels {
 
         private string _errorText;
         private string _saveProperty;
+        private RevitElemUtils _elemHelper;
+        private List<RevitParameter> _intersectedParameters;
+        private List<RevitParameter> _intersectedParametersNotReadOnly;
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -46,42 +48,41 @@ namespace RevitValueModifier.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
         }
 
+        public RevitElemUtils ElemHelper {
+            get => _elemHelper;
+            set => this.RaiseAndSetIfChanged(ref _elemHelper, value);
+        }
+
+        public List<RevitParameter> IntersectedParameters {
+            get => _intersectedParameters;
+            set => this.RaiseAndSetIfChanged(ref _intersectedParameters, value);
+        }
+
+
+        public List<RevitParameter> IntersectedParametersNotReadOnly {
+            get => _intersectedParametersNotReadOnly;
+            set => this.RaiseAndSetIfChanged(ref _intersectedParametersNotReadOnly, value);
+        }
+
+
         private void LoadView() {
+            try {
+                // Создаем объект RevitElemUtils и передаем элементы, с которыми в дальнейшем будем работать
+                ElemHelper = new RevitElemUtils(_revitRepository.SelectedElements());
+                // Оборачиваем переданные элементы в RevitElem
+                ElemHelper.GetRevitElems();
+                // Получаем параметры каждого элемента и сохраняем в RevitElem
+                ElemHelper.GetElemParameters();
 
-            ICollection<ElementId> selectedIds = _revitRepository.ActiveUIDocument.Selection.GetElementIds();
-
-            if(0 == selectedIds.Count) {
-                TaskDialog.Show("Ошибка!", "Не выбрано ни одного элемента");
-                return;
+                // Создаем объект RevitParameterUtils и передаем список RevitElem, с которыми в дальнейшем будем работать
+                var paramHelper = new RevitParameterUtils(ElemHelper.RevitElems);
+                // Получаем список пересеченных параметров RevitParameter (имеются одновременно у всех элементов)
+                IntersectedParameters = paramHelper.GetIntersectedParameters();
+                // Получаем список RevitParameter, которые доступные не только для чтения
+                IntersectedParametersNotReadOnly = paramHelper.GetNotReadOnlyParameters(IntersectedParameters);
+            } catch(Exception e) {
+                TaskDialog.Show("Ошибка!", e.Message);
             }
-
-            var selectedElems = new List<Element>();
-            foreach(ElementId selectedId in selectedIds) {
-                selectedElems.Add(_revitRepository.Document.GetElement(selectedId));
-            }
-
-
-            RevitParameterHelper paramHelper = new RevitParameterHelper();
-            List<ElementId> intersectedParameterIds = paramHelper.GetIntersectedParameterIds(selectedElems);
-
-            RevitElemHelper elemHelper = new RevitElemHelper(_revitRepository.Document);
-            List<RevitElem> revitElems = elemHelper.GetRevitElements(selectedElems, intersectedParameterIds);
-
-
-
-
-            //var element = selectedElems.First();
-            //var parameter = element.LookupParameter("ФОП_Блок СМР");
-
-            //var parameterId = parameter.Id;
-
-
-            //var parameters = element.Parameters.Cast<Parameter>();
-
-            //var sameParameter = parameters.First(p => p.Id == parameterId);
-            //var val = sameParameter.AsValueString();
-
-
 
             LoadConfig();
         }
