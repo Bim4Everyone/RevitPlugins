@@ -41,7 +41,8 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInCategory.OST_DuctInsulations,
                 BuiltInCategory.OST_PipeInsulations,
                 BuiltInCategory.OST_PlumbingFixtures,
-                BuiltInCategory.OST_Sprinklers
+                BuiltInCategory.OST_Sprinklers,
+                BuiltInCategory.OST_CableTray
             };
             return GetElementsByCategories(mechanicalCategories);
         }

@@ -17,7 +17,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 BuiltInCategory.OST_DuctCurves,
                 BuiltInCategory.OST_PipeCurves,
                 BuiltInCategory.OST_FlexDuctCurves,
-                BuiltInCategory.OST_FlexPipeCurves
+                BuiltInCategory.OST_FlexPipeCurves,
+                BuiltInCategory.OST_CableTray
     };
 
     private readonly HashSet<string> _kitNames = new HashSet<string>() {

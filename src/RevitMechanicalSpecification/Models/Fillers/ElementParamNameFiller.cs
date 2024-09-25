@@ -63,9 +63,23 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return GetPipeName(specificationElement.Element, specificationElement.ElementType);
                 case BuiltInCategory.OST_PipeInsulations:
                     return GetPipeInsulationName(specificationElement);
+                case BuiltInCategory.OST_CableTray:
+                    return GetCableTrayName(specificationElement);
             }
 
             return $"{_name} {_nameAddon}";
+        }
+
+        private string GetCableTrayName(SpecificationElement specificationElement) {
+            double width = specificationElement
+                .Element.GetParam(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
+            width = UnitConverter.DoubleToMilimeters(width);
+
+            double height = specificationElement
+                .Element.GetParam(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
+            height = UnitConverter.DoubleToMilimeters(height);
+
+            return $"{_name} {width}x{height}";
         }
 
         /// <summary>

@@ -107,7 +107,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                         BuiltInCategory.OST_PipeCurves,
                         BuiltInCategory.OST_FlexPipeCurves,
                         BuiltInCategory.OST_DuctInsulations,
-                        BuiltInCategory.OST_PipeInsulations  });
+                        BuiltInCategory.OST_PipeInsulations,
+                        BuiltInCategory.OST_CableTray});
         }
 
         /// <summary>
