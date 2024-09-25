@@ -52,6 +52,10 @@ namespace RevitMechanicalSpecification.Service {
                 }
 
                 foreach(SpecificationElement manifoldElement in splitResult.ManifoldElements) {
+                    // В этот момент мы уже прошлись по одиночным элементам и у них есть имена, которые нужны в группирование, получаем их
+                    manifoldElement.ManifoldSpElement.ElementName = 
+                        manifoldElement.ManifoldSpElement
+                        .GetTypeOrInstanceParamStringValue(_specConfiguration.TargetNameName);
                     ProcessElement(manifoldElement, fillers);
                 }
                 t.Commit();

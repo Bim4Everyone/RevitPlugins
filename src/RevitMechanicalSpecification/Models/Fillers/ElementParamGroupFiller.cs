@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 
 using Autodesk.Revit.DB;
@@ -24,12 +25,13 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// </summary>
         /// <param name="specificationElement"></param>
         public override void SetParamValue(SpecificationElement specificationElement) {
-            var manifoldGroup = specificationElement.ManifoldSpElement != null
+            var group = specificationElement.ManifoldSpElement != null
                 ? GetManifoldGroup(specificationElement)
                 : specificationElement.Element
                     .GetSharedParamValueOrDefault(Config.ForcedGroup, GetGroup(specificationElement));
 
-            TargetParam.Set(manifoldGroup);
+            
+            TargetParam.Set(group);
         }
 
         /// <summary>
@@ -51,9 +53,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private string GetManifoldGroup(SpecificationElement specificationElement) {
             string manifoldFamylyTypeName = specificationElement.ManifoldInstance
                 .GetParam(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString();
+
             return
                     $"{GetBaseGroup(specificationElement.ManifoldSpElement.Element)}" +
-                    $"{GetDetailedGroup(specificationElement.ManifoldSpElement)}" +
+                    $"{GetDetailedGroup(specificationElement.ManifoldSpElement)}"+
                     $"{manifoldFamylyTypeName}" +
                     $"{GetDetailedGroup(specificationElement)}";
         }
