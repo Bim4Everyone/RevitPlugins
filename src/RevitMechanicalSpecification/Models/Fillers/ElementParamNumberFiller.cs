@@ -70,7 +70,9 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 if(LinearLogicalFilter(specificationElement.Element)) {
                     double area = specificationElement.Element.GetParamValueOrDefault<double>(
                         BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+                    
                     double convArea = UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters);
+
                     return Math.Round(
                         UseStock(
                             specificationElement.Element,
@@ -116,8 +118,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="builtInCategory"></param>
         /// <param name="number"></param>
         /// <returns></returns>
-        private double UseStock(Element element, Element elemType, BuiltInCategory builtInCategory ,double number) {
-
+        private double UseStock(Element element, Element elemType, BuiltInCategory builtInCategory, double number) {
             double individualStock = element.GetTypeOrInstanceParamDoubleValue(elemType, Config.IndividualStock);
             if(individualStock > 0) {
                 return number * (1 + individualStock/100);

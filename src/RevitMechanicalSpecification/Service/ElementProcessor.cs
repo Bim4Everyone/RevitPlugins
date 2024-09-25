@@ -19,7 +19,8 @@ namespace RevitMechanicalSpecification.Service {
         private readonly SpecConfiguration _specConfiguration;
         private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
-        private readonly List<string> _editors;
+
+        private readonly List<string> _editors = new List<string>();
         private readonly HashSet<BuiltInCategory> _possibleGenericCategories = new HashSet<BuiltInCategory>() {
                         BuiltInCategory.OST_DuctAccessory,
                         BuiltInCategory.OST_PipeAccessory,
@@ -33,8 +34,6 @@ namespace RevitMechanicalSpecification.Service {
             _specConfiguration = new SpecConfiguration(_document.ProjectInformation);
             _paramChecker = new ParamChecker();
             _maskReplacer = new MaskReplacer(_specConfiguration);
-            _editors = new List<string>();
-
         }
 
         /// <summary>
@@ -64,18 +63,6 @@ namespace RevitMechanicalSpecification.Service {
         }
 
         /// <summary>
-        /// Если генерик - заполняет его и возвращает True. Иначе возвращает False.
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private bool FillIfGeneric(Element element) {
-            if(element.InAnyCategory(_possibleGenericCategories)) {
-                return _maskReplacer.ExecuteReplacment(element);
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Обработка элемента филлерами, если в них нет пометки что это узел
         /// </summary>
         /// <param name="element"></param>
@@ -83,35 +70,6 @@ namespace RevitMechanicalSpecification.Service {
         private void ProcessElement(SpecificationElement specificationElement, List<ElementParamFiller> fillers) {
             foreach(var filler in fillers) {
                 filler.Fill(specificationElement);
-            }
-        }
-
-        /// <summary>
-        /// Проверяем значение галочки "ФОП_ВИС_Узел"
-        /// </summary>
-        /// <param name="elemType"></param>
-        /// <returns></returns>
-        private bool IsManifold(Element elemType) {
-            return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsManiFoldParamName) == 1;
-        }
-
-        /// <summary>
-        /// Проверяем значение галочки "ФОП_ВИС_Исключить из узла"
-        /// </summary>
-        /// <param name="elemType"></param>
-        /// <returns></returns>
-        private bool IsOutSideOfManifold(Element elemType) {
-            return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsOutSideOfManifold) == 1;
-        }
-
-        /// <summary>
-        /// Выводит отчет с занявшими элемент пользователями
-        /// </summary>
-        /// <param name="editors"></param>
-        public void ShowReport() {
-            if(_editors.Count != 0) {
-                MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
-                    + string.Join(", ", _editors.ToArray()));
             }
         }
 
@@ -137,10 +95,27 @@ namespace RevitMechanicalSpecification.Service {
 
             return false;
         }
+        /// <summary>
+        /// Выводит отчет с занявшими элемент пользователями
+        /// </summary>
+        /// <param name="editors"></param>
+        private void ShowReport() {
+            if(_editors.Count != 0) {
+                MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
+                    + string.Join(", ", _editors.ToArray()));
+            }
+        }
 
-
+        /// <summary>
+        /// Делим исходный список элементов на узловые и одиночные, сразу же превращая их в SpecificationElement
+        /// </summary>
+        /// <param name="elements"></param>
+        /// <returns></returns>
         private ElementSplitResult SplitElementsToManifoldOrSingle(List<Element> elements) {
+            // Список элементов узлов в модели. Если элемент уже добавлен сюда - отдельно не обрабатываем,
+            // он уже в нужном списке
             HashSet<ElementId> manifoldPartsIds = new HashSet<ElementId>();
+
             List<SpecificationElement> singleElements = new List<SpecificationElement>();
             List<SpecificationElement> manifoldElements = new List<SpecificationElement>();
 
@@ -173,6 +148,11 @@ namespace RevitMechanicalSpecification.Service {
             return new ElementSplitResult(singleElements, manifoldElements);
         }
 
+        /// <summary>
+        /// Создать SpecificationElement для одиночного элемента
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         private SpecificationElement CreateSpecificationElement(Element element) {
             return new SpecificationElement {
                 Element = element,
@@ -181,6 +161,13 @@ namespace RevitMechanicalSpecification.Service {
             };
         }
 
+        /// <summary>
+        /// Создаем на базе specificationElement в котором есть галочка ФОП_ВИС_Узел specificationElement для узловых элементов,
+        /// отмечаем их в списке айди для дальнейшего игнорирования и заполняем список узловых элементов
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        /// <param name="manifoldPartsIds"></param>
+        /// <param name="manifoldElements"></param>
         private void ProcessManifoldElement(SpecificationElement specificationElement,
             HashSet<ElementId> manifoldPartsIds,
             List<SpecificationElement> manifoldElements) {
@@ -200,6 +187,13 @@ namespace RevitMechanicalSpecification.Service {
             }
         }
 
+        /// <summary>
+        /// Создать SpecificationElement для узлового элемента
+        /// </summary>
+        /// <param name="subElement"></param>
+        /// <param name="familyInstance"></param>
+        /// <param name="parentSpecificationElement"></param>
+        /// <returns></returns>
         private SpecificationElement CreateSubSpecificationElement(Element subElement, FamilyInstance familyInstance, SpecificationElement parentSpecificationElement) {
             return new SpecificationElement {
                 Element = subElement,
@@ -208,6 +202,36 @@ namespace RevitMechanicalSpecification.Service {
                 ManifoldSpElement = parentSpecificationElement,
                 BuiltInCategory = subElement.Category.GetBuiltInCategory()
             };
+        }
+
+        /// <summary>
+        /// Проверяем значение галочки "ФОП_ВИС_Узел"
+        /// </summary>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
+        private bool IsManifold(Element elemType) {
+            return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsManiFoldParamName) == 1;
+        }
+
+        /// <summary>
+        /// Проверяем значение галочки "ФОП_ВИС_Исключить из узла"
+        /// </summary>
+        /// <param name="elemType"></param>
+        /// <returns></returns>
+        private bool IsOutSideOfManifold(Element elemType) {
+            return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsOutSideOfManifold) == 1;
+        }
+
+        /// <summary>
+        /// Если генерик - заполняет его и возвращает True. Иначе возвращает False.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private bool FillIfGeneric(Element element) {
+            if(element.InAnyCategory(_possibleGenericCategories)) {
+                return _maskReplacer.ExecuteReplacment(element);
+            }
+            return false;
         }
     }
 }

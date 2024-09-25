@@ -58,6 +58,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 if(!specificationElement.IsTypeOrInstanceParamExist(OriginalParamName)) {
                     return;
                 }
+                
                 // Получаем значение оригинального параметра
                 OriginalParamValue = specificationElement.GetTypeOrInstanceParamStringValue(OriginalParamName);
             }

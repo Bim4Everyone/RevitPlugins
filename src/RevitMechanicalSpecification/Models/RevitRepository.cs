@@ -38,7 +38,6 @@ namespace RevitMechanicalSpecification.Models {
 
             _elementProcessor = new ElementProcessor(UIApplication.Application.Username, Document);
 
-            ManifoldParts = new HashSet<ManifoldPart>();
 
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _collector = new CollectionFactory(Document, _specConfiguration);
@@ -118,7 +117,6 @@ namespace RevitMechanicalSpecification.Models {
             };
         }
 
-        internal HashSet<ManifoldPart> ManifoldParts;
 
         public UIApplication UIApplication { get; }
 
