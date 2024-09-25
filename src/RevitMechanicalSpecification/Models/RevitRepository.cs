@@ -20,6 +20,8 @@ using RevitMechanicalSpecification.Entities;
 
 namespace RevitMechanicalSpecification.Models {
     internal class RevitRepository {
+
+        private readonly ElementProcessor _elementProcessor;
         private readonly List<ElementParamFiller> _fillersSpecRefresh;
         private readonly List<ElementParamFiller> _fillersSystemRefresh;
         private readonly List<ElementParamFiller> _fillersFunctionRefresh;
@@ -28,30 +30,24 @@ namespace RevitMechanicalSpecification.Models {
         private readonly List<VisSystem> _visSystems;
         private readonly SpecConfiguration _specConfiguration;
         private readonly VisElementsCalculator _calculator;
-        private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
-        private readonly List<string> _editors;
-        private readonly HashSet<BuiltInCategory> _possibleGenericCategories = new HashSet<BuiltInCategory>() {
-                        BuiltInCategory.OST_DuctAccessory,
-                        BuiltInCategory.OST_PipeAccessory,
-                        BuiltInCategory.OST_MechanicalEquipment
-    };
+
 
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
+
+            _elementProcessor = new ElementProcessor(UIApplication.Application.Username, Document);
 
             ManifoldParts = new HashSet<ManifoldPart>();
 
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _collector = new CollectionFactory(Document, _specConfiguration);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
-            _paramChecker = new ParamChecker();
             _maskReplacer = new MaskReplacer(_specConfiguration);
-            _editors = new List<string>();
 
             _elements = _collector.GetElementsToSpecificate();
             _visSystems = _collector.GetVisSystems();
-            
+
             _fillersSpecRefresh = new List<ElementParamFiller>()
 {
                 //Заполнение ФОП_ВИС_Наименование комбинированное
@@ -134,21 +130,21 @@ namespace RevitMechanicalSpecification.Models {
         /// Обновление только по филлерам спецификации
         /// </summary>
         public void SpecificationRefresh() {
-            ProcessElements(_fillersSpecRefresh);
+            _elementProcessor.ProcessElements(_fillersSpecRefresh, _elements);
         }
 
         /// <summary>
         /// Обновление только по филлерам системы
         /// </summary>
         public void RefreshSystemName() {
-            ProcessElements(_fillersSystemRefresh);
+            _elementProcessor.ProcessElements(_fillersSystemRefresh, _elements);
         }
 
         /// <summary>
         /// Обновление только по филлерам функции
         /// </summary>
         public void RefreshSystemFunction() {
-            ProcessElements(_fillersFunctionRefresh);
+            _elementProcessor.ProcessElements(_fillersFunctionRefresh, _elements);
         }
 
         /// <summary>
@@ -159,7 +155,7 @@ namespace RevitMechanicalSpecification.Models {
             fillers.AddRange(_fillersSpecRefresh);
             fillers.AddRange(_fillersFunctionRefresh);
             fillers.AddRange(_fillersSystemRefresh);
-            ProcessElements(fillers);
+            _elementProcessor.ProcessElements(fillers, _elements);
         }
 
         /// <summary>
@@ -175,207 +171,5 @@ namespace RevitMechanicalSpecification.Models {
             }
         }
 
-        /// <summary>
-        /// Выводит отчет с занявшими элемент пользователями
-        /// </summary>
-        /// <param name="editors"></param>
-        public void ShowReport() {
-            if(_editors.Count != 0) {
-                MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
-                    + string.Join(", ", _editors.ToArray()));
-            }
-        }
-
-        /// <summary>
-        /// Проверка на занятость элемента
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private bool IsEditedBy(string userName, Element element) {
-            string editedBy = element.GetParamValueOrDefault<string>(BuiltInParameter.EDITED_BY);
-
-            if(string.IsNullOrEmpty(editedBy)) {
-                return false;
-            }
-
-            if(!string.Equals(editedBy, userName, StringComparison.OrdinalIgnoreCase)) {
-                if(!_editors.Contains(editedBy)) {
-                    _editors.Add(editedBy);
-                }
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// После того как сабэлементы узла были отработаны филлерами - закидываем их в экземпляры класса части узла,
-        /// чтоб при следующей встрече в узловой обработке иметь возможность проигнорировать при встрече в обработке вне узловой
-        /// </summary>
-        /// <param name="element"></param>
-        /// <param name="group"></param>
-        /// <returns></returns>
-        private ManifoldPart CreateManifoldParts(Element element, string group) {
-            Element elemType = element.GetElementType();
-            if(!IsOutSideOfManifold(elemType)) {
-                ManifoldPart part = new ManifoldPart {
-                    Group = group,
-                    Id = element.Id
-                };
-                return part;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Главный цикл обработки, проверяет в себе занятость элементов, генерики и узел это или нет
-        /// </summary>
-        /// <param name="fillers"></param>
-        private void ProcessElements(List<ElementParamFiller> fillers) {
-            _paramChecker.ExecuteParamCheck(Document, _specConfiguration);
-
-            string userName = UIApplication.Application.Username.ToLower();
-
-            using(var t = Document.StartTransaction("Обновление спецификации")) {
-                foreach(Element element in _elements) {
-                    // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
-                    // редактора в список
-                    if(IsEditedBy(userName, element)) {
-                        continue;
-                    }
-
-                    // На арматуре воздуховодов/труб/оборудовании проверяем наличие шаблонизированных семейств-генериков.
-                    // Если встречаем - заполняем все по маске
-                    if(FillIfGeneric(element)) {
-                        continue;
-                    }
-
-                    // Если элемент уже встречался в обработке вложений узлов - переходим к следующему
-                    if(ManifoldParts.Any(part => part.Id == element.Id)) {
-                        continue;
-                    }
-
-                    SpecificationElement specificationElement = new SpecificationElement {
-                        Element = element,
-                        ElementType = element.GetElementType(),
-                        BuiltInCategory = element.Category.GetBuiltInCategory()
-                    };
-
-                    ProcessElement(specificationElement, fillers);
-                    ProcessManifoldElement(specificationElement, fillers);
-                }
-                t.Commit();
-                ShowReport();
-            }
-        }
-
-        /// <summary>
-        /// Если генерик - заполняет его и возвращает True. Иначе возвращает False.
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private bool FillIfGeneric(Element element) {
-            if(element.InAnyCategory(_possibleGenericCategories)) {
-                return _maskReplacer.ExecuteReplacment(element);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Обработка элемента филлерами, если в них нет пометки что это узел
-        /// </summary>
-        /// <param name="element"></param>
-        /// <param name="fillers"></param>
-        private void ProcessElement(SpecificationElement specificationElement, List<ElementParamFiller> fillers) {
-            foreach(var filler in fillers) {
-                filler.Fill(specificationElement);
-            }
-        }
-
-        /// <summary>
-        /// Обработка филлерами узлов
-        /// </summary>
-        /// <param name="element"></param>
-        /// <param name="fillers"></param>
-        private void ProcessManifoldElement(SpecificationElement specificationElement, List<ElementParamFiller> fillers) {
-            if(IsManifold(specificationElement.ElementType)) {
-
-                FamilyInstance familyInstance = specificationElement.Element as FamilyInstance;
-
-                // Сортируем лист по параметру группирования, чтоб присвоить нумерацию узлу от его индексов
-                //List<Element> manifoldElements = DataOperator.GetSub(familyInstance, Document)
-                //    .OrderBy(e => _nameAndGroupFactory.GetGroup(e))
-                //    .Where(e => !IsOutSideOfManifold(e.GetElementType()))
-                //    .ToList();
-
-                List<Element> manifoldElements = DataOperator.GetSub(familyInstance, Document);
-
-                // Если не стоит галочка "Исключить из узла"(проверяется в сортировке выше),
-                // проверяем меняется ли номер элемента в узле и отправляем элемент в филлеры
-                foreach(Element subElement in manifoldElements) {
-                    Element subElementType = subElement.GetElementType();
-
-                    //if(_nameAndGroupFactory.IsIncreaseCount(manifoldElements, index, subElement, subElementType)) {
-                    //    positionNumber++;
-                    //}
-                    SpecificationElement subSpecificationElement = new SpecificationElement {
-                        Element = subElement,
-                        ElementType = subElementType,
-                        ManifoldInstance = familyInstance,
-                        ManifoldSpElement = specificationElement,
-                        BuiltInCategory = subElement.Category.GetBuiltInCategory()
-                    };
-
-                    ProcessManifoldSubElement(fillers, subSpecificationElement);
-                }
-
-                // После того как сабэлементы узла были отработаны филлерами - закидываем их в экземпляры класса части узла,
-                // чтоб при следующей встрече в узловой обработке иметь возможность проигнорировать при встрече в обработке вне узловой
-                foreach(Element subElement in manifoldElements) {
-                    //string group = _nameAndGroupFactory.GetGroup(subElement);
-                    ManifoldPart part = CreateManifoldParts(subElement, "1");
-
-                    if(part != null) {
-                        ManifoldParts.Add(part);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Обработка филлерами вложенного элемента узла с простановкой ему нумерации внутри узла
-        /// </summary>
-        /// <param name="fillers"></param>
-        /// <param name="manifoldElement"></param>
-        /// <param name="familyInstance"></param>
-        /// <param name="count"></param>
-        private void ProcessManifoldSubElement(
-            
-            List<ElementParamFiller> fillers,
-            SpecificationElement subSpecificationElement
-            ) {
-            foreach(var filler in fillers) {
-                filler.Fill(subSpecificationElement);
-            }
-        }
-
-        /// <summary>
-        /// Проверяем значение галочки "ФОП_ВИС_Узел"
-        /// </summary>
-        /// <param name="elemType"></param>
-        /// <returns></returns>
-        private bool IsManifold(Element elemType) {
-            return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsManiFoldParamName) == 1;
-        }
-
-        /// <summary>
-        /// Проверяем значение галочки "ФОП_ВИС_Исключить из узла"
-        /// </summary>
-        /// <param name="elemType"></param>
-        /// <returns></returns>
-        private bool IsOutSideOfManifold(Element elemType) {
-            return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsOutSideOfManifold) == 1;
-        }
     }
 }
