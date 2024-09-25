@@ -76,7 +76,7 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        private bool LogicalFilter(Element element) {
+        private bool ElementNotInGroupOrModelText(Element element) {
 
             if(element is ModelText) {
                 return false;
@@ -99,7 +99,7 @@ namespace RevitMechanicalSpecification.Service {
                 .WherePasses(filter)
                 .WhereElementIsNotElementType()
                 .ToElements();
-            return elements.Where(e => LogicalFilter(e)).ToList();
+            return elements.Where(e => ElementNotInGroupOrModelText(e)).ToList();
         }
     }
 }
