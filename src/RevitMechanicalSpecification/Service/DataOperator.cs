@@ -39,10 +39,11 @@ namespace RevitMechanicalSpecification.Service {
             this SpecificationElement specificationElement,
             string paraName) {
             if(specificationElement.Element.IsExistsParam(paraName)) {
-                return specificationElement.Element.GetSharedParamValueOrDefault<string>(paraName);
+
+                return specificationElement.Element.GetParamValue<string>(paraName);
             }
             if(specificationElement.ElementType.IsExistsParam(paraName)) {
-                return specificationElement.ElementType.GetSharedParamValueOrDefault<string>(paraName);
+                return specificationElement.ElementType.GetParamValue<string>(paraName);
             }
             return null;
         }
