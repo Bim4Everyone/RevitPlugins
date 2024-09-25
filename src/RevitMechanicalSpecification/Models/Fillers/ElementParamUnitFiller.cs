@@ -13,7 +13,14 @@ using RevitMechanicalSpecification.Entities;
 
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamUnitFiller : ElementParamFiller {
-        private readonly HashSet<string> _kitNames = new HashSet<string>() {
+        private readonly List<BuiltInCategory> _linearElements = new List<BuiltInCategory>() {
+                BuiltInCategory.OST_DuctCurves,
+                BuiltInCategory.OST_PipeCurves,
+                BuiltInCategory.OST_FlexDuctCurves,
+                BuiltInCategory.OST_FlexPipeCurves
+    };
+
+    private readonly HashSet<string> _kitNames = new HashSet<string>() {
             "компл",
             "компл.",
             "Компл.",
@@ -73,11 +80,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="element"></param>
         /// <returns></returns>
         private string GetUnit(Element element) {
-            if(element.InAnyCategory(new List<BuiltInCategory>() {
-                BuiltInCategory.OST_DuctCurves,
-                BuiltInCategory.OST_PipeCurves,
-                BuiltInCategory.OST_FlexDuctCurves,
-                BuiltInCategory.OST_FlexPipeCurves })) {
+            if(element.InAnyCategory(_linearElements)) {
                 return DefaultCheck(Config.MeterUnit);
             }
 
