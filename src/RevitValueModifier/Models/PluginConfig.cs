@@ -22,6 +22,6 @@ namespace RevitValueModifier.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public string SaveProperty { get; set; }
+        public string TaskForWrite { get; set; }
     }
 }

@@ -17,8 +17,9 @@ namespace RevitValueModifier.ViewModels {
         private readonly ILocalizationService _localizationService;
 
         private string _errorText;
-        private string _saveProperty;
+        private string _taskForWrite;
         private RevitElemUtils _elemHelper;
+        private TaskParser _parserForTask;
         private List<RevitParameter> _intersectedParameters;
         private List<RevitParameter> _intersectedParametersNotReadOnly;
 
@@ -31,10 +32,13 @@ namespace RevitValueModifier.ViewModels {
             _revitRepository = revitRepository;
             _localizationService = localizationService;
 
+            TaskForWriteChangedCommand = RelayCommand.Create(TaskForWriteChanged);
+
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
+        public ICommand TaskForWriteChangedCommand { get; }
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
@@ -43,9 +47,9 @@ namespace RevitValueModifier.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
+        public string TaskForWrite {
+            get => _taskForWrite;
+            set => this.RaiseAndSetIfChanged(ref _taskForWrite, value);
         }
 
         public RevitElemUtils ElemHelper {
@@ -64,6 +68,10 @@ namespace RevitValueModifier.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _intersectedParametersNotReadOnly, value);
         }
 
+        public TaskParser ParserForTask {
+            get => _parserForTask;
+            set => this.RaiseAndSetIfChanged(ref _parserForTask, value);
+        }
 
         private void LoadView() {
             try {
@@ -80,6 +88,8 @@ namespace RevitValueModifier.ViewModels {
                 IntersectedParameters = paramHelper.GetIntersectedParameters();
                 // Получаем список RevitParameter, которые доступные не только для чтения
                 IntersectedParametersNotReadOnly = paramHelper.GetNotReadOnlyParameters(IntersectedParameters);
+
+                ParserForTask = new TaskParser();
             } catch(Exception e) {
                 TaskDialog.Show("Ошибка!", e.Message);
             }
@@ -93,11 +103,8 @@ namespace RevitValueModifier.ViewModels {
 
 
 
-
-
-
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
+            if(string.IsNullOrEmpty(TaskForWrite)) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
                 return false;
             }
@@ -109,15 +116,21 @@ namespace RevitValueModifier.ViewModels {
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+            TaskForWrite = setting?.TaskForWrite ?? _localizationService.GetLocalizedString("MainWindow.Hello");
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                     ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.SaveProperty = SaveProperty;
+            setting.TaskForWrite = TaskForWrite;
             _pluginConfig.SaveProjectConfig();
+        }
+
+
+        private void TaskForWriteChanged() {
+            TaskDialog.Show("TaskForWrite", TaskForWrite);
+            ParserForTask.ParseTask(TaskForWrite);
         }
     }
 }
