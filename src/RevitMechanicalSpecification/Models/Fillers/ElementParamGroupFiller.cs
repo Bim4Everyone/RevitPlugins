@@ -50,7 +50,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <returns></returns>
         private string GetManifoldGroup(SpecificationElement specificationElement) {
             string manifoldFamylyTypeName = specificationElement.ManifoldInstance
-                .get_Parameter(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString();
+                .GetParam(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString();
             return
                     $"{GetBaseGroup(specificationElement.ManifoldSpElement.Element)}" +
                     $"{GetDetailedGroup(specificationElement.ManifoldSpElement)}" +
