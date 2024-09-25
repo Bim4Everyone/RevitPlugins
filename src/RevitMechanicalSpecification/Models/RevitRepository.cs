@@ -31,6 +31,11 @@ namespace RevitMechanicalSpecification.Models {
         private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
         private readonly List<string> _editors;
+        private readonly HashSet<BuiltInCategory> _possibleGenericCategories = new HashSet<BuiltInCategory>() {
+                        BuiltInCategory.OST_DuctAccessory,
+                        BuiltInCategory.OST_PipeAccessory,
+                        BuiltInCategory.OST_MechanicalEquipment
+    })
 
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
@@ -271,10 +276,7 @@ namespace RevitMechanicalSpecification.Models {
         /// <param name="element"></param>
         /// <returns></returns>
         private bool FillIfGeneric(Element element) {
-            if(element.InAnyCategory(new HashSet<BuiltInCategory>() {
-                        BuiltInCategory.OST_DuctAccessory,
-                        BuiltInCategory.OST_PipeAccessory,
-                        BuiltInCategory.OST_MechanicalEquipment})) {
+            if(element.InAnyCategory(_possibleGenericCategories)) {
                 return _maskReplacer.ExecuteReplacment(element);
             }
             return false;
