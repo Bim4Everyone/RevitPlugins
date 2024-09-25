@@ -66,19 +66,19 @@ namespace RevitMechanicalSpecification.Service {
         }
 
         public static bool IsTypeOrInstanceParamExist(this SpecificationElement specificationElement, string paramName) {
-            return specificationElement.Element.IsExistsParam(paramName) 
+            return specificationElement.Element.IsExistsParam(paramName)
                 || specificationElement.ElementType.IsExistsParam(paramName);
         }
 
 
-            /// <summary>
-            /// Получаем дабл из параметра в экземпляре или типе, иначе возвращает 0
-            /// </summary>
-            /// <param name="element"></param>
-            /// <param name="elemType"></param>
-            /// <param name="paraName"></param>
-            /// <returns></returns>
-            public static double GetTypeOrInstanceParamDoubleValue(this Element element, Element elemType, string paraName) {
+        /// <summary>
+        /// Получаем дабл из параметра в экземпляре или типе, иначе возвращает 0
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="elemType"></param>
+        /// <param name="paraName"></param>
+        /// <returns></returns>
+        public static double GetTypeOrInstanceParamDoubleValue(this Element element, Element elemType, string paraName) {
             if(element.IsExistsParam(paraName)) {
                 return element.GetSharedParamValueOrDefault<double>(paraName);
             }
@@ -111,10 +111,12 @@ namespace RevitMechanicalSpecification.Service {
 
             foreach(ElementId elementId in element.GetSubComponentIds()) {
                 Element subElement = document.GetElement(elementId);
+                if(subElement == null) {
+                    continue;
+                }
                 subs.Add(subElement);
 
-                var subInst = subElement as FamilyInstance;
-                if(subInst.GetSubComponentIds().Count > 0) {
+                if(subElement is FamilyInstance subInst && subInst.GetSubComponentIds().Count > 0) {
                     subs.AddRange(GetSub(subInst, document));
                 }
             }
