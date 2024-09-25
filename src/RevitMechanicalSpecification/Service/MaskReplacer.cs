@@ -81,7 +81,7 @@ namespace RevitMechanicalSpecification.Service {
             }
 
             // Здесь нужно обновить значение ADSK_Наименование-Марка для шаблонных семейств с масками
-            Parameter toParam = element.LookupParameter(toParamName);
+            Parameter toParam = element.GetParam(toParamName);
             if(toParam != null) {
                 if(!toParam.IsReadOnly) {
                     toParam.Set(mask).ToString();
