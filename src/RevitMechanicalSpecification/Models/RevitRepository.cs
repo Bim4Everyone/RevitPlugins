@@ -188,13 +188,13 @@ namespace RevitMechanicalSpecification.Models {
         /// <param name="element"></param>
         /// <returns></returns>
         private bool IsEditedBy(string userName, Element element) {
-            string editedBy = element.GetParamValueOrDefault<string>(BuiltInParameter.EDITED_BY)?.ToLower();
+            string editedBy = element.GetParamValueOrDefault<string>(BuiltInParameter.EDITED_BY);
 
             if(string.IsNullOrEmpty(editedBy)) {
                 return false;
             }
 
-            if(editedBy != userName) {
+            if(!string.Equals(editedBy, userName, StringComparison.OrdinalIgnoreCase)) {
                 if(!_editors.Contains(editedBy)) {
                     _editors.Add(editedBy);
                 }
