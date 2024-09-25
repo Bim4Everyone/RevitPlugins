@@ -24,10 +24,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// </summary>
         /// <param name="specificationElement"></param>
         public override void SetParamValue(SpecificationElement specificationElement) {
-            TargetParam.Set(specificationElement.ManifoldSpElement != null
+            var manifoldGroup = specificationElement.ManifoldSpElement != null
                 ? GetManifoldGroup(specificationElement)
                 : specificationElement.Element
-                .GetSharedParamValueOrDefault(Config.ForcedGroup, GetGroup(specificationElement)));
+                    .GetSharedParamValueOrDefault(Config.ForcedGroup, GetGroup(specificationElement));
+
+            TargetParam.Set(manifoldGroup);
         }
 
         /// <summary>
