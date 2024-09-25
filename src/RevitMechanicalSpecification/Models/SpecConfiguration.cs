@@ -13,18 +13,18 @@ using dosymep.Revit;
 
 namespace RevitMechanicalSpecification.Models {
     public class SpecConfiguration {
-        public string GlobalFunction;
-        public string OriginalParamNameName;
-        public string OriginalParamNameMark;
-        public string OriginalParamNameCode;
-        public string OriginalParamNameUnit;
-        public string OriginalParamNameCreator;
-        public string GlobalSystem;
-        public double PipeInsulationStock;
-        public double DuctInsulationStock;
-        public double DuctAndPipeStock;
-        public bool IsSpecifyDuctFittings;
-        public bool IsSpecifyPipeFittings;
+        public readonly string GlobalFunction;
+        public readonly string OriginalParamNameName;
+        public readonly string OriginalParamNameMark;
+        public readonly string OriginalParamNameCode;
+        public readonly string OriginalParamNameUnit;
+        public readonly string OriginalParamNameCreator;
+        public readonly string GlobalSystem;
+        public readonly double PipeInsulationStock;
+        public readonly double DuctInsulationStock;
+        public readonly double DuctAndPipeStock;
+        public readonly bool IsSpecifyDuctFittings;
+        public readonly bool IsSpecifyPipeFittings;
 
         public readonly string TargetNameGroup = SharedParamsConfig.Instance.VISGrouping.Name; //ФОП_ВИС_Группирование
         public readonly string TargetNameFunction = SharedParamsConfig.Instance.EconomicFunction.Name; //"ФОП_Экономическая функция";

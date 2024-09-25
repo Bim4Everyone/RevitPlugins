@@ -35,7 +35,7 @@ namespace RevitMechanicalSpecification.Models {
                         BuiltInCategory.OST_DuctAccessory,
                         BuiltInCategory.OST_PipeAccessory,
                         BuiltInCategory.OST_MechanicalEquipment
-    })
+    };
 
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
