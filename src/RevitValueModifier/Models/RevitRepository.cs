@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -16,18 +17,37 @@ namespace RevitValueModifier.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public List<Element> SelectedElements() {
-            ICollection<ElementId> selectedIds = ActiveUIDocument.Selection.GetElementIds();
-            var selectedElems = new List<Element>();
-            if(selectedIds.Count == 0) {
-                TaskDialog.Show("Ошибка!", "Не выбрано ни одного элемента");
-                return selectedElems;
-            }
+        public List<RevitElement> GetRevitElements() => ActiveUIDocument
+                .Selection
+                .GetElementIds()
+                .Select(id => Document.GetElement(id))
+                .Select(e => new RevitElement(e))
+                .ToList();
 
-            foreach(ElementId selectedId in selectedIds) {
-                selectedElems.Add(Document.GetElement(selectedId));
-            }
-            return selectedElems;
-        }
+        internal List<ElementId> GetCategoryIds(List<RevitElement> revitElements) => revitElements
+                .Select(rE => rE.Elem.Category.Id)
+                .ToList();
+
+        internal List<RevitParameter> GetParams(List<ElementId> categoryIds) => ParameterFilterUtilities
+            .GetFilterableParametersInCommon(Document, categoryIds)
+            .Select(id => new RevitParameter(id, Document))
+            .OrderBy(rP => rP.ParamName)
+            .ToList();
+
+
+
+        //internal List<RevitParameter> GetParams(List<ElementId> categoryIds) {
+        //    // Получаем параметры для фильтров на основе ID категорий
+        //    List<ElementId> elementIds = ParameterFilterUtilities.GetFilterableParametersInCommon(Document, categoryIds).ToList();
+
+        //    var filterableParameters = new List<RevitParameter>();
+
+        //    foreach(ElementId id in elementIds) {
+
+        //        filterableParameters.Add(new RevitParameter(id, Document));
+        //    }
+
+        //    return filterableParameters;
+        //}
     }
 }

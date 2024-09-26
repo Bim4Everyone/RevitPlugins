@@ -51,7 +51,7 @@
             Grid.Column="1"
             Grid.ColumnSpan="2"
             Margin="5"
-            ItemsSource="{Binding Path=IntersectedParametersNotReadOnly}"/>
+            ItemsSource="{Binding Path=CommonParams}"/>
 
 
         <TextBox 
@@ -59,14 +59,33 @@
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="5"
-            Text="{Binding Path=TaskForWrite, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            Text="{Binding Path=ParamValueMask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="TextChanged">
                     <i:InvokeCommandAction
-                        Command="{Binding Path=TaskForWriteChangedCommand}"/>
+                        Command="{Binding Path=ParamUpdateCommand}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </TextBox>
+
+
+        <ListView 
+            Grid.Row="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            ItemsSource="{Binding Path=RevitElements, UpdateSourceTrigger=PropertyChanged}" >
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn 
+                        Width="300"
+                        DisplayMemberBinding="{Binding Path=Elem.Name}"/>
+                    <GridViewColumn 
+                        Width="400"
+                        DisplayMemberBinding="{Binding Path=ParamValue}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
 
         <StackPanel
             Grid.Column="0"

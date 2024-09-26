@@ -1,58 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
-
-using Autodesk.Revit.DB;
-
 namespace RevitValueModifier.Models {
     internal class RevitParameterUtils {
-        private readonly List<StorageType> _neededStorageTypes = new List<StorageType>() {
-                StorageType.Integer,
-                StorageType.Double,
-                StorageType.String
-            };
 
-
-        public RevitParameterUtils(List<RevitElem> revitElems) {
-            RevitElems = revitElems;
-        }
-
-
-        public List<RevitElem> RevitElems { get; }
-
-        public List<RevitParameter> GetIntersectedParameters() {
-            if(RevitElems is null || RevitElems.Count() == 0) { return new List<RevitParameter>(); }
-
-            // Т.к. списки нужно сравнивать, чтобы найти перечень параметров, которые содержатся
-            // одновременно у всех элементов, заполняем список параметрами первого элемента
-            var collectionForIntersect = RevitElems.First().GetElementParameters();
-            if(RevitElems.Count() == 1) { return collectionForIntersect.Select(p => new RevitParameter(p)).ToList(); }
-
-            for(int i = 1; i < RevitElems.Count(); i++) {
-                var paramsOfCurrentElem = RevitElems[i].GetElementParameters();
-                collectionForIntersect = collectionForIntersect.Intersect(paramsOfCurrentElem, new RevitParameterComparerById());
-            }
-
-            return collectionForIntersect
-                .Where(p => FilterParameterByStorageType(p))
-                .Select(p => new RevitParameter(p))
-                .OrderBy(rP => rP.Name)
-                .ToList();
-        }
-
-        private bool FilterParameterByStorageType(Parameter parameter) {
-            return _neededStorageTypes.Contains(parameter.StorageType) ? true : false;
-        }
-
-
-        internal List<RevitParameter> GetNotReadOnlyParameters(List<RevitParameter> revitParameters) {
-            List<RevitParameter> notReadOnly = new List<RevitParameter>();
-            foreach(RevitParameter revitParameter in revitParameters) {
-                if(!revitParameter.IsReadOnly) {
-                    notReadOnly.Add(revitParameter);
-                }
-            }
-            return notReadOnly;
-        }
 
 
         //        public ParamValuePair GetParamValuePair(Parameter parameter) {
