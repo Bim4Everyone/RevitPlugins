@@ -36,7 +36,7 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -44,20 +44,27 @@
             Grid.Row="0"
             Grid.Column="0"
             Margin="5"
-            VerticalAlignment="Center"/>
+            VerticalAlignment="Center"
+            Text="{DynamicResource ResourceKey=MainWindow.SelectParamToRecord}"/>
 
         <ComboBox
             Grid.Row="0"
             Grid.Column="1"
             Grid.ColumnSpan="2"
             Margin="5"
-            ItemsSource="{Binding Path=CommonParams}"/>
+            ItemsSource="{Binding Path=CommonParams}"
+            SelectedItem="{Binding Path=SelectedCommonParam}"/>
 
-
-        <TextBox 
+        <TextBlock
             Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="2"
+            Margin="5"
+            VerticalAlignment="Center"
+            Text="{DynamicResource ResourceKey=MainWindow.EnterMask}"/>
+        
+        <TextBox 
+            Grid.Row="1"
+            Grid.Column="1"
             Margin="5"
             Text="{Binding Path=ParamValueMask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <i:Interaction.Triggers>
@@ -68,6 +75,19 @@
             </i:Interaction.Triggers>
         </TextBox>
 
+        <ComboBox
+            Grid.Row="1"
+            Grid.Column="2"
+            Margin="5"
+            ItemsSource="{Binding Path=CommonParams}"
+            SelectedItem="{Binding Path=SelectedCommonParamForAdd}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                        Command="{Binding AddParamInMaskCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
 
         <ListView 
             Grid.Row="2"
@@ -77,10 +97,12 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn 
-                        Width="300"
+                        Width="200"
+                        Header="{DynamicResource ResourceKey=MainWindow.RevitElement}"
                         DisplayMemberBinding="{Binding Path=Elem.Name}"/>
                     <GridViewColumn 
                         Width="400"
+                        Header="{DynamicResource ResourceKey=MainWindow.ElementParamValue}"
                         DisplayMemberBinding="{Binding Path=ParamValue}"/>
                 </GridView>
             </ListView.View>

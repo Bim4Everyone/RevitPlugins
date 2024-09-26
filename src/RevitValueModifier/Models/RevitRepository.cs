@@ -33,21 +33,5 @@ namespace RevitValueModifier.Models {
             .Select(id => new RevitParameter(id, Document))
             .OrderBy(rP => rP.ParamName)
             .ToList();
-
-
-
-        //internal List<RevitParameter> GetParams(List<ElementId> categoryIds) {
-        //    // Получаем параметры для фильтров на основе ID категорий
-        //    List<ElementId> elementIds = ParameterFilterUtilities.GetFilterableParametersInCommon(Document, categoryIds).ToList();
-
-        //    var filterableParameters = new List<RevitParameter>();
-
-        //    foreach(ElementId id in elementIds) {
-
-        //        filterableParameters.Add(new RevitParameter(id, Document));
-        //    }
-
-        //    return filterableParameters;
-        //}
     }
 }

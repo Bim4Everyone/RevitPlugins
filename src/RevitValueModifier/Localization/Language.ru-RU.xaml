@@ -5,8 +5,13 @@
     <!-- Пример перевода на русский язык (google translate) -->
     
     <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+    <system:String x:Key="MainWindow.ParamValueMask">Введите маску</system:String>
+    <system:String x:Key="MainWindow.ParamValueMaskEmpty">Маска значения пуста</system:String>
+    
+    <system:String x:Key="MainWindow.SelectParamToRecord">Выберите параметр для записи</system:String>
+    <system:String x:Key="MainWindow.EnterMask">Введите маску значения</system:String>
+    <system:String x:Key="MainWindow.RevitElement">Элемент Revit</system:String>
+    <system:String x:Key="MainWindow.ElementParamValue">Значение параметра</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>

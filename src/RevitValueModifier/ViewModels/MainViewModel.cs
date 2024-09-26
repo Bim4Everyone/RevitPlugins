@@ -3,6 +3,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -17,12 +18,10 @@ namespace RevitValueModifier.ViewModels {
 
         private string _errorText;
         private string _paramValueMask;
+        private RevitParameter _selectedCommonParam;
+        private RevitParameter _selectedCommonParamForAdd;
         private List<RevitElement> _revitElements;
         private List<RevitParameter> _commonParams;
-
-        //private RevitElemUtils _elemHelper;
-        //private TaskParser _parserForTask;
-        //private List<RevitParameter> _intersectedParametersNotReadOnly;
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -33,12 +32,14 @@ namespace RevitValueModifier.ViewModels {
             _revitRepository = revitRepository;
             _localizationService = localizationService;
 
+            AddParamInMaskCommand = RelayCommand.Create(AddParamInMask);
             ParamUpdateCommand = RelayCommand.Create(ParamUpdate);
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
+        public ICommand AddParamInMaskCommand { get; }
         public ICommand ParamUpdateCommand { get; }
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
@@ -63,23 +64,61 @@ namespace RevitValueModifier.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _commonParams, value);
         }
 
+        public RevitParameter SelectedCommonParam {
+            get => _selectedCommonParam;
+            set => this.RaiseAndSetIfChanged(ref _selectedCommonParam, value);
+        }
+
+        public RevitParameter SelectedCommonParamForAdd {
+            get => _selectedCommonParamForAdd;
+            set => this.RaiseAndSetIfChanged(ref _selectedCommonParamForAdd, value);
+        }
+
         private void LoadView() {
             RevitElements = _revitRepository.GetRevitElements();
             List<ElementId> categoryIds = _revitRepository.GetCategoryIds(RevitElements);
             CommonParams = _revitRepository.GetParams(categoryIds);
 
             LoadConfig();
+            ParamUpdateCommand.Execute(null);
         }
-
         private void AcceptView() {
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Изменение значений параметров")) {
+                foreach(RevitElement revitElement in RevitElements) {
+                    revitElement.WriteParamValue(SelectedCommonParam);
+                }
+                transaction.Commit();
+            }
             SaveConfig();
         }
 
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(ParamValueMask)) {
-                ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ParamValueMaskEmpty");
                 return false;
             }
+
+            if(SelectedCommonParam is null) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.SelectParamToRecord");
+                return false;
+            }
+
+            //StorageType storageType;
+            //if(SelectedCommonParam.IsBuiltin) {
+            //    storageType = _revitRepository.Document.get_TypeOfStorage(SelectedCommonParam.BInParameter);
+            //} else {
+            //    storageType = SelectedCommonParam.ParamElement.GetStorageType();
+            //}
+
+            //if(storageType == StorageType.Integer) {
+            //    if(!int.TryParse(ParamValueMask, out _)) {
+            //        ErrorText = _localizationService.GetLocalizedString("MainWindow.FailIntParseParamValueMask");
+            //    }
+            //} else if (storageType == StorageType.Double) {
+            //    if(!double.TryParse(ParamValueMask, out _)) {
+            //        ErrorText = _localizationService.GetLocalizedString("MainWindow.FailDoubleParseParamValueMask");
+            //    }
+            //}
 
             ErrorText = null;
             return true;
@@ -87,7 +126,7 @@ namespace RevitValueModifier.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            ParamValueMask = setting?.TaskForWrite ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+            ParamValueMask = setting?.TaskForWrite ?? _localizationService.GetLocalizedString("MainWindow.ParamValueMask");
         }
 
         private void SaveConfig() {
@@ -102,6 +141,10 @@ namespace RevitValueModifier.ViewModels {
             foreach(RevitElement revitElement in RevitElements) {
                 revitElement.SetParamValue(ParamValueMask);
             }
+        }
+
+        private void AddParamInMask() {
+            ParamValueMask += $"{{{SelectedCommonParamForAdd.ParamName}}}";
         }
     }
 }
