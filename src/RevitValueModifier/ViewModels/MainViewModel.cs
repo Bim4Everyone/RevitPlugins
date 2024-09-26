@@ -93,7 +93,8 @@ namespace RevitValueModifier.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(ParamValueMask)) {
+            if(string.IsNullOrEmpty(ParamValueMask)
+                || ParamValueMask == _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask")) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.ParamValueMaskEmpty");
                 return false;
             }
@@ -126,7 +127,7 @@ namespace RevitValueModifier.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            ParamValueMask = setting?.TaskForWrite ?? _localizationService.GetLocalizedString("MainWindow.ParamValueMask");
+            ParamValueMask = setting?.TaskForWrite ?? _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask");
         }
 
         private void SaveConfig() {
@@ -144,7 +145,10 @@ namespace RevitValueModifier.ViewModels {
         }
 
         private void AddParamInMask() {
-            ParamValueMask += $"{{{SelectedCommonParamForAdd.ParamName}}}";
+            if(SelectedCommonParamForAdd != null) {
+                ParamValueMask += $"{{{SelectedCommonParamForAdd.ParamName}}}";
+                SelectedCommonParamForAdd = null;
+            }
         }
     }
 }

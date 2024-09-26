@@ -14,7 +14,7 @@
     WindowStartupLocation="CenterOwner"
     
     Title="{DynamicResource MainWindow.Title}"
-    Height="450" Width="600"    
+    Height="450" Width="700"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -34,65 +34,79 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <Grid
+            Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="{DynamicResource ResourceKey=MainWindow.SelectParamToRecord}"/>
 
-        <TextBlock
-            Grid.Row="0"
-            Grid.Column="0"
-            Margin="5"
-            VerticalAlignment="Center"
-            Text="{DynamicResource ResourceKey=MainWindow.SelectParamToRecord}"/>
+            <ComboBox
+                Grid.Row="0"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Margin="5"
+                ItemsSource="{Binding Path=CommonParams}"
+                SelectedItem="{Binding Path=SelectedCommonParam}"/>
+        </Grid>
 
-        <ComboBox
-            Grid.Row="0"
-            Grid.Column="1"
-            Grid.ColumnSpan="2"
-            Margin="5"
-            ItemsSource="{Binding Path=CommonParams}"
-            SelectedItem="{Binding Path=SelectedCommonParam}"/>
+        <Grid
+            Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="240"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock
+                Grid.Column="0"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="{DynamicResource ResourceKey=MainWindow.EnterParamValueMask}"/>
 
-        <TextBlock
-            Grid.Row="1"
-            Grid.Column="0"
-            Margin="5"
-            VerticalAlignment="Center"
-            Text="{DynamicResource ResourceKey=MainWindow.EnterMask}"/>
-        
-        <TextBox 
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="5"
-            Text="{Binding Path=ParamValueMask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="TextChanged">
-                    <i:InvokeCommandAction
+            <TextBox 
+                Grid.Column="1"
+                Margin="5"
+                Text="{Binding Path=ParamValueMask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="TextChanged">
+                        <i:InvokeCommandAction
                         Command="{Binding Path=ParamUpdateCommand}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </TextBox>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBox>
 
-        <ComboBox
-            Grid.Row="1"
-            Grid.Column="2"
-            Margin="5"
-            ItemsSource="{Binding Path=CommonParams}"
-            SelectedItem="{Binding Path=SelectedCommonParamForAdd}">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction
+            <ComboBox
+                Grid.Column="2"
+                Margin="5"
+                ItemsSource="{Binding Path=CommonParams}"
+                SelectedItem="{Binding Path=SelectedCommonParamForAdd}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction
                         Command="{Binding AddParamInMaskCommand}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </ComboBox>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
+            
+            <TextBlock
+                Grid.Column="2"
+                Margin="10 5"
+                VerticalAlignment="Center"
+                IsHitTestVisible="False"
+                Text="{DynamicResource ResourceKey=MainWindow.SelectedParamForAdd}"/>
+        </Grid>
 
         <ListView 
             Grid.Row="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
+            Margin="5"
             ItemsSource="{Binding Path=RevitElements, UpdateSourceTrigger=PropertyChanged}" >
             <ListView.View>
                 <GridView>
@@ -110,8 +124,6 @@
 
 
         <StackPanel
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
             Grid.Row="3"
             Height="45"
             Orientation="Horizontal"

@@ -8,13 +8,18 @@ using System.Text.RegularExpressions;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 namespace RevitValueModifier.Models {
     internal class RevitElement : INotifyPropertyChanged {
         private string _paramValue = string.Empty;
 
         public RevitElement(Element element) {
             Elem = element;
+            var elemType = Elem.GetElementType();
+
             Parameters = Elem.Parameters.Cast<Parameter>().ToList();
+            Parameters.AddRange(elemType.Parameters.Cast<Parameter>().ToList());
         }
 
         public Element Elem { get; }
