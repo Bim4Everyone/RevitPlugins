@@ -42,7 +42,7 @@ namespace RevitMechanicalSpecification.Service {
             double value = element.GetTypeOrInstanceParamDoubleValue(elemType, paramName);
             value = UnitConverter.DoubleToMilimeters(value);
 
-            return value.ToString();
+            return UnitConverter.DoubleToString(value);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace RevitMechanicalSpecification.Service {
             Parameter toParam = element.GetParam(toParamName);
             if(toParam != null) {
                 if(!toParam.IsReadOnly) {
-                    toParam.Set(mask).ToString();
+                    toParam.Set(mask);
                 }
             }
 

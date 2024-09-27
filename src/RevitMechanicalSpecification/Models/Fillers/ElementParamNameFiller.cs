@@ -65,11 +65,20 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return GetPipeInsulationName(specificationElement);
                 case BuiltInCategory.OST_CableTray:
                     return GetCableTrayName(specificationElement);
+                case BuiltInCategory.OST_FlexDuctCurves:
+                    return GetFlexElementtName(specificationElement);
+                case BuiltInCategory.OST_FlexPipeCurves:
+                    return GetFlexElementtName(specificationElement);
             }
 
             return $"{_name} {_nameAddon}";
         }
 
+        /// <summary>
+        /// Возвращает имя кабельного лотка
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        /// <returns></returns>
         private string GetCableTrayName(SpecificationElement specificationElement) {
             double width = specificationElement
                 .Element.GetParam(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
@@ -80,6 +89,18 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             height = UnitConverter.DoubleToMilimeters(height);
 
             return $"{_name} {width}x{height}";
+        }
+
+        /// <summary>
+        /// Возвращает имя гибких воздуховодов и труб
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        /// <returns></returns>
+        private string GetFlexElementtName(SpecificationElement specificationElement) {
+            
+            double diameter = UnitConverter.DoubleToMilimeters(
+                specificationElement.Element.GetParam(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM).AsDouble());
+            return $"{_name} ø{diameter}";
         }
 
         /// <summary>

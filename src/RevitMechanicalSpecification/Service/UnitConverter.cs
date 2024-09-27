@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,5 +44,15 @@ namespace RevitMechanicalSpecification.Service {
         public static double DoubleToDegree(double number) {
             return Math.Round(UnitUtils.ConvertFromInternalUnits(number, UnitTypeId.Degrees), 2);
         }
+
+        public static string DoubleToString(double number) {
+            CultureInfo culture = new CultureInfo("ru-RU");
+            return number.ToString("N2", culture);
+        }
+
+        public static double ReduceToTwoCharacters(double number) {
+            return Math.Round(number, 2);
+        }
+
     }
 }

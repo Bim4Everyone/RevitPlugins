@@ -161,10 +161,11 @@ namespace RevitMechanicalSpecification.Service {
                 element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_INNER_DIAM_PARAM)
                 );
 
-            string pipeThickness = ((externalSize - internalSize) / 2).ToString();
-            string pipeDiameter = UnitConverter.DoubleToMilimeters(
-                element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM)
-                ).ToString();
+            string pipeThickness = UnitConverter.DoubleToString(((externalSize - internalSize) / 2));
+            string pipeDiameter = UnitConverter.DoubleToString(
+                    UnitConverter.DoubleToMilimeters(
+                    element.GetParamValue<double>(
+                    BuiltInParameter.RBS_PIPE_DIAMETER_PARAM)));
 
             if(dy) {
                 return " ⌀" + pipeDiameter;
@@ -173,7 +174,7 @@ namespace RevitMechanicalSpecification.Service {
                 return " ⌀" + pipeDiameter + "x" + pipeThickness;
             }
             if(dExternalWall) {
-                return " ⌀" + externalSize.ToString() + "x" + pipeThickness;
+                return " ⌀" + UnitConverter.DoubleToString(externalSize) + "x" + pipeThickness;
             }
 
             return " НЕ ЗАДАН ТИП ДИАМЕТРА";
@@ -285,13 +286,15 @@ namespace RevitMechanicalSpecification.Service {
 
             //currentculture передаем
             if(thikness > upCriteria && upCriteria != 0) {
-                return Math.Max(maxInsulThikness, maxDuctThikness).ToString();
+                return 
+                    UnitConverter.DoubleToString(Math.Max(maxInsulThikness, maxDuctThikness));
             }
             if(thikness < minCriteria && minCriteria != 0) {
-                return Math.Max(minInsulThikness, minDuctThikness).ToString();
+                return
+                    UnitConverter.DoubleToString(Math.Max(minInsulThikness, minDuctThikness));
             }
 
-            return thikness.ToString();
+            return UnitConverter.DoubleToString(thikness);
         }
 
         /// <summary>
