@@ -14,6 +14,9 @@
     <system:String x:Key="MainWindow.ElementParamValue">Значение параметра</system:String>
     <system:String x:Key="MainWindow.SelectedParamForAdd">Выберите параметр для добавления</system:String>
 
+    <system:String x:Key="MainWindow.ElementParamValueExample">Значения, которые будут записаны в выбранные элементы:</system:String>
+    <system:String x:Key="MainWindow.Filtration">Фильтрация</system:String>
+
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>

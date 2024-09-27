@@ -9,12 +9,14 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitValueModifier.Views"
     xmlns:vms="clr-namespace:RevitValueModifier.ViewModels"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
     Title="{DynamicResource MainWindow.Title}"
     Height="450" Width="700"
+    MinHeight="450" MinWidth="700"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -28,6 +30,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -53,8 +56,25 @@
                 Grid.Column="1"
                 Grid.ColumnSpan="2"
                 Margin="5"
+                IsEditable="True"
+                StaysOpenOnEdit="True"
                 ItemsSource="{Binding Path=CommonParams}"
-                SelectedItem="{Binding Path=SelectedCommonParam}"/>
+                SelectedItem="{Binding Path=SelectedCommonParam}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <TextBlock Text="{Binding Path=ParamName}" FontWeight="Bold"/>
+                            <TextBlock Text=" (id: "/>
+                            <TextBlock Text="{Binding Path=Id}"/>
+                            <TextBlock Text=", system: "/>
+                            <TextBlock Text="{Binding Path=IsBuiltin, Converter={converters:BoolToStringConverter}}"/>
+                            <TextBlock Text=", shared: "/>
+                            <TextBlock Text="{Binding Path=IsShared, Converter={converters:BoolToStringConverter}}"/>
+                            <TextBlock Text=")"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </Grid>
 
         <Grid
@@ -88,6 +108,21 @@
                 Margin="5"
                 ItemsSource="{Binding Path=CommonParams}"
                 SelectedItem="{Binding Path=SelectedCommonParamForAdd}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <TextBlock Text="{Binding Path=ParamName}" FontWeight="Bold"/>
+                            <TextBlock Text=" (id: "/>
+                            <TextBlock Text="{Binding Path=Id}"/>
+                            <TextBlock Text=", system: "/>
+                            <TextBlock Text="{Binding Path=IsBuiltin, Converter={converters:BoolToStringConverter}}"/>
+                            <TextBlock Text=", shared: "/>
+                            <TextBlock Text="{Binding Path=IsShared, Converter={converters:BoolToStringConverter}}"/>
+                            <TextBlock Text=")"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction
@@ -104,8 +139,35 @@
                 Text="{DynamicResource ResourceKey=MainWindow.SelectedParamForAdd}"/>
         </Grid>
 
-        <ListView 
+
+        <TextBlock
+            Grid.Row="2" 
+            Grid.Column="0"
+            Margin="5"
+            VerticalAlignment="Center"
+            Text="{DynamicResource ResourceKey=MainWindow.ElementParamValueExample}"/>
+        
+        <StackPanel
             Grid.Row="2"
+            Orientation="Horizontal"
+            FlowDirection="RightToLeft">
+
+            <TextBox 
+                Margin="5"
+                FlowDirection="LeftToRight"
+                MinWidth="200"
+                Text="{Binding Path=RevitElementsFilter, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <TextBlock
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="{DynamicResource ResourceKey=MainWindow.Filtration}"/>
+
+        </StackPanel>
+        
+        
+        <ListView 
+            Grid.Row="3"
             Margin="5"
             ItemsSource="{Binding Path=RevitElements, UpdateSourceTrigger=PropertyChanged}" >
             <ListView.View>
@@ -113,7 +175,7 @@
                     <GridViewColumn 
                         Width="200"
                         Header="{DynamicResource ResourceKey=MainWindow.RevitElement}"
-                        DisplayMemberBinding="{Binding Path=Elem.Name}"/>
+                        DisplayMemberBinding="{Binding Path=ElemName}"/>
                     <GridViewColumn 
                         Width="400"
                         Header="{DynamicResource ResourceKey=MainWindow.ElementParamValue}"
@@ -122,9 +184,9 @@
             </ListView.View>
         </ListView>
 
-
+        
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="4"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">

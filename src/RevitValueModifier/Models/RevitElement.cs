@@ -17,61 +17,25 @@ namespace RevitValueModifier.Models {
         public RevitElement(Element element) {
             Elem = element;
             var elemType = Elem.GetElementType();
+            ElemName = Elem.Name;
 
             Parameters = Elem.Parameters.Cast<Parameter>().ToList();
             Parameters.AddRange(elemType.Parameters.Cast<Parameter>().ToList());
         }
 
+        private List<Parameter> Parameters { get; set; }
         public Element Elem { get; }
-        public List<Parameter> Parameters { get; set; }
+        public string ElemName { get; }
 
         public string ParamValue {
             get { return _paramValue; }
             set {
                 _paramValue = value;
-                OnPropertyChanged("ParamValue");
+                OnPropertyChanged(nameof(ParamValue));
             }
         }
 
-        public void WriteParamValue(RevitParameter revitParameter) {
-            Parameter parameter = Parameters.FirstOrDefault(p => p.Id == revitParameter.Id);
-            if(parameter is null) {
-                TaskDialog.Show("Ошибка!", "Не найден выбранный для записи параметр в элементе с id "
-                    + Elem.Id.ToString());
-            }
-
-            if(parameter.StorageType == StorageType.String) {
-                parameter.Set(ParamValue);
-            } else if(parameter.StorageType == StorageType.Integer) {
-                var paramValueAsInt = int.Parse(ParamValue);
-                parameter.Set(paramValueAsInt);
-            } else if(parameter.StorageType == StorageType.Double) {
-                var paramValueAsDouble = double.Parse(ParamValue);
-                parameter.Set(paramValueAsDouble);
-            }
-        }
-
-        public void SetParamValue(string paramValueMask) {
-            // заранее реализовать проверку, что символы { } парны
-            // префикс_{ФОП_Блок СМР}_суффикс1_{ФОП_Секция СМР}_суффикс2
-            ParamValue = paramValueMask;
-            Regex regex = new Regex(@"{([^\}]+)}");
-            MatchCollection matches = regex.Matches(paramValueMask);
-
-            Regex regexForParam;
-            foreach(Match match in matches) {
-                string paramName = match.Value.Replace("{", "").Replace("}", "");
-                Parameter param = Parameters
-                    .FirstOrDefault(parameter => parameter.Definition.Name == paramName);
-                if(param == null) { return; }
-
-                regexForParam = new Regex(match.Value);
-                var val = GetParamValue(param);
-                ParamValue = regexForParam.Replace(ParamValue, val, 1);
-            }
-        }
-
-        public string GetParamValue(Parameter parameter) {
+        private string GetParamValue(Parameter parameter) {
             if(!parameter.HasValue) {
                 return string.Empty;
             }
@@ -119,6 +83,44 @@ namespace RevitValueModifier.Models {
             }
 
             return value;
+        }
+
+        public void WriteParamValue(RevitParameter revitParameter) {
+            Parameter parameter = Parameters.FirstOrDefault(p => p.Id == revitParameter.Id);
+            if(parameter is null) {
+                TaskDialog.Show("Ошибка!", "Не найден выбранный для записи параметр в элементе с id "
+                    + Elem.Id.ToString());
+            }
+
+            if(parameter.StorageType == StorageType.String) {
+                parameter.Set(ParamValue);
+            } else if(parameter.StorageType == StorageType.Integer) {
+                var paramValueAsInt = int.Parse(ParamValue);
+                parameter.Set(paramValueAsInt);
+            } else if(parameter.StorageType == StorageType.Double) {
+                var paramValueAsDouble = double.Parse(ParamValue);
+                parameter.Set(paramValueAsDouble);
+            }
+        }
+
+        public void SetParamValue(string paramValueMask) {
+            // заранее реализовать проверку, что символы { } парны
+            // префикс_{ФОП_Блок СМР}_суффикс1_{ФОП_Секция СМР}_суффикс2
+            ParamValue = paramValueMask;
+            Regex regex = new Regex(@"{([^\}]+)}");
+            MatchCollection matches = regex.Matches(paramValueMask);
+
+            Regex regexForParam;
+            foreach(Match match in matches) {
+                string paramName = match.Value.Replace("{", "").Replace("}", "");
+                Parameter param = Parameters
+                    .FirstOrDefault(parameter => parameter.Definition.Name == paramName);
+                if(param == null) { return; }
+
+                regexForParam = new Regex(match.Value);
+                var val = GetParamValue(param);
+                ParamValue = regexForParam.Replace(ParamValue, val, 1);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

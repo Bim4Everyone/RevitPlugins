@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -18,6 +21,10 @@ namespace RevitValueModifier.ViewModels {
 
         private string _errorText;
         private string _paramValueMask;
+
+        private ICollectionView _revitElementsView;
+        private string _revitElementsFilter = string.Empty;
+
         private RevitParameter _selectedCommonParam;
         private RevitParameter _selectedCommonParamForAdd;
         private List<RevitElement> _revitElements;
@@ -31,6 +38,8 @@ namespace RevitValueModifier.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _localizationService = localizationService;
+
+
 
             AddParamInMaskCommand = RelayCommand.Create(AddParamInMask);
             ParamUpdateCommand = RelayCommand.Create(ParamUpdate);
@@ -74,6 +83,20 @@ namespace RevitValueModifier.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedCommonParamForAdd, value);
         }
 
+        /// <summary>
+        /// Текстовое поле для привязки к TextBlock GUI фильтра списка элементов
+        /// </summary>
+        public string RevitElementsFilter {
+            get => _revitElementsFilter;
+            set {
+                if(value != _revitElementsFilter) {
+                    _revitElementsFilter = value;
+                    _revitElementsView.Refresh();
+                    OnPropertyChanged(nameof(RevitElementsFilter));
+                }
+            }
+        }
+
         private void LoadView() {
             RevitElements = _revitRepository.GetRevitElements();
             List<ElementId> categoryIds = _revitRepository.GetCategoryIds(RevitElements);
@@ -81,7 +104,10 @@ namespace RevitValueModifier.ViewModels {
 
             LoadConfig();
             ParamUpdateCommand.Execute(null);
+
+            SetElementsFilters();
         }
+
         private void AcceptView() {
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Изменение значений параметров")) {
                 foreach(RevitElement revitElement in RevitElements) {
@@ -139,6 +165,9 @@ namespace RevitValueModifier.ViewModels {
         }
 
         private void ParamUpdate() {
+            if(ParamValueMask == _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask")) {
+                return;
+            }
             foreach(RevitElement revitElement in RevitElements) {
                 revitElement.SetParamValue(ParamValueMask);
             }
@@ -149,6 +178,18 @@ namespace RevitValueModifier.ViewModels {
                 ParamValueMask += $"{{{SelectedCommonParamForAdd.ParamName}}}";
                 SelectedCommonParamForAdd = null;
             }
+        }
+
+
+        /// <summary>
+        /// Назначает фильтр привязанный к тексту, через который фильтруется список категорий в GUI
+        /// </summary>
+        /// <param name="p"></param>
+        private void SetElementsFilters() {
+            // Организуем фильтрацию списка категорий
+            _revitElementsView = CollectionViewSource.GetDefaultView(RevitElements);
+            _revitElementsView.Filter = item => String.IsNullOrEmpty(RevitElementsFilter) ? true :
+                ((RevitElement) item).ElemName.IndexOf(RevitElementsFilter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }
