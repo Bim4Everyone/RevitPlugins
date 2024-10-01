@@ -9,12 +9,15 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitValueModifier.Models {
     internal class RevitElement : INotifyPropertyChanged {
         private string _paramValue = string.Empty;
+        private readonly ILocalizationService _localizationService;
 
-        public RevitElement(Element element) {
+        public RevitElement(Element element, ILocalizationService localizationService) {
+            _localizationService = localizationService;
             Elem = element;
             ElemId = element.Id;
             var elemType = Elem.GetElementType();
@@ -68,9 +71,9 @@ namespace RevitValueModifier.Models {
                 case StorageType.Integer:
                     if(SpecTypeId.Boolean.YesNo == parameter.Definition.GetDataType()) {
                         if(parameter.AsInteger() == 0) {
-                            value = "False";
+                            value = _localizationService.GetLocalizedString("MainWindow.False");
                         } else {
-                            value = "True";
+                            value = _localizationService.GetLocalizedString("MainWindow.True");
                         }
                     } else {
                         value = parameter.AsInteger().ToString(cultureInfo);
@@ -80,7 +83,7 @@ namespace RevitValueModifier.Models {
                     value = parameter.AsString();
                     break;
                 default:
-                    value = "Значение неизвестно";
+                    value = _localizationService.GetLocalizedString("MainWindow.ValueUnknown");
                     break;
             }
 
@@ -90,23 +93,31 @@ namespace RevitValueModifier.Models {
         public void WriteParamValue(RevitParameter revitParameter) {
             Parameter parameter = Parameters.FirstOrDefault(p => p.Id == revitParameter.Id);
             if(parameter is null) {
-                TaskDialog.Show("Ошибка!", "Не найден выбранный для записи параметр в элементе с id "
-                    + Elem.Id.ToString());
+                TaskDialog.Show(
+                    $"{_localizationService.GetLocalizedString("MainWindow.Error")}!",
+                    $"{_localizationService.GetLocalizedString("MainWindow.ParamByIdError")}" + Elem.Id.ToString());
+                return;
             }
 
-            if(parameter.StorageType == StorageType.String) {
-                parameter.Set(ParamValue);
-            } else if(parameter.StorageType == StorageType.Integer) {
-                var paramValueAsInt = int.Parse(ParamValue);
-                parameter.Set(paramValueAsInt);
-            } else if(parameter.StorageType == StorageType.Double) {
-                var paramValueAsDouble = double.Parse(ParamValue);
-                parameter.Set(paramValueAsDouble);
+            try {
+                if(parameter.StorageType == StorageType.String) {
+                    parameter.Set(ParamValue);
+                } else if(parameter.StorageType == StorageType.Integer) {
+                    var paramValueAsInt = int.Parse(ParamValue);
+                    parameter.Set(paramValueAsInt);
+                } else if(parameter.StorageType == StorageType.Double) {
+                    var paramValueAsDouble = double.Parse(ParamValue);
+                    parameter.Set(paramValueAsDouble);
+                }
+            } catch(System.Exception) {
+                TaskDialog.Show(
+                    $"{_localizationService.GetLocalizedString("MainWindow.Error")}!",
+                    $"{_localizationService.GetLocalizedString("MainWindow.SettingValueError")}" + Elem.Id.ToString());
+                return;
             }
         }
 
         public void SetParamValue(string paramValueMask) {
-            // заранее реализовать проверку, что символы { } парны
             // префикс_{ФОП_Блок СМР}_суффикс1_{ФОП_Секция СМР}_суффикс2
             ParamValue = paramValueMask;
             Regex regex = new Regex(@"{([^\}]+)}");

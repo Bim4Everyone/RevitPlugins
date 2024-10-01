@@ -16,6 +16,14 @@
     <system:String x:Key="MainWindow.SystemParameter">Системный параметр</system:String>
     <system:String x:Key="MainWindow.SharedParameter">Общий параметр</system:String>
     <system:String x:Key="MainWindow.ProjectParameter">Параметр проекта</system:String>
+
+    <system:String x:Key="MainWindow.True">Да</system:String>
+    <system:String x:Key="MainWindow.False">Нет</system:String>
+    
+    <system:String x:Key="MainWindow.Error">Ошибка</system:String>
+    <system:String x:Key="MainWindow.ParamByIdError">Не найден выбранный для записи параметр в элементе с id:</system:String>
+    <system:String x:Key="MainWindow.SettingValueError">Не удалось произвести запись в элемент с id:</system:String>
+    <system:String x:Key="MainWindow.ValueUnknown">Значение неизвестно</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>

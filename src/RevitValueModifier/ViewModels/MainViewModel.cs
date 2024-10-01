@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 using Autodesk.Revit.DB;
 
@@ -18,6 +19,8 @@ namespace RevitValueModifier.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
+
+        private DispatcherTimer _timerByChangedMask;
 
         private string _errorText;
         private string _paramValueMask;
@@ -40,9 +43,10 @@ namespace RevitValueModifier.ViewModels {
             _revitRepository = revitRepository;
             _localizationService = localizationService;
 
+            CreateDispatcherTimer();
+
             AddParamInMaskCommand = RelayCommand.Create(AddParamInMask);
             ParamUpdateCommand = RelayCommand.Create(ParamUpdate);
-
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
@@ -101,6 +105,16 @@ namespace RevitValueModifier.ViewModels {
             }
         }
 
+        private void CreateDispatcherTimer() {
+            _timerByChangedMask = new DispatcherTimer {
+                Interval = TimeSpan.FromMilliseconds(250)
+            };
+            _timerByChangedMask.Tick += (s, e) => {
+                _timerByChangedMask.Stop();
+                UpdateParamValues();
+            };
+        }
+
         private void LoadView() {
             RevitElements = _revitRepository.GetRevitElements();
             List<ElementId> categoryIds = _revitRepository.GetCategoryIds(RevitElements);
@@ -151,6 +165,11 @@ namespace RevitValueModifier.ViewModels {
         }
 
         private void ParamUpdate() {
+            CreateDispatcherTimer();
+            _timerByChangedMask.Start();
+        }
+
+        private void UpdateParamValues() {
             if(ParamValueMask == _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask")) {
                 return;
             }

@@ -28,7 +28,7 @@ namespace RevitValueModifier.Models {
                 .Selection
                 .GetElementIds()
                 .Select(id => Document.GetElement(id))
-                .Select(e => new RevitElement(e))
+                .Select(e => new RevitElement(e, _localizationService))
                 .ToList();
 
         internal List<ElementId> GetCategoryIds(List<RevitElement> revitElements) => revitElements
