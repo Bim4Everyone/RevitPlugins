@@ -11,8 +11,12 @@
     <system:String x:Key="MainWindow.RevitElement">Элемент Revit</system:String>
     <system:String x:Key="MainWindow.ElementParamValue">Значение параметра</system:String>
     <system:String x:Key="MainWindow.SelectedParamForAdd">Выберите параметр для добавления</system:String>
-
     <system:String x:Key="MainWindow.Filtration">Фильтрация</system:String>
+    
+    <system:String x:Key="MainWindow.SystemParameter">Системный параметр</system:String>
+    <system:String x:Key="MainWindow.SharedParameter">Общий параметр</system:String>
+    <system:String x:Key="MainWindow.ProjectParameter">Параметр проекта</system:String>
+    
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>

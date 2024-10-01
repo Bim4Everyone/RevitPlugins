@@ -11,8 +11,12 @@
     <system:String x:Key="MainWindow.RevitElement">Revit Element</system:String>
     <system:String x:Key="MainWindow.ElementParamValue">Parameter value</system:String>
     <system:String x:Key="MainWindow.SelectedParamForAdd">Select an option to add</system:String>
-
     <system:String x:Key="MainWindow.Filtration">Filtration</system:String>
+
+    <system:String x:Key="MainWindow.SystemParameter">System parameter</system:String>
+    <system:String x:Key="MainWindow.SharedParameter">Shared parameter</system:String>
+    <system:String x:Key="MainWindow.ProjectParameter">Project parameter</system:String>
+
     <system:String x:Key="MainWindow.ButtonOk">Ok</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>

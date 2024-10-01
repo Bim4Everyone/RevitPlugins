@@ -5,13 +5,20 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
+
 namespace RevitValueModifier.Models {
     internal class RevitRepository {
-        public RevitRepository(UIApplication uiApplication) {
+        private readonly ILocalizationService _localizationService;
+
+        public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
             UIApplication = uiApplication;
+            _localizationService = localizationService;
         }
 
         public UIApplication UIApplication { get; }
+
+
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
         public Application Application => UIApplication.Application;
@@ -30,7 +37,7 @@ namespace RevitValueModifier.Models {
 
         internal List<RevitParameter> GetParams(List<ElementId> categoryIds) => ParameterFilterUtilities
             .GetFilterableParametersInCommon(Document, categoryIds)
-            .Select(id => new RevitParameter(id, Document))
+            .Select(id => new RevitParameter(id, Document, _localizationService))
             .OrderBy(rP => rP.ParamName)
             .ToList();
     }

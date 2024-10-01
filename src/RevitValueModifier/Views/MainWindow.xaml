@@ -63,14 +63,10 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock>
-                            <TextBlock Text="{Binding Path=ParamName}" FontWeight="Bold"/>
-                            <TextBlock Text=" (id: "/>
-                            <TextBlock Text="{Binding Path=Id}"/>
-                            <TextBlock Text=", system: "/>
-                            <TextBlock Text="{Binding Path=IsBuiltin, Converter={converters:BoolToStringConverter}}"/>
-                            <TextBlock Text=", shared: "/>
-                            <TextBlock Text="{Binding Path=IsShared, Converter={converters:BoolToStringConverter}}"/>
-                            <TextBlock Text=")"/>
+                            <TextBlock Text="{Binding Path=ParamName}"/>
+                            <TextBlock
+                                Foreground="DarkGray"
+                                Text="{Binding StringFormat=({0}), Path=ParamTypeName}"/>
                         </TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -111,14 +107,10 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock>
-                            <TextBlock Text="{Binding Path=ParamName}" FontWeight="Bold"/>
-                            <TextBlock Text=" (id: "/>
-                            <TextBlock Text="{Binding Path=Id}"/>
-                            <TextBlock Text=", system: "/>
-                            <TextBlock Text="{Binding Path=IsBuiltin, Converter={converters:BoolToStringConverter}}"/>
-                            <TextBlock Text=", shared: "/>
-                            <TextBlock Text="{Binding Path=IsShared, Converter={converters:BoolToStringConverter}}"/>
-                            <TextBlock Text=")"/>
+                            <TextBlock Text="{Binding Path=ParamName}"/>
+                            <TextBlock
+                                Foreground="DarkGray"
+                                Text="{Binding StringFormat=({0}), Path=ParamTypeName}"/>
                         </TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>

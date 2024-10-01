@@ -40,8 +40,6 @@ namespace RevitValueModifier.ViewModels {
             _revitRepository = revitRepository;
             _localizationService = localizationService;
 
-
-
             AddParamInMaskCommand = RelayCommand.Create(AddParamInMask);
             ParamUpdateCommand = RelayCommand.Create(ParamUpdate);
 
