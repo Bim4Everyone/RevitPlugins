@@ -5,7 +5,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
@@ -22,6 +21,7 @@ namespace RevitValueModifier.ViewModels {
 
         private string _errorText;
         private string _paramValueMask;
+        private int _paramValueMaskCaretIndex = 0;
 
         private ICollectionView _revitElementsView;
         private string _revitElementsFilter = string.Empty;
@@ -60,6 +60,11 @@ namespace RevitValueModifier.ViewModels {
         public string ParamValueMask {
             get => _paramValueMask;
             set => this.RaiseAndSetIfChanged(ref _paramValueMask, value);
+        }
+
+        public int ParamValueMaskCaretIndex {
+            get => _paramValueMaskCaretIndex;
+            set => this.RaiseAndSetIfChanged(ref _paramValueMaskCaretIndex, value);
         }
 
         public List<RevitElement> RevitElements {
@@ -128,24 +133,6 @@ namespace RevitValueModifier.ViewModels {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.SelectParamToRecord");
                 return false;
             }
-
-            //StorageType storageType;
-            //if(SelectedCommonParam.IsBuiltin) {
-            //    storageType = _revitRepository.Document.get_TypeOfStorage(SelectedCommonParam.BInParameter);
-            //} else {
-            //    storageType = SelectedCommonParam.ParamElement.GetStorageType();
-            //}
-
-            //if(storageType == StorageType.Integer) {
-            //    if(!int.TryParse(ParamValueMask, out _)) {
-            //        ErrorText = _localizationService.GetLocalizedString("MainWindow.FailIntParseParamValueMask");
-            //    }
-            //} else if (storageType == StorageType.Double) {
-            //    if(!double.TryParse(ParamValueMask, out _)) {
-            //        ErrorText = _localizationService.GetLocalizedString("MainWindow.FailDoubleParseParamValueMask");
-            //    }
-            //}
-
             ErrorText = null;
             return true;
         }
@@ -174,7 +161,7 @@ namespace RevitValueModifier.ViewModels {
 
         private void AddParamInMask() {
             if(SelectedCommonParamForAdd != null) {
-                ParamValueMask += $"{{{SelectedCommonParamForAdd.ParamName}}}";
+                ParamValueMask = ParamValueMask.Insert(ParamValueMaskCaretIndex, $"{{{SelectedCommonParamForAdd.ParamName}}}");
                 SelectedCommonParamForAdd = null;
             }
         }

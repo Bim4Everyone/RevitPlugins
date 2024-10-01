@@ -32,5 +32,7 @@ namespace RevitValueModifier.Models {
         public string ParamName { get; set; }
         public ElementId Id { get; set; }
         public string ParamTypeName { get; set; }
+
+        public override string ToString() => $"{ParamName}";
     }
 }
