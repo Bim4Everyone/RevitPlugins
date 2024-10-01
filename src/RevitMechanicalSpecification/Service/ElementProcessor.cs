@@ -17,14 +17,19 @@ namespace RevitMechanicalSpecification.Service {
         private readonly string _userName;
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
-        private readonly ParamChecker _paramChecker;
+        private readonly ParamChecker _paramChecker; 
         private readonly MaskReplacer _maskReplacer;
+
 
         private readonly List<string> _editors = new List<string>();
         private readonly HashSet<BuiltInCategory> _possibleGenericCategories = new HashSet<BuiltInCategory>() {
                         BuiltInCategory.OST_DuctAccessory,
                         BuiltInCategory.OST_PipeAccessory,
                         BuiltInCategory.OST_MechanicalEquipment
+    };
+        private readonly HashSet<BuiltInCategory> _insulationCategories = new HashSet<BuiltInCategory>() {
+                        BuiltInCategory.OST_DuctInsulations,
+                        BuiltInCategory.OST_PipeInsulations
     };
 
         public ElementProcessor(string userName, Document document) {
@@ -154,10 +159,38 @@ namespace RevitMechanicalSpecification.Service {
         /// <param name="element"></param>
         /// <returns></returns>
         private SpecificationElement CreateSpecificationElement(Element element) {
-            return new SpecificationElement {
+            SpecificationElement specificationElement = new SpecificationElement {
                 Element = element,
                 ElementType = element.GetElementType(),
-                BuiltInCategory = element.Category.GetBuiltInCategory()
+                BuiltInCategory = element.Category.GetBuiltInCategory(),
+                InsulationSpHost = null
+            };
+
+            if(element.InAnyCategory(_insulationCategories)) {
+                specificationElement.InsulationSpHost = GetInsulationHost(element);
+            }
+
+            return specificationElement;
+        }
+
+        /// <summary>
+        /// Возвращает SpecificationElement для хоста изоляции или none, если 
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private SpecificationElement GetInsulationHost(Element element) {
+            InsulationLiningBase insulation = element as InsulationLiningBase;
+
+            Element host = _document.GetElement(insulation.HostElementId);
+            // изоляция может баговать и висеть на трубе или воздуховоде не имея хоста
+            if(host == null) {
+                return null;
+            }
+
+            return new SpecificationElement {
+                Element = host,
+                ElementType = host.GetElementType(),
+                BuiltInCategory = host.Category.GetBuiltInCategory()
             };
         }
 

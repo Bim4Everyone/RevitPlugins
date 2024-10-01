@@ -14,6 +14,7 @@ namespace RevitMechanicalSpecification.Entities {
         private string _elementName;
         private FamilyInstance _manifoldInstance = null;
         private SpecificationElement _manifoldSpElement;
+        private SpecificationElement _insulationSpHost;
 
         public BuiltInCategory BuiltInCategory {
             get => _builtInCategory;
@@ -23,6 +24,11 @@ namespace RevitMechanicalSpecification.Entities {
         public SpecificationElement ManifoldSpElement {
             get => _manifoldSpElement;
             set => _manifoldSpElement = value;
+        }
+
+        public SpecificationElement InsulationSpHost {
+            get => _insulationSpHost;
+            set => _insulationSpHost = value;
         }
 
         public Element Element {

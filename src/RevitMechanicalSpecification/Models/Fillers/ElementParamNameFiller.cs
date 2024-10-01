@@ -149,6 +149,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             if(string.IsNullOrEmpty(name)) {
                 name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ";
             }
+            // Нужно возвращать без аддона, потому что мы вызываем это из получения имени изоляции
+            // и там скобка идет с пробелом
+            if(string.IsNullOrEmpty(nameAddon)) {
+                return $"{name} {_calculator.GetPipeSize(pipe, elemType)}";
+            }
             return $"{name} {_calculator.GetPipeSize(pipe, elemType)} {nameAddon}";
         }
 

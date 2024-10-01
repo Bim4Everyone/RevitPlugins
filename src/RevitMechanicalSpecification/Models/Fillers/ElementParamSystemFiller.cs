@@ -15,6 +15,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamSystemFiller : ElementParamFiller {
         private readonly List<VisSystem> _systemList;
         private readonly SystemFunctionNameFactory _nameFactory;
+        private readonly HashSet<BuiltInCategory> _insulationCategories;
 
         public ElementParamSystemFiller(
             string toParamName, 
@@ -24,8 +25,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             List<VisSystem> systemList) : 
             base(toParamName, fromParamName, specConfiguration, document) 
             { 
+            _insulationCategories = new HashSet<BuiltInCategory>() { 
+            BuiltInCategory.OST_DuctInsulations,
+            BuiltInCategory.OST_PipeInsulations
+            };
             _systemList = systemList;
-            _nameFactory = new SystemFunctionNameFactory(Document, _systemList);
+            _nameFactory = new SystemFunctionNameFactory(Document, _systemList, specConfiguration);
         }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
@@ -48,6 +53,17 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             if(!string.IsNullOrEmpty(forcedSystem)) {
                 return forcedSystem;
             }
+
+            // Если у элемента есть хост изоляции - проверяем на принудительное имя еще и его,
+            // если заполнено - должно быть одно
+            if(specificationElement.InsulationSpHost != null) {
+                string forcedHostSystem = _nameFactory.GetForcedParamValue(specificationElement.InsulationSpHost,
+                    Config.ForcedSystemName);
+                if(!string.IsNullOrEmpty(forcedHostSystem)) {
+                    return forcedHostSystem;
+                }
+            }
+
             return _nameFactory.GetSystemNameValue(specificationElement.Element);
         }
     }

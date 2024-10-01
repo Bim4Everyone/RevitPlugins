@@ -26,7 +26,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             base(toParamName, fromParamName, specConfiguration, document) {
 
             _systemList = systemList;
-            _nameFactory = new SystemFunctionNameFactory(Document, _systemList);
+            _nameFactory = new SystemFunctionNameFactory(Document, _systemList, specConfiguration);
         }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
@@ -45,9 +45,21 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <returns></returns>
         private string GetFunction(SpecificationElement specificationElement) {
             string forcedFunction = _nameFactory.GetForcedParamValue(specificationElement, Config.ForcedFunction);
+
             if(!string.IsNullOrEmpty(forcedFunction)) {
                 return forcedFunction;
             }
+
+            // Если у элемента есть хост изоляции - проверяем на принудительное имя еще и его,
+            // если заполнено - должно быть одно
+            if(specificationElement.InsulationSpHost != null) {
+                string forcedHostFunction = _nameFactory.GetForcedParamValue(specificationElement.InsulationSpHost,
+                    Config.ForcedFunction);
+                if(!string.IsNullOrEmpty(forcedHostFunction)) {
+                    return forcedHostFunction;
+                }
+            }
+
             return _nameFactory.GetFunctionNameValue(specificationElement.Element);
         }
     }

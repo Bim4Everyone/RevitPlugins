@@ -47,10 +47,14 @@ namespace RevitMechanicalSpecification.Service {
 
         public static string DoubleToString(double number) {
             CultureInfo culture = new CultureInfo("ru-RU");
-            return number.ToString("N2", culture);
+            return number.ToString(culture);
         }
 
         public static double ReduceToTwoCharacters(double number) {
+            return Math.Round(number, 2);
+        }
+
+        public static double RoundToTwo(double number) {  
             return Math.Round(number, 2);
         }
 

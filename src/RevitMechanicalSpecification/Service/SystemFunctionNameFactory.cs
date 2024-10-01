@@ -12,16 +12,23 @@ using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitMechanicalSpecification.Entities;
+using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     internal class SystemFunctionNameFactory {
         private readonly Document _document;
         private readonly List<VisSystem> _systems;
+        private readonly SpecConfiguration _specConfiguration;
         private readonly string _noneSystemValue = "Нет системы";
 
-        public SystemFunctionNameFactory(Document document, List<VisSystem> systems) {
+        public SystemFunctionNameFactory(Document document, 
+            List<VisSystem> systems, 
+            SpecConfiguration specConfiguration
+
+            ) {
             _document = document;
             _systems = systems;
+            _specConfiguration = specConfiguration;
         }
 
         /// <summary>
@@ -110,6 +117,14 @@ namespace RevitMechanicalSpecification.Service {
             if (host == null) {
                 return _noneSystemValue;
             }
+
+            //string forcedSystemOfHost = host.GetTypeOrInstanceParamStringValue(host.GetElementType(),
+            //    _specConfiguration.ForcedSystemName);
+
+            //Console.WriteLine(forcedSystemOfHost);
+            //if(!string.IsNullOrEmpty(forcedSystem)) {
+            //    return forcedSystem;
+            //}
 
             return GetParamSystemValue(host);
         }
