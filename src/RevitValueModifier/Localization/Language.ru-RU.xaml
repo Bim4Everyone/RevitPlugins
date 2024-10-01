@@ -2,8 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
-    <!-- Пример перевода на русский язык (google translate) -->
-    
     <system:String x:Key="MainWindow.Title">Пример команды</system:String>
     <system:String x:Key="MainWindow.ParamValueMask">Введите маску</system:String>
     <system:String x:Key="MainWindow.ParamValueMaskEmpty">Маска значения пуста</system:String>
@@ -14,9 +12,7 @@
     <system:String x:Key="MainWindow.ElementParamValue">Значение параметра</system:String>
     <system:String x:Key="MainWindow.SelectedParamForAdd">Выберите параметр для добавления</system:String>
 
-    <system:String x:Key="MainWindow.ElementParamValueExample">Значения, которые будут записаны в выбранные элементы:</system:String>
     <system:String x:Key="MainWindow.Filtration">Фильтрация</system:String>
-
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>

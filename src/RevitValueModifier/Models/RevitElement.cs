@@ -16,6 +16,7 @@ namespace RevitValueModifier.Models {
 
         public RevitElement(Element element) {
             Elem = element;
+            ElemId = element.Id;
             var elemType = Elem.GetElementType();
             ElemName = Elem.Name;
 
@@ -25,6 +26,7 @@ namespace RevitValueModifier.Models {
 
         private List<Parameter> Parameters { get; set; }
         public Element Elem { get; }
+        public ElementId ElemId { get; }
         public string ElemName { get; }
 
         public string ParamValue {

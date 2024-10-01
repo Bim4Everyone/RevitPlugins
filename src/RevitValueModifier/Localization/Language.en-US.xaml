@@ -1,13 +1,18 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
-    <!-- Пример перевода на английский американский язык (google translate) -->
-    
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.ParamValueMask">Write mask</system:String>
-    <system:String x:Key="MainWindow.ParamValueMaskEmpty">Mask is empty</system:String>
-    
-    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+
+    <system:String x:Key="MainWindow.Title">Example command</system:String>
+    <system:String x:Key="MainWindow.ParamValueMask">Enter mask</system:String>
+    <system:String x:Key="MainWindow.ParamValueMaskEmpty">Value mask is empty</system:String>
+
+    <system:String x:Key="MainWindow.SelectParamToRecord">Select an option to record</system:String>
+    <system:String x:Key="MainWindow.EnterParamValueMask">Enter value mask</system:String>
+    <system:String x:Key="MainWindow.RevitElement">Revit Element</system:String>
+    <system:String x:Key="MainWindow.ElementParamValue">Parameter value</system:String>
+    <system:String x:Key="MainWindow.SelectedParamForAdd">Select an option to add</system:String>
+
+    <system:String x:Key="MainWindow.Filtration">Filtration</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Ok</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>

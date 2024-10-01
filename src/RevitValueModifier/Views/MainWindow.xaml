@@ -15,8 +15,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="{DynamicResource MainWindow.Title}"
-    Height="450" Width="700"
-    MinHeight="450" MinWidth="700"
+    Height="400" Width="700"
+    MinHeight="400" MinWidth="700"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -98,7 +98,7 @@
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="TextChanged">
                         <i:InvokeCommandAction
-                        Command="{Binding Path=ParamUpdateCommand}"/>
+                            Command="{Binding Path=ParamUpdateCommand}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </TextBox>
@@ -126,11 +126,11 @@
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction
-                        Command="{Binding AddParamInMaskCommand}"/>
+                            Command="{Binding AddParamInMaskCommand}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>
-            
+
             <TextBlock
                 Grid.Column="2"
                 Margin="10 5"
@@ -138,14 +138,6 @@
                 IsHitTestVisible="False"
                 Text="{DynamicResource ResourceKey=MainWindow.SelectedParamForAdd}"/>
         </Grid>
-
-
-        <TextBlock
-            Grid.Row="2" 
-            Grid.Column="0"
-            Margin="5"
-            VerticalAlignment="Center"
-            Text="{DynamicResource ResourceKey=MainWindow.ElementParamValueExample}"/>
         
         <StackPanel
             Grid.Row="2"
@@ -174,10 +166,26 @@
                 <GridView>
                     <GridViewColumn 
                         Width="200"
-                        Header="{DynamicResource ResourceKey=MainWindow.RevitElement}"
-                        DisplayMemberBinding="{Binding Path=ElemName}"/>
+                        Header="{DynamicResource ResourceKey=MainWindow.RevitElement}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel
+                                    Orientation="Horizontal">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Text="{Binding Path=ElemName}"/> 
+                                    <TextBlock
+                                        Margin="5"
+                                        VerticalAlignment="Center"
+                                        Foreground="DarkGray"
+                                        Text="{Binding StringFormat=(id: {0}), Path=ElemId}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
                     <GridViewColumn 
-                        Width="400"
+                        Width="450"
                         Header="{DynamicResource ResourceKey=MainWindow.ElementParamValue}"
                         DisplayMemberBinding="{Binding Path=ParamValue}"/>
                 </GridView>
