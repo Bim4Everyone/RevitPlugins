@@ -15,15 +15,20 @@ namespace RevitValueModifier.Models {
 
             if(parameterId.IsSystemId()) {
                 BuiltInParameter bInParameter = (BuiltInParameter) parameterId.GetIdValue();
+                ParamStorageType = document.get_TypeOfStorage(bInParameter);
                 ParamName = LabelUtils.GetLabelFor(bInParameter);
-                ParamTypeName = _localizationService.GetLocalizedString("MainWindow.SystemParameter");
+                ParamTypeName = RevitParamType.SystemParameter;
+                //ParamTypeName =  _localizationService.GetLocalizedString("MainWindow.SystemParameter");
             } else {
                 ParameterElement paramElement = _document.GetElement(parameterId) as ParameterElement;
                 ParamName = paramElement.Name;
+                ParamStorageType = paramElement.GetStorageType();
                 if(paramElement.IsSharedParam()) {
-                    ParamTypeName = _localizationService.GetLocalizedString("MainWindow.SharedParameter");
+                    ParamTypeName = RevitParamType.SharedParameter;
+                    //ParamTypeName = _localizationService.GetLocalizedString("MainWindow.SharedParameter");
                 } else {
-                    ParamTypeName = _localizationService.GetLocalizedString("MainWindow.ProjectParameter");
+                    ParamTypeName = RevitParamType.ProjectParameter;
+                    //ParamTypeName = _localizationService.GetLocalizedString("MainWindow.ProjectParameter");
                 }
             }
             Id = parameterId;
@@ -31,7 +36,8 @@ namespace RevitValueModifier.Models {
 
         public string ParamName { get; set; }
         public ElementId Id { get; set; }
-        public string ParamTypeName { get; set; }
+        public RevitParamType ParamTypeName { get; set; }
+        public StorageType ParamStorageType { get; set; }
 
         public override string ToString() => $"{ParamName}";
     }

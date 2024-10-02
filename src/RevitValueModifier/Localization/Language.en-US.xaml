@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Example command</system:String>
+    <system:String x:Key="MainWindow.Title">Change value</system:String>
     <system:String x:Key="MainWindow.ParamValueMask">Enter mask</system:String>
     <system:String x:Key="MainWindow.ParamValueMaskEmpty">Value mask is empty</system:String>
 
@@ -12,6 +12,7 @@
     <system:String x:Key="MainWindow.ElementParamValue">Parameter value</system:String>
     <system:String x:Key="MainWindow.SelectedParamForAdd">Select an option to add</system:String>
     <system:String x:Key="MainWindow.Filtration">Filtration</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Changing parameter values</system:String>
 
     <system:String x:Key="MainWindow.SystemParameter">System parameter</system:String>
     <system:String x:Key="MainWindow.SharedParameter">Shared parameter</system:String>

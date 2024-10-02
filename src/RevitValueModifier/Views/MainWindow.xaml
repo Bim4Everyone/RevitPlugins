@@ -7,12 +7,14 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     
     xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     xmlns:local="clr-namespace:RevitValueModifier.Views"
     xmlns:vms="clr-namespace:RevitValueModifier.ViewModels"
-    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
+    
+    x:Name="window"
     
     Title="{DynamicResource MainWindow.Title}"
     Height="400" Width="700"
@@ -58,15 +60,22 @@
                 Margin="5"
                 IsEditable="True"
                 StaysOpenOnEdit="True"
-                ItemsSource="{Binding Path=CommonParams}"
+                ItemsSource="{Binding Path=CommonParamsForWrite}"
                 SelectedItem="{Binding Path=SelectedCommonParam}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock>
                             <TextBlock Text="{Binding Path=ParamName}"/>
-                            <TextBlock
+                            <!--<TextBlock
                                 Foreground="DarkGray"
-                                Text="{Binding StringFormat=({0}), Path=ParamTypeName}"/>
+                                Text="{Binding StringFormat=({0}), Path=ParamTypeName}"/>-->
+                            
+                            <TextBlock 
+                                Foreground="DarkGray"
+                                Text="{Binding StringFormat=({0}), Path=ParamTypeName, Converter={local:ParamTypeConverter 
+                                    LocalizationService={Binding
+                                        Path=LocalizationService,
+                                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type base:PlatformWindow}}}}}"/>
                         </TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -105,7 +114,7 @@
             <ComboBox
                 Grid.Column="3"
                 Margin="5,5,5,5"
-                ItemsSource="{Binding Path=CommonParams}"
+                ItemsSource="{Binding Path=CommonParamsForRead}"
                 SelectedItem="{Binding Path=SelectedCommonParamForAdd}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>

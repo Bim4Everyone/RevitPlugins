@@ -31,8 +31,9 @@ namespace RevitValueModifier.ViewModels {
 
         private RevitParameter _selectedCommonParam;
         private RevitParameter _selectedCommonParamForAdd;
-        private List<RevitElement> _revitElements;
-        private List<RevitParameter> _commonParams;
+        private List<RevitElementViewModel> _revitElements;
+        private List<RevitParameter> _commonParamsForRead;
+        private List<RevitParameter> _commonParamsForWrite;
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -71,14 +72,19 @@ namespace RevitValueModifier.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _paramValueMaskCaretIndex, value);
         }
 
-        public List<RevitElement> RevitElements {
+        public List<RevitElementViewModel> RevitElements {
             get => _revitElements;
             set => this.RaiseAndSetIfChanged(ref _revitElements, value);
         }
 
-        public List<RevitParameter> CommonParams {
-            get => _commonParams;
-            set => this.RaiseAndSetIfChanged(ref _commonParams, value);
+        public List<RevitParameter> CommonParamsForRead {
+            get => _commonParamsForRead;
+            set => this.RaiseAndSetIfChanged(ref _commonParamsForRead, value);
+        }
+
+        public List<RevitParameter> CommonParamsForWrite {
+            get => _commonParamsForWrite;
+            set => this.RaiseAndSetIfChanged(ref _commonParamsForWrite, value);
         }
 
         public RevitParameter SelectedCommonParam {
@@ -109,16 +115,19 @@ namespace RevitValueModifier.ViewModels {
             _timerByChangedMask = new DispatcherTimer {
                 Interval = TimeSpan.FromMilliseconds(250)
             };
-            _timerByChangedMask.Tick += (s, e) => {
-                _timerByChangedMask.Stop();
-                UpdateParamValues();
-            };
+            _timerByChangedMask.Tick += (s, e) => UpdateParamValuesByTimer();
+        }
+
+        private void UpdateParamValuesByTimer() {
+            _timerByChangedMask.Stop();
+            UpdateParamValues();
         }
 
         private void LoadView() {
             RevitElements = _revitRepository.GetRevitElements();
             List<ElementId> categoryIds = _revitRepository.GetCategoryIds(RevitElements);
-            CommonParams = _revitRepository.GetParams(categoryIds);
+            CommonParamsForRead = _revitRepository.GetParamsForRead(categoryIds);
+            CommonParamsForWrite = _revitRepository.GetParamsForWrite(CommonParamsForRead);
 
             LoadConfig();
             ParamUpdateCommand.Execute(null);
@@ -128,7 +137,7 @@ namespace RevitValueModifier.ViewModels {
 
         private void AcceptView() {
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Изменение значений параметров")) {
-                foreach(RevitElement revitElement in RevitElements) {
+                foreach(RevitElementViewModel revitElement in RevitElements) {
                     revitElement.WriteParamValue(SelectedCommonParam);
                 }
                 transaction.Commit();
@@ -153,14 +162,14 @@ namespace RevitValueModifier.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            ParamValueMask = setting?.TaskForWrite ?? _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask");
+            ParamValueMask = setting?.ParamValueMask ?? _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask");
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                     ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.TaskForWrite = ParamValueMask;
+            setting.ParamValueMask = ParamValueMask;
             _pluginConfig.SaveProjectConfig();
         }
 
@@ -173,7 +182,7 @@ namespace RevitValueModifier.ViewModels {
             if(ParamValueMask == _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask")) {
                 return;
             }
-            foreach(RevitElement revitElement in RevitElements) {
+            foreach(RevitElementViewModel revitElement in RevitElements) {
                 revitElement.SetParamValue(ParamValueMask);
             }
         }
@@ -185,7 +194,6 @@ namespace RevitValueModifier.ViewModels {
             }
         }
 
-
         /// <summary>
         /// Назначает фильтр привязанный к тексту, через который фильтруется список категорий в GUI
         /// </summary>
@@ -194,7 +202,7 @@ namespace RevitValueModifier.ViewModels {
             // Организуем фильтрацию списка категорий
             _revitElementsView = CollectionViewSource.GetDefaultView(RevitElements);
             _revitElementsView.Filter = item => String.IsNullOrEmpty(RevitElementsFilter) ? true :
-                ((RevitElement) item).ElemName.IndexOf(RevitElementsFilter, StringComparison.OrdinalIgnoreCase) >= 0;
+                ((RevitElementViewModel) item).ElemName.IndexOf(RevitElementsFilter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

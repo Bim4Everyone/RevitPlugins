@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,6 +7,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.SimpleServices;
+
+using RevitValueModifier.ViewModels;
 
 namespace RevitValueModifier.Models {
     internal class RevitRepository {
@@ -24,21 +27,26 @@ namespace RevitValueModifier.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public List<RevitElement> GetRevitElements() => ActiveUIDocument
+        public List<RevitElementViewModel> GetRevitElements() => ActiveUIDocument
                 .Selection
                 .GetElementIds()
                 .Select(id => Document.GetElement(id))
-                .Select(e => new RevitElement(e, _localizationService))
+                .Select(e => new RevitElementViewModel(e, _localizationService))
                 .ToList();
 
-        internal List<ElementId> GetCategoryIds(List<RevitElement> revitElements) => revitElements
+        internal List<ElementId> GetCategoryIds(List<RevitElementViewModel> revitElements) => revitElements
                 .Select(rE => rE.Elem.Category.Id)
+                .Distinct()
                 .ToList();
 
-        internal List<RevitParameter> GetParams(List<ElementId> categoryIds) => ParameterFilterUtilities
+        internal List<RevitParameter> GetParamsForRead(List<ElementId> categoryIds) => ParameterFilterUtilities
             .GetFilterableParametersInCommon(Document, categoryIds)
             .Select(id => new RevitParameter(id, Document, _localizationService))
             .OrderBy(rP => rP.ParamName)
+            .ToList();
+
+        internal List<RevitParameter> GetParamsForWrite(List<RevitParameter> parameters) => parameters
+            .Where(p => p.ParamStorageType == StorageType.String)
             .ToList();
     }
 }
