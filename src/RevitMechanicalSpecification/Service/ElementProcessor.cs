@@ -125,12 +125,13 @@ namespace RevitMechanicalSpecification.Service {
             List<SpecificationElement> manifoldElements = new List<SpecificationElement>();
 
             foreach(Element element in elements) {
+                
                 // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
                 // редактора в список
                 if(IsEditedBy(_userName, element)) {
                     continue;
                 }
-
+                
                 // На арматуре воздуховодов/труб/оборудовании проверяем наличие шаблонизированных семейств-генериков.
                 // Если встречаем - заполняем все по маске
                 if(FillIfGeneric(element)) {
@@ -145,9 +146,9 @@ namespace RevitMechanicalSpecification.Service {
 
                 if(IsManifold(specificationElement.ElementType)) {
                     ProcessManifoldElement(specificationElement, manifoldPartsIds, manifoldElements);
-                } else {
-                    singleElements.Add(specificationElement);
                 }
+                
+                singleElements.Add(specificationElement);
             }
 
             return new ElementSplitResult(singleElements, manifoldElements);

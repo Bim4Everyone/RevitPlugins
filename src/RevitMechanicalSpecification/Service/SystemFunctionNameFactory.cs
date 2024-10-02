@@ -118,14 +118,6 @@ namespace RevitMechanicalSpecification.Service {
                 return _noneSystemValue;
             }
 
-            //string forcedSystemOfHost = host.GetTypeOrInstanceParamStringValue(host.GetElementType(),
-            //    _specConfiguration.ForcedSystemName);
-
-            //Console.WriteLine(forcedSystemOfHost);
-            //if(!string.IsNullOrEmpty(forcedSystem)) {
-            //    return forcedSystem;
-            //}
-
             return GetParamSystemValue(host);
         }
 
