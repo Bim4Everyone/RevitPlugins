@@ -49,14 +49,5 @@ namespace RevitMechanicalSpecification.Service {
             CultureInfo culture = new CultureInfo("ru-RU");
             return number.ToString(culture);
         }
-
-        public static double ReduceToTwoCharacters(double number) {
-            return Math.Round(number, 2);
-        }
-
-        public static double RoundToTwo(double number) {  
-            return Math.Round(number, 2);
-        }
-
     }
 }

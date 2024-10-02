@@ -159,11 +159,10 @@ namespace RevitMechanicalSpecification.Service {
             
             double internalSize = UnitConverter.DoubleToMilimeters(
                 element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_INNER_DIAM_PARAM)
-                
                 );
 
             string pipeThickness = UnitConverter.DoubleToString(((
-                UnitConverter.RoundToTwo(externalSize - internalSize) / 2)));
+                Math.Round(externalSize - internalSize, 2) / 2)));
             string pipeDiameter = UnitConverter.DoubleToString(
                     UnitConverter.DoubleToMilimeters(
                     element.GetParamValue<double>(

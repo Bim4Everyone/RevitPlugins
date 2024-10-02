@@ -97,6 +97,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return "10. Фасонные детали трубопроводов_";
                 case BuiltInCategory.OST_PipeInsulations:
                     return "11. Материалы трубопроводной изоляции_";
+                case BuiltInCategory.OST_CableTray:
+                    return "99. Кабельные лотки_";
             }
 
             return "Неизвестная категория";

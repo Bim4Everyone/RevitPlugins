@@ -35,10 +35,7 @@ namespace RevitMechanicalSpecification.Models {
 
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
-
             _elementProcessor = new ElementProcessor(UIApplication.Application.Username, Document);
-
-
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
             _collector = new CollectionFactory(Document, _specConfiguration);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
