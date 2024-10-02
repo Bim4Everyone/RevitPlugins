@@ -73,8 +73,7 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         private void CheckParamterValues() {
             using(var t = _document.StartTransaction("Установка стандартных значений параметров")) {
-                // Цифры  по запасам получены от Денисенко Юрия, согласованы Карамовым, Воробьевым и Копысовым 
-                // письмом от 08.08.2024 на основании опыта стройки
+                // Цифры  по запасам получены получены письмом от 08.08.2024 на основании опыта стройки
                 FillInfoParamIfEmpty(_specConfiguration.ParamNameDuctInsulationStock, 20);
                 FillInfoParamIfEmpty(_specConfiguration.ParamNameDuctPipeStock, 5);
                 FillInfoParamIfEmpty(_specConfiguration.ParamNamePipeInsulationStock, 5);

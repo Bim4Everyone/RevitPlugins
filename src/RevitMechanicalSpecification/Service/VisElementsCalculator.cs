@@ -218,7 +218,7 @@ namespace RevitMechanicalSpecification.Service {
             if(connector.Shape == ConnectorProfileType.Rectangular || connector.Shape == ConnectorProfileType.Oval) {
                 double sizeA = curve.Width;
                 double sizeB = curve.Height;
-                double size = Math.Max(sizeA, sizeB);
+                double size = UnitConverter.DoubleToMilimeters(Math.Max(sizeA, sizeB));
                 // Толщины по СП 60.13330.2020 Отопление, вентиляция и кондиционирование воздуха. Приложение К
                 if(size < 251) {
                     return 0.5;
@@ -234,7 +234,7 @@ namespace RevitMechanicalSpecification.Service {
                 }
             }
             if(connector.Shape == ConnectorProfileType.Round) {
-                double size = curve.Diameter;
+                double size = UnitConverter.DoubleToMilimeters(curve.Diameter);
                 if(size < 201) {
                     return 0.5;
                 }
