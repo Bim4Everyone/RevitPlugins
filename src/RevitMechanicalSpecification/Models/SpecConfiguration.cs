@@ -40,7 +40,7 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string ForcedName = SharedParamsConfig.Instance.VISNameForced.Name; //"ФОП_ВИС_Наименование принудительное";
         public readonly string ForcedSystemName = SharedParamsConfig.Instance.VISSystemNameForced.Name; //"ФОП_ВИС_Имя системы принудительное";
         public readonly string ForcedGroup = SharedParamsConfig.Instance.VISGroupingForced.Name; //"ФОП_ВИС_Группирование принудительное";
-        public readonly string ForcedFunction = "ФОП_ВИС_Функция принудительная";//"ФОП_ВИС_Экономическая функция принудительная";
+        public readonly string ForcedFunction = SharedParamsConfig.Instance.VISEconomicFunction.Name;//"ФОП_ВИС_Экономическая функция" - замена принудительной функции;
 
         
         public readonly string SystemEF = SharedParamsConfig.Instance.VISHvacSystemFunction.Name;//"ФОП_ВИС_ЭФ для системы"

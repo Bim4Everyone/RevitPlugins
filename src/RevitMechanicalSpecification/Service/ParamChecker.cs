@@ -35,6 +35,7 @@ namespace RevitMechanicalSpecification.Service {
             SharedParamsConfig.Instance.VISSystemNameForced,
             SharedParamsConfig.Instance.VISGroupingForced,
             SharedParamsConfig.Instance.VISEconomicFunction,
+
             SharedParamsConfig.Instance.VISMinDuctThickness,
             SharedParamsConfig.Instance.VISMaxDuctThickness,
             SharedParamsConfig.Instance.VISParamReplacementName,
