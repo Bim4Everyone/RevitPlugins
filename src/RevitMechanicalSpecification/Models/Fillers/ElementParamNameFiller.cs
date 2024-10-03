@@ -66,9 +66,9 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 case BuiltInCategory.OST_CableTray:
                     return GetCableTrayName(specificationElement);
                 case BuiltInCategory.OST_FlexDuctCurves:
-                    return GetFlexElementtName(specificationElement);
+                    return GetFlexElementName(specificationElement);
                 case BuiltInCategory.OST_FlexPipeCurves:
-                    return GetFlexElementtName(specificationElement);
+                    return GetFlexElementName(specificationElement);
             }
 
             return $"{_name} {_nameAddon}";
@@ -96,10 +96,21 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// </summary>
         /// <param name="specificationElement"></param>
         /// <returns></returns>
-        private string GetFlexElementtName(SpecificationElement specificationElement) {
-            
-            double diameter = UnitConverter.DoubleToMilimeters(
-                specificationElement.Element.GetParam(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM).AsDouble());
+        private string GetFlexElementName(SpecificationElement specificationElement) {
+            double diameter = 0;
+            BuiltInParameter diameterParam = BuiltInParameter.INVALID;
+
+            if(specificationElement.Element.Category.IsId(BuiltInCategory.OST_FlexPipeCurves)) {
+                diameterParam = BuiltInParameter.RBS_PIPE_DIAMETER_PARAM;
+            } else if(specificationElement.Element.Category.IsId(BuiltInCategory.OST_FlexDuctCurves)) {
+                diameterParam = BuiltInParameter.RBS_CURVE_DIAMETER_PARAM;
+            }
+
+            if(diameterParam != BuiltInParameter.INVALID) {
+                diameter = UnitConverter.DoubleToMilimeters(
+                    specificationElement.Element.GetParam(diameterParam).AsDouble());
+            }
+
             return $"{_name} ø{diameter}";
         }
 
