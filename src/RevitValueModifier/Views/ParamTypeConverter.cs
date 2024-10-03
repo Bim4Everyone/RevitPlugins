@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -14,8 +15,24 @@ using dosymep.SimpleServices;
 using RevitValueModifier.Models;
 
 namespace RevitValueModifier.Views {
-    public class ParamTypeConverter : MarkupExtension, IValueConverter {
-        public ILocalizationService LocalizationService { get; set; }
+    public class ParamTypeConverter : Freezable, IValueConverter {
+        protected override Freezable CreateInstanceCore() {
+            return new ParamTypeConverter();
+        }
+
+        public static readonly DependencyProperty LocalizationServiceProperty =
+            DependencyProperty.Register(
+                "LocalizationService",
+                typeof(ILocalizationService),
+                typeof(ParamTypeConverter),
+                new FrameworkPropertyMetadata(null)
+                );
+
+        public ILocalizationService LocalizationService {
+            get { return GetValue(LocalizationServiceProperty) as ILocalizationService; }
+            set { SetValue(LocalizationServiceProperty, value); }
+        }
+
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             var paramType = (RevitParamType)value;
@@ -36,10 +53,6 @@ namespace RevitValueModifier.Views {
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             throw new NotImplementedException();
-        }
-
-        public override object ProvideValue(IServiceProvider serviceProvider) {
-            return this;
         }
     }
 }

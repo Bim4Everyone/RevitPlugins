@@ -22,6 +22,11 @@
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
+    <Window.Resources>
+        <local:ParamTypeConverter x:Key="paramTypeConverter" LocalizationService="{Binding ElementName=window, Path=LocalizationService}"/>
+    </Window.Resources>
+
+
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction
@@ -70,12 +75,19 @@
                                 Foreground="DarkGray"
                                 Text="{Binding StringFormat=({0}), Path=ParamTypeName}"/>-->
                             
+                            <!--<TextBlock 
+                                Foreground="DarkGray"
+                                Text="{Binding 
+                                    StringFormat=({0}), 
+                                    Path=ParamTypeName, 
+                                    Converter={StaticResource paramTypeConverter}"/>-->
+                            
                             <TextBlock 
                                 Foreground="DarkGray"
-                                Text="{Binding StringFormat=({0}), Path=ParamTypeName, Converter={local:ParamTypeConverter 
-                                    LocalizationService={Binding
-                                        Path=LocalizationService,
-                                        RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type base:PlatformWindow}}}}}"/>
+                                Text="{Binding
+                                    Path=ParamTypeName,
+                                    Converter={StaticResource paramTypeConverter}}"
+                                />
                         </TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
