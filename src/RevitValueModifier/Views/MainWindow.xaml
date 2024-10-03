@@ -23,9 +23,10 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
-        <local:ParamTypeConverter x:Key="paramTypeConverter" LocalizationService="{Binding ElementName=window, Path=LocalizationService}"/>
+        <local:ParamTypeConverter 
+            x:Key="paramTypeConverter" 
+            LocalizationService="{Binding ElementName=window, Path=LocalizationService}"/>
     </Window.Resources>
-
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -70,24 +71,12 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock>
-                            <TextBlock Text="{Binding Path=ParamName}"/>
-                            <!--<TextBlock
-                                Foreground="DarkGray"
-                                Text="{Binding StringFormat=({0}), Path=ParamTypeName}"/>-->
-                            
-                            <!--<TextBlock 
-                                Foreground="DarkGray"
-                                Text="{Binding 
-                                    StringFormat=({0}), 
-                                    Path=ParamTypeName, 
-                                    Converter={StaticResource paramTypeConverter}"/>-->
-                            
+                            <TextBlock Text="{Binding Path=ParamName}"/>                            
                             <TextBlock 
                                 Foreground="DarkGray"
                                 Text="{Binding
                                     Path=ParamTypeName,
-                                    Converter={StaticResource paramTypeConverter}}"
-                                />
+                                    Converter={StaticResource paramTypeConverter}}"/>
                         </TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -160,7 +149,6 @@
             Grid.Row="2"
             Orientation="Horizontal"
             FlowDirection="RightToLeft">
-
             <TextBox 
                 Margin="5"
                 FlowDirection="LeftToRight"
@@ -171,7 +159,6 @@
                 Margin="5"
                 VerticalAlignment="Center"
                 Text="{DynamicResource ResourceKey=MainWindow.Filtration}"/>
-
         </StackPanel>
 
 
