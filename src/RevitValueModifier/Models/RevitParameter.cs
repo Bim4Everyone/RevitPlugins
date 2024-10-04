@@ -1,7 +1,6 @@
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.SimpleServices;
 
 namespace RevitValueModifier.Models {
     internal class RevitParameter {

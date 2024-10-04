@@ -1,14 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.SimpleServices;
-
-using RevitValueModifier.ViewModels;
 
 namespace RevitValueModifier.Models {
     internal class RevitRepository {
