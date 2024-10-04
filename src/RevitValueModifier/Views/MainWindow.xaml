@@ -71,11 +71,12 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock>
-                            <TextBlock Text="{Binding Path=ParamName}"/>                            
+                            <TextBlock Text="{Binding Path=ParamName}"/>
                             <TextBlock 
                                 Foreground="DarkGray"
                                 Text="{Binding
                                     Path=ParamTypeName,
+                                    StringFormat=({0}),
                                     Converter={StaticResource paramTypeConverter}}"/>
                         </TextBlock>
                     </DataTemplate>
@@ -121,9 +122,12 @@
                     <DataTemplate>
                         <TextBlock>
                             <TextBlock Text="{Binding Path=ParamName}"/>
-                            <TextBlock
+                            <TextBlock 
                                 Foreground="DarkGray"
-                                Text="{Binding StringFormat=({0}), Path=ParamTypeName}"/>
+                                Text="{Binding
+                                    Path=ParamTypeName,
+                                    StringFormat=({0}),
+                                    Converter={StaticResource paramTypeConverter}}"/>
                         </TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -161,11 +165,10 @@
                 Text="{DynamicResource ResourceKey=MainWindow.Filtration}"/>
         </StackPanel>
 
-
-        <ListView 
+        <ListView
             Grid.Row="3"
             Margin="5"
-            ItemsSource="{Binding Path=RevitElements, UpdateSourceTrigger=PropertyChanged}" >
+            ItemsSource="{Binding Path=RevitElementVMs, UpdateSourceTrigger=PropertyChanged}" >
             <ListView.View>
                 <GridView>
                     <GridViewColumn 
@@ -188,7 +191,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn 
+                    <GridViewColumn
                         Width="330"
                         Header="{DynamicResource ResourceKey=MainWindow.ElementParamValue}"
                         DisplayMemberBinding="{Binding Path=ParamValue}"/>

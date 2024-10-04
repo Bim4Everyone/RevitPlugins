@@ -21,27 +21,25 @@ namespace RevitValueModifier.Models {
 
         public UIApplication UIApplication { get; }
 
-
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
-        public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public List<RevitElementViewModel> GetRevitElements() => ActiveUIDocument
+        public List<RevitElement> GetRevitElements() => ActiveUIDocument
                 .Selection
                 .GetElementIds()
                 .Select(id => Document.GetElement(id))
-                .Select(e => new RevitElementViewModel(e, _localizationService))
+                .Select(e => new RevitElement(e, _localizationService))
                 .ToList();
 
-        internal List<ElementId> GetCategoryIds(List<RevitElementViewModel> revitElements) => revitElements
+        internal List<ElementId> GetCategoryIds(List<RevitElement> revitElements) => revitElements
                 .Select(rE => rE.Elem.Category.Id)
                 .Distinct()
                 .ToList();
 
         internal List<RevitParameter> GetParamsForRead(List<ElementId> categoryIds) => ParameterFilterUtilities
             .GetFilterableParametersInCommon(Document, categoryIds)
-            .Select(id => new RevitParameter(id, Document, _localizationService))
+            .Select(id => new RevitParameter(id, Document))
             .OrderBy(rP => rP.ParamName)
             .ToList();
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -31,9 +32,9 @@ namespace RevitValueModifier.ViewModels {
 
         private RevitParameter _selectedCommonParam;
         private RevitParameter _selectedCommonParamForAdd;
-        private List<RevitElementViewModel> _revitElements;
         private List<RevitParameter> _commonParamsForRead;
         private List<RevitParameter> _commonParamsForWrite;
+        private List<RevitElementViewModel> _revitElementVMs;
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -72,9 +73,9 @@ namespace RevitValueModifier.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _paramValueMaskCaretIndex, value);
         }
 
-        public List<RevitElementViewModel> RevitElements {
-            get => _revitElements;
-            set => this.RaiseAndSetIfChanged(ref _revitElements, value);
+        public List<RevitElementViewModel> RevitElementVMs {
+            get => _revitElementVMs;
+            set => this.RaiseAndSetIfChanged(ref _revitElementVMs, value);
         }
 
         public List<RevitParameter> CommonParamsForRead {
@@ -124,8 +125,12 @@ namespace RevitValueModifier.ViewModels {
         }
 
         private void LoadView() {
-            RevitElements = _revitRepository.GetRevitElements();
-            List<ElementId> categoryIds = _revitRepository.GetCategoryIds(RevitElements);
+            var revitElements = _revitRepository.GetRevitElements();
+            RevitElementVMs = revitElements
+                .Select(e => new RevitElementViewModel(e))
+                .ToList();
+
+            List<ElementId> categoryIds = _revitRepository.GetCategoryIds(revitElements);
             CommonParamsForRead = _revitRepository.GetParamsForRead(categoryIds);
             CommonParamsForWrite = _revitRepository.GetParamsForWrite(CommonParamsForRead);
 
@@ -137,7 +142,7 @@ namespace RevitValueModifier.ViewModels {
 
         private void AcceptView() {
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Изменение значений параметров")) {
-                foreach(RevitElementViewModel revitElement in RevitElements) {
+                foreach(RevitElementViewModel revitElement in RevitElementVMs) {
                     revitElement.WriteParamValue(SelectedCommonParam);
                 }
                 transaction.Commit();
@@ -182,7 +187,7 @@ namespace RevitValueModifier.ViewModels {
             if(ParamValueMask == _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask")) {
                 return;
             }
-            foreach(RevitElementViewModel revitElement in RevitElements) {
+            foreach(RevitElementViewModel revitElement in RevitElementVMs) {
                 revitElement.SetParamValue(ParamValueMask);
             }
         }
@@ -197,10 +202,9 @@ namespace RevitValueModifier.ViewModels {
         /// <summary>
         /// Назначает фильтр привязанный к тексту, через который фильтруется список категорий в GUI
         /// </summary>
-        /// <param name="p"></param>
         private void SetElementsFilters() {
             // Организуем фильтрацию списка категорий
-            _revitElementsView = CollectionViewSource.GetDefaultView(RevitElements);
+            _revitElementsView = CollectionViewSource.GetDefaultView(RevitElementVMs);
             _revitElementsView.Filter = item => String.IsNullOrEmpty(RevitElementsFilter) ? true :
                 ((RevitElementViewModel) item).ElemName.IndexOf(RevitElementsFilter, StringComparison.OrdinalIgnoreCase) >= 0;
         }
