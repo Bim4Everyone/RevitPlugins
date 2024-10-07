@@ -177,8 +177,8 @@ namespace RevitDeclarations.ViewModels {
                 return;
             }
 
-            List<DeclarationProject> projects = checkedDocuments
-                .Select(x => new DeclarationProject(x, _revitRepository, _settings))
+            List<ApartmentProject> projects = checkedDocuments
+                .Select(x => new ApartmentProject(x, _revitRepository, _settings))
                 .ToList();
 
             // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.
@@ -247,7 +247,7 @@ namespace RevitDeclarations.ViewModels {
                     }
                 }
 
-                foreach(DeclarationProject project in projects) {
+                foreach(ApartmentProject project in projects) {
                     project.CalculateUtpForApartments();
                 }
             }
