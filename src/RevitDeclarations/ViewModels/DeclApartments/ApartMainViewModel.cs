@@ -18,9 +18,9 @@ using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels {
-    internal class MainViewModel : BaseViewModel {
-        private readonly RevitRepository _revitRepository;
-        private readonly DeclarationSettings _settings;
+    internal class ApartMainViewModel : MainViewModel {
+        //private readonly RevitRepository _revitRepository;
+        //private readonly DeclarationSettings _settings;
 
         private readonly ParametersViewModel _parametersViewModel;
         private readonly PrioritiesViewModel _prioritiesViewModel;
@@ -30,7 +30,7 @@ namespace RevitDeclarations.ViewModels {
         private readonly JsonExportViewModel _jsonExportViewModel;
         private readonly List<ExportViewModel> _exportFormats;
 
-        private readonly IList<RevitDocumentViewModel> _revitDocuments;
+        //private readonly IList<RevitDocumentViewModel> _revitDocuments;
         private readonly IReadOnlyList<Phase> _phases;
 
         private string _filePath;
@@ -43,9 +43,10 @@ namespace RevitDeclarations.ViewModels {
         private string _errorText;
         private string _canLoadUtpText;
 
-        public MainViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
-            _revitRepository = revitRepository;
-            _settings = settings;
+        public ApartMainViewModel(RevitRepository revitRepository, DeclarationSettings settings) 
+            : base(revitRepository, settings) {
+            //_revitRepository = revitRepository;
+            //_settings = settings;
 
             _phases = _revitRepository.GetPhases();
 
@@ -66,12 +67,12 @@ namespace RevitDeclarations.ViewModels {
             _loadUtp = true;
             _canLoadUtp = true;
 
-            _revitDocuments = _revitRepository
-                .GetLinks()
-                .Select(x => new RevitDocumentViewModel(x, _settings))
-                .Where(x => x.HasRooms())
-                .OrderBy(x => x.Name)
-                .ToList();
+            //_revitDocuments = _revitRepository
+            //    .GetLinks()
+            //    .Select(x => new RevitDocumentViewModel(x, _settings))
+            //    .Where(x => x.HasRooms())
+            //    .OrderBy(x => x.Name)
+            //    .ToList();
 
             RevitDocumentViewModel currentDocumentVM = 
                 new RevitDocumentViewModel(_revitRepository.Document, _settings);
@@ -129,7 +130,7 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _selectedFormat, value);
         }
 
-        public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
+        //public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
         public ParametersViewModel ParametersViewModel => _parametersViewModel;
         public PrioritiesViewModel PrioritiesViewModel => _prioritiesViewModel;
 

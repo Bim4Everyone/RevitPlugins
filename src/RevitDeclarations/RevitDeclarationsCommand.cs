@@ -33,10 +33,10 @@ namespace RevitDeclarations {
 				kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 				
-				kernel.Bind<MainViewModel>().ToSelf();
+				kernel.Bind<ApartMainViewModel>().ToSelf();
 				kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ApartMainViewModel>());
 				
 				Notification(kernel.Get<MainWindow>());
 			}
