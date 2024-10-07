@@ -7,20 +7,11 @@ using pyRevitLabs.Json;
 using static Autodesk.Revit.DB.SpecTypeId;
 
 namespace RevitDeclarations.Models {
-    internal class Apartment {
-        private const double _maxAreaDeviation = 0.2;
-
-        private readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
-
-        private readonly DeclarationSettings _settings;
-        private readonly int _accuracy;
-
-        private readonly IEnumerable<RoomElement> _rooms;
+    internal class Apartment : RoomGroup {
         // Словарь для группировки помещений, входящих в исходные приоритеты
         private readonly Dictionary<string, List<RoomElement>> _mainRooms;
         // Словарь для группировки помещений, не входящих в исходные приоритеты
         private readonly Dictionary<string, List<RoomElement>> _nonConfigRooms;
-        private readonly RoomElement _firstRoom;
 
         private double _areaMainRevit;
         private double _areaCoefRevit;
@@ -37,13 +28,8 @@ namespace RevitDeclarations.Models {
         private string _utpLaundry;
         private string _utpExtraBalconyArea;
 
-        public Apartment(IEnumerable<RoomElement> rooms, DeclarationSettings settings) {
-            _settings = settings;
-            _accuracy = settings.Accuracy;
-
-            _rooms = rooms.ToList();
-            _firstRoom = rooms.FirstOrDefault();
-
+        public Apartment(IEnumerable<RoomElement> rooms, DeclarationSettings settings) 
+            : base(rooms, settings) {
             _mainRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
             _nonConfigRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
 
@@ -58,38 +44,6 @@ namespace RevitDeclarations.Models {
             CalculateRevitAreas();
         }
 
-        [JsonProperty("rooms")]
-        public IEnumerable<RoomElement> Rooms => _rooms;
-
-        [JsonProperty("full_number")]
-        public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
-        [JsonProperty("type")]
-        public string Department {
-            get {
-                if(string.IsNullOrEmpty(_firstRoom.GetTextParamValue(_settings.MultiStoreyParam))) {
-                    return _firstRoom.GetTextParamValue(_settings.DepartmentParam);
-                } else {
-                    return "Квартира на двух и более этажах";
-                }
-            }
-        }
-        [JsonProperty("floor_number")]
-        public string Level {
-            get {
-                var levelNames = _rooms
-                    .Select(x => x.GetTextParamValue(_settings.LevelParam))
-                    .Distinct();
-                return string.Join(",", levelNames);
-            }
-        }
-        [JsonProperty("section")]
-        public string Section => _firstRoom.GetTextParamValue(_settings.SectionParam);
-        [JsonProperty("building")]
-        public string Building => _firstRoom.GetTextParamValue(_settings.BuildingParam);
-        [JsonProperty("number")]
-        public string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
-        [JsonProperty("area")]
-        public double AreaMain => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy);
         [JsonProperty("area_k")]
         public double AreaCoef => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaCoefParam, _accuracy);
         [JsonProperty("area_living")]
