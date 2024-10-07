@@ -126,6 +126,13 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
+        public IReadOnlyCollection<CommercialRooms> GetCommercialRooms(IEnumerable<RoomElement> rooms,
+                                                                       DeclarationSettings settings) {
+            return rooms.GroupBy(r => r.Number)
+                .Select(g => new CommercialRooms(rooms, settings))
+                .ToList();
+        }
+
         public IReadOnlyList<Phase> GetPhases() {
             return Document
                 .Phases
