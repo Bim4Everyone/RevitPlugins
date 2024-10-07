@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Change value</system:String>
+    <system:String x:Key="MainWindow.ParamValueMask">Enter mask</system:String>
+    <system:String x:Key="MainWindow.ParamValueMaskEmpty">Value mask is empty</system:String>
+
+    <system:String x:Key="MainWindow.SelectParamToRecord">Select an option to record</system:String>
+    <system:String x:Key="MainWindow.EnterParamValueMask">Enter value mask</system:String>
+    <system:String x:Key="MainWindow.RevitElement">Revit Element</system:String>
+    <system:String x:Key="MainWindow.ElementParamValue">Parameter value</system:String>
+    <system:String x:Key="MainWindow.SelectedParamForAdd">Select an option to add</system:String>
+    <system:String x:Key="MainWindow.Filtration">Filtration</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Changing parameter values</system:String>
+
+    <system:String x:Key="MainWindow.SystemParameter">System parameter</system:String>
+    <system:String x:Key="MainWindow.SharedParameter">Shared parameter</system:String>
+    <system:String x:Key="MainWindow.ProjectParameter">Project parameter</system:String>
+
+    <system:String x:Key="MainWindow.True">True</system:String>
+    <system:String x:Key="MainWindow.False">False</system:String>
+
+    <system:String x:Key="MainWindow.Error">Error</system:String>
+    <system:String x:Key="MainWindow.ParamByIdError">The parameter selected for recording was not found in the element with id:</system:String>
+    <system:String x:Key="MainWindow.SettingValueError">Failed to write to element with id:</system:String>
+    <system:String x:Key="MainWindow.ValueUnknown">Value unknown</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">Ok</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+</ResourceDictionary>
