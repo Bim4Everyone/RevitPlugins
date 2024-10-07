@@ -7,47 +7,19 @@ using Autodesk.Revit.DB;
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
-    internal class DeclarationProject {
-        private readonly RevitDocumentViewModel _document;
-        private readonly DeclarationSettings _settings;
-        private readonly RevitRepository _revitRepository;
-
-        private readonly Phase _phase;
-
-        private readonly IEnumerable<RoomElement> _rooms;
+    internal class ApartmentProject : DeclarationProject {
         private readonly IReadOnlyCollection<Apartment> _apartments;
 
         private UtpCalculator _utpCalculator;
 
-        public DeclarationProject(RevitDocumentViewModel document,
-                                  RevitRepository revitRepository,
-                                  DeclarationSettings settings) {
-            _document = document;
-            _settings = settings;
-            _revitRepository = revitRepository;
+        public ApartmentProject(RevitDocumentViewModel document,
+                                RevitRepository revitRepository,
+                                DeclarationSettings settings) : base(document, revitRepository, settings) {
 
-            _phase = revitRepository.GetPhaseByName(document.Document, _settings.SelectedPhase.Name);
-
-            _rooms = revitRepository.GetRoomsOnPhase(document.Document, _phase, settings);
-            _rooms = FilterApartmentRooms(_rooms);
             _apartments = revitRepository.GetApartments(_rooms, settings);
         }
 
-        /// <summary>Rooms on selected phase than belong to apartments</summary>
-        public IEnumerable<RoomElement> Rooms => _rooms;
         public IReadOnlyCollection<Apartment> Apartments => _apartments;
-        public RevitDocumentViewModel Document => _document;
-        public Phase Phase => _phase;
-
-        private IReadOnlyCollection<RoomElement> FilterApartmentRooms(IEnumerable<RoomElement> rooms) {
-            Parameter filterParam = _settings.FilterRoomsParam;
-            string filterValue = _settings.FilterRoomsValue;
-            StringComparison ignorCase = StringComparison.OrdinalIgnoreCase;
-
-            return rooms
-                .Where(x => string.Equals(x.GetTextParamValue(filterParam), filterValue, ignorCase))
-                .ToList();
-        }
 
         public ErrorsListViewModel CheckApartmentsInRpoject() {
             ErrorsListViewModel errorListVM = new ErrorsListViewModel() {

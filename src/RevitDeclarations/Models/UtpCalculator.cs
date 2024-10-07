@@ -19,7 +19,7 @@ namespace RevitDeclarations.Models {
         private readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
         private readonly StringComparison _strComparison = StringComparison.OrdinalIgnoreCase;
 
-        private readonly DeclarationProject _project;
+        private readonly ApartmentProject _project;
         private readonly DeclarationSettings _settings;
         private readonly PrioritiesConfig _priorities;
 
@@ -34,7 +34,7 @@ namespace RevitDeclarations.Models {
         // Санузлы, относящиеся к мастер спальням
         private IEnumerable<ElementId> _masterBathrooms;
 
-        public UtpCalculator(DeclarationProject project, DeclarationSettings settings) {
+        public UtpCalculator(ApartmentProject project, DeclarationSettings settings) {
             _project = project;
             _settings = settings;
 
