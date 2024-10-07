@@ -357,35 +357,35 @@
 
 
 
-    <Style x:Key="IFCPartsScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+    <Style x:Key="IfcPartsScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
         <Setter Property="Text" Value="Префикс и суффикс имени ведомости IFC деталей пилона, т.е. то, что должно идти в названии ведомости перед указанием марки пилона и после нее.&#10;Например, в имени ведомости IFC деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ВД_IFC&quot; - это суффикс." />
     </Style>
 
-    <Style x:Key="IFCPartsSchedulePrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+    <Style x:Key="IfcPartsSchedulePrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
         <Setter Property="Text" Value="Префикс - часть имени ведомости IFC деталей пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени ведомости IFC деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
     </Style>
 
-    <Style x:Key="IFCPartsScheduleSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+    <Style x:Key="IfcPartsScheduleSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
         <Setter Property="Text" Value="Суффикс - часть имени ведомости IFC деталей пилона, которая должна идти после указания марки пилона.&#10;Например, в имени ведомости IFC деталей пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ВД_IFC&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_ВД_IFC&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_ВД_IFC&quot;" />
     </Style>
 
 
-    <Style x:Key="ReferenceIFCPartsScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+    <Style x:Key="ReferenceIfcPartsScheduleNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
         <Setter Property="Text" Value="Имя эталонной ведомости IFC деталей, которая будет копироваться для получения ведомости IFC деталей пилона." />
     </Style>
 
 
-    <Style x:Key="IFCPartsScheduleDisp1Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+    <Style x:Key="IfcPartsScheduleDisp1Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
         <Setter Property="Width" Value="400"/>
         <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на первом уровне у ведомости IFC деталей." />
     </Style>
 
-    <Style x:Key="IFCPartsScheduleDisp2Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+    <Style x:Key="IfcPartsScheduleDisp2Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
         <Setter Property="Width" Value="400"/>
         <Setter Property="Text" Value="Значение, которое будет использовано для заполнения параметра группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;В зависимости от того, какое значение будет здесь указано возможны следующие варианты:&#10;1) если указать название параметра, который имеется у пилона, то плагин возьмет значение этого параметра из пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;Марка&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметр с именем &quot;Марка&quot; у пилона есть. Далее он считает значение из параметра &quot;Марка&quot; у пилона и запишет в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;2) если параметр с указанным значением не будет найден у пилона, то данное значение просто запишется в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей.&#10;Пример: если записать значение &quot;ВД&quot;, то плагин обратиться к перечню параметров пилона и поймет, что параметра с именем &quot;ВД&quot; у пилона нет. Тогда он просто запишет &quot;ВД&quot; в параметр для группировки диспетчера на втором уровне у ведомости IFC деталей." />
@@ -461,7 +461,7 @@
         <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов ведомость системной арматуры" />
     </Style>
 
-    <Style x:Key="IFCPartsScheduleStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+    <Style x:Key="IfcPartsScheduleStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
         <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов ведомость IFC арматуры" />
     </Style>

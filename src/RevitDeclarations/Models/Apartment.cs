@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text.RegularExpressions;
 using pyRevitLabs.Json;
+
+using static Autodesk.Revit.DB.SpecTypeId;
 
 namespace RevitDeclarations.Models {
     internal class Apartment {
@@ -253,6 +255,16 @@ namespace RevitDeclarations.Models {
 
             _utpPantry = calculator.CalculatePantry(this);
             _utpLaundry = calculator.CalculateLaundry(this);
+        }
+
+        public int GetIntFullNumber() {
+            if(string.IsNullOrEmpty(FullNumber)) {
+                return 0;
+            } else {
+                string resultString = Regex.Match(FullNumber, @"\d+").Value;
+                int.TryParse(resultString, out int result);
+                return result;
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
 
@@ -9,15 +9,16 @@ namespace RevitServerFolders.Models {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
-        
+
         public string TargetFolder { get; set; }
         public string SourceFolder { get; set; }
+        public bool ClearTargetFolder { get; set; } = false;
         public string[] SkippedObjects { get; set; }
     }
 
     internal class FileModelObjectConfig : PluginConfig {
         public bool IsExportRooms { get; set; }
-        
+
         public static FileModelObjectConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
@@ -27,7 +28,7 @@ namespace RevitServerFolders.Models {
                 .Build<FileModelObjectConfig>();
         }
     }
-    
+
     internal class RsModelObjectConfig : PluginConfig {
         public static RsModelObjectConfig GetPluginConfig() {
             return new ProjectConfigBuilder()

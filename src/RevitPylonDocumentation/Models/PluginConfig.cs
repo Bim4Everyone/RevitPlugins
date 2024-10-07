@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -25,14 +25,11 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-
         internal void GetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
-
             UserSelectionSettings selectionSettings = mainViewModel.SelectionSettings;
             UserProjectSettings projectSettings = mainViewModel.ProjectSettings;
             UserViewSectionSettings viewSectionSettings = mainViewModel.ViewSectionSettings;
             UserSchedulesSettings schedulesSettings = mainViewModel.SchedulesSettings;
-
 
             selectionSettings.NeedWorkWithGeneralView = settings.NeedWorkWithGeneralView;
             selectionSettings.NeedWorkWithGeneralPerpendicularView = settings.NeedWorkWithGeneralPerpendicularView;
@@ -42,7 +39,7 @@ namespace RevitPylonDocumentation.Models {
             selectionSettings.NeedWorkWithRebarSchedule = settings.NeedWorkWithRebarSchedule;
             selectionSettings.NeedWorkWithMaterialSchedule = settings.NeedWorkWithMaterialSchedule;
             selectionSettings.NeedWorkWithSystemPartsSchedule = settings.NeedWorkWithSystemPartsSchedule;
-            selectionSettings.NeedWorkWithIFCPartsSchedule = settings.NeedWorkWithIFCPartsSchedule;
+            selectionSettings.NeedWorkWithIfcPartsSchedule = settings.NeedWorkWithIfcPartsSchedule;
             selectionSettings.NeedWorkWithLegend = settings.NeedWorkWithLegend;
 
             projectSettings.ProjectSection = settings.ProjectSection;
@@ -145,10 +142,10 @@ namespace RevitPylonDocumentation.Models {
             schedulesSettings.SystemPartsScheduleSuffix = settings.SystemPartsScheduleSuffix;
             schedulesSettings.SystemPartsScheduleSuffixTemp = settings.SystemPartsScheduleSuffix;
 
-            schedulesSettings.IFCPartsSchedulePrefix = settings.IFCPartsSchedulePrefix;
-            schedulesSettings.IFCPartsSchedulePrefixTemp = settings.IFCPartsSchedulePrefix;
-            schedulesSettings.IFCPartsScheduleSuffix = settings.IFCPartsScheduleSuffix;
-            schedulesSettings.IFCPartsScheduleSuffixTemp = settings.IFCPartsScheduleSuffix;
+            schedulesSettings.IfcPartsSchedulePrefix = settings.IfcPartsSchedulePrefix;
+            schedulesSettings.IfcPartsSchedulePrefixTemp = settings.IfcPartsSchedulePrefix;
+            schedulesSettings.IfcPartsScheduleSuffix = settings.IfcPartsScheduleSuffix;
+            schedulesSettings.IfcPartsScheduleSuffixTemp = settings.IfcPartsScheduleSuffix;
 
             schedulesSettings.RebarScheduleName = settings.RebarScheduleName;
             schedulesSettings.RebarScheduleNameTemp = settings.RebarScheduleName;
@@ -156,8 +153,8 @@ namespace RevitPylonDocumentation.Models {
             schedulesSettings.MaterialScheduleNameTemp = settings.MaterialScheduleName;
             schedulesSettings.SytemPartsScheduleName = settings.SystemPartsScheduleName;
             schedulesSettings.SytemPartsScheduleNameTemp = settings.SystemPartsScheduleName;
-            schedulesSettings.IFCPartsScheduleName = settings.IFCPartsScheduleName;
-            schedulesSettings.IFCPartsScheduleNameTemp = settings.IFCPartsScheduleName;
+            schedulesSettings.IfcPartsScheduleName = settings.IfcPartsScheduleName;
+            schedulesSettings.IfcPartsScheduleNameTemp = settings.IfcPartsScheduleName;
 
             schedulesSettings.RebarScheduleDisp1 = settings.RebarScheduleDisp1;
             schedulesSettings.RebarScheduleDisp1Temp = settings.RebarScheduleDisp1;
@@ -165,28 +162,26 @@ namespace RevitPylonDocumentation.Models {
             schedulesSettings.MaterialScheduleDisp1Temp = settings.MaterialScheduleDisp1;
             schedulesSettings.SystemPartsScheduleDisp1 = settings.SystemPartsScheduleDisp1;
             schedulesSettings.SystemPartsScheduleDisp1Temp = settings.SystemPartsScheduleDisp1;
-            schedulesSettings.IFCPartsScheduleDisp1 = settings.IFCPartsScheduleDisp1;
-            schedulesSettings.IFCPartsScheduleDisp1Temp = settings.IFCPartsScheduleDisp1;
+            schedulesSettings.IfcPartsScheduleDisp1 = settings.IfcPartsScheduleDisp1;
+            schedulesSettings.IfcPartsScheduleDisp1Temp = settings.IfcPartsScheduleDisp1;
             schedulesSettings.RebarScheduleDisp2 = settings.RebarScheduleDisp2;
             schedulesSettings.RebarScheduleDisp2Temp = settings.RebarScheduleDisp2;
             schedulesSettings.MaterialScheduleDisp2 = settings.MaterialScheduleDisp2;
             schedulesSettings.MaterialScheduleDisp2Temp = settings.MaterialScheduleDisp2;
             schedulesSettings.SystemPartsScheduleDisp2 = settings.SystemPartsScheduleDisp2;
             schedulesSettings.SystemPartsScheduleDisp2Temp = settings.SystemPartsScheduleDisp2;
-            schedulesSettings.IFCPartsScheduleDisp2 = settings.IFCPartsScheduleDisp2;
-            schedulesSettings.IFCPartsScheduleDisp2Temp = settings.IFCPartsScheduleDisp2;
+            schedulesSettings.IfcPartsScheduleDisp2 = settings.IfcPartsScheduleDisp2;
+            schedulesSettings.IfcPartsScheduleDisp2Temp = settings.IfcPartsScheduleDisp2;
 
             schedulesSettings.ParamsForScheduleFilters = settings.ParamsForScheduleFilters;
             schedulesSettings.ParamsForScheduleFiltersTemp = settings.ParamsForScheduleFilters;
         }
 
         internal void SetConfigProps(PluginSettings settings, MainViewModel mainViewModel) {
-
             UserSelectionSettings selectionSettings = mainViewModel.SelectionSettings;
             UserProjectSettings projectSettings = mainViewModel.ProjectSettings;
             UserViewSectionSettings viewSectionSettings = mainViewModel.ViewSectionSettings;
             UserSchedulesSettings schedulesSettings = mainViewModel.SchedulesSettings;
-
 
             settings.NeedWorkWithGeneralView = selectionSettings.NeedWorkWithGeneralView;
             settings.NeedWorkWithGeneralPerpendicularView = selectionSettings.NeedWorkWithGeneralPerpendicularView;
@@ -196,9 +191,8 @@ namespace RevitPylonDocumentation.Models {
             settings.NeedWorkWithRebarSchedule = selectionSettings.NeedWorkWithRebarSchedule;
             settings.NeedWorkWithMaterialSchedule = selectionSettings.NeedWorkWithMaterialSchedule;
             settings.NeedWorkWithSystemPartsSchedule = selectionSettings.NeedWorkWithSystemPartsSchedule;
-            settings.NeedWorkWithIFCPartsSchedule = selectionSettings.NeedWorkWithIFCPartsSchedule;
+            settings.NeedWorkWithIfcPartsSchedule = selectionSettings.NeedWorkWithIfcPartsSchedule;
             settings.NeedWorkWithLegend = selectionSettings.NeedWorkWithLegend;
-
 
             settings.ProjectSection = projectSettings.ProjectSection;
             settings.Mark = projectSettings.Mark;
@@ -246,7 +240,6 @@ namespace RevitPylonDocumentation.Models {
 
             settings.ViewFamilyTypeName = viewSectionSettings.ViewFamilyTypeName;
 
-
             settings.RebarSchedulePrefix = schedulesSettings.RebarSchedulePrefix;
             settings.RebarScheduleSuffix = schedulesSettings.RebarScheduleSuffix;
 
@@ -256,22 +249,22 @@ namespace RevitPylonDocumentation.Models {
             settings.SystemPartsSchedulePrefix = schedulesSettings.SystemPartsSchedulePrefix;
             settings.SystemPartsScheduleSuffix = schedulesSettings.SystemPartsScheduleSuffix;
 
-            settings.IFCPartsSchedulePrefix = schedulesSettings.IFCPartsSchedulePrefix;
-            settings.IFCPartsScheduleSuffix = schedulesSettings.IFCPartsScheduleSuffix;
+            settings.IfcPartsSchedulePrefix = schedulesSettings.IfcPartsSchedulePrefix;
+            settings.IfcPartsScheduleSuffix = schedulesSettings.IfcPartsScheduleSuffix;
 
             settings.RebarScheduleName = schedulesSettings.RebarScheduleName;
             settings.MaterialScheduleName = schedulesSettings.MaterialScheduleName;
             settings.SystemPartsScheduleName = schedulesSettings.SytemPartsScheduleName;
-            settings.IFCPartsScheduleName = schedulesSettings.IFCPartsScheduleName;
+            settings.IfcPartsScheduleName = schedulesSettings.IfcPartsScheduleName;
 
             settings.RebarScheduleDisp1 = schedulesSettings.RebarScheduleDisp1;
             settings.MaterialScheduleDisp1 = schedulesSettings.MaterialScheduleDisp1;
             settings.SystemPartsScheduleDisp1 = schedulesSettings.SystemPartsScheduleDisp1;
-            settings.IFCPartsScheduleDisp1 = schedulesSettings.IFCPartsScheduleDisp1;
+            settings.IfcPartsScheduleDisp1 = schedulesSettings.IfcPartsScheduleDisp1;
             settings.RebarScheduleDisp2 = schedulesSettings.RebarScheduleDisp2;
             settings.MaterialScheduleDisp2 = schedulesSettings.MaterialScheduleDisp2;
             settings.SystemPartsScheduleDisp2 = schedulesSettings.SystemPartsScheduleDisp2;
-            settings.IFCPartsScheduleDisp2 = schedulesSettings.IFCPartsScheduleDisp2;
+            settings.IfcPartsScheduleDisp2 = schedulesSettings.IfcPartsScheduleDisp2;
 
             settings.ParamsForScheduleFilters = schedulesSettings.ParamsForScheduleFilters;
         }
@@ -288,7 +281,7 @@ namespace RevitPylonDocumentation.Models {
         public bool NeedWorkWithRebarSchedule { get; set; }
         public bool NeedWorkWithMaterialSchedule { get; set; }
         public bool NeedWorkWithSystemPartsSchedule { get; set; }
-        public bool NeedWorkWithIFCPartsSchedule { get; set; }
+        public bool NeedWorkWithIfcPartsSchedule { get; set; }
         public bool NeedWorkWithLegend { get; set; }
 
 
@@ -335,21 +328,20 @@ namespace RevitPylonDocumentation.Models {
         public string MaterialScheduleSuffix { get; set; }
         public string SystemPartsSchedulePrefix { get; set; }
         public string SystemPartsScheduleSuffix { get; set; }
-        public string IFCPartsSchedulePrefix { get; set; }
-        public string IFCPartsScheduleSuffix { get; set; }
+        public string IfcPartsSchedulePrefix { get; set; }
+        public string IfcPartsScheduleSuffix { get; set; }
         public string RebarScheduleName { get; set; }
         public string MaterialScheduleName { get; set; }
         public string SystemPartsScheduleName { get; set; }
-        public string IFCPartsScheduleName { get; set; }
+        public string IfcPartsScheduleName { get; set; }
         public string RebarScheduleDisp1 { get; set; }
         public string MaterialScheduleDisp1 { get; set; }
         public string SystemPartsScheduleDisp1 { get; set; }
-        public string IFCPartsScheduleDisp1 { get; set; }
+        public string IfcPartsScheduleDisp1 { get; set; }
         public string RebarScheduleDisp2 { get; set; }
         public string MaterialScheduleDisp2 { get; set; }
         public string SystemPartsScheduleDisp2 { get; set; }
-        public string IFCPartsScheduleDisp2 { get; set; }
+        public string IfcPartsScheduleDisp2 { get; set; }
         public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; }
-
     }
 }

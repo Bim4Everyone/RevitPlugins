@@ -32,6 +32,7 @@ namespace RevitServerFolders.Services {
         public void ExportModelObjects(
             string targetFolder,
             string[] modelFiles,
+            bool clearTargetFolder = false,
             IProgress<int> progress = null,
             CancellationToken ct = default) {
             if(string.IsNullOrWhiteSpace(targetFolder)) {
@@ -43,10 +44,12 @@ namespace RevitServerFolders.Services {
 
             Directory.CreateDirectory(targetFolder);
 
-            var navisFiles = Directory.GetFiles(targetFolder, _nwcSearchPattern);
-            foreach(var navisFile in navisFiles) {
-                File.SetAttributes(navisFile, FileAttributes.Normal);
-                File.Delete(navisFile);
+            if(clearTargetFolder) {
+                var navisFiles = Directory.GetFiles(targetFolder, _nwcSearchPattern);
+                foreach(var navisFile in navisFiles) {
+                    File.SetAttributes(navisFile, FileAttributes.Normal);
+                    File.Delete(navisFile);
+                }
             }
 
             for(int i = 0; i < modelFiles.Length; i++) {
@@ -79,6 +82,9 @@ namespace RevitServerFolders.Services {
                                 item.Name.Equals(_navisworksViewName, StringComparison.OrdinalIgnoreCase));
 
                         if(navisView == null) {
+                            _loggerService.Warning(
+                                "Файл {@FileName} не содержит вид {@NavisView}.",
+                                fileName, _navisworksViewName);
                             return;
                         }
 
@@ -90,9 +96,12 @@ namespace RevitServerFolders.Services {
 #else
                                 .WherePasses(new VisibleInViewFilter(document, navisView.Id))
 #endif
-                                .Any();
+                                .Any(e => e.Category != null); // На виде, где выключена видимость всех элементов через GUI ревита, присутствует 1 элемент ExtentElem c категорией null
 
                         if(!hasElements) {
+                            _loggerService.Warning(
+                                "Вид {@NavisView} в файле {@FileName} не содержит элементы.",
+                                 navisView.Name, fileName);
                             return;
                         }
 
@@ -161,6 +170,9 @@ namespace RevitServerFolders.Services {
                 })
                 .ToArray();
 
+            if(failureMessages.Length == 0) {
+                return;
+            }
             _loggerService.Information(
                 "Event handler: {@EventHandler}; title: {@DocTitle}; Failures: {@Failures}",
                 nameof(ApplicationOnFailuresProcessing), accessor.GetDocument().Title, failureMessages);

@@ -1,9 +1,5 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Web.UI.WebControls;
-using System.Windows.Controls;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -71,7 +67,7 @@ namespace RevitPylonDocumentation.Models {
                 .OfClass(typeof(ViewFamilyType))
                 .OfType<ViewFamilyType>()
                 .Where(a => ViewFamily.Section == a.ViewFamily)
-                .ToList();        
+                .ToList();
         /// <summary>
         /// Возвращает список всех легенд, присутствующих в проекте
         /// </summary>
@@ -103,12 +99,10 @@ namespace RevitPylonDocumentation.Models {
         /// Получает информацию о всех пилонах, размещенных в проекте
         /// </summary>
         public void GetHostData(MainViewModel mainViewModel) {
-
             HostsInfo.Clear();
             HostProjectSections.Clear();
 
             foreach(var cat in new List<BuiltInCategory>() { BuiltInCategory.OST_Walls, BuiltInCategory.OST_StructuralColumns }) {
-
                 IList<Element> elems = new FilteredElementCollector(Document)
                     .OfCategory(cat)
                     .WhereElementIsNotElementType()
@@ -131,12 +125,11 @@ namespace RevitPylonDocumentation.Models {
         /// Получает информацию толко о выбранном пилоне
         /// </summary>
         public void GetHostData(MainViewModel mainViewModel, IList<Element> elems) {
-
             HostsInfo.Clear();
             HostProjectSections.Clear();
 
             AnalizePylons(mainViewModel, elems);
-            
+
             // Получаем список разделов в проекте (комплектов документации)
             HostProjectSections = new List<string>(HostsInfo
                 .Select(item => item.ProjectSection)
@@ -148,10 +141,8 @@ namespace RevitPylonDocumentation.Models {
         /// Анализирует найденные пилоны, извлекая информацию о них и заполняя список оболочек над листами пилонов
         /// </summary>
         private void AnalizePylons(MainViewModel mainViewModel, IList<Element> elems) {
-
             foreach(Element elem in elems) {
                 if(!elem.Name.Contains("Пилон")) { continue; }
-
 
                 // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
                 Parameter typicalPylonParameter = elem.LookupParameter(mainViewModel.ProjectSettings.TypicalPylonFilterParameter);
@@ -161,7 +152,6 @@ namespace RevitPylonDocumentation.Models {
                 }
 
                 if(typicalPylonParameter.AsString() is null || typicalPylonParameter.AsString() != mainViewModel.ProjectSettings.TypicalPylonFilterValue) { continue; }
-
 
                 // Запрашиваем Раздел проекта
                 Parameter projectSectionParameter = elem.LookupParameter(mainViewModel.ProjectSettings.ProjectSection);
@@ -182,7 +172,6 @@ namespace RevitPylonDocumentation.Models {
                 string hostMark = hostMarkParameter.AsString();
                 if(hostMark is null) { continue; }
 
-
                 PylonSheetInfo testPylonSheetInfo = HostsInfo
                     .Where(item => item.PylonKeyName.Equals(hostMark))
                     .FirstOrDefault();
@@ -199,7 +188,6 @@ namespace RevitPylonDocumentation.Models {
                     mainViewModel.ErrorText = "Найдены пилоны с одинаковой маркой";
                 }
             }
-
         }
 
 
@@ -208,7 +196,6 @@ namespace RevitPylonDocumentation.Models {
         /// Ищет лист в проекте по информации из оболочки листа пилона PylonSheetInfo
         /// </summary>
         public void FindSheetInPj(MainViewModel mainViewModel, PylonSheetInfo pylonSheetInfo) {
-            
             ViewSheet sheet = AllSheets
                 .Where(item => item.Name.Equals(mainViewModel.ProjectSettings.SheetPrefix + pylonSheetInfo.PylonKeyName + mainViewModel.ProjectSettings.SheetSuffix))
                 .FirstOrDefault();
@@ -223,9 +210,7 @@ namespace RevitPylonDocumentation.Models {
         /// Ищет в проекте вид по имени, указанному в оболочке вида пилона PylonView
         /// </summary>
         public void FindViewSectionInPj(PylonView pylonView) {
-
             foreach(ViewSection view in AllSectionViews) {
-                
                 if(view.Name == pylonView.ViewName) {
                     pylonView.ViewElement = view;
                     break;
@@ -237,12 +222,9 @@ namespace RevitPylonDocumentation.Models {
         /// Ищет в проекте спеки по имени, указанному в оболочке вида пилона PylonView
         /// </summary>
         public void FindViewScheduleInPj(PylonView pylonView) {
-
             foreach(ViewSchedule view in AllScheduleViews) {
-
                 if(view.Name == pylonView.ViewName) {
                     pylonView.ViewElement = view;
-
                     break;
                 }
             }

@@ -25,6 +25,7 @@ namespace RevitServerFolders.Services {
         public void ExportModelObjects(
             string targetFolder,
             string[] modelFiles,
+            bool clearTargetFolder = false,
             IProgress<int> progress = null,
             CancellationToken ct = default) {
             if(string.IsNullOrWhiteSpace(targetFolder)) {
@@ -36,10 +37,12 @@ namespace RevitServerFolders.Services {
 
             Directory.CreateDirectory(targetFolder);
 
-            var revitFiles = Directory.GetFiles(targetFolder, _rvtSearchPattern);
-            foreach(var revitFile in revitFiles) {
-                File.SetAttributes(revitFile, FileAttributes.Normal);
-                File.Delete(revitFile);
+            if(clearTargetFolder) {
+                var revitFiles = Directory.GetFiles(targetFolder, _rvtSearchPattern);
+                foreach(var revitFile in revitFiles) {
+                    File.SetAttributes(revitFile, FileAttributes.Normal);
+                    File.Delete(revitFile);
+                }
             }
 
             for(int i = 0; i < modelFiles.Length; i++) {

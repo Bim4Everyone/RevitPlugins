@@ -1,0 +1,16 @@
+<Window x:Class="RevitMechanicalSpecification.Views.MainWindow"
+    
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitMechanicalSpecification.Views"
+    xmlns:vms="clr-namespace:RevitMechanicalSpecification.ViewModels"
+    
+    
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner">
+    
+</Window>

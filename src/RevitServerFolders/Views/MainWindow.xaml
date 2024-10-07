@@ -146,6 +146,10 @@
                 EditValue="{Binding IsExportRooms}"
                 Visibility="{Binding IsExportRoomsVisible, 
                     Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <dxe:CheckEdit
+                Margin="5 0"
+                Content="Очищать папку назначения"
+                EditValue="{Binding ClearTargetFolder}" />
         </DockPanel>
 
         <dxe:ButtonEdit

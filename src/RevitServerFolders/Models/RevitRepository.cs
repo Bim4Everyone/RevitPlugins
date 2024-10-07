@@ -20,13 +20,15 @@ namespace RevitServerFolders.Models {
 
         public Document OpenDocumentFile(string fileName) {
             var modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(fileName);
+            var opts = new OpenOptions() {
+                AllowOpeningLocalByWrongUser = true,
+                OpenForeignOption = OpenForeignOption.Open,
+                DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
+            };
+            opts.SetOpenWorksetsConfiguration(new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets));
             return Application.OpenDocumentFile(
                 modelPath,
-                new OpenOptions() {
-                    AllowOpeningLocalByWrongUser = true,
-                    OpenForeignOption = OpenForeignOption.Open,
-                    DetachFromCentralOption = DetachFromCentralOption.DetachAndDiscardWorksets,
-                });
+                opts);
         }
 
         public string GetFileName(string fileName) {

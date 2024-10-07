@@ -11,11 +11,13 @@ namespace RevitServerFolders.Services {
         /// </summary>
         /// <param name="targetFolder">Абсолютный путь к директории, в которую нужно экспортировать файлы</param>
         /// <param name="modelFiles">Массив абсолютных путей к файлам, которые нужно экспортировать</param>
+        /// <param name="clearTargetFolder">True, если целевую директорию надо очистить, иначе False</param>
         /// <param name="progress">Прогресс для уведомления о ходе выполнения операции</param>
         /// <param name="ct">Токен отмены</param>
         void ExportModelObjects(
             string targetFolder,
             string[] modelFiles,
+            bool clearTargetFolder = false,
             IProgress<int> progress = null,
             CancellationToken ct = default);
     }

@@ -1,19 +1,8 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.UI.WebControls;
-using System.Windows.Controls;
-using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Mechanical;
-using Autodesk.Revit.UI;
 
-using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Revit;
-using dosymep.WPF;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.ViewModels;
@@ -23,8 +12,7 @@ using Parameter = Autodesk.Revit.DB.Parameter;
 using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
-    class PylonSheetInfo : BaseViewModel {
-
+    internal class PylonSheetInfo : BaseViewModel {
         private bool _isCheck = false;
 
         internal PylonSheetInfo(MainViewModel mvm, RevitRepository repository, string pylonKeyName) {
@@ -43,7 +31,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             RebarSchedule = new PylonView(ViewModel, Repository, this);
             MaterialSchedule = new PylonView(ViewModel, Repository, this);
             SystemPartsSchedule = new PylonView(ViewModel, Repository, this);
-            IFCPartsSchedule = new PylonView(ViewModel, Repository, this);
+            IfcPartsSchedule = new PylonView(ViewModel, Repository, this);
 
             LegendView = new PylonView(ViewModel, Repository, this);
         }
@@ -56,7 +44,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         public bool IsCheck {
             get => _isCheck;
             set => this.RaiseAndSetIfChanged(ref _isCheck, value);
-
         }
 
         public bool SheetInProject { get; set; } = false;
@@ -88,7 +75,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         public PylonView RebarSchedule { get; set; }
         public PylonView MaterialSchedule { get; set; }
         public PylonView SystemPartsSchedule { get; set; }
-        public PylonView IFCPartsSchedule { get; set; }
+        public PylonView IfcPartsSchedule { get; set; }
 
 
         // Легенда примечаний
@@ -115,7 +102,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             FindTitleBlock();
             SetTitleBlockSize(Repository.Document);
-
             return true;
         }
 
@@ -123,7 +109,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// Поиск рамки на листе
         /// </summary>
         public bool FindTitleBlock() {
-
             // Ищем рамку листа
             FamilyInstance titleBlock = new FilteredElementCollector(Repository.Document, PylonViewSheet.Id)
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
@@ -132,10 +117,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             if(titleBlock is null) { return false; }
             TitleBlock = titleBlock;
-
             return true;
         }
-
 
 
         /// <summary>
@@ -164,7 +147,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             Parameter paramA = TitleBlock.LookupParameter(ViewModel.ProjectSettings.SheetSize);
             Parameter paramX = TitleBlock.LookupParameter(ViewModel.ProjectSettings.SheetCoefficient);
 
-
             if(paramA != null && paramX != null) {
                 paramA.Set(sheetSize);
                 paramX.Set(sheetCoefficient);
@@ -187,7 +169,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// Получает и сохраняет имена видов в соответствии с префиксами/суффиксами, которые указал пользователь
         /// </summary>
         public void GetViewNamesForWork() {
-
             GeneralView.ViewName = ViewModel.ViewSectionSettings.GeneralViewPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewSuffix;
             GeneralViewPerpendicular.ViewName = ViewModel.ViewSectionSettings.GeneralViewPerpendicularPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewPerpendicularSuffix;
             TransverseViewFirst.ViewName = ViewModel.ViewSectionSettings.TransverseViewFirstPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewFirstSuffix;
@@ -197,7 +178,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             RebarSchedule.ViewName = ViewModel.SchedulesSettings.RebarSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.RebarScheduleSuffix;
             MaterialSchedule.ViewName = ViewModel.SchedulesSettings.MaterialSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.MaterialScheduleSuffix;
             SystemPartsSchedule.ViewName = ViewModel.SchedulesSettings.SystemPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SystemPartsScheduleSuffix;
-            IFCPartsSchedule.ViewName = ViewModel.SchedulesSettings.IFCPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.IFCPartsScheduleSuffix;
+            IfcPartsSchedule.ViewName = ViewModel.SchedulesSettings.IfcPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.IfcPartsScheduleSuffix;
         }
 
 
@@ -205,9 +186,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// Ищет и запоминает виды и видовые экраны через видовые экраны, размещенные на листе
         /// </summary>
         public void FindViewsNViewportsOnSheet() {
-
             foreach(ElementId id in PylonViewSheet.GetAllViewports()) {
-
                 Viewport viewport = Repository.Document.GetElement(id) as Viewport;
                 ViewSection viewSection = Repository.Document.GetElement(viewport.ViewId) as ViewSection;
 
@@ -272,9 +251,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// Ищет и запоминает легенду, размещенную на листе
         /// </summary>
         public void FindNoteLegendOnSheet() {
-
             foreach(ElementId id in PylonViewSheet.GetAllViewports()) {
-
                 Viewport viewportLegend = Repository.Document.GetElement(id) as Viewport;
                 View viewLegend = Repository.Document.GetElement(viewportLegend.ViewId) as View;
 
@@ -283,7 +260,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 if(LegendView.ViewElement is null && viewLegend.Name.Equals(ViewModel.SelectedLegend.Name)) {
                     LegendView.ViewElement = viewLegend;
                     LegendView.ViewportElement = viewportLegend;
-
                     return;
                 }
             }
@@ -294,9 +270,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// Ищет и запоминает спеки и их видовые экраны через видовые экраны, размещенные на листе
         /// </summary>
         public void FindSchedulesNViewportsOnSheet() {
-
             foreach(ElementId id in PylonViewSheet.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance)))) {
-
                 ScheduleSheetInstance viewport = Repository.Document.GetElement(id) as ScheduleSheetInstance;
                 ViewSchedule viewSchedule = Repository.Document.GetElement(viewport.ScheduleId) as ViewSchedule;
 
@@ -334,12 +308,12 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
 
                 // IFCPartsSchedule
-                if(IFCPartsSchedule.ViewElement is null && viewSchedule.Name.Equals(IFCPartsSchedule.ViewName)) {
-                    IFCPartsSchedule.ViewElement = viewSchedule;
-                    IFCPartsSchedule.ViewportElement = viewport;
+                if(IfcPartsSchedule.ViewElement is null && viewSchedule.Name.Equals(IfcPartsSchedule.ViewName)) {
+                    IfcPartsSchedule.ViewElement = viewSchedule;
+                    IfcPartsSchedule.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutScheduleSheetInstance(IFCPartsSchedule, viewport);
+                    GetInfoAboutScheduleSheetInstance(IfcPartsSchedule, viewport);
                     continue;
                 }
             }
@@ -350,7 +324,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// Получение и сохранение информации о центре и габаритах видового экрана
         /// </summary>
         public void GetInfoAboutViewport(PylonView pylonView, Viewport viewport) {
-
             XYZ viewportCenter = viewport.GetBoxCenter();
             Outline viewportOutline = viewport.GetBoxOutline();
             double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
@@ -367,7 +340,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// Получение и сохранение информации о центре и габаритах видового экрана спек
         /// </summary>
         public void GetInfoAboutScheduleSheetInstance(PylonView pylonView, ScheduleSheetInstance scheduleSheetInstance) {
-
             // Получение габаритов видового экрана спецификации
             XYZ viewportCenter = scheduleSheetInstance.Point;
             BoundingBoxXYZ boundingBoxXYZ = scheduleSheetInstance.get_BoundingBox(pylonView.SheetInfo.PylonViewSheet);
@@ -378,8 +350,5 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             pylonView.ViewportHalfWidth = scheduleHalfWidth;
             pylonView.ViewportHalfHeight = scheduleHalfHeight;
         }
-
-
-
     }
 }
