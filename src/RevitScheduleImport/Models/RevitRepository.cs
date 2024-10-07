@@ -33,7 +33,7 @@ namespace RevitScheduleImport.Models {
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 try {
                     // пытаемся добавить суффикс к названию
-                    schedule.Name = $"{name}_{DateTime.Now:yyyy_MM_dd_hh-mm-ss}";
+                    schedule.Name = $"{name}_{DateTime.Now:yyyy_MM_dd_HH-mm-ss}";
                 } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                     // оставляем название по умолчанию
                 }

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -18,6 +20,15 @@ namespace RevitScheduleImport.Services {
         private readonly ExcelReader _excelReader;
         private readonly double _footInMm;
         private readonly Dictionary<XLThemeColor, System.Drawing.Color> _colorsDictionary;
+        /// <summary>
+        /// Коэффициент перевода единиц ширины столбца Excel в мм
+        /// </summary>
+        private const double _excelWidthToMm = 2.160651;
+
+        /// <summary>
+        /// Коэффициент перевода единиц высоты строки Excel в мм
+        /// </summary>
+        private const double _excelHeightToMm = 0.344086;
 
         public ScheduleImporter(
             RevitRepository revitRepository,
@@ -37,19 +48,6 @@ namespace RevitScheduleImport.Services {
                 throw new FileNotFoundException("Excel файл не найден.", path);
             }
 
-            // В заголовке спеки в 2022 и 2024 ревите можно:
-            // добавлять, удалять, объединять, изменять размер столбцов и строк
-
-            // устанавливать в качестве стиля линии для границы ячейки стиль линий из проекта +
-
-            // устанавливать шрифт в ячейке +
-            //               размер шрифта +
-            //               начертание (полужирный +, курсив +, подчеркнутый +)
-            //               цвет шрифта +
-
-            // устанавливать выравнивание текста в ячейке по горизонтали, вертикали +
-
-            // заливку цветом ячейки (тонирование) +
             using(var excelData = _excelReader.ReadExcel(path)) {
                 using(Transaction trans = _revitRepository.Document.StartTransaction("Импорт Excel")) {
                     List<string> failedSheets = new List<string>();
@@ -106,7 +104,7 @@ namespace RevitScheduleImport.Services {
                 }
                 // fucking width
                 // https://github.com/ClosedXML/ClosedXML/wiki/Cell-Dimensions#width-1
-                tableSectionData.SetColumnWidth(i, col.Width / _footInMm);
+                tableSectionData.SetColumnWidth(i, col.Width * _excelWidthToMm / _footInMm);
                 i++;
             }
 
@@ -116,7 +114,9 @@ namespace RevitScheduleImport.Services {
                 if(j < (rowsCount - 1)) {
                     tableSectionData.InsertRow(j + 1);
                 }
-                tableSectionData.SetRowHeight(j, row.Height / (_footInMm * 7));
+                // fucking height
+                // https://github.com/ClosedXML/ClosedXML/wiki/Cell-Dimensions#height
+                tableSectionData.SetRowHeight(j, row.Height * _excelHeightToMm / _footInMm);
                 j++;
             }
 
@@ -152,58 +152,125 @@ namespace RevitScheduleImport.Services {
         }
 
         private TableCellStyle GetTableCellStyle(IXLCell cell) {
-            var cellStyle = cell.Style;
-
-
-            var cellColor = cell.Style.Fill.BackgroundColor;
-
-            var alignment = cell.Style.Alignment; // +
-            var vAlignment = alignment.Vertical; // +
-            var hAlignment = alignment.Horizontal; // +
-
-
+            if(cell.Address.RowNumber == 2) {
+                Debug.Assert(true);
+            }
             var border = cell.Style.Border;
-            var topBorder = border.TopBorder;
-            var bottomBorder = border.BottomBorder;
-            var leftBorder = border.LeftBorder;
-            var rightBorder = border.RightBorder;
-
-
-            var font = cell.Style.Font;
-            var fontSize = font.FontSize; // +
-            var fontName = font.FontName; // +
-            bool fontIsItalic = font.Italic; // +
-            bool fontIsBold = font.Bold; // +
-            bool fontIsUnderline = font.Underline != XLFontUnderlineValues.None; // +
-            var fontColor = font.FontColor; // +
+            var hideTopBorder = HideCellBorder(cell, CellBorder.Top, true);
+            var hideBottomBorder = HideCellBorder(cell, CellBorder.Bottom, true);
+            var hideLeftBorder = HideCellBorder(cell, CellBorder.Left, true);
+            var hideRightBorder = HideCellBorder(cell, CellBorder.Right, true);
 
             var style = new TableCellStyle() {
-                FontVerticalAlignment = GetVerticalAlignmentStyle(alignment.Vertical),
-                FontHorizontalAlignment = GetHorizontalAlignmentStyle(alignment.Horizontal),
-
-                TextSize = fontSize,// GetFontSizeInInternal(fontSize),
-                IsFontItalic = font.Italic,
-                IsFontBold = font.Bold,
-                IsFontUnderline = font.Underline != XLFontUnderlineValues.None,
-
-                TextColor = GetColor(cell.Worksheet.Workbook, fontColor),
-
-                FontName = fontName
+                FontVerticalAlignment = GetVerticalAlignmentStyle(cell.Style.Alignment.Vertical),
+                FontHorizontalAlignment = GetHorizontalAlignmentStyle(cell.Style.Alignment.Horizontal),
+                BackgroundColor = GetColor(cell.Worksheet.Workbook, cell.Style.Fill.BackgroundColor),
+                BorderTopLineStyle = ElementId.InvalidElementId,
+                BorderBottomLineStyle = ElementId.InvalidElementId,
+                BorderLeftLineStyle = ElementId.InvalidElementId,
+                BorderRightLineStyle = ElementId.InvalidElementId,
+                TextSize = cell.Style.Font.FontSize,
+                IsFontItalic = cell.Style.Font.Italic,
+                IsFontBold = cell.Style.Font.Bold,
+                IsFontUnderline = cell.Style.Font.Underline != XLFontUnderlineValues.None,
+                TextColor = GetColor(cell.Worksheet.Workbook, cell.Style.Font.FontColor),
+                FontName = cell.Style.Font.FontName
             };
             style.SetCellStyleOverrideOptions(new TableCellStyleOverrideOptions() {
                 VerticalAlignment = true,
                 HorizontalAlignment = true,
-
+                BackgroundColor = true,
+                BorderTopLineStyle = hideTopBorder,
+                BorderBottomLineStyle = hideBottomBorder,
+                BorderLeftLineStyle = hideLeftBorder,
+                BorderRightLineStyle = hideRightBorder,
                 FontSize = true,
                 Italics = true,
                 Bold = true,
                 Underline = true,
-
                 FontColor = true,
-
                 Font = true
             });
             return style;
+        }
+
+        private bool TryGetNeighboringCell(IXLCell cell, CellBorder border, out IXLCell neighboringCell) {
+            try {
+                switch(border) {
+                    case CellBorder.Left:
+                        neighboringCell = cell.Worksheet.Cell(cell.Address.RowNumber, cell.Address.ColumnNumber - 1);
+                        return true;
+                    case CellBorder.Top:
+                        neighboringCell = cell.Worksheet.Cell(cell.Address.RowNumber - 1, cell.Address.ColumnNumber);
+                        return true;
+                    case CellBorder.Right:
+                        neighboringCell = cell.Worksheet.Cell(cell.Address.RowNumber, cell.Address.ColumnNumber + 1);
+                        return true;
+                    case CellBorder.Bottom:
+                        neighboringCell = cell.Worksheet.Cell(cell.Address.RowNumber + 1, cell.Address.ColumnNumber);
+                        return true;
+                    default:
+                        neighboringCell = null;
+                        return false;
+                }
+            } catch(ArgumentOutOfRangeException) {
+                neighboringCell = null;
+                return false;
+            }
+        }
+
+        private bool HideCellBorder(IXLCell cell, CellBorder cellBorder, bool considerNeighbor) {
+            bool hideCurrentCellBorder = HideCellBorder(cell, cellBorder);
+            if(considerNeighbor) {
+                var neighboringCellExist = TryGetNeighboringCell(cell, cellBorder, out IXLCell neighboringCell);
+                return hideCurrentCellBorder
+                    && (neighboringCellExist && HideCellBorder(neighboringCell, GetInvertedCellBorder(cellBorder))
+                        || !neighboringCellExist);
+            } else {
+                return hideCurrentCellBorder;
+            }
+        }
+
+        private CellBorder GetInvertedCellBorder(CellBorder cellBorder) {
+            switch(cellBorder) {
+                case CellBorder.Left:
+                    return CellBorder.Right;
+                case CellBorder.Top:
+                    return CellBorder.Bottom;
+                case CellBorder.Right:
+                    return CellBorder.Left;
+                case CellBorder.Bottom:
+                    return CellBorder.Top;
+                default:
+                    throw new InvalidOperationException($"Нельзя инвертировать границу {cellBorder}");
+            }
+        }
+
+        private bool HideCellBorder(IXLCell cell, CellBorder cellBorder) {
+            var border = cell.Style.Border;
+            switch(cellBorder) {
+                case CellBorder.Left:
+                    return CellBorderColorIsWhite(cell.Worksheet.Workbook, border.LeftBorderColor)
+                        || border.LeftBorder == XLBorderStyleValues.None;
+                case CellBorder.Top:
+                    return CellBorderColorIsWhite(cell.Worksheet.Workbook, border.TopBorderColor)
+                        || border.TopBorder == XLBorderStyleValues.None;
+                case CellBorder.Right:
+                    return CellBorderColorIsWhite(cell.Worksheet.Workbook, border.RightBorderColor)
+                        || border.RightBorder == XLBorderStyleValues.None;
+                case CellBorder.Bottom:
+                    return CellBorderColorIsWhite(cell.Worksheet.Workbook, border.BottomBorderColor)
+                        || border.BottomBorder == XLBorderStyleValues.None;
+                default:
+                    return false;
+            }
+        }
+
+        private bool CellBorderColorIsWhite(IXLWorkbook workbook, XLColor xlColor) {
+            var color = GetBorderColor(workbook, xlColor);
+            return color.Red == 255
+                && color.Green == 255
+                && color.Blue == 255;
         }
 
         private Color GetColor(IXLWorkbook workbook, XLColor xlColor) {
@@ -219,6 +286,21 @@ namespace RevitScheduleImport.Services {
                     return new Color(color.R, color.G, color.B);
                 default:
                     return new Color(xlColor.Color.R, xlColor.Color.G, xlColor.Color.B);
+            }
+        }
+
+        private Color GetBorderColor(IXLWorkbook workbook, XLColor xlColor) {
+            var colorType = xlColor.ColorType;
+            if(colorType == XLColorType.Indexed
+                        && xlColor.Indexed == 64
+                        && xlColor.Color.R == 255
+                        && xlColor.Color.G == 255
+                        && xlColor.Color.B == 255) {
+                // fucking excel
+                // здесь цвет границы "по умолчанию", который отображается в Excel как черный, а в api как белый
+                return new Color(0, 0, 0); // Black
+            } else {
+                return GetColor(workbook, xlColor);
             }
         }
 
