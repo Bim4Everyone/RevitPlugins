@@ -27,7 +27,7 @@ namespace RevitDeclarations.Models {
             _phase = revitRepository.GetPhaseByName(document.Document, _settings.SelectedPhase.Name);
 
             _rooms = revitRepository.GetRoomsOnPhase(document.Document, _phase, settings);
-            _rooms = FilterApartmentRooms(_rooms);
+            _rooms = FilterDeclarationRooms(_rooms);
         }
 
         /// <summary>Отфильтрованные помещения для выгрузки</summary>
@@ -35,7 +35,7 @@ namespace RevitDeclarations.Models {
         public RevitDocumentViewModel Document => _document;
         public Phase Phase => _phase;
 
-        private IReadOnlyCollection<RoomElement> FilterApartmentRooms(IEnumerable<RoomElement> rooms) {
+        private IReadOnlyCollection<RoomElement> FilterDeclarationRooms(IEnumerable<RoomElement> rooms) {
             Parameter filterParam = _settings.FilterRoomsParam;
             string filterValue = _settings.FilterRoomsValue;
             StringComparison ignorCase = StringComparison.OrdinalIgnoreCase;
