@@ -19,8 +19,8 @@ using RevitDeclarations.Views;
 
 namespace RevitDeclarations {
     [Transaction(TransactionMode.Manual)]
-    public class RevitDeclarationsCommand : BasePluginCommand {
-        public RevitDeclarationsCommand() {
+    public class ApartmentDeclarationsCommand : BasePluginCommand {
+        public ApartmentDeclarationsCommand() {
             PluginName = "Декларации";
         }
 
@@ -33,10 +33,10 @@ namespace RevitDeclarations {
 				kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 				
-				kernel.Bind<ApartMainViewModel>().ToSelf();
+				kernel.Bind<ApartMainVM>().ToSelf();
 				kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ApartMainViewModel>());
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ApartMainVM>());
 				
 				Notification(kernel.Get<MainWindow>());
 			}

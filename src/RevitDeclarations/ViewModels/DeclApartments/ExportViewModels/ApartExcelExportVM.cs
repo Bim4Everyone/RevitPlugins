@@ -5,8 +5,8 @@ using System.Linq;
 using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels {
-    internal class ExcelExportViewModel : ExportViewModel {
-        public ExcelExportViewModel(string name, Guid id, DeclarationSettings settings) 
+    internal class ApartExcelExportVM : ExportViewModel {
+        public ApartExcelExportVM(string name, Guid id, DeclarationSettings settings) 
             : base(name, id, settings) {
         }
 

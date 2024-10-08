@@ -7,8 +7,8 @@ using Autodesk.Revit.UI;
 using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels {
-    internal class JsonExportViewModel : ExportViewModel {
-        public JsonExportViewModel(string name, Guid id, DeclarationSettings settings) 
+    internal class ApartJsonExportVM : ExportViewModel {
+        public ApartJsonExportVM(string name, Guid id, DeclarationSettings settings) 
             : base(name, id, settings) {
         }
 

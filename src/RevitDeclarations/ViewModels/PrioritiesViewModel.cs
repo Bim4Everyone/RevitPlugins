@@ -12,14 +12,14 @@ using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels {
     internal class PrioritiesViewModel : BaseViewModel {
-        private readonly ApartMainViewModel _mainViewModel;
+        private readonly ApartMainVM _mainViewModel;
         private string _filePath;
 
         private PrioritiesConfig _prioritiesConfig;
         private List<PriorityViewModel> _prioritiesVM;
 
 
-        public PrioritiesViewModel(ApartMainViewModel mainViewModel) {
+        public PrioritiesViewModel(ApartMainVM mainViewModel) {
             _mainViewModel = mainViewModel;
 
             SetDefaultConfig(new object());

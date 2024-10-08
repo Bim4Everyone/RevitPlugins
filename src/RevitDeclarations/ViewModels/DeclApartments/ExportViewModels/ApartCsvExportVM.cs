@@ -5,8 +5,8 @@ using System.Linq;
 using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels {
-    internal class CsvExportViewModel : ExportViewModel {
-        public CsvExportViewModel(string name, Guid id, DeclarationSettings settings) 
+    internal class ApartCsvExportVM : ExportViewModel {
+        public ApartCsvExportVM(string name, Guid id, DeclarationSettings settings) 
             : base(name, id, settings) { 
         }
 
