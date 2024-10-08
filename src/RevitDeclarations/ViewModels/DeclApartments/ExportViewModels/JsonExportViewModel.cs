@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.UI;
 
@@ -11,9 +12,9 @@ namespace RevitDeclarations.ViewModels {
             : base(name, id, settings) {
         }
 
-        public override void Export(string path, IEnumerable<Apartment> apartments) {
+        public override void Export(string path, IEnumerable<RoomGroup> apartments) {
             JsonExporter<Apartment> exporter = new JsonExporter<Apartment>();
-            exporter.Export(path, apartments);
+            exporter.Export(path, apartments.Cast<Apartment>());
             TaskDialog.Show("Декларации", $"Файл {Name} создан");
         }
     }

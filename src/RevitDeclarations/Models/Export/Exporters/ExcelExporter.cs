@@ -16,7 +16,7 @@ namespace RevitDeclarations.Models {
         private readonly Color _nonConfigRoomsColor = Color.FromArgb(237, 237, 237);
         private readonly Color _utpColor = Color.FromArgb(226, 207, 245);
 
-        public void Export(string path, DeclarationDataTable declarationTable) {
+        public void Export(string path, IDeclarationDataTable declarationTable) {
             /* Releasing all COM objects was made on the basis of the article:
              * https://www.add-in-express.com/creating-addins-blog/release-excel-com-objects/
              */
@@ -55,7 +55,7 @@ namespace RevitDeclarations.Models {
                     }
                 }
 
-                SetGraphicSettings(workSheet, declarationTable.TableInfo);
+                //SetGraphicSettings(workSheet, declarationTable.TableInfo);
 
                 workBook.SaveAs(path);
                 workBook.Close(false);
@@ -69,7 +69,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        private void SetGraphicSettings(Worksheet workSheet, DeclarationTableInfo tableInfo) {
+        private void SetGraphicSettings(Worksheet workSheet, ApartDeclTableInfo tableInfo) {
             workSheet.StandardWidth = 12;
             Range range = (Range) workSheet.Rows[1];
 
@@ -89,14 +89,14 @@ namespace RevitDeclarations.Models {
             workSheet.Range[firstCell, lastCell].VerticalAlignment = XlVAlign.xlVAlignCenter;
 
             for(int i = 1; i <= tableInfo.FullTableWidth; i++) {
-                if(i <= DeclarationTableInfo.InfoWidth) {
+                if(i <= ApartDeclTableInfo.InfoWidth) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 15.5;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _apartInfoColor;
-                } else if(i > DeclarationTableInfo.InfoWidth && i <= tableInfo.SummerRoomsStart) {
+                } else if(i > ApartDeclTableInfo.InfoWidth && i <= tableInfo.SummerRoomsStart) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 10;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _mainRoomsColor;
 
-                    int checkColumnNumber = (i - DeclarationTableInfo.InfoWidth) % 3;
+                    int checkColumnNumber = (i - ApartDeclTableInfo.InfoWidth) % 3;
                     if(checkColumnNumber == 0) {
                         ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;

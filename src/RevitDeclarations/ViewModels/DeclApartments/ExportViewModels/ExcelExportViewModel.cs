@@ -10,9 +10,9 @@ namespace RevitDeclarations.ViewModels {
             : base(name, id, settings) {
         }
 
-        public override void Export(string path, IEnumerable<Apartment> apartments) {
-            DeclarationTableInfo tableData = new DeclarationTableInfo(apartments.ToList(), _settings);
-            DeclarationDataTable table = new DeclarationDataTable(tableData, _settings);
+        public override void Export(string path, IEnumerable<RoomGroup> apartments) {
+            ApartDeclTableInfo tableData = new ApartDeclTableInfo(apartments.Cast<Apartment>().ToList(), _settings);
+            ApartDeclDataTable table = new ApartDeclDataTable(tableData, _settings);
 
             ExportTable<ExcelExporter>(path, table);
         }

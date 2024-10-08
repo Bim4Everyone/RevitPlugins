@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RevitDeclarations.Models {
     internal class CsvExporter : ITableExporter {
-        public void Export(string path, DeclarationDataTable table) {
+        public void Export(string path, IDeclarationDataTable table) {
             path = Path.ChangeExtension(path, "scv");
 
             string strData = ConvertDataTableToString(table);
@@ -15,7 +15,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        private string ConvertDataTableToString(DeclarationDataTable table) {
+        private string ConvertDataTableToString(IDeclarationDataTable table) {
             StringBuilder strBuilder = new StringBuilder();
 
             string[] headerFields = table.HeaderDataTable.Rows[0]

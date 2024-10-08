@@ -1,5 +1,5 @@
 namespace RevitDeclarations.Models {
     internal interface ITableExporter {
-        void Export(string path, DeclarationDataTable declarationTable);
+        void Export(string path, IDeclarationDataTable declarationTable);
     }
 }
