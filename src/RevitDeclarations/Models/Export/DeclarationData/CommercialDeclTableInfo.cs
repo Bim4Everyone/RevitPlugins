@@ -9,9 +9,18 @@ namespace RevitDeclarations.Models.Export.DeclarationData {
         private readonly IReadOnlyCollection<CommercialRooms> _commercialRooms;
         private readonly DeclarationSettings _settings;
 
-        public CommercialDeclTableInfo(IReadOnlyCollection<CommercialRooms> commercialRooms, DeclarationSettings settings) {
+        private readonly int _fullTableWidth;
+
+        public CommercialDeclTableInfo(IReadOnlyCollection<CommercialRooms> commercialRooms, 
+                                       DeclarationSettings settings) {
             _commercialRooms = commercialRooms;
             _settings = settings;
+
+            _fullTableWidth = 11;
         }
+
+        public IReadOnlyCollection<RoomGroup> RoomGroups => _commercialRooms;
+        public int FullTableWidth => _fullTableWidth;
+
     }
 }
