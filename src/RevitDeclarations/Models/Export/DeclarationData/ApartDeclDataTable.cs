@@ -37,7 +37,7 @@ namespace RevitDeclarations.Models {
         }
 
         private void CreateRows() {
-            for(int i = 0; i < _tableInfo.Apartments.Count; i++) {
+            for(int i = 0; i < _tableInfo.RoomGroups.Count; i++) {
                 _mainTable.Rows.Add();
             }
 
@@ -127,7 +127,7 @@ namespace RevitDeclarations.Models {
         private void FillTableApartmentsInfo() {
             int rowNumber = 0;
 
-            foreach(Apartment apartment in _tableInfo.Apartments) {
+            foreach(Apartment apartment in _tableInfo.RoomGroups) {
                 _mainTable.Rows[rowNumber][0] = apartment.FullNumber;
                 _mainTable.Rows[rowNumber][1] = apartment.Department;
                 _mainTable.Rows[rowNumber][2] = apartment.Level;
@@ -162,7 +162,7 @@ namespace RevitDeclarations.Models {
             int rowNumber = 0;
             int columnNumber = _tableInfo.UtpStart;
 
-            foreach(Apartment apartment in _tableInfo.Apartments) {
+            foreach(Apartment apartment in _tableInfo.RoomGroups) {
                 _mainTable.Rows[rowNumber][columnNumber] = apartment.UtpTwoBaths;
                 _mainTable.Rows[rowNumber][columnNumber + 1] = apartment.UtpHighflat;
                 _mainTable.Rows[rowNumber][columnNumber + 2] = apartment.UtpBalcony;

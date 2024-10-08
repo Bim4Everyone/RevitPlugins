@@ -34,7 +34,7 @@ namespace RevitDeclarations.Models {
             CalculateTableSizes();
         }
 
-        public IReadOnlyCollection<Apartment> Apartments => _apartments;
+        public IReadOnlyCollection<RoomGroup> RoomGroups => _apartments;
         public int FullTableWidth => _fullTableWidth;
         public int SummerRoomsStart => _summerRoomsStart;
         public int OtherRoomsStart => _otherRoomsStart;
