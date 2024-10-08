@@ -57,5 +57,7 @@ namespace RevitDeclarations.Models {
         public string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
         [JsonProperty("area")]
         public double AreaMain => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy);
+        [JsonProperty("ceiling_height")]
+        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracy);
     }
 }

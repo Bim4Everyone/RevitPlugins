@@ -66,17 +66,20 @@ namespace RevitDeclarations.Models.Export.DeclarationData {
         private void FillTableApartmentsInfo() {
             int rowNumber = 0;
 
-            foreach(CommercialRooms commercialRooms in _tableInfo.RoomGroups) {
-                _mainTable.Rows[rowNumber][0] = commercialRooms.FullNumber;
+            foreach(CommercialRooms commercialRooms in _tableInfo.RoomGroups.Cast<CommercialRooms>()) {
+                // ИСПРАВИТЬ!!!
+                RoomElement roomElement = commercialRooms.Rooms.First();
+
+                _mainTable.Rows[rowNumber][0] = $"{commercialRooms.Number}_{roomElement.Number}";
                 _mainTable.Rows[rowNumber][1] = commercialRooms.Department;
                 _mainTable.Rows[rowNumber][2] = commercialRooms.Level;
                 _mainTable.Rows[rowNumber][3] = commercialRooms.Section;
                 _mainTable.Rows[rowNumber][4] = commercialRooms.Building;
-                _mainTable.Rows[rowNumber][5] = commercialRooms.Number;
-                _mainTable.Rows[rowNumber][6] = commercialRooms.AreaMain;
+                _mainTable.Rows[rowNumber][5] = commercialRooms.AreaMain;
+                _mainTable.Rows[rowNumber][6] = commercialRooms.RoomsHeight;
                 _mainTable.Rows[rowNumber][7] = "";
                 _mainTable.Rows[rowNumber][8] = "";
-                _mainTable.Rows[rowNumber][9] = "";
+                _mainTable.Rows[rowNumber][9] = roomElement.Name;
                 _mainTable.Rows[rowNumber][10] = "";
 
                 rowNumber++;

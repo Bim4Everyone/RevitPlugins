@@ -52,8 +52,6 @@ namespace RevitDeclarations.Models {
         public double AreaNonSummer => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaNonSumParam, _accuracy);
         [JsonProperty("room_size")]
         public int RoomsAmount => _firstRoom.GetIntParamValue(_settings.RoomsAmountParam);
-        [JsonProperty("ceiling_height")]
-        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracy);
 
         [JsonIgnore]
         public string UtpTwoBaths => _utpTwoBaths;
