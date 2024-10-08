@@ -174,7 +174,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="specificationElement"></param>
         /// <returns></returns>
         private string GetPipeInsulationName(SpecificationElement specificationElement) {
-            InsulationLiningBase insulation = specificationElement.Element as InsulationLiningBase;
+            InsulationLiningBase insulation = (InsulationLiningBase)specificationElement.Element;
 
             // Нужно проверить, что у изоляции реально есть хост. Изредка багует что его нет
             if(insulation.HostElementId.IsNull()) {
