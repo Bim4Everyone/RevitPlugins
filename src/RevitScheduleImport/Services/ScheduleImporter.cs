@@ -18,17 +18,8 @@ namespace RevitScheduleImport.Services {
         private readonly RevitRepository _revitRepository;
         private readonly LengthConverter _lengthConverter;
         private readonly ExcelReader _excelReader;
-        private readonly double _footInMm;
         private readonly Dictionary<XLThemeColor, System.Drawing.Color> _colorsDictionary;
-        /// <summary>
-        /// Коэффициент перевода единиц ширины столбца Excel в мм
-        /// </summary>
-        private const double _excelWidthToMm = 2.160651;
 
-        /// <summary>
-        /// Коэффициент перевода единиц высоты строки Excel в мм
-        /// </summary>
-        private const double _excelHeightToMm = 0.344086;
 
         public ScheduleImporter(
             RevitRepository revitRepository,
@@ -37,7 +28,6 @@ namespace RevitScheduleImport.Services {
             _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
             _lengthConverter = lengthConverter ?? throw new System.ArgumentNullException(nameof(lengthConverter));
             _excelReader = excelReader ?? throw new System.ArgumentNullException(nameof(excelReader));
-            _footInMm = _lengthConverter.ConvertFromInternal(1);
             _colorsDictionary = new Dictionary<XLThemeColor, System.Drawing.Color>();
         }
 
@@ -102,16 +92,14 @@ namespace RevitScheduleImport.Services {
 
             var defaultFontSize = columns.Style.Font.FontSize;
             var tableSectionData = tableData.GetSectionData(SectionType.Header);
-            tableData.Width = columns.Sum(col => col.Width) / _footInMm;
+            tableData.Width = columns.Sum(col => _lengthConverter.ConvertExcelColWidthToInternal(col.Width));
             int columnsCount = columns.Count();
             int i = 0;
             foreach(var col in columns) {
                 if(i < (columnsCount - 1)) {
                     tableSectionData.InsertColumn(i + 1);
                 }
-                // fucking width
-                // https://github.com/ClosedXML/ClosedXML/wiki/Cell-Dimensions#width-1
-                tableSectionData.SetColumnWidth(i, col.Width * _excelWidthToMm / _footInMm);
+                tableSectionData.SetColumnWidth(i, _lengthConverter.ConvertExcelColWidthToInternal(col.Width));
                 i++;
             }
 
@@ -121,9 +109,7 @@ namespace RevitScheduleImport.Services {
                 if(j < (rowsCount - 1)) {
                     tableSectionData.InsertRow(j + 1);
                 }
-                // fucking height
-                // https://github.com/ClosedXML/ClosedXML/wiki/Cell-Dimensions#height
-                tableSectionData.SetRowHeight(j, row.Height * _excelHeightToMm / _footInMm);
+                tableSectionData.SetRowHeight(j, _lengthConverter.ConvertExcelRowHeightToInternal(row.Height));
                 j++;
             }
 
