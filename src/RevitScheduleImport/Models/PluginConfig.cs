@@ -22,6 +22,6 @@ namespace RevitScheduleImport.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public string StartDirectory { get; set; }
+        public string InitialDirectory { get; set; }
     }
 }

@@ -37,26 +37,33 @@ namespace RevitScheduleImport.Services {
             _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
             _lengthConverter = lengthConverter ?? throw new System.ArgumentNullException(nameof(lengthConverter));
             _excelReader = excelReader ?? throw new System.ArgumentNullException(nameof(excelReader));
-
             _footInMm = _lengthConverter.ConvertFromInternal(1);
             _colorsDictionary = new Dictionary<XLThemeColor, System.Drawing.Color>();
         }
 
 
-        public void ImportSchedule(string path, out string[] failedWorksheets) {
+        public void ImportSchedule(string path, string transactionName, out string[] failedWorksheets) {
             if(!File.Exists(path)) {
                 throw new FileNotFoundException("Excel файл не найден.", path);
             }
+            if(string.IsNullOrWhiteSpace(transactionName)) {
+                throw new ArgumentException(nameof(transactionName));
+            }
 
             using(var excelData = _excelReader.ReadExcel(path)) {
-                using(Transaction trans = _revitRepository.Document.StartTransaction("Импорт Excel")) {
+                using(Transaction trans = _revitRepository.Document.StartTransaction(transactionName)) {
                     List<string> failedSheets = new List<string>();
                     foreach(var worksheet in excelData.Workbook.Worksheets) {
+                        ViewSchedule schedule = default;
                         try {
                             string scheduleName = CreateScheduleName(path, worksheet.Name);
-                            var schedule = _revitRepository.CreateSchedule(scheduleName);
+                            schedule = _revitRepository.CreateSchedule(scheduleName);
                             WriteData(schedule, worksheet);
                         } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                            _revitRepository.DeleteSchedule(schedule);
+                            failedSheets.Add(worksheet.Name);
+                        } catch(NullReferenceException) {
+                            _revitRepository.DeleteSchedule(schedule);
                             failedSheets.Add(worksheet.Name);
                         }
                     }

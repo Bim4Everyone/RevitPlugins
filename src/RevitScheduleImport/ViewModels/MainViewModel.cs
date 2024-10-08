@@ -1,75 +1,109 @@
-using System.Windows.Input;
+using System;
+using System.IO;
+using System.Windows;
 
 using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitScheduleImport.Models;
+using RevitScheduleImport.Services;
 
 namespace RevitScheduleImport.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
+        private readonly IOpenFileDialogService _fileDialogService;
+        private readonly IMessageBoxService _messageBoxService;
 
-        private string _errorText;
-        private string _saveProperty;
+        private string _initialDirectory;
 
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
-            ILocalizationService localizationService) {
+            ILocalizationService localizationService,
+            IOpenFileDialogService fileDialogService,
+            IMessageBoxService messageBoxService) {
 
-            _pluginConfig = pluginConfig;
-            _revitRepository = revitRepository;
-            _localizationService = localizationService;
-
-            LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-        }
-
-        public ICommand LoadViewCommand { get; }
-        public ICommand AcceptViewCommand { get; }
-
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
-        }
-
-        private void LoadView() {
+            _pluginConfig = pluginConfig
+                ?? throw new System.ArgumentNullException(nameof(pluginConfig));
+            _revitRepository = revitRepository
+                ?? throw new System.ArgumentNullException(nameof(revitRepository));
+            _localizationService = localizationService
+                ?? throw new System.ArgumentNullException(nameof(localizationService));
+            _fileDialogService = fileDialogService
+                ?? throw new System.ArgumentNullException(nameof(fileDialogService));
+            _messageBoxService = messageBoxService
+                ?? throw new ArgumentNullException(nameof(messageBoxService));
             LoadConfig();
         }
 
-        private void AcceptView() {
-            SaveConfig();
+
+        public ILocalizationService LocalizationService => _localizationService;
+
+        public IMessageBoxService MessageBoxService => _messageBoxService;
+
+        public IOpenFileDialogService OpenFileDialogService => _fileDialogService;
+
+        public string InitialDirectory {
+            get => _initialDirectory;
+            set => this.RaiseAndSetIfChanged(ref _initialDirectory, value);
         }
 
-        private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-                return false;
-            }
 
-            ErrorText = null;
-            return true;
+        public bool ExecuteImportCommand() {
+            _fileDialogService.InitialDirectory = InitialDirectory;
+            var dialogResult = _fileDialogService.ShowDialog();
+            if(dialogResult) {
+                InitialDirectory = _fileDialogService.File.DirectoryName;
+                SaveConfig();
+                try {
+                    var importer = GetPlatformService<ScheduleImporter>();
+                    var transactionName = _localizationService.GetLocalizedString("Revit.Transaction");
+                    importer.ImportSchedule(
+                        _fileDialogService.File.FullName,
+                        transactionName,
+                        out string[] failedSheets);
+
+                    if(failedSheets.Length > 0) {
+                        var header = _localizationService.GetLocalizedString("Warnings.NotAllSheetsImported");
+                        var msg = $"{header}\n{string.Join("\n", failedSheets)}";
+                        _messageBoxService.Show(
+                            msg,
+                            _localizationService.GetLocalizedString("Errors.Severity.Warning"),
+                            System.Windows.MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                    }
+                } catch(FileNotFoundException) {
+                    ShowLocalizedErrorMessage("Errors.FileNotFoundException", MessageBoxImage.Error);
+                } catch(IOException) {
+                    ShowLocalizedErrorMessage("Errors.IOException", MessageBoxImage.Error);
+                }
+            }
+            return dialogResult;
+        }
+
+
+        private void ShowLocalizedErrorMessage(string localizedContentName, MessageBoxImage messageImage) {
+            _messageBoxService.Show(
+                _localizationService.GetLocalizedString(localizedContentName),
+                _localizationService.GetLocalizedString("Errors.Severity.Error"),
+                System.Windows.MessageBoxButton.OK,
+                messageImage);
         }
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            SaveProperty = setting?.StartDirectory ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+            InitialDirectory = setting?.InitialDirectory
+                ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                     ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.StartDirectory = SaveProperty;
+            setting.InitialDirectory = InitialDirectory;
             _pluginConfig.SaveProjectConfig();
         }
     }

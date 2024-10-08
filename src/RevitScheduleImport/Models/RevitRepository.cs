@@ -5,6 +5,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 namespace RevitScheduleImport.Models {
     public class RevitRepository {
         public RevitRepository(UIApplication uiApplication) {
@@ -41,6 +43,12 @@ namespace RevitScheduleImport.Models {
             SchedulableField schedulableField = schedule.Definition.GetSchedulableFields().First();
             schedule.Definition.AddField(schedulableField); // добавляем 1 параметр в спецификацию
             return schedule;
+        }
+
+        public void DeleteSchedule(ViewSchedule schedule) {
+            if(schedule != null && schedule.Id.IsNotNull()) {
+                Document.Delete(schedule.Id);
+            }
         }
     }
 }
