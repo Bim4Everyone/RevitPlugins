@@ -49,10 +49,8 @@ namespace RevitScheduleImport.Services {
                             string scheduleName = CreateScheduleName(path, worksheet.Name);
                             schedule = _revitRepository.CreateSchedule(scheduleName);
                             WriteData(schedule, worksheet);
-                        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                            _revitRepository.DeleteSchedule(schedule);
-                            failedSheets.Add(worksheet.Name);
-                        } catch(NullReferenceException) {
+                        } catch(Exception ex) when(ex is Autodesk.Revit.Exceptions.ApplicationException
+                            || ex is NullReferenceException) {
                             _revitRepository.DeleteSchedule(schedule);
                             failedSheets.Add(worksheet.Name);
                         }
