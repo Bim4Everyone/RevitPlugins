@@ -82,7 +82,7 @@ namespace RevitDeclarations.Models {
             ((Range) workSheet.Columns[1]).NumberFormat = "@";
 
             Range firstCell = (Range) workSheet.Cells[1, 1];
-            Range lastCell = (Range) workSheet.Cells[tableInfo.Apartments.Count + 1, tableInfo.FullTableWidth];
+            Range lastCell = (Range) workSheet.Cells[tableInfo.RoomGroups.Count + 1, tableInfo.FullTableWidth];
 
             workSheet.Range[firstCell, lastCell].Borders.ColorIndex = 0;
             workSheet.Range[firstCell, lastCell].HorizontalAlignment = XlHAlign.xlHAlignCenter;
