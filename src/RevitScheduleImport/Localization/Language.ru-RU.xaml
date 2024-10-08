@@ -8,7 +8,7 @@
     <system:String
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String
-        x:Key="MainWindow.ButtonOk">Ок</system:String>
+        x:Key="MainWindow.ButtonOk">Выбрать</system:String>
     <system:String
         x:Key="MainWindow.Title">Импорт Excel</system:String>
     <system:String
