@@ -32,7 +32,11 @@ namespace RevitScheduleImport.Services {
         }
 
 
-        public void ImportSchedule(string path, string transactionName, out string[] failedWorksheets) {
+        public void ImportSchedule(
+            string path,
+            string transactionName,
+            BuiltInCategory category,
+            out string[] failedWorksheets) {
             if(!File.Exists(path)) {
                 throw new FileNotFoundException("Excel файл не найден.", path);
             }
@@ -47,7 +51,7 @@ namespace RevitScheduleImport.Services {
                         ViewSchedule schedule = default;
                         try {
                             string scheduleName = CreateScheduleName(path, worksheet.Name);
-                            schedule = _revitRepository.CreateSchedule(scheduleName);
+                            schedule = _revitRepository.CreateSchedule(scheduleName, category);
                             WriteData(schedule, worksheet);
                         } catch(Exception ex) when(ex is Autodesk.Revit.Exceptions.ApplicationException
                             || ex is NullReferenceException) {

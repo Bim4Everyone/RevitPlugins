@@ -1,3 +1,5 @@
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -23,5 +25,6 @@ namespace RevitScheduleImport.Models {
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
         public string InitialDirectory { get; set; }
+        public BuiltInCategory ScheduleCategory { get; set; } = BuiltInCategory.OST_BridgeCables; // Ванты моста
     }
 }

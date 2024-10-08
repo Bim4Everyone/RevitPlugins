@@ -1,8 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitScheduleImport.Models;
@@ -17,6 +21,8 @@ namespace RevitScheduleImport.ViewModels {
         private readonly IMessageBoxService _messageBoxService;
 
         private string _initialDirectory;
+        private string _errorText;
+        private CategoryViewModel _categoryViewModel;
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -35,7 +41,14 @@ namespace RevitScheduleImport.ViewModels {
                 ?? throw new System.ArgumentNullException(nameof(fileDialogService));
             _messageBoxService = messageBoxService
                 ?? throw new ArgumentNullException(nameof(messageBoxService));
-            LoadConfig();
+
+            Categories = _revitRepository.GetScheduledCategories()
+                .Select(c => new CategoryViewModel(c))
+                .OrderBy(c => c.Name)
+                .ToArray();
+
+            LoadViewCommand = RelayCommand.Create(LoadView);
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
 
@@ -45,13 +58,41 @@ namespace RevitScheduleImport.ViewModels {
 
         public IOpenFileDialogService OpenFileDialogService => _fileDialogService;
 
+        public ICommand LoadViewCommand { get; }
+
+        public ICommand AcceptViewCommand { get; }
+
         public string InitialDirectory {
             get => _initialDirectory;
             set => this.RaiseAndSetIfChanged(ref _initialDirectory, value);
         }
 
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
 
-        public bool ExecuteImportCommand() {
+        public IReadOnlyCollection<CategoryViewModel> Categories { get; }
+
+        public CategoryViewModel SelectedCategory {
+            get => _categoryViewModel;
+            set => this.RaiseAndSetIfChanged(ref _categoryViewModel, value);
+        }
+
+
+        private void ShowLocalizedErrorMessage(string localizedContentName, MessageBoxImage messageImage) {
+            _messageBoxService.Show(
+                _localizationService.GetLocalizedString(localizedContentName),
+                _localizationService.GetLocalizedString("Errors.Severity.Error"),
+                System.Windows.MessageBoxButton.OK,
+                messageImage);
+        }
+
+        private void LoadView() {
+            LoadConfig();
+        }
+
+        private void AcceptView() {
             _fileDialogService.InitialDirectory = InitialDirectory;
             var dialogResult = _fileDialogService.ShowDialog();
             if(dialogResult) {
@@ -63,6 +104,7 @@ namespace RevitScheduleImport.ViewModels {
                     importer.ImportSchedule(
                         _fileDialogService.File.FullName,
                         transactionName,
+                        SelectedCategory.BuiltInCategory,
                         out string[] failedSheets);
 
                     if(failedSheets.Length > 0) {
@@ -80,16 +122,16 @@ namespace RevitScheduleImport.ViewModels {
                     ShowLocalizedErrorMessage("Errors.IOException", MessageBoxImage.Error);
                 }
             }
-            return dialogResult;
         }
 
+        private bool CanAcceptView() {
+            if(SelectedCategory is null) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.CategoryCheck");
+                return false;
+            }
 
-        private void ShowLocalizedErrorMessage(string localizedContentName, MessageBoxImage messageImage) {
-            _messageBoxService.Show(
-                _localizationService.GetLocalizedString(localizedContentName),
-                _localizationService.GetLocalizedString("Errors.Severity.Error"),
-                System.Windows.MessageBoxButton.OK,
-                messageImage);
+            ErrorText = null;
+            return true;
         }
 
         private void LoadConfig() {
@@ -97,6 +139,7 @@ namespace RevitScheduleImport.ViewModels {
 
             InitialDirectory = setting?.InitialDirectory
                 ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            SelectedCategory = Categories.FirstOrDefault(c => c.BuiltInCategory == setting?.ScheduleCategory);
         }
 
         private void SaveConfig() {
@@ -104,6 +147,7 @@ namespace RevitScheduleImport.ViewModels {
                                     ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
             setting.InitialDirectory = InitialDirectory;
+            setting.ScheduleCategory = SelectedCategory.BuiltInCategory;
             _pluginConfig.SaveProjectConfig();
         }
     }

@@ -4,6 +4,17 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
+        x:Key="MainWindow.CategoryCheck">Select category</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonOk">Ok</system:String>
+    <system:String
+        x:Key="MainWindow.Title">Import Excel</system:String>
+    <system:String
+        x:Key="MainWindow.ComboBoxTitle">Schedule category:</system:String>
+
+    <system:String
         x:Key="OpenFileDialog.Title">Select Excel file</system:String>
     <system:String
         x:Key="OpenFileDialog.Filter">Excel files |*.xls;*.xlsx</system:String>

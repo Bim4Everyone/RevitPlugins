@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -20,12 +21,12 @@ namespace RevitScheduleImport.Models {
         public Document Document => ActiveUIDocument.Document;
 
 
-        public ViewSchedule CreateSchedule(string name) {
+        public ViewSchedule CreateSchedule(string name, BuiltInCategory category) {
             if(string.IsNullOrWhiteSpace(name)) {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var schedule = ViewSchedule.CreateSchedule(Document, new ElementId(BuiltInCategory.OST_Parking));
+            var schedule = ViewSchedule.CreateSchedule(Document, new ElementId(category));
             var definition = schedule.Definition;
             definition.ShowHeaders = false;
             definition.IncludeLinkedFiles = false;
@@ -43,6 +44,13 @@ namespace RevitScheduleImport.Models {
             SchedulableField schedulableField = schedule.Definition.GetSchedulableFields().First();
             schedule.Definition.AddField(schedulableField); // добавляем 1 параметр в спецификацию
             return schedule;
+        }
+
+        public ICollection<Category> GetScheduledCategories() {
+            return Document.Settings.Categories
+                .OfType<Category>()
+                .Where(c => c.CategoryType == CategoryType.Model && c.IsVisibleInUI == true)
+                .ToArray();
         }
 
         public void DeleteSchedule(ViewSchedule schedule) {
