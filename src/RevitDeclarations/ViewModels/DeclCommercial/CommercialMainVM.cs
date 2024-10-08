@@ -13,6 +13,7 @@ using dosymep.WPF.ViewModels;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.ViewModels.DeclCommercial.ExportViewModels;
 using RevitDeclarations.Views;
 
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
@@ -27,7 +28,7 @@ namespace RevitDeclarations.ViewModels {
         //private readonly PrioritiesViewModel _prioritiesViewModel;
 
         private readonly CommercialExcelExportVM _excelExportViewModel;
-        private readonly ApartCsvExportVM _csvExportViewModel;
+        private readonly CommercialCsvExportVM _csvExportViewModel;
         private readonly List<ExportViewModel> _exportFormats;
 
         //private readonly IList<RevitDocumentViewModel> _revitDocuments;
@@ -53,7 +54,7 @@ namespace RevitDeclarations.ViewModels {
             _excelExportViewModel =
                 new CommercialExcelExportVM("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
             _csvExportViewModel =
-                new ApartCsvExportVM("csv", new Guid("BF1869ED-C5C4-4FCE-9DA9-F8F75A6B190D"), _settings);
+                new CommercialCsvExportVM("csv", new Guid("BF1869ED-C5C4-4FCE-9DA9-F8F75A6B190D"), _settings);
 
             _exportFormats = new List<ExportViewModel>() {
                 _excelExportViewModel,
@@ -159,7 +160,7 @@ namespace RevitDeclarations.ViewModels {
             ParametersViewModel paramVM = new ParametersViewModel(_revitRepository, this);
             paramVM.SetCompanyParamConfig(obj);
 
-            paramVM.FilterRoomsValue = "Нежилое помещение";
+            paramVM.FilterRoomsValue = "Нежилое помещение,Машиноместо,Кладовая";
 
             _settings.ParametersVM = paramVM;
             _settings.PrioritiesConfig = new PrioritiesConfig();
@@ -178,23 +179,21 @@ namespace RevitDeclarations.ViewModels {
                 .OrderBy(x => x.Section)
                 .ToList();
 
-            TaskDialog.Show("title", commercialRooms.ToString());
-
             _selectedFormat.Export(FullPath, commercialRooms);
-            //try {
-            //} catch(Exception e) {
-            //    var taskDialog = new TaskDialog("Ошибка выгрузки") {
-            //        CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
-            //        MainContent = "Произошла ошибка выгрузки.\nПопробовать выгрузить декларацию в формате csv?",
-            //        ExpandedContent = $"Описание ошибки: {e.Message}"
-            //    };
+            try {
+            } catch(Exception e) {
+                var taskDialog = new TaskDialog("Ошибка выгрузки") {
+                    CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,
+                    MainContent = "Произошла ошибка выгрузки.\nПопробовать выгрузить декларацию в формате csv?",
+                    ExpandedContent = $"Описание ошибки: {e.Message}"
+                };
 
-            //    TaskDialogResult dialogResult = taskDialog.Show();
+                TaskDialogResult dialogResult = taskDialog.Show();
 
-            //    if(dialogResult == TaskDialogResult.Yes) {
-            //        _csvExportViewModel.Export(FullPath, commercialRooms);
-            //    }
-            //}
+                if(dialogResult == TaskDialogResult.Yes) {
+                    _csvExportViewModel.Export(FullPath, commercialRooms);
+                }
+            }
         }
 
         public bool CanExport(object obj) {

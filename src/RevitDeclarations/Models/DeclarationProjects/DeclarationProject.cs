@@ -37,11 +37,11 @@ namespace RevitDeclarations.Models {
 
         private IReadOnlyCollection<RoomElement> FilterDeclarationRooms(IEnumerable<RoomElement> rooms) {
             Parameter filterParam = _settings.FilterRoomsParam;
-            string filterValue = _settings.FilterRoomsValue;
-            StringComparison ignorCase = StringComparison.OrdinalIgnoreCase;
+            string[] filterValues = _settings.FilterRoomsValue.Split(',');
+            StringComparer strComparer = StringComparer.OrdinalIgnoreCase;
 
             return rooms
-                .Where(x => string.Equals(x.GetTextParamValue(filterParam), filterValue, ignorCase))
+                .Where(x => filterValues.Contains(x.GetTextParamValue(filterParam), strComparer))
                 .ToList();
         }
     }
