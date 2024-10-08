@@ -88,6 +88,13 @@ namespace RevitScheduleImport.Services {
             return worksheet.Rows(1, lastIndex);
         }
 
+        /// <summary>
+        /// Создает сетку строк и столбцов в заголовке спецификации Revit.
+        /// Также устанавливается ширина столбцов и высота строк, объединяются ячейки.
+        /// </summary>
+        /// <param name="tableData">Таблица спецификации Revit</param>
+        /// <param name="worksheet">Лист Excel</param>
+        /// <returns>Заполненная сетка заголовка таблицы Revit</returns>
         private TableSectionData CreateTableSectionData(TableData tableData, IXLWorksheet worksheet) {
             IXLColumns columns = GetColumns(worksheet);
             IXLRows rows = GetRows(worksheet);
@@ -189,6 +196,13 @@ namespace RevitScheduleImport.Services {
             return style;
         }
 
+        /// <summary>
+        /// Пытается получить соседнюю ячейку с заданной стороны
+        /// </summary>
+        /// <param name="cell">Текущая ячейка</param>
+        /// <param name="border">Сторона текущей ячейки, к которой примыкает соседняя ячейка</param>
+        /// <param name="neighboringCell">Соседняя ячейка, если она есть</param>
+        /// <returns>True, если соседняя ячейка найдена, иначе False</returns>
         private bool TryGetNeighboringCell(IXLCell cell, CellBorder border, out IXLCell neighboringCell) {
             try {
                 switch(border) {
@@ -214,6 +228,13 @@ namespace RevitScheduleImport.Services {
             }
         }
 
+        /// <summary>
+        /// Проверяет, надо ли скрывать границу ячейки с заданной стороны с учетом соседней ячейки с этой стороны
+        /// </summary>
+        /// <param name="cell">Ячейка, у которой проверяется скрытие границы</param>
+        /// <param name="cellBorder">Сторона ячейки</param>
+        /// <param name="considerNeighbor">Учитывать ли соседнюю ячейку</param>
+        /// <returns>True, если у заданной ячейки надо скрыть заданную сторону границы, иначе False</returns>
         private bool HideCellBorder(IXLCell cell, CellBorder cellBorder, bool considerNeighbor) {
             bool hideCurrentCellBorder = HideCellBorder(cell, cellBorder);
             if(considerNeighbor) {
@@ -241,6 +262,12 @@ namespace RevitScheduleImport.Services {
             }
         }
 
+        /// <summary>
+        /// Проверяет, надо ли скрывать границу ячейки с заданной стороны
+        /// </summary>
+        /// <param name="cell">Ячейка, у которой проверяется скрытие границы</param>
+        /// <param name="cellBorder">Сторона ячейки</param>
+        /// <returns>True, если у заданной ячейки надо скрыть заданную сторону границы, иначе False</returns>
         private bool HideCellBorder(IXLCell cell, CellBorder cellBorder) {
             var border = cell.Style.Border;
             switch(cellBorder) {
@@ -261,6 +288,12 @@ namespace RevitScheduleImport.Services {
             }
         }
 
+        /// <summary>
+        /// Проверяет, является ли цвет границы ячейки белым
+        /// </summary>
+        /// <param name="workbook">Книга Excel</param>
+        /// <param name="xlColor">Цвет границы ячейки Excel</param>
+        /// <returns>True, если цвет границы ячейки - белый, иначе False</returns>
         private bool CellBorderColorIsWhite(IXLWorkbook workbook, XLColor xlColor) {
             var color = GetBorderColor(workbook, xlColor);
             return color.Red == 255
@@ -268,6 +301,12 @@ namespace RevitScheduleImport.Services {
                 && color.Blue == 255;
         }
 
+        /// <summary>
+        /// Конвертирует цвет Excel в цвет Revit
+        /// </summary>
+        /// <param name="workbook">Книга Excel</param>
+        /// <param name="xlColor">Цвет Excel</param>
+        /// <returns>Цвет Revit</returns>
         private Color GetColor(IXLWorkbook workbook, XLColor xlColor) {
             var colorType = xlColor.ColorType;
             switch(colorType) {
@@ -284,6 +323,12 @@ namespace RevitScheduleImport.Services {
             }
         }
 
+        /// <summary>
+        /// Конвертирует цвет границы Excel в цвет Revit
+        /// </summary>
+        /// <param name="workbook">Книга Excel</param>
+        /// <param name="xlColor">Цвет границы ячейки Excel</param>
+        /// <returns>Цвет Revit</returns>
         private Color GetBorderColor(IXLWorkbook workbook, XLColor xlColor) {
             var colorType = xlColor.ColorType;
             if(colorType == XLColorType.Indexed
