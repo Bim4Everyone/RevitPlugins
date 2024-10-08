@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using RevitDeclarations.Models.Export.DeclarationData;
+
 namespace RevitDeclarations.Models {
-    internal class DeclarationTableInfo {
+    internal class ApartDeclTableInfo : ITableInfo {
         public const int MainRoomCells = 3;
         public const int SummerRoomCells = 4;
         public const int InfoWidth = 13;
@@ -17,7 +19,7 @@ namespace RevitDeclarations.Models {
         private int _otherRoomsStart;
         private int _utpStart;
 
-        public DeclarationTableInfo(IReadOnlyCollection<Apartment> apartments, DeclarationSettings settings) {
+        public ApartDeclTableInfo(IReadOnlyCollection<Apartment> apartments, DeclarationSettings settings) {
             _apartments = apartments;
             _settings = settings;
 

@@ -3,13 +3,13 @@ using System.Data;
 using System.Linq;
 
 namespace RevitDeclarations.Models {
-    internal class DeclarationDataTable {
-        private readonly DeclarationTableInfo _tableInfo;
+    internal class ApartDeclDataTable : IDeclarationDataTable {
+        private readonly ApartDeclTableInfo _tableInfo;
         private readonly DeclarationSettings _settings;
         private readonly DataTable _mainTable;
         private readonly DataTable _headerTable;
 
-        public DeclarationDataTable(DeclarationTableInfo tableData, DeclarationSettings settings) {
+        public ApartDeclDataTable(ApartDeclTableInfo tableData, DeclarationSettings settings) {
             _tableInfo = tableData;
             _settings = settings;
 
@@ -27,7 +27,7 @@ namespace RevitDeclarations.Models {
 
         public DataTable MainDataTable => _mainTable;
         public DataTable HeaderDataTable => _headerTable;
-        public DeclarationTableInfo TableInfo => _tableInfo;
+        public ApartDeclTableInfo TableInfo => _tableInfo;
 
         private void CreateColumns() {
             for(int i = 0; i <= _tableInfo.FullTableWidth; i++) {
@@ -51,22 +51,22 @@ namespace RevitDeclarations.Models {
             _mainTable.Columns[11].DataType = typeof(double);
             _mainTable.Columns[12].DataType = typeof(double);
 
-            int columnNumber = DeclarationTableInfo.InfoWidth;
+            int columnNumber = ApartDeclTableInfo.InfoWidth;
 
             foreach(RoomPriority priority in _settings.UsedPriorities) {
                 if(priority.IsSummer) {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        int columnIndex = columnNumber + k * DeclarationTableInfo.SummerRoomCells;
+                        int columnIndex = columnNumber + k * ApartDeclTableInfo.SummerRoomCells;
                         _mainTable.Columns[columnIndex + 2].DataType = typeof(double);
                         _mainTable.Columns[columnIndex + 3].DataType = typeof(double);
                     }
-                    columnNumber += priority.MaxRoomAmount * DeclarationTableInfo.SummerRoomCells;
+                    columnNumber += priority.MaxRoomAmount * ApartDeclTableInfo.SummerRoomCells;
                 } else {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        int columnIndex = columnNumber + k * DeclarationTableInfo.MainRoomCells;
+                        int columnIndex = columnNumber + k * ApartDeclTableInfo.MainRoomCells;
                         _mainTable.Columns[columnIndex + 2].DataType = typeof(double);
                     }
-                    columnNumber += priority.MaxRoomAmount * DeclarationTableInfo.MainRoomCells;
+                    columnNumber += priority.MaxRoomAmount * ApartDeclTableInfo.MainRoomCells;
                 }
             }
         }
@@ -100,26 +100,26 @@ namespace RevitDeclarations.Models {
         }
 
         private void FillTableRoomsHeader() {
-            int columnNumber = DeclarationTableInfo.InfoWidth;
+            int columnNumber = ApartDeclTableInfo.InfoWidth;
 
             foreach(RoomPriority priority in _settings.UsedPriorities) {
                 if(priority.IsSummer) {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        int columnIndex = columnNumber + k * DeclarationTableInfo.SummerRoomCells;
+                        int columnIndex = columnNumber + k * ApartDeclTableInfo.SummerRoomCells;
                         _headerTable.Rows[0][columnIndex] = "№ Пом.";
                         _headerTable.Rows[0][columnIndex + 1] = "Наименование на планировке";
                         _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name}_{k + 1}, площадь без коэф.";
                         _headerTable.Rows[0][columnIndex + 3] = $"{priority.Name}_{k + 1}, площадь с коэф.";
                     }
-                    columnNumber += priority.MaxRoomAmount * DeclarationTableInfo.SummerRoomCells;
+                    columnNumber += priority.MaxRoomAmount * ApartDeclTableInfo.SummerRoomCells;
                 } else {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        int columnIndex = columnNumber + k * DeclarationTableInfo.MainRoomCells;
+                        int columnIndex = columnNumber + k * ApartDeclTableInfo.MainRoomCells;
                         _headerTable.Rows[0][columnIndex] = "№ Пом.";
                         _headerTable.Rows[0][columnIndex + 1] = "Наименование на планировке";
                         _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name}_{k + 1}";
                     }
-                    columnNumber += priority.MaxRoomAmount * DeclarationTableInfo.MainRoomCells;
+                    columnNumber += priority.MaxRoomAmount * ApartDeclTableInfo.MainRoomCells;
                 }
             }
         }
@@ -142,7 +142,7 @@ namespace RevitDeclarations.Models {
                 _mainTable.Rows[rowNumber][11] = apartment.AreaNonSummer;
                 _mainTable.Rows[rowNumber][12] = apartment.RoomsHeight;
 
-                int columnNumber = DeclarationTableInfo.InfoWidth;
+                int columnNumber = ApartDeclTableInfo.InfoWidth;
 
                 foreach(RoomPriority priority in _settings.UsedPriorities) {
                     IReadOnlyList<RoomElement> rooms = apartment.GetRoomsByPrior(priority);
@@ -183,7 +183,7 @@ namespace RevitDeclarations.Models {
                                               int startColumn) {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
-                    int columnIndex = startColumn + k * DeclarationTableInfo.SummerRoomCells;
+                    int columnIndex = startColumn + k * ApartDeclTableInfo.SummerRoomCells;
                     _mainTable.Rows[rowNumber][columnIndex] = rooms[k].Number;
                     _mainTable.Rows[rowNumber][columnIndex + 1] = rooms[k].DeclarationName;
                     _mainTable.Rows[rowNumber][columnIndex + 2] = rooms[k].Area;
@@ -191,7 +191,7 @@ namespace RevitDeclarations.Models {
                 }
             }
 
-            startColumn += priority.MaxRoomAmount * DeclarationTableInfo.SummerRoomCells;
+            startColumn += priority.MaxRoomAmount * ApartDeclTableInfo.SummerRoomCells;
             return startColumn;
         }
 
@@ -201,14 +201,14 @@ namespace RevitDeclarations.Models {
                                             int startColumn) {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
-                    int columnIndex = startColumn + k * DeclarationTableInfo.MainRoomCells;
+                    int columnIndex = startColumn + k * ApartDeclTableInfo.MainRoomCells;
                     _mainTable.Rows[rowNumber][columnIndex] = rooms[k].Number;
                     _mainTable.Rows[rowNumber][columnIndex + 1] = rooms[k].DeclarationName;
                     _mainTable.Rows[rowNumber][columnIndex + 2] = rooms[k].Area;
                 }
             }
 
-            startColumn += priority.MaxRoomAmount * DeclarationTableInfo.MainRoomCells;
+            startColumn += priority.MaxRoomAmount * ApartDeclTableInfo.MainRoomCells;
             return startColumn;
         }
 
