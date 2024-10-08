@@ -20,13 +20,13 @@ namespace RevitDeclarations.ViewModels {
         public string Name => _name;
         public Guid Id => _id;
 
-        public void ExportTable<T>(string path, DeclarationDataTable table) where T : ITableExporter, new() {
+        public void ExportTable<T>(string path, IDeclarationDataTable table) where T : ITableExporter, new() {
             T exporter = new T();
             exporter.Export(path, table);
             TaskDialog.Show("Декларации", $"Файл {Name} создан");
         }
 
-        public virtual void Export(string path, IEnumerable<Apartment> apartments) { 
+        public virtual void Export(string path, IEnumerable<RoomGroup> apartments) { 
         }
     }
 }
