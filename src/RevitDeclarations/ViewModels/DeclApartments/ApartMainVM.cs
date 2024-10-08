@@ -1,15 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-
-using dosymep.WPF.Commands;
-using dosymep.WPF.ViewModels;
-
-using Microsoft.WindowsAPICodePack.Dialogs;
 
 using RevitDeclarations.Models;
 using RevitDeclarations.Views;
@@ -19,9 +13,6 @@ using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels {
     internal class ApartMainVM : MainViewModel {
-        //private readonly RevitRepository _revitRepository;
-        //private readonly DeclarationSettings _settings;
-
         private readonly ParametersViewModel _parametersViewModel;
         private readonly PrioritiesViewModel _prioritiesViewModel;
 
@@ -30,26 +21,14 @@ namespace RevitDeclarations.ViewModels {
         private readonly ApartJsonExportVM _jsonExportViewModel;
         private readonly List<ExportViewModel> _exportFormats;
 
-        //private readonly IList<RevitDocumentViewModel> _revitDocuments;
-        private readonly IReadOnlyList<Phase> _phases;
-
-        private string _filePath;
-        private string _fileName;
-        private Phase _selectedPhase;
         private ExportViewModel _selectedFormat;
-        private string _accuracy;
+
         private bool _loadUtp;
         private bool _canLoadUtp;
-        private string _errorText;
         private string _canLoadUtpText;
 
         public ApartMainVM(RevitRepository revitRepository, DeclarationSettings settings) 
             : base(revitRepository, settings) {
-            //_revitRepository = revitRepository;
-            //_settings = settings;
-
-            _phases = _revitRepository.GetPhases();
-
             _excelExportViewModel = 
                 new ApartExcelExportVM("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
             _csvExportViewModel = 
@@ -67,13 +46,6 @@ namespace RevitDeclarations.ViewModels {
             _loadUtp = true;
             _canLoadUtp = true;
 
-            //_revitDocuments = _revitRepository
-            //    .GetLinks()
-            //    .Select(x => new RevitDocumentViewModel(x, _settings))
-            //    .Where(x => x.HasRooms())
-            //    .OrderBy(x => x.Name)
-            //    .ToList();
-
             RevitDocumentViewModel currentDocumentVM = 
                 new RevitDocumentViewModel(_revitRepository.Document, _settings);
 
@@ -84,34 +56,16 @@ namespace RevitDeclarations.ViewModels {
             _parametersViewModel = new ParametersViewModel(_revitRepository, this);
             _prioritiesViewModel = new PrioritiesViewModel(this);
 
-            SelectFolderCommand = new RelayCommand(SelectFolder);
-            ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
+            _selectedPhase = _phases[0];
+            _selectedFormat = _exportFormats[0];
 
             LoadConfig();
         }
-
-        public ICommand SelectFolderCommand { get; }
-        public ICommand ExportDeclarationCommand { get; }
-
-        public string FilePath {
-            get => _filePath;
-            set => RaiseAndSetIfChanged(ref _filePath, value);
-        }
-        public string FileName {
-            get => _fileName;
-            set => RaiseAndSetIfChanged(ref _fileName, value);
-        }
-        public string FullPath => FilePath + "\\" + FileName;
 
         public IReadOnlyList<Phase> Phases => _phases;
         public Phase SelectedPhase {
             get => _selectedPhase;
             set => RaiseAndSetIfChanged(ref _selectedPhase, value);
-        }
-
-        public string Accuracy {
-            get => _accuracy;
-            set => RaiseAndSetIfChanged(ref _accuracy, value);
         }
 
         public bool LoadUtp {
@@ -130,31 +84,15 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _selectedFormat, value);
         }
 
-        //public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
         public ParametersViewModel ParametersViewModel => _parametersViewModel;
         public PrioritiesViewModel PrioritiesViewModel => _prioritiesViewModel;
-
-        public string ErrorText {
-            get => _errorText;
-            set => RaiseAndSetIfChanged(ref _errorText, value);
-        }
 
         public string CanLoadUtpText {
             get => _canLoadUtpText;
             set => RaiseAndSetIfChanged(ref _canLoadUtpText, value);
         }
 
-        public void SelectFolder(object obj) {
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog() {
-                IsFolderPicker = true
-            };
-
-            if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-                FilePath = dialog.FileName;
-            }
-        }
-
-        public void ExportDeclaration(object obj) {
+        public override void ExportDeclaration(object obj) {
             int.TryParse(_accuracy, out int accuracy);
             _settings.Accuracy = accuracy;
             _settings.SelectedPhase = _selectedPhase;
@@ -274,49 +212,6 @@ namespace RevitDeclarations.ViewModels {
                     _csvExportViewModel.Export(FullPath, apartments);
                 }
             }
-        }
-
-        public bool CanExport(object obj) {
-            IEnumerable<RevitDocumentViewModel> checkedDocuments = _revitDocuments
-                .Where(x => x.IsChecked);
-
-            bool hasCheckedDocuments = _revitDocuments
-                .Where(x => x.IsChecked)
-                .Any();
-
-            bool hasPhases = checkedDocuments
-                .All(x => x.HasPhase(_selectedPhase));
-
-            bool hasEmptyParameters = _parametersViewModel
-                .GetAllParametrs()
-                .Where(x => x == null)
-                .Any();
-
-            if(string.IsNullOrEmpty(_filePath)) {
-                ErrorText = "Не выбрана папка";
-                return false;
-            }
-            if(string.IsNullOrEmpty(_fileName)) {
-                ErrorText = "Не заполнено имя файла";
-                return false;
-            }
-            if(!hasCheckedDocuments) {
-                ErrorText = "Не выбраны проекты для выгрузки";
-                return false;
-            }
-            if(!hasPhases) {
-                ErrorText = "В выбранных проектах отсутствует выбранная стадия";
-                return false;
-            }
-            if(hasEmptyParameters 
-                || string.IsNullOrEmpty(_parametersViewModel.FilterRoomsValue)
-                || string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
-                ErrorText = "Не выбран параметр на вкладке \"Параметры\"";
-                return false;
-            }
-
-            ErrorText = "";
-            return true;
         }
 
         private void SaveConfig() {
