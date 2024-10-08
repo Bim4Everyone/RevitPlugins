@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using RevitDeclarations.Models;
 using RevitDeclarations.Models.Export.DeclarationData;
 
-namespace RevitDeclarations.ViewModels.DeclCommercial.ExportViewModels {
+namespace RevitDeclarations.ViewModels {
     internal class CommercialCsvExportVM : ExportViewModel {
         public CommercialCsvExportVM(string name, Guid id, DeclarationSettings settings)
             : base(name, id, settings) {
