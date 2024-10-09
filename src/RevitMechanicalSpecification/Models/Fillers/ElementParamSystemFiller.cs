@@ -48,7 +48,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             // Он будет устраняться из всех шаблонов, включая шаблоны самой B4E. Но пока он глубоко интегрирован в документацию, 
             // будем обновлять, чтоб не плодить переработки. 
             if(specificationElement.Element.IsExistsParam(_tempSharedNameName)) {
-                specificationElement.Element.GetParam(_tempSharedNameName).Set(calculatedSystem);
+                specificationElement.Element.SetParamValue(_tempSharedNameName, calculatedSystem);
             }
         }
 
