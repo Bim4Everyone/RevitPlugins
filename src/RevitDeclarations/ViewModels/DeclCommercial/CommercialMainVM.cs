@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Data;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -89,7 +90,7 @@ namespace RevitDeclarations.ViewModels {
             ParametersViewModel paramVM = new ParametersViewModel(_revitRepository, this);
             paramVM.SetCompanyParamConfig(obj);
 
-            paramVM.FilterRoomsValue = "Нежилое помещение,Машиноместо,Кладовая";
+            paramVM.FilterRoomsValue = "Нежилое помещение,Машино-место,Кладовая";
 
             _settings.ParametersVM = paramVM;
             _settings.PrioritiesConfig = new PrioritiesConfig();
@@ -126,7 +127,8 @@ namespace RevitDeclarations.ViewModels {
             List<CommercialRooms> commercialRooms = projects
                 .SelectMany(x => x.RoomGroups)
                 .Cast<CommercialRooms>()
-                .OrderBy(x => x.Section)
+                .OrderBy(x => x.Number)
+                .ThenBy(x => ValueConverter.ConvertStringToInt(x.Rooms.First().Number))
                 .ToList();
 
             _selectedFormat.Export(FullPath, commercialRooms);

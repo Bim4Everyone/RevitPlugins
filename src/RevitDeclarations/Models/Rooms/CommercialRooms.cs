@@ -9,8 +9,15 @@ using Autodesk.Revit.DB;
 
 namespace RevitDeclarations.Models {
     internal class CommercialRooms : RoomGroup {
+        private readonly bool _isOneRoomGroup = false;
+
         public CommercialRooms(IEnumerable<RoomElement> rooms, DeclarationSettings settings) 
-            : base(rooms, settings) {            
+            : base(rooms, settings) {
+            if (rooms.Count() == 1) {
+                _isOneRoomGroup = true;
+            }
         }
+
+        public bool IsOneRoomGroup => _isOneRoomGroup;
     }
 }

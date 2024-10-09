@@ -61,7 +61,7 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows[0][7] = "Тип расположения";
             _headerTable.Rows[0][8] = "Класс машиноместа";
             _headerTable.Rows[0][9] = "Наименование помещения";
-            _headerTable.Rows[0][10] = "ID объекта";
+            _headerTable.Rows[0][10] = "ИД объекта";
         }
 
         private void FillTableApartmentsInfo() {
@@ -76,10 +76,14 @@ namespace RevitDeclarations.Models {
                 _mainTable.Rows[rowNumber][2] = commercialRooms.Level;
                 _mainTable.Rows[rowNumber][3] = commercialRooms.Section;
                 _mainTable.Rows[rowNumber][4] = commercialRooms.Building;
-                _mainTable.Rows[rowNumber][5] = commercialRooms.AreaMain;
+                if(commercialRooms.IsOneRoomGroup) {
+                    _mainTable.Rows[rowNumber][5] = roomElement.Area;
+                } else {
+                    _mainTable.Rows[rowNumber][5] = commercialRooms.AreaMain;
+                }
                 _mainTable.Rows[rowNumber][6] = commercialRooms.RoomsHeight;
                 _mainTable.Rows[rowNumber][7] = "";
-                _mainTable.Rows[rowNumber][8] = "";
+                _mainTable.Rows[rowNumber][8] = roomElement.RevitRoom.LookupParameter("Комментарии").AsString();
                 _mainTable.Rows[rowNumber][9] = roomElement.Name;
                 _mainTable.Rows[rowNumber][10] = "";
 
