@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Data;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -195,7 +196,7 @@ namespace RevitDeclarations.ViewModels {
                 .SelectMany(x => x.RoomGroups)
                 .Cast<Apartment>()
                 .OrderBy(x => x.Section)
-                .ThenBy(x => x.GetIntFullNumber())
+                .ThenBy(x => ValueConverter.ConvertStringToInt(x.FullNumber))
                 .ToList();
 
             try {
