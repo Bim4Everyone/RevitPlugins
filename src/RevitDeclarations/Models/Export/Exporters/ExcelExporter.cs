@@ -55,7 +55,7 @@ namespace RevitDeclarations.Models {
                     }
                 }
 
-                //SetGraphicSettings(workSheet, declarationTable.TableInfo);
+                SetGraphicSettings(workSheet, declarationTable.TableInfo);
 
                 workBook.SaveAs(path);
                 workBook.Close(false);
@@ -69,7 +69,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        private void SetGraphicSettings(Worksheet workSheet, ApartDeclTableInfo tableInfo) {
+        private void SetGraphicSettings(Worksheet workSheet, ITableInfo tableInfo) {
             workSheet.StandardWidth = 12;
             Range range = (Range) workSheet.Rows[1];
 

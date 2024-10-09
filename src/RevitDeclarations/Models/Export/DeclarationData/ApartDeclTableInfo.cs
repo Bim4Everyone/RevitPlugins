@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using RevitDeclarations.Models.Export.DeclarationData;
-
 namespace RevitDeclarations.Models {
     internal class ApartDeclTableInfo : ITableInfo {
         public const int MainRoomCells = 3;

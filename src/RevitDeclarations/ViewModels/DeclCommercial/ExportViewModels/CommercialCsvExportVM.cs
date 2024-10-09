@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RevitDeclarations.Models;
-using RevitDeclarations.Models.Export.DeclarationData;
 
 namespace RevitDeclarations.ViewModels {
     internal class CommercialCsvExportVM : ExportViewModel {

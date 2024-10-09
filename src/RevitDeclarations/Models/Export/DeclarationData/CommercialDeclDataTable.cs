@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevitDeclarations.Models.Export.DeclarationData {
+namespace RevitDeclarations.Models {
     internal class CommercialDeclDataTable : IDeclarationDataTable {
         private readonly CommercialDeclTableInfo _tableInfo;
         private readonly DeclarationSettings _settings;
@@ -28,6 +28,7 @@ namespace RevitDeclarations.Models.Export.DeclarationData {
 
         public DataTable MainDataTable => _mainTable;
         public DataTable HeaderDataTable => _headerTable;
+        public ITableInfo TableInfo => _tableInfo;
 
         private void CreateColumns() {
             for(int i = 0; i <= _tableInfo.FullTableWidth; i++) {

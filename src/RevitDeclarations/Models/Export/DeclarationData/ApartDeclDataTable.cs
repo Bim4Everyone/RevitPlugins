@@ -27,7 +27,7 @@ namespace RevitDeclarations.Models {
 
         public DataTable MainDataTable => _mainTable;
         public DataTable HeaderDataTable => _headerTable;
-        public ApartDeclTableInfo TableInfo => _tableInfo;
+        public ITableInfo TableInfo => _tableInfo;
 
         private void CreateColumns() {
             for(int i = 0; i <= _tableInfo.FullTableWidth; i++) {
