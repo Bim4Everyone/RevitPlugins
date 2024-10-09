@@ -44,15 +44,15 @@
             </TextBlock>
             <ComboBox
                 Width="200"
-                ItemsSource="{Binding Categories}"
-                SelectedItem="{Binding SelectedCategory}"
+                IsEditable="True"
+                IsTextSearchEnabled="True"
+                IsTextSearchCaseSensitive="False"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
-                IsTextSearchEnabled="True"
-                IsTextSearchCaseSensitive="False" 
+                DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
-                IsEditable="True"
-                DisplayMemberPath="Name"/>
+                ItemsSource="{Binding Categories}"
+                SelectedItem="{Binding SelectedCategory}" />
         </StackPanel>
 
         <StackPanel
