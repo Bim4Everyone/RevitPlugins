@@ -13,9 +13,9 @@ namespace RevitScheduleImport.ViewModels {
         }
 
 
-        public string Name => _category?.Name ?? string.Empty;
+        public string Name => _category.Name;
 
-        public BuiltInCategory BuiltInCategory => _category?.GetBuiltInCategory() ?? BuiltInCategory.INVALID;
+        public BuiltInCategory BuiltInCategory => _category.GetBuiltInCategory();
 
         public override bool Equals(object obj) {
             return Equals(obj as CategoryViewModel);
