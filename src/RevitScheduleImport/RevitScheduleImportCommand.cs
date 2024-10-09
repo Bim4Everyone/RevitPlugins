@@ -24,7 +24,7 @@ namespace RevitScheduleImport {
     [Transaction(TransactionMode.Manual)]
     public class RevitScheduleImportCommand : BasePluginCommand {
         public RevitScheduleImportCommand() {
-            PluginName = "RevitScheduleImport";
+            PluginName = "Импорт Excel";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -58,10 +58,10 @@ namespace RevitScheduleImport {
                 kernel.UseXtraLocalization(
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
-                var localizationServise = kernel.Get<ILocalizationService>();
+                var localizationService = kernel.Get<ILocalizationService>();
                 kernel.UseXtraOpenFileDialog<MainViewModel>(
-                    title: localizationServise.GetLocalizedString("OpenFileDialog.Title"),
-                    filter: localizationServise.GetLocalizedString("OpenFileDialog.Filter")
+                    title: localizationService.GetLocalizedString("OpenFileDialog.Title"),
+                    filter: localizationService.GetLocalizedString("OpenFileDialog.Filter")
                     );
 
                 Notification(kernel.Get<MainWindow>());
