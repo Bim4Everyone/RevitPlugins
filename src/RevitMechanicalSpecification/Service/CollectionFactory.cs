@@ -66,7 +66,11 @@ namespace RevitMechanicalSpecification.Service {
                     _specConfiguration.SystemEF),
                 SystemShortName = element.GetElementType().GetSharedParamValueOrDefault<string>(
                     _specConfiguration.SystemShortName),
-                SystemTargetName = element.Name.Split(' ').First()
+                SystemTargetName = element.Name.Split(' ').First(),
+
+                SystemForsedInstanceName = element
+                .GetSharedParamValueOrDefault<string>(_specConfiguration.ForcedSystemName)
+                
             }));
 
             return mechanicalSystems;
