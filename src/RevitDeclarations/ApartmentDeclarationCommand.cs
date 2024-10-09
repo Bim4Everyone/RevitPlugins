@@ -19,27 +19,27 @@ using RevitDeclarations.Views;
 
 namespace RevitDeclarations {
     [Transaction(TransactionMode.Manual)]
-    public class CommercialDeclarationsCommand : BasePluginCommand {
-        public CommercialDeclarationsCommand() {
-            PluginName = "Декларации коммерческие";
+    public class ApartmentDeclarationCommand : BasePluginCommand {
+        public ApartmentDeclarationCommand() {
+            PluginName = "Декларации";
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+			using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-
-                kernel.Bind<PluginConfig>()
+					
+				kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
-
-                kernel.Bind<CommercialMainVM>().ToSelf();
-                kernel.Bind<DeclCommercialWindow>().ToSelf()
+				
+				kernel.Bind<ApartMainVM>().ToSelf();
+				kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<CommercialMainVM>());
-
-                Notification(kernel.Get<DeclCommercialWindow>());
-            }
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ApartMainVM>());
+				
+				Notification(kernel.Get<MainWindow>());
+			}
         }
     }
 }
