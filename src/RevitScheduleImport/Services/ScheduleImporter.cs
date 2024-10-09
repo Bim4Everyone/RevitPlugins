@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -94,17 +93,16 @@ namespace RevitScheduleImport.Services {
         /// </summary>
         /// <param name="tableData">Таблица спецификации Revit</param>
         /// <param name="worksheet">Лист Excel</param>
-        /// <returns>Заполненная сетка заголовка таблицы Revit</returns>
+        /// <returns>Сетка заголовка таблицы Revit</returns>
         private TableSectionData CreateTableSectionData(TableData tableData, IXLWorksheet worksheet) {
             IXLColumns columns = GetColumns(worksheet);
             IXLRows rows = GetRows(worksheet);
 
-            var defaultFontSize = columns.Style.Font.FontSize;
-            var tableSectionData = tableData.GetSectionData(SectionType.Header);
+            TableSectionData tableSectionData = tableData.GetSectionData(SectionType.Header);
             tableData.Width = columns.Sum(col => _lengthConverter.ConvertExcelColWidthToInternal(col.Width));
             int columnsCount = columns.Count();
             int i = 0;
-            foreach(var col in columns) {
+            foreach(IXLColumn col in columns) {
                 if(i < (columnsCount - 1)) {
                     tableSectionData.InsertColumn(i + 1);
                 }
@@ -114,7 +112,7 @@ namespace RevitScheduleImport.Services {
 
             int rowsCount = rows.Count();
             int j = 0;
-            foreach(var row in rows) {
+            foreach(IXLRow row in rows) {
                 if(j < (rowsCount - 1)) {
                     tableSectionData.InsertRow(j + 1);
                 }
@@ -122,10 +120,11 @@ namespace RevitScheduleImport.Services {
                 j++;
             }
 
-            var mergedRanges = worksheet.MergedRanges;
-            foreach(var mergedRange in mergedRanges) {
-                var leftTopCell = mergedRange.FirstCell().Address;
-                var bottomRightCell = mergedRange.LastCell().Address;
+            IXLRanges mergedRanges = worksheet.MergedRanges;
+            foreach(IXLRange mergedRange in mergedRanges) {
+                IXLAddress leftTopCell = mergedRange.FirstCell().Address;
+                IXLAddress bottomRightCell = mergedRange.LastCell().Address;
+                // в TableSectionData индексация с 0, в Excel индексация с 1
                 tableSectionData.MergeCells(new TableMergedCell(
                     leftTopCell.RowNumber - 1,
                     leftTopCell.ColumnNumber - 1,
@@ -154,10 +153,6 @@ namespace RevitScheduleImport.Services {
         }
 
         private TableCellStyle GetTableCellStyle(IXLCell cell) {
-            if(cell.Address.RowNumber == 2) {
-                Debug.Assert(true);
-            }
-            var border = cell.Style.Border;
             var hideTopBorder = HideCellBorder(cell, CellBorder.Top, true);
             var hideBottomBorder = HideCellBorder(cell, CellBorder.Bottom, true);
             var hideLeftBorder = HideCellBorder(cell, CellBorder.Left, true);
@@ -336,7 +331,6 @@ namespace RevitScheduleImport.Services {
                         && xlColor.Color.R == 255
                         && xlColor.Color.G == 255
                         && xlColor.Color.B == 255) {
-                // fucking excel
                 // здесь цвет границы "по умолчанию", который отображается в Excel как черный, а в api как белый
                 return new Color(0, 0, 0); // Black
             } else {
@@ -380,9 +374,9 @@ namespace RevitScheduleImport.Services {
                 case XLDataType.Text:
                     return cellValue.GetText();
                 case XLDataType.DateTime:
-                    return cellValue.GetDateTime().ToString();
+                    return cellValue.GetDateTime().ToString(CultureInfo.CurrentCulture);
                 case XLDataType.TimeSpan:
-                    return cellValue.GetTimeSpan().ToString();
+                    return cellValue.GetTimeSpan().ToString("c", CultureInfo.CurrentCulture);
                 default:
                     return string.Empty;
             }
