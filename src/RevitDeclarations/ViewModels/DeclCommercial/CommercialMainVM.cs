@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Views;
 
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
@@ -28,9 +29,9 @@ namespace RevitDeclarations.ViewModels {
         public CommercialMainVM(RevitRepository revitRepository, DeclarationSettings settings) 
             : base(revitRepository, settings) {
             _excelExportViewModel =
-                new CommercialExcelExportVM("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
+                new CommercialExcelExportVM("Excel", new Guid("8D69848F-159D-4B26-B4C0-17E3B3A132CC"), _settings);
             _csvExportViewModel =
-                new CommercialCsvExportVM("csv", new Guid("BF1869ED-C5C4-4FCE-9DA9-F8F75A6B190D"), _settings);
+                new CommercialCsvExportVM("csv", new Guid("EC72C14A-9D4A-4D8B-BD35-50801CE68C24"), _settings);
 
             _exportFormats = new List<ExportViewModel>() {
                 _excelExportViewModel,
@@ -98,12 +99,33 @@ namespace RevitDeclarations.ViewModels {
                 .Where(x => x.IsChecked)
                 .ToList();
 
+            // Проверка 1. Наличие параметров во всех выбранных проектах.
+            IEnumerable<ErrorsListViewModel> parameterErrors = checkedDocuments
+                .Select(x => x.CheckParameters())
+                .Where(x => x.Errors.Any());
+            if(parameterErrors.Any()) {
+                var window = new ErrorWindow() { DataContext = new ErrorsViewModel(parameterErrors, false) };
+                window.ShowDialog();
+                return;
+            }
+
             List<CommercialProject> projects = checkedDocuments
                 .Select(x => new CommercialProject(x, _revitRepository, _settings))
                 .ToList();
 
+            // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.
+            IEnumerable<ErrorsListViewModel> noApartsErrors = projects
+                .Select(x => x.CheckRoomGroupsInRpoject())
+                .Where(x => x.Errors.Any());
+            if(noApartsErrors.Any()) {
+                var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
+                window.ShowDialog();
+                return;
+            }
+
             List<CommercialRooms> commercialRooms = projects
-                .SelectMany(x => x.CommercialRooms)
+                .SelectMany(x => x.RoomGroups)
+                .Cast<CommercialRooms>()
                 .OrderBy(x => x.Section)
                 .ToList();
 

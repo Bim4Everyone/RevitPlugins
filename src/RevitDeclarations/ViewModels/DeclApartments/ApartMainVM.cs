@@ -122,7 +122,7 @@ namespace RevitDeclarations.ViewModels {
 
             // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.
             IEnumerable<ErrorsListViewModel> noApartsErrors = projects
-                .Select(x => x.CheckApartmentsInRpoject())
+                .Select(x => x.CheckRoomGroupsInRpoject())
                 .Where(x => x.Errors.Any());
             if(noApartsErrors.Any()) {
                 var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
@@ -192,7 +192,8 @@ namespace RevitDeclarations.ViewModels {
             }
 
             List<Apartment> apartments = projects
-                .SelectMany(x => x.Apartments)
+                .SelectMany(x => x.RoomGroups)
+                .Cast<Apartment>()
                 .OrderBy(x => x.Section)
                 .ThenBy(x => x.GetIntFullNumber())
                 .ToList();
