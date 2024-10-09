@@ -16,6 +16,7 @@ namespace RevitDeclarations.Models {
         private protected readonly Phase _phase;
 
         private protected readonly IEnumerable<RoomElement> _rooms;
+        private protected IReadOnlyCollection<RoomGroup> _roomGroups;
 
         public DeclarationProject(RevitDocumentViewModel document,
                                   RevitRepository revitRepository,
@@ -30,10 +31,12 @@ namespace RevitDeclarations.Models {
             _rooms = FilterDeclarationRooms(_rooms);
         }
 
-        /// <summary>Отфильтрованные помещения для выгрузки</summary>
-        public IEnumerable<RoomElement> Rooms => _rooms;
         public RevitDocumentViewModel Document => _document;
         public Phase Phase => _phase;
+
+        /// <summary>Отфильтрованные помещения для выгрузки</summary>
+        public IEnumerable<RoomElement> Rooms => _rooms;
+        public IReadOnlyCollection<RoomGroup> RoomGroups => _roomGroups;
 
         private IReadOnlyCollection<RoomElement> FilterDeclarationRooms(IEnumerable<RoomElement> rooms) {
             Parameter filterParam = _settings.FilterRoomsParam;
@@ -43,6 +46,22 @@ namespace RevitDeclarations.Models {
             return rooms
                 .Where(x => filterValues.Contains(x.GetTextParamValue(filterParam), strComparer))
                 .ToList();
+        }
+
+        public ErrorsListViewModel CheckRoomGroupsInRpoject() {
+            ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
+                Message = "Ошибка",
+                Description = "В проекте отсутствуют необходимые группы помещений на выбранной стадии",
+                DocumentName = _document.Name
+            };
+
+            if(_roomGroups.Count == 0) {
+                errorListVM.Errors = new List<ErrorElement>() {
+                    new ErrorElement(_settings.SelectedPhase.Name, "Отсутствуют группы помещений")
+                };
+            }
+
+            return errorListVM;
         }
     }
 }

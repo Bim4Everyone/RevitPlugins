@@ -8,7 +8,7 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class ApartmentProject : DeclarationProject {
-        private readonly IReadOnlyCollection<Apartment> _apartments;
+        //private readonly IReadOnlyCollection<Apartment> _apartments;
 
         private UtpCalculator _utpCalculator;
 
@@ -16,26 +16,26 @@ namespace RevitDeclarations.Models {
                                 RevitRepository revitRepository,
                                 DeclarationSettings settings) : base(document, revitRepository, settings) {
 
-            _apartments = revitRepository.GetApartments(_rooms, settings);
+            _roomGroups = revitRepository.GetApartments(_rooms, settings);
         }
 
-        public IReadOnlyCollection<Apartment> Apartments => _apartments;
+        //public IReadOnlyCollection<Apartment> Apartments => _apartments;
 
-        public ErrorsListViewModel CheckApartmentsInRpoject() {
-            ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
-                Message = "Ошибка",
-                Description = "В проекте отсутствуют квартиры на выбранной стадии",
-                DocumentName = _document.Name
-            };
+        //public ErrorsListViewModel CheckApartmentsInRpoject() {
+        //    ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
+        //        Message = "Ошибка",
+        //        Description = "В проекте отсутствуют квартиры на выбранной стадии",
+        //        DocumentName = _document.Name
+        //    };
 
-            if(_apartments.Count == 0) {
-                errorListVM.Errors = new List<ErrorElement>() {
-                    new ErrorElement(_settings.SelectedPhase.Name, "Отсутствуют помещения квартир")
-                };
-            }
+        //    if(_roomGroups.Count == 0) {
+        //        errorListVM.Errors = new List<ErrorElement>() {
+        //            new ErrorElement(_settings.SelectedPhase.Name, "Отсутствуют помещения квартир")
+        //        };
+        //    }
 
-            return errorListVM;
-        }
+        //    return errorListVM;
+        //}
 
         public ErrorsListViewModel CheckRoomAreasEquality() {
             ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
@@ -44,7 +44,7 @@ namespace RevitDeclarations.Models {
                 DocumentName = _document.Name
             };
 
-            foreach(var apartment in _apartments) {
+            foreach(Apartment apartment in _roomGroups) {
                 if(!apartment.CheckEqualityOfRoomAreas()) {
                     string apartInfo = $"Квартира № {apartment.Number} на этаже {apartment.Level}";
                     string apartAreas = "Площади квартиры (без коэффициента/с коэффициентом/жилая/без ЛП) " +
@@ -63,7 +63,7 @@ namespace RevitDeclarations.Models {
                 DocumentName = _document.Name
             };
 
-            foreach(var apartment in _apartments) {
+            foreach(Apartment apartment in _roomGroups) {
                 if(!apartment.CheckActualRoomAreas()) {
                     string apartInfo = $"Квартира № {apartment.Number} на этаже {apartment.Level}";
                     string apartAreas = "Площади помещений, рассчитанные квартирографией " +
@@ -82,7 +82,7 @@ namespace RevitDeclarations.Models {
                 DocumentName = _document.Name
             };
 
-            foreach(var apartment in _apartments) {
+            foreach(Apartment apartment in _roomGroups) {
                 if(!apartment.CheckActualApartmentAreas()) {
                     string apartInfo = $"Квартира № {apartment.Number} на этаже {apartment.Level}";
                     string apartAreas = "Площади квартиры, рассчитанные квартирографией " +
@@ -104,7 +104,7 @@ namespace RevitDeclarations.Models {
         public void CalculateUtpForApartments() {
             _utpCalculator.CalculateRoomsForUtp();
 
-            foreach(var apartment in _apartments) {
+            foreach(Apartment apartment in _roomGroups) {
                 apartment.CalculateUtp(_utpCalculator);
             }
         }
