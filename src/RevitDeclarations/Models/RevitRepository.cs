@@ -128,7 +128,7 @@ namespace RevitDeclarations.Models {
 
         public IReadOnlyCollection<CommercialRooms> GetCommercialRooms(IEnumerable<RoomElement> rooms,
                                                                        DeclarationSettings settings) {
-            return rooms.GroupBy(r => r.Number)
+            return rooms.GroupBy(r => new { s = r.GetTextParamValue(settings.GroupingByGroupParam), r.Number })
                 .Select(g => new CommercialRooms(g, settings))
                 .ToList();
         }
