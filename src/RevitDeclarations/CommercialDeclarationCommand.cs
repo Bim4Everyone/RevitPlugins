@@ -21,7 +21,7 @@ namespace RevitDeclarations {
     [Transaction(TransactionMode.Manual)]
     public class CommercialDeclarationCommand : BasePluginCommand {
         public CommercialDeclarationCommand() {
-            PluginName = "Декларации коммерческие";
+            PluginName = "Декларация коммерческих помещений";
         }
 
         protected override void Execute(UIApplication uiApplication) {

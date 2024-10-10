@@ -21,7 +21,7 @@ namespace RevitDeclarations {
     [Transaction(TransactionMode.Manual)]
     public class ApartmentDeclarationCommand : BasePluginCommand {
         public ApartmentDeclarationCommand() {
-            PluginName = "Декларации";
+            PluginName = "Декларация квартир";
         }
 
         protected override void Execute(UIApplication uiApplication) {

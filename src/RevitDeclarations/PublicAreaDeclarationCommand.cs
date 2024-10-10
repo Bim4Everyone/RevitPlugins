@@ -21,7 +21,7 @@ namespace RevitDeclarations {
     [Transaction(TransactionMode.Manual)]
     public class PublicAreaDeclarationCommand : BasePluginCommand {
         public PublicAreaDeclarationCommand() {
-            PluginName = "Декларации коммерческие";
+            PluginName = "Декларация МОП";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -38,7 +38,7 @@ namespace RevitDeclarations {
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<PublicAreasMainVM>());
 
-                Notification(kernel.Get<CommercialMainWindow>());
+                Notification(kernel.Get<PublicAreaMainWindow>());
             }
         }
     }
