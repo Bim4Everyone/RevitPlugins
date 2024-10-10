@@ -72,7 +72,7 @@ namespace RevitMechanicalSpecification.Service {
             string startName = "Не удалось определить тип фитинга";
             FamilyInstance instanse = element as FamilyInstance;
             MechanicalFitting fitting = instanse.MEPModel as MechanicalFitting;
-
+            string a = "";
             switch(fitting.PartType) {
                 case PartType.Transition:
                     startName = "Переход между сечениями воздуховода";
