@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -14,6 +15,7 @@ using RevitOpeningPlacement.Models.TypeNamesProviders;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class MepCategoryViewModel : BaseViewModel {
+        private const string _pipeDiameterDisplayName = "Внешний диаметр";
         private string _name;
         private ObservableCollection<SizeViewModel> _minSizes;
         private ObservableCollection<OffsetViewModel> _offsets;
@@ -36,7 +38,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             SelectedRounding = mepCategory.Rounding;
             var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
             SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel, mepCategory.Set);
-
+            RenameDisplayParameters();
             AddOffsetCommand = RelayCommand.Create(AddOffset);
             RemoveOffsetCommand = RelayCommand.Create<OffsetViewModel>(RemoveOffset, CanRemoveOffset);
         }
@@ -128,6 +130,20 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             };
         }
 
+
+        private void RenameDisplayParameters() {
+            if(Name.Equals(
+                RevitRepository.MepCategoryNames[MepCategoryEnum.Pipe],
+                StringComparison.InvariantCultureIgnoreCase)) {
+
+                var diameter = MinSizes.FirstOrDefault(p => p.DisplayName.Equals(
+                    RevitRepository.ParameterNames[Parameters.Diameter],
+                    StringComparison.InvariantCultureIgnoreCase));
+                if(diameter != null) {
+                    diameter.DisplayName = _pipeDiameterDisplayName;
+                }
+            }
+        }
 
         private void AddOffset() {
             Offsets.Add(new OffsetViewModel(new TypeNamesProvider(IsRound)));
