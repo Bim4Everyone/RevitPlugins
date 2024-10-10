@@ -19,24 +19,6 @@ namespace RevitDeclarations.Models {
             _roomGroups = revitRepository.GetApartments(_rooms, settings);
         }
 
-        //public IReadOnlyCollection<Apartment> Apartments => _apartments;
-
-        //public ErrorsListViewModel CheckApartmentsInRpoject() {
-        //    ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
-        //        Message = "Ошибка",
-        //        Description = "В проекте отсутствуют квартиры на выбранной стадии",
-        //        DocumentName = _document.Name
-        //    };
-
-        //    if(_roomGroups.Count == 0) {
-        //        errorListVM.Errors = new List<ErrorElement>() {
-        //            new ErrorElement(_settings.SelectedPhase.Name, "Отсутствуют помещения квартир")
-        //        };
-        //    }
-
-        //    return errorListVM;
-        //}
-
         public ErrorsListViewModel CheckRoomAreasEquality() {
             ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
                 Message = "Ошибка",
