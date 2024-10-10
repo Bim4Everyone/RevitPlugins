@@ -14,9 +14,9 @@
     
     mc:Ignorable="d"
     Title="ClashReportDiffView" Height="450" Width="800"
-    d:DataContext="{d:DesignInstance vm:ClashReportDiffViewModel, IsDesignTimeCreatable=False}"
     MinHeight="300"
-    MinWidth="500">
+    MinWidth="500"
+    d:DataContext="{d:DesignInstance vm:ClashReportDiffViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
