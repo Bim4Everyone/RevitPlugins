@@ -17,14 +17,14 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <dxe:ComboBoxEdit Grid.Column="0"
-            NullText="Выберите файлы"
-            SeparatorString=", "
-            IsTextEditable="False"
-            TextWrapping="Wrap"
-            DisplayMember="Name"
-            AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
-            ItemsSource="{Binding Files}"
-            EditValue="{Binding SelectedFileObjects, UpdateSourceTrigger=PropertyChanged}">
+                          NullText="Выберите файлы"
+                          SeparatorString=", "
+                          IsTextEditable="False"
+                          TextWrapping="Wrap"
+                          DisplayMember="Name"
+                          AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
+                          ItemsSource="{Binding Files}"
+                          EditValue="{Binding SelectedFileObjects, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ComboBoxEdit.StyleSettings>
                 <dxe:CheckedComboBoxStyleSettings />
             </dxe:ComboBoxEdit.StyleSettings>
