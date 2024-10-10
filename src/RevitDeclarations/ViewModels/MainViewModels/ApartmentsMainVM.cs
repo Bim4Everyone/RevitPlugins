@@ -14,19 +14,9 @@ using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels {
     internal class ApartmentsMainVM : MainViewModel {
-        private readonly ParametersViewModel _parametersViewModel;
-        private readonly PrioritiesViewModel _prioritiesViewModel;
-
         private readonly ApartmentsExcelExportVM _excelExportViewModel;
         private readonly ApartmentsCsvExportVM _csvExportViewModel;
         private readonly ApartmentsJsonExportVM _jsonExportViewModel;
-        private readonly List<ExportViewModel> _exportFormats;
-
-        private ExportViewModel _selectedFormat;
-
-        private bool _loadUtp;
-        private bool _canLoadUtp;
-        private string _canLoadUtpText;
 
         public ApartmentsMainVM(RevitRepository revitRepository, DeclarationSettings settings) 
             : base(revitRepository, settings) {
@@ -42,64 +32,19 @@ namespace RevitDeclarations.ViewModels {
                 _csvExportViewModel,
                 _jsonExportViewModel,
             };
-
-            _accuracy = "1";
-            _loadUtp = true;
-            _canLoadUtp = true;
-
-            RevitDocumentViewModel currentDocumentVM = 
-                new RevitDocumentViewModel(_revitRepository.Document, _settings);
-
-            if(currentDocumentVM.HasRooms()) {
-                _revitDocuments.Insert(0, currentDocumentVM);
-            }
+            _selectedFormat = _exportFormats[0];
 
             _parametersViewModel = new ParametersViewModel(_revitRepository, this);
             _prioritiesViewModel = new PrioritiesViewModel(this);
 
-            _selectedPhase = _phases[0];
-            _selectedFormat = _exportFormats[0];
+            _loadUtp = true;
+            _canLoadUtp = true;
 
             LoadConfig();
         }
 
-        public IReadOnlyList<Phase> Phases => _phases;
-        public Phase SelectedPhase {
-            get => _selectedPhase;
-            set => RaiseAndSetIfChanged(ref _selectedPhase, value);
-        }
-
-        public bool LoadUtp {
-            get => _loadUtp;
-            set => RaiseAndSetIfChanged(ref _loadUtp, value);
-        }
-
-        public bool CanLoadUtp {
-            get => _canLoadUtp;
-            set => RaiseAndSetIfChanged(ref _canLoadUtp, value);
-        }
-
-        public IReadOnlyList<ExportViewModel> ExportFormats => _exportFormats;
-        public ExportViewModel SelectedFormat {
-            get => _selectedFormat;
-            set => RaiseAndSetIfChanged(ref _selectedFormat, value);
-        }
-
-        public ParametersViewModel ParametersViewModel => _parametersViewModel;
-        public PrioritiesViewModel PrioritiesViewModel => _prioritiesViewModel;
-
-        public string CanLoadUtpText {
-            get => _canLoadUtpText;
-            set => RaiseAndSetIfChanged(ref _canLoadUtpText, value);
-        }
-
         public override void ExportDeclaration(object obj) {
-            int.TryParse(_accuracy, out int accuracy);
-            _settings.Accuracy = accuracy;
-            _settings.SelectedPhase = _selectedPhase;
-            _settings.ParametersVM = ParametersViewModel;
-            _settings.PrioritiesConfig = _prioritiesViewModel.PrioritiesConfig;
-            _settings.LoadUtp = _loadUtp;
+            SetSelectedSettings();            
 
             List<RevitDocumentViewModel> checkedDocuments = _revitDocuments
                 .Where(x => x.IsChecked)

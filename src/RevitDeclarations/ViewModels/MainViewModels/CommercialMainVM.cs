@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Data;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -14,18 +13,8 @@ using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels {
     internal class CommercialMainVM : MainViewModel {
-        //private readonly ParametersViewModel _parametersViewModel;
-        //private readonly PrioritiesViewModel _prioritiesViewModel;
-
         private readonly CommercialExcelExportVM _excelExportViewModel;
         private readonly CommercialCsvExportVM _csvExportViewModel;
-        private readonly List<ExportViewModel> _exportFormats;        
-
-        private ExportViewModel _selectedFormat;
-        
-        private bool _loadUtp;
-        private bool _canLoadUtp;
-        private string _canLoadUtpText;
 
         public CommercialMainVM(RevitRepository revitRepository, DeclarationSettings settings) 
             : base(revitRepository, settings) {
@@ -38,63 +27,23 @@ namespace RevitDeclarations.ViewModels {
                 _excelExportViewModel,
                 _csvExportViewModel
             };
-                        
+            _selectedFormat = _exportFormats[0];
+
+            ParametersViewModel paramVM = new ParametersViewModel(_revitRepository, this);
+            paramVM.SetCompanyParamConfig(new object());
+            paramVM.FilterRoomsValue = "Нежилое помещение,Машино-место,Кладовая";
+
+            _parametersViewModel = paramVM;
+            _prioritiesViewModel = new PrioritiesViewModel(this);
+
             _loadUtp = false;
             _canLoadUtp = false;
-
-            RevitDocumentViewModel currentDocumentVM =
-                new RevitDocumentViewModel(_revitRepository.Document, _settings);
-
-            if(currentDocumentVM.HasRooms()) {
-                _revitDocuments.Insert(0, currentDocumentVM);
-            }
-
-            _selectedPhase = _phases[0];
-            _selectedFormat = _exportFormats[0];
 
             LoadConfig();
         }
 
-        public IReadOnlyList<Phase> Phases => _phases;
-        public Phase SelectedPhase {
-            get => _selectedPhase;
-            set => RaiseAndSetIfChanged(ref _selectedPhase, value);
-        }
-
-        public bool LoadUtp {
-            get => _loadUtp;
-            set => RaiseAndSetIfChanged(ref _loadUtp, value);
-        }
-
-        public bool CanLoadUtp {
-            get => _canLoadUtp;
-            set => RaiseAndSetIfChanged(ref _canLoadUtp, value);
-        }
-
-        public IReadOnlyList<ExportViewModel> ExportFormats => _exportFormats;
-        public ExportViewModel SelectedFormat {
-            get => _selectedFormat;
-            set => RaiseAndSetIfChanged(ref _selectedFormat, value);
-        }
-
-        public string CanLoadUtpText {
-            get => _canLoadUtpText;
-            set => RaiseAndSetIfChanged(ref _canLoadUtpText, value);
-        }
-
         public override void ExportDeclaration(object obj) {
-            int.TryParse(_accuracy, out int accuracy);
-            _settings.Accuracy = accuracy;
-            _settings.SelectedPhase = _selectedPhase;
-
-            ParametersViewModel paramVM = new ParametersViewModel(_revitRepository, this);
-            paramVM.SetCompanyParamConfig(obj);
-
-            paramVM.FilterRoomsValue = "Нежилое помещение,Машино-место,Кладовая";
-
-            _settings.ParametersVM = paramVM;
-            _settings.PrioritiesConfig = new PrioritiesConfig();
-            _settings.LoadUtp = _loadUtp;
+            SetSelectedSettings();
 
             List<RevitDocumentViewModel> checkedDocuments = _revitDocuments
                 .Where(x => x.IsChecked)
@@ -131,8 +80,8 @@ namespace RevitDeclarations.ViewModels {
                 .ThenBy(x => ValueConverter.ConvertStringToInt(x.Rooms.First().Number))
                 .ToList();
 
-            _selectedFormat.Export(FullPath, commercialRooms);
             try {
+                _selectedFormat.Export(FullPath, commercialRooms);
             } catch(Exception e) {
                 var taskDialog = new TaskDialog("Ошибка выгрузки") {
                     CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,

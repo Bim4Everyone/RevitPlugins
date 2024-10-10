@@ -21,12 +21,22 @@ namespace RevitDeclarations.ViewModels {
 
         private protected readonly IList<RevitDocumentViewModel> _revitDocuments;
         private protected readonly IReadOnlyList<Phase> _phases;
+        private protected Phase _selectedPhase;
 
         private protected string _filePath;
         private protected string _fileName;
-        private protected Phase _selectedPhase;
+
+        private protected ParametersViewModel _parametersViewModel;
+        private protected PrioritiesViewModel _prioritiesViewModel;
+
+        private protected List<ExportViewModel> _exportFormats;
+        private protected ExportViewModel _selectedFormat;
 
         private protected string _accuracy;
+
+        private protected bool _loadUtp;
+        private protected bool _canLoadUtp;
+        private protected string _canLoadUtpText;
 
         private string _errorText;
 
@@ -35,6 +45,7 @@ namespace RevitDeclarations.ViewModels {
             _settings = settings;
 
             _phases = _revitRepository.GetPhases();
+            _selectedPhase = _phases[_phases.Count() - 1];
 
             _revitDocuments = _revitRepository
                 .GetLinks()
@@ -42,6 +53,13 @@ namespace RevitDeclarations.ViewModels {
                 .Where(x => x.HasRooms())
                 .OrderBy(x => x.Name)
                 .ToList();
+
+            RevitDocumentViewModel currentDocumentVM =
+                new RevitDocumentViewModel(_revitRepository.Document, _settings);
+
+            if(currentDocumentVM.HasRooms()) {
+                _revitDocuments.Insert(0, currentDocumentVM);
+            }
 
             _accuracy = "1";
 
@@ -52,7 +70,16 @@ namespace RevitDeclarations.ViewModels {
         public ICommand SelectFolderCommand { get; }
         public ICommand ExportDeclarationCommand { get; }
 
+        public ParametersViewModel ParametersViewModel => _parametersViewModel;
+        public PrioritiesViewModel PrioritiesViewModel => _prioritiesViewModel;
+
         public IList<RevitDocumentViewModel> RevitDocuments => _revitDocuments;
+        public IReadOnlyList<Phase> Phases => _phases;
+
+        public Phase SelectedPhase {
+            get => _selectedPhase;
+            set => RaiseAndSetIfChanged(ref _selectedPhase, value);
+        }
 
         public string FilePath {
             get => _filePath;
@@ -64,9 +91,29 @@ namespace RevitDeclarations.ViewModels {
         }
         public string FullPath => FilePath + "\\" + FileName;
 
+        public IReadOnlyList<ExportViewModel> ExportFormats => _exportFormats;
+        public ExportViewModel SelectedFormat {
+            get => _selectedFormat;
+            set => RaiseAndSetIfChanged(ref _selectedFormat, value);
+        }
+
         public string Accuracy {
             get => _accuracy;
             set => RaiseAndSetIfChanged(ref _accuracy, value);
+        }
+
+        public bool LoadUtp {
+            get => _loadUtp;
+            set => RaiseAndSetIfChanged(ref _loadUtp, value);
+        }
+
+        public bool CanLoadUtp {
+            get => _canLoadUtp;
+            set => RaiseAndSetIfChanged(ref _canLoadUtp, value);
+        }
+        public string CanLoadUtpText {
+            get => _canLoadUtpText;
+            set => RaiseAndSetIfChanged(ref _canLoadUtpText, value);
         }
 
         public string ErrorText {
@@ -97,6 +144,11 @@ namespace RevitDeclarations.ViewModels {
             bool hasPhases = checkedDocuments
                 .All(x => x.HasPhase(_selectedPhase));
 
+            bool hasEmptyParameters = _parametersViewModel
+                .GetAllParametrs()
+                .Where(x => x == null)
+                .Any();
+
             if(string.IsNullOrEmpty(_filePath)) {
                 ErrorText = "Не выбрана папка";
                 return false;
@@ -113,9 +165,26 @@ namespace RevitDeclarations.ViewModels {
                 ErrorText = "В выбранных проектах отсутствует выбранная стадия";
                 return false;
             }
+            if(hasEmptyParameters
+                || string.IsNullOrEmpty(_parametersViewModel.FilterRoomsValue)
+                || string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
+                ErrorText = "Не выбран параметр на вкладке \"Параметры\"";
+                return false;
+            }
 
             ErrorText = "";
             return true;
+        }
+
+        public void SetSelectedSettings() {
+            int.TryParse(_accuracy, out int accuracy);
+            _settings.Accuracy = accuracy;
+            _settings.SelectedPhase = _selectedPhase;
+
+            _settings.ParametersVM = _parametersViewModel;
+            _settings.PrioritiesConfig = _prioritiesViewModel.PrioritiesConfig;
+
+            _settings.LoadUtp = _loadUtp;
         }
     }
 }
