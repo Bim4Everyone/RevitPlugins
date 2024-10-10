@@ -17,7 +17,9 @@
                            Title="Навигатор"
                            Height="450"
                            Width="800"
-                           d:DataContext="{d:DesignInstance vm:ReportsViewModel, IsDesignTimeCreatable=False}">
+                           MinHeight="300"
+                           MinWidth="500"
+    d:DataContext="{d:DesignInstance vm:ReportsViewModel, IsDesignTimeCreatable=False}">
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Closing">
             <b:InvokeCommandAction Command="{Binding OpenClashDetectorCommand}" />
