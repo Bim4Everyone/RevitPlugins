@@ -17,6 +17,8 @@
                            Title="Навигатор"
                            Height="450"
                            Width="800"
+                           MinHeight="300"
+                           MinWidth="500"
                            d:DataContext="{d:DesignInstance vm:ReportsViewModel, IsDesignTimeCreatable=False}">
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Closing">
