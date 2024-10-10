@@ -19,7 +19,7 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Title="Декларации"
+    Title="Декларация коммерческих помещений"
     Height="760" Width="650"
     MinHeight="760" MinWidth="650"
     ResizeMode="NoResize"
