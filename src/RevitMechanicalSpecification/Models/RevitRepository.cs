@@ -53,12 +53,6 @@ namespace RevitMechanicalSpecification.Models {
                 _specConfiguration,
                 Document,
                 _calculator),
-                //Заполнение ФОП_ВИС_Группирование
-                new ElementParamGroupFiller(
-                _specConfiguration.TargetNameGroup,
-                null,
-                _specConfiguration,
-                Document),
                 //Заполнение ФОП_ВИС_Марка
                 new ElementParamMarkFiller(
                 _specConfiguration.TargetNameMark,
@@ -66,6 +60,13 @@ namespace RevitMechanicalSpecification.Models {
                 _specConfiguration,
                 _calculator,
                 Document),
+                //Заполнение ФОП_ВИС_Группирование
+                new ElementParamGroupFiller(
+                _specConfiguration.TargetNameGroup,
+                null,
+                _specConfiguration,
+                Document),
+
                 //Заполнение ФОП_ВИС_Код изделия
                 new ElementParamDefaultFiller(
                 _specConfiguration.TargetNameCode,
