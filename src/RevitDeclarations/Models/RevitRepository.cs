@@ -133,6 +133,12 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
+        public IReadOnlyCollection<PublicArea> GetPublicAreas(IEnumerable<RoomElement> rooms,
+                                                              DeclarationSettings settings) {
+            return rooms.Select(r => new PublicArea(new List<RoomElement>() { r }, settings))
+                .ToList();
+        }
+
         public IReadOnlyList<Phase> GetPhases() {
             return Document
                 .Phases
