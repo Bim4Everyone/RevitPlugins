@@ -14,6 +14,8 @@
     
     mc:Ignorable="d"
     Title="Поисковые наборы" Height="450" Width="1000"
+    MinHeight="300"
+    MinWidth="500"
     x:Name="ViewFilterCreator"
     d:DataContext="{d:DesignInstance vm:FiltersViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">

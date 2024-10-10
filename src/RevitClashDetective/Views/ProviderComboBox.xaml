@@ -22,6 +22,7 @@
                           IsTextEditable="False"
                           TextWrapping="Wrap"
                           DisplayMember="Name"
+                          AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
                           ItemsSource="{Binding Files}"
                           EditValue="{Binding SelectedFileObjects, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ComboBoxEdit.StyleSettings>
@@ -34,6 +35,7 @@
                           IsTextEditable="False"
                           TextWrapping="Wrap"
                           DisplayMember="Name"
+                          AllowUpdateTwoWayBoundPropertiesOnSynchronization="False"
                           ItemsSource="{Binding Providers}"
                           EditValue="{Binding SelectedProvidersObjects, UpdateSourceTrigger=PropertyChanged}">
             <dxe:ComboBoxEdit.StyleSettings>
