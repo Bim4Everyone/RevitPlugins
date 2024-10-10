@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
@@ -12,7 +6,6 @@ namespace RevitDeclarations.Models {
                                 RevitRepository revitRepository,
                                 DeclarationSettings settings) 
             : base(document, revitRepository, settings) {
-
             _roomGroups = revitRepository.GetCommercialRooms(_rooms, settings);
         }
     }
