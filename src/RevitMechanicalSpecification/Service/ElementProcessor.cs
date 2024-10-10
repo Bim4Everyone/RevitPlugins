@@ -53,6 +53,10 @@ namespace RevitMechanicalSpecification.Service {
 
                 foreach(SpecificationElement specificationElement in splitResult.SingleElements) {
                     ProcessElement(specificationElement, fillers);
+
+                    // На арматуре воздуховодов/труб/оборудовании проверяем наличие шаблонизированных семейств-генериков.
+                    // Если встречаем - заполняем все по маске
+                    FillIfGeneric(specificationElement.Element);
                 }
 
                 foreach(SpecificationElement manifoldElement in splitResult.ManifoldElements) {
@@ -129,12 +133,6 @@ namespace RevitMechanicalSpecification.Service {
                 // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
                 // редактора в список
                 if(IsEditedBy(_userName, element)) {
-                    continue;
-                }
-                
-                // На арматуре воздуховодов/труб/оборудовании проверяем наличие шаблонизированных семейств-генериков.
-                // Если встречаем - заполняем все по маске
-                if(FillIfGeneric(element)) {
                     continue;
                 }
 
