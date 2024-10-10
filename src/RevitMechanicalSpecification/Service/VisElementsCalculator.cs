@@ -86,6 +86,9 @@ namespace RevitMechanicalSpecification.Service {
                 case PartType.Cross:
                     startName = "Крестовина ";
                     break;
+                case PartType.Cap:
+                    startName = "Заглушка ";
+                    break;
                 case PartType.Union:
                     return "!Не учитывать";
                 case PartType.Elbow:

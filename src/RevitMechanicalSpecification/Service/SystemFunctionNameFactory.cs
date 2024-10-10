@@ -89,6 +89,10 @@ namespace RevitMechanicalSpecification.Service {
                 return null;
             }
 
+            if(!string.IsNullOrEmpty(visSystem.SystemForsedInstanceName)) {
+                return visSystem.SystemForsedInstanceName;
+            }
+
             if(!string.IsNullOrEmpty(visSystem.SystemShortName)) {
                 return visSystem.SystemShortName;
             }
