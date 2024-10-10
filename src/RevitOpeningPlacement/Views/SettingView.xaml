@@ -71,11 +71,11 @@
                                         </dxg:GridControl.View>
                                         <dxg:GridControl.Columns>
                                             <dxg:GridColumn Header="Параметр"
-                                                            FieldName="Name"
-                                                            Width="*"
+                                                            FieldName="DisplayName"
+                                                            Width="2*"
                                                             ReadOnly="True" />
                                             <dxg:GridColumn Header="Значение"
-                                                            Width="*"
+                                                            Width="1*"
                                                             AllowEditing="True"
                                                             FieldName="Value" />
                                         </dxg:GridControl.Columns>
