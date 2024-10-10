@@ -109,7 +109,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// </summary>
         private string GetDetailedGroup(SpecificationElement specificationElement) {
             string name = specificationElement.ElementName;
-            string mark = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameMark);
+            string mark = !string.IsNullOrEmpty(specificationElement.ElementMark)
+                   ? specificationElement.ElementMark
+                   : specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameMark);
+
             string code = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameCode);
             string creator = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameCreator);
 
