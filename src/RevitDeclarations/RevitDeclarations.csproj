@@ -7,5 +7,7 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="ViewModels\DeclPublicAreas\ExportViewModels\" />
+      <Folder Include="Views\MainWindows\" />
+      <Folder Include="Views\TabItems\" />
     </ItemGroup>
 </Project>

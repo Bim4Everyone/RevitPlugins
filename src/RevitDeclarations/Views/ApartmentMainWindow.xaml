@@ -1,5 +1,5 @@
-﻿<base:PlatformWindow
-    x:Class="RevitDeclarations.Views.DeclCommercialWindow"
+<base:PlatformWindow
+    x:Class="RevitDeclarations.Views.ApartmentMainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -46,6 +46,18 @@
                 Header="Декларация">
                 <tabData:DeclarationTabItem/>
             </TabItem>
+
+            <TabItem
+                Header="Параметры"
+                DataContext="{Binding ParametersViewModel}">
+                <tabData:ParametersTabItem/>
+            </TabItem>
+
+            <TabItem 
+                Header="Приоритеты"
+                DataContext="{Binding PrioritiesViewModel}">
+                <tabData:PrioritiesTabItem/>
+            </TabItem>
         </TabControl>
 
         <StackPanel
@@ -76,4 +88,3 @@
         </StackPanel>
     </Grid>
 </base:PlatformWindow>
-

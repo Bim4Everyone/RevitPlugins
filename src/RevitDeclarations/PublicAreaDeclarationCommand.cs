@@ -19,8 +19,8 @@ using RevitDeclarations.Views;
 
 namespace RevitDeclarations {
     [Transaction(TransactionMode.Manual)]
-    public class CommercialDeclarationCommand : BasePluginCommand {
-        public CommercialDeclarationCommand() {
+    public class PublicAreaDeclarationCommand : BasePluginCommand {
+        public PublicAreaDeclarationCommand() {
             PluginName = "Декларации коммерческие";
         }
 
@@ -36,7 +36,7 @@ namespace RevitDeclarations {
                 kernel.Bind<CommercialMainVM>().ToSelf();
                 kernel.Bind<CommercialMainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<CommercialMainVM>());
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<PublicAreasMainVM>());
 
                 Notification(kernel.Get<CommercialMainWindow>());
             }

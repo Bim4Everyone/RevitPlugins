@@ -16,13 +16,13 @@ namespace RevitDeclarations.Views {
     /// <summary>
     /// Interaction logic for DeclCommercialWindow.xaml
     /// </summary>
-    public partial class DeclCommercialWindow {
-        public DeclCommercialWindow() {
+    public partial class CommercialMainWindow {
+        public CommercialMainWindow() {
             InitializeComponent();
         }
 
         public override string PluginName => nameof(RevitDeclarations);
-        public override string ProjectConfigName => nameof(MainWindow);
+        public override string ProjectConfigName => nameof(ApartmentMainWindow);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
