@@ -1,0 +1,36 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="MainWindow.CategoryCheck">Select category</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonOk">Select</system:String>
+    <system:String
+        x:Key="MainWindow.Title">Import Excel</system:String>
+    <system:String
+        x:Key="MainWindow.ComboBoxTitle">Schedule category:</system:String>
+
+    <system:String
+        x:Key="OpenFileDialog.Title">Select Excel file</system:String>
+    <system:String
+        x:Key="OpenFileDialog.Filter">Excel files |*.xls;*.xlsx</system:String>
+
+    <system:String
+        x:Key="Revit.Transaction">Import Excel</system:String>
+
+    <system:String
+        x:Key="Errors.Severity.Error">Error</system:String>
+    <system:String
+        x:Key="Errors.Severity.Warning">Warning</system:String>
+    <system:String
+        x:Key="Errors.IOException">Cannot import file, because it is already open.</system:String>
+    <system:String
+        x:Key="Errors.FileNotFoundException">Excel file not found.</system:String>
+    <system:String
+        x:Key="Warnings.NotAllSheetsImported">Not all worksheets were imported.</system:String>
+
+</ResourceDictionary>
