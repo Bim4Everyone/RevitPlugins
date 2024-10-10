@@ -71,7 +71,7 @@ namespace RevitDeclarations.Models {
                 // ИСПРАВИТЬ!!!
                 RoomElement roomElement = commercialRooms.Rooms.First();
 
-                _mainTable.Rows[rowNumber][0] = $"{commercialRooms.Number}_{roomElement.Number}";
+                _mainTable.Rows[rowNumber][0] = $"{commercialRooms.Number}-{roomElement.Number}";
                 _mainTable.Rows[rowNumber][1] = commercialRooms.Department;
                 _mainTable.Rows[rowNumber][2] = commercialRooms.Level;
                 _mainTable.Rows[rowNumber][3] = commercialRooms.Section;
