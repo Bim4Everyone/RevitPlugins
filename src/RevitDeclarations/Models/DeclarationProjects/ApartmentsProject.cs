@@ -7,12 +7,12 @@ using Autodesk.Revit.DB;
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
-    internal class ApartmentProject : DeclarationProject {
+    internal class ApartmentsProject : DeclarationProject {
         //private readonly IReadOnlyCollection<Apartment> _apartments;
 
         private UtpCalculator _utpCalculator;
 
-        public ApartmentProject(RevitDocumentViewModel document,
+        public ApartmentsProject(RevitDocumentViewModel document,
                                 RevitRepository revitRepository,
                                 DeclarationSettings settings) : base(document, revitRepository, settings) {
 

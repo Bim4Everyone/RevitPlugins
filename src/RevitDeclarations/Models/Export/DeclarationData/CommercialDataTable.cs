@@ -6,13 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
-    internal class CommercialDeclDataTable : IDeclarationDataTable {
-        private readonly CommercialDeclTableInfo _tableInfo;
+    internal class CommercialDataTable : IDeclarationDataTable {
+        private readonly CommercialTableInfo _tableInfo;
         private readonly DeclarationSettings _settings;
         private readonly DataTable _mainTable;
         private readonly DataTable _headerTable;
 
-        public CommercialDeclDataTable(CommercialDeclTableInfo tableInfo, DeclarationSettings settings) {
+        public CommercialDataTable(CommercialTableInfo tableInfo, DeclarationSettings settings) {
             _tableInfo = tableInfo;
             _settings = settings;
 

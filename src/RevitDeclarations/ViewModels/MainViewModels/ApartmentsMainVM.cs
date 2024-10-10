@@ -13,13 +13,13 @@ using TaskDialog = Autodesk.Revit.UI.TaskDialog;
 using TaskDialogResult = Autodesk.Revit.UI.TaskDialogResult;
 
 namespace RevitDeclarations.ViewModels {
-    internal class ApartMainVM : MainViewModel {
+    internal class ApartmentsMainVM : MainViewModel {
         private readonly ParametersViewModel _parametersViewModel;
         private readonly PrioritiesViewModel _prioritiesViewModel;
 
-        private readonly ApartExcelExportVM _excelExportViewModel;
-        private readonly ApartCsvExportVM _csvExportViewModel;
-        private readonly ApartJsonExportVM _jsonExportViewModel;
+        private readonly ApartmentsExcelExportVM _excelExportViewModel;
+        private readonly ApartmentsCsvExportVM _csvExportViewModel;
+        private readonly ApartmentsJsonExportVM _jsonExportViewModel;
         private readonly List<ExportViewModel> _exportFormats;
 
         private ExportViewModel _selectedFormat;
@@ -28,14 +28,14 @@ namespace RevitDeclarations.ViewModels {
         private bool _canLoadUtp;
         private string _canLoadUtpText;
 
-        public ApartMainVM(RevitRepository revitRepository, DeclarationSettings settings) 
+        public ApartmentsMainVM(RevitRepository revitRepository, DeclarationSettings settings) 
             : base(revitRepository, settings) {
             _excelExportViewModel = 
-                new ApartExcelExportVM("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
+                new ApartmentsExcelExportVM("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
             _csvExportViewModel = 
-                new ApartCsvExportVM("csv", new Guid("BF1869ED-C5C4-4FCE-9DA9-F8F75A6B190D"), _settings);
+                new ApartmentsCsvExportVM("csv", new Guid("BF1869ED-C5C4-4FCE-9DA9-F8F75A6B190D"), _settings);
             _jsonExportViewModel = 
-                new ApartJsonExportVM("json", new Guid("159FA27A-06E7-4515-9221-0BAFC0008F21"), _settings);
+                new ApartmentsJsonExportVM("json", new Guid("159FA27A-06E7-4515-9221-0BAFC0008F21"), _settings);
 
             _exportFormats = new List<ExportViewModel>() {
                 _excelExportViewModel,
@@ -117,8 +117,8 @@ namespace RevitDeclarations.ViewModels {
                 return;
             }
 
-            List<ApartmentProject> projects = checkedDocuments
-                .Select(x => new ApartmentProject(x, _revitRepository, _settings))
+            List<ApartmentsProject> projects = checkedDocuments
+                .Select(x => new ApartmentsProject(x, _revitRepository, _settings))
                 .ToList();
 
             // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.
@@ -187,7 +187,7 @@ namespace RevitDeclarations.ViewModels {
                     }
                 }
 
-                foreach(ApartmentProject project in projects) {
+                foreach(ApartmentsProject project in projects) {
                     project.CalculateUtpForApartments();
                 }
             }

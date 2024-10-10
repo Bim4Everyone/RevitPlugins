@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
-    internal class CommercialDeclTableInfo : ITableInfo {
+    internal class CommercialTableInfo : ITableInfo {
         private readonly IReadOnlyCollection<CommercialRooms> _commercialRooms;
         private readonly DeclarationSettings _settings;
 
@@ -14,7 +14,7 @@ namespace RevitDeclarations.Models {
         private readonly int _otherRoomsStart;
         private readonly int _utpStart;
 
-        public CommercialDeclTableInfo(IReadOnlyCollection<CommercialRooms> commercialRooms, 
+        public CommercialTableInfo(IReadOnlyCollection<CommercialRooms> commercialRooms, 
                                        DeclarationSettings settings) {
             _commercialRooms = commercialRooms;
             _settings = settings;

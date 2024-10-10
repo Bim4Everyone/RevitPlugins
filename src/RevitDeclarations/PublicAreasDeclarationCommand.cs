@@ -19,27 +19,27 @@ using RevitDeclarations.Views;
 
 namespace RevitDeclarations {
     [Transaction(TransactionMode.Manual)]
-    public class ApartmentDeclarationCommand : BasePluginCommand {
-        public ApartmentDeclarationCommand() {
-            PluginName = "Декларация квартир";
+    public class PublicAreasDeclarationCommand : BasePluginCommand {
+        public PublicAreasDeclarationCommand() {
+            PluginName = "Декларация МОП";
         }
 
         protected override void Execute(UIApplication uiApplication) {
-			using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-					
-				kernel.Bind<PluginConfig>()
+
+                kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
-				
-				kernel.Bind<ApartMainVM>().ToSelf();
-				kernel.Bind<ApartmentMainWindow>().ToSelf()
+
+                kernel.Bind<CommercialMainVM>().ToSelf();
+                kernel.Bind<CommercialMainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ApartMainVM>());
-				
-				Notification(kernel.Get<ApartmentMainWindow>());
-			}
+                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<PublicAreasMainVM>());
+
+                Notification(kernel.Get<PublicAreasMainWindow>());
+            }
         }
     }
 }

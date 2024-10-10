@@ -16,13 +16,13 @@ namespace RevitDeclarations.Views {
     /// <summary>
     /// Interaction logic for PublicAreaMainWindow.xaml
     /// </summary>
-    public partial class PublicAreaMainWindow {
-        public PublicAreaMainWindow() {
+    public partial class PublicAreasMainWindow {
+        public PublicAreasMainWindow() {
             InitializeComponent();
         }
 
         public override string PluginName => nameof(RevitDeclarations);
-        public override string ProjectConfigName => nameof(ApartmentMainWindow);
+        public override string ProjectConfigName => nameof(ApartmentsMainWindow);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

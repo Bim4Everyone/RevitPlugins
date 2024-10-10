@@ -3,13 +3,13 @@ using System.Windows;
 using System.Windows.Input;
 
 namespace RevitDeclarations.Views {
-    public partial class ApartmentMainWindow {
-        public ApartmentMainWindow() {
+    public partial class ApartmentsMainWindow {
+        public ApartmentsMainWindow() {
             InitializeComponent();
         }
 
         public override string PluginName => nameof(RevitDeclarations);
-        public override string ProjectConfigName => nameof(ApartmentMainWindow);
+        public override string ProjectConfigName => nameof(ApartmentsMainWindow);
         
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

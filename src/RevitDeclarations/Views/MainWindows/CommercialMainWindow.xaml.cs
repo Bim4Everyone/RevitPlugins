@@ -22,7 +22,7 @@ namespace RevitDeclarations.Views {
         }
 
         public override string PluginName => nameof(RevitDeclarations);
-        public override string ProjectConfigName => nameof(ApartmentMainWindow);
+        public override string ProjectConfigName => nameof(ApartmentsMainWindow);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

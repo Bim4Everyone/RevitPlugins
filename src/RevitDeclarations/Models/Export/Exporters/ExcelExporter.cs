@@ -89,14 +89,14 @@ namespace RevitDeclarations.Models {
             workSheet.Range[firstCell, lastCell].VerticalAlignment = XlVAlign.xlVAlignCenter;
 
             for(int i = 1; i <= tableInfo.FullTableWidth; i++) {
-                if(i <= ApartDeclTableInfo.InfoWidth) {
+                if(i <= ApartmentsTableInfo.InfoWidth) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 15.5;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _apartInfoColor;
-                } else if(i > ApartDeclTableInfo.InfoWidth && i <= tableInfo.SummerRoomsStart) {
+                } else if(i > ApartmentsTableInfo.InfoWidth && i <= tableInfo.SummerRoomsStart) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 10;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _mainRoomsColor;
 
-                    int checkColumnNumber = (i - ApartDeclTableInfo.InfoWidth) % 3;
+                    int checkColumnNumber = (i - ApartmentsTableInfo.InfoWidth) % 3;
                     if(checkColumnNumber == 0) {
                         ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
