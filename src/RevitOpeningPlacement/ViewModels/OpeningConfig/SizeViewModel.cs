@@ -1,14 +1,16 @@
-﻿using dosymep.WPF.ViewModels;
+using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models.Configs;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
     internal class SizeViewModel : BaseViewModel {
         private double _value;
-        private string _name;
+        private string _displayName;
+        private readonly string _sizeName;
 
         public SizeViewModel(Size size) {
-            Name = size.Name;
+            _sizeName = size.Name;
+            DisplayName = size.Name;
             Value = size.Value;
         }
 
@@ -16,9 +18,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         }
 
-        public string Name {
-            get => _name;
-            set => this.RaiseAndSetIfChanged(ref _name, value);
+        public string DisplayName {
+            get => _displayName;
+            set => this.RaiseAndSetIfChanged(ref _displayName, value);
         }
         public double Value {
             get => _value;
@@ -27,13 +29,13 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
 
         public string GetErrorText() {
             if(Value < 0) {
-                return $"значение параметра \"{Name}\" должно быть неотрицательным.";
+                return $"значение параметра \"{DisplayName}\" должно быть неотрицательным.";
             }
             return null;
         }
 
         public Size GetSize() {
-            return new Size() { Name = Name, Value = Value };
+            return new Size() { Name = _sizeName, Value = Value };
         }
     }
 }
