@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitMechanicalSpecification.Entities;
@@ -48,7 +49,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             // Он будет устраняться из всех шаблонов, включая шаблоны самой B4E. Но пока он глубоко интегрирован в документацию, 
             // будем обновлять, чтоб не плодить переработки. 
             if(specificationElement.Element.IsExistsParam(_tempSharedNameName)) {
-                specificationElement.Element.SetParamValue(_tempSharedNameName, calculatedSystem);
+                Parameter adsk_name = specificationElement.Element.GetParam(_tempSharedNameName);
+
+                // В основном ситуация с рид-онли встречается у внешних пользователей, наши не блокируют этот параметр
+                if(!adsk_name.IsReadOnly) {
+                    adsk_name.Set(calculatedSystem);
+                }
             }
         }
 

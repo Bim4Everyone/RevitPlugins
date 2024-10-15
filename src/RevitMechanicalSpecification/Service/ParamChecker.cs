@@ -91,15 +91,7 @@ namespace RevitMechanicalSpecification.Service {
             _document = document;
             _specConfiguration = specConfiguration;
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
-            //projectParameters.SetupRevitParams(document, _revitParams);
-
-            // Если использовать SetupRevitParams для всего листа сразу - любые снятые/добавленные галочки перебьются.
-            // Это плохо играет на кастомных категориях
-            foreach(RevitParam revitParam in _revitParams) {
-                if(!document.IsExistsParam(revitParam.Name)){
-                    projectParameters.SetupRevitParam(document, revitParam);
-                }
-            }
+            projectParameters.SetupRevitParams(document, _revitParams);
 
             CheckParamterValues();
         }
