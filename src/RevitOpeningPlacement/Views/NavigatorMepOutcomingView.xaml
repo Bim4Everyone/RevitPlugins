@@ -10,6 +10,7 @@
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
                            xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                            xmlns:dxgt="http://schemas.devexpress.com/winfx/2008/xaml/grid/themekeys"
+                           xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            x:Name="_this"
                            mc:Ignorable="d"
@@ -19,6 +20,12 @@
                            MinHeight="300"
                            MinWidth="500"
                            d:DataContext="{d:DesignInstance {x:Type vm:MepNavigatorForOutcomingTasksViewModel}, IsDesignTimeCreatable=False}">
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand
+            EventName="Loaded"
+            Command="{Binding LoadViewCommand}" />
+    </dxmvvm:Interaction.Behaviors>
+    
     <base:ThemedPlatformWindow.Resources>
         <DataTemplate x:Key="OneParentIdTemplate" DataType="{x:Type dxg:GroupRowData}">
             <Grid x:Name="_grid">
