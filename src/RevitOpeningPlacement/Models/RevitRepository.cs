@@ -482,10 +482,10 @@ namespace RevitOpeningPlacement.Models {
         }
 
         public FamilyInstance CreateInstance(FamilySymbol type, XYZ point, Level level) {
+            if(!type.IsActive) {
+                type.Activate();
+            }
             if(level != null) {
-                if(!type.IsActive) {
-                    type.Activate();
-                }
                 point = point - XYZ.BasisZ * level.ProjectElevation;
                 return _document.Create.NewFamilyInstance(point, type, level, StructuralType.NonStructural);
             }

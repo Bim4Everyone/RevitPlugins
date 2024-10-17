@@ -336,6 +336,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="realOpenings">Коллекция чистовых отверстий из активного документа ревита</param>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
+#pragma warning disable 0618
         private ICollection<ElementId> GetIntersectingOpeningsIds(ICollection<IOpeningReal> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return Array.Empty<ElementId>();
@@ -349,6 +350,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 }
             }
         }
+#pragma warning restore 0618
 
         /// <summary>
         /// Возвращает Id элемента конструкции, который наиболее похож на хост для задания на отверстие.

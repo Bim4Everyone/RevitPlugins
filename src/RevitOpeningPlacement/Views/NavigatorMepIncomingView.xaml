@@ -12,6 +12,7 @@
                            xmlns:dxgt="http://schemas.devexpress.com/winfx/2008/xaml/grid/themekeys"
                            xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
                            xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                           xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            x:Name="_this"
                            mc:Ignorable="d"
                            Title="NavigatorMepIncomingView"
@@ -25,6 +26,12 @@
                            WindowStartupLocation="Manual"
                            Left="50"
                            Top="50">
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand
+            EventName="Loaded"
+            Command="{Binding LoadViewCommand}" />
+    </dxmvvm:Interaction.Behaviors>
+    
     <base:ThemedPlatformWindow.Resources>
         <DataTemplate x:Key="OneParentIdTemplate"
                       DataType="{x:Type dxg:GroupRowData}">

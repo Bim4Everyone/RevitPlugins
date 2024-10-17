@@ -6,11 +6,8 @@ using dosymep.Revit.Geometry;
 
 using RevitOpeningPlacement.Models.Interfaces;
 
-namespace RevitOpeningPlacement.Models.Extensions {
-    /// <summary>
-    /// Методы расширения для классов, реализующих интерфейс <see cref="ISolidProvider">ISolidProvider</see>
-    /// </summary>
-    internal static class ISolidProviderExtension {
+namespace RevitOpeningPlacement.Services {
+    internal class SolidProviderUtils : ISolidProviderUtils {
         /// <summary>
         /// Точность для определения расстояний и координат 1 мм.
         /// </summary>
@@ -27,20 +24,22 @@ namespace RevitOpeningPlacement.Models.Extensions {
         private const double _toleranceVolumePercentage = 0.01;
 
 
+        public SolidProviderUtils() {
+        }
+
+
         /// <summary>
-        /// Проверяет на равенство текущего <see cref="ISolidProvider">ISolidProvider</see> и поданного <see cref="Solid"/>
-        /// Под равенством понимается равенство объемов с точностью до 1% и равенство координат ограничивающих <see cref="BoundingBoxXYZ"/> 
-        /// с точностью до <paramref name="tolerance"/> в единицах длины Revit (футах)
+        /// Проверяет на равенство 2 тела. <br/>
+        /// Под равенством понимается равенство объемов с точностью до 1% <br/>
+        /// и равенство координат боксов тел (<see cref="BoundingBoxXYZ"/>) с точностью до <paramref name="tolerance"/> в единицах длины Revit (футах).
         /// </summary>
-        /// <param name="solidProvider">Текущий <see cref="ISolidProvider">ISolidProvider</see></param>
-        /// <param name="otherSolid">Поданный <see cref="Solid"/></param>
-        /// <param name="tolerance">Допустимое расстояние в единицах длины Revit (футах) между текущим <see cref="ISolidProvider"/> и поданным <see cref="Solid"/></param>
-        /// <returns>True, если разница объемов текущего и поданного <see cref="ISolidProvider">ISolidProvider</see> меньше, либо равна 1 см3, 
-        /// и если разница координат ограничивающих их <see cref="BoundingBoxXYZ"/> меньше, либо равна <paramref name="tolerance"/>;
+        /// <param name="solidProvider">Первое тело.</param>
+        /// <param name="otherSolid">Второе тело.</param>
+        /// <param name="tolerance">Допустимое расстояние в единицах длины Revit (футах) между телами.</param>
+        /// <returns>True, если разница объемов тел меньше, либо равна 1% от объема меньшего солида, <br/>
+        /// и если разница координат ограничивающих боксов (<see cref="BoundingBoxXYZ"/>) меньше, либо равна <paramref name="tolerance"/>;<br/>
         /// Иначе False</returns>
-#pragma warning disable 0618
-        [Obsolete("Use ISolidProviderUtils.EqualsSolid", error: false)]
-        internal static bool EqualsSolid(this ISolidProvider solidProvider, Solid otherSolid, double tolerance) {
+        public bool EqualsSolid(ISolidProvider solidProvider, Solid otherSolid, double tolerance) {
             var thisSolid = solidProvider.GetSolid();
 
             if(!SolidsVolumesEqual(thisSolid, otherSolid)) {
@@ -53,7 +52,14 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return BBoxesEqual(thisSolidBBox, otherSolidBBox, tolerance);
         }
 
-        internal static bool SolidsIntersect(Solid firstSolid, BoundingBoxXYZ firstBBox, Solid secondSolid, BoundingBoxXYZ secondBBox) {
+        public bool IntersectsSolid(ISolidProvider thisSolidProvider, Solid otherSolid, BoundingBoxXYZ otherSolidBBox) {
+            var thisSolid = thisSolidProvider.GetSolid();
+            var thisBBox = thisSolidProvider.GetTransformedBBoxXYZ();
+            return SolidsIntersect(thisSolid, thisBBox, otherSolid, otherSolidBBox);
+        }
+
+
+        private bool SolidsIntersect(Solid firstSolid, BoundingBoxXYZ firstBBox, Solid secondSolid, BoundingBoxXYZ secondBBox) {
             if((firstSolid is null) || (secondSolid is null)) {
                 return false;
             }
@@ -88,40 +94,6 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return false;
         }
 
-        [Obsolete("Use ISolidProviderUtils.IntersectsSolid", error: false)]
-        internal static bool IntersectsSolid(this ISolidProvider thisSolidProvider, Solid otherSolid, BoundingBoxXYZ otherSolidBBox) {
-            var thisSolid = thisSolidProvider.GetSolid();
-            var thisBBox = thisSolidProvider.GetTransformedBBoxXYZ();
-            return SolidsIntersect(thisSolid, thisBBox, otherSolid, otherSolidBBox);
-        }
-
-        /// <summary>
-        /// Проверяет, пересекается ли текущий <see cref="ISolidProvider">ISolidProvider</see> с поданным <see cref="ISolidProvider">ISolidProvider</see>.
-        /// </summary>
-        /// <param name="thisSolidProvider">Текущий <see cref="ISolidProvider">ISolidProvider</see></param>
-        /// <param name="solidProvider">Поданный <see cref="ISolidProvider">ISolidProvider</see></param>
-        /// <returns>True, если текущий <see cref="ISolidProvider">ISolidProvider</see> пересекается с поданным <see cref="ISolidProvider">ISolidProvider</see>, иначе False.
-        /// Если объекты касаются друг друга, то также False</returns>
-        internal static bool IntersectsSolidProvider(this ISolidProvider thisSolidProvider, ISolidProvider solidProvider) {
-            var otherSolid = solidProvider.GetSolid();
-            var otherBBox = solidProvider.GetTransformedBBoxXYZ();
-            return IntersectsSolid(thisSolidProvider, otherSolid, otherBBox);
-        }
-
-        /// <summary>
-        /// Проверяет на равенство текущего <see cref="ISolidProvider">ISolidProvider</see> и поданного <see cref="Solid"/>
-        /// Под равенством понимается равенство объемов с точностью до 1 см3 и равенство координат ограничивающих <see cref="BoundingBoxXYZ"/> с точностью до 1 мм.
-        /// </summary>
-        /// <param name="solidProvider">Текущий <see cref="ISolidProvider">ISolidProvider</see></param>
-        /// <param name="otherSolid">Поданный <see cref="Solid"/></param>
-        /// <returns>True, если разница объемов текущего и поданного <see cref="ISolidProvider">ISolidProvider</see> меньше, либо равна 1 см3, 
-        /// и если разница координат ограничивающих их <see cref="BoundingBoxXYZ"/> меньше, либо равна 1 мм;
-        /// Иначе False</returns>
-        internal static bool EqualsSolid(this ISolidProvider solidProvider, Solid otherSolid) {
-            return EqualsSolid(solidProvider, otherSolid, _toleranceDistance);
-        }
-#pragma warning restore 0618
-
         /// <summary>
         /// Проверяет на равенство текущего <see cref="Solid"/> и поданного <see cref="Solid"/>.
         /// <para> Под равенством понимается равенство объемов с точностью до 1% объема от меньшего солида и равенство координат ограничивающих <see cref="BoundingBoxXYZ"/> с точностью до 1 мм.</para>
@@ -133,7 +105,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <returns>True, если разница объемов текущего и поданного Solid меньше, либо равна 1 см3, 
         /// и если разница координат ограничивающих их <see cref="BoundingBoxXYZ"/> меньше, либо равна 1 мм;
         /// Иначе False</returns>
-        private static bool SolidEquals(Solid thisSolid, BoundingBoxXYZ thisSolidBBox, Solid otherSolid, BoundingBoxXYZ otherSolidBBox) {
+        private bool SolidEquals(Solid thisSolid, BoundingBoxXYZ thisSolidBBox, Solid otherSolid, BoundingBoxXYZ otherSolidBBox) {
             if(!SolidsVolumesEqual(thisSolid, otherSolid)) {
                 return false;
             }
@@ -147,7 +119,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <param name="solid1">Первый солид</param>
         /// <param name="solid2">Второй солид</param>
         /// <returns>True, если разница объемов не превышает процент объема <see cref="_toleranceVolumePercentage"/> меньшего солида</returns>
-        private static bool SolidsVolumesEqual(Solid solid1, Solid solid2) {
+        private bool SolidsVolumesEqual(Solid solid1, Solid solid2) {
             if((solid1 is null) || (solid2 is null)) {
                 return false;
             }
@@ -156,11 +128,11 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return Math.Abs(solid1.Volume - solid2.Volume) <= volumeTolerance;
         }
 
-        private static bool BBoxesEqual(BoundingBoxXYZ bbox1, BoundingBoxXYZ bbox2) {
+        private bool BBoxesEqual(BoundingBoxXYZ bbox1, BoundingBoxXYZ bbox2) {
             return BBoxesEqual(bbox1, bbox2, _toleranceDistance);
         }
 
-        private static bool BBoxesEqual(BoundingBoxXYZ bbox1, BoundingBoxXYZ bbox2, double tolerance) {
+        private bool BBoxesEqual(BoundingBoxXYZ bbox1, BoundingBoxXYZ bbox2, double tolerance) {
             var minDistance = (bbox1.Min - bbox2.Min).GetLength();
             if(minDistance > tolerance) {
                 return false;

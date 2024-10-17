@@ -207,6 +207,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="thisOpeningBBox">
         /// Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
+#pragma warning disable 0618
         private ICollection<ElementId> GetIntersectingOpeningsIds(
             ICollection<OpeningRealKr> realOpenings,
             Solid thisOpeningSolid,
@@ -223,5 +224,6 @@ namespace RevitOpeningPlacement.OpeningModels {
                 }
             }
         }
+#pragma warning restore 0618
     }
 }
