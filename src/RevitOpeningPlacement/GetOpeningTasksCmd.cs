@@ -67,6 +67,9 @@ namespace RevitOpeningPlacement {
                 if(!ModelCorrect(repo)) {
                     return;
                 }
+                if(!repo.ContinueIfNotAllLinksLoaded()) {
+                    throw new OperationCanceledException();
+                }
                 GetOpeningsTask(kernel);
             }
         }
@@ -101,14 +104,29 @@ namespace RevitOpeningPlacement {
         /// Логика вывода окна навигатора по заданиям на отверстия в файле архитектуры
         /// </summary>
         private void GetOpeningsTaskInDocumentAR(IKernel kernel) {
+            kernel.Bind<IConstantsProvider>()
+                .To<ConstantsProvider>()
+                .InSingletonScope();
+            kernel.Bind<ArchitectureNavigatorForIncomingTasksViewModel>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<NavigatorMepIncomingView>()
+                .ToSelf()
+                .InSingletonScope()
+                .WithPropertyValue(nameof(Window.DataContext),
+                    c => c.Kernel.Get<ArchitectureNavigatorForIncomingTasksViewModel>())
+                .WithPropertyValue(nameof(Window.Title), PluginName);
+
+            var window = kernel.Get<NavigatorMepIncomingView>();
             var uiApplication = kernel.Get<UIApplication>();
-            var revitRepository = kernel.Get<RevitRepository>();
-            GetIncomingTaskInDocAR(uiApplication, revitRepository);
+            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+            window.Show();
         }
 
         /// <summary>
         /// Запуск окна навигатора по входящим заданиям на отверстия в файле архитектуры
         /// </summary>
+        [Obsolete]
         private void GetIncomingTaskInDocAR(UIApplication uiApplication, RevitRepository revitRepository) {
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();
@@ -142,6 +160,7 @@ namespace RevitOpeningPlacement {
         /// Просмотр входящих заданий на отверстия от ВИС в файле КР
         /// </summary>
         /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
+        [Obsolete]
         private void GetIncomingTasksFromMepInDocKR(UIApplication uiApplication, RevitRepository revitRepository) {
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();
@@ -178,6 +197,7 @@ namespace RevitOpeningPlacement {
         /// Просмотр входящих заданий на отверстия от АР в файле КР
         /// </summary>
         /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
+        [Obsolete]
         private void GetIncomingTasksFromArInDocKR(UIApplication uiApplication, RevitRepository revitRepository) {
             if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
                 throw new OperationCanceledException();
@@ -215,6 +235,7 @@ namespace RevitOpeningPlacement {
         /// <param name="incomingTasks">Входящие задания на отверстия из связей</param>
         /// <param name="realOpenings">Чистовые отверстия из текущего документа</param>
         /// <param name="constructureElementsIds">Элементы конструкций из текущего документа</param>
+        [Obsolete]
         private ICollection<IOpeningTaskIncomingForKrViewModel> GetOpeningsArIncomingTasksViewModels(
             ICollection<OpeningArTaskIncoming> incomingTasks,
             ICollection<OpeningRealKr> realOpenings,
@@ -248,6 +269,7 @@ namespace RevitOpeningPlacement {
         /// <param name="incomingTasks">Входящие задания на отверстия из связей</param>
         /// <param name="realOpenings">Чистовые отверстия из текущего документа</param>
         /// <param name="constructureElementsIds">Элементы конструкций из текущего документа</param>
+        [Obsolete]
         private ICollection<OpeningMepTaskIncomingViewModel> GetOpeningsMepIncomingTasksViewModels(
             ICollection<OpeningMepTaskIncoming> incomingTasks,
             ICollection<IOpeningReal> realOpenings,
@@ -285,6 +307,7 @@ namespace RevitOpeningPlacement {
         /// </summary>
         /// <param name="openingsReal">Чистовые отверстия, размещенные в активном документе КР</param>
         /// <param name="updateStatus">Делегат для обновления статусов размещенных чистовых отверстий КР</param>
+        [Obsolete]
         private ICollection<OpeningRealKrViewModel> GetOpeningsRealKrViewModels(
             ICollection<OpeningRealKr> openingsReal,
             Action<OpeningRealKr> updateStatus) {
@@ -318,6 +341,7 @@ namespace RevitOpeningPlacement {
         /// </summary>
         /// <param name="mepLinks">Связи ВИС</param>
         /// <param name="openingsReal">Чистовые отверстия, размещенные в активном документе АР</param>
+        [Obsolete]
         private ICollection<OpeningRealArViewModel> GetOpeningsRealArViewModels(
             ICollection<IMepLinkElementsProvider> mepLinks,
             ICollection<OpeningRealAr> openingsReal) {
@@ -380,35 +404,49 @@ namespace RevitOpeningPlacement {
         /// Логика вывода окна навигатора по заданиям на отверстия в файле несущих конструкций
         /// </summary>
         private void GetOpeningsTaskInDocumentKR(IKernel kernel) {
-            var uiApplication = kernel.Get<UIApplication>();
-            var revitRepository = kernel.Get<RevitRepository>();
+            kernel.Bind<OpeningRealsKrConfig>()
+                .ToMethod(c => {
+                    var repo = c.Kernel.Get<RevitRepository>();
+                    return OpeningRealsKrConfig.GetOpeningConfig(repo.Doc);
+                });
 
             var navigatorMode = GetKrNavigatorMode();
-            var config = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
+            var config = kernel.Get<OpeningRealsKrConfig>();
             switch(navigatorMode) {
                 case KrNavigatorMode.IncomingAr: {
                     config.PlacementType = OpeningRealKrPlacementType.PlaceByAr;
                     config.SaveProjectConfig();
-                    GetIncomingTasksFromArInDocKR(uiApplication, revitRepository);
                     break;
                 }
                 case KrNavigatorMode.IncomingMep: {
                     config.PlacementType = OpeningRealKrPlacementType.PlaceByMep;
                     config.SaveProjectConfig();
-                    GetIncomingTasksFromMepInDocKR(uiApplication, revitRepository);
                     break;
                 }
                 default:
                     throw new OperationCanceledException();
             }
+
+            kernel.Bind<IConstantsProvider>()
+                .To<ConstantsProvider>()
+                .InSingletonScope();
+            kernel.Bind<ConstructureNavigatorForIncomingTasksViewModel>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<NavigatorArIncomingView>()
+                .ToSelf()
+                .InSingletonScope()
+                .WithPropertyValue(nameof(Window.DataContext),
+                    c => c.Kernel.Get<ConstructureNavigatorForIncomingTasksViewModel>())
+                .WithPropertyValue(nameof(Window.Title), PluginName);
+
+            var window = kernel.Get<NavigatorArIncomingView>();
+            var uiApplication = kernel.Get<UIApplication>();
+            var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
+            window.Show();
         }
 
         private void GetOpeningsTaskInDocumentMEP(IKernel kernel) {
-            var revitRepository = kernel.Get<RevitRepository>();
-            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
-                throw new OperationCanceledException();
-            }
-
             kernel.Bind<IConstantsProvider>()
                 .To<ConstantsProvider>()
                 .InSingletonScope();
