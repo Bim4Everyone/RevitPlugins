@@ -137,6 +137,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="linkOpeningsIntersectConstructions">
         /// Флаг, показывающий, 
         /// полностью ли текущее чистовое отверстие закрывает собой пересекающие его задания на отверстия</param>
+#pragma warning disable 0618
         private Solid SubtractLinkOpenings(
             IConstructureLinkElementsProvider link,
             Solid thisOpeningSolidForSubtraction,
@@ -176,6 +177,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             }
             return solidAfterSubtraction;
         }
+#pragma warning restore 0618
 
         /// <summary>
         /// Возвращает статус текущего чистового отверстия по коэффициенту пересекаемого объема.

@@ -241,6 +241,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="placedOpenings">Существующие задания на отверстия в проекте</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+#pragma warning disable 0618
         public bool IsAlreadyPlaced(ICollection<OpeningMepTaskOutcoming> placedOpenings) {
             if(IsRemoved || placedOpenings.Count == 0) {
                 return false;
@@ -260,6 +261,7 @@ namespace RevitOpeningPlacement.OpeningModels {
             }
             return false;
         }
+#pragma warning restore 0618
 
         public override bool Equals(object obj) {
             return !IsRemoved && (obj is OpeningMepTaskOutcoming otherTask) && Equals(otherTask);

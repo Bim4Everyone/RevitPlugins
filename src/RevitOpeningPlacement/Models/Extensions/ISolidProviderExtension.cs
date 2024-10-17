@@ -38,6 +38,8 @@ namespace RevitOpeningPlacement.Models.Extensions {
         /// <returns>True, если разница объемов текущего и поданного <see cref="ISolidProvider">ISolidProvider</see> меньше, либо равна 1 см3, 
         /// и если разница координат ограничивающих их <see cref="BoundingBoxXYZ"/> меньше, либо равна <paramref name="tolerance"/>;
         /// Иначе False</returns>
+#pragma warning disable 0618
+        [Obsolete("Use ISolidProviderUtils.EqualsSolid", error: false)]
         internal static bool EqualsSolid(this ISolidProvider solidProvider, Solid otherSolid, double tolerance) {
             var thisSolid = solidProvider.GetSolid();
 
@@ -86,6 +88,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
             return false;
         }
 
+        [Obsolete("Use ISolidProviderUtils.IntersectsSolid", error: false)]
         internal static bool IntersectsSolid(this ISolidProvider thisSolidProvider, Solid otherSolid, BoundingBoxXYZ otherSolidBBox) {
             var thisSolid = thisSolidProvider.GetSolid();
             var thisBBox = thisSolidProvider.GetTransformedBBoxXYZ();
@@ -117,7 +120,7 @@ namespace RevitOpeningPlacement.Models.Extensions {
         internal static bool EqualsSolid(this ISolidProvider solidProvider, Solid otherSolid) {
             return EqualsSolid(solidProvider, otherSolid, _toleranceDistance);
         }
-
+#pragma warning restore 0618
 
         /// <summary>
         /// Проверяет на равенство текущего <see cref="Solid"/> и поданного <see cref="Solid"/>.
