@@ -40,6 +40,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Кэш для хранения результата метода <see cref="GetIntersectingMepElementsIds"/>
         /// </summary>
+        [Obsolete]
         private (ICollection<ElementId> Value, DateTime CacheTime) _intersectingMepElementsCache;
 
         /// <summary>
