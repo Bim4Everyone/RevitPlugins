@@ -1,14 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// <summary>
@@ -16,24 +25,26 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
     /// </summary>
     internal class MepNavigatorForOutcomingTasksViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly IConstantsProvider _constantsProvider;
+        private readonly IResolutionRoot _resolutionRoot;
         private OpeningMepTaskOutcomingViewModel _selectedOpeningMepTaskOutcoming;
 
 
-        public MepNavigatorForOutcomingTasksViewModel(RevitRepository revitRepository, ICollection<OpeningMepTaskOutcomingViewModel> openingsMepTasksOutcoming) {
-            if(revitRepository is null) {
-                throw new ArgumentNullException(nameof(revitRepository));
-            }
-            if(openingsMepTasksOutcoming is null) {
-                throw new ArgumentNullException(nameof(openingsMepTasksOutcoming));
-            }
+        public MepNavigatorForOutcomingTasksViewModel(
+            RevitRepository revitRepository,
+            IResolutionRoot resolutionRoot,
+            IConstantsProvider constantsProvider) {
 
-            _revitRepository = revitRepository;
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
+            _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
 
-            OpeningsMepTaskOutcoming = new ObservableCollection<OpeningMepTaskOutcomingViewModel>(openingsMepTasksOutcoming);
+            OpeningsMepTaskOutcoming = new ObservableCollection<OpeningMepTaskOutcomingViewModel>();
             OpeningsMepTasksOutcomingViewSource = new CollectionViewSource() { Source = OpeningsMepTaskOutcoming };
 
             SelectCommand = RelayCommand.Create<ISelectorAndHighlighter>(SelectElement, CanSelect);
             RenewCommand = RelayCommand.Create(Renew);
+            LoadViewCommand = RelayCommand.Create(LoadView);
         }
 
 
@@ -51,6 +62,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public ICommand RenewCommand { get; }
 
+        public ICommand LoadViewCommand { get; }
+
 
         private void SelectElement(ISelectorAndHighlighter p) {
             _revitRepository.SelectAndShowElement(p);
@@ -66,6 +79,46 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                 command.ExecuteCommand(_revitRepository.UIApplication);
             };
             _revitRepository.DoAction(action);
+        }
+
+
+        private void LoadView() {
+            var outcomingTasks = _revitRepository.GetOpeningsMepTasksOutcoming();
+            IList<ElementId> outcomingTasksIds = outcomingTasks.Select(task => task.Id).ToList();
+            var mepElementsIds = _revitRepository.GetMepElementsIds();
+            var openingTaskOutcomingViewModels = GetMepTaskOutcomingViewModels(outcomingTasks);
+
+            OpeningsMepTaskOutcoming.Clear();
+            foreach(var item in openingTaskOutcomingViewModels) {
+                OpeningsMepTaskOutcoming.Add(item);
+            }
+        }
+
+        private ICollection<OpeningMepTaskOutcomingViewModel> GetMepTaskOutcomingViewModels(
+            ICollection<OpeningMepTaskOutcoming> outcomingTasks) {
+
+            var service = _resolutionRoot.Get<IOpeningInfoUpdater<OpeningMepTaskOutcoming>>();
+
+            var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
+
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.StepValue = _constantsProvider.ProgressBarStepLarge;
+                pb.DisplayTitleFormat = "Анализ заданий... [{0}\\{1}]";
+                var progress = pb.CreateProgress();
+                pb.MaxValue = outcomingTasks.Count;
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                int i = 0;
+                foreach(var outcomingTask in outcomingTasks) {
+                    ct.ThrowIfCancellationRequested();
+                    progress.Report(i);
+                    service.UpdateInfo(outcomingTask);
+                    openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask));
+                    i++;
+                }
+            }
+            return openingTaskOutcomingViewModels;
         }
     }
 }
