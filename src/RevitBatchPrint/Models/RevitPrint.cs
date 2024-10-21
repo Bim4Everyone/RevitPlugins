@@ -138,7 +138,7 @@ namespace RevitBatchPrint.Models {
                 .Select(item => GetMessage(item.ViewSheet, item.ViewsWithoutCrop));
 
             if(messages.Any()) {
-                Errors.Add("Листы у которые есть виды с отключенной подрезкой:" + Environment.NewLine +
+                Errors.Add("Листы у которых есть виды с отключенной подрезкой:" + Environment.NewLine +
                            string.Join(Environment.NewLine, messages));
             }
         }

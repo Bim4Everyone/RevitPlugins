@@ -78,6 +78,7 @@ namespace RevitBatchPrint.Models {
             return viewSheet.GetAllPlacedViews()
                 .Select(item => Document.GetElement(item))
                 .OfType<View>()
+                .Where(item => item.CropBox != null)
                 .Where(item => !item.CropBoxActive)
                 .ToList();
         }
