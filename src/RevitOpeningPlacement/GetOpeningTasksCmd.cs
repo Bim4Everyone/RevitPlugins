@@ -29,10 +29,6 @@ namespace RevitOpeningPlacement {
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class GetOpeningTasksCmd : BasePluginCommand {
-        private const int _progressBarStepLarge = 100;
-        private const int _progressBarStepSmall = 25;
-
-
         public GetOpeningTasksCmd() {
             PluginName = "Навигатор по заданиям";
         }
