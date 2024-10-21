@@ -69,8 +69,6 @@ namespace RevitBatchPrint.Models {
 
                 try {
                     using(Transaction transaction = _revitRepository.Document.StartTransaction("PrintSettings")) {
-                        transaction.Start();
-
                         PrintManager.PrintSetup.CurrentPrintSetting = PrintManager.PrintSetup.InSession;
 
                         PaperSize paperSize = _revitRepository.GetPaperSizeByName(printSettings.Format.Name);
@@ -88,6 +86,8 @@ namespace RevitBatchPrint.Models {
 
                         PrintManager.Apply();
                         PrintManager.SubmitPrint(viewSheet);
+
+                        transaction.RollBack();
                     }
                 } catch(Exception ex) {
                     printErrors.Add((viewSheet, ex.Message));
