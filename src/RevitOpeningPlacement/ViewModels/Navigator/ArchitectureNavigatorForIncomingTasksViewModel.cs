@@ -24,34 +24,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         private readonly RevitRepository _revitRepository;
         private readonly IConstantsProvider _constantsProvider;
 
-        [Obsolete]
-        public ArchitectureNavigatorForIncomingTasksViewModel(
-            RevitRepository revitRepository,
-            ICollection<OpeningMepTaskIncomingViewModel> openingsMepTasksIncomingViewModels,
-            ICollection<OpeningRealArViewModel> openingsRealViewModels) {
-
-            if(revitRepository is null) {
-                throw new ArgumentNullException(nameof(revitRepository));
-            }
-            if(openingsMepTasksIncomingViewModels is null) {
-                throw new ArgumentNullException(nameof(openingsMepTasksIncomingViewModels));
-            }
-
-            _revitRepository = revitRepository;
-
-            OpeningsMepTaskIncoming = new ObservableCollection<OpeningMepTaskIncomingViewModel>(openingsMepTasksIncomingViewModels);
-            OpeningsMepTasksIncomingViewSource = new CollectionViewSource() { Source = OpeningsMepTaskIncoming };
-
-            OpeningsReal = new ObservableCollection<OpeningRealArViewModel>(openingsRealViewModels);
-            OpeningsRealViewSource = new CollectionViewSource() { Source = OpeningsReal };
-
-            SelectCommand = RelayCommand.Create<ISelectorAndHighlighter>(SelectElement, CanSelect);
-            RenewCommand = RelayCommand.Create(Renew);
-            PlaceRealOpeningBySingleTaskCommand = RelayCommand.Create(PlaceRealOpeningBySingleTask);
-            PlaceOneRealOpeningByManyTasksCommand = RelayCommand.Create(PlaceOneRealOpeningByManyTasks);
-            PlaceManyRealOpeningsByManyTasksCommand = RelayCommand.Create(PlaceManyRealOpeningsByManyTasks);
-            PlaceManyRealOpeningsByManyTasksInManyHostsCommand = RelayCommand.Create(PlaceManyRealOpeningsByManyTasksInManyHosts);
-        }
 
         public ArchitectureNavigatorForIncomingTasksViewModel(
             RevitRepository revitRepository,

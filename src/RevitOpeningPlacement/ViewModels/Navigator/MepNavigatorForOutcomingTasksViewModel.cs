@@ -30,24 +30,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         private OpeningMepTaskOutcomingViewModel _selectedOpeningMepTaskOutcoming;
 
 
-        [Obsolete]
-        public MepNavigatorForOutcomingTasksViewModel(RevitRepository revitRepository, ICollection<OpeningMepTaskOutcomingViewModel> openingsMepTasksOutcoming) {
-            if(revitRepository is null) {
-                throw new ArgumentNullException(nameof(revitRepository));
-            }
-            if(openingsMepTasksOutcoming is null) {
-                throw new ArgumentNullException(nameof(openingsMepTasksOutcoming));
-            }
-
-            _revitRepository = revitRepository;
-
-            OpeningsMepTaskOutcoming = new ObservableCollection<OpeningMepTaskOutcomingViewModel>(openingsMepTasksOutcoming);
-            OpeningsMepTasksOutcomingViewSource = new CollectionViewSource() { Source = OpeningsMepTaskOutcoming };
-
-            SelectCommand = RelayCommand.Create<ISelectorAndHighlighter>(SelectElement, CanSelect);
-            RenewCommand = RelayCommand.Create(Renew);
-        }
-
         public MepNavigatorForOutcomingTasksViewModel(
             RevitRepository revitRepository,
             IResolutionRoot resolutionRoot,
