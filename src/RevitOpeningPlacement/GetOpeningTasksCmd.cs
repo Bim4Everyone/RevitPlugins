@@ -247,7 +247,7 @@ namespace RevitOpeningPlacement {
     }
 
     /// <summary>
-    /// Перечисление режимов навигатора по заданиям на отверстиям в файле КР
+    /// Перечисление режимов навигатора по заданиям на отверстия в файле КР
     /// </summary>
     internal enum KrNavigatorMode {
         /// <summary>
