@@ -24,6 +24,10 @@ namespace RevitOpeningPlacement.Services {
         /// Репозиторий активного файла
         /// </summary>
         private readonly RevitRepository _revitRepository;
+
+        /// <summary>
+        /// Обработчик геометрии солидов
+        /// </summary>
         private readonly ISolidProviderUtils _solidProviderUtils;
 
         /// <summary>
@@ -42,7 +46,8 @@ namespace RevitOpeningPlacement.Services {
         private readonly ICollection<IConstructureLinkElementsProvider> _constructureLinks;
 
         /// <summary>
-        /// Допустимое расстояние между экземплярами семейств заданий на отверстия, при котором считается, что они размещены в одном и том же месте
+        /// Допустимое расстояние между экземплярами семейств заданий на отверстия, 
+        /// при котором считается, что они размещены в одном и том же месте
         /// </summary>
         private readonly double _distance3dTolerance = Math.Sqrt(3 * XYZExtension.FeetRound * XYZExtension.FeetRound);
 
@@ -51,7 +56,16 @@ namespace RevitOpeningPlacement.Services {
         /// </summary>
         private readonly double _volumeTolerance;
 
+        /// <summary>
+        /// Кэш для хранения коллекции id элементов ВИС из активного файла, 
+        /// которые пересекаются с исходящим заданием на отверстие
+        /// </summary>
         private readonly Dictionary<ElementId, ICollection<ElementId>> _intersectingMepElementsCache;
+
+        /// <summary>
+        /// Кэш для хранения солидов исходящих заданий на отверстия из активного файла
+        /// </summary>
+        private readonly Dictionary<ElementId, Solid> _openingsSolidCache;
 
 
         public MepTaskOutcomingInfoUpdater(RevitRepository revitRepository, ISolidProviderUtils solidProviderUtils) {
@@ -62,73 +76,108 @@ namespace RevitOpeningPlacement.Services {
             _mepElementsIds = revitRepository.GetMepElementsIds();
             _constructureLinks = GetLinkProviders(revitRepository);
             _intersectingMepElementsCache = new Dictionary<ElementId, ICollection<ElementId>>();
+            _openingsSolidCache = new Dictionary<ElementId, Solid>();
 
             _volumeTolerance = _distance3dTolerance * _distance3dTolerance * _distance3dTolerance;
         }
 
-
+        // 1. определить, что геометрия валидная
+        // 2. проверить значение параметра "размещено вручную"
+        // 3. проверить статус "не актуальное" и закэшировать элементы ВИС, которые проходят через задание
+        // 4. проверить статус "пересекающееся отверстие"
+        // 5. проверить статус "объединенное" - если количество закэшированных элементов ВИС >= 2
+        // 6. проверить габаритные статусы. Принять за вводные, что через задание проходит только 1 элемент ВИС.
+        //      Найти отступы сверху-снизу, справа-слева, определить для этого элемента ВИС отступы и округление из конфига
+        //      по этим значениям определить статус "большое", "маленькое", "корректно".
         /// <summary>
-        /// Обновляет <see cref="OpeningMepTaskOutcoming.Status">статус</see> и <see cref="OpeningMepTaskOutcoming.Host">хост</see>
+        /// Обновляет <see cref="OpeningMepTaskOutcoming.Status">статус</see> 
+        /// и <see cref="OpeningMepTaskOutcoming.Host">хост</see>
         /// исходящего задания на отверстие от ВИС из активного файла.
         /// </summary>
         /// <param name="outcomingTask">Исходящее задание н отверстие от ВИС из активного файла.</param>
         public void UpdateInfo(OpeningMepTaskOutcoming outcomingTask) {
-            if(!outcomingTask.IsRemoved) {
-                var openingSolid = outcomingTask.GetSolid();
-                if((openingSolid is null) || (openingSolid.Volume < _volumeTolerance)) {
+            try {
+                if(TaskIsInvalid(outcomingTask)) {
                     outcomingTask.Status = OpeningTaskOutcomingStatus.Invalid;
                     return;
                 }
 
+                var openingSolid = GetOpeningSolid(outcomingTask);
                 if(IsManuallyPlaced(outcomingTask)) {
-                    FindAndSetHost(openingSolid, _constructureLinks, outcomingTask);
+                    FindAndSetHost(outcomingTask);
                     outcomingTask.Status = OpeningTaskOutcomingStatus.ManuallyPlaced;
                     return;
                 }
 
-                if(ThisOpeningTaskIsNotActual(openingSolid, _constructureLinks, _mepElementsIds, outcomingTask)) {
+                if(ThisOpeningTaskIsNotActual(outcomingTask)) {
                     outcomingTask.Status = OpeningTaskOutcomingStatus.NotActual;
                     return;
                 }
 
                 var intersectingOpeningIds = GetIntersectingOpeningsTasks(
-                    openingSolid,
-                    _outcomingTasksIds,
                     outcomingTask);
                 if(intersectingOpeningIds.Count > 0) {
                     outcomingTask.Status = OpeningTaskOutcomingStatus.Intersects;
                     return;
-                } else {
-                    _outcomingTasksIds.Remove(outcomingTask.Id);
                 }
 
-                try {
-                    Solid openingSolidAfterIntersection = GetOpeningAndMepsSolidsDifference(
-                        openingSolid,
-                        _mepElementsIds,
-                        outcomingTask);
-                    if(openingSolidAfterIntersection is null) {
-                        outcomingTask.Status = OpeningTaskOutcomingStatus.Invalid;
-                        return;
-                    }
-                    double volumeRatio =
-                        (openingSolid.Volume - openingSolidAfterIntersection.Volume) / openingSolid.Volume;
-                    outcomingTask.Status = GetOpeningTaskOutcomingStatus(volumeRatio);
-                    return;
-
-                } catch(InvalidOperationException) {
+                Solid openingSolidAfterIntersection = GetOpeningAndMepSolidsDifference(outcomingTask);
+                if(openingSolidAfterIntersection is null) {
                     outcomingTask.Status = OpeningTaskOutcomingStatus.Invalid;
                     return;
                 }
-            } else {
+                double volumeRatio =
+                    (openingSolid.Volume - openingSolidAfterIntersection.Volume) / openingSolid.Volume;
+                outcomingTask.Status = GetOpeningTaskOutcomingStatus(volumeRatio);
+                return;
+            } catch(Exception ex) when(
+            ex is NullReferenceException
+            || ex is ArgumentException
+            || ex is InvalidOperationException
+            || ex is Autodesk.Revit.Exceptions.ApplicationException) {
                 outcomingTask.Status = OpeningTaskOutcomingStatus.Invalid;
                 return;
             }
         }
 
         /// <summary>
+        /// Проверяет на валидность исходящее задание на отверстие
+        /// </summary>
+        /// <param name="opening">Исходящее задание на отверстие</param>
+        /// <returns>True, если задание не валидно, иначе False.</returns>
+        private bool TaskIsInvalid(OpeningMepTaskOutcoming opening) {
+            var solid = GetOpeningSolid(opening);
+            return opening.IsRemoved || (solid is null) || (solid.Volume < _volumeTolerance);
+        }
+
+        /// <summary>
+        /// Возвращает солид исходящего задания на отверстие в координатах активного файла
+        /// </summary>
+        /// <param name="opening">Исходящее задание на отверстие</param>
+        /// <returns>Солид исходящего задания на отверстие</returns>
+        private Solid GetOpeningSolid(OpeningMepTaskOutcoming opening) {
+            if(!_openingsSolidCache.ContainsKey(opening.Id)) {
+                var solid = opening.GetSolid();
+                _openingsSolidCache.Add(opening.Id, solid);
+            }
+            return _openingsSolidCache[opening.Id];
+        }
+
+        /// <summary>
+        /// Возвращает солид исходящего задания на отверстие в координатах связанного конструктивного файла
+        /// </summary>
+        /// <param name="opening">Исходящее задание на отверстие</param>
+        /// <param name="link">Связь с конструкциями, в координатах которой нужно получить солид</param>
+        /// <returns>Солид исходящего задания на отверстие в координатах связанного файла</returns>
+        private Solid GetOpeningSolid(OpeningMepTaskOutcoming opening, IConstructureLinkElementsProvider link) {
+            Solid thisOpeningTaskSolid = GetOpeningSolid(opening);
+            return SolidUtils.CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
+        }
+
+        /// <summary>
         /// Возвращает статус задания на отверстие по отношению объема пересечения задания на отверстие с элементом инженерной системы к исходному объему задания на отверстие
         /// </summary>
+        /// <param name="volumeRatio">Отношение объемов, [0; 1]</param>
         /// <exception cref="ArgumentOutOfRangeException">Исключение, если коэффициент отношения объемов меньше 0 или больше 1</exception>
         private OpeningTaskOutcomingStatus GetOpeningTaskOutcomingStatus(double volumeRatio) {
             if((volumeRatio < 0) || (volumeRatio > 1)) {
@@ -148,18 +197,15 @@ namespace RevitOpeningPlacement.Services {
             return status;
         }
 
+        // TODO too big method
         /// <summary>
         /// Возвращает солид, образованный вычитанием из исходного солида задания на отверстие всех пересекающих его элементов инженерных систем
         /// </summary>
-        /// <param name="thisOpeningSolid">Солид текущего задания на отверстие</param>
-        /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
+        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие</param>
         /// <exception cref="InvalidOperationException">Исключение, если не удалось выполнить вычитание солида отверстия и солида элемента инженерной системы</exception>
-        private Solid GetOpeningAndMepsSolidsDifference(
-            Solid thisOpeningSolid,
-            ICollection<ElementId> allMepElementsIds,
-            OpeningMepTaskOutcoming mepTaskOutcoming) {
-
-            var intersectingMepSolids = GetIntersectingMepSolids(thisOpeningSolid, allMepElementsIds, mepTaskOutcoming);
+        private Solid GetOpeningAndMepSolidsDifference(OpeningMepTaskOutcoming mepTaskOutcoming) {
+            var intersectingMepSolids = GetIntersectingMepSolids(mepTaskOutcoming);
+            Solid thisOpeningSolid = GetOpeningSolid(mepTaskOutcoming);
             Solid openingSolidAfterIntersection = thisOpeningSolid;
             foreach(var mepSolid in intersectingMepSolids) {
                 //здесь определяется солид, образованный вычитанием из исходного солида задания на отверстие всех пересекающих его элементов инженерных систем
@@ -205,94 +251,65 @@ namespace RevitOpeningPlacement.Services {
 
 
         /// <summary>
-        /// Возвращает список солидов элементов инженерных систем, которые пересекаются с данным заданием на отверстие, из текущего документа
+        /// Возвращает список солидов элементов инженерных систем, которые пересекаются с заданием на отверстие
         /// </summary>
-        /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
-        /// <param name="allMepElementsIds">Коллекция Id всех элементов инженерных систем из файла, в котором размещено задание на отверстие</param>
-        private ICollection<Solid> GetIntersectingMepSolids(
-            Solid thisOpeningTaskSolid,
-            ICollection<ElementId> allMepElementsIds,
-            OpeningMepTaskOutcoming mepTaskOutcoming) {
-
-            if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
-                return Array.Empty<Solid>();
-            } else {
-                return GetIntersectingMepElementsIds(thisOpeningTaskSolid, allMepElementsIds, mepTaskOutcoming)
-                    .Select(elementId => _revitRepository.Doc.GetElement(elementId).GetSolid())
-                    .ToHashSet();
-            }
+        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие</param>
+        /// <returns>Коллекция солидов элементов ВИС из активного файла, которые пересекаются с заданием на отверстие
+        /// </returns>
+        private ICollection<Solid> GetIntersectingMepSolids(OpeningMepTaskOutcoming mepTaskOutcoming) {
+            return GetIntersectingMepElementsIds(mepTaskOutcoming)
+                .Select(elementId => _revitRepository.Doc.GetElement(elementId).GetSolid())
+                .ToArray();
         }
 
         /// <summary>
-        /// Возвращает Id всех исходящих заданий на отверстия, которые пересекаются с данным заданием на отверстие из текущего документа
+        /// Находит задания на отверстия из активного файла, которые пересекаются с данным заданием на отверстие
         /// </summary>
-        /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
-        /// <param name="allOpeningTasksInDoc">Id всех экземпляров семейств заданий на отверстия из активного документа ревита для проверки</param>
-        /// <returns>Коллекция Id экземпляров семейств исходящих заданий на отверстия, которые пересекаются с текущим заданием на отверстие</returns>
-        private ICollection<ElementId> GetIntersectingOpeningsTasks(
-            Solid thisOpeningTaskSolid,
-            ICollection<ElementId> allOpeningTasksInDoc,
-            OpeningMepTaskOutcoming mepTaskOutcoming) {
-
-            if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0) || (!allOpeningTasksInDoc.Any())) {
-                return Array.Empty<ElementId>();
-            } else {
-                return new FilteredElementCollector(_revitRepository.Doc, allOpeningTasksInDoc)
-                    .Excluding(new ElementId[] { mepTaskOutcoming.Id })
-                    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
-                    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
-                    .ToElementIds();
-            }
+        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие</param>
+        /// <returns>Коллекция Id заданий на отверстия, которые пересекаются с текущим заданием на отверстие</returns>
+        private ICollection<ElementId> GetIntersectingOpeningsTasks(OpeningMepTaskOutcoming mepTaskOutcoming) {
+            Solid thisOpeningTaskSolid = GetOpeningSolid(mepTaskOutcoming);
+            return new FilteredElementCollector(_revitRepository.Doc, _outcomingTasksIds)
+                .Excluding(new ElementId[] { mepTaskOutcoming.Id })
+                .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
+                .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
+                .ToElementIds();
         }
 
+        // TODO too big method
         /// <summary>
         /// Проверяет, является ли данное задание на отверстие НЕ актуальным. Если задание не актуально, возвращается False, иначе True.
         /// Метод может установить только НЕкорректность задания, но корректность абсолютно точно подтвердить не может.
         /// </summary>
-        /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
-        /// <param name="constructureLinkElementsProviders">Коллекция объектов-оберток связанных файлов с элементами конструкций: стенами, перекрытиями и т.п.</param>
+        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие из активного файла</param>
         /// <returns>True - задание точно некорректно; False - задание не некорректно, но утверждать, что оно корректно нельзя</returns>
-        private bool ThisOpeningTaskIsNotActual(
-            Solid thisOpeningTaskSolid,
-            ICollection<IConstructureLinkElementsProvider> constructureLinkElementsProviders,
-            ICollection<ElementId> allMepElementsIds,
-            OpeningMepTaskOutcoming mepTaskOutcoming
-            ) {
-
-            if((thisOpeningTaskSolid is null) || (thisOpeningTaskSolid.Volume <= 0)) {
-                // геометрия задания на отверстие не корректна - задание не актуально
-                return true;
+        private bool ThisOpeningTaskIsNotActual(OpeningMepTaskOutcoming mepTaskOutcoming) {
+            if(_constructureLinks is null) {
+                throw new ArgumentNullException(nameof(_constructureLinks));
             }
-            if(constructureLinkElementsProviders is null) {
-                throw new ArgumentNullException(nameof(constructureLinkElementsProviders));
-            }
-            if(allMepElementsIds is null) {
-                throw new ArgumentNullException(nameof(allMepElementsIds));
+            if(_mepElementsIds is null) {
+                throw new ArgumentNullException(nameof(_mepElementsIds));
             }
 
-            bool mepElementsNotIntersectThisTask = false;
-            var mepElementsIntersectingThisTask = GetIntersectingMepElementsIds(
-                thisOpeningTaskSolid,
-                allMepElementsIds,
-                mepTaskOutcoming);
+            var mepElementsIntersectingThisTask = GetIntersectingMepElementsIds(mepTaskOutcoming);
             if(mepElementsIntersectingThisTask.Count == 0) {
                 // задание на отверстие не пересекается ни с одним элементом инженерной системы - задание не актуально
-                mepElementsNotIntersectThisTask = true;
+                return true;
             }
 
             // проверка на то, что:
             // во-первых есть конструкции в связанных файлах, внутри которых расположено задание на отверстие,
             // во-вторых, что ни один элемент ВИС, проходящий через текущее задание на отверстие не пересекается с этими конструкциями
-            foreach(var link in constructureLinkElementsProviders) {
+            foreach(var link in _constructureLinks) {
+                // поиск конструкций из связей, которые можно считать хостами для исходящего задания на отверстие
                 var hostConstructions = GetHostConstructionsForThisOpeningTask(
-                    thisOpeningTaskSolid, link,
+                    link,
                     out ICollection<IOpeningReal> intersectingOpenings,
                     mepTaskOutcoming);
                 if(hostConstructions.Count > 0) {
-                    return mepElementsNotIntersectThisTask
-                        || MepElementsIntersectConstructionsOrOpenings(
-                            thisOpeningTaskSolid,
-                            mepElementsIntersectingThisTask,
+                    // хост-конструкции найдены, теперь проверяем, что элементы ВИС из активного файла,
+                    // проходящие через исходящее задание на отверстие не пересекают эти конструкции
+                    return MepElementsIntersectConstructionsOrOpenings(
                             hostConstructions,
                             intersectingOpenings,
                             link,
@@ -309,36 +326,29 @@ namespace RevitOpeningPlacement.Services {
             return true;
         }
 
+        // TODO too big method
         /// <summary>
         /// Проверяет, пересекаются ли элементы ВИС из текущего файла с конструкциями или чистовыми отверстиями, причем место пересечения находится вне солида задания на отверстие.
         /// <para>При этом проверяемые элементы ВИС, а также проверяемые конструкции и чистовые отверстия из связи должны пересекать солид текущего задания на отверстие</para>
         /// </summary>
-        /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
-        /// <param name="intersectingMepElementsIds">Элементы ВИС из текущего файла с заданиями на отверстия, которые пересекают солид текущего задания на отверстие</param>
         /// <param name="intersectingLinkConstructions">Конструкции из <paramref name="link"/>, которые пересекаются с текущим заданием на отверстие</param>
         /// <param name="intersectingLinkOpeningsReal">Чистовые отверстия из <paramref name="link"/>, которые пересекаются с текущим заданием на отверстие</param>
         /// <param name="link">Связанный файл с конструкциями</param>
+        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие</param>
         /// <returns>True, если найдено пересечение элементов ВИС и конструкций (или чистовых отверстий) вне солида задания на отверстие, иначе False</returns>
         private bool MepElementsIntersectConstructionsOrOpenings(
-            Solid thisOpeningTaskSolid,
-            ICollection<ElementId> intersectingMepElementsIds,
             ICollection<ElementId> intersectingLinkConstructions,
             ICollection<IOpeningReal> intersectingLinkOpeningsReal,
             IConstructureLinkElementsProvider link,
             OpeningMepTaskOutcoming mepTaskOutcoming
             ) {
-            if(!mepTaskOutcoming.IsRemoved
-                && (link != null)
-                && (intersectingMepElementsIds != null)
-                && (intersectingMepElementsIds.Count > 0)
+            if((link != null)
                 && (intersectingLinkConstructions != null)
                 && (intersectingLinkConstructions.Count > 0)
-                && (intersectingLinkOpeningsReal != null)
-                && (thisOpeningTaskSolid != null)
-                && (thisOpeningTaskSolid.Volume > 0)) {
+                && (intersectingLinkOpeningsReal != null)) {
 
-                var thisSolidInLinkCoordinates = SolidUtils
-                    .CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
+                ICollection<ElementId> intersectingMepElementsIds = GetIntersectingMepElementsIds(mepTaskOutcoming);
+                var thisSolidInLinkCoordinates = GetOpeningSolid(mepTaskOutcoming, link);
 
                 // получение объединенного солида для элементов ВИС в координатах текущего файла с заданиями на отверстия
                 var mepElements = intersectingMepElementsIds
@@ -389,46 +399,35 @@ namespace RevitOpeningPlacement.Services {
         }
 
         /// <summary>
-        /// Возвращает список Id элементов инженерных систем, которые пересекаются с данным заданием на отверстие, из текущего документа
+        /// Находит элементы ВИС из активного файла, которые пересекаются с заданием на отверстие
         /// </summary>
-        private ICollection<ElementId> GetIntersectingMepElementsIds(
-            Solid thisOpeningSolid,
-            ICollection<ElementId> allMepElementsIds,
-            OpeningMepTaskOutcoming mepTaskOutcoming) {
-
-            if(!mepTaskOutcoming.IsRemoved
-                && (thisOpeningSolid != null)
-                && (allMepElementsIds != null)
-                && allMepElementsIds.Any()) {
-
-                if(!_intersectingMepElementsCache.ContainsKey(mepTaskOutcoming.Id)) {
-                    var ids = new FilteredElementCollector(_revitRepository.Doc, allMepElementsIds)
-                        .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
-                        .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
-                        .ToElementIds();
-                    _intersectingMepElementsCache.Add(mepTaskOutcoming.Id, ids);
-                }
-                return _intersectingMepElementsCache[mepTaskOutcoming.Id];
-            } else {
-                return Array.Empty<ElementId>();
+        /// <param name="mepTaskOutcoming">Задание на отверстие</param>
+        /// <returns>Коллекцию Id элементов ВИС, которые пересекают задание на отверстие</returns>
+        private ICollection<ElementId> GetIntersectingMepElementsIds(OpeningMepTaskOutcoming mepTaskOutcoming) {
+            if(_mepElementsIds is null) {
+                throw new ArgumentNullException(nameof(_mepElementsIds));
             }
+            Solid thisOpeningSolid = GetOpeningSolid(mepTaskOutcoming);
+            if(!_intersectingMepElementsCache.ContainsKey(mepTaskOutcoming.Id)) {
+                var ids = new FilteredElementCollector(_revitRepository.Doc, _mepElementsIds)
+                    .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
+                    .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
+                    .ToElementIds();
+                _intersectingMepElementsCache.Add(mepTaskOutcoming.Id, ids);
+            }
+            return _intersectingMepElementsCache[mepTaskOutcoming.Id];
         }
 
         /// <summary>
-        /// Проверяет, размещено ли текущее задание на отверстие вручную
+        /// Проверяет, размещено ли задание на отверстие вручную
         /// </summary>
-        /// <returns>True, если присутствует и включен параметр <see cref="RevitRepository.OpeningIsManuallyPlaced"/>,
-        /// иначе False</returns>
+        /// <param name="outcomingTask">Задание на отверстие</param>
+        /// <returns>True, если задание размещено вручную, иначе False</returns>
         private bool IsManuallyPlaced(OpeningMepTaskOutcoming outcomingTask) {
-            if(!outcomingTask.IsRemoved) {
-                try {
-                    return outcomingTask.GetFamilyInstance()
-                        .GetSharedParamValue<int>(RevitRepository.OpeningIsManuallyPlaced) == 1;
-
-                } catch(ArgumentException) {
-                    return false;
-                }
-            } else {
+            try {
+                return outcomingTask.GetFamilyInstance()
+                    .GetSharedParamValue<int>(RevitRepository.OpeningIsManuallyPlaced) == 1;
+            } catch(ArgumentException) {
                 return false;
             }
         }
@@ -446,17 +445,13 @@ namespace RevitOpeningPlacement.Services {
             return openingsInFloor.Select(famInst => famInst.Id).ToHashSet();
         }
 
+        // TODO strange method
         /// <summary>
         /// Назначает хост задания на отверстие
         /// </summary>
-        private void FindAndSetHost(
-            Solid thisOpeningTaskSolid,
-            ICollection<IConstructureLinkElementsProvider> constructureLinkElementsProviders,
-            OpeningMepTaskOutcoming mepTaskOutcoming) {
-
-            foreach(var link in constructureLinkElementsProviders) {
+        private void FindAndSetHost(OpeningMepTaskOutcoming mepTaskOutcoming) {
+            foreach(var link in _constructureLinks) {
                 var hostConstructions = GetHostConstructionsForThisOpeningTask(
-                    thisOpeningTaskSolid,
                     link,
                     out _,
                     mepTaskOutcoming);
@@ -467,50 +462,48 @@ namespace RevitOpeningPlacement.Services {
         }
 
         /// <summary>
-        /// Возвращает коллекцию Id элементов конструкций из <see cref="IConstructureLinkElementsProvider">связанного файла</see>, которые пересекаются с текущим заданием на отверстие
+        /// Находит элементы конструкций из связи, с которыми пересекается задание на отверстие
         /// </summary>
-        /// <param name="thisOpeningSolidInLinkCoordinates">Солид текущего задания на отверстие в координатах связанного файла <paramref name="constructureLinkElementsProvider"/></param>
-        /// <param name="constructureLinkElementsProvider">Связанный файл для проверки на пересечение</param>
-        private ICollection<ElementId> GetIntersectingLinkConstructionElementsIds(
-            Solid thisOpeningSolidInLinkCoordinates,
-            IConstructureLinkElementsProvider constructureLinkElementsProvider) {
+        /// <param name="mepTaskOutcoming">Задание на отверстие из активного файла</param>
+        /// <param name="constructureLink">Связанный файл с конструкциями</param>
+        /// <returns>Коллекция Id элементов конструкций из связи, с которыми пересекается задание на отверстие</returns>
+        private ICollection<ElementId> GetIntersectingLinkConstructions(
+            OpeningMepTaskOutcoming mepTaskOutcoming,
+            IConstructureLinkElementsProvider constructureLink) {
 
-            ICollection<ElementId> ids = constructureLinkElementsProvider.GetConstructureElementIds();
+            ICollection<ElementId> ids = constructureLink.GetConstructureElementIds();
             if(!ids.Any()) {
                 return Array.Empty<ElementId>();
             }
-            return new FilteredElementCollector(constructureLinkElementsProvider.Document, ids)
-                .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolidInLinkCoordinates.GetOutline()))
-                .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolidInLinkCoordinates))
+            Solid solidInLinkCoordinates = GetOpeningSolid(mepTaskOutcoming, constructureLink);
+            return new FilteredElementCollector(constructureLink.Document, ids)
+                .WherePasses(new BoundingBoxIntersectsFilter(solidInLinkCoordinates.GetOutline()))
+                .WherePasses(new ElementIntersectsSolidFilter(solidInLinkCoordinates))
                 .ToElementIds();
         }
 
+        // TODO too big method
         /// <summary>
         /// Поиск конструкций из связанного файла, в которых расположено задание на отверстие.
         /// Если конструкции будут найдены, то также будет вызван метод <see cref="SetHostConstruction"/>
         /// </summary>
-        /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
         /// <param name="link">Связь с конструкциями</param>
         /// <param name="intersectingOpeningsReal">Чистовые отверстия из связи, которые пересекаются с солидом текущего задания на отверстие</param>
+        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие</param>
         /// <returns>
         /// Коллекция Id конструкций (стен или перекрытий) из связанного файла, которые пересекаются с солидом текущего задания на отверстие
         /// <para>или коллекция Id конструкций, которые являются хостами чистовых отверстий, с которыми пересекается солид текущего задания на отверстие</para> 
         /// </returns>
         private ICollection<ElementId> GetHostConstructionsForThisOpeningTask(
-            Solid thisOpeningTaskSolid,
             IConstructureLinkElementsProvider link,
             out ICollection<IOpeningReal> intersectingOpeningsReal,
             OpeningMepTaskOutcoming mepTaskOutcoming) {
 
-            var thisSolidInLinkCoordinates = SolidUtils.CreateTransformed(
-                thisOpeningTaskSolid,
-                link.DocumentTransform.Inverse);
-
-            intersectingOpeningsReal = GetIntersectingLinkOpeningsReal(link, thisOpeningTaskSolid, mepTaskOutcoming);
+            intersectingOpeningsReal = GetIntersectingLinkOpeningsReal(link, mepTaskOutcoming);
 
             // поиск конструкций из связи, в которых находится текущее задание на отверстие
-            var intersectingConstructions = GetIntersectingLinkConstructionElementsIds(
-                thisSolidInLinkCoordinates,
+            var intersectingConstructions = GetIntersectingLinkConstructions(
+                mepTaskOutcoming,
                 link);
             if(intersectingConstructions.Count == 0) {
                 // задание на отверстие не пересекается с конструкциями из связей
@@ -528,7 +521,7 @@ namespace RevitOpeningPlacement.Services {
             } else {
                 // если задание на отверстие пересекается с конструкциями из связей, то будем считать, что даже если задание также пересекается с чистовыми отверстиями,
                 // то хосты этих чистовых отверстий - это и есть конструкции, с которым пересекается само задание на отверстие.
-                // Поэтому можно не делать долгую проверку на поиск пересекающих чистовых отверстий (см. ниже).
+                // Поэтому можно не делать поиск пересекающих чистовых отверстий (см. ниже).
 
                 // Если эта логика окажется неверной, то надо убрать комментарии ниже
 
@@ -543,29 +536,28 @@ namespace RevitOpeningPlacement.Services {
                 //}
             }
             if(intersectingConstructions.Count > 0) {
-                SetHostConstruction(link, intersectingConstructions, thisSolidInLinkCoordinates, mepTaskOutcoming);
+                SetHostConstruction(link, intersectingConstructions, mepTaskOutcoming);
             }
 
             return intersectingConstructions;
         }
 
+        // TODO too big method
         /// <summary>
         /// Назначает свойство хоста текущего задания на отверстие <see cref="OpeningMepTaskOutcoming.Host"/>
         /// </summary>
         /// <param name="link">Связанный файл с конструкциями</param>
         /// <param name="intersectingLinkedElements">Элементы из связанного файла с конструкциями, которые пересекаются с текущим заданием на отверстие</param>
-        /// <param name="thisOpeningTaskSolidInLinkCoordinates">Солид текущего задания на отверстие в координатах связанного файла</param>
+        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие</param>
         private void SetHostConstruction(
             IConstructureLinkElementsProvider link,
             ICollection<ElementId> intersectingLinkedElements,
-            Solid thisOpeningTaskSolidInLinkCoordinates,
             OpeningMepTaskOutcoming mepTaskOutcoming) {
 
             if((link != null)
-                && intersectingLinkedElements.Any()
-                && (thisOpeningTaskSolidInLinkCoordinates != null)
-                && (thisOpeningTaskSolidInLinkCoordinates.Volume >= _volumeTolerance)) {
+                && intersectingLinkedElements.Any()) {
 
+                Solid thisOpeningTaskSolidInLinkCoordinates = GetOpeningSolid(mepTaskOutcoming, link);
                 // поиск элемента конструкции, с которым пересечение текущего задания на отверстие имеет наибольший объем
                 double halfOpeningTaskVolume = thisOpeningTaskSolidInLinkCoordinates.Volume / 2;
                 var elements = intersectingLinkedElements.Select(id => link.Document.GetElement(id)).ToHashSet();
@@ -601,20 +593,19 @@ namespace RevitOpeningPlacement.Services {
         }
 
         /// <summary>
-        /// Поиск чистовых отверстий из связанного файла, в которых расположено задание на отверстие
+        /// Поиск чистовых отверстий из связанного файла, которые пересекают задание на отверстие
         /// </summary>
-        /// <param name="link">Связь с конструкциями и чистовыми отверстиями</param>
-        /// <param name="thisOpeningTaskSolid">Солид текущего задания на отверстие</param>
-        /// <returns>Коллекция чистовых отверстий из связи, которые пересекаются с солидом текущего задания на отверстие</returns>
+        /// <param name="link">Связь с чистовыми отверстиями</param>
+        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие</param>
+        /// <returns>Коллекция чистовых отверстий из связи, которые пересекаются с текущим заданием на отверстие
+        /// </returns>
         private ICollection<IOpeningReal> GetIntersectingLinkOpeningsReal(
             IConstructureLinkElementsProvider link,
-            Solid thisOpeningTaskSolid,
             OpeningMepTaskOutcoming mepTaskOutcoming
             ) {
 
-            var thisSolidInLinkCoordinates = SolidUtils
-                .CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
-            var thisBBoxInLinkCoordinates = GetTransformedBBoxXYZ(mepTaskOutcoming)
+            var thisSolidInLinkCoordinates = GetOpeningSolid(mepTaskOutcoming, link);
+            var thisBBoxInLinkCoordinates = mepTaskOutcoming.GetTransformedBBoxXYZ()
                 .TransformBoundingBox(link.DocumentTransform.Inverse);
             return link.GetOpeningsReal()
                 .Where(realOpening => _solidProviderUtils.IntersectsSolid(
@@ -622,17 +613,6 @@ namespace RevitOpeningPlacement.Services {
                     thisSolidInLinkCoordinates,
                     thisBBoxInLinkCoordinates))
                 .ToHashSet();
-        }
-
-        /// <summary>
-        /// Возвращает BoundingBoxXYZ с учетом расположения в файле Revit, 
-        /// если элемент был удален из документа, будет возвращено значение по умолчанию
-        /// </summary>
-        public BoundingBoxXYZ GetTransformedBBoxXYZ(OpeningMepTaskOutcoming mepTaskOutcoming) {
-            if(mepTaskOutcoming.IsRemoved) {
-                return default;
-            }
-            return mepTaskOutcoming.GetFamilyInstance().GetBoundingBox();
         }
     }
 }
