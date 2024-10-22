@@ -128,7 +128,6 @@ namespace RevitMechanicalSpecification.Service {
             return filteredElements;
         }
 
-
         private List<Element> GetVisibleElementsByCategories(List<BuiltInCategory> builtInCategories) {
             var filter = new ElementMulticategoryFilter(builtInCategories);
             var view = _document.ActiveView;
@@ -141,7 +140,6 @@ namespace RevitMechanicalSpecification.Service {
 
             return visibleElements.Where(e => ElementNotInGroupOrModelText(e)).ToList();
         }
-
 
         /// <summary>
         /// Получаем элементы по списку категорий

@@ -34,9 +34,7 @@ namespace RevitMechanicalSpecification {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            bool selected = true;
-            bool visible = false;
-            new RevitRepository(uiApplication).FullRefresh(visible, selected);
+            new RevitRepository(uiApplication).FullRefresh(selected: true);
         }
     }
 }
