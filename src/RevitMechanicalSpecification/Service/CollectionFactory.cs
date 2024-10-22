@@ -9,15 +9,18 @@ using dosymep.Revit;
 using System.Windows.Forms;
 using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Models;
+using Autodesk.Revit.UI;
 
 namespace RevitMechanicalSpecification.Service {
 
     internal class CollectionFactory {
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
+        private readonly UIDocument _uidocument;
 
-        public CollectionFactory(Document doc, SpecConfiguration specConfiguration) {
+        public CollectionFactory(Document doc, SpecConfiguration specConfiguration, UIDocument uIDocument) {
             _document = doc;
+            _uidocument = uIDocument;
             _specConfiguration = specConfiguration;
         }
 
@@ -25,7 +28,7 @@ namespace RevitMechanicalSpecification.Service {
         /// Получение специфицируемых элементов
         /// </summary>
         /// <returns></returns>
-        public List<Element> GetElementsToSpecificate() {
+        public List<Element> GetElementsToSpecificate(bool visible = false, bool selected = false) {
             var mechanicalCategories = new List<BuiltInCategory>()
             {
                 BuiltInCategory.OST_DuctFitting,
@@ -44,6 +47,15 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInCategory.OST_Sprinklers,
                 BuiltInCategory.OST_CableTray
             };
+
+            if (visible) {
+                return GetVisibleElementsByCategories(mechanicalCategories);
+            }
+
+            if(selected) {
+                return GetSelectedElementsByCategories(mechanicalCategories);
+            }
+
             return GetElementsByCategories(mechanicalCategories);
         }
 
@@ -92,6 +104,44 @@ namespace RevitMechanicalSpecification.Service {
             }
             return false;
         }
+
+        private List<Element> GetSelectedElementsByCategories(List<BuiltInCategory> builtInCategories) {
+            var filter = new ElementMulticategoryFilter(builtInCategories);
+            var elementIds = _uidocument.Selection.GetElementIds();
+
+            var selectedElements = elementIds.Select(elemId => _uidocument.Document.GetElement(elemId)).ToList();
+
+            var filteredElements = selectedElements
+                .Where(e => filter.PassesFilter(e) && ElementNotInGroupOrModelText(e))
+                .ToList();
+
+            // Если выделять объект с вложениями, они не будут выделены. Нужно проверить в выборке на наличие
+            foreach(Element element in filteredElements) {
+                if(element is FamilyInstance instance) {
+                    List<Element> subElements = DataOperator.GetSub(instance, _document);
+                    if(subElements.Count > 0) {
+                        filteredElements.Concat(subElements);
+                    }
+                }
+            }
+
+            return filteredElements;
+        }
+
+
+        private List<Element> GetVisibleElementsByCategories(List<BuiltInCategory> builtInCategories) {
+            var filter = new ElementMulticategoryFilter(builtInCategories);
+            var view = _document.ActiveView;
+
+            var visibleElements = new FilteredElementCollector(_document, view.Id)
+                .WherePasses(filter)
+                .WhereElementIsNotElementType()
+                .WhereElementIsViewIndependent()
+                .ToElements();
+
+            return visibleElements.Where(e => ElementNotInGroupOrModelText(e)).ToList();
+        }
+
 
         /// <summary>
         /// Получаем элементы по списку категорий

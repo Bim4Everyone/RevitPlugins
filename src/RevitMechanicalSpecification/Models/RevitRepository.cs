@@ -26,7 +26,7 @@ namespace RevitMechanicalSpecification.Models {
         private readonly List<ElementParamFiller> _fillersSystemRefresh;
         private readonly List<ElementParamFiller> _fillersFunctionRefresh;
         private readonly CollectionFactory _collector;
-        private readonly List<Element> _elements;
+        private List<Element> _elements;
         private readonly List<VisSystem> _visSystems;
         private readonly SpecConfiguration _specConfiguration;
         private readonly VisElementsCalculator _calculator;
@@ -37,11 +37,10 @@ namespace RevitMechanicalSpecification.Models {
             UIApplication = uiApplication;
             _elementProcessor = new ElementProcessor(UIApplication.Application.Username, Document);
             _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
-            _collector = new CollectionFactory(Document, _specConfiguration);
+            _collector = new CollectionFactory(Document, _specConfiguration, ActiveUIDocument);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
             _maskReplacer = new MaskReplacer(_specConfiguration);
 
-            _elements = _collector.GetElementsToSpecificate();
             _visSystems = _collector.GetVisSystems();
 
             _fillersSpecRefresh = new List<ElementParamFiller>()
@@ -126,6 +125,7 @@ namespace RevitMechanicalSpecification.Models {
         /// Обновление только по филлерам спецификации
         /// </summary>
         public void SpecificationRefresh() {
+            _elements = _collector.GetElementsToSpecificate();
             _elementProcessor.ProcessElements(_fillersSpecRefresh, _elements);
         }
 
@@ -133,6 +133,7 @@ namespace RevitMechanicalSpecification.Models {
         /// Обновление только по филлерам системы
         /// </summary>
         public void RefreshSystemName() {
+            _elements = _collector.GetElementsToSpecificate();
             _elementProcessor.ProcessElements(_fillersSystemRefresh, _elements);
         }
 
@@ -140,13 +141,15 @@ namespace RevitMechanicalSpecification.Models {
         /// Обновление только по филлерам функции
         /// </summary>
         public void RefreshSystemFunction() {
+            _elements = _collector.GetElementsToSpecificate();
             _elementProcessor.ProcessElements(_fillersFunctionRefresh, _elements);
         }
 
         /// <summary>
         /// Здесь нужно провести полное обновление всех параметров, поэтому будут сложены все филлеры в один лист 
         /// </summary>
-        public void FullRefresh() {
+        public void FullRefresh(bool visible = false, bool selected = false) {
+            _elements = _collector.GetElementsToSpecificate(visible, selected);
             List<ElementParamFiller> fillers = new List<ElementParamFiller>();
             fillers.AddRange(_fillersSpecRefresh);
             fillers.AddRange(_fillersFunctionRefresh);
