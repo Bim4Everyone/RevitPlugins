@@ -32,6 +32,7 @@ namespace RevitDeclarations.ViewModels {
             ParametersViewModel paramVM = new ParametersViewModel(_revitRepository, this);
             paramVM.SetCompanyParamConfig(new object());
             paramVM.FilterRoomsValue = "Нежилое помещение,Машино-место,Кладовая";
+            paramVM.ProjectName = "test";
 
             _parametersViewModel = paramVM;
             _prioritiesViewModel = new PrioritiesViewModel(this);
@@ -63,7 +64,7 @@ namespace RevitDeclarations.ViewModels {
                 .Select(x => new CommercialProject(x, _revitRepository, _settings))
                 .ToList();
 
-            // Проверка 2. Наличие квартир на выбранной стадии во всех выбранных проектах.
+            // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.
             IEnumerable<ErrorsListViewModel> noApartsErrors = projects
                 .Select(x => x.CheckRoomGroupsInRpoject())
                 .Where(x => x.Errors.Any());
