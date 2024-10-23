@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using DevExpress.XtraRichEdit.Layout.Engine;
+
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
@@ -29,6 +31,11 @@ namespace RevitOpeningPlacement.Services {
         /// Обработчик геометрии солидов
         /// </summary>
         private readonly ISolidProviderUtils _solidProviderUtils;
+
+        /// <summary>
+        /// Обработчик отступов для элементов ВИС, проходящих через задания на отверстия
+        /// </summary>
+        private readonly IOutcomingTaskOffsetFinder<Element> _offsetFinder;
 
         /// <summary>
         /// Все исходящие задания на отверстия от ВИС из активного файла
@@ -68,10 +75,14 @@ namespace RevitOpeningPlacement.Services {
         private Solid _openingSolidCache;
 
 
-        public MepTaskOutcomingInfoUpdater(RevitRepository revitRepository, ISolidProviderUtils solidProviderUtils) {
+        public MepTaskOutcomingInfoUpdater(
+            RevitRepository revitRepository,
+            ISolidProviderUtils solidProviderUtils,
+            IOutcomingTaskOffsetFinder<Element> offsetFinder) {
+
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _solidProviderUtils = solidProviderUtils ?? throw new ArgumentNullException(nameof(solidProviderUtils));
-
+            _offsetFinder = offsetFinder ?? throw new ArgumentNullException(nameof(offsetFinder));
             _outcomingTasksIds = GetOpeningsMepTasksOutcoming(_revitRepository);
             _mepElementsIds = revitRepository.GetMepElementsIds();
             _constructureLinks = GetLinkProviders(revitRepository);
@@ -160,17 +171,22 @@ namespace RevitOpeningPlacement.Services {
         /// </summary>
         /// <param name="opening">Исходящее задание на отверстие</param>
         private void SetGeometryStatus(OpeningMepTaskOutcoming opening) {
-            Solid openingSolidAfterIntersection = GetOpeningAndMepSolidsDifference(opening);
-            if(openingSolidAfterIntersection is null) {
-                opening.Status = OpeningTaskOutcomingStatus.Invalid;
-                return;
+            Element mepElement = GetIntersectingMepElements(opening).First();
+
+            double minOffset = _offsetFinder.GetMinHorizontalOffsetSum(mepElement);
+            double maxOffset = _offsetFinder.GetMaxHorizontalOffsetSum(mepElement);
+            var horiz = _offsetFinder.FindHorizontalOffsetsSum(opening, mepElement);
+            var vert = _offsetFinder.FindVerticalOffsetsSum(opening, mepElement);
+
+            if((horiz < minOffset) || (vert < minOffset)) {
+                opening.Status = OpeningTaskOutcomingStatus.TooSmall;
+            } else if((horiz > maxOffset) || (vert > maxOffset)) {
+                opening.Status = OpeningTaskOutcomingStatus.TooBig;
+            } else if((minOffset <= horiz) && (horiz <= maxOffset)
+                && (minOffset <= vert) && (vert <= maxOffset)) {
+                opening.Status = OpeningTaskOutcomingStatus.Correct;
             }
             FindAndSetHost(opening);
-            var openingSolid = GetOpeningSolid(opening);
-            double volumeRatio =
-                (openingSolid.Volume - openingSolidAfterIntersection.Volume) / openingSolid.Volume;
-            opening.Status = GetOpeningTaskOutcomingStatus(volumeRatio);
-            return;
         }
 
         /// <summary>
@@ -196,118 +212,9 @@ namespace RevitOpeningPlacement.Services {
             return SolidUtils.CreateTransformed(thisOpeningTaskSolid, link.DocumentTransform.Inverse);
         }
 
-        /// <summary>
-        /// Возвращает статус задания на отверстие по отношению объема пересечения задания на отверстие с элементом инженерной системы к исходному объему задания на отверстие
-        /// </summary>
-        /// <param name="volumeRatio">Отношение объемов, [0; 1]</param>
-        /// <exception cref="ArgumentOutOfRangeException">Исключение, если коэффициент отношения объемов меньше 0 или больше 1</exception>
-        private OpeningTaskOutcomingStatus GetOpeningTaskOutcomingStatus(double volumeRatio) {
-            if((volumeRatio < 0) || (volumeRatio > 1)) {
-                throw new ArgumentOutOfRangeException(
-                    $"Значение параметра {nameof(volumeRatio)} должно находиться в интервале [0; 1]");
-            }
-            OpeningTaskOutcomingStatus status;
-            if(0.95 <= volumeRatio) {
-                status = OpeningTaskOutcomingStatus.TooSmall;
-            } else if((0.2 <= volumeRatio) && (volumeRatio < 0.95)) {
-                status = OpeningTaskOutcomingStatus.Correct;
-            } else if((0.001 <= volumeRatio) && (volumeRatio < 0.2)) {
-                status = OpeningTaskOutcomingStatus.TooBig;
-            } else {
-                status = OpeningTaskOutcomingStatus.NotActual;
-            }
-            return status;
-        }
-
-        /// <summary>
-        /// Создает солид, образованный вычитанием из исходного солида задания на отверстие 
-        /// всех пересекающих его элементов ВИС
-        /// </summary>
-        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие</param>
-        /// <exception cref="InvalidOperationException">
-        /// Исключение, если не удалось выполнить вычитание солида отверстия и солида элемента инженерной системы
-        /// </exception>
-        private Solid GetOpeningAndMepSolidsDifference(OpeningMepTaskOutcoming mepTaskOutcoming) {
-            var intersectingMepSolids = GetIntersectingMepSolids(mepTaskOutcoming);
-            Solid openingSolidAfterIntersection = GetOpeningSolid(mepTaskOutcoming);
-            foreach(var mepSolid in intersectingMepSolids) {
-                const double offset = 0.001;
-                try {
-                    openingSolidAfterIntersection = SubtractSolids(
-                        openingSolidAfterIntersection,
-                        mepSolid);
-                } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                    try {
-                        // если один солид касается другого солида изнутри,
-                        // то будет исключение InvalidOperationException.
-                        // здесь производится попытка слегка подвинуть один из солидов, чтобы избежать этого касания
-                        var mepTransformedSolid = MoveSolid(
-                            mepSolid,
-                            new XYZ(offset, offset, offset)); // сдвигаем вправо вперед вверх
-                        openingSolidAfterIntersection = SubtractSolids(
-                            openingSolidAfterIntersection,
-                            mepTransformedSolid);
-
-                    } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                        try {
-                            // здесь производится попытка слегка подвинуть один из солидов в другую сторону
-                            var mepTransformedSolid = MoveSolid(
-                                mepSolid,
-                                new XYZ(offset, -offset, -offset)); // сдвигаем вправо назад вниз
-                            openingSolidAfterIntersection = SubtractSolids(
-                                openingSolidAfterIntersection,
-                                mepTransformedSolid);
-
-                        } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                            // остановимся после 2-х попыток смещения
-                            throw new InvalidOperationException();
-                        }
-                    }
-                }
-            }
-            return openingSolidAfterIntersection;
-        }
-
         private void ClearCache() {
             _intersectingMepElementsCache = null;
             _openingSolidCache = null;
-        }
-
-        /// <summary>
-        /// Вычитает второй солид из первого и возвращает результат.
-        /// </summary>
-        /// <param name="solid1">Первый солид</param>
-        /// <param name="solid2">Второй солид</param>
-        /// <returns>Результат вычитания</returns>
-        private Solid SubtractSolids(Solid solid1, Solid solid2) {
-            return BooleanOperationsUtils.ExecuteBooleanOperation(
-                solid1,
-                solid2,
-                BooleanOperationsType.Difference);
-        }
-
-        /// <summary>
-        /// Сдвигает солид на заданный вектор
-        /// </summary>
-        /// <param name="solid">Солид</param>
-        /// <param name="vector">Вектор для смещения</param>
-        /// <returns>Новый солид, созданный путем перемещения исходного</returns>
-        private Solid MoveSolid(Solid solid, XYZ vector) {
-            return SolidUtils.CreateTransformed(
-                solid,
-                Transform.CreateTranslation(vector));
-        }
-
-        /// <summary>
-        /// Возвращает список солидов элементов инженерных систем, которые пересекаются с заданием на отверстие
-        /// </summary>
-        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие</param>
-        /// <returns>Коллекция солидов элементов ВИС из активного файла, которые пересекаются с заданием на отверстие
-        /// </returns>
-        private ICollection<Solid> GetIntersectingMepSolids(OpeningMepTaskOutcoming mepTaskOutcoming) {
-            return GetIntersectingMepElementsIds(mepTaskOutcoming)
-                .Select(elementId => _revitRepository.Doc.GetElement(elementId).GetSolid())
-                .ToArray();
         }
 
         /// <summary>
