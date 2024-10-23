@@ -107,7 +107,7 @@ namespace RevitMechanicalSpecification.Service {
 
         private List<Element> GetSelectedElementsByCategories(List<BuiltInCategory> builtInCategories) {
             var filter = new ElementMulticategoryFilter(builtInCategories);
-            var elementIds = _uidocument.Selection.GetElementIds();
+            var elementIds = _uidocument.GetSelectedElements();
 
             var selectedElements = elementIds.Select(elemId => _uidocument.Document.GetElement(elemId)).ToList();
 
