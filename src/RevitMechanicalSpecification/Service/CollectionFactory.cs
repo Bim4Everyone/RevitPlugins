@@ -9,24 +9,21 @@ using dosymep.Revit;
 using System.Windows.Forms;
 using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Models;
+using Autodesk.Revit.UI;
 
 namespace RevitMechanicalSpecification.Service {
 
     internal class CollectionFactory {
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
+        private readonly UIDocument _uidocument;
+        private readonly List<BuiltInCategory> _mechanicalCategories;
 
-        public CollectionFactory(Document doc, SpecConfiguration specConfiguration) {
+        public CollectionFactory(Document doc, SpecConfiguration specConfiguration, UIDocument uIDocument) {
             _document = doc;
+            _uidocument = uIDocument;
             _specConfiguration = specConfiguration;
-        }
-
-        /// <summary>
-        /// Получение специфицируемых элементов
-        /// </summary>
-        /// <returns></returns>
-        public List<Element> GetElementsToSpecificate() {
-            var mechanicalCategories = new List<BuiltInCategory>()
+            _mechanicalCategories = new List<BuiltInCategory>()
             {
                 BuiltInCategory.OST_DuctFitting,
                 BuiltInCategory.OST_PipeFitting,
@@ -44,7 +41,6 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInCategory.OST_Sprinklers,
                 BuiltInCategory.OST_CableTray
             };
-            return GetElementsByCategories(mechanicalCategories);
         }
 
         /// <summary>
@@ -70,10 +66,66 @@ namespace RevitMechanicalSpecification.Service {
 
                 SystemForsedInstanceName = element
                 .GetSharedParamValueOrDefault<string>(_specConfiguration.ForcedSystemName)
-                
+
             }));
 
             return mechanicalSystems;
+        }
+
+        /// <summary>
+        /// Получаем выбранные элементы по списку категорий
+        /// </summary>
+        public List<Element> GetSelectedElementsByCategories() {
+            var filter = new ElementMulticategoryFilter(_mechanicalCategories);
+
+            var selectedElements = _uidocument.GetSelectedElements();
+
+            var filteredElements = selectedElements
+                .Where(e => filter.PassesFilter(e) && ElementNotInGroupOrModelText(e))
+                .ToList();
+
+            // Если выделять объект с вложениями, они не будут выделены. Нужно проверить в выборке на наличие
+            foreach(Element element in filteredElements) {
+                if(element is FamilyInstance instance) {
+                    List<Element> subElements = DataOperator.GetSub(instance, _document);
+                    if(subElements.Count > 0) {
+                        filteredElements.Concat(subElements);
+                    }
+                }
+            }
+
+            return filteredElements;
+        }
+
+        /// <summary>
+        /// Получаем видимые элементы по списку категорий
+        /// </summary>
+        public List<Element> GetVisibleElementsByCategories() {
+            var filter = new ElementMulticategoryFilter(_mechanicalCategories);
+            var view = _document.ActiveView;
+
+            var visibleElements = new FilteredElementCollector(_document, view.Id)
+                .WherePasses(filter)
+                .WhereElementIsNotElementType()
+                .WhereElementIsViewIndependent()
+                .ToElements();
+
+            return visibleElements.Where(e => ElementNotInGroupOrModelText(e)).ToList();
+        }
+
+        /// <summary>
+        /// Получаем элементы по списку категорий
+        /// </summary>
+        public List<Element> GetElementsByCategories(List<BuiltInCategory> builtInCategories = null) {
+            if(builtInCategories == null) {
+                builtInCategories = _mechanicalCategories;
+            }
+            var filter = new ElementMulticategoryFilter(builtInCategories);
+            var elements = (List<Element>) new FilteredElementCollector(_document)
+                .WherePasses(filter)
+                .WhereElementIsNotElementType()
+                .ToElements();
+            return elements.Where(e => ElementNotInGroupOrModelText(e)).ToList();
         }
 
         /// <summary>
@@ -91,20 +143,6 @@ namespace RevitMechanicalSpecification.Service {
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Получаем элементы по списку категорий
-        /// </summary>
-        /// <param name="builtInCategories"></param>
-        /// <returns></returns>
-        private List<Element> GetElementsByCategories(List<BuiltInCategory> builtInCategories) {
-            var filter = new ElementMulticategoryFilter(builtInCategories);
-            var elements = (List<Element>) new FilteredElementCollector(_document)
-                .WherePasses(filter)
-                .WhereElementIsNotElementType()
-                .ToElements();
-            return elements.Where(e => ElementNotInGroupOrModelText(e)).ToList();
         }
     }
 }

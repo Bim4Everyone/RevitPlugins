@@ -105,10 +105,13 @@ namespace RevitMechanicalSpecification.Service {
                     return startName;
             }
 
-
             string size = element.GetParamValue<string>(BuiltInParameter.RBS_CALCULATED_SIZE);
             //Ревит пишет размеры всех коннекторов. Для всего кроме тройника и перехода нам хватит первого размера
-            if(!(fitting.PartType is PartType.Transition) || !(fitting.PartType is PartType.Tee)) {
+
+            bool notTransition = !(fitting.PartType is PartType.Transition);
+            bool notTee = !(fitting.PartType is PartType.Tee); 
+
+            if(notTransition && notTee) {
                 size = size.Split('-').First();
             }
             return startName + " " + size + ", с толщиной стенки " + thikness + " мм";

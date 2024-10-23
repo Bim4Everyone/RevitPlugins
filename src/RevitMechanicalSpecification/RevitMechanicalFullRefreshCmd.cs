@@ -30,7 +30,7 @@ namespace RevitMechanicalSpecification {
     [Transaction(TransactionMode.Manual)]
     public class RevitMechanicalFullRefreshCmd : BasePluginCommand {
         public RevitMechanicalFullRefreshCmd() {
-            PluginName = "RevitMechanicalSpecification";
+            PluginName = "Полное обновление";
         }
 
         protected override void Execute(UIApplication uiApplication) {
