@@ -44,23 +44,6 @@ namespace RevitMechanicalSpecification.Service {
         }
 
         /// <summary>
-        /// Получение специфицируемых элементов
-        /// </summary>
-        /// <returns></returns>
-        public List<Element> GetElementsToSpecificate(bool visible = false, bool selected = false) {
-
-            if (visible) {
-                return GetVisibleElementsByCategories();
-            }
-
-            if(selected) {
-                return GetSelectedElementsByCategories();
-            }
-
-            return GetElementsByCategories();
-        }
-
-        /// <summary>
         /// Получение списка систем труб и воздуховодов и создание из них списка VisSystem-ов
         /// </summary>
         /// <returns></returns>
@@ -83,29 +66,15 @@ namespace RevitMechanicalSpecification.Service {
 
                 SystemForsedInstanceName = element
                 .GetSharedParamValueOrDefault<string>(_specConfiguration.ForcedSystemName)
-                
+
             }));
 
             return mechanicalSystems;
         }
 
         /// <summary>
-        /// Логический фильтр на исключение текста модели
+        /// Получаем выбранные элементы по списку категорий
         /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private bool ElementNotInGroupOrModelText(Element element) {
-
-            if(element is ModelText) {
-                return false;
-            }
-
-            if(element.GroupId.IsNull()) {
-                return true;
-            }
-            return false;
-        }
-
         public List<Element> GetSelectedElementsByCategories() {
             var filter = new ElementMulticategoryFilter(_mechanicalCategories);
 
@@ -128,6 +97,9 @@ namespace RevitMechanicalSpecification.Service {
             return filteredElements;
         }
 
+        /// <summary>
+        /// Получаем видимые элементы по списку категорий
+        /// </summary>
         public List<Element> GetVisibleElementsByCategories() {
             var filter = new ElementMulticategoryFilter(_mechanicalCategories);
             var view = _document.ActiveView;
@@ -145,7 +117,7 @@ namespace RevitMechanicalSpecification.Service {
         /// Получаем элементы по списку категорий
         /// </summary>
         public List<Element> GetElementsByCategories(List<BuiltInCategory> builtInCategories = null) {
-            if (builtInCategories == null) {
+            if(builtInCategories == null) {
                 builtInCategories = _mechanicalCategories;
             }
             var filter = new ElementMulticategoryFilter(builtInCategories);
@@ -154,6 +126,23 @@ namespace RevitMechanicalSpecification.Service {
                 .WhereElementIsNotElementType()
                 .ToElements();
             return elements.Where(e => ElementNotInGroupOrModelText(e)).ToList();
+        }
+
+        /// <summary>
+        /// Логический фильтр на исключение текста модели
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private bool ElementNotInGroupOrModelText(Element element) {
+
+            if(element is ModelText) {
+                return false;
+            }
+
+            if(element.GroupId.IsNull()) {
+                return true;
+            }
+            return false;
         }
     }
 }
