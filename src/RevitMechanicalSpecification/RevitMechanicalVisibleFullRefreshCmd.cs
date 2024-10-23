@@ -34,7 +34,7 @@ namespace RevitMechanicalSpecification {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            new RevitRepository(uiApplication).FullRefresh(visible: true);
+            new RevitRepository(uiApplication).VisibleFullRefresh();
         }
     }
 }

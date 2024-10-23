@@ -125,7 +125,7 @@ namespace RevitMechanicalSpecification.Models {
         /// Обновление только по филлерам спецификации
         /// </summary>
         public void SpecificationRefresh() {
-            _elements = _collector.GetElementsToSpecificate();
+            _elements = _collector.GetElementsByCategories();
             _elementProcessor.ProcessElements(_fillersSpecRefresh, _elements);
         }
 
@@ -133,7 +133,7 @@ namespace RevitMechanicalSpecification.Models {
         /// Обновление только по филлерам системы
         /// </summary>
         public void RefreshSystemName() {
-            _elements = _collector.GetElementsToSpecificate();
+            _elements = _collector.GetElementsByCategories();
             _elementProcessor.ProcessElements(_fillersSystemRefresh, _elements);
         }
 
@@ -141,20 +141,32 @@ namespace RevitMechanicalSpecification.Models {
         /// Обновление только по филлерам функции
         /// </summary>
         public void RefreshSystemFunction() {
-            _elements = _collector.GetElementsToSpecificate();
+            _elements = _collector.GetElementsByCategories();
             _elementProcessor.ProcessElements(_fillersFunctionRefresh, _elements);
         }
 
         /// <summary>
         /// Здесь нужно провести полное обновление всех параметров, поэтому будут сложены все филлеры в один лист 
         /// </summary>
-        public void FullRefresh(bool visible = false, bool selected = false) {
-            _elements = _collector.GetElementsToSpecificate(visible, selected);
-            List<ElementParamFiller> fillers = new List<ElementParamFiller>();
-            fillers.AddRange(_fillersSpecRefresh);
-            fillers.AddRange(_fillersFunctionRefresh);
-            fillers.AddRange(_fillersSystemRefresh);
-            _elementProcessor.ProcessElements(fillers, _elements);
+        public void FullRefresh() {
+            _elements = _collector.GetElementsByCategories();
+            _elementProcessor.ProcessElements(FoldFillerLists(), _elements);
+        }
+
+        /// <summary>
+        /// Здесь нужно провести полное обновление видимых элементов и всех параметров, поэтому будут сложены все филлеры в один лист 
+        /// </summary>
+        public void VisibleFullRefresh() {
+            _elements = _collector.GetVisibleElementsByCategories();
+            _elementProcessor.ProcessElements(FoldFillerLists(), _elements);
+        }
+
+        /// <summary>
+        /// Здесь нужно провести полное обновление выбранных элементов и всех параметров, поэтому будут сложены все филлеры в один лист 
+        /// </summary>
+        public void SelectedFullRefresh() {
+            _elements = _collector.GetSelectedElementsByCategories();
+            _elementProcessor.ProcessElements(FoldFillerLists(), _elements);
         }
 
         /// <summary>
@@ -168,6 +180,14 @@ namespace RevitMechanicalSpecification.Models {
                 }
                 t.Commit();
             }
+        }
+
+        private List<ElementParamFiller> FoldFillerLists() {
+            List<ElementParamFiller> fillers = new List<ElementParamFiller>();
+            fillers.AddRange(_fillersSpecRefresh);
+            fillers.AddRange(_fillersFunctionRefresh);
+            fillers.AddRange(_fillersSystemRefresh);
+            return fillers;
         }
 
     }

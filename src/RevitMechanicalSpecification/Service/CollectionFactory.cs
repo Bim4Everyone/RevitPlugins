@@ -17,19 +17,13 @@ namespace RevitMechanicalSpecification.Service {
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
         private readonly UIDocument _uidocument;
+        private readonly List<BuiltInCategory> _mechanicalCategories;
 
         public CollectionFactory(Document doc, SpecConfiguration specConfiguration, UIDocument uIDocument) {
             _document = doc;
             _uidocument = uIDocument;
             _specConfiguration = specConfiguration;
-        }
-
-        /// <summary>
-        /// Получение специфицируемых элементов
-        /// </summary>
-        /// <returns></returns>
-        public List<Element> GetElementsToSpecificate(bool visible = false, bool selected = false) {
-            var mechanicalCategories = new List<BuiltInCategory>()
+            _mechanicalCategories = new List<BuiltInCategory>()
             {
                 BuiltInCategory.OST_DuctFitting,
                 BuiltInCategory.OST_PipeFitting,
@@ -47,16 +41,23 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInCategory.OST_Sprinklers,
                 BuiltInCategory.OST_CableTray
             };
+        }
+
+        /// <summary>
+        /// Получение специфицируемых элементов
+        /// </summary>
+        /// <returns></returns>
+        public List<Element> GetElementsToSpecificate(bool visible = false, bool selected = false) {
 
             if (visible) {
-                return GetVisibleElementsByCategories(mechanicalCategories);
+                return GetVisibleElementsByCategories();
             }
 
             if(selected) {
-                return GetSelectedElementsByCategories(mechanicalCategories);
+                return GetSelectedElementsByCategories();
             }
 
-            return GetElementsByCategories(mechanicalCategories);
+            return GetElementsByCategories();
         }
 
         /// <summary>
@@ -105,11 +106,10 @@ namespace RevitMechanicalSpecification.Service {
             return false;
         }
 
-        private List<Element> GetSelectedElementsByCategories(List<BuiltInCategory> builtInCategories) {
-            var filter = new ElementMulticategoryFilter(builtInCategories);
-            var elementIds = _uidocument.GetSelectedElements();
+        public List<Element> GetSelectedElementsByCategories() {
+            var filter = new ElementMulticategoryFilter(_mechanicalCategories);
 
-            var selectedElements = elementIds.Select(elemId => _uidocument.Document.GetElement(elemId)).ToList();
+            var selectedElements = _uidocument.GetSelectedElements();
 
             var filteredElements = selectedElements
                 .Where(e => filter.PassesFilter(e) && ElementNotInGroupOrModelText(e))
@@ -128,8 +128,8 @@ namespace RevitMechanicalSpecification.Service {
             return filteredElements;
         }
 
-        private List<Element> GetVisibleElementsByCategories(List<BuiltInCategory> builtInCategories) {
-            var filter = new ElementMulticategoryFilter(builtInCategories);
+        public List<Element> GetVisibleElementsByCategories() {
+            var filter = new ElementMulticategoryFilter(_mechanicalCategories);
             var view = _document.ActiveView;
 
             var visibleElements = new FilteredElementCollector(_document, view.Id)
@@ -144,9 +144,10 @@ namespace RevitMechanicalSpecification.Service {
         /// <summary>
         /// Получаем элементы по списку категорий
         /// </summary>
-        /// <param name="builtInCategories"></param>
-        /// <returns></returns>
-        private List<Element> GetElementsByCategories(List<BuiltInCategory> builtInCategories) {
+        public List<Element> GetElementsByCategories(List<BuiltInCategory> builtInCategories = null) {
+            if (builtInCategories == null) {
+                builtInCategories = _mechanicalCategories;
+            }
             var filter = new ElementMulticategoryFilter(builtInCategories);
             var elements = (List<Element>) new FilteredElementCollector(_document)
                 .WherePasses(filter)
