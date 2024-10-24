@@ -7,6 +7,8 @@ using RevitOpeningPlacement.Models.Configs;
 
 namespace RevitOpeningPlacement.Services {
     internal class ConduitOffsetFinder : OutcomingTaskOffsetFinder<Conduit> {
+        private MepCategory _category;
+
         public ConduitOffsetFinder(
             OpeningConfig openingConfig,
             OutcomingTaskGeometryProvider geometryProvider,
@@ -29,7 +31,8 @@ namespace RevitOpeningPlacement.Services {
         }
 
         protected override MepCategory GetCategory(Conduit mepElement) {
-            return OpeningConfig.Categories[Models.MepCategoryEnum.Conduit];
+            _category = _category ?? OpeningConfig.Categories[Models.MepCategoryEnum.Conduit];
+            return _category;
         }
 
         protected override Solid GetMepSolid(Conduit mepElement) {

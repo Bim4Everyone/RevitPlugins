@@ -7,6 +7,9 @@ using RevitOpeningPlacement.Models.Configs;
 
 namespace RevitOpeningPlacement.Services {
     internal class DuctOffsetFinder : OutcomingTaskOffsetFinder<Duct> {
+        private MepCategory _roundCategory;
+        private MepCategory _rectangleCategory;
+
         public DuctOffsetFinder(
             OpeningConfig openingConfig,
             OutcomingTaskGeometryProvider geometryProvider,
@@ -22,9 +25,11 @@ namespace RevitOpeningPlacement.Services {
 
         protected override MepCategory GetCategory(Duct mepElement) {
             if(mepElement.DuctType.Shape == ConnectorProfileType.Round) {
-                return OpeningConfig.Categories[Models.MepCategoryEnum.RoundDuct];
+                _roundCategory = _roundCategory ?? OpeningConfig.Categories[Models.MepCategoryEnum.RoundDuct];
+                return _roundCategory;
             } else {
-                return OpeningConfig.Categories[Models.MepCategoryEnum.RectangleDuct];
+                _rectangleCategory = _rectangleCategory ?? OpeningConfig.Categories[Models.MepCategoryEnum.RectangleDuct];
+                return _rectangleCategory;
             }
         }
 

@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-
 using Autodesk.Revit.DB;
 
 using RevitOpeningPlacement.Models.Configs;
@@ -36,27 +33,35 @@ namespace RevitOpeningPlacement.Services {
 
 
         public double FindHorizontalOffsetsSum(OpeningMepTaskOutcoming opening, T mepElement) {
-            var leftPlane = GeometryProvider.GetLeftPlane(opening);
-            var rightPlane = GeometryProvider.GetRightPlane(opening);
-            var face = GetPlanarFaceForCalculation(opening, mepElement);
-            var points = GeometryUtils.GetPoints(face, TessellationCount);
+            if(IsSpecialOrthogonalCase(opening, mepElement)) {
+                return FindHorizontalOffsetsSumOrthogonal(opening, mepElement);
+            } else {
+                var leftPlane = GeometryProvider.GetLeftPlane(opening);
+                var rightPlane = GeometryProvider.GetRightPlane(opening);
+                var solid = GetIntersectionSolid(opening, mepElement);
+                var points = GeometryUtils.GetPoints(solid, TessellationCount);
 
-            var leftDist = GeometryUtils.GetMinDistance(leftPlane, points);
-            var rightDist = GeometryUtils.GetMinDistance(rightPlane, points);
+                var leftDist = GeometryUtils.GetMinDistance(leftPlane, points);
+                var rightDist = GeometryUtils.GetMinDistance(rightPlane, points);
 
-            return leftDist + rightDist;
+                return leftDist + rightDist;
+            }
         }
 
         public double FindVerticalOffsetsSum(OpeningMepTaskOutcoming opening, T mepElement) {
-            var bottomPlane = GeometryProvider.GetBottomPlane(opening);
-            var topPlane = GeometryProvider.GetTopPlane(opening);
-            var face = GetPlanarFaceForCalculation(opening, mepElement);
-            var points = GeometryUtils.GetPoints(face, TessellationCount);
+            if(IsSpecialOrthogonalCase(opening, mepElement)) {
+                return FindVerticalOffsetsSumOrthogonal(opening, mepElement);
+            } else {
+                var bottomPlane = GeometryProvider.GetBottomPlane(opening);
+                var topPlane = GeometryProvider.GetTopPlane(opening);
+                var solid = GetIntersectionSolid(opening, mepElement);
+                var points = GeometryUtils.GetPoints(solid, TessellationCount);
 
-            var bottomDist = GeometryUtils.GetMinDistance(bottomPlane, points);
-            var topDist = GeometryUtils.GetMinDistance(topPlane, points);
+                var bottomDist = GeometryUtils.GetMinDistance(bottomPlane, points);
+                var topDist = GeometryUtils.GetMinDistance(topPlane, points);
 
-            return bottomDist + topDist;
+                return bottomDist + topDist;
+            }
         }
 
         public double GetMinHorizontalOffsetSum(T mepElement) {
@@ -83,13 +88,19 @@ namespace RevitOpeningPlacement.Services {
             return offset + tolerance;
         }
 
+        /// <summary>
+        /// Находит солид пересечения элемента ВИС с заданием
+        /// </summary>
+        /// <param name="opening">Задание на отверстие</param>
+        /// <param name="mepElement">Элемент ВИС</param>
+        /// <returns>Солид, образованный пересечением тел</returns>
         protected Solid GetIntersectionSolid(OpeningMepTaskOutcoming opening, T mepElement) {
             var intersection = GetMepSolid(mepElement);
             var frontFace = GeometryProvider.GetFrontPlane(opening);
             var backFace = GeometryProvider.GetBackPlane(opening);
 
-            BooleanOperationsUtils.CutWithHalfSpaceModifyingOriginalSolid(intersection, frontFace);
-            BooleanOperationsUtils.CutWithHalfSpaceModifyingOriginalSolid(intersection, backFace);
+            intersection = BooleanOperationsUtils.CutWithHalfSpace(intersection, frontFace);
+            intersection = BooleanOperationsUtils.CutWithHalfSpace(intersection, backFace);
             return intersection;
         }
 
@@ -103,24 +114,6 @@ namespace RevitOpeningPlacement.Services {
         }
 
         /// <summary>
-        /// Находит сечение элемента ВИС плоскостью задания на отверстие, по которому будем определять отступы.
-        /// </summary>
-        /// <param name="opening">Задание на отверстие</param>
-        /// <param name="mepElement">Элемент ВИС</param>
-        /// <returns>Сечение элемента ВИС в плоскости задания на отверстие</returns>
-        protected PlanarFace GetPlanarFaceForCalculation(OpeningMepTaskOutcoming opening, T mepElement) {
-            var frontFaceNormal = GeometryProvider.GetFrontPlane(opening).Normal;
-            return GetIntersectionSolid(opening, mepElement)
-                .Faces
-                .OfType<Face>()
-                .Where(f => f is PlanarFace face
-                    && face.FaceNormal.CrossProduct(frontFaceNormal).IsAlmostEqualTo(XYZ.Zero))
-                .OrderByDescending(f => f.Area)
-                .FirstOrDefault() as PlanarFace
-                ?? throw new InvalidOperationException();
-        }
-
-        /// <summary>
         /// Находит требуемый отступ в единицах Revit (футах) для заданного размера элемента ВИС с двух сторон
         /// </summary>
         /// <param name="mepElement">Элемент ВИС</param>
@@ -131,14 +124,14 @@ namespace RevitOpeningPlacement.Services {
         }
 
         /// <summary>
-        /// Находит высоту элемента ВИС в единицах Revit
+        /// Находит высоту элемента ВИС в единицах Revit для получения требуемых отступов
         /// </summary>
         /// <param name="mepElement">Элемент ВИС</param>
         /// <returns>Высота в единицах Revit</returns>
         protected abstract double GetHeight(T mepElement);
 
         /// <summary>
-        /// Находит ширину элемента ВИС в единицах Revit
+        /// Находит ширину элемента ВИС в единицах Revit для получения требуемых отступов
         /// </summary>
         /// <param name="mepElement">Элемент ВИС</param>
         /// <returns>Ширина в единицах Revit</returns>
@@ -152,5 +145,45 @@ namespace RevitOpeningPlacement.Services {
         protected abstract Solid GetMepSolid(T mepElement);
 
         protected abstract MepCategory GetCategory(T mepElement);
+
+        /// <summary>
+        /// Находит сумму отступов по горизонтали от элемента ВИС до габаритов задания в частном ортогональном случае
+        /// </summary>
+        /// <param name="opening">Задание на отверстие</param>
+        /// <param name="mepElement">Элемент ВИС</param>
+        /// <returns>Сумма отступов по горизонтали в единицах Revit</returns>
+        private double FindHorizontalOffsetsSumOrthogonal(OpeningMepTaskOutcoming opening, T mepElement) {
+            var openingWidth = GeometryProvider.GetWidth(opening);
+            var mepWidth = GetWidth(mepElement);
+            return openingWidth - mepWidth;
+        }
+
+        /// <summary>
+        /// Находит сумму отступов по вертикали от элемента ВИС до габаритов задания в частном ортогональном случае
+        /// </summary>
+        /// <param name="opening">Задание на отверстие</param>
+        /// <param name="mepElement">Элемент ВИС</param>
+        /// <returns>Сумма отступов по вертикали в единицах Revit</returns>
+        private double FindVerticalOffsetsSumOrthogonal(OpeningMepTaskOutcoming opening, T mepElement) {
+            var openingHeight = GeometryProvider.GetHeight(opening);
+            var mepHeight = GetHeight(mepElement);
+            return openingHeight - mepHeight;
+        }
+
+        /// <summary>
+        /// Проверяет, что задание на отверстие пересекается с линейным элементом ВИС под прямым углом
+        /// </summary>
+        /// <param name="opening">Задание на отверстие</param>
+        /// <param name="mepElement">Элемент ВИС</param>
+        /// <returns>True, если элемент ВИС пересекает задание на отверстие под прямым углом, иначе false</returns>
+        private bool IsSpecialOrthogonalCase(OpeningMepTaskOutcoming opening, T mepElement) {
+            if(mepElement is MEPCurve mepCurve) {
+                var frontPlane = GeometryProvider.GetRotationAsVector(opening);
+                var mepDirection = ((Line) ((LocationCurve) mepCurve.Location).Curve).Direction;
+                return frontPlane.CrossProduct(mepDirection).IsAlmostEqualTo(XYZ.Zero);
+            } else {
+                return false;
+            }
+        }
     }
 }

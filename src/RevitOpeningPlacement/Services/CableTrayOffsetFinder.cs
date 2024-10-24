@@ -3,13 +3,14 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Electrical;
 
-
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Configs;
 
 namespace RevitOpeningPlacement.Services {
     internal class CableTrayOffsetFinder : OutcomingTaskOffsetFinder<CableTray> {
+        private MepCategory _category;
+
         public CableTrayOffsetFinder(
             OpeningConfig openingConfig,
             OutcomingTaskGeometryProvider geometryProvider,
@@ -32,7 +33,8 @@ namespace RevitOpeningPlacement.Services {
         }
 
         protected override MepCategory GetCategory(CableTray mepElement) {
-            return OpeningConfig.Categories[Models.MepCategoryEnum.CableTray];
+            _category = _category ?? OpeningConfig.Categories[Models.MepCategoryEnum.CableTray];
+            return _category;
         }
 
         protected override Solid GetMepSolid(CableTray cableTray) {

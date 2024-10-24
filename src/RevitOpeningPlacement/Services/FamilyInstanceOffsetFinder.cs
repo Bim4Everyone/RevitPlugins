@@ -47,11 +47,14 @@ namespace RevitOpeningPlacement.Services {
         }
 
         protected override double GetHeight(FamilyInstance mepElement) {
-            throw new NotImplementedException();
+            var box = mepElement.GetBoundingBox();
+            // будем брать наибольшее расстояние по осям OY и OZ. Такой точности сейчас хватает.
+            return Math.Max(box.Max.Z - box.Min.Z, box.Max.Y - box.Min.Y);
         }
 
         protected override double GetWidth(FamilyInstance mepElement) {
-            throw new NotImplementedException();
+            var box = mepElement.GetBoundingBox();
+            return box.Max.X - box.Min.X;
         }
 
         protected override Solid GetMepSolid(FamilyInstance mepElement) {

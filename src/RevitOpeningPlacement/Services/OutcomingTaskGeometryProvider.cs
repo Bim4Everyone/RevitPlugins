@@ -165,8 +165,19 @@ namespace RevitOpeningPlacement.Services {
             }
         }
 
+        /// <summary>
+        /// Возвращает угол поворота задания как вектор оси (-OY) экземпляра 
+        /// семейства задания на отверстия в координатах документа
+        /// </summary>
+        /// <param name="opening">Задание на отверстие</param>
+        /// <returns>Вектор в координатах документа, совпадающий с отрицательной локальной осью OY экземпляра семейства
+        /// </returns>
+        public XYZ GetRotationAsVector(OpeningMepTaskOutcoming opening) {
+            var rotation = GetRotation(opening) - Math.PI / 2;
+            return new XYZ(Math.Cos(rotation), Math.Sin(rotation), 0).Normalize();
+        }
 
-        private double GetWidth(OpeningMepTaskOutcoming opening) {
+        public double GetWidth(OpeningMepTaskOutcoming opening) {
             var famInst = opening.GetFamilyInstance();
             switch(opening.OpeningType) {
                 case OpeningType.WallRound:
@@ -180,7 +191,7 @@ namespace RevitOpeningPlacement.Services {
             }
         }
 
-        private double GetHeight(OpeningMepTaskOutcoming opening) {
+        public double GetHeight(OpeningMepTaskOutcoming opening) {
             var famInst = opening.GetFamilyInstance();
             switch(opening.OpeningType) {
                 case OpeningType.WallRound:
@@ -197,7 +208,7 @@ namespace RevitOpeningPlacement.Services {
         /// <summary>
         /// Находит толщину задания в единицах Revit
         /// </summary>
-        private double GetThickness(OpeningMepTaskOutcoming opening) {
+        public double GetThickness(OpeningMepTaskOutcoming opening) {
             switch(opening.OpeningType) {
                 case OpeningType.WallRound:
                 case OpeningType.WallRectangle:
@@ -209,17 +220,12 @@ namespace RevitOpeningPlacement.Services {
             }
         }
 
-        private XYZ GetLocation(OpeningMepTaskOutcoming opening) {
+        public XYZ GetLocation(OpeningMepTaskOutcoming opening) {
             return opening.Location;
         }
 
-        private double GetRotation(OpeningMepTaskOutcoming opening) {
+        public double GetRotation(OpeningMepTaskOutcoming opening) {
             return (opening.GetFamilyInstance().Location as LocationPoint).Rotation;
-        }
-
-        private XYZ GetRotationAsVector(OpeningMepTaskOutcoming opening) {
-            var rotation = GetRotation(opening);
-            return new XYZ(Math.Cos(rotation), Math.Sin(rotation), 0).Normalize();
         }
 
         /// <summary>

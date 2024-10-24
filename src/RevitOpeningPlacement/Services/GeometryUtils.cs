@@ -12,20 +12,18 @@ namespace RevitOpeningPlacement.Services {
 
 
         /// <summary>
-        /// Возвращает точки ребер, образующих плоскую грань.
+        /// Возвращает точки ребер, образующих солид.
         /// </summary>
-        /// <param name="planarFace">Плоская грань</param>
+        /// <param name="solid">Солид</param>
         /// <param name="tessellationPoints">Количество точек тесселяции для изогнутых линий</param>
-        /// <returns>Массив точек, образующих ребра плоской грани</returns>
-        public XYZ[] GetPoints(PlanarFace planarFace, int tessellationPoints) {
-            return planarFace.EdgeLoops
-                .OfType<EdgeArray>()
-                .SelectMany(arr => arr
-                    .OfType<Edge>()
-                    .Select(edge => edge.AsCurve())
-                    .SelectMany(curve => curve is Line line
+        /// <returns>Массив точек, образующих ребра солида</returns>
+        public XYZ[] GetPoints(Solid solid, int tessellationPoints) {
+            return solid.Edges
+                .OfType<Edge>()
+                .Select(edge => edge.AsCurve())
+                .SelectMany(curve => curve is Line line
                         ? new XYZ[] { line.GetEndPoint(0) }
-                        : curve.Tessellate().Take(tessellationPoints)))
+                        : curve.Tessellate().Take(tessellationPoints))
                 .ToArray();
         }
 

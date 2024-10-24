@@ -31,6 +31,7 @@ namespace RevitOpeningPlacement.Services {
         /// Обработчик геометрии солидов
         /// </summary>
         private readonly ISolidProviderUtils _solidProviderUtils;
+        private readonly IConstantsProvider _constantsProvider;
 
         /// <summary>
         /// Обработчик отступов для элементов ВИС, проходящих через задания на отверстия
@@ -70,6 +71,11 @@ namespace RevitOpeningPlacement.Services {
         private ICollection<ElementId> _intersectingMepElementsCache;
 
         /// <summary>
+        /// Кэш для хранения найденных конструкций-кандидатов на хосты обрабатываемого задания на отверстия
+        /// </summary>
+        private (ICollection<ElementId> HostCandidates, IConstructureLinkElementsProvider Link) _hostConstructionsCache;
+
+        /// <summary>
         /// Кэш для хранения солида обрабатываемого исходящего задания на отверстие из активного файла
         /// </summary>
         private Solid _openingSolidCache;
@@ -78,10 +84,12 @@ namespace RevitOpeningPlacement.Services {
         public MepTaskOutcomingInfoUpdater(
             RevitRepository revitRepository,
             ISolidProviderUtils solidProviderUtils,
+            IConstantsProvider constantsProvider,
             IOutcomingTaskOffsetFinder<Element> offsetFinder) {
 
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _solidProviderUtils = solidProviderUtils ?? throw new ArgumentNullException(nameof(solidProviderUtils));
+            _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
             _offsetFinder = offsetFinder ?? throw new ArgumentNullException(nameof(offsetFinder));
             _outcomingTasksIds = GetOpeningsMepTasksOutcoming(_revitRepository);
             _mepElementsIds = revitRepository.GetMepElementsIds();
@@ -124,7 +132,7 @@ namespace RevitOpeningPlacement.Services {
                     outcomingTask.Status = OpeningTaskOutcomingStatus.United;
                     return;
                 }
-                SetGeometryStatus(outcomingTask);
+                SetSizeStatus(outcomingTask);
 
             } catch(Exception ex) when(
             ex is NullReferenceException
@@ -170,13 +178,13 @@ namespace RevitOpeningPlacement.Services {
         /// Назначает заданию статус его геометрии: слишком большое, слишком маленькое и т.п.
         /// </summary>
         /// <param name="opening">Исходящее задание на отверстие</param>
-        private void SetGeometryStatus(OpeningMepTaskOutcoming opening) {
+        private void SetSizeStatus(OpeningMepTaskOutcoming opening) {
             Element mepElement = GetIntersectingMepElements(opening).First();
 
             double minOffset = _offsetFinder.GetMinHorizontalOffsetSum(mepElement);
             double maxOffset = _offsetFinder.GetMaxHorizontalOffsetSum(mepElement);
-            var horiz = _offsetFinder.FindHorizontalOffsetsSum(opening, mepElement);
-            var vert = _offsetFinder.FindVerticalOffsetsSum(opening, mepElement);
+            var horiz = GetRoundDistance(_offsetFinder.FindHorizontalOffsetsSum(opening, mepElement));
+            var vert = GetRoundDistance(_offsetFinder.FindVerticalOffsetsSum(opening, mepElement));
 
             if((horiz < minOffset) || (vert < minOffset)) {
                 opening.Status = OpeningTaskOutcomingStatus.TooSmall;
@@ -187,6 +195,17 @@ namespace RevitOpeningPlacement.Services {
                 opening.Status = OpeningTaskOutcomingStatus.Correct;
             }
             FindAndSetHost(opening);
+        }
+
+        /// <summary>
+        /// Округляет заданное расстояние кратно допуску на расстояние, 
+        /// определенному в <see cref="IConstantsProvider.ToleranceDistanceFeet"/>
+        /// </summary>
+        /// <param name="distance">Расстояние в единицах Revit</param>
+        /// <returns>Расстояние в единицах Revit, кратное допуску.</returns>
+        private double GetRoundDistance(double distance) {
+            return Math.Round(distance / _constantsProvider.ToleranceDistanceFeet, MidpointRounding.AwayFromZero)
+                * _constantsProvider.ToleranceDistanceFeet;
         }
 
         /// <summary>
@@ -215,6 +234,7 @@ namespace RevitOpeningPlacement.Services {
         private void ClearCache() {
             _intersectingMepElementsCache = null;
             _openingSolidCache = null;
+            _hostConstructionsCache = (null, null);
         }
 
         /// <summary>
@@ -263,6 +283,7 @@ namespace RevitOpeningPlacement.Services {
                     // проверяем, что элементы ВИС из активного файла,
                     // проходящие через исходящее задание на отверстие, не пересекают эти конструкции
                     // и заканчиваем обработку
+                    _hostConstructionsCache = (hostConstructions, link);
                     return MepElementsIntersectConstructionsOrOpenings(
                             mepTaskOutcoming,
                             hostConstructions,
@@ -494,6 +515,13 @@ namespace RevitOpeningPlacement.Services {
         /// Назначает хост задания на отверстие
         /// </summary>
         private void FindAndSetHost(OpeningMepTaskOutcoming mepTaskOutcoming) {
+            if(_hostConstructionsCache.Link != null && _hostConstructionsCache.HostCandidates != null) {
+                mepTaskOutcoming.Host = FindHostConstruction(
+                    mepTaskOutcoming,
+                    _hostConstructionsCache.HostCandidates,
+                    _hostConstructionsCache.Link);
+                return;
+            }
             foreach(var link in _constructureLinks) {
                 var hostConstructions = GetHostConstructionsForThisOpeningTask(
                     mepTaskOutcoming,
