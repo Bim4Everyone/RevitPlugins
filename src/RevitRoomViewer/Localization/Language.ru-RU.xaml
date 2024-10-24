@@ -7,7 +7,7 @@
     <system:String x:Key="MainWindow.Title">Пример команды</system:String>
     <system:String x:Key="MainWindow.Hello">Привет Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
-
+    <system:String x:Key="MainWindow.Description">Введите описание.</system:String>
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>

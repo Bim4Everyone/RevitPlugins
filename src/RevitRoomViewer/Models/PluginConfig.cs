@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -22,6 +24,6 @@ namespace RevitRoomViewer.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public string SaveProperty { get; set; }
+        public Dictionary<string, RoomSettings> RoomsWithSettings { get; set; }
     }
 }
