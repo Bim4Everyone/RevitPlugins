@@ -26,6 +26,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private ObservableCollection<MepCategoryViewModel> _mepCategories;
         private DispatcherTimer _timer;
         private readonly RevitRepository _revitRepository;
+        private string _configName;
 
         public MainViewModel(RevitRepository revitRepository, Models.Configs.OpeningConfig openingConfig) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -37,6 +38,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
             MepCategories = new ObservableCollection<MepCategoryViewModel>(
                 openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
+            ConfigName = openingConfig.Name;
 
             InitializeTimer();
 
@@ -52,6 +54,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             foreach(MepCategoryViewModel mepCategoryViewModel in MepCategories) {
                 mepCategoryViewModel.PropertyChanged += MepCategoryIsSelectedPropertyChanged;
             }
+        }
+
+        public string ConfigName {
+            get => _configName;
+            set => RaiseAndSetIfChanged(ref _configName, value);
         }
 
         private MepCategoryViewModel _selectedMepCategoryViewModel;
@@ -148,6 +155,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var config = Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc);
             config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
             config.ShowPlacingErrors = ShowPlacingErrors;
+            config.Name = ConfigName.Trim();
             return config;
         }
 
@@ -174,12 +182,21 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                     config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
                 SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
                     ?? MepCategories.First();
+                ConfigName = config.Name;
             }
             MessageText = "Файл настроек успешно загружен.";
             _timer.Start();
         }
 
         private bool CanSaveConfig() {
+            if(string.IsNullOrWhiteSpace(ConfigName)) {
+                ErrorText = "Укажите название настроек.";
+                return false;
+            }
+            if(ConfigName.Length > 100) {
+                ErrorText = "Слишком длинное название настроек.";
+                return false;
+            }
             ErrorText = MepCategories.FirstOrDefault(item => !string.IsNullOrEmpty(item.GetErrorText()))
                 ?.GetErrorText();
             return string.IsNullOrEmpty(ErrorText);

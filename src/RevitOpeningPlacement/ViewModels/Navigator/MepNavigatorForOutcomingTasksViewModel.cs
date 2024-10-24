@@ -31,14 +31,15 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
 
         public MepNavigatorForOutcomingTasksViewModel(
+            Models.Configs.OpeningConfig openingConfig,
             RevitRepository revitRepository,
             IResolutionRoot resolutionRoot,
             IConstantsProvider constantsProvider) {
-
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
             _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
 
+            ConfigName = openingConfig.Name;
             OpeningsMepTaskOutcoming = new ObservableCollection<OpeningMepTaskOutcomingViewModel>();
             OpeningsMepTasksOutcomingViewSource = new CollectionViewSource() { Source = OpeningsMepTaskOutcoming };
 
@@ -57,6 +58,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _selectedOpeningMepTaskOutcoming, value);
         }
 
+        public string ConfigName { get; }
 
         public ICommand SelectCommand { get; }
 

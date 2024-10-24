@@ -4,6 +4,9 @@ using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Electrical;
+using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -29,10 +32,6 @@ namespace RevitOpeningPlacement {
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class GetOpeningTasksCmd : BasePluginCommand {
-        private const int _progressBarStepLarge = 100;
-        private const int _progressBarStepSmall = 25;
-
-
         public GetOpeningTasksCmd() {
             PluginName = "Навигатор по заданиям";
         }
@@ -197,6 +196,11 @@ namespace RevitOpeningPlacement {
         }
 
         private void GetOpeningsTaskInDocumentMEP(IKernel kernel) {
+            kernel.Bind<OpeningConfig>()
+                .ToMethod(c => {
+                    var repo = c.Kernel.Get<RevitRepository>();
+                    return OpeningConfig.GetOpeningConfig(repo.Doc);
+                });
             kernel.Bind<IConstantsProvider>()
                 .To<ConstantsProvider>()
                 .InSingletonScope();
@@ -205,6 +209,33 @@ namespace RevitOpeningPlacement {
                 .InSingletonScope();
             kernel.Bind<IOpeningInfoUpdater<OpeningMepTaskOutcoming>>()
                 .To<MepTaskOutcomingInfoUpdater>()
+                .InTransientScope();
+            kernel.Bind<ILengthConverter>()
+                .To<LengthConverterService>()
+                .InSingletonScope();
+            kernel.Bind<OutcomingTaskGeometryProvider>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<GeometryUtils>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<IOutcomingTaskOffsetFinder<Pipe>>()
+                .To<PipeOffsetFinder>()
+                .InTransientScope();
+            kernel.Bind<IOutcomingTaskOffsetFinder<Duct>>()
+                .To<DuctOffsetFinder>()
+                .InTransientScope();
+            kernel.Bind<IOutcomingTaskOffsetFinder<Conduit>>()
+                .To<ConduitOffsetFinder>()
+                .InTransientScope();
+            kernel.Bind<IOutcomingTaskOffsetFinder<CableTray>>()
+                .To<CableTrayOffsetFinder>()
+                .InTransientScope();
+            kernel.Bind<IOutcomingTaskOffsetFinder<FamilyInstance>>()
+                .To<FamilyInstanceOffsetFinder>()
+                .InTransientScope();
+            kernel.Bind<IOutcomingTaskOffsetFinder<Element>>()
+                .To<ElementOffsetFinder>()
                 .InTransientScope();
 
             kernel.Bind<MepNavigatorForOutcomingTasksViewModel>()

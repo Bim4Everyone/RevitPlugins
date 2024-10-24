@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace RevitOpeningPlacement.OpeningModels.Enums {
     /// <summary>
@@ -41,6 +41,11 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Задание на отверстие размещено вручную
         /// </summary>
         [Description("Размещено вручную")]
-        ManuallyPlaced
+        ManuallyPlaced,
+        /// <summary>
+        /// Задание на отверстие - объединенное
+        /// </summary>
+        [Description("Объединенное")]
+        United
     }
 }

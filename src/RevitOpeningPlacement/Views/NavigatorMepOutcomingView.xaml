@@ -101,15 +101,23 @@
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <DockPanel Grid.Row="0">
+            <TextBlock
+                Text="Статусы заданий назначаются согласно настройкам: "></TextBlock>
+            <TextBlock Text="{Binding ConfigName}"></TextBlock>
+        </DockPanel>
+        
         <dxg:GridControl x:Name="_dg" 
                              ItemsSource="{Binding OpeningsMepTasksOutcomingViewSource.View}" 
                              DefaultSorting="MepSystem" 
                              BorderThickness="0" 
                              SelectionMode="Row"
+                             Grid.Row="1"
                              CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningMepTaskOutcomingViewModel"
                              SelectedItem="{Binding SelectedOpeningMepTaskOutcoming}">
             <dxg:GridControl.GroupSummary>
@@ -150,7 +158,7 @@
             </dxg:GridControl.Columns>
         </dxg:GridControl>
 
-        <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal"
+        <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
                           Foreground="Orange" />
