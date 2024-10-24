@@ -1,11 +1,13 @@
+using System.Collections.Generic;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
-namespace RevitPlugins.Models {
-    public class PluginConfig : ProjectConfig<RevitSettings> {
+namespace RevitRoomViewer.Models {
+    internal class PluginConfig : ProjectConfig<RevitSettings> {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
@@ -13,15 +15,15 @@ namespace RevitPlugins.Models {
         public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
-                .SetPluginName(nameof(RevitPlugins))
+                .SetPluginName(nameof(RevitRoomViewer))
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(nameof(PluginConfig) + ".json")
                 .Build<PluginConfig>();
         }
     }
 
-    public class RevitSettings : ProjectSettings {
-        public string SaveProperty { get; set; }
+    internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
+        public Dictionary<string, RoomSettings> RoomsWithSettings { get; set; }
     }
 }
