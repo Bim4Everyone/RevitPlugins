@@ -196,6 +196,11 @@ namespace RevitOpeningPlacement {
         }
 
         private void GetOpeningsTaskInDocumentMEP(IKernel kernel) {
+            kernel.Bind<OpeningConfig>()
+                .ToMethod(c => {
+                    var repo = c.Kernel.Get<RevitRepository>();
+                    return OpeningConfig.GetOpeningConfig(repo.Doc);
+                });
             kernel.Bind<IConstantsProvider>()
                 .To<ConstantsProvider>()
                 .InSingletonScope();
