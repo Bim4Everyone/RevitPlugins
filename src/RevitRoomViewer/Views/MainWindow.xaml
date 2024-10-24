@@ -1,4 +1,4 @@
-﻿<base:PlatformWindow
+<base:ThemedPlatformWindow
     x:Class="RevitRoomViewer.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,7 +8,10 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitRoomViewer.Views"
     xmlns:vms="clr-namespace:RevitRoomViewer.ViewModels"
-    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -17,73 +20,38 @@
     Height="450" Width="800"    
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-
-    <b:Interaction.Triggers>
-        <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction
-            Command="{Binding LoadViewCommand}" />
-        </b:EventTrigger>
-    </b:Interaction.Triggers>
+    
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding LoadViewCommand}"/>
+    </dxmvvm:Interaction.Behaviors>
     
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
+        <dxe:TextEdit
+            Grid.Row="0"
+            Width="200"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
 
-        <DataGrid x:Name="AllRoomsDataGrid" 
-          ItemsSource="{Binding AllRooms}" 
-          AutoGenerateColumns="False" 
-          SelectionMode="Single"
-          HorizontalAlignment="Stretch" 
-          VerticalAlignment="Stretch">
-            
-            <DataGrid.ColumnHeaderStyle>
-                <Style TargetType="DataGridColumnHeader">
-                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                </Style>
-            </DataGrid.ColumnHeaderStyle>
-            
-            <DataGrid.Columns>
-                <DataGridTextColumn 
-                            Header="Имя"
-                            Binding="{Binding RoomName}" 
-                            IsReadOnly="True"/>
-
-
-                <DataGridTemplateColumn Header="Описание">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBox Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridCheckBoxColumn Header="Нужен замер" 
-                        Binding="{Binding NeedMeasuring, Mode=TwoWay}" />
-            </DataGrid.Columns>
-        </DataGrid>
-
+            Text="{Binding SaveProperty,
+                UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel
             Grid.Row="1"
             Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
-            
             <TextBlock
                 Margin="10"
-                Foreground="Black"
+                Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{DynamicResource MainWindow.Description}" />
-            
-            <TextBlock
-                Margin="30,0,0,0"
-                Foreground="Black"
-                VerticalAlignment="Center"
-                Text="{Binding RevitVersion}" />
-            
-            <Button
+                Text="{Binding ErrorText}" />
+
+            <dx:SimpleButton
                 Margin="10"
                 Width="80"
                 Content="{DynamicResource MainWindow.ButtonOk}"
@@ -91,7 +59,7 @@
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
-            <Button
+            <dx:SimpleButton
                 Margin="10"
                 Width="80"
                 Content="{DynamicResource MainWindow.ButtonCancel}"
@@ -99,4 +67,4 @@
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</base:ThemedPlatformWindow>
