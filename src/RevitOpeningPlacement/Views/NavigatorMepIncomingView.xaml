@@ -243,7 +243,7 @@
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </dxdo:LayoutPanel>
-                <dxdo:LayoutPanel Caption="Размещенные отверстия, требующие в проверки"
+                <dxdo:LayoutPanel Caption="Размещенные отверстия, требующие проверки"
                                   Style="{StaticResource ChangingVisibility}"
                                   ShowPinButton="False"
                                   ShowCloseButton="False">
