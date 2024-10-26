@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:RevitDeclarations.Views"
              mc:Ignorable="d" 
              Background="White"
-             Height="650" Width="630">
+             Height="690" Width="630">
 
     <UserControl.Resources>
         <ResourceDictionary>

@@ -20,8 +20,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="Декларация квартир"
-    Height="760" Width="650"
-    MinHeight="760" MinWidth="650"
+    Height="800" Width="650"
+    MinHeight="800" MinWidth="650"
     ResizeMode="NoResize"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
