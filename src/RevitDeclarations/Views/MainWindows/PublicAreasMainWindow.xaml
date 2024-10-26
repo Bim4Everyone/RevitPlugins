@@ -46,6 +46,12 @@
                 Header="Декларация">
                 <tabData:DeclarationTabItem/>
             </TabItem>
+
+            <TabItem
+                Header="Параметры"
+                DataContext="{Binding ParametersViewModel}">
+                <tabData:ParamsPubliclTabItem/>
+            </TabItem>
         </TabControl>
 
         <StackPanel
