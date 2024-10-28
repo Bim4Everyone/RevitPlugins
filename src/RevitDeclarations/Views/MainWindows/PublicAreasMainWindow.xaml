@@ -50,7 +50,7 @@
             <TabItem
                 Header="Параметры"
                 DataContext="{Binding ParametersViewModel}">
-                <tabData:ParamsPubliclTabItem/>
+                <tabData:ParamsPublicAreasTabItem/>
             </TabItem>
         </TabControl>
 

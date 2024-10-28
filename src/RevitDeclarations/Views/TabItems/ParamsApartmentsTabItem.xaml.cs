@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,8 +17,8 @@ namespace RevitDeclarations.Views {
     /// <summary>
     /// Interaction logic for ParametersTabItem.xaml
     /// </summary>
-    public partial class ParametersTabItem : UserControl {
-        public ParametersTabItem() {
+    public partial class ParamsApartmentsTabItem : UserControl {
+        public ParamsApartmentsTabItem() {
             InitializeComponent();
         }
     }

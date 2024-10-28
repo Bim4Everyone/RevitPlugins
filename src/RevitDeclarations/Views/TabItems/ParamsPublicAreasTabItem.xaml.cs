@@ -17,8 +17,8 @@ namespace RevitDeclarations.Views {
     /// <summary>
     /// Interaction logic for ParametersTabItem.xaml
     /// </summary>
-    public partial class ParamsPubliclTabItem : UserControl {
-        public ParamsPubliclTabItem() {
+    public partial class ParamsPublicAreasTabItem : UserControl {
+        public ParamsPublicAreasTabItem() {
             InitializeComponent();
         }
     }
