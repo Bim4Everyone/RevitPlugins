@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Models;
 using Autodesk.Revit.UI;
+using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitMechanicalSpecification.Service {
 
@@ -139,10 +140,15 @@ namespace RevitMechanicalSpecification.Service {
                 return false;
             }
 
-            if(element.GroupId.IsNull()) {
-                return true;
+            // временное дополнение. Если в проекте есть ФОП_ВИС_Число ДЕ - группы должны обрабатываться.
+            if(!_document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency.Name)) {
+                if(element.GroupId.IsNull()) {
+                    return true;
+                }
+                return false;
             }
-            return false;
+
+            return true;
         }
     }
 }

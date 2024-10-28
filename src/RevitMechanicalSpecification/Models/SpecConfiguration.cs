@@ -40,7 +40,7 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string ForcedName = SharedParamsConfig.Instance.VISNameForced.Name; //"ФОП_ВИС_Наименование принудительное";
         public readonly string ForcedSystemName = SharedParamsConfig.Instance.VISSystemNameForced.Name; //"ФОП_ВИС_Имя системы принудительное";
         public readonly string ForcedGroup = SharedParamsConfig.Instance.VISGroupingForced.Name; //"ФОП_ВИС_Группирование принудительное";
-        public readonly string ForcedFunction = SharedParamsConfig.Instance.VISEconomicFunction.Name;//"ФОП_ВИС_Экономическая функция" - замена принудительной функции;
+        public readonly string ForcedFunction = SharedParamsConfig.Instance.VISHvacSystemForcedFunction.Name;//"ФОП_ВИС_Экономическая функция" - замена принудительной функции;
 
         
         public readonly string SystemEF = SharedParamsConfig.Instance.VISHvacSystemFunction.Name;//"ФОП_ВИС_ЭФ для системы"
@@ -81,7 +81,14 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string MaskMarkName = "ФОП_ВИС_Маска марки";
         public readonly string MaskNameName = "ФОП_ВИС_Маска наименования";
 
-        public SpecConfiguration(ProjectInfo info) {
+        public SpecConfiguration(Document document) {
+            ProjectInfo info = document.ProjectInformation;
+
+            // Временная проверка пока ФОП_ВИС_Число не ушло из оборота
+            if(document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency.Name)) {
+                TargetNameNumber = SharedParamsConfig.Instance.VISSpecNumbersCurrency.Name; //"ФОП_ВИС_Число ДЕ";
+            }
+
             GlobalSystem = info.GetParamValueOrDefault(_outSystemNameParam, "!Нет системы");
             OriginalParamNameName = info.GetParamValueOrDefault(_changedNameName, "ADSK_Наименование");
             OriginalParamNameMark = info.GetParamValueOrDefault(_changedNameMark, "ADSK_Марка");
