@@ -4,7 +4,7 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Services {
-    internal abstract class OutcomingTaskOffsetFinder<T> : IOutcomingTaskOffsetFinder<T> where T : Element {
+    internal abstract class OutcomingTaskOffsetFinder<T> : IOutcomingTaskOffsetFinder where T : Element {
         protected OutcomingTaskOffsetFinder(
             OpeningConfig openingConfig,
             OutcomingTaskGeometryProvider geometryProvider,
@@ -32,7 +32,7 @@ namespace RevitOpeningPlacement.Services {
         protected abstract int TessellationCount { get; }
 
 
-        public double FindHorizontalOffsetsSum(OpeningMepTaskOutcoming opening, T mepElement) {
+        public double FindHorizontalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
             if(IsSpecialOrthogonalCase(opening, mepElement)) {
                 return FindHorizontalOffsetsSumOrthogonal(opening, mepElement);
             } else {
@@ -48,7 +48,7 @@ namespace RevitOpeningPlacement.Services {
             }
         }
 
-        public double FindVerticalOffsetsSum(OpeningMepTaskOutcoming opening, T mepElement) {
+        public double FindVerticalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
             if(IsSpecialOrthogonalCase(opening, mepElement)) {
                 return FindVerticalOffsetsSumOrthogonal(opening, mepElement);
             } else {
@@ -64,26 +64,30 @@ namespace RevitOpeningPlacement.Services {
             }
         }
 
-        public double GetMinHorizontalOffsetSum(T mepElement) {
-            var offset = GetOffset(mepElement, GetWidth(mepElement));
+        public double GetMinHorizontalOffsetSum(Element mepElement) {
+            var element = GetMepElement(mepElement);
+            var offset = GetOffset(mepElement, GetWidth(element));
             var tolerance = GetTolerance(mepElement);
             return offset > tolerance ? offset - tolerance : 0;
         }
 
-        public double GetMaxHorizontalOffsetSum(T mepElement) {
-            var offset = GetOffset(mepElement, GetWidth(mepElement));
+        public double GetMaxHorizontalOffsetSum(Element mepElement) {
+            var element = GetMepElement(mepElement);
+            var offset = GetOffset(mepElement, GetWidth(element));
             var tolerance = GetTolerance(mepElement);
             return offset + tolerance;
         }
 
-        public double GetMinVerticalOffsetSum(T mepElement) {
-            var offset = GetOffset(mepElement, GetHeight(mepElement));
+        public double GetMinVerticalOffsetSum(Element mepElement) {
+            var element = GetMepElement(mepElement);
+            var offset = GetOffset(mepElement, GetHeight(element));
             var tolerance = GetTolerance(mepElement);
             return offset > tolerance ? offset - tolerance : 0;
         }
 
-        public double GetMaxVerticalOffsetSum(T mepElement) {
-            var offset = GetOffset(mepElement, GetHeight(mepElement));
+        public double GetMaxVerticalOffsetSum(Element mepElement) {
+            var element = GetMepElement(mepElement);
+            var offset = GetOffset(mepElement, GetHeight(element));
             var tolerance = GetTolerance(mepElement);
             return offset + tolerance;
         }
@@ -94,8 +98,9 @@ namespace RevitOpeningPlacement.Services {
         /// <param name="opening">Задание на отверстие</param>
         /// <param name="mepElement">Элемент ВИС</param>
         /// <returns>Солид, образованный пересечением тел</returns>
-        protected Solid GetIntersectionSolid(OpeningMepTaskOutcoming opening, T mepElement) {
-            var intersection = GetMepSolid(mepElement);
+        protected Solid GetIntersectionSolid(OpeningMepTaskOutcoming opening, Element mepElement) {
+            var element = GetMepElement(mepElement);
+            var intersection = GetMepSolid(element);
             var frontFace = GeometryProvider.GetFrontPlane(opening);
             var backFace = GeometryProvider.GetBackPlane(opening);
 
@@ -109,8 +114,9 @@ namespace RevitOpeningPlacement.Services {
         /// </summary>
         /// <param name="mepElement">Элемент ВИС</param>
         /// <returns>Точность в единицах Revit</returns>
-        protected double GetTolerance(T mepElement) {
-            return LengthConverter.ConvertToInternal(GetCategory(mepElement).Rounding);
+        protected double GetTolerance(Element mepElement) {
+            var element = GetMepElement(mepElement);
+            return LengthConverter.ConvertToInternal(GetCategory(element).Rounding);
         }
 
         /// <summary>
@@ -119,8 +125,9 @@ namespace RevitOpeningPlacement.Services {
         /// <param name="mepElement">Элемент ВИС</param>
         /// <param name="size">Размер элемента ВИС единицах Revit (футах)</param>
         /// <returns>Требуемый отступ суммарно с двух сторон от элемента ВИС единицах Revit (футах)</returns>
-        protected double GetOffset(T mepElement, double size) {
-            return GetCategory(mepElement).GetOffsetValue(size);
+        protected double GetOffset(Element mepElement, double size) {
+            var element = GetMepElement(mepElement);
+            return GetCategory(element).GetOffsetValue(size);
         }
 
         /// <summary>
@@ -146,15 +153,20 @@ namespace RevitOpeningPlacement.Services {
 
         protected abstract MepCategory GetCategory(T mepElement);
 
+        private T GetMepElement(Element mepElement) {
+            return mepElement as T;
+        }
+
         /// <summary>
         /// Находит сумму отступов по горизонтали от элемента ВИС до габаритов задания в частном ортогональном случае
         /// </summary>
         /// <param name="opening">Задание на отверстие</param>
         /// <param name="mepElement">Элемент ВИС</param>
         /// <returns>Сумма отступов по горизонтали в единицах Revit</returns>
-        private double FindHorizontalOffsetsSumOrthogonal(OpeningMepTaskOutcoming opening, T mepElement) {
+        private double FindHorizontalOffsetsSumOrthogonal(OpeningMepTaskOutcoming opening, Element mepElement) {
             var openingWidth = GeometryProvider.GetWidth(opening);
-            var mepWidth = GetWidth(mepElement);
+            var element = GetMepElement(mepElement);
+            var mepWidth = GetWidth(element);
             return openingWidth - mepWidth;
         }
 
@@ -164,9 +176,10 @@ namespace RevitOpeningPlacement.Services {
         /// <param name="opening">Задание на отверстие</param>
         /// <param name="mepElement">Элемент ВИС</param>
         /// <returns>Сумма отступов по вертикали в единицах Revit</returns>
-        private double FindVerticalOffsetsSumOrthogonal(OpeningMepTaskOutcoming opening, T mepElement) {
+        private double FindVerticalOffsetsSumOrthogonal(OpeningMepTaskOutcoming opening, Element mepElement) {
             var openingHeight = GeometryProvider.GetHeight(opening);
-            var mepHeight = GetHeight(mepElement);
+            var element = GetMepElement(mepElement);
+            var mepHeight = GetHeight(element);
             return openingHeight - mepHeight;
         }
 
@@ -176,7 +189,7 @@ namespace RevitOpeningPlacement.Services {
         /// <param name="opening">Задание на отверстие</param>
         /// <param name="mepElement">Элемент ВИС</param>
         /// <returns>True, если элемент ВИС пересекает задание на отверстие под прямым углом, иначе false</returns>
-        private bool IsSpecialOrthogonalCase(OpeningMepTaskOutcoming opening, T mepElement) {
+        private bool IsSpecialOrthogonalCase(OpeningMepTaskOutcoming opening, Element mepElement) {
             if(mepElement is MEPCurve mepCurve) {
                 var frontPlane = GeometryProvider.GetRotationAsVector(opening);
                 var mepDirection = ((Line) ((LocationCurve) mepCurve.Location).Curve).Direction;

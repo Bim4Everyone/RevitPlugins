@@ -6,10 +6,9 @@ using Autodesk.Revit.DB.Electrical;
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Configs;
-using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Services {
-    internal class CableTrayOffsetFinder : OutcomingTaskOffsetFinder<CableTray>, IOutcomingTaskOffsetFinder {
+    internal class CableTrayOffsetFinder : OutcomingTaskOffsetFinder<CableTray> {
         private MepCategory _category;
 
         public CableTrayOffsetFinder(
@@ -50,30 +49,6 @@ namespace RevitOpeningPlacement.Services {
                 .GetUnitedSolids()
                 .ToList();
             return ElementExtensions.UniteSolids(solids);
-        }
-
-        public double FindHorizontalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
-            return base.FindHorizontalOffsetsSum(opening, mepElement as CableTray);
-        }
-
-        public double FindVerticalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
-            return base.FindHorizontalOffsetsSum(opening, mepElement as CableTray);
-        }
-
-        public double GetMinHorizontalOffsetSum(Element mepElement) {
-            return base.GetMinHorizontalOffsetSum(mepElement as CableTray);
-        }
-
-        public double GetMaxHorizontalOffsetSum(Element mepElement) {
-            return base.GetMaxHorizontalOffsetSum(mepElement as CableTray);
-        }
-
-        public double GetMinVerticalOffsetSum(Element mepElement) {
-            return base.GetMinVerticalOffsetSum(mepElement as CableTray);
-        }
-
-        public double GetMaxVerticalOffsetSum(Element mepElement) {
-            return base.GetMaxVerticalOffsetSum(mepElement as CableTray);
         }
     }
 }
