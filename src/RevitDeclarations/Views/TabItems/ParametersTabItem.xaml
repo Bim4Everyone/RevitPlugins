@@ -349,7 +349,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedBuildingParam}"/>
+                SelectedItem="{Binding SelectedBuildingNumberParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -367,7 +367,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedBuildingParam}"/>
+                SelectedItem="{Binding SelectedConstrWorksNumberParam}"/>
 
             <Button
                 Grid.Column="0"

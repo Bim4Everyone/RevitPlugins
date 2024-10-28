@@ -35,6 +35,8 @@ namespace RevitDeclarations.Models {
         public Parameter LevelParam => ParametersVM.SelectedLevelParam;
         public Parameter SectionParam => ParametersVM.SelectedSectionParam;
         public Parameter BuildingParam => ParametersVM.SelectedBuildingParam;
+        public Parameter BuildingNumberParam => ParametersVM.SelectedBuildingNumberParam;
+        public Parameter ConstrWorksNumberParam => ParametersVM.SelectedConstrWorksNumberParam;
         public Parameter ApartmentNumberParam => ParametersVM.SelectedApartNumParam;
         public Parameter ApartmentAreaParam => ParametersVM.SelectedApartAreaParam;
         public Parameter ApartmentAreaCoefParam => ParametersVM.SelectedApartAreaCoefParam;
@@ -57,6 +59,8 @@ namespace RevitDeclarations.Models {
             LevelParam,
             SectionParam,
             BuildingParam,
+            BuildingNumberParam,
+            ConstrWorksNumberParam,
             ApartmentNumberParam,
             ApartmentAreaParam,
             ApartmentAreaCoefParam,

@@ -46,14 +46,16 @@ namespace RevitDeclarations.Models {
         public string LevelParam { get; set; }
         public string SectionParam { get; set; }
         public string BuildingParam { get; set; }
+        public string BuildingNumberParam { get; set; }
+        public string ConstrWorksNumberParam { get; set; }
+        public string ApartmentAreaCoefParam { get; set; }
+        public string RoomsAmountParam { get; set; }
+        public string ApartmentAreaLivingParam { get; set; }
+        public string RoomsHeightParam { get; set; }
+        public string ProjectNameID { get; set; }
         public string ApartmentNumberParam { get; set; }
         public string ApartmentAreaParam { get; set; }
-        public string ApartmentAreaCoefParam { get; set; }
-        public string ApartmentAreaLivingParam { get; set; }
-        public string RoomsAmountParam { get; set; }
-        public string ProjectNameID { get; set; }
         public string ApartmentAreaNonSumParam { get; set; }
-        public string RoomsHeightParam { get; set; }
 
         public string RoomAreaParam { get; set; }
         public string RoomAreaCoefParam { get; set; }
@@ -73,8 +75,9 @@ namespace RevitDeclarations.Models {
                 DepartmentParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
                 LevelParam = SharedParamsConfig.Instance.Level.Name,
                 SectionParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
-                //BuildingParam = SharedParamsConfig.Instance.RoomBuildingShortName.Name,
-                BuildingParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
+                BuildingParam = SharedParamsConfig.Instance.RoomBuildingShortName.Name,
+                BuildingNumberParam = SharedParamsConfig.Instance.BuildingNumber.Name,
+                ConstrWorksNumberParam = SharedParamsConfig.Instance.ConstructionWorksNumber.Name,
                 ApartmentNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
                 ApartmentAreaParam = SharedParamsConfig.Instance.ApartmentArea.Name,
                 ApartmentAreaCoefParam = SharedParamsConfig.Instance.ApartmentAreaRatio.Name,

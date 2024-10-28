@@ -45,11 +45,11 @@ namespace RevitDeclarations.Models {
         }
 
         private void SetDataTypesForColumns() {
-            _mainTable.Columns[6].DataType = typeof(double);
-            _mainTable.Columns[7].DataType = typeof(double);
             _mainTable.Columns[8].DataType = typeof(double);
-            _mainTable.Columns[11].DataType = typeof(double);
-            _mainTable.Columns[12].DataType = typeof(double);
+            _mainTable.Columns[9].DataType = typeof(double);
+            _mainTable.Columns[10].DataType = typeof(double);
+            _mainTable.Columns[13].DataType = typeof(double);
+            _mainTable.Columns[14].DataType = typeof(double);
 
             int columnNumber = ApartmentsTableInfo.InfoWidth;
 
@@ -77,14 +77,16 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows[0][2] = "Этаж расположения";
             _headerTable.Rows[0][3] = "Номер подъезда";
             _headerTable.Rows[0][4] = "Номер корпуса";
-            _headerTable.Rows[0][5] = "Номер на площадке";
-            _headerTable.Rows[0][6] = "Общая площадь без пониж. коэффициента, м2";
+            _headerTable.Rows[0][5] = "Номер здания";
+            _headerTable.Rows[0][6] = "Номер объекта строительства";
             _headerTable.Rows[0][7] = "Общая площадь с пониж. коэффициентом, м2";
-            _headerTable.Rows[0][8] = "Общая жилая площадь, м2";
-            _headerTable.Rows[0][9] = "Количество комнат";
-            _headerTable.Rows[0][10] = "ИД Объекта";
-            _headerTable.Rows[0][11] = "Площадь квартиры без летних помещений, м2";
-            _headerTable.Rows[0][12] = "Высота потолка, м";
+            _headerTable.Rows[0][8] = "Количество комнат";
+            _headerTable.Rows[0][9] = "Жилая площадь, м2";
+            _headerTable.Rows[0][10] = "Высота потолка, м";
+            _headerTable.Rows[0][11] = "ИД Объекта";
+            _headerTable.Rows[0][12] = "Номер на площадке";
+            _headerTable.Rows[0][13] = "Общая площадь без пониж. коэффициента, м2";
+            _headerTable.Rows[0][14] = "Площадь квартиры без летних помещений, м2";
 
             if(_settings.LoadUtp) {
                 _headerTable.Rows[0][_tableInfo.UtpStart] = "Две ванны";
@@ -133,14 +135,16 @@ namespace RevitDeclarations.Models {
                 _mainTable.Rows[rowNumber][2] = apartment.Level;
                 _mainTable.Rows[rowNumber][3] = apartment.Section;
                 _mainTable.Rows[rowNumber][4] = apartment.Building;
-                _mainTable.Rows[rowNumber][5] = apartment.Number;
-                _mainTable.Rows[rowNumber][6] = apartment.AreaMain;
+                _mainTable.Rows[rowNumber][5] = apartment.BuildingNumber;
+                _mainTable.Rows[rowNumber][6] = apartment.ConstrWorksNumber;
                 _mainTable.Rows[rowNumber][7] = apartment.AreaCoef;
-                _mainTable.Rows[rowNumber][8] = apartment.AreaLiving;
-                _mainTable.Rows[rowNumber][9] = apartment.RoomsAmount;
-                _mainTable.Rows[rowNumber][10] = _settings.ProjectName;
-                _mainTable.Rows[rowNumber][11] = apartment.AreaNonSummer;
-                _mainTable.Rows[rowNumber][12] = apartment.RoomsHeight;
+                _mainTable.Rows[rowNumber][8] = apartment.RoomsAmount;
+                _mainTable.Rows[rowNumber][9] = apartment.AreaLiving;
+                _mainTable.Rows[rowNumber][10] = apartment.RoomsHeight;
+                _mainTable.Rows[rowNumber][11] = _settings.ProjectName;
+                _mainTable.Rows[rowNumber][12] = apartment.Number;
+                _mainTable.Rows[rowNumber][13] = apartment.AreaMain;
+                _mainTable.Rows[rowNumber][14] = apartment.AreaNonSummer;
 
                 int columnNumber = ApartmentsTableInfo.InfoWidth;
 

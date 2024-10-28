@@ -32,6 +32,8 @@ namespace RevitDeclarations.ViewModels {
         private Parameter _selectedLevelParam;
         private Parameter _selectedSectionParam;
         private Parameter _selectedBuildingParam;
+        private Parameter _selectedBuildingNumberParam;
+        private Parameter _selectedConstrWorksNumberParam;
         private Parameter _selectedApartNumParam;
         private Parameter _selectedApartAreaParam;
         private Parameter _selectedApartAreaCoefParam;
@@ -128,6 +130,14 @@ namespace RevitDeclarations.ViewModels {
             get => _selectedBuildingParam;
             set => RaiseAndSetIfChanged(ref _selectedBuildingParam, value);
         }
+        public Parameter SelectedBuildingNumberParam {
+            get => _selectedBuildingNumberParam;
+            set => RaiseAndSetIfChanged(ref _selectedBuildingNumberParam, value);
+        }
+        public Parameter SelectedConstrWorksNumberParam {
+            get => _selectedConstrWorksNumberParam;
+            set => RaiseAndSetIfChanged(ref _selectedConstrWorksNumberParam, value);
+        }
         public Parameter SelectedApartNumParam {
             get => _selectedApartNumParam;
             set => RaiseAndSetIfChanged(ref _selectedApartNumParam, value);
@@ -183,6 +193,8 @@ namespace RevitDeclarations.ViewModels {
                 SelectedLevelParam,
                 SelectedSectionParam,
                 SelectedBuildingParam,
+                SelectedBuildingNumberParam,
+                SelectedConstrWorksNumberParam,
                 SelectedApartNumParam,
                 SelectedApartAreaParam,
                 SelectedApartAreaCoefParam,
@@ -227,6 +239,10 @@ namespace RevitDeclarations.ViewModels {
                 .FirstOrDefault(x => x.Definition.Name == configSettings.SectionParam);
             SelectedBuildingParam = TextParameters
                 .FirstOrDefault(x => x.Definition.Name == configSettings.BuildingParam);
+            SelectedBuildingNumberParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == configSettings.BuildingNumberParam);
+            SelectedConstrWorksNumberParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == configSettings.ConstrWorksNumberParam);
             SelectedApartNumParam = TextParameters
                 .FirstOrDefault(x => x.Definition.Name == configSettings.ApartmentNumberParam);
             SelectedApartAreaParam = DoubleParameters

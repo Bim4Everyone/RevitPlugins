@@ -53,6 +53,10 @@ namespace RevitDeclarations.Models {
         public string Section => _firstRoom.GetTextParamValue(_settings.SectionParam);
         [JsonProperty("building")]
         public string Building => _firstRoom.GetTextParamValue(_settings.BuildingParam);
+        [JsonProperty("building_number")]
+        public string BuildingNumber => _firstRoom.GetTextParamValue(_settings.BuildingNumberParam);
+        [JsonProperty("construction_works")]
+        public string ConstrWorksNumber => _firstRoom.GetTextParamValue(_settings.ConstrWorksNumberParam);
         [JsonProperty("number")]
         public string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
         [JsonProperty("area")]

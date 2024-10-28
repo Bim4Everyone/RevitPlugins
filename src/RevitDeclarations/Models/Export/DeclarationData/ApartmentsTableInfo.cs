@@ -5,7 +5,7 @@ namespace RevitDeclarations.Models {
     internal class ApartmentsTableInfo : ITableInfo {
         public const int MainRoomCells = 3;
         public const int SummerRoomCells = 4;
-        public const int InfoWidth = 13;
+        public const int InfoWidth = 15;
 
         public readonly int UtpWidth = 9;
 
