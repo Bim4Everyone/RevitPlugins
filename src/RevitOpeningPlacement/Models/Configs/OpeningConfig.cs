@@ -29,7 +29,7 @@ namespace RevitOpeningPlacement.Models.Configs {
         /// <summary>
         /// Название настроек
         /// </summary>
-        public string Name { get; set; } = "default";
+        public string Name { get; set; } = "по умолчанию";
 
         public static OpeningConfig GetOpeningConfig(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
