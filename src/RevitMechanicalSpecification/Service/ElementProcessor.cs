@@ -54,9 +54,6 @@ namespace RevitMechanicalSpecification.Service {
                 foreach(SpecificationElement specificationElement in splitResult.SingleElements) {
                     ProcessElement(specificationElement, fillers);
 
-                    // На арматуре воздуховодов/труб/оборудовании проверяем наличие шаблонизированных семейств-генериков.
-                    // Если встречаем - заполняем все по маске
-                    FillIfGeneric(specificationElement.Element);
                 }
 
                 foreach(SpecificationElement manifoldElement in splitResult.ManifoldElements) {
