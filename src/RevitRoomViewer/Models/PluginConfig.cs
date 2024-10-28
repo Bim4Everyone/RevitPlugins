@@ -24,6 +24,6 @@ namespace RevitRoomViewer.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public Dictionary<string, RoomSettings> RoomsWithSettings { get; set; }
+        public Dictionary<string, RoomElement> RoomsWithSettings { get; set; }
     }
 }

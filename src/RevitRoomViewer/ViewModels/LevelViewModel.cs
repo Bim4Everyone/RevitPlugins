@@ -1,0 +1,25 @@
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
+
+using dosymep.WPF.ViewModels;
+
+using RevitRoomViewer.Models;
+
+namespace RevitRoomViewer.ViewModels {
+    internal class LevelViewModel : BaseViewModel {
+
+        private readonly Level _level;
+        private readonly List<RoomElement> _rooms;
+
+        public Level Element { get => _level; }
+        public List<RoomElement> Rooms { get => _rooms; }
+        public string Name { get; set; }
+
+        public LevelViewModel(string name, Level level, List<RoomElement> rooms) {
+            Name = name;
+            _level = level;
+            _rooms = rooms;
+        }
+    }
+}
