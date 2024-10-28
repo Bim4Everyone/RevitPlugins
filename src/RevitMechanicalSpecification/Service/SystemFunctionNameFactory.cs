@@ -67,7 +67,16 @@ namespace RevitMechanicalSpecification.Service {
             }
 
             VisSystem visSystem = GetVisSystem(element);
-            if(visSystem == null || string.IsNullOrEmpty(visSystem.SystemFunction)) {
+
+            if(visSystem == null) {
+                return null;
+            }
+
+            if(!string.IsNullOrEmpty(visSystem.SystemForcedInstanceFunction)) {
+                return visSystem.SystemForcedInstanceFunction;
+            }
+
+            if(string.IsNullOrEmpty(visSystem.SystemFunction)) {
                 return null;
             }
 
