@@ -36,7 +36,7 @@ namespace RevitOpeningPlacement.Services {
         /// <summary>
         /// Обработчик отступов для элементов ВИС, проходящих через задания на отверстия
         /// </summary>
-        private readonly IOutcomingTaskOffsetFinder<Element> _offsetFinder;
+        private readonly IOutcomingTaskOffsetFinder _offsetFinder;
 
         /// <summary>
         /// Все исходящие задания на отверстия от ВИС из активного файла
@@ -85,7 +85,7 @@ namespace RevitOpeningPlacement.Services {
             RevitRepository revitRepository,
             ISolidProviderUtils solidProviderUtils,
             IConstantsProvider constantsProvider,
-            IOutcomingTaskOffsetFinder<Element> offsetFinder) {
+            IOutcomingTaskOffsetFinder offsetFinder) {
 
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _solidProviderUtils = solidProviderUtils ?? throw new ArgumentNullException(nameof(solidProviderUtils));

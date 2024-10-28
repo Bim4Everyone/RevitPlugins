@@ -8,9 +8,10 @@ using dosymep.Revit;
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Services {
-    internal class FamilyInstanceOffsetFinder : OutcomingTaskOffsetFinder<FamilyInstance> {
+    internal class FamilyInstanceOffsetFinder : OutcomingTaskOffsetFinder<FamilyInstance>, IOutcomingTaskOffsetFinder {
         public FamilyInstanceOffsetFinder(
             OpeningConfig openingConfig,
             OutcomingTaskGeometryProvider geometryProvider,
@@ -59,6 +60,30 @@ namespace RevitOpeningPlacement.Services {
 
         protected override Solid GetMepSolid(FamilyInstance mepElement) {
             return mepElement.GetSolid();
+        }
+
+        public double FindHorizontalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
+            return base.FindHorizontalOffsetsSum(opening, mepElement as FamilyInstance);
+        }
+
+        public double FindVerticalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
+            return base.FindVerticalOffsetsSum(opening, mepElement as FamilyInstance);
+        }
+
+        public double GetMinHorizontalOffsetSum(Element mepElement) {
+            return base.GetMinHorizontalOffsetSum(mepElement as FamilyInstance);
+        }
+
+        public double GetMaxHorizontalOffsetSum(Element mepElement) {
+            return base.GetMaxHorizontalOffsetSum(mepElement as FamilyInstance);
+        }
+
+        public double GetMinVerticalOffsetSum(Element mepElement) {
+            return base.GetMinVerticalOffsetSum(mepElement as FamilyInstance);
+        }
+
+        public double GetMaxVerticalOffsetSum(Element mepElement) {
+            return base.GetMaxVerticalOffsetSum(mepElement as FamilyInstance);
         }
     }
 }

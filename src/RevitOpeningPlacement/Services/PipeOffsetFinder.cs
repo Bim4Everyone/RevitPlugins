@@ -4,9 +4,10 @@ using Autodesk.Revit.DB.Plumbing;
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Services {
-    internal class PipeOffsetFinder : OutcomingTaskOffsetFinder<Pipe> {
+    internal class PipeOffsetFinder : OutcomingTaskOffsetFinder<Pipe>, IOutcomingTaskOffsetFinder {
         private MepCategory _category;
 
         public PipeOffsetFinder(
@@ -35,6 +36,30 @@ namespace RevitOpeningPlacement.Services {
 
         protected override Solid GetMepSolid(Pipe mepElement) {
             return mepElement.GetSolid();
+        }
+
+        public double FindHorizontalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
+            return base.FindHorizontalOffsetsSum(opening, mepElement as Pipe);
+        }
+
+        public double FindVerticalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
+            return base.FindVerticalOffsetsSum(opening, mepElement as Pipe);
+        }
+
+        public double GetMinHorizontalOffsetSum(Element mepElement) {
+            return base.GetMinHorizontalOffsetSum(mepElement as Pipe);
+        }
+
+        public double GetMaxHorizontalOffsetSum(Element mepElement) {
+            return base.GetMaxHorizontalOffsetSum(mepElement as Pipe);
+        }
+
+        public double GetMinVerticalOffsetSum(Element mepElement) {
+            return base.GetMinVerticalOffsetSum(mepElement as Pipe);
+        }
+
+        public double GetMaxVerticalOffsetSum(Element mepElement) {
+            return base.GetMaxVerticalOffsetSum(mepElement as Pipe);
         }
     }
 }

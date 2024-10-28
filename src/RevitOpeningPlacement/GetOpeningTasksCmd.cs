@@ -4,9 +4,6 @@ using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Electrical;
-using Autodesk.Revit.DB.Mechanical;
-using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -219,22 +216,22 @@ namespace RevitOpeningPlacement {
             kernel.Bind<GeometryUtils>()
                 .ToSelf()
                 .InSingletonScope();
-            kernel.Bind<IOutcomingTaskOffsetFinder<Pipe>>()
-                .To<PipeOffsetFinder>()
+            kernel.Bind<PipeOffsetFinder>()
+                .ToSelf()
                 .InTransientScope();
-            kernel.Bind<IOutcomingTaskOffsetFinder<Duct>>()
-                .To<DuctOffsetFinder>()
+            kernel.Bind<DuctOffsetFinder>()
+                .ToSelf()
                 .InTransientScope();
-            kernel.Bind<IOutcomingTaskOffsetFinder<Conduit>>()
-                .To<ConduitOffsetFinder>()
+            kernel.Bind<ConduitOffsetFinder>()
+                .ToSelf()
                 .InTransientScope();
-            kernel.Bind<IOutcomingTaskOffsetFinder<CableTray>>()
-                .To<CableTrayOffsetFinder>()
+            kernel.Bind<CableTrayOffsetFinder>()
+                .ToSelf()
                 .InTransientScope();
-            kernel.Bind<IOutcomingTaskOffsetFinder<FamilyInstance>>()
-                .To<FamilyInstanceOffsetFinder>()
+            kernel.Bind<FamilyInstanceOffsetFinder>()
+                .ToSelf()
                 .InTransientScope();
-            kernel.Bind<IOutcomingTaskOffsetFinder<Element>>()
+            kernel.Bind<IOutcomingTaskOffsetFinder>()
                 .To<ElementOffsetFinder>()
                 .InTransientScope();
 

@@ -8,20 +8,20 @@ using Autodesk.Revit.DB.Plumbing;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.Services {
-    internal class ElementOffsetFinder : IOutcomingTaskOffsetFinder<Element> {
-        private readonly IOutcomingTaskOffsetFinder<Pipe> _pipeFinder;
-        private readonly IOutcomingTaskOffsetFinder<Duct> _ductFinder;
-        private readonly IOutcomingTaskOffsetFinder<Conduit> _conduitFinder;
-        private readonly IOutcomingTaskOffsetFinder<CableTray> _cableTrayFinder;
-        private readonly IOutcomingTaskOffsetFinder<FamilyInstance> _familyInstanceFinder;
+    internal class ElementOffsetFinder : IOutcomingTaskOffsetFinder {
+        private readonly PipeOffsetFinder _pipeFinder;
+        private readonly DuctOffsetFinder _ductFinder;
+        private readonly ConduitOffsetFinder _conduitFinder;
+        private readonly CableTrayOffsetFinder _cableTrayFinder;
+        private readonly FamilyInstanceOffsetFinder _familyInstanceFinder;
 
 
         public ElementOffsetFinder(
-            IOutcomingTaskOffsetFinder<Pipe> pipeFinder,
-            IOutcomingTaskOffsetFinder<Duct> ductFinder,
-            IOutcomingTaskOffsetFinder<Conduit> conduitFinder,
-            IOutcomingTaskOffsetFinder<CableTray> cableTrayFinder,
-            IOutcomingTaskOffsetFinder<FamilyInstance> familyInstanceFinder) {
+            PipeOffsetFinder pipeFinder,
+            DuctOffsetFinder ductFinder,
+            ConduitOffsetFinder conduitFinder,
+            CableTrayOffsetFinder cableTrayFinder,
+            FamilyInstanceOffsetFinder familyInstanceFinder) {
 
             _pipeFinder = pipeFinder
                 ?? throw new ArgumentNullException(nameof(pipeFinder));
@@ -37,96 +37,40 @@ namespace RevitOpeningPlacement.Services {
 
 
         public double FindHorizontalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
-            if(mepElement is Pipe pipe) {
-                return _pipeFinder.FindHorizontalOffsetsSum(opening, pipe);
-            } else if(mepElement is Duct duct) {
-                return _ductFinder.FindHorizontalOffsetsSum(opening, duct);
-            } else if(mepElement is Conduit conduit) {
-                return _conduitFinder.FindHorizontalOffsetsSum(opening, conduit);
-            } else if(mepElement is CableTray cableTray) {
-                return _cableTrayFinder.FindHorizontalOffsetsSum(opening, cableTray);
-            } else if(mepElement is FamilyInstance familyInstance) {
-                return _familyInstanceFinder.FindHorizontalOffsetsSum(opening, familyInstance);
-            } else {
-                throw new InvalidOperationException($"Type doesn't support: {mepElement.GetType().FullName}");
-            }
+            return GetOffsetFinder(mepElement).FindHorizontalOffsetsSum(opening, mepElement);
         }
 
         public double FindVerticalOffsetsSum(OpeningMepTaskOutcoming opening, Element mepElement) {
-            if(mepElement is Pipe pipe) {
-                return _pipeFinder.FindVerticalOffsetsSum(opening, pipe);
-            } else if(mepElement is Duct duct) {
-                return _ductFinder.FindVerticalOffsetsSum(opening, duct);
-            } else if(mepElement is Conduit conduit) {
-                return _conduitFinder.FindVerticalOffsetsSum(opening, conduit);
-            } else if(mepElement is CableTray cableTray) {
-                return _cableTrayFinder.FindVerticalOffsetsSum(opening, cableTray);
-            } else if(mepElement is FamilyInstance familyInstance) {
-                return _familyInstanceFinder.FindVerticalOffsetsSum(opening, familyInstance);
-            } else {
-                throw new InvalidOperationException($"Type doesn't support: {mepElement.GetType().FullName}");
-            }
+            return GetOffsetFinder(mepElement).FindVerticalOffsetsSum(opening, mepElement);
         }
 
         public double GetMaxHorizontalOffsetSum(Element mepElement) {
-            if(mepElement is Pipe pipe) {
-                return _pipeFinder.GetMaxHorizontalOffsetSum(pipe);
-            } else if(mepElement is Duct duct) {
-                return _ductFinder.GetMaxHorizontalOffsetSum(duct);
-            } else if(mepElement is Conduit conduit) {
-                return _conduitFinder.GetMaxHorizontalOffsetSum(conduit);
-            } else if(mepElement is CableTray cableTray) {
-                return _cableTrayFinder.GetMaxHorizontalOffsetSum(cableTray);
-            } else if(mepElement is FamilyInstance familyInstance) {
-                return _familyInstanceFinder.GetMaxHorizontalOffsetSum(familyInstance);
-            } else {
-                throw new InvalidOperationException($"Type doesn't support: {mepElement.GetType().FullName}");
-            }
+            return GetOffsetFinder(mepElement).GetMaxHorizontalOffsetSum(mepElement);
         }
 
         public double GetMinHorizontalOffsetSum(Element mepElement) {
-            if(mepElement is Pipe pipe) {
-                return _pipeFinder.GetMinHorizontalOffsetSum(pipe);
-            } else if(mepElement is Duct duct) {
-                return _ductFinder.GetMinHorizontalOffsetSum(duct);
-            } else if(mepElement is Conduit conduit) {
-                return _conduitFinder.GetMinHorizontalOffsetSum(conduit);
-            } else if(mepElement is CableTray cableTray) {
-                return _cableTrayFinder.GetMinHorizontalOffsetSum(cableTray);
-            } else if(mepElement is FamilyInstance familyInstance) {
-                return _familyInstanceFinder.GetMinHorizontalOffsetSum(familyInstance);
-            } else {
-                throw new InvalidOperationException($"Type doesn't support: {mepElement.GetType().FullName}");
-            }
+            return GetOffsetFinder(mepElement).GetMinHorizontalOffsetSum(mepElement);
         }
 
         public double GetMaxVerticalOffsetSum(Element mepElement) {
-            if(mepElement is Pipe pipe) {
-                return _pipeFinder.GetMaxVerticalOffsetSum(pipe);
-            } else if(mepElement is Duct duct) {
-                return _ductFinder.GetMaxVerticalOffsetSum(duct);
-            } else if(mepElement is Conduit conduit) {
-                return _conduitFinder.GetMaxVerticalOffsetSum(conduit);
-            } else if(mepElement is CableTray cableTray) {
-                return _cableTrayFinder.GetMaxVerticalOffsetSum(cableTray);
-            } else if(mepElement is FamilyInstance familyInstance) {
-                return _familyInstanceFinder.GetMaxVerticalOffsetSum(familyInstance);
-            } else {
-                throw new InvalidOperationException($"Type doesn't support: {mepElement.GetType().FullName}");
-            }
+            return GetOffsetFinder(mepElement).GetMaxVerticalOffsetSum(mepElement);
         }
 
         public double GetMinVerticalOffsetSum(Element mepElement) {
-            if(mepElement is Pipe pipe) {
-                return _pipeFinder.GetMinVerticalOffsetSum(pipe);
-            } else if(mepElement is Duct duct) {
-                return _ductFinder.GetMinVerticalOffsetSum(duct);
-            } else if(mepElement is Conduit conduit) {
-                return _conduitFinder.GetMinVerticalOffsetSum(conduit);
-            } else if(mepElement is CableTray cableTray) {
-                return _cableTrayFinder.GetMinVerticalOffsetSum(cableTray);
-            } else if(mepElement is FamilyInstance familyInstance) {
-                return _familyInstanceFinder.GetMinVerticalOffsetSum(familyInstance);
+            return GetOffsetFinder(mepElement).GetMinVerticalOffsetSum(mepElement);
+        }
+
+        private IOutcomingTaskOffsetFinder GetOffsetFinder(Element mepElement) {
+            if(mepElement is Pipe) {
+                return _pipeFinder;
+            } else if(mepElement is Duct) {
+                return _ductFinder;
+            } else if(mepElement is Conduit) {
+                return _conduitFinder;
+            } else if(mepElement is CableTray) {
+                return _cableTrayFinder;
+            } else if(mepElement is FamilyInstance) {
+                return _familyInstanceFinder;
             } else {
                 throw new InvalidOperationException($"Type doesn't support: {mepElement.GetType().FullName}");
             }
