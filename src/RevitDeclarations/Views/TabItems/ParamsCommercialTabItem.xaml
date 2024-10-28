@@ -232,7 +232,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -427,7 +426,7 @@
                 Grid.Column="1"
                 Grid.Row="10"
                 Style="{StaticResource ParameterName}"
-                Text="9. Высота потолка:"/>
+                Text="10. Класс машиноместа:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="10"
@@ -437,35 +436,17 @@
                 SelectedItem="{Binding SelectedRoomsAmountParam}"/>
 
             <Button
-                Grid.Column="0"
                 Grid.Row="11"
-                ToolTip="{Binding ParameterToolTip.ApartAreaNonSumParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
-            <TextBlock
-                Grid.Column="1"
-                Grid.Row="11"
-                Style="{StaticResource ParameterName}"
-                Text="10. Тип расположения:"/>
-            <ComboBox
-                Grid.Column="2"
-                Grid.Row="11"
-                Margin="10, 0"
-                ItemsSource="{Binding DoubleParameters}"
-                DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedApartAreaNonSumParam}"/>
-
-            <Button
-                Grid.Row="12"
                 Grid.Column="0"
                 ToolTip="{Binding ParameterToolTip.RoomsHeightParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
-                Grid.Row="12"
+                Grid.Row="11"
                 Grid.Column="1"
                 Style="{StaticResource ParameterName}"
-                Text="11. Класс машиноместа:"/>
+                Text="11. Наименование помещения:"/>
             <ComboBox
-                Grid.Row="12"
+                Grid.Row="11"
                 Grid.Column="2"
                 Margin="10, 0"
                 ItemsSource="{Binding DoubleParameters}"
@@ -474,17 +455,17 @@
 
             <Button
                 Grid.Column="0"
-                Grid.Row="13"
+                Grid.Row="12"
                 ToolTip="{Binding ParameterToolTip.ProjectNameToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
-                Grid.Row="13"
+                Grid.Row="12"
                 Style="{StaticResource ParameterName}"
-                Text="13. ИД Объекта:"/>
+                Text="12. ИД Объекта:"/>
             <TextBox
                 Grid.Column="2"
-                Grid.Row="13"
+                Grid.Row="12"
                 Margin="10, 0"
                 Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>

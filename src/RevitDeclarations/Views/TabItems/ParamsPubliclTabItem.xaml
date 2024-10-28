@@ -228,11 +228,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -283,7 +278,7 @@
                 Grid.Column="1"
                 Grid.Row="2"
                 Style="{StaticResource ParameterName}"
-                Text="2. Назначение:"/>
+                Text="2. Имя помещения:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="2"
@@ -301,7 +296,7 @@
                 Grid.Column="1"
                 Grid.Row="3"
                 Style="{StaticResource ParameterName}"
-                Text="3. Этаж расположения:"/>
+                Text="3.1 Местоположение - корпус:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="3"
@@ -319,7 +314,7 @@
                 Grid.Column="1"
                 Grid.Row="4"
                 Style="{StaticResource ParameterName}"
-                Text="4. Номер подъезда:"/>
+                Text="3.2 Местоположение - секция:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="4"
@@ -337,7 +332,7 @@
                 Grid.Column="1"
                 Grid.Row="5"
                 Style="{StaticResource ParameterName}"
-                Text="5. Номер корпуса:"/>
+                Text="3.3 Местоположение - этаж:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="5"
@@ -355,7 +350,7 @@
                 Grid.Column="1"
                 Grid.Row="6"
                 Style="{StaticResource ParameterName}"
-                Text="6. Номер здания:"/>
+                Text="4. Назначение:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="6"
@@ -373,7 +368,7 @@
                 Grid.Column="1"
                 Grid.Row="7"
                 Style="{StaticResource ParameterName}"
-                Text="7. Номер объекта строительства:"/>
+                Text="5. Площадь помещения, м2:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="7"
@@ -381,110 +376,20 @@
                 ItemsSource="{Binding DoubleParameters}"
                 DisplayMemberPath="Definition.Name"
                 SelectedItem="{Binding SelectedApartAreaCoefParam}"/>
-
+ 
             <Button
                 Grid.Column="0"
                 Grid.Row="8"
-                ToolTip="{Binding ParameterToolTip.ApartAreaLivingParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
-            <TextBlock
-                Grid.Column="1"
-                Grid.Row="8"
-                Style="{StaticResource ParameterName}"
-                Text="8. Общая площадь без пониж. коэффициент:"/>
-            <ComboBox
-                Grid.Column="2"
-                Grid.Row="8"
-                Margin="10, 0"
-                ItemsSource="{Binding DoubleParameters}"
-                DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedApartAreaLivingParam}"/>
-
-            <Button
-                Grid.Column="0"
-                Grid.Row="9"
-                ToolTip="{Binding ParameterToolTip.RoomsAmountParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
-            <TextBlock
-                Grid.Column="1"
-                Grid.Row="9"
-                Style="{StaticResource ParameterName}"
-                Text="9. Высота потолка:"/>
-            <ComboBox
-                Grid.Column="2"
-                Grid.Row="9"
-                Margin="10, 0"
-                ItemsSource="{Binding IntParameters}"
-                DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedRoomsAmountParam}"/>
-
-            <Button
-                Grid.Column="0"
-                Grid.Row="10"
-                ToolTip="{Binding ParameterToolTip.RoomsAmountParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
-            <TextBlock
-                Grid.Column="1"
-                Grid.Row="10"
-                Style="{StaticResource ParameterName}"
-                Text="9. Высота потолка:"/>
-            <ComboBox
-                Grid.Column="2"
-                Grid.Row="10"
-                Margin="10, 0"
-                ItemsSource="{Binding IntParameters}"
-                DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedRoomsAmountParam}"/>
-
-            <Button
-                Grid.Column="0"
-                Grid.Row="11"
-                ToolTip="{Binding ParameterToolTip.ApartAreaNonSumParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
-            <TextBlock
-                Grid.Column="1"
-                Grid.Row="11"
-                Style="{StaticResource ParameterName}"
-                Text="10. Тип расположения:"/>
-            <ComboBox
-                Grid.Column="2"
-                Grid.Row="11"
-                Margin="10, 0"
-                ItemsSource="{Binding DoubleParameters}"
-                DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedApartAreaNonSumParam}"/>
-
-            <Button
-                Grid.Row="12"
-                Grid.Column="0"
-                ToolTip="{Binding ParameterToolTip.RoomsHeightParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
-            <TextBlock
-                Grid.Row="12"
-                Grid.Column="1"
-                Style="{StaticResource ParameterName}"
-                Text="11. Класс машиноместа:"/>
-            <ComboBox
-                Grid.Row="12"
-                Grid.Column="2"
-                Margin="10, 0"
-                ItemsSource="{Binding DoubleParameters}"
-                DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedRoomsHeightParam}"/>
-
-            <Button
-                Grid.Column="0"
-                Grid.Row="13"
                 ToolTip="{Binding ParameterToolTip.ProjectNameToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
-                Grid.Row="13"
+                Grid.Row="8"
                 Style="{StaticResource ParameterName}"
-                Text="13. ИД Объекта:"/>
+                Text="6. ИД Объекта:"/>
             <TextBox
                 Grid.Column="2"
-                Grid.Row="13"
+                Grid.Row="8"
                 Margin="10, 0"
                 Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
