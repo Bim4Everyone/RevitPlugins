@@ -18,6 +18,50 @@ using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     internal class ParamChecker {
+        private readonly List<RevitParam> _paramsToDataGroup = new List<RevitParam>() {
+            SharedParamsConfig.Instance.VISHvacSystemFunction,
+            SharedParamsConfig.Instance.VISSystemShortName,
+            SharedParamsConfig.Instance.VISOutSystemName,
+
+            SharedParamsConfig.Instance.VISNote,
+            SharedParamsConfig.Instance.VISMass,
+            SharedParamsConfig.Instance.VISPosition,
+            SharedParamsConfig.Instance.VISGrouping,
+            SharedParamsConfig.Instance.EconomicFunction,
+            SharedParamsConfig.Instance.VISSystemName,
+            SharedParamsConfig.Instance.VISCombinedName,
+            SharedParamsConfig.Instance.VISMarkNumber,
+            SharedParamsConfig.Instance.VISItemCode,
+            SharedParamsConfig.Instance.VISUnit,
+            SharedParamsConfig.Instance.VISManufacturer,
+
+            SharedParamsConfig.Instance.VISMinDuctThickness,
+            SharedParamsConfig.Instance.VISMaxDuctThickness,
+            SharedParamsConfig.Instance.VISParamReplacementName,
+            SharedParamsConfig.Instance.VISParamReplacementMarkNumber,
+            SharedParamsConfig.Instance.VISParamReplacementItemCode,
+            SharedParamsConfig.Instance.VISParamReplacementUnit,
+            SharedParamsConfig.Instance.VISParamReplacementManufacturer,
+
+            SharedParamsConfig.Instance.VISConsiderPipeFittings,
+            SharedParamsConfig.Instance.VISConsiderPipeFittingsByType,
+            SharedParamsConfig.Instance.VISConsiderDuctFittings,
+            SharedParamsConfig.Instance.VISPipeInsulationReserve,
+            SharedParamsConfig.Instance.VISDuctInsulationReserve,
+            SharedParamsConfig.Instance.VISPipeDuctReserve,
+            SharedParamsConfig.Instance.VISIndividualStock,
+            SharedParamsConfig.Instance.VISJunction,
+            SharedParamsConfig.Instance.VISExcludeFromJunction,
+            SharedParamsConfig.Instance.VISSpecNumbersCurrency,
+            SharedParamsConfig.Instance.VISSpecNumbers
+        };
+        private readonly List<RevitParam> _paramsToConstraints = new List<RevitParam>() {
+            SharedParamsConfig.Instance.VISNameAddition,
+            SharedParamsConfig.Instance.VISNameForced,
+            SharedParamsConfig.Instance.VISSystemNameForced,
+            SharedParamsConfig.Instance.VISGroupingForced,
+            SharedParamsConfig.Instance.VISHvacSystemForcedFunction,
+        };
         private readonly List<RevitParam> _revitParams = new List<RevitParam>() {
             SharedParamsConfig.Instance.VISHvacSystemFunction,
             SharedParamsConfig.Instance.VISSystemShortName,
@@ -88,6 +132,18 @@ namespace RevitMechanicalSpecification.Service {
             }
         }
 
+        // Если параметр существует - назначает его в указанную группу. Работы с шаблоном недостаточно, параметры в итоге оказываются в произвольных группах
+        private void SortParameterToGroup(Document document, string paraname, ForgeTypeId group) {
+            SharedParameterElement param = document.GetSharedParam(paraname);
+            if(param is null) {
+                return;
+            }
+            InternalDefinition definition = param.GetDefinition();
+            if(definition.GetGroupTypeId() != group) {
+                definition.SetGroupTypeId(group);
+            }
+        }
+
         // Временная проверка пока мы не переходим на редактируемые экземпляры групп. Если ФОП_ВИС_Число и ФОП_ВИС_Число ДЕ в проекте вместе - отменяем работу 
         private void CheckNumberDuplicate(Document document) {
             if(document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbers) &&
@@ -116,6 +172,14 @@ namespace RevitMechanicalSpecification.Service {
             CheckNumberDuplicate(document);
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
             projectParameters.SetupRevitParams(document, _revitParams);
+
+            foreach(RevitParam revitParam in _paramsToDataGroup) {
+                SortParameterToGroup(document, revitParam.Name, GroupTypeId.Data);
+            }
+
+            foreach(RevitParam revitParam in _paramsToConstraints) {
+                SortParameterToGroup(document, revitParam.Name, GroupTypeId.Constraints);
+            }
 
             CheckParamterValues();
         }
