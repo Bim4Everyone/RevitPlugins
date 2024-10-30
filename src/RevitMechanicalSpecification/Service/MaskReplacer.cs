@@ -56,7 +56,7 @@ namespace RevitMechanicalSpecification.Service {
             Element elemType = element.GetElementType();
 
             if(!elemType.IsExistsParam(maskName)) {
-                return null;
+                return string.Empty;
             }
 
             string mask = elemType.GetSharedParamValueOrDefault<string>(maskName, "ЗАПОЛНИТЕ МАСКУ");
