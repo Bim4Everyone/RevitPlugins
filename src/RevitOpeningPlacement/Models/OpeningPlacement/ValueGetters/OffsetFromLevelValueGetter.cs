@@ -3,32 +3,32 @@ using RevitClashDetective.Models.Value;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
-    internal class BottomOffsetFromLevelValueGetter : LengthConverter, IValueGetter<DoubleParamValue> {
+    internal class OffsetFromLevelValueGetter : LengthConverter, IValueGetter<DoubleParamValue> {
         /// <summary>
         /// Провайдер отметки низа отверстия в мм
         /// </summary>
-        private readonly IValueGetter<DoubleParamValue> _bottomOffsetValueGetter;
+        private readonly IValueGetter<DoubleParamValue> _offsetValueGetter;
         private readonly ILevelFinder _levelFinder;
 
         /// <summary>
         /// Класс, предоставляющий значение отметки низа отверстия от уровня в единицах Revit
         /// </summary>
-        /// <param name="bottomOffsetValueGetter">Провайдер отметки низа отверстия в мм от начала проекта</param>
+        /// <param name="offsetMmValueGetter">Провайдер отметки низа отверстия в мм от начала проекта</param>
         /// <param name="levelFinder">Провайдер уровня, на котором размещается отверстие</param>
         /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public BottomOffsetFromLevelValueGetter(
-            IValueGetter<DoubleParamValue> bottomOffsetValueGetter,
+        public OffsetFromLevelValueGetter(
+            IValueGetter<DoubleParamValue> offsetMmValueGetter,
             ILevelFinder levelFinder) {
 
-            _bottomOffsetValueGetter = bottomOffsetValueGetter
-                ?? throw new System.ArgumentNullException(nameof(bottomOffsetValueGetter));
+            _offsetValueGetter = offsetMmValueGetter
+                ?? throw new System.ArgumentNullException(nameof(offsetMmValueGetter));
             _levelFinder = levelFinder
                 ?? throw new System.ArgumentNullException(nameof(levelFinder));
         }
 
 
         public DoubleParamValue GetValue() {
-            var bottomOffset = ConvertToInternal(_bottomOffsetValueGetter.GetValue().TValue);
+            var bottomOffset = ConvertToInternal(_offsetValueGetter.GetValue().TValue);
             var levelOffset = _levelFinder.GetLevel().Elevation;
             return new DoubleParamValue(bottomOffset - levelOffset);
         }
