@@ -118,26 +118,23 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
                 RevitRepository.OpeningMepSystem,
                 RevitRepository.OpeningAuthor,
                 RevitRepository.OpeningThickness,
-                RevitRepository.OpeningOffsetBottom,
                 RevitRepository.OpeningIsManuallyPlaced,
+                RevitRepository.OpeningOffsetBottom,
+                RevitRepository.OpeningOffsetCenter,
                 RevitRepository.OpeningOffsetBottomAdsk,
                 RevitRepository.OpeningOffsetFromLevelAdsk,
-                RevitRepository.OpeningLevelOffsetAdsk
+                RevitRepository.OpeningLevelOffsetAdsk,
+                RevitRepository.OpeningOffsetBottomAdskOld,
+                RevitRepository.OpeningOffsetFromLevelAdskOld,
+                RevitRepository.OpeningLevelOffsetAdskOld
             };
             // добавление специфических параметров семейств
             switch(openingType) {
+                case OpeningType.FloorRound:
                 case OpeningType.WallRound:
                     paramNames.Add(RevitRepository.OpeningDiameter);
-                    paramNames.Add(RevitRepository.OpeningOffsetCenter);
                     break;
                 case OpeningType.WallRectangle:
-                    paramNames.Add(RevitRepository.OpeningHeight);
-                    paramNames.Add(RevitRepository.OpeningWidth);
-                    paramNames.Add(RevitRepository.OpeningOffsetCenter);
-                    break;
-                case OpeningType.FloorRound:
-                    paramNames.Add(RevitRepository.OpeningDiameter);
-                    break;
                 case OpeningType.FloorRectangle:
                     paramNames.Add(RevitRepository.OpeningHeight);
                     paramNames.Add(RevitRepository.OpeningWidth);
