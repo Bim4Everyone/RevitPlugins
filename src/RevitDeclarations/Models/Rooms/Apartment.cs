@@ -44,6 +44,16 @@ namespace RevitDeclarations.Models {
             CalculateRevitAreas();
         }
 
+        [JsonProperty("type")]
+        public override string Department {
+            get {
+                if(string.IsNullOrEmpty(_firstRoom.GetTextParamValue(_settings.MultiStoreyParam))) {
+                    return _firstRoom.GetTextParamValue(_settings.DepartmentParam);
+                } else {
+                    return "Квартира на двух и более этажах";
+                }
+            }
+        }
         [JsonProperty("area_k")]
         public double AreaCoef => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaCoefParam, _accuracy);
         [JsonProperty("area_living")]

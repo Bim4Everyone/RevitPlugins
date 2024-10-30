@@ -16,6 +16,7 @@ namespace RevitDeclarations.Models {
         private protected readonly IEnumerable<RoomElement> _rooms;
 
         private protected readonly RoomElement _firstRoom;
+        private protected readonly bool _isOneRoomGroup = false;
 
         public RoomGroup(IEnumerable<RoomElement> rooms, DeclarationSettings settings) {
             _settings = settings;
@@ -23,6 +24,9 @@ namespace RevitDeclarations.Models {
 
             _rooms = rooms.ToList();
             _firstRoom = rooms.FirstOrDefault();
+            if(rooms.Count() == 1) {
+                _isOneRoomGroup = true;
+            }
         }
 
         [JsonProperty("rooms")]
@@ -31,15 +35,7 @@ namespace RevitDeclarations.Models {
         [JsonProperty("full_number")]
         public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
         [JsonProperty("type")]
-        public string Department {
-            get {
-                if(string.IsNullOrEmpty(_firstRoom.GetTextParamValue(_settings.MultiStoreyParam))) {
-                    return _firstRoom.GetTextParamValue(_settings.DepartmentParam);
-                } else {
-                    return "Квартира на двух и более этажах";
-                }
-            }
-        }
+        public virtual string Department => _firstRoom.GetTextParamValue(_settings.DepartmentParam);
         [JsonProperty("floor_number")]
         public string Level {
             get {
@@ -58,9 +54,9 @@ namespace RevitDeclarations.Models {
         [JsonProperty("construction_works")]
         public string ConstrWorksNumber => _firstRoom.GetTextParamValue(_settings.ConstrWorksNumberParam);
         [JsonProperty("number")]
-        public string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
+        public virtual string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
         [JsonProperty("area")]
-        public double AreaMain => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy);
+        public virtual double AreaMain => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy);
         [JsonProperty("ceiling_height")]
         public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracy);
     }
