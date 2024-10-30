@@ -85,7 +85,7 @@ namespace RevitMechanicalSpecification.Models {
             ProjectInfo info = document.ProjectInformation;
 
             // Временная проверка пока ФОП_ВИС_Число не ушло из оборота
-            if(document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency.Name)) {
+            if(document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
                 TargetNameNumber = SharedParamsConfig.Instance.VISSpecNumbersCurrency.Name; //"ФОП_ВИС_Число ДЕ";
             }
 

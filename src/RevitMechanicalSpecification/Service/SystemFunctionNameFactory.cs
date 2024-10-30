@@ -69,7 +69,7 @@ namespace RevitMechanicalSpecification.Service {
             VisSystem visSystem = GetVisSystem(element);
 
             if(visSystem == null) {
-                return null;
+                return string.Empty;
             }
 
             if(!string.IsNullOrEmpty(visSystem.SystemForcedInstanceFunction)) {
@@ -77,7 +77,7 @@ namespace RevitMechanicalSpecification.Service {
             }
 
             if(string.IsNullOrEmpty(visSystem.SystemFunction)) {
-                return null;
+                return string.Empty;
             }
 
             return visSystem.SystemFunction;
@@ -95,7 +95,7 @@ namespace RevitMechanicalSpecification.Service {
 
             VisSystem visSystem = GetVisSystem(element);
             if(visSystem is null) {
-                return null;
+                return string.Empty;
             }
 
             if(!string.IsNullOrEmpty(visSystem.SystemForsedInstanceName)) {

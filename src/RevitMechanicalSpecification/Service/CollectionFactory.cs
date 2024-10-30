@@ -11,6 +11,8 @@ using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Models;
 using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone;
+
 
 namespace RevitMechanicalSpecification.Service {
 
@@ -69,7 +71,6 @@ namespace RevitMechanicalSpecification.Service {
                 .GetSharedParamValueOrDefault<string>(_specConfiguration.ForcedSystemName),
                 SystemForcedInstanceFunction = element
                 .GetSharedParamValueOrDefault<string>(_specConfiguration.ForcedFunction)
-
             }));
 
             return mechanicalSystems;
@@ -143,7 +144,7 @@ namespace RevitMechanicalSpecification.Service {
             }
 
             // временное дополнение. Если в проекте есть ФОП_ВИС_Число ДЕ - группы должны обрабатываться.
-            if(!_document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency.Name)) {
+            if(!_document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
                 if(element.GroupId.IsNull()) {
                     return true;
                 }

@@ -38,7 +38,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         public override void SetParamValue(SpecificationElement specificationElement) {
             string calculatedSystem = GetSystemName(specificationElement);
 
-            if(!(string.IsNullOrEmpty(calculatedSystem))) {
+            if(!(string.IsNullOrWhiteSpace(calculatedSystem))) {
                 TargetParam.Set(calculatedSystem);
             } else {
                 calculatedSystem = Config.GlobalSystem;
