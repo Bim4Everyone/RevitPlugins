@@ -19,7 +19,7 @@ namespace RevitDeclarations.Models {
             _commercialRooms = commercialRooms;
             _settings = settings;
 
-            _fullTableWidth = 11;
+            _fullTableWidth = 12;
             _summerRoomsStart = 0;
             _otherRoomsStart = 0;
             _utpStart = 0;
