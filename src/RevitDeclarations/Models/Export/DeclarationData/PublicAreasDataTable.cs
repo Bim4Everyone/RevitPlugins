@@ -61,14 +61,11 @@ namespace RevitDeclarations.Models {
             int rowNumber = 0;
 
             foreach(PublicArea publicArea in _tableInfo.RoomGroups.Cast<PublicArea>()) {
-                // ИСПРАВИТЬ!!!
-                RoomElement roomElement = publicArea.Rooms.First();
-
-                _mainTable.Rows[rowNumber][0] = $"{publicArea.Number}-{roomElement.Number}";
-                _mainTable.Rows[rowNumber][1] = roomElement.Name;
-                _mainTable.Rows[rowNumber][2] = publicArea.Level;
+                _mainTable.Rows[rowNumber][0] = publicArea.Number;
+                _mainTable.Rows[rowNumber][1] = publicArea.GroupName;
+                _mainTable.Rows[rowNumber][2] = publicArea.RoomPosition;
                 _mainTable.Rows[rowNumber][3] = publicArea.Department;
-                _mainTable.Rows[rowNumber][4] = roomElement.Area;
+                _mainTable.Rows[rowNumber][4] = publicArea.AreaMain;
                 _mainTable.Rows[rowNumber][5] = "";
 
                 rowNumber++;
