@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -16,9 +16,29 @@ namespace RevitRoomViewer.ViewModels {
         private string _revitVersion;
         private string _errorText;
 
-        private List<LevelViewModel> _levels;
         private LevelViewModel _selectedLevel;
-        public Dictionary<string, RoomElement> RoomsWithSettings { get; set; } = new Dictionary<string, RoomElement>();
+        private ObservableCollection<LevelViewModel> _levels;
+
+        public ObservableCollection<RoomElement> RoomsWithSettings;
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+        public string RevitVersion {
+            get => _revitVersion;
+            set => this.RaiseAndSetIfChanged(ref _revitVersion, value);
+        }
+        public ObservableCollection<LevelViewModel> Levels {
+            get => _levels;
+            set => this.RaiseAndSetIfChanged(ref _levels, value);
+        }
+        public LevelViewModel SelectedLevel {
+            get => _selectedLevel;
+            set => this.RaiseAndSetIfChanged(ref _selectedLevel, value);
+        }
+
+        public ICommand LoadViewCommand { get; }
+        public ICommand AcceptViewCommand { get; }
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -32,36 +52,15 @@ namespace RevitRoomViewer.ViewModels {
 #else
             RevitVersion = "Revit 2024";
 #endif
-
-
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-
-        }
-
-        public ICommand LoadViewCommand { get; }
-        public ICommand AcceptViewCommand { get; }
-
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-        public string RevitVersion {
-            get => _revitVersion;
-            set => this.RaiseAndSetIfChanged(ref _revitVersion, value);
-        }
-        public List<LevelViewModel> Levels {
-            get => _levels;
-            set => this.RaiseAndSetIfChanged(ref _levels, value);
-        }
-        public LevelViewModel SelectedLevel {
-            get => _selectedLevel;
-            set => this.RaiseAndSetIfChanged(ref _selectedLevel, value);
         }
 
         private void LoadView() {
             LoadConfig();
-            Levels = _revitRepository.GetLevelsWithRooms(RoomsWithSettings);
+
+            var rooms = _revitRepository.GetRooms(RoomsWithSettings);
+            Levels = _revitRepository.GetLevels(rooms);
             SelectedLevel = Levels.FirstOrDefault();
         }
 
@@ -76,7 +75,14 @@ namespace RevitRoomViewer.ViewModels {
         private void UpdateRoomSettings(LevelViewModel levelViewModel) {
             var rooms = levelViewModel.Rooms;
             foreach(var room in rooms) {
-                RoomsWithSettings[room.Id.ToString()] = room;
+                var existingRoom = RoomsWithSettings.FirstOrDefault(r => r.Id == room.Id);
+
+                if(existingRoom != null) {
+                    existingRoom.Description = room.Description;
+                    existingRoom.NeedMeasuring = room.NeedMeasuring;
+                } else {
+                    RoomsWithSettings.Add(room);
+                }
             }
         }
 
@@ -95,28 +101,22 @@ namespace RevitRoomViewer.ViewModels {
                     ErrorText = "Ни у одной комнаты нет описания";
                     return false;
                 }
-
-
             }
-
             ErrorText = null;
             return true;
-
         }
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            if(setting != null && setting.RoomsWithSettings != null)
-                RoomsWithSettings = setting.RoomsWithSettings;
+            RoomsWithSettings = setting?.RoomsWithSettings ?? new ObservableCollection<RoomElement>();
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                    ?? _pluginConfig.AddSettings(_revitRepository.Document);
+                ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
             setting.RoomsWithSettings = RoomsWithSettings;
             _pluginConfig.SaveProjectConfig();
         }
     }
 }
-

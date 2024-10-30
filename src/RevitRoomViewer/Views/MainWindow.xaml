@@ -4,68 +4,92 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitRoomViewer.Views"
     xmlns:vms="clr-namespace:RevitRoomViewer.ViewModels"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    
     Title="{DynamicResource MainWindow.Title}"
-    Height="450" Width="800"    
-
+    Height="450"
+    Width="800"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <b:Interaction.Triggers>
-        <b:EventTrigger EventName="Loaded">
+        <b:EventTrigger
+            EventName="Loaded">
             <b:InvokeCommandAction
-            Command="{Binding LoadViewCommand}" />
+                Command="{Binding LoadViewCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TabControl ItemsSource="{Binding Levels}" 
+        <TabControl
+            ItemsSource="{Binding Levels}"
             SelectedItem="{Binding SelectedLevel}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
+                    <TextBlock
+                        Text="{Binding Name}" />
                 </DataTemplate>
             </TabControl.ItemTemplate>
 
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <DataGrid ItemsSource="{Binding Rooms}"
-                      AutoGenerateColumns="False"
-                      SelectionMode="Single"
-                      HorizontalAlignment="Stretch" 
-                      VerticalAlignment="Stretch">
-
+                    <DataGrid
+                        AutoGenerateColumns="False"
+                        SelectionMode="Single"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        ItemsSource="{Binding Rooms}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Имя"
-                                        Binding="{Binding Name}" 
-                                                IsReadOnly="True" />
-                            <DataGridTextColumn Header="Описание"
-                                        Binding="{Binding  Description}" />
-                            <DataGridCheckBoxColumn Header="Нужен замер"
-                                            Binding="{Binding NeedMeasuring}" />
+                            <DataGridTextColumn
+                                Header="Имя"
+                                IsReadOnly="True"
+                                Binding="{Binding Name}" />
+                            <DataGridTextColumn
+                                Header="Описание"
+                                Binding="{Binding  Description, UpdateSourceTrigger=PropertyChanged}" />
+                            <DataGridCheckBoxColumn
+                                Header="Нужен замер"
+                                Binding="{Binding NeedMeasuring}" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <TextBlock Margin="10" Foreground="Orange" VerticalAlignment="Center" Text="{Binding ErrorText}" />
-            <TextBlock Margin="30,0,0,0" Foreground="Black" VerticalAlignment="Center" Text="{Binding RevitVersion}" />
-            <Button Margin="10" Width="80" Content="Сохранить" Command="{Binding AcceptViewCommand}" />
-            <Button Margin="10" Width="80" Content="Отменить" IsCancel="True" />
+        <StackPanel
+            Grid.Row="1"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+            <TextBlock
+                Margin="30,0,0,0"
+                Foreground="Black"
+                VerticalAlignment="Center"
+                Text="{Binding RevitVersion}" />
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Сохранить"
+                Command="{Binding AcceptViewCommand}" />
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Отменить"
+                IsCancel="True" />
         </StackPanel>
     </Grid>
 </base:PlatformWindow>

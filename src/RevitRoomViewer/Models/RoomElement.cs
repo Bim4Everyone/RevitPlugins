@@ -1,16 +1,10 @@
-using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.DB;
 
 namespace RevitRoomViewer.Models {
     internal class RoomElement {
-
-        private readonly Room _room;
-
-        public RoomElement(Room room) {
-            _room = room;
-        }
-        public string Id => _room.Id.ToString();
-        public string LevelId => _room.LevelId.ToString();
-        public string Name => _room.Name;
+        public ElementId Id { get; set; }
+        public ElementId LevelId { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
         public bool NeedMeasuring { get; set; }
     }

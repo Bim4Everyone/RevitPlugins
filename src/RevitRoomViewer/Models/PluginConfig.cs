@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -24,6 +24,6 @@ namespace RevitRoomViewer.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public Dictionary<string, RoomElement> RoomsWithSettings { get; set; }
+        public ObservableCollection<RoomElement> RoomsWithSettings { get; set; }
     }
 }
