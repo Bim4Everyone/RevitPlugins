@@ -30,12 +30,7 @@ namespace RevitDeclarations.ViewModels {
             };
             _selectedFormat = _exportFormats[0];
 
-            ParametersViewModel paramVM = new ParametersViewModel(_revitRepository, this);
-            paramVM.SetCompanyParamConfig(new object());
-            paramVM.FilterRoomsValue = "МОП";
-            paramVM.ProjectName = "test";
-
-            _parametersViewModel = paramVM;
+            _parametersViewModel = new ParametersViewModel(_revitRepository, this);            
             _prioritiesViewModel = new PrioritiesViewModel(this);
 
             _loadUtp = false;
