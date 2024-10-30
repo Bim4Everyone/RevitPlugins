@@ -10,6 +10,9 @@ using System.Windows.Forms;
 using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Models;
 using Autodesk.Revit.UI;
+using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone;
+
 
 namespace RevitMechanicalSpecification.Service {
 
@@ -65,8 +68,9 @@ namespace RevitMechanicalSpecification.Service {
                 SystemTargetName = element.Name.Split(' ').First(),
 
                 SystemForsedInstanceName = element
-                .GetSharedParamValueOrDefault<string>(_specConfiguration.ForcedSystemName)
-
+                .GetSharedParamValueOrDefault<string>(_specConfiguration.ForcedSystemName),
+                SystemForcedInstanceFunction = element
+                .GetSharedParamValueOrDefault<string>(_specConfiguration.ForcedFunction)
             }));
 
             return mechanicalSystems;
@@ -139,10 +143,15 @@ namespace RevitMechanicalSpecification.Service {
                 return false;
             }
 
-            if(element.GroupId.IsNull()) {
-                return true;
+            // временное дополнение. Если в проекте есть ФОП_ВИС_Число ДЕ - группы должны обрабатываться.
+            if(!_document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
+                if(element.GroupId.IsNull()) {
+                    return true;
+                }
+                return false;
             }
-            return false;
+
+            return true;
         }
     }
 }

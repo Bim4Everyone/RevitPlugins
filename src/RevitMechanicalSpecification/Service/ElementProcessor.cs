@@ -36,7 +36,7 @@ namespace RevitMechanicalSpecification.Service {
             _userName = userName;
             _document = document;
 
-            _specConfiguration = new SpecConfiguration(_document.ProjectInformation);
+            _specConfiguration = new SpecConfiguration(_document);
             _paramChecker = new ParamChecker();
             _maskReplacer = new MaskReplacer(_specConfiguration);
         }
@@ -54,9 +54,6 @@ namespace RevitMechanicalSpecification.Service {
                 foreach(SpecificationElement specificationElement in splitResult.SingleElements) {
                     ProcessElement(specificationElement, fillers);
 
-                    // На арматуре воздуховодов/труб/оборудовании проверяем наличие шаблонизированных семейств-генериков.
-                    // Если встречаем - заполняем все по маске
-                    FillIfGeneric(specificationElement.Element);
                 }
 
                 foreach(SpecificationElement manifoldElement in splitResult.ManifoldElements) {

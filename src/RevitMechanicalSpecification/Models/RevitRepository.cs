@@ -36,7 +36,7 @@ namespace RevitMechanicalSpecification.Models {
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
             _elementProcessor = new ElementProcessor(UIApplication.Application.Username, Document);
-            _specConfiguration = new SpecConfiguration(Document.ProjectInformation);
+            _specConfiguration = new SpecConfiguration(Document);
             _collector = new CollectionFactory(Document, _specConfiguration, ActiveUIDocument);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
             _maskReplacer = new MaskReplacer(_specConfiguration);
@@ -126,6 +126,7 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void SpecificationRefresh() {
             _elements = _collector.GetElementsByCategories();
+            ReplaceMask(_elements);
             _elementProcessor.ProcessElements(_fillersSpecRefresh, _elements);
         }
 
@@ -150,6 +151,7 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void FullRefresh() {
             _elements = _collector.GetElementsByCategories();
+            ReplaceMask(_elements);
             _elementProcessor.ProcessElements(FoldFillerLists(), _elements);
         }
 
@@ -158,6 +160,7 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void VisibleFullRefresh() {
             _elements = _collector.GetVisibleElementsByCategories();
+            ReplaceMask(_elements);
             _elementProcessor.ProcessElements(FoldFillerLists(), _elements);
         }
 
@@ -166,6 +169,7 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void SelectedFullRefresh() {
             _elements = _collector.GetSelectedElementsByCategories();
+            ReplaceMask(_elements);
             _elementProcessor.ProcessElements(FoldFillerLists(), _elements);
         }
 
@@ -173,9 +177,13 @@ namespace RevitMechanicalSpecification.Models {
         /// Вызов замены маски в шаблонизированных семействах-генериках. Отдельный мини-плагин, который должен вызываться
         /// вместе с спекой, поэтому проще его встроить сюда
         /// </summary>
-        public void ReplaceMask() {
+        public void ReplaceMask(List<Element> elements = null) {
             using(var t = Document.StartTransaction("Сформировать имя")) {
-                foreach(Element element in _elements) {
+
+                if (elements is null) { 
+                    elements = _collector.GetElementsByCategories();
+                }
+                foreach(Element element in elements) {
                     _maskReplacer.ExecuteReplacment(element);
                 }
                 t.Commit();
