@@ -80,7 +80,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             }
 
             //отметки отверстия
-            var bottomOffsetValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, sizeInit.GetThickness());
+            var bottomOffsetValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder);
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottomAdsk, new BottomOffsetInFeetValueGetter(bottomOffsetValueGetter)).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdsk, new BottomOffsetFromLevelValueGetter(bottomOffsetValueGetter, _levelFinder)).GetParamValue();
