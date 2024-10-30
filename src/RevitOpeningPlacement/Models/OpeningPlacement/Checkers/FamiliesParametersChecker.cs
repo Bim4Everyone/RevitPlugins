@@ -121,10 +121,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.Checkers {
                 RevitRepository.OpeningIsManuallyPlaced,
                 RevitRepository.OpeningOffsetBottom,
                 RevitRepository.OpeningOffsetCenter,
-                RevitRepository.OpeningOffsetBottomAdsk,
+                RevitRepository.OpeningOffsetAdsk,
                 RevitRepository.OpeningOffsetFromLevelAdsk,
                 RevitRepository.OpeningLevelOffsetAdsk,
-                RevitRepository.OpeningOffsetBottomAdskOld,
+                RevitRepository.OpeningOffsetAdskOld,
                 RevitRepository.OpeningOffsetFromLevelAdskOld,
                 RevitRepository.OpeningLevelOffsetAdskOld
             };
