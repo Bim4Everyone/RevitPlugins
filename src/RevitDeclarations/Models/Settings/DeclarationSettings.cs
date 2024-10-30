@@ -48,28 +48,33 @@ namespace RevitDeclarations.Models {
 
         public Parameter RoomAreaParam => ParametersVM.SelectedRoomAreaParam;
         public Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaCoefParam;
+        
+        // Настройки для параметров нежилых помещений
+        public Parameter GroupNameParam => ParametersVM.SelectedGroupNameParam;
+        public bool AddPostfixToNumber => ParametersVM.AddPostfixToNumber;
+
 
         public IReadOnlyCollection<Parameter> AllParameters => new List<Parameter>() {
             FilterRoomsParam,
-            GroupingBySectionParam,
-            GroupingByGroupParam,
-            MultiStoreyParam,
-            ApartmentFullNumberParam,
-            DepartmentParam,
-            LevelParam,
+            //GroupingBySectionParam,
+            //GroupingByGroupParam,
+            //MultiStoreyParam,
+            //ApartmentFullNumberParam,
+            //DepartmentParam,
+            //LevelParam,
             SectionParam,
-            BuildingParam,
-            BuildingNumberParam,
-            ConstrWorksNumberParam,
-            ApartmentNumberParam,
-            ApartmentAreaParam,
-            ApartmentAreaCoefParam,
-            ApartmentAreaLivingParam,
-            RoomsAmountParam,
-            ApartmentAreaNonSumParam,
-            RoomsHeightParam,
-            RoomAreaParam,
-            RoomAreaCoefParam
+            //BuildingParam,
+            //BuildingNumberParam,
+            //ConstrWorksNumberParam,
+            //ApartmentNumberParam,
+            //ApartmentAreaParam,
+            //ApartmentAreaCoefParam,
+            //ApartmentAreaLivingParam,
+            //RoomsAmountParam,
+            //ApartmentAreaNonSumParam,
+            //RoomsHeightParam,
+            //RoomAreaParam,
+            //RoomAreaCoefParam
         };
 
         public void UpdatePriorities(List<string> newNames) {

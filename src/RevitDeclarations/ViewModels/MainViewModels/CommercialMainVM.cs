@@ -29,12 +29,8 @@ namespace RevitDeclarations.ViewModels {
             };
             _selectedFormat = _exportFormats[0];
 
-            ParametersViewModel paramVM = new ParametersViewModel(_revitRepository, this);
-            paramVM.SetCompanyParamConfig(new object());
-            paramVM.FilterRoomsValue = "Нежилое помещение,Машино-место,Кладовая";
-            paramVM.ProjectName = "test";
-
-            _parametersViewModel = paramVM;
+            // Нежилое помещение,Машино-место,Кладовая
+            _parametersViewModel = new ParametersViewModel(_revitRepository, this);
             _prioritiesViewModel = new PrioritiesViewModel(this);
 
             _loadUtp = false;
@@ -136,6 +132,8 @@ namespace RevitDeclarations.ViewModels {
 
             configSettings.RoomAreaParam = _settings.RoomAreaParam?.Definition.Name;
             configSettings.RoomAreaCoefParam = _settings.RoomAreaCoefParam?.Definition.Name;
+
+            configSettings.GroupNameParam = _settings.GroupNameParam?.Definition.Name;
 
             config.SaveProjectConfig();
         }

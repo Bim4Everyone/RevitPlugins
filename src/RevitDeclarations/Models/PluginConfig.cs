@@ -60,6 +60,9 @@ namespace RevitDeclarations.Models {
         public string RoomAreaParam { get; set; }
         public string RoomAreaCoefParam { get; set; }
 
+        public string GroupNameParam { get; set; }
+        public bool AddPostfixToNumber { get; set; }
+
         public string PrioritiesFilePath { get; set; }
 
 
@@ -88,7 +91,9 @@ namespace RevitDeclarations.Models {
                 RoomsHeightParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_HEIGHT),
 
                 RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
-                RoomAreaCoefParam = SharedParamsConfig.Instance.RoomAreaWithRatio.Name
+                RoomAreaCoefParam = SharedParamsConfig.Instance.RoomAreaWithRatio.Name,
+
+                GroupNameParam = SharedParamsConfig.Instance.ApartmentGroupName.Name
             };
         }
     }

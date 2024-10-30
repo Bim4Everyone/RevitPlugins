@@ -46,6 +46,9 @@ namespace RevitDeclarations.ViewModels {
         private Parameter _selectedRoomAreaParam;
         private Parameter _selectedRoomAreaCoefParam;
 
+        private Parameter _selectedGroupNameParam;
+        private bool _addPostfixToNumber;
+
         public ParametersViewModel(RevitRepository revitRepository, MainViewModel mainViewModel) {
             _mainViewModel = mainViewModel;
             _revitRepository = revitRepository;
@@ -180,30 +183,40 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _selectedRoomAreaCoefParam, value);
         }
 
+        public Parameter SelectedGroupNameParam {
+            get => _selectedGroupNameParam;
+            set => RaiseAndSetIfChanged(ref _selectedGroupNameParam, value);
+        }
+
+        public bool AddPostfixToNumber {
+            get => _addPostfixToNumber;
+            set => RaiseAndSetIfChanged(ref _addPostfixToNumber, value);
+        }
+
         public ParameterToolTip ParameterToolTip => _parameterToolTip;
 
         public List<Parameter> GetAllParametrs() {
             return new List<Parameter> {
-                SelectedFilterRoomsParam,
-                SelectedGroupingBySectionParam,
-                SelectedGroupingByGroupParam,
-                SelectedMultiStoreyParam,
-                SelectedFullApartNumParam,
-                SelectedDepartmentParam,
+                //SelectedFilterRoomsParam,
+                //SelectedGroupingBySectionParam,
+                //SelectedGroupingByGroupParam,
+                //SelectedMultiStoreyParam,
+                //SelectedFullApartNumParam,
+                //SelectedDepartmentParam,
                 SelectedLevelParam,
                 SelectedSectionParam,
-                SelectedBuildingParam,
-                SelectedBuildingNumberParam,
-                SelectedConstrWorksNumberParam,
-                SelectedApartNumParam,
-                SelectedApartAreaParam,
-                SelectedApartAreaCoefParam,
-                SelectedApartAreaLivingParam,
-                SelectedRoomsAmountParam,
-                SelectedApartAreaNonSumParam,
-                SelectedRoomsHeightParam,
-                SelectedRoomAreaParam,
-                SelectedRoomAreaCoefParam
+                //SelectedBuildingParam,
+                //SelectedBuildingNumberParam,
+                //SelectedConstrWorksNumberParam,
+                //SelectedApartNumParam,
+                //SelectedApartAreaParam,
+                //SelectedApartAreaCoefParam,
+                //SelectedApartAreaLivingParam,
+                //SelectedRoomsAmountParam,
+                //SelectedApartAreaNonSumParam,
+                //SelectedRoomsHeightParam,
+                //SelectedRoomAreaParam,
+                //SelectedRoomAreaCoefParam
             };
         }
 
@@ -263,6 +276,11 @@ namespace RevitDeclarations.ViewModels {
                 .FirstOrDefault(x => x.Definition.Name == configSettings.RoomAreaParam);
             SelectedRoomAreaCoefParam = DoubleParameters
                 .FirstOrDefault(x => x.Definition.Name == configSettings.RoomAreaCoefParam);
+
+            SelectedGroupNameParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == configSettings.GroupNameParam);
+
+            AddPostfixToNumber = configSettings.AddPostfixToNumber;
         }
     }
 }
