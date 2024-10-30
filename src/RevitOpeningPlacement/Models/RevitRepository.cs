@@ -478,18 +478,24 @@ namespace RevitOpeningPlacement.Models {
             if(!familySymbol.IsActive) { familySymbol.Activate(); }
 
             var level = GetElement(host.LevelId) as Level;
-            return _document.Create.NewFamilyInstance(point, familySymbol, host, level, StructuralType.NonStructural);
+            var inst = _document.Create.NewFamilyInstance(point, familySymbol, host, level, StructuralType.NonStructural);
+            Doc.Regenerate(); // решение бага, когда значения параметров, которые назначались этому экземпляру сразу после создания, по итогу не назначались
+            return inst;
         }
 
         public FamilyInstance CreateInstance(FamilySymbol type, XYZ point, Level level) {
             if(!type.IsActive) {
                 type.Activate();
             }
+            FamilyInstance inst;
             if(level != null) {
                 point = point - XYZ.BasisZ * level.ProjectElevation;
-                return _document.Create.NewFamilyInstance(point, type, level, StructuralType.NonStructural);
+                inst = _document.Create.NewFamilyInstance(point, type, level, StructuralType.NonStructural);
+            } else {
+                inst = _document.Create.NewFamilyInstance(point, type, StructuralType.NonStructural);
             }
-            return _document.Create.NewFamilyInstance(point, type, StructuralType.NonStructural);
+            Doc.Regenerate(); // решение бага, когда значения параметров, которые назначались этому экземпляру сразу после создания, по итогу не назначались
+            return inst;
         }
 
         public void RotateElement(Element element, XYZ point, Rotates angle) {
