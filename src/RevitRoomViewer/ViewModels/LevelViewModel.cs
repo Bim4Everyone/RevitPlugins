@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 using Autodesk.Revit.DB;
@@ -13,10 +12,10 @@ namespace RevitRoomViewer.ViewModels {
         private readonly Level _level;
         private readonly ObservableCollection<RoomElement> _rooms;
 
-        public LevelViewModel(string name, Level level, List<RoomElement> rooms) {
+        public LevelViewModel(string name, Level level, ObservableCollection<RoomElement> rooms) {
             Name = name;
             _level = level;
-            _rooms = new ObservableCollection<RoomElement>(rooms);
+            _rooms = rooms;
         }
 
         public Level Element { get => _level; }

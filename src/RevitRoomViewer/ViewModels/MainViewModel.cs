@@ -59,9 +59,7 @@ namespace RevitRoomViewer.ViewModels {
 
         private void LoadView() {
             LoadConfig();
-            var levelViewModels = _revitRepository.GetLevels(RoomSettings);
-            Levels = new ObservableCollection<LevelViewModel>(levelViewModels);
-            SelectedLevel = Levels.FirstOrDefault();
+            LoadLevel();
         }
 
         private void AcceptView() {
@@ -71,16 +69,51 @@ namespace RevitRoomViewer.ViewModels {
             SaveConfig();
         }
 
+        private void LoadLevel() {
+
+            var rooms = _revitRepository.GetRooms();
+            var roomsWithSettings = new List<RoomElement>();
+
+            foreach(var room in rooms) {
+                var roomSetting = RoomSettings
+                    .FirstOrDefault(r => r.Id == room.Id);
+
+                var roomElement = new RoomElement() {
+                    Id = room.Id,
+                    LevelId = room.LevelId,
+                    Name = room.Name,
+                    Description = roomSetting?.Description ?? string.Empty,
+                    NeedMeasuring = roomSetting?.NeedMeasuring ?? false
+                };
+                roomsWithSettings.Add(roomElement);
+            }
+
+            var levels = _revitRepository.GetLevels();
+            var levelViewModels = new ObservableCollection<LevelViewModel>();
+
+            foreach(var level in levels) {
+                var roomsOnLevel = new ObservableCollection<RoomElement>(
+                    roomsWithSettings.Where(room => room.LevelId == level.Id)
+                );
+
+                var levelViewModel = new LevelViewModel(level.Name, level, roomsOnLevel);
+                levelViewModels.Add(levelViewModel);
+            }
+
+            Levels = levelViewModels;
+            SelectedLevel = Levels.FirstOrDefault();
+        }
+
         private void UpdateRoomSettings(LevelViewModel levelViewModel) {
             var rooms = levelViewModel.Rooms;
             foreach(var room in rooms) {
-                var existingRoom = RoomsWithSettings.FirstOrDefault(r => r.Id == room.Id);
+                var existingRoom = RoomSettings.FirstOrDefault(r => r.Id == room.Id);
 
                 if(existingRoom != null) {
                     existingRoom.Description = room.Description;
                     existingRoom.NeedMeasuring = room.NeedMeasuring;
                 } else {
-                    RoomsWithSettings.Add(room);
+                    RoomSettings.Add(room);
                 }
             }
         }
@@ -107,14 +140,14 @@ namespace RevitRoomViewer.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            RoomsWithSettings = setting?.RoomsWithSettings ?? new List<RoomElement>();
+            RoomSettings = setting?.RoomsWithSettings ?? new List<RoomElement>();
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.RoomsWithSettings = RoomsWithSettings;
+            setting.RoomsWithSettings = RoomSettings;
             _pluginConfig.SaveProjectConfig();
         }
     }
