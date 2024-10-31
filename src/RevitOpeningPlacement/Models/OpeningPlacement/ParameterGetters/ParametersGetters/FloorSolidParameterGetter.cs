@@ -73,14 +73,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
                 yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, sizeInit.GetHeight()).GetParamValue();
                 yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, sizeInit.GetWidth()).GetParamValue();
             }
+            IValueGetter<DoubleParamValue> thicknessValueGetter;
             if((_structureElement != null) && (_structureElement is Floor ceilingAndFloor)) {
-                yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new FloorThicknessValueGetter(ceilingAndFloor)).GetParamValue();
+                thicknessValueGetter = new FloorThicknessValueGetter(ceilingAndFloor);
             } else {
-                yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, sizeInit.GetThickness()).GetParamValue();
+                thicknessValueGetter = sizeInit.GetThickness();
             }
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, thicknessValueGetter).GetParamValue();
 
             //отметки отверстия
-            var bottomOffsetValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, sizeInit.GetThickness());
+            var bottomOffsetValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, thicknessValueGetter);
             var centerOffsetMmValueGetter = new CenterOffsetValueGetter(_pointFinder);
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, centerOffsetMmValueGetter).GetParamValue();

@@ -92,7 +92,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             } else {
                 originOffsetMm = bottomOffsetMmValueGetter;
             }
-            var offsetFeetFromLevelValueGetter = new OffsetFromLevelValueGetter(bottomOffsetMmValueGetter, _levelFinder);
+            var offsetFeetFromLevelValueGetter = new OffsetFromLevelValueGetter(originOffsetMm, _levelFinder);
             var levelFeetOffsetValueGetter = new LevelOffsetValueGetter(_levelFinder);
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetAdsk, new OffsetInFeetValueGetter(originOffsetMm)).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdsk, offsetFeetFromLevelValueGetter).GetParamValue();

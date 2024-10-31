@@ -28,9 +28,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
 
 
         public DoubleParamValue GetValue() {
-            var bottomOffset = ConvertToInternal(_offsetValueGetter.GetValue().TValue);
+            var offset = ConvertToInternal(_offsetValueGetter.GetValue().TValue);
             var levelOffset = _levelFinder.GetLevel().Elevation;
-            return new DoubleParamValue(bottomOffset - levelOffset);
+            return new DoubleParamValue(offset - levelOffset);
         }
     }
 }
