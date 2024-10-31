@@ -84,6 +84,7 @@
                 Width="80"
                 Content="Сохранить"
                 Click="ButtonOk_Click"
+                IsDefault="True"
                 Command="{Binding AcceptViewCommand}" />
             <Button
                 Margin="10"

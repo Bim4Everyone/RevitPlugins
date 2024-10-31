@@ -39,7 +39,7 @@ namespace RevitRoomViewer.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
-        public List<RoomElement> RoomsWithSettings { get; set; }
+        public List<RoomElement> RoomSettings { get; set; }
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -59,8 +59,8 @@ namespace RevitRoomViewer.ViewModels {
 
         private void LoadView() {
             LoadConfig();
-
-            Levels = _revitRepository.GetLevels(RoomsWithSettings);
+            var levelViewModels = _revitRepository.GetLevels(RoomSettings);
+            Levels = new ObservableCollection<LevelViewModel>(levelViewModels);
             SelectedLevel = Levels.FirstOrDefault();
         }
 

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -47,7 +46,7 @@ namespace RevitRoomViewer.Models {
             return roomsWithSettings;
         }
 
-        public ObservableCollection<LevelViewModel> GetLevels(List<RoomElement> roomsSettings = null) {
+        public List<LevelViewModel> GetLevels(List<RoomElement> roomsSettings = null) {
 
             var rooms = new List<RoomElement>();
 
@@ -60,10 +59,10 @@ namespace RevitRoomViewer.Models {
                 .Cast<Level>()
                 .ToList();
 
-            var levelViewModels = new ObservableCollection<LevelViewModel>();
+            var levelViewModels = new List<LevelViewModel>();
 
             foreach(var level in levels) {
-                var roomsOnLevel = new ObservableCollection<RoomElement>(
+                var roomsOnLevel = new List<RoomElement>(
                     rooms.Where(room => room.LevelId == level.Id)
                 );
 
