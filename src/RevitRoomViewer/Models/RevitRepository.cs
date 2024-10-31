@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -19,18 +20,19 @@ namespace RevitRoomViewer.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public ObservableCollection<RoomElement> GetRooms(ObservableCollection<RoomElement> roomsWithSettings) {
+        public List<RoomElement> GetRoomsWithSettings(List<RoomElement> roomsSettings) {
 
-            Room[] rooms = new FilteredElementCollector(Document, Document.ActiveView.Id)
-                .WherePasses(new RoomFilter())
+            var rooms = new FilteredElementCollector(Document)
+                .OfCategory(BuiltInCategory.OST_Rooms)
+                .WhereElementIsNotElementType()
                 .Cast<Room>()
                 .Where(r => r.Area > 0)
-                .ToArray();
+                .ToList();
 
-            var roomsWithSettingsCollection = new ObservableCollection<RoomElement>();
+            var roomsWithSettings = new List<RoomElement>();
 
             foreach(var room in rooms) {
-                var roomSetting = roomsWithSettings
+                var roomSetting = roomsSettings
                     .FirstOrDefault(r => r.Id == room.Id);
 
                 var roomElement = new RoomElement() {
@@ -40,12 +42,19 @@ namespace RevitRoomViewer.Models {
                     Description = roomSetting?.Description ?? string.Empty,
                     NeedMeasuring = roomSetting?.NeedMeasuring ?? false
                 };
-                roomsWithSettingsCollection.Add(roomElement);
+                roomsWithSettings.Add(roomElement);
             }
-            return roomsWithSettingsCollection;
+            return roomsWithSettings;
         }
 
-        public ObservableCollection<LevelViewModel> GetLevels(ObservableCollection<RoomElement> rooms) {
+        public ObservableCollection<LevelViewModel> GetLevels(List<RoomElement> roomsSettings = null) {
+
+            var rooms = new List<RoomElement>();
+
+            if(roomsSettings != null) {
+                rooms = GetRoomsWithSettings(roomsSettings);
+            }
+
             var levels = new FilteredElementCollector(Document)
                 .OfClass(typeof(Level))
                 .Cast<Level>()

@@ -8,7 +8,7 @@ namespace RevitRoomViewer.Views {
 
         public override string PluginName => nameof(RevitRoomViewer);
         public override string ProjectConfigName => nameof(MainWindow);
-        
+
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
         }

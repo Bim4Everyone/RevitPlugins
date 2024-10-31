@@ -5,8 +5,6 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 
 using Ninject;
 
@@ -18,7 +16,7 @@ namespace RevitRoomViewer {
     [Transaction(TransactionMode.Manual)]
     public class RevitRoomViewerCommand : BasePluginCommand {
         public RevitRoomViewerCommand() {
-            PluginName = "RevitRoomViewer";
+            PluginName = "Просмотр помещений";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -34,8 +32,8 @@ namespace RevitRoomViewer {
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>())
-                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                        c => c.Kernel.Get<ILocalizationService>());
+                    .WithPropertyValue(nameof(Window.Title),
+                        c => PluginName);
 
                 Notification(kernel.Get<MainWindow>());
             }

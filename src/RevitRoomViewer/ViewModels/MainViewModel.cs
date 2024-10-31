@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
@@ -10,6 +10,7 @@ using RevitRoomViewer.Models;
 
 namespace RevitRoomViewer.ViewModels {
     internal class MainViewModel : BaseViewModel {
+
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
@@ -18,27 +19,6 @@ namespace RevitRoomViewer.ViewModels {
 
         private LevelViewModel _selectedLevel;
         private ObservableCollection<LevelViewModel> _levels;
-
-        public ObservableCollection<RoomElement> RoomsWithSettings;
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-        public string RevitVersion {
-            get => _revitVersion;
-            set => this.RaiseAndSetIfChanged(ref _revitVersion, value);
-        }
-        public ObservableCollection<LevelViewModel> Levels {
-            get => _levels;
-            set => this.RaiseAndSetIfChanged(ref _levels, value);
-        }
-        public LevelViewModel SelectedLevel {
-            get => _selectedLevel;
-            set => this.RaiseAndSetIfChanged(ref _selectedLevel, value);
-        }
-
-        public ICommand LoadViewCommand { get; }
-        public ICommand AcceptViewCommand { get; }
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -56,11 +36,31 @@ namespace RevitRoomViewer.ViewModels {
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
+        public ICommand LoadViewCommand { get; }
+        public ICommand AcceptViewCommand { get; }
+
+        public List<RoomElement> RoomsWithSettings { get; set; }
+        public string ErrorText {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+        public string RevitVersion {
+            get => _revitVersion;
+            set => this.RaiseAndSetIfChanged(ref _revitVersion, value);
+        }
+        public ObservableCollection<LevelViewModel> Levels {
+            get => _levels;
+            set => this.RaiseAndSetIfChanged(ref _levels, value);
+        }
+        public LevelViewModel SelectedLevel {
+            get => _selectedLevel;
+            set => this.RaiseAndSetIfChanged(ref _selectedLevel, value);
+        }
+
         private void LoadView() {
             LoadConfig();
 
-            var rooms = _revitRepository.GetRooms(RoomsWithSettings);
-            Levels = _revitRepository.GetLevels(rooms);
+            Levels = _revitRepository.GetLevels(RoomsWithSettings);
             SelectedLevel = Levels.FirstOrDefault();
         }
 
@@ -69,7 +69,6 @@ namespace RevitRoomViewer.ViewModels {
                 UpdateRoomSettings(level);
             }
             SaveConfig();
-            MessageBox.Show("Данные успешно сохранены", "Сохранение", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void UpdateRoomSettings(LevelViewModel levelViewModel) {
@@ -108,7 +107,7 @@ namespace RevitRoomViewer.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            RoomsWithSettings = setting?.RoomsWithSettings ?? new ObservableCollection<RoomElement>();
+            RoomsWithSettings = setting?.RoomsWithSettings ?? new List<RoomElement>();
         }
 
         private void SaveConfig() {
