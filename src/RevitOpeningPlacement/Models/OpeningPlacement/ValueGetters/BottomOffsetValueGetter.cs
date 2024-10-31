@@ -10,7 +10,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         private readonly IValueGetter<DoubleParamValue> _heightInFeetParamGetter;
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение высотной отметки низа отверстия в мм от начала проекта, кроме прямоугольных отверстий в стенах и кроме отверстий в перекрытиях
+        /// Конструктор класса, предоставляющего значение высотной отметки низа отверстия в мм от начала проекта для круглых отверстий в стенах
         /// Для прямоугольных отверстий в стенах использовать <see cref="BottomOffsetOfRectangleOpeningInWallValueGetter"/>
         /// Для отверстий в перекрытиях использовать <see cref="BottomOffsetOfOpeningInFloorValueGetter"/>
         /// </summary>

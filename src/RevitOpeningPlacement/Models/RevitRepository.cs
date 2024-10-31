@@ -273,9 +273,12 @@ namespace RevitOpeningPlacement.Models {
         public const string OpeningOffsetBottom = "ФОП_ВИС_Отметка низа от нуля";
         public const string OpeningAuthor = "ФОП_Автор задания";
         public const string OpeningIsManuallyPlaced = "ФОП_Размещено вручную";
-        public const string OpeningOffsetBottomAdsk = "ADSK_Отверстие_Отметка от нуля";
+        public const string OpeningOffsetAdsk = "ADSK_Отверстие_Отметка от нуля";
         public const string OpeningOffsetFromLevelAdsk = "ADSK_Отверстие_Отметка от этажа";
         public const string OpeningLevelOffsetAdsk = "ADSK_Отверстие_Отметка этажа";
+        public const string OpeningOffsetAdskOld = "ADSK_Отверстие_ОтметкаОтНуля";
+        public const string OpeningOffsetFromLevelAdskOld = "ADSK_Отверстие_ОтметкаОтЭтажа";
+        public const string OpeningLevelOffsetAdskOld = "ADSK_Отверстие_ОтметкаЭтажа";
 
         public static List<BuiltInParameter> MepCurveDiameters => new List<BuiltInParameter>() {
             BuiltInParameter.RBS_PIPE_OUTER_DIAMETER,
@@ -478,18 +481,24 @@ namespace RevitOpeningPlacement.Models {
             if(!familySymbol.IsActive) { familySymbol.Activate(); }
 
             var level = GetElement(host.LevelId) as Level;
-            return _document.Create.NewFamilyInstance(point, familySymbol, host, level, StructuralType.NonStructural);
+            var inst = _document.Create.NewFamilyInstance(point, familySymbol, host, level, StructuralType.NonStructural);
+            Doc.Regenerate(); // решение бага, когда значения параметров, которые назначались этому экземпляру сразу после создания, по итогу не назначались
+            return inst;
         }
 
         public FamilyInstance CreateInstance(FamilySymbol type, XYZ point, Level level) {
             if(!type.IsActive) {
                 type.Activate();
             }
+            FamilyInstance inst;
             if(level != null) {
                 point = point - XYZ.BasisZ * level.ProjectElevation;
-                return _document.Create.NewFamilyInstance(point, type, level, StructuralType.NonStructural);
+                inst = _document.Create.NewFamilyInstance(point, type, level, StructuralType.NonStructural);
+            } else {
+                inst = _document.Create.NewFamilyInstance(point, type, StructuralType.NonStructural);
             }
-            return _document.Create.NewFamilyInstance(point, type, StructuralType.NonStructural);
+            Doc.Regenerate(); // решение бага, когда значения параметров, которые назначались этому экземпляру сразу после создания, по итогу не назначались
+            return inst;
         }
 
         public void RotateElement(Element element, XYZ point, Rotates angle) {

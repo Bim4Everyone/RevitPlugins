@@ -73,18 +73,27 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
                 yield return new DoubleParameterGetter(RevitRepository.OpeningHeight, sizeInit.GetHeight()).GetParamValue();
                 yield return new DoubleParameterGetter(RevitRepository.OpeningWidth, sizeInit.GetWidth()).GetParamValue();
             }
+            IValueGetter<DoubleParamValue> thicknessValueGetter;
             if((_structureElement != null) && (_structureElement is Floor ceilingAndFloor)) {
-                yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new FloorThicknessValueGetter(ceilingAndFloor)).GetParamValue();
+                thicknessValueGetter = new FloorThicknessValueGetter(ceilingAndFloor);
             } else {
-                yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, sizeInit.GetThickness()).GetParamValue();
+                thicknessValueGetter = sizeInit.GetThickness();
             }
+            yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, thicknessValueGetter).GetParamValue();
 
             //отметки отверстия
-            var bottomOffsetValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, sizeInit.GetThickness());
+            var bottomOffsetValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, thicknessValueGetter);
+            var centerOffsetMmValueGetter = new CenterOffsetValueGetter(_pointFinder);
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottomAdsk, new BottomOffsetInFeetValueGetter(bottomOffsetValueGetter)).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdsk, new BottomOffsetFromLevelValueGetter(bottomOffsetValueGetter, _levelFinder)).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningLevelOffsetAdsk, new LevelOffsetValueGetter(_levelFinder)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, centerOffsetMmValueGetter).GetParamValue();
+            var offsetFeetFromLevelValueGetter = new OffsetFromLevelValueGetter(centerOffsetMmValueGetter, _levelFinder);
+            var levelFeetOffsetValueGetter = new LevelOffsetValueGetter(_levelFinder);
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetAdsk, new OffsetInFeetValueGetter(centerOffsetMmValueGetter)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdsk, offsetFeetFromLevelValueGetter).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningLevelOffsetAdsk, levelFeetOffsetValueGetter).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetAdskOld, centerOffsetMmValueGetter).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdskOld, new OffsetInMmValueGetter(offsetFeetFromLevelValueGetter)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningLevelOffsetAdskOld, new OffsetInMmValueGetter(levelFeetOffsetValueGetter)).GetParamValue();
 
             //текстовые данные отверстия
             yield return new StringParameterGetter(RevitRepository.OpeningDate, new DateValueGetter()).GetParamValue();
