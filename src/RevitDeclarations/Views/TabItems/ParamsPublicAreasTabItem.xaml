@@ -267,7 +267,8 @@
                 Grid.Column="2"
                 Grid.Row="1"
                 Margin="10, 0"
-                Height="20"/>
+                Height="20"
+                IsChecked="{Binding AddPostfixToNumber}"/>
 
             <Button
                 Grid.Column="0"
@@ -303,7 +304,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedSectionParam}"/>
+                SelectedItem="{Binding SelectedBuildingParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -321,7 +322,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedBuildingParam}"/>
+                SelectedItem="{Binding SelectedSectionParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -339,7 +340,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedApartNumParam}"/>
+                SelectedItem="{Binding SelectedLevelParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -355,9 +356,9 @@
                 Grid.Column="2"
                 Grid.Row="6"
                 Margin="10, 0"
-                ItemsSource="{Binding DoubleParameters}"
+                ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedApartAreaParam}"/>
+                SelectedItem="{Binding SelectedDepartmentParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -375,7 +376,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding DoubleParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedApartAreaCoefParam}"/>
+                SelectedItem="{Binding SelectedRoomAreaParam}"/>
  
             <Button
                 Grid.Column="0"

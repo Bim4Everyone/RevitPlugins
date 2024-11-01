@@ -258,7 +258,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedFullApartNumParam}"/>
+                SelectedItem="{Binding SelectedApartNumParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -292,7 +292,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedLevelParam}"/>
+                SelectedItem="{Binding SelectedDepartmentParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -310,7 +310,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedSectionParam}"/>
+                SelectedItem="{Binding SelectedLevelParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -328,7 +328,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedBuildingParam}"/>
+                SelectedItem="{Binding SelectedSectionParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -346,7 +346,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedApartNumParam}"/>
+                SelectedItem="{Binding SelectedBuildingParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -364,7 +364,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedApartAreaParam}"/>
+                SelectedItem="{Binding SelectedBuildingNumberParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -382,7 +382,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedApartAreaCoefParam}"/>
+                SelectedItem="{Binding SelectedConstrWorksNumberParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -435,9 +435,9 @@
                 Grid.Column="2"
                 Grid.Row="11"
                 Margin="10, 0"
-                ItemsSource="{Binding IntParameters}"
+                ItemsSource="{Binding DoubleParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedRoomsAmountParam}"/>
+                SelectedItem="{Binding SelectedRoomsHeightParam}"/>
 
             <Button
                 Grid.Column="0"
@@ -453,9 +453,9 @@
                 Grid.Column="2"
                 Grid.Row="12"
                 Margin="10, 0"
-                ItemsSource="{Binding IntParameters}"
+                ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedRoomsAmountParam}"/>
+                SelectedItem="{Binding SelectedGroupNameParam}"/>
 
             <Button
                 Grid.Row="13"
