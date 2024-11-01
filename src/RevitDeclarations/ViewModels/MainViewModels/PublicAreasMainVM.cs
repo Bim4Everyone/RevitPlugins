@@ -17,7 +17,7 @@ namespace RevitDeclarations.ViewModels {
         private readonly PublicAreasExcelExportVM _excelExportViewModel;
         private readonly PublicAreasCsvExportVM _csvExportViewModel;
 
-        public PublicAreasMainVM(RevitRepository revitRepository, DeclarationSettings settings)
+        public PublicAreasMainVM(RevitRepository revitRepository, PublicAreasSettings settings)
             : base(revitRepository, settings) {
             _excelExportViewModel =
                 new PublicAreasExcelExportVM("Excel", new Guid("186F3EEE-303A-42DF-910E-475AD2525ABD"), _settings);
@@ -30,7 +30,7 @@ namespace RevitDeclarations.ViewModels {
             };
             _selectedFormat = _exportFormats[0];
 
-            _parametersViewModel = new ParametersViewModel(_revitRepository, this);            
+            _parametersViewModel = new PublicAreasParamsVM(_revitRepository, this);            
             _prioritiesViewModel = new PrioritiesViewModel(this);
 
             _loadUtp = false;
@@ -95,7 +95,7 @@ namespace RevitDeclarations.ViewModels {
         }
 
         private void LoadConfig() {
-            var config = PluginConfig.GetPluginConfig();
+            var config = CommercialConfig.GetPluginConfig();
             var configSettings = config.GetSettings(_revitRepository.Document);
 
             if(configSettings is null)

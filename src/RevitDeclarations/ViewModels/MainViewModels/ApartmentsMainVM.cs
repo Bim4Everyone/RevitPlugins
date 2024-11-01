@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Models.Configs;
 using RevitDeclarations.Views;
 
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
@@ -18,7 +19,7 @@ namespace RevitDeclarations.ViewModels {
         private readonly ApartmentsCsvExportVM _csvExportViewModel;
         private readonly ApartmentsJsonExportVM _jsonExportViewModel;
 
-        public ApartmentsMainVM(RevitRepository revitRepository, DeclarationSettings settings) 
+        public ApartmentsMainVM(RevitRepository revitRepository, ApartmentsSettings settings) 
             : base(revitRepository, settings) {
             _excelExportViewModel = 
                 new ApartmentsExcelExportVM("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
@@ -34,7 +35,7 @@ namespace RevitDeclarations.ViewModels {
             };
             _selectedFormat = _exportFormats[0];
 
-            _parametersViewModel = new ParametersViewModel(_revitRepository, this);
+            _parametersViewModel = new ApartmentsParamsVM(_revitRepository, this);
             _prioritiesViewModel = new PrioritiesViewModel(this);
 
             _loadUtp = true;
@@ -162,7 +163,9 @@ namespace RevitDeclarations.ViewModels {
         }
 
         private void SaveConfig() {
-            var config = PluginConfig.GetPluginConfig();
+            var config = ApartmentsConfig.GetPluginConfig();
+
+            ApartmentsSettings settings = (ApartmentsSettings) _settings;
 
             var configSettings =
                 config.GetSettings(_revitRepository.Document) ?? config.AddSettings(_revitRepository.Document);
@@ -183,19 +186,19 @@ namespace RevitDeclarations.ViewModels {
             configSettings.GroupingByGroupParam = _settings.GroupingByGroupParam?.Definition.Name;
             configSettings.MultiStoreyParam = _settings.MultiStoreyParam?.Definition.Name;
 
-            configSettings.ApartmentFullNumberParam = _settings.ApartmentFullNumberParam?.Definition.Name;
+            configSettings.ApartmentFullNumberParam = settings.ApartmentFullNumberParam?.Definition.Name;
             configSettings.DepartmentParam = _settings.DepartmentParam?.Definition.Name;
             configSettings.LevelParam = _settings.LevelParam?.Definition.Name;
             configSettings.SectionParam = _settings.SectionParam?.Definition.Name;
             configSettings.BuildingParam = _settings.BuildingParam?.Definition.Name;
             configSettings.ApartmentNumberParam = _settings.ApartmentNumberParam?.Definition.Name;
             configSettings.ApartmentAreaParam = _settings.ApartmentAreaParam?.Definition.Name;
-            configSettings.ApartmentAreaCoefParam = _settings.ApartmentAreaCoefParam?.Definition.Name;
-            configSettings.ApartmentAreaLivingParam = _settings.ApartmentAreaLivingParam?.Definition.Name;
-            configSettings.RoomsAmountParam = _settings.RoomsAmountParam?.Definition.Name;
+            configSettings.ApartmentAreaCoefParam = settings.ApartmentAreaCoefParam?.Definition.Name;
+            configSettings.ApartmentAreaLivingParam = settings.ApartmentAreaLivingParam?.Definition.Name;
+            configSettings.RoomsAmountParam = settings.RoomsAmountParam?.Definition.Name;
             configSettings.ProjectNameID = _settings.ProjectName;
-            configSettings.ApartmentAreaNonSumParam = _settings.ApartmentAreaNonSumParam?.Definition.Name;
-            configSettings.RoomsHeightParam = _settings.RoomsHeightParam?.Definition.Name;
+            configSettings.ApartmentAreaNonSumParam = settings.ApartmentAreaNonSumParam?.Definition.Name;
+            configSettings.RoomsHeightParam = settings.RoomsHeightParam?.Definition.Name;
 
             configSettings.RoomAreaParam = _settings.RoomAreaParam?.Definition.Name;
             configSettings.RoomAreaCoefParam = _settings.RoomAreaCoefParam?.Definition.Name;
@@ -206,7 +209,7 @@ namespace RevitDeclarations.ViewModels {
         }
 
         private void LoadConfig() {
-            var config = PluginConfig.GetPluginConfig();
+            var config = ApartmentsConfig.GetPluginConfig();
             var configSettings = config.GetSettings(_revitRepository.Document);
 
             if(configSettings is null)
