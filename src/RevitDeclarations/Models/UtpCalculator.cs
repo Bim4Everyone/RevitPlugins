@@ -20,7 +20,7 @@ namespace RevitDeclarations.Models {
         private readonly StringComparison _strComparison = StringComparison.OrdinalIgnoreCase;
 
         private readonly ApartmentsProject _project;
-        private readonly DeclarationSettings _settings;
+        private readonly ApartmentsSettings _settings;
         private readonly PrioritiesConfig _priorities;
 
         private readonly bool _hasNullAreas;
@@ -36,7 +36,7 @@ namespace RevitDeclarations.Models {
 
         public UtpCalculator(ApartmentsProject project, DeclarationSettings settings) {
             _project = project;
-            _settings = settings;
+            _settings = (ApartmentsSettings) settings;
 
             _hasNullAreas = CheckUtpNullAreas();
             _hasBannedNames = GetBannedUtpRoomNames().Any();
