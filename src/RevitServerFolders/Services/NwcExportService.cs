@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -97,7 +98,7 @@ namespace RevitServerFolders.Services {
 #else
                                 .WherePasses(new VisibleInViewFilter(document, navisView.Id))
 #endif
-                        .Any(e => e.Category != null && e.GetSolids().Any(s => s.Volume > 0)); // Ищем геометрию на виде
+                                .Any(e => e.Category != null && ElementHasGeometry(e)); // Ищем геометрию на виде
 
                         if(!hasElements) {
                             _loggerService.Warning(
@@ -129,6 +130,17 @@ namespace RevitServerFolders.Services {
             } finally {
                 _revitRepository.Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
                 _revitRepository.UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
+            }
+        }
+
+        private bool ElementHasGeometry(Element element) {
+            try {
+                return element.GetSolids().Any(s => s?.Volume > 0);
+            } catch(Exception ex) when(
+            ex is System.ArgumentNullException
+            || ex is System.NullReferenceException
+            || ex is Autodesk.Revit.Exceptions.ApplicationException) {
+                return false;
             }
         }
 
