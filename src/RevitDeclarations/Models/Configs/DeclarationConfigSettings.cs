@@ -26,6 +26,8 @@ namespace RevitDeclarations.Models {
         public string LevelParam { get; set; }
         public string SectionParam { get; set; }
         public string BuildingParam { get; set; }
+        public string RoomNameParam { get; set; }
+        public string RoomNumberParam { get; set; }
         public string RoomAreaParam { get; set; }
         public string ApartmentAreaParam { get; set; }
         public string ApartmentNumberParam { get; set; }

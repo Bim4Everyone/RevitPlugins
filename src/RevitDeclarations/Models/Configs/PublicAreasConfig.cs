@@ -44,7 +44,9 @@ namespace RevitDeclarations.Models {
                 ApartmentAreaParam = SharedParamsConfig.Instance.ApartmentArea.Name,
                 RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
                 AddPostfixToNumber = true,
-                ProjectNameID = ""
+                ProjectNameID = "",
+                RoomNameParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME),
+                RoomNumberParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER)
             };
         }
     }

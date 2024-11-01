@@ -55,6 +55,8 @@ namespace RevitDeclarations.Models {
                 ConstrWorksNumberParam = SharedParamsConfig.Instance.ConstructionWorksNumber.Name,
                 AddPostfixToNumber = true,
                 GroupNameParam = SharedParamsConfig.Instance.ApartmentGroupName.Name,
+                RoomNameParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME),
+                RoomNumberParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER)
             };
         }
     }

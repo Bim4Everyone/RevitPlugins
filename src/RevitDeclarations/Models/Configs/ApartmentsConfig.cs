@@ -65,6 +65,8 @@ namespace RevitDeclarations.Models.Configs {
 
                 RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
                 RoomAreaCoefParam = SharedParamsConfig.Instance.RoomAreaWithRatio.Name,
+                RoomNameParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME),
+                RoomNumberParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER)
             };
         }
     }
