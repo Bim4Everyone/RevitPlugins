@@ -29,9 +29,12 @@ namespace RevitDeclarations {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<PublicAreasSettings>()
+                    .ToSelf()
+                    .InSingletonScope();
 
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
+                kernel.Bind<PublicAreasConfig>()
+                    .ToMethod(c => PublicAreasConfig.GetPluginConfig());
 
                 kernel.Bind<PublicAreasMainVM>().ToSelf();
                 kernel.Bind<PublicAreasMainWindow>().ToSelf()

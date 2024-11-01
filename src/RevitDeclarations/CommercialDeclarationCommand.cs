@@ -29,9 +29,12 @@ namespace RevitDeclarations {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<CommercialSettings>()
+                    .ToSelf()
+                    .InSingletonScope();
 
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
+                kernel.Bind<CommercialConfig>()
+                    .ToMethod(c => CommercialConfig.GetPluginConfig());
 
                 kernel.Bind<CommercialMainVM>().ToSelf();
                 kernel.Bind<CommercialMainWindow>().ToSelf()

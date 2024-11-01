@@ -14,6 +14,7 @@ using dosymep.Bim4Everyone.SimpleServices;
 using Ninject;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Models.Configs;
 using RevitDeclarations.ViewModels;
 using RevitDeclarations.Views;
 
@@ -29,9 +30,12 @@ namespace RevitDeclarations {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-					
-				kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
+                kernel.Bind<ApartmentsSettings>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                kernel.Bind<ApartmentsConfig>()
+                    .ToMethod(c => ApartmentsConfig.GetPluginConfig());
 				
 				kernel.Bind<ApartmentsMainVM>().ToSelf();
 				kernel.Bind<ApartmentsMainWindow>().ToSelf()
