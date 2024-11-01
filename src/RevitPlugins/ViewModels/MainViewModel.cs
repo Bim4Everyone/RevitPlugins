@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Windows.Input;
 
 using Autodesk.Revit.UI;
@@ -20,10 +20,10 @@ namespace RevitPlugins.ViewModels {
         private string _saveProperty;
 
         public MainViewModel(
-            PluginConfig pluginConfig, 
-            RevitRepository revitRepository, 
+            PluginConfig pluginConfig,
+            RevitRepository revitRepository,
             ILocalizationService localizationService) {
-            
+
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _localizationService = localizationService;
@@ -52,7 +52,7 @@ namespace RevitPlugins.ViewModels {
         private void AcceptView() {
             SaveConfig();
         }
-        
+
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(SaveProperty)) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");

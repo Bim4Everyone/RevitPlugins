@@ -1,11 +1,10 @@
-﻿using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
-namespace RevitPlugins.Models
-{
+namespace RevitPlugins.Models {
     public class PluginConfig : ProjectConfig<RevitSettings> {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
@@ -20,7 +19,7 @@ namespace RevitPlugins.Models
                 .Build<PluginConfig>();
         }
     }
-    
+
     public class RevitSettings : ProjectSettings {
         public string SaveProperty { get; set; }
         public override string ProjectName { get; set; }
