@@ -1,4 +1,4 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -16,10 +16,10 @@ namespace RevitPluginTemplate.ViewModels {
         private string _saveProperty;
 
         public MainViewModel(
-            PluginConfig pluginConfig, 
-            RevitRepository revitRepository, 
+            PluginConfig pluginConfig,
+            RevitRepository revitRepository,
             ILocalizationService localizationService) {
-            
+
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _localizationService = localizationService;
@@ -48,10 +48,10 @@ namespace RevitPluginTemplate.ViewModels {
         private void AcceptView() {
             SaveConfig();
         }
-        
+
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText =  _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
                 return false;
             }
 
