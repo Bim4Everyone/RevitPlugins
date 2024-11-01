@@ -71,6 +71,7 @@
                 Margin="10"
                 Content="{DynamicResource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
+                IsDefault="True"
                 Command="{Binding AcceptViewCommand}" />
 
             <Button
