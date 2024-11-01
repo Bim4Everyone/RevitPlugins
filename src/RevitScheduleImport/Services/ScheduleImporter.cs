@@ -138,6 +138,7 @@ namespace RevitScheduleImport.Services {
             if(tableSectionData.NeedsRefresh) {
                 tableSectionData.RefreshData();
             }
+            _revitRepository.Document.Regenerate(); // если не вызвать, размер шрифта на листе может не обновиться
         }
 
         private TableSectionData FillTable(TableSectionData tableSectionData, IXLWorksheet worksheet) {
@@ -166,7 +167,7 @@ namespace RevitScheduleImport.Services {
                 BorderBottomLineStyle = ElementId.InvalidElementId,
                 BorderLeftLineStyle = ElementId.InvalidElementId,
                 BorderRightLineStyle = ElementId.InvalidElementId,
-                TextSize = cell.Style.Font.FontSize,
+                TextSize = _lengthConverter.ConvertExcelFontSizeToInternal(cell.Style.Font.FontSize),
                 IsFontItalic = cell.Style.Font.Italic,
                 IsFontBold = cell.Style.Font.Bold,
                 IsFontUnderline = cell.Style.Font.Underline != XLFontUnderlineValues.None,

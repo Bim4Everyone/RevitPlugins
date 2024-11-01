@@ -15,6 +15,14 @@ namespace RevitScheduleImport.Services {
         private const double _excelHeightToMm = 0.344086;
         private readonly double _footInMm;
 
+        /// <summary>
+        /// Коэффициент, на который надо умножить количество пунктов высоты текста из Excel,<br/>
+        /// чтобы получить количество пунктов в Revit,<br/>
+        /// чтобы по итогу значение высоты текста в мм было одинаковым.<br/>
+        /// Получен эмпирическим путем из размеров текста при печати из Excel и Revit.
+        /// </summary>
+        private const double _excelPtToRvtPt = 0.842519685;
+
         public LengthConverter() {
             _footInMm = ConvertFromInternal(1);
         }
@@ -58,6 +66,15 @@ namespace RevitScheduleImport.Services {
             // https://github.com/ClosedXML/ClosedXML/wiki/Cell-Dimensions#height
             // поэтому берем коэффициент перевода, полученный из размеров ячеек при печати листа Excel
             return excelRowHeight * _excelHeightToMm / _footInMm;
+        }
+
+        /// <summary>
+        /// Конвертирует высоту текста в пунктах Excel в высоту текста в единицах Revit
+        /// </summary>
+        /// <param name="excelFontSize">Высота текста в пунктах в Excel</param>
+        /// <returns>Высота текста в единицах Revit</returns>
+        public double ConvertExcelFontSizeToInternal(double excelFontSize) {
+            return excelFontSize * _excelPtToRvtPt;
         }
     }
 }
