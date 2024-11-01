@@ -71,7 +71,7 @@ namespace RevitPlugins.ViewModels {
 
         private void SaveConfig() {
             var setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                          ?? _pluginConfig.AddSettings(_revitRepository.Document);
+                ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
             setting.SaveProperty = SaveProperty;
             _pluginConfig.SaveProjectConfig();
