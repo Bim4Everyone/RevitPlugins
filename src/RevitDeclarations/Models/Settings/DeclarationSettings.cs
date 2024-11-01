@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
-    internal class DeclarationSettings {
+    internal abstract class DeclarationSettings {
         public ICollection<RoomPriority> Priorities => PrioritiesConfig.Priorities;
         public PrioritiesConfig PrioritiesConfig { get; set; }
         public IReadOnlyCollection<RoomPriority> UsedPriorities => PrioritiesConfig
@@ -22,60 +22,23 @@ namespace RevitDeclarations.Models {
                 .Select(x => x.Name)
                 .ToList();
         public string[] BannedRoomNames => PrioritiesConfig.BannedRoomNames;
-        public ParametersViewModel ParametersVM { get; set; }
 
+        public virtual ParametersViewModel ParametersVM { get; set; }
         public Parameter FilterRoomsParam => ParametersVM.SelectedFilterRoomsParam;
         public string FilterRoomsValue => ParametersVM.FilterRoomsValue;
         public Parameter GroupingBySectionParam => ParametersVM.SelectedGroupingBySectionParam;
         public Parameter GroupingByGroupParam => ParametersVM.SelectedGroupingByGroupParam;
         public Parameter MultiStoreyParam => ParametersVM.SelectedMultiStoreyParam;
-
-        public Parameter ApartmentFullNumberParam => ParametersVM.SelectedFullApartNumParam;
-        public Parameter DepartmentParam => ParametersVM.SelectedDepartmentParam;
+        public virtual Parameter DepartmentParam => ParametersVM.SelectedDepartmentParam;
         public Parameter LevelParam => ParametersVM.SelectedLevelParam;
+        public Parameter ApartmentNumberParam => ParametersVM.SelectedApartNumParam;
         public Parameter SectionParam => ParametersVM.SelectedSectionParam;
         public Parameter BuildingParam => ParametersVM.SelectedBuildingParam;
-        public Parameter BuildingNumberParam => ParametersVM.SelectedBuildingNumberParam;
-        public Parameter ConstrWorksNumberParam => ParametersVM.SelectedConstrWorksNumberParam;
-        public Parameter ApartmentNumberParam => ParametersVM.SelectedApartNumParam;
         public Parameter ApartmentAreaParam => ParametersVM.SelectedApartAreaParam;
-        public Parameter ApartmentAreaCoefParam => ParametersVM.SelectedApartAreaCoefParam;
-        public Parameter ApartmentAreaLivingParam => ParametersVM.SelectedApartAreaLivingParam;
-        public Parameter RoomsAmountParam => ParametersVM.SelectedRoomsAmountParam;
         public string ProjectName => ParametersVM.ProjectName;
-        public Parameter ApartmentAreaNonSumParam => ParametersVM.SelectedApartAreaNonSumParam;
-        public Parameter RoomsHeightParam => ParametersVM.SelectedRoomsHeightParam;
-
         public Parameter RoomAreaParam => ParametersVM.SelectedRoomAreaParam;
-        public Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaCoefParam;
-        
-        // Настройки для параметров нежилых помещений
-        public Parameter GroupNameParam => ParametersVM.SelectedGroupNameParam;
-        public bool AddPostfixToNumber => ParametersVM.AddPostfixToNumber;
-
-
-        public IReadOnlyCollection<Parameter> AllParameters => new List<Parameter>() {
-            FilterRoomsParam,
-            //GroupingBySectionParam,
-            //GroupingByGroupParam,
-            //MultiStoreyParam,
-            //ApartmentFullNumberParam,
-            //DepartmentParam,
-            //LevelParam,
-            SectionParam,
-            //BuildingParam,
-            //BuildingNumberParam,
-            //ConstrWorksNumberParam,
-            //ApartmentNumberParam,
-            //ApartmentAreaParam,
-            //ApartmentAreaCoefParam,
-            //ApartmentAreaLivingParam,
-            //RoomsAmountParam,
-            //ApartmentAreaNonSumParam,
-            //RoomsHeightParam,
-            //RoomAreaParam,
-            //RoomAreaCoefParam
-        };
+        public virtual Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaParam;
+        public virtual IReadOnlyCollection<Parameter> AllParameters => new List<Parameter>() { };
 
         public void UpdatePriorities(List<string> newNames) {
             int prioritiesLength = PrioritiesConfig.Priorities.Count;
