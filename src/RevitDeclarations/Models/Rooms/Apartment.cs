@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using pyRevitLabs.Json;
 
-using static Autodesk.Revit.DB.SpecTypeId;
-
 namespace RevitDeclarations.Models {
     internal class Apartment : RoomGroup {
         // Словарь для группировки помещений, входящих в исходные приоритеты
         private readonly Dictionary<string, List<RoomElement>> _mainRooms;
         // Словарь для группировки помещений, не входящих в исходные приоритеты
         private readonly Dictionary<string, List<RoomElement>> _nonConfigRooms;
+
+        private readonly ApartmentsSettings _settings;
 
         private double _areaMainRevit;
         private double _areaCoefRevit;
@@ -30,6 +30,7 @@ namespace RevitDeclarations.Models {
 
         public Apartment(IEnumerable<RoomElement> rooms, DeclarationSettings settings) 
             : base(rooms, settings) {
+            _settings = (ApartmentsSettings) settings;
             _mainRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
             _nonConfigRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
 
@@ -43,6 +44,9 @@ namespace RevitDeclarations.Models {
 
             CalculateRevitAreas();
         }
+
+        [JsonProperty("full_number")]
+        public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
 
         [JsonProperty("type")]
         public override string Department {
@@ -62,6 +66,13 @@ namespace RevitDeclarations.Models {
         public double AreaNonSummer => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaNonSumParam, _accuracy);
         [JsonProperty("room_size")]
         public int RoomsAmount => _firstRoom.GetIntParamValue(_settings.RoomsAmountParam);
+        [JsonProperty("building_number")]
+        public string BuildingNumber => _firstRoom.GetTextParamValue(_settings.BuildingNumberParam);
+        [JsonProperty("construction_works")]
+        public string ConstrWorksNumber => _firstRoom.GetTextParamValue(_settings.ConstrWorksNumberParam);
+
+        [JsonProperty("ceiling_height")]
+        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracy);
 
         [JsonIgnore]
         public string UtpTwoBaths => _utpTwoBaths;

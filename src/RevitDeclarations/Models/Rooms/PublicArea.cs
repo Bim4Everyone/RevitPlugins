@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 namespace RevitDeclarations.Models
 {
     internal class PublicArea : RoomGroup {
+        private readonly PublicAreasSettings _settings;
+
         public PublicArea(IEnumerable<RoomElement> rooms, DeclarationSettings settings)
             : base(rooms, settings) {
+            _settings = (PublicAreasSettings)settings;
         }
 
         public override string Number {

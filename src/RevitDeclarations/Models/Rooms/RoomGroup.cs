@@ -10,7 +10,7 @@ namespace RevitDeclarations.Models {
 
         private protected readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
 
-        private protected readonly DeclarationSettings _settings;
+        private readonly DeclarationSettings _settings;
         private protected readonly int _accuracy;
 
         private protected readonly IEnumerable<RoomElement> _rooms;
@@ -31,11 +31,9 @@ namespace RevitDeclarations.Models {
 
         [JsonProperty("rooms")]
         public IEnumerable<RoomElement> Rooms => _rooms;
-
-        [JsonProperty("full_number")]
-        public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
         [JsonProperty("type")]
         public virtual string Department => _firstRoom.GetTextParamValue(_settings.DepartmentParam);
+
         [JsonProperty("floor_number")]
         public string Level {
             get {
@@ -45,19 +43,14 @@ namespace RevitDeclarations.Models {
                 return string.Join(",", levelNames);
             }
         }
+        [JsonProperty("number")]
+        public virtual string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
         [JsonProperty("section")]
         public string Section => _firstRoom.GetTextParamValue(_settings.SectionParam);
         [JsonProperty("building")]
         public string Building => _firstRoom.GetTextParamValue(_settings.BuildingParam);
-        [JsonProperty("building_number")]
-        public string BuildingNumber => _firstRoom.GetTextParamValue(_settings.BuildingNumberParam);
-        [JsonProperty("construction_works")]
-        public string ConstrWorksNumber => _firstRoom.GetTextParamValue(_settings.ConstrWorksNumberParam);
-        [JsonProperty("number")]
-        public virtual string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
+
         [JsonProperty("area")]
         public virtual double AreaMain => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy);
-        [JsonProperty("ceiling_height")]
-        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracy);
     }
 }

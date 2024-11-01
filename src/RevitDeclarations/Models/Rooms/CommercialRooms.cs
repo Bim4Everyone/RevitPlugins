@@ -11,10 +11,19 @@ using pyRevitLabs.Json;
 
 namespace RevitDeclarations.Models {
     internal class CommercialRooms : RoomGroup {
+        private readonly CommercialSettings _settings;
 
         public CommercialRooms(IEnumerable<RoomElement> rooms, DeclarationSettings settings)
             : base(rooms, settings) {
+            _settings = (CommercialSettings) settings;
         }
+
+        [JsonProperty("building_number")]
+        public string BuildingNumber => _firstRoom.GetTextParamValue(_settings.BuildingNumberParam);
+        [JsonProperty("construction_works")]
+        public string ConstrWorksNumber => _firstRoom.GetTextParamValue(_settings.ConstrWorksNumberParam);
+        [JsonProperty("ceiling_height")]
+        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracy);
 
         [JsonProperty("type")]
         public override string Department {
