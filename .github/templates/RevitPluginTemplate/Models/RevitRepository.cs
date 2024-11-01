@@ -10,7 +10,6 @@ namespace RevitPluginTemplate.Models {
 
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
     }
