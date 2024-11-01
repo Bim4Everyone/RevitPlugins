@@ -21,7 +21,10 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
             // получаем трансформацию от начала проекта первого задания
             var transform = _group.Elements.First().GetFamilyInstance().GetTotalTransform();
             // находим бокс, ограничивающий все задания из группы в координатах относительно первого задания
-            var bb = _group.Elements.Select(item => SolidUtils.CreateTransformed(item.GetSolid(), transform.Inverse).GetTransformedBoundingBox())
+            var bb = _group.Elements
+                .Select(item => SolidUtils
+                    .CreateTransformed(item.GetSolid(), transform.Inverse)
+                    .GetTransformedBoundingBox())
                 .ToList()
                 .CreateUnitedBoundingBox();
             var center = bb.Min + (bb.Max - bb.Min) / 2;
