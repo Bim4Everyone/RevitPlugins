@@ -145,6 +145,10 @@ namespace RevitDeclarations.ViewModels {
             SelectedRoomsHeightParam = DoubleParameters
                 .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.RoomsHeightParam);
 
+            SelectedRoomNumberParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.RoomNumberParam);
+            SelectedRoomNameParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.RoomNameParam);
             SelectedRoomAreaParam = DoubleParameters
                 .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.RoomAreaParam);
             SelectedRoomAreaCoefParam = DoubleParameters
