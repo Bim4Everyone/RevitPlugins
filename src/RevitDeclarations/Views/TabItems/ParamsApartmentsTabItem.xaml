@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:RevitDeclarations.Views"
              mc:Ignorable="d" 
              Background="White"
-             Height="740" Width="630">
+             Height="770" Width="630">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -116,6 +116,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -151,26 +152,75 @@
                 Grid.Column="1"
                 Grid.Row="1"
                 Style="{StaticResource ParameterName}"
-                Text="Значение параметра фильтрации квартир:"/>
-            <TextBox
+                Text="Значения параметра фильтрации квартир:"/>
+            <Grid
                 Grid.Column="2"
                 Grid.Row="1"
+                Margin="10, 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="70"/>
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    Grid.Column="0"
+                    Text="{Binding FilterRoomsValue}"/>
+                <Button
+                    Grid.Column="1"                    
+                    Content="Добавить"
+                    Command="{Binding AddFilterCommand}"/>
+            </Grid> 
+
+            <ItemsControl
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Grid.Row="2"
                 Margin="10, 0"
-                Text="{Binding FilterRoomsValue}"/>
+                Height="30"                
+                ItemsSource="{Binding FilterRoomsValues}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel                            
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button 
+                            Width="Auto"
+                            Margin="4"
+                            Padding="3"
+                            Background="#e9f0f0"
+                            BorderThickness="0"
+                            Command="{Binding RemoveFilterCommand}">
+                            <DockPanel>
+                                <TextBlock
+                                    DockPanel.Dock="Left"
+                                    Text="{Binding Value}"/>
+                                <TextBlock
+                                    DockPanel.Dock="Right"
+                                    FontWeight="Bold"
+                                    FontSize="10"                                
+                                    Text="  x"/>
+                            </DockPanel>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
             <Button
                 Grid.Column="0"
-                Grid.Row="2"
+                Grid.Row="3"
                 ToolTip="{Binding ParameterToolTip.GroupBySectionParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
-                Grid.Row="2"
+                Grid.Row="3"
                 Style="{StaticResource ParameterName}"
                 Text="Параметр принадлежности к секции:"/>
             <ComboBox
                 Grid.Column="2"
-                Grid.Row="2"
+                Grid.Row="3"
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
@@ -178,17 +228,17 @@
 
             <Button
                 Grid.Column="0"
-                Grid.Row="3"
+                Grid.Row="4"
                 ToolTip="{Binding ParameterToolTip.GroupByGroupParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
-                Grid.Row="3"
+                Grid.Row="4"
                 Style="{StaticResource ParameterName}"
                 Text="Параметр принадлежности к квартире:"/>
             <ComboBox
                 Grid.Column="2"
-                Grid.Row="3"
+                Grid.Row="4"
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
@@ -196,17 +246,17 @@
 
             <Button
                 Grid.Column="0"
-                Grid.Row="4"
+                Grid.Row="5"
                 ToolTip="{Binding ParameterToolTip.MultiStoreyParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
-                Grid.Row="4"
+                Grid.Row="5"
                 Style="{StaticResource ParameterName}"
                 Text="Параметр группировки многоуровневых квартир:"/>
             <ComboBox
                 Grid.Column="2"
-                Grid.Row="4"
+                Grid.Row="5"
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"

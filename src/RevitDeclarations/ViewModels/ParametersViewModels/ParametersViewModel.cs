@@ -9,6 +9,7 @@ using dosymep.WPF.ViewModels;
 
 using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone.ProjectConfigs;
+using System.Collections.ObjectModel;
 
 namespace RevitDeclarations.ViewModels {
     internal class ParametersViewModel : BaseViewModel {
@@ -24,6 +25,7 @@ namespace RevitDeclarations.ViewModels {
 
         private Parameter _selectedFilterRoomsParam;
         private string _filterRoomsValue;
+        private ObservableCollection<FilterRoomValueVM> _filterRoomsValues;
         private Parameter _selectedSectionRoomParam;
         private Parameter _selectedGroupRoomParam;
         private Parameter _selectedMultiStoreyParam;
@@ -53,10 +55,14 @@ namespace RevitDeclarations.ViewModels {
 
             _parameterToolTip = new ParameterToolTip();
 
+            _filterRoomsValues = new ObservableCollection<FilterRoomValueVM>();
+
+            AddFilterCommand = new RelayCommand(AddFilter);
             SetLastConfigCommand = new RelayCommand(SetLastParamConfig);
             SetCompanyConfigCommand = new RelayCommand(SetCompanyParamConfig);
         }
 
+        public ICommand AddFilterCommand { get; }
         public ICommand SetLastConfigCommand { get; }
         public ICommand SetCompanyConfigCommand { get; }
 
@@ -88,6 +94,10 @@ namespace RevitDeclarations.ViewModels {
         public string FilterRoomsValue {
             get => _filterRoomsValue;
             set => RaiseAndSetIfChanged(ref _filterRoomsValue, value);
+        }
+        public ObservableCollection<FilterRoomValueVM> FilterRoomsValues {
+            get => _filterRoomsValues;
+            set => RaiseAndSetIfChanged(ref _filterRoomsValues, value);
         }
         public Parameter SelectedGroupingBySectionParam {
             get => _selectedSectionRoomParam;
@@ -152,6 +162,17 @@ namespace RevitDeclarations.ViewModels {
 
         public virtual List<Parameter> GetAllParametrs() {
             return new List<Parameter> {};
+        }
+
+        public void AddFilter(object obj) {
+            if(!string.IsNullOrEmpty(_filterRoomsValue)) {
+                _filterRoomsValues.Add(new FilterRoomValueVM(this, _filterRoomsValue));
+            }
+            FilterRoomsValue = "";
+        }
+
+        public void RemoveFilter(FilterRoomValueVM filterValue) {
+            _filterRoomsValues.Remove(filterValue);
         }
 
         public virtual void SetLastParamConfig(object obj) { }

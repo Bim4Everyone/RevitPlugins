@@ -17,7 +17,7 @@ namespace RevitDeclarations.Models {
         public List<string> RevitDocuments { get; set; } = new List<string>();
 
         public string FilterRoomsParam { get; set; }
-        public string FilterRoomsValue { get; set; }
+        public string[] FilterRoomsValues { get; set; }
         public string GroupingBySectionParam { get; set; }
         public string GroupingByGroupParam { get; set; }
         public string MultiStoreyParam { get; set; }

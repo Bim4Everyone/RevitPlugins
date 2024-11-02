@@ -42,7 +42,7 @@ namespace RevitDeclarations.Models.Configs {
         public ApartmnetsConfigSettings GetCompanyConfig() {
             return new ApartmnetsConfigSettings() {
                 FilterRoomsParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
-                FilterRoomsValue = "квартира",
+                FilterRoomsValues = new [] {"квартира"},
                 GroupingBySectionParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
                 GroupingByGroupParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
                 MultiStoreyParam = SharedParamsConfig.Instance.RoomMultilevelGroup.Name,

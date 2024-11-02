@@ -25,7 +25,7 @@ namespace RevitDeclarations.Models {
 
         public virtual ParametersViewModel ParametersVM { get; set; }
         public Parameter FilterRoomsParam => ParametersVM.SelectedFilterRoomsParam;
-        public string FilterRoomsValue => ParametersVM.FilterRoomsValue;
+        public string[] FilterRoomsValues => ParametersVM.FilterRoomsValues.Select(x => x.Value).ToArray();
         public Parameter GroupingBySectionParam => ParametersVM.SelectedGroupingBySectionParam;
         public Parameter GroupingByGroupParam => ParametersVM.SelectedGroupingByGroupParam;
         public Parameter MultiStoreyParam => ParametersVM.SelectedMultiStoreyParam;

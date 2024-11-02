@@ -181,7 +181,7 @@ namespace RevitDeclarations.ViewModels {
                 .ToList();
 
             configSettings.FilterRoomsParam = _settings.FilterRoomsParam?.Definition.Name;
-            configSettings.FilterRoomsValue = _settings.FilterRoomsValue;
+            configSettings.FilterRoomsValues = _settings.FilterRoomsValues;
             configSettings.GroupingBySectionParam = _settings.GroupingBySectionParam?.Definition.Name;
             configSettings.GroupingByGroupParam = _settings.GroupingByGroupParam?.Definition.Name;
             configSettings.MultiStoreyParam = _settings.MultiStoreyParam?.Definition.Name;

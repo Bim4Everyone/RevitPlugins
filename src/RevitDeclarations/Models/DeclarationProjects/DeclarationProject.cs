@@ -40,7 +40,7 @@ namespace RevitDeclarations.Models {
 
         private IReadOnlyCollection<RoomElement> FilterDeclarationRooms(IEnumerable<RoomElement> rooms) {
             Parameter filterParam = _settings.FilterRoomsParam;
-            string[] filterValues = _settings.FilterRoomsValue.Split(',');
+            string[] filterValues = _settings.FilterRoomsValues;
             StringComparer strComparer = StringComparer.OrdinalIgnoreCase;
 
             return rooms

@@ -166,7 +166,6 @@ namespace RevitDeclarations.ViewModels {
                 return false;
             }
             if(hasEmptyParameters
-                || string.IsNullOrEmpty(_parametersViewModel.FilterRoomsValue)
                 || string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
                 ErrorText = "Не выбран параметр на вкладке \"Параметры\"";
                 return false;

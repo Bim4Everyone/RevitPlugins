@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,7 +63,8 @@ namespace RevitDeclarations.ViewModels {
             CommercialConfigSettings commercialConfigSettings = (CommercialConfigSettings) configSettings;
             SelectedFilterRoomsParam = TextParameters
                 .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.FilterRoomsParam);
-            FilterRoomsValue = commercialConfigSettings.FilterRoomsValue;
+            FilterRoomsValues = new ObservableCollection<FilterRoomValueVM>(
+                commercialConfigSettings.FilterRoomsValues.Select(x => new FilterRoomValueVM(this, x)));
             SelectedGroupingBySectionParam = TextParameters
                 .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.GroupingBySectionParam);
             SelectedGroupingByGroupParam = TextParameters

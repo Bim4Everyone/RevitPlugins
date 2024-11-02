@@ -36,7 +36,7 @@ namespace RevitDeclarations.Models {
         public CommercialConfigSettings GetCompanyConfig() {
             return new CommercialConfigSettings() {
                 FilterRoomsParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
-                FilterRoomsValue = "Нежилое помещение,Машино-место,Кладовая",
+                FilterRoomsValues = new[] { "нежилое помещение", "машино-место", "кладовая" },
                 GroupingBySectionParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
                 GroupingByGroupParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER),
                 MultiStoreyParam = SharedParamsConfig.Instance.RoomMultilevelGroup.Name,

@@ -32,7 +32,7 @@ namespace RevitDeclarations.Models {
         public PublicAreasConfigSettings GetCompanyConfig() {
             return new PublicAreasConfigSettings() {
                 FilterRoomsParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
-                FilterRoomsValue = "общественное; техническое",
+                FilterRoomsValues = new[] { "общественное", "техническое" },
                 GroupingBySectionParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
                 GroupingByGroupParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER),
                 MultiStoreyParam = SharedParamsConfig.Instance.RoomMultilevelGroup.Name,
