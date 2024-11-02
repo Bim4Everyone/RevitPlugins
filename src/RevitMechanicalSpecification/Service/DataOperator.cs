@@ -102,6 +102,25 @@ namespace RevitMechanicalSpecification.Service {
             return instance;
         }
 
+        public static Element GetInsulationOfCurve(Element element, Document document) {
+
+            foreach(ElementId elementId in element.GetDependentElements(null)) {
+                Element subElement = document.GetElement(elementId);
+                if(subElement == null) {
+                    continue;
+                }
+
+                if(subElement.Category.IsId(BuiltInCategory.OST_PipeInsulations)) {
+                    return subElement;
+                }
+
+                if(subElement.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
+                    return subElement;
+                }
+            }
+            return null;
+        }
+
         /// <summary>
         /// Возвращает субкомпоненты и субкомпоненты субкомпонентов
         /// </summary>

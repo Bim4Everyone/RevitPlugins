@@ -16,14 +16,20 @@ using dosymep.Bim4Everyone;
 
 namespace RevitMechanicalSpecification.Service {
 
+
+
     internal class CollectionFactory {
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
         private readonly UIDocument _uidocument;
         private readonly List<BuiltInCategory> _mechanicalCategories;
+        private readonly bool _useGroups;
+        private readonly List<BuiltInCategory> _elementsCanBeInsulated;
 
         public CollectionFactory(Document doc, SpecConfiguration specConfiguration, UIDocument uIDocument) {
             _document = doc;
+            // временное дополнение. Если в проекте есть ФОП_ВИС_Число ДЕ - группы должны обрабатываться.
+            _useGroups = _document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency);
             _uidocument = uIDocument;
             _specConfiguration = specConfiguration;
             _mechanicalCategories = new List<BuiltInCategory>()
@@ -43,6 +49,12 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInCategory.OST_PlumbingFixtures,
                 BuiltInCategory.OST_Sprinklers,
                 BuiltInCategory.OST_CableTray
+            };
+            _elementsCanBeInsulated = new List<BuiltInCategory>() {
+                BuiltInCategory.OST_DuctFitting,
+                BuiltInCategory.OST_PipeFitting,
+                BuiltInCategory.OST_PipeCurves,
+                BuiltInCategory.OST_DuctCurves
             };
         }
 
@@ -81,6 +93,7 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         public List<Element> GetSelectedElementsByCategories() {
             var filter = new ElementMulticategoryFilter(_mechanicalCategories);
+            var result = new List<Element>();
 
             var selectedElements = _uidocument.GetSelectedElements();
 
@@ -89,16 +102,27 @@ namespace RevitMechanicalSpecification.Service {
                 .ToList();
 
             // Если выделять объект с вложениями, они не будут выделены. Нужно проверить в выборке на наличие
+            // то же самое касается изоляции
             foreach(Element element in filteredElements) {
                 if(element is FamilyInstance instance) {
                     List<Element> subElements = DataOperator.GetSub(instance, _document);
                     if(subElements.Count > 0) {
-                        filteredElements.Concat(subElements);
+                        result.AddRange(subElements);
+                    }
+                }
+
+                if(element.InAnyCategory(_elementsCanBeInsulated)) {
+                    Element insulation = DataOperator.GetInsulationOfCurve(element, _document);
+                    if(insulation != null) {
+                        result.Add(insulation);
                     }
                 }
             }
 
-            return filteredElements;
+            // Добавляем отфильтрованные элементы в результат
+            result.AddRange(filteredElements);
+
+            return result;
         }
 
         /// <summary>
@@ -138,17 +162,12 @@ namespace RevitMechanicalSpecification.Service {
         /// <param name="element"></param>
         /// <returns></returns>
         private bool ElementNotInGroupOrModelText(Element element) {
-
             if(element is ModelText) {
                 return false;
             }
 
-            // временное дополнение. Если в проекте есть ФОП_ВИС_Число ДЕ - группы должны обрабатываться.
-            if(!_document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
-                if(element.GroupId.IsNull()) {
-                    return true;
-                }
-                return false;
+            if(!_useGroups && element.GroupId.IsNull()) {
+                return true;
             }
 
             return true;
