@@ -90,6 +90,11 @@ namespace RevitDeclarations.ViewModels {
                 .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.RoomsHeightParam);
             ProjectName = commercialConfigSettings.ProjectNameID;
 
+            SelectedRoomNumberParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.RoomNumberParam);
+            SelectedRoomNameParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.RoomNameParam);
+
             SelectedRoomAreaParam = DoubleParameters
                 .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.RoomAreaParam);
             SelectedGroupNameParam = TextParameters
