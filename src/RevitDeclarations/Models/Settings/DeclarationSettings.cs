@@ -38,6 +38,8 @@ namespace RevitDeclarations.Models {
         public string ProjectName => ParametersVM.ProjectName;
         public Parameter RoomAreaParam => ParametersVM.SelectedRoomAreaParam;
         public virtual Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaParam;
+        public Parameter RoomNameParam => ParametersVM.SelectedRoomNameParam;
+        public Parameter RoomNumberParam => ParametersVM.SelectedRoomNumberParam;
         public virtual IReadOnlyCollection<Parameter> AllParameters => new List<Parameter>() { };
 
         public void UpdatePriorities(List<string> newNames) {

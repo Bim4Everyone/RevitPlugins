@@ -263,11 +263,6 @@
                 DisplayMemberPath="Definition.Name"
                 SelectedItem="{Binding SelectedApartNumParam}"/>
 
-            <Button
-                Grid.Column="0"
-                Grid.Row="1"
-                ToolTip="{Binding ParameterToolTip.DepartmentParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="1"
@@ -279,11 +274,6 @@
                 Height="20"
                 IsChecked="{Binding AddPostfixToNumber}"/>
 
-            <Button
-                Grid.Column="0"
-                Grid.Row="2"
-                ToolTip="{Binding ParameterToolTip.DepartmentParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="2"
