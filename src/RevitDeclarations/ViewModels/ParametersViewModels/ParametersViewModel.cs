@@ -35,6 +35,8 @@ namespace RevitDeclarations.ViewModels {
         private Parameter _selectedApartNumParam;
         private string _projectName;
         private Parameter _selectedRoomAreaParam;
+        private Parameter _selectedRoomNameParam;
+        private Parameter _selectedRoomNumberParam;
 
         public ParametersViewModel(RevitRepository revitRepository, MainViewModel mainViewModel) {
             _mainViewModel = mainViewModel;
@@ -131,10 +133,19 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _projectName, value);
         }
 
-
         public Parameter SelectedRoomAreaParam {
             get => _selectedRoomAreaParam;
             set => RaiseAndSetIfChanged(ref _selectedRoomAreaParam, value);
+        }
+
+        public Parameter SelectedRoomNameParam {
+            get => _selectedRoomNameParam;
+            set => RaiseAndSetIfChanged(ref _selectedRoomNameParam, value);
+        }
+
+        public Parameter SelectedRoomNumberParam {
+            get => _selectedRoomNumberParam;
+            set => RaiseAndSetIfChanged(ref _selectedRoomNumberParam, value);
         }
 
         public ParameterToolTip ParameterToolTip => _parameterToolTip;
