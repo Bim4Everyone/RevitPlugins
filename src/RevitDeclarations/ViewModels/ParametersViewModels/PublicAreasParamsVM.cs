@@ -64,7 +64,13 @@ namespace RevitDeclarations.ViewModels {
             SelectedApartAreaParam = DoubleParameters
                 .FirstOrDefault(x => x.Definition.Name == publicAreasConfigSettings.ApartmentAreaParam);
             ProjectName = publicAreasConfigSettings.ProjectNameID;
+            SelectedApartNumParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == publicAreasConfigSettings.ApartmentNumberParam);
 
+            SelectedRoomNumberParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == publicAreasConfigSettings.RoomNumberParam);
+            SelectedRoomNameParam = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == publicAreasConfigSettings.RoomNameParam);
             SelectedRoomAreaParam = DoubleParameters
                 .FirstOrDefault(x => x.Definition.Name == publicAreasConfigSettings.RoomAreaParam);
 
