@@ -190,7 +190,7 @@ namespace RevitOpeningPlacement.Models {
 
         /// <summary>
         /// Возвращает фильтр по всем используемым категориям чистовых проемов в АР
-        /// /// </summary>
+        /// </summary>
         public static ElementFilter GetFilterByAllUsedOpeningsArCategories() {
             return new ElementMulticategoryFilter(GetAllUsedOpeningsCategories());
         }
