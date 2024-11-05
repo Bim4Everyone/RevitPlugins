@@ -546,7 +546,7 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает коллекцию исходящих заданий на отверстия, размещенных в текущем файле Revit
         /// </summary>
         public ICollection<OpeningMepTaskOutcoming> GetPlacedOutcomingTasks() {
-            return GetOpeningsTaskFromCurrentDoc().Select(f => new OpeningMepTaskOutcoming(f)).ToHashSet();
+            return GetOpeningsTasks(_document).Select(f => new OpeningMepTaskOutcoming(f)).ToHashSet();
         }
 
         public void DeleteElements(ICollection<ElementId> elements) {
@@ -824,7 +824,7 @@ namespace RevitOpeningPlacement.Models {
             foreach(RevitLinkInstance link in links) {
                 var linkDoc = link.GetLinkDocument();
                 var transform = link.GetTransform();
-                var genericModelsInLink = GetOpeningsTasksFromDoc(linkDoc)
+                var genericModelsInLink = GetOpeningsTasks(linkDoc)
                     .Select(famInst => new OpeningMepTaskIncoming(famInst, this, transform))
                     .ToHashSet();
                 genericModelsInLinks.UnionWith(genericModelsInLink);
@@ -1105,16 +1105,6 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Выбирает элементы из активного документа по Id
-        /// </summary>
-        /// <param name="elementIds">Коллекция Id элементов из активного документа, которые надо выбрать</param>
-        public void SetSelection(ICollection<ElementId> elementIds) {
-            if(elementIds != null) {
-                _uiDocument.Selection.SetElementIds(elementIds);
-            }
-        }
-
-        /// <summary>
         /// Выбирает элемент из активного документа по Id
         /// </summary>
         /// <param name="elementIds">Id элемента из активного документа, который надо выбрать</param>
@@ -1139,16 +1129,6 @@ namespace RevitOpeningPlacement.Models {
                 return OpeningType.WallRectangle;
             }
             return openingTypeAndFamNameDict
-                .FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase))
-                .Key;
-        }
-
-        /// <summary>
-        /// Возвращает тип архитектурного проема по названию семейств
-        /// </summary>
-        /// <param name="familyName">Название семейства архитектурного проема</param>
-        public static OpeningType GetOpeningRealArType(string familyName) {
-            return OpeningRealArFamilyName
                 .FirstOrDefault(pair => pair.Value.Equals(familyName, StringComparison.CurrentCultureIgnoreCase))
                 .Key;
         }
@@ -1203,18 +1183,14 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         public ICollection<FamilyInstance> GetOpeningsKr(Document document) {
             List<FamilyInstance> elements = new List<FamilyInstance>();
-            elements.AddRange(
-                GetFamilyInstances(document,
-                OpeningRealKrFamilyName[OpeningType.WallRectangle],
-                OpeningRealKrTypeName[OpeningType.WallRectangle]));
-            elements.AddRange(
-                GetFamilyInstances(document,
-                OpeningRealKrFamilyName[OpeningType.WallRound],
-                OpeningRealKrTypeName[OpeningType.WallRound]));
-            elements.AddRange(
-                GetFamilyInstances(document,
-                OpeningRealKrFamilyName[OpeningType.FloorRectangle],
-                OpeningRealKrTypeName[OpeningType.FloorRectangle]));
+            foreach(var openingType in Enum.GetValues(typeof(OpeningType))
+                .OfType<OpeningType>()
+                .Where(t => t != OpeningType.FloorRound)) {
+                elements.AddRange(
+                    GetFamilyInstances(document,
+                    OpeningRealKrFamilyName[openingType],
+                    OpeningRealKrTypeName[openingType]));
+            }
             return elements;
         }
 
@@ -1223,23 +1199,25 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         private ICollection<FamilyInstance> GetOpeningsAr(Document document) {
             List<FamilyInstance> elements = new List<FamilyInstance>();
-            elements.AddRange(
-                GetFamilyInstances(document,
-                OpeningRealArFamilyName[OpeningType.WallRectangle],
-                OpeningRealArTypeName[OpeningType.WallRectangle]));
-            elements.AddRange(
-                GetFamilyInstances(document,
-                OpeningRealArFamilyName[OpeningType.WallRound],
-                OpeningRealArTypeName[OpeningType.WallRound]));
-            elements.AddRange(
-                GetFamilyInstances(document,
-                OpeningRealArFamilyName[OpeningType.FloorRectangle],
-                OpeningRealArTypeName[OpeningType.FloorRectangle]));
-            elements.AddRange(
-                GetFamilyInstances(document,
-                OpeningRealArFamilyName[OpeningType.FloorRound],
-                OpeningRealArTypeName[OpeningType.FloorRound]));
+            foreach(var openingType in Enum.GetValues(typeof(OpeningType)).OfType<OpeningType>()) {
+                elements.AddRange(
+                    GetFamilyInstances(document,
+                    OpeningRealArFamilyName[openingType],
+                    OpeningRealArTypeName[openingType]));
+            }
             return elements;
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию экземпляров семейств заданий на отверстия от ВИС
+        /// </summary>
+        /// <param name="doc">Документ, в котором будет происходить поиск экземпляров семейств</param>
+        /// <returns>Коллекция экземпляров семейств заданий на отверстия от ВИС</returns>
+        private ICollection<FamilyInstance> GetOpeningsTasks(Document doc) {
+            return GetOpeningsMepTasks(doc,
+                Enum.GetValues(typeof(OpeningType))
+                .OfType<OpeningType>()
+                .ToArray());
         }
 
         /// <summary>
@@ -1357,22 +1335,6 @@ namespace RevitOpeningPlacement.Models {
                     System.Windows.MessageBoxResult.OK);
                 throw new OperationCanceledException();
             }
-        }
-
-        /// <summary>
-        /// Возвращает коллекцию экземпляров семейств-заданий на отверстия от инженера из текущего файла ревит 
-        /// ("исходящие" задания).
-        /// </summary>
-        /// <returns>Коллекция экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
-        private ICollection<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
-            return GetOpeningsTasksFromDoc(_document);
-        }
-
-        private ICollection<FamilyInstance> GetOpeningsTasksFromDoc(Document doc) {
-            return GetOpeningsMepTasks(doc,
-                Enum.GetValues(typeof(OpeningType))
-                .OfType<OpeningType>()
-                .ToArray());
         }
 
         private void RotateElement(Element element, Line axis, double angle) {
