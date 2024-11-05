@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 
 using DevExpress.Xpf.Grid;
 
@@ -15,14 +15,6 @@ namespace RevitOpeningPlacement.Views {
         public override string PluginName => nameof(RevitOpeningPlacement);
         public override string ProjectConfigName => nameof(NavigatorArIncomingView);
 
-
-        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-            Close();
-        }
-
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-            Close();
-        }
 
         private void SimpleButton_Click(object sender, RoutedEventArgs e) {
             Close();

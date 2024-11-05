@@ -157,17 +157,5 @@
                 <dxg:GridColumn ReadOnly="True" Width="60" Header="Создатель" FieldName="Username" />
             </dxg:GridControl.Columns>
         </dxg:GridControl>
-
-        <StackPanel Grid.Row="2" Margin="0 10 0 0" Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
-                          Foreground="Orange" />
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
-                          Foreground="Green" />
-            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             Click="ButtonOk_Click"/>
-            <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
-                             Click="ButtonCancel_Click" />
-        </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>
