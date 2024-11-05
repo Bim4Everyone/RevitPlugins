@@ -494,7 +494,7 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         public List<FamilyInstance> GetWallOpeningsMepTasksOutcoming() {
             var wallTypes = new[] { OpeningType.WallRectangle, OpeningType.WallRound };
-            return GetOpeningsMepTasksOutcoming(wallTypes);
+            return GetOpeningsMepTasks(_document, wallTypes);
         }
 
         /// <summary>
@@ -502,7 +502,7 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         public List<FamilyInstance> GetFloorOpeningsMepTasksOutcoming() {
             var floorTypes = new[] { OpeningType.FloorRectangle, OpeningType.FloorRound };
-            return GetOpeningsMepTasksOutcoming(floorTypes);
+            return GetOpeningsMepTasks(_document, floorTypes);
         }
 
         public string GetFamilyName(Element element) {
@@ -824,12 +824,7 @@ namespace RevitOpeningPlacement.Models {
             foreach(RevitLinkInstance link in links) {
                 var linkDoc = link.GetLinkDocument();
                 var transform = link.GetTransform();
-                var genericModelsInLink = new FilteredElementCollector(linkDoc)
-                    .WhereElementIsNotElementType()
-                    .OfCategory(BuiltInCategory.OST_GenericModel)
-                    .OfType<FamilyInstance>()
-                    .Where(item => OpeningTaskTypeName.Any(n => n.Value.Equals(item.Name))
-                                && OpeningTaskFamilyName.Any(n => n.Value.Equals(GetFamilyName(item))))
+                var genericModelsInLink = GetOpeningsTasksFromDoc(linkDoc)
                     .Select(famInst => new OpeningMepTaskIncoming(famInst, this, transform))
                     .ToHashSet();
                 genericModelsInLinks.UnionWith(genericModelsInLink);
@@ -1370,7 +1365,11 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         /// <returns>Коллекция экземпляров семейств, названия семейств и типов которых заданы в соответствующих словарях
         private ICollection<FamilyInstance> GetOpeningsTaskFromCurrentDoc() {
-            return GetOpeningsMepTasksOutcoming(
+            return GetOpeningsTasksFromDoc(_document);
+        }
+
+        private ICollection<FamilyInstance> GetOpeningsTasksFromDoc(Document doc) {
+            return GetOpeningsMepTasks(doc,
                 Enum.GetValues(typeof(OpeningType))
                 .OfType<OpeningType>()
                 .ToArray());
@@ -1409,11 +1408,11 @@ namespace RevitOpeningPlacement.Models {
         /// <summary>
         /// Возвращает задания на отверстия от инженера из текущего файла Revit
         /// </summary>
-        private List<FamilyInstance> GetOpeningsMepTasksOutcoming(ICollection<OpeningType> types) {
+        private List<FamilyInstance> GetOpeningsMepTasks(Document document, ICollection<OpeningType> types) {
             List<FamilyInstance> elements = new List<FamilyInstance>();
             foreach(var type in types) {
                 elements.AddRange(
-                    GetFamilyInstances(_document,
+                    GetFamilyInstances(document,
                     OpeningTaskFamilyName[type],
                     OpeningTaskTypeName[type]));
             }
