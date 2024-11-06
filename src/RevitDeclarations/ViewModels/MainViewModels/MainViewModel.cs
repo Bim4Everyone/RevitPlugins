@@ -192,5 +192,46 @@ namespace RevitDeclarations.ViewModels {
 
             _settings.LoadUtp = _loadUtp;
         }
+
+        /// <summary>
+        /// Сохранение настроек вкладки DeclarationTabItem.
+        /// Эти настройки одинаковы для всех деклараций.
+        /// </summary>
+        public void SaveMainWindowConfig(DeclarationConfigSettings configSettings) {
+            configSettings.DeclarationName = FileName;
+            configSettings.DeclarationPath = FilePath;
+            configSettings.ExportFormat = SelectedFormat.Id;
+            configSettings.Phase = SelectedPhase.Name;
+
+            configSettings.RevitDocuments = RevitDocuments
+                .Where(x => x.IsChecked)
+                .Select(x => x.Name)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Сохранение настроек вкладки ParamsTabItem.
+        /// Сохраняются настройки, общие для всех деклараций.
+        /// </summary>
+        public void SaveParametersConfig(DeclarationConfigSettings configSettings) {
+            configSettings.FilterRoomsParam = _settings.FilterRoomsParam?.Definition.Name;
+            configSettings.FilterRoomsValues = _settings.FilterRoomsValues;
+            configSettings.GroupingBySectionParam = _settings.GroupingBySectionParam?.Definition.Name;
+            configSettings.GroupingByGroupParam = _settings.GroupingByGroupParam?.Definition.Name;
+            configSettings.MultiStoreyParam = _settings.MultiStoreyParam?.Definition.Name;
+
+            configSettings.DepartmentParam = _settings.DepartmentParam?.Definition.Name;
+            configSettings.LevelParam = _settings.LevelParam?.Definition.Name;
+            configSettings.SectionParam = _settings.SectionParam?.Definition.Name;
+            configSettings.BuildingParam = _settings.BuildingParam?.Definition.Name;
+
+            configSettings.ApartmentNumberParam = _settings.ApartmentNumberParam?.Definition.Name;
+            configSettings.ApartmentAreaParam = _settings.ApartmentAreaParam?.Definition.Name;
+
+            configSettings.RoomAreaParam = _settings.RoomAreaParam?.Definition.Name;
+            configSettings.RoomNameParam = _settings.RoomNameParam?.Definition.Name;
+
+            configSettings.ProjectNameID = _settings.ProjectName;
+        }
     }
 }

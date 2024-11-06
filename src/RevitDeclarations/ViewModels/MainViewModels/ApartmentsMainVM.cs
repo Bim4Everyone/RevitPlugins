@@ -170,37 +170,19 @@ namespace RevitDeclarations.ViewModels {
             var configSettings =
                 config.GetSettings(_revitRepository.Document) ?? config.AddSettings(_revitRepository.Document);
 
-            configSettings.DeclarationName = FileName;
-            configSettings.DeclarationPath = FilePath;
-            configSettings.ExportFormat = SelectedFormat.Id;
-            configSettings.Phase = SelectedPhase.Name;
+            SaveMainWindowConfig(configSettings);
+            SaveParametersConfig(configSettings);
 
-            configSettings.RevitDocuments = RevitDocuments
-                .Where(x => x.IsChecked)
-                .Select(x => x.Name)
-                .ToList();
-
-            configSettings.FilterRoomsParam = _settings.FilterRoomsParam?.Definition.Name;
-            configSettings.FilterRoomsValues = _settings.FilterRoomsValues;
-            configSettings.GroupingBySectionParam = _settings.GroupingBySectionParam?.Definition.Name;
-            configSettings.GroupingByGroupParam = _settings.GroupingByGroupParam?.Definition.Name;
-            configSettings.MultiStoreyParam = _settings.MultiStoreyParam?.Definition.Name;
-
-            configSettings.ApartmentFullNumberParam = settings.ApartmentFullNumberParam?.Definition.Name;
-            configSettings.DepartmentParam = _settings.DepartmentParam?.Definition.Name;
-            configSettings.LevelParam = _settings.LevelParam?.Definition.Name;
-            configSettings.SectionParam = _settings.SectionParam?.Definition.Name;
-            configSettings.BuildingParam = _settings.BuildingParam?.Definition.Name;
-            configSettings.ApartmentNumberParam = _settings.ApartmentNumberParam?.Definition.Name;
-            configSettings.ApartmentAreaParam = _settings.ApartmentAreaParam?.Definition.Name;
+            configSettings.BuildingNumberParam = settings.BuildingNumberParam?.Definition.Name;
+            configSettings.ConstrWorksNumberParam = settings.ConstrWorksNumberParam?.Definition.Name;
+            configSettings.ApartmentFullNumberParam = settings.ApartmentFullNumberParam?.Definition.Name;            
             configSettings.ApartmentAreaCoefParam = settings.ApartmentAreaCoefParam?.Definition.Name;
             configSettings.ApartmentAreaLivingParam = settings.ApartmentAreaLivingParam?.Definition.Name;
-            configSettings.RoomsAmountParam = settings.RoomsAmountParam?.Definition.Name;
-            configSettings.ProjectNameID = _settings.ProjectName;
             configSettings.ApartmentAreaNonSumParam = settings.ApartmentAreaNonSumParam?.Definition.Name;
+            configSettings.RoomsAmountParam = settings.RoomsAmountParam?.Definition.Name;
             configSettings.RoomsHeightParam = settings.RoomsHeightParam?.Definition.Name;
 
-            configSettings.RoomAreaParam = _settings.RoomAreaParam?.Definition.Name;
+            configSettings.RoomNumberParam = settings.RoomNumberParam?.Definition.Name;
             configSettings.RoomAreaCoefParam = _settings.RoomAreaCoefParam?.Definition.Name;
 
             configSettings.PrioritiesFilePath = _prioritiesViewModel.FilePath;

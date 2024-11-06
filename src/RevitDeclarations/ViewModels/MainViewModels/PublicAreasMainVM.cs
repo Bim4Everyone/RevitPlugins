@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using RevitDeclarations.Models;
+using RevitDeclarations.Models.Configs;
 using RevitDeclarations.ViewModels.ExportViewModels;
 using RevitDeclarations.Views;
 
@@ -45,6 +46,8 @@ namespace RevitDeclarations.ViewModels {
             List<RevitDocumentViewModel> checkedDocuments = _revitDocuments
                 .Where(x => x.IsChecked)
                 .ToList();
+
+            SaveConfig();
 
             // Проверка 1. Наличие параметров во всех выбранных проектах.
             IEnumerable<ErrorsListViewModel> parameterErrors = checkedDocuments
@@ -108,6 +111,26 @@ namespace RevitDeclarations.ViewModels {
                 }
             }
         }
+
+        private void SaveConfig() {
+            var config = PublicAreasConfig.GetPluginConfig();
+
+            PublicAreasSettings settings = (PublicAreasSettings) _settings;
+
+            var configSettings =
+                config.GetSettings(_revitRepository.Document) ?? config.AddSettings(_revitRepository.Document);
+
+            SaveMainWindowConfig(configSettings);
+            SaveParametersConfig(configSettings);
+
+            configSettings.AddPrefixToNumber = settings.AddPrefixToNumber;
+            if(settings.AddPrefixToNumber) {
+                configSettings.RoomNumberParam = settings.RoomNumberParam?.Definition.Name;
+            }
+
+            config.SaveProjectConfig();
+        }
+
 
         private void LoadConfig() {
             var config = CommercialConfig.GetPluginConfig();

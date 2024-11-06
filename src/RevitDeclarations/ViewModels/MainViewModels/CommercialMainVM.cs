@@ -46,6 +46,8 @@ namespace RevitDeclarations.ViewModels {
                 .Where(x => x.IsChecked)
                 .ToList();
 
+            SaveConfig();
+
             // Проверка 1. Наличие параметров во всех выбранных проектах.
             IEnumerable<ErrorsListViewModel> parameterErrors = checkedDocuments
                 .Select(x => x.CheckParameters())
@@ -110,47 +112,26 @@ namespace RevitDeclarations.ViewModels {
         }
 
         private void SaveConfig() {
-            //var config = PluginConfig.GetPluginConfig();
+            CommercialSettings settings = (CommercialSettings) _settings;
 
-            //var configSettings =
-            //    config.GetSettings(_revitRepository.Document) ?? config.AddSettings(_revitRepository.Document);
+            var config = CommercialConfig.GetPluginConfig();
 
-            //configSettings.DeclarationName = FileName;
-            //configSettings.DeclarationPath = FilePath;
-            //configSettings.ExportFormat = SelectedFormat.Id;
-            //configSettings.Phase = SelectedPhase.Name;
+            var configSettings =
+                config.GetSettings(_revitRepository.Document) ?? config.AddSettings(_revitRepository.Document);
 
-            //configSettings.RevitDocuments = RevitDocuments
-            //    .Where(x => x.IsChecked)
-            //    .Select(x => x.Name)
-            //    .ToList();
+            SaveMainWindowConfig(configSettings);
+            SaveParametersConfig(configSettings);
 
-            //configSettings.FilterRoomsParam = _settings.FilterRoomsParam?.Definition.Name;
-            //configSettings.FilterRoomsValue = _settings.FilterRoomsValue;
-            //configSettings.GroupingBySectionParam = _settings.GroupingBySectionParam?.Definition.Name;
-            //configSettings.GroupingByGroupParam = _settings.GroupingByGroupParam?.Definition.Name;
-            //configSettings.MultiStoreyParam = _settings.MultiStoreyParam?.Definition.Name;
+            configSettings.BuildingNumberParam = settings.BuildingNumberParam?.Definition.Name;
+            configSettings.ConstrWorksNumberParam = settings.ConstrWorksNumberParam?.Definition.Name;
+            configSettings.RoomsHeightParam = settings.RoomsHeightParam?.Definition.Name;
+            configSettings.GroupNameParam = settings.GroupNameParam?.Definition.Name;
+            configSettings.AddPrefixToNumber = settings.AddPrefixToNumber;
+            if(settings.AddPrefixToNumber) {
+                configSettings.RoomNumberParam = settings.RoomNumberParam?.Definition.Name;
+            }
 
-            //configSettings.ApartmentFullNumberParam = _settings.ApartmentFullNumberParam?.Definition.Name;
-            //configSettings.DepartmentParam = _settings.DepartmentParam?.Definition.Name;
-            //configSettings.LevelParam = _settings.LevelParam?.Definition.Name;
-            //configSettings.SectionParam = _settings.SectionParam?.Definition.Name;
-            //configSettings.BuildingParam = _settings.BuildingParam?.Definition.Name;
-            //configSettings.ApartmentNumberParam = _settings.ApartmentNumberParam?.Definition.Name;
-            //configSettings.ApartmentAreaParam = _settings.ApartmentAreaParam?.Definition.Name;
-            //configSettings.ApartmentAreaCoefParam = _settings.ApartmentAreaCoefParam?.Definition.Name;
-            //configSettings.ApartmentAreaLivingParam = _settings.ApartmentAreaLivingParam?.Definition.Name;
-            //configSettings.RoomsAmountParam = _settings.RoomsAmountParam?.Definition.Name;
-            //configSettings.ProjectNameID = _settings.ProjectName;
-            //configSettings.ApartmentAreaNonSumParam = _settings.ApartmentAreaNonSumParam?.Definition.Name;
-            //configSettings.RoomsHeightParam = _settings.RoomsHeightParam?.Definition.Name;
-
-            //configSettings.RoomAreaParam = _settings.RoomAreaParam?.Definition.Name;
-            //configSettings.RoomAreaCoefParam = _settings.RoomAreaCoefParam?.Definition.Name;
-
-            //configSettings.GroupNameParam = _settings.GroupNameParam?.Definition.Name;
-
-            //config.SaveProjectConfig();
+            config.SaveProjectConfig();
         }
 
         private void LoadConfig() {
