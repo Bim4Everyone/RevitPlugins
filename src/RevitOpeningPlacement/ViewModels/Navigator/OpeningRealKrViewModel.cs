@@ -10,7 +10,6 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models.Clashes;
 
 using RevitOpeningPlacement.Models.Interfaces;
-using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement;
 using RevitOpeningPlacement.OpeningModels;
 
