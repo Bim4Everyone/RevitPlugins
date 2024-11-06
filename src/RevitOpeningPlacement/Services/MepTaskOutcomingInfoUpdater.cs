@@ -499,7 +499,7 @@ namespace RevitOpeningPlacement.Services {
         }
 
         private ICollection<IConstructureLinkElementsProvider> GetLinkProviders(RevitRepository revitRepository) {
-            return revitRepository.GetConstructureLinks()
+            return revitRepository.GetSelectedRevitLinks()
                 .Select(link => new ConstructureLinkElementsProvider(revitRepository, link))
                 .ToArray();
         }

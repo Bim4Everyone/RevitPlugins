@@ -22,7 +22,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private protected override void InitializeGrid() {
             var elements = new List<ElementModel>();
             RevitClashDetective.Models.RevitRepository clashRepo = _revitRepository.GetClashRevitRepository();
-            string[] linkStructureDocs = _revitRepository.GetConstructureLinks()
+            string[] linkStructureDocs = _revitRepository.GetSelectedRevitLinks()
                 .Select(c => RevitRepository.GetDocumentName(c.GetLinkDocument()))
                 .ToArray();
             var docInfos = _revitRepository.DocInfos
