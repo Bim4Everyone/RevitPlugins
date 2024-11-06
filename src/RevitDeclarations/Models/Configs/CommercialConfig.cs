@@ -29,7 +29,7 @@ namespace RevitDeclarations.Models {
     internal class CommercialConfigSettings : DeclarationConfigSettings {
         public string BuildingNumberParam { get; set; }
         public string ConstrWorksNumberParam { get; set; }
-        public bool AddPostfixToNumber { get; set; }
+        public bool AddPrefixToNumber { get; set; }
         public string RoomsHeightParam { get; set; }
         public string GroupNameParam { get; set; }
 
@@ -45,16 +45,19 @@ namespace RevitDeclarations.Models {
                 LevelParam = SharedParamsConfig.Instance.Level.Name,
                 SectionParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
                 BuildingParam = SharedParamsConfig.Instance.RoomBuildingShortName.Name,
-                ApartmentNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
-                ApartmentAreaParam = SharedParamsConfig.Instance.ApartmentArea.Name,
-                RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
-                ProjectNameID = "",
-
-                RoomsHeightParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_HEIGHT),
                 BuildingNumberParam = SharedParamsConfig.Instance.BuildingNumber.Name,
                 ConstrWorksNumberParam = SharedParamsConfig.Instance.ConstructionWorksNumber.Name,
-                AddPostfixToNumber = true,
+
+                ApartmentNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
+                ApartmentAreaParam = SharedParamsConfig.Instance.ApartmentArea.Name,
+                RoomsHeightParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_HEIGHT),
                 GroupNameParam = SharedParamsConfig.Instance.ApartmentGroupName.Name,
+
+                ProjectNameID = "",
+
+                AddPrefixToNumber = true,
+
+                RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
                 RoomNameParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME),
                 RoomNumberParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER)
             };

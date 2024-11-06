@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
@@ -27,7 +24,7 @@ namespace RevitDeclarations.Models {
     }
 
     internal class PublicAreasConfigSettings : DeclarationConfigSettings {
-        public bool AddPostfixToNumber { get; set; }
+        public bool AddPrefixToNumber { get; set; }
 
         public PublicAreasConfigSettings GetCompanyConfig() {
             return new PublicAreasConfigSettings() {
@@ -41,13 +38,16 @@ namespace RevitDeclarations.Models {
                 LevelParam = SharedParamsConfig.Instance.Level.Name,
                 SectionParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
                 BuildingParam = SharedParamsConfig.Instance.RoomBuildingShortName.Name,
+                
                 ApartmentAreaParam = SharedParamsConfig.Instance.ApartmentArea.Name,
-                RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
-                AddPostfixToNumber = true,
+                ApartmentNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
+
+                AddPrefixToNumber = true,
                 ProjectNameID = "",
+
+                RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
                 RoomNameParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME),
                 RoomNumberParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER),
-                ApartmentNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name
             };
         }
     }

@@ -42,26 +42,28 @@ namespace RevitDeclarations.Models.Configs {
         public ApartmnetsConfigSettings GetCompanyConfig() {
             return new ApartmnetsConfigSettings() {
                 FilterRoomsParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
-                FilterRoomsValues = new [] {"квартира"},
+                FilterRoomsValues = new[] { "квартира" },
                 GroupingBySectionParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
                 GroupingByGroupParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
                 MultiStoreyParam = SharedParamsConfig.Instance.RoomMultilevelGroup.Name,
 
-                ApartmentFullNumberParam = SharedParamsConfig.Instance.ApartmentNumber.Name,
                 DepartmentParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
                 LevelParam = SharedParamsConfig.Instance.Level.Name,
                 SectionParam = SharedParamsConfig.Instance.RoomSectionShortName.Name,
                 BuildingParam = SharedParamsConfig.Instance.RoomBuildingShortName.Name,
                 BuildingNumberParam = SharedParamsConfig.Instance.BuildingNumber.Name,
                 ConstrWorksNumberParam = SharedParamsConfig.Instance.ConstructionWorksNumber.Name,
+
                 ApartmentNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
+                ApartmentFullNumberParam = SharedParamsConfig.Instance.ApartmentNumber.Name,
                 ApartmentAreaParam = SharedParamsConfig.Instance.ApartmentArea.Name,
                 ApartmentAreaCoefParam = SharedParamsConfig.Instance.ApartmentAreaRatio.Name,
                 ApartmentAreaLivingParam = SharedParamsConfig.Instance.ApartmentLivingArea.Name,
-                RoomsAmountParam = SharedParamsConfig.Instance.RoomsCount.Name,
-                ProjectNameID = "",
                 ApartmentAreaNonSumParam = SharedParamsConfig.Instance.ApartmentAreaNoBalcony.Name,
+                RoomsAmountParam = SharedParamsConfig.Instance.RoomsCount.Name,
                 RoomsHeightParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_HEIGHT),
+
+                ProjectNameID = "",
 
                 RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
                 RoomAreaCoefParam = SharedParamsConfig.Instance.RoomAreaWithRatio.Name,
