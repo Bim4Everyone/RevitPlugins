@@ -145,7 +145,7 @@ namespace RevitDeclarations.ViewModels {
                 .All(x => x.HasPhase(_selectedPhase));
 
             bool hasEmptyParameters = _parametersViewModel
-                .GetAllParametrs()
+                .AllSelectedParameters
                 .Where(x => x == null)
                 .Any();
 
@@ -165,9 +165,16 @@ namespace RevitDeclarations.ViewModels {
                 ErrorText = "В выбранных проектах отсутствует выбранная стадия";
                 return false;
             }
-            if(hasEmptyParameters
-                || string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
+            if(hasEmptyParameters) {
                 ErrorText = "Не выбран параметр на вкладке \"Параметры\"";
+                return false;
+            }
+            if(!_parametersViewModel.FilterRoomsValues.Any()) {
+                ErrorText = "Не заполнены значения для фильтрации на вкладке \"Параметры\"";
+                return false;
+            }
+            if(string.IsNullOrEmpty(_parametersViewModel.ProjectName)) {
+                ErrorText = "Не заполнено ИД объекта на вкладке \"Параметры\"";
                 return false;
             }
 
