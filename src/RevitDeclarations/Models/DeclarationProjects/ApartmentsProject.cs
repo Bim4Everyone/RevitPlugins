@@ -19,6 +19,12 @@ namespace RevitDeclarations.Models {
             _roomGroups = revitRepository.GetApartments(_rooms, settings);
         }
 
+        /// <summary>
+        /// У каждого помещения одной квартиры должны быть одинаковые значения параметров,
+        /// в которых хранятся общие площади этой квартиры.
+        /// Проверяется общая площадь, жилая, без летних помещений и площадь с коэффициентом.
+        /// </summary>
+        /// <returns></returns>
         public ErrorsListViewModel CheckRoomAreasEquality() {
             ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
                 Message = "Ошибка",
