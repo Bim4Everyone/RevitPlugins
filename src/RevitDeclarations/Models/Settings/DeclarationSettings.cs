@@ -40,7 +40,11 @@ namespace RevitDeclarations.Models {
         public virtual Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaParam;
         public Parameter RoomNameParam => ParametersVM.SelectedRoomNameParam;
         public Parameter RoomNumberParam => ParametersVM.SelectedRoomNumberParam;
-        public virtual IReadOnlyCollection<Parameter> AllParameters => new List<Parameter>() { };
+
+        /// <summary>
+        /// Список параметров для проверки их наличия в проекте
+        /// </summary>
+        public IReadOnlyCollection<Parameter> AllParameters => ParametersVM.AllSelectedParameters;
 
         public void UpdatePriorities(List<string> newNames) {
             int prioritiesLength = PrioritiesConfig.Priorities.Count;

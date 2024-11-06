@@ -24,7 +24,7 @@ namespace RevitDeclarations.Models {
         public Parameter RoomsHeightParam => _parametersVM.SelectedRoomsHeightParam;
 
         public Parameter GroupNameParam => _parametersVM.SelectedGroupNameParam;
-        public bool AddPostfixToNumber => _parametersVM.AddPostfixToNumber;
+        public bool AddPrefixToNumber => _parametersVM.AddPrefixToNumber;
 
         public override Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaParam;
     }

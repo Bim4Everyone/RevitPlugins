@@ -19,7 +19,7 @@ namespace RevitDeclarations.Models {
             } 
         }
 
-        public Parameter ApartmentFullNumberParam => _parametersVM.SelectedFullApartNumParam;
+        public Parameter ApartmentFullNumberParam => _parametersVM.SelectedApartFullNumParam;
         public override Parameter DepartmentParam => _parametersVM.SelectedDepartmentParam;
         public Parameter BuildingNumberParam => _parametersVM.SelectedBuildingNumberParam;
         public Parameter ConstrWorksNumberParam => _parametersVM.SelectedConstrWorksNumberParam;
@@ -30,31 +30,5 @@ namespace RevitDeclarations.Models {
         public Parameter ApartmentAreaNonSumParam => _parametersVM.SelectedApartAreaNonSumParam;
         public Parameter RoomsHeightParam => _parametersVM.SelectedRoomsHeightParam;
         public override Parameter RoomAreaCoefParam => _parametersVM.SelectedRoomAreaCoefParam;
-
-
-        public override IReadOnlyCollection<Parameter> AllParameters => new List<Parameter>() {
-            FilterRoomsParam,
-            GroupingBySectionParam,
-            GroupingByGroupParam,
-            MultiStoreyParam,
-            ApartmentFullNumberParam,
-            DepartmentParam,
-            LevelParam,
-            SectionParam,
-            BuildingParam,
-            BuildingNumberParam,
-            ConstrWorksNumberParam,
-            ApartmentNumberParam,
-            ApartmentAreaParam,
-            ApartmentAreaCoefParam,
-            ApartmentAreaLivingParam,
-            RoomsAmountParam,
-            ApartmentAreaNonSumParam,
-            RoomsHeightParam,
-            RoomAreaParam,
-            RoomAreaCoefParam
-        };
-
-
     }
 }
