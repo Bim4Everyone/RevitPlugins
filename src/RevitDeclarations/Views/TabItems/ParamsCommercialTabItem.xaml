@@ -516,7 +516,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedGroupNameParam}"/>
+                SelectedItem="{Binding SelectedParkingSpaceClass}"/>
 
             <Button
                 Grid.Row="14"

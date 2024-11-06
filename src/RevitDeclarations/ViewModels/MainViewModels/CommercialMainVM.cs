@@ -126,6 +126,7 @@ namespace RevitDeclarations.ViewModels {
             configSettings.ConstrWorksNumberParam = settings.ConstrWorksNumberParam?.Definition.Name;
             configSettings.RoomsHeightParam = settings.RoomsHeightParam?.Definition.Name;
             configSettings.GroupNameParam = settings.GroupNameParam?.Definition.Name;
+            configSettings.ParkingSpaceClass = settings.ParkingSpaceClass?.Definition.Name;
             configSettings.AddPrefixToNumber = settings.AddPrefixToNumber;
             if(settings.AddPrefixToNumber) {
                 configSettings.RoomNumberParam = settings.RoomNumberParam?.Definition.Name;
@@ -144,7 +145,7 @@ namespace RevitDeclarations.ViewModels {
             LoadMainWindowConfig(configSettings);
             _parametersViewModel.SetParametersFromConfig(configSettings);
 
-            //config.SaveProjectConfig();
+            config.SaveProjectConfig();
         }
     }
 }

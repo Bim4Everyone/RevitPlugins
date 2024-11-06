@@ -22,6 +22,7 @@ namespace RevitDeclarations.Models {
         public Parameter BuildingNumberParam => _parametersVM.SelectedBuildingNumberParam;
         public Parameter ConstrWorksNumberParam => _parametersVM.SelectedConstrWorksNumberParam;
         public Parameter RoomsHeightParam => _parametersVM.SelectedRoomsHeightParam;
+        public Parameter ParkingSpaceClass => _parametersVM.SelectedParkingSpaceClass;
 
         public Parameter GroupNameParam => _parametersVM.SelectedGroupNameParam;
         public bool AddPrefixToNumber => _parametersVM.AddPrefixToNumber;
