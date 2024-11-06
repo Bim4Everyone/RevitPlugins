@@ -10,25 +10,45 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
 using RevitDeclarations.Models;
-using RevitDeclarations.Models.Configs;
 
 namespace RevitDeclarations.ViewModels {
     internal class PublicAreasParamsVM : ParametersViewModel {
         private Parameter _selectedGroupNameParam;
-        private bool _addPostfixToNumber;
 
         public PublicAreasParamsVM(RevitRepository revitRepository, MainViewModel mainViewModel)
             : base(revitRepository, mainViewModel) { }
-        
-
-        public bool AddPostfixToNumber {
-            get => _addPostfixToNumber;
-            set => RaiseAndSetIfChanged(ref _addPostfixToNumber, value);
-        }
 
         public Parameter SelectedGroupNameParam {
             get => _selectedGroupNameParam;
             set => RaiseAndSetIfChanged(ref _selectedGroupNameParam, value);
+        }
+
+        public override List<Parameter> AllSelectedParameters {
+            get {
+                var parameters = new List<Parameter> {
+                    SelectedFilterRoomsParam,
+                    SelectedGroupingBySectionParam,
+                    SelectedGroupingByGroupParam,
+                    SelectedMultiStoreyParam,
+
+                    SelectedDepartmentParam,
+                    SelectedLevelParam,
+                    SelectedSectionParam,
+                    SelectedBuildingParam,
+
+                    SelectedApartNumParam,
+                    SelectedApartAreaParam,
+
+                    SelectedRoomNameParam,
+                    SelectedRoomAreaParam
+                };
+
+                if(AddPrefixToNumber) {
+                    parameters.Add(SelectedRoomNumberParam);
+                }
+
+                return parameters;
+            }
         }
 
         public override void SetLastParamConfig(object obj) {
@@ -76,7 +96,7 @@ namespace RevitDeclarations.ViewModels {
             SelectedRoomAreaParam = DoubleParameters
                 .FirstOrDefault(x => x.Definition.Name == publicAreasConfigSettings.RoomAreaParam);
 
-            AddPostfixToNumber = publicAreasConfigSettings.AddPostfixToNumber;
+            AddPrefixToNumber = publicAreasConfigSettings.AddPrefixToNumber;
         }
     }
 }

@@ -10,12 +10,10 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
 using RevitDeclarations.Models;
-using RevitDeclarations.Models.Configs;
 
 namespace RevitDeclarations.ViewModels {
     internal class CommercialParamsVM : ParametersViewModel {
         private Parameter _selectedGroupNameParam;
-        private bool _addPostfixToNumber;
         private Parameter _selectedBuildingNumberParam;
         private Parameter _selectedConstrWorksNumberParam;
         private Parameter _selectedRoomsHeightParam;
@@ -23,11 +21,6 @@ namespace RevitDeclarations.ViewModels {
         public CommercialParamsVM(RevitRepository revitRepository, MainViewModel mainViewModel)
             : base(revitRepository, mainViewModel) {
             
-        }
-
-        public bool AddPostfixToNumber {
-            get => _addPostfixToNumber;
-            set => RaiseAndSetIfChanged(ref _addPostfixToNumber, value);
         }
 
         public Parameter SelectedGroupNameParam {
@@ -47,6 +40,38 @@ namespace RevitDeclarations.ViewModels {
             get => _selectedRoomsHeightParam;
             set => RaiseAndSetIfChanged(ref _selectedRoomsHeightParam, value);
         }
+
+        public override List<Parameter> AllSelectedParameters {
+            get {
+                var parameters =  new List<Parameter> {
+                    SelectedFilterRoomsParam,
+                    SelectedGroupingBySectionParam,
+                    SelectedGroupingByGroupParam,
+                    SelectedMultiStoreyParam,
+
+                    SelectedDepartmentParam,
+                    SelectedLevelParam,
+                    SelectedSectionParam,
+                    SelectedBuildingParam,
+                    SelectedBuildingNumberParam,
+                    SelectedConstrWorksNumberParam,
+
+                    SelectedApartNumParam,
+                    SelectedApartAreaParam,
+                    SelectedRoomsHeightParam,
+
+                    SelectedRoomNameParam,
+                    SelectedRoomAreaParam
+                };
+
+                if(AddPrefixToNumber) {
+                    parameters.Add(SelectedRoomNumberParam);
+                }
+
+                return parameters;
+            }
+        }
+
 
         public override void SetLastParamConfig(object obj) {
             CommercialConfig config = CommercialConfig.GetPluginConfig();
@@ -102,7 +127,7 @@ namespace RevitDeclarations.ViewModels {
             SelectedGroupNameParam = TextParameters
                 .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.GroupNameParam);
 
-            AddPostfixToNumber = commercialConfigSettings.AddPostfixToNumber;
+            AddPrefixToNumber = commercialConfigSettings.AddPrefixToNumber;
         }
     }
 }

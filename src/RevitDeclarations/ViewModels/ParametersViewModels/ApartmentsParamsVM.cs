@@ -14,7 +14,7 @@ using RevitDeclarations.Models.Configs;
 
 namespace RevitDeclarations.ViewModels {
     internal class ApartmentsParamsVM : ParametersViewModel {
-        private Parameter _selectedFullApartNumParam;
+        private Parameter _selectedApartFullNumParam;
         private Parameter _selectedBuildingNumberParam;
         private Parameter _selectedConstrWorksNumberParam;
         private Parameter _selectedApartAreaCoefParam;
@@ -29,9 +29,9 @@ namespace RevitDeclarations.ViewModels {
             
         }
 
-        public Parameter SelectedFullApartNumParam {
-            get => _selectedFullApartNumParam;
-            set => RaiseAndSetIfChanged(ref _selectedFullApartNumParam, value);
+        public Parameter SelectedApartFullNumParam {
+            get => _selectedApartFullNumParam;
+            set => RaiseAndSetIfChanged(ref _selectedApartFullNumParam, value);
         }
 
         public Parameter SelectedBuildingNumberParam {
@@ -68,30 +68,33 @@ namespace RevitDeclarations.ViewModels {
             set => RaiseAndSetIfChanged(ref _selectedRoomAreaCoefParam, value);
         }
 
-        public override List<Parameter> GetAllParametrs() {
-            return new List<Parameter> {
-                SelectedFilterRoomsParam,
-                SelectedGroupingBySectionParam,
-                SelectedGroupingByGroupParam,
-                SelectedMultiStoreyParam,
-                SelectedFullApartNumParam,
-                SelectedDepartmentParam,
-                SelectedLevelParam,
-                SelectedSectionParam,
-                SelectedBuildingParam,
-                SelectedBuildingNumberParam,
-                SelectedConstrWorksNumberParam,
-                SelectedApartNumParam,
-                SelectedApartAreaParam,
-                SelectedApartAreaCoefParam,
-                SelectedApartAreaLivingParam,
-                SelectedRoomsAmountParam,
-                SelectedApartAreaNonSumParam,
-                SelectedRoomsHeightParam,
-                SelectedRoomAreaParam,
-                SelectedRoomAreaCoefParam
-            };
-        }
+        public override List<Parameter> AllSelectedParameters => new List<Parameter> {
+            SelectedFilterRoomsParam,
+            SelectedGroupingBySectionParam,
+            SelectedGroupingByGroupParam,
+            SelectedMultiStoreyParam,
+
+            SelectedDepartmentParam,
+            SelectedLevelParam,
+            SelectedSectionParam,
+            SelectedBuildingParam,
+            SelectedBuildingNumberParam,
+            SelectedConstrWorksNumberParam,
+
+            SelectedApartFullNumParam,
+            SelectedApartNumParam,
+            SelectedApartAreaParam,
+            SelectedApartAreaCoefParam,
+            SelectedApartAreaLivingParam,
+            SelectedApartAreaNonSumParam,
+            SelectedRoomsAmountParam,
+            SelectedRoomsHeightParam,
+
+            SelectedRoomNumberParam,
+            SelectedRoomNameParam,
+            SelectedRoomAreaParam,
+            SelectedRoomAreaCoefParam,
+        };
 
         public override void SetLastParamConfig(object obj) {
             ApartmentsConfig config = ApartmentsConfig.GetPluginConfig();
@@ -117,7 +120,7 @@ namespace RevitDeclarations.ViewModels {
             SelectedMultiStoreyParam = TextParameters
                 .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.MultiStoreyParam);
 
-            SelectedFullApartNumParam = TextParameters
+            SelectedApartFullNumParam = TextParameters
                 .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.ApartmentFullNumberParam);
             SelectedDepartmentParam = TextParameters
                 .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.DepartmentParam);

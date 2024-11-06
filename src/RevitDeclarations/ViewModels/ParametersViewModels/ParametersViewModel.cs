@@ -39,6 +39,7 @@ namespace RevitDeclarations.ViewModels {
         private Parameter _selectedRoomAreaParam;
         private Parameter _selectedRoomNameParam;
         private Parameter _selectedRoomNumberParam;
+        private bool _addPrefixToNumber;
 
         public ParametersViewModel(RevitRepository revitRepository, MainViewModel mainViewModel) {
             _mainViewModel = mainViewModel;
@@ -160,9 +161,16 @@ namespace RevitDeclarations.ViewModels {
 
         public ParameterToolTip ParameterToolTip => _parameterToolTip;
 
-        public virtual List<Parameter> GetAllParametrs() {
-            return new List<Parameter> {};
+        public bool AddPrefixToNumber {
+            get => _addPrefixToNumber;
+            set => RaiseAndSetIfChanged(ref _addPrefixToNumber, value);
         }
+
+        /// <summary>
+        /// Список параметров для проверки их заполненности в View
+        /// </summary>
+        public virtual List<Parameter> AllSelectedParameters => new List<Parameter> {};
+
 
         public void AddFilter(object obj) {
             if(!string.IsNullOrEmpty(_filterRoomsValue)) {
