@@ -19,6 +19,7 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Navigator.Checkers;
 using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.Services;
+using RevitOpeningPlacement.ViewModels.Links;
 using RevitOpeningPlacement.ViewModels.Navigator;
 using RevitOpeningPlacement.Views;
 
@@ -41,6 +42,9 @@ namespace RevitOpeningPlacement {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<UIApplication>()
+                    .ToSelf()
+                    .InSingletonScope();
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
@@ -53,14 +57,22 @@ namespace RevitOpeningPlacement {
                 kernel.Bind<ParameterFilterProvider>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<IDocTypesHandler>()
+                    .To<BimModelPartsHandler>()
+                    .InSingletonScope();
+                kernel.Bind<LinksSelectorViewModel>()
+                    .ToSelf()
+                    .InTransientScope();
+                kernel.Bind<LinksSelectorWindow>()
+                    .ToSelf()
+                    .InTransientScope()
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<LinksSelectorViewModel>());
 
                 var repo = kernel.Get<RevitRepository>();
 
                 if(!ModelCorrect(repo)) {
                     return;
-                }
-                if(!repo.ContinueIfNotAllLinksLoaded()) {
-                    throw new OperationCanceledException();
                 }
                 GetOpeningsTask(kernel);
             }
@@ -71,8 +83,9 @@ namespace RevitOpeningPlacement {
         /// Логика вывода окна навигатора по заданиям на отверстия в зависимости от раздела проекта
         /// </summary>
         private void GetOpeningsTask(IKernel kernel) {
-            var revitRepository = kernel.Get<RevitRepository>();
-            var docType = revitRepository.GetDocumentType();
+            var bimPartsHandler = kernel.Get<IDocTypesHandler>();
+            var activeDoc = kernel.Get<UIApplication>().ActiveUIDocument.Document;
+            var docType = bimPartsHandler.GetDocType(activeDoc);
             switch(docType) {
                 case DocTypeEnum.AR:
                     GetOpeningsTaskInDocumentAR(kernel);
@@ -96,6 +109,14 @@ namespace RevitOpeningPlacement {
         /// Логика вывода окна навигатора по заданиям на отверстия в файле архитектуры
         /// </summary>
         private void GetOpeningsTaskInDocumentAR(IKernel kernel) {
+            kernel.Bind<IDocTypesProvider>()
+                .ToMethod(c => {
+                    return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.MEP });
+                })
+                .InSingletonScope();
+            kernel.Bind<IRevitLinkTypesSetter>()
+                .To<UserSelectedLinksSetter>()
+                .InTransientScope();
             kernel.Bind<IConstantsProvider>()
                 .To<ConstantsProvider>()
                 .InSingletonScope();
@@ -108,6 +129,8 @@ namespace RevitOpeningPlacement {
                 .WithPropertyValue(nameof(Window.DataContext),
                     c => c.Kernel.Get<ArchitectureNavigatorForIncomingTasksViewModel>())
                 .WithPropertyValue(nameof(Window.Title), PluginName);
+
+            kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
             var window = kernel.Get<NavigatorMepIncomingView>();
             var uiApplication = kernel.Get<UIApplication>();
@@ -158,21 +181,31 @@ namespace RevitOpeningPlacement {
 
             var navigatorMode = GetKrNavigatorMode();
             var config = kernel.Get<OpeningRealsKrConfig>();
+            DocTypeEnum[] docTypes;
             switch(navigatorMode) {
                 case KrNavigatorMode.IncomingAr: {
                     config.PlacementType = OpeningRealKrPlacementType.PlaceByAr;
                     config.SaveProjectConfig();
+                    docTypes = new DocTypeEnum[] { DocTypeEnum.AR };
                     break;
                 }
                 case KrNavigatorMode.IncomingMep: {
                     config.PlacementType = OpeningRealKrPlacementType.PlaceByMep;
                     config.SaveProjectConfig();
+                    docTypes = new DocTypeEnum[] { DocTypeEnum.MEP };
                     break;
                 }
                 default:
                     throw new OperationCanceledException();
             }
-
+            kernel.Bind<IDocTypesProvider>()
+                .ToMethod(c => {
+                    return new DocTypesProvider(docTypes);
+                })
+                .InSingletonScope();
+            kernel.Bind<IRevitLinkTypesSetter>()
+                .To<UserSelectedLinksSetter>()
+                .InTransientScope();
             kernel.Bind<IConstantsProvider>()
                 .To<ConstantsProvider>()
                 .InSingletonScope();
@@ -186,6 +219,8 @@ namespace RevitOpeningPlacement {
                     c => c.Kernel.Get<ConstructureNavigatorForIncomingTasksViewModel>())
                 .WithPropertyValue(nameof(Window.Title), PluginName);
 
+            kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
+
             var window = kernel.Get<NavigatorArIncomingView>();
             var uiApplication = kernel.Get<UIApplication>();
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
@@ -193,6 +228,14 @@ namespace RevitOpeningPlacement {
         }
 
         private void GetOpeningsTaskInDocumentMEP(IKernel kernel) {
+            kernel.Bind<IDocTypesProvider>()
+                .ToMethod(c => {
+                    return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.AR, DocTypeEnum.KR });
+                })
+                .InSingletonScope();
+            kernel.Bind<IRevitLinkTypesSetter>()
+                .To<UserSelectedLinksSetter>()
+                .InTransientScope();
             kernel.Bind<OpeningConfig>()
                 .ToMethod(c => {
                     var repo = c.Kernel.Get<RevitRepository>();
@@ -244,6 +287,8 @@ namespace RevitOpeningPlacement {
                 .WithPropertyValue(nameof(Window.DataContext),
                     c => c.Kernel.Get<MepNavigatorForOutcomingTasksViewModel>())
                 .WithPropertyValue(nameof(Window.Title), PluginName);
+
+            kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
             var window = kernel.Get<NavigatorMepOutcomingView>();
             var uiApplication = kernel.Get<UIApplication>();

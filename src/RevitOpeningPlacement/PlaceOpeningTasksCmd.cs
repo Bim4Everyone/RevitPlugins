@@ -26,6 +26,7 @@ using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.ReportViewModel;
 using RevitOpeningPlacement.Views;
 
@@ -50,6 +51,14 @@ namespace RevitOpeningPlacement {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<IDocTypesProvider>()
+                    .ToMethod(c => {
+                        return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.AR, DocTypeEnum.KR });
+                    })
+                    .InSingletonScope();
+                kernel.Bind<IRevitLinkTypesSetter>()
+                    .To<DocTypeLinksSetter>()
+                    .InTransientScope();
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
@@ -62,6 +71,8 @@ namespace RevitOpeningPlacement {
                 kernel.Bind<ParameterFilterProvider>()
                     .ToSelf()
                     .InSingletonScope();
+
+                kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
                 var revitRepository = kernel.Get<RevitRepository>();
                 PlaceOpeningTasks(uiApplication, revitRepository, Array.Empty<ElementId>());
