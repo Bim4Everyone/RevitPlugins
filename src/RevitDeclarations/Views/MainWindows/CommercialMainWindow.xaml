@@ -20,8 +20,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="Декларация коммерческих помещений"
-    Height="790" Width="650"
-    MinHeight="790" MinWidth="650"
+    Height="880" Width="650"
+    MinHeight="880" MinWidth="650"
     ResizeMode="NoResize"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">

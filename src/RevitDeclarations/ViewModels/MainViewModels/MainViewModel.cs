@@ -233,5 +233,21 @@ namespace RevitDeclarations.ViewModels {
 
             configSettings.ProjectNameID = _settings.ProjectName;
         }
+
+        public void LoadMainWindowConfig(DeclarationConfigSettings configSettings) {
+            FileName = configSettings.DeclarationName;
+            FilePath = configSettings.DeclarationPath;
+            SelectedFormat = ExportFormats
+                .FirstOrDefault(x => x.Id == configSettings.ExportFormat) ?? _exportFormats.FirstOrDefault();
+            SelectedPhase = Phases
+                .FirstOrDefault(x => x.Name == configSettings.Phase) ?? _phases[_phases.Count - 1];
+
+            var documents = RevitDocuments
+                .Where(x => configSettings.RevitDocuments.Contains(x.Name));
+
+            foreach(var document in documents) {
+                document.IsChecked = true;
+            }
+        }
     }
 }

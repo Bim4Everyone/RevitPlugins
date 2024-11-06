@@ -141,19 +141,10 @@ namespace RevitDeclarations.ViewModels {
             if(configSettings is null)
                 return;
 
-            FileName = configSettings.DeclarationName;
-            FilePath = configSettings.DeclarationPath;
-            SelectedFormat = ExportFormats
-                .FirstOrDefault(x => x.Id == configSettings.ExportFormat) ?? _exportFormats.FirstOrDefault();
-            SelectedPhase = Phases
-                .FirstOrDefault(x => x.Name == configSettings.Phase) ?? _phases[_phases.Count - 1];
+            LoadMainWindowConfig(configSettings);
+            _parametersViewModel.SetParametersFromConfig(configSettings);
 
-
-            foreach(var document in RevitDocuments.Where(x => configSettings.RevitDocuments.Contains(x.Name))) {
-                document.IsChecked = true;
-            }
-
-            config.SaveProjectConfig();
+            //config.SaveProjectConfig();
         }
     }
 }
