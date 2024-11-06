@@ -10,7 +10,6 @@ using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
-using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
@@ -42,6 +41,7 @@ namespace RevitOpeningPlacement.Models {
 
         private readonly View3DProvider _view3DProvider;
         private readonly View3D _view;
+        private readonly List<ElementId> _linkTypeIdsToUse;
 
         public RevitRepository(
             UIApplication uiApplication,
@@ -53,6 +53,7 @@ namespace RevitOpeningPlacement.Models {
             _application = UIApplication.Application;
             _uiDocument = UIApplication.ActiveUIDocument;
             _document = _uiDocument.Document;
+            _linkTypeIdsToUse = GetAllRevitLinkTypes().Select(t => t.Id).ToList();
 
             _view3DProvider = new View3DProvider();
             _view = _view3DProvider.GetView(_document, $"BIM_Задания на отверстия_{_application.Username}");
@@ -405,27 +406,6 @@ namespace RevitOpeningPlacement.Models {
         /// </summary>
         public string GetDocumentName() {
             return _clashRevitRepository.GetDocumentName();
-        }
-
-        /// <summary>
-        /// Возвращает раздел проектирования <see cref="_document">файла репозитория</see>
-        /// </summary>
-        public DocTypeEnum GetDocumentType() {
-            var bimModelPartsService = GetBimModelPartsService();
-
-            if(bimModelPartsService.InAnyBimModelParts(_document, BimModelPart.ARPart)) {
-                return DocTypeEnum.AR;
-            }
-
-            if(bimModelPartsService.InAnyBimModelParts(_document, BimModelPart.KRPart, BimModelPart.KMPart)) {
-                return DocTypeEnum.KR;
-            }
-
-            if(bimModelPartsService.InAnyBimModelParts(_document, BimModelPart.KOORDPart)) {
-                return DocTypeEnum.KOORD;
-            }
-
-            return DocTypeEnum.MEP;
         }
 
         /// <summary>
@@ -819,7 +799,7 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает коллекцию всех входящих заданий на отверстия из связанных файлов ВИС
         /// </summary>
         public ICollection<OpeningMepTaskIncoming> GetOpeningsMepTasksIncoming() {
-            var links = GetRevitLinks();
+            var links = GetSelectedRevitLinks();
             HashSet<OpeningMepTaskIncoming> genericModelsInLinks = new HashSet<OpeningMepTaskIncoming>();
             foreach(RevitLinkInstance link in links) {
                 var linkDoc = link.GetLinkDocument();
@@ -836,8 +816,7 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает коллекцию всех входящих заданий на отверстия из связанных файлов АР
         /// </summary>
         public ICollection<OpeningArTaskIncoming> GetOpeningsArTasksIncoming() {
-            var service = GetBimModelPartsService();
-            var links = GetRevitLinks().Where(link => service.InAnyBimModelParts(link, BimModelPart.ARPart));
+            var links = GetSelectedRevitLinks();
             HashSet<OpeningArTaskIncoming> openingsArInLinks = new HashSet<OpeningArTaskIncoming>();
             foreach(RevitLinkInstance link in links) {
                 var linkDoc = link.GetLinkDocument();
@@ -850,59 +829,19 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
-        /// Возвращает коллекцию всех связей АР и КР из документа репозитория
+        /// Находит экземпляры связей из активного документа, 
+        /// типоразмеры которых были настроены через метод <see cref="SetRevitLinkTypesToUse"/>
         /// </summary>
-        public ICollection<RevitLinkInstance> GetConstructureLinks() {
-            var bimModelPartsService = GetBimModelPartsService();
-            return GetRevitLinks()
-                .Where(link => bimModelPartsService.InAnyBimModelParts(
-                    link.Name,
-                    BimModelPart.ARPart,
-                    BimModelPart.KRPart,
-                    BimModelPart.KMPart
-                    ))
-                .ToHashSet();
-        }
-
-        /// <summary>
-        /// Возвращает коллекцию всех связей инженерных систем из документа репозитория
-        /// </summary>
-        public ICollection<RevitLinkInstance> GetMepLinks() {
-            var bimModelPartsService = GetBimModelPartsService();
-            return GetRevitLinks()
-                .Where(link => bimModelPartsService.InAnyBimModelParts(
-                    link.Name,
-                    BimModelPart.OVPart,
-                    BimModelPart.ITPPart,
-                    BimModelPart.HCPart,
-                    BimModelPart.VKPart,
-                    BimModelPart.EOMPart,
-                    BimModelPart.EGPart,
-                    BimModelPart.SSPart,
-                    BimModelPart.VNPart,
-                    BimModelPart.KVPart,
-                    BimModelPart.OTPart,
-                    BimModelPart.DUPart,
-                    BimModelPart.VSPart,
-                    BimModelPart.KNPart,
-                    BimModelPart.PTPart,
-                    BimModelPart.EOPart,
-                    BimModelPart.EMPart
-                    ))
-            .ToHashSet();
-        }
-
-        /// <summary>
-        /// Возвращает коллекцию всех связей архитектурных файлов из документа репозитория
-        /// </summary>
-        public ICollection<RevitLinkInstance> GetArLinks() {
-            var service = GetBimModelPartsService();
-            return GetRevitLinks()
-                .Where(link => service.InAnyBimModelParts(
-                    link,
-                    BimModelPart.ARPart
-                    ))
-                .ToHashSet();
+        /// <returns>Коллекция экземпляров связей, в которой находятся связи, выбранные пользователем</returns>
+        public IList<RevitLinkInstance> GetSelectedRevitLinks() {
+            return new FilteredElementCollector(_document)
+                .OfCategory(BuiltInCategory.OST_RvtLinks)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(RevitLinkInstance))
+                .Cast<RevitLinkInstance>()
+                .Where(link => _linkTypeIdsToUse.Contains(link.GetTypeId())
+                    && RevitLinkType.IsLoaded(_document, link.GetTypeId()))
+                .ToList();
         }
 
         /// <summary>
@@ -1179,6 +1118,38 @@ namespace RevitOpeningPlacement.Models {
         }
 
         /// <summary>
+        /// Задает коллекцию типоразмеров связей, подгруженных в активный документ,<br/>
+        /// которые будут в дальнейшем использоваться в алгоритмах плагина.<br/>
+        /// Не загруженные типы связей будут загружены в результате выполнения метода.
+        /// </summary>
+        /// <param name="linkTypes">Типы связей, которые нужно использовать.</param>
+        public void SetRevitLinkTypesToUse(IEnumerable<RevitLinkType> linkTypes) {
+            if(linkTypes is null) {
+                throw new ArgumentNullException(nameof(linkTypes));
+            }
+
+            _linkTypeIdsToUse.Clear();
+            foreach(var linkType in linkTypes) {
+                if(!RevitLinkType.IsLoaded(Doc, linkType.Id)) {
+                    try {
+                        linkType.Load();
+                    } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                        continue;
+                    }
+                }
+                _linkTypeIdsToUse.Add(linkType.Id);
+            }
+        }
+
+        public ICollection<RevitLinkType> GetAllRevitLinkTypes() {
+            return new FilteredElementCollector(Doc)
+                .WhereElementIsElementType()
+                .OfClass(typeof(RevitLinkType))
+                .Cast<RevitLinkType>()
+                .ToArray();
+        }
+
+        /// <summary>
         /// Возвращает коллекцию чистовых экземпляров семейств отверстий КР из документа Revit
         /// </summary>
         public ICollection<FamilyInstance> GetOpeningsKr(Document document) {
@@ -1348,23 +1319,9 @@ namespace RevitOpeningPlacement.Models {
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
                 .WhereElementIsElementType()
                 .OfClass(typeof(RevitLinkType))
-                .Where(link => !RevitLinkType.IsLoaded(
-                                   _document,
-                                   link.Id))
+                .Where(link => !RevitLinkType.IsLoaded(_document, link.Id))
                 .Select(link => link.Name)
                 .ToHashSet();
-        }
-
-        private IList<RevitLinkInstance> GetRevitLinks() {
-            return new FilteredElementCollector(_document)
-                .OfCategory(BuiltInCategory.OST_RvtLinks)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(RevitLinkInstance))
-                .Cast<RevitLinkInstance>()
-                .Where(link => RevitLinkType.IsLoaded(
-                                   _document,
-                                   link.GetTypeId()))
-                .ToList();
         }
 
         /// <summary>
