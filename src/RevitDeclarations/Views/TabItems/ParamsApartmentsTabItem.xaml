@@ -297,7 +297,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="0"
-                ToolTip="{Binding ParameterToolTip.FullApartNumParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.ApartFullNumParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -310,7 +310,7 @@
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
-                SelectedItem="{Binding SelectedFullApartNumParam}"/>
+                SelectedItem="{Binding SelectedApartFullNumParam}"/>
 
             <Button
                 Grid.Column="0"

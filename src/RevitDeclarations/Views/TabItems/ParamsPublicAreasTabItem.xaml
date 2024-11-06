@@ -292,7 +292,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="0"
-                ToolTip="{Binding ParameterToolTip.FullApartNumParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.ApartFullNumParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -316,7 +316,7 @@
                 Grid.Row="1"
                 Margin="10, 0"
                 Height="20"
-                IsChecked="{Binding AddPostfixToNumber}"/>
+                IsChecked="{Binding AddPrefixToNumber}"/>
 
             <TextBlock
                 Grid.Column="1"
@@ -327,7 +327,7 @@
                 Grid.Column="2"
                 Grid.Row="2"
                 Margin="10, 0"
-                IsEnabled="{Binding AddPostfixToNumber}"
+                IsEnabled="{Binding AddPrefixToNumber}"
                 ItemsSource="{Binding TextParameters}"
                 DisplayMemberPath="Definition.Name"
                 SelectedItem="{Binding SelectedRoomNumberParam}"/>

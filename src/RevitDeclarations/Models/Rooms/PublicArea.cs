@@ -16,7 +16,7 @@ namespace RevitDeclarations.Models
 
         public override string Number {
             get {
-                if(_settings.AddPostfixToNumber) {
+                if(_settings.AddPrefixToNumber) {
                     return $"{base.Number}-{_firstRoom.Number}";
                 } else {
                     return base.Number;
