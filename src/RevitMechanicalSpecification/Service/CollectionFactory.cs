@@ -15,21 +15,18 @@ using dosymep.Bim4Everyone;
 
 
 namespace RevitMechanicalSpecification.Service {
-
-
-
     internal class CollectionFactory {
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
         private readonly UIDocument _uidocument;
         private readonly List<BuiltInCategory> _mechanicalCategories;
-        private readonly bool _useGroups;
+        private readonly bool _isNumberCurrencyExists;
         private readonly List<BuiltInCategory> _elementsCanBeInsulated;
 
         public CollectionFactory(Document doc, SpecConfiguration specConfiguration, UIDocument uIDocument) {
             _document = doc;
             // временное дополнение. Если в проекте есть ФОП_ВИС_Число ДЕ - группы должны обрабатываться.
-            _useGroups = _document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency);
+            _isNumberCurrencyExists = _document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency);
             _uidocument = uIDocument;
             _specConfiguration = specConfiguration;
             _mechanicalCategories = new List<BuiltInCategory>()
@@ -98,7 +95,7 @@ namespace RevitMechanicalSpecification.Service {
             var selectedElements = _uidocument.GetSelectedElements();
 
             var filteredElements = selectedElements
-                .Where(e => filter.PassesFilter(e) && ElementNotInGroupOrModelText(e))
+                .Where(e => filter.PassesFilter(e) && FilterElementsToSpecificate(e))
                 .ToList();
 
             // Если выделять объект с вложениями, они не будут выделены. Нужно проверить в выборке на наличие
@@ -138,7 +135,7 @@ namespace RevitMechanicalSpecification.Service {
                 .WhereElementIsViewIndependent()
                 .ToElements();
 
-            return visibleElements.Where(e => ElementNotInGroupOrModelText(e)).ToList();
+            return visibleElements.Where(e => FilterElementsToSpecificate(e)).ToList();
         }
 
         /// <summary>
@@ -153,24 +150,50 @@ namespace RevitMechanicalSpecification.Service {
                 .WherePasses(filter)
                 .WhereElementIsNotElementType()
                 .ToElements();
-            return elements.Where(e => ElementNotInGroupOrModelText(e)).ToList();
+            return elements.Where(e => FilterElementsToSpecificate(e)).ToList();
         }
 
         /// <summary>
-        /// Логический фильтр на исключение текста модели
+        /// Логический фильтр в зависимости от наличия или отсутствия ФОП_ВИС_Число ДЕ в проекте                        
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        private bool ElementNotInGroupOrModelText(Element element) {
+        private bool FilterElementsToSpecificate(Element element) {
+            if(_isNumberCurrencyExists) {
+                return FilterElementsWithGroups(element);
+            } else {
+                return FilterElementsWithoutGroups(element);
+            }
+        }                       
+
+        /// <summary>
+        /// Если ФОП_ВИС_Число ДЕ в проекте - проверяем только на ModelText
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private bool FilterElementsWithGroups(Element element) {
             if(element is ModelText) {
                 return false;
             }
 
-            if(!_useGroups && element.GroupId.IsNull()) {
+            return true;
+        }
+
+        /// <summary>
+        /// Если ФОП_ВИС_Число ДЕ не в проекте - проверяем ModelText и то что элемент не в группе модели
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private bool FilterElementsWithoutGroups(Element element) {
+            if(element is ModelText) {
+                return false;
+            }
+
+            if(element.GroupId.IsNull()) {
                 return true;
             }
 
-            return true;
+            return false;
         }
     }
 }
