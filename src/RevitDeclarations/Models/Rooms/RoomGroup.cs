@@ -52,5 +52,23 @@ namespace RevitDeclarations.Models {
 
         [JsonProperty("area")]
         public virtual double AreaMain => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy);
+
+        // Проверка актуальности площадей помещений.
+        // 1. Сравнивается системная площадь помещения с площадью из квартирографии.
+        // 2. Сравнивается системная площадь помещения, умноженная на коэффициент из приоритета
+        // с площадью из квартирографии.
+        public bool CheckActualRoomAreas() {
+            foreach(var room in _rooms) {
+                if(Math.Abs(room.AreaRevit - room.Area) > _maxAreaDeviation) {
+                    return false;
+                }
+
+                if(Math.Abs(room.AreaCoefRevit - room.AreaCoef) > _maxAreaDeviation) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

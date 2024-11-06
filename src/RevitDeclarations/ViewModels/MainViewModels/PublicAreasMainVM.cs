@@ -70,6 +70,21 @@ namespace RevitDeclarations.ViewModels {
                 return;
             }
 
+            // Проверка 3. У каждого помещения должны быть актуальные площади помещения из кватирографии.
+            IEnumerable<ErrorsListViewModel> actualRoomAreasErrors = projects
+                .Select(x => x.CheckActualRoomAreas())
+                .Where(x => x.Errors.Any());
+            if(actualRoomAreasErrors.Any()) {
+                var window = new ErrorWindow() {
+                    DataContext = new ErrorsViewModel(actualRoomAreasErrors, true)
+                };
+                window.ShowDialog();
+
+                if(!(bool) window.DialogResult) {
+                    return;
+                }
+            }
+
             List<PublicArea> commercialRooms = projects
                 .SelectMany(x => x.RoomGroups)
                 .Cast<PublicArea>()

@@ -63,5 +63,24 @@ namespace RevitDeclarations.Models {
 
             return errorListVM;
         }
+
+        public ErrorsListViewModel CheckActualRoomAreas() {
+            ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
+                Message = "Предупреждение",
+                Description = "Не актуальные площади помещений, рассчитанные квартирографией",
+                DocumentName = _document.Name
+            };
+
+            foreach(RoomGroup roomGroup in _roomGroups) {
+                if(!roomGroup.CheckActualRoomAreas()) {
+                    string groupInfo = $"Квартира № {roomGroup.Number} на этаже {roomGroup.Level}";
+                    string groupAreas = "Площади помещений, рассчитанные квартирографией " +
+                        "отличаются от актуальной системной площадей помещения.";
+                    errorListVM.Errors.Add(new ErrorElement(groupInfo, groupAreas));
+                }
+            }
+
+            return errorListVM;
+        }
     }
 }
