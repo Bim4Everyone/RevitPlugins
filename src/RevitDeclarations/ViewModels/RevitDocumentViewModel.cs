@@ -77,8 +77,6 @@ namespace RevitDeclarations.ViewModels {
                 DocumentName = _name
             };
 
-            //RoomForChecks roomForCheck = new RoomForChecks(_room);
-
             errorListVM.Errors = _settings
                 .AllParameters
                 .Select(x => x.Definition.Name)
