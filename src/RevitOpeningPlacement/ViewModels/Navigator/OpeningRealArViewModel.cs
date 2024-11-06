@@ -10,6 +10,7 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models.Clashes;
 
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator {
@@ -30,6 +31,9 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Height = _openingReal.Height;
             Status = _openingReal.Status.GetDescription();
             Comment = _openingReal.Comment;
+            LevelName = GetLevelName(openingReal);
+            TaskInfo = GetTaskInfo(openingReal);
+            FamilyName = GetFamilyName(openingReal);
         }
 
 
@@ -63,6 +67,21 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// </summary>
         public string Comment { get; } = string.Empty;
 
+        /// <summary>
+        /// Название уровня
+        /// </summary>
+        public string LevelName { get; } = string.Empty;
+
+        /// <summary>
+        /// Информация о задании, по которому было создано данное чистовое отверстие
+        /// </summary>
+        public string TaskInfo { get; } = string.Empty;
+
+        /// <summary>
+        /// Название семейства
+        /// </summary>
+        public string FamilyName { get; } = string.Empty;
+
 
         public override bool Equals(object obj) {
             return (obj != null)
@@ -93,6 +112,21 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             return new ElementModel[] {
                 new ElementModel(_openingReal.GetFamilyInstance())
             };
+        }
+
+        private string GetLevelName(OpeningRealAr openingReal) {
+            var famInst = openingReal.GetFamilyInstance();
+            var doc = famInst.Document;
+            return doc.GetElement(famInst.LevelId).Name;
+        }
+
+        private string GetFamilyName(OpeningRealAr openingReal) {
+            return openingReal.GetFamilyInstance().Symbol.FamilyName;
+        }
+
+        private string GetTaskInfo(OpeningRealAr openingReal) {
+            return openingReal.GetFamilyInstance()
+                .GetSharedParamValueOrDefault<string>(RealOpeningArPlacer.RealOpeningTaskId);
         }
     }
 }

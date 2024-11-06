@@ -311,10 +311,25 @@
                                             IsSmart="True"
                                             FieldName="Height" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="*"
+                                            Width="60"
                                             Header="Комментарий"
                                             IsSmart="True"
                                             FieldName="Comment" />
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="80"
+                                            Header="Уровень"
+                                            IsSmart="True"
+                                            FieldName="LevelName" />
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="200"
+                                            Header="Семейство"
+                                            IsSmart="True"
+                                            FieldName="FamilyName" />
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="*"
+                                            Header="ФОП_ID задания"
+                                            IsSmart="True"
+                                            FieldName="TaskInfo" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </dxdo:LayoutPanel>
