@@ -7,6 +7,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using RevitMechanicalSpecification.Models.Fillers;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties;
 using System.Xml.Linq;
@@ -15,6 +16,7 @@ using RevitMechanicalSpecification.Service;
 using System.Diagnostics;
 using System;
 using RevitMechanicalSpecification.Entities;
+using dosymep.WPF.ViewModels;
 
 
 
@@ -34,13 +36,13 @@ namespace RevitMechanicalSpecification.Models {
 
 
         public RevitRepository(UIApplication uiApplication) {
+
             UIApplication = uiApplication;
-            _elementProcessor = new ElementProcessor(UIApplication.Application.Username, Document);
+            _elementProcessor = new ElementProcessor(Document);
             _specConfiguration = new SpecConfiguration(Document);
             _collector = new CollectionFactory(Document, _specConfiguration, ActiveUIDocument);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
             _maskReplacer = new MaskReplacer(_specConfiguration);
-
             _visSystems = _collector.GetVisSystems();
 
             _fillersSpecRefresh = new List<ElementParamFiller>()
@@ -127,7 +129,7 @@ namespace RevitMechanicalSpecification.Models {
         public void SpecificationRefresh() {
             _elements = _collector.GetElementsByCategories();
             ReplaceMask(_elements);
-            _elementProcessor.ProcessElements(_fillersSpecRefresh, _elements);
+            _elementProcessor.ShowProcess(_fillersSpecRefresh, _elements);
         }
 
         /// <summary>
@@ -135,7 +137,7 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void RefreshSystemName() {
             _elements = _collector.GetElementsByCategories();
-            _elementProcessor.ProcessElements(_fillersSystemRefresh, _elements);
+            _elementProcessor.ShowProcess(_fillersSystemRefresh, _elements);
         }
 
         /// <summary>
@@ -143,7 +145,7 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void RefreshSystemFunction() {
             _elements = _collector.GetElementsByCategories();
-            _elementProcessor.ProcessElements(_fillersFunctionRefresh, _elements);
+            _elementProcessor.ShowProcess(_fillersFunctionRefresh, _elements);
         }
 
         /// <summary>
@@ -152,7 +154,7 @@ namespace RevitMechanicalSpecification.Models {
         public void FullRefresh() {
             _elements = _collector.GetElementsByCategories();
             ReplaceMask(_elements);
-            _elementProcessor.ProcessElements(FoldFillerLists(), _elements);
+            _elementProcessor.ShowProcess(FoldFillerLists(), _elements);
         }
 
         /// <summary>
@@ -161,7 +163,7 @@ namespace RevitMechanicalSpecification.Models {
         public void VisibleFullRefresh() {
             _elements = _collector.GetVisibleElementsByCategories();
             ReplaceMask(_elements);
-            _elementProcessor.ProcessElements(FoldFillerLists(), _elements);
+            _elementProcessor.ShowProcess(FoldFillerLists(), _elements);
         }
 
         /// <summary>
@@ -170,7 +172,7 @@ namespace RevitMechanicalSpecification.Models {
         public void SelectedFullRefresh() {
             _elements = _collector.GetSelectedElementsByCategories();
             ReplaceMask(_elements);
-            _elementProcessor.ProcessElements(FoldFillerLists(), _elements);
+            _elementProcessor.ShowProcess(FoldFillerLists(), _elements);
         }
 
         /// <summary>
