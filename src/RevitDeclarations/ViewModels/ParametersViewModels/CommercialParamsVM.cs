@@ -56,7 +56,7 @@ namespace RevitDeclarations.ViewModels {
                     SelectedBuildingNumberParam,
                     SelectedConstrWorksNumberParam,
 
-                    SelectedApartNumParam,
+                    SelectedRoomNumberParam,
                     SelectedApartAreaParam,
                     SelectedRoomsHeightParam,
 
@@ -65,7 +65,7 @@ namespace RevitDeclarations.ViewModels {
                 };
 
                 if(AddPrefixToNumber) {
-                    parameters.Add(SelectedRoomNumberParam);
+                    parameters.Add(SelectedApartNumParam);
                 }
 
                 return parameters;
