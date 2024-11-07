@@ -29,7 +29,8 @@ namespace RevitOpeningPlacement.ViewModels.Links {
 
             Links = new ObservableCollection<LinkViewModel>(_revitRepository.GetAllRevitLinkTypes()
                 .Where(doc => _docTypesProvider.GetDocTypes().Contains(_bimModelPartsHandler.GetDocType(doc)))
-                .Select(link => new LinkViewModel(link)));
+                .Select(link => new LinkViewModel(link))
+                .OrderBy(vm => vm.Name));
 
             ApplyUserSelectionCommand = RelayCommand.Create(ApplyUserSelection);
         }
