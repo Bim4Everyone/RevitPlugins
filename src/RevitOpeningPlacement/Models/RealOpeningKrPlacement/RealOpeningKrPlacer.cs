@@ -267,6 +267,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
                 throw new OpeningNotPlacedException(exFrameworkNull.Message);
             } catch(ArgumentException exFrameworkArg) {
                 throw new OpeningNotPlacedException(exFrameworkArg.Message);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException exInvalid) {
+                throw new OpeningNotPlacedException(exInvalid.Message);
             }
         }
 
