@@ -39,7 +39,7 @@ namespace RevitValueModifier.Models {
             }
             string value = parameter.AsValueString();
             if(string.IsNullOrEmpty(value)) {
-                return parameter.AsObject().ToString();
+                return string.Empty;
             }
             return value;
         }
