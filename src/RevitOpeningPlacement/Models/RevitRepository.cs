@@ -1107,7 +1107,10 @@ namespace RevitOpeningPlacement.Models {
             foreach(var linkType in linkTypes) {
                 if(!RevitLinkType.IsLoaded(Doc, linkType.Id)) {
                     try {
-                        linkType.Load();
+                        var result = linkType.Load();
+                        if(result.LoadResult != LinkLoadResultType.LinkLoaded) {
+                            continue;
+                        }
                     } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                         continue;
                     }
