@@ -57,12 +57,10 @@ namespace RevitOpeningPlacement.Models {
 
             _view3DProvider = new View3DProvider();
             _view = _view3DProvider.GetView(_document, $"BIM_Задания на отверстия_{_application.Username}");
-
-            DocInfos = GetDocInfos();
         }
 
         public UIApplication UIApplication { get; }
-        public List<DocInfo> DocInfos { get; }
+        public List<DocInfo> DocInfos => _clashRevitRepository.DocInfos;
 
         public Document Doc => _document;
 
@@ -497,10 +495,6 @@ namespace RevitOpeningPlacement.Models {
             return null;
         }
 
-        public List<DocInfo> GetDocInfos() {
-            return _clashRevitRepository.DocInfos;
-        }
-
         public RevitClashDetective.Models.RevitRepository GetClashRevitRepository() {
             return _clashRevitRepository;
         }
@@ -675,25 +669,6 @@ namespace RevitOpeningPlacement.Models {
                 default:
                     throw new NotImplementedException(nameof(mepCategory));
             };
-        }
-
-        /// <summary>
-        /// Спрашивает у пользователя, нужно ли продолжать операцию, если загружены не все связи
-        /// </summary>
-        public bool ContinueIfNotAllLinksLoaded() {
-            var notLoadedLinksNames = GetRevitLinkNotLoadedNames();
-            if(notLoadedLinksNames.Count > 0) {
-                var dialog = GetMessageBoxService();
-                return dialog.Show(
-                    $"Связи:\n{string.Join(";\n", notLoadedLinksNames)} \nне загружены, хотите продолжить?",
-                    "Задания на отверстия",
-                    System.Windows.MessageBoxButton.YesNo,
-                    System.Windows.MessageBoxImage.Warning,
-                    System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.Yes;
-
-            } else {
-                return true;
-            }
         }
 
         /// <summary>
@@ -1138,7 +1113,9 @@ namespace RevitOpeningPlacement.Models {
                     }
                 }
                 _linkTypeIdsToUse.Add(linkType.Id);
+
             }
+            _clashRevitRepository.InitializeDocInfos();
         }
 
         public ICollection<RevitLinkType> GetAllRevitLinkTypes() {
@@ -1312,16 +1289,6 @@ namespace RevitOpeningPlacement.Models {
             if(Math.Abs(angle) > 0.00001) {
                 ElementTransformUtils.RotateElement(_document, element.Id, axis, angle);
             }
-        }
-
-        private ICollection<string> GetRevitLinkNotLoadedNames() {
-            return new FilteredElementCollector(_document)
-                .OfCategory(BuiltInCategory.OST_RvtLinks)
-                .WhereElementIsElementType()
-                .OfClass(typeof(RevitLinkType))
-                .Where(link => !RevitLinkType.IsLoaded(_document, link.Id))
-                .Select(link => link.Name)
-                .ToHashSet();
         }
 
         /// <summary>
