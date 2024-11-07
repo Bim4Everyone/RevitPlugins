@@ -9,10 +9,10 @@ using dosymep.Bim4Everyone.SimpleServices;
 using RevitOpeningPlacement.Models;
 
 namespace RevitOpeningPlacement.Services {
-    internal class BimModelPartsHandler : IDocTypesHandler {
+    internal class DocTypesHandler : IDocTypesHandler {
         private readonly IBimModelPartsService _bimModelPartsService;
 
-        public BimModelPartsHandler(IBimModelPartsService bimModelPartsService) {
+        public DocTypesHandler(IBimModelPartsService bimModelPartsService) {
             _bimModelPartsService = bimModelPartsService
                 ?? throw new ArgumentNullException(nameof(bimModelPartsService));
         }

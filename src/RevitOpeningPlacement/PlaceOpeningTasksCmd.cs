@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
@@ -27,6 +28,7 @@ using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.Services;
+using RevitOpeningPlacement.ViewModels.Links;
 using RevitOpeningPlacement.ViewModels.ReportViewModel;
 using RevitOpeningPlacement.Views;
 
@@ -57,8 +59,11 @@ namespace RevitOpeningPlacement {
                     })
                     .InSingletonScope();
                 kernel.Bind<IRevitLinkTypesSetter>()
-                    .To<DocTypeLinksSetter>()
+                    .To<UserSelectedLinksSetter>()
                     .InTransientScope();
+                kernel.Bind<IDocTypesHandler>()
+                    .To<DocTypesHandler>()
+                    .InSingletonScope();
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
@@ -71,6 +76,14 @@ namespace RevitOpeningPlacement {
                 kernel.Bind<ParameterFilterProvider>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<LinksSelectorViewModel>()
+                    .ToSelf()
+                    .InTransientScope();
+                kernel.Bind<LinksSelectorWindow>()
+                    .ToSelf()
+                    .InTransientScope()
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<LinksSelectorViewModel>());
 
                 kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
@@ -85,9 +98,6 @@ namespace RevitOpeningPlacement {
             ElementId[] mepElements) {
 
             _duplicatedInstancesToRemoveIds.Clear();
-            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
-                throw new OperationCanceledException();
-            }
             if(!ModelCorrect(revitRepository)) {
                 throw new OperationCanceledException();
             }

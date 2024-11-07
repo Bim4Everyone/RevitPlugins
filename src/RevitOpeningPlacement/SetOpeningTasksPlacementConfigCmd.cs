@@ -55,9 +55,11 @@ namespace RevitOpeningPlacement {
                     })
                     .InSingletonScope();
                 kernel.Bind<IRevitLinkTypesSetter>()
-                    .To<DocTypeLinksSetter>()
+                    .To<DocTypeLoadedLinksSetter>()
                     .InTransientScope();
-
+                kernel.Bind<IDocTypesHandler>()
+                    .To<DocTypesHandler>()
+                    .InSingletonScope();
                 kernel.Bind<MainViewModel>()
                     .ToSelf()
                     .InSingletonScope();

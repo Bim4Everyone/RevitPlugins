@@ -42,6 +42,9 @@ namespace RevitOpeningPlacement {
                 kernel.Bind<RevitEventHandler>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<IDocTypesHandler>()
+                    .To<DocTypesHandler>()
+                    .InSingletonScope();
                 kernel.Bind<ParameterFilterProvider>()
                     .ToSelf()
                     .InSingletonScope();

@@ -37,7 +37,7 @@ namespace RevitOpeningPlacement {
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<IDocTypesHandler>()
-                    .To<BimModelPartsHandler>()
+                    .To<DocTypesHandler>()
                     .InSingletonScope();
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
