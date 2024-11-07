@@ -6,7 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:RevitDeclarations.Views"
     Background="White"
-    Height="690" Width="630">
+    MinHeight="770" MinWidth="630"
+    Height="Auto" Width="Auto">
 
     <UserControl.Resources>
         <ResourceDictionary>

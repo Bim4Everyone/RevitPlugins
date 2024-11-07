@@ -12,17 +12,12 @@
     xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
     xmlns:tabData="clr-namespace:RevitDeclarations.Views"
     
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
     Title="Декларация квартир"
-    Height="880" Width="650"
     MinHeight="880" MinWidth="650"
-    ResizeMode="NoResize"
+    Height="880" Width="650"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -42,7 +37,7 @@
         </Grid.RowDefinitions>
 
         <TabControl>
-            <TabItem 
+            <TabItem                
                 Header="Декларация">
                 <tabData:DeclarationTabItem/>
             </TabItem>
