@@ -4,7 +4,7 @@ using RevitOpeningPlacement.Views;
 
 namespace RevitOpeningPlacement.Services {
     /// <summary>
-    /// Класс для назначения используемых связей через выбор пользователя
+    /// Обновляет используемые типы связей в <see cref="Models.RevitRepository"/> по выбору пользователя
     /// </summary>
     internal class UserSelectedLinksSetter : IRevitLinkTypesSetter {
         private readonly LinksSelectorWindow _window;
