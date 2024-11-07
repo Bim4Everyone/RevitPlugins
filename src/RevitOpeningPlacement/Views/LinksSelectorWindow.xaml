@@ -13,8 +13,10 @@
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     mc:Ignorable="d"
     Title="Выбор связей для обработки"
-    Height="450"
-    Width="800"
+    Height="300"
+    Width="600"
+    MinHeight="150"
+    MinWidth="150"
     d:DataContext="{d:DesignInstance vms:LinksSelectorViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
