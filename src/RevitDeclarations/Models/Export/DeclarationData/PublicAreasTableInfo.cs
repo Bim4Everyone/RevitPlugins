@@ -28,6 +28,7 @@ namespace RevitDeclarations.Models
 
         public IReadOnlyCollection<RoomGroup> RoomGroups => _publicAreas;
         public int FullTableWidth => _fullTableWidth;
+        public int RoomGroupsInfoWidth => _fullTableWidth;
         public int SummerRoomsStart => _summerRoomsStart;
         public int OtherRoomsStart => _otherRoomsStart;
         public int UtpStart => _utpStart;

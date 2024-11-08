@@ -19,7 +19,7 @@ namespace RevitDeclarations.Models {
             _commercialRooms = commercialRooms;
             _settings = settings;
 
-            _fullTableWidth = 12;
+            _fullTableWidth = 13;
             _summerRoomsStart = 0;
             _otherRoomsStart = 0;
             _utpStart = 0;
@@ -27,6 +27,7 @@ namespace RevitDeclarations.Models {
 
         public IReadOnlyCollection<RoomGroup> RoomGroups => _commercialRooms;
         public int FullTableWidth => _fullTableWidth;
+        public int RoomGroupsInfoWidth => _fullTableWidth;
         public int SummerRoomsStart => _summerRoomsStart;
         public int OtherRoomsStart => _otherRoomsStart;
         public int UtpStart => _utpStart;

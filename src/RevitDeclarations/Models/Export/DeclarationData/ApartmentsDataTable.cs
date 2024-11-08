@@ -52,7 +52,7 @@ namespace RevitDeclarations.Models {
             _mainTable.Columns[13].DataType = typeof(double);
             _mainTable.Columns[14].DataType = typeof(double);
 
-            int columnNumber = ApartmentsTableInfo.InfoWidth;
+            int columnNumber = _tableInfo.RoomGroupsInfoWidth;
 
             foreach(RoomPriority priority in _settings.UsedPriorities) {
                 if(priority.IsSummer) {
@@ -103,7 +103,7 @@ namespace RevitDeclarations.Models {
         }
 
         private void FillTableRoomsHeader() {
-            int columnNumber = ApartmentsTableInfo.InfoWidth;
+            int columnNumber = _tableInfo.RoomGroupsInfoWidth;
 
             foreach(RoomPriority priority in _settings.UsedPriorities) {
                 if(priority.IsSummer) {
@@ -147,7 +147,7 @@ namespace RevitDeclarations.Models {
                 _mainTable.Rows[rowNumber][13] = apartment.AreaMain;
                 _mainTable.Rows[rowNumber][14] = apartment.AreaNonSummer;
 
-                int columnNumber = ApartmentsTableInfo.InfoWidth;
+                int columnNumber = _tableInfo.RoomGroupsInfoWidth;
 
                 foreach(RoomPriority priority in _settings.UsedPriorities) {
                     IReadOnlyList<RoomElement> rooms = apartment.GetRoomsByPrior(priority);

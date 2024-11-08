@@ -70,37 +70,41 @@ namespace RevitDeclarations.Models {
         }
 
         private void SetGraphicSettings(Worksheet workSheet, ITableInfo tableInfo) {
+            // Общие настройки
             workSheet.StandardWidth = 12;
-            Range range = (Range) workSheet.Rows[1];
-
-            range.RowHeight = 60;
-            range.WrapText = true;
-
-            Microsoft.Office.Interop.Excel.Font font = range.Font;
-            font.Bold = true;
-
             ((Range) workSheet.Columns[1]).NumberFormat = "@";
 
+            // Настройка границ и выравнивания для всей таблицы
             Range firstCell = (Range) workSheet.Cells[1, 1];
             Range lastCell = (Range) workSheet.Cells[tableInfo.RoomGroups.Count + 1, tableInfo.FullTableWidth];
-
             workSheet.Range[firstCell, lastCell].Borders.ColorIndex = 0;
             workSheet.Range[firstCell, lastCell].HorizontalAlignment = XlHAlign.xlHAlignCenter;
             workSheet.Range[firstCell, lastCell].VerticalAlignment = XlVAlign.xlVAlignCenter;
 
+            // Настройка шапки таблицы
+            Range range = (Range) workSheet.Rows[1];
+            range.RowHeight = 60;
+            range.WrapText = true;
+            Microsoft.Office.Interop.Excel.Font font = range.Font;
+            font.Bold = true;
+
+            // Настройка графики и форматов по столбцам
             for(int i = 1; i <= tableInfo.FullTableWidth; i++) {
-                if(i <= ApartmentsTableInfo.InfoWidth) {
+                // Общая информация про группы помещений
+                if(i <= tableInfo.RoomGroupsInfoWidth) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 15.5;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _apartInfoColor;
-                } else if(i > ApartmentsTableInfo.InfoWidth && i <= tableInfo.SummerRoomsStart) {
+                // Основные помещения квартир
+                } else if(i > tableInfo.RoomGroupsInfoWidth && i <= tableInfo.SummerRoomsStart) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 10;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _mainRoomsColor;
 
-                    int checkColumnNumber = (i - ApartmentsTableInfo.InfoWidth) % 3;
+                    int checkColumnNumber = (i - tableInfo.RoomGroupsInfoWidth) % 3;
                     if(checkColumnNumber == 0) {
                         ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
                     }
+                // Летние помещения квартир
                 } else if(i > tableInfo.SummerRoomsStart && i <= tableInfo.OtherRoomsStart) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 10;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _summerRoomsColor;
@@ -110,6 +114,7 @@ namespace RevitDeclarations.Models {
                         ((Range) workSheet.Columns[i - 3]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 2]).ColumnWidth = 17;
                     }
+                // Остальные (не из списка приоритетов) помещения квартир
                 } else if(i > tableInfo.OtherRoomsStart && i <= tableInfo.UtpStart) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 10;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _nonConfigRoomsColor;
@@ -119,6 +124,7 @@ namespace RevitDeclarations.Models {
                         ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
                     }
+                // УТП квартир
                 } else {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 12;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _utpColor;
