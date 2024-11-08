@@ -45,6 +45,7 @@ namespace RevitDeclarations.Models {
         }
 
         private void SetDataTypesForColumns() {
+            _mainTable.Columns[7].DataType = typeof(double);
             _mainTable.Columns[8].DataType = typeof(double);
             _mainTable.Columns[9].DataType = typeof(double);
             _mainTable.Columns[10].DataType = typeof(double);

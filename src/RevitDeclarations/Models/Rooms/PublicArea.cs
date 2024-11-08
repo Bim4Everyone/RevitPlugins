@@ -29,7 +29,7 @@ namespace RevitDeclarations.Models
                 if(_isOneRoomGroup) {
                     return _firstRoom.Area;
                 } else {
-                    return AreaMain;
+                    return base.AreaMain;
                 }
             }
         }
