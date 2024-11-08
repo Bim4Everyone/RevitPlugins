@@ -16,7 +16,10 @@ namespace RevitDeclarations.Models {
                                 RevitRepository revitRepository,
                                 DeclarationSettings settings) : base(document, revitRepository, settings) {
 
-            _roomGroups = revitRepository.GetApartments(_rooms, settings);
+            _roomGroups = revitRepository
+                .GroupRooms(_rooms, settings)
+                .Select(x => new Apartment(x, settings))
+                .ToList();
         }
 
         /// <summary>
