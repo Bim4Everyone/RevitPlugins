@@ -8,17 +8,16 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class ApartmentsProject : DeclarationProject {
-        //private readonly IReadOnlyCollection<Apartment> _apartments;
-
         private UtpCalculator _utpCalculator;
 
         public ApartmentsProject(RevitDocumentViewModel document,
                                 RevitRepository revitRepository,
                                 DeclarationSettings settings) : base(document, revitRepository, settings) {
 
+            RoomParamProvider paramProvider = new RoomParamProvider(settings);
             _roomGroups = revitRepository
                 .GroupRooms(_rooms, settings)
-                .Select(x => new Apartment(x, settings))
+                .Select(x => new Apartment(x, settings, paramProvider))
                 .ToList();
         }
 

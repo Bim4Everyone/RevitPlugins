@@ -70,7 +70,7 @@ namespace RevitDeclarations.Models {
             int rowNumber = 0;
 
             foreach(CommercialRooms commercialRooms in _tableInfo.RoomGroups.Cast<CommercialRooms>()) {
-                _mainTable.Rows[rowNumber][0] = commercialRooms.Number;
+                _mainTable.Rows[rowNumber][0] = commercialRooms.DeclarationNumber;
                 _mainTable.Rows[rowNumber][1] = commercialRooms.Department;
                 _mainTable.Rows[rowNumber][2] = commercialRooms.Level;
                 _mainTable.Rows[rowNumber][3] = commercialRooms.Section;

@@ -13,8 +13,10 @@ namespace RevitDeclarations.Models {
     internal class CommercialRooms : RoomGroup {
         private readonly CommercialSettings _settings;
 
-        public CommercialRooms(IEnumerable<RoomElement> rooms, DeclarationSettings settings)
-            : base(rooms, settings) {
+        public CommercialRooms(IEnumerable<RoomElement> rooms, 
+                                           DeclarationSettings settings, 
+                                           RoomParamProvider paramProvider)
+            : base(rooms, settings, paramProvider) {
             _settings = (CommercialSettings) settings;
         }
 
@@ -26,25 +28,10 @@ namespace RevitDeclarations.Models {
         public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracy);
 
         [JsonProperty("type")]
-        public override string Department {
-            get {
-                if(string.IsNullOrEmpty(_firstRoom.GetTextParamValue(_settings.MultiStoreyParam))) {
-                    return _firstRoom.GetTextParamValue(_settings.DepartmentParam);
-                } else {
-                    return "Коммерция на двух и более этажах";
-                }
-            }
-        }
+        public override string Department => _paramProvider.GetDepartment(_firstRoom, "Нежилые помещения");
 
-        public override string Number {
-            get {
-                if(_settings.AddPrefixToNumber) {
-                    return $"{base.Number}-{_firstRoom.Number}";
-                } else {
-                    return base.Number;
-                }
-            }
-        }
+        public string DeclarationNumber =>
+            _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber);
 
         public override double AreaMain {
             get {

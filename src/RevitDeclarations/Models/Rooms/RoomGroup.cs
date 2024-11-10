@@ -11,6 +11,7 @@ namespace RevitDeclarations.Models {
         private protected readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
 
         private readonly DeclarationSettings _settings;
+        private protected readonly RoomParamProvider _paramProvider;
         private protected readonly int _accuracy;
 
         private protected readonly IEnumerable<RoomElement> _rooms;
@@ -18,8 +19,9 @@ namespace RevitDeclarations.Models {
         private protected readonly RoomElement _firstRoom;
         private protected readonly bool _isOneRoomGroup = false;
 
-        public RoomGroup(IEnumerable<RoomElement> rooms, DeclarationSettings settings) {
+        public RoomGroup(IEnumerable<RoomElement> rooms, DeclarationSettings settings, RoomParamProvider paramProvider) {
             _settings = settings;
+            _paramProvider = paramProvider;
             _accuracy = settings.Accuracy;
 
             _rooms = rooms.ToList();

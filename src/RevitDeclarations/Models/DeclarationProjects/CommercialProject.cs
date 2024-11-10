@@ -8,9 +8,10 @@ namespace RevitDeclarations.Models {
                                 RevitRepository revitRepository,
                                 DeclarationSettings settings) 
             : base(document, revitRepository, settings) {
+            RoomParamProvider paramProvider = new RoomParamProvider(settings);
             _roomGroups = revitRepository
                 .GroupRooms(_rooms, settings)
-                .Select(x => new CommercialRooms(x, settings))
+                .Select(x => new CommercialRooms(x, settings, paramProvider))
                 .ToList();
         }
     }

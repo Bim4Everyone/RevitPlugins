@@ -4,26 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Autodesk.Revit.DB.Architecture;
+
 namespace RevitDeclarations.Models
 {
     internal class PublicArea : RoomGroup {
         private readonly PublicAreasSettings _settings;
 
-        public PublicArea(IEnumerable<RoomElement> rooms, DeclarationSettings settings)
-            : base(rooms, settings) {
-            _settings = (PublicAreasSettings)settings;
+        public PublicArea(IEnumerable<RoomElement> rooms, 
+                          DeclarationSettings settings, 
+                          RoomParamProvider paramProvider)
+            : base(rooms, settings, paramProvider) {
+            _settings = (PublicAreasSettings) settings;
         }
 
-        public override string Number {
-            get {
-                if(_settings.AddPrefixToNumber) {
-                    return $"{base.Number}-{_firstRoom.Number}";
-                } else {
-                    return base.Number;
-                }
-            }
-        }
+        public string DeclarationNumber => 
+            _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber);
 
+        public override string Department => _paramProvider.GetDepartment(_firstRoom, "МОП");
         public override double AreaMain {
             get {
                 if(_isOneRoomGroup) {
@@ -36,11 +34,7 @@ namespace RevitDeclarations.Models
 
         public string GroupName => _firstRoom.Name;
 
-
-        public string RoomPosition {
-            get {
-                return $"{Building}-{Section}-{Level}";
-            }
-        }
+        public string RoomPosition =>
+            _paramProvider.GetRoomsPosition(this);
     }
 }

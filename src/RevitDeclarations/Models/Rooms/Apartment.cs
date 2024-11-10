@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using pyRevitLabs.Json;
 
 namespace RevitDeclarations.Models {
@@ -28,8 +27,10 @@ namespace RevitDeclarations.Models {
         private string _utpLaundry;
         private string _utpExtraBalconyArea;
 
-        public Apartment(IEnumerable<RoomElement> rooms, DeclarationSettings settings) 
-            : base(rooms, settings) {
+        public Apartment(IEnumerable<RoomElement> rooms, 
+                         DeclarationSettings settings, 
+                         RoomParamProvider paramProvider) 
+            : base(rooms, settings, paramProvider) {
             _settings = (ApartmentsSettings) settings;
             _mainRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
             _nonConfigRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
@@ -49,15 +50,7 @@ namespace RevitDeclarations.Models {
         public string FullNumber => _firstRoom.GetTextParamValue(_settings.ApartmentFullNumberParam);
 
         [JsonProperty("type")]
-        public override string Department {
-            get {
-                if(string.IsNullOrEmpty(_firstRoom.GetTextParamValue(_settings.MultiStoreyParam))) {
-                    return _firstRoom.GetTextParamValue(_settings.DepartmentParam);
-                } else {
-                    return "Квартира на двух и более этажах";
-                }
-            }
-        }
+        public override string Department => _paramProvider.GetDepartment(_firstRoom, "Квартира");
         [JsonProperty("area_k")]
         public double AreaCoef => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaCoefParam, _accuracy);
         [JsonProperty("area_living")]
