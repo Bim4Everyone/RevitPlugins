@@ -21,7 +21,7 @@ namespace RevitDeclarations {
     [Transaction(TransactionMode.Manual)]
     public class PublicAreasDeclarationCommand : BasePluginCommand {
         public PublicAreasDeclarationCommand() {
-            PluginName = "Декларация МОП";
+            PluginName = "16.1. О помещениях общего пользования";
         }
 
         protected override void Execute(UIApplication uiApplication) {

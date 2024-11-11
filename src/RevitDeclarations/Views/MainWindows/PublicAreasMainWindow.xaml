@@ -14,8 +14,7 @@
     
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    
-    Title="Декларация МОП"
+
     MinHeight="880" MinWidth="650"
     Height="880" Width="650"
 
