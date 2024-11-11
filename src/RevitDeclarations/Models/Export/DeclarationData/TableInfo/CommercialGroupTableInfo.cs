@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
-    internal class CommercialTableInfo : ITableInfo {
-        private readonly IReadOnlyCollection<CommercialRooms> _commercialRooms;
+    internal class CommercialGroupTableInfo : ITableInfo {
+        private readonly IReadOnlyCollection<CommercialRooms> _roomGroups;
         private readonly DeclarationSettings _settings;
 
         private readonly int _fullTableWidth;
@@ -14,18 +14,18 @@ namespace RevitDeclarations.Models {
         private readonly int _otherRoomsStart;
         private readonly int _utpStart;
 
-        public CommercialTableInfo(IReadOnlyCollection<CommercialRooms> commercialRooms, 
-                                   DeclarationSettings settings) {
-            _commercialRooms = commercialRooms;
+        public CommercialGroupTableInfo(IReadOnlyCollection<CommercialRooms> roomGroups,
+                                        DeclarationSettings settings) {
+            _roomGroups = roomGroups;
             _settings = settings;
 
-            _fullTableWidth = 13;
+            _fullTableWidth = 3;
             _summerRoomsStart = 0;
             _otherRoomsStart = 0;
             _utpStart = 0;
-    }
+        }
 
-        public IReadOnlyCollection<RoomGroup> RoomGroups => _commercialRooms;
+        public IReadOnlyCollection<RoomGroup> RoomGroups => _roomGroups;
         public int FullTableWidth => _fullTableWidth;
         public int RoomGroupsInfoWidth => _fullTableWidth;
         public int SummerRoomsStart => _summerRoomsStart;

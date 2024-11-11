@@ -52,5 +52,7 @@ namespace RevitDeclarations.Models {
                 }
             }
         }
+
+        public bool IsOneRoomGroup => _isOneRoomGroup;
     }
 }

@@ -11,10 +11,11 @@ namespace RevitDeclarations.Models {
         private readonly DeclarationSettings _settings;
         private readonly DataTable _mainTable;
         private readonly DataTable _headerTable;
+        private readonly List<IDeclarationDataTable> _subTables = new List<IDeclarationDataTable>();
 
-        public CommercialDataTable(CommercialTableInfo tableInfo, DeclarationSettings settings) {
+        public CommercialDataTable(CommercialTableInfo tableInfo) {
             _tableInfo = tableInfo;
-            _settings = settings;
+            _settings = tableInfo.Settings;
 
             _mainTable = new DataTable();
             _headerTable = new DataTable();
@@ -22,13 +23,16 @@ namespace RevitDeclarations.Models {
             SetDataTypesForColumns();
             CreateRows();
 
-            FillTableApartmentHeader();
-            FillTableApartmentsInfo();
+            FillTableRoomsHeader();
+            FillTableRoomsInfo();
+            GenerateSubTables();
         }
 
         public DataTable MainDataTable => _mainTable;
         public DataTable HeaderDataTable => _headerTable;
         public ITableInfo TableInfo => _tableInfo;
+
+        public List<IDeclarationDataTable> SubTables => _subTables;
 
         private void CreateColumns() {
             for(int i = 0; i <= _tableInfo.FullTableWidth; i++) {
@@ -50,7 +54,7 @@ namespace RevitDeclarations.Models {
             _mainTable.Columns[8].DataType = typeof(double);
         }
 
-        private void FillTableApartmentHeader() {
+        private void FillTableRoomsHeader() {
             _headerTable.Rows[0][0] = "Номер помещения";
             _headerTable.Rows[0][1] = "Назначение";
             _headerTable.Rows[0][2] = "Этаж расположения";
@@ -66,7 +70,7 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows[0][12] = "ИД объекта";
         }
 
-        private void FillTableApartmentsInfo() {
+        private void FillTableRoomsInfo() {
             int rowNumber = 0;
 
             foreach(CommercialRooms commercialRooms in _tableInfo.RoomGroups.Cast<CommercialRooms>()) {
@@ -85,6 +89,19 @@ namespace RevitDeclarations.Models {
                 _mainTable.Rows[rowNumber][12] = _settings.ProjectName;
 
                 rowNumber++;
+            }
+        }
+
+        private void GenerateSubTables() {
+            foreach(var commercialRooms in _tableInfo.RoomGroups.Cast<CommercialRooms>()) {
+                if(!commercialRooms.IsOneRoomGroup) {
+                    List<CommercialRooms> rooms = new List<CommercialRooms> { commercialRooms };
+
+                    CommercialGroupTableInfo tableInfo = new CommercialGroupTableInfo(rooms, _settings);
+                    CommercialGroupDataTable table = new CommercialGroupDataTable(tableInfo, _settings);
+
+                    _subTables.Add(table);
+                }
             }
         }
     }

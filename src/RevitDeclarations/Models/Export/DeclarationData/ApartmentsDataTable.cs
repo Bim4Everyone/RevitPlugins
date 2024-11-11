@@ -8,10 +8,11 @@ namespace RevitDeclarations.Models {
         private readonly DeclarationSettings _settings;
         private readonly DataTable _mainTable;
         private readonly DataTable _headerTable;
+        private readonly List<IDeclarationDataTable> _subTables = new List<IDeclarationDataTable>();
 
-        public ApartmentsDataTable(ApartmentsTableInfo tableData, DeclarationSettings settings) {
-            _tableInfo = tableData;
-            _settings = settings;
+        public ApartmentsDataTable(ApartmentsTableInfo tableInfo) {
+            _tableInfo = tableInfo;
+            _settings = tableInfo.Settings;
 
             _mainTable = new DataTable();
             _headerTable = new DataTable();
@@ -28,6 +29,7 @@ namespace RevitDeclarations.Models {
         public DataTable MainDataTable => _mainTable;
         public DataTable HeaderDataTable => _headerTable;
         public ITableInfo TableInfo => _tableInfo;
+        public List<IDeclarationDataTable> SubTables => _subTables;
 
         private void CreateColumns() {
             for(int i = 0; i <= _tableInfo.FullTableWidth; i++) {

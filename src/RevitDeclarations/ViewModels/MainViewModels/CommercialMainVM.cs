@@ -94,8 +94,8 @@ namespace RevitDeclarations.ViewModels {
                 .ThenBy(x => ValueConverter.ConvertStringToInt(x.Rooms.First().Number))
                 .ToList();
 
+            _selectedFormat.Export(FullPath, commercialRooms);
             try {
-                _selectedFormat.Export(FullPath, commercialRooms);
             } catch(Exception e) {
                 var taskDialog = new TaskDialog("Ошибка выгрузки") {
                     CommonButtons = TaskDialogCommonButtons.No | TaskDialogCommonButtons.Yes,

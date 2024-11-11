@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using Autodesk.Revit.UI;
@@ -42,6 +43,7 @@ namespace RevitDeclarations.Models {
                 workBook = workBooks.Add();
                 workSheets = workBook.Worksheets;
                 workSheet = (Worksheet) workSheets["Лист1"];
+                workSheet.Name = "Помещения";
 
                 DataTable headerTable = declarationTable.HeaderDataTable;
                 for(int i = 0; i < headerTable.Columns.Count; i++) {
@@ -55,7 +57,31 @@ namespace RevitDeclarations.Models {
                     }
                 }
 
-                SetGraphicSettings(workSheet, declarationTable.TableInfo);
+                SetMainSheetGraphicSettings(workSheet, declarationTable.TableInfo);
+
+                int counter = 1;
+                if(declarationTable.SubTables.Any()) {
+
+                    foreach(var subTable in declarationTable.SubTables) {
+                        workSheet = (Worksheet) workSheets.Add(After: workBook.Sheets[workBook.Sheets.Count]);
+                        workSheet.Name = $"Части помещений-{counter}";
+
+                        DataTable subHeaderTable = subTable.HeaderDataTable;
+                        for(int i = 0; i < subHeaderTable.Columns.Count; i++) {
+                            workSheet.Cells[1, i + 1] = subHeaderTable.Rows[0][i];
+                        }
+
+                        DataTable subMainTable = subTable.MainDataTable;
+                        for(int i = 0; i < subMainTable.Rows.Count; i++) {
+                            for(int j = 0; j < subMainTable.Columns.Count; j++) {
+                                workSheet.Cells[i + 2, j + 1] = subMainTable.Rows[i][j];
+                            }
+                        }
+
+                        SetSubSheetGraphicSettings(workSheet);
+                        counter++;
+                    }
+                }
 
                 workBook.SaveAs(path);
                 workBook.Close(false);
@@ -69,7 +95,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        private void SetGraphicSettings(Worksheet workSheet, ITableInfo tableInfo) {
+        private void SetMainSheetGraphicSettings(Worksheet workSheet, ITableInfo tableInfo) {
             // Общие настройки
             workSheet.StandardWidth = 12;
             ((Range) workSheet.Columns[1]).NumberFormat = "@";
@@ -130,6 +156,19 @@ namespace RevitDeclarations.Models {
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _utpColor;
                 }
             }
+        }
+
+        private void SetSubSheetGraphicSettings(Worksheet workSheet) {
+            Range range = (Range) workSheet.Rows[1];
+            Microsoft.Office.Interop.Excel.Font font = range.Font;
+            font.Bold = true;
+
+            ((Range) workSheet.Columns[1]).ColumnWidth = 35;
+            ((Range) workSheet.Columns[2]).ColumnWidth = 13;
+            ((Range) workSheet.Columns[3]).ColumnWidth = 17;
+
+            ((Range) workSheet.Rows[1]).HorizontalAlignment = XlHAlign.xlHAlignCenter;
+            ((Range) workSheet.Columns[2]).HorizontalAlignment = XlHAlign.xlHAlignCenter;
         }
     }
 }

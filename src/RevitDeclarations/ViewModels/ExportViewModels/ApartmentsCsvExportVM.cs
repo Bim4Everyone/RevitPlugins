@@ -12,7 +12,7 @@ namespace RevitDeclarations.ViewModels {
 
         public override void Export(string path, IEnumerable<RoomGroup> apartments) {
             ApartmentsTableInfo tableData = new ApartmentsTableInfo(apartments.Cast<Apartment>().ToList(), _settings);
-            ApartmentsDataTable table = new ApartmentsDataTable(tableData, _settings);
+            ApartmentsDataTable table = new ApartmentsDataTable(tableData);
 
             ExportTable<CsvExporter>(path, table);
         }
