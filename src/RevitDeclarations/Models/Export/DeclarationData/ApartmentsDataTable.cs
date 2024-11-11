@@ -113,8 +113,8 @@ namespace RevitDeclarations.Models {
                         int columnIndex = columnNumber + k * ApartmentsTableInfo.SummerRoomCells;
                         _headerTable.Rows[0][columnIndex] = "№ Пом.";
                         _headerTable.Rows[0][columnIndex + 1] = "Наименование на планировке";
-                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name}_{k + 1}, площадь без коэф.";
-                        _headerTable.Rows[0][columnIndex + 3] = $"{priority.Name}_{k + 1}, площадь с коэф.";
+                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name} {k + 1}, площадь без коэф.";
+                        _headerTable.Rows[0][columnIndex + 3] = $"{priority.Name} {k + 1}, площадь с коэф.";
                     }
                     columnNumber += priority.MaxRoomAmount * ApartmentsTableInfo.SummerRoomCells;
                 } else {
@@ -122,7 +122,7 @@ namespace RevitDeclarations.Models {
                         int columnIndex = columnNumber + k * ApartmentsTableInfo.MainRoomCells;
                         _headerTable.Rows[0][columnIndex] = "№ Пом.";
                         _headerTable.Rows[0][columnIndex + 1] = "Наименование на планировке";
-                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name}_{k + 1}";
+                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name} {k + 1}";
                     }
                     columnNumber += priority.MaxRoomAmount * ApartmentsTableInfo.MainRoomCells;
                 }
