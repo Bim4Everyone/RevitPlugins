@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -10,7 +10,7 @@ using RevitClashDetective.Models;
 
 namespace RevitOpeningPlacement.ViewModels.Services {
     internal class ConfigSaverService {
-        public void Save(ProjectConfig config, Document document) {
+        public string Save(ProjectConfig config, Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
             var saveWindow = GetPlatformService<ISaveFileDialogService>();
@@ -22,6 +22,7 @@ namespace RevitOpeningPlacement.ViewModels.Services {
             }
             var configSaver = new ConfigSaver(document);
             configSaver.Save(config, saveWindow.File.FullName);
+            return saveWindow.File.FullName;
         }
 
         protected T GetPlatformService<T>() {

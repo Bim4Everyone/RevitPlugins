@@ -27,6 +27,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private DispatcherTimer _timer;
         private readonly RevitRepository _revitRepository;
         private string _configName;
+        private string _configPath;
 
         public MainViewModel(RevitRepository revitRepository, Models.Configs.OpeningConfig openingConfig) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -39,6 +40,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             MepCategories = new ObservableCollection<MepCategoryViewModel>(
                 openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
             ConfigName = openingConfig.Name;
+            ConfigPath = openingConfig.ProjectConfigPath;
 
             InitializeTimer();
 
@@ -54,6 +56,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             foreach(MepCategoryViewModel mepCategoryViewModel in MepCategories) {
                 mepCategoryViewModel.PropertyChanged += MepCategoryIsSelectedPropertyChanged;
             }
+        }
+
+        public string ConfigPath {
+            get => _configPath;
+            set => RaiseAndSetIfChanged(ref _configPath, value);
         }
 
         public string ConfigName {
@@ -168,7 +175,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private void SaveAsConfig() {
             var config = GetOpeningConfig();
             var css = new ConfigSaverService();
-            css.Save(config, _revitRepository.Doc);
+            var path = css.Save(config, _revitRepository.Doc);
+            UpdateOpeningConfigPath(path);
             MessageText = "Файл настроек успешно сохранен.";
             _timer.Start();
         }
@@ -186,6 +194,13 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
             MessageText = "Файл настроек успешно загружен.";
             _timer.Start();
+        }
+
+        private void UpdateOpeningConfigPath(string path) {
+            var mepConfigPath = MepConfigPath.GetMepConfigPath(_revitRepository.Doc);
+            mepConfigPath.OpeningConfigPath = path;
+            mepConfigPath.SaveProjectConfig();
+            ConfigPath = path;
         }
 
         private bool CanSaveConfig() {
