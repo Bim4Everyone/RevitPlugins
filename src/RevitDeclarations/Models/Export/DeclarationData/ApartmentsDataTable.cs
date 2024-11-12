@@ -81,11 +81,11 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows[0][3] = "Номер подъезда";
             _headerTable.Rows[0][4] = "Номер корпуса";
             _headerTable.Rows[0][5] = "Номер здания";
-            _headerTable.Rows[0][6] = "Номер объекта строительства";
+            _headerTable.Rows[0][6] = "Номер ОКС";
             _headerTable.Rows[0][7] = "Общая площадь с пониж. коэффициентом, м2";
             _headerTable.Rows[0][8] = "Количество комнат";
             _headerTable.Rows[0][9] = "Жилая площадь, м2";
-            _headerTable.Rows[0][10] = "Высота потолка, м";
+            _headerTable.Rows[0][10] = "Высота потолков, м";
             _headerTable.Rows[0][11] = "ИД Объекта";
             _headerTable.Rows[0][12] = "Номер на площадке";
             _headerTable.Rows[0][13] = "Общая площадь без пониж. коэффициента, м2";

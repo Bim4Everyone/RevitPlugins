@@ -52,11 +52,11 @@ namespace RevitDeclarations.Models {
             _mainTable.Columns[4].DataType = typeof(double);
         }
         private void FillTableApartmentHeader() {
-            _headerTable.Rows[0][0] = "Номер помещения";
-            _headerTable.Rows[0][1] = "Наименование помещения";
-            _headerTable.Rows[0][2] = "Местоположение помещения";
+            _headerTable.Rows[0][0] = "№ п/п";
+            _headerTable.Rows[0][1] = "Вид помещения";
+            _headerTable.Rows[0][2] = "Описание места расположения помещения";
             _headerTable.Rows[0][3] = "Назначение помещения";
-            _headerTable.Rows[0][4] = "Площадь помещения, м²";
+            _headerTable.Rows[0][4] = "Площадь, м²";
             _headerTable.Rows[0][5] = "ИД объекта";
         }
         private void FillTableApartmentsInfo() {

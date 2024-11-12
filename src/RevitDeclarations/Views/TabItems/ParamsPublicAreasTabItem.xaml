@@ -5,6 +5,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:RevitDeclarations.Views"
+        
+    xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"    
+    d:DataContext="{d:DesignInstance vms:PublicAreasParamsVM, IsDesignTimeCreatable=False}"
+        
     mc:Ignorable="d" 
     Background="White"
     MinHeight="770" MinWidth="630"
@@ -134,7 +138,7 @@
                 Grid.Column="1"
                 Grid.Row="0"
                 Style="{StaticResource ParameterName}"
-                Text="Параметр для фильтрации коммерческих помещений:"/>
+                Text="Параметр для фильтрации помещений МОП:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="0"
@@ -146,7 +150,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="1"
-                ToolTip="{Binding ParameterToolTip.FilterRoomsValueToolTip}"
+                ToolTip="{Binding ParameterToolTip.FilterRoomsValuesToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -212,13 +216,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="3"
-                ToolTip="{Binding ParameterToolTip.GroupBySectionParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.GroupBySectionParamPublicToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="3"
                 Style="{StaticResource ParameterName}"
-                Text="Параметр группировки коммерческих групп:"/>
+                Text="Параметр группировки МОП:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="3"
@@ -230,13 +234,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="4"
-                ToolTip="{Binding ParameterToolTip.GroupByGroupParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.GroupByGroupCommerParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="4"
                 Style="{StaticResource ParameterName}"
-                Text="Параметр группировки внутри коммерческой группы:"/>
+                Text="Параметр группировки внутри групп МОП:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="4"
@@ -248,7 +252,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="5"
-                ToolTip="{Binding ParameterToolTip.MultiStoreyParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.MultiStoreyCommerParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -295,7 +299,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="0"
-                ToolTip="{Binding ParameterToolTip.ApartFullNumParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.PublicAreaNumberParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -338,13 +342,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="3"
-                ToolTip="{Binding ParameterToolTip.LevelParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.PublicAreaNameParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="3"
                 Style="{StaticResource ParameterName}"
-                Text="2. Имя помещения:"/>
+                Text="2. Вид помещения:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="3"
@@ -356,7 +360,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="4"
-                ToolTip="{Binding ParameterToolTip.SectionParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.PublicAreaPositionParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -371,11 +375,6 @@
                 DisplayMemberPath="Definition.Name"
                 SelectedItem="{Binding SelectedBuildingParam}"/>
 
-            <Button
-                Grid.Column="0"
-                Grid.Row="5"
-                ToolTip="{Binding ParameterToolTip.BuildingParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="5"
@@ -389,11 +388,6 @@
                 DisplayMemberPath="Definition.Name"
                 SelectedItem="{Binding SelectedSectionParam}"/>
 
-            <Button
-                Grid.Column="0"
-                Grid.Row="6"
-                ToolTip="{Binding ParameterToolTip.ApartNumParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="6"
@@ -410,7 +404,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="7"
-                ToolTip="{Binding ParameterToolTip.ApartAreaParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.PublicAreaDepartmentParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -428,13 +422,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="8"
-                ToolTip="{Binding ParameterToolTip.ApartAreaCoefParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.PublicAreaAreaParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="8"
                 Style="{StaticResource ParameterName}"
-                Text="5. Площадь помещения, м2"/>
+                Text="5. Площадь, м2"/>
 
             <TextBlock
                 Grid.Column="1"

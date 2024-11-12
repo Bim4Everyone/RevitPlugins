@@ -5,6 +5,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:RevitDeclarations.Views"
+    
+    xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"    
+    d:DataContext="{d:DesignInstance vms:ApartmentsParamsVM, IsDesignTimeCreatable=False}"
+    
     mc:Ignorable="d" 
     Background="White"
     MinHeight="770" MinWidth="630"
@@ -148,13 +152,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="1"
-                ToolTip="{Binding ParameterToolTip.FilterRoomsValueToolTip}"
+                ToolTip="{Binding ParameterToolTip.FilterRoomsValuesToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="1"
                 Style="{StaticResource ParameterName}"
-                Text="Значения параметра фильтрации квартир:"/>
+                Text="Значения параметра фильтрации:"/>
             <Grid
                 Grid.Column="2"
                 Grid.Row="1"
@@ -214,7 +218,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="3"
-                ToolTip="{Binding ParameterToolTip.GroupBySectionParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.GroupBySectionParamApartToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -232,7 +236,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="4"
-                ToolTip="{Binding ParameterToolTip.GroupByGroupParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.GroupByGroupApartParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -250,7 +254,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="5"
-                ToolTip="{Binding ParameterToolTip.MultiStoreyParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.MultiStoreyApartParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -389,7 +393,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="5"
-                ToolTip="{Binding ParameterToolTip.BuildingParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.BuildingNumberParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -407,13 +411,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="6"
-                ToolTip="{Binding ParameterToolTip.BuildingParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.ConstrWorkNumberParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="6"
                 Style="{StaticResource ParameterName}"
-                Text="7. Номер объекта строительства:"/>
+                Text="7. Номер ОКС:"/>
             <ComboBox
                 Grid.Column="2"
                 Grid.Row="6"
@@ -485,7 +489,7 @@
                 Grid.Row="10"
                 Grid.Column="1"
                 Style="{StaticResource ParameterName}"
-                Text="11. Высота потолка, м:"/>
+                Text="11. Высота потолков, м:"/>
             <ComboBox
                 Grid.Row="10"
                 Grid.Column="2"
@@ -588,7 +592,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="0"
-                ToolTip="{Binding ParameterToolTip.RoomAreaParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.RoomNumberParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"
@@ -606,7 +610,7 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="1"
-                ToolTip="{Binding ParameterToolTip.RoomAreaCoefParamToolTip}"
+                ToolTip="{Binding ParameterToolTip.RoomNameParamToolTip}"
                 Style="{StaticResource RoundButton}"/>
             <TextBlock
                 Grid.Column="1"

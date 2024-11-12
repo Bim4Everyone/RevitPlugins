@@ -55,17 +55,17 @@ namespace RevitDeclarations.Models {
         }
 
         private void FillTableRoomsHeader() {
-            _headerTable.Rows[0][0] = "Номер помещения";
+            _headerTable.Rows[0][0] = "Условный номер";
             _headerTable.Rows[0][1] = "Назначение";
             _headerTable.Rows[0][2] = "Этаж расположения";
             _headerTable.Rows[0][3] = "Номер подъезда";
             _headerTable.Rows[0][4] = "Номер корпуса";
             _headerTable.Rows[0][5] = "Номер здания";
-            _headerTable.Rows[0][6] = "Номер объекта строительства";
+            _headerTable.Rows[0][6] = "Номер ОКС";
             _headerTable.Rows[0][7] = "Общая площадь, м²";
             _headerTable.Rows[0][8] = "Высота потолков, м";
             _headerTable.Rows[0][9] = "Тип расположения";
-            _headerTable.Rows[0][10] = "Класс машиноместа";
+            _headerTable.Rows[0][10] = "Класс машино-места";
             _headerTable.Rows[0][11] = "Наименование помещения";
             _headerTable.Rows[0][12] = "ИД объекта";
         }
