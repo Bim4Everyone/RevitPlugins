@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 
 namespace RevitDeclarations.Models {
     internal class RoomParamProvider {
@@ -49,6 +50,13 @@ namespace RevitDeclarations.Models {
             }
 
             return string.Join("-", resultString);
+        }
+
+        public string GetAllLevels(IEnumerable<RoomElement> rooms) {
+            var levelNames = rooms
+                .Select(x => x.GetTextParamValue(_settings.LevelParam))
+                .Distinct();
+            return string.Join(",", levelNames);
         }
     }
 }

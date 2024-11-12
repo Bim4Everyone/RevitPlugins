@@ -37,14 +37,7 @@ namespace RevitDeclarations.Models {
         public virtual string Department => _firstRoom.GetTextParamValue(_settings.DepartmentParam);
 
         [JsonProperty("floor_number")]
-        public string Level {
-            get {
-                var levelNames = _rooms
-                    .Select(x => x.GetTextParamValue(_settings.LevelParam))
-                    .Distinct();
-                return string.Join(",", levelNames);
-            }
-        }
+        public string Level => _paramProvider.GetAllLevels(_rooms);
         [JsonProperty("number")]
         public virtual string Number => _firstRoom.GetTextParamValue(_settings.ApartmentNumberParam);
         [JsonProperty("section")]
