@@ -85,7 +85,14 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="mepLinkElementsProviders">Коллекция связей с элементами ВИС и заданиями на отверстиями</param>
         public void UpdateStatus(ICollection<IMepLinkElementsProvider> mepLinkElementsProviders) {
-            Status = DetermineStatus(mepLinkElementsProviders);
+            try {
+                Status = DetermineStatus(mepLinkElementsProviders);
+            } catch(Exception ex) when(
+                ex is Autodesk.Revit.Exceptions.ApplicationException
+                || ex is NullReferenceException
+                || ex is ArgumentNullException) {
+                Status = OpeningRealStatus.Invalid;
+            }
         }
 
         /// <summary>
@@ -93,21 +100,28 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="arLinkElementsProviders">АР связи с входящими заданиями</param>
         public void UpdateStatus(ICollection<IConstructureLinkElementsProvider> arLinkElementsProviders) {
-            Solid thisOpeningRealSolid = GetSolid();
-            Solid thisOpeningRealSolidAfterIntersection = thisOpeningRealSolid;
+            try {
+                Solid thisOpeningRealSolid = GetSolid();
+                Solid thisOpeningRealSolidAfterIntersection = thisOpeningRealSolid;
 
-            foreach(IConstructureLinkElementsProvider link in arLinkElementsProviders) {
-                thisOpeningRealSolidAfterIntersection = SubtractLinkOpenings(
-                    link,
-                    thisOpeningRealSolidAfterIntersection,
-                    out bool openingIsNotActual);
-                if(openingIsNotActual) {
-                    Status = OpeningRealStatus.NotActual;
-                    return;
+                foreach(IConstructureLinkElementsProvider link in arLinkElementsProviders) {
+                    thisOpeningRealSolidAfterIntersection = SubtractLinkOpenings(
+                        link,
+                        thisOpeningRealSolidAfterIntersection,
+                        out bool openingIsNotActual);
+                    if(openingIsNotActual) {
+                        Status = OpeningRealStatus.NotActual;
+                        return;
+                    }
                 }
+                var volumeRatio = GetSolidsVolumesRatio(thisOpeningRealSolid, thisOpeningRealSolidAfterIntersection);
+                Status = GetStatusByVolumeRatio(volumeRatio);
+            } catch(Exception ex) when(
+                ex is Autodesk.Revit.Exceptions.ApplicationException
+                || ex is NullReferenceException
+                || ex is ArgumentNullException) {
+                Status = OpeningRealStatus.Invalid;
             }
-            var volumeRatio = GetSolidsVolumesRatio(thisOpeningRealSolid, thisOpeningRealSolidAfterIntersection);
-            Status = GetStatusByVolumeRatio(volumeRatio);
         }
 
         /// <summary>

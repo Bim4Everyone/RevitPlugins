@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace RevitOpeningPlacement.OpeningModels.Enums {
     /// <summary>
@@ -24,6 +24,11 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Задание на отверстие не пересекается ни с одним элементом конструкции и ни с одним проемом текущем файле АР или КР
         /// </summary>
         [Description("Нет пересечения")]
-        NoIntersection
+        NoIntersection,
+        /// <summary>
+        /// Произошла ошибка обработки геометрии в процессе определения статуса
+        /// </summary>
+        [Description("Ошибка обработки геометрии")]
+        Invalid
     }
 }

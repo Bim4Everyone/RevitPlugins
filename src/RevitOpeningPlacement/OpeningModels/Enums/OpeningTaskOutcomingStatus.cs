@@ -33,7 +33,7 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         [Description("Не актуальное отверстие")]
         NotActual,
         /// <summary>
-        /// Геометрия экземпляра семейства задания на отверстие не корректна
+        /// Произошла ошибка обработки геометрии в процессе определения статуса
         /// </summary>
         [Description("Ошибка обработки геометрии")]
         Invalid,

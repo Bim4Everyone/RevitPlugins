@@ -164,7 +164,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         private void LoadOpeningsReal(ICollection<OpeningRealAr> realOpenings) {
             ICollection<IMepLinkElementsProvider> mepLinks = _revitRepository
-                .GetMepLinks()
+                .GetSelectedRevitLinks()
                 .Select(link => new MepLinkElementsProvider(link) as IMepLinkElementsProvider)
                 .ToArray();
             var openingsRealViewModels = GetOpeningsRealArViewModels(mepLinks, realOpenings);

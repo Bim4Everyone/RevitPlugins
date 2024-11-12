@@ -20,8 +20,8 @@
                            d:Height="600"
                            Height="500"
                            Width="1000"
-                           MinHeight="300"
-                           MinWidth="950"
+                           MinHeight="150"
+                           MinWidth="150"
                            d:DataContext="{d:DesignInstance {x:Type vm:ArchitectureNavigatorForIncomingTasksViewModel}, IsDesignTimeCreatable=False}"
                            WindowStartupLocation="Manual"
                            Left="50"
@@ -311,10 +311,25 @@
                                             IsSmart="True"
                                             FieldName="Height" />
                             <dxg:GridColumn ReadOnly="True"
-                                            Width="*"
+                                            Width="60"
                                             Header="Комментарий"
                                             IsSmart="True"
                                             FieldName="Comment" />
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="80"
+                                            Header="Уровень"
+                                            IsSmart="True"
+                                            FieldName="LevelName" />
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="200"
+                                            Header="Семейство"
+                                            IsSmart="True"
+                                            FieldName="FamilyName" />
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="*"
+                                            Header="ФОП_ID задания"
+                                            IsSmart="True"
+                                            FieldName="TaskInfo" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </dxdo:LayoutPanel>
@@ -324,16 +339,6 @@
                     Margin="0 10 0 0"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10 0"
-                          IsReadOnly="True"
-                          EditMode="InplaceActive"
-                          EditValue="{Binding ErrorText}"
-                          Foreground="Orange" />
-            <dxe:TextEdit Margin="10 0"
-                          IsReadOnly="True"
-                          EditMode="InplaceActive"
-                          EditValue="{Binding MessageText}"
-                          Foreground="Green" />
             <dx:SimpleButton Content="Авторазмещение"
                              Command="{Binding ElementName=_this, Path=DataContext.PlaceManyRealOpeningsByManyTasksInManyHostsCommand}" />
             <dx:DropDownButton Height="25"
@@ -349,17 +354,6 @@
             </dx:DropDownButton>
             <dx:SimpleButton Content="Принять одно"
                              Command="{Binding ElementName=_this, Path=DataContext.PlaceRealOpeningBySingleTaskCommand}" />
-            <dx:SimpleButton Content="ОК"
-                             Height="25"
-                             Width="80"
-                             Margin="10 0"
-                             IsDefault="True"
-                             Click="ButtonOk_Click" />
-            <dx:SimpleButton Content="Отмена"
-                             Height="25"
-                             Width="80"
-                             IsCancel="true"
-                             Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>

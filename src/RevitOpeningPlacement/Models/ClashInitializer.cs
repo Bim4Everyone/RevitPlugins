@@ -29,7 +29,7 @@ namespace RevitOpeningPlacement.Models {
                 return Enumerable.Empty<ClashModel>();
             }
             var otherProviders = revitRepository
-                .GetConstructureLinks()
+                .GetSelectedRevitLinks()
                 .Select(item => new FilterProvider(item.GetLinkDocument(), architectureFilter, item.GetTransform()))
                 .Where(item => item.GetElements().Count > 0)
                 .ToList();

@@ -168,7 +168,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             ICollection<OpeningRealKr> realOpenings = _revitRepository.GetRealOpeningsKr();
             ICollection<ElementId> constructureElementsIds = _revitRepository.GetConstructureElementsIds();
             ICollection<IConstructureLinkElementsProvider> arLinks = _revitRepository
-                .GetArLinks()
+                .GetSelectedRevitLinks()
                 .Select(link => new ConstructureLinkElementsProvider(_revitRepository, link)
                     as IConstructureLinkElementsProvider)
                 .ToArray();
@@ -190,7 +190,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             ICollection<OpeningRealKr> realOpenings = _revitRepository.GetRealOpeningsKr();
             ICollection<ElementId> constructureElementsIds = _revitRepository.GetConstructureElementsIds();
             ICollection<IMepLinkElementsProvider> mepLinks = _revitRepository
-                .GetMepLinks()
+                .GetSelectedRevitLinks()
                 .Select(link => new MepLinkElementsProvider(link) as IMepLinkElementsProvider)
                 .ToArray();
 
