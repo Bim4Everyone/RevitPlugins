@@ -27,7 +27,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private DispatcherTimer _timer;
         private readonly RevitRepository _revitRepository;
         private string _configName;
-        private string _configPath;
 
         public MainViewModel(RevitRepository revitRepository, Models.Configs.OpeningConfig openingConfig) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -40,7 +39,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             MepCategories = new ObservableCollection<MepCategoryViewModel>(
                 openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
             ConfigName = openingConfig.Name;
-            ConfigPath = openingConfig.ProjectConfigPath;
 
             InitializeTimer();
 
@@ -58,10 +56,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             }
         }
 
-        public string ConfigPath {
-            get => _configPath;
-            set => RaiseAndSetIfChanged(ref _configPath, value);
-        }
 
         public string ConfigName {
             get => _configName;
@@ -200,7 +194,6 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var mepConfigPath = MepConfigPath.GetMepConfigPath(_revitRepository.Doc);
             mepConfigPath.OpeningConfigPath = path;
             mepConfigPath.SaveProjectConfig();
-            ConfigPath = path;
         }
 
         private bool CanSaveConfig() {
