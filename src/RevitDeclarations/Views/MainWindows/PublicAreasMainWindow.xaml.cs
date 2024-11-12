@@ -13,9 +13,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace RevitDeclarations.Views {
-    /// <summary>
-    /// Interaction logic for PublicAreaMainWindow.xaml
-    /// </summary>
     public partial class PublicAreasMainWindow {
         public PublicAreasMainWindow() {
             InitializeComponent();

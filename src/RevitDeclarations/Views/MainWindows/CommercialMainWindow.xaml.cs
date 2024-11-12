@@ -13,9 +13,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace RevitDeclarations.Views {
-    /// <summary>
-    /// Interaction logic for DeclCommercialWindow.xaml
-    /// </summary>
     public partial class CommercialMainWindow {
         public CommercialMainWindow() {
             InitializeComponent();

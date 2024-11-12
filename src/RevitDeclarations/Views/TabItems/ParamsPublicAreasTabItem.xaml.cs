@@ -14,9 +14,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace RevitDeclarations.Views {
-    /// <summary>
-    /// Interaction logic for ParametersTabItem.xaml
-    /// </summary>
     public partial class ParamsPublicAreasTabItem : UserControl {
         public ParamsPublicAreasTabItem() {
             InitializeComponent();
