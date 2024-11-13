@@ -28,7 +28,7 @@ namespace RevitOpeningPlacement.Services {
             }
 
             if(!string.IsNullOrWhiteSpace(selectFilePath) && File.Exists(selectFilePath)) {
-                Process.Start("explorer.exe", string.Format(_selectMask, Path.GetFullPath(selectFilePath)));
+                Process.Start(_explorer, string.Format(_selectMask, Path.GetFullPath(selectFilePath)));
             } else {
                 Process.Start(Path.GetFullPath(folderPath));
             }
