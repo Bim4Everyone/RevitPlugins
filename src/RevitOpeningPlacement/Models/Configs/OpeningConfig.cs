@@ -55,7 +55,7 @@ namespace RevitOpeningPlacement.Models.Configs {
         private static ProjectConfigBuilder GetOverriddenBuilder(Document document) {
             var builder = GetDefaultBuilder(document);
             var configPath = MepConfigPath.GetMepConfigPath(document).OpeningConfigPath;
-            if(string.IsNullOrWhiteSpace(configPath) && File.Exists(configPath)) {
+            if(!string.IsNullOrWhiteSpace(configPath) && File.Exists(configPath)) {
                 builder.SetProjectConfigPath(configPath);
             }
             return builder;
