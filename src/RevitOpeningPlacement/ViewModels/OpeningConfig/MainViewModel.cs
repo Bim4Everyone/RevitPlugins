@@ -196,6 +196,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
                     ?? MepCategories.First();
                 ConfigName = config.Name;
+                UpdateOpeningConfigPath(config.ProjectConfigPath);
             }
             MessageText = "Файл настроек успешно загружен.";
             _timer.Start();

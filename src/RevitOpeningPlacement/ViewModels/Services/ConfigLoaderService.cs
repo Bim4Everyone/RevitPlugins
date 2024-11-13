@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -14,14 +14,16 @@ namespace RevitOpeningPlacement.ViewModels.Services {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
             var openWindow = GetPlatformService<IOpenFileDialogService>();
-            openWindow.Filter = "ClashConfig |*.json";
+            openWindow.Filter = "OpeningConfig |*.json";
             if(!openWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop))) {
                 throw new OperationCanceledException();
             }
 
             try {
                 var configLoader = new ConfigLoader(document);
-                return configLoader.Load<T>(openWindow.File.FullName);
+                T config = configLoader.Load<T>(openWindow.File.FullName);
+                config.ProjectConfigPath = openWindow.File.FullName;
+                return config;
             } catch(pyRevitLabs.Json.JsonSerializationException) {
                 ShowError();
                 throw new OperationCanceledException();

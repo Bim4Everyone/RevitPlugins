@@ -15,7 +15,7 @@ namespace RevitOpeningPlacement.ViewModels.Services {
 
             var saveWindow = GetPlatformService<ISaveFileDialogService>();
             saveWindow.AddExtension = true;
-            saveWindow.Filter = "ClashConfig |*.json";
+            saveWindow.Filter = "OpeningConfig |*.json";
             saveWindow.FilterIndex = 1;
             if(!saveWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "config")) {
                 throw new OperationCanceledException();
