@@ -170,7 +170,9 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         private void SaveConfig() {
-            GetOpeningConfig().SaveProjectConfig();
+            var config = GetOpeningConfig();
+            config.SaveProjectConfig();
+            UpdateOpeningConfigPath(config.ProjectConfigPath);
             MessageText = "Файл настроек успешно сохранен.";
             _timer.Start();
         }
