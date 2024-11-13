@@ -15,6 +15,7 @@ using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
 using RevitOpeningPlacement.Views;
 
@@ -64,6 +65,9 @@ namespace RevitOpeningPlacement {
                     .ToMethod(c =>
                         OpeningConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
                     );
+                kernel.Bind<ConfigFileService>()
+                    .ToSelf()
+                    .InSingletonScope();
 
                 Notification(kernel.Get<MainWindow>());
             }

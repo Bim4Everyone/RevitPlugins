@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -16,6 +17,7 @@ using RevitClashDetective.Models.FilterModel;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
+using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.Services;
 using RevitOpeningPlacement.Views;
 
@@ -26,15 +28,19 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private ObservableCollection<MepCategoryViewModel> _mepCategories;
         private DispatcherTimer _timer;
         private readonly RevitRepository _revitRepository;
+        private readonly ConfigFileService _configFileService;
         private string _configName;
 
-        public MainViewModel(RevitRepository revitRepository, Models.Configs.OpeningConfig openingConfig) {
+        public MainViewModel(
+            RevitRepository revitRepository,
+            ConfigFileService configFileService,
+            Models.Configs.OpeningConfig openingConfig) {
+
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _configFileService = configFileService ?? throw new ArgumentNullException(nameof(configFileService));
+
             if(openingConfig is null) {
                 throw new ArgumentNullException(nameof(openingConfig));
-            }
-            if(openingConfig.Categories.Count != new MepCategoryCollection().Count) {
-                throw new ArgumentException("Файл конфигурации некорректен, нужно удалить его.", nameof(openingConfig));
             }
             MepCategories = new ObservableCollection<MepCategoryViewModel>(
                 openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
@@ -45,6 +51,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             SaveConfigCommand = RelayCommand.Create(SaveConfig, CanSaveConfig);
             SaveAsConfigCommand = RelayCommand.Create(SaveAsConfig, CanSaveConfig);
             LoadConfigCommand = RelayCommand.Create(LoadConfig);
+            OpenConfigFolderCommand = RelayCommand.Create(OpenConfigFolder);
             CheckMepFilterCommand = RelayCommand.Create(CheckMepFilter, CanSaveConfig);
             CheckWallFilterCommand = RelayCommand.Create(CheckWallFilter, CanSaveConfig);
             CheckFloorFilterCommand = RelayCommand.Create(CheckFloorFilter, CanSaveConfig);
@@ -95,6 +102,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public ICommand CheckMepFilterCommand { get; }
         public ICommand CheckWallFilterCommand { get; }
         public ICommand CheckFloorFilterCommand { get; }
+
+        public ICommand OpenConfigFolderCommand { get; }
 
 
         private void InitializeTimer() {
@@ -223,6 +232,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                     SelectedMepCategoryViewModel = mepCategoryViewModel;
                 }
             }
+        }
+
+        private void OpenConfigFolder() {
+            var path = GetOpeningConfig().ProjectConfigPath;
+            var dir = Path.GetDirectoryName(path);
+            _configFileService.OpenFolder(dir, path);
         }
     }
 }
