@@ -20,14 +20,13 @@ namespace RevitDeclarations.Models {
         }
 
         public Parameter ApartmentFullNumberParam => _parametersVM.SelectedApartFullNumParam;
-        public override Parameter DepartmentParam => _parametersVM.SelectedDepartmentParam;
         public Parameter BuildingNumberParam => _parametersVM.SelectedBuildingNumberParam;
         public Parameter ConstrWorksNumberParam => _parametersVM.SelectedConstrWorksNumberParam;
         
         public Parameter ApartmentAreaCoefParam => _parametersVM.SelectedApartAreaCoefParam;
         public Parameter ApartmentAreaLivingParam => _parametersVM.SelectedApartAreaLivingParam;
-        public Parameter RoomsAmountParam => _parametersVM.SelectedRoomsAmountParam;
         public Parameter ApartmentAreaNonSumParam => _parametersVM.SelectedApartAreaNonSumParam;
+        public Parameter RoomsAmountParam => _parametersVM.SelectedRoomsAmountParam;
         public Parameter RoomsHeightParam => _parametersVM.SelectedRoomsHeightParam;
         public override Parameter RoomAreaCoefParam => _parametersVM.SelectedRoomAreaCoefParam;
     }

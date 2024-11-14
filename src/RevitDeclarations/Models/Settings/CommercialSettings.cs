@@ -26,7 +26,5 @@ namespace RevitDeclarations.Models {
 
         public Parameter GroupNameParam => _parametersVM.SelectedGroupNameParam;
         public bool AddPrefixToNumber => _parametersVM.AddPrefixToNumber;
-
-        public override Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaParam;
     }
 }
