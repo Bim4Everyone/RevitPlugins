@@ -25,8 +25,7 @@ namespace RevitDeclarations.ViewModels {
         private Parameter _selectedRoomAreaCoefParam;
 
         public ApartmentsParamsVM(RevitRepository revitRepository, MainViewModel mainViewModel)
-            : base(revitRepository, mainViewModel) {
-            
+            : base(revitRepository, mainViewModel) {            
         }
 
         public Parameter SelectedApartFullNumParam {

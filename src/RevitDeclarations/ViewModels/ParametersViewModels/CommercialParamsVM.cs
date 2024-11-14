@@ -20,8 +20,7 @@ namespace RevitDeclarations.ViewModels {
         private Parameter _selectedParkingSpaceClass;
 
         public CommercialParamsVM(RevitRepository revitRepository, MainViewModel mainViewModel)
-            : base(revitRepository, mainViewModel) {
-            
+            : base(revitRepository, mainViewModel) {            
         }
 
         public Parameter SelectedGroupNameParam {

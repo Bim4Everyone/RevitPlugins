@@ -12,7 +12,7 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 using System.Collections.ObjectModel;
 
 namespace RevitDeclarations.ViewModels {
-    internal class ParametersViewModel : BaseViewModel {
+    internal abstract class ParametersViewModel : BaseViewModel {
         private readonly MainViewModel _mainViewModel;
         private protected readonly RevitRepository _revitRepository;
         private readonly ParameterToolTip _parameterToolTip;
@@ -169,7 +169,7 @@ namespace RevitDeclarations.ViewModels {
         /// <summary>
         /// Список параметров для проверки их заполненности в View
         /// </summary>
-        public virtual List<Parameter> AllSelectedParameters => new List<Parameter> {};
+        public abstract List<Parameter> AllSelectedParameters { get; }
 
 
         public void AddFilter(object obj) {
