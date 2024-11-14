@@ -3,21 +3,10 @@ using System.Data;
 using System.Linq;
 
 namespace RevitDeclarations.Models {
-    internal class ApartmentsDataTable : IDeclarationDataTable {
-        private readonly ApartmentsTableInfo _tableInfo;
-        private readonly DeclarationSettings _settings;
-        private readonly DataTable _mainTable;
-        private readonly DataTable _headerTable;
-        private readonly List<IDeclarationDataTable> _subTables = new List<IDeclarationDataTable>();
-
-        public ApartmentsDataTable(ApartmentsTableInfo tableInfo) {
-            _tableInfo = tableInfo;
-            _settings = tableInfo.Settings;
-
-            _mainTable = new DataTable();
-            _headerTable = new DataTable();
-            CreateColumns();
-            SetDataTypesForColumns();
+    internal class ApartmentsDataTable : DeclarationDataTable {
+        public ApartmentsDataTable(ApartmentsTableInfo tableInfo) : base(tableInfo) {
+            SetTypeForColumns(new int[] { 7, 8, 9, 10, 13, 14 });
+            SetDataTypesRoomColumns();
             CreateRows();
 
             FillTableApartmentHeader();
@@ -26,48 +15,20 @@ namespace RevitDeclarations.Models {
             FillTableUtpInfo();
         }
 
-        public DataTable MainDataTable => _mainTable;
-        public DataTable HeaderDataTable => _headerTable;
-        public ITableInfo TableInfo => _tableInfo;
-        public List<IDeclarationDataTable> SubTables => _subTables;
-
-        private void CreateColumns() {
-            for(int i = 0; i <= _tableInfo.FullTableWidth; i++) {
-                _mainTable.Columns.Add();
-                _headerTable.Columns.Add();
-            }
-        }
-
-        private void CreateRows() {
-            for(int i = 0; i < _tableInfo.RoomGroups.Count; i++) {
-                _mainTable.Rows.Add();
-            }
-
-            _headerTable.Rows.Add();
-        }
-
-        private void SetDataTypesForColumns() {
-            _mainTable.Columns[7].DataType = typeof(double);
-            _mainTable.Columns[8].DataType = typeof(double);
-            _mainTable.Columns[9].DataType = typeof(double);
-            _mainTable.Columns[10].DataType = typeof(double);
-            _mainTable.Columns[13].DataType = typeof(double);
-            _mainTable.Columns[14].DataType = typeof(double);
-
+        private void SetDataTypesRoomColumns() {
             int columnNumber = _tableInfo.RoomGroupsInfoWidth;
 
             foreach(RoomPriority priority in _settings.UsedPriorities) {
                 if(priority.IsSummer) {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
                         int columnIndex = columnNumber + k * ApartmentsTableInfo.SummerRoomCells;
-                        _mainTable.Columns[columnIndex + 2].DataType = typeof(double);
-                        _mainTable.Columns[columnIndex + 3].DataType = typeof(double);
+                        SetTypeForColumns(new int[] { columnIndex + 2, columnIndex + 3 });
                     }
                     columnNumber += priority.MaxRoomAmount * ApartmentsTableInfo.SummerRoomCells;
                 } else {
                     for(int k = 0; k < priority.MaxRoomAmount; k++) {
                         int columnIndex = columnNumber + k * ApartmentsTableInfo.MainRoomCells;
-                        _mainTable.Columns[columnIndex + 2].DataType = typeof(double);
+                        SetTypeForColumns(new int[] { columnIndex + 2 });
                     }
                     columnNumber += priority.MaxRoomAmount * ApartmentsTableInfo.MainRoomCells;
                 }
