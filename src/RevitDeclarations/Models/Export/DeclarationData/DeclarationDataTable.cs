@@ -20,7 +20,7 @@ namespace RevitDeclarations.Models {
             _mainTable = new DataTable();
             _headerTable = new DataTable();
             CreateColumns();
-            SetTypeForColumns(_tableInfo.ColumnsWithDoubleType);
+            SetTypeForColumns(_tableInfo.NumericColumnsIndexes);
             CreateRows();
         }
 
@@ -31,14 +31,14 @@ namespace RevitDeclarations.Models {
         public List<IDeclarationDataTable> SubTables => _subTables;
 
         private protected void CreateColumns() {
-            for(int i = 0; i <= _tableInfo.FullTableWidth; i++) {
+            for(int i = 0; i <= _tableInfo.ColumnsTotalNumber; i++) {
                 _mainTable.Columns.Add();
                 _headerTable.Columns.Add();
             }
         }
 
         private protected void CreateRows() {
-            for(int i = 0; i < _tableInfo.RowsNumber; i++) {
+            for(int i = 0; i < _tableInfo.RowsTotalNumber; i++) {
                 _mainTable.Rows.Add();
             }
 

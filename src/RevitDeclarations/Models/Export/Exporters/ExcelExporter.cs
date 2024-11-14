@@ -102,7 +102,7 @@ namespace RevitDeclarations.Models {
 
             // Настройка границ и выравнивания для всей таблицы
             Range firstCell = (Range) workSheet.Cells[1, 1];
-            Range lastCell = (Range) workSheet.Cells[tableInfo.RoomGroups.Count + 1, tableInfo.FullTableWidth];
+            Range lastCell = (Range) workSheet.Cells[tableInfo.RoomGroups.Count + 1, tableInfo.ColumnsTotalNumber];
             workSheet.Range[firstCell, lastCell].Borders.ColorIndex = 0;
             workSheet.Range[firstCell, lastCell].HorizontalAlignment = XlHAlign.xlHAlignCenter;
             workSheet.Range[firstCell, lastCell].VerticalAlignment = XlVAlign.xlVAlignCenter;
@@ -115,17 +115,17 @@ namespace RevitDeclarations.Models {
             font.Bold = true;
 
             // Настройка графики и форматов по столбцам
-            for(int i = 1; i <= tableInfo.FullTableWidth; i++) {
+            for(int i = 1; i <= tableInfo.ColumnsTotalNumber; i++) {
                 // Общая информация про группы помещений
-                if(i <= tableInfo.RoomGroupsInfoWidth) {
+                if(i <= tableInfo.GroupsInfoColumnsNumber) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 15.5;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _apartInfoColor;
                 // Основные помещения квартир
-                } else if(i > tableInfo.RoomGroupsInfoWidth && i <= tableInfo.SummerRoomsStart) {
+                } else if(i > tableInfo.GroupsInfoColumnsNumber && i <= tableInfo.SummerRoomsStart) {
                     ((Range) workSheet.Columns[i]).ColumnWidth = 10;
                     ((Range) workSheet.Cells[1, i]).Interior.Color = _mainRoomsColor;
 
-                    int checkColumnNumber = (i - tableInfo.RoomGroupsInfoWidth) % 3;
+                    int checkColumnNumber = (i - tableInfo.GroupsInfoColumnsNumber) % 3;
                     if(checkColumnNumber == 0) {
                         ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
