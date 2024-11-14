@@ -6,37 +6,38 @@ using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
     internal class CommercialTableInfo : ITableInfo {
-        private readonly IReadOnlyCollection<CommercialRooms> _commercialRooms;
-        private readonly DeclarationSettings _settings;
-
-        private readonly int _fullTableWidth;
+        private readonly int _columnsTotalNumber;
+        private readonly int _rowsTotalNumber;
         private readonly int _summerRoomsStart;
         private readonly int _otherRoomsStart;
         private readonly int _utpStart;
-        private readonly int[] _columnsWithDoubleType;
-        private readonly int _rowsNumber;
+        private readonly int[] _numericColumnsIndexes;
+
+        private readonly DeclarationSettings _settings;
+        private readonly IReadOnlyCollection<CommercialRooms> _commercialRooms;
 
         public CommercialTableInfo(IReadOnlyCollection<CommercialRooms> commercialRooms, 
                                    DeclarationSettings settings) {
             _commercialRooms = commercialRooms;
             _settings = settings;
 
-            _fullTableWidth = 13;
+            _columnsTotalNumber = 13;
             _summerRoomsStart = 0;
             _otherRoomsStart = 0;
             _utpStart = 0;
-            _columnsWithDoubleType = new int[] { 7, 8 };
-            _rowsNumber = RoomGroups.Count;
+            _numericColumnsIndexes = new int[] { 7, 8 };
+            _rowsTotalNumber = RoomGroups.Count;
         }
 
-        public IReadOnlyCollection<RoomGroup> RoomGroups => _commercialRooms;
-        public int[] ColumnsWithDoubleType => _columnsWithDoubleType;
-        public DeclarationSettings Settings => _settings;
-        public int FullTableWidth => _fullTableWidth;
-        public int RowsNumber => _rowsNumber;
-        public int RoomGroupsInfoWidth => _fullTableWidth;
+        public int ColumnsTotalNumber => _columnsTotalNumber;
+        public int RowsTotalNumber => _rowsTotalNumber;
+        public int GroupsInfoColumnsNumber => _columnsTotalNumber;
         public int SummerRoomsStart => _summerRoomsStart;
         public int OtherRoomsStart => _otherRoomsStart;
         public int UtpStart => _utpStart;
+        public int[] NumericColumnsIndexes => _numericColumnsIndexes;
+
+        public DeclarationSettings Settings => _settings;
+        public IReadOnlyCollection<RoomGroup> RoomGroups => _commercialRooms;
     }
 }

@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
     internal interface ITableInfo {
-        int FullTableWidth { get; }
-        int RowsNumber { get; }
-        int RoomGroupsInfoWidth { get; }
+        int ColumnsTotalNumber { get; }
+        int RowsTotalNumber { get; }
+
+        int GroupsInfoColumnsNumber { get; }
         int SummerRoomsStart { get; }
         int OtherRoomsStart { get; }
         int UtpStart { get; }
-        int[] ColumnsWithDoubleType { get; }
+        int[] NumericColumnsIndexes { get; }
 
         DeclarationSettings Settings { get; }
         IReadOnlyCollection<RoomGroup> RoomGroups { get; }
