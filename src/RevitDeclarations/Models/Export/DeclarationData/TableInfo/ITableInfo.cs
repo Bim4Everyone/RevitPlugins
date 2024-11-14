@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace RevitDeclarations.Models {
     internal interface ITableInfo {
         int FullTableWidth { get; }
+        int RowsNumber { get; }
         int RoomGroupsInfoWidth { get; }
         int SummerRoomsStart { get; }
         int OtherRoomsStart { get; }

@@ -14,6 +14,7 @@ namespace RevitDeclarations.Models {
         private readonly int _otherRoomsStart;
         private readonly int _utpStart;
         private readonly int[] _columnsWithDoubleType;
+        private readonly int _rowsNumber;
 
         public CommercialTableInfo(IReadOnlyCollection<CommercialRooms> commercialRooms, 
                                    DeclarationSettings settings) {
@@ -25,12 +26,14 @@ namespace RevitDeclarations.Models {
             _otherRoomsStart = 0;
             _utpStart = 0;
             _columnsWithDoubleType = new int[] { 7, 8 };
-    }
+            _rowsNumber = RoomGroups.Count;
+        }
 
         public IReadOnlyCollection<RoomGroup> RoomGroups => _commercialRooms;
         public int[] ColumnsWithDoubleType => _columnsWithDoubleType;
         public DeclarationSettings Settings => _settings;
         public int FullTableWidth => _fullTableWidth;
+        public int RowsNumber => _rowsNumber;
         public int RoomGroupsInfoWidth => _fullTableWidth;
         public int SummerRoomsStart => _summerRoomsStart;
         public int OtherRoomsStart => _otherRoomsStart;

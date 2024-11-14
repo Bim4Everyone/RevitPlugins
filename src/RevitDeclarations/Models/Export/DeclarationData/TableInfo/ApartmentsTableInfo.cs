@@ -11,6 +11,7 @@ namespace RevitDeclarations.Models {
         private readonly IReadOnlyCollection<Apartment> _apartments;
         private readonly DeclarationSettings _settings;
         private readonly int _roomGroupsInfoWidth;
+        private readonly int _rowsNumber;
 
         private int _fullTableWidth;
         private int _summerRoomsStart;
@@ -26,6 +27,8 @@ namespace RevitDeclarations.Models {
             if(!_settings.LoadUtp) {
                 UtpWidth = 0;
             }
+
+            _rowsNumber = RoomGroups.Count;
 
             List<string> otherNames = GetOtherPriorities();
             settings.UpdatePriorities(otherNames);
@@ -43,6 +46,7 @@ namespace RevitDeclarations.Models {
         public int[] ColumnsWithDoubleType => _columnsWithDoubleType;
         public DeclarationSettings Settings => _settings;
         public int FullTableWidth => _fullTableWidth;
+        public int RowsNumber => _rowsNumber;
         public int RoomGroupsInfoWidth => _roomGroupsInfoWidth;
         public int SummerRoomsStart => _summerRoomsStart;
         public int OtherRoomsStart => _otherRoomsStart;

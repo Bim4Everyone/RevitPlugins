@@ -15,6 +15,7 @@ namespace RevitDeclarations.Models
         private readonly int _otherRoomsStart;
         private readonly int _utpStart;
         private readonly int[] _columnsWithDoubleType;
+        private readonly int _rowsNumber;
 
         public PublicAreasTableInfo(IReadOnlyCollection<PublicArea> publicAreas,
                                     DeclarationSettings settings) {
@@ -26,12 +27,14 @@ namespace RevitDeclarations.Models
             _otherRoomsStart = 0;
             _utpStart = 0;
             _columnsWithDoubleType = new int[] { 4 };
+            _rowsNumber = RoomGroups.Count;
         }
 
         public IReadOnlyCollection<RoomGroup> RoomGroups => _publicAreas;
         public int[] ColumnsWithDoubleType => _columnsWithDoubleType;
         public DeclarationSettings Settings => _settings;
         public int FullTableWidth => _fullTableWidth;
+        public int RowsNumber => _rowsNumber;
         public int RoomGroupsInfoWidth => _fullTableWidth;
         public int SummerRoomsStart => _summerRoomsStart;
         public int OtherRoomsStart => _otherRoomsStart;

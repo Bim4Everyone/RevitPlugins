@@ -38,7 +38,7 @@ namespace RevitDeclarations.Models {
         }
 
         private protected void CreateRows() {
-            for(int i = 0; i < _tableInfo.RoomGroups.Count; i++) {
+            for(int i = 0; i < _tableInfo.RowsNumber; i++) {
                 _mainTable.Rows.Add();
             }
 
