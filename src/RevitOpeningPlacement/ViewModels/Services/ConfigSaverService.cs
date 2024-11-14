@@ -17,7 +17,7 @@ namespace RevitOpeningPlacement.ViewModels.Services {
             saveWindow.AddExtension = true;
             saveWindow.Filter = "OpeningConfig |*.json";
             saveWindow.FilterIndex = 1;
-            if(!saveWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "config")) {
+            if(!saveWindow.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Настройки заданий на отверстия")) {
                 throw new OperationCanceledException();
             }
             var configSaver = new ConfigSaver(document);
