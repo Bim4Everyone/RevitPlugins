@@ -64,7 +64,7 @@ namespace RevitDeclarations.ViewModels {
 
             // Проверка 2. Наличие групп помещений на выбранной стадии во всех выбранных проектах.
             IEnumerable<ErrorsListViewModel> noApartsErrors = projects
-                .Select(x => x.CheckRoomGroupsInRpoject())
+                .Select(x => x.CheckRoomGroupsInProject())
                 .Where(x => x.Errors.Any());
             if(noApartsErrors.Any()) {
                 var window = new ErrorWindow() { DataContext = new ErrorsViewModel(noApartsErrors, false) };
