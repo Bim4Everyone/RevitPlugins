@@ -27,7 +27,10 @@ namespace RevitDeclarations.Models {
             IEnumerable<RevitLinkType> loadedLinkTypes = new FilteredElementCollector(Document)
                 .OfClass(typeof(RevitLinkType))
                 .Cast<RevitLinkType>()
+                .Where(x => !x.IsNestedLink)
                 .Where(x => x.GetLinkedFileStatus() == LinkedFileStatus.Loaded);
+
+            var temp = loadedLinkTypes.ToList();
 
             ElementClassFilter filter = new ElementClassFilter(typeof(RevitLinkInstance));
 
