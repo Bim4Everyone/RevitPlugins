@@ -25,6 +25,7 @@ namespace RevitDeclarations.Models {
             _utpStart = 0;
         }
 
+        public DeclarationSettings Settings => _settings;
         public IReadOnlyCollection<RoomGroup> RoomGroups => _roomGroups;
         public int FullTableWidth => _fullTableWidth;
         public int RoomGroupsInfoWidth => _fullTableWidth;

@@ -12,6 +12,7 @@ namespace RevitDeclarations.Models {
         int OtherRoomsStart { get; }
         int UtpStart { get; }
 
+        DeclarationSettings Settings { get; }
         IReadOnlyCollection<RoomGroup> RoomGroups { get; }
     }
 }
