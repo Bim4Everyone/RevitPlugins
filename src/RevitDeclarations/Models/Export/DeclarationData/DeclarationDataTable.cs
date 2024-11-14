@@ -20,6 +20,8 @@ namespace RevitDeclarations.Models {
             _mainTable = new DataTable();
             _headerTable = new DataTable();
             CreateColumns();
+            SetTypeForColumns(_tableInfo.ColumnsWithDoubleType);
+            CreateRows();
         }
 
         public DataTable MainDataTable => _mainTable;

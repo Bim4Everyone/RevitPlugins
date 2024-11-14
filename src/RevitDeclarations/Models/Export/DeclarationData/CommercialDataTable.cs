@@ -8,9 +8,6 @@ using System.Threading.Tasks;
 namespace RevitDeclarations.Models {
     internal class CommercialDataTable : DeclarationDataTable {
         public CommercialDataTable(CommercialTableInfo tableInfo) : base(tableInfo) {
-            SetTypeForColumns(new int[]{ 7, 8 });
-            CreateRows();
-
             FillTableRoomsHeader();
             FillTableRoomsInfo();
             GenerateSubTables();
@@ -60,7 +57,7 @@ namespace RevitDeclarations.Models {
                     List<CommercialRooms> rooms = new List<CommercialRooms> { commercialRooms };
 
                     CommercialGroupTableInfo tableInfo = new CommercialGroupTableInfo(rooms, _settings);
-                    CommercialGroupDataTable table = new CommercialGroupDataTable(tableInfo, _settings);
+                    CommercialGroupDataTable table = new CommercialGroupDataTable(tableInfo);
 
                     _subTables.Add(table);
                 }

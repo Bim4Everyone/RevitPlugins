@@ -11,6 +11,7 @@ namespace RevitDeclarations.Models {
         int SummerRoomsStart { get; }
         int OtherRoomsStart { get; }
         int UtpStart { get; }
+        int[] ColumnsWithDoubleType { get; }
 
         DeclarationSettings Settings { get; }
         IReadOnlyCollection<RoomGroup> RoomGroups { get; }

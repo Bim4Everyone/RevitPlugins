@@ -16,6 +16,7 @@ namespace RevitDeclarations.Models {
         private int _summerRoomsStart;
         private int _otherRoomsStart;
         private int _utpStart;
+        private readonly int[] _columnsWithDoubleType;
 
         public ApartmentsTableInfo(IReadOnlyCollection<Apartment> apartments, DeclarationSettings settings) {
             _apartments = apartments;
@@ -31,9 +32,15 @@ namespace RevitDeclarations.Models {
 
             CountRoomsForPriorities();
             CalculateTableSizes();
+
+            int[] mainColumnsIndexes = new int[] { 7, 8, 9, 10, 13, 14 };
+            _columnsWithDoubleType = mainColumnsIndexes
+                .Concat(FindDataColumns())
+                .ToArray();
         }
 
         public IReadOnlyCollection<RoomGroup> RoomGroups => _apartments;
+        public int[] ColumnsWithDoubleType => _columnsWithDoubleType;
         public DeclarationSettings Settings => _settings;
         public int FullTableWidth => _fullTableWidth;
         public int RoomGroupsInfoWidth => _roomGroupsInfoWidth;
@@ -89,6 +96,29 @@ namespace RevitDeclarations.Models {
             _summerRoomsStart = RoomGroupsInfoWidth + mainRoomsWidth;
             _otherRoomsStart = RoomGroupsInfoWidth + mainRoomsWidth + summerRoomsWidth;
             _utpStart = RoomGroupsInfoWidth + mainRoomsWidth + summerRoomsWidth + otherRoomsWidth;
+        }
+
+        private int[] FindDataColumns() {
+            List<int> columnsIndexes = new List<int>();
+            int columnNumber = RoomGroupsInfoWidth;
+
+            foreach(RoomPriority priority in _settings.UsedPriorities) {
+                if(priority.IsSummer) {
+                    for(int k = 0; k < priority.MaxRoomAmount; k++) {
+                        int columnIndex = columnNumber + k * SummerRoomCells;
+                        columnsIndexes.Add(columnIndex + 2);
+                        columnsIndexes.Add(columnIndex + 3);
+                    }
+                    columnNumber += priority.MaxRoomAmount * SummerRoomCells;
+                } else {
+                    for(int k = 0; k < priority.MaxRoomAmount; k++) {
+                        int columnIndex = columnNumber + k * MainRoomCells;
+                        columnsIndexes.Add(columnIndex + 2);
+                    }
+                    columnNumber += priority.MaxRoomAmount * MainRoomCells;
+                }
+            }
+            return columnsIndexes.ToArray();
         }
     }
 }

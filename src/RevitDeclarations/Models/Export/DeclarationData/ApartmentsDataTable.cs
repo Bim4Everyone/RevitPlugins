@@ -5,34 +5,10 @@ using System.Linq;
 namespace RevitDeclarations.Models {
     internal class ApartmentsDataTable : DeclarationDataTable {
         public ApartmentsDataTable(ApartmentsTableInfo tableInfo) : base(tableInfo) {
-            SetTypeForColumns(new int[] { 7, 8, 9, 10, 13, 14 });
-            SetDataTypesRoomColumns();
-            CreateRows();
-
             FillTableApartmentHeader();
             FillTableRoomsHeader();
             FillTableApartmentsInfo();
             FillTableUtpInfo();
-        }
-
-        private void SetDataTypesRoomColumns() {
-            int columnNumber = _tableInfo.RoomGroupsInfoWidth;
-
-            foreach(RoomPriority priority in _settings.UsedPriorities) {
-                if(priority.IsSummer) {
-                    for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        int columnIndex = columnNumber + k * ApartmentsTableInfo.SummerRoomCells;
-                        SetTypeForColumns(new int[] { columnIndex + 2, columnIndex + 3 });
-                    }
-                    columnNumber += priority.MaxRoomAmount * ApartmentsTableInfo.SummerRoomCells;
-                } else {
-                    for(int k = 0; k < priority.MaxRoomAmount; k++) {
-                        int columnIndex = columnNumber + k * ApartmentsTableInfo.MainRoomCells;
-                        SetTypeForColumns(new int[] { columnIndex + 2 });
-                    }
-                    columnNumber += priority.MaxRoomAmount * ApartmentsTableInfo.MainRoomCells;
-                }
-            }
         }
 
         private void FillTableApartmentHeader() {

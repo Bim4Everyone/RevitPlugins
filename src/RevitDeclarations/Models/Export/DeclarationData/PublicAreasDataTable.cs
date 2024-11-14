@@ -8,9 +8,6 @@ using System.Threading.Tasks;
 namespace RevitDeclarations.Models { 
     internal class PublicAreasDataTable : DeclarationDataTable {
         public PublicAreasDataTable(PublicAreasTableInfo tableInfo) : base(tableInfo) {
-            SetTypeForColumns(new int[] { 4 });
-            CreateRows();
-
             FillTableApartmentHeader();
             FillTableApartmentsInfo();
         }
