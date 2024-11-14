@@ -131,7 +131,7 @@ namespace RevitDeclarations.ViewModels {
             }
         }
 
-        public virtual void ExportDeclaration(object obj) { }
+        public abstract void ExportDeclaration(object obj);
 
         public bool CanExport(object obj) {
             IEnumerable<RevitDocumentViewModel> checkedDocuments = _revitDocuments
