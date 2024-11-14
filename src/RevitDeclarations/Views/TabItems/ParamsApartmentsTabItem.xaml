@@ -100,7 +100,7 @@
                 Grid.Row="2"
                 Grid.Column="1"
                 Style="{StaticResource ParameterName}"
-                Text="Конфигурация А101:"/>
+                Text="Корпоративная конфигурация:"/>
             <Button
                 Grid.Row="2"
                 Grid.Column="2"
