@@ -8,7 +8,7 @@ using Autodesk.Revit.DB;
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
-    internal class DeclarationProject {
+    internal abstract class DeclarationProject {
         private protected readonly RevitDocumentViewModel _document;
         private protected readonly DeclarationSettings _settings;
         private protected readonly RevitRepository _revitRepository;
@@ -48,7 +48,7 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
-        public ErrorsListViewModel CheckRoomGroupsInRpoject() {
+        public ErrorsListViewModel CheckRoomGroupsInProject() {
             ErrorsListViewModel errorListVM = new ErrorsListViewModel() {
                 Message = "Ошибка",
                 Description = "В проекте отсутствуют необходимые группы помещений на выбранной стадии",

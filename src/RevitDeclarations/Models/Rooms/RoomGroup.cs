@@ -5,7 +5,7 @@ using System.Linq;
 using pyRevitLabs.Json;
 
 namespace RevitDeclarations.Models {
-    internal class RoomGroup {
+    internal abstract class RoomGroup {
         private protected const double _maxAreaDeviation = 0.2;
 
         private protected readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
