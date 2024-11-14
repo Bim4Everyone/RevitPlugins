@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
 namespace RevitDeclarations.Models {
-    internal class DeclarationConfigSettings : ProjectSettings {
+    internal abstract class DeclarationConfigSettings : ProjectSettings {
         public override string ProjectName { get; set; }
 
         public string DeclarationName { get; set; }
