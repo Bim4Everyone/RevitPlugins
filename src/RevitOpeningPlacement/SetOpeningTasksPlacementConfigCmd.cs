@@ -75,6 +75,9 @@ namespace RevitOpeningPlacement {
                     .ToMethod(c =>
                         OpeningConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
                     );
+                kernel.Bind<ConfigFileService>()
+                    .ToSelf()
+                    .InSingletonScope();
 
                 kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
