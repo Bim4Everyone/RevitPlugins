@@ -144,11 +144,11 @@ namespace RevitExamplePlugin.ViewModels {
                 view.ShowDialog();
             }
         }
-        
+
         private void ShowWall(WallViewModel wallViewModel) {
             _wallRevitRepository.ShowElements(wallViewModel.Wall);
         }
-        
+
         private bool CanShowWall(WallViewModel wallViewModel) {
             return wallViewModel != null;
         }
