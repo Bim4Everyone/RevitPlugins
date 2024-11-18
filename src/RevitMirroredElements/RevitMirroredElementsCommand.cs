@@ -1,13 +1,23 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 
+using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Bim4Everyone.Templates;
+using dosymep.SimpleServices;
+using dosymep.WPF.Views;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -19,43 +29,33 @@ namespace RevitMirroredElements {
     [Transaction(TransactionMode.Manual)]
     public class RevitMirroredElementsCommand : BasePluginCommand {
         public RevitMirroredElementsCommand() {
-            PluginName = "Проверка на зеркальность";
+            PluginName = "RevitMirroredElements";
         }
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
 
-
-                kernel.Bind<CategoriesViewModel>()
-                   .ToSelf()
-                   .InTransientScope()
-                   .WithPropertyValue(nameof(Window.Title), PluginName)
-                   .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<CategoriesViewModel>())
-                   .WithPropertyValue(nameof(Window.Owner), c => c.Kernel.Get<MainWindow>());
-
-
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                var mainWindow = kernel.Get<MainWindow>();
-                var mainViewModel = kernel.Get<MainViewModel>();
-                mainViewModel.MainWindow = mainWindow;
-                mainWindow.DataContext = mainViewModel;
-                mainWindow.Title = PluginName;
+                kernel.Bind<MainViewModel>().ToSelf();
+                kernel.Bind<MainWindow>().ToSelf()
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<MainViewModel>())
+                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                        c => c.Kernel.Get<ILocalizationService>());
 
-                UpdateParams(uiApplication);
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-                Notification(mainWindow);
+                kernel.UseXtraLocalization(
+                    $"/{assemblyName};component/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
+
+                Notification(kernel.Get<MainWindow>());
             }
-        }
-        private static void UpdateParams(UIApplication uiApplication) {
-            ProjectParameters projectParameters = ProjectParameters.Create(uiApplication.Application);
-            projectParameters.SetupRevitParams(uiApplication.ActiveUIDocument.Document,
-                SharedParamsConfig.Instance.ElementMirroring);
         }
     }
 }

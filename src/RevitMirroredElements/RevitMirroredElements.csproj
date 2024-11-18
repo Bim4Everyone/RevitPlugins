@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <UseDevExpress>false</UseDevExpress>
+        <UseDevExpress>true</UseDevExpress>
     </PropertyGroup>
 </Project>
