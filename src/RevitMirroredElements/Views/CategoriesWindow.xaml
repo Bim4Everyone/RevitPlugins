@@ -30,9 +30,9 @@
             Margin="10">
             <Grid>
                 <TextBox
-                    Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                     Margin="0,5,0,5"
-                    VerticalAlignment="Center" />
+                    VerticalAlignment="Center"
+                    Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBlock
                     Text="Введите для поиска..."
                     IsHitTestVisible="False"
@@ -46,11 +46,11 @@
                 VerticalScrollBarVisibility="Auto"
                 Height="300">
                 <DataGrid
-                    ItemsSource="{Binding FilteredCategories, UpdateSourceTrigger=PropertyChanged}"
                     AutoGenerateColumns="False"
                     HeadersVisibility="Column"
                     Margin="0,0,0,15"
-                    CanUserAddRows="False">
+                    CanUserAddRows="False"
+                    ItemsSource="{Binding FilteredCategories, UpdateSourceTrigger=PropertyChanged}">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn
                             Width="30">
@@ -64,9 +64,9 @@
                         </DataGridTemplateColumn>
 
                         <DataGridTextColumn
-                            Binding="{Binding Name}"
                             Header="Категория"
-                            Width="*" />
+                            Width="*"
+                            Binding="{Binding Name}" />
                     </DataGrid.Columns>
                 </DataGrid>
             </ScrollViewer>
@@ -74,8 +74,8 @@
             <CheckBox
                 Content="Выбрать все / Отменить все"
                 Margin="5,10,0,5"
-                IsChecked="{Binding AllCategoriesSelected, Mode=TwoWay}"
-                HorizontalAlignment="Left" />
+                HorizontalAlignment="Left"
+                IsChecked="{Binding AllCategoriesSelected, Mode=TwoWay}" />
             <Button
                 Margin="10"
                 Width="100"

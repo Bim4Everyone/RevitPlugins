@@ -57,11 +57,11 @@
                         IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedElements}"/>
 
                     <Button
-                        Content="Выбрать"
                         Width="80"
-                        Command="{Binding SelectElementsCommand}"
+                        Grid.Column="1"
+                        Content="Выбрать"
                         HorizontalAlignment="Right"
-                        Grid.Column="1" />
+                        Command="{Binding SelectElementsCommand}"/>
                 </Grid>
 
                 <Grid

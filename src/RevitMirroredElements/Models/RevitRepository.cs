@@ -182,6 +182,5 @@ namespace RevitMirroredElements.Models {
             var elementIds = elements.Select(x => x.Id).ToList();
             ActiveUIDocument.Selection.SetElementIds(elementIds);
         }
-
     }
 }

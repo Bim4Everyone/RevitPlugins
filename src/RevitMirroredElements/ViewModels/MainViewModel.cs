@@ -20,8 +20,6 @@ namespace RevitMirroredElements.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
 
-        //private readonly RevitEventHandler _revitEventHandler;
-
         private string _errorText;
         private string _selectedElementsText;
         private string _selectedCategoriesText;
