@@ -38,7 +38,7 @@ namespace RevitDeclarations.Models {
 
             int[] mainColumnsIndexes = new int[] { 7, 8, 9, 10, 13, 14 };
             _numericColumnsIndexes = mainColumnsIndexes
-                .Concat(FindDataColumns())
+                .Concat(FindNumericColumns())
                 .ToArray();
         }
 
@@ -104,7 +104,7 @@ namespace RevitDeclarations.Models {
             _utpStart = GroupsInfoColumnsNumber + mainRoomsWidth + summerRoomsWidth + otherRoomsWidth;
         }
 
-        private int[] FindDataColumns() {
+        private int[] FindNumericColumns() {
             List<int> columnsIndexes = new List<int>();
             int columnNumber = GroupsInfoColumnsNumber;
 

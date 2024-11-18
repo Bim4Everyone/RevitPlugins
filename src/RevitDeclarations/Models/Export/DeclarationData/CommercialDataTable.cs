@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 namespace RevitDeclarations.Models {
     internal class CommercialDataTable : DeclarationDataTable {
         public CommercialDataTable(CommercialTableInfo tableInfo) : base(tableInfo) {
-            FillTableRoomsHeader();
-            FillTableRoomsInfo();
+            FillTableHeader();
+            FillMainTable();
             GenerateSubTables();
         }
 
-        private void FillTableRoomsHeader() {
+        private void FillTableHeader() {
             _headerTable.Rows[0][0] = "Условный номер";
             _headerTable.Rows[0][1] = "Назначение";
             _headerTable.Rows[0][2] = "Этаж расположения";
@@ -29,7 +29,7 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows[0][12] = "ИД объекта";
         }
 
-        private void FillTableRoomsInfo() {
+        private void FillMainTable() {
             int rowNumber = 0;
 
             foreach(CommercialRooms commercialRooms in _tableInfo.RoomGroups.Cast<CommercialRooms>()) {

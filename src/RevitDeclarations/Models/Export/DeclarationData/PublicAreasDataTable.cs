@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 namespace RevitDeclarations.Models { 
     internal class PublicAreasDataTable : DeclarationDataTable {
         public PublicAreasDataTable(PublicAreasTableInfo tableInfo) : base(tableInfo) {
-            FillTableApartmentHeader();
-            FillTableApartmentsInfo();
+            FillTableHeader();
+            FillMainTable();
         }
 
-        private void FillTableApartmentHeader() {
+        private void FillTableHeader() {
             _headerTable.Rows[0][0] = "№ п/п";
             _headerTable.Rows[0][1] = "Вид помещения";
             _headerTable.Rows[0][2] = "Описание места расположения помещения";
@@ -20,7 +20,7 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows[0][4] = "Площадь, м²";
             _headerTable.Rows[0][5] = "ИД объекта";
         }
-        private void FillTableApartmentsInfo() {
+        private void FillMainTable() {
             int rowNumber = 0;
 
             foreach(PublicArea publicArea in _tableInfo.RoomGroups.Cast<PublicArea>()) {

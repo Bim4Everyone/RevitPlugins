@@ -4,17 +4,17 @@ using System.Linq;
 namespace RevitDeclarations.Models {
     internal class CommercialGroupDataTable : DeclarationDataTable {
         public CommercialGroupDataTable(CommercialGroupTableInfo tableInfo) : base(tableInfo) {
-            FillTableRoomsHeader();
-            FillTableRoomsInfo();
+            FillTableHeader();
+            FillMainTable();
         }
 
-        private void FillTableRoomsHeader() {
+        private void FillTableHeader() {
             _headerTable.Rows[0][0] = "Наименование помещения";
             _headerTable.Rows[0][1] = "Площадь, м²";
             _headerTable.Rows[0][2] = "Условный номер";
         }
 
-        private void FillTableRoomsInfo() {
+        private void FillMainTable() {
             int rowNumber = 0;
 
             CommercialRooms commercialRooms = _tableInfo.RoomGroups
