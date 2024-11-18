@@ -61,27 +61,30 @@ namespace RevitDeclarations.Models {
 
                 int counter = 1;
                 if(declarationTable.SubTables.Any()) {
+                    Worksheet subWorkSheet = null;
 
                     foreach(var subTable in declarationTable.SubTables) {
-                        workSheet = (Worksheet) workSheets.Add(After: workBook.Sheets[workBook.Sheets.Count]);
-                        workSheet.Name = $"Части помещений-{counter}";
+                        subWorkSheet = (Worksheet) workSheets.Add(After: workBook.Sheets[workBook.Sheets.Count]);
+                        subWorkSheet.Name = $"Части помещений-{counter}";
 
                         DataTable subHeaderTable = subTable.HeaderDataTable;
                         for(int i = 0; i < subHeaderTable.Columns.Count; i++) {
-                            workSheet.Cells[1, i + 1] = subHeaderTable.Rows[0][i];
+                            subWorkSheet.Cells[1, i + 1] = subHeaderTable.Rows[0][i];
                         }
 
                         DataTable subMainTable = subTable.MainDataTable;
                         for(int i = 0; i < subMainTable.Rows.Count; i++) {
                             for(int j = 0; j < subMainTable.Columns.Count; j++) {
-                                workSheet.Cells[i + 2, j + 1] = subMainTable.Rows[i][j];
+                                subWorkSheet.Cells[i + 2, j + 1] = subMainTable.Rows[i][j];
                             }
                         }
 
-                        SetSubSheetGraphicSettings(workSheet);
+                        SetSubSheetGraphicSettings(subWorkSheet);
                         counter++;
                     }
                 }
+
+                workSheet.Activate();
 
                 workBook.SaveAs(path);
                 workBook.Close(false);
