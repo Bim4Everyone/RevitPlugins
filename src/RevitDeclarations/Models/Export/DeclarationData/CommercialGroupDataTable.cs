@@ -9,8 +9,8 @@ namespace RevitDeclarations.Models {
         }
 
         private void FillTableHeader() {
-            _headerTable.Rows[0][0] = "Наименование помещения";
-            _headerTable.Rows[0][1] = "Площадь, м²";
+            _headerTable.Rows[0][0] = "Наименование частей нежилых помещений";
+            _headerTable.Rows[0][1] = "Площадь частей нежилых помещений, м²";
             _headerTable.Rows[0][2] = "Условный номер";
         }
 

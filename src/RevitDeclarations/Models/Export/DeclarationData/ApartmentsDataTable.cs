@@ -21,14 +21,14 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows[0][4] = "Номер корпуса";
             _headerTable.Rows[0][5] = "Номер здания";
             _headerTable.Rows[0][6] = "Номер ОКС";
-            _headerTable.Rows[0][7] = "Общая площадь с пониж. коэффициентом, м2";
+            _headerTable.Rows[0][7] = "Общая площадь с пониж. коэффициентом, м²";
             _headerTable.Rows[0][8] = "Количество комнат";
-            _headerTable.Rows[0][9] = "Жилая площадь, м2";
+            _headerTable.Rows[0][9] = "Жилая площадь, м²";
             _headerTable.Rows[0][10] = "Высота потолков, м";
             _headerTable.Rows[0][11] = "ИД Объекта";
             _headerTable.Rows[0][12] = "Номер на площадке";
-            _headerTable.Rows[0][13] = "Общая площадь без пониж. коэффициента, м2";
-            _headerTable.Rows[0][14] = "Площадь квартиры без летних помещений, м2";
+            _headerTable.Rows[0][13] = "Общая площадь без пониж. коэффициента, м²";
+            _headerTable.Rows[0][14] = "Площадь квартиры без летних помещений, м²";
 
             if(_settings.LoadUtp) {
                 _headerTable.Rows[0][_tableInfo.UtpStart] = "Две ванны";
@@ -52,7 +52,7 @@ namespace RevitDeclarations.Models {
                         int columnIndex = columnNumber + k * ApartmentsTableInfo.SummerRoomCells;
                         _headerTable.Rows[0][columnIndex] = "№ Пом.";
                         _headerTable.Rows[0][columnIndex + 1] = "Наименование на планировке";
-                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name} {k + 1}, площадь без коэф.";
+                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name} {k + 1}, без коэф.";
                         _headerTable.Rows[0][columnIndex + 3] = $"{priority.Name} {k + 1}, площадь с коэф.";
                     }
                     columnNumber += priority.MaxRoomAmount * ApartmentsTableInfo.SummerRoomCells;
