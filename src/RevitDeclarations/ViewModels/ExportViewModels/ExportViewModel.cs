@@ -26,6 +26,6 @@ namespace RevitDeclarations.ViewModels {
             TaskDialog.Show("Декларации", $"Файл {Name} создан");
         }
 
-        public abstract void Export(string path, IEnumerable<RoomGroup> apartments);
+        public abstract void Export(string path, IEnumerable<RoomGroup> roomGroups);
     }
 }

@@ -12,9 +12,10 @@ namespace RevitDeclarations.ViewModels {
             : base(name, id, settings) {
         }
 
-        public override void Export(string path, IEnumerable<RoomGroup> apartments) {
+        public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {
+            var apartments = roomGroups.Cast<Apartment>();
             JsonExporter<Apartment> exporter = new JsonExporter<Apartment>();
-            exporter.Export(path, apartments.Cast<Apartment>());
+            exporter.Export(path, apartments);
             TaskDialog.Show("Декларации", $"Файл {Name} создан");
         }
     }

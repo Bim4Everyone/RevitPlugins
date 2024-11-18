@@ -12,9 +12,9 @@ namespace RevitDeclarations.ViewModels {
             : base(name, id, settings) {
         }
 
-        public override void Export(string path, IEnumerable<RoomGroup> commercialRooms) {
-            CommercialTableInfo tableInfo = 
-                new CommercialTableInfo(commercialRooms.Cast<CommercialRooms>().ToList(), _settings);
+        public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {
+            List<CommercialRooms> commercialRooms = roomGroups.Cast<CommercialRooms>().ToList();
+            CommercialTableInfo tableInfo = new CommercialTableInfo(commercialRooms, _settings);
             CommercialDataTable table = new CommercialDataTable(tableInfo);
 
             ExportTable<ExcelExporter>(path, table);
