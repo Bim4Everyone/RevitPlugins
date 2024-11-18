@@ -163,8 +163,8 @@ namespace RevitDeclarations.Models {
             Microsoft.Office.Interop.Excel.Font font = range.Font;
             font.Bold = true;
 
-            ((Range) workSheet.Columns[1]).ColumnWidth = 35;
-            ((Range) workSheet.Columns[2]).ColumnWidth = 13;
+            ((Range) workSheet.Columns[1]).ColumnWidth = 43;
+            ((Range) workSheet.Columns[2]).ColumnWidth = 43;
             ((Range) workSheet.Columns[3]).ColumnWidth = 17;
 
             ((Range) workSheet.Rows[1]).HorizontalAlignment = XlHAlign.xlHAlignCenter;
