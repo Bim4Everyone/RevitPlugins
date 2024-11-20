@@ -52,6 +52,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
             PlaceSingleOpeningByOneIncomingTask(host, openingTask);
         }
 
+#pragma warning disable 0618
         public void PlaceUnitedOpeningByManyTasks() {
             Element host = _revitRepository.PickHostForRealOpening();
             ICollection<IOpeningTaskIncoming> openingTasks = PickOpeningsTaskIncoming(_config);
@@ -60,7 +61,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
                 openingTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToArray()
                 );
         }
+#pragma warning restore 0618
 
+#pragma warning disable 0618
         public void PlaceSingleOpeningsInOneHost() {
             Element host = _revitRepository.PickHostForRealOpening();
             ICollection<IOpeningTaskIncoming> openingTasks = PickOpeningsTaskIncoming(_config);
@@ -69,6 +72,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
                 openingTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToArray()
                 );
         }
+#pragma warning restore 0618
 
         public void PlaceSingleOpeningsInManyHosts() {
             ICollection<Element> hosts = _revitRepository.PickHostsForRealOpenings();
@@ -125,6 +129,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Размещение чистового отверстия КР по одному заданию на отверстие из связи в одном хосте
         /// </summary>
+#pragma warning disable 0618
         private void PlaceSingleOpeningByOneIncomingTask(Element host, IOpeningTaskIncoming openingTask) {
             using(var transaction = _revitRepository.GetTransaction("Размещение одиночного отверстия")) {
                 try {
@@ -141,6 +146,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
                 transaction.Commit();
             }
         }
+#pragma warning restore 0618
 
         /// <summary>
         /// Размещение объединенного чистового отверстия КР по одному или нескольким заданиям на отверстия из связи(ей) в одном хосте
@@ -188,6 +194,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Размещение нескольких одиночных чистовых отверстий КР в выбранных хостах по всем заданиям на отверстия из связи(ей), которые пересекаются с этими хостами
         /// </summary>
+#pragma warning disable 0618
         private void PlaceSingleOpeningsInManyHostsByIncomingTasks(ICollection<Element> hosts, ICollection<IOpeningTaskIncoming> allOpeningTasks) {
             StringBuilder sb = new StringBuilder();
             using(var transaction = _revitRepository.GetTransaction("Одиночные отверстия в нескольких хостах")) {
@@ -226,6 +233,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
                 _revitRepository.ShowErrorMessage(sb.ToString());
             }
         }
+#pragma warning restore 0618
 
 
         /// <summary>
@@ -259,6 +267,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
                 throw new OpeningNotPlacedException(exFrameworkNull.Message);
             } catch(ArgumentException exFrameworkArg) {
                 throw new OpeningNotPlacedException(exFrameworkArg.Message);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException exInvalid) {
+                throw new OpeningNotPlacedException(exInvalid.Message);
             }
         }
 

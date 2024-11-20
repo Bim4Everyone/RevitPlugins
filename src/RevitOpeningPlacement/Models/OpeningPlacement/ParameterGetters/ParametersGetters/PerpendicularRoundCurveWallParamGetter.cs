@@ -40,21 +40,33 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash.Element2)).GetParamValue();
 
             //отметки отверстия
-            IValueGetter<DoubleParamValue> bottomOffsetValueGetter;
+            IValueGetter<DoubleParamValue> bottomOffsetMmValueGetter;
+            IValueGetter<DoubleParamValue> centerOffsetMmValueGetter;
             if(openingTaskIsRound) {
                 //отверстие круглое
-                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetValueGetter(_pointFinder)).GetParamValue();
-                bottomOffsetValueGetter = new BottomOffsetValueGetter(_pointFinder, openingSizeGetter);
-                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
+                centerOffsetMmValueGetter = new CenterOffsetValueGetter(_pointFinder);
+                bottomOffsetMmValueGetter = new BottomOffsetValueGetter(_pointFinder, openingSizeGetter);
             } else {
                 // отверстие прямоугольное (квадратное)
-                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetOfRectangleOpeningInWallValueGetter(_pointFinder, openingSizeGetter)).GetParamValue();
-                bottomOffsetValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(_pointFinder);
-                yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
+                centerOffsetMmValueGetter = new CenterOffsetOfRectangleOpeningInWallValueGetter(_pointFinder, openingSizeGetter);
+                bottomOffsetMmValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(_pointFinder);
             }
-            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottomAdsk, new BottomOffsetInFeetValueGetter(bottomOffsetValueGetter)).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdsk, new BottomOffsetFromLevelValueGetter(bottomOffsetValueGetter, _levelFinder)).GetParamValue();
-            yield return new DoubleParameterGetter(RevitRepository.OpeningLevelOffsetAdsk, new LevelOffsetValueGetter(_levelFinder)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, centerOffsetMmValueGetter).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetMmValueGetter).GetParamValue();
+            IValueGetter<DoubleParamValue> originOffsetMm;
+            if(openingTaskIsRound) {
+                originOffsetMm = centerOffsetMmValueGetter;
+            } else {
+                originOffsetMm = bottomOffsetMmValueGetter;
+            }
+            var offsetFeetFromLevelValueGetter = new OffsetFromLevelValueGetter(originOffsetMm, _levelFinder);
+            var levelFeetOffsetValueGetter = new LevelOffsetValueGetter(_levelFinder);
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetAdsk, new OffsetInFeetValueGetter(originOffsetMm)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdsk, offsetFeetFromLevelValueGetter).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningLevelOffsetAdsk, levelFeetOffsetValueGetter).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetAdskOld, originOffsetMm).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetFromLevelAdskOld, new OffsetInMmValueGetter(offsetFeetFromLevelValueGetter)).GetParamValue();
+            yield return new DoubleParameterGetter(RevitRepository.OpeningLevelOffsetAdskOld, new OffsetInMmValueGetter(levelFeetOffsetValueGetter)).GetParamValue();
 
             //текстовые данные отверстия
             yield return new StringParameterGetter(RevitRepository.OpeningDate, new DateValueGetter()).GetParamValue();

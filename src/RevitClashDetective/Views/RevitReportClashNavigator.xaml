@@ -13,6 +13,8 @@
     xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     mc:Ignorable="d"
     Title="Навигатор" Height="450" Width="800"
+    MinHeight="300"
+    MinWidth="500"
     d:DataContext="{d:DesignInstance vm:RevitReportClashesViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
         <Grid.RowDefinitions>

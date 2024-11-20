@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 
 namespace RevitPluginTemplate.Views {
     public partial class MainWindow {
@@ -8,7 +8,7 @@ namespace RevitPluginTemplate.Views {
 
         public override string PluginName => nameof(RevitPluginTemplate);
         public override string ProjectConfigName => nameof(MainWindow);
-        
+
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
         }

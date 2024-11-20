@@ -49,6 +49,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// <summary>
         /// Размещение чистового отверстия по одному заданию на отверстие из связи в одном хосте
         /// </summary>
+#pragma warning disable 0618
         public void PlaceSingleOpeningByOneTask() {
             Element host = _revitRepository.PickHostForRealOpening();
             OpeningMepTaskIncoming openingTask = _revitRepository.PickSingleOpeningMepTaskIncoming();
@@ -68,10 +69,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
                 transaction.Commit();
             }
         }
+#pragma warning restore 0618
 
         /// <summary>
         /// Размещение объединенного чистового отверстия по одному или нескольким заданиям на отверстия из связи(ей) в одном хосте
         /// </summary>
+#pragma warning disable 0618
         public void PlaceUnitedOpeningByManyTasks() {
             Element host = _revitRepository.PickHostForRealOpening();
             HashSet<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningMepTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
@@ -92,10 +95,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
                 throw new OperationCanceledException();
             }
         }
+#pragma warning restore 0618
 
         /// <summary>
         /// Размещение нескольких одиночных чистовых отверстий по нескольким заданиям на отверстия из связи(ей) без их объединения в одном хосте
         /// </summary>
+#pragma warning disable 0618
         public void PlaceSingleOpeningsInOneHost() {
             Element host = _revitRepository.PickHostForRealOpening();
             HashSet<OpeningMepTaskIncoming> openingTasks = _revitRepository.PickManyOpeningMepTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
@@ -118,10 +123,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
                 _revitRepository.ShowErrorMessage(sb.ToString());
             }
         }
+#pragma warning restore 0618
 
         /// <summary>
         /// Размещение нескольких одиночных чистовых отверстий в выбранных хостах по всем заданиям на отверстия из связи(ей), которые пересекаются с этими хостами
         /// </summary>
+#pragma warning disable 0618
         public void PlaceSingleOpeningsInManyHosts() {
             ICollection<Element> hosts = _revitRepository.PickHostsForRealOpenings();
             ICollection<OpeningMepTaskIncoming> allOpeningTasks = _revitRepository.GetOpeningsMepTasksIncoming();
@@ -166,6 +173,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
                 _revitRepository.ShowErrorMessage(sb.ToString());
             }
         }
+#pragma warning restore 0618
 
 
         /// <summary>

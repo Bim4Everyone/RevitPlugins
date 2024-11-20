@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -16,6 +17,7 @@ using RevitClashDetective.Models.FilterModel;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
+using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.Services;
 using RevitOpeningPlacement.Views;
 
@@ -26,23 +28,30 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private ObservableCollection<MepCategoryViewModel> _mepCategories;
         private DispatcherTimer _timer;
         private readonly RevitRepository _revitRepository;
+        private readonly ConfigFileService _configFileService;
+        private string _configName;
 
-        public MainViewModel(RevitRepository revitRepository, Models.Configs.OpeningConfig openingConfig) {
+        public MainViewModel(
+            RevitRepository revitRepository,
+            ConfigFileService configFileService,
+            Models.Configs.OpeningConfig openingConfig) {
+
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _configFileService = configFileService ?? throw new ArgumentNullException(nameof(configFileService));
+
             if(openingConfig is null) {
                 throw new ArgumentNullException(nameof(openingConfig));
             }
-            if(openingConfig.Categories.Count != new MepCategoryCollection().Count) {
-                throw new ArgumentException("Файл конфигурации некорректен, нужно удалить его.", nameof(openingConfig));
-            }
             MepCategories = new ObservableCollection<MepCategoryViewModel>(
                 openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
+            ConfigName = openingConfig.Name;
 
             InitializeTimer();
 
             SaveConfigCommand = RelayCommand.Create(SaveConfig, CanSaveConfig);
             SaveAsConfigCommand = RelayCommand.Create(SaveAsConfig, CanSaveConfig);
             LoadConfigCommand = RelayCommand.Create(LoadConfig);
+            OpenConfigFolderCommand = RelayCommand.Create(OpenConfigFolder);
             CheckMepFilterCommand = RelayCommand.Create(CheckMepFilter, CanSaveConfig);
             CheckWallFilterCommand = RelayCommand.Create(CheckWallFilter, CanSaveConfig);
             CheckFloorFilterCommand = RelayCommand.Create(CheckFloorFilter, CanSaveConfig);
@@ -52,6 +61,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             foreach(MepCategoryViewModel mepCategoryViewModel in MepCategories) {
                 mepCategoryViewModel.PropertyChanged += MepCategoryIsSelectedPropertyChanged;
             }
+        }
+
+
+        public string ConfigName {
+            get => _configName;
+            set => RaiseAndSetIfChanged(ref _configName, value);
         }
 
         private MepCategoryViewModel _selectedMepCategoryViewModel;
@@ -87,6 +102,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public ICommand CheckMepFilterCommand { get; }
         public ICommand CheckWallFilterCommand { get; }
         public ICommand CheckFloorFilterCommand { get; }
+
+        public ICommand OpenConfigFolderCommand { get; }
 
 
         private void InitializeTimer() {
@@ -148,11 +165,14 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var config = Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc);
             config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
             config.ShowPlacingErrors = ShowPlacingErrors;
+            config.Name = ConfigName.Trim();
             return config;
         }
 
         private void SaveConfig() {
-            GetOpeningConfig().SaveProjectConfig();
+            var config = GetOpeningConfig();
+            config.SaveProjectConfig();
+            UpdateOpeningConfigPath(config.ProjectConfigPath);
             MessageText = "Файл настроек успешно сохранен.";
             _timer.Start();
         }
@@ -160,7 +180,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private void SaveAsConfig() {
             var config = GetOpeningConfig();
             var css = new ConfigSaverService();
-            css.Save(config, _revitRepository.Doc);
+            var path = css.Save(config, _revitRepository.Doc);
+            UpdateOpeningConfigPath(path);
             MessageText = "Файл настроек успешно сохранен.";
             _timer.Start();
         }
@@ -174,12 +195,28 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                     config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
                 SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
                     ?? MepCategories.First();
+                ConfigName = config.Name;
+                UpdateOpeningConfigPath(config.ProjectConfigPath);
             }
             MessageText = "Файл настроек успешно загружен.";
             _timer.Start();
         }
 
+        private void UpdateOpeningConfigPath(string path) {
+            var mepConfigPath = MepConfigPath.GetMepConfigPath(_revitRepository.Doc);
+            mepConfigPath.OpeningConfigPath = path;
+            mepConfigPath.SaveProjectConfig();
+        }
+
         private bool CanSaveConfig() {
+            if(string.IsNullOrWhiteSpace(ConfigName)) {
+                ErrorText = "Укажите название настроек.";
+                return false;
+            }
+            if(ConfigName.Length > 100) {
+                ErrorText = "Слишком длинное название настроек.";
+                return false;
+            }
             ErrorText = MepCategories.FirstOrDefault(item => !string.IsNullOrEmpty(item.GetErrorText()))
                 ?.GetErrorText();
             return string.IsNullOrEmpty(ErrorText);
@@ -198,6 +235,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                     SelectedMepCategoryViewModel = mepCategoryViewModel;
                 }
             }
+        }
+
+        private void OpenConfigFolder() {
+            var path = GetOpeningConfig().ProjectConfigPath;
+            var dir = Path.GetDirectoryName(path);
+            _configFileService.OpenFolder(dir, path);
         }
     }
 }

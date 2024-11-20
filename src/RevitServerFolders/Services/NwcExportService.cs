@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -8,6 +9,7 @@ using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI.Events;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
 using RevitServerFolders.Models;
@@ -96,7 +98,7 @@ namespace RevitServerFolders.Services {
 #else
                                 .WherePasses(new VisibleInViewFilter(document, navisView.Id))
 #endif
-                                .Any(e => e.Category != null); // На виде, где выключена видимость всех элементов через GUI ревита, присутствует 1 элемент ExtentElem c категорией null
+                                .Any(e => e.Category != null && ElementHasGeometry(e)); // Ищем геометрию на виде
 
                         if(!hasElements) {
                             _loggerService.Warning(
@@ -128,6 +130,17 @@ namespace RevitServerFolders.Services {
             } finally {
                 _revitRepository.Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
                 _revitRepository.UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
+            }
+        }
+
+        private bool ElementHasGeometry(Element element) {
+            try {
+                return element.GetSolids().Any(s => s?.Volume > 0);
+            } catch(Exception ex) when(
+            ex is System.ArgumentNullException
+            || ex is System.NullReferenceException
+            || ex is Autodesk.Revit.Exceptions.ApplicationException) {
+                return false;
             }
         }
 

@@ -246,22 +246,29 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="realOpenings">Коллекция чистовых отверстий, размещенных в активном документе-получателе заданий на отверстия</param>
         /// <param name="constructureElementsIds">Коллекция элементов конструкций в активном документе-получателе заданий на отверстия</param>
         public void UpdateStatusAndHostName(ICollection<IOpeningReal> realOpenings, ICollection<ElementId> constructureElementsIds) {
-            var thisOpeningSolid = GetSolid();
-            var thisOpeningBBox = GetTransformedBBoxXYZ();
+            try {
+                var thisOpeningSolid = GetSolid();
+                var thisOpeningBBox = GetTransformedBBoxXYZ();
 
-            var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
-            var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
-            var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
-            SetOpeningTaskHost(hostId);
+                var intersectingStructureElements = GetIntersectingStructureElementsIds(thisOpeningSolid, constructureElementsIds);
+                var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
+                var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
+                SetOpeningTaskHost(hostId);
 
-            if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
-                Status = OpeningTaskIncomingStatus.NoIntersection;
-            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count == 0)) {
-                Status = OpeningTaskIncomingStatus.New;
-            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count > 0)) {
-                Status = OpeningTaskIncomingStatus.NotMatch;
-            } else if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count > 0)) {
-                Status = OpeningTaskIncomingStatus.Completed;
+                if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
+                    Status = OpeningTaskIncomingStatus.NoIntersection;
+                } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count == 0)) {
+                    Status = OpeningTaskIncomingStatus.New;
+                } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count > 0)) {
+                    Status = OpeningTaskIncomingStatus.NotMatch;
+                } else if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count > 0)) {
+                    Status = OpeningTaskIncomingStatus.Completed;
+                }
+            } catch(Exception ex) when(
+                ex is Autodesk.Revit.Exceptions.ApplicationException
+                || ex is NullReferenceException
+                || ex is ArgumentNullException) {
+                Status = OpeningTaskIncomingStatus.Invalid;
             }
         }
 
@@ -336,6 +343,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <param name="realOpenings">Коллекция чистовых отверстий из активного документа ревита</param>
         /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
+#pragma warning disable 0618
         private ICollection<ElementId> GetIntersectingOpeningsIds(ICollection<IOpeningReal> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
             if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
                 return Array.Empty<ElementId>();
@@ -349,6 +357,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 }
             }
         }
+#pragma warning restore 0618
 
         /// <summary>
         /// Возвращает Id элемента конструкции, который наиболее похож на хост для задания на отверстие.

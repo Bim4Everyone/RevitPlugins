@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace RevitOpeningPlacement.OpeningModels.Enums {
     /// <summary>
@@ -24,6 +24,11 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Размещенное чистовое отверстие корректно
         /// </summary>
         [Description("Корректно")]
-        Correct
+        Correct,
+        /// <summary>
+        /// Произошла ошибка обработки геометрии в процессе определения статуса
+        /// </summary>
+        [Description("Ошибка обработки геометрии")]
+        Invalid
     }
 }

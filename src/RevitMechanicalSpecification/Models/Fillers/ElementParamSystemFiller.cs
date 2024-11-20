@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitMechanicalSpecification.Entities;
@@ -16,6 +17,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private readonly List<VisSystem> _systemList;
         private readonly SystemFunctionNameFactory _nameFactory;
         private readonly HashSet<BuiltInCategory> _insulationCategories;
+        private readonly string _tempSharedNameName = "ADSK_Имя системы";
 
         public ElementParamSystemFiller(
             string toParamName, 
@@ -35,12 +37,25 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public override void SetParamValue(SpecificationElement specificationElement) {
             string calculatedSystem = GetSystemName(specificationElement);
-            if(!(string.IsNullOrEmpty(calculatedSystem))) {
-                TargetParam.Set(GetSystemName(specificationElement));
-                return;
+
+            if(!(string.IsNullOrWhiteSpace(calculatedSystem))) {
+                TargetParam.Set(calculatedSystem);
+            } else {
+                calculatedSystem = Config.GlobalSystem;
+                TargetParam.Set(calculatedSystem);
             }
 
-            TargetParam.Set(Config.GlobalSystem);
+            // Параметр ADSK_Имя системы не имеет отношения к платформе, но очень часто участвует в фильтрах
+            // Он будет устраняться из всех шаблонов, включая шаблоны самой B4E. Но пока он глубоко интегрирован в документацию, 
+            // будем обновлять, чтоб не плодить переработки. 
+            if(specificationElement.Element.IsExistsParam(_tempSharedNameName)) {
+                Parameter adsk_name = specificationElement.Element.GetParam(_tempSharedNameName);
+
+                // В основном ситуация с рид-онли встречается у внешних пользователей, наши не блокируют этот параметр
+                if(!adsk_name.IsReadOnly) {
+                    adsk_name.Set(calculatedSystem);
+                }
+            }
         }
 
         /// <summary>

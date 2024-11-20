@@ -31,7 +31,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public override void SetParamValue(SpecificationElement specificationElement) {
             string calculatedFunction = GetFunction(specificationElement);
-            if(!(string.IsNullOrEmpty(calculatedFunction))) {
+            if(!(string.IsNullOrWhiteSpace(calculatedFunction))) {
                 TargetParam.Set(GetFunction(specificationElement));
                 return;
             }

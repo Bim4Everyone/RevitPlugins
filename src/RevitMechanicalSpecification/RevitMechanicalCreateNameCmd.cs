@@ -30,7 +30,7 @@ namespace RevitMechanicalSpecification {
     [Transaction(TransactionMode.Manual)]
     public class RevitMechanicalCreateNameCmd : BasePluginCommand {
         public RevitMechanicalCreateNameCmd() {
-            PluginName = "RevitMechanicalSpecification";
+            PluginName = "Сформировать имя";
         }
 
         protected override void Execute(UIApplication uiApplication) {

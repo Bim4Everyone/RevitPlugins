@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <system:String x:Key="MainWindow.Title">Изменить значение</system:String>
+    <system:String x:Key="MainWindow.ParamValueMask">Введите маску</system:String>
+    <system:String x:Key="MainWindow.ParamValueMaskEmpty">Маска значения пуста</system:String>
+    
+    <system:String x:Key="MainWindow.SelectParamToRecord">Выберите параметр для записи</system:String>
+    <system:String x:Key="MainWindow.EnterParamValueMask">Введите маску значения</system:String>
+    <system:String x:Key="MainWindow.RevitElement">Элемент Revit</system:String>
+    <system:String x:Key="MainWindow.ElementParamValue">Значение параметра</system:String>
+    <system:String x:Key="MainWindow.SelectedParamForAdd">Выберите параметр для добавления</system:String>
+    <system:String x:Key="MainWindow.Filtration">Фильтрация</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Изменение значений параметров</system:String>
+    
+    <system:String x:Key="MainWindow.SystemParameter">Системный параметр</system:String>
+    <system:String x:Key="MainWindow.SharedParameter">Общий параметр</system:String>
+    <system:String x:Key="MainWindow.ProjectParameter">Параметр проекта</system:String>
+
+    <system:String x:Key="MainWindow.True">Да</system:String>
+    <system:String x:Key="MainWindow.False">Нет</system:String>
+    
+    <system:String x:Key="MainWindow.Error">Ошибка</system:String>
+    <system:String x:Key="MainWindow.ParamByIdError">Не найден выбранный для записи параметр в элементе с id:</system:String>
+    <system:String x:Key="MainWindow.SettingValueError">Не удалось произвести запись в элемент с id:</system:String>
+    <system:String x:Key="MainWindow.ValueUnknown">Значение неизвестно</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+</ResourceDictionary>
