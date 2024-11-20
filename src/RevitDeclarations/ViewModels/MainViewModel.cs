@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit.Comparators;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -48,6 +49,7 @@ namespace RevitDeclarations.ViewModels {
             _settings = settings;
 
             _phases = _revitRepository.GetPhases();
+            _selectedPhase = _phases[_phases.Count - 1];
 
             _excelExportViewModel = 
                 new ExcelExportViewModel("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
@@ -252,10 +254,11 @@ namespace RevitDeclarations.ViewModels {
                 }
             }
 
+            LogicalStringComparer comparer = new LogicalStringComparer();
             List<Apartment> apartments = projects
                 .SelectMany(x => x.Apartments)
                 .OrderBy(x => x.Section)
-                .ThenBy(x => x.GetIntFullNumber())
+                .ThenBy(x => x.FullNumber, comparer)
                 .ToList();
 
             try {
