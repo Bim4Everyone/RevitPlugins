@@ -22,6 +22,8 @@ namespace RevitDeclarations.Models {
             CreateColumns();
             SetTypeForColumns(_tableInfo.NumericColumnsIndexes);
             CreateRows();
+            FillTableHeader();
+            FillMainTable();
         }
 
         public DataTable MainDataTable => _mainTable;
@@ -50,6 +52,11 @@ namespace RevitDeclarations.Models {
                 _mainTable.Columns[i].DataType = typeof(double);
             }
         }
+
+        protected abstract void FillTableHeader();
+        protected abstract void FillMainTable();
+
+
     }
 
 }

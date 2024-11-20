@@ -5,15 +5,13 @@ using System.Linq;
 namespace RevitDeclarations.Models {
     internal class ApartmentsDataTable : DeclarationDataTable {
         public ApartmentsDataTable(ApartmentsTableInfo tableInfo) : base(tableInfo) {
-            FillTableApartmentHeader();
             FillTableRoomsHeader();
-            FillTableApartmentsInfo();
             if(_settings.LoadUtp) {
                 FillTableUtpInfo();
             }
         }
 
-        private void FillTableApartmentHeader() {
+        protected override void FillTableHeader() {
             _headerTable.Rows[0][0] = "Сквозной номер квартиры";
             _headerTable.Rows[0][1] = "Назначение";
             _headerTable.Rows[0][2] = "Этаж расположения";
@@ -68,7 +66,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
-        private void FillTableApartmentsInfo() {
+        protected override void FillMainTable() {
             int rowNumber = 0;
 
             foreach(Apartment apartment in _tableInfo.RoomGroups) {
