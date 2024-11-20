@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit.Comparators;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -252,10 +253,11 @@ namespace RevitDeclarations.ViewModels {
                 }
             }
 
+            LogicalStringComparer comparer = new LogicalStringComparer();
             List<Apartment> apartments = projects
                 .SelectMany(x => x.Apartments)
                 .OrderBy(x => x.Section)
-                .ThenBy(x => x.GetIntFullNumber())
+                .ThenBy(x => x.FullNumber, comparer)
                 .ToList();
 
             try {
