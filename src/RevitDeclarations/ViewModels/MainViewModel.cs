@@ -49,6 +49,7 @@ namespace RevitDeclarations.ViewModels {
             _settings = settings;
 
             _phases = _revitRepository.GetPhases();
+            _selectedPhase = _phases[_phases.Count - 1];
 
             _excelExportViewModel = 
                 new ExcelExportViewModel("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
