@@ -195,21 +195,31 @@ namespace RevitMechanicalSpecification.Service {
         public bool IsSpecifyPipeFittingName(Element element) {
             List<Connector> connectors = GetConnectors(element);
 
+            // Если нет учета на весь проект - учет не ведется
+            if(_specConfiguration.IsSpecifyPipeFittings is false) {
+                return false;
+            }
+
+            bool specifiPipeFitting = false;
             if(_specConfiguration.IsSpecifyPipeFittings) {
                 foreach(Connector connector in connectors) {
                     foreach(Connector reference in connector.AllRefs) {
-
+                        // Проверяем каждую трубу подключенную к фитингу
                         if(reference.Owner.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
                             Element elemType = reference.Owner.GetElementType();
-                            return elemType.GetSharedParamValueOrDefault<int>(
-                                _specConfiguration.ParamNameIsSpecifyPipeFittingsFromPype
-                                ) == 1;
+                            specifiPipeFitting = elemType.GetSharedParamValueOrDefault<int>
+                                (_specConfiguration.ParamNameIsSpecifyPipeFittingsFromPype) == 1;
+
+                            if(specifiPipeFitting) {
+                                return true;
+                            }
                         }
                     }
                 }
             }
-
-            return _specConfiguration.IsSpecifyPipeFittings;
+            
+            // Если мы прошли по всем коннекторам и нигде не нашли трубы подходящей, то только тогда возвращаем false
+            return false;
         }
 
         /// <summary>
