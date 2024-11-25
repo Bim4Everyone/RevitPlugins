@@ -199,13 +199,16 @@ namespace RevitMechanicalSpecification.Service {
             if(_specConfiguration.IsSpecifyPipeFittings is false) {
                 return false;
             }
-
-            bool specifiPipeFitting = false;
+            
+            // Если есть учет на весь проект - по умолчанию true
+            bool specifiPipeFitting = true;
             if(_specConfiguration.IsSpecifyPipeFittings) {
                 foreach(Connector connector in connectors) {
                     foreach(Connector reference in connector.AllRefs) {
                         // Проверяем каждую трубу подключенную к фитингу
                         if(reference.Owner.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
+                            // Если подключена хоть одна труба - требуется проверять учет по трубе, по умолчанию false
+                            specifiPipeFitting = false;
                             Element elemType = reference.Owner.GetElementType();
                             specifiPipeFitting = elemType.GetSharedParamValueOrDefault<int>
                                 (_specConfiguration.ParamNameIsSpecifyPipeFittingsFromPype) == 1;
@@ -218,8 +221,9 @@ namespace RevitMechanicalSpecification.Service {
                 }
             }
             
-            // Если мы прошли по всем коннекторам и нигде не нашли трубы подходящей, то только тогда возвращаем false
-            return false;
+            // Возвращаем результаты проверки после прохода по всем коннекторам. Если были встречены трубы и на них не включены расчеты - 
+            // возвращается false. Если их не было или на трубах включен- true
+            return specifiPipeFitting;
         }
 
         /// <summary>
