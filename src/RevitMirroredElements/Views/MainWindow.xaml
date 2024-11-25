@@ -7,19 +7,15 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitMirroredElements.Views"
     xmlns:vms="clr-namespace:RevitMirroredElements.ViewModels"
-    xmlns:conv="clr-namespace:RevitMirroredElements.Converters"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    x:Name="mainWindow"
     mc:Ignorable="d"
     Title="Проверка на зеркальность"
     Height="350"
     Width="300"
+    ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <Window.Resources>
-        <conv:EnumToBoolConverter
-            x:Key="EnumToBoolConverter" />
-    </Window.Resources>
-    
     <i:Interaction.Triggers>
         <i:EventTrigger
             EventName="Loaded">
@@ -54,14 +50,15 @@
                         VerticalAlignment="Center"
                         GroupName="TypeSelectionElement"
                         Content="{Binding SelectedElementsText}"
-                        IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedElements}"/>
+                        IsChecked="{Binding IsSelectedElements, Mode=TwoWay}" />
 
                     <Button
                         Width="80"
                         Grid.Column="1"
                         Content="Выбрать"
                         HorizontalAlignment="Right"
-                        Command="{Binding SelectElementsCommand}"/>
+                        Command="{Binding SelectElementsCommand}"
+                        CommandParameter="{Binding ElementName=mainWindow}" />
                 </Grid>
 
                 <Grid
@@ -78,7 +75,8 @@
                         VerticalAlignment="Center"
                         GroupName="TypeSelectionElement"
                         Content="{Binding SelectedCategoriesText}"
-                        IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedCategories}" />
+                        IsChecked="{Binding IsSelectedCategories, Mode=TwoWay}" />
+
 
                     <Button
                         Width="80"
@@ -89,6 +87,7 @@
                 </Grid>
             </StackPanel>
 
+
             <StackPanel
                 Orientation="Horizontal"
                 Margin="20,10,0,0">
@@ -97,14 +96,14 @@
                         Content="В активном виде"
                         GroupName="ElementScope"
                         Margin="0,0,0,5"
-                        IsEnabled="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedCategories}"
-                        IsChecked="{Binding SelectedElementScope, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ActiveView}" />
+                        IsEnabled="{Binding IsSelectedCategories}"
+                        IsChecked="{Binding IsActiveView, Mode=TwoWay}"/>
 
                     <RadioButton
                         Content="Во всём проекте"
                         GroupName="ElementScope"
-                        IsEnabled="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedCategories}"
-                        IsChecked="{Binding SelectedElementScope, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=WholeProject}" />
+                        IsEnabled="{Binding IsSelectedCategories}"
+                        IsChecked="{Binding WholeProject, Mode=TwoWay}"/>
                 </StackPanel>
             </StackPanel>
 
@@ -140,23 +139,33 @@
 
         <StackPanel
             Grid.Row="1"
-            Height="45"
-            Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
-                Margin="10"
+                Margin="0,0,0,5"
                 TextWrapping="Wrap"
                 Foreground="Orange"
+                HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
-            <Button
-                Margin="10"
-                Width="100"
-                Content="Выполнить"
-                IsDefault="True"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+                <Button
+                    Margin="10"
+                    Width="80"
+                    Content="ОК"
+                    IsDefault="True"
+                    Click="ButtonOk_Click"
+                    Command="{Binding AcceptViewCommand}" />
+
+                <Button
+                    Margin="10"
+                    Width="80"
+                    Content="Отмена"
+                    IsCancel="True"
+                    Click="ButtonCancel_Click" />
+            </StackPanel>
         </StackPanel>
     </Grid>
 </base:PlatformWindow>

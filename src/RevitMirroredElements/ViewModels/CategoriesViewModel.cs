@@ -15,14 +15,12 @@ using RevitMirroredElements.Models;
 namespace RevitMirroredElements.ViewModels {
     internal class CategoriesViewModel : BaseViewModel {
 
-        #region Fields 
         private readonly RevitRepository _revitRepository;
         private readonly CollectionViewSource _filteredCategoriesSource;
         private readonly ObservableCollection<CategoryElement> _allCategories;
         private string _searchText;
         private bool _hasSearchText;
         private bool _allCategoriesSelected;
-        #endregion
 
         public CategoriesViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
@@ -46,11 +44,7 @@ namespace RevitMirroredElements.ViewModels {
             LoadViewCommand = RelayCommand.Create(LoadView);
         }
 
-        #region Command 
         public ICommand LoadViewCommand { get; }
-        #endregion
-
-        #region Properties
 
         public ICollectionView FilteredCategories => _filteredCategoriesSource.View;
 
@@ -58,7 +52,6 @@ namespace RevitMirroredElements.ViewModels {
             get => _hasSearchText;
             private set => RaiseAndSetIfChanged(ref _hasSearchText, value);
         }
-
         public bool AllCategoriesSelected {
             get => _allCategoriesSelected;
             set {
@@ -66,7 +59,6 @@ namespace RevitMirroredElements.ViewModels {
                 MassSelectedCategories();
             }
         }
-
         public string SearchText {
             get => _searchText;
             set {
@@ -75,7 +67,6 @@ namespace RevitMirroredElements.ViewModels {
                 UpdateFilterCategories();
             }
         }
-        #endregion
 
         private void FilterCategories(object sender, FilterEventArgs e) {
             if(e.Item is CategoryElement category) {
@@ -107,10 +98,10 @@ namespace RevitMirroredElements.ViewModels {
         }
 
         public List<Category> GetSelectedCategories() {
-            return new List<Category>(_allCategories
+            return _allCategories
                 .Where(x => x.IsSelected == true)
                 .Select(x => x.Category)
-                .ToList());
+                .ToList();
         }
 
         private void LoadView() {

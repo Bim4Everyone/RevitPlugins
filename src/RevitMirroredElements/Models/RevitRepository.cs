@@ -7,24 +7,73 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 
 
 namespace RevitMirroredElements.Models {
     internal class RevitRepository {
 
+        public const string MirrorFilterName = "Проверка зеркальности";
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
 
-        public const string MirrorFilterName = "Проверка зеркальности";
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public ICollection<ElementId> SelectElementsOnView() {
+        private ElementId GetParameterIdByName(string paramName) {
+            var paramElement = new FilteredElementCollector(Document)
+                .OfClass(typeof(SharedParameterElement))
+                .Cast<SharedParameterElement>()
+                .FirstOrDefault(e => e.Name == paramName);
 
+            return paramElement?.Id ?? ElementId.InvalidElementId;
+        }
+
+        private OverrideGraphicSettings CreateMirrorCheckGraphicOverrides() {
+            var overrideSettings = new OverrideGraphicSettings()
+                .SetSurfaceTransparency(0)
+                .SetHalftone(false)
+                .SetProjectionLineColor(new Color(255, 0, 0))
+                .SetProjectionLineWeight(1);
+
+            SetLinePatterns(overrideSettings);
+            SetFillPatterns(overrideSettings);
+
+            return overrideSettings;
+        }
+
+        private void SetLinePatterns(OverrideGraphicSettings settings) {
+            var solidLinePattern = new FilteredElementCollector(Document)
+                .OfClass(typeof(LinePatternElement))
+                .Cast<LinePatternElement>()
+                .FirstOrDefault(p => p.Name == "<Solid>");
+
+            if(solidLinePattern != null) {
+                settings.SetProjectionLinePatternId(solidLinePattern.Id);
+            }
+        }
+
+        private void SetFillPatterns(OverrideGraphicSettings settings) {
+            var solidFillPattern = new FilteredElementCollector(Document)
+                .OfClass(typeof(FillPatternElement))
+                .Cast<FillPatternElement>()
+                .FirstOrDefault(p => p.GetFillPattern().IsSolidFill);
+
+            if(solidFillPattern != null) {
+                settings.SetSurfaceForegroundPatternId(solidFillPattern.Id);
+                settings.SetCutForegroundPatternId(solidFillPattern.Id);
+            }
+
+            settings.SetSurfaceForegroundPatternColor(new Color(255, 0, 0));
+            settings.SetCutForegroundPatternColor(new Color(255, 0, 0));
+        }
+
+        public ICollection<ElementId> SelectElementsOnView() {
             var uiDocument = UIApplication.ActiveUIDocument;
 
             var selectedReferences = uiDocument.Selection.PickObjects(
@@ -39,35 +88,92 @@ namespace RevitMirroredElements.Models {
 
             return new List<ElementId>();
         }
-        public ICollection<ElementId> GetElementsIdsFromCategories(List<Category> selectedCategories, ElementScope selectedGroupType) {
-            var elements = new List<ElementId>();
 
-            foreach(var category in selectedCategories) {
-                var collector = new FilteredElementCollector(Document)
-                    .OfCategory(category.GetBuiltInCategory())
-                    .WhereElementIsNotElementType();
+        private void EnableTemporaryViewMode(View view) {
+            view.EnableTemporaryViewPropertiesMode(view.Id);
+        }
 
-                if(selectedGroupType == ElementScope.ActiveView) {
-                    var viewId = Document.ActiveView.Id;
+        private ParameterFilterElement GetOrCreateMirrorFilter(List<Element> elements) {
+            var userName = Application.Username;
+            string filterNameWithUser = $"{MirrorFilterName}_{userName}";
+
+            var existingFilter = FindFilterByName(filterNameWithUser);
+            var paramId = GetParameterIdByName(SharedParamsConfig.Instance.ElementMirroring.Name);
+
+            if(paramId == ElementId.InvalidElementId) {
+                throw new InvalidOperationException($"Параметр '{SharedParamsConfig.Instance.ElementMirroring.Name}' не найден.");
+            }
+
+            var rule = new FilterDoubleRule(new ParameterValueProvider(paramId), new FilterNumericEquals(), 1, 1e-6);
+            var newCategoryIds = elements
+                .Select(e => e.Category?.Id)
+                .Where(id => id != null)
+                .Distinct()
+                .ToList();
+
+            if(existingFilter != null) {
+                var existingCategoryIds = existingFilter.GetCategories().ToList();
+                var combinedCategoryIds = existingCategoryIds
+                    .Concat(newCategoryIds)
+                    .Distinct()
+                    .ToList();
+
+                existingFilter.SetCategories(combinedCategoryIds);
+                existingFilter.SetElementFilter(new ElementParameterFilter(rule));
+
+                return existingFilter;
+            } else {
+                var newFilter = ParameterFilterElement.Create(Document, filterNameWithUser, newCategoryIds);
+                newFilter.SetElementFilter(new ElementParameterFilter(rule));
+                return newFilter;
+            }
+        }
+
+        private ParameterFilterElement FindFilterByName(string filterName) {
+            return new FilteredElementCollector(Document)
+                .OfClass(typeof(ParameterFilterElement))
+                .Cast<ParameterFilterElement>()
+                .FirstOrDefault(f => f.Name == filterName);
+        }
+
+        private void ApplyFilterToView(View view, ParameterFilterElement filter, OverrideGraphicSettings settings) {
+            if(!view.GetFilters().Contains(filter.Id)) {
+                view.AddFilter(filter.Id);
+            }
+            view.SetFilterOverrides(filter.Id, settings);
+            view.SetFilterVisibility(filter.Id, true);
+        }
+
+        public ICollection<ElementId> GetElementsIdsFromCategories(List<Category> selectedCategories, ElementScope scope) {
+            return selectedCategories
+                .SelectMany(category => GetElementsByCategory(category, scope))
+                .ToList();
+        }
+
+        private IEnumerable<ElementId> GetElementsByCategory(Category category, ElementScope scope) {
+            var collector = new FilteredElementCollector(Document)
+                .OfCategory(category.GetBuiltInCategory())
+                .WhereElementIsNotElementType();
+
+            return scope == ElementScope.ActiveView
+                ? FilterByActiveView(collector)
+                : collector.ToElementIds();
+        }
+
+        private IEnumerable<ElementId> FilterByActiveView(FilteredElementCollector collector) {
+            var viewId = Document.ActiveView.Id;
 
 #if REVIT_2021_OR_LESS
-                    var filteredElements = collector
-                        .Where(item => item.OwnerViewId == Document.ActiveView.Id)
-                        .ToList();
-
-                    collector = new FilteredElementCollector(Document, filteredElements.Select(e => e.Id).ToList());
+    return collector
+        .Where(item => item.OwnerViewId == viewId)
+        .ToElementIds();
 #else
-                    collector = collector.WherePasses(new VisibleInViewFilter(Document, viewId));
+            return collector.WherePasses(new VisibleInViewFilter(Document, viewId)).ToElementIds();
 #endif
-                }
-
-                elements.AddRange(collector.ToElementIds());
-            }
-            return elements;
         }
+
         public ICollection<Element> GetElements(ICollection<ElementId> elementIds) {
             var elements = new List<Element>();
-
 
             foreach(var id in elementIds) {
                 Element element = Document.GetElement(id);
@@ -78,109 +184,80 @@ namespace RevitMirroredElements.Models {
             }
             return elements;
         }
+
         public ICollection<ElementId> GetSelectedElementsIds() {
             return ActiveUIDocument.Selection.GetElementIds();
         }
+
         public ICollection<Category> GetCategories() {
-            Categories categories = Document.Settings.Categories;
-
-            var modelCategories = categories
-                .Cast<Category>()
-                .Where(c => c.CategoryType == CategoryType.Model)
-                .ToList();
-
-            return modelCategories;
-        }
-        private ElementId GetParameterIdByName(string paramName) {
-            var paramElement = new FilteredElementCollector(Document)
+            var sharedParamElement = new FilteredElementCollector(Document)
                 .OfClass(typeof(SharedParameterElement))
                 .Cast<SharedParameterElement>()
-                .FirstOrDefault(e => e.Name == paramName);
-            return paramElement?.Id;
-        }
-        private OverrideGraphicSettings CreateMirrorCheckGraphicOverrides() {
-            var overrideSettings = new OverrideGraphicSettings();
-            overrideSettings.SetSurfaceTransparency(0);
-            overrideSettings.SetHalftone(false);
-            overrideSettings.SetProjectionLineColor(new Color(255, 0, 0));
+                .FirstOrDefault(e => e.Name == SharedParamsConfig.Instance.ElementMirroring.Name);
 
-            var solidLinePattern = new FilteredElementCollector(Document)
-                .OfClass(typeof(LinePatternElement))
-                .Cast<LinePatternElement>()
-                .FirstOrDefault(p => p.Name == "<Solid>");
-
-            if(solidLinePattern != null) {
-                overrideSettings.SetProjectionLinePatternId(solidLinePattern.Id);
+            if(sharedParamElement == null) {
+                throw new InvalidOperationException($"Параметр '{SharedParamsConfig.Instance.ElementMirroring.Name}' не найден.");
             }
 
-            overrideSettings.SetProjectionLineWeight(1);
+            BindingMap bindingMap = Document.ParameterBindings;
+            var bindings = bindingMap.ForwardIterator();
+            List<Category> categories = new List<Category>();
 
-            var solidFillPattern = new FilteredElementCollector(Document)
-                .OfClass(typeof(FillPatternElement))
-                .Cast<FillPatternElement>()
-                .FirstOrDefault(p => p.GetFillPattern().IsSolidFill);
+            while(bindings.MoveNext()) {
+                if(bindings.Key.GetElementId() == sharedParamElement.Id) {
+                    if(bindings.Current is InstanceBinding instanceBinding) {
+                        categories.AddRange(instanceBinding.Categories.Cast<Category>());
+                    }
+                }
+            }
+            return categories;
+        }
 
-            if(solidFillPattern != null) {
-                overrideSettings.SetSurfaceForegroundPatternId(solidFillPattern.Id);
-                overrideSettings.SetCutForegroundPatternId(solidFillPattern.Id);
+        public void UpdateParams() {
+            ProjectParameters projectParameters = ProjectParameters.Create(Application);
+            projectParameters.SetupRevitParams(ActiveUIDocument.Document,
+                SharedParamsConfig.Instance.ElementMirroring);
+        }
+
+        public ICollection<Category> GetCategoriesByElementIds(ICollection<ElementId> elementIds) {
+            if(elementIds == null || !elementIds.Any()) {
+                return new List<Category>();
+            }
+            var categories = new List<Category>();
+            foreach(ElementId elementId in elementIds) {
+                var category = Category.GetCategory(Document, elementId);
+                categories.Add(category);
             }
 
-            overrideSettings.SetSurfaceForegroundPatternColor(new Color(255, 0, 0));
-            overrideSettings.SetCutForegroundPatternColor(new Color(255, 0, 0));
-
-            return overrideSettings;
+            return categories;
         }
+
         public Transaction StartTransaction(string transactionName) {
             return Document.StartTransaction(transactionName);
         }
+
         public void FilterOnTemporaryView(List<Element> elements) {
-            View activeView = Document.ActiveView;
-            using(Transaction transaction = StartTransaction("Настройка временного вида для зеркальности")) {
+            using(var transaction = StartTransaction("Настройка временного вида для зеркальности")) {
+                var activeView = Document.ActiveView;
+                EnableTemporaryViewMode(activeView);
 
-                activeView.EnableTemporaryViewPropertiesMode(activeView.Id);
-
-                var collector = new FilteredElementCollector(Document).OfClass(typeof(ParameterFilterElement));
-                ParameterFilterElement mirrorCheckFilter = null;
-
-                foreach(ParameterFilterElement filter in collector) {
-                    if(filter.Name == MirrorFilterName) {
-                        mirrorCheckFilter = filter;
-                        break;
-                    }
-                }
-
-                if(mirrorCheckFilter == null) {
-                    string paramName = SharedParamsConfig.Instance.ElementMirroring.Name;
-                    ElementId paramId = GetParameterIdByName(paramName);
-                    if(paramId == null) {
-                        throw new InvalidOperationException($"Параметр '{paramName}' не найден в документе.");
-                    }
-
-                    var rule = new FilterIntegerRule(new ParameterValueProvider(paramId), new FilterNumericEquals(), 1);
-
-                    var categoryIds = elements
-                        .Select(element => element.Category?.Id)
-                        .Where(id => id != null)
-                        .Distinct()
-                        .ToList();
-
-                    mirrorCheckFilter = ParameterFilterElement.Create(Document, MirrorFilterName, categoryIds);
-                    mirrorCheckFilter.SetElementFilter(new ElementParameterFilter(rule));
-                }
-
+                var mirrorCheckFilter = GetOrCreateMirrorFilter(elements);
                 var overrideSettings = CreateMirrorCheckGraphicOverrides();
-                if(!activeView.GetFilters().Contains(mirrorCheckFilter.Id)) {
-                    activeView.AddFilter(mirrorCheckFilter.Id);
-                }
-                activeView.SetFilterOverrides(mirrorCheckFilter.Id, overrideSettings);
-                activeView.SetFilterVisibility(mirrorCheckFilter.Id, true);
 
+                ApplyFilterToView(activeView, mirrorCheckFilter, overrideSettings);
                 transaction.Commit();
             }
         }
+
         public void SelectElementsOnMainView(List<Element> elements) {
-            var elementIds = elements.Select(x => x.Id).ToList();
-            ActiveUIDocument.Selection.SetElementIds(elementIds);
+            var elementsIds = new List<ElementId>();
+            foreach(var element in elements) {
+                var isMirrored = element.GetParamValue<double>(SharedParamsConfig.Instance.ElementMirroring.Name);
+                if(isMirrored != 0) {
+                    elementsIds.Add(element.Id);
+                }
+            }
+            ActiveUIDocument.Selection.SetElementIds(elementsIds);
         }
     }
 }

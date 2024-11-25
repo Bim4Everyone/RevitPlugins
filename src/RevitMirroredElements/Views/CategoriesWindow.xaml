@@ -10,7 +10,8 @@
     mc:Ignorable="d"
     Title="Проверка на зеркальность"
     Height="450"
-    Width="300">
+    Width="300"
+    ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
         <conv:BoolToVisibilityConverter
@@ -26,61 +27,82 @@
     </i:Interaction.Triggers>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBox
+            Margin="10,5,10,5"
+            Grid.Row="0"
+            VerticalAlignment="Center"
+            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock
+            Text="Введите для поиска..."
+            IsHitTestVisible="False"
+            Margin="15,5,0,5"
+            Grid.Row="0"
+            Foreground="Gray"
+            VerticalAlignment="Center"
+            Visibility="{Binding HasSearchText, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+        <DataGrid
+            Grid.Row="1"
+            Margin="10,0,10,10"
+            AutoGenerateColumns="False"
+            HeadersVisibility="Column"
+            CanUserAddRows="False"
+            IsReadOnly="True"
+            ItemsSource="{Binding FilteredCategories, UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn
+                    Width="30">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox
+                                HorizontalAlignment="Center"
+                                IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn
+                    Header="Категория"
+                    Width="*"
+                    IsReadOnly="True"
+                    Binding="{Binding Name}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
         <StackPanel
-            Margin="10">
-            <Grid>
-                <TextBox
-                    Margin="0,5,0,5"
-                    VerticalAlignment="Center"
-                    Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock
-                    Text="Введите для поиска..."
-                    IsHitTestVisible="False"
-                    Margin="5,5,0,5"
-                    Foreground="Gray"
-                    VerticalAlignment="Center"
-                    Visibility="{Binding HasSearchText, Converter={StaticResource BoolToVisibilityConverter}}" />
-            </Grid>
-
-            <ScrollViewer
-                VerticalScrollBarVisibility="Auto"
-                Height="300">
-                <DataGrid
-                    AutoGenerateColumns="False"
-                    HeadersVisibility="Column"
-                    Margin="0,0,0,15"
-                    CanUserAddRows="False"
-                    ItemsSource="{Binding FilteredCategories, UpdateSourceTrigger=PropertyChanged}">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn
-                            Width="30">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox
-                                        HorizontalAlignment="Center"
-                                        IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                        <DataGridTextColumn
-                            Header="Категория"
-                            Width="*"
-                            Binding="{Binding Name}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </ScrollViewer>
-
+            Grid.Row="2"
+            Orientation="Vertical"
+            HorizontalAlignment="Center">
             <CheckBox
                 Content="Выбрать все / Отменить все"
-                Margin="5,10,0,5"
-                HorizontalAlignment="Left"
+                Margin="0,0,0,0"
                 IsChecked="{Binding AllCategoriesSelected, Mode=TwoWay}" />
-            <Button
-                Margin="10"
-                Width="100"
-                Content="Выполнить"
-                Click="Button_Click" />
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+                <Button
+                    Margin="10"
+                    Width="80"
+                    Content="ОК"
+                    IsDefault="True"
+                    Click="ButtonOk_Click" />
+
+                <Button
+                    Margin="10"
+                    Width="80"
+                    Content="Отмена"
+                    IsCancel="True"
+                    Click="ButtonCancel_Click" />
+            </StackPanel>
         </StackPanel>
     </Grid>
-</Window> 
+</Window>

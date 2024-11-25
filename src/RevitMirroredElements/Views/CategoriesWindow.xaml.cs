@@ -7,8 +7,12 @@ namespace RevitMirroredElements.Views {
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e) {
+        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+            DialogResult = false;
         }
     }
 }
