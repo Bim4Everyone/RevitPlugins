@@ -22,7 +22,7 @@ namespace RevitMirroredElements.ViewModels {
         private bool _hasSearchText;
         private bool _allCategoriesSelected;
 
-        public CategoriesViewModel(RevitRepository revitRepository) {
+        public CategoriesViewModel(RevitRepository revitRepository, List<Category> selectedCategories) {
             _revitRepository = revitRepository;
 
             _allCategories = new ObservableCollection<CategoryElement>(
@@ -32,7 +32,7 @@ namespace RevitMirroredElements.ViewModels {
                 Id = category.Id,
                 Name = category.Name,
                 Category = category,
-                IsSelected = false,
+                IsSelected = selectedCategories != null && selectedCategories.Any(sc => sc.Id == category.Id),
             }));
 
             _filteredCategoriesSource = new CollectionViewSource();

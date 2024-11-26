@@ -4,4 +4,5 @@ namespace RevitMirroredElements.Models {
         SelectedElements,
         SelectedCategories
     }
+
 }

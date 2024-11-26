@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:RevitMirroredElements.Views"
     xmlns:vms="clr-namespace:RevitMirroredElements.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:conv="clr-namespace:RevitMirroredElements.Converters"
     x:Name="mainWindow"
     mc:Ignorable="d"
     Title="Проверка на зеркальность"
@@ -16,6 +17,11 @@
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
+    <Window.Resources>
+        <conv:EnumToBoolConverter
+            x:Key="EnumToBoolConverter" />
+    </Window.Resources>
+    
     <i:Interaction.Triggers>
         <i:EventTrigger
             EventName="Loaded">
@@ -35,7 +41,9 @@
             Margin="10"
             VerticalAlignment="Center">
 
-            <StackPanel>
+            <StackPanel
+                Margin="10"
+                VerticalAlignment="Center">
                 <Grid
                     Margin="0,5,0,0">
                     <Grid.ColumnDefinitions>
@@ -48,9 +56,9 @@
                     <RadioButton
                         Grid.Column="0"
                         VerticalAlignment="Center"
-                        GroupName="TypeSelectionElement"
+                        GroupName="GroupType"
                         Content="{Binding SelectedElementsText}"
-                        IsChecked="{Binding IsSelectedElements, Mode=TwoWay}" />
+                        IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedElements}" />
 
                     <Button
                         Width="80"
@@ -73,10 +81,9 @@
                     <RadioButton
                         Grid.Column="0"
                         VerticalAlignment="Center"
-                        GroupName="TypeSelectionElement"
+                        GroupName="GroupType"
                         Content="{Binding SelectedCategoriesText}"
-                        IsChecked="{Binding IsSelectedCategories, Mode=TwoWay}" />
-
+                        IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedCategories}" />
 
                     <Button
                         Width="80"
@@ -85,25 +92,24 @@
                         HorizontalAlignment="Right"
                         Command="{Binding SelectCategoriesCommand}" />
                 </Grid>
-            </StackPanel>
 
+                <StackPanel
+                    Orientation="Horizontal"
+                    Margin="20,10,0,0">
+                    <StackPanel>
+                        <RadioButton
+                            Content="В активном виде"
+                            GroupName="ElementScope"
+                            Margin="0,0,0,5"
+                            IsEnabled="{Binding IsCategoriesSelected}"
+                            IsChecked="{Binding SelectedElementScope, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ActiveView}" />
 
-            <StackPanel
-                Orientation="Horizontal"
-                Margin="20,10,0,0">
-                <StackPanel>
-                    <RadioButton
-                        Content="В активном виде"
-                        GroupName="ElementScope"
-                        Margin="0,0,0,5"
-                        IsEnabled="{Binding IsSelectedCategories}"
-                        IsChecked="{Binding IsActiveView, Mode=TwoWay}"/>
-
-                    <RadioButton
-                        Content="Во всём проекте"
-                        GroupName="ElementScope"
-                        IsEnabled="{Binding IsSelectedCategories}"
-                        IsChecked="{Binding WholeProject, Mode=TwoWay}"/>
+                        <RadioButton
+                            Content="Во всём проекте"
+                            GroupName="ElementScope"
+                            IsEnabled="{Binding IsCategoriesSelected}"
+                            IsChecked="{Binding SelectedElementScope, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=WholeProject}" />
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
 
@@ -127,7 +133,7 @@
 
             <TextBlock
                 TextWrapping="Wrap"
-                Margin="0,10,0,5">
+                Margin="0,10,0,15">
                 Плагин заполняет параметр 'ФОП_Зеркальность' 
                 <LineBreak />
                 '0' - элемент без изменений

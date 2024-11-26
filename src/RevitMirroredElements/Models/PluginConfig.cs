@@ -26,12 +26,9 @@ namespace RevitMirroredElements.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public bool IsSelectedElements { get; set; }
-        public bool IsSelectedCategories { get; set; }
-        public bool IsActiveView { get; set; }
-        public bool WholeProject { get; set; }
+        public ElementScope ElementScope { get; set; }
+        public ElementGroupType ElementGroupType { get; set; }
         public bool EnableFilter { get; set; }
-
         public List<ElementId> SelectedCategories { get; set; }
     }
 }

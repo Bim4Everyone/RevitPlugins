@@ -6,6 +6,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
@@ -25,15 +26,6 @@ namespace RevitMirroredElements.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        private ElementId GetParameterIdByName(string paramName) {
-            var paramElement = new FilteredElementCollector(Document)
-                .OfClass(typeof(SharedParameterElement))
-                .Cast<SharedParameterElement>()
-                .FirstOrDefault(e => e.Name == paramName);
-
-            return paramElement?.Id ?? ElementId.InvalidElementId;
-        }
-
         private OverrideGraphicSettings CreateMirrorCheckGraphicOverrides() {
             var overrideSettings = new OverrideGraphicSettings()
                 .SetSurfaceTransparency(0)
@@ -48,10 +40,11 @@ namespace RevitMirroredElements.Models {
         }
 
         private void SetLinePatterns(OverrideGraphicSettings settings) {
+            var solidNames = new List<string> { "<Solid>", "<Сплошная>" };
             var solidLinePattern = new FilteredElementCollector(Document)
                 .OfClass(typeof(LinePatternElement))
                 .Cast<LinePatternElement>()
-                .FirstOrDefault(p => p.Name == "<Solid>");
+                .FirstOrDefault(p => solidNames.Contains(p.Name));
 
             if(solidLinePattern != null) {
                 settings.SetProjectionLinePatternId(solidLinePattern.Id);
@@ -73,38 +66,37 @@ namespace RevitMirroredElements.Models {
             settings.SetCutForegroundPatternColor(new Color(255, 0, 0));
         }
 
-        public ICollection<ElementId> SelectElementsOnView() {
-            var uiDocument = UIApplication.ActiveUIDocument;
-
-            var selectedReferences = uiDocument.Selection.PickObjects(
+        public List<FamilyInstance> SelectElementsOnView() {
+            var selectedReferences = ActiveUIDocument.Selection.PickObjects(
                 Autodesk.Revit.UI.Selection.ObjectType.Element,
                 "Выберите элементы");
 
             if(selectedReferences != null) {
                 return selectedReferences
-                    .Select(reference => reference.ElementId)
+                    .Select(reference => ActiveUIDocument.Document.GetElement(reference.ElementId))
+                    .OfType<FamilyInstance>()
                     .ToList();
             }
 
-            return new List<ElementId>();
+
+            return new List<FamilyInstance>();
         }
 
         private void EnableTemporaryViewMode(View view) {
             view.EnableTemporaryViewPropertiesMode(view.Id);
         }
 
-        private ParameterFilterElement GetOrCreateMirrorFilter(List<Element> elements) {
+        private ParameterFilterElement GetOrCreateMirrorFilter(List<FamilyInstance> elements) {
             var userName = Application.Username;
             string filterNameWithUser = $"{MirrorFilterName}_{userName}";
 
             var existingFilter = FindFilterByName(filterNameWithUser);
-            var paramId = GetParameterIdByName(SharedParamsConfig.Instance.ElementMirroring.Name);
-
-            if(paramId == ElementId.InvalidElementId) {
+            var param = Document.GetSharedParam(SharedParamsConfig.Instance.ElementMirroring.Name);
+            if(!param.Id.IsNotNull()) {
                 throw new InvalidOperationException($"Параметр '{SharedParamsConfig.Instance.ElementMirroring.Name}' не найден.");
             }
 
-            var rule = new FilterDoubleRule(new ParameterValueProvider(paramId), new FilterNumericEquals(), 1, 1e-6);
+            var rule = new FilterDoubleRule(new ParameterValueProvider(param.Id), new FilterNumericEquals(), 1, 1e-6);
             var newCategoryIds = elements
                 .Select(e => e.Category?.Id)
                 .Where(id => id != null)
@@ -144,73 +136,76 @@ namespace RevitMirroredElements.Models {
             view.SetFilterVisibility(filter.Id, true);
         }
 
-        public ICollection<ElementId> GetElementsIdsFromCategories(List<Category> selectedCategories, ElementScope scope) {
-            return selectedCategories
-                .SelectMany(category => GetElementsByCategory(category, scope))
+        public List<FamilyInstance> GetElementsFromCategories(List<Category> selectedCategories, ElementScope scope) {
+            if(selectedCategories == null || !selectedCategories.Any()) {
+                return new List<FamilyInstance>();
+            }
+
+            var categoryIds = selectedCategories
+                .Where(c => c != null)
+                .Select(c => c.Id)
+                .ToList();
+
+            var multiCategoryFilter = new ElementMulticategoryFilter(categoryIds);
+
+            var collector = scope == ElementScope.ActiveView
+               ? new FilteredElementCollector(Document, Document.ActiveView.Id)
+                   .WherePasses(multiCategoryFilter)
+                   .WhereElementIsNotElementType()
+               : new FilteredElementCollector(Document)
+                   .WherePasses(multiCategoryFilter)
+                   .WhereElementIsNotElementType();
+
+
+            return collector
+                .OfType<FamilyInstance>()
                 .ToList();
         }
 
-        private IEnumerable<ElementId> GetElementsByCategory(Category category, ElementScope scope) {
-            var collector = new FilteredElementCollector(Document)
-                .OfCategory(category.GetBuiltInCategory())
-                .WhereElementIsNotElementType();
-
-            return scope == ElementScope.ActiveView
-                ? FilterByActiveView(collector)
-                : collector.ToElementIds();
-        }
-
-        private IEnumerable<ElementId> FilterByActiveView(FilteredElementCollector collector) {
-            var viewId = Document.ActiveView.Id;
-
-#if REVIT_2021_OR_LESS
-    return collector
-        .Where(item => item.OwnerViewId == viewId)
-        .ToElementIds();
-#else
-            return collector.WherePasses(new VisibleInViewFilter(Document, viewId)).ToElementIds();
-#endif
-        }
-
-        public ICollection<Element> GetElements(ICollection<ElementId> elementIds) {
-            var elements = new List<Element>();
-
+        public List<FamilyInstance> GetSelectedElements() {
+            var elements = new List<FamilyInstance>();
+            var elementIds = ActiveUIDocument.Selection.GetElementIds();
             foreach(var id in elementIds) {
                 Element element = Document.GetElement(id);
 
                 if(element is FamilyInstance familyInstance) {
-                    elements.Add(element);
+                    elements.Add(familyInstance);
                 }
             }
             return elements;
         }
 
-        public ICollection<ElementId> GetSelectedElementsIds() {
-            return ActiveUIDocument.Selection.GetElementIds();
-        }
-
-        public ICollection<Category> GetCategories() {
-            var sharedParamElement = new FilteredElementCollector(Document)
-                .OfClass(typeof(SharedParameterElement))
-                .Cast<SharedParameterElement>()
-                .FirstOrDefault(e => e.Name == SharedParamsConfig.Instance.ElementMirroring.Name);
+        public List<Category> GetCategories() {
+            var sharedParamElement = Document.GetSharedParam(SharedParamsConfig.Instance.ElementMirroring.Name);
 
             if(sharedParamElement == null) {
                 throw new InvalidOperationException($"Параметр '{SharedParamsConfig.Instance.ElementMirroring.Name}' не найден.");
             }
 
-            BindingMap bindingMap = Document.ParameterBindings;
-            var bindings = bindingMap.ForwardIterator();
-            List<Category> categories = new List<Category>();
+            var categories = Document
+               .GetParameterBindings()
+               .Where(binding => binding.Definition.GetElementId() == sharedParamElement.Id && binding.Binding is InstanceBinding)
+               .SelectMany(binding => ((InstanceBinding) binding.Binding).Categories.Cast<Category>())
+               .ToList();
 
-            while(bindings.MoveNext()) {
-                if(bindings.Key.GetElementId() == sharedParamElement.Id) {
-                    if(bindings.Current is InstanceBinding instanceBinding) {
-                        categories.AddRange(instanceBinding.Categories.Cast<Category>());
-                    }
+            return categories;
+        }
+
+        public List<Category> GetSaveCategories(List<ElementId> elementsIds) {
+            if(elementsIds == null || !elementsIds.Any()) {
+                return new List<Category>();
+            }
+
+            var categories = new List<Category>();
+
+            foreach(var elementId in elementsIds) {
+                var category = Category.GetCategory(Document, elementId);
+                if(category != null) {
+                    categories.Add(category);
                 }
             }
-            return categories;
+
+            return categories.Distinct().ToList();
         }
 
         public void UpdateParams() {
@@ -219,24 +214,11 @@ namespace RevitMirroredElements.Models {
                 SharedParamsConfig.Instance.ElementMirroring);
         }
 
-        public ICollection<Category> GetCategoriesByElementIds(ICollection<ElementId> elementIds) {
-            if(elementIds == null || !elementIds.Any()) {
-                return new List<Category>();
-            }
-            var categories = new List<Category>();
-            foreach(ElementId elementId in elementIds) {
-                var category = Category.GetCategory(Document, elementId);
-                categories.Add(category);
-            }
-
-            return categories;
-        }
-
         public Transaction StartTransaction(string transactionName) {
             return Document.StartTransaction(transactionName);
         }
 
-        public void FilterOnTemporaryView(List<Element> elements) {
+        public void FilterOnTemporaryView(List<FamilyInstance> elements) {
             using(var transaction = StartTransaction("Настройка временного вида для зеркальности")) {
                 var activeView = Document.ActiveView;
                 EnableTemporaryViewMode(activeView);
@@ -249,10 +231,10 @@ namespace RevitMirroredElements.Models {
             }
         }
 
-        public void SelectElementsOnMainView(List<Element> elements) {
+        public void SelectElementsOnMainView(List<FamilyInstance> elements) {
             var elementsIds = new List<ElementId>();
             foreach(var element in elements) {
-                var isMirrored = element.GetParamValue<double>(SharedParamsConfig.Instance.ElementMirroring.Name);
+                var isMirrored = element.GetParamValue<double>(SharedParamsConfig.Instance.ElementMirroring);
                 if(isMirrored != 0) {
                     elementsIds.Add(element.Id);
                 }

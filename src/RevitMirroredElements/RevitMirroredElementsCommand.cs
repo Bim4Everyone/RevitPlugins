@@ -1,3 +1,5 @@
+using System.Linq;
+
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -20,6 +22,13 @@ namespace RevitMirroredElements {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                Document document = uiApplication.ActiveUIDocument.Document;
+                View activeView = document.ActiveView;
+
+                if(!IsSupportedView(activeView)) {
+                    TaskDialog.Show("Ошибка", "Плагин может быть запущен только в следующих типах видов:\n- 3D Вид\n- План этажа\n- Разрез\n- Фасад.");
+                    return;
+                }
 
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
@@ -36,6 +45,18 @@ namespace RevitMirroredElements {
 
                 Notification(kernel.Get<MainWindow>());
             }
+
+        }
+
+        private bool IsSupportedView(View view) {
+            var supportedViewTypes = new[] {
+            ViewType.ThreeD,
+            ViewType.FloorPlan,
+            ViewType.Section,
+            ViewType.Elevation
+        };
+
+            return supportedViewTypes.Contains(view.ViewType);
         }
     }
 }

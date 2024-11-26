@@ -24,16 +24,12 @@ namespace RevitMirroredElements.ViewModels {
         private string _selectedCategoriesText;
 
         private bool _enableFilter;
-        private bool _isSelectedElements;
-        private bool _isSelectedCategories;
-        private bool _isActiveView;
-        private bool _isWholeProject;
 
         private ElementScope _selectedElementScope;
         private ElementGroupType _selectedGroupType;
-        private ICollection<ElementId> _selectedElementsIds;
+        private List<FamilyInstance> _selectedElements;
         private List<Category> _selectedCategories;
-        private List<Element> _needParameterElements;
+        private List<FamilyInstance> _needParameterElements;
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -44,7 +40,6 @@ namespace RevitMirroredElements.ViewModels {
 
             SelectedElementScope = ElementScope.NotSelected;
             SelectedGroupType = ElementGroupType.NotSelected;
-
 
             SelectElementsCommand = RelayCommand.Create<MainWindow>(SelectElements);
             SelectCategoriesCommand = RelayCommand.Create(SelectCategories);
@@ -57,15 +52,15 @@ namespace RevitMirroredElements.ViewModels {
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
-        public ICollection<ElementId> SelectedElementsIds {
-            get => _selectedElementsIds;
-            set => this.RaiseAndSetIfChanged(ref _selectedElementsIds, value);
+        public List<FamilyInstance> SelectedElements {
+            get => _selectedElements;
+            set => this.RaiseAndSetIfChanged(ref _selectedElements, value);
         }
         public List<Category> SelectedCategories {
             get => _selectedCategories;
             set => this.RaiseAndSetIfChanged(ref _selectedCategories, value);
         }
-        public List<Element> NeedParameterElements {
+        public List<FamilyInstance> NeedParameterElements {
             get => _needParameterElements;
             set => this.RaiseAndSetIfChanged(ref _needParameterElements, value);
         }
@@ -91,46 +86,15 @@ namespace RevitMirroredElements.ViewModels {
         }
         public ElementGroupType SelectedGroupType {
             get => _selectedGroupType;
-            set => this.RaiseAndSetIfChanged(ref _selectedGroupType, value);
-        }
-        public bool IsSelectedElements {
-            get => _isSelectedElements;
             set {
-                if(value == true) {
-                    SelectedGroupType = ElementGroupType.SelectedElements;
+                if(_selectedGroupType != value) {
+                    this.RaiseAndSetIfChanged(ref _selectedGroupType, value);
+                    this.RaisePropertyChanged(nameof(IsCategoriesSelected));
                 }
-                this.RaiseAndSetIfChanged(ref _isSelectedElements, value);
             }
+        }
 
-        }
-        public bool IsSelectedCategories {
-            get => _isSelectedCategories;
-            set {
-                if(value == true) {
-                    SelectedGroupType = ElementGroupType.SelectedCategories;
-                }
-                this.RaiseAndSetIfChanged(ref _isSelectedCategories, value);
-            }
-        }
-        public bool IsActiveView {
-            get => _isActiveView;
-            set {
-                if(value == true) {
-                    SelectedElementScope = ElementScope.ActiveView;
-                }
-                this.RaiseAndSetIfChanged(ref _isActiveView, value);
-            }
-
-        }
-        public bool WholeProject {
-            get => _isWholeProject;
-            set {
-                if(value == true) {
-                    SelectedElementScope = ElementScope.WholeProject;
-                }
-                this.RaiseAndSetIfChanged(ref _isWholeProject, value);
-            }
-        }
+        public bool IsCategoriesSelected => SelectedGroupType == ElementGroupType.SelectedCategories;
 
         public void UpdateMirrorParameters() {
 
@@ -141,7 +105,7 @@ namespace RevitMirroredElements.ViewModels {
                     var ct = window.CreateCancellationToken();
                     int count = 1;
 
-                    foreach(Element element in NeedParameterElements) {
+                    foreach(FamilyInstance element in NeedParameterElements) {
                         progress.Report(count++);
                         ct.ThrowIfCancellationRequested();
 
@@ -153,7 +117,7 @@ namespace RevitMirroredElements.ViewModels {
             }
         }
 
-        private IProgressDialogService CreateProgressDialog(IList<Element> elements) {
+        private IProgressDialogService CreateProgressDialog(List<FamilyInstance> elements) {
             var window = GetPlatformService<IProgressDialogService>();
             window.DisplayTitleFormat = $"Заполнение [{{0}}\\{{1}}]";
             window.MaxValue = elements.Count;
@@ -162,15 +126,15 @@ namespace RevitMirroredElements.ViewModels {
             return window;
         }
 
-        private bool IsElementMirrored(Element element) {
-            return ((FamilyInstance) element).Mirrored;
+        private bool IsElementMirrored(FamilyInstance familyInstance) {
+            return familyInstance.Mirrored;
         }
 
         private void SelectElements(MainWindow mainWindow) {
             mainWindow.Hide();
             try {
-                _selectedElementsIds = _revitRepository.SelectElementsOnView();
-                SelectedElementsText = $"Выбранные элементы ({_selectedElementsIds?.Count ?? 0})";
+                _selectedElements = _revitRepository.SelectElementsOnView();
+                SelectedElementsText = $"Выбранные элементы ({_selectedElements?.Count ?? 0})";
             } finally {
                 mainWindow.ShowDialog();
             }
@@ -178,7 +142,7 @@ namespace RevitMirroredElements.ViewModels {
 
         private void SelectCategories() {
             var categoriesWindow = new CategoriesWindow();
-            var categoriesViewWindow = new CategoriesViewModel(_revitRepository);
+            var categoriesViewWindow = new CategoriesViewModel(_revitRepository, SelectedCategories);
             categoriesWindow.DataContext = categoriesViewWindow;
             if(categoriesWindow.ShowDialog() == true) {
                 SelectedCategories = categoriesViewWindow.GetSelectedCategories();
@@ -189,21 +153,24 @@ namespace RevitMirroredElements.ViewModels {
         private void LoadView() {
             LoadConfig();
             _revitRepository.UpdateParams();
-            _selectedElementsIds = _revitRepository.GetSelectedElementsIds();
+            _selectedElements = _revitRepository.GetSelectedElements();
 
-            SelectedElementsText = $"Выбранные элементы ({_selectedElementsIds?.Count ?? 0})";
+            SelectedElementsText = $"Выбранные элементы ({_selectedElements?.Count ?? 0})";
             SelectedCategoriesText = $"Выбранные категории ({SelectedCategories?.Count ?? 0})";
         }
 
         private void AcceptView() {
             SaveConfig();
-            var needParametrElementsIds = SelectedGroupType == ElementGroupType.SelectedCategories
-                ? _revitRepository.GetElementsIdsFromCategories(SelectedCategories, SelectedElementScope)
-                : _selectedElementsIds;
+            NeedParameterElements = SelectedGroupType == ElementGroupType.SelectedCategories
+                ? _revitRepository.GetElementsFromCategories(SelectedCategories, SelectedElementScope)
+                : _selectedElements.ToList();
 
-            NeedParameterElements = _revitRepository.GetElements(needParametrElementsIds).ToList();
+            if(NeedParameterElements == null || !NeedParameterElements.Any()) {
+                return;
+            }
 
             UpdateMirrorParameters();
+
 
             if(EnableFilter) {
                 _revitRepository.FilterOnTemporaryView(NeedParameterElements);
@@ -217,7 +184,7 @@ namespace RevitMirroredElements.ViewModels {
                 ErrorText = "Необходимо выбрать фильтр";
                 return false;
             }
-            if(SelectedGroupType == ElementGroupType.SelectedElements && SelectedElementsIds.Count == 0) {
+            if(SelectedGroupType == ElementGroupType.SelectedElements && SelectedElements.Count == 0) {
                 ErrorText = "Необходимо выбрать элементы";
                 return false;
             }
@@ -235,22 +202,18 @@ namespace RevitMirroredElements.ViewModels {
 
         private void LoadConfig() {
             var setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            IsSelectedElements = setting.IsSelectedElements;
-            IsSelectedCategories = setting.IsSelectedCategories;
-            IsActiveView = setting.IsActiveView;
-            WholeProject = setting.WholeProject;
+            SelectedElementScope = setting.ElementScope;
+            SelectedGroupType = setting.ElementGroupType;
             EnableFilter = setting.EnableFilter;
-            SelectedCategories = _revitRepository.GetCategoriesByElementIds(setting.SelectedCategories).ToList();
+            SelectedCategories = _revitRepository.GetSaveCategories(setting.SelectedCategories).ToList();
         }
 
         private void SaveConfig() {
             var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.IsSelectedElements = IsSelectedElements;
-            setting.IsSelectedCategories = IsSelectedCategories;
-            setting.IsActiveView = IsActiveView;
-            setting.WholeProject = WholeProject;
+            setting.ElementScope = SelectedElementScope;
+            setting.ElementGroupType = SelectedGroupType;
             setting.EnableFilter = EnableFilter;
             setting.SelectedCategories = SelectedCategories.Select(x => x.Id).ToList();
             _pluginConfig.SaveProjectConfig();
