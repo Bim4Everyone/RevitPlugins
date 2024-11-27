@@ -14,6 +14,7 @@ namespace RevitDeclarations.Models {
             _curveTolerance = room.Document.Application.ShortCurveTolerance;
 
             SpatialElementBoundaryOptions options = new SpatialElementBoundaryOptions();
+            options.SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Finish;
             IList<IList<BoundarySegment>> roomBoundaries = room
                 .GetBoundarySegments(options)
                 .ToList();
