@@ -83,7 +83,7 @@ namespace RevitMirroredElements.Models {
         }
 
         private void EnableTemporaryViewMode(View view) {
-            view.EnableTemporaryViewPropertiesMode(view.Id);
+            view.EnableTemporaryViewPropertiesMode(view.Id);// работает только при передаче view.Id если передать view.ViewTemplateId временный вид не создается 
         }
 
         private ParameterFilterElement GetOrCreateMirrorFilter(List<FamilyInstance> elements) {
@@ -91,12 +91,12 @@ namespace RevitMirroredElements.Models {
             string filterNameWithUser = $"{MirrorFilterName}_{userName}";
 
             var existingFilter = FindFilterByName(filterNameWithUser);
-            var param = Document.GetSharedParam(SharedParamsConfig.Instance.ElementMirroring.Name);
-            if(!param.Id.IsNotNull()) {
+            var sharedParam = SharedParamsConfig.Instance.ElementMirroring.GetRevitParamElement(Document);
+            if(sharedParam.Id.IsNull()) {
                 throw new InvalidOperationException($"Параметр '{SharedParamsConfig.Instance.ElementMirroring.Name}' не найден.");
             }
 
-            var rule = new FilterDoubleRule(new ParameterValueProvider(param.Id), new FilterNumericEquals(), 1, 1e-6);
+            var rule = new FilterDoubleRule(new ParameterValueProvider(sharedParam.Id), new FilterNumericEquals(), 1, 1e-6);
             var newCategoryIds = elements
                 .Select(e => e.Category?.Id)
                 .Where(id => id != null)
@@ -176,30 +176,25 @@ namespace RevitMirroredElements.Models {
         }
 
         public List<Category> GetCategories() {
-            var sharedParamElement = Document.GetSharedParam(SharedParamsConfig.Instance.ElementMirroring.Name);
+            var revitParam = SharedParamsConfig.Instance.ElementMirroring;
+            var categories = revitParam.GetParamBinding(Document).Binding.GetCategories();
 
-            if(sharedParamElement == null) {
-                throw new InvalidOperationException($"Параметр '{SharedParamsConfig.Instance.ElementMirroring.Name}' не найден.");
+            if(categories != null && categories.Any()) {
+                return categories.ToList();
             }
 
-            var categories = Document
-               .GetParameterBindings()
-               .Where(binding => binding.Definition.GetElementId() == sharedParamElement.Id && binding.Binding is InstanceBinding)
-               .SelectMany(binding => ((InstanceBinding) binding.Binding).Categories.Cast<Category>())
-               .ToList();
-
-            return categories;
+            return new List<Category>();
         }
 
-        public List<Category> GetSaveCategories(List<ElementId> elementsIds) {
-            if(elementsIds == null || !elementsIds.Any()) {
+        public List<Category> GetSaveCategories(List<ElementId> categoriesIds) {
+            if(categoriesIds == null || !categoriesIds.Any()) {
                 return new List<Category>();
             }
 
             var categories = new List<Category>();
 
-            foreach(var elementId in elementsIds) {
-                var category = Category.GetCategory(Document, elementId);
+            foreach(var categoryId in categoriesIds) {
+                var category = Category.GetCategory(Document, categoryId);
                 if(category != null) {
                     categories.Add(category);
                 }

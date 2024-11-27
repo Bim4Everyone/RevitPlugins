@@ -26,7 +26,7 @@ namespace RevitMirroredElements {
                 View activeView = document.ActiveView;
 
                 if(!IsSupportedView(activeView)) {
-                    TaskDialog.Show("Ошибка", "Плагин может быть запущен только в следующих типах видов:\n- 3D Вид\n- План этажа\n- Разрез\n- Фасад.");
+                    TaskDialog.Show("Ошибка", "Данный плагин не поддерживает работу в текущем виде.");
                     return;
                 }
 
@@ -50,11 +50,13 @@ namespace RevitMirroredElements {
 
         private bool IsSupportedView(View view) {
             var supportedViewTypes = new[] {
-            ViewType.ThreeD,
-            ViewType.FloorPlan,
-            ViewType.Section,
-            ViewType.Elevation
-        };
+                ViewType.ThreeD,
+                ViewType.FloorPlan,
+                ViewType.Section,
+                ViewType.Elevation,
+                ViewType.CeilingPlan,
+                ViewType.Schedule
+            };
 
             return supportedViewTypes.Contains(view.ViewType);
         }
