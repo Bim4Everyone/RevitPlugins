@@ -6,7 +6,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using RevitDeclarations.Models;
-using RevitDeclarations.Models.Configs;
 using RevitDeclarations.ViewModels.ExportViewModels;
 using RevitDeclarations.Views;
 
@@ -18,8 +17,12 @@ namespace RevitDeclarations.ViewModels {
         private readonly PublicAreasExcelExportVM _excelExportViewModel;
         private readonly PublicAreasCsvExportVM _csvExportViewModel;
 
+        private new readonly PublicAreasSettings _settings;
+
         public PublicAreasMainVM(RevitRepository revitRepository, PublicAreasSettings settings)
             : base(revitRepository, settings) {
+            _settings = settings;
+
             _excelExportViewModel =
                 new PublicAreasExcelExportVM("Excel", new Guid("186F3EEE-303A-42DF-910E-475AD2525ABD"), _settings);
             _csvExportViewModel =
@@ -42,6 +45,7 @@ namespace RevitDeclarations.ViewModels {
 
         public override void ExportDeclaration(object obj) {
             SetSelectedSettings();
+            SetPublicAreasSettings();
 
             List<RevitDocumentViewModel> checkedDocuments = _revitDocuments
                 .Where(x => x.IsChecked)
@@ -130,7 +134,6 @@ namespace RevitDeclarations.ViewModels {
             config.SaveProjectConfig();
         }
 
-
         private void LoadConfig() {
             var config = PublicAreasConfig.GetPluginConfig();
             var configSettings = config.GetSettings(_revitRepository.Document);
@@ -142,6 +145,11 @@ namespace RevitDeclarations.ViewModels {
             _parametersViewModel.SetParametersFromConfig(configSettings);
 
             config.SaveProjectConfig();
+        }
+
+        private void SetPublicAreasSettings() {
+            PublicAreasParamsVM publicAreasParamsVM = (PublicAreasParamsVM) _parametersViewModel;
+            _settings.AddPrefixToNumber = publicAreasParamsVM.AddPrefixToNumber;
         }
     }
 }

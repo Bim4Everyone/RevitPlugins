@@ -187,10 +187,28 @@ namespace RevitDeclarations.ViewModels {
             _settings.Accuracy = accuracy;
             _settings.SelectedPhase = _selectedPhase;
 
-            _settings.ParametersVM = _parametersViewModel;
             _settings.PrioritiesConfig = _prioritiesViewModel.PrioritiesConfig;
 
             _settings.LoadUtp = _loadUtp;
+
+            _settings.FilterRoomsParam = _parametersViewModel.SelectedFilterRoomsParam;
+            _settings.FilterRoomsValues = _parametersViewModel.FilterRoomsValues.Select(x => x.Value).ToArray();
+            _settings.GroupingBySectionParam = _parametersViewModel.SelectedGroupingBySectionParam;
+            _settings.GroupingByGroupParam = _parametersViewModel.SelectedGroupingByGroupParam;
+            _settings.MultiStoreyParam = _parametersViewModel.SelectedMultiStoreyParam;
+            _settings.DepartmentParam = _parametersViewModel.SelectedDepartmentParam;
+            _settings.LevelParam = _parametersViewModel.SelectedLevelParam;
+            _settings.ApartmentNumberParam = _parametersViewModel.SelectedApartNumParam;
+            _settings.SectionParam = _parametersViewModel.SelectedSectionParam;
+            _settings.BuildingParam = _parametersViewModel.SelectedBuildingParam;
+            _settings.ApartmentAreaParam = _parametersViewModel.SelectedApartAreaParam;
+            _settings.ProjectName = _parametersViewModel.ProjectName;
+            _settings.RoomAreaParam = _parametersViewModel.SelectedRoomAreaParam;
+            _settings.RoomAreaCoefParam = _parametersViewModel.SelectedRoomAreaParam;
+            _settings.RoomNameParam = _parametersViewModel.SelectedRoomNameParam;
+            _settings.RoomNumberParam = _parametersViewModel.SelectedRoomNumberParam;
+
+            _settings.AllParameters = _parametersViewModel.AllSelectedParameters;
         }
 
         /// <summary>

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Data;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -19,8 +18,12 @@ namespace RevitDeclarations.ViewModels {
         private readonly ApartmentsCsvExportVM _csvExportViewModel;
         private readonly ApartmentsJsonExportVM _jsonExportViewModel;
 
+        private new readonly ApartmentsSettings _settings;
+
         public ApartmentsMainVM(RevitRepository revitRepository, ApartmentsSettings settings) 
             : base(revitRepository, settings) {
+            _settings = settings;
+
             _excelExportViewModel = 
                 new ApartmentsExcelExportVM("Excel", new Guid("01EE33B6-69E1-4364-92FD-A2F94F115A9E"), _settings);
             _csvExportViewModel = 
@@ -45,7 +48,8 @@ namespace RevitDeclarations.ViewModels {
         }
 
         public override void ExportDeclaration(object obj) {
-            SetSelectedSettings();            
+            SetSelectedSettings();
+            SetApartSettings();
 
             List<RevitDocumentViewModel> checkedDocuments = _revitDocuments
                 .Where(x => x.IsChecked)
@@ -205,6 +209,19 @@ namespace RevitDeclarations.ViewModels {
             }
 
             config.SaveProjectConfig();
+        }
+
+        private void SetApartSettings() {
+            ApartmentsParamsVM apartParamsVM = (ApartmentsParamsVM) _parametersViewModel;
+            _settings.ApartmentFullNumberParam = apartParamsVM.SelectedApartFullNumParam;
+            _settings.BuildingNumberParam = apartParamsVM.SelectedBuildingNumberParam;
+            _settings.ConstrWorksNumberParam = apartParamsVM.SelectedConstrWorksNumberParam;
+            _settings.ApartmentAreaCoefParam = apartParamsVM.SelectedApartAreaCoefParam;
+            _settings.ApartmentAreaLivingParam = apartParamsVM.SelectedApartAreaLivingParam;
+            _settings.ApartmentAreaNonSumParam = apartParamsVM.SelectedApartAreaNonSumParam;
+            _settings.RoomsAmountParam = apartParamsVM.SelectedRoomsAmountParam;
+            _settings.RoomsHeightParam = apartParamsVM.SelectedRoomsHeightParam;
+            _settings.RoomAreaCoefParam = apartParamsVM.SelectedRoomAreaCoefParam;
         }
     }
 }

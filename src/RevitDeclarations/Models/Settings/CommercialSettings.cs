@@ -1,30 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Autodesk.Revit.DB;
-
-using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class CommercialSettings : DeclarationSettings {
-        private CommercialParamsVM _parametersVM;
+        public Parameter BuildingNumberParam { get; set; }
+        public Parameter ConstrWorksNumberParam { get; set; }
+        public Parameter RoomsHeightParam { get; set; }
+        public Parameter ParkingSpaceClass { get; set; }
 
-        public override ParametersViewModel ParametersVM {
-            get { return _parametersVM; }
-            set {
-                _parametersVM = (CommercialParamsVM) value;
-            }
-        }
-
-        public Parameter BuildingNumberParam => _parametersVM.SelectedBuildingNumberParam;
-        public Parameter ConstrWorksNumberParam => _parametersVM.SelectedConstrWorksNumberParam;
-        public Parameter RoomsHeightParam => _parametersVM.SelectedRoomsHeightParam;
-        public Parameter ParkingSpaceClass => _parametersVM.SelectedParkingSpaceClass;
-
-        public Parameter GroupNameParam => _parametersVM.SelectedGroupNameParam;
-        public bool AddPrefixToNumber => _parametersVM.AddPrefixToNumber;
+        public Parameter GroupNameParam { get; set; }
+        public bool AddPrefixToNumber { get; set; }
     }
 }

@@ -3,8 +3,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using RevitDeclarations.ViewModels;
-
 namespace RevitDeclarations.Models {
     internal abstract class DeclarationSettings {
         public ICollection<RoomPriority> Priorities => PrioritiesConfig.Priorities;
@@ -23,28 +21,27 @@ namespace RevitDeclarations.Models {
                 .ToList();
         public string[] BannedRoomNames => PrioritiesConfig.BannedRoomNames;
 
-        public virtual ParametersViewModel ParametersVM { get; set; }
-        public Parameter FilterRoomsParam => ParametersVM.SelectedFilterRoomsParam;
-        public string[] FilterRoomsValues => ParametersVM.FilterRoomsValues.Select(x => x.Value).ToArray();
-        public Parameter GroupingBySectionParam => ParametersVM.SelectedGroupingBySectionParam;
-        public Parameter GroupingByGroupParam => ParametersVM.SelectedGroupingByGroupParam;
-        public Parameter MultiStoreyParam => ParametersVM.SelectedMultiStoreyParam;
-        public virtual Parameter DepartmentParam => ParametersVM.SelectedDepartmentParam;
-        public Parameter LevelParam => ParametersVM.SelectedLevelParam;
-        public Parameter ApartmentNumberParam => ParametersVM.SelectedApartNumParam;
-        public Parameter SectionParam => ParametersVM.SelectedSectionParam;
-        public Parameter BuildingParam => ParametersVM.SelectedBuildingParam;
-        public Parameter ApartmentAreaParam => ParametersVM.SelectedApartAreaParam;
-        public string ProjectName => ParametersVM.ProjectName;
-        public Parameter RoomAreaParam => ParametersVM.SelectedRoomAreaParam;
-        public virtual Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaParam;
-        public Parameter RoomNameParam => ParametersVM.SelectedRoomNameParam;
-        public Parameter RoomNumberParam => ParametersVM.SelectedRoomNumberParam;
+        public Parameter FilterRoomsParam { get; set; }
+        public string[] FilterRoomsValues { get; set; }
+        public Parameter GroupingBySectionParam { get; set; }
+        public Parameter GroupingByGroupParam { get; set; }
+        public Parameter MultiStoreyParam { get; set; }
+        public virtual Parameter DepartmentParam { get; set; }
+        public Parameter LevelParam { get; set; }
+        public Parameter ApartmentNumberParam { get; set; }
+        public Parameter SectionParam { get; set; }
+        public Parameter BuildingParam { get; set; }
+        public Parameter ApartmentAreaParam { get; set; }
+        public string ProjectName { get; set; }
+        public Parameter RoomAreaParam { get; set; }
+        public Parameter RoomAreaCoefParam { get; set; }
+        public Parameter RoomNameParam { get; set; }
+        public Parameter RoomNumberParam { get; set; }
 
         /// <summary>
         /// Список параметров для проверки их наличия в проекте
         /// </summary>
-        public IReadOnlyCollection<Parameter> AllParameters => ParametersVM.AllSelectedParameters;
+        public IReadOnlyCollection<Parameter> AllParameters { get; set; }
 
         public void UpdatePriorities(List<string> newNames) {
             int prioritiesLength = PrioritiesConfig.Priorities.Count;

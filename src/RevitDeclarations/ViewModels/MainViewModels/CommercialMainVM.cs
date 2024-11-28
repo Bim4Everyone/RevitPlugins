@@ -17,8 +17,12 @@ namespace RevitDeclarations.ViewModels {
         private readonly CommercialExcelExportVM _excelExportViewModel;
         private readonly CommercialCsvExportVM _csvExportViewModel;
 
+        private new readonly CommercialSettings _settings;
+
         public CommercialMainVM(RevitRepository revitRepository, CommercialSettings settings) 
             : base(revitRepository, settings) {
+            _settings = settings;
+
             _excelExportViewModel =
                 new CommercialExcelExportVM("Excel", new Guid("8D69848F-159D-4B26-B4C0-17E3B3A132CC"), _settings);
             _csvExportViewModel =
@@ -41,6 +45,7 @@ namespace RevitDeclarations.ViewModels {
 
         public override void ExportDeclaration(object obj) {
             SetSelectedSettings();
+            SetCommSettings();
 
             List<RevitDocumentViewModel> checkedDocuments = _revitDocuments
                 .Where(x => x.IsChecked)
@@ -146,6 +151,17 @@ namespace RevitDeclarations.ViewModels {
             _parametersViewModel.SetParametersFromConfig(configSettings);
 
             config.SaveProjectConfig();
+        }
+
+
+        private void SetCommSettings() {
+            CommercialParamsVM apartParamsVM = (CommercialParamsVM) _parametersViewModel;
+            _settings.BuildingNumberParam = apartParamsVM.SelectedBuildingNumberParam;
+            _settings.ConstrWorksNumberParam = apartParamsVM.SelectedConstrWorksNumberParam;
+            _settings.RoomsHeightParam = apartParamsVM.SelectedRoomsHeightParam;
+            _settings.ParkingSpaceClass = apartParamsVM.SelectedParkingSpaceClass;
+            _settings.GroupNameParam = apartParamsVM.SelectedGroupNameParam;
+            _settings.AddPrefixToNumber = apartParamsVM.AddPrefixToNumber;
         }
     }
 }
