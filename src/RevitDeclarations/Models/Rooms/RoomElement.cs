@@ -2,6 +2,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Revit;
 
 using pyRevitLabs.Json;
 
@@ -60,23 +62,21 @@ namespace RevitDeclarations.Models
         public string Number => _revitRoom.Number;
 
         public string GetTextParamValue(Parameter parameter) {
-            Parameter param = RevitRoom.LookupParameter(parameter.Definition.Name);
-            return param.HasValue ? param.AsString() : "";               
+            return RevitRoom.GetParamValueOrDefault(parameter.Definition.Name, "");
         }
 
         public double GetAreaParamValue(Parameter parameter, int accuracy) {
-            Parameter param = RevitRoom.LookupParameter(parameter.Definition.Name);
-            return param.HasValue ? ParamConverter.ConvertArea(param.AsDouble(), accuracy) : 0;
+            var value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
+            return ParamConverter.ConvertArea(value, accuracy);
         }
 
         public double GetLengthParamValue(Parameter parameter, int accuracy) {
-            Parameter param = RevitRoom.LookupParameter(parameter.Definition.Name);            
-            return param.HasValue ? ParamConverter.ConvertLength(param.AsDouble(), accuracy) : 0;
+            var value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
+            return ParamConverter.ConvertLength(value, accuracy);
         }
 
         public int GetIntParamValue(Parameter parameter) {
-            Parameter param = RevitRoom.LookupParameter(parameter.Definition.Name);
-            return param.HasValue ? param.AsInteger() : 0;
+            return RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
         }
     }
 }
