@@ -13,8 +13,8 @@ using System.Collections.ObjectModel;
 
 namespace RevitDeclarations.ViewModels {
     internal abstract class ParametersViewModel : BaseViewModel {
+        protected readonly RevitRepository _revitRepository;
         private readonly MainViewModel _mainViewModel;
-        private protected readonly RevitRepository _revitRepository;
 
         private RevitDocumentViewModel _selectedDocument;
 

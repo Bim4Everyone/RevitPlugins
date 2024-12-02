@@ -6,18 +6,18 @@ using pyRevitLabs.Json;
 
 namespace RevitDeclarations.Models {
     internal abstract class RoomGroup {
-        private protected const double _maxAreaDeviation = 0.2;
+        protected const double _maxAreaDeviation = 0.2;
 
-        private protected readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
+        protected readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
 
+        protected readonly RoomParamProvider _paramProvider;
+        protected readonly int _accuracy;
+
+        protected readonly IEnumerable<RoomElement> _rooms;
+
+        protected readonly RoomElement _firstRoom;
+        protected readonly bool _isOneRoomGroup = false;
         private readonly DeclarationSettings _settings;
-        private protected readonly RoomParamProvider _paramProvider;
-        private protected readonly int _accuracy;
-
-        private protected readonly IEnumerable<RoomElement> _rooms;
-
-        private protected readonly RoomElement _firstRoom;
-        private protected readonly bool _isOneRoomGroup = false;
 
         public RoomGroup(IEnumerable<RoomElement> rooms, DeclarationSettings settings, RoomParamProvider paramProvider) {
             _settings = settings;

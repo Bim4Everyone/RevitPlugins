@@ -7,9 +7,10 @@ using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels {
     internal abstract class ExportViewModel {
+        protected readonly DeclarationSettings _settings;
+
         private readonly string _name;
         private readonly Guid _id;
-        private protected readonly DeclarationSettings _settings;
 
         protected ExportViewModel(string name, Guid id, DeclarationSettings settings) {
             _id = id;

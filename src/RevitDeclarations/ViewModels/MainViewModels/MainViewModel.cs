@@ -17,29 +17,29 @@ using RevitDeclarations.Models;
 
 namespace RevitDeclarations.ViewModels {
     internal abstract class MainViewModel : BaseViewModel {
-        private protected readonly RevitRepository _revitRepository;
-        private protected readonly DeclarationSettings _settings;
+        protected readonly RevitRepository _revitRepository;
+        protected readonly DeclarationSettings _settings;
 
-        private protected readonly IList<RevitDocumentViewModel> _revitDocuments;
-        private protected readonly IReadOnlyList<Phase> _phases;
-        private protected Phase _selectedPhase;
+        protected readonly IList<RevitDocumentViewModel> _revitDocuments;
+        protected readonly IReadOnlyList<Phase> _phases;
+        protected Phase _selectedPhase;
 
-        private protected string _filePath;
-        private protected string _fileName;
+        protected string _filePath;
+        protected string _fileName;
 
-        private protected ParametersViewModel _parametersViewModel;
-        private protected PrioritiesViewModel _prioritiesViewModel;
+        protected ParametersViewModel _parametersViewModel;
+        protected PrioritiesViewModel _prioritiesViewModel;
 
-        private protected List<ExportViewModel> _exportFormats;
-        private protected ExportViewModel _selectedFormat;
+        protected List<ExportViewModel> _exportFormats;
+        protected ExportViewModel _selectedFormat;
 
-        private protected string _accuracy;
+        protected string _accuracy;
 
-        private protected bool _loadUtp;
-        private protected bool _canLoadUtp;
-        private protected string _canLoadUtpText;
+        protected bool _loadUtp;
+        protected bool _canLoadUtp;
+        protected string _canLoadUtpText;
 
-        private protected LogicalStringComparer _stringComparer;
+        protected LogicalStringComparer _stringComparer;
 
         private string _errorText;
 
