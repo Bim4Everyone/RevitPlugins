@@ -15,7 +15,6 @@ namespace RevitDeclarations.ViewModels {
     internal abstract class ParametersViewModel : BaseViewModel {
         private readonly MainViewModel _mainViewModel;
         private protected readonly RevitRepository _revitRepository;
-        private readonly ParameterToolTip _parameterToolTip;
 
         private RevitDocumentViewModel _selectedDocument;
 
@@ -53,8 +52,6 @@ namespace RevitDeclarations.ViewModels {
                 .GetRoomsParamsByStorageType(SelectedDocument, StorageType.Double);
             _intParameters = _revitRepository
                 .GetRoomsParamsByStorageType(SelectedDocument, StorageType.Integer);
-
-            _parameterToolTip = new ParameterToolTip();
 
             _filterRoomsValues = new ObservableCollection<FilterRoomValueVM>();
 
@@ -158,8 +155,6 @@ namespace RevitDeclarations.ViewModels {
             get => _selectedRoomNumberParam;
             set => RaiseAndSetIfChanged(ref _selectedRoomNumberParam, value);
         }
-
-        public ParameterToolTip ParameterToolTip => _parameterToolTip;
 
         public bool AddPrefixToNumber {
             get => _addPrefixToNumber;

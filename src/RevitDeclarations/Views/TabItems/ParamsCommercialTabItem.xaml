@@ -18,6 +18,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary  Source="../Styles/StyleResources.xaml"/>
+                <ResourceDictionary  Source="../ToolTips/ParameterToolTips.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
@@ -57,8 +58,13 @@
             <Button
                 Grid.Row="0"
                 Grid.Column="0"
-                ToolTip="{Binding ParameterToolTip.ParamDocumentToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource ParamDocumentToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Row="0"
                 Grid.Column="1"
@@ -75,8 +81,13 @@
             <Button
                 Grid.Row="1"
                 Grid.Column="0"
-                ToolTip="{Binding ParameterToolTip.LastConfigToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource LastConfigToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="1"
@@ -92,8 +103,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="2"
-                ToolTip="{Binding ParameterToolTip.CompanyConfigToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource CompanyConfigToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Row="2"
                 Grid.Column="1"
@@ -132,8 +148,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="0"
-                ToolTip="{Binding ParameterToolTip.FilterRoomsParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource FilterRoomsParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="0"
@@ -150,8 +171,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="1"
-                ToolTip="{Binding ParameterToolTip.FilterRoomsValuesToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource FilterRoomsValuesToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="1"
@@ -216,8 +242,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="3"
-                ToolTip="{Binding ParameterToolTip.GroupBySectionParamCommerToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource GroupBySectionParamCommerToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="3"
@@ -234,8 +265,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="4"
-                ToolTip="{Binding ParameterToolTip.GroupByGroupCommerParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource GroupByGroupCommerParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="4"
@@ -252,8 +288,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="5"
-                ToolTip="{Binding ParameterToolTip.MultiStoreyCommerParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource MultiStoreyCommerParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="5"
@@ -305,8 +346,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="0"
-                ToolTip="{Binding ParameterToolTip.ConditionalNumberParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource ConditionalNumberParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="0"
@@ -347,8 +393,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="3"
-                ToolTip="{Binding ParameterToolTip.DepartmentParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource DepartmentParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="3"
@@ -365,8 +416,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="4"
-                ToolTip="{Binding ParameterToolTip.LevelParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource LevelParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="4"
@@ -383,8 +439,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="5"
-                ToolTip="{Binding ParameterToolTip.SectionParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource SectionParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="5"
@@ -401,8 +462,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="6"
-                ToolTip="{Binding ParameterToolTip.BuildingParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource BuildingParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="6"
@@ -419,8 +485,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="7"
-                ToolTip="{Binding ParameterToolTip.BuildingNumberParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource BuildingNumberParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="7"
@@ -437,8 +508,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="8"
-                ToolTip="{Binding ParameterToolTip.ConstrWorkNumberParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource ConstrWorkNumberParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="8"
@@ -455,8 +531,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="9"
-                ToolTip="{Binding ParameterToolTip.CommercialAreaParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource CommercialAreaParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="9"
@@ -492,8 +573,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="12"
-                ToolTip="{Binding ParameterToolTip.RoomsHeightParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource RoomsHeightParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="12"
@@ -510,8 +596,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="13"
-                ToolTip="{Binding ParameterToolTip.ParkingSpaceClassParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource ParkingSpaceClassParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="13"
@@ -528,8 +619,13 @@
             <Button
                 Grid.Row="14"
                 Grid.Column="0"
-                ToolTip="{Binding ParameterToolTip.CommercialNameClassParamToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource CommercialNameClassParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Row="14"
                 Grid.Column="1"
@@ -565,8 +661,13 @@
             <Button
                 Grid.Column="0"
                 Grid.Row="17"
-                ToolTip="{Binding ParameterToolTip.ProjectNameToolTip}"
-                Style="{StaticResource RoundButton}"/>
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource ProjectNameToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
             <TextBlock
                 Grid.Column="1"
                 Grid.Row="17"
