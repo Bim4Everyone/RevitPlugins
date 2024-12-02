@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit.Comparators;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -38,6 +39,8 @@ namespace RevitDeclarations.ViewModels {
         private protected bool _canLoadUtp;
         private protected string _canLoadUtpText;
 
+        private protected LogicalStringComparer _stringComparer;
+
         private string _errorText;
 
         public MainViewModel(RevitRepository revitRepository, DeclarationSettings settings) {
@@ -62,6 +65,8 @@ namespace RevitDeclarations.ViewModels {
             }
 
             _accuracy = "1";
+
+            _stringComparer = new LogicalStringComparer();
 
             SelectFolderCommand = new RelayCommand(SelectFolder);
             ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
