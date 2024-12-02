@@ -11,15 +11,21 @@ using RevitMechanicalSpecification.Models.Fillers;
 using RevitMechanicalSpecification.Models;
 using dosymep.Revit;
 using System.Windows;
+using System.Threading;
+using dosymep.SimpleServices;
+using dosymep.Xpf.Core.SimpleServices;
+using dosymep.WPF.ViewModels;
+using dosymep.Bim4Everyone.SimpleServices;
+using System.Diagnostics;
+
 
 namespace RevitMechanicalSpecification.Service {
     internal class ElementProcessor {
         private readonly string _userName;
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
-        private readonly ParamChecker _paramChecker; 
+        private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
-
 
         private readonly List<string> _editors = new List<string>();
         private readonly HashSet<BuiltInCategory> _possibleGenericCategories = new HashSet<BuiltInCategory>() {
@@ -32,34 +38,82 @@ namespace RevitMechanicalSpecification.Service {
                         BuiltInCategory.OST_PipeInsulations
     };
 
-        public ElementProcessor(string userName, Document document) {
-            _userName = userName;
+        public ElementProcessor(Document document) {
+            _userName = document.Application.Username;
             _document = document;
 
-            _specConfiguration = new SpecConfiguration(_document.ProjectInformation);
+            _specConfiguration = new SpecConfiguration(_document);
             _paramChecker = new ParamChecker();
             _maskReplacer = new MaskReplacer(_specConfiguration);
+        }
+
+        /// <summary>
+        /// Вывод на экран процесса обработки элементов, отсюда же вызываем главный цикл обработки
+        /// </summary>
+        /// <param name="fillers"></param>
+        /// <param name="elements"></param>
+        public void ShowProcess(List<ElementParamFiller> fillers,
+            List<Element> elements) {
+            ElementSplitResult splitResult = SplitElementsToManifoldOrSingle(elements);
+
+            //ProcessElements(splitResult, fillers);
+            using(IProgressDialogService dialog = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+
+
+                dialog.StepValue = 1;
+                dialog.DisplayTitleFormat = "Обновление параметров... [{0}%]";
+                var progress = dialog.CreateProgress();
+                dialog.MaxValue = 100;
+                var ct = dialog.CreateCancellationToken();
+                dialog.Show();
+
+                ProcessElements(splitResult, fillers, progress, ct);
+            }
         }
 
         /// <summary>
         /// Главный цикл обработки, проверяет в себе занятость элементов, генерики и узел это или нет
         /// </summary>
         /// <param name="fillers"></param>
-        public void ProcessElements(List<ElementParamFiller> fillers, List<Element> elements) {
+        public void ProcessElements(
+        ElementSplitResult splitResult,
+        List<ElementParamFiller> fillers,
+        IProgress<int> progress = null,
+        CancellationToken ct = default) {
             _paramChecker.ExecuteParamCheck(_document, _specConfiguration);
 
             using(var t = _document.StartTransaction("Обновление спецификации")) {
-                ElementSplitResult splitResult = SplitElementsToManifoldOrSingle(elements);
+                var totalElements = splitResult.SingleElements.Count + splitResult.ManifoldElements.Count;
+                
+                var percent = totalElements * 0.01; //1 процент от элементов
+                var nextStepByPercents = totalElements * 0.01; // число элементов по достижению которых обновляем счетчик
+                var elementCount = 0; // счетчик элементов
+                var percentCount = 0; // счетчик процентов, на него умножаем nextStepByPercents для обновления условия
 
                 foreach(SpecificationElement specificationElement in splitResult.SingleElements) {
+                    ct.ThrowIfCancellationRequested();
+
+                    elementCount++;
+                    if(elementCount > nextStepByPercents) {
+                        progress.Report(percentCount);
+                        percentCount += 1;
+                        nextStepByPercents = percent * percentCount;
+                    }
+                    
                     ProcessElement(specificationElement, fillers);
                 }
 
                 foreach(SpecificationElement manifoldElement in splitResult.ManifoldElements) {
                     // В этот момент мы уже прошлись по одиночным элементам и у них есть имена, которые нужны в группирование, получаем их
-                    manifoldElement.ManifoldSpElement.ElementName = 
+                    manifoldElement.ManifoldSpElement.ElementName =
                         manifoldElement.ManifoldSpElement
                         .GetTypeOrInstanceParamStringValue(_specConfiguration.TargetNameName);
+
+                    if(elementCount > nextStepByPercents) {
+                        progress.Report(percentCount);
+                        percentCount += 1;
+                        nextStepByPercents = percent * percentCount;
+                    }
                     ProcessElement(manifoldElement, fillers);
                 }
                 t.Commit();
@@ -125,16 +179,10 @@ namespace RevitMechanicalSpecification.Service {
             List<SpecificationElement> manifoldElements = new List<SpecificationElement>();
 
             foreach(Element element in elements) {
-                
+
                 // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
                 // редактора в список
                 if(IsEditedBy(_userName, element)) {
-                    continue;
-                }
-                
-                // На арматуре воздуховодов/труб/оборудовании проверяем наличие шаблонизированных семейств-генериков.
-                // Если встречаем - заполняем все по маске
-                if(FillIfGeneric(element)) {
                     continue;
                 }
 
@@ -147,7 +195,7 @@ namespace RevitMechanicalSpecification.Service {
                 if(IsManifold(specificationElement.ElementType)) {
                     ProcessManifoldElement(specificationElement, manifoldPartsIds, manifoldElements);
                 }
-                
+
                 singleElements.Add(specificationElement);
             }
 

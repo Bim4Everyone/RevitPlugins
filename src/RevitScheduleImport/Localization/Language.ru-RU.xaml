@@ -1,0 +1,35 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="MainWindow.CategoryCheck">Выберите категорию</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonOk">Выбрать</system:String>
+    <system:String
+        x:Key="MainWindow.Title">Импорт Excel</system:String>
+    <system:String
+        x:Key="MainWindow.ComboBoxTitle">Категория спецификации:</system:String>
+
+    <system:String
+        x:Key="OpenFileDialog.Title">Выберите Excel файл</system:String>
+    <system:String
+        x:Key="OpenFileDialog.Filter">Excel файлы |*.xls;*.xlsx</system:String>
+
+    <system:String
+        x:Key="Revit.Transaction">Импорт Excel</system:String>
+
+    <system:String
+        x:Key="Errors.Severity.Error">Ошибка</system:String>
+    <system:String
+        x:Key="Errors.Severity.Warning">Предупреждение</system:String>
+    <system:String
+        x:Key="Errors.IOException">Нельзя импортировать файл, т.к. он открыт.</system:String>
+    <system:String
+        x:Key="Errors.FileNotFoundException">Не найден файл Excel.</system:String>
+    <system:String
+        x:Key="Warnings.NotAllSheetsImported">Не все листы были импортированы.</system:String>
+</ResourceDictionary>

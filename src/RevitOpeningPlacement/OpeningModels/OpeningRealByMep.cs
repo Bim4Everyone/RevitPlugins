@@ -130,9 +130,18 @@ namespace RevitOpeningPlacement.OpeningModels {
             IMepLinkElementsProvider mepLink,
             ICollection<ElementId> linkElementsIds) {
             var doc = mepLink.Document;
-            return linkElementsIds.Select(
-                id => SolidUtils.CreateTransformed(doc.GetElement(id).GetSolid(), mepLink.DocumentTransform))
-                .ToHashSet();
+            List<Solid> solids = new List<Solid>();
+            foreach(var id in linkElementsIds) {
+                var solid = doc.GetElement(id)?.GetSolid();
+                if(solid != null) {
+                    try {
+                        solids.Add(SolidUtils.CreateTransformed(solid, mepLink.DocumentTransform));
+                    } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                        continue;
+                    }
+                }
+            }
+            return solids;
         }
 
         /// <summary>

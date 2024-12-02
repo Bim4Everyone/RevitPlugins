@@ -15,6 +15,7 @@ using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
 using RevitOpeningPlacement.Views;
 
@@ -48,7 +49,17 @@ namespace RevitOpeningPlacement {
                 kernel.Bind<ParameterFilterProvider>()
                     .ToSelf()
                     .InSingletonScope();
-
+                kernel.Bind<IDocTypesProvider>()
+                    .ToMethod(c => {
+                        return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.AR, DocTypeEnum.KR });
+                    })
+                    .InSingletonScope();
+                kernel.Bind<IRevitLinkTypesSetter>()
+                    .To<DocTypeLoadedLinksSetter>()
+                    .InTransientScope();
+                kernel.Bind<IDocTypesHandler>()
+                    .To<DocTypesHandler>()
+                    .InSingletonScope();
                 kernel.Bind<MainViewModel>()
                     .ToSelf()
                     .InSingletonScope();
@@ -64,6 +75,11 @@ namespace RevitOpeningPlacement {
                     .ToMethod(c =>
                         OpeningConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
                     );
+                kernel.Bind<ConfigFileService>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
                 Notification(kernel.Get<MainWindow>());
             }

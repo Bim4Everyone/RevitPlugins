@@ -157,22 +157,29 @@ namespace RevitOpeningPlacement.OpeningModels {
         public void UpdateStatus(
             ICollection<OpeningRealKr> realOpenings,
             ICollection<ElementId> constructureElementsIds) {
-            var thisOpeningSolid = GetSolid();
-            var thisOpeningBBox = GetTransformedBBoxXYZ();
+            try {
+                var thisOpeningSolid = GetSolid();
+                var thisOpeningBBox = GetTransformedBBoxXYZ();
 
-            var intersectingStructureElements = GetIntersectingStructureElementsIds(
-                thisOpeningSolid,
-                constructureElementsIds);
-            var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
+                var intersectingStructureElements = GetIntersectingStructureElementsIds(
+                    thisOpeningSolid,
+                    constructureElementsIds);
+                var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
 
-            if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
-                Status = OpeningTaskIncomingStatus.NoIntersection;
-            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count == 0)) {
-                Status = OpeningTaskIncomingStatus.New;
-            } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count > 0)) {
-                Status = OpeningTaskIncomingStatus.NotMatch;
-            } else if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count > 0)) {
-                Status = OpeningTaskIncomingStatus.Completed;
+                if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
+                    Status = OpeningTaskIncomingStatus.NoIntersection;
+                } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count == 0)) {
+                    Status = OpeningTaskIncomingStatus.New;
+                } else if((intersectingStructureElements.Count > 0) && (intersectingOpenings.Count > 0)) {
+                    Status = OpeningTaskIncomingStatus.NotMatch;
+                } else if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count > 0)) {
+                    Status = OpeningTaskIncomingStatus.Completed;
+                }
+            } catch(Exception ex) when(
+                ex is Autodesk.Revit.Exceptions.ApplicationException
+                || ex is NullReferenceException
+                || ex is ArgumentNullException) {
+                Status = OpeningTaskIncomingStatus.Invalid;
             }
         }
 
@@ -207,6 +214,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
         /// <param name="thisOpeningBBox">
         /// Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
+#pragma warning disable 0618
         private ICollection<ElementId> GetIntersectingOpeningsIds(
             ICollection<OpeningRealKr> realOpenings,
             Solid thisOpeningSolid,
@@ -223,5 +231,6 @@ namespace RevitOpeningPlacement.OpeningModels {
                 }
             }
         }
+#pragma warning restore 0618
     }
 }

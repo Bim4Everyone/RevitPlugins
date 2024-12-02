@@ -14,6 +14,7 @@ using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement.Checkers;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.Checkers;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement {
     /// <summary>
@@ -32,6 +33,12 @@ namespace RevitOpeningPlacement {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<UIApplication>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<IDocTypesHandler>()
+                    .To<DocTypesHandler>()
+                    .InSingletonScope();
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
@@ -46,7 +53,8 @@ namespace RevitOpeningPlacement {
                     .InSingletonScope();
 
                 var revitRepository = kernel.Get<RevitRepository>();
-                var docType = revitRepository.GetDocumentType();
+                var bimPartsHandler = kernel.Get<IDocTypesHandler>();
+                var docType = bimPartsHandler.GetDocType(revitRepository.Doc);
                 switch(docType) {
                     case DocTypeEnum.AR: {
                         if(!ModelCorrect(new RealOpeningsArChecker(revitRepository))) {

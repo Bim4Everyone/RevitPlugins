@@ -14,6 +14,8 @@
     mc:Ignorable="d"
     x:Name="_this"
     Title="Проверки на коллизии" Height="450" Width="800"
+    MinHeight="300"
+    MinWidth="500"
     d:DataContext="{d:DesignInstance clashDetective:MainViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
         <Grid.RowDefinitions>

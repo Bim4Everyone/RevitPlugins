@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 
 using DevExpress.Xpf.Grid;
 
@@ -29,13 +29,6 @@ namespace RevitOpeningPlacement.Views {
         public override string PluginName => nameof(RevitOpeningPlacement);
         public override string ProjectConfigName => nameof(NavigatorMepIncomingView);
 
-        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-            Close();
-        }
-
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-            Close();
-        }
 
         private void viewTasks_FocusedRowHandleChanged(object sender, FocusedRowHandleChangedEventArgs e) {
             var handle = _dgIncomingTasks.View.FocusedRowHandle;

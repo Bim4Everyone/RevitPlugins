@@ -55,23 +55,20 @@ namespace RevitBatchPrint.Models {
             // у которых есть виды с отключенной подрезкой видов
             AddErrorCropView(viewSheets);
 
+            // удаляем старые созданные форматы для принтера
+            // из-за того что отправка на печать асинхронная
+            // приходится созданные форматы оставлять
+            RemoveOldFormats();
+            
             var printErrors = new List<(ViewSheet ViewSheet, string Message)>();
             foreach(ViewSheet viewSheet in viewSheets) {
-                var printSettings = GetPrintSettings(viewSheet);
-                bool hasFormatName = PrinterSettings.HasFormatName(printSettings.Format.Name);
-                if(!hasFormatName) {
-                    // создаем новый формат в Windows, если не был найден подходящий
-                    PrinterSettings.AddFormat(printSettings.Format.Name,
-                        new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
-
-                    // перезагружаем в ревите принтер, чтобы появились изменения
-                    _revitRepository.ReloadPrintSettings(PrinterName);
-                }
+                PrintSettings printSettings = GetPrintSettings(viewSheet);
+                
+                // создаем формат, если его не было
+                CreateFormatIfNotExists(printSettings);
 
                 try {
-                    using(Transaction transaction = new Transaction(_revitRepository.Document, "PrintSettings")) {
-                        transaction.Start();
-
+                    using(Transaction transaction = _revitRepository.Document.StartTransaction("PrintSettings")) {
                         PrintManager.PrintSetup.CurrentPrintSetting = PrintManager.PrintSetup.InSession;
 
                         PaperSize paperSize = _revitRepository.GetPaperSizeByName(printSettings.Format.Name);
@@ -89,17 +86,37 @@ namespace RevitBatchPrint.Models {
 
                         PrintManager.Apply();
                         PrintManager.SubmitPrint(viewSheet);
+
+                        transaction.RollBack();
                     }
                 } catch(Exception ex) {
                     printErrors.Add((viewSheet, ex.Message));
-                } finally {
-                    if(!hasFormatName) {
-                        PrinterSettings.RemoveFormat(printSettings.Format.Name);
-                    }
                 }
             }
 
             AddExceptionError(printErrors);
+        }
+
+        private void CreateFormatIfNotExists(PrintSettings printSettings) {
+            if(PrinterSettings.HasFormatName(printSettings.Format.Name)) {
+                return;
+            }
+
+            // создаем новый формат в Windows, если не был найден подходящий
+            PrinterSettings.AddFormat(printSettings.Format.Name,
+                new System.Drawing.Size(printSettings.Format.Width, printSettings.Format.Height));
+
+            // перезагружаем в ревите принтер, чтобы появились изменения
+            _revitRepository.ReloadPrintSettings(PrinterName);
+        }
+
+        private void RemoveOldFormats() {
+            IEnumerable<string> formats = PrinterSettings.GetFormatNames()
+                .Where(item => item.StartsWith(Format.CustomPrefix));
+
+            foreach(string format in formats) {
+                PrinterSettings.RemoveFormat(format);
+            }
         }
 
         private void AddExceptionError(List<(ViewSheet ViewSheet, string Message)> printErrors) {
@@ -121,7 +138,7 @@ namespace RevitBatchPrint.Models {
                 .Select(item => GetMessage(item.ViewSheet, item.ViewsWithoutCrop));
 
             if(messages.Any()) {
-                Errors.Add("Листы у которые есть виды с отключенной подрезкой:" + Environment.NewLine +
+                Errors.Add("Листы у которых есть виды с отключенной подрезкой:" + Environment.NewLine +
                            string.Join(Environment.NewLine, messages));
             }
         }

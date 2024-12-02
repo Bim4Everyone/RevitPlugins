@@ -75,16 +75,19 @@ namespace RevitMechanicalSpecification.Service {
 
             switch(fitting.PartType) {
                 case PartType.Transition:
-                    startName = "Переход между сечениями воздуховода ";
+                    startName = "Переход между сечениями воздуховода";
                     break;
                 case PartType.Tee:
-                    startName = "Тройник ";
+                    startName = "Тройник";
                     break;
                 case PartType.TapAdjustable:
-                    startName = "Врезка в воздуховод ";
+                    startName = "Врезка в воздуховод";
                     break;
                 case PartType.Cross:
-                    startName = "Крестовина ";
+                    startName = "Крестовина";
+                    break;
+                case PartType.Cap:
+                    startName = "Заглушка";
                     break;
                 case PartType.Union:
                     return "!Не учитывать";
@@ -102,10 +105,13 @@ namespace RevitMechanicalSpecification.Service {
                     return startName;
             }
 
-
             string size = element.GetParamValue<string>(BuiltInParameter.RBS_CALCULATED_SIZE);
             //Ревит пишет размеры всех коннекторов. Для всего кроме тройника и перехода нам хватит первого размера
-            if(!(fitting.PartType is PartType.Transition) || !(fitting.PartType is PartType.Tee)) {
+
+            bool notTransition = !(fitting.PartType is PartType.Transition);
+            bool notTee = !(fitting.PartType is PartType.Tee); 
+
+            if(notTransition && notTee) {
                 size = size.Split('-').First();
             }
             return startName + " " + size + ", с толщиной стенки " + thikness + " мм";
@@ -189,21 +195,35 @@ namespace RevitMechanicalSpecification.Service {
         public bool IsSpecifyPipeFittingName(Element element) {
             List<Connector> connectors = GetConnectors(element);
 
+            // Если нет учета на весь проект - учет не ведется
+            if(_specConfiguration.IsSpecifyPipeFittings is false) {
+                return false;
+            }
+            
+            // Если есть учет на весь проект - по умолчанию true
+            bool specifiPipeFitting = true;
             if(_specConfiguration.IsSpecifyPipeFittings) {
                 foreach(Connector connector in connectors) {
                     foreach(Connector reference in connector.AllRefs) {
-
+                        // Проверяем каждую трубу подключенную к фитингу
                         if(reference.Owner.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
+                            // Если подключена хоть одна труба - требуется проверять учет по трубе, по умолчанию false
+                            specifiPipeFitting = false;
                             Element elemType = reference.Owner.GetElementType();
-                            return elemType.GetSharedParamValueOrDefault<int>(
-                                _specConfiguration.ParamNameIsSpecifyPipeFittingsFromPype
-                                ) == 1;
+                            specifiPipeFitting = elemType.GetSharedParamValueOrDefault<int>
+                                (_specConfiguration.ParamNameIsSpecifyPipeFittingsFromPype) == 1;
+
+                            if(specifiPipeFitting) {
+                                return true;
+                            }
                         }
                     }
                 }
             }
-
-            return _specConfiguration.IsSpecifyPipeFittings;
+            
+            // Возвращаем результаты проверки после прохода по всем коннекторам. Если были встречены трубы и на них не включены расчеты - 
+            // возвращается false. Если их не было или на трубах включен- true
+            return specifiPipeFitting;
         }
 
         /// <summary>

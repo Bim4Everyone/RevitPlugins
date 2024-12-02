@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace RevitOpeningPlacement.OpeningModels.Enums {
     /// <summary>
@@ -33,7 +33,7 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         [Description("Не актуальное отверстие")]
         NotActual,
         /// <summary>
-        /// Геометрия экземпляра семейства задания на отверстие не корректна
+        /// Произошла ошибка обработки геометрии в процессе определения статуса
         /// </summary>
         [Description("Ошибка обработки геометрии")]
         Invalid,
@@ -41,6 +41,11 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Задание на отверстие размещено вручную
         /// </summary>
         [Description("Размещено вручную")]
-        ManuallyPlaced
+        ManuallyPlaced,
+        /// <summary>
+        /// Задание на отверстие - объединенное
+        /// </summary>
+        [Description("Объединенное")]
+        United
     }
 }

@@ -10,15 +10,22 @@
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
                            xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                            xmlns:dxgt="http://schemas.devexpress.com/winfx/2008/xaml/grid/themekeys"
+                           xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                            x:Name="_this"
                            mc:Ignorable="d"
                            Title="NavigatorMepOutcomingView" 
                            Height="450" 
                            Width="800"
-                           MinHeight="300"
-                           MinWidth="500"
+                           MinHeight="150"
+                           MinWidth="150"
                            d:DataContext="{d:DesignInstance {x:Type vm:MepNavigatorForOutcomingTasksViewModel}, IsDesignTimeCreatable=False}">
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand
+            EventName="Loaded"
+            Command="{Binding LoadViewCommand}" />
+    </dxmvvm:Interaction.Behaviors>
+    
     <base:ThemedPlatformWindow.Resources>
         <DataTemplate x:Key="OneParentIdTemplate" DataType="{x:Type dxg:GroupRowData}">
             <Grid x:Name="_grid">
@@ -94,15 +101,23 @@
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <DockPanel Grid.Row="0">
+            <TextBlock
+                Text="Статусы заданий назначаются согласно настройкам: "></TextBlock>
+            <TextBlock Text="{Binding ConfigName}"></TextBlock>
+        </DockPanel>
+        
         <dxg:GridControl x:Name="_dg" 
                              ItemsSource="{Binding OpeningsMepTasksOutcomingViewSource.View}" 
                              DefaultSorting="MepSystem" 
                              BorderThickness="0" 
                              SelectionMode="Row"
+                             Grid.Row="1"
                              CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningMepTaskOutcomingViewModel"
                              SelectedItem="{Binding SelectedOpeningMepTaskOutcoming}">
             <dxg:GridControl.GroupSummary>
@@ -142,17 +157,5 @@
                 <dxg:GridColumn ReadOnly="True" Width="60" Header="Создатель" FieldName="Username" />
             </dxg:GridControl.Columns>
         </dxg:GridControl>
-
-        <StackPanel Grid.Row="1" Margin="0 10 0 0" Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding ErrorText}"
-                          Foreground="Orange" />
-            <dxe:TextEdit Margin="10 0" IsReadOnly="True" EditMode="InplaceActive" EditValue="{Binding MessageText}"
-                          Foreground="Green" />
-            <dx:SimpleButton Content="ОК" Height="25" Width="80" Margin="10 0" IsDefault="True"
-                             Click="ButtonOk_Click"/>
-            <dx:SimpleButton Content="Отмена" Height="25" Width="80"  IsCancel="true"
-                             Click="ButtonCancel_Click" />
-        </StackPanel>
     </Grid>
 </base:ThemedPlatformWindow>

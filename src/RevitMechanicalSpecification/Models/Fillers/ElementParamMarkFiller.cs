@@ -41,6 +41,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
             if(specificationElement.BuiltInCategory == BuiltInCategory.OST_DuctFitting) {
                 mark = _calculator.GetDuctFittingMark(specificationElement.Element);
+                specificationElement.ElementMark = mark;
             }
 
             return mark;

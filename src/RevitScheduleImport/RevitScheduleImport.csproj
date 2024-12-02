@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <UseDevExpress>false</UseDevExpress>
+    </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="ClosedXML" Version="0.104.1">
+        <PrivateAssets>all</PrivateAssets>
+        <ExcludeAssets>runtime</ExcludeAssets>
+      </PackageReference>
+    </ItemGroup>
+</Project>

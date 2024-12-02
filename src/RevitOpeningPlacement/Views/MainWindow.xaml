@@ -47,6 +47,20 @@
                              Command="{Binding SaveAsConfigCommand}"
                              Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}" />
 
+            <dx:SimpleButton Height="32"
+                             Width="32"
+                             Margin="0 0 10 0"
+                             ToolTip="Открыть папку конфига"
+                             Command="{Binding OpenConfigFolderCommand}"
+                             Glyph="{dx:DXImage 'DevAV/Actions/OpenDoc_32x32.png'}" />
+            <DockPanel VerticalAlignment="Center">
+                
+            <TextBlock Text="Название настроек: " 
+                       VerticalAlignment="Center"/>
+            <dxe:TextEdit Width="600"
+                          NullText="default"
+                          EditValue="{Binding ConfigName, UpdateSourceTrigger=PropertyChanged}"/>
+            </DockPanel>
         </StackPanel>
 
         <dxdo:DockLayoutManager Grid.Row="1">
