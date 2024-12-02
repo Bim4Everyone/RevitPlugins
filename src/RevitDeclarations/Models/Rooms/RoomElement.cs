@@ -62,7 +62,7 @@ namespace RevitDeclarations.Models
         public string Number => _revitRoom.Number;
 
         public string GetTextParamValue(Parameter parameter) {
-            return RevitRoom.GetParamValueOrDefault(parameter.Definition.Name, "");
+            return RevitRoom.GetParamValueOrDefault<string>(parameter.Definition.Name);
         }
 
         public double GetAreaParamValue(Parameter parameter, int accuracy) {

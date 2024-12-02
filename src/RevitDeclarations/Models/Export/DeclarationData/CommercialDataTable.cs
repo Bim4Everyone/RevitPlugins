@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
     internal class CommercialDataTable : DeclarationDataTable {
@@ -31,19 +29,19 @@ namespace RevitDeclarations.Models {
             int rowNumber = 0;
 
             foreach(CommercialRooms commercialRooms in _tableInfo.RoomGroups.Cast<CommercialRooms>()) {
-                _mainTable.Rows[rowNumber][0] = commercialRooms.DeclarationNumber;
-                _mainTable.Rows[rowNumber][1] = commercialRooms.Department;
-                _mainTable.Rows[rowNumber][2] = commercialRooms.Level;
-                _mainTable.Rows[rowNumber][3] = commercialRooms.Section;
-                _mainTable.Rows[rowNumber][4] = commercialRooms.Building;
-                _mainTable.Rows[rowNumber][5] = commercialRooms.BuildingNumber;
-                _mainTable.Rows[rowNumber][6] = commercialRooms.ConstrWorksNumber;
+                _mainTable.Rows[rowNumber][0] = commercialRooms.DeclarationNumber ?? "";
+                _mainTable.Rows[rowNumber][1] = commercialRooms.Department ?? "";
+                _mainTable.Rows[rowNumber][2] = commercialRooms.Level ?? "";
+                _mainTable.Rows[rowNumber][3] = commercialRooms.Section ?? "";
+                _mainTable.Rows[rowNumber][4] = commercialRooms.Building ?? "";
+                _mainTable.Rows[rowNumber][5] = commercialRooms.BuildingNumber ?? "";
+                _mainTable.Rows[rowNumber][6] = commercialRooms.ConstrWorksNumber ?? "";
                 _mainTable.Rows[rowNumber][7] = commercialRooms.AreaMain;
                 _mainTable.Rows[rowNumber][8] = commercialRooms.RoomsHeight;
                 _mainTable.Rows[rowNumber][9] = "";
                 _mainTable.Rows[rowNumber][10] = "";
-                _mainTable.Rows[rowNumber][11] = commercialRooms.GroupName;
-                _mainTable.Rows[rowNumber][12] = _settings.ProjectName;
+                _mainTable.Rows[rowNumber][11] = commercialRooms.GroupName ?? "";
+                _mainTable.Rows[rowNumber][12] = _settings.ProjectName ?? "";
 
                 rowNumber++;
             }

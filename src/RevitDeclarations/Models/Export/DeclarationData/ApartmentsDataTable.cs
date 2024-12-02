@@ -70,19 +70,19 @@ namespace RevitDeclarations.Models {
             int rowNumber = 0;
 
             foreach(Apartment apartment in _tableInfo.RoomGroups) {
-                _mainTable.Rows[rowNumber][0] = apartment.FullNumber;
-                _mainTable.Rows[rowNumber][1] = apartment.Department;
-                _mainTable.Rows[rowNumber][2] = apartment.Level;
-                _mainTable.Rows[rowNumber][3] = apartment.Section;
-                _mainTable.Rows[rowNumber][4] = apartment.Building;
-                _mainTable.Rows[rowNumber][5] = apartment.BuildingNumber;
-                _mainTable.Rows[rowNumber][6] = apartment.ConstrWorksNumber;
+                _mainTable.Rows[rowNumber][0] = apartment.FullNumber ?? "";
+                _mainTable.Rows[rowNumber][1] = apartment.Department ?? "";
+                _mainTable.Rows[rowNumber][2] = apartment.Level ?? "";
+                _mainTable.Rows[rowNumber][3] = apartment.Section ?? "";
+                _mainTable.Rows[rowNumber][4] = apartment.Building ?? "";
+                _mainTable.Rows[rowNumber][5] = apartment.BuildingNumber ?? "";
+                _mainTable.Rows[rowNumber][6] = apartment.ConstrWorksNumber ?? "";
                 _mainTable.Rows[rowNumber][7] = apartment.AreaCoef;
                 _mainTable.Rows[rowNumber][8] = apartment.RoomsAmount;
                 _mainTable.Rows[rowNumber][9] = apartment.AreaLiving;
                 _mainTable.Rows[rowNumber][10] = apartment.RoomsHeight;
-                _mainTable.Rows[rowNumber][11] = _settings.ProjectName;
-                _mainTable.Rows[rowNumber][12] = apartment.Number;
+                _mainTable.Rows[rowNumber][11] = _settings.ProjectName ?? "";
+                _mainTable.Rows[rowNumber][12] = apartment.Number ?? "";
                 _mainTable.Rows[rowNumber][13] = apartment.AreaMain;
                 _mainTable.Rows[rowNumber][14] = apartment.AreaNonSummer;
 
@@ -128,8 +128,8 @@ namespace RevitDeclarations.Models {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
                     int columnIndex = startColumn + k * ApartmentsTableInfo.SummerRoomCells;
-                    _mainTable.Rows[rowNumber][columnIndex] = rooms[k].Number;
-                    _mainTable.Rows[rowNumber][columnIndex + 1] = rooms[k].DeclarationName;
+                    _mainTable.Rows[rowNumber][columnIndex] = rooms[k].Number ?? "";
+                    _mainTable.Rows[rowNumber][columnIndex + 1] = rooms[k].DeclarationName ?? "";
                     _mainTable.Rows[rowNumber][columnIndex + 2] = rooms[k].Area;
                     _mainTable.Rows[rowNumber][columnIndex + 3] = rooms[k].AreaCoef;
                 }
@@ -146,8 +146,8 @@ namespace RevitDeclarations.Models {
             for(int k = 0; k < priority.MaxRoomAmount; k++) {
                 if(rooms.ElementAtOrDefault(k) != null) {
                     int columnIndex = startColumn + k * ApartmentsTableInfo.MainRoomCells;
-                    _mainTable.Rows[rowNumber][columnIndex] = rooms[k].Number;
-                    _mainTable.Rows[rowNumber][columnIndex + 1] = rooms[k].DeclarationName;
+                    _mainTable.Rows[rowNumber][columnIndex] = rooms[k].Number ?? "";
+                    _mainTable.Rows[rowNumber][columnIndex + 1] = rooms[k].DeclarationName ?? "";
                     _mainTable.Rows[rowNumber][columnIndex + 2] = rooms[k].Area;
                 }
             }

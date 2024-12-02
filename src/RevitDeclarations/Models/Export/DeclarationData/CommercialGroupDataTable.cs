@@ -20,9 +20,9 @@ namespace RevitDeclarations.Models {
                 .First();
 
             foreach(RoomElement room in commercialRooms.Rooms) {
-                _mainTable.Rows[rowNumber][0] = room.Name;
+                _mainTable.Rows[rowNumber][0] = room.Name ?? "";
                 _mainTable.Rows[rowNumber][1] = room.Area;
-                _mainTable.Rows[rowNumber][2] = commercialRooms.DeclarationNumber;
+                _mainTable.Rows[rowNumber][2] = commercialRooms.DeclarationNumber ?? "";
 
                 rowNumber++;
             }
