@@ -9,14 +9,14 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal abstract class DeclarationProject {
-        private protected readonly RevitDocumentViewModel _document;
-        private protected readonly DeclarationSettings _settings;
-        private protected readonly RevitRepository _revitRepository;
+        protected readonly RevitDocumentViewModel _document;
+        protected readonly DeclarationSettings _settings;
+        protected readonly RevitRepository _revitRepository;
 
-        private protected readonly Phase _phase;
+        protected readonly Phase _phase;
 
-        private protected readonly IEnumerable<RoomElement> _rooms;
-        private protected IReadOnlyCollection<RoomGroup> _roomGroups;
+        protected readonly IEnumerable<RoomElement> _rooms;
+        protected IReadOnlyCollection<RoomGroup> _roomGroups;
 
         public DeclarationProject(RevitDocumentViewModel document,
                                   RevitRepository revitRepository,

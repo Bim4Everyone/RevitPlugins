@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
     internal abstract class DeclarationDataTable : IDeclarationDataTable {
-        private protected readonly ITableInfo _tableInfo;
-        private protected readonly DeclarationSettings _settings;
-        private protected readonly DataTable _mainTable;
-        private protected readonly DataTable _headerTable;
-        private protected readonly List<IDeclarationDataTable> _subTables = new List<IDeclarationDataTable>();
+        protected readonly ITableInfo _tableInfo;
+        protected readonly DeclarationSettings _settings;
+        protected readonly DataTable _mainTable;
+        protected readonly DataTable _headerTable;
+        protected readonly List<IDeclarationDataTable> _subTables = new List<IDeclarationDataTable>();
 
         protected DeclarationDataTable(ITableInfo tableInfo) {
             _tableInfo = tableInfo;
@@ -32,14 +32,14 @@ namespace RevitDeclarations.Models {
 
         public List<IDeclarationDataTable> SubTables => _subTables;
 
-        private protected void CreateColumns() {
+        protected void CreateColumns() {
             for(int i = 0; i <= _tableInfo.ColumnsTotalNumber; i++) {
                 _mainTable.Columns.Add();
                 _headerTable.Columns.Add();
             }
         }
 
-        private protected void CreateRows() {
+        protected void CreateRows() {
             for(int i = 0; i < _tableInfo.RowsTotalNumber; i++) {
                 _mainTable.Rows.Add();
             }
@@ -47,7 +47,7 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows.Add();
         }
 
-        private protected void SetTypeForColumns(int[] columnIndexes) {
+        protected void SetTypeForColumns(int[] columnIndexes) {
             foreach(int i in columnIndexes) {
                 _mainTable.Columns[i].DataType = typeof(double);
             }
