@@ -27,5 +27,8 @@ namespace RevitDeclarations.Models {
                 rowNumber++;
             }
         }
+
+        protected override void FillAdditionalInfo() { 
+        }
     }
 }

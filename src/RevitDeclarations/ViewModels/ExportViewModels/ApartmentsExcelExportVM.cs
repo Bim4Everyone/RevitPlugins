@@ -14,6 +14,7 @@ namespace RevitDeclarations.ViewModels {
             List<Apartment> apartments = roomGroups.Cast<Apartment>().ToList();
             ApartmentsTableInfo tableData = new ApartmentsTableInfo(apartments, _settings);
             ApartmentsDataTable table = new ApartmentsDataTable(tableData);
+            table.GenerateTable();
 
             ExportTable<ExcelExporter>(path, table);
         }

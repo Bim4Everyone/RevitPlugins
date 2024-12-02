@@ -17,6 +17,7 @@ namespace RevitDeclarations.ViewModels.ExportViewModels
             List<PublicArea> publicAreas = roomGroups.Cast<PublicArea>().ToList();
             PublicAreasTableInfo tableData = new PublicAreasTableInfo(publicAreas, _settings);
             PublicAreasDataTable table = new PublicAreasDataTable(tableData);
+            table.GenerateTable();
 
             ExportTable<ExcelExporter>(path, table);
         }

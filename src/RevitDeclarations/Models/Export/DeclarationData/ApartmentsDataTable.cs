@@ -4,11 +4,7 @@ using System.Linq;
 
 namespace RevitDeclarations.Models {
     internal class ApartmentsDataTable : DeclarationDataTable {
-        public ApartmentsDataTable(ApartmentsTableInfo tableInfo) : base(tableInfo) {
-            FillTableRoomsHeader();
-            if(_settings.LoadUtp) {
-                FillTableUtpInfo();
-            }
+        public ApartmentsDataTable(ApartmentsTableInfo tableInfo) : base(tableInfo) { 
         }
 
         protected override void FillTableHeader() {
@@ -99,6 +95,13 @@ namespace RevitDeclarations.Models {
                 }
 
                 rowNumber++;
+            }
+        }
+
+        protected override void FillAdditionalInfo() {
+            FillTableRoomsHeader();
+            if(_settings.LoadUtp) {
+                FillTableUtpInfo();
             }
         }
 

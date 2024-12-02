@@ -19,18 +19,21 @@ namespace RevitDeclarations.Models {
 
             _mainTable = new DataTable();
             _headerTable = new DataTable();
-            CreateColumns();
-            SetTypeForColumns(_tableInfo.NumericColumnsIndexes);
-            CreateRows();
-            FillTableHeader();
-            FillMainTable();
         }
 
         public DataTable MainDataTable => _mainTable;
         public DataTable HeaderDataTable => _headerTable;
         public ITableInfo TableInfo => _tableInfo;
-
         public List<IDeclarationDataTable> SubTables => _subTables;
+
+        public void GenerateTable() {
+            CreateColumns();
+            SetTypeForColumns(_tableInfo.NumericColumnsIndexes);
+            CreateRows();
+            FillTableHeader();
+            FillMainTable();
+            FillAdditionalInfo();
+        }
 
         protected void CreateColumns() {
             for(int i = 0; i <= _tableInfo.ColumnsTotalNumber; i++) {
@@ -55,6 +58,7 @@ namespace RevitDeclarations.Models {
 
         protected abstract void FillTableHeader();
         protected abstract void FillMainTable();
+        protected abstract void FillAdditionalInfo();
 
 
     }
