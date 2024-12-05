@@ -10,20 +10,23 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace RevitDeclarations.Views {
-    public partial class ErrorWindow : Window {
-        public ErrorWindow() {
+    public partial class DeclarationTabItem : UserControl {
+        public DeclarationTabItem() {
             InitializeComponent();
         }
 
-        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-            DialogResult = true;
+        private void IndentValidation(object sender, TextCompositionEventArgs e) {
+            e.Handled = !e.Text.All(char.IsDigit);
         }
 
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-            DialogResult = false;
+        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e) {
+            if(e.Key == Key.Space) {
+                e.Handled = true;
+            }
         }
     }
 }

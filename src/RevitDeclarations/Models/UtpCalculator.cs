@@ -19,8 +19,8 @@ namespace RevitDeclarations.Models {
         private readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
         private readonly StringComparison _strComparison = StringComparison.OrdinalIgnoreCase;
 
-        private readonly DeclarationProject _project;
-        private readonly DeclarationSettings _settings;
+        private readonly ApartmentsProject _project;
+        private readonly ApartmentsSettings _settings;
         private readonly PrioritiesConfig _priorities;
 
         private readonly bool _hasNullAreas;
@@ -34,9 +34,9 @@ namespace RevitDeclarations.Models {
         // Санузлы, относящиеся к мастер спальням
         private IEnumerable<ElementId> _masterBathrooms;
 
-        public UtpCalculator(DeclarationProject project, DeclarationSettings settings) {
+        public UtpCalculator(ApartmentsProject project, DeclarationSettings settings) {
             _project = project;
-            _settings = settings;
+            _settings = (ApartmentsSettings) settings;
 
             _hasNullAreas = CheckUtpNullAreas();
             _hasBannedNames = GetBannedUtpRoomNames().Any();

@@ -17,6 +17,7 @@ namespace RevitDeclarations.Models
 
         public RoomPriority LivingRoom { get; set; }
         public RoomPriority Kitchen {get; set;}
+        public RoomPriority KitchenDiningRoom {get; set;}
         public RoomPriority KitchenNiche {get; set;}
         public RoomPriority Bathroom {get; set;}
         public RoomPriority Laundry {get; set;}
@@ -44,22 +45,23 @@ namespace RevitDeclarations.Models
                 IsLiving = true
             };
             defaultConfig.Kitchen = new RoomPriority(2, "Кухня");
-            defaultConfig.KitchenNiche = new RoomPriority(3, "Кухня-ниша");
-            defaultConfig.Bathroom = new RoomPriority(4, "Санузел");
-            defaultConfig.Laundry = new RoomPriority(5, "Постирочная");
-            defaultConfig.Pantry = new RoomPriority(6, "Гардеробная");
-            defaultConfig.Cabinet = new RoomPriority(7, "Кабинет");
-            defaultConfig.Corridor = new RoomPriority(8, "Коридор");
-            defaultConfig.Hall = new RoomPriority(9, "Прихожая");
-            defaultConfig.Loggia = new RoomPriority(10, "Лоджия") {
+            defaultConfig.KitchenDiningRoom = new RoomPriority(3, "Кухня-столовая");
+            defaultConfig.KitchenNiche = new RoomPriority(4, "Кухня-ниша");
+            defaultConfig.Bathroom = new RoomPriority(5, "Санузел");
+            defaultConfig.Laundry = new RoomPriority(6, "Постирочная");
+            defaultConfig.Pantry = new RoomPriority(7, "Гардеробная");
+            defaultConfig.Cabinet = new RoomPriority(8, "Кабинет");
+            defaultConfig.Corridor = new RoomPriority(9, "Коридор");
+            defaultConfig.Hall = new RoomPriority(10, "Прихожая");
+            defaultConfig.Loggia = new RoomPriority(11, "Лоджия") {
                 IsSummer = true,
                 AreaCoefficient = 0.5
             };
-            defaultConfig.Balcony = new RoomPriority(11, "Балкон") {
+            defaultConfig.Balcony = new RoomPriority(12, "Балкон") {
                 IsSummer = true,
                 AreaCoefficient = 0.3
             };
-            defaultConfig.Terrace = new RoomPriority(12, "Терраса") {
+            defaultConfig.Terrace = new RoomPriority(13, "Терраса") {
                 IsSummer = true,
                 AreaCoefficient = 0.3
             };
@@ -67,6 +69,7 @@ namespace RevitDeclarations.Models
             defaultConfig.Priorities = new List<RoomPriority>() {
                 defaultConfig.LivingRoom,
                 defaultConfig.Kitchen,
+                defaultConfig.KitchenDiningRoom,
                 defaultConfig.KitchenNiche,
                 defaultConfig.Bathroom,
                 defaultConfig.Laundry,

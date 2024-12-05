@@ -13,10 +13,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace RevitDeclarations.Views {
-    public partial class ErrorWindow : Window {
-        public ErrorWindow() {
+    public partial class PublicAreasMainWindow {
+        public PublicAreasMainWindow() {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitDeclarations);
+        public override string ProjectConfigName => nameof(ApartmentsMainWindow);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

@@ -3,10 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using RevitDeclarations.ViewModels;
-
 namespace RevitDeclarations.Models {
-    internal class DeclarationSettings {
+    internal abstract class DeclarationSettings {
         public ICollection<RoomPriority> Priorities => PrioritiesConfig.Priorities;
         public PrioritiesConfig PrioritiesConfig { get; set; }
         public IReadOnlyCollection<RoomPriority> UsedPriorities => PrioritiesConfig
@@ -22,51 +20,28 @@ namespace RevitDeclarations.Models {
                 .Select(x => x.Name)
                 .ToList();
         public string[] BannedRoomNames => PrioritiesConfig.BannedRoomNames;
-        public ParametersViewModel ParametersVM { get; set; }
 
-        public Parameter FilterRoomsParam => ParametersVM.SelectedFilterRoomsParam;
-        public string FilterRoomsValue => ParametersVM.FilterRoomsValue;
-        public Parameter GroupingBySectionParam => ParametersVM.SelectedGroupingBySectionParam;
-        public Parameter GroupingByGroupParam => ParametersVM.SelectedGroupingByGroupParam;
-        public Parameter MultiStoreyParam => ParametersVM.SelectedMultiStoreyParam;
+        public Parameter FilterRoomsParam { get; set; }
+        public string[] FilterRoomsValues { get; set; }
+        public Parameter GroupingBySectionParam { get; set; }
+        public Parameter GroupingByGroupParam { get; set; }
+        public Parameter MultiStoreyParam { get; set; }
+        public virtual Parameter DepartmentParam { get; set; }
+        public Parameter LevelParam { get; set; }
+        public Parameter ApartmentNumberParam { get; set; }
+        public Parameter SectionParam { get; set; }
+        public Parameter BuildingParam { get; set; }
+        public Parameter ApartmentAreaParam { get; set; }
+        public string ProjectName { get; set; }
+        public Parameter RoomAreaParam { get; set; }
+        public Parameter RoomAreaCoefParam { get; set; }
+        public Parameter RoomNameParam { get; set; }
+        public Parameter RoomNumberParam { get; set; }
 
-        public Parameter ApartmentFullNumberParam => ParametersVM.SelectedFullApartNumParam;
-        public Parameter DepartmentParam => ParametersVM.SelectedDepartmentParam;
-        public Parameter LevelParam => ParametersVM.SelectedLevelParam;
-        public Parameter SectionParam => ParametersVM.SelectedSectionParam;
-        public Parameter BuildingParam => ParametersVM.SelectedBuildingParam;
-        public Parameter ApartmentNumberParam => ParametersVM.SelectedApartNumParam;
-        public Parameter ApartmentAreaParam => ParametersVM.SelectedApartAreaParam;
-        public Parameter ApartmentAreaCoefParam => ParametersVM.SelectedApartAreaCoefParam;
-        public Parameter ApartmentAreaLivingParam => ParametersVM.SelectedApartAreaLivingParam;
-        public Parameter RoomsAmountParam => ParametersVM.SelectedRoomsAmountParam;
-        public string ProjectName => ParametersVM.ProjectName;
-        public Parameter ApartmentAreaNonSumParam => ParametersVM.SelectedApartAreaNonSumParam;
-        public Parameter RoomsHeightParam => ParametersVM.SelectedRoomsHeightParam;
-
-        public Parameter RoomAreaParam => ParametersVM.SelectedRoomAreaParam;
-        public Parameter RoomAreaCoefParam => ParametersVM.SelectedRoomAreaCoefParam;
-
-        public IReadOnlyCollection<Parameter> AllParameters => new List<Parameter>() {
-            FilterRoomsParam,
-            GroupingBySectionParam,
-            GroupingByGroupParam,
-            MultiStoreyParam,
-            ApartmentFullNumberParam,
-            DepartmentParam,
-            LevelParam,
-            SectionParam,
-            BuildingParam,
-            ApartmentNumberParam,
-            ApartmentAreaParam,
-            ApartmentAreaCoefParam,
-            ApartmentAreaLivingParam,
-            RoomsAmountParam,
-            ApartmentAreaNonSumParam,
-            RoomsHeightParam,
-            RoomAreaParam,
-            RoomAreaCoefParam
-        };
+        /// <summary>
+        /// Список параметров для проверки их наличия в проекте
+        /// </summary>
+        public IReadOnlyCollection<Parameter> AllParameters { get; set; }
 
         public void UpdatePriorities(List<string> newNames) {
             int prioritiesLength = PrioritiesConfig.Priorities.Count;

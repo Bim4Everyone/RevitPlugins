@@ -1,5 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
+using System.Web.Security;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -24,7 +27,10 @@ namespace RevitDeclarations.Models {
             IEnumerable<RevitLinkType> loadedLinkTypes = new FilteredElementCollector(Document)
                 .OfClass(typeof(RevitLinkType))
                 .Cast<RevitLinkType>()
+                .Where(x => !x.IsNestedLink)
                 .Where(x => x.GetLinkedFileStatus() == LinkedFileStatus.Loaded);
+
+            var temp = loadedLinkTypes.ToList();
 
             ElementClassFilter filter = new ElementClassFilter(typeof(RevitLinkInstance));
 
@@ -43,8 +49,8 @@ namespace RevitDeclarations.Models {
                 .FirstOrDefault();
         }
 
-        public IReadOnlyCollection<RoomElement> GetRoomsOnPhase(Document document, 
-                                                                Phase phase, 
+        public IReadOnlyCollection<RoomElement> GetRoomsOnPhase(Document document,
+                                                                Phase phase,
                                                                 DeclarationSettings settings) {
             var phaseProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
 
@@ -103,27 +109,28 @@ namespace RevitDeclarations.Models {
                 .WherePasses(notWindowsFilter)
                 .WherePasses(phaseFilter)
                 .OfType<FamilyInstance>()
-                .Where(x => x.Symbol.Family.Name.ToLower().Contains("ванна") || 
+                .Where(x => x.Symbol.Family.Name.ToLower().Contains("ванна") ||
                     x.Symbol.Family.Name.ToLower().Contains("душев"))
                 .Where(x => !x.Symbol.Family.Name.ToLower().Contains("ованна"))
                 .ToList();
         }
 
-        public IReadOnlyCollection<Apartment> GetApartments(IEnumerable<RoomElement> rooms, 
-                                                            DeclarationSettings settings) {
+        public IEnumerable<IEnumerable<RoomElement>> GroupRooms(IEnumerable<RoomElement> rooms,
+                                                   DeclarationSettings settings) {
             var multiStoreyAparts = rooms.Where(x => !string.IsNullOrEmpty(x.GetTextParamValue(settings.MultiStoreyParam)))
                 .GroupBy(r => new { l = r.GetTextParamValue(settings.MultiStoreyParam), s = r.GetTextParamValue(settings.SectionParam) })
-                .Select(g => new Apartment(g, settings))
-                .ToList();
+                .Select(g => new List<RoomElement>(g));
 
             var oneStoreyAparts = rooms.Where(x => string.IsNullOrEmpty(x.GetTextParamValue(settings.MultiStoreyParam)))
-                .GroupBy(r => new { r.RoomLevel, s = r.GetTextParamValue(settings.SectionParam), g = r.GetTextParamValue(settings.GroupingByGroupParam) })
-                .Select(g => new Apartment(g, settings))
-                .ToList();            
+                .GroupBy(r => new {
+                    r.RoomLevel,
+                    s = r.GetTextParamValue(settings.GroupingBySectionParam),
+                    g = r.GetTextParamValue(settings.GroupingByGroupParam)
+                })
+                .Select(g => new List<RoomElement>(g));
 
             return oneStoreyAparts
-                .Concat(multiStoreyAparts)
-                .ToList();
+                .Concat(multiStoreyAparts);
         }
 
         public IReadOnlyList<Phase> GetPhases() {

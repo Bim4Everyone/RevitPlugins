@@ -10,20 +10,13 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace RevitDeclarations.Views {
-    public partial class ErrorWindow : Window {
-        public ErrorWindow() {
+    public partial class ParamsApartmentsTabItem : UserControl {
+        public ParamsApartmentsTabItem() {
             InitializeComponent();
-        }
-
-        private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-            DialogResult = true;
-        }
-
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-            DialogResult = false;
         }
     }
 }
