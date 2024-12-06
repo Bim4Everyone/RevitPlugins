@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -24,6 +25,10 @@ namespace RevitServerFolders {
         }
 
         protected override void Execute(UIApplication uiApplication) {
+            if(!OptionalFunctionalityUtils.IsNavisworksExporterAvailable()) {
+                throw new InvalidOperationException(
+                    "Отсутствует плагин Navisworks NWC Export Utility. Необходимо установить его.");
+            }
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
