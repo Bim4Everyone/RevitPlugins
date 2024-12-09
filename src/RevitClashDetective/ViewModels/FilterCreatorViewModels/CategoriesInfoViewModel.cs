@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -31,9 +31,7 @@ namespace RevitClashDetective.ViewModels.FilterCreatorViewModels {
         }
 
         public void InitializeParameters() {
-            var parameters =
-                _revitRepository.DocInfos
-                .SelectMany(item => _revitRepository.GetParameters(item.Doc, Categories.Select(c => c.Category)))
+            var parameters = _revitRepository.GetParameters(_revitRepository.Doc, Categories.Select(c => c.Category))
                 .Distinct()
                 .Select(item => new ParameterViewModel(item))
                 .ToList();
