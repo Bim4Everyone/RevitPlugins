@@ -1,9 +1,12 @@
 using System.Windows;
 
+using Wpf.Ui.Appearance;
+
 namespace RevitPluginExample.Views {
-    public partial class MainWindow {
+    public partial class MainWindow : BaseWindow {
         public MainWindow() {
             InitializeComponent();
+            ApplicationThemeManager.Apply(this);
         }
 
         public override string PluginName => nameof(RevitPluginExample);
