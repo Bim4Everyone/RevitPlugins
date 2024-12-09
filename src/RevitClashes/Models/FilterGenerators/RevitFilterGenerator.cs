@@ -19,7 +19,7 @@ namespace RevitClashDetective.Models.FilterGenerators {
         protected IFilterGenerator SetRuleFilter(Document doc, Rule rule, bool inverted) {
             var ruleCreator = RuleEvaluatorUtils.GetRevitRuleCreator(rule.Evaluator.Evaluator);
             var providerRule = rule.Provider.GetRule(doc, ruleCreator, rule.Value);
-            var revitRule = inverted
+            var revitRule = (inverted && providerRule != null)
                 ? new FilterInverseRule(providerRule)
                 : providerRule;
             if(revitRule == null) {
