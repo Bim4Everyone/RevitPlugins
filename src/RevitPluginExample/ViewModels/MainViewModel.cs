@@ -6,11 +6,16 @@ using dosymep.WPF.ViewModels;
 
 using RevitPluginExample.Models;
 
+using Wpf.Ui;
+using Wpf.Ui.Appearance;
+using Wpf.Ui.Controls;
+
 namespace RevitPluginExample.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
+        private readonly IThemeService _themeService;
 
         private string _errorText;
         private string _saveProperty;
@@ -18,18 +23,22 @@ namespace RevitPluginExample.ViewModels {
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
-            ILocalizationService localizationService) {
+            ILocalizationService localizationService,
+            IThemeService themeService) {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _localizationService = localizationService;
+            _themeService = themeService;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+            ChangeThemeCommand = RelayCommand.Create(OnChangeTheme);
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
+        public ICommand ChangeThemeCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -39,6 +48,15 @@ namespace RevitPluginExample.ViewModels {
         public string SaveProperty {
             get => _saveProperty;
             set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
+        }
+
+        private void OnChangeTheme() {
+            var currentTheme = _themeService.GetTheme();
+            var newTheme = currentTheme == ApplicationTheme.Dark
+                ? ApplicationTheme.Light
+                : ApplicationTheme.Dark;
+
+            ApplicationThemeManager.Apply(newTheme, WindowBackdropType.Mica, true);
         }
 
         private void LoadView() {
