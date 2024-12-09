@@ -5,7 +5,7 @@
     xmlns:local="clr-namespace:RevitPluginExample.Views"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="Главное окно"
-    Width="800"
+    Width="900"
     Height="450">
     <Grid>
         <TextBox
@@ -134,7 +134,6 @@
             </ui:NavigationView.ContentOverlay>
         </ui:NavigationView>
 
-
         <StackPanel
             x:Name="InfoBars"
             Grid.Column="2"
@@ -181,14 +180,14 @@
             <ui:Button
                 Margin="5 5 5 4"
                 Width="80"
-                Content="ОК"
+                Content="{DynamicResource MainWindow.ButtonOk}"
                 FontSize="14"
                 Click="ButtonOk_Click" />
 
             <ui:Button
                 Margin="5 5 0 4"
                 Width="80"
-                Content="Отмена"
+                Content="{DynamicResource MainWindow.ButtonCancel}"
                 FontSize="14"
                 Appearance="Primary"
                 Click="ButtonCancel_Click" />
