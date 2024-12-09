@@ -57,6 +57,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             return
                     $"{GetBaseGroup(specificationElement.ManifoldSpElement.Element)}" +
                     $"{GetDetailedGroup(specificationElement.ManifoldSpElement)}"+
+                    $"_Узел_" +
                     $"{manifoldFamylyTypeName}" +
                     $"{GetDetailedGroup(specificationElement)}";
         }
