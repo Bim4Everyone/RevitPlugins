@@ -38,7 +38,7 @@ namespace RevitDeclarations.Models {
                 _mainTable.Rows[rowNumber][7] = commercialRooms.AreaMain;
                 _mainTable.Rows[rowNumber][8] = commercialRooms.RoomsHeight;
                 _mainTable.Rows[rowNumber][9] = "";
-                _mainTable.Rows[rowNumber][10] = "";
+                _mainTable.Rows[rowNumber][10] = commercialRooms.ParkingSpaceClass ?? "";
                 _mainTable.Rows[rowNumber][11] = commercialRooms.GroupName ?? "";
                 _mainTable.Rows[rowNumber][12] = _settings.ProjectName ?? "";
 
