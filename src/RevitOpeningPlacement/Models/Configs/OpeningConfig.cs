@@ -40,8 +40,17 @@ namespace RevitOpeningPlacement.Models.Configs {
                 config = GetOverriddenBuilder(document)
                     .Build<OpeningConfig>();
             } catch(JsonException) {
-                config = GetDefaultBuilder(document)
-                    .Build<OpeningConfig>();
+                try {
+                    config = GetDefaultBuilder(document)
+                        .Build<OpeningConfig>();
+                } catch(JsonException) {
+                    // файл конфига по умолчанию был сохранен с использованием параметра,
+                    // который отсутствует в активном документе
+                    config = new OpeningConfig() {
+                        ProjectConfigPath = GetDefaultPath(),
+                        Serializer = new RevitClashConfigSerializer(new OpeningSerializationBinder(), document)
+                    };
+                }
             }
             MepCategoryCollection defaultCollection = new MepCategoryCollection();
             if(config.Categories.Count == defaultCollection.Categories.Count) {
@@ -67,6 +76,15 @@ namespace RevitOpeningPlacement.Models.Configs {
                  .SetPluginName(nameof(RevitOpeningPlacement))
                  .SetRevitVersion(ModuleEnvironment.RevitVersion)
                  .SetProjectConfigName(nameof(OpeningConfig) + ".json");
+        }
+
+        private static string GetDefaultPath() {
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                "dosymep",
+                ModuleEnvironment.RevitVersion,
+                nameof(RevitOpeningPlacement),
+                nameof(OpeningConfig) + ".json");
         }
     }
 }
