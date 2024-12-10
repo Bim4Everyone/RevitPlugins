@@ -45,6 +45,8 @@ namespace RevitDeclarations.Models {
                 workSheet = (Worksheet) workSheets["Лист1"];
                 workSheet.Name = "Помещения";
 
+                SetMainSheetGraphicSettings(workSheet, declarationTable.TableInfo);
+
                 DataTable headerTable = declarationTable.HeaderDataTable;
                 for(int i = 0; i < headerTable.Columns.Count; i++) {
                     workSheet.Cells[1, i + 1] = headerTable.Rows[0][i];
@@ -57,7 +59,6 @@ namespace RevitDeclarations.Models {
                     }
                 }
 
-                SetMainSheetGraphicSettings(workSheet, declarationTable.TableInfo);
 
                 int counter = 1;
                 if(declarationTable.SubTables.Any()) {
