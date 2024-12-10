@@ -9,6 +9,9 @@ using dosymep.Serializers;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
 
+using pyRevitLabs.Json;
+
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace RevitPluginExample.Views {
@@ -16,16 +19,52 @@ namespace RevitPluginExample.Views {
         private readonly WindowInteropHelper _windowInteropHelper;
 
         public BaseWindow() {
-            LocalizationService = ServicesProvider.GetPlatformService<ILocalizationService>();
+            LanguageService = GetPlatformService<ILanguageService>();
 
             _windowInteropHelper = new WindowInteropHelper(this) {
                 Owner = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle
             };
         }
 
+        /// <summary>
+        /// Наименование плагина.
+        /// </summary>
         public virtual string PluginName { get; }
+        /// <summary>
+        /// Наименование файла конфигурации.
+        /// </summary>
         public virtual string ProjectConfigName { get; }
+        /// <summary>
+        /// Сервис локализации окон.
+        /// </summary>
         public virtual ILocalizationService LocalizationService { get; set; }
+        /// <summary>
+        /// Предоставляет доступ к текущему языку платформы.
+        /// </summary>
+        protected ILanguageService LanguageService { get; }
+
+        private ApplicationTheme _currentTheme = ApplicationThemeManager.GetAppTheme();
+
+        /// <summary>
+        /// Переключает текущую тему между светлой и тёмной.
+        /// </summary>
+        public void ChangeTheme() {
+            var newTheme = _currentTheme == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
+            SetTheme(newTheme);
+        }
+
+        /// <summary>
+        /// Устанавливает указанную тему.
+        /// </summary>
+        /// <param name="theme">Тема, которую нужно установить.</param>
+        public void SetTheme(ApplicationTheme theme) {
+            _currentTheme = theme;
+            ApplicationThemeManager.Apply(_currentTheme, WindowBackdropType.Mica, true);
+        }
+
+        protected T GetPlatformService<T>() {
+            return ServicesProvider.GetPlatformService<T>();
+        }
 
         protected override void OnSourceInitialized(EventArgs e) {
             base.OnSourceInitialized(e);
@@ -36,6 +75,8 @@ namespace RevitPluginExample.Views {
             if(config.WindowPlacement.HasValue) {
                 this.SetPlacement(config.WindowPlacement.Value);
             }
+
+            SetTheme(_currentTheme);
         }
 
         protected override void OnClosing(CancelEventArgs e) {
@@ -46,13 +87,20 @@ namespace RevitPluginExample.Views {
             config.SaveProjectConfig();
         }
 
-        protected virtual PlatformWindowConfig GetProjectConfig() {
+        protected virtual BaseWindowConfig GetProjectConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
                 .SetPluginName(PluginName)
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(ProjectConfigName + ".json")
-                .Build<PlatformWindowConfig>();
+                .Build<BaseWindowConfig>();
+        }
+
+        public class BaseWindowConfig : ProjectConfig {
+            [JsonIgnore] public override string ProjectConfigPath { get; set; }
+            [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
+
+            public WINDOWPLACEMENT? WindowPlacement { get; set; }
         }
     }
 }

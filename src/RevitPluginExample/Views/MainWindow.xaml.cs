@@ -19,5 +19,10 @@ namespace RevitPluginExample.Views {
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
         }
+
+        private void ButtonChangeTheme_Click(object sender, RoutedEventArgs e) {
+            ChangeTheme();
+        }
+
     }
 }

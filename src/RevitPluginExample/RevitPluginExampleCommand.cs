@@ -9,7 +9,6 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -17,8 +16,6 @@ using Ninject;
 using RevitPluginExample.Models;
 using RevitPluginExample.ViewModels;
 using RevitPluginExample.Views;
-
-using Wpf.Ui;
 
 namespace RevitPluginExample {
     [Transaction(TransactionMode.Manual)]
@@ -36,15 +33,11 @@ namespace RevitPluginExample {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                kernel.Bind<IThemeService>()
-                    .To<ThemeService>()
-                    .InSingletonScope();
-
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>())
-                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                    .WithPropertyValue(nameof(BaseWindow.LocalizationService),
                         c => c.Kernel.Get<ILocalizationService>());
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;

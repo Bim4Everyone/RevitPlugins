@@ -190,13 +190,13 @@
                 Content="{DynamicResource MainWindow.ButtonCancel}"
                 FontSize="14"
                 Appearance="Primary"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click" /> 
             <ui:Button
                 Margin="5 5 5 4"
                 Width="150"
                 Content="Сменить тему"
                 FontSize="14"
-                Command="{Binding ChangeThemeCommand}"
+                Click="ButtonChangeTheme_Click"
                 Appearance="Primary" />
         </StackPanel>
     </Grid>
