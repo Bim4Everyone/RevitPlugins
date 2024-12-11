@@ -64,7 +64,6 @@ partial class Build {
 
     Configure<DotNetBuildSettings> CompileSettingsBase => _ => _
         .DisableNoRestore()
-        .SetOutputDirectory(Output)
         .SetCopyright($"Copyright © {DateTime.Now.Year}")
         .When(settings => IsServerBuild,
             _ => _
