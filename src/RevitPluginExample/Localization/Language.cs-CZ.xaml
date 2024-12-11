@@ -13,4 +13,27 @@
     <system:String x:Key="MainWindow.ChangeTheme">Změnit téma</system:String>
     <system:String x:Key="MainWindow.PanelName">Super panel</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Zrušit</system:String>
+    <system:String x:Key="MainWindow.InformationalMessage">Tady jsou informace!</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">Tady je chyba!</system:String>
+    <system:String x:Key="MainWindow.SuccessMessage">Tady je něco úspěšného!</system:String>
+    <system:String x:Key="MainWindow.WarningMessage">Tady je varování!</system:String>
+    <system:String x:Key="MainWindow.Footer">Zápatí</system:String>
+    <system:String x:Key="MainWindow.Header">Záhlaví</system:String>
+    <system:String x:Key="MainWindow.Username1">Uživatel 1</system:String>
+    <system:String x:Key="MainWindow.Username2">Uživatel 2</system:String>
+    <system:String x:Key="MainWindow.Username3">Uživatel 3</system:String>
+    <system:String x:Key="MainWindow.Username4">Uživatel 4</system:String>
+    <system:String x:Key="MainWindow.Edit">Upravit</system:String>
+    <system:String x:Key="MainWindow.Undo">Zpět</system:String>
+    <system:String x:Key="MainWindow.Cut">Vyjmout</system:String>
+    <system:String x:Key="MainWindow.Copy">Kopírovat</system:String>
+    <system:String x:Key="MainWindow.Paste">Vložit</system:String>
+    <system:String x:Key="MainWindow.SearchWithBrowser">Hledat v prohlížeči</system:String>
+    <system:String x:Key="MainWindow.Find">Najít...</system:String>
+    <system:String x:Key="MainWindow.FindNext">Najít další</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Vybrat vše</system:String>
+    <system:String x:Key="MainWindow.File">Soubor</system:String>
+    <system:String x:Key="MainWindow.Open">Otevřít...</system:String>
+    <system:String x:Key="MainWindow.Save">Uložit</system:String>
+    <system:String x:Key="MainWindow.Search">Hledat</system:String>
 </ResourceDictionary>

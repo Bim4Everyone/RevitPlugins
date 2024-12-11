@@ -12,4 +12,27 @@
     <system:String x:Key="MainWindow.ChangeTheme">Téma váltása</system:String>
     <system:String x:Key="MainWindow.PanelName">Szuperpanel</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Mégse</system:String>
+    <system:String x:Key="MainWindow.InformationalMessage">Itt van az információ!</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">Itt egy hiba!</system:String>
+    <system:String x:Key="MainWindow.SuccessMessage">Itt egy sikeres művelet!</system:String>
+    <system:String x:Key="MainWindow.WarningMessage">Itt egy figyelmeztetés!</system:String>
+    <system:String x:Key="MainWindow.Footer">Lábléc</system:String>
+    <system:String x:Key="MainWindow.Header">Fejléc</system:String>
+    <system:String x:Key="MainWindow.Username1">Felhasználó 1</system:String>
+    <system:String x:Key="MainWindow.Username2">Felhasználó 2</system:String>
+    <system:String x:Key="MainWindow.Username3">Felhasználó 3</system:String>
+    <system:String x:Key="MainWindow.Username4">Felhasználó 4</system:String>
+    <system:String x:Key="MainWindow.Edit">Szerkesztés</system:String>
+    <system:String x:Key="MainWindow.Undo">Visszavonás</system:String>
+    <system:String x:Key="MainWindow.Cut">Kivágás</system:String>
+    <system:String x:Key="MainWindow.Copy">Másolás</system:String>
+    <system:String x:Key="MainWindow.Paste">Beillesztés</system:String>
+    <system:String x:Key="MainWindow.SearchWithBrowser">Keresés böngészővel</system:String>
+    <system:String x:Key="MainWindow.Find">Keresés...</system:String>
+    <system:String x:Key="MainWindow.FindNext">Következő keresés</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Mindet kijelöl</system:String>
+    <system:String x:Key="MainWindow.File">Fájl</system:String>
+    <system:String x:Key="MainWindow.Open">Megnyitás...</system:String>
+    <system:String x:Key="MainWindow.Save">Mentés</system:String>
+    <system:String x:Key="MainWindow.Search">Keresés</system:String>
 </ResourceDictionary>

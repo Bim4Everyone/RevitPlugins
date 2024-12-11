@@ -12,4 +12,27 @@
     <system:String x:Key="MainWindow.ChangeTheme">Changer de thème</system:String>
     <system:String x:Key="MainWindow.PanelName">Super panneau</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Annuler</system:String>
+    <system:String x:Key="MainWindow.InformationalMessage">Voici des informations !</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">Voici une erreur !</system:String>
+    <system:String x:Key="MainWindow.SuccessMessage">Voici un succès !</system:String>
+    <system:String x:Key="MainWindow.WarningMessage">Voici un avertissement !</system:String>
+    <system:String x:Key="MainWindow.Footer">Pied de page</system:String>
+    <system:String x:Key="MainWindow.Header">En-tête</system:String>
+    <system:String x:Key="MainWindow.Username1">Utilisateur 1</system:String>
+    <system:String x:Key="MainWindow.Username2">Utilisateur 2</system:String>
+    <system:String x:Key="MainWindow.Username3">Utilisateur 3</system:String>
+    <system:String x:Key="MainWindow.Username4">Utilisateur 4</system:String>
+    <system:String x:Key="MainWindow.Edit">Modifier</system:String>
+    <system:String x:Key="MainWindow.Undo">Annuler</system:String>
+    <system:String x:Key="MainWindow.Cut">Couper</system:String>
+    <system:String x:Key="MainWindow.Copy">Copier</system:String>
+    <system:String x:Key="MainWindow.Paste">Coller</system:String>
+    <system:String x:Key="MainWindow.SearchWithBrowser">Rechercher avec le navigateur</system:String>
+    <system:String x:Key="MainWindow.Find">Trouver...</system:String>
+    <system:String x:Key="MainWindow.FindNext">Trouver suivant</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Tout sélectionner</system:String>
+    <system:String x:Key="MainWindow.File">Fichier</system:String>
+    <system:String x:Key="MainWindow.Open">Ouvrir...</system:String>
+    <system:String x:Key="MainWindow.Save">Enregistrer</system:String>
+    <system:String x:Key="MainWindow.Search">Rechercher</system:String>
 </ResourceDictionary>

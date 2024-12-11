@@ -12,4 +12,27 @@
     <system:String x:Key="MainWindow.ChangeTheme">Thema wijzigen</system:String>
     <system:String x:Key="MainWindow.PanelName">Superpaneel</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Annuleren</system:String>
+    <system:String x:Key="MainWindow.InformationalMessage">Hier is een bericht!</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">Hier is een fout!</system:String>
+    <system:String x:Key="MainWindow.SuccessMessage">Hier is een succes!</system:String>
+    <system:String x:Key="MainWindow.WarningMessage">Hier is een waarschuwing!</system:String>
+    <system:String x:Key="MainWindow.Footer">Voettekst</system:String>
+    <system:String x:Key="MainWindow.Header">Koptekst</system:String>
+    <system:String x:Key="MainWindow.Username1">Gebruiker 1</system:String>
+    <system:String x:Key="MainWindow.Username2">Gebruiker 2</system:String>
+    <system:String x:Key="MainWindow.Username3">Gebruiker 3</system:String>
+    <system:String x:Key="MainWindow.Username4">Gebruiker 4</system:String>
+    <system:String x:Key="MainWindow.Edit">Bewerken</system:String>
+    <system:String x:Key="MainWindow.Undo">Ongedaan maken</system:String>
+    <system:String x:Key="MainWindow.Cut">Knippen</system:String>
+    <system:String x:Key="MainWindow.Copy">Kopiëren</system:String>
+    <system:String x:Key="MainWindow.Paste">Plakken</system:String>
+    <system:String x:Key="MainWindow.SearchWithBrowser">Zoeken met browser</system:String>
+    <system:String x:Key="MainWindow.Find">Zoeken...</system:String>
+    <system:String x:Key="MainWindow.FindNext">Volgende zoeken</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Alles selecteren</system:String>
+    <system:String x:Key="MainWindow.File">Bestand</system:String>
+    <system:String x:Key="MainWindow.Open">Openen...</system:String>
+    <system:String x:Key="MainWindow.Save">Opslaan</system:String>
+    <system:String x:Key="MainWindow.Search">Zoeken</system:String>
 </ResourceDictionary>

@@ -12,4 +12,27 @@
     <system:String x:Key="MainWindow.ChangeTheme">테마 변경</system:String>
     <system:String x:Key="MainWindow.PanelName">슈퍼 패널</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">취소</system:String>
+    <system:String x:Key="MainWindow.InformationalMessage">여기 정보가 있습니다!</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">여기 오류가 있습니다!</system:String>
+    <system:String x:Key="MainWindow.SuccessMessage">여기 성공이 있습니다!</system:String>
+    <system:String x:Key="MainWindow.WarningMessage">여기 경고가 있습니다!</system:String>
+    <system:String x:Key="MainWindow.Footer">바닥글</system:String>
+    <system:String x:Key="MainWindow.Header">머리글</system:String>
+    <system:String x:Key="MainWindow.Username1">사용자 1</system:String>
+    <system:String x:Key="MainWindow.Username2">사용자 2</system:String>
+    <system:String x:Key="MainWindow.Username3">사용자 3</system:String>
+    <system:String x:Key="MainWindow.Username4">사용자 4</system:String>
+    <system:String x:Key="MainWindow.Edit">편집</system:String>
+    <system:String x:Key="MainWindow.Undo">실행 취소</system:String>
+    <system:String x:Key="MainWindow.Cut">잘라내기</system:String>
+    <system:String x:Key="MainWindow.Copy">복사</system:String>
+    <system:String x:Key="MainWindow.Paste">붙여넣기</system:String>
+    <system:String x:Key="MainWindow.SearchWithBrowser">브라우저에서 검색</system:String>
+    <system:String x:Key="MainWindow.Find">찾기...</system:String>
+    <system:String x:Key="MainWindow.FindNext">다음 찾기</system:String>
+    <system:String x:Key="MainWindow.SelectAll">모두 선택</system:String>
+    <system:String x:Key="MainWindow.File">파일</system:String>
+    <system:String x:Key="MainWindow.Open">열기...</system:String>
+    <system:String x:Key="MainWindow.Save">저장</system:String>
+    <system:String x:Key="MainWindow.Search">검색</system:String>
 </ResourceDictionary>

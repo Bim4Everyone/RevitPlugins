@@ -12,4 +12,27 @@
     <system:String x:Key="MainWindow.ChangeTheme">テーマを変更する</system:String>
     <system:String x:Key="MainWindow.PanelName">スーパーパネル</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">キャンセル</system:String>
+    <system:String x:Key="MainWindow.InformationalMessage">ここに情報があります！</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">ここにエラーがあります！</system:String>
+    <system:String x:Key="MainWindow.SuccessMessage">ここに成功があります！</system:String>
+    <system:String x:Key="MainWindow.WarningMessage">ここに警告があります！</system:String>
+    <system:String x:Key="MainWindow.Footer">フッター</system:String>
+    <system:String x:Key="MainWindow.Header">ヘッダー</system:String>
+    <system:String x:Key="MainWindow.Username1">ユーザー1</system:String>
+    <system:String x:Key="MainWindow.Username2">ユーザー2</system:String>
+    <system:String x:Key="MainWindow.Username3">ユーザー3</system:String>
+    <system:String x:Key="MainWindow.Username4">ユーザー4</system:String>
+    <system:String x:Key="MainWindow.Edit">編集</system:String>
+    <system:String x:Key="MainWindow.Undo">元に戻す</system:String>
+    <system:String x:Key="MainWindow.Cut">切り取り</system:String>
+    <system:String x:Key="MainWindow.Copy">コピー</system:String>
+    <system:String x:Key="MainWindow.Paste">貼り付け</system:String>
+    <system:String x:Key="MainWindow.SearchWithBrowser">ブラウザで検索</system:String>
+    <system:String x:Key="MainWindow.Find">検索...</system:String>
+    <system:String x:Key="MainWindow.FindNext">次を検索</system:String>
+    <system:String x:Key="MainWindow.SelectAll">すべて選択</system:String>
+<system:String x:Key="MainWindow.File">ファイル</system:String>
+<system:String x:Key="MainWindow.Open">開く...</system:String>
+<system:String x:Key="MainWindow.Save">保存</system:String>
+<system:String x:Key="MainWindow.Search">検索</system:String>
 </ResourceDictionary>

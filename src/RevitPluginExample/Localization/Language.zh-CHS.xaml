@@ -12,4 +12,27 @@
     <system:String x:Key="MainWindow.ChangeTheme">更改主题</system:String>
     <system:String x:Key="MainWindow.PanelName">超级面板</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">取消</system:String>
+    <system:String x:Key="MainWindow.InformationalMessage">这里是信息！</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">这里是错误！</system:String>
+    <system:String x:Key="MainWindow.SuccessMessage">这里是成功！</system:String>
+    <system:String x:Key="MainWindow.WarningMessage">这里是警告！</system:String>
+    <system:String x:Key="MainWindow.Footer">页脚</system:String>
+    <system:String x:Key="MainWindow.Header">标题</system:String>
+    <system:String x:Key="MainWindow.Username1">用户 1</system:String>
+    <system:String x:Key="MainWindow.Username2">用户 2</system:String>
+    <system:String x:Key="MainWindow.Username3">用户 3</system:String>
+    <system:String x:Key="MainWindow.Username4">用户 4</system:String>
+    <system:String x:Key="MainWindow.Edit">编辑</system:String>
+    <system:String x:Key="MainWindow.Undo">撤销</system:String>
+    <system:String x:Key="MainWindow.Cut">剪切</system:String>
+    <system:String x:Key="MainWindow.Copy">复制</system:String>
+    <system:String x:Key="MainWindow.Paste">粘贴</system:String>
+    <system:String x:Key="MainWindow.SearchWithBrowser">用浏览器搜索</system:String>
+    <system:String x:Key="MainWindow.Find">查找...</system:String>
+    <system:String x:Key="MainWindow.FindNext">查找下一个</system:String>
+    <system:String x:Key="MainWindow.SelectAll">全选</system:String>
+    <system:String x:Key="MainWindow.File">文件</system:String>
+    <system:String x:Key="MainWindow.Open">打开...</system:String>
+    <system:String x:Key="MainWindow.Save">保存</system:String>
+    <system:String x:Key="MainWindow.Search">搜索</system:String>
 </ResourceDictionary>

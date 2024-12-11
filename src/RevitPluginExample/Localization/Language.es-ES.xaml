@@ -12,4 +12,27 @@
     <system:String x:Key="MainWindow.ChangeTheme">Cambiar tema</system:String>
     <system:String x:Key="MainWindow.PanelName">Súper panel</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancelar</system:String>
+    <system:String x:Key="MainWindow.InformationalMessage">Aquí hay información!</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">¡Aquí hay un error!</system:String>
+    <system:String x:Key="MainWindow.SuccessMessage">¡Aquí hay algo exitoso!</system:String>
+    <system:String x:Key="MainWindow.WarningMessage">¡Aquí hay una advertencia!</system:String>
+    <system:String x:Key="MainWindow.Footer">Pie de página</system:String>
+    <system:String x:Key="MainWindow.Header">Encabezado</system:String>
+    <system:String x:Key="MainWindow.Username1">Usuario 1</system:String>
+    <system:String x:Key="MainWindow.Username2">Usuario 2</system:String>
+    <system:String x:Key="MainWindow.Username3">Usuario 3</system:String>
+    <system:String x:Key="MainWindow.Username4">Usuario 4</system:String>
+    <system:String x:Key="MainWindow.Edit">Editar</system:String>
+    <system:String x:Key="MainWindow.Undo">Deshacer</system:String>
+    <system:String x:Key="MainWindow.Cut">Cortar</system:String>
+    <system:String x:Key="MainWindow.Copy">Copiar</system:String>
+    <system:String x:Key="MainWindow.Paste">Pegar</system:String>
+    <system:String x:Key="MainWindow.SearchWithBrowser">Buscar con navegador</system:String>
+    <system:String x:Key="MainWindow.Find">Buscar...</system:String>
+    <system:String x:Key="MainWindow.FindNext">Buscar siguiente</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Seleccionar todo</system:String>
+    <system:String x:Key="MainWindow.File">Archivo</system:String>
+    <system:String x:Key="MainWindow.Open">Abrir...</system:String>
+    <system:String x:Key="MainWindow.Save">Guardar</system:String>
+    <system:String x:Key="MainWindow.Search">Buscar</system:String>
 </ResourceDictionary>

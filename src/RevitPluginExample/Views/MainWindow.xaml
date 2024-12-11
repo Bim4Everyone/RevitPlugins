@@ -9,8 +9,7 @@
     xmlns:vms="clr-namespace:RevitPluginExample.ViewModels"
     Title="Главное окно"
     Width="900"
-    Height="450"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    Height="450">
 
     <b:Interaction.Triggers>
         <b:EventTrigger
@@ -42,49 +41,48 @@
             <ui:NavigationView.AutoSuggestBox>
                 <ui:AutoSuggestBox
                     Margin="0,0,0,8"
-                    PlaceholderText="Search" />
+                    PlaceholderText="{DynamicResource MainWindow.Search}" />
             </ui:NavigationView.AutoSuggestBox>
 
             <ui:NavigationView.Header>
                 <Menu
                     FontSize="14">
                     <ui:MenuItem
-                        Header="File"
+                        Header="{DynamicResource MainWindow.File}"
                         Icon="{ui:SymbolIcon DocumentSplitHint20}">
                         <MenuItem
-                            Header="Open..."
+                            Header="{DynamicResource MainWindow.Open}"
                             Command="{Binding Path=OpenFileCommand}" />
-
                         <Separator />
                         <MenuItem
-                            Header="Save"
+                            Header="{DynamicResource MainWindow.Save}"
                             Command="{Binding Path=SaveFileCommand}"
                             CommandParameter="{Binding ElementName=snackbarPresenter}" />
                     </ui:MenuItem>
                     <ui:MenuItem
-                        Header="Edit"
+                        Header="{DynamicResource MainWindow.Edit}"
                         Icon="{ui:SymbolIcon DocumentEdit20}">
                         <MenuItem
-                            Header="Undo" />
+                            Header="{DynamicResource MainWindow.Undo}" />
                         <Separator />
                         <MenuItem
-                            Header="Cut" />
+                            Header="{DynamicResource MainWindow.Cut}" />
                         <MenuItem
-                            Header="Copy" />
+                            Header="{DynamicResource MainWindow.Copy}" />
                         <MenuItem
-                            Header="Paste" />
+                            Header="{DynamicResource MainWindow.Paste}" />
                         <MenuItem
                             IsEnabled="False" />
                         <Separator />
                         <MenuItem
-                            Header="Search with browser" />
+                            Header="{DynamicResource MainWindow.SearchWithBrowser}" />
                         <MenuItem
-                            Header="Find..." />
+                            Header="{DynamicResource MainWindow.Find}" />
                         <MenuItem
-                            Header="Find next" />
+                            Header="{DynamicResource MainWindow.FindNext}" />
                         <Separator />
                         <MenuItem
-                            Header="Select All" />
+                            Header="{DynamicResource MainWindow.SelectAll}" />
                     </ui:MenuItem>
                     <Separator />
                     <ui:MenuItem
@@ -100,13 +98,13 @@
                         <ui:DropDownButton.Flyout>
                             <ContextMenu>
                                 <MenuItem
-                                    Header="Пользователь 1" />
+                                    Header="{DynamicResource MainWindow.Username1}"/>
                                 <MenuItem
-                                    Header="Пользователь 2" />
+                                    Header="{DynamicResource MainWindow.Username2}"/>
                                 <MenuItem
-                                    Header="Пользователь 3" />
+                                    Header="{DynamicResource MainWindow.Username3}" />
                                 <MenuItem
-                                    Header="Пользователь 4" />
+                                    Header="{DynamicResource MainWindow.Username4}"/>
                             </ContextMenu>
                         </ui:DropDownButton.Flyout>
                     </ui:DropDownButton>
@@ -123,7 +121,7 @@
                         VerticalAlignment="Center"
                         FontWeight="Medium"
                         Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                        Text="Pane Header" />
+                        Text="{DynamicResource MainWindow.Header}" />
                 </Border>
             </ui:NavigationView.PaneHeader>
 
@@ -137,7 +135,7 @@
                         VerticalAlignment="Center"
                         FontWeight="Medium"
                         Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                        Text="Pane Footer" />
+                        Text="{DynamicResource MainWindow.Footer}" />
                 </Border>
             </ui:NavigationView.PaneFooter>
 
@@ -159,32 +157,32 @@
                 Margin="5 5 0 5"
                 IsOpen="True"
                 Severity="Informational"
-                Title="Title"
-                Message="Вот тут вот инфо!" />
+                Title="{DynamicResource MainWindow.TitleMessage}"
+                Message="{DynamicResource MainWindow.InformationalMessage}" />
 
             <ui:InfoBar
                 Grid.Row="1"
                 Margin="5 5 0 5"
                 IsOpen="True"
                 Severity="Error"
-                Title="Title"
-                Message="А вот тут вот ошибка!" />
+                Title="{DynamicResource MainWindow.TitleMessage}"
+                Message="{DynamicResource MainWindow.ErrorMessage}" />
 
             <ui:InfoBar
                 Grid.Row="2"
                 Margin="5 5 0 5"
                 IsOpen="True"
                 Severity="Success"
-                Title="Title"
-                Message="Вот тут что то успешное!" />
+                Title="{DynamicResource MainWindow.TitleMessage}"
+                Message="{DynamicResource MainWindow.SuccessMessage}" />
 
             <ui:InfoBar
                 Grid.Row="3"
                 Margin="5 5 0 5"
                 IsOpen="True"
                 Severity="Warning"
-                Title="Title"
-                Message="А тут предупреждение!" />
+                Title="{DynamicResource MainWindow.TitleMessage}"
+                Message="{DynamicResource MainWindow.WarningMessage}" />
         </StackPanel>
        
         <StackPanel

@@ -12,4 +12,27 @@
     <system:String x:Key="MainWindow.ChangeTheme">Thema ändern</system:String>
     <system:String x:Key="MainWindow.PanelName">Super-Panel</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Stornierung</system:String>
+    <system:String x:Key="MainWindow.InformationalMessage">Hier sind Informationen!</system:String>
+    <system:String x:Key="MainWindow.ErrorMessage">Hier ist ein Fehler!</system:String>
+    <system:String x:Key="MainWindow.SuccessMessage">Hier ist etwas Erfolgreiches!</system:String>
+    <system:String x:Key="MainWindow.WarningMessage">Hier ist eine Warnung!</system:String>
+    <system:String x:Key="MainWindow.Footer">Fußzeile</system:String>
+    <system:String x:Key="MainWindow.Header">Kopfzeile</system:String>
+    <system:String x:Key="MainWindow.Username1">Benutzer 1</system:String>
+    <system:String x:Key="MainWindow.Username2">Benutzer 2</system:String>
+    <system:String x:Key="MainWindow.Username3">Benutzer 3</system:String>
+    <system:String x:Key="MainWindow.Username4">Benutzer 4</system:String>
+    <system:String x:Key="MainWindow.Edit">Bearbeiten</system:String>
+    <system:String x:Key="MainWindow.Undo">Rückgängig</system:String>
+    <system:String x:Key="MainWindow.Cut">Ausschneiden</system:String>
+    <system:String x:Key="MainWindow.Copy">Kopieren</system:String>
+    <system:String x:Key="MainWindow.Paste">Einfügen</system:String>
+    <system:String x:Key="MainWindow.SearchWithBrowser">Mit Browser suchen</system:String>
+    <system:String x:Key="MainWindow.Find">Finden...</system:String>
+    <system:String x:Key="MainWindow.FindNext">Nächstes finden</system:String>
+    <system:String x:Key="MainWindow.SelectAll">Alles auswählen</system:String>
+    <system:String x:Key="MainWindow.File">Datei</system:String>
+    <system:String x:Key="MainWindow.Open">Öffnen...</system:String>
+    <system:String x:Key="MainWindow.Save">Speichern</system:String>
+    <system:String x:Key="MainWindow.Search">Suchen</system:String>
 </ResourceDictionary>
