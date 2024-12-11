@@ -9,7 +9,7 @@
     <system:String x:Key="MainWindow.HelloCheck">Introduzca un valor para la propiedad que desea guardar.</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
-    <system:String x:Key="MainWindow.ChangeTheme.ES">Cambiar tema</system:String>
-    <system:String x:Key="MainWindow.PanelName.ES">Súper panel</system:String>
+    <system:String x:Key="MainWindow.ChangeTheme">Cambiar tema</system:String>
+    <system:String x:Key="MainWindow.PanelName">Súper panel</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancelar</system:String>
 </ResourceDictionary>
