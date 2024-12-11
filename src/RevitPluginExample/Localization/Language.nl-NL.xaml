@@ -9,5 +9,7 @@
     <system:String x:Key="MainWindow.HelloCheck">Voer een waarde in voor de eigenschap die u wilt opslaan.</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ChangeTheme.NL">Thema wijzigen</system:String>
+    <system:String x:Key="MainWindow.PanelName.NL">Superpaneel</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Annuleren</system:String>
 </ResourceDictionary>

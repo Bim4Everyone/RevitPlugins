@@ -9,5 +9,7 @@
     <system:String x:Key="MainWindow.HelloCheck">Entrez une valeur pour la propriété à enregistrer.</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ChangeTheme.FR">Changer de thème</system:String>
+    <system:String x:Key="MainWindow.PanelName.FR">Super panneau</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Annuler</system:String>
 </ResourceDictionary>

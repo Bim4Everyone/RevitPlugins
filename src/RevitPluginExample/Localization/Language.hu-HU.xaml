@@ -9,5 +9,7 @@
     <system:String x:Key="MainWindow.HelloCheck">Adja meg a menteni kívánt tulajdonság értékét.</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ChangeTheme.HU">Téma váltása</system:String>
+    <system:String x:Key="MainWindow.PanelName.HU">Szuperpanel</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Mégse</system:String>
 </ResourceDictionary>

@@ -10,5 +10,7 @@
     
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ChangeTheme.CZ">Změnit téma</system:String>
+    <system:String x:Key="MainWindow.PanelName.CZ">Super panel</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Zrušit</system:String>
 </ResourceDictionary>

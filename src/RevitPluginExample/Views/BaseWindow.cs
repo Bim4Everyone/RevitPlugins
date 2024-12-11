@@ -11,7 +11,6 @@ using dosymep.WPF.Views;
 
 using pyRevitLabs.Json;
 
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace RevitPluginExample.Views {
@@ -20,6 +19,10 @@ namespace RevitPluginExample.Views {
 
         public BaseWindow() {
             LanguageService = GetPlatformService<ILanguageService>();
+            UIThemeService = GetPlatformService<IUIThemeService>();
+            UIThemeUpdaterService = GetPlatformService<IUIThemeUpdaterService>();
+
+            UIThemeService.UIThemeChanged += OnUIThemeChanged;
 
             _windowInteropHelper = new WindowInteropHelper(this) {
                 Owner = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle
@@ -39,44 +42,32 @@ namespace RevitPluginExample.Views {
         /// </summary>
         public virtual ILocalizationService LocalizationService { get; set; }
         /// <summary>
+        /// Предоставляет доступ к настройкам темы платформы.
+        /// </summary>
+        public virtual IUIThemeService UIThemeService { get; }
+        /// <summary>
+        /// Сервис по обновлению темы у окна.
+        /// </summary>
+        public virtual IUIThemeUpdaterService UIThemeUpdaterService { get; }
+        /// <summary>
         /// Предоставляет доступ к текущему языку платформы.
         /// </summary>
         protected ILanguageService LanguageService { get; }
 
-        private ApplicationTheme _currentTheme = ApplicationThemeManager.GetAppTheme();
-
-        /// <summary>
-        /// Переключает текущую тему между светлой и тёмной.
-        /// </summary>
-        public void ChangeTheme() {
-            var newTheme = _currentTheme == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
-            SetTheme(newTheme);
-        }
-
-        /// <summary>
-        /// Устанавливает указанную тему.
-        /// </summary>
-        /// <param name="theme">Тема, которую нужно установить.</param>
-        public void SetTheme(ApplicationTheme theme) {
-            _currentTheme = theme;
-            ApplicationThemeManager.Apply(_currentTheme, WindowBackdropType.Mica, true);
-        }
 
         protected T GetPlatformService<T>() {
             return ServicesProvider.GetPlatformService<T>();
         }
 
         protected override void OnSourceInitialized(EventArgs e) {
-            base.OnSourceInitialized(e);
+            LocalizationService?.SetLocalization(LanguageService.HostLanguage, this);
 
-            LocalizationService?.SetLocalization(System.Globalization.CultureInfo.CurrentUICulture, this);
+            base.OnSourceInitialized(e);
 
             var config = GetProjectConfig();
             if(config.WindowPlacement.HasValue) {
                 this.SetPlacement(config.WindowPlacement.Value);
             }
-
-            SetTheme(_currentTheme);
         }
 
         protected override void OnClosing(CancelEventArgs e) {
@@ -85,6 +76,14 @@ namespace RevitPluginExample.Views {
             var config = GetProjectConfig();
             config.WindowPlacement = this.GetPlacement();
             config.SaveProjectConfig();
+        }
+
+        private void OnUIThemeChanged(UIThemes obj) {
+            UpdateTheme();
+        }
+
+        public void UpdateTheme() {
+            UIThemeUpdaterService.SetTheme(this, UIThemeService.HostTheme);
         }
 
         protected virtual BaseWindowConfig GetProjectConfig() {

@@ -9,5 +9,7 @@
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.ChangeTheme">Изменить тему</system:String>
+    <system:String x:Key="MainWindow.PanelName">Суперпанель</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String> 
 </ResourceDictionary>

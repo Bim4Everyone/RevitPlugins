@@ -9,5 +9,7 @@
     <system:String x:Key="MainWindow.HelloCheck">輸入要儲存的屬性的值。</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ChangeTheme.CHT">更改主題</system:String>
+    <system:String x:Key="MainWindow.PanelName.CHT">超級面板</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">取消</system:String>
 </ResourceDictionary>

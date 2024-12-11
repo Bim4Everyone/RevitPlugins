@@ -9,5 +9,7 @@
     <system:String x:Key="MainWindow.HelloCheck">저장할 속성의 값을 입력하세요.</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ChangeTheme.KR">테마 변경</system:String>
+    <system:String x:Key="MainWindow.PanelName.KR">슈퍼 패널</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">취소</system:String>
 </ResourceDictionary>

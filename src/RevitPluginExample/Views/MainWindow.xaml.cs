@@ -21,8 +21,7 @@ namespace RevitPluginExample.Views {
         }
 
         private void ButtonChangeTheme_Click(object sender, RoutedEventArgs e) {
-            ChangeTheme();
+            UpdateTheme();
         }
-
     }
 }

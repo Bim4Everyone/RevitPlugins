@@ -14,6 +14,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitPluginExample.Models;
+using RevitPluginExample.Services;
 using RevitPluginExample.ViewModels;
 using RevitPluginExample.Views;
 
@@ -25,6 +26,17 @@ namespace RevitPluginExample {
         }
 
         protected override void Execute(UIApplication uiApplication) {
+
+            ServicesProvider.Instance
+                .Rebind<IUIThemeService>()
+                .To<ThemeService>()
+                .InSingletonScope();
+
+            ServicesProvider.Instance
+                .Rebind<IUIThemeUpdaterService>()
+                .To<ThemeUpdaterService>()
+                .InSingletonScope();
+
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
