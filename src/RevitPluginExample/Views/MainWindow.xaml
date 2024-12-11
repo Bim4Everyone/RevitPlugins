@@ -5,9 +5,12 @@
     xmlns:local="clr-namespace:RevitPluginExample.Views"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vms="clr-namespace:RevitPluginExample.ViewModels"
     Title="Главное окно"
     Width="900"
-    Height="450">
+    Height="450"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <b:Interaction.Triggers>
         <b:EventTrigger
