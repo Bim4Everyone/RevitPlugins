@@ -11,6 +11,8 @@ using dosymep.WPF.Views;
 
 using pyRevitLabs.Json;
 
+using RevitPluginExample.Services;
+
 using Wpf.Ui.Controls;
 
 namespace RevitPluginExample.Views {
@@ -19,10 +21,6 @@ namespace RevitPluginExample.Views {
 
         public BaseWindow() {
             LanguageService = GetPlatformService<ILanguageService>();
-            UIThemeService = GetPlatformService<IUIThemeService>();
-            UIThemeUpdaterService = GetPlatformService<IUIThemeUpdaterService>();
-
-            UIThemeService.UIThemeChanged += OnUIThemeChanged;
 
             _windowInteropHelper = new WindowInteropHelper(this) {
                 Owner = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle
@@ -44,11 +42,11 @@ namespace RevitPluginExample.Views {
         /// <summary>
         /// Предоставляет доступ к настройкам темы платформы.
         /// </summary>
-        public virtual IUIThemeService UIThemeService { get; }
+        public virtual ThemeService UIThemeService { get; }
         /// <summary>
         /// Сервис по обновлению темы у окна.
         /// </summary>
-        public virtual IUIThemeUpdaterService UIThemeUpdaterService { get; }
+        public virtual ThemeUpdaterService UIThemeUpdaterService { get; }
         /// <summary>
         /// Предоставляет доступ к текущему языку платформы.
         /// </summary>
@@ -68,6 +66,8 @@ namespace RevitPluginExample.Views {
             if(config.WindowPlacement.HasValue) {
                 this.SetPlacement(config.WindowPlacement.Value);
             }
+
+            UIThemeService.UIThemeChanged += OnUIThemeChanged;
         }
 
         protected override void OnClosing(CancelEventArgs e) {

@@ -18,6 +18,8 @@ using RevitPluginExample.Services;
 using RevitPluginExample.ViewModels;
 using RevitPluginExample.Views;
 
+using Application = Autodesk.Revit.ApplicationServices.Application;
+
 namespace RevitPluginExample {
     [Transaction(TransactionMode.Manual)]
     public class RevitPluginExampleCommand : BasePluginCommand {
@@ -26,27 +28,28 @@ namespace RevitPluginExample {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-
-            ServicesProvider.Instance
-                .Rebind<IUIThemeService>()
-                .To<ThemeService>()
-                .InSingletonScope();
-
-            ServicesProvider.Instance
-                .Rebind<IUIThemeUpdaterService>()
-                .To<ThemeUpdaterService>()
-                .InSingletonScope();
-
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
+                kernel.Bind<UIApplication>()
+                    .ToConstant(uiApplication)
+                    .InTransientScope();
+                kernel.Bind<Application>()
+                    .ToConstant(uiApplication.Application)
+                    .InTransientScope();
 
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                kernel.Bind<MainViewModel>().ToSelf();
+                kernel.Bind<IUIThemeUpdaterService>()
+                    .To<ThemeUpdaterService>()
+                    .InSingletonScope();
+
+                kernel.Bind<MainViewModel>().ToSelf()
+                    .InSingletonScope();
                 kernel.Bind<MainWindow>().ToSelf()
+                    .WithPropertyValue(nameof(BaseWindow.UIThemeService),
+                         c => c.Kernel.Get<ThemeService>())
+                    .WithPropertyValue(nameof(BaseWindow.UIThemeUpdaterService),
+                        c => c.Kernel.Get<ThemeUpdaterService>())
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>())
                     .WithPropertyValue(nameof(BaseWindow.LocalizationService),
