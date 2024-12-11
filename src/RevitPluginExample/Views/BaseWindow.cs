@@ -58,6 +58,7 @@ namespace RevitPluginExample.Views {
         }
 
         protected override void OnSourceInitialized(EventArgs e) {
+            UpdateTheme();
             UIThemeService.UIThemeChanged += OnUIThemeChanged;
             LocalizationService?.SetLocalization(LanguageService.HostLanguage, this);
 
@@ -81,7 +82,7 @@ namespace RevitPluginExample.Views {
             UpdateTheme();
         }
 
-        public void UpdateTheme() {
+        private void UpdateTheme() {
             UIThemeUpdaterService.SetTheme(this, UIThemeService.HostTheme);
         }
 
