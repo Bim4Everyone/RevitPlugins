@@ -42,11 +42,11 @@ namespace RevitPluginExample.Views {
         /// <summary>
         /// Предоставляет доступ к настройкам темы платформы.
         /// </summary>
-        public virtual IUIThemeService UIThemeService { get; }
+        public virtual IUIThemeService UIThemeService { get; set; }
         /// <summary>
         /// Сервис по обновлению темы у окна.
         /// </summary>
-        public virtual IUIThemeUpdaterService UIThemeUpdaterService { get; }
+        public virtual IUIThemeUpdaterService UIThemeUpdaterService { get; set; }
         /// <summary>
         /// Предоставляет доступ к текущему языку платформы.
         /// </summary>
