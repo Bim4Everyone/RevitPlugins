@@ -13,13 +13,16 @@ using pyRevitLabs.Json;
 
 using RevitPluginExample.Services;
 
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace RevitPluginExample.Views {
-    public partial class BaseWindow : FluentWindow {
+    public class BaseWindow : FluentWindow {
         private readonly WindowInteropHelper _windowInteropHelper;
 
         public BaseWindow() {
+            ApplicationThemeManager.Apply(this);
+            
             LanguageService = GetPlatformService<ILanguageService>();
 
             _windowInteropHelper = new WindowInteropHelper(this) {
