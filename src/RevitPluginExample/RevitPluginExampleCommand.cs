@@ -47,9 +47,9 @@ namespace RevitPluginExample {
                     .InSingletonScope();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(BaseWindow.UIThemeService),
-                         c => c.Kernel.Get<ThemeService>())
+                         c => c.Kernel.Get<IUIThemeService>())
                     .WithPropertyValue(nameof(BaseWindow.UIThemeUpdaterService),
-                        c => c.Kernel.Get<ThemeUpdaterService>())
+                        c => c.Kernel.Get<IUIThemeUpdaterService>())
                     .WithPropertyValue(nameof(Window.DataContext),
                         c => c.Kernel.Get<MainViewModel>())
                     .WithPropertyValue(nameof(BaseWindow.LocalizationService),

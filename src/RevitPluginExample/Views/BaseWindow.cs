@@ -42,11 +42,11 @@ namespace RevitPluginExample.Views {
         /// <summary>
         /// Предоставляет доступ к настройкам темы платформы.
         /// </summary>
-        public virtual ThemeService UIThemeService { get; }
+        public virtual IUIThemeService UIThemeService { get; }
         /// <summary>
         /// Сервис по обновлению темы у окна.
         /// </summary>
-        public virtual ThemeUpdaterService UIThemeUpdaterService { get; }
+        public virtual IUIThemeUpdaterService UIThemeUpdaterService { get; }
         /// <summary>
         /// Предоставляет доступ к текущему языку платформы.
         /// </summary>
@@ -58,6 +58,7 @@ namespace RevitPluginExample.Views {
         }
 
         protected override void OnSourceInitialized(EventArgs e) {
+            UIThemeService.UIThemeChanged += OnUIThemeChanged;
             LocalizationService?.SetLocalization(LanguageService.HostLanguage, this);
 
             base.OnSourceInitialized(e);
@@ -66,8 +67,6 @@ namespace RevitPluginExample.Views {
             if(config.WindowPlacement.HasValue) {
                 this.SetPlacement(config.WindowPlacement.Value);
             }
-
-            UIThemeService.UIThemeChanged += OnUIThemeChanged;
         }
 
         protected override void OnClosing(CancelEventArgs e) {
