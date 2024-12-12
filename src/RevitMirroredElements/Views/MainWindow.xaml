@@ -12,8 +12,8 @@
     x:Name="mainWindow"
     mc:Ignorable="d"
     Title="Проверка на зеркальность"
-    Height="350"
-    Width="300"
+    Height="400"
+    Width="350"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
