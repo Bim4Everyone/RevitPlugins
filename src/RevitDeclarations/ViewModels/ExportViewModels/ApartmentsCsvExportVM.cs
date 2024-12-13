@@ -12,8 +12,8 @@ namespace RevitDeclarations.ViewModels {
 
         public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {
             List<Apartment> apartments = roomGroups.Cast<Apartment>().ToList();
-            ApartmentsTableInfo tableData = new ApartmentsTableInfo(apartments, _settings);
-            ApartmentsDataTable table = new ApartmentsDataTable(tableData);
+            ApartmentsTableInfo tableInfo = new ApartmentsTableInfo(apartments, _settings);
+            ApartmentsDataTable table = new ApartmentsDataTable("15.2 Жилые помещения", tableInfo);
             table.GenerateTable();
 
             ExportTable<CsvExporter>(path, table);

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models { 
     internal class PublicAreasDataTable : DeclarationDataTable {
-        public PublicAreasDataTable(PublicAreasTableInfo tableInfo) : base(tableInfo) {
+        public PublicAreasDataTable(string name, PublicAreasTableInfo tableInfo) : base(name, tableInfo) {
         }
 
         protected override void FillTableHeader() {

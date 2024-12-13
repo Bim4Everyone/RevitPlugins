@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace RevitDeclarations.Models {
     internal class CommercialGroupDataTable : DeclarationDataTable {
-        public CommercialGroupDataTable(CommercialGroupTableInfo tableInfo) : base(tableInfo) {
+        public CommercialGroupDataTable(string name, CommercialGroupTableInfo tableInfo) : base(name, tableInfo) {
         }
 
         protected override void FillTableHeader() {

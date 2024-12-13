@@ -17,7 +17,7 @@ namespace RevitDeclarations.Models {
         private readonly Color _nonConfigRoomsColor = Color.FromArgb(237, 237, 237);
         private readonly Color _utpColor = Color.FromArgb(226, 207, 245);
 
-        public void Export(string path, IDeclarationDataTable declarationTable) {
+        public void Export(string path, IDeclarationDataTable declarationDataTable) {
             /* Releasing all COM objects was made on the basis of the article:
              * https://www.add-in-express.com/creating-addins-blog/release-excel-com-objects/
              */
@@ -43,16 +43,16 @@ namespace RevitDeclarations.Models {
                 workBook = workBooks.Add();
                 workSheets = workBook.Worksheets;
                 workSheet = (Worksheet) workSheets["Лист1"];
-                workSheet.Name = "Помещения";
+                workSheet.Name = declarationDataTable.Name;
 
-                SetMainSheetGraphicSettings(workSheet, declarationTable.TableInfo);
+                SetMainSheetGraphicSettings(workSheet, declarationDataTable.TableInfo);
 
-                DataTable headerTable = declarationTable.HeaderDataTable;
+                DataTable headerTable = declarationDataTable.HeaderDataTable;
                 for(int i = 0; i < headerTable.Columns.Count; i++) {
                     workSheet.Cells[1, i + 1] = headerTable.Rows[0][i];
                 }
 
-                DataTable mainTable = declarationTable.MainDataTable;
+                DataTable mainTable = declarationDataTable.MainDataTable;
                 for(int i = 0; i < mainTable.Rows.Count; i++) {
                     for(int j = 0; j < mainTable.Columns.Count; j++) {
                         workSheet.Cells[i + 2, j + 1] = mainTable.Rows[i][j];
@@ -61,19 +61,19 @@ namespace RevitDeclarations.Models {
 
 
                 int counter = 1;
-                if(declarationTable.SubTables.Any()) {
+                if(declarationDataTable.SubTables.Any()) {
                     Worksheet subWorkSheet = null;
 
-                    foreach(var subTable in declarationTable.SubTables) {
+                    foreach(var subDataTable in declarationDataTable.SubTables) {
                         subWorkSheet = (Worksheet) workSheets.Add(After: workBook.Sheets[workBook.Sheets.Count]);
-                        subWorkSheet.Name = $"Части помещений-{counter}";
+                        subWorkSheet.Name = $"{subDataTable.Name}-{counter}";
 
-                        DataTable subHeaderTable = subTable.HeaderDataTable;
+                        DataTable subHeaderTable = subDataTable.HeaderDataTable;
                         for(int i = 0; i < subHeaderTable.Columns.Count; i++) {
                             subWorkSheet.Cells[1, i + 1] = subHeaderTable.Rows[0][i];
                         }
 
-                        DataTable subMainTable = subTable.MainDataTable;
+                        DataTable subMainTable = subDataTable.MainDataTable;
                         for(int i = 0; i < subMainTable.Rows.Count; i++) {
                             for(int j = 0; j < subMainTable.Columns.Count; j++) {
                                 subWorkSheet.Cells[i + 2, j + 1] = subMainTable.Rows[i][j];

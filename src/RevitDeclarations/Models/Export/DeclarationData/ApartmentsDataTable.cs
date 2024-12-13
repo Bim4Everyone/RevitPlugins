@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace RevitDeclarations.Models {
     internal class ApartmentsDataTable : DeclarationDataTable {
-        public ApartmentsDataTable(ApartmentsTableInfo tableInfo) : base(tableInfo) { 
+        public ApartmentsDataTable(string name, ApartmentsTableInfo tableInfo) : base(name,tableInfo) { 
         }
 
         protected override void FillTableHeader() {
