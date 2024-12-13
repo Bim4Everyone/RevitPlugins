@@ -29,17 +29,19 @@
             x:Name="LeftGrid"
             Grid.Row="0"
             Margin="10 10 10 0"
-            SelectionMode="Cell"
+            SelectionMode="Row"
             DefaultSorting="Level"
             AutoGenerateColumns="None"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.VirtualizationMode="Recycling"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-            ItemsSource="{Binding Links}">
+            ItemsSource="{Binding Links}"
+            SelectedItems="{Binding SelectedLinks}">
             <dxg:GridControl.View>
                 <dxg:TableView
                     VerticalScrollbarVisibility="Auto"
                     HorizontalScrollbarVisibility="Auto"
+                    ShowCheckBoxSelectorColumn="True"
                     ShowGroupPanel="False">
                 </dxg:TableView>
             </dxg:GridControl.View>
@@ -56,20 +58,6 @@
                     FieldName="CurrentStatus"
                     ReadOnly="True"
                     AllowEditing="False" />
-                <dxg:GridColumn
-                    Header="Обрабатывать"
-                    FieldName="DeleteGroup"
-                    Width="100"
-                    ReadOnly="False">
-                    <dxg:GridColumn.CellTemplate>
-                        <DataTemplate>
-                            <dxe:CheckEdit
-                                IsChecked="{Binding RowData.Row.IsSelected}"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center" />
-                        </DataTemplate>
-                    </dxg:GridColumn.CellTemplate>
-                </dxg:GridColumn>
                 <dxg:GridColumn
                     Header="Новый статус"
                     Width="100"

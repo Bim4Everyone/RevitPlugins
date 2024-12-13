@@ -1,9 +1,12 @@
+using System;
+using System.Collections.Generic;
+
 using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
 namespace RevitOpeningPlacement.ViewModels.Links {
-    internal class LinkViewModel : BaseViewModel {
+    internal class LinkViewModel : BaseViewModel, IEquatable<LinkViewModel> {
         private readonly RevitLinkType _linkType;
         private string _futureStatus;
         private bool _isSelected;
@@ -41,6 +44,24 @@ namespace RevitOpeningPlacement.ViewModels.Links {
         public string FutureStatus {
             get => _futureStatus;
             private set => RaiseAndSetIfChanged(ref _futureStatus, value);
+        }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as LinkViewModel);
+        }
+
+        public bool Equals(LinkViewModel other) {
+            if(ReferenceEquals(null, other)) {
+                return false;
+            }
+            if(ReferenceEquals(this, other)) {
+                return true;
+            }
+            return _linkType.Id == other._linkType.Id;
+        }
+
+        public override int GetHashCode() {
+            return -1154484602 + EqualityComparer<ElementId>.Default.GetHashCode(_linkType?.Id);
         }
 
         public RevitLinkType GetLinkType() {

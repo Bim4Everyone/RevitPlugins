@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Input;
 
@@ -31,6 +32,8 @@ namespace RevitOpeningPlacement.ViewModels.Links {
                 .Where(doc => _docTypesProvider.GetDocTypes().Contains(_bimModelPartsHandler.GetDocType(doc)))
                 .Select(link => new LinkViewModel(link))
                 .OrderBy(vm => vm.Name));
+            SelectedLinks = new ObservableCollection<LinkViewModel>(Links.Where(link => link.IsSelected));
+            SelectedLinks.CollectionChanged += OnCollectionChanged;
 
             ApplyUserSelectionCommand = RelayCommand.Create(ApplyUserSelection);
         }
@@ -39,6 +42,19 @@ namespace RevitOpeningPlacement.ViewModels.Links {
         public ICommand ApplyUserSelectionCommand { get; }
 
         public ObservableCollection<LinkViewModel> Links { get; }
+
+        public ObservableCollection<LinkViewModel> SelectedLinks { get; }
+
+
+        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            UpdateSelection();
+        }
+
+        private void UpdateSelection() {
+            foreach(var link in Links) {
+                link.IsSelected = SelectedLinks.Contains(link);
+            }
+        }
 
         private void ApplyUserSelection() {
             _revitRepository.SetRevitLinkTypesToUse(Links
