@@ -25,14 +25,14 @@ namespace RevitDeclarations.Models
 
             _name = _revitRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
 
-            _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.Accuracy);
+            _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.AccuracyForArea);
             RoomAreaCalculator areaCalculator = new RoomAreaCalculator(settings, this);
             _areaCoefRevit = areaCalculator.CalculateAreaCoefRevit();
             _areaLivingRevit = areaCalculator.CalculateAreaLivingRevit();
             _areaNonSummerRevit = areaCalculator.CalculateAreaNonSummerRevit();
 
-            _area = GetAreaParamValue(settings.RoomAreaParam, settings.Accuracy);
-            _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.Accuracy);
+            _area = GetAreaParamValue(settings.RoomAreaParam, settings.AccuracyForArea);
+            _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.AccuracyForArea);
         }
 
         [JsonIgnore] 
