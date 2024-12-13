@@ -203,18 +203,11 @@ namespace RevitMirroredElements.ViewModels {
         private void LoadConfig() {
             var setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            if(setting == null) {
-                SelectedElementScope = ElementScope.NotSelected;
-                SelectedGroupType = ElementGroupType.NotSelected;
-                EnableFilter = false;
-                SelectedCategories = new List<Category>();
-                return;
-            }
+            SelectedElementScope = setting?.ElementScope ?? ElementScope.NotSelected;
+            SelectedGroupType = setting?.ElementGroupType ?? ElementGroupType.NotSelected;
+            EnableFilter = setting?.EnableFilter ?? false;
 
-            SelectedElementScope = setting.ElementScope;
-            SelectedGroupType = setting.ElementGroupType;
-            EnableFilter = setting.EnableFilter;
-            SelectedCategories = _revitRepository.GetSaveCategories(setting.SelectedCategories)?.ToList() ?? new List<Category>();
+            SelectedCategories = _revitRepository.GetSaveCategories(setting?.SelectedCategories).ToList();
         }
 
         private void SaveConfig() {

@@ -14,7 +14,8 @@
     Title="Проверка на зеркальность"
     Height="400"
     Width="350"
-    ResizeMode="NoResize"
+    MinHeight="400"  
+    MinWidth="350"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
