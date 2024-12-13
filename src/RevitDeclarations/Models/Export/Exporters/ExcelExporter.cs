@@ -42,7 +42,7 @@ namespace RevitDeclarations.Models {
                 workBooks = excelApp.Workbooks;
                 workBook = workBooks.Add();
                 workSheets = workBook.Worksheets;
-                workSheet = (Worksheet) workSheets["Лист1"];
+                workSheet = (Worksheet) workSheets[1];
                 workSheet.Name = declarationDataTable.Name;
 
                 SetMainSheetGraphicSettings(workSheet, declarationDataTable.TableInfo);
