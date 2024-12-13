@@ -59,14 +59,12 @@ namespace RevitDeclarations.Models {
                     }
                 }
 
-
-                int counter = 1;
                 if(declarationDataTable.SubTables.Any()) {
                     Worksheet subWorkSheet = null;
 
                     foreach(var subDataTable in declarationDataTable.SubTables) {
                         subWorkSheet = (Worksheet) workSheets.Add(After: workBook.Sheets[workBook.Sheets.Count]);
-                        subWorkSheet.Name = $"{subDataTable.Name}-{counter}";
+                        subWorkSheet.Name = subDataTable.Name;
 
                         DataTable subHeaderTable = subDataTable.HeaderDataTable;
                         for(int i = 0; i < subHeaderTable.Columns.Count; i++) {
@@ -81,7 +79,6 @@ namespace RevitDeclarations.Models {
                         }
 
                         SetSubSheetGraphicSettings(subWorkSheet);
-                        counter++;
                     }
                 }
 
@@ -111,6 +108,18 @@ namespace RevitDeclarations.Models {
             workSheet.Range[firstCell, lastCell].HorizontalAlignment = XlHAlign.xlHAlignCenter;
             workSheet.Range[firstCell, lastCell].VerticalAlignment = XlVAlign.xlVAlignCenter;
 
+            for(int i = 0; i < tableInfo.ColumnsTotalNumber; i++) {
+                if(tableInfo.AreaTypeColumnsIndexes.Contains(i)) {
+                    string strFormat = $"0.{new string('0', tableInfo.Settings.AccuracyForArea)}";
+                    ((Range) workSheet.Columns[i + 1]).NumberFormat = strFormat;
+                } else if(tableInfo.LengthTypeColumnsIndexes.Contains(i)) {
+                    string strFormat = $"0.{new string('0', tableInfo.Settings.AccuracyForLength)}";
+                    ((Range) workSheet.Columns[i + 1]).NumberFormat = strFormat;
+                } else {
+                    ((Range) workSheet.Columns[i + 1]).NumberFormat = "@";
+                }
+            }
+
             // Настройка шапки таблицы
             Range range = (Range) workSheet.Rows[1];
             range.RowHeight = 60;
@@ -131,7 +140,7 @@ namespace RevitDeclarations.Models {
 
                     int checkColumnNumber = (i - tableInfo.GroupsInfoColumnsNumber) % 3;
                     if(checkColumnNumber == 0) {
-                        ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
+                        //((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
                     }
                 // Летние помещения квартир
@@ -141,7 +150,7 @@ namespace RevitDeclarations.Models {
 
                     int checkColumnNumber = (i - tableInfo.SummerRoomsStart) % 4;
                     if(checkColumnNumber == 0) {
-                        ((Range) workSheet.Columns[i - 3]).NumberFormat = "@";
+                        //((Range) workSheet.Columns[i - 3]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 2]).ColumnWidth = 17;
                     }
                 // Остальные (не из списка приоритетов) помещения квартир
@@ -151,7 +160,7 @@ namespace RevitDeclarations.Models {
 
                     int checkColumnNumber = (i - tableInfo.OtherRoomsStart) % 3;
                     if(checkColumnNumber == 0) {
-                        ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
+                        //((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
                     }
                 // УТП квартир
@@ -170,6 +179,8 @@ namespace RevitDeclarations.Models {
             ((Range) workSheet.Columns[1]).ColumnWidth = 43;
             ((Range) workSheet.Columns[2]).ColumnWidth = 43;
             ((Range) workSheet.Columns[3]).ColumnWidth = 17;
+
+            ((Range) workSheet.Columns[2]).NumberFormat = "0.0";
 
             ((Range) workSheet.Rows[1]).HorizontalAlignment = XlHAlign.xlHAlignCenter;
             ((Range) workSheet.Columns[2]).HorizontalAlignment = XlHAlign.xlHAlignCenter;
