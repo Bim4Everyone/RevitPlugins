@@ -6,12 +6,21 @@ using System.Text;
 namespace RevitDeclarations.Models {
     internal class CsvExporter : ITableExporter {
         public void Export(string path, IDeclarationDataTable table) {
-            path = Path.ChangeExtension(path, "csv");
+            string fullPath = Path.ChangeExtension(path, "csv");
 
             string strData = ConvertDataTableToString(table);
 
-            using(StreamWriter file = File.CreateText(path)) {
+            using(StreamWriter file = File.CreateText(fullPath)) {
                 file.Write(strData);
+            }
+
+            if(table.SubTables.Any()) {
+                int tableNumber = 1;
+                foreach(var subTable in table.SubTables) {
+                    path = $"{path}-{tableNumber}";
+                    Export(path, subTable);
+                    tableNumber++;
+                }
             }
         }
 
