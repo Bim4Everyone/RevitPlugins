@@ -36,7 +36,7 @@ namespace RevitDeclarations.Models {
 
             foreach(Apartment apartment in _roomGroups) {
                 if(!apartment.CheckEqualityOfRoomAreas()) {
-                    string apartInfo = $"Квартира № {apartment.Number} на этаже {apartment.Level}";
+                    string apartInfo = $"Группа помещений № {apartment.Number} на этаже {apartment.Level}";
                     string apartAreas = "Площади квартиры (без коэффициента/с коэффициентом/жилая/без ЛП) " +
                         "должны быть одинаковыми для каждого помещения квартиры";
                     errorListVM.Errors.Add(new ErrorElement(apartInfo, apartAreas));
@@ -55,7 +55,7 @@ namespace RevitDeclarations.Models {
 
             foreach(Apartment apartment in _roomGroups) {
                 if(!apartment.CheckActualApartmentAreas()) {
-                    string apartInfo = $"Квартира № {apartment.Number} на этаже {apartment.Level}";
+                    string apartInfo = $"Группа помещений № {apartment.Number} на этаже {apartment.Level}";
                     string apartAreas = "Площади квартиры, рассчитанные квартирографией " +
                         "отличаются от суммы актуальных системных площадей этой квартиры. " +
                         "Проверьте общую площадь квартиры, площадь с коэффициентом, " +

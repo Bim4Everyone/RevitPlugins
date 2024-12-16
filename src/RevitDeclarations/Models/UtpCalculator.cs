@@ -118,7 +118,7 @@ namespace RevitDeclarations.Models {
         // Все помещения в квартире имеют высоту от 3400 мм.
         public string CalculateHighflat(Apartment apartment) {
             foreach(var room in apartment.Rooms) {
-                double height = room.GetLengthParamValue(_settings.RoomsHeightParam, _settings.Accuracy);
+                double height = room.GetLengthParamValue(_settings.RoomsHeightParam, _settings.AccuracyForArea);
                 if(height < _minHighFlatHeight) {
                     return "Нет";
                 }
@@ -217,7 +217,7 @@ namespace RevitDeclarations.Models {
 
             if(summerRooms.Any()) {
                 return ContourChecker
-                    .CheckAnyRoomSizes(summerRevitRooms, _settings.Accuracy, 0, _minBalconyDepth)
+                    .CheckAnyRoomSizes(summerRevitRooms, _settings.AccuracyForArea, 0, _minBalconyDepth)
                     .GetDescription();
             } else {
                 return "Нет";
@@ -240,12 +240,12 @@ namespace RevitDeclarations.Models {
                 .GetRoomsByPrior(_priorities.Pantry)
                 .Select(x => x.RevitRoom)
                 .Where(x => !_pantriesWithBedroom.Contains(x.Id))
-                .Where(x => ContourChecker.CheckArea(x, _settings.Accuracy, _minPantryArea))
+                .Where(x => ContourChecker.CheckArea(x, _settings.AccuracyForArea, _minPantryArea))
                 .ToList();
 
             if(pantriesWithoutBedrooms.Any()) {
                 return ContourChecker
-                    .CheckAnyRoomSizes(pantriesWithoutBedrooms, _settings.Accuracy, _minPantryDepth)
+                    .CheckAnyRoomSizes(pantriesWithoutBedrooms, _settings.AccuracyForArea, _minPantryDepth)
                     .GetDescription();
             } else {
                 return "Нет";

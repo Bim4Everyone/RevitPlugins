@@ -9,6 +9,8 @@ namespace RevitDeclarations.Models {
         private readonly int _otherRoomsStart;
         private readonly int _utpStart;
         private readonly int[] _numericColumnsIndexes;
+        private readonly int[] _areaTypeColumnsIndexes;
+        private readonly int[] _lengthTypeColumnsIndexes;
 
         private readonly DeclarationSettings _settings;
         private readonly IReadOnlyCollection<CommercialRooms> _roomGroups;
@@ -22,8 +24,14 @@ namespace RevitDeclarations.Models {
             _summerRoomsStart = 0;
             _otherRoomsStart = 0;
             _utpStart = 0;
-            _numericColumnsIndexes = new int[] { 1 };
-            _rowsTotalNumber = RoomGroups.First().Rooms.Count();
+
+            _areaTypeColumnsIndexes = new int[] { 1 };
+            _lengthTypeColumnsIndexes = new int[] { };
+            _numericColumnsIndexes = _areaTypeColumnsIndexes
+                .Concat(_lengthTypeColumnsIndexes)
+                .ToArray();
+
+            _rowsTotalNumber = RoomGroups.Select(x => x.Rooms.Count()).Sum();
         }
 
         public int ColumnsTotalNumber => _columnsTotalNumber;
@@ -34,6 +42,8 @@ namespace RevitDeclarations.Models {
         public int OtherRoomsStart => _otherRoomsStart;
         public int UtpStart => _utpStart;
         public int[] NumericColumnsIndexes => _numericColumnsIndexes;
+        public int[] AreaTypeColumnsIndexes => _areaTypeColumnsIndexes;
+        public int[] LengthTypeColumnsIndexes => _lengthTypeColumnsIndexes;
 
         public DeclarationSettings Settings => _settings;
         public IReadOnlyCollection<RoomGroup> RoomGroups => _roomGroups;

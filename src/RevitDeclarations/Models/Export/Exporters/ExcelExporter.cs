@@ -17,7 +17,7 @@ namespace RevitDeclarations.Models {
         private readonly Color _nonConfigRoomsColor = Color.FromArgb(237, 237, 237);
         private readonly Color _utpColor = Color.FromArgb(226, 207, 245);
 
-        public void Export(string path, IDeclarationDataTable declarationTable) {
+        public void Export(string path, IDeclarationDataTable declarationDataTable) {
             /* Releasing all COM objects was made on the basis of the article:
              * https://www.add-in-express.com/creating-addins-blog/release-excel-com-objects/
              */
@@ -42,38 +42,36 @@ namespace RevitDeclarations.Models {
                 workBooks = excelApp.Workbooks;
                 workBook = workBooks.Add();
                 workSheets = workBook.Worksheets;
-                workSheet = (Worksheet) workSheets["Лист1"];
-                workSheet.Name = "Помещения";
+                workSheet = (Worksheet) workSheets[1];
+                workSheet.Name = declarationDataTable.Name;
 
-                SetMainSheetGraphicSettings(workSheet, declarationTable.TableInfo);
+                SetMainSheetGraphicSettings(workSheet, declarationDataTable.TableInfo);
 
-                DataTable headerTable = declarationTable.HeaderDataTable;
+                DataTable headerTable = declarationDataTable.HeaderDataTable;
                 for(int i = 0; i < headerTable.Columns.Count; i++) {
                     workSheet.Cells[1, i + 1] = headerTable.Rows[0][i];
                 }
 
-                DataTable mainTable = declarationTable.MainDataTable;
+                DataTable mainTable = declarationDataTable.MainDataTable;
                 for(int i = 0; i < mainTable.Rows.Count; i++) {
                     for(int j = 0; j < mainTable.Columns.Count; j++) {
                         workSheet.Cells[i + 2, j + 1] = mainTable.Rows[i][j];
                     }
                 }
 
-
-                int counter = 1;
-                if(declarationTable.SubTables.Any()) {
+                if(declarationDataTable.SubTables.Any()) {
                     Worksheet subWorkSheet = null;
 
-                    foreach(var subTable in declarationTable.SubTables) {
+                    foreach(var subDataTable in declarationDataTable.SubTables) {
                         subWorkSheet = (Worksheet) workSheets.Add(After: workBook.Sheets[workBook.Sheets.Count]);
-                        subWorkSheet.Name = $"Части помещений-{counter}";
+                        subWorkSheet.Name = subDataTable.Name;
 
-                        DataTable subHeaderTable = subTable.HeaderDataTable;
+                        DataTable subHeaderTable = subDataTable.HeaderDataTable;
                         for(int i = 0; i < subHeaderTable.Columns.Count; i++) {
                             subWorkSheet.Cells[1, i + 1] = subHeaderTable.Rows[0][i];
                         }
 
-                        DataTable subMainTable = subTable.MainDataTable;
+                        DataTable subMainTable = subDataTable.MainDataTable;
                         for(int i = 0; i < subMainTable.Rows.Count; i++) {
                             for(int j = 0; j < subMainTable.Columns.Count; j++) {
                                 subWorkSheet.Cells[i + 2, j + 1] = subMainTable.Rows[i][j];
@@ -81,7 +79,6 @@ namespace RevitDeclarations.Models {
                         }
 
                         SetSubSheetGraphicSettings(subWorkSheet);
-                        counter++;
                     }
                 }
 
@@ -111,6 +108,18 @@ namespace RevitDeclarations.Models {
             workSheet.Range[firstCell, lastCell].HorizontalAlignment = XlHAlign.xlHAlignCenter;
             workSheet.Range[firstCell, lastCell].VerticalAlignment = XlVAlign.xlVAlignCenter;
 
+            for(int i = 0; i < tableInfo.ColumnsTotalNumber; i++) {
+                if(tableInfo.AreaTypeColumnsIndexes.Contains(i)) {
+                    string strFormat = $"0.{new string('0', tableInfo.Settings.AccuracyForArea)}";
+                    ((Range) workSheet.Columns[i + 1]).NumberFormat = strFormat;
+                } else if(tableInfo.LengthTypeColumnsIndexes.Contains(i)) {
+                    string strFormat = $"0.{new string('0', tableInfo.Settings.AccuracyForLength)}";
+                    ((Range) workSheet.Columns[i + 1]).NumberFormat = strFormat;
+                } else {
+                    ((Range) workSheet.Columns[i + 1]).NumberFormat = "@";
+                }
+            }
+
             // Настройка шапки таблицы
             Range range = (Range) workSheet.Rows[1];
             range.RowHeight = 60;
@@ -131,7 +140,7 @@ namespace RevitDeclarations.Models {
 
                     int checkColumnNumber = (i - tableInfo.GroupsInfoColumnsNumber) % 3;
                     if(checkColumnNumber == 0) {
-                        ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
+                        //((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
                     }
                 // Летние помещения квартир
@@ -141,7 +150,7 @@ namespace RevitDeclarations.Models {
 
                     int checkColumnNumber = (i - tableInfo.SummerRoomsStart) % 4;
                     if(checkColumnNumber == 0) {
-                        ((Range) workSheet.Columns[i - 3]).NumberFormat = "@";
+                        //((Range) workSheet.Columns[i - 3]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 2]).ColumnWidth = 17;
                     }
                 // Остальные (не из списка приоритетов) помещения квартир
@@ -151,7 +160,7 @@ namespace RevitDeclarations.Models {
 
                     int checkColumnNumber = (i - tableInfo.OtherRoomsStart) % 3;
                     if(checkColumnNumber == 0) {
-                        ((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
+                        //((Range) workSheet.Columns[i - 2]).NumberFormat = "@";
                         ((Range) workSheet.Columns[i - 1]).ColumnWidth = 17;
                     }
                 // УТП квартир
@@ -170,6 +179,8 @@ namespace RevitDeclarations.Models {
             ((Range) workSheet.Columns[1]).ColumnWidth = 43;
             ((Range) workSheet.Columns[2]).ColumnWidth = 43;
             ((Range) workSheet.Columns[3]).ColumnWidth = 17;
+
+            ((Range) workSheet.Columns[2]).NumberFormat = "0.0";
 
             ((Range) workSheet.Rows[1]).HorizontalAlignment = XlHAlign.xlHAlignCenter;
             ((Range) workSheet.Columns[2]).HorizontalAlignment = XlHAlign.xlHAlignCenter;

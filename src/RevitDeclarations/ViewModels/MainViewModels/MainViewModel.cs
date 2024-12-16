@@ -189,7 +189,8 @@ namespace RevitDeclarations.ViewModels {
 
         public void SetSelectedSettings() {
             int.TryParse(_accuracy, out int accuracy);
-            _settings.Accuracy = accuracy;
+            _settings.AccuracyForArea = accuracy;
+            _settings.AccuracyForLength = 2;
             _settings.SelectedPhase = _selectedPhase;
 
             _settings.PrioritiesConfig = _prioritiesViewModel.PrioritiesConfig;

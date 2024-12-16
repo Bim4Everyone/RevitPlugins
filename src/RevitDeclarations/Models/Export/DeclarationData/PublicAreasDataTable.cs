@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models { 
     internal class PublicAreasDataTable : DeclarationDataTable {
-        public PublicAreasDataTable(PublicAreasTableInfo tableInfo) : base(tableInfo) {
+        public PublicAreasDataTable(string name, PublicAreasTableInfo tableInfo) : base(name, tableInfo) {
         }
 
         protected override void FillTableHeader() {
@@ -27,7 +27,7 @@ namespace RevitDeclarations.Models {
                 _mainTable.Rows[rowNumber][2] = publicArea.RoomPosition ?? "";
                 _mainTable.Rows[rowNumber][3] = publicArea.Department ?? "";
                 _mainTable.Rows[rowNumber][4] = publicArea.AreaMain;
-                _mainTable.Rows[rowNumber][5] = "";
+                _mainTable.Rows[rowNumber][5] = _settings.ProjectName ?? "";
 
                 rowNumber++;
             }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace RevitDeclarations.Models {
     internal class CommercialDataTable : DeclarationDataTable {
-        public CommercialDataTable(CommercialTableInfo tableInfo) : base(tableInfo) { 
+        public CommercialDataTable(string name, CommercialTableInfo tableInfo) : base(name, tableInfo) { 
         }
 
         protected override void FillTableHeader() {
@@ -51,17 +51,19 @@ namespace RevitDeclarations.Models {
         }
 
         private void GenerateSubTables() {
+            List<CommercialRooms> rooms = new List<CommercialRooms>();
             foreach(var commercialRooms in _tableInfo.RoomGroups.Cast<CommercialRooms>()) {
                 if(!commercialRooms.IsOneRoomGroup) {
-                    List<CommercialRooms> rooms = new List<CommercialRooms> { commercialRooms };
-
-                    CommercialGroupTableInfo tableInfo = new CommercialGroupTableInfo(rooms, _settings);
-                    CommercialGroupDataTable table = new CommercialGroupDataTable(tableInfo);
-                    table.GenerateTable();
-
-                    _subTables.Add(table);
+                    rooms.Add(commercialRooms);
                 }
             }
+
+            CommercialGroupTableInfo tableInfo = new CommercialGroupTableInfo(rooms, _settings);
+            CommercialGroupDataTable table = 
+                new CommercialGroupDataTable("15.3 Части нежилых помещения", tableInfo);
+            table.GenerateTable();
+
+            _subTables.Add(table);
         }
     }
 }

@@ -13,7 +13,8 @@ namespace RevitDeclarations.Models {
             .ToList();
 
         public Phase SelectedPhase { get; set; }
-        public int Accuracy { get; set; }
+        public int AccuracyForArea { get; set; }
+        public int AccuracyForLength { get; set; }
         public bool LoadUtp { get; set; }
         public IReadOnlyCollection<string> MainRoomNames => PrioritiesConfig
                 .Priorities
