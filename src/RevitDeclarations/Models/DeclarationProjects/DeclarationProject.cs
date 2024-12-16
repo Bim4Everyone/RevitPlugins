@@ -73,7 +73,7 @@ namespace RevitDeclarations.Models {
 
             foreach(RoomGroup roomGroup in _roomGroups) {
                 if(!roomGroup.CheckActualRoomAreas()) {
-                    string groupInfo = $"Квартира № {roomGroup.Number} на этаже {roomGroup.Level}";
+                    string groupInfo = $"Группа помещений № {roomGroup.Number} на этаже {roomGroup.Level}";
                     string groupAreas = "Площади помещений, рассчитанные квартирографией " +
                         "отличаются от актуальной системной площадей помещения.";
                     errorListVM.Errors.Add(new ErrorElement(groupInfo, groupAreas));
