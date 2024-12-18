@@ -34,10 +34,10 @@ namespace RevitKrChecker {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                kernel.Bind<MainViewModel>().ToSelf();
+                kernel.Bind<MainVM>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>())
+                        c => c.Kernel.Get<MainVM>())
                     .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                         c => c.Kernel.Get<ILocalizationService>());
 

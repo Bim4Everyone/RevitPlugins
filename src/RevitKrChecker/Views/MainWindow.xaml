@@ -13,59 +13,28 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
-    Height="450"
-    Width="800"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction
-                Command="{Binding LoadViewCommand}"
-                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+    Height="100"
+    Width="500"
+    d:DataContext="{d:DesignInstance vms:MainVM, IsDesignTimeCreatable=False}">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition
-                Height="*" />
-            <RowDefinition
-                Height="Auto" />
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <TextBlock
-            Grid.Row="0"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty,
-                UpdateSourceTrigger=PropertyChanged}" />
+        <Button
+            Grid.Column="0"
+            Margin="10"
+            Content="FromView"
+            Command="{Binding Path=CheckElemsFromViewCommand}" 
+            />
 
-        <StackPanel
-            Grid.Row="1"
-            Height="45"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-            <TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
-
-            <Button
-                Margin="10"
-                Width="80"
-                Content="{DynamicResource MainWindow.ButtonOk}"
-                IsDefault="True"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
-
-            <Button
-                Margin="10"
-                Width="80"
-                Content="{DynamicResource MainWindow.ButtonCancel}"
-                IsCancel="True"
-                Click="ButtonCancel_Click" />
-        </StackPanel>
+        <Button
+            Grid.Column="1"
+            Margin="10"
+            Content="FromPj"
+            Command="{Binding Path=CheckElemsFromPjCommand}"
+            />
     </Grid>
 </base:PlatformWindow>
