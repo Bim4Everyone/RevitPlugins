@@ -22,7 +22,7 @@ namespace RevitDeclarations.Models {
         public RoomGroup(IEnumerable<RoomElement> rooms, DeclarationSettings settings, RoomParamProvider paramProvider) {
             _settings = settings;
             _paramProvider = paramProvider;
-            _accuracy = settings.Accuracy;
+            _accuracy = settings.AccuracyForArea;
 
             _rooms = rooms.ToList();
             _firstRoom = rooms.FirstOrDefault();

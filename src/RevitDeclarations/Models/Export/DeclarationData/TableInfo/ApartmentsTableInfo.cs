@@ -9,6 +9,8 @@ namespace RevitDeclarations.Models {
         private readonly int _rowsTotalNumber;
         private readonly int _groupsInfoColumnsNumber;
         private readonly int[] _numericColumnsIndexes;
+        private readonly int[] _areaTypeColumnsIndexes;
+        private readonly int[] _lengthTypeColumnsIndexes;
         private readonly int _utpWidth = 9;
 
         private readonly DeclarationSettings _settings;
@@ -36,9 +38,14 @@ namespace RevitDeclarations.Models {
             CountRoomsForPriorities();
             CalculateTableSizes();
 
-            int[] mainColumnsIndexes = new int[] { 7, 8, 9, 10, 13, 14 };
-            _numericColumnsIndexes = mainColumnsIndexes
+            int[] mainColumnsNumIndexes = new int[] { 7, 8, 9, 13, 14 };
+            _areaTypeColumnsIndexes = mainColumnsNumIndexes
                 .Concat(FindNumericColumns())
+                .ToArray();
+            _lengthTypeColumnsIndexes = new int[] { 10 };
+
+            _numericColumnsIndexes = _areaTypeColumnsIndexes
+                .Concat(_lengthTypeColumnsIndexes)
                 .ToArray();
         }
 
@@ -50,6 +57,8 @@ namespace RevitDeclarations.Models {
         public int OtherRoomsStart => _otherRoomsStart;
         public int UtpStart => _utpStart;
         public int[] NumericColumnsIndexes => _numericColumnsIndexes;
+        public int[] AreaTypeColumnsIndexes => _areaTypeColumnsIndexes;
+        public int[] LengthTypeColumnsIndexes => _lengthTypeColumnsIndexes;
 
         public DeclarationSettings Settings => _settings;
         public IReadOnlyCollection<RoomGroup> RoomGroups => _apartments;

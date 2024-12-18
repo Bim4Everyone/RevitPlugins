@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
     internal interface ITableInfo {
@@ -14,6 +10,8 @@ namespace RevitDeclarations.Models {
         int OtherRoomsStart { get; }
         int UtpStart { get; }
         int[] NumericColumnsIndexes { get; }
+        int[] AreaTypeColumnsIndexes { get; }
+        int[] LengthTypeColumnsIndexes { get; }
 
         DeclarationSettings Settings { get; }
         IReadOnlyCollection<RoomGroup> RoomGroups { get; }

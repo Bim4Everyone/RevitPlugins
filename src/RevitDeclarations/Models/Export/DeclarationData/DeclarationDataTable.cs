@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 
 namespace RevitDeclarations.Models {
     internal abstract class DeclarationDataTable : IDeclarationDataTable {
+        protected readonly string _name;
         protected readonly ITableInfo _tableInfo;
         protected readonly DeclarationSettings _settings;
         protected readonly DataTable _mainTable;
         protected readonly DataTable _headerTable;
         protected readonly List<IDeclarationDataTable> _subTables = new List<IDeclarationDataTable>();
 
-        protected DeclarationDataTable(ITableInfo tableInfo) {
+        protected DeclarationDataTable(string name, ITableInfo tableInfo) {
+            _name = name;
             _tableInfo = tableInfo;
             _settings = tableInfo.Settings;
 
@@ -21,6 +23,7 @@ namespace RevitDeclarations.Models {
             _headerTable = new DataTable();
         }
 
+        public string Name => _name;
         public DataTable MainDataTable => _mainTable;
         public DataTable HeaderDataTable => _headerTable;
         public ITableInfo TableInfo => _tableInfo;
