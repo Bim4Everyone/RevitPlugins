@@ -37,24 +37,24 @@
             Grid.Column="0"
             Margin="5"
             VerticalContentAlignment="Center"
-            Name="combobox1"
-            SelectionChanged="combobox1_SelectionChanged" />
+            Name="FirstLevelGrouping"
+            SelectionChanged="FirstLevelGrouping_SelectionChanged" />
 
         <ComboBox
             Grid.Row="1"
             Grid.Column="1"
             Margin="5"
             VerticalContentAlignment="Center"
-            Name="combobox2"
-            SelectionChanged="combobox2_SelectionChanged" />
+            Name="SecondLevelGrouping"
+            SelectionChanged="SecondLevelGrouping_SelectionChanged" />
 
         <ComboBox
             Grid.Row="1"
             Grid.Column="2"
             Margin="5"
             VerticalContentAlignment="Center"
-            Name="combobox3"
-            SelectionChanged="combobox3_SelectionChanged" />
+            Name="ThirdLevelGrouping"
+            SelectionChanged="ThirdLevelGrouping_SelectionChanged" />
 
         <ListView 
             Grid.Row="3"

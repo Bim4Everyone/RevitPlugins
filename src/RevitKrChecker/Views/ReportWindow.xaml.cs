@@ -4,6 +4,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
+using RevitKrChecker.ViewModels;
+
 namespace RevitKrChecker.Views {
     /// <summary>
     /// Логика взаимодействия для ReportWindow.xaml
@@ -15,19 +17,19 @@ namespace RevitKrChecker.Views {
         public ReportWindow() {
             InitializeComponent();
 
-            //ListCollectionView = (CollectionView) CollectionViewSource.GetDefaultView(reportList.ItemsSource);
-            //var comboboxList = new List<string>() { _notListItem };
+            ListCollectionView = (CollectionView) CollectionViewSource.GetDefaultView(reportList.ItemsSource);
+            var comboboxList = new List<string>() { _notListItem };
 
-            //foreach(var prop in typeof(CheckInfo).GetProperties()) {
-            //    comboboxList.Add(prop.Name);
-            //}
+            foreach(var prop in typeof(ReportItemVM).GetProperties()) {
+                comboboxList.Add(prop.Name);
+            }
 
-            //combobox1.ItemsSource = comboboxList;
-            //combobox1.SelectedIndex = 0;
-            //combobox2.ItemsSource = comboboxList;
-            //combobox2.SelectedIndex = 0;
-            //combobox3.ItemsSource = comboboxList;
-            //combobox3.SelectedIndex = 0;
+            FirstLevelGrouping.ItemsSource = comboboxList;
+            FirstLevelGrouping.SelectedIndex = 0;
+            SecondLevelGrouping.ItemsSource = comboboxList;
+            SecondLevelGrouping.SelectedIndex = 0;
+            ThirdLevelGrouping.ItemsSource = comboboxList;
+            ThirdLevelGrouping.SelectedIndex = 0;
         }
 
         public CollectionView ListCollectionView { get; set; }
@@ -36,34 +38,41 @@ namespace RevitKrChecker.Views {
         public string ComboBox3Value { get; set; }
 
 
-        private void combobox1_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
-            if(combobox1.SelectedItem != null) {
-                ComboBox1Value = combobox1.SelectedItem as string;
+        private void FirstLevelGrouping_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
+            if(FirstLevelGrouping.SelectedItem != null) {
+                ComboBox1Value = FirstLevelGrouping.SelectedItem as string;
                 if(ComboBox1Value == _notListItem) {
                     ComboBox2Value = ComboBox3Value = _notListItem;
                 }
-                ListGroupintUpdate();
+                ListGroupingUpdate();
             }
         }
 
-        private void combobox2_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
-            if(combobox2.SelectedItem != null) {
-                ComboBox2Value = combobox2.SelectedItem as string;
+        private void SecondLevelGrouping_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
+            if(SecondLevelGrouping.SelectedItem != null) {
+                ComboBox2Value = SecondLevelGrouping.SelectedItem as string;
                 if(ComboBox2Value == _notListItem) {
                     ComboBox3Value = _notListItem;
                 }
-                ListGroupintUpdate();
+                ListGroupingUpdate();
             }
         }
 
-        private void combobox3_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
-            if(combobox3.SelectedItem != null) {
-                ComboBox3Value = combobox3.SelectedItem as string;
-                ListGroupintUpdate();
+        private void ThirdLevelGrouping_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
+            if(ThirdLevelGrouping.SelectedItem != null) {
+                ComboBox3Value = ThirdLevelGrouping.SelectedItem as string;
+                ListGroupingUpdate();
             }
         }
 
-        private void ListGroupintUpdate() {
+        private void ListGroupingUpdate() {
+            if(ListCollectionView is null) {
+                ListCollectionView = (CollectionView) CollectionViewSource.GetDefaultView(reportList.ItemsSource);
+            }
+            if(ListCollectionView is null) {
+                return;
+            }
+
             ListCollectionView.GroupDescriptions.Clear();
 
             if(!string.IsNullOrEmpty(ComboBox1Value) && ComboBox1Value != _notListItem) {
