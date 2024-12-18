@@ -1,0 +1,215 @@
+﻿<local:BaseWindow
+    x:Class="RevitPluginExample.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:RevitPluginExample.Views"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vms="clr-namespace:RevitPluginExample.ViewModels"
+    Title="Главное окно"
+    Width="900"
+    Height="450">
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger
+            EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="Главное окно"/>
+
+        <ui:NavigationView
+            Grid.Row="1"
+            MinHeight="300"
+            Margin="0 5"
+            IsBackButtonVisible="Auto"
+            IsPaneToggleVisible="True"
+            PaneDisplayMode="Left"
+            PaneTitle= "{DynamicResource MainWindow.PanelName}">
+            <ui:NavigationView.AutoSuggestBox>
+                <ui:AutoSuggestBox
+                    Margin="0,0,0,8"
+                    PlaceholderText="{DynamicResource MainWindow.Search}" />
+            </ui:NavigationView.AutoSuggestBox>
+
+            <ui:NavigationView.Header>
+                <Menu
+                    FontSize="14">
+                    <ui:MenuItem
+                        Header="{DynamicResource MainWindow.File}"
+                        Icon="{ui:SymbolIcon DocumentSplitHint20}">
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.Open}"
+                            Command="{Binding Path=OpenFileCommand}" />
+                        <Separator />
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.Save}"
+                            Command="{Binding Path=SaveFileCommand}"
+                            CommandParameter="{Binding ElementName=snackbarPresenter}" />
+                    </ui:MenuItem>
+                    <ui:MenuItem
+                        Header="{DynamicResource MainWindow.Edit}"
+                        Icon="{ui:SymbolIcon DocumentEdit20}">
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.Undo}" />
+                        <Separator />
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.Cut}" />
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.Copy}" />
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.Paste}" />
+                        <MenuItem
+                            IsEnabled="False" />
+                        <Separator />
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.SearchWithBrowser}" />
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.Find}" />
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.FindNext}" />
+                        <Separator />
+                        <MenuItem
+                            Header="{DynamicResource MainWindow.SelectAll}" />
+                    </ui:MenuItem>
+                    <Separator />
+                    <ui:MenuItem
+                        Icon="{ui:SymbolIcon TextBold20}" />
+                    <ui:MenuItem
+                        Icon="{ui:SymbolIcon TextItalic20}" />
+                    <ui:MenuItem
+                        Icon="{ui:SymbolIcon TextUnderline20}" />
+                    <ui:DropDownButton
+                        Content="Выберите пользователя"
+                        Icon="{ui:SymbolIcon Fluent24}"
+                        Margin="10">
+                        <ui:DropDownButton.Flyout>
+                            <ContextMenu>
+                                <MenuItem
+                                    Header="{DynamicResource MainWindow.Username1}"/>
+                                <MenuItem
+                                    Header="{DynamicResource MainWindow.Username2}"/>
+                                <MenuItem
+                                    Header="{DynamicResource MainWindow.Username3}" />
+                                <MenuItem
+                                    Header="{DynamicResource MainWindow.Username4}"/>
+                            </ContextMenu>
+                        </ui:DropDownButton.Flyout>
+                    </ui:DropDownButton>
+                </Menu>
+            </ui:NavigationView.Header>
+
+            <ui:NavigationView.PaneHeader>
+                <Border
+                    Margin="0,0,0,8"
+                    Background="{DynamicResource StripedBackgroundBrush}"
+                    CornerRadius="6">
+                    <TextBlock
+                        Margin="24"
+                        VerticalAlignment="Center"
+                        FontWeight="Medium"
+                        Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                        Text="{DynamicResource MainWindow.Header}" />
+                </Border>
+            </ui:NavigationView.PaneHeader>
+
+            <ui:NavigationView.PaneFooter>
+                <Border
+                    Margin="0,8,0,0"
+                    Background="{DynamicResource StripedBackgroundBrush}"
+                    CornerRadius="6">
+                    <TextBlock
+                        Margin="24"
+                        VerticalAlignment="Center"
+                        FontWeight="Medium"
+                        Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                        Text="{DynamicResource MainWindow.Footer}" />
+                </Border>
+            </ui:NavigationView.PaneFooter>
+
+            <ui:NavigationView.ContentOverlay>
+                <Grid>
+                    <ui:SnackbarPresenter
+                        x:Name="snackbarPresenter" />
+                </Grid>
+            </ui:NavigationView.ContentOverlay>
+        </ui:NavigationView>
+
+        <StackPanel
+            VerticalAlignment="Bottom"
+            Grid.Row="1"
+            Margin="10 0 0 0">
+
+            <ui:InfoBar
+                Grid.Row="0"
+                Margin="5 5 0 5"
+                IsOpen="True"
+                Severity="Informational"
+                Title="{DynamicResource MainWindow.TitleMessage}"
+                Message="{DynamicResource MainWindow.InformationalMessage}" />
+
+            <ui:InfoBar
+                Grid.Row="1"
+                Margin="5 5 0 5"
+                IsOpen="True"
+                Severity="Error"
+                Title="{DynamicResource MainWindow.TitleMessage}"
+                Message="{DynamicResource MainWindow.ErrorMessage}" />
+
+            <ui:InfoBar
+                Grid.Row="2"
+                Margin="5 5 0 5"
+                IsOpen="True"
+                Severity="Success"
+                Title="{DynamicResource MainWindow.TitleMessage}"
+                Message="{DynamicResource MainWindow.SuccessMessage}" />
+
+            <ui:InfoBar
+                Grid.Row="3"
+                Margin="5 5 0 5"
+                IsOpen="True"
+                Severity="Warning"
+                Title="{DynamicResource MainWindow.TitleMessage}"
+                Message="{DynamicResource MainWindow.WarningMessage}" />
+        </StackPanel>
+       
+        <StackPanel
+            Grid.Row="2"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Orientation="Horizontal"
+            Margin="0,0,0,20">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+            <ui:Button
+                Margin="5 5 5 4"
+                Width="80"
+                Content="{DynamicResource MainWindow.ButtonOk}"
+                FontSize="14"
+                Click="ButtonOk_Click" />
+
+            <ui:Button
+                Margin="5 5 0 4"
+                Width="80"
+                Content="{DynamicResource MainWindow.ButtonCancel}"
+                FontSize="14"
+                Appearance="Primary"
+                Click="ButtonCancel_Click" /> 
+        </StackPanel>
+    </Grid>
+</local:BaseWindow>
