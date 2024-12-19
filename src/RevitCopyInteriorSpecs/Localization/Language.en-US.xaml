@@ -10,4 +10,15 @@
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.SelectedSpecs">Selected specifications to copy:</system:String>
+    <system:String x:Key="MainWindow.GroupType">Group type</system:String>
+    <system:String x:Key="MainWindow.Level">Level</system:String>
+    <system:String x:Key="MainWindow.LevelShortName">Floor</system:String>
+    <system:String x:Key="MainWindow.Phase">Phase</system:String>
+    <system:String x:Key="MainWindow.FirstDispatcherGroupingLevel">Grouping 1</system:String>
+    <system:String x:Key="MainWindow.SecondDispatcherGroupingLevel">Grouping 2</system:String>
+    <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevel">Grouping 3</system:String>
+    <system:String x:Key="MainWindow.AddTask">Add</system:String>
+    <system:String x:Key="MainWindow.DeleteTask">Delete</system:String>
 </ResourceDictionary>
