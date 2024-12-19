@@ -27,5 +27,11 @@ namespace RevitCopyInteriorSpecs.Models {
             .WhereElementIsNotElementType()
             .Cast<T>()
             .ToList();
+
+
+        public ViewSchedule GetSpecByName(string specName) => new FilteredElementCollector(Document)
+                .OfClass(typeof(ViewSchedule))
+                .OfType<ViewSchedule>()
+                .FirstOrDefault(o => o.Name.Equals(specName));
     }
 }

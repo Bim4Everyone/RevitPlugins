@@ -1,11 +1,14 @@
 // Ignore Spelling: plugin
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -27,6 +30,12 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
         private ObservableCollection<TaskInfo> _tasksForWork = new ObservableCollection<TaskInfo>();
         private TaskInfo _selectedTask;
+
+        private string _groupTypeParamName = "ФОП_Тип квартиры";
+        private string _levelShortNameParamName = "ФОП_Этаж";
+        private string _firstDispatcherGroupingLevelParamName = "_Стадия Проекта";
+        private string _secondDispatcherGroupingLevelParamName = "_Группа Видов";
+        private string _thirdDispatcherGroupingLevelParamName = "Назначение вида";
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -85,6 +94,34 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedTask, value);
         }
 
+
+        public string GroupTypeParamName {
+            get => _groupTypeParamName;
+            set => this.RaiseAndSetIfChanged(ref _groupTypeParamName, value);
+        }
+
+        public string LevelShortNameParamName {
+            get => _levelShortNameParamName;
+            set => this.RaiseAndSetIfChanged(ref _levelShortNameParamName, value);
+        }
+
+        public string FirstDispatcherGroupingLevelParamName {
+            get => _firstDispatcherGroupingLevelParamName;
+            set => this.RaiseAndSetIfChanged(ref _firstDispatcherGroupingLevelParamName, value);
+        }
+
+        public string SecondDispatcherGroupingLevelParamName {
+            get => _secondDispatcherGroupingLevelParamName;
+            set => this.RaiseAndSetIfChanged(ref _secondDispatcherGroupingLevelParamName, value);
+        }
+
+        public string ThirdDispatcherGroupingLevelParamName {
+            get => _thirdDispatcherGroupingLevelParamName;
+            set => this.RaiseAndSetIfChanged(ref _thirdDispatcherGroupingLevelParamName, value);
+        }
+
+
+
         private void LoadView() {
             LoadConfig();
 
@@ -92,21 +129,50 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             Levels = _revitRepository.GetElements<Level>();
             Phases = _revitRepository.GetElements<Phase>();
 
-
+            TasksForWork.Add(new TaskInfo());
         }
 
         private void AcceptView() {
             SaveConfig();
 
+            using(Transaction transaction = _revitRepository.Document.StartTransaction("Копирование спецификаций АИ")) {
+
+                foreach(TaskInfo task in TasksForWork) {
+                    foreach(ViewSchedule spec in SelectedSpecs) {
+                        string newViewSpecName = $"!АИ_О_Спецификация помещений_{task.Phase.Name}_{task.GroupType}_{task.LevelShortName}";
+
+                        ViewSchedule newViewSpec = DuplicateSpec(spec, newViewSpecName);
+
+                        DispatcherOption dispatcherOption = new DispatcherOption() {
+                            FirstGroupingLevelParamName = FirstDispatcherGroupingLevelParamName,
+                            SecondGroupingLevelParamName = SecondDispatcherGroupingLevelParamName,
+                            ThirdGroupingLevelParamName = ThirdDispatcherGroupingLevelParamName,
+
+                            FirstGroupingLevelParamValue = task.FirstDispatcherGroupingLevel,
+                            SecondGroupingLevelParamValue = task.SecondDispatcherGroupingLevel,
+                            ThirdGroupingLevelParamValue = task.ThirdDispatcherGroupingLevel
+                        };
+
+                        SetSpecParams(newViewSpec, dispatcherOption);
+
+
+                    }
+                }
+
+                transaction.Commit();
+            }
         }
 
+
+
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+
+            if(TasksForWork.Count == 0) {
+                ErrorText = "Не создано ни одной задачи";
                 return false;
             }
 
-            ErrorText = null;
+            ErrorText = string.Empty;
             return true;
         }
 
@@ -122,6 +188,31 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             setting.SaveProperty = SaveProperty;
             _pluginConfig.SaveProjectConfig();
         }
+
+
+        /// <summary>
+        /// Дублирует спецификацию, и задает указанное имя.
+        /// Если спецификация с таким именем уже существует, то выбрасывает исключение.
+        /// </summary>
+        private ViewSchedule DuplicateSpec(ViewSchedule viewSchedule, string newViewSpecName) {
+            ViewSchedule newViewSpec = _revitRepository.GetSpecByName(newViewSpecName);
+            // Если спеку с указанным именем не нашли, то будем создавать дублированием
+            if(newViewSpec is null) {
+                newViewSpec = _revitRepository.Document.GetElement(viewSchedule.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
+                newViewSpec.Name = newViewSpecName;
+            } else {
+                throw new ArgumentException($"Спецификация с именем {newViewSpecName} уже существует!", "newViewSpecName");
+            }
+
+            return newViewSpec;
+        }
+
+        private void SetSpecParams(ViewSchedule newViewSpec, DispatcherOption dispatcherOption) {
+            newViewSpec.SetParamValue(dispatcherOption.FirstGroupingLevelParamName, dispatcherOption.FirstGroupingLevelParamValue);
+            newViewSpec.SetParamValue(dispatcherOption.SecondGroupingLevelParamName, dispatcherOption.SecondGroupingLevelParamValue);
+            newViewSpec.SetParamValue(dispatcherOption.ThirdGroupingLevelParamName, dispatcherOption.ThirdGroupingLevelParamValue);
+        }
+
 
 
         /// <summary>
