@@ -33,5 +33,10 @@ namespace RevitCopyInteriorSpecs.Models {
                 .OfClass(typeof(ViewSchedule))
                 .OfType<ViewSchedule>()
                 .FirstOrDefault(o => o.Name.Equals(specName));
+
+        public Level GetLevelByName(string specName) => new FilteredElementCollector(Document)
+            .OfClass(typeof(Level))
+            .Cast<Level>()
+            .FirstOrDefault(o => o.Name.Equals(specName));
     }
 }

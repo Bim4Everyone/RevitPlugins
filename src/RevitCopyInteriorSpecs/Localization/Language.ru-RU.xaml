@@ -21,4 +21,7 @@
     <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevel">Группировка 3</system:String>
     <system:String x:Key="MainWindow.AddTask">Добавить</system:String>
     <system:String x:Key="MainWindow.DeleteTask">Удалить</system:String>
+
+    <system:String x:Key="MainWindow.SimultaneousFillingFields">Для заполнения полей строк заданий одновременно: </system:String>
+    <system:String x:Key="MainWindow.TaskRows">Строки заданий: </system:String>
 </ResourceDictionary>

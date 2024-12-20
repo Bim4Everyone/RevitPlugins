@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -139,7 +140,11 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
                 foreach(TaskInfo task in TasksForWork) {
                     foreach(ViewSchedule spec in SelectedSpecs) {
-                        string newViewSpecName = $"!АИ_О_Спецификация помещений_{task.Phase.Name}_{task.GroupType}_{task.LevelShortName}";
+
+                        string specOldName = spec.Name;
+
+                        //string newViewSpecName = $"!АИ_О_Спецификация помещений_{task.Phase.Name}_{task.GroupType}_{task.LevelShortName}";
+                        string newViewSpecName = $"{specOldName}_{task.Phase.Name}_{task.GroupType}_{task.LevelShortName}";
 
                         ViewSchedule newViewSpec = DuplicateSpec(spec, newViewSpecName);
 
@@ -155,7 +160,9 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
                         SetSpecParams(newViewSpec, dispatcherOption);
 
-
+                        ChangeSpecFilters(newViewSpec, GroupTypeParamName, task.GroupType);
+                        ChangeSpecFilters(newViewSpec, "Уровень", task.Level.Id);
+                        ChangeSpecFilters(newViewSpec, LevelShortNameParamName, task.LevelShortName);
                     }
                 }
 
@@ -211,6 +218,58 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             newViewSpec.SetParamValue(dispatcherOption.FirstGroupingLevelParamName, dispatcherOption.FirstGroupingLevelParamValue);
             newViewSpec.SetParamValue(dispatcherOption.SecondGroupingLevelParamName, dispatcherOption.SecondGroupingLevelParamValue);
             newViewSpec.SetParamValue(dispatcherOption.ThirdGroupingLevelParamName, dispatcherOption.ThirdGroupingLevelParamValue);
+        }
+
+
+        /// <summary>
+        /// Метод по изменению фильтра спецификации с указанным именем на указанное значение с учетом формата предыдущего значения
+        /// </summary>
+        public void ChangeSpecFilters(ViewSchedule spec, string specFilterName, string newFilterValue) {
+            ScheduleDefinition specificationDefinition = spec.Definition;
+            List<ScheduleFilter> specificationFilters = specificationDefinition.GetFilters().ToList();
+
+            List<ScheduleFilter> newScheduleFilters = new List<ScheduleFilter>();
+
+            // Перебираем фильтры и записываем каждый, изменяя только тот, что ищем потому что механизм изменения значения конкретного фильтра работал нестабильно
+            for(int i = 0; i < specificationFilters.Count; i++) {
+
+                ScheduleFilter currentFilter = specificationFilters[i];
+                ScheduleField scheduleFieldFromFilter = specificationDefinition.GetField(currentFilter.FieldId);
+
+                if(scheduleFieldFromFilter.GetName() == specFilterName) {
+                    currentFilter.SetValue(newFilterValue);
+                    newScheduleFilters.Add(currentFilter);
+                } else {
+                    newScheduleFilters.Add(currentFilter);
+                }
+            }
+
+            specificationDefinition.SetFilters(newScheduleFilters);
+        }
+
+
+        public void ChangeSpecFilters(ViewSchedule spec, string specFilterName, ElementId newFilterValue) {
+            ScheduleDefinition specificationDefinition = spec.Definition;
+            List<ScheduleFilter> specificationFilters = specificationDefinition.GetFilters().ToList();
+
+
+            List<ScheduleFilter> newScheduleFilters = new List<ScheduleFilter>();
+
+            // Перебираем фильтры и записываем каждый, изменяя только тот, что ищем потому что механизм изменения значения конкретного фильтра работал нестабильно
+            for(int i = 0; i < specificationFilters.Count; i++) {
+
+                ScheduleFilter currentFilter = specificationFilters[i];
+                ScheduleField scheduleFieldFromFilter = specificationDefinition.GetField(currentFilter.FieldId);
+
+                if(scheduleFieldFromFilter.GetName() == specFilterName) {
+                    currentFilter.SetValue(newFilterValue);
+                    newScheduleFilters.Add(currentFilter);
+                } else {
+                    newScheduleFilters.Add(currentFilter);
+                }
+            }
+
+            specificationDefinition.SetFilters(newScheduleFilters);
         }
 
 
