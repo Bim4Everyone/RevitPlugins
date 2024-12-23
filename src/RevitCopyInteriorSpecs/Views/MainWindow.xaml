@@ -70,15 +70,15 @@
             <StackPanel
                 Orientation="Horizontal">
                 <TextBox
-                    Margin="5"
+                    Margin="15 5 5 5"
                     Width="{Binding ElementName=column1, Path=Width, 
                         Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
-                    Text="test" />
+                    Text="group" />
 
                 <ComboBox
-                    Margin="5"
+                    Margin="8 5"
                     Width="{Binding ElementName=column2, Path=Width, 
                         Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
     
@@ -90,15 +90,15 @@
                 </ComboBox>
 
                 <TextBox
-                    Margin="5"
+                    Margin="8 5"
                     Width="{Binding ElementName=column3, Path=Width, 
                         Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
-                    Text="test" />
+                    Text="shortlevel" />
 
                 <ComboBox
-                    Margin="5"
+                    Margin="8 5"
                     Width="{Binding ElementName=column4, Path=Width, 
                         Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
     
@@ -108,6 +108,32 @@
                     ItemsSource="{Binding Path=DataContext.Phases, 
                         RelativeSource={RelativeSource AncestorType={x:Type Window}}}" >
                 </ComboBox>
+
+                <TextBox
+                     Margin="8 5"
+                     Width="{Binding ElementName=column5, Path=Width, 
+                         Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Left"
+                     Text="disp1" />
+
+
+                <TextBox
+                     Margin="8 5"
+                     Width="{Binding ElementName=column6, Path=Width, 
+                         Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Left"
+                     Text="disp2" />
+
+
+                <TextBox
+                     Margin="8 5"
+                     Width="{Binding ElementName=column7, Path=Width, 
+                         Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Left"
+                     Text="disp3" />
             </StackPanel>
         </ScrollViewer>
         
@@ -283,51 +309,85 @@
 
 
 
-        <StackPanel
-            Grid.Row="6"
-            Orientation="Vertical">
+        <Grid
+            Grid.Row="6">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
 
             <TextBlock
-                Margin="5"
-                Text="{DynamicResource MainWindow.GroupType}"/>
-
-            <TextBox
-                Margin="5" 
-                Text="{Binding Path=GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}"/>
-
-            <TextBlock
-                Margin="5"
-                Text="{DynamicResource MainWindow.LevelShortName}"/>
-
-            <TextBox
-                Margin="5" 
-                Text="{Binding Path=LevelShortNameParamName, UpdateSourceTrigger=PropertyChanged}"/>
-
-            
-            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
                 Margin="5"
                 Text="{DynamicResource MainWindow.FirstDispatcherGroupingLevel}"/>
 
             <TextBox
+                Grid.Row="1"
+                Grid.Column="0"
                 Margin="5" 
                 Text="{Binding Path=FirstDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
                 Margin="5"
                 Text="{DynamicResource MainWindow.SecondDispatcherGroupingLevel}"/>
 
             <TextBox
+                Grid.Row="3"
+                Grid.Column="0"
                 Margin="5" 
                 Text="{Binding Path=SecondDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock
+                Grid.Row="4"
+                Grid.Column="0"
                 Margin="5"
                 Text="{DynamicResource MainWindow.ThirdDispatcherGroupingLevel}"/>
 
             <TextBox
+                Grid.Row="5"
+                Grid.Column="0"
                 Margin="5" 
-                Text="{Binding Path=ThirdDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
-        </StackPanel>
+                Text="{Binding Path=ThirdDispatcherGroupingLevelParamName, 
+                UpdateSourceTrigger=PropertyChanged}"
+                />
+
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="5"
+                Text="{DynamicResource MainWindow.GroupType}"/>
+
+            <TextBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="5" 
+                Text="{Binding Path=GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="5"
+                Text="{DynamicResource MainWindow.LevelShortName}"/>
+
+            <TextBox
+                Grid.Row="3"
+                Grid.Column="1"
+                Margin="5" 
+                Text="{Binding Path=LevelShortNameParamName, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
 
 
 
