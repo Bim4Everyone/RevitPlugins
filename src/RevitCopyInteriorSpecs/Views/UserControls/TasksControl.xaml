@@ -8,12 +8,13 @@
     
     xmlns:local="clr-namespace:RevitCopyInteriorSpecs.Views" 
     xmlns:vms="clr-namespace:RevitCopyInteriorSpecs.ViewModels"
+    xmlns:converters="clr-namespace:RevitCopyInteriorSpecs.Views.Converters"
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400"
     d:DataContext="{d:DesignInstance Type=vms:MainViewModel}">
 
     <UserControl.Resources>
-        <local:NumberWithOffsetConverter x:Key="columnContentWidthConverter" Offset="-15" />
+        <converters:NumberWithOffsetConverter x:Key="columnContentWidthConverter" Offset="-15" />
     </UserControl.Resources>
     
     <GroupBox Margin="5" Header="{DynamicResource MainWindow.Tasks}">

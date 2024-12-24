@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace RevitCopyInteriorSpecs.Views {
+namespace RevitCopyInteriorSpecs.Views.Converters {
     public class NumberWithOffsetConverter : MarkupExtension, IValueConverter {
         /// <summary> 
         /// Вывод, когда значение bool == True
