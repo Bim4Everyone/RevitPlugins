@@ -12,6 +12,10 @@
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 
     <system:String x:Key="MainWindow.SelectedSpecs">Выбрано спецификаций для копирования:</system:String>
+    <system:String x:Key="MainWindow.SimultaneousFillingFields">Область для заполнения полей всех задач одновременно: </system:String>
+
+    <system:String x:Key="MainWindow.Tasks">Задачи для работы плагина</system:String>
+    <system:String x:Key="MainWindow.TaskRows">Строки заданий:</system:String>
     <system:String x:Key="MainWindow.GroupType">Тип группы</system:String>
     <system:String x:Key="MainWindow.Level">Уровень</system:String>
     <system:String x:Key="MainWindow.LevelShortName">Этаж</system:String>
@@ -19,9 +23,10 @@
     <system:String x:Key="MainWindow.FirstDispatcherGroupingLevel">Группировка 1</system:String>
     <system:String x:Key="MainWindow.SecondDispatcherGroupingLevel">Группировка 2</system:String>
     <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevel">Группировка 3</system:String>
+    
     <system:String x:Key="MainWindow.AddTask">Добавить</system:String>
     <system:String x:Key="MainWindow.DeleteTask">Удалить</system:String>
 
-    <system:String x:Key="MainWindow.SimultaneousFillingFields">Для заполнения полей строк заданий одновременно: </system:String>
-    <system:String x:Key="MainWindow.TaskRows">Строки заданий: </system:String>
+    <system:String x:Key="MainWindow.Parameters">Параметры</system:String>
+    <system:String x:Key="MainWindow.ProjectParametersSettings">Настройка параметров проекта</system:String>
 </ResourceDictionary>
