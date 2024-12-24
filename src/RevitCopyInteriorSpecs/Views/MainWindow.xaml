@@ -75,7 +75,7 @@
                         Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
-                    Text="{Binding Path=GeneralGroupType}" >
+                    Text="{Binding Path=GeneralGroupType, UpdateSourceTrigger=PropertyChanged}" >
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
@@ -95,7 +95,7 @@
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Path=DataContext.Levels, 
                         RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
-                    SelectedItem="{Binding Path=GeneralLevel}" >
+                    SelectedItem="{Binding Path=GeneralLevel, UpdateSourceTrigger=PropertyChanged}" >
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
@@ -111,7 +111,7 @@
                         Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Left"
-                    Text="{Binding Path=GeneralLevelShortName}" >
+                    Text="{Binding Path=GeneralLevelShortName, UpdateSourceTrigger=PropertyChanged}" >
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
@@ -131,7 +131,7 @@
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Path=DataContext.Phases, 
                         RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
-                    SelectedItem="{Binding Path=GeneralPhase}">
+                    SelectedItem="{Binding Path=GeneralPhase, UpdateSourceTrigger=PropertyChanged}">
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
@@ -147,7 +147,8 @@
                          Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Left"
-                     Text="{Binding Path=GeneralFirstDispatcherGroupingLevel}" >
+                     Text="{Binding Path=GeneralFirstDispatcherGroupingLevel, 
+                        UpdateSourceTrigger=PropertyChanged}" >
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
@@ -164,7 +165,8 @@
                          Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Left"
-                     Text="{Binding Path=GeneralSecondDispatcherGroupingLevel}" >
+                     Text="{Binding Path=GeneralSecondDispatcherGroupingLevel, 
+                        UpdateSourceTrigger=PropertyChanged}" >
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
@@ -181,7 +183,8 @@
                          Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Left"
-                     Text="{Binding Path=GeneralThirdDispatcherGroupingLevel}" >
+                     Text="{Binding Path=GeneralThirdDispatcherGroupingLevel, 
+                        UpdateSourceTrigger=PropertyChanged}" >
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">

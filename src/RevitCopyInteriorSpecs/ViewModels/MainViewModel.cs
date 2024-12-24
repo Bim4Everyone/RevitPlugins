@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -30,8 +29,8 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         private List<Level> _levels;
         private List<Phase> _phases;
 
-        private ObservableCollection<TaskInfo> _tasksForWork = new ObservableCollection<TaskInfo>();
-        private TaskInfo _selectedTask;
+        private ObservableCollection<TaskInfoVM> _tasksForWork = new ObservableCollection<TaskInfoVM>();
+        private TaskInfoVM _selectedTask;
 
         private string _groupTypeParamName = "ФОП_Тип квартиры";
         private string _levelShortNameParamName = "ФОП_Этаж";
@@ -62,24 +61,14 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             DeleteTaskCommand = RelayCommand.Create(DeleteTask, CanDeleteTask);
 
             GeneralGroupTypeChangedCommand = RelayCommand.Create(GeneralGroupTypeChanged);
-            //GeneralLevelChangedCommand = RelayCommand.Create(GeneralLevelChanged);
-            //GeneralLevelShortNameChangedCommand = RelayCommand.Create(GeneralLevelShortNameChanged);
-            //GeneralPhaseChangedCommand = RelayCommand.Create(GeneralPhaseChanged);
-            //GeneralFirstDispatcherGroupingLevelChangedCommand = RelayCommand.Create(GeneralFirstDispatcherGroupingLevelChanged);
-            //GeneralSecondDispatcherGroupingLevelChangedCommand = RelayCommand.Create(GeneralSecondDispatcherGroupingLevelChanged);
-            //GeneralThirdDispatcherGroupingLevelChangedCommand = RelayCommand.Create(GeneralThirdDispatcherGroupingLevelChanged);
+            GeneralLevelChangedCommand = RelayCommand.Create(GeneralLevelChanged);
+            GeneralLevelShortNameChangedCommand = RelayCommand.Create(GeneralLevelShortNameChanged);
+            GeneralPhaseChangedCommand = RelayCommand.Create(GeneralPhaseChanged);
+            GeneralFirstDispatcherGroupingLevelChangedCommand = RelayCommand.Create(GeneralFirstDispatcherGroupingLevelChanged);
+            GeneralSecondDispatcherGroupingLevelChangedCommand = RelayCommand.Create(GeneralSecondDispatcherGroupingLevelChanged);
+            GeneralThirdDispatcherGroupingLevelChangedCommand = RelayCommand.Create(GeneralThirdDispatcherGroupingLevelChanged);
         }
 
-        private void GeneralGroupTypeChanged() {
-            foreach (TaskInfo task in TasksForWork) {
-                SetTestValue<string>(task, "GroupType", GeneralGroupType);
-            }
-        }
-
-        private void SetTestValue<T>(TaskInfo taskInfo, string propName, T propValue) {
-            var prop = taskInfo.GetType().GetProperty(propName);
-            prop.SetValue(this, propValue, null);   
-        }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
@@ -122,12 +111,12 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _phases, value);
         }
 
-        public ObservableCollection<TaskInfo> TasksForWork {
+        public ObservableCollection<TaskInfoVM> TasksForWork {
             get => _tasksForWork;
             set => this.RaiseAndSetIfChanged(ref _tasksForWork, value);
         }
 
-        public TaskInfo SelectedTask {
+        public TaskInfoVM SelectedTask {
             get => _selectedTask;
             set => this.RaiseAndSetIfChanged(ref _selectedTask, value);
         }
@@ -182,8 +171,8 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         public string GeneralFirstDispatcherGroupingLevel {
             get => _generalFirstDispatcherGroupingLevel;
             set => this.RaiseAndSetIfChanged(ref _generalFirstDispatcherGroupingLevel, value);
-        }        
-        
+        }
+
         public string GeneralSecondDispatcherGroupingLevel {
             get => _generalSecondDispatcherGroupingLevel;
             set => this.RaiseAndSetIfChanged(ref _generalSecondDispatcherGroupingLevel, value);
@@ -203,7 +192,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             Levels = _revitRepository.GetElements<Level>();
             Phases = _revitRepository.GetElements<Phase>();
 
-            TasksForWork.Add(new TaskInfo());
+            TasksForWork.Add(new TaskInfoVM());
         }
 
         private void AcceptView() {
@@ -211,7 +200,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
             using(Transaction transaction = _revitRepository.Document.StartTransaction("Копирование спецификаций АИ")) {
 
-                foreach(TaskInfo task in TasksForWork) {
+                foreach(TaskInfoVM task in TasksForWork) {
                     foreach(ViewSchedule spec in SelectedSpecs) {
 
                         string specOldName = spec.Name;
@@ -352,7 +341,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         /// Задача содержит информацию о начальном и конечном уровне, с которыми нужно работать; выбранную область видимости и спеки
         /// </summary>
         private void AddTask() {
-            TasksForWork.Add(new TaskInfo());
+            TasksForWork.Add(new TaskInfoVM());
         }
 
         /// <summary>
@@ -367,6 +356,41 @@ namespace RevitCopyInteriorSpecs.ViewModels {
                 return false;
             }
             return true;
+        }
+
+
+        private void GeneralGroupTypeChanged() {
+            SetTasksPropValues("GroupType", GeneralGroupType);
+        }
+
+        private void GeneralLevelChanged() {
+            SetTasksPropValues("Level", GeneralLevel);
+        }
+
+        private void GeneralLevelShortNameChanged() {
+            SetTasksPropValues("LevelShortName", GeneralLevelShortName);
+        }
+
+        private void GeneralPhaseChanged() {
+            SetTasksPropValues("Phase", GeneralPhase);
+        }
+
+        private void GeneralFirstDispatcherGroupingLevelChanged() {
+            SetTasksPropValues("FirstDispatcherGroupingLevel", GeneralFirstDispatcherGroupingLevel);
+        }
+
+        private void GeneralSecondDispatcherGroupingLevelChanged() {
+            SetTasksPropValues("SecondDispatcherGroupingLevel", GeneralSecondDispatcherGroupingLevel);
+        }
+        private void GeneralThirdDispatcherGroupingLevelChanged() {
+            SetTasksPropValues("ThirdDispatcherGroupingLevel", GeneralThirdDispatcherGroupingLevel);
+        }
+
+        private void SetTasksPropValues(string propName, object propValue) {
+            foreach(TaskInfoVM task in TasksForWork) {
+                var prop = task.GetType().GetProperty(propName);
+                prop.SetValue(task, propValue);
+            }
         }
     }
 }
