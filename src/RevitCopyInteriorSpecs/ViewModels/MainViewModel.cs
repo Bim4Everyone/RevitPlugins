@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -37,6 +38,13 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         private string _firstDispatcherGroupingLevelParamName = "_Стадия Проекта";
         private string _secondDispatcherGroupingLevelParamName = "_Группа Видов";
         private string _thirdDispatcherGroupingLevelParamName = "Назначение вида";
+        private string _generalGroupType;
+        private Level _generalLevel;
+        private string _generalLevelShortName;
+        private Phase _generalPhase;
+        private string _generalFirstDispatcherGroupingLevel;
+        private string _generalSecondDispatcherGroupingLevel;
+        private string _generalThirdDispatcherGroupingLevel;
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -52,6 +60,25 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
             AddTaskCommand = RelayCommand.Create(AddTask);
             DeleteTaskCommand = RelayCommand.Create(DeleteTask, CanDeleteTask);
+
+            GeneralGroupTypeChangedCommand = RelayCommand.Create(GeneralGroupTypeChanged);
+            //GeneralLevelChangedCommand = RelayCommand.Create(GeneralLevelChanged);
+            //GeneralLevelShortNameChangedCommand = RelayCommand.Create(GeneralLevelShortNameChanged);
+            //GeneralPhaseChangedCommand = RelayCommand.Create(GeneralPhaseChanged);
+            //GeneralFirstDispatcherGroupingLevelChangedCommand = RelayCommand.Create(GeneralFirstDispatcherGroupingLevelChanged);
+            //GeneralSecondDispatcherGroupingLevelChangedCommand = RelayCommand.Create(GeneralSecondDispatcherGroupingLevelChanged);
+            //GeneralThirdDispatcherGroupingLevelChangedCommand = RelayCommand.Create(GeneralThirdDispatcherGroupingLevelChanged);
+        }
+
+        private void GeneralGroupTypeChanged() {
+            foreach (TaskInfo task in TasksForWork) {
+                SetTestValue<string>(task, "GroupType", GeneralGroupType);
+            }
+        }
+
+        private void SetTestValue<T>(TaskInfo taskInfo, string propName, T propValue) {
+            var prop = taskInfo.GetType().GetProperty(propName);
+            prop.SetValue(this, propValue, null);   
         }
 
         public ICommand LoadViewCommand { get; }
@@ -59,6 +86,16 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
         public ICommand AddTaskCommand { get; }
         public ICommand DeleteTaskCommand { get; }
+
+        public ICommand GeneralGroupTypeChangedCommand { get; }
+        public ICommand GeneralLevelChangedCommand { get; }
+        public ICommand GeneralLevelShortNameChangedCommand { get; }
+        public ICommand GeneralPhaseChangedCommand { get; }
+        public ICommand GeneralFirstDispatcherGroupingLevelChangedCommand { get; }
+        public ICommand GeneralSecondDispatcherGroupingLevelChangedCommand { get; }
+        public ICommand GeneralThirdDispatcherGroupingLevelChangedCommand { get; }
+
+
 
         public string ErrorText {
             get => _errorText;
@@ -119,6 +156,42 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         public string ThirdDispatcherGroupingLevelParamName {
             get => _thirdDispatcherGroupingLevelParamName;
             set => this.RaiseAndSetIfChanged(ref _thirdDispatcherGroupingLevelParamName, value);
+        }
+
+
+        public string GeneralGroupType {
+            get => _generalGroupType;
+            set => this.RaiseAndSetIfChanged(ref _generalGroupType, value);
+        }
+
+        public Level GeneralLevel {
+            get => _generalLevel;
+            set => this.RaiseAndSetIfChanged(ref _generalLevel, value);
+        }
+
+        public string GeneralLevelShortName {
+            get => _generalLevelShortName;
+            set => this.RaiseAndSetIfChanged(ref _generalLevelShortName, value);
+        }
+
+        public Phase GeneralPhase {
+            get => _generalPhase;
+            set => this.RaiseAndSetIfChanged(ref _generalPhase, value);
+        }
+
+        public string GeneralFirstDispatcherGroupingLevel {
+            get => _generalFirstDispatcherGroupingLevel;
+            set => this.RaiseAndSetIfChanged(ref _generalFirstDispatcherGroupingLevel, value);
+        }        
+        
+        public string GeneralSecondDispatcherGroupingLevel {
+            get => _generalSecondDispatcherGroupingLevel;
+            set => this.RaiseAndSetIfChanged(ref _generalSecondDispatcherGroupingLevel, value);
+        }
+
+        public string GeneralThirdDispatcherGroupingLevel {
+            get => _generalThirdDispatcherGroupingLevel;
+            set => this.RaiseAndSetIfChanged(ref _generalThirdDispatcherGroupingLevel, value);
         }
 
 
