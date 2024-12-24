@@ -3,10 +3,14 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
     <!-- Пример перевода на русский язык (google translate) -->
-    
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
+
+    <system:String x:Key="MainWindow.Title">Копирование спецификаций АИ</system:String>
     <system:String x:Key="MainWindow.Hello">Привет Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+
+    <system:String x:Key="MainWindow.NoTasksCreated">Не создано ни одной задачи</system:String>
+    <system:String x:Key="MainWindow.NotAllLevelsSelected">Не во всех задачах выбран уровень</system:String>
+    <system:String x:Key="MainWindow.NotAllPhasesSelected">Не во всех задачах выбрана стадия</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>

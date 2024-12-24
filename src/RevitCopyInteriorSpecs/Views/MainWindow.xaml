@@ -228,7 +228,7 @@
                             <GridViewColumn 
                                 x:Name="column1"
                                 Header="{DynamicResource MainWindow.GroupType}"
-                                Width="150">
+                                Width="120">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox
@@ -244,7 +244,7 @@
                             <GridViewColumn
                                 Header="{DynamicResource MainWindow.Level}"
                                 x:Name="column2"
-                                Width="150">
+                                Width="120">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox
@@ -265,7 +265,7 @@
                             <GridViewColumn 
                                 Header="{DynamicResource MainWindow.LevelShortName}"
                                 x:Name="column3"
-                                Width="150">
+                                Width="120">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox
@@ -282,7 +282,7 @@
                             <GridViewColumn
                                 Header="{DynamicResource MainWindow.Phase}"
                                 x:Name="column4"
-                                Width="150">
+                                Width="120">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox
@@ -303,7 +303,7 @@
                             <GridViewColumn 
                                 Header="{DynamicResource MainWindow.FirstDispatcherGroupingLevel}"
                                 x:Name="column5"
-                                Width="150">
+                                Width="120">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox
@@ -320,7 +320,7 @@
                             <GridViewColumn 
                                 Header="{DynamicResource MainWindow.SecondDispatcherGroupingLevel}"
                                 x:Name="column6"
-                                Width="150">
+                                Width="120">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox
@@ -337,7 +337,7 @@
                             <GridViewColumn 
                                 Header="{DynamicResource MainWindow.ThirdDispatcherGroupingLevel}"
                                 x:Name="column7"
-                                Width="150">
+                                Width="120">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox

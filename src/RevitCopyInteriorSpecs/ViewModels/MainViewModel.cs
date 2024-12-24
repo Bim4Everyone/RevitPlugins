@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -44,6 +45,8 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         private string _generalFirstDispatcherGroupingLevel;
         private string _generalSecondDispatcherGroupingLevel;
         private string _generalThirdDispatcherGroupingLevel;
+
+        private string _errorReport = string.Empty;
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -202,13 +205,16 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
                 foreach(TaskInfoVM task in TasksForWork) {
                     foreach(ViewSchedule spec in SelectedSpecs) {
-
                         string specOldName = spec.Name;
 
-                        //string newViewSpecName = $"!АИ_О_Спецификация помещений_{task.Phase.Name}_{task.GroupType}_{task.LevelShortName}";
                         string newViewSpecName = $"{specOldName}_{task.Phase.Name}_{task.GroupType}_{task.LevelShortName}";
-
-                        ViewSchedule newViewSpec = DuplicateSpec(spec, newViewSpecName);
+                        ViewSchedule newViewSpec;
+                        try {
+                            newViewSpec = DuplicateSpec(spec, newViewSpecName);
+                        } catch(ArgumentException e) {
+                            _errorReport += $"- {e.Message};" + Environment.NewLine + Environment.NewLine;
+                            continue;
+                        }
 
                         DispatcherOption dispatcherOption = new DispatcherOption() {
                             FirstGroupingLevelParamName = FirstDispatcherGroupingLevelParamName,
@@ -230,15 +236,30 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
                 transaction.Commit();
             }
-        }
 
+            if(!string.IsNullOrEmpty(_errorReport)) {
+                MessageBox.Show(_errorReport, "Отчет по ошибкам");
+            }
+        }
 
 
         private bool CanAcceptView() {
 
             if(TasksForWork.Count == 0) {
-                ErrorText = "Не создано ни одной задачи";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.NoTasksCreated");
                 return false;
+            }
+
+            foreach(TaskInfoVM task in TasksForWork) {
+                if(task.Level is null) {
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.NotAllLevelsSelected");
+                    return false;
+                }
+
+                if(task.Phase is null) {
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.NotAllPhasesSelected");
+                    return false;
+                }
             }
 
             ErrorText = string.Empty;
@@ -270,7 +291,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
                 newViewSpec = _revitRepository.Document.GetElement(viewSchedule.Duplicate(ViewDuplicateOption.Duplicate)) as ViewSchedule;
                 newViewSpec.Name = newViewSpecName;
             } else {
-                throw new ArgumentException($"Спецификация с именем {newViewSpecName} уже существует!", "newViewSpecName");
+                throw new ArgumentException($"Спецификация с именем \"{newViewSpecName}\" уже существует!");
             }
 
             return newViewSpec;
@@ -292,9 +313,9 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
             List<ScheduleFilter> newScheduleFilters = new List<ScheduleFilter>();
 
-            // Перебираем фильтры и записываем каждый, изменяя только тот, что ищем потому что механизм изменения значения конкретного фильтра работал нестабильно
+            // Перебираем фильтры и записываем каждый, изменяя только тот, что ищем
+            // потому что механизм изменения значения конкретного фильтра работал нестабильно
             for(int i = 0; i < specificationFilters.Count; i++) {
-
                 ScheduleFilter currentFilter = specificationFilters[i];
                 ScheduleField scheduleFieldFromFilter = specificationDefinition.GetField(currentFilter.FieldId);
 
