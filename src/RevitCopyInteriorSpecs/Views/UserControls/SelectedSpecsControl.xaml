@@ -23,6 +23,6 @@
             Margin="5"
             Width="200"
             VerticalAlignment="Center"
-            Text="{Binding Path=SelectedSpecs.Count}" />
+            Text="{Binding Path=SelectedSpecsVM.SelectedSpecs.Count}" />
     </StackPanel>
 </UserControl>

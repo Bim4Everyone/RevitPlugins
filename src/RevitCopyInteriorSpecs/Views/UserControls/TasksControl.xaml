@@ -38,12 +38,12 @@
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Left"
-                        Text="{Binding Path=GeneralGroupType, UpdateSourceTrigger=PropertyChanged}" >
+                        Text="{Binding Path=TasksVM.GeneralGroupType, UpdateSourceTrigger=PropertyChanged}" >
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="TextChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding GeneralGroupTypeChangedCommand}"/>
+                                    Command="{Binding TasksVM.GeneralGroupTypeChangedCommand}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </TextBox>
@@ -56,14 +56,13 @@
                         VerticalContentAlignment="Center"
                         HorizontalAlignment="Center"
                         DisplayMemberPath="Name"
-                        ItemsSource="{Binding Path=DataContext.Levels, 
-                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
-                        SelectedItem="{Binding Path=GeneralLevel, UpdateSourceTrigger=PropertyChanged}" >
+                        ItemsSource="{Binding Path=TasksVM.Levels, UpdateSourceTrigger=PropertyChanged}" 
+                        SelectedItem="{Binding Path=TasksVM.GeneralLevel, UpdateSourceTrigger=PropertyChanged}" >
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="SelectionChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding GeneralLevelChangedCommand}"/>
+                                    Command="{Binding TasksVM.GeneralLevelChangedCommand}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </ComboBox>
@@ -74,12 +73,12 @@
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Left"
-                        Text="{Binding Path=GeneralLevelShortName, UpdateSourceTrigger=PropertyChanged}" >
+                        Text="{Binding Path=TasksVM.GeneralLevelShortName, UpdateSourceTrigger=PropertyChanged}" >
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="TextChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding GeneralLevelShortNameChangedCommand}"/>
+                                    Command="{Binding TasksVM.GeneralLevelShortNameChangedCommand}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </TextBox>
@@ -92,14 +91,13 @@
                         VerticalContentAlignment="Center"
                         HorizontalAlignment="Center"
                         DisplayMemberPath="Name"
-                        ItemsSource="{Binding Path=DataContext.Phases, 
-                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
-                        SelectedItem="{Binding Path=GeneralPhase, UpdateSourceTrigger=PropertyChanged}">
+                        ItemsSource="{Binding Path=TasksVM.Phases, UpdateSourceTrigger=PropertyChanged}" 
+                        SelectedItem="{Binding Path=TasksVM.GeneralPhase, UpdateSourceTrigger=PropertyChanged}">
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="SelectionChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding GeneralPhaseChangedCommand}"/>
+                                    Command="{Binding TasksVM.GeneralPhaseChangedCommand}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </ComboBox>
@@ -110,13 +108,13 @@
                              Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                          VerticalAlignment="Center"
                          HorizontalAlignment="Left"
-                         Text="{Binding Path=GeneralFirstDispatcherGroupingLevel, 
+                         Text="{Binding Path=TasksVM.GeneralFirstDispatcherGroupingLevel, 
                             UpdateSourceTrigger=PropertyChanged}" >
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="TextChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding GeneralFirstDispatcherGroupingLevelChangedCommand}"/>
+                                    Command="{Binding TasksVM.GeneralFirstDispatcherGroupingLevelChangedCommand}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </TextBox>
@@ -128,13 +126,13 @@
                              Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                          VerticalAlignment="Center"
                          HorizontalAlignment="Left"
-                         Text="{Binding Path=GeneralSecondDispatcherGroupingLevel, 
+                         Text="{Binding Path=TasksVM.GeneralSecondDispatcherGroupingLevel, 
                             UpdateSourceTrigger=PropertyChanged}" >
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="TextChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding GeneralSecondDispatcherGroupingLevelChangedCommand}"/>
+                                    Command="{Binding TasksVM.GeneralSecondDispatcherGroupingLevelChangedCommand}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </TextBox>
@@ -146,13 +144,13 @@
                              Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                          VerticalAlignment="Center"
                          HorizontalAlignment="Left"
-                         Text="{Binding Path=GeneralThirdDispatcherGroupingLevel, 
+                         Text="{Binding Path=TasksVM.GeneralThirdDispatcherGroupingLevel, 
                             UpdateSourceTrigger=PropertyChanged}" >
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="TextChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding GeneralThirdDispatcherGroupingLevelChangedCommand}"/>
+                                    Command="{Binding TasksVM.GeneralThirdDispatcherGroupingLevelChangedCommand}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </TextBox>
@@ -169,8 +167,8 @@
                 Margin="5"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
                 ScrollViewer.CanContentScroll="False"
-                ItemsSource="{Binding Path=TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                SelectedItem="{Binding Path=SelectedTask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                ItemsSource="{Binding Path=TasksVM.TasksForWork, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                SelectedItem="{Binding Path=TasksVM.SelectedTask, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 SelectionMode="Single">
 
                 <ListView.View>
@@ -204,7 +202,7 @@
                                         HorizontalAlignment="Center"
                                         VerticalContentAlignment="Center"
                                         DisplayMemberPath="Name"
-                                        ItemsSource="{Binding Path=DataContext.Levels, 
+                                        ItemsSource="{Binding Path=DataContext.TasksVM.Levels, 
                                             RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
                                         SelectedItem="{Binding Path=Level}">
                                     </ComboBox>
@@ -242,7 +240,7 @@
                                         HorizontalAlignment="Center"
                                         VerticalContentAlignment="Center"
                                         DisplayMemberPath="Name"
-                                        ItemsSource="{Binding Path=DataContext.Phases, 
+                                        ItemsSource="{Binding Path=DataContext.TasksVM.Phases, 
                                             RelativeSource={RelativeSource AncestorType={x:Type Window}}}" 
                                         SelectedItem="{Binding Path=Phase}">
                                     </ComboBox>
@@ -315,13 +313,13 @@
                     Margin="10 5 10 10" 
                     Width="150" 
                     Content="{DynamicResource MainWindow.AddTask}" 
-                    Command="{Binding Path=AddTaskCommand}" />
+                    Command="{Binding Path=TasksVM.AddTaskCommand}" />
                 
                 <Button
                     Margin="10 5 10 10" 
                     Width="150" 
                     Content="{DynamicResource MainWindow.DeleteTask}" 
-                    Command="{Binding Path=DeleteTaskCommand}" />
+                    Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
             </StackPanel>
         </Grid>
     </GroupBox>

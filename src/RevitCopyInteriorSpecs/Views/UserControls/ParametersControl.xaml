@@ -49,7 +49,7 @@
                     Grid.Column="0"
                     Margin="5" 
                     Padding="1"
-                    Text="{Binding Path=FirstDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
+                    Text="{Binding Path=ParametersVM.FirstDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock
                     Grid.Row="3"
@@ -62,7 +62,7 @@
                     Grid.Column="0"
                     Margin="5" 
                     Padding="1"
-                    Text="{Binding Path=SecondDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
+                    Text="{Binding Path=ParametersVM.SecondDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock
                     Grid.Row="5"
@@ -75,7 +75,7 @@
                     Grid.Column="0"
                     Margin="5" 
                     Padding="1"
-                    Text="{Binding Path=ThirdDispatcherGroupingLevelParamName, 
+                    Text="{Binding Path=ParametersVM.ThirdDispatcherGroupingLevelParamName, 
                     UpdateSourceTrigger=PropertyChanged}" />
 
             <TextBlock
@@ -89,7 +89,7 @@
                     Grid.Column="1"
                     Margin="5" 
                     Padding="1"
-                    Text="{Binding Path=GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}"/>
+                    Text="{Binding Path=ParametersVM.GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock
                     Grid.Row="3"
@@ -102,7 +102,7 @@
                     Grid.Column="1"
                     Margin="5" 
                     Padding="1"
-                    Text="{Binding Path=LevelShortNameParamName, UpdateSourceTrigger=PropertyChanged}"/>
+                    Text="{Binding Path=ParametersVM.LevelShortNameParamName, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
     </GroupBox>
 </UserControl>
