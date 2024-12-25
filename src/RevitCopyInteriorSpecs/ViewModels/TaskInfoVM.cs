@@ -2,7 +2,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
-namespace RevitCopyInteriorSpecs.Models {
+namespace RevitCopyInteriorSpecs.ViewModels {
     internal class TaskInfoVM : BaseViewModel {
         private string _groupType;
         private Level _level;
@@ -13,7 +13,6 @@ namespace RevitCopyInteriorSpecs.Models {
         private string _thirdDispatcherGroupingLevel;
 
         public TaskInfoVM() { }
-
 
         public string GroupType {
             get => _groupType;

@@ -5,8 +5,6 @@
     <!-- Пример перевода на русский язык (google translate) -->
 
     <system:String x:Key="MainWindow.Title">Копирование спецификаций АИ</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
     <system:String x:Key="MainWindow.NoTasksCreated">Не создано ни одной задачи</system:String>
     <system:String x:Key="MainWindow.NotAllLevelsSelected">Не во всех задачах выбран уровень</system:String>
@@ -33,4 +31,8 @@
 
     <system:String x:Key="MainWindow.Parameters">Параметры</system:String>
     <system:String x:Key="MainWindow.ProjectParametersSettings">Настройка параметров проекта</system:String>
+
+    <system:String x:Key="MainWindow.SpecificationAlreadyExists">В проекте уже есть спецификация с именем</system:String>
+    <system:String x:Key="MainWindow.ErrorReport">Отчет по ошибкам</system:String>
+    <system:String x:Key="MainWindow.TransactionName">BIM: Копирование спецификаций АИ</system:String>
 </ResourceDictionary>

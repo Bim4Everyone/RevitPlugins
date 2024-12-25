@@ -5,8 +5,6 @@
     <!-- Пример перевода на английский американский язык (google translate) -->
 
     <system:String x:Key="MainWindow.Title">Copying specifications</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
 
     <system:String x:Key="MainWindow.NoTasksCreated">No tasks created</system:String>
     <system:String x:Key="MainWindow.NotAllLevelsSelected">Not all tasks have a level selected</system:String>
@@ -33,4 +31,8 @@
 
     <system:String x:Key="MainWindow.Parameters">Parameters</system:String>
     <system:String x:Key="MainWindow.ProjectParametersSettings">Project parameters settings</system:String>
+
+    <system:String x:Key="MainWindow.SpecificationAlreadyExists">The project already has a specification with the name</system:String>
+    <system:String x:Key="MainWindow.ErrorReport">Error report</system:String>
+    <system:String x:Key="MainWindow.TransactionName">BIM: Copying specifications</system:String>
 </ResourceDictionary>
