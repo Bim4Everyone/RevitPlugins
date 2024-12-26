@@ -25,7 +25,7 @@ namespace RevitDeclarations.Models {
         [JsonProperty("construction_works")]
         public string ConstrWorksNumber => _firstRoom.GetTextParamValue(_settings.ConstrWorksNumberParam);
         [JsonProperty("ceiling_height")]
-        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracyFoLength);
+        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracyForLength);
 
         [JsonProperty("type")]
         public override string Department => _paramProvider.GetDepartment(_firstRoom, "Нежилые помещения");

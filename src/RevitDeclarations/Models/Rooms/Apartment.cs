@@ -65,7 +65,7 @@ namespace RevitDeclarations.Models {
         public string ConstrWorksNumber => _firstRoom.GetTextParamValue(_settings.ConstrWorksNumberParam);
 
         [JsonProperty("ceiling_height")]
-        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracyFoLength);
+        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracyForLength);
 
         [JsonIgnore]
         public string UtpTwoBaths => _utpTwoBaths;

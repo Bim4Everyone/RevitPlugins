@@ -12,7 +12,7 @@ namespace RevitDeclarations.Models {
 
         protected readonly RoomParamProvider _paramProvider;
         protected readonly int _accuracyFoArea;
-        protected readonly int _accuracyFoLength;
+        protected readonly int _accuracyForLength;
 
         protected readonly IEnumerable<RoomElement> _rooms;
 
@@ -24,7 +24,7 @@ namespace RevitDeclarations.Models {
             _settings = settings;
             _paramProvider = paramProvider;
             _accuracyFoArea = settings.AccuracyForArea;
-            _accuracyFoLength = settings.AccuracyForLength;
+            _accuracyForLength = settings.AccuracyForLength;
 
             _rooms = rooms.ToList();
             _firstRoom = rooms.FirstOrDefault();
