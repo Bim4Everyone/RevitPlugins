@@ -636,7 +636,7 @@
                 Grid.Row="15"
                 Grid.Column="1"
                 Style="{StaticResource ParameterName}"
-                Text="11.2 Для группы из нескольких помещений:"/>
+                Text="11.1 Для группы из нескольких помещений:"/>
             <ComboBox
                 Grid.Row="15"
                 Grid.Column="2"
