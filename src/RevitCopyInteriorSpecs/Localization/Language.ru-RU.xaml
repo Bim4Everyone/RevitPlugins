@@ -6,6 +6,13 @@
 
     <system:String x:Key="MainWindow.Title">Копирование спецификаций АИ</system:String>
 
+    <system:String x:Key="MainWindow.GroupTypeParamName">ФОП_Тип квартиры</system:String>
+    <system:String x:Key="MainWindow.LevelParamName">Уровень</system:String>
+    <system:String x:Key="MainWindow.LevelShortNameParamName">ФОП_Этаж</system:String>
+    <system:String x:Key="MainWindow.FirstDispatcherGroupingLevelParamName">_Стадия Проекта</system:String>
+    <system:String x:Key="MainWindow.SecondDispatcherGroupingLevelParamName">_Группа Видов</system:String>
+    <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevelParamName">Назначение вида</system:String>
+
     <system:String x:Key="MainWindow.NoTasksCreated">Не создано ни одной задачи</system:String>
     <system:String x:Key="MainWindow.NotAllLevelsSelected">Не во всех задачах выбран уровень</system:String>
     <system:String x:Key="MainWindow.NotAllPhasesSelected">Не во всех задачах выбрана стадия</system:String>

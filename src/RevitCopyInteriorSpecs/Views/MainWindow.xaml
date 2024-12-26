@@ -15,8 +15,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
-    Height="700"
-    Width="900"
+    Height="650"
+    Width="920"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>

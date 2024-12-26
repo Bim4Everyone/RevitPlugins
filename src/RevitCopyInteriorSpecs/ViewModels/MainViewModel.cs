@@ -138,12 +138,37 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+            ParametersVM.GroupTypeParamName =
+                setting?.GroupTypeParamName ??
+                    _localizationService.GetLocalizedString("MainWindow.GroupTypeParamName");
+            ParametersVM.LevelParamName =
+                setting?.LevelParamName ??
+                    _localizationService.GetLocalizedString("MainWindow.LevelParamName");
+            ParametersVM.LevelShortNameParamName =
+                setting?.LevelShortNameParamName ??
+                    _localizationService.GetLocalizedString("MainWindow.LevelShortNameParamName");
+            ParametersVM.FirstDispatcherGroupingLevelParamName =
+                setting?.FirstDispatcherGroupingLevelParamName ??
+                    _localizationService.GetLocalizedString("MainWindow.FirstDispatcherGroupingLevelParamName");
+            ParametersVM.SecondDispatcherGroupingLevelParamName =
+                setting?.SecondDispatcherGroupingLevelParamName ??
+                    _localizationService.GetLocalizedString("MainWindow.SecondDispatcherGroupingLevelParamName");
+            ParametersVM.ThirdDispatcherGroupingLevelParamName =
+                setting?.ThirdDispatcherGroupingLevelParamName ??
+                    _localizationService.GetLocalizedString("MainWindow.ThirdDispatcherGroupingLevelParamName");
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
+            setting.GroupTypeParamName = ParametersVM.GroupTypeParamName;
+            setting.LevelParamName = ParametersVM.LevelParamName;
+            setting.LevelShortNameParamName = ParametersVM.LevelShortNameParamName;
+            setting.FirstDispatcherGroupingLevelParamName = ParametersVM.FirstDispatcherGroupingLevelParamName;
+            setting.SecondDispatcherGroupingLevelParamName = ParametersVM.SecondDispatcherGroupingLevelParamName;
+            setting.ThirdDispatcherGroupingLevelParamName = ParametersVM.ThirdDispatcherGroupingLevelParamName;
             _pluginConfig.SaveProjectConfig();
         }
     }

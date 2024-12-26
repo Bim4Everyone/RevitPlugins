@@ -2,12 +2,12 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitCopyInteriorSpecs.ViewModels.MainViewModelParts {
     internal class ParametersViewModel : BaseViewModel {
-        private string _groupTypeParamName = "ФОП_Тип квартиры";
-        private string _levelParamName = "Уровень";
-        private string _levelShortNameParamName = "ФОП_Этаж";
-        private string _firstDispatcherGroupingLevelParamName = "_Стадия Проекта";
-        private string _secondDispatcherGroupingLevelParamName = "_Группа Видов";
-        private string _thirdDispatcherGroupingLevelParamName = "Назначение вида";
+        private string _groupTypeParamName = string.Empty;
+        private string _levelParamName = string.Empty;
+        private string _levelShortNameParamName = string.Empty;
+        private string _firstDispatcherGroupingLevelParamName = string.Empty;
+        private string _secondDispatcherGroupingLevelParamName = string.Empty;
+        private string _thirdDispatcherGroupingLevelParamName = string.Empty;
 
         public string GroupTypeParamName {
             get => _groupTypeParamName;
