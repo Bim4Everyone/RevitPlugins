@@ -48,27 +48,27 @@ namespace RevitCopyInteriorSpecs.Services {
         /// <summary>
         /// Изменяет фильтр спецификации, когда он хранит string.
         /// </summary>
-        public void ChangeSpecFilter(ViewSchedule spec, string specFilterName, string newFilterValue) {
-            ScheduleDefinition specificationDefinition = spec.Definition;
-            List<ScheduleFilter> specificationFilters = specificationDefinition.GetFilters().ToList();
-            List<ScheduleFilter> newScheduleFilters = new List<ScheduleFilter>();
-
-            for(int i = 0; i < specificationFilters.Count; i++) {
-                ScheduleFilter currentFilter = specificationFilters[i];
-                ScheduleField scheduleFieldFromFilter = specificationDefinition.GetField(currentFilter.FieldId);
-
-                if(scheduleFieldFromFilter.GetName() == specFilterName) {
-                    currentFilter.SetValue(newFilterValue);
-                }
-                newScheduleFilters.Add(currentFilter);
-            }
-            specificationDefinition.SetFilters(newScheduleFilters);
+        public void ChangeSpecFilter(ViewSchedule spec, string specFilterName, string filterValue) {
+            ChangeSpecFilter(
+                spec,
+                specFilterName,
+                (filter) => filter.SetValue(filterValue));
         }
 
         /// <summary>
         /// Изменяет фильтр спецификации, когда он хранит ElementId.
         /// </summary>
-        public void ChangeSpecFilter(ViewSchedule spec, string specFilterName, ElementId newFilterValue) {
+        public void ChangeSpecFilter(ViewSchedule spec, string specFilterName, ElementId filterValue) {
+            ChangeSpecFilter(
+                spec,
+                specFilterName,
+                (filter) => filter.SetValue(filterValue));
+        }
+
+        /// <summary>
+        /// Изменяет фильтр спецификации с учетом переданного типа значения.  
+        /// </summary>
+        private void ChangeSpecFilter(ViewSchedule spec, string specFilterName, Action<ScheduleFilter> action) {
             ScheduleDefinition specificationDefinition = spec.Definition;
             List<ScheduleFilter> specificationFilters = specificationDefinition.GetFilters().ToList();
             List<ScheduleFilter> newScheduleFilters = new List<ScheduleFilter>();
@@ -78,7 +78,7 @@ namespace RevitCopyInteriorSpecs.Services {
                 ScheduleField scheduleFieldFromFilter = specificationDefinition.GetField(currentFilter.FieldId);
 
                 if(scheduleFieldFromFilter.GetName() == specFilterName) {
-                    currentFilter.SetValue(newFilterValue);
+                    action.Invoke(currentFilter);
                 }
                 newScheduleFilters.Add(currentFilter);
             }
