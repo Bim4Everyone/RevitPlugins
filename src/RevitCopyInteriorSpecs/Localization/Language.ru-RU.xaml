@@ -9,6 +9,7 @@
     <system:String x:Key="MainWindow.GroupTypeParamName">ФОП_Тип квартиры</system:String>
     <system:String x:Key="MainWindow.LevelParamName">Уровень</system:String>
     <system:String x:Key="MainWindow.LevelShortNameParamName">ФОП_Этаж</system:String>
+    <system:String x:Key="MainWindow.PhaseParamName">Стадия</system:String>
     <system:String x:Key="MainWindow.FirstDispatcherGroupingLevelParamName">_Стадия Проекта</system:String>
     <system:String x:Key="MainWindow.SecondDispatcherGroupingLevelParamName">_Группа Видов</system:String>
     <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevelParamName">Назначение вида</system:String>
@@ -17,6 +18,14 @@
     <system:String x:Key="MainWindow.NotAllLevelsSelected">Не во всех задачах выбран уровень</system:String>
     <system:String x:Key="MainWindow.NotAllPhasesSelected">Не во всех задачах выбрана стадия</system:String>
 
+    <system:String x:Key="MainWindow.GroupTypeParamNameEmpty">Не указано имя параметра для типа группы</system:String>
+    <system:String x:Key="MainWindow.LevelParamNameEmpty">Не указано имя параметра для уровня</system:String>
+    <system:String x:Key="MainWindow.LevelShortNameParamNameEmpty">Не указано имя параметра для этажа</system:String>
+    <system:String x:Key="MainWindow.PhaseParamNameEmpty">Не указано имя параметра для стадии</system:String>
+    <system:String x:Key="MainWindow.FirstDispatcherGroupingLevelParamNameEmpty">Не указано имя параметра для группировки диспетчера 1</system:String>
+    <system:String x:Key="MainWindow.SecondDispatcherGroupingLevelParamNameEmpty">Не указано имя параметра для группировки диспетчера 2</system:String>
+    <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevelParamNameEmpty">Не указано имя параметра для группировки диспетчера 3</system:String>
+    
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 

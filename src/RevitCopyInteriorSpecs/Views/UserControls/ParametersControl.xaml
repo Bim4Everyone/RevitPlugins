@@ -23,6 +23,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -37,6 +39,7 @@
                 Margin="5" 
                 Text="{DynamicResource MainWindow.ProjectParametersSettings}" />
 
+            
             <TextBlock
                     Grid.Row="1"
                     Grid.Column="0"
@@ -50,6 +53,7 @@
                     Padding="1"
                     Text="{Binding Path=ParametersVM.GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}"/>
 
+            
             <TextBlock
                     Grid.Row="3"
                     Grid.Column="0"
@@ -62,6 +66,7 @@
                     Margin="5" 
                     Padding="1"
                     Text="{Binding Path=ParametersVM.LevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
+            
             
             <TextBlock
                     Grid.Row="5"
@@ -78,6 +83,20 @@
 
             
             <TextBlock
+                    Grid.Row="7"
+                    Grid.Column="0"
+                    Margin="5 5 5 0"
+                    Text="{DynamicResource MainWindow.Phase}"/>
+
+            <TextBox
+                    Grid.Row="8"
+                    Grid.Column="0"
+                    Margin="5" 
+                    Padding="1"
+                    Text="{Binding Path=ParametersVM.PhaseParamName, UpdateSourceTrigger=PropertyChanged}"/>
+
+
+            <TextBlock
                 Grid.Row="1"
                 Grid.Column="1"
                 Margin="5 5 5 0"
@@ -90,6 +109,7 @@
                 Padding="1"
                 Text="{Binding Path=ParametersVM.FirstDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
 
+            
             <TextBlock
                 Grid.Row="3"
                 Grid.Column="1"
@@ -103,6 +123,7 @@
                 Padding="1"
                 Text="{Binding Path=ParametersVM.SecondDispatcherGroupingLevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
 
+            
             <TextBlock
                 Grid.Row="5"
                 Grid.Column="1"

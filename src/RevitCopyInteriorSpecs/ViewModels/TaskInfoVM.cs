@@ -4,13 +4,13 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitCopyInteriorSpecs.ViewModels {
     internal class TaskInfoVM : BaseViewModel {
-        private string _groupType;
+        private string _groupType = string.Empty;
         private Level _level;
-        private string _levelShortName;
+        private string _levelShortName = string.Empty;
         private Phase _phase;
-        private string _firstDispatcherGroupingLevel;
-        private string _secondDispatcherGroupingLevel;
-        private string _thirdDispatcherGroupingLevel;
+        private string _firstDispatcherGroupingLevel = string.Empty;
+        private string _secondDispatcherGroupingLevel = string.Empty;
+        private string _thirdDispatcherGroupingLevel = string.Empty;
 
         public TaskInfoVM() { }
 

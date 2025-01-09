@@ -36,18 +36,19 @@ namespace RevitCopyInteriorSpecs.Services {
         }
 
         /// <summary>
-        /// Устанавливает параметры спецификации.
+        /// Устанавливает значения параметрам спецификации.
         /// </summary>
-        public void SetSpecParams(ViewSchedule newViewSpec, DispatcherOption dispatcherOption) {
-            newViewSpec.SetParamValue(dispatcherOption.FirstGroupingLevelParamName, dispatcherOption.FirstGroupingLevelParamValue);
-            newViewSpec.SetParamValue(dispatcherOption.SecondGroupingLevelParamName, dispatcherOption.SecondGroupingLevelParamValue);
-            newViewSpec.SetParamValue(dispatcherOption.ThirdGroupingLevelParamName, dispatcherOption.ThirdGroupingLevelParamValue);
+        public void SetSpecParams(ViewSchedule newViewSpec, ParametersOption dispatcherOption) {
+            newViewSpec.SetParamValue(dispatcherOption.FirstParamName, dispatcherOption.FirstParamValue);
+            newViewSpec.SetParamValue(dispatcherOption.SecondParamName, dispatcherOption.SecondParamValue);
+            newViewSpec.SetParamValue(dispatcherOption.ThirdParamName, dispatcherOption.ThirdParamValue);
+            newViewSpec.SetParamValue(dispatcherOption.FourthParamName, dispatcherOption.FourthParamValue);
         }
 
         /// <summary>
-        /// Изменяет фильтры спецификации.
+        /// Изменяет фильтр спецификации, когда он хранит string.
         /// </summary>
-        public void ChangeSpecFilters(ViewSchedule spec, string specFilterName, string newFilterValue) {
+        public void ChangeSpecFilter(ViewSchedule spec, string specFilterName, string newFilterValue) {
             ScheduleDefinition specificationDefinition = spec.Definition;
             List<ScheduleFilter> specificationFilters = specificationDefinition.GetFilters().ToList();
             List<ScheduleFilter> newScheduleFilters = new List<ScheduleFilter>();
@@ -65,9 +66,9 @@ namespace RevitCopyInteriorSpecs.Services {
         }
 
         /// <summary>
-        /// Изменяет фильтры спецификации для ElementId.
+        /// Изменяет фильтр спецификации, когда он хранит ElementId.
         /// </summary>
-        public void ChangeSpecFilters(ViewSchedule spec, string specFilterName, ElementId newFilterValue) {
+        public void ChangeSpecFilter(ViewSchedule spec, string specFilterName, ElementId newFilterValue) {
             ScheduleDefinition specificationDefinition = spec.Definition;
             List<ScheduleFilter> specificationFilters = specificationDefinition.GetFilters().ToList();
             List<ScheduleFilter> newScheduleFilters = new List<ScheduleFilter>();

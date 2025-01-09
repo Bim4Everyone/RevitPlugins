@@ -5,6 +5,7 @@ namespace RevitCopyInteriorSpecs.ViewModels.MainViewModelParts {
         private string _groupTypeParamName = string.Empty;
         private string _levelParamName = string.Empty;
         private string _levelShortNameParamName = string.Empty;
+        private string _phaseParamName = string.Empty;
         private string _firstDispatcherGroupingLevelParamName = string.Empty;
         private string _secondDispatcherGroupingLevelParamName = string.Empty;
         private string _thirdDispatcherGroupingLevelParamName = string.Empty;
@@ -22,6 +23,11 @@ namespace RevitCopyInteriorSpecs.ViewModels.MainViewModelParts {
         public string LevelShortNameParamName {
             get => _levelShortNameParamName;
             set => this.RaiseAndSetIfChanged(ref _levelShortNameParamName, value);
+        }
+
+        public string PhaseParamName {
+            get => _phaseParamName;
+            set => this.RaiseAndSetIfChanged(ref _phaseParamName, value);
         }
 
         public string FirstDispatcherGroupingLevelParamName {

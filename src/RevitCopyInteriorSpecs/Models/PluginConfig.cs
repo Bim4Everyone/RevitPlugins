@@ -25,6 +25,7 @@ namespace RevitCopyInteriorSpecs.Models {
         public string GroupTypeParamName { get; set; }
         public string LevelParamName { get; set; }
         public string LevelShortNameParamName { get; set; }
+        public string PhaseParamName { get; set; }
         public string FirstDispatcherGroupingLevelParamName { get; set; }
         public string SecondDispatcherGroupingLevelParamName { get; set; }
         public string ThirdDispatcherGroupingLevelParamName { get; set; }

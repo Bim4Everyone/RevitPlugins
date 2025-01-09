@@ -79,7 +79,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
                             SetSpecParams(newViewSpec, task);
                             ChangeSpecFilters(newViewSpec, task);
                         } catch(ArgumentException e) {
-                            _errorReport += $"- {e.Message};" + Environment.NewLine + Environment.NewLine;
+                            _errorReport += $"- {e.Message} - \"{newViewSpecName}\";" + Environment.NewLine + Environment.NewLine;
                             continue;
                         }
                     }
@@ -96,6 +96,35 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         private bool CanAcceptView() {
             if(TasksVM.TasksForWork.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.NoTasksCreated");
+                return false;
+            }
+
+            if(ParametersVM.GroupTypeParamName == string.Empty) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.GroupTypeParamNameEmpty");
+                return false;
+            }
+            if(ParametersVM.LevelParamName == string.Empty) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.LevelParamNameEmpty");
+                return false;
+            }
+            if(ParametersVM.LevelShortNameParamName == string.Empty) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.LevelShortNameParamNameEmpty");
+                return false;
+            }
+            if(ParametersVM.PhaseParamName == string.Empty) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.PhaseParamNameEmpty");
+                return false;
+            }
+            if(ParametersVM.FirstDispatcherGroupingLevelParamName == string.Empty) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.FirstDispatcherGroupingLevelParamNameEmpty");
+                return false;
+            }
+            if(ParametersVM.SecondDispatcherGroupingLevelParamName == string.Empty) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.SecondDispatcherGroupingLevelParamNameEmpty");
+                return false;
+            }
+            if(ParametersVM.ThirdDispatcherGroupingLevelParamName == string.Empty) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ThirdDispatcherGroupingLevelParamNameEmpty");
                 return false;
             }
 
@@ -116,14 +145,16 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
 
         private void SetSpecParams(ViewSchedule newViewSpec, TaskInfoVM task) {
-            var dispatcherOption = new DispatcherOption {
-                FirstGroupingLevelParamName = ParametersVM.FirstDispatcherGroupingLevelParamName,
-                SecondGroupingLevelParamName = ParametersVM.SecondDispatcherGroupingLevelParamName,
-                ThirdGroupingLevelParamName = ParametersVM.ThirdDispatcherGroupingLevelParamName,
+            var dispatcherOption = new ParametersOption {
+                FirstParamName = ParametersVM.FirstDispatcherGroupingLevelParamName,
+                SecondParamName = ParametersVM.SecondDispatcherGroupingLevelParamName,
+                ThirdParamName = ParametersVM.ThirdDispatcherGroupingLevelParamName,
+                FourthParamName = ParametersVM.PhaseParamName,
 
-                FirstGroupingLevelParamValue = task.FirstDispatcherGroupingLevel,
-                SecondGroupingLevelParamValue = task.SecondDispatcherGroupingLevel,
-                ThirdGroupingLevelParamValue = task.ThirdDispatcherGroupingLevel
+                FirstParamValue = task.FirstDispatcherGroupingLevel,
+                SecondParamValue = task.SecondDispatcherGroupingLevel,
+                ThirdParamValue = task.ThirdDispatcherGroupingLevel,
+                FourthParamValue = task.Phase.Id
             };
 
             _specificationService.SetSpecParams(newViewSpec, dispatcherOption);
@@ -131,10 +162,11 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
 
         private void ChangeSpecFilters(ViewSchedule spec, TaskInfoVM task) {
-            _specificationService.ChangeSpecFilters(spec, ParametersVM.GroupTypeParamName, task.GroupType);
-            _specificationService.ChangeSpecFilters(spec, ParametersVM.LevelParamName, task.Level.Id);
-            _specificationService.ChangeSpecFilters(spec, ParametersVM.LevelShortNameParamName, task.LevelShortName);
+            _specificationService.ChangeSpecFilter(spec, ParametersVM.GroupTypeParamName, task.GroupType);
+            _specificationService.ChangeSpecFilter(spec, ParametersVM.LevelParamName, task.Level.Id);
+            _specificationService.ChangeSpecFilter(spec, ParametersVM.LevelShortNameParamName, task.LevelShortName);
         }
+
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
@@ -148,6 +180,9 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             ParametersVM.LevelShortNameParamName =
                 setting?.LevelShortNameParamName ??
                     _localizationService.GetLocalizedString("MainWindow.LevelShortNameParamName");
+            ParametersVM.PhaseParamName =
+                setting?.PhaseParamName ??
+                    _localizationService.GetLocalizedString("MainWindow.PhaseParamName");
             ParametersVM.FirstDispatcherGroupingLevelParamName =
                 setting?.FirstDispatcherGroupingLevelParamName ??
                     _localizationService.GetLocalizedString("MainWindow.FirstDispatcherGroupingLevelParamName");
@@ -166,6 +201,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             setting.GroupTypeParamName = ParametersVM.GroupTypeParamName;
             setting.LevelParamName = ParametersVM.LevelParamName;
             setting.LevelShortNameParamName = ParametersVM.LevelShortNameParamName;
+            setting.PhaseParamName = ParametersVM.PhaseParamName;
             setting.FirstDispatcherGroupingLevelParamName = ParametersVM.FirstDispatcherGroupingLevelParamName;
             setting.SecondDispatcherGroupingLevelParamName = ParametersVM.SecondDispatcherGroupingLevelParamName;
             setting.ThirdDispatcherGroupingLevelParamName = ParametersVM.ThirdDispatcherGroupingLevelParamName;
