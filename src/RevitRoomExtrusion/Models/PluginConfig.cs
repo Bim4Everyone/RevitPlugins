@@ -23,5 +23,7 @@ namespace RevitRoomExtrusion.Models {
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
         public string SaveProperty { get; set; }
+        public string ExtrusionHeight { get; set; } 
+        public string ExtrusionFamilyName { get; set; } 
     }
 }
