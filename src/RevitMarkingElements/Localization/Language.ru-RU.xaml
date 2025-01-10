@@ -6,8 +6,9 @@
     
     <system:String x:Key="MainWindow.Title">Пример команды</system:String>
     <system:String x:Key="MainWindow.Hello">Привет Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
-
+    <system:String x:Key="MainWindow.HelloCheck">Нет подходящих элементов и линий.</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Нумерация элементов.</system:String>
+    <system:String x:Key="MainWindow.ErrorNoElements">Необходимо пометить элементы линиями.</system:String>
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>
