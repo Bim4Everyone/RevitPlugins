@@ -42,7 +42,7 @@ namespace RevitMarkingElements.Models {
             }).ToList();
         }
 
-        private bool HasMarkParameter(Category category) {
+        public bool HasMarkParameter(Category category) {
             var collector = new FilteredElementCollector(Document)
                 .OfCategoryId(category.Id)
                 .WhereElementIsNotElementType()
