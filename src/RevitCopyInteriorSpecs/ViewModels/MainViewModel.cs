@@ -62,7 +62,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         private void LoadView() {
             LoadConfig();
             SelectedSpecsVM.GetSelectedSpecs();
-            TasksVM.TasksForWork.Add(new TaskInfoVM());
+            TasksVM.TasksForWork.Add(new TaskInfoViewModel());
         }
 
 
@@ -70,7 +70,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
             SaveConfig();
             var transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
             using(Transaction transaction = _revitRepository.Document.StartTransaction(transactionName)) {
-                foreach(TaskInfoVM task in TasksVM.TasksForWork) {
+                foreach(TaskInfoViewModel task in TasksVM.TasksForWork) {
                     foreach(ViewSchedule spec in SelectedSpecsVM.SelectedSpecs) {
                         string specOldName = spec.Name;
                         string newViewSpecName = $"{specOldName}_{task.Phase.Name}_{task.GroupType}_{task.LevelShortName}";
@@ -134,7 +134,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
                 return false;
             }
 
-            foreach(TaskInfoVM task in TasksVM.TasksForWork) {
+            foreach(TaskInfoViewModel task in TasksVM.TasksForWork) {
                 if(task.Level is null) {
                     ErrorText = _localizationService.GetLocalizedString("MainWindow.NotAllLevelsSelected");
                     return false;
@@ -150,7 +150,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         }
 
 
-        private void SetSpecParams(ViewSchedule newViewSpec, TaskInfoVM task) {
+        private void SetSpecParams(ViewSchedule newViewSpec, TaskInfoViewModel task) {
             var dispatcherOption = new ParametersOption {
                 FirstParamName = ParametersVM.FirstDispatcherGroupingLevelParamName,
                 SecondParamName = ParametersVM.SecondDispatcherGroupingLevelParamName,
@@ -167,7 +167,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         }
 
 
-        private void ChangeSpecFilters(ViewSchedule spec, TaskInfoVM task) {
+        private void ChangeSpecFilters(ViewSchedule spec, TaskInfoViewModel task) {
             _specificationService.ChangeSpecFilter(spec, ParametersVM.GroupTypeParamName, task.GroupType);
             _specificationService.ChangeSpecFilter(spec, ParametersVM.LevelParamName, task.Level.Id);
             _specificationService.ChangeSpecFilter(spec, ParametersVM.LevelShortNameParamName, task.LevelShortName);

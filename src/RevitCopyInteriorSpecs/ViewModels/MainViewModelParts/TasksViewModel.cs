@@ -13,8 +13,8 @@ namespace RevitCopyInteriorSpecs.ViewModels.MainViewModelParts {
     internal class TasksViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
-        private ObservableCollection<TaskInfoVM> _tasksForWork = new ObservableCollection<TaskInfoVM>();
-        private TaskInfoVM _selectedTask;
+        private ObservableCollection<TaskInfoViewModel> _tasksForWork = new ObservableCollection<TaskInfoViewModel>();
+        private TaskInfoViewModel _selectedTask;
 
         private List<Level> _levels;
         private List<Phase> _phases;
@@ -59,12 +59,12 @@ namespace RevitCopyInteriorSpecs.ViewModels.MainViewModelParts {
         public ICommand GeneralThirdDispatcherGroupingLevelChangedCommand { get; }
 
 
-        public ObservableCollection<TaskInfoVM> TasksForWork {
+        public ObservableCollection<TaskInfoViewModel> TasksForWork {
             get => _tasksForWork;
             set => this.RaiseAndSetIfChanged(ref _tasksForWork, value);
         }
 
-        public TaskInfoVM SelectedTask {
+        public TaskInfoViewModel SelectedTask {
             get => _selectedTask;
             set => this.RaiseAndSetIfChanged(ref _selectedTask, value);
         }
@@ -122,7 +122,7 @@ namespace RevitCopyInteriorSpecs.ViewModels.MainViewModelParts {
         /// Задача содержит информацию о начальном и конечном уровне, с которыми нужно работать; выбранную область видимости и спеки
         /// </summary>
         private void AddTask() {
-            TasksForWork.Add(new TaskInfoVM());
+            TasksForWork.Add(new TaskInfoViewModel());
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace RevitCopyInteriorSpecs.ViewModels.MainViewModelParts {
         }
 
         private void SetTasksPropValues(string propName, object propValue) {
-            foreach(TaskInfoVM task in TasksForWork) {
+            foreach(TaskInfoViewModel task in TasksForWork) {
                 var prop = task.GetType().GetProperty(propName);
                 prop.SetValue(task, propValue);
             }
