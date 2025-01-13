@@ -14,6 +14,7 @@
     <system:String x:Key="MainWindow.SecondDispatcherGroupingLevelParamName">_Группа Видов</system:String>
     <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevelParamName">Назначение вида</system:String>
 
+    <system:String x:Key="MainWindow.NoSpecsSelected">Не выбрано ни одной спецификации</system:String>
     <system:String x:Key="MainWindow.NoTasksCreated">Не создано ни одной задачи</system:String>
     <system:String x:Key="MainWindow.NotAllLevelsSelected">Не во всех задачах выбран уровень</system:String>
     <system:String x:Key="MainWindow.NotAllPhasesSelected">Не во всех задачах выбрана стадия</system:String>

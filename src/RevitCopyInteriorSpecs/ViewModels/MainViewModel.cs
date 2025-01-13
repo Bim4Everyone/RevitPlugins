@@ -61,6 +61,7 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
         private void LoadView() {
             LoadConfig();
+            SelectedSpecsVM.GetSelectedSpecs();
             TasksVM.TasksForWork.Add(new TaskInfoVM());
         }
 
@@ -94,6 +95,11 @@ namespace RevitCopyInteriorSpecs.ViewModels {
 
 
         private bool CanAcceptView() {
+            if(SelectedSpecsVM.SelectedSpecs.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.NoSpecsSelected");
+                return false;
+            }
+
             if(TasksVM.TasksForWork.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.NoTasksCreated");
                 return false;
