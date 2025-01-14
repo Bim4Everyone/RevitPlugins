@@ -60,9 +60,9 @@ namespace RevitKrChecker.Models {
                 "Автостоянка",
                 "Пристройка"
             };
-            var FOP_BlockSMR_Check = new ParamCheck("ФОП_Блок СМР", "ФОП_Блок СМР", new ContainsCheckRule(), trueValues);
+            var blockSmrCheck = new ParamCheck("ФОП_Блок СМР", "ФОП_Блок СМР", new ContainsCheckRule(), trueValues);
 
-            stoppingChecks.Add(FOP_BlockSMR_Check);
+            stoppingChecks.Add(blockSmrCheck);
             return stoppingChecks;
         }
 

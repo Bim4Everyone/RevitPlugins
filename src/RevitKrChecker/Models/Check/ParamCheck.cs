@@ -28,6 +28,7 @@ namespace RevitKrChecker.Models.Check {
 
         public bool Check(Element element, out CheckInfo info) {
             string targetParamValue = element.GetParamValue<string>(TargetParamName);
+            targetParamValue = targetParamValue is null ? string.Empty : targetParamValue;
 
             if(TrueValues is null) {
                 throw new ArgumentNullException("The correct values were not passed.");

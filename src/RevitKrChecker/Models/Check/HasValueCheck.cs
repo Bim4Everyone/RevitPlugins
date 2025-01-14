@@ -17,12 +17,12 @@ namespace RevitKrChecker.Models.Check {
             string targetParamValue = element.GetParamValue<string>(TargetParamName);
 
             if(string.IsNullOrEmpty(targetParamValue)) {
-                info = null;
-                return true;
+                info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
+                return false;
             }
 
-            info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
-            return false;
+            info = null;
+            return true;
         }
 
         public string GetTooltip() {
