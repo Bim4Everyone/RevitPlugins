@@ -1,5 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <UseDevExpress>true</UseDevExpress>
+        <UseDevExpress>false</UseDevExpress>
     </PropertyGroup>
+    <ItemGroup>
+      <Folder Include="Localization\" />
+    </ItemGroup>
 </Project>

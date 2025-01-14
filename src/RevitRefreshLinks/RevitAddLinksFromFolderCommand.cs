@@ -1,16 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -27,9 +19,9 @@ using RevitRefreshLinks.Views;
 
 namespace RevitRefreshLinks {
     [Transaction(TransactionMode.Manual)]
-    public class RevitRefreshLinksCommand : BasePluginCommand {
-        public RevitRefreshLinksCommand() {
-            PluginName = "RevitRefreshLinks";
+    public class RevitAddLinksFromFolderCommand : BasePluginCommand {
+        public RevitAddLinksFromFolderCommand() {
+            PluginName = "Добавить связанные файлы из папки";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -41,10 +33,10 @@ namespace RevitRefreshLinks {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                kernel.Bind<MainViewModel>().ToSelf();
-                kernel.Bind<MainWindow>().ToSelf()
+                kernel.Bind<UpdateLinksViewModel>().ToSelf();
+                kernel.Bind<UpdateLinksWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>())
+                        c => c.Kernel.Get<UpdateLinksViewModel>())
                     .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                         c => c.Kernel.Get<ILocalizationService>());
 
@@ -54,7 +46,7 @@ namespace RevitRefreshLinks {
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
 
-                Notification(kernel.Get<MainWindow>());
+                Notification(kernel.Get<UpdateLinksWindow>());
             }
         }
     }

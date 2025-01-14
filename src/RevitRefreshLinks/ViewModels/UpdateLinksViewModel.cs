@@ -7,7 +7,7 @@ using dosymep.WPF.ViewModels;
 using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.ViewModels {
-    internal class MainViewModel : BaseViewModel {
+    internal class UpdateLinksViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
@@ -15,7 +15,7 @@ namespace RevitRefreshLinks.ViewModels {
         private string _errorText;
         private string _saveProperty;
 
-        public MainViewModel(
+        public UpdateLinksViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
             ILocalizationService localizationService) {
@@ -51,7 +51,7 @@ namespace RevitRefreshLinks.ViewModels {
 
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+                ErrorText = _localizationService.GetLocalizedString("UpdateLinksWindow.HelloCheck");
                 return false;
             }
 
@@ -62,7 +62,7 @@ namespace RevitRefreshLinks.ViewModels {
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+            SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("UpdateLinksWindow.Hello");
         }
 
         private void SaveConfig() {
