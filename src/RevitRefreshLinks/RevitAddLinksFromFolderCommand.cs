@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -8,14 +7,12 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
 using RevitRefreshLinks.Models;
-using RevitRefreshLinks.ViewModels;
-using RevitRefreshLinks.Views;
+using RevitRefreshLinks.Services;
 
 namespace RevitRefreshLinks {
     [Transaction(TransactionMode.Manual)]
@@ -29,25 +26,41 @@ namespace RevitRefreshLinks {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<UIApplication>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ILinksProvider>()
+                    .To<LinksProvider>()
+                    .InSingletonScope();
+                kernel.Bind<ILinksLoader>()
+                    .To<LinksLoader>()
+                    .InSingletonScope();
 
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
-
-                kernel.Bind<UpdateLinksViewModel>().ToSelf();
-                kernel.Bind<UpdateLinksWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<UpdateLinksViewModel>())
-                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                        c => c.Kernel.Get<ILocalizationService>());
+                kernel.Bind<AddLinksFromFolderConfig>()
+                    .ToMethod(c => AddLinksFromFolderConfig.GetPluginConfig())
+                    .InTransientScope();
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-
                 kernel.UseXtraLocalization(
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
+                var localizationService = kernel.Get<ILocalizationService>();
+                kernel.UseXtraOpenFileDialog<LinksProvider>(
+                    title: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Title"),
+                    filter: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Filter"),
+                    initialDirectory: GetInitialFolder(kernel),
+                    multiSelect: true);
 
-                Notification(kernel.Get<UpdateLinksWindow>());
+                var links = kernel.Get<ILinksProvider>().GetFolderLinks();
+                kernel.Get<ILinksLoader>().LoadLinks(links);
+                Notification(true);
             }
+        }
+
+        private string GetInitialFolder(IKernel kernel) {
+            return kernel.Get<AddLinksFromFolderConfig>()
+                .GetSettings(kernel.Get<UIApplication>().ActiveUIDocument.Document)
+                .InitialFolderPath ?? string.Empty;
         }
     }
 }

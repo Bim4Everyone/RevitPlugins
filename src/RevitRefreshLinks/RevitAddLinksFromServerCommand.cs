@@ -30,8 +30,8 @@ namespace RevitRefreshLinks {
                     .ToSelf()
                     .InSingletonScope();
 
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
+                kernel.Bind<AddLinksFromFolderConfig>()
+                    .ToMethod(c => AddLinksFromFolderConfig.GetPluginConfig());
 
                 kernel.Bind<UpdateLinksViewModel>().ToSelf();
                 kernel.Bind<UpdateLinksWindow>().ToSelf()

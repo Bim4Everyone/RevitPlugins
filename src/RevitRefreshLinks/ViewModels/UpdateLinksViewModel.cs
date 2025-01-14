@@ -8,7 +8,7 @@ using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.ViewModels {
     internal class UpdateLinksViewModel : BaseViewModel {
-        private readonly PluginConfig _pluginConfig;
+        private readonly AddLinksFromFolderConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
 
@@ -16,7 +16,7 @@ namespace RevitRefreshLinks.ViewModels {
         private string _saveProperty;
 
         public UpdateLinksViewModel(
-            PluginConfig pluginConfig,
+            AddLinksFromFolderConfig pluginConfig,
             RevitRepository revitRepository,
             ILocalizationService localizationService) {
 
@@ -60,16 +60,14 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private void LoadConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+            AddLinksFromFolderSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("UpdateLinksWindow.Hello");
         }
 
         private void SaveConfig() {
-            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
+            AddLinksFromFolderSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.SaveProperty = SaveProperty;
             _pluginConfig.SaveProjectConfig();
         }
     }
