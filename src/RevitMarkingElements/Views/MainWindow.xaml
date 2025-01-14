@@ -40,7 +40,7 @@
             Margin="10"
             Grid.Row="0">
             <TextBlock
-                Text="Категория элементов:"
+                Text="{DynamicResource MainWindow.CategoriesElements}"
                 Margin="0,0,0,5" />
             <ComboBox
                 ItemsSource="{Binding CategoriesNames}"
@@ -48,11 +48,11 @@
                 Margin="0,0,0,10" />
 
             <CheckBox
-                Content="Нумеровать элементы, не помеченные линиями"
+                Content="{DynamicResource MainWindow.NumberUnmarkedElements}"
                 IsChecked="{Binding IncludeUnselected}"
                 Margin="0,0,0,10" />
             <CheckBox
-                Content="Перенумеровать уже нумерованные"
+                Content="{DynamicResource MainWindow.RenumberMarkedElements}"
                 IsChecked="{Binding RenumberAll}"
                 Margin="0,0,0,10" />
         </StackPanel>

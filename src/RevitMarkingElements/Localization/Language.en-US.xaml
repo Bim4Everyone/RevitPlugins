@@ -3,12 +3,14 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
     <!-- Пример перевода на английский американский язык (google translate) -->
-    
-   <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
+
+    <system:String x:Key="MainWindow.Title">Marking of elements</system:String>
+    <system:String x:Key="MainWindow.CategoriesElements">Element category:</system:String>
     <system:String x:Key="MainWindow.HelloCheck">There are no matching elements and lines.</system:String>
     <system:String x:Key="MainWindow.TransactionName">Numbering of elements.</system:String>
     <system:String x:Key="MainWindow.ErrorNoElements">It is necessary to mark the elements with lines.</system:String>
+    <system:String x:Key="MainWindow.NumberUnmarkedElements">Number unmarked elements</system:String>
+    <system:String x:Key="MainWindow.RenumberMarkedElements">Renumber already numbered elements</system:String>
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>
