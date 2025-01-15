@@ -5,6 +5,11 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
+
+using RevitMarkingElements.ViewModels;
+
 namespace RevitMarkingElements.Models {
     internal class RevitRepository {
         public RevitRepository(UIApplication uiApplication) {
@@ -17,13 +22,22 @@ namespace RevitMarkingElements.Models {
         public Document Document => ActiveUIDocument.Document;
 
         public List<Category> GetCategoriesWithMarkParam() {
-            return new FilteredElementCollector(Document)
+
+            var markParam = MainViewModel.MarkParam;
+            List<Category> categories = new List<Category>();
+
+            categories = new FilteredElementCollector(Document)
                 .OfClass(typeof(FamilyInstance))
                 .WhereElementIsNotElementType()
+                .Cast<FamilyInstance>()
+                .Where(element => element.IsExistsParam(markParam))
                 .Select(element => element.Category)
-                .Where(category => category != null && HasMarkParameter(category))
-                .Distinct()
+                .Where(category => category != null)
+                .GroupBy(category => category.Id)
+                .Select(group => group.First())
                 .ToList();
+
+            return categories;
         }
 
         public List<Element> GetElementsIntersectingLine(List<Element> elements, CurveElement lineElement) {
@@ -38,57 +52,44 @@ namespace RevitMarkingElements.Models {
                     return false;
 
                 var center = (bbox.Min + bbox.Max) / 2.0;
-                return line.Project(center)?.Distance < 13.3;
+                var lineToObjectDistance = 13.3;
+                return line.Project(center)?.Distance < lineToObjectDistance;
             }).ToList();
-        }
-
-        public bool HasMarkParameter(Category category) {
-            var collector = new FilteredElementCollector(Document)
-                .OfCategoryId(category.Id)
-                .WhereElementIsNotElementType()
-                .FirstOrDefault();
-
-            if(collector != null) {
-                var param = collector.get_Parameter(BuiltInParameter.ALL_MODEL_MARK);
-                return param != null;
-            }
-
-            return false;
         }
 
         public Transaction CreateTransaction(string transactionName) {
             return new Transaction(Document, transactionName);
         }
 
-        public Category GetCategoryById(ElementId categoryId) {
-            return Document.Settings.Categories
-                .Cast<Category>()
-                .FirstOrDefault(cat => cat.Id == categoryId);
-        }
-
-        public List<Element> GetElements(Category category) {
-            if(category == null) {
+        public List<Element> GetElements(ElementId categoryId) {
+            if(categoryId == null) {
                 return new List<Element>();
             }
 
             FilteredElementCollector collector = new FilteredElementCollector(Document);
 
             return collector
-                .WherePasses(new ElementCategoryFilter(category.Id))
+                .WherePasses(new ElementCategoryFilter(categoryId))
                 .WhereElementIsNotElementType()
                 .ToElements()
                 .ToList();
         }
 
         public List<CurveElement> GetLinesAndSplines() {
-            FilteredElementCollector collector = new FilteredElementCollector(Document);
+            var selectedElementIds = ActiveUIDocument.Selection.GetElementIds();
 
-            return collector
-                .OfClass(typeof(CurveElement))
-                .Cast<CurveElement>()
+            if(!selectedElementIds.Any()) {
+                return new List<CurveElement>();
+            }
+
+            return selectedElementIds
+                .Select(id => Document.GetElement(id))
+                .OfType<CurveElement>()
                 .Where(curveElement =>
                     curveElement.GeometryCurve != null &&
-                    (curveElement is ModelLine || curveElement is ModelNurbSpline)).ToList();
+                    (curveElement is ModelLine || curveElement is ModelNurbSpline))
+                .Reverse()
+                .ToList();
         }
 
         public XYZ GetElementCoordinates(Element element) {

@@ -16,19 +16,21 @@ using RevitMarkingElements.Models;
 
 namespace RevitMarkingElements.ViewModels {
     internal class MainViewModel : BaseViewModel {
+        public const BuiltInParameter MarkParam = BuiltInParameter.ALL_MODEL_MARK;
+        private const BuiltInCategory _structuralColumns = BuiltInCategory.OST_StructuralColumns;
+
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
 
-        private const BuiltInParameter _markParam = BuiltInParameter.ALL_MODEL_MARK;
-        private const BuiltInCategory _structuralColumns = BuiltInCategory.OST_StructuralColumns;
-
         private string _errorText;
         private string _selectedCategoryName;
-        private List<string> _categoriesNames;
+        private List<Category> _categories;
         private ElementId _selectedCategoryId;
         private bool _includeUnselected;
         private bool _renumberAll;
+        private List<Element> MarkingElements { get; set; }
+        private List<CurveElement> Lines { get; set; }
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -51,15 +53,17 @@ namespace RevitMarkingElements.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public List<string> CategoriesNames {
-            get => _categoriesNames;
-            set => this.RaiseAndSetIfChanged(ref _categoriesNames, value);
+        public List<Category> Categories {
+            get => _categories;
+            set => this.RaiseAndSetIfChanged(ref _categories, value);
         }
+
         public string SelectedCategoryName {
             get => _selectedCategoryName;
             set {
                 this.RaiseAndSetIfChanged(ref _selectedCategoryName, value);
-                SelectedCategoryId = _revitRepository.GetCategoriesWithMarkParam()
+
+                SelectedCategoryId = _categories
                     .FirstOrDefault(category => category.Name == value)?.Id;
             }
         }
@@ -79,16 +83,11 @@ namespace RevitMarkingElements.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _renumberAll, value);
         }
 
-        public List<Element> MarkingElements { get; set; }
-        public List<CurveElement> Lines { get; set; }
-
         private void LoadCategories() {
             var allCategories = _revitRepository.GetCategoriesWithMarkParam();
 
-            SelectedCategoryName = allCategories
-                .FirstOrDefault(x => x.Id.GetIdValue() == (int) _structuralColumns)?.Name;
-
-            CategoriesNames = allCategories.Select(x => x.Name).Distinct().ToList();
+            Categories = allCategories.ToList();
+            SelectedCategoryName = allCategories.FirstOrDefault(x => x.Id.AsBuiltInCategory() == _structuralColumns)?.Name;
         }
 
         private void NumberMarkingElements() {
@@ -98,7 +97,7 @@ namespace RevitMarkingElements.ViewModels {
                 transaction.Start();
 
                 int counter = StartingCounter();
-                var processedElements = ProcessElementsByLines(ref counter);
+                List<Element> processedElements = ProcessElementsByLines(ref counter);
                 ProcessUnselectedElements(ref counter, processedElements);
 
                 transaction.Commit();
@@ -107,8 +106,7 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private void PrepareMarkingElements() {
-            var category = _revitRepository.GetCategoryById(SelectedCategoryId);
-            MarkingElements = _revitRepository.GetElements(category);
+            MarkingElements = _revitRepository.GetElements(SelectedCategoryId);
             Lines = _revitRepository.GetLinesAndSplines();
         }
 
@@ -139,7 +137,7 @@ namespace RevitMarkingElements.ViewModels {
 
         private int AssignMarksToElements(List<Element> elements, int counter, List<Element> processedElements) {
             foreach(var markingElement in elements) {
-                var markParam = markingElement.GetParam(_markParam);
+                var markParam = markingElement.GetParam(MarkParam);
                 if(markParam != null && !markParam.IsReadOnly) {
                     markParam.Set($"{counter++}");
                     processedElements.Add(markingElement);
@@ -164,7 +162,7 @@ namespace RevitMarkingElements.ViewModels {
 
         private int GetLastMarkNumber() {
             var filledMarks = MarkingElements
-                .Select(markingElement => markingElement.GetParamValue<string>(_markParam))
+                .Select(markingElement => markingElement.GetParamValue<string>(MarkParam))
                 .Where(mark => !string.IsNullOrEmpty(mark) && int.TryParse(mark, out _))
                 .Select(mark => int.Parse(mark))
                 .ToList();
