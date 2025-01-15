@@ -1,4 +1,4 @@
-# RevitPluginTemplate (${{ gen.bundle_name }})
+# RevitPluginTemplate (Название плагина)
 Описание проекта 
 
 # Сборка проекта
