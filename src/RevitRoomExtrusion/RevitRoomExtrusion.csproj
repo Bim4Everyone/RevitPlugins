@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <UseDevExpress>false</UseDevExpress>
-    </PropertyGroup>
+    </PropertyGroup>   
     <ItemGroup>
       <Reference Include="RevitAPI">
         <HintPath>C:\Program Files\Autodesk\Revit 2022\RevitAPI.dll</HintPath>
@@ -11,13 +11,5 @@
         <HintPath>C:\Program Files\Autodesk\Revit 2022\RevitAPIUI.dll</HintPath>
         <Private>False</Private>
       </Reference>
-    </ItemGroup>
-    <ItemGroup>
-      <Reference Update="dosymep.Bim4Everyone">
-        <HintPath>C:\Users\Pavel\AppData\Roaming\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\2020\dosymep.Bim4Everyone.dll</HintPath>
-      </Reference>
-      <Reference Update="dosymep.Revit">
-        <HintPath>C:\Users\Pavel\AppData\Roaming\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\2020\dosymep.Revit.dll</HintPath>
-      </Reference>
-    </ItemGroup>
+    </ItemGroup>     
 </Project>

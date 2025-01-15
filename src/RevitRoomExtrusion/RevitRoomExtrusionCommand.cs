@@ -48,13 +48,29 @@ namespace RevitRoomExtrusion {
                     .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                         c => c.Kernel.Get<ILocalizationService>());
 
+                kernel.Bind<ErrorViewModel>().ToSelf();
+                kernel.Bind<ErrorWindow>().ToSelf()
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<ErrorViewModel>())
+                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                        c => c.Kernel.Get<ILocalizationService>());
+
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
                 kernel.UseXtraLocalization(
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
 
-                Notification(kernel.Get<MainWindow>());
+                RoomChecker roomChecker = kernel.Get<RoomChecker>();
+
+                if(roomChecker.IsSelected()) {
+                    if(roomChecker.IsCheked()) {
+                        Notification(kernel.Get<MainWindow>());
+                    } else {
+                        var errorWindow = kernel.Get<ErrorWindow>();
+                        errorWindow.Show();
+                    }                  
+                }                              
             }
         }
     }
