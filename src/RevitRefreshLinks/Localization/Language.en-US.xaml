@@ -1,11 +1,22 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
-    <system:String x:Key="UpdateLinksWindow.Title">Sample command</system:String>
-    <system:String x:Key="UpdateLinksWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="UpdateLinksWindow.HelloCheck">Enter a value for the property to save.</system:String>
-    
-    <system:String x:Key="UpdateLinksWindow.ButtonOk">OK</system:String>
-    <system:String x:Key="UpdateLinksWindow.ButtonCancel">Cancel</system:String>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="UpdateLinksWindow.Title">Sample command</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Hello">Hello Revit!</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.HelloCheck">Enter a value for the property to save.</system:String>
+
+    <system:String
+        x:Key="UpdateLinksWindow.ButtonOk">OK</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String
+        x:Key="SelectLinksFromFolderDialog.Title">Select link files to add</system:String>
+    <system:String
+        x:Key="SelectLinksFromFolderDialog.Filter">Revit files (*.rvt)|*.rvt</system:String>
 </ResourceDictionary>

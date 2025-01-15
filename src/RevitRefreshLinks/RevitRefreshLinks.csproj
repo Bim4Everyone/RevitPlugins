@@ -2,7 +2,4 @@
     <PropertyGroup>
         <UseDevExpress>false</UseDevExpress>
     </PropertyGroup>
-    <ItemGroup>
-      <Folder Include="Localization\" />
-    </ItemGroup>
 </Project>
