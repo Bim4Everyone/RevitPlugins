@@ -10,8 +10,11 @@ namespace RevitRefreshLinks.Models {
                 throw new FileNotFoundException(path);
             }
             Path = path;
+            Name = System.IO.Path.GetFileNameWithoutExtension(Path);
         }
 
         public string Path { get; }
+
+        public string Name { get; }
     }
 }

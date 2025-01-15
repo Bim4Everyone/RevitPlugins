@@ -13,6 +13,7 @@ using Ninject;
 
 using RevitRefreshLinks.Models;
 using RevitRefreshLinks.Services;
+using RevitRefreshLinks.ViewModels;
 
 namespace RevitRefreshLinks {
     [Transaction(TransactionMode.Manual)]
@@ -29,11 +30,17 @@ namespace RevitRefreshLinks {
                 kernel.Bind<UIApplication>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<ILinksProvider>()
-                    .To<LinksProvider>()
+                kernel.Bind<IFolderLinksProvider>()
+                    .To<OneFolderLinksProvider>()
                     .InSingletonScope();
                 kernel.Bind<ILinksLoader>()
                     .To<LinksLoader>()
+                    .InSingletonScope();
+                kernel.Bind<AddLinksFromFolderViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<IConfigProvider>()
+                    .To<ConfigProvider>()
                     .InSingletonScope();
 
                 kernel.Bind<AddLinksFromFolderConfig>()
@@ -45,22 +52,21 @@ namespace RevitRefreshLinks {
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
                 var localizationService = kernel.Get<ILocalizationService>();
-                kernel.UseXtraOpenFileDialog<LinksProvider>(
+                kernel.UseXtraOpenFileDialog<OneFolderLinksProvider>(
                     title: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Title"),
                     filter: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Filter"),
                     initialDirectory: GetInitialFolder(kernel),
                     multiSelect: true);
 
-                var links = kernel.Get<ILinksProvider>().GetFolderLinks();
-                kernel.Get<ILinksLoader>().LoadLinks(links);
-                Notification(true);
+                var vm = kernel.Get<AddLinksFromFolderViewModel>();
+                Notification(vm.ShowWindow());
             }
         }
 
         private string GetInitialFolder(IKernel kernel) {
             return kernel.Get<AddLinksFromFolderConfig>()
                 .GetSettings(kernel.Get<UIApplication>().ActiveUIDocument.Document)
-                .InitialFolderPath ?? string.Empty;
+                ?.InitialFolderPath ?? string.Empty;
         }
     }
 }
