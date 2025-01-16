@@ -1,4 +1,4 @@
-<base:PlatformWindow
+<base:PlatformWindow 
     
     x:Class="RevitRoomExtrusion.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -14,8 +14,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="Выдавливание помещений"
-    Height="250" Width="400"
-    MinHeight="250" MinWidth="400">
+    Height="250" Width="450"
+    MinHeight="250" MinWidth="450">
     
     <b:Interaction.Triggers>
         <b:EventTrigger
@@ -25,12 +25,7 @@
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width = "Auto"/>
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-
+    <Grid> 
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="Auto" />
@@ -40,14 +35,14 @@
             Grid.Row="0"            
             Height="Auto"
             Orientation="Vertical"
-            HorizontalAlignment="Left">
+            HorizontalAlignment="Stretch">
 
             <Label
                 Content="Введите высоту выдавливания"
                 Margin="5"
                 Padding="5" />
             <TextBox
-                Text="{Binding ExtrusionHeight}"
+                Text="{Binding ExtrusionHeight, UpdateSourceTrigger=PropertyChanged}"
                 Margin="5"
                 Padding="5"/>
             <Label
@@ -55,7 +50,7 @@
                 Margin="5"
                 Padding="5"/>
             <TextBox
-                Text="{Binding ExtrusionFamilyName}"
+                Text="{Binding ExtrusionFamilyName, UpdateSourceTrigger=PropertyChanged}"
                 Margin="5"                
                 Padding="5"/>
                 

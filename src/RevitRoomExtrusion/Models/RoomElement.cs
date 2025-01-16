@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
@@ -45,9 +46,11 @@ namespace RevitRoomExtrusion.Models {
             ReferenceWithContext referenceWithContext = refIntersec.FindNearest(pointCenter, pointDirection);
             ElementId foundElementId = referenceWithContext.GetReference().ElementId;
 
-            Element foundElement = _document.GetElement(foundElementId);
-            double foundElementLocation = foundElement.get_BoundingBox(null).Max.Z;
-            return foundElementLocation;
+            double proximity = referenceWithContext.Proximity;
+            double foundElementLocation = pointCenter.Z - proximity;
+            double roundedFoundElementLocation =  UnitUtils.ConvertFromInternalUnits(foundElementLocation, 
+                                                                                     UnitTypeId.Millimeters);            
+            return Math.Round(roundedFoundElementLocation);
         }
 
         private CurveArrArray GetArrArray() {

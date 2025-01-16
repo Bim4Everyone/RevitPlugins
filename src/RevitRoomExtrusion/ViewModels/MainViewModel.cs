@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -66,8 +69,17 @@ namespace RevitRoomExtrusion.ViewModels {
             LoadConfig();
         }
         private void AcceptView() {            
-            SaveConfig();            
-            _familyCreator.CreatingFamilyes(_extrusionFamilyName, _extrusionHeight, SelectedRooms);
+            SaveConfig();
+            using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+                progressDialogService.MaxValue = SelectedRooms.Count;
+                progressDialogService.StepValue = progressDialogService.MaxValue / 20;
+                progressDialogService.DisplayTitleFormat = "Обработка помещений... [{0}]\\[{1}]";
+                var progress = progressDialogService.CreateProgress();
+                var ct = progressDialogService.CreateCancellationToken();
+                progressDialogService.Show();
+                
+                _familyCreator.CreatingFamilyes(_extrusionFamilyName, _extrusionHeight, SelectedRooms, progress, ct);
+            }
         }
 
         private bool CanAcceptView() {

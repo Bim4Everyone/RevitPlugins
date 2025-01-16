@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using System.Windows;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
@@ -15,10 +15,8 @@ namespace RevitRoomExtrusion.Models {
         public bool IsSelected() {
             bool result = true;
             if(_revitRepository.GetRooms().Count <= 0) {
-                MessageBox.Show("Помещения не выбраны",
-                    "Ошибка",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+
+                TaskDialog.Show("BIM", "Помещения не выбраны");                
                 result = false;
             }
             return result;
@@ -32,10 +30,7 @@ namespace RevitRoomExtrusion.Models {
                 }
             }
             if(!resultCheck) {
-                MessageBox.Show("В выборке содержатся помещения с ошибками",
-                    "Предупреждение",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                TaskDialog.Show("BIM", "Выбраны помещения с ошибками");                
             }
             return resultCheck;
         }

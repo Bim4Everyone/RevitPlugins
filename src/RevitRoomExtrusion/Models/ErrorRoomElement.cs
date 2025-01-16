@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
@@ -15,8 +16,8 @@ namespace RevitRoomExtrusion.Models {
         public ErrorRoomElement(RevitRepository revitRepository, Room room, ICommand showElementCommand) {
             _revitRepository = revitRepository;
             ElementId = room.Id;
-            Name = room.Name;
-            NumberRoom = GetParamNumber(room);
+            RoomName = GetParamName(room);
+            RoomNumber = GetParamNumber(room);
             LevelName = room.Level.Name;
             ErrorDescription = GetErrorDescription(room);
             ShowElementCommand = showElementCommand;
@@ -24,8 +25,8 @@ namespace RevitRoomExtrusion.Models {
 
         public ICommand ShowElementCommand { get; set; }
         public ElementId ElementId { get; set; }
-        public string Name { get; set; }
-        public string NumberRoom { get; set; }
+        public string RoomName { get; set; }
+        public string RoomNumber { get; set; }
         public string LevelName { get; set; }
         public string ErrorDescription { get; set; }
 
@@ -42,15 +43,30 @@ namespace RevitRoomExtrusion.Models {
             }
             return errorDescription;
         }
-
         private string GetParamNumber(Room room) {
-            string roomGroupShortName = room.GetParamValue<string>(SharedParamsConfig.Instance.RoomGroupShortName);
-            string numberPrefix = null;
-            if(roomGroupShortName != null) {
-                numberPrefix = $"{roomGroupShortName}-";
+            
+            string numberPrefix = null;            
+            string roomGroupShortName = room.GetParamValue<string>(SharedParamsConfig.Instance.RoomGroupShortName);                        
+            if(!room.IsExistsParam(SharedParamsConfig.Instance.RoomGroupShortName)) {
+                if(roomGroupShortName != null) {
+                    numberPrefix = $"{roomGroupShortName}-";
+                } 
             }
-            string numberRoom = $"{numberPrefix}{room.Number}";
-            return numberRoom;
-        }        
+            Parameter numberParameter = room.get_Parameter(BuiltInParameter.ROOM_NUMBER);
+            if(numberParameter.AsString() != "") {
+                return $"{numberPrefix}{numberParameter.AsString()}";
+            } else {
+                return "Нет номера";
+            }            
+        }
+        private string GetParamName(Room room) {
+            Parameter nameParameter = room.get_Parameter(BuiltInParameter.ROOM_NAME);
+            if(nameParameter.AsString() != "") {                
+                string roomName = nameParameter.AsString();
+                return roomName;
+            } else {
+                return "Нет имени";
+            }
+        }
     }
 }

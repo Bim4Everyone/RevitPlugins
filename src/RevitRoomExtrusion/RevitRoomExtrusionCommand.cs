@@ -69,8 +69,11 @@ namespace RevitRoomExtrusion {
                     } else {
                         var errorWindow = kernel.Get<ErrorWindow>();
                         errorWindow.Show();
-                    }                  
-                }                              
+                        throw new OperationCanceledException();
+                    }
+                } else {
+                    throw new OperationCanceledException();
+                }
             }
         }
     }

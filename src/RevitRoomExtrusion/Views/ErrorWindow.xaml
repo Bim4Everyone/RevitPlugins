@@ -31,8 +31,8 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding Name}" Header="Наименование" />
-                <DataGridTextColumn Binding="{Binding NumberRoom}" Header="Номер" />
+                <DataGridTextColumn Binding="{Binding RoomName}" Header="Наименование" />
+                <DataGridTextColumn Binding="{Binding RoomNumber}" Header="Номер" />
                 <DataGridTextColumn Binding="{Binding LevelName}" Header="Уровень" />                
                 <DataGridTextColumn Binding="{Binding ErrorDescription}" Header="Тип ошибки" />
             </DataGrid.Columns>

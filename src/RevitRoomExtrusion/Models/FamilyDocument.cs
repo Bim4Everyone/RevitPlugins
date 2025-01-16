@@ -21,8 +21,8 @@ namespace RevitRoomExtrusion.Models {
 
             string templatePath = @"C:\ProgramData\Autodesk\RVT 2022\Family Templates\English\Metric Generic Model.rft";
             string directory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Temp\";
-            double locationString = location * 304.8;
-            string famName = $"Држ_проверка_{familyName}_отм.{locationString}";
+            double locationString = location;
+            string famName = $"Држ_Проверка_{familyName}_Отм.{locationString}";
             string famPath = $"{directory}{famName}.rfa";
             
             _application = application;
@@ -42,12 +42,12 @@ namespace RevitRoomExtrusion.Models {
         public Document CreateFamily() {
             
             using(Transaction tf = new Transaction(_familyDocument, "Изменение категории, создание выдавливания")) {
-               
+                
                 tf.Start();
                 Category familyCategory = Category.GetCategory(_familyDocument, BuiltInCategory.OST_Roads);
                 _familyDocument.OwnerFamily.FamilyCategory = familyCategory;
-
-                List<Extrusion> extrusionList = new List<Extrusion>();
+                List<Extrusion> extrusionList = new List<Extrusion>();                
+                
                 foreach(RoomElement roomElement in _roomList) {
                     CurveArrArray curveArrArray = roomElement.ArrArray;
                     Extrusion extrusion = CreateExtrusion(curveArrArray, _amount);
@@ -57,6 +57,7 @@ namespace RevitRoomExtrusion.Models {
                     .OfClass(typeof(Material))
                     .WhereElementIsNotElementType()
                     .ToElements();
+               
                 ElementId matsId = null;
                 foreach(Material mat in materials) {
                     if(mat.Name.Equals("Glass", StringComparison.OrdinalIgnoreCase) || 
@@ -89,8 +90,9 @@ namespace RevitRoomExtrusion.Models {
             SketchPlane sketchPlane = SketchPlane.Create(_familyDocument, plane);
 
             Autodesk.Revit.Creation.FamilyItemFactory familyCreator = _familyDocument.FamilyCreate;
-
-            double amountFt = amount / 304.8;          
+            
+            double amountFt = UnitUtils.ConvertToInternalUnits(amount, UnitTypeId.Millimeters);                     
+            
             Extrusion extrusion = familyCreator.NewExtrusion(true, curveArrArray, sketchPlane, amountFt);
             return extrusion;
         }
