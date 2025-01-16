@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 using RevitRefreshLinks.Models;
 
@@ -17,7 +19,15 @@ namespace RevitRefreshLinks.Services {
 
 
         public ICollection<ILink> GetLinks() {
-            throw new NotImplementedException();
+            // TODO
+            // Временная заглушка для тестов плагина, пока не будет готово нормальное окно выбора файлов из RS
+            string path = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "test\\RevitRefreshLinks\\rs-fullpath-list.txt");
+            if(!File.Exists(path)) {
+                File.Create(path);
+            }
+            return File.ReadLines(path).Select(line => new Link(line)).ToArray();
         }
     }
 }
