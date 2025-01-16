@@ -10,11 +10,11 @@ using RevitRefreshLinks.Services;
 
 namespace RevitRefreshLinks.ViewModels {
     internal class AddLinksViewModel : BaseViewModel {
-        private readonly ILinksToAddProvider _linksProvider;
+        private readonly IOneSourceLinksProvider _linksProvider;
         private readonly ILinksLoader _linksLoader;
 
         public AddLinksViewModel(
-            ILinksToAddProvider linksProvider,
+            IOneSourceLinksProvider linksProvider,
             ILinksLoader linksLoader) {
 
             _linksProvider = linksProvider

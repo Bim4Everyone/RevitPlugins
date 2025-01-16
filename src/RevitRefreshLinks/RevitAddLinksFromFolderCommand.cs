@@ -30,7 +30,7 @@ namespace RevitRefreshLinks {
                 kernel.Bind<UIApplication>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<ILinksToAddProvider>()
+                kernel.Bind<IOneSourceLinksProvider>()
                     .To<OneFolderLinksProvider>()
                     .InSingletonScope();
                 kernel.Bind<ILinksLoader>()

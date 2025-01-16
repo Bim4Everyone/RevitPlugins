@@ -6,7 +6,7 @@ using System.Linq;
 using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.Services {
-    internal class OneRsFolderLinksProvider : ILinksToAddProvider {
+    internal class OneRsFolderLinksProvider : IOneSourceLinksProvider {
         private readonly RevitRepository _revitRepository;
         private readonly IConfigProvider _configProvider;
 
