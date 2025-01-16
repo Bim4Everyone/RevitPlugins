@@ -31,7 +31,10 @@ namespace RevitRefreshLinks.Services {
                 settings.InitialFolderPath = _openFileDialog.File.DirectoryName;
                 config.SaveProjectConfig();
 
+                const string rvtExtension = ".rvt";
+
                 return _openFileDialog.Files
+                    .Where(file => file.Extension.Equals(rvtExtension))
                     .Select(file => new Link(file.FullName))
                     .ToArray();
             } else {

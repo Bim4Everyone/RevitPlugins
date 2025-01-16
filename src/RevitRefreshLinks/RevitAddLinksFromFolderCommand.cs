@@ -58,8 +58,7 @@ namespace RevitRefreshLinks {
                     initialDirectory: GetInitialFolder(kernel),
                     multiSelect: true);
 
-                var vm = kernel.Get<AddLinksViewModel>();
-                Notification(vm.ShowWindow());
+                Notification(kernel.Get<AddLinksViewModel>().ShowWindow());
             }
         }
 

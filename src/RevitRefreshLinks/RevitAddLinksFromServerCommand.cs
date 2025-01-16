@@ -53,8 +53,7 @@ namespace RevitRefreshLinks {
                     CultureInfo.GetCultureInfo("ru-RU"));
                 var localizationService = kernel.Get<ILocalizationService>();
 
-                var vm = kernel.Get<AddLinksViewModel>();
-                Notification(vm.ShowWindow());
+                Notification(kernel.Get<AddLinksViewModel>().ShowWindow());
             }
         }
     }
