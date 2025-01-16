@@ -51,8 +51,8 @@ namespace RevitRefreshLinks.Models {
             }
         }
 
-        public bool ReloadLink(RevitLinkType link, string path, out string error) {
-            ModelPath modelPath = ConvertToModelPath(path);
+        public bool ReloadLink(RevitLinkType link, string source, out string error) {
+            ModelPath modelPath = ConvertToModelPath(source);
             error = string.Empty;
             try {
                 var linkLoadResult = link.LoadFrom(modelPath, _worksetConfiguration);
