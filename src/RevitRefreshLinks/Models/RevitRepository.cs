@@ -10,8 +10,10 @@ using dosymep.Revit;
 
 namespace RevitRefreshLinks.Models {
     internal class RevitRepository {
-        private readonly RevitLinkOptions _revitLinkOptions
+        private readonly RevitLinkOptions _revitLinkOptionsLocal
             = new RevitLinkOptions(true, new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets));
+        private readonly RevitLinkOptions _revitLinkOptionsServer
+            = new RevitLinkOptions(false, new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets));
         private readonly WorksetConfiguration _worksetConfiguration
             = new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets);
 
@@ -31,7 +33,8 @@ namespace RevitRefreshLinks.Models {
             ModelPath modelPath = ConvertToModelPath(path);
             error = string.Empty;
             try {
-                var linkLoadResult = RevitLinkType.Create(Document, modelPath, _revitLinkOptions);
+                var opts = GetLinkOptions(modelPath);
+                var linkLoadResult = RevitLinkType.Create(Document, modelPath, opts);
                 if(!LinkLoadResult.IsCodeSuccess(linkLoadResult.LoadResult)) {
                     return false;
                 }
@@ -76,6 +79,10 @@ namespace RevitRefreshLinks.Models {
                 .OfClass(typeof(RevitLinkType))
                 .Cast<RevitLinkType>()
                 .ToArray();
+        }
+
+        private RevitLinkOptions GetLinkOptions(ModelPath modelPath) {
+            return modelPath.ServerPath ? _revitLinkOptionsServer : _revitLinkOptionsLocal;
         }
     }
 }
