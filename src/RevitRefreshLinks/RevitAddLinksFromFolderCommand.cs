@@ -30,13 +30,13 @@ namespace RevitRefreshLinks {
                 kernel.Bind<UIApplication>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<IFolderLinksProvider>()
+                kernel.Bind<ILinksToAddProvider>()
                     .To<OneFolderLinksProvider>()
                     .InSingletonScope();
                 kernel.Bind<ILinksLoader>()
                     .To<LinksLoader>()
                     .InSingletonScope();
-                kernel.Bind<AddLinksFromFolderViewModel>()
+                kernel.Bind<AddLinksViewModel>()
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<IConfigProvider>()
@@ -58,7 +58,7 @@ namespace RevitRefreshLinks {
                     initialDirectory: GetInitialFolder(kernel),
                     multiSelect: true);
 
-                var vm = kernel.Get<AddLinksFromFolderViewModel>();
+                var vm = kernel.Get<AddLinksViewModel>();
                 Notification(vm.ShowWindow());
             }
         }

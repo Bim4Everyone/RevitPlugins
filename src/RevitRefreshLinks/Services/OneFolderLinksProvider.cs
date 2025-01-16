@@ -7,7 +7,7 @@ using dosymep.SimpleServices;
 using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.Services {
-    internal class OneFolderLinksProvider : IFolderLinksProvider {
+    internal class OneFolderLinksProvider : ILinksToAddProvider {
         private readonly RevitRepository _revitRepository;
         private readonly IConfigProvider _configProvider;
         private readonly IOpenFileDialogService _openFileDialog;
@@ -23,7 +23,7 @@ namespace RevitRefreshLinks.Services {
         }
 
 
-        public ICollection<ILink> GetFolderLinks() {
+        public ICollection<ILink> GetLinks() {
             if(_openFileDialog.ShowDialog()) {
                 var config = _configProvider.GetAddLinksFromFolderConfig();
                 var settings = config.GetSettings(_revitRepository.Document)

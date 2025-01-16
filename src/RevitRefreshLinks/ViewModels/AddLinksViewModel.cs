@@ -9,12 +9,12 @@ using RevitRefreshLinks.Models;
 using RevitRefreshLinks.Services;
 
 namespace RevitRefreshLinks.ViewModels {
-    internal class AddLinksFromFolderViewModel : BaseViewModel {
-        private readonly IFolderLinksProvider _linksProvider;
+    internal class AddLinksViewModel : BaseViewModel {
+        private readonly ILinksToAddProvider _linksProvider;
         private readonly ILinksLoader _linksLoader;
 
-        public AddLinksFromFolderViewModel(
-            IFolderLinksProvider linksProvider,
+        public AddLinksViewModel(
+            ILinksToAddProvider linksProvider,
             ILinksLoader linksLoader) {
 
             _linksProvider = linksProvider
@@ -25,7 +25,7 @@ namespace RevitRefreshLinks.ViewModels {
 
 
         public bool ShowWindow() {
-            var links = _linksProvider.GetFolderLinks();
+            var links = _linksProvider.GetLinks();
             ICollection<(ILink Link, string Error)> errors;
             using(var progressDialogService = GetPlatformService<IProgressDialogService>()) {
                 var progress = progressDialogService.CreateProgress();

@@ -33,9 +33,10 @@ namespace RevitRefreshLinks.Services {
                         bool success;
                         string error;
                         if(LinkExists(existingLinks, link, out RevitLinkType existingLink)) {
-                            success = _revitRepository.ReloadLink(existingLink, link.Path, out error);
+                            success = false;
+                            error = "Файл уже добавлен в документ";
                         } else {
-                            success = _revitRepository.AddLink(link.Path, out error);
+                            success = _revitRepository.AddLink(link.FullPath, out error);
                         }
                         if(success) {
                             transaction.Commit();
@@ -64,7 +65,7 @@ namespace RevitRefreshLinks.Services {
                     using(var transaction = _revitRepository.Document.StartTransaction("Обновление связи")) {
                         bool success = _revitRepository.ReloadLink(
                             item.LocalLink,
-                            item.SourceLink.Path,
+                            item.SourceLink.FullPath,
                             out string error);
                         if(success) {
                             transaction.Commit();
@@ -86,7 +87,7 @@ namespace RevitRefreshLinks.Services {
             out RevitLinkType existingLink) {
 
             existingLink = existingLinks.FirstOrDefault(
-                t => t.Name.Equals(linkToCheck.Name, StringComparison.InvariantCultureIgnoreCase));
+                t => t.Name.Equals(linkToCheck.NameWithExtension, StringComparison.InvariantCultureIgnoreCase));
             return existingLink != null;
         }
     }

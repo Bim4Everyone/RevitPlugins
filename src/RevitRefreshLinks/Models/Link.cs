@@ -9,11 +9,14 @@ namespace RevitRefreshLinks.Models {
             if(!File.Exists(path)) {
                 throw new FileNotFoundException(path);
             }
-            Path = path;
-            Name = System.IO.Path.GetFileNameWithoutExtension(Path);
+            FullPath = path;
+            Name = System.IO.Path.GetFileNameWithoutExtension(FullPath);
+            NameWithExtension = System.IO.Path.GetFileName(FullPath);
         }
 
-        public string Path { get; }
+        public string FullPath { get; }
+
+        public string NameWithExtension { get; }
 
         public string Name { get; }
     }
