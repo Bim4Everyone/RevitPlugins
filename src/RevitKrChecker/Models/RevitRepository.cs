@@ -54,25 +54,32 @@ namespace RevitKrChecker.Models {
         public List<ICheck> StoppingChecks() {
             List<ICheck> stoppingChecks = new List<ICheck>();
 
-            //Параметр "ФОП_Блок СМР" должен содержать "Корпус", "Автостоянка", "Пристройка"
-            List<string> trueValues = new List<string>() {
-                "Корпус",
-                "Автостоянка",
-                "Пристройка"
-            };
-            var blockSmrCheck = new ParamCheck("ФОП_Блок СМР", "ФОП_Блок СМР", new ContainsCheckRule(), trueValues);
+            // Параметр "ФОП_Блок СМР" должен содержать "Корпус", "Автостоянка", "Пристройка"
+            stoppingChecks.Add(new ParamCheck(
+                "ФОП_Блок СМР",
+                "ФОП_Блок СМР",
+                LevelToFind.Instance,
+                new ContainsCheckRule(),
+                new List<string>() { "Корпус", "Автостоянка", "Пристройка" }));
 
-            stoppingChecks.Add(blockSmrCheck);
             return stoppingChecks;
         }
 
         public List<ICheck> NonStoppingChecks() {
             List<ICheck> nonStoppingChecks = new List<ICheck>();
 
-            //Параметр "Секция СМР" должен быть заполнен
-            var FOP_SekciaSMR_Check = new HasValueCheck("ФОП_Секция СМР", "ФОП_Секция СМР");
+            // Параметр "Секция СМР" должен быть заполнен
+            nonStoppingChecks.Add(new HasValueCheck("ФОП_Секция СМР", "ФОП_Секция СМР", LevelToFind.Instance));
+            // Параметр "Этаж СМР" должен быть заполнен
+            nonStoppingChecks.Add(new HasValueCheck("ФОП_Этаж СМР", "ФОП_Этаж СМР", LevelToFind.Instance));
+            // Параметр "Материал: Имя" начинается с: г02.02, г02.03, г02.04
+            nonStoppingChecks.Add(new ParamCheck(
+                "Материал: Имя",
+                "Имя",
+                LevelToFind.Material,
+                new StartWithCheckRule(),
+                new List<string>() { "г02.02", "г02.03", "г02.04" }));
 
-            nonStoppingChecks.Add(FOP_SekciaSMR_Check);
             return nonStoppingChecks;
         }
     }
