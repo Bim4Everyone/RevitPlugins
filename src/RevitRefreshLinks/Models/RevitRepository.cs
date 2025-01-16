@@ -66,19 +66,19 @@ namespace RevitRefreshLinks.Models {
             }
         }
 
-        public ModelPath ConvertToModelPath(string path) {
-            if(string.IsNullOrWhiteSpace(path)) {
-                throw new ArgumentException(nameof(path));
-            }
-            return ModelPathUtils.ConvertUserVisiblePathToModelPath(path);
-        }
-
         public ICollection<RevitLinkType> GetExistingLinks() {
             return new FilteredElementCollector(Document)
                 .WhereElementIsElementType()
                 .OfClass(typeof(RevitLinkType))
                 .Cast<RevitLinkType>()
                 .ToArray();
+        }
+
+        private ModelPath ConvertToModelPath(string path) {
+            if(string.IsNullOrWhiteSpace(path)) {
+                throw new ArgumentException(nameof(path));
+            }
+            return ModelPathUtils.ConvertUserVisiblePathToModelPath(path);
         }
 
         private RevitLinkOptions GetLinkOptions(ModelPath modelPath) {
