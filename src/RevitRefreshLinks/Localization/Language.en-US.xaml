@@ -19,4 +19,7 @@
         x:Key="SelectLinksFromFolderDialog.Title">Select link files to add</system:String>
     <system:String
         x:Key="SelectLinksFromFolderDialog.Filter">Revit files (*.rvt)|*.rvt</system:String>
+
+    <system:String
+        x:Key="SelectLocalFoldersDialog.Title">Select folders with links to update</system:String>
 </ResourceDictionary>

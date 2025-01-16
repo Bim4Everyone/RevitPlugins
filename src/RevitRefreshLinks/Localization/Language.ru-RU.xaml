@@ -4,19 +4,67 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="UpdateLinksWindow.Title">Пример команды</system:String>
+        x:Key="UpdateLinksWindow.Title">Обновление связей</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.Hello">Привет Revit!</system:String>
+        x:Key="UpdateLinksWindow.EmptySelectionCheck">Выберите связи для обновления.</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
-
+        x:Key="UpdateLinksWindow.EmptySourcesCheck">Выберите папку со связями.</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.ButtonOk">ОК</system:String>
+        x:Key="UpdateLinksWindow.LocalFolder">Локальная папка:</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.ButtonCancel">Отмена</system:String>
+        x:Key="UpdateLinksWindow.ServerFolder">Revit Server папка:</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.SourceDuplicatedStatus">Дублируется</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.SourceNotFoundStatus">Не найден</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.LinkName.Header">Имя связи</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Header">Рабочий набор</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Opened">Открыт</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Closed">Закрыт</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Header">Статус связи</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Loaded">Загружена</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Unloaded">Выгружена</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.LocallyUnloaded">Выгружена локально</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.NotFound">Не найдена</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Unknown">Не определено</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Header">Источник</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Found">Найден</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.NotFound">Не найден</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Duplicated">Дублируется</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.SelectAll">Выбрать все</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.Select">Снять выбор</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.SelectServerFolder">Инвертировать</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.SelectLocalFolder">Выбрать локальную папку</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.SelectServerFolder">Выбрать папку из RS</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.Ok">ОК</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.Cancel">Отмена</system:String>
 
     <system:String
         x:Key="SelectLinksFromFolderDialog.Title">Выберите связи для добавления</system:String>
     <system:String
         x:Key="SelectLinksFromFolderDialog.Filter">Revit файлы (*.rvt)|*.rvt</system:String>
+
+    <system:String
+        x:Key="SelectLocalFoldersDialog.Title">Выберите папки со связями для обновления</system:String>
 </ResourceDictionary>

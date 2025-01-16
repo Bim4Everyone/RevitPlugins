@@ -24,11 +24,47 @@
     </i:Interaction.Triggers>
 
     <Grid>
+        <Grid.Resources>
+            <Style
+                TargetType="DataGridRow">
+                <Setter
+                    Property="Background"
+                    Value="Transparent" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="0" />
+                <Setter
+                    Property="Padding"
+                    Value="5" />
+                <Style.Triggers>
+                    <Trigger
+                        Property="IsSelected"
+                        Value="True">
+                        <Setter
+                            Property="Background"
+                            Value="Transparent" />
+                        <Setter
+                            Property="Foreground"
+                            Value="Black" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style
+                TargetType="DataGridCell">
+                <Setter
+                    Property="BorderThickness"
+                    Value="0" />
+                <Setter
+                    Property="Padding"
+                    Value="5" />
+                <Setter
+                    Property="Background"
+                    Value="Transparent" />
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition
                 Height="50" />
-            <RowDefinition
-                Height="Auto" />
             <RowDefinition
                 Height="60" />
             <RowDefinition />
@@ -70,83 +106,38 @@
             TextWrapping="Wrap"
             Text="{Binding folder_path}" />
 
-        <TextBlock
+        <DataGrid
             Grid.Row="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
-            Margin="10,5,10,5"
-            TextWrapping="Wrap">
-                Внимание!
-                <LineBreak />
-                Нельзя обновить связь, если типоразмер связи находится в закрытом рабочем наборе.
-                Рабочий набор типоразмера связи настраивается в диспетчере проекта!
-        </TextBlock>
-
-        <ListView
-            Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Margin="10,5,10,10"
             ItemsSource="{Binding links}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn
-                        Width="25">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox
-                                    IsChecked="{Binding is_checked}"
-                                    IsEnabled="{Binding is_ws_open}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                        <GridViewColumn.HeaderContainerStyle>
-                            <Style
-                                TargetType="GridViewColumnHeader">
-                                <Setter
-                                    Property="IsHitTestVisible"
-                                    Value="False" />
-                            </Style>
-                        </GridViewColumn.HeaderContainerStyle>
-                    </GridViewColumn>
-                    <GridViewColumn
-                        Header="Имя связи"
-                        Width="Auto"
-                        DisplayMemberBinding="{Binding link_name}" />
-                    <GridViewColumn
-                        Header="Рабочий набор"
-                        Width="120"
-                        DisplayMemberBinding="{Binding ws_status}" />
-                    <GridViewColumn
-                        Header="Статус связи"
-                        Width="Auto"
-                        DisplayMemberBinding="{Binding link_status}" />
-                </GridView>
-            </ListView.View>
-        </ListView>
+
+        </DataGrid>
 
         <Button
-            Grid.Row="4"
+            Grid.Row="3"
             Grid.Column="0"
             Margin="10"
             Content="Выбрать все"
             Command="{Binding SetTrueCommand}" />
 
         <Button
-            Grid.Row="4"
+            Grid.Row="3"
             Grid.Column="1"
             Margin="10"
             Content="Снять выбор"
             Command="{Binding SetFalseCommand}" />
 
         <Button
-            Grid.Row="4"
+            Grid.Row="3"
             Grid.Column="2"
             Margin="10"
             Content="Инвертировать"
             Command="{Binding InvertCommand}" />
 
         <StackPanel
-            Grid.Row="5"
+            Grid.Row="4"
             Grid.ColumnSpan="3"
             Height="45"
             Orientation="Horizontal"

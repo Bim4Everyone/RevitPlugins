@@ -8,7 +8,6 @@ using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.ViewModels {
     internal class UpdateLinksViewModel : BaseViewModel {
-        private readonly AddLinksFromFolderConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
 
@@ -16,11 +15,9 @@ namespace RevitRefreshLinks.ViewModels {
         private string _saveProperty;
 
         public UpdateLinksViewModel(
-            AddLinksFromFolderConfig pluginConfig,
             RevitRepository revitRepository,
             ILocalizationService localizationService) {
 
-            _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _localizationService = localizationService;
 
@@ -42,11 +39,9 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private void LoadView() {
-            LoadConfig();
         }
 
         private void AcceptView() {
-            SaveConfig();
         }
 
         private bool CanAcceptView() {
@@ -57,18 +52,6 @@ namespace RevitRefreshLinks.ViewModels {
 
             ErrorText = null;
             return true;
-        }
-
-        private void LoadConfig() {
-            AddLinksFromFolderSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        }
-
-        private void SaveConfig() {
-            AddLinksFromFolderSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-            _pluginConfig.SaveProjectConfig();
         }
     }
 }
