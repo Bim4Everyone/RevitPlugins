@@ -66,8 +66,9 @@
             <RowDefinition
                 Height="50" />
             <RowDefinition
-                Height="60" />
-            <RowDefinition />
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
             <RowDefinition
                 Height="45" />
             <RowDefinition
@@ -88,53 +89,95 @@
                 Height="25"
                 Width="200"
                 Margin="10,10,10,5"
-                Content="Выбрать локальную папку"
-                Command="{Binding PickFolderCommand}" />
+                Content="{DynamicResource UpdateLinksWindow.Buttons.SelectLocalFolder}"
+                Command="{Binding SelectLocalSourceCommand}" />
             <Button
                 Height="25"
                 Width="200"
                 Margin="0,10,10,5"
-                Content="Выбрать папку из RS"
-                Command="{Binding PickFolderCommand}" />
+                Content="{DynamicResource UpdateLinksWindow.Buttons.SelectServerFolder}"
+                Command="{Binding SelectServerSourceCommand}" />
         </DockPanel>
 
-        <TextBlock
+        <StackPanel
             Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="3"
-            Margin="10,5,10,20"
-            TextWrapping="Wrap"
-            Text="{Binding folder_path}" />
+            Margin="10,5,10,0">
+
+            <DockPanel>
+                <TextBlock
+                    TextWrapping="Wrap"
+                    Text="{DynamicResource UpdateLinksWindow.LocalFolder}" />
+                <TextBlock
+                    TextWrapping="Wrap"
+                    Text="C:\\azaza" />
+            </DockPanel>
+
+            <DockPanel>
+                <TextBlock
+                    TextWrapping="Wrap"
+                    Text="{DynamicResource UpdateLinksWindow.ServerFolder}" />
+                <TextBlock
+                    TextWrapping="Wrap"
+                    Text="RSN:\\azaza" />
+            </DockPanel>
+        </StackPanel>
 
         <DataGrid
             Grid.Row="2"
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Margin="10,5,10,10"
-            ItemsSource="{Binding links}">
-
+            GridLinesVisibility="None"
+            HeadersVisibility="None"
+            AutoGenerateColumns="False"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False"
+            Background="LightBlue"
+            BorderThickness="1"
+            RowBackground="Transparent"
+            AlternatingRowBackground="Transparent"
+            SelectionUnit="Cell"
+            ItemsSource="{Binding LinksToUpdate}">
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn
+                    Binding="{Binding IsSelected}" />
+                <DataGridTextColumn
+                    IsReadOnly="True"
+                    Binding="{Binding Name}" />
+                <DataGridTextColumn
+                    IsReadOnly="True"
+                    Binding="{Binding DisplayWorkset}" />
+                <DataGridTextColumn
+                    IsReadOnly="True"
+                    Binding="{Binding DisplayLinkStatus}" />
+                <DataGridTextColumn
+                    IsReadOnly="True"
+                    Binding="{Binding SourceStatus}" />
+            </DataGrid.Columns>
         </DataGrid>
 
         <Button
             Grid.Row="3"
             Grid.Column="0"
             Margin="10"
-            Content="Выбрать все"
-            Command="{Binding SetTrueCommand}" />
+            Content="{DynamicResource UpdateLinksWindow.List.Button.SelectAll}"
+            Command="{Binding SelectAllLinksCommand}" />
 
         <Button
             Grid.Row="3"
             Grid.Column="1"
             Margin="10"
-            Content="Снять выбор"
-            Command="{Binding SetFalseCommand}" />
+            Content="{DynamicResource UpdateLinksWindow.List.Button.UnselectAll}"
+            Command="{Binding UnselectAllLinksCommand}" />
 
         <Button
             Grid.Row="3"
             Grid.Column="2"
             Margin="10"
-            Content="Инвертировать"
-            Command="{Binding InvertCommand}" />
+            Content="{DynamicResource UpdateLinksWindow.List.Button.Invert}"
+            Command="{Binding InvertSelectedLinksCommand}" />
 
         <StackPanel
             Grid.Row="4"
@@ -151,16 +194,16 @@
             <Button
                 Margin="10"
                 Width="80"
-                Content="{DynamicResource UpdateLinksWindow.ButtonOk}"
                 IsDefault="True"
                 Click="ButtonOk_Click"
+                Content="{DynamicResource UpdateLinksWindow.Buttons.Ok}"
                 Command="{Binding AcceptViewCommand}" />
 
             <Button
                 Margin="10"
                 Width="80"
-                Content="{DynamicResource UpdateLinksWindow.ButtonCancel}"
                 IsCancel="True"
+                Content="{DynamicResource UpdateLinksWindow.Buttons.Cancel}"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>

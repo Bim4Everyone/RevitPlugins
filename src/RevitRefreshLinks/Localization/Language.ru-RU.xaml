@@ -48,9 +48,9 @@
     <system:String
         x:Key="UpdateLinksWindow.List.Button.SelectAll">Выбрать все</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.List.Button.Select">Снять выбор</system:String>
+        x:Key="UpdateLinksWindow.List.Button.UnselectAll">Снять выбор</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.List.Button.SelectServerFolder">Инвертировать</system:String>
+        x:Key="UpdateLinksWindow.List.Button.Invert">Инвертировать</system:String>
     <system:String
         x:Key="UpdateLinksWindow.Buttons.SelectLocalFolder">Выбрать локальную папку</system:String>
     <system:String
