@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 
 namespace RevitRoomExtrusion.Models {
     internal class RevitRepository {
@@ -15,9 +17,9 @@ namespace RevitRoomExtrusion.Models {
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
         public Application Application => UIApplication.Application;
-        public Document Document => ActiveUIDocument.Document;         
+        public Document Document => ActiveUIDocument.Document;
 
-        public View3D GetView3D(string name) {
+        public View3D GetView3D(string familyName) {
             var views = new FilteredElementCollector(Document)
                 .OfCategory(BuiltInCategory.OST_Views)
                 .WhereElementIsNotElementType()
@@ -35,29 +37,35 @@ namespace RevitRoomExtrusion.Models {
             }
             var viewType3D = viewTypes3D.First();
 
-            var existingView = views.FirstOrDefault(v => v.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            string userName = Application.Username;
+            string name3Dview = $"${userName}/{familyName}/Проверка дорожек";
+            var existingView = views.FirstOrDefault(v => v.Name.Equals(name3Dview, StringComparison.OrdinalIgnoreCase));
             if(existingView != null) {
                 return existingView as View3D;
             }
-            View3D view3D = View3D.CreateIsometric(Document, viewType3D.Id);
-            view3D.Name = name;
-            return view3D;
+
+            using(Transaction t = Document.StartTransaction("BIM: Создание 3D вида проверки дорожек")) {                
+                View3D view3D = View3D.CreateIsometric(Document, viewType3D.Id);
+                view3D.Name = name3Dview;                
+                t.Commit();
+                return view3D;
+            }            
         }
-        public List<Room> GetRooms() {
-            ICollection<ElementId> selectedObjectIds = ActiveUIDocument.Selection.GetElementIds();
-            List<Room> rooms = new List<Room>();
-            foreach(ElementId id in selectedObjectIds) {
-                Element element = Document.GetElement(id);
-                if(element is Room room) {
-                    rooms.Add(room);
-                }
-            }
-            return rooms;
-        } 
-        public void SetRoom(ElementId elementId) {
-            List<ElementId> listRoomElements = new List<ElementId>();            
-            listRoomElements.Add(elementId);            
+
+        public List<Room> GetSelectedRooms() {
+            return ActiveUIDocument.Selection
+                .GetElementIds()
+                .Select(x => Document.GetElement(x))
+                .OfType<Room>()
+                .ToList();
+        }
+
+        public void SetSelectedRoom(ElementId elementId) {
+            List<ElementId> listRoomElements = new List<ElementId>() { 
+                elementId };                        
             ActiveUIDocument.Selection.SetElementIds(listRoomElements);
         }
     }
+}
+
 }

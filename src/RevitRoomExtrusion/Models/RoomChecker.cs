@@ -14,7 +14,7 @@ namespace RevitRoomExtrusion.Models {
         }
         public bool IsSelected() {
             bool result = true;
-            if(_revitRepository.GetRooms().Count <= 0) {
+            if(_revitRepository.GetSelectedRooms().Count <= 0) {
 
                 TaskDialog.Show("BIM", "Помещения не выбраны");                
                 result = false;
@@ -23,15 +23,12 @@ namespace RevitRoomExtrusion.Models {
         }
         public bool IsCheked() {
             bool resultCheck = true;
-            foreach(Room room in _revitRepository.GetRooms()) {
+            foreach(Room room in _revitRepository.GetSelectedRooms()) {
                 if(IsInValidRoom(room)) {
                     resultCheck = false;
                     break;
                 }
-            }
-            if(!resultCheck) {
-                TaskDialog.Show("BIM", "Выбраны помещения с ошибками");                
-            }
+            }            
             return resultCheck;
         }
         public bool IsInValidRoom(Room room) {

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
@@ -66,6 +68,6 @@ namespace RevitRoomExtrusion.Models {
                 curveArrArray.Append(curveArray);
             } 
             return curveArrArray;
-        }
+        }        
     }
 }

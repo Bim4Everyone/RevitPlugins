@@ -26,12 +26,12 @@ namespace RevitRoomExtrusion.ViewModels {
         public ObservableCollection<ErrorRoomElement> ErrorRooms { get; set; }
 
         private void ShowElement(ElementId elementId) {
-            _revitRepository.SetRoom(elementId);
+            _revitRepository.SetSelectedRoom(elementId);
         }
         private List<Room> GetErrorRooms() {
             List<Room> result = new List<Room>();
             RoomChecker roomChecker = new RoomChecker(_revitRepository);
-            foreach(Room room in _revitRepository.GetRooms()) {
+            foreach(Room room in _revitRepository.GetSelectedRooms()) {
                 if(roomChecker.IsInValidRoom(room)) {
                     result.Add(room);
                 }

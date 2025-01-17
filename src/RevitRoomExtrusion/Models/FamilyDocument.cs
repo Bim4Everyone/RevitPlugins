@@ -9,14 +9,11 @@ namespace RevitRoomExtrusion.Models {
         
         private readonly Application _application;
         private readonly Document _familyDocument;
-        private readonly string _templatePath;
-        private readonly double _amount;
-        private readonly List<RoomElement> _roomList; 
+        private readonly string _templatePath;         
 
         public FamilyDocument(
             Application application, 
-            double amount, double location, 
-            List<RoomElement> roomList, 
+            double location,             
             string familyName) {             
 
             string templatePath = @"C:\ProgramData\Autodesk\RVT 2022\Family Templates\English\Metric Generic Model.rft";
@@ -26,9 +23,7 @@ namespace RevitRoomExtrusion.Models {
             string famPath = $"{directory}{famName}.rfa";
             
             _application = application;
-            _templatePath = templatePath;
-            _amount = amount;
-            _roomList = roomList;
+            _templatePath = templatePath;            
 
             _familyDocument = _application.NewFamilyDocument(_templatePath);
 
@@ -39,18 +34,18 @@ namespace RevitRoomExtrusion.Models {
         public string FamName { get; }
         public string FamPath { get; }         
 
-        public Document CreateFamily() {
+        public Document CreateDocument(double amount, List<RoomElement> roomList) {
             
-            using(Transaction tf = new Transaction(_familyDocument, "Изменение категории, создание выдавливания")) {
-                
+            using(Transaction tf = new Transaction(_familyDocument, "Изменение категории, создание выдавливания")) {            
+
                 tf.Start();
                 Category familyCategory = Category.GetCategory(_familyDocument, BuiltInCategory.OST_Roads);
                 _familyDocument.OwnerFamily.FamilyCategory = familyCategory;
                 List<Extrusion> extrusionList = new List<Extrusion>();                
                 
-                foreach(RoomElement roomElement in _roomList) {
+                foreach(RoomElement roomElement in roomList) {
                     CurveArrArray curveArrArray = roomElement.ArrArray;
-                    Extrusion extrusion = CreateExtrusion(curveArrArray, _amount);
+                    Extrusion extrusion = CreateExtrusion(curveArrArray, amount);
                     extrusionList.Add(extrusion);
                 }
                 var materials = new FilteredElementCollector(_familyDocument)

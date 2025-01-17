@@ -1,68 +1,89 @@
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.DB;
 using System.Linq;
+using System;
+using System.IO;
+using dosymep.Revit;
+
 
 namespace RevitRoomExtrusion.Models {
     internal class FamilyLoader {
-
         private readonly RevitRepository _revitRepository;         
         public FamilyLoader(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }
+
         public FamilySymbol LoadRoomFamily(string path) {
             Family family = null;
             FamilyLoadOptions loadOptions = new FamilyLoadOptions();
-            _revitRepository.Document.LoadFamily(path, loadOptions, out family);
 
-            FamilySymbol familySymbol = null;
-            foreach(ElementId id in family.GetFamilySymbolIds()) {
-                Element element = _revitRepository.Document.GetElement(id);
-                familySymbol = element as FamilySymbol;
-                break;
+            using(Transaction t = _revitRepository.Document.StartTransaction("BIM: Загрузка семейства дорожек")) {
+                _revitRepository.Document.LoadFamily(path, loadOptions, out family);
+                t.Commit();
             }
+                
+            FamilySymbol familySymbol = family.GetFamilySymbolIds()
+                .Select(id => _revitRepository.Document.GetElement(id) as FamilySymbol)
+                .FirstOrDefault(symbol => symbol != null);
+
             if(!familySymbol.IsActive) {
                 familySymbol.Activate();
                 _revitRepository.Document.Regenerate();
             }
+            
+            DeleteRoomFamily(path);
+
             return familySymbol;
         }
+
         private class FamilyLoadOptions : IFamilyLoadOptions {
             public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues) {
                 overwriteParameterValues = true;
                 return true;
             }
-            public bool OnSharedFamilyFound(
-                Family sharedFamily,
-                bool familyInUse,
-                out FamilySource source,
-                out bool overwriteParameterValues) {
+            public bool OnSharedFamilyFound(Family sharedFamily,
+                                            bool familyInUse,
+                                            out FamilySource source,
+                                            out bool overwriteParameterValues) {                
                 source = FamilySource.Project;
                 overwriteParameterValues = true;
                 return true;
             }
         }
-        public void PlaceFamily(FamilySymbol symbol, double zLocation) {
-            XYZ xyz = new XYZ(0, 0, zLocation);
-            FamilyInstance familyInstance = _revitRepository.Document.Create.NewFamilyInstance(
-                xyz, 
-                symbol, 
-                StructuralType.NonStructural);
-        }
-        public bool IsFamilyInstancePlaced(string familyName) {
-            bool resultFam = false;
-            var familyInstances = new FilteredElementCollector(_revitRepository.Document)
-                .OfCategory(BuiltInCategory.OST_Roads)
-                .WhereElementIsNotElementType()
-                .ToElements()
-                .Cast<FamilyInstance>();
 
-            foreach(var familyInstance in familyInstances) {
-                if(familyInstance.Symbol.Name == familyName) {
-                    resultFam = true;
-                    break;
+        private void DeleteRoomFamily(string famPath) {
+            try {
+                if(File.Exists(famPath)) {
+                    File.Delete(famPath);
                 }
+            } catch(Exception) {
             }
-            return resultFam;
+        }
+
+        public void PlaceRoomFamily(FamilySymbol symbol, IGrouping<double, RoomElement> groupRooms, double location) {
+
+            double locationRoom = groupRooms.FirstOrDefault().LocationRoom;
+            double locationFt = UnitUtils.ConvertToInternalUnits(location, UnitTypeId.Millimeters);
+            double locationPlace = locationFt - locationRoom;
+            using(Transaction t = _revitRepository.Document.StartTransaction("BIM: Вставка семейства дорожек")) {
+                XYZ xyz = new XYZ(0, 0, locationPlace);
+                FamilyInstance familyInstance = _revitRepository.Document.Create.NewFamilyInstance(
+                    xyz,
+                    symbol,
+                    StructuralType.NonStructural);
+                t.Commit();
+            }
+        } 
+        
+        public bool IsFamilyInstancePlaced(string familyName) {
+            return new FilteredElementCollector(_revitRepository.Document)
+                .OfCategory(BuiltInCategory.OST_Roads)
+                .WhereElementIsElementType()
+                .Cast<FamilyInstance>()
+                .Any(familyInstance => familyInstance.Name == familyName);                
         }
     }
 }
+
+
+

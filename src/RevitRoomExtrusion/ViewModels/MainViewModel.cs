@@ -15,9 +15,7 @@ namespace RevitRoomExtrusion.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;        
-        private readonly ILocalizationService _localizationService;
-        
-        private readonly FamilyCreator _familyCreator;               
+        private readonly ILocalizationService _localizationService;                       
 
         private string _errorText;
         private string _saveProperty;
@@ -31,9 +29,7 @@ namespace RevitRoomExtrusion.ViewModels {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-            _localizationService = localizationService;              
-
-            _familyCreator = new FamilyCreator(revitRepository);            
+            _localizationService = localizationService;                        
 
             ExtrusionHeight = "2200";
             ExtrusionFamilyName = "Машино-места";
@@ -41,7 +37,7 @@ namespace RevitRoomExtrusion.ViewModels {
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
-            SelectedRooms = _revitRepository.GetRooms();
+            SelectedRooms = _revitRepository.GetSelectedRooms();
         }
 
         public ICommand LoadViewCommand { get; }
@@ -77,8 +73,17 @@ namespace RevitRoomExtrusion.ViewModels {
                 var progress = progressDialogService.CreateProgress();
                 var ct = progressDialogService.CreateCancellationToken();
                 progressDialogService.Show();
+
+                View3D view3d = _revitRepository.GetView3D(_extrusionFamilyName);
                 
-                _familyCreator.CreatingFamilyes(_extrusionFamilyName, _extrusionHeight, SelectedRooms, progress, ct);
+                FamilyCreator familyCreator = new FamilyCreator(_revitRepository);
+                
+                familyCreator.CreatingFamilyes(_extrusionFamilyName, 
+                                               _extrusionHeight, 
+                                               SelectedRooms, 
+                                               view3d, 
+                                               progress, 
+                                               ct);
             }
         }
 
