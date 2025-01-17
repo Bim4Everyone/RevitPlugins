@@ -12,10 +12,10 @@ namespace RevitKrChecker.Models.Check {
     public class CompareParamsCheck : ICheck {
         public CompareParamsCheck(string checkName,
                           string targetParamName,
-                          LevelToFind targetParamLevel,
+                          ParamLevel targetParamLevel,
                           ICheckRule checkRule,
                           string sourceParamName,
-                          LevelToFind sourceParamLevel) {
+                          ParamLevel sourceParamLevel) {
             CheckName = checkName ?? throw new ArgumentNullException(nameof(checkName));
             TargetParamName = targetParamName ?? throw new ArgumentNullException(nameof(targetParamName));
             TargetParamLevel = targetParamLevel;
@@ -26,53 +26,83 @@ namespace RevitKrChecker.Models.Check {
 
         public string CheckName { get; }
         public string TargetParamName { get; }
-        public LevelToFind TargetParamLevel { get; }
+        public ParamLevel TargetParamLevel { get; }
         public ICheckRule CheckRule { get; }
         private string SourceParamName { get; }
-        public LevelToFind SourceParamLevel { get; }
+        public ParamLevel SourceParamLevel { get; }
+
 
         public bool Check(Element element, out CheckInfo info) {
-            //string targetParamValue = element.GetParamValue<string>(TargetParamName);
-            //string sourceParamValue = element.GetParamValue<string>(SourceParamName);
+            Document doc = element.Document;
 
-            //if(CheckRule.Check(targetParamValue, sourceParamValue)) {
-            //    info = null;
-            //    return true;
-            //}
+            if(TargetParamLevel is ParamLevel.Material && SourceParamLevel is ParamLevel.Material) {
 
-            //info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
-            //return false;
+                var materials = element.GetMaterialIds(false)
+                                       .Select(id => doc.GetElement(id))
+                                       .ToList();
 
+                foreach(Element material in materials) {
+                    string targetParamValue = material.GetParamValue<string>(TargetParamName);
+                    string sourceParamValue = material.GetParamValue<string>(SourceParamName);
 
+                    if(!CheckRule.Check(targetParamValue, sourceParamValue)) {
+                        info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
+                        return false;
+                    }
+                }
+                info = null;
+                return true;
 
-            var targetParams = GetParamsToCheck(element, TargetParamName, TargetParamLevel);
+            } else if(TargetParamLevel != ParamLevel.Material && SourceParamLevel != ParamLevel.Material) {
+                Element elementType = doc.GetElement(element.GetTypeId());
+                string targetParamValue = string.Empty;
+                string sourceParamValue = string.Empty;
 
-            foreach(var targetParam in targetParams) {
-                string targetParamValue = targetParam.AsValueString();
+                if(TargetParamLevel is ParamLevel.Type) {
+                    targetParamValue = elementType.GetParamValue<string>(TargetParamName);
+                } else {
+                    targetParamValue = element.GetParamValue<string>(TargetParamName);
+                }
 
-                if(!CheckTrueValues(targetParamValue)) {
+                if(SourceParamLevel is ParamLevel.Type) {
+                    sourceParamValue = elementType.GetParamValue<string>(SourceParamName);
+                } else {
+                    sourceParamValue = element.GetParamValue<string>(SourceParamName);
+                }
+
+                if(!CheckRule.Check(targetParamValue, sourceParamValue)) {
                     info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
                     return false;
                 }
+                info = null;
+                return true;
+
+            } else {
+
             }
+
 
             info = null;
             return true;
         }
 
 
-        private List<Parameter> GetParamsToCheck(Element element, string paramName, LevelToFind paramLevel) {
+
+
+
+
+        private List<Parameter> GetParamsToCheck(Element element, string paramName, ParamLevel paramLevel) {
             Document doc = element.Document;
             switch(paramLevel) {
-                case LevelToFind.Instance:
+                case ParamLevel.Instance:
                     return new List<Parameter> {
                         element.GetParam(paramName)
                     };
-                case LevelToFind.Type:
+                case ParamLevel.Type:
                     return new List<Parameter> {
                         doc.GetElement(element.GetTypeId()).GetParam(paramName)
                     };
-                case LevelToFind.Material:
+                case ParamLevel.Material:
                     return element
                         .GetMaterialIds(false)
                         .Select(id => doc.GetElement(id))

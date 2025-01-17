@@ -1,5 +1,5 @@
 namespace RevitKrChecker.Models {
-    public enum LevelToFind {
+    public enum ParamLevel {
         Instance,
         Type,
         Material

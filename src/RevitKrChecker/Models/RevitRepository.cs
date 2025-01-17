@@ -58,7 +58,7 @@ namespace RevitKrChecker.Models {
             stoppingChecks.Add(new ParamCheck(
                 "ФОП_Блок СМР",
                 "ФОП_Блок СМР",
-                LevelToFind.Instance,
+                ParamLevel.Instance,
                 new ContainsCheckRule(),
                 new List<string>() { "Корпус", "Автостоянка", "Пристройка" }));
 
@@ -69,14 +69,14 @@ namespace RevitKrChecker.Models {
             List<ICheck> nonStoppingChecks = new List<ICheck>();
 
             // Параметр "Секция СМР" должен быть заполнен
-            nonStoppingChecks.Add(new HasValueCheck("ФОП_Секция СМР", "ФОП_Секция СМР", LevelToFind.Instance));
+            nonStoppingChecks.Add(new HasValueCheck("ФОП_Секция СМР", "ФОП_Секция СМР", ParamLevel.Instance));
             // Параметр "Этаж СМР" должен быть заполнен
-            nonStoppingChecks.Add(new HasValueCheck("ФОП_Этаж СМР", "ФОП_Этаж СМР", LevelToFind.Instance));
+            nonStoppingChecks.Add(new HasValueCheck("ФОП_Этаж СМР", "ФОП_Этаж СМР", ParamLevel.Instance));
             // Параметр "Материал: Имя" начинается с: г02.02, г02.03, г02.04
             nonStoppingChecks.Add(new ParamCheck(
                 "Материал: Имя",
                 "Имя",
-                LevelToFind.Material,
+                ParamLevel.Material,
                 new StartWithCheckRule(),
                 new List<string>() { "г02.02", "г02.03", "г02.04" }));
 

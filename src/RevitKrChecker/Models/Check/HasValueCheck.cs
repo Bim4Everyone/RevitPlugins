@@ -10,7 +10,7 @@ namespace RevitKrChecker.Models.Check {
     public class HasValueCheck : ICheck {
         public HasValueCheck(string checkName,
                              string targetParamName,
-                             LevelToFind targetParamLevel) {
+                             ParamLevel targetParamLevel) {
             CheckName = checkName ?? throw new ArgumentNullException(nameof(checkName));
             TargetParamName = targetParamName ?? throw new ArgumentNullException(nameof(targetParamName));
             TargetParamLevel = targetParamLevel;
@@ -18,23 +18,12 @@ namespace RevitKrChecker.Models.Check {
 
         public string CheckName { get; }
         public string TargetParamName { get; }
-        public LevelToFind TargetParamLevel { get; }
+        public ParamLevel TargetParamLevel { get; }
 
 
         public bool Check(Element element, out CheckInfo info) {
             if(element == null)
                 throw new ArgumentNullException(nameof(element));
-
-            //var elems = GetElementsToCheck(element);
-
-            //foreach(var elem in elems) {
-            //    string targetParamValue = elem.GetParamValue<string>(TargetParamName);
-
-            //    if(string.IsNullOrEmpty(targetParamValue)) {
-            //        info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
-            //        return false;
-            //    }
-            //}
 
             var targetParams = GetParamsToCheck(element, TargetParamName, TargetParamLevel);
 
@@ -53,18 +42,18 @@ namespace RevitKrChecker.Models.Check {
 
 
 
-        private List<Parameter> GetParamsToCheck(Element element, string paramName, LevelToFind paramLevel) {
+        private List<Parameter> GetParamsToCheck(Element element, string paramName, ParamLevel paramLevel) {
             Document doc = element.Document;
             switch(paramLevel) {
-                case LevelToFind.Instance:
+                case ParamLevel.Instance:
                     return new List<Parameter> {
                         element.GetParam(paramName)
                     };
-                case LevelToFind.Type:
+                case ParamLevel.Type:
                     return new List<Parameter> {
                         doc.GetElement(element.GetTypeId()).GetParam(paramName)
                     };
-                case LevelToFind.Material:
+                case ParamLevel.Material:
                     return element
                         .GetMaterialIds(false)
                         .Select(id => doc.GetElement(id))
