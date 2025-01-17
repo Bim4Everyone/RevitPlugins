@@ -22,9 +22,26 @@
                 Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-
     <Grid>
+        <!--https://github.com/dotnet/wpf/issues/6302
+        DynamicResource не отображается в Header-->
         <Grid.Resources>
+            <TextBlock
+                x:Key="NameColumnHeader"
+                Text="{DynamicResource UpdateLinksWindow.List.LinkName.Header}"
+                TextWrapping="Wrap" />
+            <TextBlock
+                x:Key="WorksetColumnHeader"
+                Text="{DynamicResource UpdateLinksWindow.List.Workset.Header}"
+                TextWrapping="Wrap" />
+            <TextBlock
+                x:Key="LinkStatusColumnHeader"
+                Text="{DynamicResource UpdateLinksWindow.List.Link.Header}"
+                TextWrapping="Wrap" />
+            <TextBlock
+                x:Key="SourceColumnHeader"
+                Text="{DynamicResource UpdateLinksWindow.List.Source.Header}"
+                TextWrapping="Wrap" />
             <Style
                 TargetType="DataGridRow">
                 <Setter
@@ -187,19 +204,19 @@
                     IsReadOnly="True"
                     Width="*"
                     Binding="{Binding NameWithExtension}"
-                    Header="{DynamicResource UpdateLinksWindow.List.LinkName.Header}" />
+                    Header="{StaticResource NameColumnHeader}" />
                 <DataGridTextColumn
                     IsReadOnly="True"
                     Binding="{Binding DisplayWorksetStatus}"
-                    Header="{DynamicResource UpdateLinksWindow.List.Workset.Header}" />
+                    Header="{StaticResource WorksetColumnHeader}" />
                 <DataGridTextColumn
                     IsReadOnly="True"
                     Binding="{Binding DisplayLinkStatus}"
-                    Header="{DynamicResource UpdateLinksWindow.List.Link.Header}" />
+                    Header="{StaticResource LinkStatusColumnHeader}" />
                 <DataGridTextColumn
                     IsReadOnly="True"
                     Binding="{Binding SourceStatus}"
-                    Header="{DynamicResource UpdateLinksWindow.List.Source.Header}" />
+                    Header="{StaticResource SourceColumnHeader}" />
             </DataGrid.Columns>
         </DataGrid>
 
