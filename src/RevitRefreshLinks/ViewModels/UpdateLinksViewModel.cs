@@ -18,6 +18,7 @@ namespace RevitRefreshLinks.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
         private readonly ITwoSourceLinksProvider _linksProvider;
+        private readonly ILinksLoader _linksLoader;
         private string _errorText;
         private string _selectedLocalSource;
         private string _selectedServerSource;
@@ -26,12 +27,13 @@ namespace RevitRefreshLinks.ViewModels {
         public UpdateLinksViewModel(
             RevitRepository revitRepository,
             ILocalizationService localizationService,
-            ITwoSourceLinksProvider linksProvider) {
+            ITwoSourceLinksProvider linksProvider,
+            ILinksLoader linksLoader) {
 
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _linksProvider = linksProvider ?? throw new ArgumentNullException(nameof(linksProvider));
-
+            _linksLoader = linksLoader ?? throw new ArgumentNullException(nameof(linksLoader));
             LinksToUpdate = new ObservableCollection<LinkToUpdateViewModel>();
             SourceLocalLinks = new ObservableCollection<ILink>();
             SourceServerLinks = new ObservableCollection<ILink>();
@@ -95,15 +97,20 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private void AcceptView() {
+            // TODO add logic to begin update
         }
 
         private bool CanAcceptView() {
-            //if(true) {
-            //    ErrorText = _localizationService.GetLocalizedString("UpdateLinksWindow.HelloCheck");
-            //    return false;
-            //}
+            if(string.IsNullOrWhiteSpace(SelectedLocalSource) && string.IsNullOrWhiteSpace(SelectedServerSource)) {
+                ErrorText = _localizationService.GetLocalizedString("UpdateLinksWindow.EmptySourcesCheck");
+                return false;
+            }
+            if(LinksToUpdate.All(l => !l.IsSelected)) {
+                ErrorText = _localizationService.GetLocalizedString("UpdateLinksWindow.EmptySelectionCheck");
+                return false;
+            }
 
-            //ErrorText = null;
+            ErrorText = null;
             return true;
         }
 
