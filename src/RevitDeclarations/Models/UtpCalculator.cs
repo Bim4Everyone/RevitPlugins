@@ -60,16 +60,23 @@ namespace RevitDeclarations.Models {
             List<ElementId> masterPantries = _pantriesWithBedroom.Intersect(pantriesWithBathroom).ToList();
 
             var bedroomPantry = GetRoomsByDoors(_priorities.LivingRoom, masterPantries);
-            // Жилые комнаты, соединенные с мастер-гврдеробными
+            // Жилые комнаты, соединенные с мастер-гардеробными
             var bedroomsWithPantryAndBathroom = bedroomPantry[_priorities.LivingRoom.Name];
-            _masterBedrooms = bedroomsWithBathroom.Concat(bedroomsWithPantryAndBathroom).ToList();
+
+            // Итоговый список мастер-спален
+            _masterBedrooms = bedroomsWithBathroom
+                .Concat(bedroomsWithPantryAndBathroom)
+                .ToList();
 
             List<ElementId> bathroomsWithBedroom = bedroomBathroom[_priorities.Bathroom.Name];
             var bathroomPantry = GetRoomsByDoors(_priorities.Bathroom, masterPantries);
             // Санузлы, соединенные с мастер-гардеробными
             var bathroomsWithMasterPantry = bathroomPantry[_priorities.Bathroom.Name];
+
             // Санузлы, относящиеся к мастер-спальням для определение УТП Две ванны
-            _masterBathrooms = bathroomsWithBedroom.Concat(bathroomsWithMasterPantry).ToList();
+            _masterBathrooms = bathroomsWithBedroom
+                .Concat(bathroomsWithMasterPantry)
+                .ToList();
         }
 
         public IReadOnlyCollection<ErrorsListViewModel> CheckProjectForUtp() {
@@ -346,6 +353,11 @@ namespace RevitDeclarations.Models {
             }
 
             return roomByNames;
+        }
+
+        private Dictionary<string, List<ElementId>> GetRoomsBySeparators(RoomPriority priority1, 
+                                                                         RoomPriority priority2) {
+
         }
 
         private IEnumerable<ElementId> GetRoomsWithBath() {
