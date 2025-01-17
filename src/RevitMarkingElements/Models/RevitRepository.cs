@@ -8,10 +8,9 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
-using RevitMarkingElements.ViewModels;
-
 namespace RevitMarkingElements.Models {
     internal class RevitRepository {
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
@@ -21,9 +20,8 @@ namespace RevitMarkingElements.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public List<Category> GetCategoriesWithMarkParam() {
+        public List<Category> GetCategoriesWithMarkParam(BuiltInParameter markParam) {
 
-            var markParam = MainViewModel.MarkParam;
             List<Category> categories = new List<Category>();
 
             categories = new FilteredElementCollector(Document)
@@ -52,9 +50,28 @@ namespace RevitMarkingElements.Models {
                     return false;
 
                 var center = (bbox.Min + bbox.Max) / 2.0;
+                // расстояние когда линия визуально и в действительности пересекает объект
                 var lineToObjectDistance = 13.3;
                 return line.Project(center)?.Distance < lineToObjectDistance;
             }).ToList();
+        }
+
+        public List<CurveElement> SelectLinesOnView(string selectLinesText) {
+            var selectedReferences = ActiveUIDocument.Selection.PickObjects(
+                Autodesk.Revit.UI.Selection.ObjectType.Element,
+                selectLinesText);
+
+            if(selectedReferences != null) {
+                return selectedReferences
+                    .Select(reference => ActiveUIDocument.Document.GetElement(reference.ElementId))
+                    .OfType<CurveElement>()
+                    .Where(curveElement =>
+                    curveElement.GeometryCurve != null &&
+                    (curveElement is ModelLine || curveElement is ModelNurbSpline))
+                    .ToList();
+            }
+
+            return new List<CurveElement>();
         }
 
         public Transaction CreateTransaction(string transactionName) {

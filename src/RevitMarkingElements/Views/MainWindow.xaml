@@ -9,11 +9,12 @@
     xmlns:vms="clr-namespace:RevitMarkingElements.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     mc:Ignorable="d"
+    x:Name="mainWindow"
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
-    Height="200"
+    Height="250"
     Width="350"
-    MinHeight="200"
+    MinHeight="250"
     MinWidth="350"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -39,6 +40,43 @@
             Orientation="Vertical"
             Margin="10"
             Grid.Row="0">
+            <RadioButton
+                Margin="0,0,0,5"
+                GroupName="NumberingMode"
+                Content="{DynamicResource MainWindow.ArrayNumberingLabel}"
+                IsChecked="{Binding IsArrayNumberingSelected}" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <RadioButton
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    GroupName="NumberingMode"
+                    Content="{DynamicResource MainWindow.LineNumberingLabel}"
+                    IsChecked="{Binding IsLineNumberingSelected}" />
+
+                <Button
+                    Width="100"
+                    Grid.Column="1"
+                    Padding="10"
+                    HorizontalAlignment="Right"
+                    Content="{DynamicResource MainWindow.SelectLinesButton}"
+                    Command="{Binding SelectLinesCommand}"
+                    CommandParameter="{Binding ElementName=mainWindow}"
+                    IsEnabled="{Binding IsLineNumberingSelected}" />
+            </Grid>
+        </StackPanel>
+
+        <StackPanel
+            Orientation="Vertical"
+            Margin="10,0,10,0"
+            Grid.Row="1">
             <TextBlock
                 Text="{DynamicResource MainWindow.CategoriesElements}"
                 Margin="0,0,0,5" />
@@ -52,7 +90,9 @@
             <CheckBox
                 Content="{DynamicResource MainWindow.NumberUnmarkedElements}"
                 IsChecked="{Binding IncludeUnselected}"
-                Margin="0,0,0,10" />
+                Margin="0,0,0,10"
+                IsEnabled="{Binding IsLineNumberingSelected}" />
+
             <CheckBox
                 Content="{DynamicResource MainWindow.RenumberMarkedElements}"
                 IsChecked="{Binding RenumberAll}"
@@ -77,7 +117,6 @@
                 IsDefault="True"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
-
             <Button
                 Margin="10"
                 Width="80"
