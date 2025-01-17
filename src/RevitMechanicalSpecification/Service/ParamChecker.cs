@@ -103,6 +103,15 @@ namespace RevitMechanicalSpecification.Service {
             SharedParamsConfig.Instance.VISJunction,
             SharedParamsConfig.Instance.VISExcludeFromJunction
         };
+        private readonly List<string> _obsoleteParamNames = new List<string>() { 
+            "ФОП_ВИС_Совместно с воздуховодом",
+            "ФОП_ВИС_Нумерация позиций",
+            "ФОП_ВИС_Площади воздуховодов в примечания",
+            "ФОП_ВИС_Экономическая функция",
+            "ФОП_ВИС_Запас изоляции",
+            "ФОП_ВИС_Имя трубы из сегмента"
+        };
+
         private SpecConfiguration _specConfiguration;
         private Document _document;
 
@@ -140,8 +149,23 @@ namespace RevitMechanicalSpecification.Service {
             }
             InternalDefinition definition = param.GetDefinition();
             if(definition.GetGroupTypeId() != group) {
-                definition.SetGroupTypeId(group);
+                Binding binding = document.ParameterBindings.get_Item(definition);
+
+                if(binding is ElementBinding elementBinding) {
+                    CategorySet categories = elementBinding.Categories;
+
+                    if(binding is InstanceBinding) {
+                        document.ParameterBindings.ReInsert(definition, new InstanceBinding(categories), group);
+                    } else if(binding is TypeBinding) {
+                        document.ParameterBindings.ReInsert(definition, new TypeBinding(categories), group);
+                    }
+                }
             }
+        }
+
+        // Удаление неиспользуемых более параметров, которые мусорят проект и путают проектировщиков
+        private void RemoveObsoleteParam(Document document, SharedParameterElement obsoleteParam) {
+            document.Delete(obsoleteParam.Id); // Удаляем элемент по его Id
         }
 
         // Временная проверка пока мы не переходим на редактируемые экземпляры групп. Если ФОП_ВИС_Число и ФОП_ВИС_Число ДЕ в проекте вместе - отменяем работу 
@@ -173,12 +197,22 @@ namespace RevitMechanicalSpecification.Service {
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
             projectParameters.SetupRevitParams(document, _revitParams);
 
-            foreach(RevitParam revitParam in _paramsToDataGroup) {
-                SortParameterToGroup(document, revitParam.Name, GroupTypeId.Data);
-            }
+            using(var t = _document.StartTransaction("Проверка групп параметров")) {
+                foreach(RevitParam revitParam in _paramsToDataGroup) {
+                    SortParameterToGroup(document, revitParam.Name, GroupTypeId.Data);
+                }
 
-            foreach(RevitParam revitParam in _paramsToConstraints) {
-                SortParameterToGroup(document, revitParam.Name, GroupTypeId.Constraints);
+                foreach(RevitParam revitParam in _paramsToConstraints) {
+                    SortParameterToGroup(document, revitParam.Name, GroupTypeId.Constraints);
+                }
+
+                foreach(string paraName in _obsoleteParamNames) {
+                    if(document.IsExistsSharedParam(paraName)) {
+                        SharedParameterElement obsoleteParam = document.GetSharedParam(paraName);
+                        RemoveObsoleteParam(document, obsoleteParam);
+                    }
+                }
+                t.Commit();
             }
 
             CheckParamterValues();
