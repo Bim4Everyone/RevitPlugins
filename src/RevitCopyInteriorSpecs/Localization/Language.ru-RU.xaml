@@ -6,6 +6,7 @@
 
     <system:String x:Key="MainWindow.Title">Копирование спецификаций АИ</system:String>
 
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
     <system:String x:Key="MainWindow.GroupTypeParamName">ФОП_Тип квартиры</system:String>
     <system:String x:Key="MainWindow.LevelParamName">Уровень</system:String>
     <system:String x:Key="MainWindow.LevelShortNameParamName">ФОП_Этаж</system:String>
@@ -43,8 +44,8 @@
     <system:String x:Key="MainWindow.SecondDispatcherGroupingLevel">Группировка 2</system:String>
     <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevel">Группировка 3</system:String>
     
-    <system:String x:Key="MainWindow.AddTask">Добавить</system:String>
-    <system:String x:Key="MainWindow.DeleteTask">Удалить</system:String>
+    <system:String x:Key="MainWindow.AddTask">Добавить задачу</system:String>
+    <system:String x:Key="MainWindow.DeleteTask">Удалить задачу</system:String>
 
     <system:String x:Key="MainWindow.Parameters">Параметры</system:String>
     <system:String x:Key="MainWindow.ProjectParametersSettings">Настройка параметров проекта</system:String>

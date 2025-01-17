@@ -15,8 +15,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
-    Height="650" Width="920"
-    MinHeight="600" MinWidth="500"
+    Height="500" Width="920"
+    MinHeight="450" MinWidth="500"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
@@ -30,45 +30,76 @@
     <Window.Resources>
         <converters:NumberWithOffsetConverter x:Key="columnContentWidthConverter" Offset="-15" />
     </Window.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
 
-        <controls:SelectedSpecsControl Grid.Row="0" />
-        <controls:TasksControl Grid.Row="1" />
-        <controls:ParametersControl Grid.Row="2" />
-   
 
-        <StackPanel
-            Grid.Row="3"
-            Height="45"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-            <TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
+        <Canvas
+            Grid.Column="1" 
+            Width="{Binding ActualWidth, ElementName=expander}" 
+            Panel.ZIndex="1"
+            Margin="0 5 5 0">
+            <Expander 
+                x:Name="expander"
+                ExpandDirection="Down"
+                FlowDirection="RightToLeft"
+                Background="White"
+                BorderThickness="1"
+                BorderBrush="Gray" 
+                Padding="3" 
+                Header="{DynamicResource MainWindow.Settings}">
 
-            <Button
-                Margin="10"
-                Width="80"
-                Content="{DynamicResource MainWindow.ButtonOk}"
-                IsDefault="True"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
+                <Grid FlowDirection="LeftToRight">
+                    <controls:ParametersControl/>
+                </Grid>
+            </Expander>
+        </Canvas>
 
-            <Button
-                Margin="10"
-                Width="80"
-                Content="{DynamicResource MainWindow.ButtonCancel}"
-                IsCancel="True"
-                Click="ButtonCancel_Click" />
-        </StackPanel>
+
+        <Grid Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <controls:SelectedSpecsControl Grid.Row="0" Margin="0 10 0 0"/>
+            <controls:TasksControl Grid.Row="1" />
+
+            <StackPanel
+                Grid.Row="3"
+                Height="45"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+                <TextBlock
+                    Margin="10"
+                    Foreground="Orange"
+                    VerticalAlignment="Center"
+                    Text="{Binding ErrorText}" />
+
+                <Button
+                    Margin="10"
+                    Width="80"
+                    Content="{DynamicResource MainWindow.ButtonOk}"
+                    IsDefault="True"
+                    Click="ButtonOk_Click"
+                    Command="{Binding AcceptViewCommand}" />
+
+                <Button
+                    Margin="10"
+                    Width="80"
+                    Content="{DynamicResource MainWindow.ButtonCancel}"
+                    IsCancel="True"
+                    Click="ButtonCancel_Click" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </base:PlatformWindow>

@@ -6,6 +6,7 @@
 
     <system:String x:Key="MainWindow.Title">Copying specifications</system:String>
 
+    <system:String x:Key="MainWindow.Settings">Settings</system:String>
     <system:String x:Key="MainWindow.GroupTypeParamName">ФОП_Тип квартиры</system:String>
     <system:String x:Key="MainWindow.LevelParamName">Level</system:String>
     <system:String x:Key="MainWindow.LevelShortNameParamName">ФОП_Этаж</system:String>
@@ -42,8 +43,8 @@
     <system:String x:Key="MainWindow.SecondDispatcherGroupingLevel">Grouping 2</system:String>
     <system:String x:Key="MainWindow.ThirdDispatcherGroupingLevel">Grouping 3</system:String>
     
-    <system:String x:Key="MainWindow.AddTask">Add</system:String>
-    <system:String x:Key="MainWindow.DeleteTask">Delete</system:String>
+    <system:String x:Key="MainWindow.AddTask">Add task</system:String>
+    <system:String x:Key="MainWindow.DeleteTask">Delete task</system:String>
 
     <system:String x:Key="MainWindow.Parameters">Parameters</system:String>
     <system:String x:Key="MainWindow.ProjectParametersSettings">Project parameters settings</system:String>

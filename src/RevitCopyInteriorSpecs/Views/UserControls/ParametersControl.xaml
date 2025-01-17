@@ -9,6 +9,7 @@
     xmlns:vms="clr-namespace:RevitCopyInteriorSpecs.ViewModels"
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400"
+    MinWidth="250"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <GroupBox 
@@ -23,87 +24,77 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock 
-                Grid.Row="0" 
-                Grid.Column="0" 
-                Grid.ColumnSpan="2" 
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="5 5 5 0"
+                Text="{DynamicResource MainWindow.GroupType}"/>
+
+            <TextBox
+                Grid.Row="0"
+                Grid.Column="1"
                 Margin="5" 
-                Text="{DynamicResource MainWindow.ProjectParametersSettings}" />
+                Padding="1"
+                Text="{Binding Path=ParametersVM.GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}"/>
 
             
-            <TextBlock
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Margin="5 5 5 0"
-                    Text="{DynamicResource MainWindow.GroupType}"/>
-
-            <TextBox
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Margin="5" 
-                    Padding="1"
-                    Text="{Binding Path=ParametersVM.GroupTypeParamName, UpdateSourceTrigger=PropertyChanged}"/>
-
-            
-            <TextBlock
-                    Grid.Row="3"
-                    Grid.Column="0"
-                    Margin="5 5 5 0"
-                    Text="{DynamicResource MainWindow.Level}"/>
-
-            <TextBox
-                    Grid.Row="4"
-                    Grid.Column="0"
-                    Margin="5" 
-                    Padding="1"
-                    Text="{Binding Path=ParametersVM.LevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
-            
-            
-            <TextBlock
-                    Grid.Row="5"
-                    Grid.Column="0"
-                    Margin="5 5 5 0"
-                    Text="{DynamicResource MainWindow.LevelShortName}"/>
-
-            <TextBox
-                    Grid.Row="6"
-                    Grid.Column="0"
-                    Margin="5" 
-                    Padding="1"
-                    Text="{Binding Path=ParametersVM.LevelShortNameParamName, UpdateSourceTrigger=PropertyChanged}"/>
-
-            
-            <TextBlock
-                    Grid.Row="7"
-                    Grid.Column="0"
-                    Margin="5 5 5 0"
-                    Text="{DynamicResource MainWindow.Phase}"/>
-
-            <TextBox
-                    Grid.Row="8"
-                    Grid.Column="0"
-                    Margin="5" 
-                    Padding="1"
-                    Text="{Binding Path=ParametersVM.PhaseParamName, UpdateSourceTrigger=PropertyChanged}"/>
-
-
             <TextBlock
                 Grid.Row="1"
+                Grid.Column="0"
+                Margin="5 5 5 0"
+                Text="{DynamicResource MainWindow.Level}"/>
+
+            <TextBox
+                Grid.Row="1"
                 Grid.Column="1"
+                Margin="5" 
+                Padding="1"
+                Text="{Binding Path=ParametersVM.LevelParamName, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="5 5 5 0"
+                Text="{DynamicResource MainWindow.LevelShortName}"/>
+
+            <TextBox
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="5" 
+                Padding="1"
+                Text="{Binding Path=ParametersVM.LevelShortNameParamName, UpdateSourceTrigger=PropertyChanged}"/>
+
+            
+            <TextBlock
+                Grid.Row="3"
+                Grid.Column="0"
+                Margin="5 5 5 0"
+                Text="{DynamicResource MainWindow.Phase}"/>
+
+            <TextBox
+                Grid.Row="3"
+                Grid.Column="1"
+                Margin="5" 
+                Padding="1"
+                Text="{Binding Path=ParametersVM.PhaseParamName, UpdateSourceTrigger=PropertyChanged}"/>
+
+
+            <TextBlock
+                Grid.Row="4"
+                Grid.Column="0"
                 Margin="5 5 5 0"
                 Text="{DynamicResource MainWindow.FirstDispatcherGroupingLevel}"/>
 
             <TextBox
-                Grid.Row="2"
+                Grid.Row="4"
                 Grid.Column="1"
                 Margin="5" 
                 Padding="1"
@@ -111,13 +102,13 @@
 
             
             <TextBlock
-                Grid.Row="3"
-                Grid.Column="1"
+                Grid.Row="5"
+                Grid.Column="0"
                 Margin="5 5 5 0"
                 Text="{DynamicResource MainWindow.SecondDispatcherGroupingLevel}"/>
 
             <TextBox
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="1"
                 Margin="5" 
                 Padding="1"
@@ -125,8 +116,8 @@
 
             
             <TextBlock
-                Grid.Row="5"
-                Grid.Column="1"
+                Grid.Row="6"
+                Grid.Column="0"
                 Margin="5 5 5 0"
                 Text="{DynamicResource MainWindow.ThirdDispatcherGroupingLevel}"/>
 

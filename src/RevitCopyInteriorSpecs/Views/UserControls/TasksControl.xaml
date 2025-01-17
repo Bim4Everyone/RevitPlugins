@@ -24,16 +24,43 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Margin="5 5 5 0" Content="{DynamicResource MainWindow.SimultaneousFillingFields}" />
+            <StackPanel 
+                Grid.Row="0" 
+                Grid.Column="1" 
+                Orientation="Horizontal" 
+                HorizontalAlignment="Right">
+                <Button
+                    Margin="5" 
+                    Padding="5"
+                    MinWidth="130" 
+                    Content="{DynamicResource MainWindow.AddTask}" 
+                    Command="{Binding Path=TasksVM.AddTaskCommand}" />
 
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto">
+                <Button
+                    Margin="5" 
+                    Padding="5"
+                    MinWidth="130" 
+                    Content="{DynamicResource MainWindow.DeleteTask}" 
+                    Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
+            </StackPanel>
+            
+            <Label 
+                Grid.Row="0" 
+                Margin="5 0" 
+                VerticalAlignment="Bottom"
+                Content="{DynamicResource MainWindow.SimultaneousFillingFields}" />
+
+            <ScrollViewer 
+                Grid.Row="1" 
+                VerticalScrollBarVisibility="Hidden" 
+                HorizontalScrollBarVisibility="Auto">
                 <StackPanel
                     Orientation="Horizontal">
                     <TextBox
                         Margin="15 5 5 5"
+                        Padding="2"
                         Width="{Binding ElementName=column1, Path=Width, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                         VerticalAlignment="Center"
@@ -49,7 +76,7 @@
                     </TextBox>
 
                     <ComboBox
-                        Margin="8 5"
+                        Margin="8 8"
                         Width="{Binding ElementName=column2, Path=Width, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
     
@@ -69,6 +96,7 @@
 
                     <TextBox
                         Margin="8 5"
+                        Padding="2"
                         Width="{Binding ElementName=column3, Path=Width, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                         VerticalAlignment="Center"
@@ -84,7 +112,7 @@
                     </TextBox>
 
                     <ComboBox
-                        Margin="8 5"
+                        Margin="8 8"
                         Width="{Binding ElementName=column4, Path=Width, 
                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
     
@@ -103,12 +131,13 @@
                     </ComboBox>
 
                     <TextBox
-                         Margin="8 5"
-                         Width="{Binding ElementName=column5, Path=Width, 
+                        Margin="8 5"
+                        Padding="2"
+                        Width="{Binding ElementName=column5, Path=Width, 
                              Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                         VerticalAlignment="Center"
-                         HorizontalAlignment="Left"
-                         Text="{Binding Path=TasksVM.GeneralFirstDispatcherGroupingLevel, 
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="{Binding Path=TasksVM.GeneralFirstDispatcherGroupingLevel, 
                             UpdateSourceTrigger=PropertyChanged}" >
 
                         <i:Interaction.Triggers>
@@ -121,12 +150,13 @@
 
 
                     <TextBox
-                         Margin="8 5"
-                         Width="{Binding ElementName=column6, Path=Width, 
+                        Margin="8 5"
+                        Padding="2"
+                        Width="{Binding ElementName=column6, Path=Width, 
                              Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                         VerticalAlignment="Center"
-                         HorizontalAlignment="Left"
-                         Text="{Binding Path=TasksVM.GeneralSecondDispatcherGroupingLevel, 
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="{Binding Path=TasksVM.GeneralSecondDispatcherGroupingLevel, 
                             UpdateSourceTrigger=PropertyChanged}" >
 
                         <i:Interaction.Triggers>
@@ -139,12 +169,13 @@
 
 
                     <TextBox
-                         Margin="8 5"
-                         Width="{Binding ElementName=column7, Path=Width, 
+                        Margin="8 5"
+                        Padding="2"
+                        Width="{Binding ElementName=column7, Path=Width, 
                              Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
-                         VerticalAlignment="Center"
-                         HorizontalAlignment="Left"
-                         Text="{Binding Path=TasksVM.GeneralThirdDispatcherGroupingLevel, 
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="{Binding Path=TasksVM.GeneralThirdDispatcherGroupingLevel, 
                             UpdateSourceTrigger=PropertyChanged}" >
 
                         <i:Interaction.Triggers>
@@ -159,7 +190,8 @@
 
             <Label 
                 Grid.Row="2" 
-                Margin="5 5 5 0" 
+                Margin="5 0" 
+                VerticalAlignment="Bottom"
                 Content="{DynamicResource MainWindow.TaskRows}" />
 
             <ListView 
@@ -302,25 +334,6 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-
-            <StackPanel 
-                Grid.Row="4" 
-                Grid.Column="1" 
-                Height="45" 
-                Orientation="Horizontal" 
-                HorizontalAlignment="Right">
-                <Button
-                    Margin="10 5 10 10" 
-                    Width="150" 
-                    Content="{DynamicResource MainWindow.AddTask}" 
-                    Command="{Binding Path=TasksVM.AddTaskCommand}" />
-                
-                <Button
-                    Margin="10 5 10 10" 
-                    Width="150" 
-                    Content="{DynamicResource MainWindow.DeleteTask}" 
-                    Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
-            </StackPanel>
         </Grid>
     </GroupBox>
 </UserControl>
