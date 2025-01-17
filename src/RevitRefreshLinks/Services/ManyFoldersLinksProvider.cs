@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -24,7 +23,7 @@ namespace RevitRefreshLinks.Services {
         }
 
 
-        public ICollection<ILink> GetLocalLinks() {
+        public ISelectLinksResult GetLocalLinks() {
             if(_openFolderDialog.ShowDialog()) {
                 var config = _configProvider.GetUpdateLinksConfig();
                 var settings = config.GetSettings(_revitRepository.Document)
@@ -34,19 +33,20 @@ namespace RevitRefreshLinks.Services {
 
                 const string searchPattern = "*.rvt";
 
-                return _openFolderDialog.Folders
+                return new SelectLinksResult(_openFolderDialog.Folder.FullName,
+                    _openFolderDialog.Folders
                     .SelectMany(dir => Directory.EnumerateFiles(
                         dir.FullName,
                         searchPattern,
                         SearchOption.AllDirectories))
                     .Select(path => new Link(path))
-                    .ToArray();
+                    .ToArray());
             } else {
                 throw new OperationCanceledException();
             }
         }
 
-        public ICollection<ILink> GetServerLinks() {
+        public ISelectLinksResult GetServerLinks() {
             // TODO
             // Временная заглушка для тестов плагина, пока не будет готово нормальное окно выбора папок из RS
             string path = Path.Combine(
@@ -55,7 +55,7 @@ namespace RevitRefreshLinks.Services {
             if(!File.Exists(path)) {
                 File.Create(path);
             }
-            return File.ReadLines(path).Select(line => new Link(line)).ToArray();
+            return new SelectLinksResult(path, File.ReadLines(path).Select(line => new Link(line)).ToArray());
         }
     }
 }

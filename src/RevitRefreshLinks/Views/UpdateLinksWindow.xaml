@@ -61,6 +61,15 @@
                     Property="Background"
                     Value="Transparent" />
             </Style>
+            <Style
+                TargetType="DataGridColumnHeader">
+                <Setter
+                    Property="Background"
+                    Value="LightGray" />
+                <Setter
+                    Property="Foreground"
+                    Value="Black" />
+            </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition
@@ -108,19 +117,21 @@
             <DockPanel>
                 <TextBlock
                     TextWrapping="Wrap"
+                    Margin="0 0 5 0"
                     Text="{DynamicResource UpdateLinksWindow.LocalFolder}" />
                 <TextBlock
                     TextWrapping="Wrap"
-                    Text="C:\\azaza" />
+                    Text="{Binding SelectedLocalSource}" />
             </DockPanel>
 
             <DockPanel>
                 <TextBlock
                     TextWrapping="Wrap"
+                    Margin="0 0 5 0"
                     Text="{DynamicResource UpdateLinksWindow.ServerFolder}" />
                 <TextBlock
                     TextWrapping="Wrap"
-                    Text="RSN:\\azaza" />
+                    Text="{Binding SelectedServerSource}" />
             </DockPanel>
         </StackPanel>
 
@@ -130,31 +141,65 @@
             Grid.ColumnSpan="3"
             Margin="10,5,10,10"
             GridLinesVisibility="None"
-            HeadersVisibility="None"
             AutoGenerateColumns="False"
             CanUserAddRows="False"
             CanUserDeleteRows="False"
             Background="LightBlue"
             BorderThickness="1"
             RowBackground="Transparent"
+            IsReadOnly="False"
+            HeadersVisibility="Column"
             AlternatingRowBackground="Transparent"
-            SelectionUnit="Cell"
             ItemsSource="{Binding LinksToUpdate}">
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn
-                    Binding="{Binding IsSelected}" />
+                    Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+                    <DataGridCheckBoxColumn.ElementStyle>
+                        <Style
+                            TargetType="CheckBox">
+                            <Setter
+                                Property="Focusable"
+                                Value="False" />
+                            <Setter
+                                Property="IsEnabled"
+                                Value="False" />
+                            <Style.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding CanSelect}"
+                                    Value="True">
+                                    <Setter
+                                        Property="IsEnabled"
+                                        Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridCheckBoxColumn.ElementStyle>
+                    <DataGridCheckBoxColumn.EditingElementStyle>
+                        <Style
+                            TargetType="CheckBox">
+                            <Setter
+                                Property="Focusable"
+                                Value="True" />
+                        </Style>
+                    </DataGridCheckBoxColumn.EditingElementStyle>
+                </DataGridCheckBoxColumn>
                 <DataGridTextColumn
                     IsReadOnly="True"
-                    Binding="{Binding Name}" />
+                    Width="*"
+                    Binding="{Binding NameWithExtension}"
+                    Header="{DynamicResource UpdateLinksWindow.List.LinkName.Header}" />
                 <DataGridTextColumn
                     IsReadOnly="True"
-                    Binding="{Binding DisplayWorkset}" />
+                    Binding="{Binding DisplayWorksetStatus}"
+                    Header="{DynamicResource UpdateLinksWindow.List.Workset.Header}" />
                 <DataGridTextColumn
                     IsReadOnly="True"
-                    Binding="{Binding DisplayLinkStatus}" />
+                    Binding="{Binding DisplayLinkStatus}"
+                    Header="{DynamicResource UpdateLinksWindow.List.Link.Header}" />
                 <DataGridTextColumn
                     IsReadOnly="True"
-                    Binding="{Binding SourceStatus}" />
+                    Binding="{Binding SourceStatus}"
+                    Header="{DynamicResource UpdateLinksWindow.List.Source.Header}" />
             </DataGrid.Columns>
         </DataGrid>
 

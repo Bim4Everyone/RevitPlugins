@@ -36,6 +36,8 @@
     <system:String
         x:Key="UpdateLinksWindow.List.Link.NotFound">Не найдена</system:String>
     <system:String
+        x:Key="UpdateLinksWindow.List.Link.ClosedWorkset">В закрытом РН</system:String>
+    <system:String
         x:Key="UpdateLinksWindow.List.Link.Unknown">Не определено</system:String>
     <system:String
         x:Key="UpdateLinksWindow.List.Source.Header">Источник</system:String>
