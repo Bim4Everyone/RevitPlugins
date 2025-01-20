@@ -8,31 +8,32 @@ using dosymep.Revit;
 
 namespace RevitRoomExtrusion.Models {
     internal class FamilyLoader {
-        private readonly RevitRepository _revitRepository;         
+
+        private readonly RevitRepository _revitRepository;  
+        
         public FamilyLoader(RevitRepository revitRepository) {
             _revitRepository = revitRepository;
         }
 
         public FamilySymbol LoadRoomFamily(string path) {
             Family family = null;
+            FamilySymbol familySymbol = null;
             FamilyLoadOptions loadOptions = new FamilyLoadOptions();
-
-            using(Transaction t = _revitRepository.Document.StartTransaction("BIM: Загрузка семейства дорожек")) {
-                _revitRepository.Document.LoadFamily(path, loadOptions, out family);
-                t.Commit();
-            }
-                
-            FamilySymbol familySymbol = family.GetFamilySymbolIds()
-                .Select(id => _revitRepository.Document.GetElement(id) as FamilySymbol)
-                .FirstOrDefault(symbol => symbol != null);
-
-            if(!familySymbol.IsActive) {
-                familySymbol.Activate();
-                _revitRepository.Document.Regenerate();
-            }
             
-            DeleteRoomFamily(path);
+            using(Transaction t = _revitRepository.Document.StartTransaction("BIM: Загрузка семейства дорожек")) {
+                _revitRepository.Document.LoadFamily(path, loadOptions, out family);                            
 
+                familySymbol = family.GetFamilySymbolIds()
+                    .Select(id => _revitRepository.Document.GetElement(id) as FamilySymbol)
+                    .FirstOrDefault(symbol => symbol != null);
+
+                if(!familySymbol.IsActive) {
+                    familySymbol.Activate();
+                    _revitRepository.Document.Regenerate();
+                }
+                t.Commit();
+            }            
+            DeleteRoomFamily(path);
             return familySymbol;
         }
 
@@ -41,6 +42,7 @@ namespace RevitRoomExtrusion.Models {
                 overwriteParameterValues = true;
                 return true;
             }
+
             public bool OnSharedFamilyFound(Family sharedFamily,
                                             bool familyInUse,
                                             out FamilySource source,

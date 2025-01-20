@@ -14,16 +14,16 @@ namespace RevitRoomExtrusion.ViewModels {
         public ErrorViewModel(RevitRepository revitRepository) {
             
             _revitRepository = revitRepository;
-            ErrorRooms = new ObservableCollection<ErrorRoomElement>();
+            ErrorRooms = new ObservableCollection<RoomErrorElement>();
             
             foreach(Room roomError in GetErrorRooms()) { 
-                ErrorRooms.Add(new ErrorRoomElement(_revitRepository, roomError, ShowElementCommand));
+                ErrorRooms.Add(new RoomErrorElement(_revitRepository, roomError, ShowElementCommand));
             }            
             ShowElementCommand = RelayCommand.Create<ElementId>(ShowElement);
         }
         
         public ICommand ShowElementCommand { get; }        
-        public ObservableCollection<ErrorRoomElement> ErrorRooms { get; set; }
+        public ObservableCollection<RoomErrorElement> ErrorRooms { get; set; }
 
         private void ShowElement(ElementId elementId) {
             _revitRepository.SetSelectedRoom(elementId);

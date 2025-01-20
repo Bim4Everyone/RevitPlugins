@@ -17,7 +17,7 @@ namespace RevitRoomExtrusion.Models {
             _familyLoader = new FamilyLoader(revitRepository);
         }
 
-        public void CreatingFamilyes(string familyName, 
+        public void CreatingFamilies(string familyName, 
             string extrusionHeight, 
             List<Room> listRoom,
             View3D view3D,
@@ -33,11 +33,9 @@ namespace RevitRoomExtrusion.Models {
 
                 FamilyDocument familyDocument = new FamilyDocument(_revitRepository.Application, locationKey, familyName);                
                 familyDocument.CreateDocument(extrusionHeightDouble, groupRooms.ToList());
-
-                string famPath = familyDocument.FamPath;
-                FamilySymbol famSymbol = null;                
-               
-                famSymbol = _familyLoader.LoadRoomFamily(famPath);
+                                                
+                FamilySymbol famSymbol = null;               
+                famSymbol = _familyLoader.LoadRoomFamily(familyDocument.FamPath);
 
                 _familyLoader.PlaceRoomFamily(famSymbol, groupRooms, locationKey);                
             }              

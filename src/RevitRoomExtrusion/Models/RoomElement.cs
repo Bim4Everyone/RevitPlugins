@@ -23,6 +23,7 @@ namespace RevitRoomExtrusion.Models {
             LocationSlab = CalculateLocation();
             ArrArray = GetArrArray();
         }
+
         public double LocationRoom { get; private set; }
         public double LocationSlab { get; private set; }        
         public CurveArrArray ArrArray { get; private set; }

@@ -11,9 +11,11 @@ using dosymep.Revit;
 
 namespace RevitRoomExtrusion.Models {
     internal class RevitRepository {
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;             
         }
+
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
         public Application Application => UIApplication.Application;
@@ -68,4 +70,4 @@ namespace RevitRoomExtrusion.Models {
     }
 }
 
-}
+

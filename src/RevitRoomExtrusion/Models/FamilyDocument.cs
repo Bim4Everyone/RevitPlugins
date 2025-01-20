@@ -31,6 +31,7 @@ namespace RevitRoomExtrusion.Models {
             FamPath = famPath;
             
         }
+
         public string FamName { get; }
         public string FamPath { get; }         
 

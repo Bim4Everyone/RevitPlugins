@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Windows.Input;
-
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
@@ -78,7 +77,7 @@ namespace RevitRoomExtrusion.ViewModels {
                 
                 FamilyCreator familyCreator = new FamilyCreator(_revitRepository);
                 
-                familyCreator.CreatingFamilyes(_extrusionFamilyName, 
+                familyCreator.CreatingFamilies(_extrusionFamilyName, 
                                                _extrusionHeight, 
                                                SelectedRooms, 
                                                view3d, 

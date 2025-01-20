@@ -9,11 +9,11 @@ using dosymep.Revit;
 
 
 namespace RevitRoomExtrusion.Models {
-    internal class ErrorRoomElement { 
+    internal class RoomErrorElement { 
         
         private readonly RevitRepository _revitRepository;
 
-        public ErrorRoomElement(RevitRepository revitRepository, Room room, ICommand showElementCommand) {
+        public RoomErrorElement(RevitRepository revitRepository, Room room, ICommand showElementCommand) {
             _revitRepository = revitRepository;
             ElementId = room.Id;
             RoomName = GetParamName(room);
@@ -43,6 +43,7 @@ namespace RevitRoomExtrusion.Models {
             }
             return errorDescription;
         }
+
         private string GetParamNumber(Room room) {
             
             string numberPrefix = null;            
@@ -59,6 +60,7 @@ namespace RevitRoomExtrusion.Models {
                 return "Нет номера";
             }            
         }
+
         private string GetParamName(Room room) {
             Parameter nameParameter = room.get_Parameter(BuiltInParameter.ROOM_NAME);
             if(nameParameter.AsString() != "") {                

@@ -5,7 +5,9 @@ using dosymep.Serializers;
 using pyRevitLabs.Json;
 
 namespace RevitRoomExtrusion.Models {
+
     internal class PluginConfig : ProjectConfig<RevitSettings> {
+
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }

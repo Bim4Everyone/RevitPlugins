@@ -1,4 +1,4 @@
-﻿<base:PlatformWindow 
+﻿<base:PlatformWindow  
     x:Class="RevitRoomExtrusion.Views.ErrorWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -14,28 +14,33 @@
     MinHeight="300" MinWidth="600">
     
     <Grid Margin="10">
-        <DataGrid
-            AutoGenerateColumns="False"
-            ItemsSource="{Binding ErrorRooms}"
-            IsReadOnly="True"
-            Margin="0,10,0,0">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="ID">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button
-                                Content="{Binding ElementId}"
-                                Command="{Binding DataContext.ShowElementCommand, 
-                                RelativeSource={RelativeSource AncestorType=Window}}"
-                                CommandParameter="{Binding ElementId}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding RoomName}" Header="Наименование" />
-                <DataGridTextColumn Binding="{Binding RoomNumber}" Header="Номер" />
-                <DataGridTextColumn Binding="{Binding LevelName}" Header="Уровень" />                
-                <DataGridTextColumn Binding="{Binding ErrorDescription}" Header="Тип ошибки" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <StackPanel>
+            <Label
+                Foreground="Orange"
+                Content="Выбраны помещения с ошибками. Для корректной работы плагина, исправьте ошибки"/>
+            <DataGrid
+                AutoGenerateColumns="False"
+                ItemsSource="{Binding ErrorRooms}"
+                IsReadOnly="True"
+                Margin="0,10,0,0">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="ID">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Content="{Binding ElementId}"
+                                    Command="{Binding DataContext.ShowElementCommand, 
+                                    RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding ElementId}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding RoomName}" Header="Наименование" />
+                    <DataGridTextColumn Binding="{Binding RoomNumber}" Header="Номер" />
+                    <DataGridTextColumn Binding="{Binding LevelName}" Header="Уровень" />                
+                    <DataGridTextColumn Binding="{Binding ErrorDescription}" Header="Тип ошибки" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
     </Grid>
 </base:PlatformWindow>
