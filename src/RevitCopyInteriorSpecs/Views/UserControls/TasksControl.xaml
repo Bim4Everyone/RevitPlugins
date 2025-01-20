@@ -26,34 +26,42 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <StackPanel 
-                Grid.Row="0" 
-                Grid.Column="1" 
-                Orientation="Horizontal" 
-                HorizontalAlignment="Right">
-                <Button
-                    Margin="5" 
-                    Padding="5"
-                    MinWidth="130" 
-                    Content="{DynamicResource MainWindow.AddTask}" 
-                    Command="{Binding Path=TasksVM.AddTaskCommand}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                <Button
-                    Margin="5" 
-                    Padding="5"
-                    MinWidth="130" 
-                    Content="{DynamicResource MainWindow.DeleteTask}" 
-                    Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
-            </StackPanel>
+                <Label 
+                    Grid.Column="0"
+                    Margin="5 0" 
+                    VerticalAlignment="Bottom"
+                    Content="{DynamicResource MainWindow.SimultaneousFillingFields}" />
+
+                <StackPanel 
+                    Grid.Column="1" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right">
+                    <Button
+                        Margin="5" 
+                        Padding="5"
+                        MinWidth="130" 
+                        MinHeight="15"
+                        Content="{DynamicResource MainWindow.AddTask}" 
+                        Command="{Binding Path=TasksVM.AddTaskCommand}" />
+
+                    <Button
+                        Margin="5" 
+                        Padding="5"
+                        MinWidth="130" 
+                        MinHeight="30"
+                        Content="{DynamicResource MainWindow.DeleteTask}" 
+                        Command="{Binding Path=TasksVM.DeleteTaskCommand}" />
+                </StackPanel>
+            </Grid>
             
-            <Label 
-                Grid.Row="0" 
-                Margin="5 0" 
-                VerticalAlignment="Bottom"
-                Content="{DynamicResource MainWindow.SimultaneousFillingFields}" />
-
             <ScrollViewer 
-                Grid.Row="1" 
+                Grid.Row="1"
                 VerticalScrollBarVisibility="Hidden" 
                 HorizontalScrollBarVisibility="Auto">
                 <StackPanel
@@ -212,6 +220,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox
+                                        Padding="2"
                                         Width="{Binding ElementName=column1, Path=Width, 
                                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                                         HorizontalAlignment="Center"
@@ -249,6 +258,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox
+                                        Padding="2"
                                         Width="{Binding ElementName=column3, Path=Width, 
                                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     
@@ -287,6 +297,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox
+                                        Padding="2"
                                         Width="{Binding ElementName=column5, Path=Width, 
                                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     
@@ -305,6 +316,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox
+                                        Padding="2"
                                         Width="{Binding ElementName=column6, Path=Width, 
                                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     
@@ -322,6 +334,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBox
+                                        Padding="2"
                                         Width="{Binding ElementName=column7, Path=Width, 
                                             Converter={StaticResource ResourceKey=columnContentWidthConverter}}"
                     

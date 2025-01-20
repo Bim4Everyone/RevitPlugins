@@ -16,7 +16,7 @@
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
     Height="500" Width="920"
-    MinHeight="450" MinWidth="500"
+    MinHeight="450" MinWidth="700"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
