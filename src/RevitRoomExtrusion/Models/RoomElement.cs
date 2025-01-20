@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
@@ -12,6 +10,7 @@ namespace RevitRoomExtrusion.Models {
         private readonly Document _document;
         private readonly Room _room;
         private readonly View3D _view3D;
+        private readonly double _normalDirection = -100000;
 
         public RoomElement(Document document, Room room, View3D view3D) {
             _document = document;
@@ -28,32 +27,19 @@ namespace RevitRoomExtrusion.Models {
         public double LocationSlab { get; private set; }        
         public CurveArrArray ArrArray { get; private set; }
 
-        private double CalculateLocation() {            
+        private double CalculateLocation() {
+            
             BoundingBoxXYZ boundingBox = _room.get_BoundingBox(null);
             XYZ minBB = boundingBox.Min;
             XYZ maxBB = boundingBox.Max;            
             XYZ pointCenter = (maxBB + minBB) / 2;
-            XYZ pointDirection = new XYZ(pointCenter.X, pointCenter.Y, -100000);
+            XYZ pointDirection = new XYZ(pointCenter.X, pointCenter.Y, _normalDirection);                        
 
-            List<BuiltInCategory> collectionFilter = new List<BuiltInCategory> {
-                BuiltInCategory.OST_StructuralFoundation,
-                BuiltInCategory.OST_Floors
-            };
-            
-            ElementMulticategoryFilter multiCategoryFilter = new ElementMulticategoryFilter(collectionFilter);            
-            ReferenceIntersector refIntersec = new ReferenceIntersector(
-                multiCategoryFilter, 
-                FindReferenceTarget.Element, 
-                _view3D);            
-            
-            ReferenceWithContext referenceWithContext = refIntersec.FindNearest(pointCenter, pointDirection);
-            ElementId foundElementId = referenceWithContext.GetReference().ElementId;
-
-            double proximity = referenceWithContext.Proximity;
+            double proximity = GetReferenceWithContext(pointCenter, pointDirection).Proximity;
             double foundElementLocation = pointCenter.Z - proximity;
-            double roundedFoundElementLocation =  UnitUtils.ConvertFromInternalUnits(foundElementLocation, 
-                                                                                     UnitTypeId.Millimeters);            
-            return Math.Round(roundedFoundElementLocation);
+            double convertedFoundElementLocation =  UnitUtils.ConvertFromInternalUnits(foundElementLocation, 
+                                                                                       UnitTypeId.Millimeters);            
+            return Math.Round(convertedFoundElementLocation);
         }
 
         private CurveArrArray GetArrArray() {
@@ -69,6 +55,20 @@ namespace RevitRoomExtrusion.Models {
                 curveArrArray.Append(curveArray);
             } 
             return curveArrArray;
-        }        
+        }
+        
+        private ReferenceWithContext GetReferenceWithContext(XYZ pointCenter, XYZ pointDirection) {
+            List<BuiltInCategory> collectionFilter = new List<BuiltInCategory> {
+                BuiltInCategory.OST_StructuralFoundation,
+                BuiltInCategory.OST_Floors
+            };
+
+            ElementMulticategoryFilter multiCategoryFilter = new ElementMulticategoryFilter(collectionFilter);
+            ReferenceIntersector refIntersec = new ReferenceIntersector(multiCategoryFilter,
+                                                                        FindReferenceTarget.Element,
+                                                                        _view3D);
+
+            return refIntersec.FindNearest(pointCenter, pointDirection);            
+        }
     }
 }

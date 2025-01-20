@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
 
@@ -12,46 +10,35 @@ namespace RevitRoomExtrusion.Models {
         private readonly RevitRepository _revitRepository;
         private readonly FamilyLoader _familyLoader;
 
-        public FamilyCreator(RevitRepository revitRepository) {            
+        public FamilyCreator(RevitRepository revitRepository) {
+            
             _revitRepository = revitRepository;
             _familyLoader = new FamilyLoader(revitRepository);
         }
 
-        public void CreatingFamilies(string familyName, 
-            string extrusionHeight, 
-            List<Room> listRoom,
-            View3D view3D,
-            IProgress<int> progress = null,
-            CancellationToken ct = default) {             
+        public void CreateFamilies(string familyName, double extrusionHeight, List<Room> listRoom, View3D view3D) {
 
-
-            foreach(IGrouping<double, RoomElement> groupRooms in GetGropRoomElements(listRoom, view3D, progress)) {
-                ct.ThrowIfCancellationRequested();
-
-                double locationKey = groupRooms.Key;
-                double extrusionHeightDouble = Convert.ToDouble(extrusionHeight);
-
-                FamilyDocument familyDocument = new FamilyDocument(_revitRepository.Application, locationKey, familyName);                
-                familyDocument.CreateDocument(extrusionHeightDouble, groupRooms.ToList());
-                                                
-                FamilySymbol famSymbol = null;               
-                famSymbol = _familyLoader.LoadRoomFamily(familyDocument.FamPath);
-
-                _familyLoader.PlaceRoomFamily(famSymbol, groupRooms, locationKey);                
-            }              
-        }
-
-        private IEnumerable<IGrouping<double, RoomElement>> GetGropRoomElements(List<Room> listRoom, 
-                                                                                View3D view3D, 
-                                                                                IProgress<int> progress) {
-            int progressCount = 0;
             List<RoomElement> roomElements = listRoom
-                .Select(room => {
-                    progress.Report(progressCount++);
+                .Select(room => {                    
                     return new RoomElement(_revitRepository.Document, room, view3D);
                 })
                 .ToList();
-                return roomElements.GroupBy(re => re.LocationSlab);
-        }         
+
+            IEnumerable<IGrouping<double, RoomElement>>  groupedRooms = roomElements.GroupBy(re => re.LocationSlab);
+
+            foreach(IGrouping<double, RoomElement> groupRooms in groupedRooms) {                
+
+                double locationKey = groupRooms.Key;
+                FamilyDocument familyDocument = new FamilyDocument(_revitRepository.Application, locationKey, familyName);                
+                
+                familyDocument.CreateDocument(extrusionHeight, groupRooms.ToList());                                                
+                
+                FamilySymbol famSymbol = _familyLoader.LoadRoomFamily(familyDocument.FamPath);
+
+                if(!_familyLoader.IsFamilyInstancePlaced(familyDocument.FamName)) {
+                    _familyLoader.PlaceRoomFamily(famSymbol, groupRooms, locationKey);
+                }                                
+            }              
+        }                
     }
 }

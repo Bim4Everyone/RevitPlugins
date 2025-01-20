@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -64,26 +64,17 @@ namespace RevitRoomExtrusion.ViewModels {
             LoadConfig();
         }
         private void AcceptView() {            
-            SaveConfig();
-            using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
-                progressDialogService.MaxValue = SelectedRooms.Count;
-                progressDialogService.StepValue = progressDialogService.MaxValue / 20;
-                progressDialogService.DisplayTitleFormat = "Обработка помещений... [{0}]\\[{1}]";
-                var progress = progressDialogService.CreateProgress();
-                var ct = progressDialogService.CreateCancellationToken();
-                progressDialogService.Show();
+            
+            SaveConfig();            
 
-                View3D view3d = _revitRepository.GetView3D(_extrusionFamilyName);
+            View3D view3d = _revitRepository.GetView3D(_extrusionFamilyName);
                 
-                FamilyCreator familyCreator = new FamilyCreator(_revitRepository);
+            FamilyCreator familyCreator = new FamilyCreator(_revitRepository);
                 
-                familyCreator.CreatingFamilies(_extrusionFamilyName, 
-                                               _extrusionHeight, 
-                                               SelectedRooms, 
-                                               view3d, 
-                                               progress, 
-                                               ct);
-            }
+            double extrusionHeightDouble = Convert.ToDouble(_extrusionHeight);
+
+            familyCreator.CreateFamilies(_extrusionFamilyName, extrusionHeightDouble, SelectedRooms, view3d);
+            
         }
 
         private bool CanAcceptView() {

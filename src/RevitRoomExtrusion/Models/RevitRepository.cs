@@ -13,6 +13,7 @@ namespace RevitRoomExtrusion.Models {
     internal class RevitRepository {
 
         public RevitRepository(UIApplication uiApplication) {
+
             UIApplication = uiApplication;             
         }
 
@@ -34,6 +35,7 @@ namespace RevitRoomExtrusion.Models {
             var viewTypes3D = viewTypes
                 .Where(vt => vt.ViewFamily == ViewFamily.ThreeDimensional)
                 .ToList();
+            
             if(!viewTypes3D.Any()) {
                 throw new InvalidOperationException("Тип 3D вид не найден!");
             }
@@ -42,6 +44,7 @@ namespace RevitRoomExtrusion.Models {
             string userName = Application.Username;
             string name3Dview = $"${userName}/{familyName}/Проверка дорожек";
             var existingView = views.FirstOrDefault(v => v.Name.Equals(name3Dview, StringComparison.OrdinalIgnoreCase));
+            
             if(existingView != null) {
                 return existingView as View3D;
             }
@@ -69,5 +72,3 @@ namespace RevitRoomExtrusion.Models {
         }
     }
 }
-
-

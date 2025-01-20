@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Input;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
@@ -7,13 +6,14 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
+using RevitRoomExtrusion.Models;
 
-namespace RevitRoomExtrusion.Models {
-    internal class RoomErrorElement { 
-        
+namespace RevitRoomExtrusion.ViewModels {
+    internal class RoomErrorViewModel {
+
         private readonly RevitRepository _revitRepository;
 
-        public RoomErrorElement(RevitRepository revitRepository, Room room, ICommand showElementCommand) {
+        public RoomErrorViewModel(RevitRepository revitRepository, Room room, ICommand showElementCommand) {
             _revitRepository = revitRepository;
             ElementId = room.Id;
             RoomName = GetParamName(room);
@@ -24,7 +24,7 @@ namespace RevitRoomExtrusion.Models {
         }
 
         public ICommand ShowElementCommand { get; set; }
-        public ElementId ElementId { get; set; }
+        public ElementId ElementId { get; private set; }
         public string RoomName { get; set; }
         public string RoomNumber { get; set; }
         public string LevelName { get; set; }
@@ -32,7 +32,7 @@ namespace RevitRoomExtrusion.Models {
 
         private string GetErrorDescription(Room room) {
             string errorDescription = null;
-            RoomChecker roomChecker = new RoomChecker(_revitRepository);
+            var roomChecker = new RoomChecker(_revitRepository);
 
             if(room.IsRedundant()) {
                 errorDescription = "Помещение избыточно";
@@ -45,25 +45,25 @@ namespace RevitRoomExtrusion.Models {
         }
 
         private string GetParamNumber(Room room) {
-            
-            string numberPrefix = null;            
-            string roomGroupShortName = room.GetParamValue<string>(SharedParamsConfig.Instance.RoomGroupShortName);                        
+
+            string numberPrefix = null;
+            string roomGroupShortName = room.GetParamValue<string>(SharedParamsConfig.Instance.RoomGroupShortName);
             if(!room.IsExistsParam(SharedParamsConfig.Instance.RoomGroupShortName)) {
                 if(roomGroupShortName != null) {
                     numberPrefix = $"{roomGroupShortName}-";
-                } 
+                }
             }
             Parameter numberParameter = room.get_Parameter(BuiltInParameter.ROOM_NUMBER);
             if(numberParameter.AsString() != "") {
                 return $"{numberPrefix}{numberParameter.AsString()}";
             } else {
                 return "Нет номера";
-            }            
+            }
         }
 
         private string GetParamName(Room room) {
             Parameter nameParameter = room.get_Parameter(BuiltInParameter.ROOM_NAME);
-            if(nameParameter.AsString() != "") {                
+            if(nameParameter.AsString() != "") {
                 string roomName = nameParameter.AsString();
                 return roomName;
             } else {
