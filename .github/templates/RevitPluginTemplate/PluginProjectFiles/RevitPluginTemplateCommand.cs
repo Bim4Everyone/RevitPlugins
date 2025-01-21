@@ -14,11 +14,11 @@ using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
-using RevitPlugins.Models;
-using RevitPlugins.ViewModels;
-using RevitPlugins.Views;
+using RevitPluginTemplate.Models;
+using RevitPluginTemplate.ViewModels;
+using RevitPluginTemplate.Views;
 
-namespace RevitPlugins;
+namespace RevitPluginTemplate;
 
 /// <summary>
 /// Класс команды Revit плагина.
@@ -27,12 +27,12 @@ namespace RevitPlugins;
 /// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
 /// </remarks>
 [Transaction(TransactionMode.Manual)]
-public class RevitPluginsCommand : BasePluginCommand {
+public class RevitPluginTemplateCommand : BasePluginCommand {
     /// <summary>
     /// Инициализирует команду плагина.
     /// </summary>
-    public RevitPluginsCommand() {
-        PluginName = "Пример команды";
+    public RevitPluginTemplateCommand() {
+        PluginName = "RevitPluginTemplate";
     }
 
     /// <summary>

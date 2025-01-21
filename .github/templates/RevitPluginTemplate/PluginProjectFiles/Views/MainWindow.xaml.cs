@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace RevitPlugins.Views;
+namespace RevitPluginTemplate.Views;
 
 /// <summary>
 /// Класс главного окна плагина.
@@ -19,7 +19,7 @@ public partial class MainWindow {
     /// <remarks>
     /// Используется для сохранения положения окна.
     /// </remarks>
-    public override string PluginName => nameof(RevitPlugins);
+    public override string PluginName => nameof(RevitPluginTemplate);
     
     /// <summary>
     /// Наименование файла конфигурации.

@@ -2,7 +2,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-namespace RevitPlugins.Models;
+namespace RevitPluginTemplate.Models;
 
 /// <summary>
 /// Класс доступа к документу и приложению Revit.

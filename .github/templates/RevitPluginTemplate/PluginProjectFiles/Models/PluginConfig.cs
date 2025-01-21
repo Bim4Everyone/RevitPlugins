@@ -4,7 +4,7 @@ using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
-namespace RevitPlugins.Models;
+namespace RevitPluginTemplate.Models;
 
 /// <summary>
 /// Класс конфигурации плагина.
@@ -33,7 +33,7 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
             .SetSerializer(configSerializer)
-            .SetPluginName(nameof(RevitPlugins))
+            .SetPluginName(nameof(RevitPluginTemplate))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
             .SetProjectConfigName(nameof(PluginConfig) + ".json")
             .Build<PluginConfig>();

@@ -4,9 +4,9 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitPlugins.Models;
+using RevitPluginTemplate.Models;
 
-namespace RevitPlugins.ViewModels;
+namespace RevitPluginTemplate.ViewModels;
 
 /// <summary>
 /// Основная ViewModel главного окна плагина.
