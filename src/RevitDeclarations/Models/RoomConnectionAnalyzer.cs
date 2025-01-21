@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime;
 
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
-using System.Runtime;
 
 namespace RevitDeclarations.Models {
     internal class RoomConnectionAnalyzer {
@@ -44,13 +44,15 @@ namespace RevitDeclarations.Models {
         }
 
         public void FindConnections() {
+            IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
+
             // Словарь с жилыми комнатами, соединенными с СУ и этими СУ
-            var bedroomBathroom = GetRoomsByDoors(_priorities.LivingRoom, _priorities.Bathroom);
+            var bedroomBathroom = GetRoomsByDoors(doors, _priorities.LivingRoom, _priorities.Bathroom);
             // Жилые комнаты, соединенные с санузлами
             List<ElementId> bedroomsWithBathroom = bedroomBathroom[_priorities.LivingRoom];
 
-            var pantryBedroom = GetRoomsByDoors(_priorities.Pantry, _priorities.LivingRoom);
-            var pantryBathroom = GetRoomsByDoors(_priorities.Pantry, _priorities.Bathroom);
+            var pantryBedroom = GetRoomsByDoors(doors, _priorities.Pantry, _priorities.LivingRoom);
+            var pantryBathroom = GetRoomsByDoors(doors, _priorities.Pantry, _priorities.Bathroom);
             // Гардеробные, соединенные с жилыми комнатами (не учитываются для УТП Гардеробная)
             _pantriesWithBedroom = pantryBedroom[_priorities.Pantry];
             // Гардеробные, соединенные с санузлами
@@ -58,7 +60,7 @@ namespace RevitDeclarations.Models {
             // Мастер-гардеробные (имеющие дверь в санузел) для определения мастер-спален
             List<ElementId> masterPantries = _pantriesWithBedroom.Intersect(pantriesWithBathroom).ToList();
 
-            var bedroomPantry = GetRoomsByDoors(_priorities.LivingRoom, masterPantries);
+            var bedroomPantry = GetRoomsByDoors(doors, _priorities.LivingRoom, masterPantries);
             // Жилые комнаты, соединенные с мастер-гардеробными
             var bedroomsWithPantryAndBathroom = bedroomPantry[_priorities.LivingRoom];
 
@@ -68,7 +70,7 @@ namespace RevitDeclarations.Models {
                 .ToList();
 
             List<ElementId> bathroomsWithBedroom = bedroomBathroom[_priorities.Bathroom];
-            var bathroomPantry = GetRoomsByDoors(_priorities.Bathroom, masterPantries);
+            var bathroomPantry = GetRoomsByDoors(doors, _priorities.Bathroom, masterPantries);
             // Санузлы, соединенные с мастер-гардеробными
             var bathroomsWithMasterPantry = bathroomPantry[_priorities.Bathroom];
 
@@ -78,9 +80,9 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
-        private Dictionary<RoomPriority, List<ElementId>> GetRoomsByDoors(RoomPriority priority1, RoomPriority priority2) {
-            IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
-
+        private Dictionary<RoomPriority, List<ElementId>> GetRoomsByDoors(IReadOnlyCollection<FamilyInstance> doors, 
+                                                                          RoomPriority priority1, 
+                                                                          RoomPriority priority2) {
             var roomByNames = new Dictionary<RoomPriority, List<ElementId>>() {
                 [priority1] = new List<ElementId>(),
                 [priority2] = new List<ElementId>()
@@ -109,9 +111,9 @@ namespace RevitDeclarations.Models {
             return roomByNames;
         }
 
-        private Dictionary<RoomPriority, List<ElementId>> GetRoomsByDoors(RoomPriority priority, List<ElementId> rooms) {
-            IReadOnlyCollection<FamilyInstance> doors = _project.GetDoors();
-
+        private Dictionary<RoomPriority, List<ElementId>> GetRoomsByDoors(IReadOnlyCollection<FamilyInstance> doors, 
+                                                                          RoomPriority priority, 
+                                                                          List<ElementId> rooms) {
             var roomByNames = new Dictionary<RoomPriority, List<ElementId>>() {
                 [priority] = new List<ElementId>()
             };
@@ -137,9 +139,9 @@ namespace RevitDeclarations.Models {
             return roomByNames;
         }
 
-        //private Dictionary<string, List<ElementId>> GetRoomsBySeparators(RoomPriority priority1,
-        //                                                                 RoomPriority priority2) {
+        private Dictionary<string, List<ElementId>> GetRoomsBySeparators(RoomPriority priority1,
+                                                                         RoomPriority priority2) {
 
-        //}
+        }
     }
 }
