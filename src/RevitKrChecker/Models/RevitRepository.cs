@@ -185,13 +185,70 @@ namespace RevitKrChecker.Models {
             // Параметр "Материал: Имя" содержит параметр "Материал: Описание"
             nonStoppingChecks.Add(new CompareMaterialParamsCheck(
                 new CompareCheckOptions() {
-                    CheckName = "Проверка описания материала в имени материала",
+                    CheckName = "Проверка наличия описания материала в имени материала",
                     TargetParamName = "Имя",
                     TargetParamLevel = ParamLevel.Material,
                     CheckRule = new ContainsCheckRule(),
                     SourceParamName = "Описание",
                     SourceParamLevel = ParamLevel.Material,
                 }));
+
+            // Код работы в "Материал: Ключевая пометка" соответствует коду работы в "Материал: Имя" (содержится в нем)
+            // Параметр "Материал: Имя" содержит параметр "Материал: Ключевая пометка"
+            nonStoppingChecks.Add(new CompareMaterialParamsCheck(
+                new CompareCheckOptions() {
+                    CheckName = "Проверка наличия ключевой пометки материала в имени материала",
+                    TargetParamName = "Имя",
+                    TargetParamLevel = ParamLevel.Material,
+                    CheckRule = new ContainsCheckRule(),
+                    SourceParamName = "Ключевая пометка",
+                    SourceParamLevel = ParamLevel.Material,
+                }));
+
+            // [ФОП_МТР_Единица измерения] соответствует [ФОП_МТР_Тип подсчета]:
+            // ед.изм. "м" - подсчет "1";
+            // ед.изм. "м²" - подсчет "2";
+            // ед.изм. "м³" - подсчет "3";
+            // ед.изм. "шт." - подсчет "4"
+            // Параметр "ФОП_МТР_Единица измерения" содержит соответствующее "ФОП_МТР_Тип подсчета"
+            nonStoppingChecks.Add(new TemplatesCompareMaterialParamsCheck(
+                new TemplatesCompareCheckOptions() {
+                    CheckName = "Проверка соответствия единицы измерения и типа подсчета материала",
+                    TargetParamName = "ФОП_МТР_Единица измерения",
+                    TargetParamLevel = ParamLevel.Material,
+                    CheckRule = new EqualCheckRule(),
+                    SourceParamName = "ФОП_МТР_Тип подсчета",
+                    SourceParamLevel = ParamLevel.Material,
+                    DictForCompare = new Dictionary<string, string>() {
+                        { "1", "м" },
+                        { "2", "м²" },
+                        { "3", "м³" },
+                        { "4", "шт." }
+                    }
+                }));
+
+
+
+            // Код работы в "Материал: Ключевая пометка" соответствует "Имени типа" элемента:
+            // код "г02.02." - имя начинается "Ф_";
+            // код "г02.03." - имя начинается "НН_";
+            // код "г02.04." - имя начинается "ВН_"
+            // Параметр "Материал: Ключевая пометка" содержит соответствующее "Имени типа"
+            //nonStoppingChecks.Add(new TemplatesCompareMaterialParamsCheck(
+            //    new TemplatesCompareCheckOptions() {
+            //        CheckName = "Проверка наличия ключевой пометки материала в имени материала",
+            //        TargetParamName = "Имя",
+            //        TargetParamLevel = ParamLevel.Material,
+            //        CheckRule = new ContainsCheckRule(),
+            //        SourceParamName = "Ключевая пометка",
+            //        SourceParamLevel = ParamLevel.Material, 
+            //        DictForCompare = new Dictionary<string, string>() {
+            //            { "1", "2" },
+            //            { "1", "2" },
+            //            { "1", "2" }
+            //        }
+            //    }));
+
 
 
             return nonStoppingChecks;

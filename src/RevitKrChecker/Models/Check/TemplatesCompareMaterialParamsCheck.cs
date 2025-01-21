@@ -61,12 +61,12 @@ namespace RevitKrChecker.Models.Check {
                            .ToList();
 
             foreach(Element material in materials) {
-                string targetParamValue = material.GetParamValue<string>(TargetParamName);
+                string targetParamValue = material.GetParam(TargetParamName).AsValueString();
 
                 // Если сравнивать будем со значением параметра на уровне материала,
                 // то будем получать его значение каждый раз в рамках материала
                 if(SourceParamLevel is ParamLevel.Material) {
-                    string sourceParamValue = material.GetParamValue<string>(SourceParamName);
+                    string sourceParamValue = material.GetParam(SourceParamName).AsValueString();
                     dictSourceParamValue = DictForCompare[sourceParamValue];
                 }
 
