@@ -43,7 +43,7 @@
                 Margin="5"
                 Padding="5"/>
             <Label
-                Content="Введите тип помещений"
+                Content="Введите имя семейства"
                 Margin="5"
                 Padding="5"/>
             <TextBox

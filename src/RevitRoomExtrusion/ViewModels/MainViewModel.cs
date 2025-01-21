@@ -80,7 +80,7 @@ namespace RevitRoomExtrusion.ViewModels {
                 return false;
             }
             if(string.IsNullOrEmpty(_extrusionFamilyName)) {
-                ErrorText = "Задайте имя типа помещений";
+                ErrorText = "Задайте имя семейства";
                 return false;
             }           
             ErrorText = null;
