@@ -13,7 +13,6 @@ namespace RevitRoomExtrusion.Models {
     internal class RevitRepository {
 
         public RevitRepository(UIApplication uiApplication) {
-
             UIApplication = uiApplication;             
         }
 
@@ -23,38 +22,22 @@ namespace RevitRoomExtrusion.Models {
         public Document Document => ActiveUIDocument.Document;
 
         public View3D GetView3D(string familyName) {
+            string userName = Application.Username;
+            string name3Dview = $"${userName}/{familyName}/Проверка дорожек";
+            
             var views = new FilteredElementCollector(Document)
                 .OfCategory(BuiltInCategory.OST_Views)
                 .WhereElementIsNotElementType()
                 .ToElements()
-                .Cast<View>();
-            var viewTypes = new FilteredElementCollector(Document)
-                .OfClass(typeof(ViewFamilyType))
-                .ToElements()
-                .Cast<ViewFamilyType>();
-            var viewTypes3D = viewTypes
-                .Where(vt => vt.ViewFamily == ViewFamily.ThreeDimensional)
-                .ToList();
-            
-            if(!viewTypes3D.Any()) {
-                throw new InvalidOperationException("Тип 3D вид не найден!");
-            }
-            var viewType3D = viewTypes3D.First();
-
-            string userName = Application.Username;
-            string name3Dview = $"${userName}/{familyName}/Проверка дорожек";
-            var existingView = views.FirstOrDefault(v => v.Name.Equals(name3Dview, StringComparison.OrdinalIgnoreCase));
+                .Cast<View>();            
+            var existingView = views
+                .FirstOrDefault(v => v.Name.Equals(name3Dview, StringComparison.OrdinalIgnoreCase));
             
             if(existingView != null) {
                 return existingView as View3D;
-            }
-
-            using(Transaction t = Document.StartTransaction("BIM: Создание 3D вида проверки дорожек")) {                
-                View3D view3D = View3D.CreateIsometric(Document, viewType3D.Id);
-                view3D.Name = name3Dview;                
-                t.Commit();
-                return view3D;
-            }            
+            } else {
+                return CreateView3D(name3Dview);
+            }                       
         }
 
         public List<Room> GetSelectedRooms() {
@@ -69,6 +52,23 @@ namespace RevitRoomExtrusion.Models {
             List<ElementId> listRoomElements = new List<ElementId>() { 
                 elementId };                        
             ActiveUIDocument.Selection.SetElementIds(listRoomElements);
+        }
+
+        private View3D CreateView3D(string name3Dview) {
+            var viewTypes = new FilteredElementCollector(Document)
+                .OfClass(typeof(ViewFamilyType))
+                .ToElements()
+                .Cast<ViewFamilyType>();
+            var viewTypes3D = viewTypes
+                .Where(vt => vt.ViewFamily == ViewFamily.ThreeDimensional)
+                .ToList()
+                .First();
+            using(Transaction t = Document.StartTransaction("BIM: Создание 3D вида проверки дорожек")) {
+                View3D view3D = View3D.CreateIsometric(Document, viewTypes3D.Id);
+                view3D.Name = name3Dview;
+                t.Commit();
+                return view3D;
+            }
         }
     }
 }

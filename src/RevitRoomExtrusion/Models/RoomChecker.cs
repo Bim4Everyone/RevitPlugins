@@ -16,7 +16,7 @@ namespace RevitRoomExtrusion.Models {
             _revitRepository = revitRepository;
         }
 
-        public bool IsSelected() {
+        public bool CheckSelection() {
             bool result = true;
             if(_revitRepository.GetSelectedRooms().Count <= 0) {
                 TaskDialog.Show("BIM", "Помещения не выбраны");                
@@ -25,25 +25,25 @@ namespace RevitRoomExtrusion.Models {
             return result;
         }
 
-        public bool IsCheked() {
-            return _revitRepository.GetSelectedRooms().All(room => !IsInValidRoom(room));
+        public bool CheckRooms() {
+            return _revitRepository.GetSelectedRooms().All(room => !CheckInvalidRoom(room));
             }
 
-        public bool IsInValidRoom(Room room) {
+        public bool CheckInvalidRoom(Room room) {
             bool resultCheck = false;
-            if (room.IsNotEnclosed() || room.IsRedundant() || IsIntersectBoundary(room)) {
+            if (room.IsNotEnclosed() || room.IsRedundant() || CheckIntersectBoundary(room)) {
                 resultCheck = true;
             }            
             return resultCheck;
         }         
         
-        public bool IsIntersectBoundary(Room room) {            
+        public bool CheckIntersectBoundary(Room room) {            
             SpatialElementBoundaryOptions options = new SpatialElementBoundaryOptions();            
             return room.GetBoundarySegments(options)
-                .Any(listSegment => IsIntersectCurve(listSegment));            
+                .Any(listSegment => CheckIntersectCurve(listSegment));            
         }   
         
-        private bool IsIntersectCurve(IList<BoundarySegment> segments) {           
+        private bool CheckIntersectCurve(IList<BoundarySegment> segments) {           
             bool resultCheck = false;            
             List<Curve> curves = new List<Curve>();
             foreach(BoundarySegment segment in segments) {

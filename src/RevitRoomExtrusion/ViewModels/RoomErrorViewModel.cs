@@ -38,14 +38,13 @@ namespace RevitRoomExtrusion.ViewModels {
                 errorDescription = "Помещение избыточно";
             } else if(room.IsNotEnclosed()) {
                 errorDescription = "Помещение не окружено";
-            } else if(roomChecker.IsIntersectBoundary(room)) {
+            } else if(roomChecker.CheckIntersectBoundary(room)) {
                 errorDescription = "Помещение не ограничено разделителями";
             }
             return errorDescription;
         }
 
         private string GetParamNumber(Room room) {
-
             string numberPrefix = null;
             string roomGroupShortName = room.GetParamValue<string>(SharedParamsConfig.Instance.RoomGroupShortName);
             if(!room.IsExistsParam(SharedParamsConfig.Instance.RoomGroupShortName)) {

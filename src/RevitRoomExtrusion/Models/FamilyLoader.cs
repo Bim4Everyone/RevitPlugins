@@ -1,8 +1,10 @@
-using Autodesk.Revit.DB.Structure;
-using Autodesk.Revit.DB;
-using System.Linq;
 using System;
 using System.IO;
+using System.Linq;
+using Autodesk.Revit.DB.Structure;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+
 using dosymep.Revit;
 
 
@@ -12,7 +14,6 @@ namespace RevitRoomExtrusion.Models {
         private readonly RevitRepository _revitRepository;
 
         public FamilyLoader(RevitRepository revitRepository) {
-
             _revitRepository = revitRepository;
         }
 
@@ -36,41 +37,25 @@ namespace RevitRoomExtrusion.Models {
             }
             DeleteRoomFamily(path);
             return familySymbol;
-        }
-
-        private class FamilyLoadOptions : IFamilyLoadOptions {
-            public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues) {
-                overwriteParameterValues = true;
-                return true;
-            }
-
-            public bool OnSharedFamilyFound(Family sharedFamily,
-                                            bool familyInUse,
-                                            out FamilySource source,
-                                            out bool overwriteParameterValues) {
-                source = FamilySource.Project;
-                overwriteParameterValues = true;
-                return true;
-            }
-        }
+        }        
 
         private void DeleteRoomFamily(string famPath) {
             try {
                 if(File.Exists(famPath)) {
                     File.Delete(famPath);
                 }
-            } catch(Exception) {
+            } catch(UnauthorizedAccessException) {
+                TaskDialog.Show("BIM", $"Ошибка удаления файла семейства. Удалите файл {famPath} вручную.");
             }
         }
 
         public void PlaceRoomFamily(FamilySymbol symbol, IGrouping<double, RoomElement> groupRooms, double location) {
-
-            double locationRoom = groupRooms.FirstOrDefault().LocationRoom;
+            double locationRoom = groupRooms
+                .FirstOrDefault().LocationRoom;
             double locationFt = UnitUtils.ConvertToInternalUnits(location, UnitTypeId.Millimeters);
             double locationPlace = locationFt - locationRoom;
 
             using(Transaction t = _revitRepository.Document.StartTransaction("BIM: Размещение семейства дорожек")) {
-
                 XYZ xyz = new XYZ(0, 0, locationPlace);
                 FamilyInstance familyInstance = _revitRepository.Document.Create.NewFamilyInstance(
                     xyz,
@@ -83,7 +68,8 @@ namespace RevitRoomExtrusion.Models {
         public bool IsFamilyInstancePlaced(string familyName) {
             return new FilteredElementCollector(_revitRepository.Document)
                 .OfCategory(BuiltInCategory.OST_Roads)
-                .WhereElementIsElementType()                
+                .WhereElementIsNotElementType()
+                .Cast<FamilyInstance>()
                 .Any(familyInstance => familyInstance.Name == familyName);
         }
     }

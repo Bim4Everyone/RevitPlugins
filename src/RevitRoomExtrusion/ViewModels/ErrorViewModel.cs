@@ -14,15 +14,13 @@ namespace RevitRoomExtrusion.ViewModels {
         
         private readonly RevitRepository _revitRepository;
 
-        public ErrorViewModel(RevitRepository revitRepository) {
-            
+        public ErrorViewModel(RevitRepository revitRepository) {            
             _revitRepository = revitRepository;
 
             ErrorRooms = new ObservableCollection<RoomErrorViewModel>(
                 GetErrorRooms().Select(roomError => new RoomErrorViewModel(_revitRepository, 
                                                                            roomError, 
                                                                            ShowElementCommand)));
-
             ShowElementCommand = RelayCommand.Create<ElementId>(ShowElement);
         }
         
@@ -37,7 +35,7 @@ namespace RevitRoomExtrusion.ViewModels {
             RoomChecker roomChecker = new RoomChecker(_revitRepository);
             return new List<Room>(
                 _revitRepository.GetSelectedRooms()
-                .Where(room => roomChecker.IsInValidRoom(room)));                
+                .Where(room => roomChecker.CheckInvalidRoom(room)));                
              
         }
     }    

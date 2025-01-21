@@ -23,12 +23,10 @@ namespace RevitRoomExtrusion.Models {
         private readonly int _normalDirection = 10;
 
         public FamilyDocument(Application application, double location, string familyName) {            
-            
             _application = application; 
             _familyDocument = _application.NewFamilyDocument(_templatePath);
             _location = location;
             _familyName = familyName;
-
             SetFamilyNameAndPath();
         }
 
@@ -36,12 +34,10 @@ namespace RevitRoomExtrusion.Models {
         public string FamPath { get; private set; }         
 
         public Document CreateDocument(double amount, List<RoomElement> roomList) {
-
             Category familyCategory = Category.GetCategory(_familyDocument, BuiltInCategory.OST_Roads);
             ElementId materialElementId = GetMaterialElementId();
 
-            using(Transaction t = new Transaction(_familyDocument, "Категория, выдавливания, материал")) {
-                
+            using(Transaction t = new Transaction(_familyDocument, "Категория, выдавливания, материал")) {                
                 t.Start();                
                 _familyDocument.OwnerFamily.FamilyCategory = familyCategory;                
 
@@ -69,13 +65,11 @@ namespace RevitRoomExtrusion.Models {
             return _familyDocument;
         }
 
-        private ElementId GetMaterialElementId() {
-            
+        private ElementId GetMaterialElementId() {            
             var materials = new FilteredElementCollector(_familyDocument)
                     .OfClass(typeof(Material))
                     .WhereElementIsNotElementType()
                     .ToElements();
-
             return materials
                 .FirstOrDefault(mat => mat.Name.Equals("glass", StringComparison.OrdinalIgnoreCase) ||
                     mat.Name.Equals("стекло", StringComparison.OrdinalIgnoreCase))

@@ -63,8 +63,8 @@ namespace RevitRoomExtrusion {
 
                 RoomChecker roomChecker = kernel.Get<RoomChecker>();
 
-                if(roomChecker.IsSelected()) {
-                    if(roomChecker.IsCheked()) {
+                if(roomChecker.CheckSelection()) {
+                    if(roomChecker.CheckRooms()) {
                         Notification(kernel.Get<MainWindow>());
                     } else {
                         var errorWindow = kernel.Get<ErrorWindow>();

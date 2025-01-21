@@ -34,9 +34,7 @@ namespace RevitRoomExtrusion.ViewModels {
             ExtrusionFamilyName = "Машино-места";
 
             LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-
-            SelectedRooms = _revitRepository.GetSelectedRooms();
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);            
         }
 
         public ICommand LoadViewCommand { get; }
@@ -64,17 +62,12 @@ namespace RevitRoomExtrusion.ViewModels {
             LoadConfig();
         }
         private void AcceptView() {            
-            
-            SaveConfig();            
-
+            SaveConfig();
+            SelectedRooms = _revitRepository.GetSelectedRooms();
             View3D view3d = _revitRepository.GetView3D(_extrusionFamilyName);
-                
-            FamilyCreator familyCreator = new FamilyCreator(_revitRepository);
-                
             double extrusionHeightDouble = Convert.ToDouble(_extrusionHeight);
-
+            FamilyCreator familyCreator = new FamilyCreator(_revitRepository); 
             familyCreator.CreateFamilies(_extrusionFamilyName, extrusionHeightDouble, SelectedRooms, view3d);
-            
         }
 
         private bool CanAcceptView() {

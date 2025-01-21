@@ -15,8 +15,7 @@ namespace RevitRoomExtrusion.Models {
         public RoomElement(Document document, Room room, View3D view3D) {
             _document = document;
             _room = room;
-            _view3D = view3D;
-            
+            _view3D = view3D;            
             LocationPoint locationPoint = room.Location as LocationPoint;
             LocationRoom = locationPoint.Point.Z;
             LocationSlab = CalculateLocation();
@@ -27,8 +26,7 @@ namespace RevitRoomExtrusion.Models {
         public double LocationSlab { get; private set; }        
         public CurveArrArray ArrArray { get; private set; }
 
-        private double CalculateLocation() {
-            
+        private double CalculateLocation() {            
             BoundingBoxXYZ boundingBox = _room.get_BoundingBox(null);
             XYZ minBB = boundingBox.Min;
             XYZ maxBB = boundingBox.Max;            
@@ -62,12 +60,10 @@ namespace RevitRoomExtrusion.Models {
                 BuiltInCategory.OST_StructuralFoundation,
                 BuiltInCategory.OST_Floors
             };
-
             ElementMulticategoryFilter multiCategoryFilter = new ElementMulticategoryFilter(collectionFilter);
             ReferenceIntersector refIntersec = new ReferenceIntersector(multiCategoryFilter,
                                                                         FindReferenceTarget.Element,
                                                                         _view3D);
-
             return refIntersec.FindNearest(pointCenter, pointDirection);            
         }
     }
