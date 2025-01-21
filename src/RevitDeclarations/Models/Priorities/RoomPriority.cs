@@ -1,5 +1,7 @@
 using System;
 
+using Microsoft.Office.Interop.Excel;
+
 using pyRevitLabs.Json;
 
 namespace RevitDeclarations.Models
@@ -29,6 +31,19 @@ namespace RevitDeclarations.Models
                 return true;
             }
             return false;
+        }
+
+        public override bool Equals(object obj) {
+            if(obj == null || GetType() != obj.GetType()) {
+                return false;
+            }
+
+            RoomPriority priority = (RoomPriority)obj;
+            return string.Equals(priority.Name, Name, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override int GetHashCode() {
+            return Name?.GetHashCode() ?? 0;
         }
     }
 }
