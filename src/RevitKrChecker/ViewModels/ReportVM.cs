@@ -10,7 +10,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitKrChecker.Models;
-using RevitKrChecker.Models.Check;
+using RevitKrChecker.Models.Interfaces;
 
 namespace RevitKrChecker.ViewModels {
     internal class ReportVM : BaseViewModel {

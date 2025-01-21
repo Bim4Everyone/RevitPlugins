@@ -1,4 +1,4 @@
-namespace RevitKrChecker.Models.Rule {
+namespace RevitKrChecker.Models.Interfaces {
     public interface ICheckRule {
         string CheckRuleName { get; }
         string UnfulfilledRule { get; }

@@ -1,3 +1,5 @@
+using RevitKrChecker.Models.Interfaces;
+
 namespace RevitKrChecker.Models.Rule {
     public class EqualCheckRule : ICheckRule {
 

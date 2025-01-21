@@ -1,28 +1,28 @@
-// Ignore Spelling: Tooltip
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using RevitKrChecker.Models.Rule;
+using RevitKrChecker.Models.CheckOptions;
+using RevitKrChecker.Models.Interfaces;
 using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
     public class ParamCheck : ICheck {
         private readonly ParamService _paramService;
 
-        public ParamCheck(string checkName,
-                          string targetParamName,
-                          ParamLevel targetParamLevel,
-                          ICheckRule checkRule,
-                          List<string> trueValues) {
-            CheckName = checkName ?? throw new ArgumentNullException(nameof(checkName));
-            TargetParamName = targetParamName ?? throw new ArgumentNullException(nameof(targetParamName));
-            TargetParamLevel = targetParamLevel;
-            CheckRule = checkRule ?? throw new ArgumentNullException(nameof(checkRule));
-            TrueValues = trueValues ?? throw new ArgumentNullException(nameof(trueValues));
+        public ParamCheck(ParamCheckOptions checkOptions) {
+            CheckName = checkOptions.CheckName
+                ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
+            TargetParamName = checkOptions.TargetParamName
+                ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
+            TargetParamLevel = checkOptions.TargetParamLevel;
+
+            CheckRule = checkOptions.CheckRule
+                ?? throw new ArgumentNullException(nameof(checkOptions.CheckRule));
+            TrueValues = checkOptions.TrueValues
+                ?? throw new ArgumentNullException(nameof(checkOptions.TrueValues));
 
             _paramService = new ParamService();
         }

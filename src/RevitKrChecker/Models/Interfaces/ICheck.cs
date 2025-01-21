@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitKrChecker.Models.Check {
+namespace RevitKrChecker.Models.Interfaces {
     public interface ICheck {
         string CheckName { get; }
         string TargetParamName { get; }

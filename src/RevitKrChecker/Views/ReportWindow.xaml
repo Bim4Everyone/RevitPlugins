@@ -92,10 +92,10 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Margin="2" Orientation="Horizontal">
-                        <TextBlock Margin="2" Foreground="Black" Text="{Binding Path=СheckName}"/>
-                        <TextBlock Margin="2" Foreground="Black" Text=" ("/>
-                        <TextBlock Margin="2" Foreground="Black" FontWeight="Bold" Text="{Binding Path=Elem.Id}"/>
-                        <TextBlock Margin="2" Foreground="Black" Text=")"/>
+                        <TextBlock Margin="0 2" Foreground="Black" Text="{Binding Path=СheckName}"/>
+                        <TextBlock Margin="0 2" Foreground="Black" Text=" ("/>
+                        <TextBlock Margin="0 2" Foreground="Black" FontWeight="Bold" Text="{Binding Path=Elem.Id}"/>
+                        <TextBlock Margin="0 2" Foreground="Black" Text=")"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

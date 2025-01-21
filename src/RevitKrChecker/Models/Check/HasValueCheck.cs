@@ -1,21 +1,19 @@
-// Ignore Spelling: Tooltip
-
 using System;
 
 using Autodesk.Revit.DB;
 
+using RevitKrChecker.Models.CheckOptions;
+using RevitKrChecker.Models.Interfaces;
 using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
     public class HasValueCheck : ICheck {
         private readonly ParamService _paramService;
 
-        public HasValueCheck(string checkName,
-                             string targetParamName,
-                             ParamLevel targetParamLevel) {
-            CheckName = checkName ?? throw new ArgumentNullException(nameof(checkName));
-            TargetParamName = targetParamName ?? throw new ArgumentNullException(nameof(targetParamName));
-            TargetParamLevel = targetParamLevel;
+        public HasValueCheck(HasValueCheckOptions checkOptions) {
+            CheckName = checkOptions.CheckName ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
+            TargetParamName = checkOptions.TargetParamName ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
+            TargetParamLevel = checkOptions.TargetParamLevel;
 
             _paramService = new ParamService();
         }
