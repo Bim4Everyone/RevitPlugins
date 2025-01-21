@@ -12,9 +12,9 @@
     x:Name="mainWindow"
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
-    Height="250"
+    Height="300"
     Width="350"
-    MinHeight="250"
+    MinHeight="300"
     MinWidth="350"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -70,7 +70,22 @@
                     Command="{Binding SelectLinesCommand}"
                     CommandParameter="{Binding ElementName=mainWindow}"
                     IsEnabled="{Binding IsLineNumberingSelected}" />
+                
             </Grid>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0,10,0,0">
+                <TextBlock
+                    Margin="0,0,0,0"
+                    Text="{DynamicResource MainWindow.StartNumbericFrom}" />
+                <TextBox
+                    Margin="10,0,0,0"
+                    Width="100"
+                    Text="{Binding StartNumber}"
+                    IsEnabled="{Binding RenumberAll}" />
+            </StackPanel>
+
         </StackPanel>
 
         <StackPanel

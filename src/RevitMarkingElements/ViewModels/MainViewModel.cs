@@ -33,6 +33,7 @@ namespace RevitMarkingElements.ViewModels {
         private bool _renumberAll;
         private bool _isArrayNumberingSelected;
         private bool _isLineNumberingSelected;
+        private int _startNumber = 1;
         private List<CurveElement> Lines { get; set; }
 
         public MainViewModel(
@@ -44,6 +45,7 @@ namespace RevitMarkingElements.ViewModels {
             _revitRepository = revitRepository;
             _localizationService = localizationService;
 
+            //После закрытия окна выбора линий снять выделения с линии нельзя, только выбирать линии заново, пока оставили так
             SelectLinesCommand = RelayCommand.Create<MainWindow>(SelectLines);
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -56,6 +58,11 @@ namespace RevitMarkingElements.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public int StartNumber {
+            get => _startNumber;
+            set => this.RaiseAndSetIfChanged(ref _startNumber, value);
         }
 
         public List<Category> Categories {
@@ -102,24 +109,38 @@ namespace RevitMarkingElements.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _renumberAll, value);
         }
 
+        private void LoadCategories() {
+            var allCategories = _revitRepository.GetCategoriesWithMarkParam(_markParam);
+
+            Categories = allCategories;
+            SelectedCategoryName = allCategories.FirstOrDefault(x => x.Id.AsBuiltInCategory() == _structuralColumns)?.Name;
+        }
+
         private void SelectLines(MainWindow mainWindow) {
             mainWindow.Hide();
             try {
                 var mainInstruction = _localizationService.GetLocalizedString("MainWindow.MainInstruction");
                 var mainContent = _localizationService.GetLocalizedString("MainWindow.MainContent");
+                var contentAbout = _localizationService.GetLocalizedString("MainWindow.ContentAbout");
                 var selectLinesText = _localizationService.GetLocalizedString("MainWindow.SelectLines");
                 var resultMessage = _localizationService.GetLocalizedString("MainWindow.ResultMessage");
                 var resultTitle = _localizationService.GetLocalizedString("MainWindow.ResultTitle");
+                var linesType = _localizationService.GetLocalizedString("MainWindow.LinesType");
+                var finishLineSelection = _localizationService.GetLocalizedString("MainWindow.FinishLineSelection");
 
                 var taskDialog = new TaskDialog("Выбор линий") {
-                    MainInstruction = mainInstruction,
-                    MainContent = mainContent,
-                    CommonButtons = TaskDialogCommonButtons.Ok
+                    MainInstruction = finishLineSelection,
+                    MainContent = mainInstruction + "\n\n" + contentAbout + "\n\n" + mainContent,
+                    CommonButtons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel
                 };
 
-                taskDialog.Show();
-                var linesType = _localizationService.GetLocalizedString("MainWindow.LinesType");
-                Lines = _revitRepository.SelectLinesOnView(linesType);
+                var result = taskDialog.Show();
+
+                if(result == TaskDialogResult.Cancel) {
+                    return;
+                }
+
+                Lines = _revitRepository.SelectLinesOnView();
                 var message = $"{resultMessage}({Lines?.Count ?? 0})";
 
                 TaskDialog.Show(resultTitle, message);
@@ -128,41 +149,32 @@ namespace RevitMarkingElements.ViewModels {
             }
         }
 
-        private void LoadCategories() {
-            var allCategories = _revitRepository.GetCategoriesWithMarkParam(_markParam);
-
-            Categories = allCategories;
-            SelectedCategoryName = allCategories.FirstOrDefault(x => x.Id.AsBuiltInCategory() == _structuralColumns)?.Name;
-        }
-
         private void NumberMarkingElements() {
             var markingElements = _revitRepository.GetElements(SelectedCategoryId);
-            var counter = RenumberAll ? 1 : GetNextAvailableMarkNumber(markingElements);
 
-            var context = new MarkingContext {
-                Counter = counter,
-                MarkingElements = markingElements,
-                Lines = Lines
-            };
+            var processedElements = RenumberAll
+                ? new List<Element>()
+                : markingElements.Where(e => !string.IsNullOrEmpty(e.GetParam(_markParam)?.AsString())).ToList();
+
+            var unprocessedElements = RenumberAll
+                ? markingElements
+                : markingElements.Except(processedElements).ToList();
+
+            var counter = RenumberAll ? StartNumber : GetNextAvailableMarkNumber(markingElements);
+
+            var lines = IsLineNumberingSelected ? Lines : null;
+            var sortedUnprocessedElements = IsLineNumberingSelected
+                ? SortElementsByLines(unprocessedElements, lines)
+                : SortElementsByCoordinates(unprocessedElements);
 
             var transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
             using(Transaction transaction = _revitRepository.CreateTransaction(transactionName)) {
                 transaction.Start();
 
-                if(IsArrayNumberingSelected) {
-                    ProcessUnselectedElements(context);
-                } else {
-                    ProcessElementsByLines(context);
-
-                    if(IncludeUnselected) {
-                        ProcessUnselectedElements(context);
-                    }
-                }
+                AssignMarks(sortedUnprocessedElements, processedElements, ref counter);
 
                 transaction.Commit();
             }
-
-            ErrorText = null;
         }
 
         private int GetNextAvailableMarkNumber(List<Element> markingElements) {
@@ -185,63 +197,52 @@ namespace RevitMarkingElements.ViewModels {
             return nextAvailableNumber;
         }
 
-        private void ProcessElementsByLines(MarkingContext context) {
-            foreach(var lineElement in context.Lines) {
-                var line = lineElement.GeometryCurve;
-                if(line == null) {
-                    continue;
-                }
+        private List<Element> SortElementsByLines(List<Element> elements, List<CurveElement> lines) {
+            var sortedElements = new List<Element>();
 
-                var markingElementsOnLine = _revitRepository
-                    .GetElementsIntersectingLine(context.MarkingElements, lineElement)
-                    .OrderBy(markingElement => {
-                        var markingElementPoint = _revitRepository.GetElementCoordinates(markingElement);
-                        return markingElementPoint.DistanceTo(line.GetEndPoint(0));
+            foreach(var line in lines) {
+                var lineCurve = line.GeometryCurve;
+                if(lineCurve == null)
+                    continue;
+
+                var elementsOnLine = _revitRepository
+                    .GetElementsIntersectingLine(elements, line)
+                    .OrderBy(element => {
+                        var point = _revitRepository.GetElementCoordinates(element);
+                        return point.DistanceTo(lineCurve.GetEndPoint(0));
                     })
                     .ToList();
 
-                AssignMarksToElements(markingElementsOnLine, context);
+                sortedElements.AddRange(elementsOnLine);
             }
+
+            return sortedElements;
         }
 
-        private void ProcessUnselectedElements(MarkingContext context) {
-
-            var remainingElements = context.MarkingElements.Except(context.ProcessedElements)
-                .OrderByDescending(markingElement => {
-                    var point = _revitRepository.GetElementCoordinates(markingElement);
+        private List<Element> SortElementsByCoordinates(List<Element> elements) {
+            return elements
+                .OrderByDescending(element => {
+                    var point = _revitRepository.GetElementCoordinates(element);
                     return (point.Y, point.X);
                 })
                 .ToList();
-
-            AssignMarksToElements(remainingElements, context);
         }
 
-        private void AssignMarksToElements(List<Element> elements, MarkingContext context) {
-            var existingMarks = RenumberAll
-                ? new List<string>()
-                : new List<string>(
-                    elements
-                        .Select(e => e.GetParam(_markParam)?.AsString())
-                        .Where(mark => !string.IsNullOrEmpty(mark))
-                );
+        private void AssignMarks(List<Element> elements, List<Element> processedElements, ref int counter) {
+            var existingMarks = new HashSet<string>(
+                processedElements.Select(e => e.GetParam(_markParam)?.AsString()).Where(mark => !string.IsNullOrEmpty(mark)));
 
-            foreach(var markingElement in elements) {
-                var markParam = markingElement.GetParam(_markParam);
+            foreach(var element in elements) {
+                var markParam = element.GetParam(_markParam);
                 if(markParam != null && !markParam.IsReadOnly) {
-                    var currentMarkValue = markParam.AsString();
-                    if(!RenumberAll && !string.IsNullOrEmpty(currentMarkValue)) {
-                        context.ProcessedElements.Add(markingElement);
-                        continue;
+                    while(existingMarks.Contains(counter.ToString())) {
+                        counter++;
                     }
 
-                    while(existingMarks.Contains(context.Counter.ToString())) {
-                        context.Counter++;
-                    }
-
-                    markParam.Set($"{context.Counter}");
-                    existingMarks.Add(context.Counter.ToString());
-                    context.Counter++;
-                    context.ProcessedElements.Add(markingElement);
+                    markParam.Set($"{counter}");
+                    existingMarks.Add(counter.ToString());
+                    processedElements.Add(element);
+                    counter++;
                 }
             }
         }

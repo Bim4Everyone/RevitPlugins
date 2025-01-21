@@ -1,8 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
-    <!-- Пример перевода на русский язык (google translate) -->
 
     <system:String x:Key="MainWindow.Title">Маркировка элементов</system:String>
     <system:String x:Key="MainWindow.CategoriesElements">Категория элементов:</system:String>
@@ -13,7 +11,8 @@
     <system:String x:Key="MainWindow.LinesType">Выберите кривые или прямые линии</system:String>
     <system:String x:Key="MainWindow.SelectLines">Выберите линии для определения порядка нумерации</system:String>
     <system:String x:Key="MainWindow.MainInstruction">Необходимо выбрать линии для определения порядка нумерации.</system:String>
-    <system:String x:Key="MainWindow.MainContent">Начало линии определяет начало нумерации.\n\nЕсли линий нет, то их нужно нарисовать на виде.</system:String>
+    <system:String x:Key="MainWindow.ContentAbout">Начало линии определяет начало нумерации.</system:String>
+    <system:String x:Key="MainWindow.MainContent">Если линий нет, то их нужно нарисовать на виде.</system:String>
     <system:String x:Key="MainWindow.ResultMessage">Выбранные элементы</system:String>
     <system:String x:Key="MainWindow.ResultTitle">Результат выбора</system:String>
     <system:String x:Key="MainWindow.ArrayNumberingLabel">Нумеровать массив</system:String>
@@ -22,4 +21,6 @@
     <system:String x:Key="MainWindow.SelectNumberingType">Необходимо выбрать тип нумерации</system:String>
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.FinishLineSelection">Нажмите Esc для завершения выбора линий.</system:String>
+    <system:String x:Key="MainWindow.StartNumbericFrom">Начать нумерацию с числа.</system:String> 
 </ResourceDictionary>

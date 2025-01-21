@@ -4,15 +4,18 @@ using System.Linq;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitMarkingElements.Models {
     internal class RevitRepository {
-
-        public RevitRepository(UIApplication uiApplication) {
+        private readonly ILocalizationService _localizationService;
+        public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
             UIApplication = uiApplication;
+            _localizationService = localizationService;
         }
 
         public UIApplication UIApplication { get; }
@@ -56,22 +59,30 @@ namespace RevitMarkingElements.Models {
             }).ToList();
         }
 
-        public List<CurveElement> SelectLinesOnView(string selectLinesText) {
-            var selectedReferences = ActiveUIDocument.Selection.PickObjects(
-                Autodesk.Revit.UI.Selection.ObjectType.Element,
-                selectLinesText);
+        public List<CurveElement> SelectLinesOnView() {
+            var selectedLines = new List<CurveElement>();
+            ISelectionFilter lineSelectionFilter = new CurveElementSelectionFilter();
+            var finishLineSelection = _localizationService.GetLocalizedString("MainWindow.FinishLineSelection");
+            bool isDone = false;
+            while(!isDone) {
+                try {
+                    var reference = ActiveUIDocument.Selection.PickObject(
+                        ObjectType.Element,
+                        lineSelectionFilter,
+                        finishLineSelection);
 
-            if(selectedReferences != null) {
-                return selectedReferences
-                    .Select(reference => ActiveUIDocument.Document.GetElement(reference.ElementId))
-                    .OfType<CurveElement>()
-                    .Where(curveElement =>
-                    curveElement.GeometryCurve != null &&
-                    (curveElement is ModelLine || curveElement is ModelNurbSpline))
-                    .ToList();
+                    if(reference != null) {
+                        var element = ActiveUIDocument.Document.GetElement(reference.ElementId) as CurveElement;
+                        if(element != null && element.GeometryCurve != null) {
+                            selectedLines.Add(element);
+                        }
+                    }
+                } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
+                    isDone = true;
+                }
             }
 
-            return new List<CurveElement>();
+            return selectedLines;
         }
 
         public Transaction CreateTransaction(string transactionName) {

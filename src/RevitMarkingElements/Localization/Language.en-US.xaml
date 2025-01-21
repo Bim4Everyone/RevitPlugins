@@ -2,8 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
-    <!-- Пример перевода на английский американский язык (google translate) -->
-
     <system:String x:Key="MainWindow.Title">Marking of elements</system:String>
     <system:String x:Key="MainWindow.CategoriesElements">Element category:</system:String>
     <system:String x:Key="MainWindow.TransactionName">Numbering of elements.</system:String>
@@ -13,7 +11,8 @@
     <system:String x:Key="MainWindow.LinesType">Select curves or straight lines</system:String>
     <system:String x:Key="MainWindow.SelectLines">Select lines for determining the numbering order</system:String>
     <system:String x:Key="MainWindow.MainInstruction">You need to select lines to determine the numbering order.</system:String>
-    <system:String x:Key="MainWindow.MainContent">The beginning of the line determines the start of numbering.\n\nIf there are no lines, they need to be drawn on the view.</system:String>
+    <system:String x:Key="MainWindow.ContentAbout">The beginning of the line determines the start of numbering.</system:String>
+    <system:String x:Key="MainWindow.MainContent">If there are no lines, they need to be drawn on the view.</system:String>
     <system:String x:Key="MainWindow.ResultMessage">Selected elements</system:String>
     <system:String x:Key="MainWindow.ResultTitle">Selection Result</system:String>
     <system:String x:Key="MainWindow.ArrayNumberingLabel">Number array</system:String>
@@ -22,4 +21,6 @@
     <system:String x:Key="MainWindow.SelectNumberingType">You must select a numbering type</system:String>
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="MainWindow.FinishLineSelection">"Press Esc to complete line selection"</system:String>
+    <system:String x:Key="MainWindow.StartNumbericFrom">Start numbering with a number.</system:String> 
 </ResourceDictionary>
