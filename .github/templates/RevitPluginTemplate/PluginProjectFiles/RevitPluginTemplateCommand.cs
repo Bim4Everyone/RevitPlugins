@@ -6,6 +6,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
@@ -53,7 +54,7 @@ public class RevitPluginTemplateCommand : BasePluginCommand {
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
-            .ToMethod(c => PluginConfig.GetPluginConfig());
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         // Настройка запуска окна
         kernel.Bind<MainViewModel>().ToSelf();

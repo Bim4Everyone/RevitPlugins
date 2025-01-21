@@ -27,11 +27,12 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     /// Метод создания конфигурации плагина.
     /// </summary>
     /// <returns>
+	/// <param name="configSerializer">Сериализатор конфигурации.</param>
     /// Возвращает прочитанную конфигурацию плагина, либо созданный конфиг по умолчанию.
     /// </returns>
-    public static PluginConfig GetPluginConfig() {
+    public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
-            .SetSerializer(new ConfigSerializer())
+            .SetSerializer(configSerializer)
             .SetPluginName(nameof(RevitPluginTemplate))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
             .SetProjectConfigName(nameof(PluginConfig) + ".json")
