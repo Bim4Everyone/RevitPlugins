@@ -133,6 +133,8 @@ namespace RevitOpeningPlacement.OpeningModels {
                 solid = GetSolidByFamily(_familyInstance.Symbol.FamilyName);
             } catch(Exception ex) when(
             ex is NullReferenceException
+            || ex is ArgumentNullException
+            || ex is ArgumentException
             || ex is InvalidOperationException
             || ex is Autodesk.Revit.Exceptions.ApplicationException) {
                 solid = GetSolidByCut();
