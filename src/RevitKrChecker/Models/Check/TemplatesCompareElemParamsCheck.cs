@@ -56,7 +56,9 @@ namespace RevitKrChecker.Models.Check {
 
             string targetParamValue = targetParam.AsValueString();
             string sourceParamValue = sourceParam.AsValueString();
-            string dictSourceParamValue = DictForCompare[sourceParamValue];
+            string dictSourceParamValue = DictForCompare.ContainsKey(sourceParamValue)
+                ? DictForCompare[sourceParamValue]
+                : null;
 
             if(CheckRule.Check(targetParamValue, dictSourceParamValue)) {
                 info = null;

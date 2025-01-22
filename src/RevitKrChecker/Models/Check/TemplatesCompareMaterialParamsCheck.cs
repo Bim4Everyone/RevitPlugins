@@ -53,7 +53,9 @@ namespace RevitKrChecker.Models.Check {
             if(SourceParamLevel != ParamLevel.Material) {
                 Parameter sourceParam = _paramService.GetParamToCheck(element, SourceParamName, SourceParamLevel);
                 string sourceParamValue = sourceParam.AsValueString();
-                dictSourceParamValue = DictForCompare[sourceParamValue];
+                dictSourceParamValue = DictForCompare.ContainsKey(sourceParamValue)
+                    ? DictForCompare[sourceParamValue]
+                    : null;
             }
 
             List<Element> materials = element.GetMaterialIds(false)
@@ -67,7 +69,9 @@ namespace RevitKrChecker.Models.Check {
                 // то будем получать его значение каждый раз в рамках материала
                 if(SourceParamLevel is ParamLevel.Material) {
                     string sourceParamValue = material.GetParam(SourceParamName).AsValueString();
-                    dictSourceParamValue = DictForCompare[sourceParamValue];
+                    dictSourceParamValue = DictForCompare.ContainsKey(sourceParamValue)
+                        ? DictForCompare[sourceParamValue]
+                        : null;
                 }
 
                 if(!CheckRule.Check(targetParamValue, dictSourceParamValue)) {

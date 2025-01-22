@@ -7,8 +7,8 @@ using Autodesk.Revit.UI;
 
 using RevitKrChecker.Models.Check;
 using RevitKrChecker.Models.CheckOptions;
+using RevitKrChecker.Models.CheckRule;
 using RevitKrChecker.Models.Interfaces;
-using RevitKrChecker.Models.Rule;
 
 namespace RevitKrChecker.Models {
     internal class RevitRepository {
