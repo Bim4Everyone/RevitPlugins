@@ -12,7 +12,7 @@ using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
     public class TemplatesCompareMaterialParamsCheck : ICheck {
-        private readonly ParamService _paramService;
+        private readonly ParamValueService _paramService;
 
         public TemplatesCompareMaterialParamsCheck(TemplatesCompareCheckOptions checkOptions) {
             CheckName = checkOptions.CheckName
@@ -27,12 +27,14 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckRule));
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
-            SourceParamLevel = checkOptions.SourceParamLevel;
+            SourceParamLevel = checkOptions.SourceParamLevel != ParamLevel.Material
+                ? throw new ArgumentException("Проверка не предусмотрена для проверки c параметрами не материала")
+                : checkOptions.SourceParamLevel;
 
             DictForCompare = checkOptions.DictForCompare
                 ?? throw new ArgumentNullException(nameof(checkOptions.DictForCompare));
 
-            _paramService = new ParamService();
+            _paramService = new ParamValueService();
         }
 
         public string CheckName { get; }
@@ -42,39 +44,26 @@ namespace RevitKrChecker.Models.Check {
         public ParamLevel SourceParamLevel { get; }
         public Dictionary<string, string> DictForCompare { get; }
 
+        private string GetValueByDict(string value) {
+            return DictForCompare.ContainsKey(value)
+                ? DictForCompare[value]
+                : null;
+        }
 
         public bool Check(Element element, out CheckInfo info) {
+            if(element == null)
+                throw new ArgumentNullException(nameof(element));
             Document doc = element.Document;
-
-            // Если сравнивать будем не с параметром материала, а с параметров экземпляра или типа,
-            // то значение будет одно и то же для разных материалов. Получать его потом много раз в цикле нет смысла
-            // В этом случае получим значение, с которым будем сравнивать сразу
-            string dictSourceParamValue = string.Empty;
-            if(SourceParamLevel != ParamLevel.Material) {
-                Parameter sourceParam = _paramService.GetParamToCheck(element, SourceParamName, SourceParamLevel);
-                string sourceParamValue = sourceParam.AsValueString();
-                dictSourceParamValue = DictForCompare.ContainsKey(sourceParamValue)
-                    ? DictForCompare[sourceParamValue]
-                    : null;
-            }
-
             List<Element> materials = element.GetMaterialIds(false)
                            .Select(id => doc.GetElement(id))
                            .ToList();
 
             foreach(Element material in materials) {
                 string targetParamValue = material.GetParam(TargetParamName).AsValueString();
+                string sourceParamValue = material.GetParam(SourceParamName).AsValueString();
+                string sourceParamValueByDict = GetValueByDict(sourceParamValue);
 
-                // Если сравнивать будем со значением параметра на уровне материала,
-                // то будем получать его значение каждый раз в рамках материала
-                if(SourceParamLevel is ParamLevel.Material) {
-                    string sourceParamValue = material.GetParam(SourceParamName).AsValueString();
-                    dictSourceParamValue = DictForCompare.ContainsKey(sourceParamValue)
-                        ? DictForCompare[sourceParamValue]
-                        : null;
-                }
-
-                if(!CheckRule.Check(targetParamValue, dictSourceParamValue)) {
+                if(!CheckRule.Check(targetParamValue, sourceParamValueByDict)) {
                     info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
                     return false;
                 }

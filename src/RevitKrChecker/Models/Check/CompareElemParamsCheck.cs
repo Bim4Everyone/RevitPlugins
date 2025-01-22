@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -8,7 +10,7 @@ using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
     public class CompareElemParamsCheck : ICheck {
-        private readonly ParamService _paramService;
+        private readonly ParamValueService _paramService;
 
         public CompareElemParamsCheck(CompareCheckOptions checkOptions) {
             CheckName = checkOptions.CheckName
@@ -23,11 +25,9 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckRule));
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
-            SourceParamLevel = checkOptions.SourceParamLevel is ParamLevel.Material
-                ? throw new ArgumentException("Проверка не предусмотрена для сравнения с параметром материала")
-                : checkOptions.SourceParamLevel;
+            SourceParamLevel = checkOptions.SourceParamLevel;
 
-            _paramService = new ParamService();
+            _paramService = new ParamValueService();
         }
 
         public string CheckName { get; }
@@ -37,15 +37,20 @@ namespace RevitKrChecker.Models.Check {
         private string SourceParamName { get; }
         public ParamLevel SourceParamLevel { get; }
 
+        private bool CheckAllValues(string targetParamValue, List<string> sourceParamValues) {
+            return sourceParamValues.All(sourceParamValue => CheckRule.Check(targetParamValue, sourceParamValue));
+        }
 
         public bool Check(Element element, out CheckInfo info) {
-            Parameter targetParam = _paramService.GetParamToCheck(element, TargetParamName, TargetParamLevel);
-            Parameter sourceParam = _paramService.GetParamToCheck(element, SourceParamName, SourceParamLevel);
+            if(element == null)
+                throw new ArgumentNullException(nameof(element));
 
-            string targetParamValue = targetParam.AsValueString();
-            string sourceParamValue = sourceParam.AsValueString();
+            string targetParamValue = _paramService.GetParamValueToCheck(element, TargetParamName, TargetParamLevel);
+            List<string> sourceParamValues = _paramService.GetParamValuesToCheck(element, SourceParamName, SourceParamLevel);
 
-            if(!CheckRule.Check(targetParamValue, sourceParamValue)) {
+            // Значение проверяемого параметра должно соответствовать каждому из значений (может быть несколько,
+            // если материалов несколько)
+            if(!CheckAllValues(targetParamValue, sourceParamValues)) {
                 info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
                 return false;
             }

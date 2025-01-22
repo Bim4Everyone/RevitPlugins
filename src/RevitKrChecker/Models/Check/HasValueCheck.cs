@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -8,14 +9,14 @@ using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
     public class HasValueCheck : ICheck {
-        private readonly ParamService _paramService;
+        private readonly ParamValueService _paramService;
 
         public HasValueCheck(HasValueCheckOptions checkOptions) {
             CheckName = checkOptions.CheckName ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
             TargetParamName = checkOptions.TargetParamName ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             TargetParamLevel = checkOptions.TargetParamLevel;
 
-            _paramService = new ParamService();
+            _paramService = new ParamValueService();
         }
 
         public string CheckName { get; }
@@ -27,11 +28,9 @@ namespace RevitKrChecker.Models.Check {
             if(element == null)
                 throw new ArgumentNullException(nameof(element));
 
-            var targetParams = _paramService.GetParamsToCheck(element, TargetParamName, TargetParamLevel);
+            List<string> targetParamValues = _paramService.GetParamValuesToCheck(element, TargetParamName, TargetParamLevel);
 
-            foreach(var targetParam in targetParams) {
-                string targetParamValue = targetParam.AsValueString();
-
+            foreach(var targetParamValue in targetParamValues) {
                 if(string.IsNullOrEmpty(targetParamValue)) {
                     info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
                     return false;

@@ -10,7 +10,7 @@ using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
     public class ParamCheck : ICheck {
-        private readonly ParamService _paramService;
+        private readonly ParamValueService _paramService;
 
         public ParamCheck(ParamCheckOptions checkOptions) {
             CheckName = checkOptions.CheckName
@@ -24,7 +24,7 @@ namespace RevitKrChecker.Models.Check {
             TrueValues = checkOptions.TrueValues
                 ?? throw new ArgumentNullException(nameof(checkOptions.TrueValues));
 
-            _paramService = new ParamService();
+            _paramService = new ParamValueService();
         }
 
         public string CheckName { get; }
@@ -41,11 +41,10 @@ namespace RevitKrChecker.Models.Check {
             if(element == null)
                 throw new ArgumentNullException(nameof(element));
 
-            var targetParams = _paramService.GetParamsToCheck(element, TargetParamName, TargetParamLevel);
+            List<string> targetParamValues = _paramService.GetParamValuesToCheck(element, TargetParamName, TargetParamLevel);
 
-            foreach(var targetParam in targetParams) {
-                string targetParamValue = targetParam.AsValueString();
-
+            // Каждый из значений (может быть несколько, если материалов несколько) должен соответствовать любому
+            foreach(var targetParamValue in targetParamValues) {
                 if(!CheckAnyTrueValues(targetParamValue)) {
                     info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
                     return false;

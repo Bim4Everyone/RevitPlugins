@@ -11,10 +11,10 @@ using RevitKrChecker.Models.Interfaces;
 using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
-    public class CompareMaterialParamsCheck : ICheck {
+    public class CompareMaterialElemParamsCheck : ICheck {
         private readonly ParamValueService _paramService;
 
-        public CompareMaterialParamsCheck(CompareCheckOptions checkOptions) {
+        public CompareMaterialElemParamsCheck(CompareCheckOptions checkOptions) {
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
             TargetParamName = checkOptions.TargetParamName
@@ -27,8 +27,8 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckRule));
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
-            SourceParamLevel = checkOptions.SourceParamLevel != ParamLevel.Material
-                ? throw new ArgumentException("Проверка не предусмотрена для проверки c параметрами не материала")
+            SourceParamLevel = checkOptions.SourceParamLevel is ParamLevel.Material
+                ? throw new ArgumentException("Проверка не предусмотрена для проверки c параметрами материала")
                 : checkOptions.SourceParamLevel;
 
             _paramService = new ParamValueService();
@@ -43,16 +43,14 @@ namespace RevitKrChecker.Models.Check {
         public bool Check(Element element, out CheckInfo info) {
             if(element == null)
                 throw new ArgumentNullException(nameof(element));
-
             Document doc = element.Document;
             List<Element> materials = element.GetMaterialIds(false)
                            .Select(id => doc.GetElement(id))
                            .ToList();
+            string sourceParamValue = _paramService.GetParamValueToCheck(element, SourceParamName, SourceParamLevel);
 
             foreach(Element material in materials) {
                 string targetParamValue = material.GetParam(TargetParamName).AsValueString();
-                string sourceParamValue = material.GetParam(SourceParamName).AsValueString();
-
                 if(!CheckRule.Check(targetParamValue, sourceParamValue)) {
                     info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
                     return false;
