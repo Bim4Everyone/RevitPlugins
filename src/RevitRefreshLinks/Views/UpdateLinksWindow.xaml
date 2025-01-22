@@ -23,6 +23,7 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
+        <!--TODO доработать разметку и стили-->
         <!--https://github.com/dotnet/wpf/issues/6302
         DynamicResource не отображается в Header-->
         <Grid.Resources>
