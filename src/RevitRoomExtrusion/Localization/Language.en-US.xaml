@@ -3,11 +3,22 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
     <!-- Пример перевода на английский американский язык (google translate) -->
-    
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
-    
-    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+
+    <system:String x:Key="MainWindow.Title">Extruding rooms</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Extrude</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.ExtrusionHeight">Enter extrusion height</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Enter family name</system:String>
+    <system:String x:Key="MainWindow.HeightError">Height must be a number</system:String>
+
+    <system:String x:Key="ErrorWindow.Title">Height must be a number</system:String>
+    <system:String x:Key="ErrorWindow.Warning">Rooms with errors were selected. For the plugin to work correctly, correct errors</system:String>
+
+    <system:String x:Key="ErrorWindow.HeaderTitle">Name</system:String>
+    <system:String x:Key="ErrorWindow.HeaderNumber">Number</system:String>
+    <system:String x:Key="ErrorWindow.HeaderLevel">Level</system:String>
+    <system:String x:Key="ErrorWindow.HeaderTypeError">Type Error</system:String>
+
+
 </ResourceDictionary>

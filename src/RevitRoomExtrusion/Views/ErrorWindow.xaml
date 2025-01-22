@@ -9,15 +9,30 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterScreen"
 
-    Title="Ошибки помещений"
+    Title="{DynamicResource ErrorWindow.Title}"
     Height="500" Width="900"
     MinHeight="300" MinWidth="600">
+
+    <Window.Resources>
+        <TextBlock
+        x:Key="HeaderTitle"
+        Text="{DynamicResource ErrorWindow.HeaderTitle}"/>
+        <TextBlock
+        x:Key="HeaderNumber"
+        Text="{DynamicResource ErrorWindow.HeaderNumber}"/>
+        <TextBlock
+        x:Key="HeaderLevel"
+        Text="{DynamicResource ErrorWindow.HeaderLevel}"/>
+        <TextBlock
+        x:Key="HeaderTypeError"
+        Text="{DynamicResource ErrorWindow.HeaderTypeError}"/>
+    </Window.Resources>
     
     <Grid Margin="10">
         <StackPanel>
             <Label
                 Foreground="Orange"
-                Content="Выбраны помещения с ошибками. Для корректной работы плагина, исправьте ошибки"/>
+                Content="{DynamicResource ErrorWindow.Warning}"/>
             <DataGrid
                 AutoGenerateColumns="False"
                 ItemsSource="{Binding ErrorRooms}"
@@ -35,10 +50,10 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding RoomName}" Header="Наименование" />
-                    <DataGridTextColumn Binding="{Binding RoomNumber}" Header="Номер" />
-                    <DataGridTextColumn Binding="{Binding LevelName}" Header="Уровень" />                
-                    <DataGridTextColumn Binding="{Binding ErrorDescription}" Header="Тип ошибки" />
+                    <DataGridTextColumn Binding="{Binding RoomName}" Header="{StaticResource HeaderTitle}"/>
+                    <DataGridTextColumn Binding="{Binding RoomNumber}" Header="{StaticResource HeaderNumber}"/>
+                    <DataGridTextColumn Binding="{Binding LevelName}" Header="{StaticResource HeaderLevel}"/>
+                    <DataGridTextColumn Binding="{Binding ErrorDescription}" Header="{StaticResource HeaderTypeError}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>

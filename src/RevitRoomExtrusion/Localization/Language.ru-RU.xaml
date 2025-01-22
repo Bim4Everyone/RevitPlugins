@@ -3,11 +3,22 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
     <!-- Пример перевода на русский язык (google translate) -->
-    
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.Title">Выдавливание помещений</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Выдавить</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
+
+    <system:String x:Key="MainWindow.ExtrusionHeight">Введите высоту выдавливания</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Введите имя семейства</system:String>
+    <system:String x:Key="MainWindow.HeightError">Высота должна быть числом</system:String>
+
+    <system:String x:Key="ErrorWindow.Title">Ошибки помещений</system:String>
+    <system:String x:Key="ErrorWindow.Warning">Выбраны помещения с ошибками. Для корректной работы плагина, исправьте ошибки</system:String>
+
+    <system:String x:Key="ErrorWindow.HeaderTitle">Наименование</system:String>
+    <system:String x:Key="ErrorWindow.HeaderNumber">Номер</system:String>
+    <system:String x:Key="ErrorWindow.HeaderLevel">Уровень</system:String>
+    <system:String x:Key="ErrorWindow.HeaderTypeError">Тип ошибки</system:String>
+
+
 </ResourceDictionary>

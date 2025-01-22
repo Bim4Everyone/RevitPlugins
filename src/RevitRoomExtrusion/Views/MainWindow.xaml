@@ -13,7 +13,7 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     
-    Title="Выдавливание помещений"
+    Title="{DynamicResource MainWindow.Title}"
     Height="250" Width="450"
     MinHeight="250" MinWidth="450">
     
@@ -35,19 +35,21 @@
             Orientation="Vertical"
             HorizontalAlignment="Stretch">
             <Label
-                Content="Введите высоту выдавливания"
+                Content="{DynamicResource MainWindow.ExtrusionHeight}"
                 Margin="5"
                 Padding="5" />
             <TextBox
-                Text="{Binding ExtrusionHeight, UpdateSourceTrigger=PropertyChanged}"
+                Text="{Binding ExtrusionHeight, 
+                    UpdateSourceTrigger=PropertyChanged}"
                 Margin="5"
                 Padding="5"/>
             <Label
-                Content="Введите имя семейства"
+                Content="{DynamicResource MainWindow.FamilyName}"
                 Margin="5"
                 Padding="5"/>
             <TextBox
-                Text="{Binding ExtrusionFamilyName, UpdateSourceTrigger=PropertyChanged}"
+                Text="{Binding ExtrusionFamilyName, 
+                    UpdateSourceTrigger=PropertyChanged}"
                 Margin="5"                
                 Padding="5"/> 
         </StackPanel>
@@ -62,18 +64,18 @@
                 Margin="10"                
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
+                Text="{Binding ErrorText}"/>
             <Button
                 Margin="10"
                 Width="80"
-                Content="Выдавить"
+                Content="{DynamicResource MainWindow.ButtonOk}"
                 IsDefault="True"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
             <Button
                 Margin="10"
                 Width="80"
-                Content="Отменить"
+                Content="{DynamicResource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>

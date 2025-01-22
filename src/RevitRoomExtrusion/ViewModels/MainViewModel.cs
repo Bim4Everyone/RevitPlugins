@@ -72,15 +72,15 @@ namespace RevitRoomExtrusion.ViewModels {
 
         private bool CanAcceptView() {
             if(string.IsNullOrEmpty(_extrusionHeight)) {
-                ErrorText = "Задайте высоту выдавливания";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ExtrusionHeight");
                 return false;
             }
             if(!double.TryParse(_extrusionHeight, out double result)) {
-                ErrorText = "Высота должна быть числом";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.HeightError");
                 return false;
             }
             if(string.IsNullOrEmpty(_extrusionFamilyName)) {
-                ErrorText = "Задайте имя семейства";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.FamilyName");
                 return false;
             }           
             ErrorText = null;
