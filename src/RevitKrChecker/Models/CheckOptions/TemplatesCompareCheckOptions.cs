@@ -11,5 +11,6 @@ namespace RevitKrChecker.Models.CheckOptions {
         public string SourceParamName { get; set; }
         public ParamLevel SourceParamLevel { get; set; }
         public Dictionary<string, string> DictForCompare { get; set; }
+        public ICheckRule DictForCompareRule { get; set; }
     }
 }

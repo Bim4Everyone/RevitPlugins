@@ -224,32 +224,52 @@ namespace RevitKrChecker.Models {
                         { "2", "м²" },
                         { "3", "м³" },
                         { "4", "шт." }
-                    }
+                    },
+                    DictForCompareRule = new EqualCheckRule()
                 }));
 
-
-
             // Код работы в "Материал: Ключевая пометка" соответствует "Имени типа" элемента:
-            // код "г02.02." - имя начинается "Ф_";
-            // код "г02.03." - имя начинается "НН_";
-            // код "г02.04." - имя начинается "ВН_"
-            // Параметр "Материал: Ключевая пометка" содержит соответствующее "Имени типа"
-            //nonStoppingChecks.Add(new TemplatesCompareMaterialParamsCheck(
-            //    new TemplatesCompareCheckOptions() {
-            //        CheckName = "Проверка наличия ключевой пометки материала в имени материала",
-            //        TargetParamName = "Имя",
-            //        TargetParamLevel = ParamLevel.Material,
-            //        CheckRule = new ContainsCheckRule(),
-            //        SourceParamName = "Ключевая пометка",
-            //        SourceParamLevel = ParamLevel.Material, 
-            //        DictForCompare = new Dictionary<string, string>() {
-            //            { "1", "2" },
-            //            { "1", "2" },
-            //            { "1", "2" }
-            //        }
-            //    }));
+            // код СОДЕРЖИТ "г02.02." - имя начинается "Ф_";
+            // код СОДЕРЖИТ "г02.03." - имя начинается "НН_";
+            // код СОДЕРЖИТ "г02.04." - имя начинается "ВН_"
+            // Проверяем Имя типа, что оно соответствует по правилу Ключевой пометке, которая содержится в ключах словаря
+            nonStoppingChecks.Add(new TemplatesCompareElemParamsCheck(
+                new TemplatesCompareCheckOptions() {
+                    CheckName = "Проверка соответствия имени типа и ключевой пометки материала",
+                    TargetParamName = "Имя типа",
+                    TargetParamLevel = ParamLevel.Type,
+                    CheckRule = new StartWithCheckRule(),
+                    SourceParamName = "Ключевая пометка",
+                    SourceParamLevel = ParamLevel.Material,
+                    DictForCompare = new Dictionary<string, string>() {
+                        { "г02.02.", "Ф_" },
+                        { "г02.03.", "НН_" },
+                        { "г02.04.", "ВН_" }
+                    },
+                    DictForCompareRule = new ContainsCheckRule()
+                }));
 
-
+            // Код работы в [Материал: Ключевая пометка] соответствует [Материал: ФОП_МТР_Наименование главы]:
+            // код СОДЕРЖИТ  "г02.02." - глава равно "Устройство фундамента";
+            // код СОДЕРЖИТ  "г02.03." - глава равно "Конструкции до отм. +/-0,000";
+            // код СОДЕРЖИТ  "г02.04." - глава равно "Конструкции выше отм. +/-0,000"
+            // Проверяем ФОП_МТР_Наименование главы, что значение соответствует по правилу Ключевой пометке,
+            // которая содержится в ключах словаря
+            nonStoppingChecks.Add(new TemplatesCompareMaterialParamsCheck(
+                new TemplatesCompareCheckOptions() {
+                    CheckName = "Проверка соответствия наименование главы и ключевой пометки материала",
+                    TargetParamName = "ФОП_МТР_Наименование главы",
+                    TargetParamLevel = ParamLevel.Material,
+                    CheckRule = new EqualCheckRule(),
+                    SourceParamName = "Ключевая пометка",
+                    SourceParamLevel = ParamLevel.Material,
+                    DictForCompare = new Dictionary<string, string>() {
+                        { "г02.02.", "Устройство фундамента" },
+                        { "г02.03.", "Конструкции до отм. +/-0,000" },
+                        { "г02.04.", "Конструкции выше отм. +/-0,000" }
+                    },
+                    DictForCompareRule = new ContainsCheckRule()
+                }));
 
             return nonStoppingChecks;
         }

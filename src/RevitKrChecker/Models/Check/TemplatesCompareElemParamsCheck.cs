@@ -30,6 +30,7 @@ namespace RevitKrChecker.Models.Check {
 
             DictForCompare = checkOptions.DictForCompare
                 ?? throw new ArgumentNullException(nameof(checkOptions.DictForCompare));
+            DictForCompareRule = checkOptions.DictForCompareRule;
 
             _paramService = new ParamValueService();
         }
@@ -41,11 +42,16 @@ namespace RevitKrChecker.Models.Check {
         private string SourceParamName { get; }
         public ParamLevel SourceParamLevel { get; }
         private Dictionary<string, string> DictForCompare { get; }
+        public ICheckRule DictForCompareRule { get; }
+
+
+        private string GetDictForCompareKeyByRule(string value) {
+            return DictForCompare.Keys.FirstOrDefault(key => DictForCompareRule.Check(value, key));
+        }
 
         private string GetValueByDict(string value) {
-            return DictForCompare.ContainsKey(value)
-                ? DictForCompare[value]
-                : null;
+            string key = GetDictForCompareKeyByRule(value);
+            return key is null ? null : DictForCompare[key];
         }
 
         private bool CheckAllValues(string targetParamValue, List<string> sourceParamValues) {
@@ -64,8 +70,8 @@ namespace RevitKrChecker.Models.Check {
                 info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
                 return false;
             }
-            info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
-            return false;
+            info = null;
+            return true;
         }
 
 
