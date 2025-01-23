@@ -10,8 +10,20 @@
         
         mc:Ignorable="d"
         Title="ReportWindow" 
-        Height="600" Width="600" 
+        Height="600" Width="600"
         d:DataContext="{d:DesignInstance vms:ReportVM, IsDesignTimeCreatable=False}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding Path=LoadViewCommand}"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction
+                Command="{Binding Path=ClosingViewCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -41,7 +53,16 @@
             Margin="5"
             VerticalContentAlignment="Center"
             Name="FirstLevelGrouping"
-            SelectionChanged="FirstLevelGrouping_SelectionChanged" />
+            ItemsSource="{Binding Path=GroupingList}"
+            SelectedItem="{Binding Path=SelectedFirstLevelGrouping}" >
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                        Command="{Binding Path=FirstLevelGroupingChangedCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
 
         <ComboBox
             Grid.Row="1"
@@ -49,7 +70,16 @@
             Margin="5"
             VerticalContentAlignment="Center"
             Name="SecondLevelGrouping"
-            SelectionChanged="SecondLevelGrouping_SelectionChanged" />
+            ItemsSource="{Binding Path=GroupingList}"
+            SelectedItem="{Binding Path=SelectedSecondLevelGrouping}">
+            
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                        Command="{Binding Path=SecondLevelGroupingChangedCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
 
         <ComboBox
             Grid.Row="1"
@@ -57,7 +87,16 @@
             Margin="5"
             VerticalContentAlignment="Center"
             Name="ThirdLevelGrouping"
-            SelectionChanged="ThirdLevelGrouping_SelectionChanged" />
+            ItemsSource="{Binding Path=GroupingList}"
+            SelectedItem="{Binding Path=SelectedThirdLevelGrouping}">
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                        Command="{Binding Path=ThirdLevelGroupingChangedCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
 
         <Button
             Grid.Row="2"

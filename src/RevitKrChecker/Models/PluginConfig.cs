@@ -23,5 +23,8 @@ namespace RevitKrChecker.Models {
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
         public string SaveProperty { get; set; }
+        public string SelectedFirstLevelGrouping { get; set; }
+        public string SelectedSecondLevelGrouping { get; set; }
+        public string SelectedThirdLevelGrouping { get; set; }
     }
 }

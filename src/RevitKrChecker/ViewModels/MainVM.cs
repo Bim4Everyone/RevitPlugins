@@ -45,7 +45,14 @@ namespace RevitKrChecker.ViewModels {
         }
 
         private void GetReportVM(List<Element> elements) {
-            ReportVM reportVM = new ReportVM(elements, _revitRepository.StoppingChecks(), _revitRepository.NonStoppingChecks(), _revitRepository);
+            ReportVMOption reportVMOption = new ReportVMOption() {
+                Elements = elements,
+                StoppingChecks = _revitRepository.StoppingChecks(),
+                NonStoppingChecks = _revitRepository.NonStoppingChecks(),
+                RepositoryOfRevit = _revitRepository,
+                ConfigOfPlugin = _pluginConfig
+            };
+            ReportVM reportVM = new ReportVM(reportVMOption);
             ReportWindow reportWindow = new ReportWindow();
             reportWindow.DataContext = reportVM;
             reportWindow.Show();
