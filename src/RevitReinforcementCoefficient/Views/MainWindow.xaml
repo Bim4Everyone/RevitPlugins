@@ -15,8 +15,8 @@
     WindowStartupLocation="CenterOwner"
     
     Title="Расчет коэффициента армирования"
-    Height="400" Width="950"
-    MinHeight="300" MinWidth="950"
+    Height="400" Width="1030"
+    MinHeight="300" MinWidth="1030"
 
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
