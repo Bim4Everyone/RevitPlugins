@@ -15,6 +15,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitCopyInteriorSpecs.Models;
+using RevitCopyInteriorSpecs.Services;
 using RevitCopyInteriorSpecs.ViewModels;
 using RevitCopyInteriorSpecs.Views;
 
@@ -30,6 +31,8 @@ namespace RevitCopyInteriorSpecs {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<SpecificationService>()
+                    .ToSelf();
 
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());

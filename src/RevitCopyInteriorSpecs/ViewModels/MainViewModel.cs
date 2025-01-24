@@ -19,8 +19,8 @@ namespace RevitCopyInteriorSpecs.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-        private readonly ILocalizationService _localizationService;
         private readonly SpecificationService _specificationService;
+        private readonly ILocalizationService _localizationService;
 
         private string _errorText;
         private string _errorReport = string.Empty;
@@ -28,13 +28,14 @@ namespace RevitCopyInteriorSpecs.ViewModels {
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
+            SpecificationService specificationService,
             ILocalizationService localizationService) {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+            _specificationService = specificationService;
             _localizationService = localizationService;
 
-            _specificationService = new SpecificationService(revitRepository, localizationService);
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
