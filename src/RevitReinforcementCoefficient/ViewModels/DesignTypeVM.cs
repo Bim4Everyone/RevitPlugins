@@ -14,9 +14,10 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private string _rebarCoef = "0";
         private bool _isCheck = false;
 
-        public DesignTypeVM(string typeName, string docPackage, bool aboveZero, ICommonElement firstElement) {
+        public DesignTypeVM(string typeName, string docPackage, string elemSection, bool aboveZero, ICommonElement firstElement) {
             TypeName = typeName;
             DocPackage = docPackage;
+            ElemSection = elemSection;
             AboveZero = aboveZero;
             AddItem(firstElement);
         }
@@ -38,6 +39,11 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// "обр_ФОП_Раздел проекта"
         /// </summary>
         public string DocPackage { get; set; }
+
+        /// <summary>
+        /// "ФОП_Секция СМР"
+        /// </summary>
+        public string ElemSection { get; set; }
 
         /// <summary>
         /// "обр_ФОП_Орг. уровень"

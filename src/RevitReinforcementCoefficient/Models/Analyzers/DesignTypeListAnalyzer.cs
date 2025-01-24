@@ -24,6 +24,7 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
         private readonly List<string> _paramsForAll = new List<string>() {
             "обр_ФОП_Марка ведомости расхода",
             "обр_ФОП_Раздел проекта",
+            "ФОП_Секция СМР",
             "обр_ФОП_Орг. уровень"
         };
 
@@ -61,7 +62,7 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
                         continue;
                     }
 
-                    // Если значение параметра указывает, что это облочка, то пропускаем, этот элемент не участвует в расчетах
+                    // Если значение параметра указывает, что это оболочка, то пропускаем, этот элемент не участвует в расчетах
                     if(_paramUtils.GetParamValueAnywhere<int>(element, _paramForRebarShell) == _paramValueForRebarShell) {
                         continue;
                     }
@@ -75,19 +76,22 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
                 // Получение значений параметров, необходимых для распределения по типам конструкций
                 string typeName = element.GetParamValue<string>("обр_ФОП_Марка ведомости расхода");
                 typeName = typeName ?? "";
-                string docPackage = element.GetParamValue<string>("обр_ФОП_Раздел проекта");
-                docPackage = docPackage ?? "";
                 // Сделали преобразование null в "" из-за того, что фильтрация в GUI иначе нормально не отрабатывает
+                string docPackage = element.GetParamValue<string>("обр_ФОП_Раздел проекта") ?? "";
+                string elemSection = element.GetParamValue<string>("ФОП_Секция СМР") ?? "";
                 bool aboveZero = element.GetParamValue<int>("обр_ФОП_Орг. уровень") > 0;
 
                 // Ищем подходящий тип конструкции среди уже существующих в списке
                 DesignTypeVM designType = designTypes.FirstOrDefault(
-                    e => e.TypeName == typeName && e.DocPackage == docPackage && e.AboveZero == aboveZero);
+                    e => e.TypeName == typeName
+                      && e.DocPackage == docPackage
+                      && e.ElemSection == elemSection
+                      && e.AboveZero == aboveZero);
 
                 // Если null, то создаем новый, если нет, то дописываем элемент в список уже существующего
                 ICommonElement specificElement = _elementFactory.CreateSpecificElement(element);
                 if(designType is null) {
-                    var newDesignType = new DesignTypeVM(typeName, docPackage, aboveZero, specificElement);
+                    var newDesignType = new DesignTypeVM(typeName, docPackage, elemSection, aboveZero, specificElement);
                     designTypes.Add(newDesignType);
                 } else {
                     designType.AddItem(specificElement);

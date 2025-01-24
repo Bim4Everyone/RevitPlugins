@@ -32,6 +32,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -42,20 +43,31 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel
-            Grid.Row="0"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Left">
+
+        <Grid 
+            Grid.Row="1"
+            Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
             <Label 
-                Margin="10"
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="5"
                 VerticalAlignment="Center"
                 Content="Выберите комплект документации:"/>
 
             <ComboBox
-                Margin="10"
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="5"
                 Width="200"
                 VerticalContentAlignment="Center"
                 ItemsSource="{Binding Path=DockPackages}"
@@ -73,18 +85,50 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>
-        </StackPanel>
+
+            <Label 
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="5"
+                VerticalAlignment="Center"
+                Content="Выберите секцию:"/>
+
+            <ComboBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="5"
+                Width="200"
+                VerticalContentAlignment="Center"
+                ItemsSource="{Binding Path=ElemSections}"
+                SelectedItem="{Binding Path=SelectedElemSection, UpdateSourceTrigger=PropertyChanged}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock 
+                            Text="{Binding Converter={converters:NullToStringConverter}}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding UpdateFilteringCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
+        </Grid>
+        
 
         <StackPanel
-            Grid.Row="0"
+            Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Orientation="Horizontal"
-            HorizontalAlignment="Right">
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom">
 
             <Button
                 Margin="10"
                 Width="120"
+                Height="22"
                 Padding="3"
                 Content="Выбрать все"
                 Command="{Binding Path=SelectAllVisibleCommand}" />
@@ -92,6 +136,7 @@
             <Button
                 Margin="10"
                 Width="120"
+                Height="22"
                 Padding="3"
                 Content="Отменить выбор"
                 Command="{Binding Path=UnselectAllVisibleCommand}" />
@@ -99,7 +144,7 @@
 
 
         <ListView
-            Grid.Row="1" 
+            Grid.Row="2" 
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="10"
@@ -130,6 +175,15 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=DocPackage, 
+                                    Converter={converters:NullToStringConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Секция" Width="90">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=ElemSection, 
                                     Converter={converters:NullToStringConverter}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -180,7 +234,7 @@
         </ListView>
 
         <CheckBox 
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.Column="0"
             Margin="10"
             VerticalAlignment="Center"
@@ -188,7 +242,7 @@
             Content="Считать коэффициент армирования усредненно"/>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Orientation="Horizontal"
@@ -210,7 +264,7 @@
         </StackPanel>
         
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="4"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Height="45"
