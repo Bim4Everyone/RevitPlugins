@@ -16,6 +16,7 @@ namespace RevitReinforcementCoefficient.Models {
                 new ElementCategoryFilter(BuiltInCategory.OST_Columns),
                 new ElementCategoryFilter(BuiltInCategory.OST_StructuralColumns),
                 new ElementCategoryFilter(BuiltInCategory.OST_StructuralFoundation),
+                new ElementCategoryFilter(BuiltInCategory.OST_Stairs),
                 new ElementCategoryFilter(BuiltInCategory.OST_Rebar)
             });
 
