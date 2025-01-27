@@ -132,9 +132,12 @@ namespace RevitKrChecker.ViewModels {
         private void LoadConfig() {
             var settings = _pluginConfig.GetSettings(_revitRepository.Document);
             if(settings is null) { return; }
-            SelectedFirstLevelGrouping = settings.SelectedFirstLevelGrouping;
-            SelectedSecondLevelGrouping = settings.SelectedSecondLevelGrouping;
             SelectedThirdLevelGrouping = settings.SelectedThirdLevelGrouping;
+            ThirdLevelGroupingChangedCommand.Execute(null);
+            SelectedSecondLevelGrouping = settings.SelectedSecondLevelGrouping;
+            SecondLevelGroupingChangedCommand.Execute(null);
+            SelectedFirstLevelGrouping = settings.SelectedFirstLevelGrouping;
+            FirstLevelGroupingChangedCommand.Execute(null);
         }
 
 
