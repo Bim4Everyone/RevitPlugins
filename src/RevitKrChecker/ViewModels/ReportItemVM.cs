@@ -1,5 +1,3 @@
-// Ignore Spelling: Tooltip Сheck
-
 using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;

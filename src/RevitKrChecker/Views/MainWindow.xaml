@@ -15,6 +15,7 @@
     Title="{DynamicResource MainWindow.Title}"
     Height="100"
     Width="500"
+    MinWidth="500"
     d:DataContext="{d:DesignInstance vms:MainVM, IsDesignTimeCreatable=False}">
 
     <Grid>
@@ -26,7 +27,7 @@
         <Button
             Grid.Column="0"
             Margin="10"
-            Content="FromView"
+            Content="{DynamicResource MainWindow.GetFromView}"
             Click="ButtonOk_Click"
             Command="{Binding Path=CheckElemsFromViewCommand}" 
             />
@@ -34,7 +35,7 @@
         <Button
             Grid.Column="1"
             Margin="10"
-            Content="FromPj"
+            Content="{DynamicResource MainWindow.GetFromProject}"
             Click="ButtonOk_Click"
             Command="{Binding Path=CheckElemsFromPjCommand}"
             />

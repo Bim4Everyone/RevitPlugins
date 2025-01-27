@@ -50,7 +50,8 @@ namespace RevitKrChecker.ViewModels {
                 StoppingChecks = _revitRepository.StoppingChecks(),
                 NonStoppingChecks = _revitRepository.NonStoppingChecks(),
                 RepositoryOfRevit = _revitRepository,
-                ConfigOfPlugin = _pluginConfig
+                ConfigOfPlugin = _pluginConfig,
+                LocalizationService = _localizationService
             };
             ReportVM reportVM = new ReportVM(reportVMOption);
             ReportWindow reportWindow = new ReportWindow();

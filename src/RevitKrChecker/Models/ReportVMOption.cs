@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using RevitKrChecker.Models.Interfaces;
 
 namespace RevitKrChecker.Models {
@@ -11,5 +13,6 @@ namespace RevitKrChecker.Models {
         internal List<ICheck> NonStoppingChecks { get; set; }
         internal RevitRepository RepositoryOfRevit { get; set; }
         internal PluginConfig ConfigOfPlugin { get; set; }
+        internal ILocalizationService LocalizationService { get; set; }
     }
 }

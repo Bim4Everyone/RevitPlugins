@@ -3,11 +3,25 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
     <!-- Пример перевода на английский американский язык (google translate) -->
-    
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
-    
+
+    <system:String x:Key="MainWindow.Title">Check model</system:String>
+    <system:String x:Key="MainWindow.GetFromView">Get elements from view</system:String>
+    <system:String x:Key="MainWindow.GetFromProject">Get items from the entire project</system:String>
+
+    <system:String x:Key="MainWindow.Grouping">Grouping:</system:String>
+    <system:String x:Key="MainWindow.Expand">Expand</system:String>
+    <system:String x:Key="MainWindow.Collapse">Collapse</system:String>
+    <system:String x:Key="MainWindow.ErrorExplanations">Error explanations:</system:String>
+    <system:String x:Key="MainWindow.Show">Show</system:String>
+    <system:String x:Key="MainWindow.Recheck">Recheck</system:String>
+
+    <system:String x:Key="MainWindow.ElementCategoryName">Category name</system:String>
+    <system:String x:Key="MainWindow.ElementTypeName">Type name</system:String>
+    <system:String x:Key="MainWindow.Elem">Element</system:String>
+    <system:String x:Key="MainWindow.TargetParamName">Parameter to check</system:String>
+    <system:String x:Key="MainWindow.СheckName">Check name</system:String>
+    <system:String x:Key="MainWindow.ElementErrorTooltip">Error explanation</system:String>
+
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>

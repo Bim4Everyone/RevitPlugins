@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -20,6 +21,7 @@ namespace RevitKrChecker.ViewModels {
         private readonly List<ICheck> _nonStoppingChecks;
         private readonly RevitRepository _revitRepository;
         private readonly PluginConfig _pluginConfig;
+        private readonly ILocalizationService _localizationService;
 
         private string _notSelectedItem;
         private List<string> _groupingList;
@@ -42,9 +44,11 @@ namespace RevitKrChecker.ViewModels {
                 ?? throw new ArgumentNullException(nameof(option.RepositoryOfRevit));
             _pluginConfig = option.ConfigOfPlugin
                 ?? throw new ArgumentNullException(nameof(option.ConfigOfPlugin));
+            _localizationService = option.LocalizationService
+                ?? throw new ArgumentNullException(nameof(option.LocalizationService));
 
             SelectedFirstLevelGrouping = SelectedSecondLevelGrouping = SelectedThirdLevelGrouping = NotSelectedItem = "<Нет>";
-            GroupingList = GetComboboxList();
+            GroupingList = GetGroupingList();
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             ClosingViewCommand = RelayCommand.Create(ClosingView);
@@ -209,7 +213,7 @@ namespace RevitKrChecker.ViewModels {
         /// <summary>
         /// Метод по получению списка параметров по которым можно будет группировать отчет об ошибках
         /// </summary>
-        private List<string> GetComboboxList() {
+        private List<string> GetGroupingList() {
             List<string> groupingList = new List<string>() { NotSelectedItem };
             foreach(var prop in typeof(ReportItemVM).GetProperties()) {
                 groupingList.Add(prop.Name);
