@@ -5,7 +5,6 @@ using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
@@ -26,6 +25,7 @@ namespace RevitMarkingElements.ViewModels {
         private readonly ILocalizationService _localizationService;
 
         private string _errorText;
+        private string _lineNumberingContent;
         private string _selectedCategoryName;
         private List<Category> _categories;
         private ElementId _selectedCategoryId;
@@ -33,7 +33,7 @@ namespace RevitMarkingElements.ViewModels {
         private bool _renumberAll;
         private bool _isArrayNumberingSelected;
         private bool _isLineNumberingSelected;
-        private int _startNumber = 1;
+        private int _startNumber;
         private List<CurveElement> Lines { get; set; }
 
         public MainViewModel(
@@ -44,6 +44,9 @@ namespace RevitMarkingElements.ViewModels {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _localizationService = localizationService;
+
+            IsLineNumberingSelected = true;
+            StartNumber = 1;
 
             //После закрытия окна выбора линий снять выделения с линии нельзя, только выбирать линии заново, пока оставили так
             SelectLinesCommand = RelayCommand.Create<MainWindow>(SelectLines);
@@ -58,6 +61,11 @@ namespace RevitMarkingElements.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public string LineNumberingContent {
+            get => _lineNumberingContent;
+            set => this.RaiseAndSetIfChanged(ref _lineNumberingContent, value);
         }
 
         public int StartNumber {
@@ -119,31 +127,12 @@ namespace RevitMarkingElements.ViewModels {
         private void SelectLines(MainWindow mainWindow) {
             mainWindow.Hide();
             try {
-                var mainInstruction = _localizationService.GetLocalizedString("MainWindow.MainInstruction");
-                var mainContent = _localizationService.GetLocalizedString("MainWindow.MainContent");
-                var contentAbout = _localizationService.GetLocalizedString("MainWindow.ContentAbout");
-                var selectLinesText = _localizationService.GetLocalizedString("MainWindow.SelectLines");
-                var resultMessage = _localizationService.GetLocalizedString("MainWindow.ResultMessage");
-                var resultTitle = _localizationService.GetLocalizedString("MainWindow.ResultTitle");
-                var linesType = _localizationService.GetLocalizedString("MainWindow.LinesType");
-                var finishLineSelection = _localizationService.GetLocalizedString("MainWindow.FinishLineSelection");
-
-                var taskDialog = new TaskDialog("Выбор линий") {
-                    MainInstruction = finishLineSelection,
-                    MainContent = mainInstruction + "\n\n" + contentAbout + "\n\n" + mainContent,
-                    CommonButtons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel
-                };
-
-                var result = taskDialog.Show();
-
-                if(result == TaskDialogResult.Cancel) {
-                    return;
-                }
-
                 Lines = _revitRepository.SelectLinesOnView();
-                var message = $"{resultMessage}({Lines?.Count ?? 0})";
 
-                TaskDialog.Show(resultTitle, message);
+                var lineNumberingLabel = _localizationService.GetLocalizedString("MainWindow.LineNumberingLabel");
+                var count = Lines?.Count ?? 0;
+                LineNumberingContent = $"{lineNumberingLabel} ({count}) ";
+
             } finally {
                 mainWindow.ShowDialog();
             }
@@ -154,7 +143,9 @@ namespace RevitMarkingElements.ViewModels {
 
             var processedElements = RenumberAll
                 ? new List<Element>()
-                : markingElements.Where(e => !string.IsNullOrEmpty(e.GetParam(_markParam)?.AsString())).ToList();
+                : markingElements
+                    .Where(e => e.IsExistsParamValue(_markParam))
+                    .ToList();
 
             var unprocessedElements = RenumberAll
                 ? markingElements
@@ -205,15 +196,17 @@ namespace RevitMarkingElements.ViewModels {
                 if(lineCurve == null)
                     continue;
 
+                // Находим элементы, которые пересекаются с текущей линией
                 var elementsOnLine = _revitRepository
                     .GetElementsIntersectingLine(elements, line)
                     .OrderBy(element => {
                         var point = _revitRepository.GetElementCoordinates(element);
-                        return point.DistanceTo(lineCurve.GetEndPoint(0));
+                        return lineCurve.Project(point)?.Parameter ?? double.MaxValue;
                     })
                     .ToList();
 
                 sortedElements.AddRange(elementsOnLine);
+
             }
 
             return sortedElements;
@@ -230,7 +223,8 @@ namespace RevitMarkingElements.ViewModels {
 
         private void AssignMarks(List<Element> elements, List<Element> processedElements, ref int counter) {
             var existingMarks = new HashSet<string>(
-                processedElements.Select(e => e.GetParam(_markParam)?.AsString()).Where(mark => !string.IsNullOrEmpty(mark)));
+                processedElements.Where(e => e.IsExistsParamValue(_markParam))
+                                 .Select(e => e.GetParamValueOrDefault<string>(_markParam)));
 
             foreach(var element in elements) {
                 var markParam = element.GetParam(_markParam);
@@ -250,6 +244,8 @@ namespace RevitMarkingElements.ViewModels {
         private void LoadView() {
             LoadConfig();
             LoadCategories();
+            var lineNumberingLabel = _localizationService.GetLocalizedString("MainWindow.LineNumberingLabel");
+            LineNumberingContent = $"{lineNumberingLabel} () ";
         }
 
         private void AcceptView() {

@@ -13,9 +13,9 @@
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
     Height="300"
-    Width="350"
+    Width="400"
     MinHeight="300"
-    MinWidth="350"
+    MinWidth="400"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
@@ -58,19 +58,35 @@
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     GroupName="NumberingMode"
-                    Content="{DynamicResource MainWindow.LineNumberingLabel}"
+                    Content="{Binding LineNumberingContent}"
                     IsChecked="{Binding IsLineNumberingSelected}" />
 
                 <Button
-                    Width="100"
+                    Width="110"
                     Grid.Column="1"
                     Padding="10"
                     HorizontalAlignment="Right"
                     Content="{DynamicResource MainWindow.SelectLinesButton}"
                     Command="{Binding SelectLinesCommand}"
                     CommandParameter="{Binding ElementName=mainWindow}"
-                    IsEnabled="{Binding IsLineNumberingSelected}" />
-                
+                    IsEnabled="{Binding IsLineNumberingSelected}">
+                    <Button.ToolTip>
+                        <ToolTip >
+                            <StackPanel>
+                                <TextBlock
+                                    Text="{DynamicResource MainWindow.MainInstruction}"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Text="{DynamicResource MainWindow.ContentAbout}"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Text="{DynamicResource MainWindow.MainContent}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+
             </Grid>
 
             <StackPanel

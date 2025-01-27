@@ -63,7 +63,9 @@ namespace RevitMarkingElements.Models {
             var selectedLines = new List<CurveElement>();
             ISelectionFilter lineSelectionFilter = new CurveElementSelectionFilter();
             var finishLineSelection = _localizationService.GetLocalizedString("MainWindow.FinishLineSelection");
-            bool isDone = false;
+            var isDone = false;
+
+
             while(!isDone) {
                 try {
                     var reference = ActiveUIDocument.Selection.PickObject(
@@ -82,7 +84,7 @@ namespace RevitMarkingElements.Models {
                 }
             }
 
-            return selectedLines;
+            return selectedLines.Distinct(new CurveElementComparer()).ToList();
         }
 
         public Transaction CreateTransaction(string transactionName) {
@@ -94,29 +96,18 @@ namespace RevitMarkingElements.Models {
                 return new List<Element>();
             }
 
+            var selectedElementIds = ActiveUIDocument.Selection.GetElementIds();
+
+            if(selectedElementIds == null || !selectedElementIds.Any()) {
+                return new List<Element>();
+            }
+
             FilteredElementCollector collector = new FilteredElementCollector(Document);
 
             return collector
                 .WherePasses(new ElementCategoryFilter(categoryId))
                 .WhereElementIsNotElementType()
-                .ToElements()
-                .ToList();
-        }
-
-        public List<CurveElement> GetLinesAndSplines() {
-            var selectedElementIds = ActiveUIDocument.Selection.GetElementIds();
-
-            if(!selectedElementIds.Any()) {
-                return new List<CurveElement>();
-            }
-
-            return selectedElementIds
-                .Select(id => Document.GetElement(id))
-                .OfType<CurveElement>()
-                .Where(curveElement =>
-                    curveElement.GeometryCurve != null &&
-                    (curveElement is ModelLine || curveElement is ModelNurbSpline))
-                .Reverse()
+                .Where(element => selectedElementIds.Contains(element.Id))
                 .ToList();
         }
 
