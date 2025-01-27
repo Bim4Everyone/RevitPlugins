@@ -35,6 +35,7 @@ namespace RevitMarkingElements.ViewModels {
         private bool _isLineNumberingSelected;
         private int _startNumber;
         private List<CurveElement> Lines { get; set; }
+        private List<ElementId> SelectedElementsIds { get; set; }
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -47,6 +48,7 @@ namespace RevitMarkingElements.ViewModels {
 
             IsLineNumberingSelected = true;
             StartNumber = 1;
+            SelectedElementsIds = _revitRepository.GetSelectedElementsIds();
 
             //После закрытия окна выбора линий снять выделения с линии нельзя, только выбирать линии заново, пока оставили так
             SelectLinesCommand = RelayCommand.Create<MainWindow>(SelectLines);
@@ -139,7 +141,9 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private void NumberMarkingElements() {
-            var markingElements = _revitRepository.GetElements(SelectedCategoryId);
+            var markingElements = _revitRepository.GetElements(SelectedCategoryId)
+                .Where(element => SelectedElementsIds.Contains(element.Id)).ToList();
+
 
             var processedElements = RenumberAll
                 ? new List<Element>()
@@ -196,7 +200,6 @@ namespace RevitMarkingElements.ViewModels {
                 if(lineCurve == null)
                     continue;
 
-                // Находим элементы, которые пересекаются с текущей линией
                 var elementsOnLine = _revitRepository
                     .GetElementsIntersectingLine(elements, line)
                     .OrderBy(element => {
@@ -244,6 +247,7 @@ namespace RevitMarkingElements.ViewModels {
         private void LoadView() {
             LoadConfig();
             LoadCategories();
+
             var lineNumberingLabel = _localizationService.GetLocalizedString("MainWindow.LineNumberingLabel");
             LineNumberingContent = $"{lineNumberingLabel} () ";
         }
@@ -254,6 +258,11 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private bool CanAcceptView() {
+            if(SelectedElementsIds.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoSelectedElements");
+                return false;
+            }
+
             if(!IsLineNumberingSelected && !IsArrayNumberingSelected) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.SelectNumberingType");
                 return false;

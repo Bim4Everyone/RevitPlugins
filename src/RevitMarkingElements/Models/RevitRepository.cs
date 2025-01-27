@@ -96,19 +96,23 @@ namespace RevitMarkingElements.Models {
                 return new List<Element>();
             }
 
-            var selectedElementIds = ActiveUIDocument.Selection.GetElementIds();
-
-            if(selectedElementIds == null || !selectedElementIds.Any()) {
-                return new List<Element>();
-            }
-
             FilteredElementCollector collector = new FilteredElementCollector(Document);
 
             return collector
                 .WherePasses(new ElementCategoryFilter(categoryId))
                 .WhereElementIsNotElementType()
-                .Where(element => selectedElementIds.Contains(element.Id))
+                .ToElements()
                 .ToList();
+        }
+
+        public List<ElementId> GetSelectedElementsIds() {
+            var selectedElementIds = ActiveUIDocument.Selection.GetElementIds();
+
+            if(selectedElementIds == null || !selectedElementIds.Any()) {
+                return new List<ElementId>();
+            }
+
+            return selectedElementIds.ToList();
         }
 
         public XYZ GetElementCoordinates(Element element) {

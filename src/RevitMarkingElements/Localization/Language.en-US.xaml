@@ -22,5 +22,6 @@
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String x:Key="MainWindow.FinishLineSelection">"Press Esc to complete line selection"</system:String>
-    <system:String x:Key="MainWindow.StartNumbericFrom">Start numbering with a number.</system:String> 
+    <system:String x:Key="MainWindow.StartNumbericFrom">Start numbering with a number.</system:String>
+    <system:String x:Key="MainWindow.ErrorNoSelectedElements">Need select elements on view</system:String>
 </ResourceDictionary>

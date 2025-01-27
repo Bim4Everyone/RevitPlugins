@@ -22,5 +22,6 @@
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String x:Key="MainWindow.FinishLineSelection">Нажмите Esc для завершения выбора линий.</system:String>
-    <system:String x:Key="MainWindow.StartNumbericFrom">Начать нумерацию с числа.</system:String> 
+    <system:String x:Key="MainWindow.StartNumbericFrom">Начать нумерацию с числа.</system:String>
+    <system:String x:Key="MainWindow.ErrorNoSelectedElements">Необходимо выбрать элементы на виде</system:String>
 </ResourceDictionary>
