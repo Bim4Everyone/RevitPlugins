@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Windows.Input;
+
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
@@ -13,28 +16,27 @@ using RevitRoomExtrusion.Models;
 namespace RevitRoomExtrusion.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
-        private readonly RevitRepository _revitRepository;        
-        private readonly ILocalizationService _localizationService;                       
+        private readonly RevitRepository _revitRepository;
+        private readonly FamilyCreator _familyCreator;
+        private readonly ILocalizationService _localizationService;
 
         private string _errorText;
-        private string _saveProperty;
         private string _extrusionHeight;
-        private string _extrusionFamilyName;                        
+        private string _extrusionFamilyName;
 
         public MainViewModel(
             PluginConfig pluginConfig,
-            RevitRepository revitRepository,            
+            RevitRepository revitRepository,
+            FamilyCreator familyCreator,
             ILocalizationService localizationService) {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-            _localizationService = localizationService;                        
-
-            ExtrusionHeight = "2200";
-            ExtrusionFamilyName = "Машино-места";
+            _familyCreator = familyCreator;
+            _localizationService = localizationService;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
-            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);            
+            AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
         public ICommand LoadViewCommand { get; }
@@ -45,10 +47,6 @@ namespace RevitRoomExtrusion.ViewModels {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
-        public string SaveProperty {
-            get => _saveProperty;
-            set => this.RaiseAndSetIfChanged(ref _saveProperty, value);
-        }
         public string ExtrusionHeight {
             get => _extrusionHeight;
             set => this.RaiseAndSetIfChanged(ref _extrusionHeight, value);
@@ -56,18 +54,17 @@ namespace RevitRoomExtrusion.ViewModels {
         public string ExtrusionFamilyName {
             get => _extrusionFamilyName;
             set => this.RaiseAndSetIfChanged(ref _extrusionFamilyName, value);
-        }                
+        }
 
         private void LoadView() {
             LoadConfig();
         }
-        private void AcceptView() {            
+        private void AcceptView() {
             SaveConfig();
             SelectedRooms = _revitRepository.GetSelectedRooms();
             View3D view3d = _revitRepository.GetView3D(_extrusionFamilyName);
             double extrusionHeightDouble = Convert.ToDouble(_extrusionHeight);
-            FamilyCreator familyCreator = new FamilyCreator(_revitRepository); 
-            familyCreator.CreateFamilies(_extrusionFamilyName, extrusionHeightDouble, SelectedRooms, view3d);
+            _familyCreator.CreateFamilies(SelectedRooms, view3d, _extrusionFamilyName, extrusionHeightDouble);
         }
 
         private bool CanAcceptView() {
@@ -82,22 +79,27 @@ namespace RevitRoomExtrusion.ViewModels {
             if(string.IsNullOrEmpty(_extrusionFamilyName)) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.FamilyName");
                 return false;
-            }           
+            }
+            if(!NamingUtils.IsValidName(_extrusionFamilyName) ||
+                _extrusionFamilyName.Any(c => Path.GetInvalidFileNameChars().Contains(c)) ||
+                _extrusionFamilyName.Any(c => Path.GetInvalidPathChars().Contains(c))) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.NameError");
+                return false;
+            }
             ErrorText = null;
             return true;
-        }       
+        }
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
-            ExtrusionHeight = setting?.ExtrusionHeight ?? "2200";            
-            ExtrusionFamilyName = setting?.ExtrusionFamilyName ?? "Машино-места";
+            ExtrusionHeight = setting?.ExtrusionHeight ?? "2200";
+            ExtrusionFamilyName = setting?.ExtrusionFamilyName
+                ?? _localizationService.GetLocalizedString("MainViewModel.DefaultFamilyName");
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
-            setting.SaveProperty = SaveProperty;
             setting.ExtrusionHeight = ExtrusionHeight;
             setting.ExtrusionFamilyName = ExtrusionFamilyName;
             _pluginConfig.SaveProjectConfig();

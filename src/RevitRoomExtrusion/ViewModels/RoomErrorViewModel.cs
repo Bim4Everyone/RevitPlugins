@@ -1,20 +1,24 @@
 using System.Windows.Input;
+
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitRoomExtrusion.Models;
 
 namespace RevitRoomExtrusion.ViewModels {
     internal class RoomErrorViewModel {
+        private readonly ILocalizationService _localizationService;
+        private readonly RoomChecker _roomChecker;
 
-        private readonly RevitRepository _revitRepository;
-
-        public RoomErrorViewModel(RevitRepository revitRepository, Room room, ICommand showElementCommand) {
-            _revitRepository = revitRepository;
+        public RoomErrorViewModel(
+            ILocalizationService localizationService, RoomChecker roomChecker, Room room, ICommand showElementCommand) {
+            _roomChecker = roomChecker;
+            _localizationService = localizationService;
             ElementId = room.Id;
             RoomName = GetParamName(room);
             RoomNumber = GetParamNumber(room);
@@ -32,41 +36,44 @@ namespace RevitRoomExtrusion.ViewModels {
 
         private string GetErrorDescription(Room room) {
             string errorDescription = null;
-            var roomChecker = new RoomChecker(_revitRepository);
-
             if(room.IsRedundant()) {
-                errorDescription = "Помещение избыточно";
+                errorDescription = _localizationService.GetLocalizedString("RoomErrorViewModel.RedundantError");
             } else if(room.IsNotEnclosed()) {
-                errorDescription = "Помещение не окружено";
-            } else if(roomChecker.CheckIntersectBoundary(room)) {
-                errorDescription = "Помещение не ограничено разделителями";
+                errorDescription = _localizationService.GetLocalizedString("RoomErrorViewModel.NotEnclosed");
+            } else if(_roomChecker.CheckIntersectBoundary(room)) {
+                errorDescription = _localizationService.GetLocalizedString("RoomErrorViewModel.IntersectBoundary");
             }
             return errorDescription;
         }
 
         private string GetParamNumber(Room room) {
+
+            string roomGroupShortName = null;
             string numberPrefix = null;
-            string roomGroupShortName = room.GetParamValue<string>(SharedParamsConfig.Instance.RoomGroupShortName);
-            if(!room.IsExistsParam(SharedParamsConfig.Instance.RoomGroupShortName)) {
-                if(roomGroupShortName != null) {
+
+            SharedParam sharedParam = SharedParamsConfig.Instance.RoomGroupShortName;
+            if(room.IsExistsParam(sharedParam)) {
+                roomGroupShortName = room.GetParamValue<string>(sharedParam);
+
+                if(room.IsExistsParamValue(sharedParam)) {
                     numberPrefix = $"{roomGroupShortName}-";
                 }
             }
+
             Parameter numberParameter = room.get_Parameter(BuiltInParameter.ROOM_NUMBER);
             if(numberParameter.AsString() != "") {
                 return $"{numberPrefix}{numberParameter.AsString()}";
             } else {
-                return "Нет номера";
+                return _localizationService.GetLocalizedString("RoomErrorViewModel.NoNumber");
             }
         }
 
         private string GetParamName(Room room) {
             Parameter nameParameter = room.get_Parameter(BuiltInParameter.ROOM_NAME);
             if(nameParameter.AsString() != "") {
-                string roomName = nameParameter.AsString();
-                return roomName;
+                return nameParameter.AsString();
             } else {
-                return "Нет имени";
+                return _localizationService.GetLocalizedString("RoomErrorViewModel.NoName");
             }
         }
     }

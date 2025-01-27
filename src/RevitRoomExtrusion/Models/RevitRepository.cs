@@ -1,19 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 
 namespace RevitRoomExtrusion.Models {
     internal class RevitRepository {
+        private readonly ILocalizationService _localizationService;
 
-        public RevitRepository(UIApplication uiApplication) {
-            UIApplication = uiApplication;             
+        public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
+            UIApplication = uiApplication;
+            _localizationService = localizationService;
         }
 
         public UIApplication UIApplication { get; }
@@ -22,22 +26,22 @@ namespace RevitRoomExtrusion.Models {
         public Document Document => ActiveUIDocument.Document;
 
         public View3D GetView3D(string familyName) {
-            string userName = Application.Username;
-            string name3Dview = $"${userName}/{familyName}/Проверка дорожек";
-            
+            string name3Dview = String.Format(
+                _localizationService.GetLocalizedString("RevitRepository.ViewName"), Application.Username, familyName);
+
             var views = new FilteredElementCollector(Document)
                 .OfCategory(BuiltInCategory.OST_Views)
                 .WhereElementIsNotElementType()
                 .ToElements()
-                .Cast<View>();            
+                .Cast<View>();
             var existingView = views
                 .FirstOrDefault(v => v.Name.Equals(name3Dview, StringComparison.OrdinalIgnoreCase));
-            
+
             if(existingView != null) {
                 return existingView as View3D;
             } else {
                 return CreateView3D(name3Dview);
-            }                       
+            }
         }
 
         public List<Room> GetSelectedRooms() {
@@ -49,9 +53,17 @@ namespace RevitRoomExtrusion.Models {
         }
 
         public void SetSelectedRoom(ElementId elementId) {
-            List<ElementId> listRoomElements = new List<ElementId>() { 
-                elementId };                        
+            List<ElementId> listRoomElements = new List<ElementId>() {
+                elementId };
             ActiveUIDocument.Selection.SetElementIds(listRoomElements);
+        }
+
+        public FamilySymbol GetFamilySymbol(Family family) {
+            ElementFilter filter = new FamilySymbolFilter(family.Id);
+            return new FilteredElementCollector(Document)
+                .WherePasses(filter)
+                .Cast<FamilySymbol>()
+                .FirstOrDefault();
         }
 
         private View3D CreateView3D(string name3Dview) {
@@ -61,9 +73,9 @@ namespace RevitRoomExtrusion.Models {
                 .Cast<ViewFamilyType>();
             var viewTypes3D = viewTypes
                 .Where(vt => vt.ViewFamily == ViewFamily.ThreeDimensional)
-                .ToList()
                 .First();
-            using(Transaction t = Document.StartTransaction("BIM: Создание 3D вида проверки дорожек")) {
+            string transactionName = _localizationService.GetLocalizedString("RevitRepository.TransactionNameCreate");
+            using(Transaction t = Document.StartTransaction(transactionName)) {
                 View3D view3D = View3D.CreateIsometric(Document, viewTypes3D.Id);
                 view3D.Name = name3Dview;
                 t.Commit();

@@ -1,15 +1,2 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <UseDevExpress>false</UseDevExpress>
-    </PropertyGroup>   
-    <ItemGroup>
-      <Reference Include="RevitAPI">
-        <HintPath>C:\Program Files\Autodesk\Revit 2022\RevitAPI.dll</HintPath>
-        <Private>False</Private>
-      </Reference>
-      <Reference Include="RevitAPIUI">
-        <HintPath>C:\Program Files\Autodesk\Revit 2022\RevitAPIUI.dll</HintPath>
-        <Private>False</Private>
-      </Reference>
-    </ItemGroup>     
+﻿<Project Sdk="Microsoft.NET.Sdk">        
 </Project>

@@ -1,14 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -29,12 +23,24 @@ namespace RevitRoomExtrusion {
     [Transaction(TransactionMode.Manual)]
     public class RevitRoomExtrusionCommand : BasePluginCommand {
         public RevitRoomExtrusionCommand() {
-            PluginName = "RevitRoomExtrusion";
+            PluginName = "Выдавить помещения";
         }
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RoomChecker>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<FamilyLoader>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<FamilyCreator>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<FamilyLoadOptions>()
                     .ToSelf()
                     .InSingletonScope();
 
@@ -63,6 +69,11 @@ namespace RevitRoomExtrusion {
 
                 RoomChecker roomChecker = kernel.Get<RoomChecker>();
 
+                IMessageBoxService messageBoxService = kernel.Get<IMessageBoxService>();
+                ILocalizationService iLocalizationService = kernel.Get<ILocalizationService>();
+                string stringMessegeBody = iLocalizationService.GetLocalizedString("Command.MessegeBody");
+                string stringMessegeTitle = iLocalizationService.GetLocalizedString("Command.MessegeTitle");
+
                 if(roomChecker.CheckSelection()) {
                     if(roomChecker.CheckRooms()) {
                         Notification(kernel.Get<MainWindow>());
@@ -72,6 +83,8 @@ namespace RevitRoomExtrusion {
                         throw new OperationCanceledException();
                     }
                 } else {
+                    messageBoxService.Show(
+                        stringMessegeBody, stringMessegeTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     throw new OperationCanceledException();
                 }
             }

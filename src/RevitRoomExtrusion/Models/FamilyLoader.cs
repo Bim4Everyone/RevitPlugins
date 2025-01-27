@@ -1,43 +1,47 @@
 using System;
 using System.IO;
 using System.Linq;
-using Autodesk.Revit.DB.Structure;
+
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
+using Autodesk.Revit.DB.Structure;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 
 namespace RevitRoomExtrusion.Models {
     internal class FamilyLoader {
-
+        private readonly ILocalizationService _localizationService;
         private readonly RevitRepository _revitRepository;
+        private readonly FamilyLoadOptions _familyLoadOptions;
 
-        public FamilyLoader(RevitRepository revitRepository) {
+        public FamilyLoader(
+            ILocalizationService localizationService,
+            RevitRepository revitRepository,
+            FamilyLoadOptions familyLoadOptions) {
             _revitRepository = revitRepository;
+            _familyLoadOptions = familyLoadOptions;
+            _localizationService = localizationService;
         }
 
-        public FamilySymbol LoadRoomFamily(string path) {
+        public FamilySymbol LoadFamilyInstance(string path) {
             Family family = null;
             FamilySymbol familySymbol = null;
-            FamilyLoadOptions loadOptions = new FamilyLoadOptions();
 
-            using(Transaction t = _revitRepository.Document.StartTransaction("BIM: Загрузка семейства дорожек")) {
-                _revitRepository.Document.LoadFamily(path, loadOptions, out family);
+            string transactionNameLoad = _localizationService.GetLocalizedString("FamilyLoader.TransactionNameLoad");
+            using(Transaction t = _revitRepository.Document.StartTransaction(transactionNameLoad)) {
+                _revitRepository.Document.LoadFamily(path, _familyLoadOptions, out family);
 
-                familySymbol = family.GetFamilySymbolIds()
-                    .Select(id => _revitRepository.Document.GetElement(id) as FamilySymbol)
-                    .FirstOrDefault(symbol => symbol != null);
+                familySymbol = _revitRepository.GetFamilySymbol(family);
 
                 if(!familySymbol.IsActive) {
                     familySymbol.Activate();
-                    _revitRepository.Document.Regenerate();
                 }
                 t.Commit();
             }
             DeleteRoomFamily(path);
             return familySymbol;
-        }        
+        }
 
         private void DeleteRoomFamily(string famPath) {
             try {
@@ -45,17 +49,22 @@ namespace RevitRoomExtrusion.Models {
                     File.Delete(famPath);
                 }
             } catch(UnauthorizedAccessException) {
-                TaskDialog.Show("BIM", $"Ошибка удаления файла семейства. Удалите файл {famPath} вручную.");
             }
         }
 
-        public void PlaceRoomFamily(FamilySymbol symbol, IGrouping<double, RoomElement> groupRooms, double location) {
-            double locationRoom = groupRooms
-                .FirstOrDefault().LocationRoom;
+        public void PlaceFamilyInstance(FamilySymbol symbol, IGrouping<double, RoomElement> groupRooms, double location) {
+            RoomElement firstRoom = groupRooms
+                .FirstOrDefault();
+
+            double locationRoom = 0;
+            if(firstRoom != null) {
+                locationRoom = firstRoom.LocationRoom;
+            }
+
             double locationFt = UnitUtils.ConvertToInternalUnits(location, UnitTypeId.Millimeters);
             double locationPlace = locationFt - locationRoom;
-
-            using(Transaction t = _revitRepository.Document.StartTransaction("BIM: Размещение семейства дорожек")) {
+            string transactionNamePlace = _localizationService.GetLocalizedString("FamilyLoader.TransactionNamePlace");
+            using(Transaction t = _revitRepository.Document.StartTransaction(transactionNamePlace)) {
                 XYZ xyz = new XYZ(0, 0, locationPlace);
                 FamilyInstance familyInstance = _revitRepository.Document.Create.NewFamilyInstance(
                     xyz,
@@ -66,11 +75,21 @@ namespace RevitRoomExtrusion.Models {
         }
 
         public bool IsFamilyInstancePlaced(string familyName) {
-            return new FilteredElementCollector(_revitRepository.Document)
-                .OfCategory(BuiltInCategory.OST_Roads)
-                .WhereElementIsNotElementType()
-                .Cast<FamilyInstance>()
-                .Any(familyInstance => familyInstance.Name == familyName);
+            var family = new FilteredElementCollector(_revitRepository.Document)
+                .OfClass(typeof(Family))
+                .FirstOrDefault(f => f.Name.Equals(familyName, StringComparison.InvariantCultureIgnoreCase));
+            if(family != null) {
+                var symbolId = new FilteredElementCollector(_revitRepository.Document)
+                    .WherePasses(new FamilySymbolFilter(family.Id))
+                    .ToElementIds()
+                    .FirstOrDefault();
+                if(symbolId != null) {
+                    return new FilteredElementCollector(_revitRepository.Document)
+                        .WherePasses(new FamilyInstanceFilter(_revitRepository.Document, symbolId))
+                        .Any();
+                }
+            }
+            return false;
         }
     }
 }

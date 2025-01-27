@@ -7,7 +7,6 @@ using pyRevitLabs.Json;
 namespace RevitRoomExtrusion.Models {
 
     internal class PluginConfig : ProjectConfig<RevitSettings> {
-
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
 
@@ -23,8 +22,7 @@ namespace RevitRoomExtrusion.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public string SaveProperty { get; set; }
-        public string ExtrusionHeight { get; set; } 
-        public string ExtrusionFamilyName { get; set; } 
+        public string ExtrusionHeight { get; set; }
+        public string ExtrusionFamilyName { get; set; }
     }
 }
