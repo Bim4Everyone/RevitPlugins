@@ -87,6 +87,24 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
+        public IReadOnlyCollection<CurveElement> GetRoomSeparationLinesOnPhase(Document document, Phase phase) {
+            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
+                ElementOnPhaseStatus.Existing,
+                ElementOnPhaseStatus.Demolished,
+                ElementOnPhaseStatus.New,
+                ElementOnPhaseStatus.Temporary
+            };
+
+            ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, statuses);
+
+            return new FilteredElementCollector(document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_RoomSeparationLines)
+                .WherePasses(phaseFilter)
+                .OfType<CurveElement>()
+                .ToList();
+        }
+
         public IReadOnlyCollection<FamilyInstance> GetBathInstancesOnPhase(Document document, Phase phase) {
             ElementCategoryFilter notDoorsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Doors, true);
             ElementCategoryFilter notWindowsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows, true);
