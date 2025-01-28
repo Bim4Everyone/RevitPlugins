@@ -14,11 +14,6 @@ using dosymep.SimpleServices;
 namespace RevitRoomExtrusion.Models {
     internal class RevitRepository {
         private readonly ILocalizationService _localizationService;
-        private static readonly ElementMulticategoryFilter _multiCategoryFilter = new ElementMulticategoryFilter(
-            new BuiltInCategory[] {
-                BuiltInCategory.OST_StructuralFoundation,
-                BuiltInCategory.OST_Floors
-            });
 
         public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
             UIApplication = uiApplication;
