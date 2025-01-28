@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 using pyRevitLabs.Json;

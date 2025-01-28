@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
-using System.Web.Security;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -70,14 +69,7 @@ namespace RevitDeclarations.Models {
         }
 
         public IReadOnlyCollection<FamilyInstance> GetDoorsOnPhase(Document document, Phase phase) {
-            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
-                ElementOnPhaseStatus.Existing,
-                ElementOnPhaseStatus.Demolished,
-                ElementOnPhaseStatus.New,
-                ElementOnPhaseStatus.Temporary
-            };
-
-            ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, statuses);
+            ElementPhaseStatusFilter phaseFilter = GetPhaseFilter(phase);
 
             return new FilteredElementCollector(document)
                 .OfCategory(BuiltInCategory.OST_Doors)
@@ -88,14 +80,7 @@ namespace RevitDeclarations.Models {
         }
 
         public IReadOnlyCollection<CurveElement> GetRoomSeparationLinesOnPhase(Document document, Phase phase) {
-            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
-                ElementOnPhaseStatus.Existing,
-                ElementOnPhaseStatus.Demolished,
-                ElementOnPhaseStatus.New,
-                ElementOnPhaseStatus.Temporary
-            };
-
-            ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, statuses);
+            ElementPhaseStatusFilter phaseFilter = GetPhaseFilter(phase);
 
             return new FilteredElementCollector(document)
                 .WhereElementIsNotElementType()
@@ -108,15 +93,7 @@ namespace RevitDeclarations.Models {
         public IReadOnlyCollection<FamilyInstance> GetBathInstancesOnPhase(Document document, Phase phase) {
             ElementCategoryFilter notDoorsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Doors, true);
             ElementCategoryFilter notWindowsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows, true);
-
-            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
-                ElementOnPhaseStatus.Existing,
-                ElementOnPhaseStatus.Demolished,
-                ElementOnPhaseStatus.New,
-                ElementOnPhaseStatus.Temporary
-            };
-
-            ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, statuses);
+            ElementPhaseStatusFilter phaseFilter = GetPhaseFilter(phase);
 
             /// Поиск семейств ванн и душевых кабин по наличию "ванна" или "душев" в имени семейства.
             /// Также исключается семейства с суффиксом "ова", например, заканчиваюищеся на "ованная"
@@ -134,7 +111,7 @@ namespace RevitDeclarations.Models {
         }
 
         public IEnumerable<IEnumerable<RoomElement>> GroupRooms(IEnumerable<RoomElement> rooms,
-                                                   DeclarationSettings settings) {
+                                                                DeclarationSettings settings) {
             var multiStoreyAparts = rooms.Where(x => !string.IsNullOrEmpty(x.GetTextParamValue(settings.MultiStoreyParam)))
                 .GroupBy(r => new { l = r.GetTextParamValue(settings.MultiStoreyParam), s = r.GetTextParamValue(settings.SectionParam) })
                 .Select(g => new List<RoomElement>(g));
@@ -170,6 +147,17 @@ namespace RevitDeclarations.Models {
                 .GetOrderedParameters()
                 .Where(x => x.StorageType == storageType)
                 .ToList();
+        }
+
+        private ElementPhaseStatusFilter GetPhaseFilter(Phase phase) {
+            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
+                ElementOnPhaseStatus.Existing,
+                ElementOnPhaseStatus.Demolished,
+                ElementOnPhaseStatus.New,
+                ElementOnPhaseStatus.Temporary
+            };
+
+            return new ElementPhaseStatusFilter(phase.Id, statuses);
         }
     }
 }

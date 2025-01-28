@@ -236,7 +236,6 @@ namespace RevitDeclarations.Models {
             return "Нет";
         }
 
-
         private bool CheckUtpNullAreas() {
             return _project
                 .Rooms

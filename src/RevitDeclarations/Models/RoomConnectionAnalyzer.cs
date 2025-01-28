@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime;
 
-using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
 
 namespace RevitDeclarations.Models {
@@ -15,11 +11,11 @@ namespace RevitDeclarations.Models {
         private readonly PrioritiesConfig _priorities;
 
         // Мастер-спальни 
-        private IEnumerable<ElementId> _masterBedrooms;
+        private IEnumerable<ElementId> _masterBedrooms = new List<ElementId>();
         // Санузлы, относящиеся к мастер спальням
-        private IEnumerable<ElementId> _masterBathrooms;
+        private IEnumerable<ElementId> _masterBathrooms = new List<ElementId>();
         // Гардеробные с дверью (разделителем) в жилую комнату. Для УТП Гардеробная
-        private IEnumerable<ElementId> _pantriesWithBedroom;
+        private IEnumerable<ElementId> _pantriesWithBedroom = new List<ElementId>();
 
         public RoomConnectionAnalyzer(ApartmentsProject project, ApartmentsSettings settings) {
             _project = project;

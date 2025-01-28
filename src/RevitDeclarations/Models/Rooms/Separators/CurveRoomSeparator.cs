@@ -1,13 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-
-using dosymep.Revit;
 
 namespace RevitDeclarations.Models {
     internal class CurveRoomSeparator : RoomSeparator {
