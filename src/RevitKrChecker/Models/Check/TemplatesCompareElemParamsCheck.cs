@@ -15,6 +15,7 @@ namespace RevitKrChecker.Models.Check {
         public TemplatesCompareElemParamsCheck(TemplatesCompareCheckOptions checkOptions) {
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
+
             TargetParamName = checkOptions.TargetParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             // Проверяем, что параметр для проверке не на уровне материала
@@ -24,6 +25,7 @@ namespace RevitKrChecker.Models.Check {
 
             CheckRule = checkOptions.CheckRule
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckRule));
+
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
             SourceParamLevel = checkOptions.SourceParamLevel;
@@ -45,15 +47,6 @@ namespace RevitKrChecker.Models.Check {
         public ICheckRule DictForCompareRule { get; }
 
 
-        private string GetDictForCompareKeyByRule(string value) {
-            return DictForCompare.Keys.FirstOrDefault(key => DictForCompareRule.Check(value, key));
-        }
-
-        private string GetValueByDict(string value) {
-            string key = GetDictForCompareKeyByRule(value);
-            return key is null ? null : DictForCompare[key];
-        }
-
         private bool CheckAllValues(string targetParamValue, List<string> sourceParamValues) {
             return sourceParamValues.All(sourceParamValue => CheckRule.Check(targetParamValue, sourceParamValue));
         }
@@ -64,7 +57,9 @@ namespace RevitKrChecker.Models.Check {
 
             string targetParamValue = _paramService.GetParamValueToCheck(element, TargetParamName, TargetParamLevel);
             List<string> sourceParamValues = _paramService.GetParamValuesToCheck(element, SourceParamName, SourceParamLevel);
-            List<string> sourceParamValuesByDict = sourceParamValues.Select(val => GetValueByDict(val)).ToList();
+            List<string> sourceParamValuesByDict = sourceParamValues
+                .Select(val => _paramService.GetValueByDict(DictForCompare, DictForCompareRule, val))
+                .ToList();
 
             if(!CheckAllValues(targetParamValue, sourceParamValuesByDict)) {
                 info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());

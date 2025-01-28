@@ -20,11 +20,13 @@ namespace RevitKrChecker.Models.Check {
             TargetParamName = checkOptions.TargetParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             // Проверяем, что параметр для проверке на уровне материала
-            if(checkOptions.TargetParamLevel != ParamLevel.Material)
-                throw new ArgumentException("Проверка предусмотрена только для проверки параметра материала");
+            TargetParamLevel = checkOptions.TargetParamLevel != ParamLevel.Material
+                ? throw new ArgumentException("Проверка предусмотрена только для проверки параметра материала")
+                : checkOptions.TargetParamLevel;
 
             CheckRule = checkOptions.CheckRule
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckRule));
+
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
             SourceParamLevel = checkOptions.SourceParamLevel != ParamLevel.Material
@@ -40,21 +42,13 @@ namespace RevitKrChecker.Models.Check {
 
         public string CheckName { get; }
         public string TargetParamName { get; }
+        public ParamLevel TargetParamLevel { get; }
         public ICheckRule CheckRule { get; }
         private string SourceParamName { get; }
         public ParamLevel SourceParamLevel { get; }
         public Dictionary<string, string> DictForCompare { get; }
         public ICheckRule DictForCompareRule { get; }
 
-
-        private string GetDictForCompareKeyByRule(string value) {
-            return DictForCompare.Keys.FirstOrDefault(key => DictForCompareRule.Check(value, key));
-        }
-
-        private string GetValueByDict(string value) {
-            string key = GetDictForCompareKeyByRule(value);
-            return key is null ? null : DictForCompare[key];
-        }
 
         public bool Check(Element element, out CheckInfo info) {
             if(element == null)
@@ -67,7 +61,7 @@ namespace RevitKrChecker.Models.Check {
             foreach(Element material in materials) {
                 string targetParamValue = material.GetParam(TargetParamName).AsValueString();
                 string sourceParamValue = material.GetParam(SourceParamName).AsValueString();
-                string sourceParamValueByDict = GetValueByDict(sourceParamValue);
+                string sourceParamValueByDict = _paramService.GetValueByDict(DictForCompare, DictForCompareRule, sourceParamValue);
 
                 if(!CheckRule.Check(targetParamValue, sourceParamValueByDict)) {
                     info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());

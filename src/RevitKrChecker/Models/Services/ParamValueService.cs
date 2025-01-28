@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitKrChecker.Models.Interfaces;
+
 namespace RevitKrChecker.Models.Services {
     internal class ParamValueService {
         public string GetParamValueToCheck(Element element, string paramName, ParamLevel paramLevel) {
@@ -48,22 +50,17 @@ namespace RevitKrChecker.Models.Services {
             }
         }
 
+        private string GetDictForCompareKeyByRule(Dictionary<string, string> dictForCompare,
+                                                  ICheckRule dictForCompareRule,
+                                                  string value) {
+            return dictForCompare.Keys.FirstOrDefault(key => dictForCompareRule.Check(value, key));
+        }
 
-
-
-        //private bool CheckAllValues(string targetParamValue, List<string> sourceParamValues) {
-        //    return sourceParamValues.All(sourceParamValue => CheckRule.Check(targetParamValue, sourceParamValue));
-        //}
-
-
-        //private bool CheckAllValues(List<string> targetParamValues, string sourceParamValue) {
-        //    return targetParamValues.All(targetParamValue => CheckRule.Check(targetParamValue, sourceParamValue));
-        //}
-
-        //private bool CheckAllValues(List<string> targetParamValues, List<string> sourceParamValues) {
-        //    return targetParamValues
-        //        .All(targetParamValue => sourceParamValues
-        //            .All(sourceParamValue => CheckRule.Check(targetParamValue, sourceParamValue)));
-        //}
+        public string GetValueByDict(Dictionary<string, string> dictForCompare,
+                                     ICheckRule dictForCompareRule,
+                                     string value) {
+            string key = GetDictForCompareKeyByRule(dictForCompare, dictForCompareRule, value);
+            return key is null ? null : dictForCompare[key];
+        }
     }
 }

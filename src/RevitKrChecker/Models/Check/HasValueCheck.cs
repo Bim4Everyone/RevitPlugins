@@ -13,6 +13,7 @@ namespace RevitKrChecker.Models.Check {
 
         public HasValueCheck(HasValueCheckOptions checkOptions) {
             CheckName = checkOptions.CheckName ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
+
             TargetParamName = checkOptions.TargetParamName ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             TargetParamLevel = checkOptions.TargetParamLevel;
 

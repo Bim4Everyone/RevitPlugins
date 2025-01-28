@@ -17,18 +17,21 @@ namespace RevitKrChecker.Models.Check {
         public CompareMaterialParamsCheck(CompareCheckOptions checkOptions) {
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
+
             TargetParamName = checkOptions.TargetParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             // Проверяем, что параметр для проверке на уровне материала
-            if(checkOptions.TargetParamLevel != ParamLevel.Material)
-                throw new ArgumentException("Проверка предусмотрена только для проверки параметра материала");
+            TargetParamLevel = checkOptions.TargetParamLevel != ParamLevel.Material
+                ? throw new ArgumentException("Проверка предусмотрена только для проверки параметра материала")
+                : checkOptions.TargetParamLevel;
 
             CheckRule = checkOptions.CheckRule
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckRule));
+
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
             SourceParamLevel = checkOptions.SourceParamLevel != ParamLevel.Material
-                ? throw new ArgumentException("Проверка не предусмотрена для проверки c параметрами не материала")
+                ? throw new ArgumentException("Проверка предусмотрена только для проверки c параметрами материала")
                 : checkOptions.SourceParamLevel;
 
             _paramService = new ParamValueService();
@@ -36,6 +39,7 @@ namespace RevitKrChecker.Models.Check {
 
         public string CheckName { get; }
         public string TargetParamName { get; }
+        public ParamLevel TargetParamLevel { get; }
         public ICheckRule CheckRule { get; }
         private string SourceParamName { get; }
         public ParamLevel SourceParamLevel { get; }

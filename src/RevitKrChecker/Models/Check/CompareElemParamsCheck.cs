@@ -15,6 +15,7 @@ namespace RevitKrChecker.Models.Check {
         public CompareElemParamsCheck(CompareCheckOptions checkOptions) {
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
+
             TargetParamName = checkOptions.TargetParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             TargetParamLevel = checkOptions.TargetParamLevel is ParamLevel.Material
@@ -23,6 +24,7 @@ namespace RevitKrChecker.Models.Check {
 
             CheckRule = checkOptions.CheckRule
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckRule));
+
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
             SourceParamLevel = checkOptions.SourceParamLevel;
