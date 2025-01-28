@@ -16,11 +16,8 @@ namespace RevitRoomExtrusion.Models {
         }
 
         public bool CheckSelection() {
-            bool result = true;
-            if(_revitRepository.GetSelectedRooms().Count <= 0) {
-                result = false;
-            }
-            return result;
+            return _revitRepository.GetSelectedRooms()
+                .Count() > 0;
         }
 
         public bool CheckRooms() {
@@ -29,11 +26,7 @@ namespace RevitRoomExtrusion.Models {
         }
 
         public bool CheckInvalidRoom(Room room) {
-            bool resultCheck = false;
-            if(room.IsNotEnclosed() || room.IsRedundant() || CheckIntersectBoundary(room)) {
-                resultCheck = true;
-            }
-            return resultCheck;
+            return room.IsNotEnclosed() || room.IsRedundant() || CheckIntersectBoundary(room);
         }
 
         public bool CheckIntersectBoundary(Room room) {
@@ -43,7 +36,6 @@ namespace RevitRoomExtrusion.Models {
         }
 
         private bool CheckIntersectCurve(IList<BoundarySegment> segments) {
-            bool resultCheck = false;
             List<Curve> curves = new List<Curve>();
             foreach(BoundarySegment segment in segments) {
                 curves.Add(segment.GetCurve());
@@ -58,7 +50,7 @@ namespace RevitRoomExtrusion.Models {
                     }
                 }
             }
-            return resultCheck;
+            return false;
         }
 
 

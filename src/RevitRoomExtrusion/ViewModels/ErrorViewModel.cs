@@ -38,9 +38,9 @@ namespace RevitRoomExtrusion.ViewModels {
         }
 
         private List<Room> GetErrorRooms() {
-            return new List<Room>(
-                _revitRepository.GetSelectedRooms()
-                .Where(room => _roomChecker.CheckInvalidRoom(room)));
+            return _revitRepository.GetSelectedRooms()
+                .Where(room => _roomChecker.CheckInvalidRoom(room))
+                .ToList();
         }
     }
 }

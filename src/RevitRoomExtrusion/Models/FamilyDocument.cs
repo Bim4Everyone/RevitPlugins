@@ -47,10 +47,9 @@ namespace RevitRoomExtrusion.Models {
                     .Select(roomElement => CreateExtrusion(roomElement.ArrArray, amount))
                     .ToList();
 
-                if(materialElementId != null) {
+                if(materialElementId.IsNotNull()) {
                     foreach(Extrusion extrusion in extrusionList) {
-                        Parameter extrusionParameter = extrusion.get_Parameter(BuiltInParameter.MATERIAL_ID_PARAM);
-                        extrusionParameter.Set(materialElementId);
+                        extrusion.SetParamValue(BuiltInParameter.MATERIAL_ID_PARAM, materialElementId);
                     }
                 }
                 t.Commit();

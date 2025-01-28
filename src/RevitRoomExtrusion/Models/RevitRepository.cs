@@ -14,6 +14,11 @@ using dosymep.SimpleServices;
 namespace RevitRoomExtrusion.Models {
     internal class RevitRepository {
         private readonly ILocalizationService _localizationService;
+        private static readonly ElementMulticategoryFilter _multiCategoryFilter = new ElementMulticategoryFilter(
+            new BuiltInCategory[] {
+                BuiltInCategory.OST_StructuralFoundation,
+                BuiltInCategory.OST_Floors
+            });
 
         public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
             UIApplication = uiApplication;
@@ -63,7 +68,7 @@ namespace RevitRoomExtrusion.Models {
             return new FilteredElementCollector(Document)
                 .WherePasses(filter)
                 .Cast<FamilySymbol>()
-                .FirstOrDefault();
+                .First();
         }
 
         private View3D CreateView3D(string name3Dview) {

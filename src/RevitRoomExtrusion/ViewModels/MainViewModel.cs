@@ -15,6 +15,8 @@ using RevitRoomExtrusion.Models;
 
 namespace RevitRoomExtrusion.ViewModels {
     internal class MainViewModel : BaseViewModel {
+        private const string _defaultHeight = "2200";
+
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly FamilyCreator _familyCreator;
@@ -92,7 +94,7 @@ namespace RevitRoomExtrusion.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            ExtrusionHeight = setting?.ExtrusionHeight ?? "2200";
+            ExtrusionHeight = setting?.ExtrusionHeight ?? _defaultHeight;
             ExtrusionFamilyName = setting?.ExtrusionFamilyName
                 ?? _localizationService.GetLocalizedString("MainViewModel.DefaultFamilyName");
         }

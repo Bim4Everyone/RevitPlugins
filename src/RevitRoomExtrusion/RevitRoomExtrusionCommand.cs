@@ -70,9 +70,9 @@ namespace RevitRoomExtrusion {
                 RoomChecker roomChecker = kernel.Get<RoomChecker>();
 
                 IMessageBoxService messageBoxService = kernel.Get<IMessageBoxService>();
-                ILocalizationService iLocalizationService = kernel.Get<ILocalizationService>();
-                string stringMessegeBody = iLocalizationService.GetLocalizedString("Command.MessegeBody");
-                string stringMessegeTitle = iLocalizationService.GetLocalizedString("Command.MessegeTitle");
+                ILocalizationService localizationService = kernel.Get<ILocalizationService>();
+                string stringMessegeBody = localizationService.GetLocalizedString("Command.MessegeBody");
+                string stringMessegeTitle = localizationService.GetLocalizedString("Command.MessegeTitle");
 
                 if(roomChecker.CheckSelection()) {
                     if(roomChecker.CheckRooms()) {

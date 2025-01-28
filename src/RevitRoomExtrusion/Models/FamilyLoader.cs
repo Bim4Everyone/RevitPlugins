@@ -34,8 +34,10 @@ namespace RevitRoomExtrusion.Models {
 
                 familySymbol = _revitRepository.GetFamilySymbol(family);
 
-                if(!familySymbol.IsActive) {
-                    familySymbol.Activate();
+                if(familySymbol != null) {
+                    if(!familySymbol.IsActive) {
+                        familySymbol.Activate();
+                    }
                 }
                 t.Commit();
             }
@@ -52,7 +54,7 @@ namespace RevitRoomExtrusion.Models {
             }
         }
 
-        public void PlaceFamilyInstance(FamilySymbol symbol, IGrouping<double, RoomElement> groupRooms, double location) {
+        public void PlaceFamilyInstance(FamilySymbol symbol, IGrouping<int, RoomElement> groupRooms, double location) {
             RoomElement firstRoom = groupRooms
                 .FirstOrDefault();
 

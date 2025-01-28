@@ -22,16 +22,14 @@ namespace RevitRoomExtrusion.Models {
 
         public void CreateFamilies(List<Room> listRoom, View3D view3D, string familyName, double extrusionHeight) {
             List<RoomElement> roomElements = listRoom
-                .Select(room => {
-                    return new RoomElement(_revitRepository.Document, room, view3D);
-                })
+                .Select(room => new RoomElement(_revitRepository.Document, room, view3D))
                 .ToList();
 
-            IEnumerable<IGrouping<double, RoomElement>> groupedRooms = roomElements
+            IEnumerable<IGrouping<int, RoomElement>> groupedRooms = roomElements
                 .GroupBy(re => re.LocationSlab);
 
-            foreach(IGrouping<double, RoomElement> groupRooms in groupedRooms) {
-                double locationKey = groupRooms.Key;
+            foreach(IGrouping<int, RoomElement> groupRooms in groupedRooms) {
+                int locationKey = groupRooms.Key;
                 FamilyDocument familyDocument = new FamilyDocument(
                     _localizationService, _revitRepository.Application, locationKey, familyName);
 
@@ -39,7 +37,7 @@ namespace RevitRoomExtrusion.Models {
 
                 FamilySymbol famSymbol = _familyLoader.LoadFamilyInstance(familyDocument.FamilyDocumentPath);
 
-                if(_familyLoader.IsFamilyInstancePlaced(familyDocument.FamilyDocumentName) == false) {
+                if(!_familyLoader.IsFamilyInstancePlaced(familyDocument.FamilyDocumentName)) {
                     _familyLoader.PlaceFamilyInstance(famSymbol, groupRooms, locationKey);
                 }
             }

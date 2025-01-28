@@ -12,12 +12,11 @@ namespace RevitRoomExtrusion.Models {
         private readonly View3D _view3D;
         private readonly double _normalDirection = -100000;
 
-        private static readonly List<BuiltInCategory> _collectionFilter = new List<BuiltInCategory> {
-        BuiltInCategory.OST_StructuralFoundation,
-        BuiltInCategory.OST_Floors
-        };
         private static readonly ElementMulticategoryFilter _multiCategoryFilter = new ElementMulticategoryFilter(
-            _collectionFilter);
+            new BuiltInCategory[] {
+                BuiltInCategory.OST_StructuralFoundation,
+                BuiltInCategory.OST_Floors
+            });
 
         public RoomElement(Document document, Room room, View3D view3D) {
             _document = document;
@@ -30,21 +29,24 @@ namespace RevitRoomExtrusion.Models {
         }
 
         public double LocationRoom { get; private set; }
-        public double LocationSlab { get; private set; }
+        public int LocationSlab { get; private set; }
         public CurveArrArray ArrArray { get; private set; }
 
-        private double CalculateLocation() {
+        private int CalculateLocation() {
             BoundingBoxXYZ boundingBox = _room.get_BoundingBox(null);
-            XYZ minBB = boundingBox.Min;
-            XYZ maxBB = boundingBox.Max;
-            XYZ pointCenter = (maxBB + minBB) / 2;
+            XYZ pointCenter = (boundingBox.Max + boundingBox.Min) / 2;
             XYZ pointDirection = new XYZ(pointCenter.X, pointCenter.Y, _normalDirection);
-
-            double proximity = GetReferenceWithContext(pointCenter, pointDirection).Proximity;
-            double foundElementLocation = pointCenter.Z - proximity;
+            ReferenceWithContext referenceWithContext = GetReferenceWithContext(pointCenter, pointDirection);
+            double foundElementLocation;
+            if(referenceWithContext != null) {
+                double proximity = referenceWithContext.Proximity;
+                foundElementLocation = pointCenter.Z - proximity;
+            } else {
+                foundElementLocation = boundingBox.Min.Z;
+            }
             double convertedFoundElementLocation = UnitUtils.ConvertFromInternalUnits(
                 foundElementLocation, UnitTypeId.Millimeters);
-            return Math.Round(convertedFoundElementLocation);
+            return Convert.ToInt32(Math.Round(convertedFoundElementLocation));
         }
 
         private CurveArrArray GetArrArray() {
