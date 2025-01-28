@@ -247,7 +247,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                 foreach(var incomingTask in incomingTasks) {
                     ct.ThrowIfCancellationRequested();
                     progress.Report(i);
-                    incomingTask.UpdateStatus(realOpenings, constructureElementsIds);
+                    incomingTask.UpdateStatusAndHost(realOpenings, constructureElementsIds);
                     incomintTasksViewModels.Add(new OpeningArTaskIncomingViewModel(incomingTask));
                     i++;
                 }
