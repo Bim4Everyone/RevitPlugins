@@ -1,11 +1,8 @@
 using System;
 
-using Microsoft.Office.Interop.Excel;
-
 using pyRevitLabs.Json;
 
-namespace RevitDeclarations.Models
-{
+namespace RevitDeclarations.Models {
     public class RoomPriority {
         public RoomPriority(int number, string name) {
             OrdinalNumber = number;
@@ -27,7 +24,7 @@ namespace RevitDeclarations.Models
         public int MaxRoomAmount { get; set; }
 
         public bool CheckName(string name) {
-            if(string.Equals(name, this.Name, StringComparison.OrdinalIgnoreCase)) {
+            if(string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)) {
                 return true;
             }
             return false;
@@ -39,7 +36,7 @@ namespace RevitDeclarations.Models
             }
 
             RoomPriority priority = (RoomPriority)obj;
-            return string.Equals(priority.Name, Name, StringComparison.OrdinalIgnoreCase);
+            return CheckName(priority.Name);
         }
 
         public override int GetHashCode() {
