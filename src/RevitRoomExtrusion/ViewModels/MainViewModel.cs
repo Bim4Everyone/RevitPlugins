@@ -15,7 +15,7 @@ using RevitRoomExtrusion.Models;
 
 namespace RevitRoomExtrusion.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private const string _defaultHeight = "2200";
+        private const string _defaultHeight = "2200"; //Стандартная высота машино-места
 
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
