@@ -4,16 +4,59 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="UpdateLinksWindow.Title">Sample command</system:String>
+        x:Key="UpdateLinksWindow.Title">Link update</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.Hello">Hello Revit!</system:String>
+        x:Key="UpdateLinksWindow.EmptySelectionCheck">Select links to update.</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.HelloCheck">Enter a value for the property to save.</system:String>
-
+        x:Key="UpdateLinksWindow.EmptySourcesCheck">Select source with link.</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.ButtonOk">OK</system:String>
+        x:Key="UpdateLinksWindow.LocalFolder">Local source:</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.ButtonCancel">Cancel</system:String>
+        x:Key="UpdateLinksWindow.ServerFolder">Revit Server source:</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.LinkName.Header">Link name</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Header">Workset status</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Opened">Opened</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Closed">Closed</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Header">Link status</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Loaded">Loaded</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Unloaded">Unloaded</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.LocallyUnloaded">Locally unload</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.NotFound">Not found</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.ClosedWorkset">Closed workset</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Unknown">Unknown</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Header">Source</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Found">Found</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.NotFound">Not found</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Duplicated">Duplicated</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.SelectAll">Select all</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.UnselectAll">Unselect all</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.Invert">Invert</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.SelectLocalFolder">Select local folder</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.SelectServerFolder">Select RS folder</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.Ok">OK</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.Cancel">Cancel</system:String>
 
     <system:String
         x:Key="SelectLinksFromFolderDialog.Title">Select link files to add</system:String>

@@ -14,10 +14,6 @@
     <system:String
         x:Key="UpdateLinksWindow.ServerFolder">Revit Server папка:</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.List.SourceDuplicatedStatus">Дублируется</system:String>
-    <system:String
-        x:Key="UpdateLinksWindow.List.SourceNotFoundStatus">Не найден</system:String>
-    <system:String
         x:Key="UpdateLinksWindow.List.LinkName.Header">Имя связи</system:String>
     <system:String
         x:Key="UpdateLinksWindow.List.Workset.Header">Рабочий набор</system:String>
