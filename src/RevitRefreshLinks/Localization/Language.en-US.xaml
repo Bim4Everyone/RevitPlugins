@@ -57,6 +57,8 @@
         x:Key="UpdateLinksWindow.Buttons.Ok">OK</system:String>
     <system:String
         x:Key="UpdateLinksWindow.Buttons.Cancel">Cancel</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Progress.Title">Links update [{0}/{1}] ...</system:String>
 
     <system:String
         x:Key="SelectLinksFromFolderDialog.Title">Select link files to add</system:String>

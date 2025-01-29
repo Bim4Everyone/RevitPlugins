@@ -57,6 +57,8 @@
         x:Key="UpdateLinksWindow.Buttons.Ok">ОК</system:String>
     <system:String
         x:Key="UpdateLinksWindow.Buttons.Cancel">Отмена</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Progress.Title">Обновление связей[{0}/{1}] ...</system:String>
 
     <system:String
         x:Key="SelectLinksFromFolderDialog.Title">Выберите связи для добавления</system:String>

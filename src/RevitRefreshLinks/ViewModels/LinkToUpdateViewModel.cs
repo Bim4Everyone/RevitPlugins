@@ -85,6 +85,10 @@ namespace RevitRefreshLinks.ViewModels {
             return new ReadOnlyCollection<ILink>(_sourceLinks);
         }
 
+        public RevitLinkType GetLinkType() {
+            return _linkType;
+        }
+
         private void SourceLinksCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
             CanSelect = !WorksetIsClosed && (SourceLinksCount == 1);
             if(!CanSelect) {

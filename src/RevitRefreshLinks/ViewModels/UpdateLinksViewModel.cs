@@ -98,7 +98,18 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private void AcceptView() {
-            // TODO add logic to begin update
+            var linkPairs = LinksToUpdate
+                .Where(t => t.IsSelected && t.SourceLinksCount == 1)
+                .Select(t => new LinkPair(t.GetLinkType(), t.GetSourceLinks().First()))
+                .ToArray();
+            using(var pb = GetPlatformService<IProgressDialogService>()) {
+                pb.MaxValue = linkPairs.Length;
+                var progress = pb.CreateProgress();
+                var ct = pb.CreateCancellationToken();
+                pb.Show();
+
+                _linksLoader.UpdateLinks(linkPairs, progress, ct);
+            }
         }
 
         private bool CanAcceptView() {
