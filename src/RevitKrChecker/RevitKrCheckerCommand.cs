@@ -41,6 +41,12 @@ namespace RevitKrChecker {
                     .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                         c => c.Kernel.Get<ILocalizationService>());
 
+                kernel.Bind<ReportVM>().ToSelf();
+                kernel.Bind<ReportGroupingVM>().ToSelf();
+                kernel.Bind<ReportWindow>().ToSelf()
+                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                        c => c.Kernel.Get<ILocalizationService>());
+
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
                 kernel.UseXtraLocalization(

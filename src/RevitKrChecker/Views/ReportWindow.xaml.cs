@@ -7,12 +7,14 @@ namespace RevitKrChecker.Views {
     /// <summary>
     /// Логика взаимодействия для ReportWindow.xaml
     /// </summary>
-    public partial class ReportWindow : Window {
+    public partial class ReportWindow {
 
         public ReportWindow() {
             InitializeComponent();
         }
 
+        public override string PluginName => nameof(RevitKrChecker);
+        public override string ProjectConfigName => nameof(ReportWindow);
 
         private void Button_Click_ListViewExpander_Expand(object sender, RoutedEventArgs e) {
             foreach(GroupItem gi in FindVisualChildren<GroupItem>(reportList))

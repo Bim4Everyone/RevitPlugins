@@ -26,21 +26,19 @@ namespace RevitKrChecker.ViewModels {
 
         private ObservableCollection<ReportItemVM> _reportResult = new ObservableCollection<ReportItemVM>();
 
-        public ReportVM(ReportVMOption option) {
-            _elems = option.Elements
-                ?? throw new ArgumentNullException(nameof(option.Elements));
-            _stoppingChecks = option.StoppingChecks
-                ?? throw new ArgumentNullException(nameof(option.StoppingChecks));
-            _nonStoppingChecks = option.NonStoppingChecks
-                ?? throw new ArgumentNullException(nameof(option.NonStoppingChecks));
-            _revitRepository = option.RepositoryOfRevit
-                ?? throw new ArgumentNullException(nameof(option.RepositoryOfRevit));
-            _pluginConfig = option.ConfigOfPlugin
-                ?? throw new ArgumentNullException(nameof(option.ConfigOfPlugin));
-            _localizationService = option.LocalizationService
-                ?? throw new ArgumentNullException(nameof(option.LocalizationService));
+        public ReportVM(List<Element> elements,
+                        ReportGroupingVM reportGroupingVM,
+                        PluginConfig pluginConfig,
+                        RevitRepository revitRepository,
+                        ILocalizationService localizationService) {
+            _elems = elements;
+            _pluginConfig = pluginConfig;
+            _revitRepository = revitRepository;
+            _localizationService = localizationService;
+            GroupingVM = reportGroupingVM;
 
-            GroupingVM = new ReportGroupingVM();
+            _stoppingChecks = _revitRepository.StoppingChecks();
+            _nonStoppingChecks = _revitRepository.NonStoppingChecks();
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             ClosingViewCommand = RelayCommand.Create(ClosingView);

@@ -7,6 +7,10 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Ninject;
+using Ninject.Parameters;
+using Ninject.Syntax;
+
 using RevitKrChecker.Models;
 using RevitKrChecker.Views;
 
@@ -15,16 +19,18 @@ namespace RevitKrChecker.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
+        private readonly IResolutionRoot _resolutionRoot;
 
         public MainVM(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
-            ILocalizationService localizationService) {
+            ILocalizationService localizationService,
+            IResolutionRoot resolutionRoot) {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _localizationService = localizationService;
-
+            _resolutionRoot = resolutionRoot;
 
             CheckElemsFromViewCommand = RelayCommand.Create(CheckElemsFromView);
             CheckElemsFromPjCommand = RelayCommand.Create(CheckElemsFromPj);
@@ -45,17 +51,12 @@ namespace RevitKrChecker.ViewModels {
         }
 
         private void GetReportVM(List<Element> elements) {
-            ReportVMOption reportVMOption = new ReportVMOption() {
-                Elements = elements,
-                StoppingChecks = _revitRepository.StoppingChecks(),
-                NonStoppingChecks = _revitRepository.NonStoppingChecks(),
-                RepositoryOfRevit = _revitRepository,
-                ConfigOfPlugin = _pluginConfig,
-                LocalizationService = _localizationService
-            };
-            ReportVM reportVM = new ReportVM(reportVMOption);
-            ReportWindow reportWindow = new ReportWindow();
-            reportWindow.DataContext = reportVM;
+            ReportWindow reportWindow = _resolutionRoot.Get<ReportWindow>(
+                new PropertyValue(
+                    nameof(ReportWindow.DataContext),
+                    _resolutionRoot.Get<ReportVM>(
+                        new ConstructorArgument(nameof(elements), elements))));
+
             reportWindow.Show();
         }
     }
