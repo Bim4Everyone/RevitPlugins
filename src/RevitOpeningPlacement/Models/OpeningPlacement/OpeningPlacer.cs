@@ -42,7 +42,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement {
             ex is IntersectionNotFoundException
             || ex is NullReferenceException
             || ex is ArgumentNullException
-            || ex is Autodesk.Revit.Exceptions.ArgumentNullException) {
+            || ex is Autodesk.Revit.Exceptions.ApplicationException) {
 
                 throw new OpeningNotPlacedException("Не удалось найти точку вставки");
             }
