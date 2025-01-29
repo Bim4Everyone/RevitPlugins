@@ -13,6 +13,8 @@
     Title="{DynamicResource UpdateLinksWindow.Title}"
     Height="450"
     Width="800"
+    MinHeight="300"
+    MinWidth="500"
     d:DataContext="{d:DesignInstance vms:UpdateLinksViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
@@ -23,7 +25,6 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
-        <!--TODO доработать разметку и стили-->
         <!--https://github.com/dotnet/wpf/issues/6302
         DynamicResource не отображается в Header-->
         <Grid.Resources>
@@ -46,26 +47,11 @@
             <Style
                 TargetType="DataGridRow">
                 <Setter
-                    Property="Background"
-                    Value="Transparent" />
-                <Setter
                     Property="BorderThickness"
                     Value="0" />
                 <Setter
                     Property="Padding"
                     Value="5" />
-                <Style.Triggers>
-                    <Trigger
-                        Property="IsSelected"
-                        Value="True">
-                        <Setter
-                            Property="Background"
-                            Value="Transparent" />
-                        <Setter
-                            Property="Foreground"
-                            Value="Black" />
-                    </Trigger>
-                </Style.Triggers>
             </Style>
             <Style
                 TargetType="DataGridCell">
@@ -77,7 +63,22 @@
                     Value="5" />
                 <Setter
                     Property="Background"
-                    Value="Transparent" />
+                    Value="White" />
+                <Setter
+                    Property="Foreground"
+                    Value="Black" />
+                <Style.Triggers>
+                    <Trigger
+                        Property="IsSelected"
+                        Value="True">
+                        <Setter
+                            Property="Foreground"
+                            Value="Black" />
+                        <Setter
+                            Property="Background"
+                            Value="LightBlue" />
+                    </Trigger>
+                </Style.Triggers>
             </Style>
             <Style
                 TargetType="DataGridColumnHeader">
@@ -162,15 +163,14 @@
             AutoGenerateColumns="False"
             CanUserAddRows="False"
             CanUserDeleteRows="False"
-            Background="LightBlue"
+            Background="White"
             BorderThickness="1"
-            RowBackground="Transparent"
             IsReadOnly="False"
             HeadersVisibility="Column"
-            AlternatingRowBackground="Transparent"
             ItemsSource="{Binding LinksToUpdate}">
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn
+                    CanUserResize="False"
                     Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
                     <DataGridCheckBoxColumn.ElementStyle>
                         <Style
@@ -208,39 +208,48 @@
                     Header="{StaticResource NameColumnHeader}" />
                 <DataGridTextColumn
                     IsReadOnly="True"
+                    Width="100"
+                    CanUserResize="False"
                     Binding="{Binding DisplayWorksetStatus}"
                     Header="{StaticResource WorksetColumnHeader}" />
                 <DataGridTextColumn
                     IsReadOnly="True"
+                    Width="100"
+                    CanUserResize="False"
                     Binding="{Binding DisplayLinkStatus}"
                     Header="{StaticResource LinkStatusColumnHeader}" />
                 <DataGridTextColumn
                     IsReadOnly="True"
+                    Width="100"
+                    CanUserResize="False"
                     Binding="{Binding SourceStatus}"
                     Header="{StaticResource SourceColumnHeader}" />
             </DataGrid.Columns>
         </DataGrid>
 
-        <Button
+        <DockPanel
             Grid.Row="3"
-            Grid.Column="0"
-            Margin="10"
-            Content="{DynamicResource UpdateLinksWindow.List.Button.SelectAll}"
-            Command="{Binding SelectAllLinksCommand}" />
+            Grid.ColumnSpan="3"
+            HorizontalAlignment="Center">
 
-        <Button
-            Grid.Row="3"
-            Grid.Column="1"
-            Margin="10"
-            Content="{DynamicResource UpdateLinksWindow.List.Button.UnselectAll}"
-            Command="{Binding UnselectAllLinksCommand}" />
+            <Button
+                Margin="10"
+                Width="100"
+                Content="{DynamicResource UpdateLinksWindow.List.Button.SelectAll}"
+                Command="{Binding SelectAllLinksCommand}" />
 
-        <Button
-            Grid.Row="3"
-            Grid.Column="2"
-            Margin="10"
-            Content="{DynamicResource UpdateLinksWindow.List.Button.Invert}"
-            Command="{Binding InvertSelectedLinksCommand}" />
+            <Button
+                Margin="10"
+                Width="100"
+                Content="{DynamicResource UpdateLinksWindow.List.Button.UnselectAll}"
+                Command="{Binding UnselectAllLinksCommand}" />
+
+            <Button
+                Margin="10"
+                Width="100"
+                Content="{DynamicResource UpdateLinksWindow.List.Button.Invert}"
+                Command="{Binding InvertSelectedLinksCommand}" />
+        </DockPanel>
 
         <StackPanel
             Grid.Row="4"
