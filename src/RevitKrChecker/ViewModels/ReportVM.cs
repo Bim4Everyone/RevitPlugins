@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -23,15 +22,9 @@ namespace RevitKrChecker.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly ILocalizationService _localizationService;
 
-        private string _notSelectedItem;
-        private List<string> _groupingList;
         private string _selectedErrorTooltips;
-        private CollectionView _reportResultCollectionView;
 
         private ObservableCollection<ReportItemVM> _reportResult = new ObservableCollection<ReportItemVM>();
-        private string _selectedFirstLevelGrouping;
-        private string _selectedSecondLevelGrouping;
-        private string _selectedThirdLevelGrouping;
 
         public ReportVM(ReportVMOption option) {
             _elems = option.Elements
@@ -47,8 +40,7 @@ namespace RevitKrChecker.ViewModels {
             _localizationService = option.LocalizationService
                 ?? throw new ArgumentNullException(nameof(option.LocalizationService));
 
-            SelectedFirstLevelGrouping = SelectedSecondLevelGrouping = SelectedThirdLevelGrouping = NotSelectedItem = "<Нет>";
-            GroupingList = GetGroupingList();
+            GroupingVM = new ReportGroupingVM();
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             ClosingViewCommand = RelayCommand.Create(ClosingView);
@@ -57,13 +49,10 @@ namespace RevitKrChecker.ViewModels {
             UpdateTooltipsCommand = RelayCommand.Create<IEnumerable>(UpdateTooltips);
             ShowErrorElemsCommand = RelayCommand.Create<IEnumerable>(ShowErrorElems);
 
-            FirstLevelGroupingChangedCommand = RelayCommand.Create(FirstLevelGroupingChanged);
-            SecondLevelGroupingChangedCommand = RelayCommand.Create(SecondLevelGroupingChanged);
-            ThirdLevelGroupingChangedCommand = RelayCommand.Create(ThirdLevelGroupingChanged);
-
             Reсheck();
         }
 
+        public ReportGroupingVM GroupingVM { get; }
 
         public ICommand LoadViewCommand { get; }
         public ICommand ClosingViewCommand { get; }
@@ -71,11 +60,6 @@ namespace RevitKrChecker.ViewModels {
         public ICommand ReсheckCommand { get; }
         public ICommand UpdateTooltipsCommand { get; }
         public ICommand ShowErrorElemsCommand { get; }
-
-        public ICommand FirstLevelGroupingChangedCommand { get; }
-        public ICommand SecondLevelGroupingChangedCommand { get; }
-        public ICommand ThirdLevelGroupingChangedCommand { get; }
-
 
         public ObservableCollection<ReportItemVM> ReportResult {
             get => _reportResult;
@@ -87,74 +71,33 @@ namespace RevitKrChecker.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedErrorTooltips, value);
         }
 
-
-        public string NotSelectedItem {
-            get => _notSelectedItem;
-            set => this.RaiseAndSetIfChanged(ref _notSelectedItem, value);
-        }
-
-        public List<string> GroupingList {
-            get => _groupingList;
-            set => this.RaiseAndSetIfChanged(ref _groupingList, value);
-        }
-
-        public string SelectedFirstLevelGrouping {
-            get => _selectedFirstLevelGrouping;
-            set => this.RaiseAndSetIfChanged(ref _selectedFirstLevelGrouping, value);
-        }
-
-        public string SelectedSecondLevelGrouping {
-            get => _selectedSecondLevelGrouping;
-            set => this.RaiseAndSetIfChanged(ref _selectedSecondLevelGrouping, value);
-        }
-
-        public string SelectedThirdLevelGrouping {
-            get => _selectedThirdLevelGrouping;
-            set => this.RaiseAndSetIfChanged(ref _selectedThirdLevelGrouping, value);
-        }
-
-
-
-        /// <summary>
-        /// Метод, отрабатывающий при загрузке окна
-        /// </summary>
         private void LoadView() {
+            GroupingVM.SetCollection(ReportResult);
             LoadConfig();
         }
 
-        /// <summary>
-        /// Метод, отрабатывающий при закрытии окна
-        /// </summary>
         private void ClosingView() {
             SaveConfig();
         }
 
-
-        /// <summary>
-        /// Подгружает параметры плагина с предыдущего запуска
-        /// </summary>
         private void LoadConfig() {
             var settings = _pluginConfig.GetSettings(_revitRepository.Document);
             if(settings is null) { return; }
-            SelectedThirdLevelGrouping = settings.SelectedThirdLevelGrouping;
-            ThirdLevelGroupingChangedCommand.Execute(null);
-            SelectedSecondLevelGrouping = settings.SelectedSecondLevelGrouping;
-            SecondLevelGroupingChangedCommand.Execute(null);
-            SelectedFirstLevelGrouping = settings.SelectedFirstLevelGrouping;
-            FirstLevelGroupingChangedCommand.Execute(null);
+            GroupingVM.SelectedThirdLevelGrouping = settings.SelectedThirdLevelGrouping;
+            GroupingVM.ThirdLevelGroupingChangedCommand.Execute(null);
+            GroupingVM.SelectedSecondLevelGrouping = settings.SelectedSecondLevelGrouping;
+            GroupingVM.SecondLevelGroupingChangedCommand.Execute(null);
+            GroupingVM.SelectedFirstLevelGrouping = settings.SelectedFirstLevelGrouping;
+            GroupingVM.FirstLevelGroupingChangedCommand.Execute(null);
         }
 
-
-        /// <summary>
-        /// Сохраняет параметры плагина для следующего запуска
-        /// </summary>
         private void SaveConfig() {
             var settings = _pluginConfig.GetSettings(_revitRepository.Document)
                           ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            settings.SelectedFirstLevelGrouping = SelectedFirstLevelGrouping;
-            settings.SelectedSecondLevelGrouping = SelectedSecondLevelGrouping;
-            settings.SelectedThirdLevelGrouping = SelectedThirdLevelGrouping;
+            settings.SelectedFirstLevelGrouping = GroupingVM.SelectedFirstLevelGrouping;
+            settings.SelectedSecondLevelGrouping = GroupingVM.SelectedSecondLevelGrouping;
+            settings.SelectedThirdLevelGrouping = GroupingVM.SelectedThirdLevelGrouping;
             _pluginConfig.SaveProjectConfig();
         }
 
@@ -180,16 +123,9 @@ namespace RevitKrChecker.ViewModels {
             _revitRepository.ActiveUIDocument.Selection.SetElementIds(elemIds);
         }
 
-
         private void Reсheck() {
             ReportResult.Clear();
             List<Element> tempElems = _elems.GetRange(0, _elems.Count);
-
-            /* Существует два типа проверок:
-            1. Проверки, которые не допускают элемент к другим проверкам в случае ошибки
-            _stoppingChecks = List<ICheck>();
-            2. Проверки, которые допускают элемент к другим проверкам в случае ошибки
-            _nonStoppingChecks = List<ICheck>();*/
 
             for(int i = tempElems.Count - 1; i >= 0; i--) {
                 foreach(ICheck check in _stoppingChecks) {
@@ -207,82 +143,6 @@ namespace RevitKrChecker.ViewModels {
                         ReportResult.Add(new ReportItemVM(info));
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// Метод по получению списка параметров по которым можно будет группировать отчет об ошибках
-        /// </summary>
-        private List<string> GetGroupingList() {
-            List<string> groupingList = new List<string>() { NotSelectedItem };
-            foreach(var prop in typeof(ReportItemVM).GetProperties()) {
-                groupingList.Add(prop.Name);
-            }
-            return groupingList;
-        }
-
-        /// <summary>
-        /// Метод команды по изменению значения группировки списка ошибок на первом уровне
-        /// </summary>
-        private void FirstLevelGroupingChanged() {
-            if(SelectedFirstLevelGrouping is null) {
-                return;
-            }
-            if(SelectedFirstLevelGrouping == NotSelectedItem) {
-                SelectedSecondLevelGrouping = SelectedThirdLevelGrouping = NotSelectedItem;
-            }
-            ReportResultGroupingUpdate();
-        }
-
-        /// <summary>
-        /// Метод команды по изменению значения группировки списка ошибок на втором уровне
-        /// </summary>
-        private void SecondLevelGroupingChanged() {
-            if(SelectedSecondLevelGrouping is null) {
-                return;
-            }
-            if(SelectedSecondLevelGrouping == NotSelectedItem) {
-                SelectedThirdLevelGrouping = NotSelectedItem;
-            }
-            ReportResultGroupingUpdate();
-        }
-
-        /// <summary>
-        /// Метод команды по изменению значения группировки списка ошибок на третьем уровне
-        /// </summary>
-        private void ThirdLevelGroupingChanged() {
-            if(SelectedThirdLevelGrouping is null) {
-                return;
-            }
-            ReportResultGroupingUpdate();
-        }
-
-        /// <summary>
-        /// Метод по обновлению группировки списка ошибок в соответствии с выбранной группировкой на каждом уровне
-        /// </summary>
-        private void ReportResultGroupingUpdate() {
-            if(_reportResultCollectionView is null) {
-                _reportResultCollectionView = (CollectionView) CollectionViewSource.GetDefaultView(ReportResult);
-            }
-            if(_reportResultCollectionView is null) {
-                return;
-            }
-
-            _reportResultCollectionView.GroupDescriptions.Clear();
-
-            if(!string.IsNullOrEmpty(SelectedFirstLevelGrouping) && SelectedFirstLevelGrouping != NotSelectedItem) {
-                PropertyGroupDescription group1 = new PropertyGroupDescription(SelectedFirstLevelGrouping);
-                _reportResultCollectionView.GroupDescriptions.Add(group1);
-            }
-
-            if(!string.IsNullOrEmpty(SelectedSecondLevelGrouping) && SelectedSecondLevelGrouping != NotSelectedItem) {
-                PropertyGroupDescription group2 = new PropertyGroupDescription(SelectedSecondLevelGrouping);
-                _reportResultCollectionView.GroupDescriptions.Add(group2);
-            }
-
-            if(!string.IsNullOrEmpty(SelectedThirdLevelGrouping) && SelectedThirdLevelGrouping != NotSelectedItem) {
-                PropertyGroupDescription group3 = new PropertyGroupDescription(SelectedThirdLevelGrouping);
-                _reportResultCollectionView.GroupDescriptions.Add(group3);
             }
         }
     }

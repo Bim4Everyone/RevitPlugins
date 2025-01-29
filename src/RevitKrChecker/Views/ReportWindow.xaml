@@ -53,13 +53,13 @@
             Margin="5"
             VerticalContentAlignment="Center"
             Name="FirstLevelGrouping"
-            ItemsSource="{Binding Path=GroupingList}"
-            SelectedItem="{Binding Path=SelectedFirstLevelGrouping}" >
+            ItemsSource="{Binding Path=GroupingVM.GroupingList}"
+            SelectedItem="{Binding Path=GroupingVM.SelectedFirstLevelGrouping}" >
 
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction
-                        Command="{Binding Path=FirstLevelGroupingChangedCommand}"/>
+                        Command="{Binding Path=GroupingVM.FirstLevelGroupingChangedCommand}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ComboBox>
@@ -70,13 +70,13 @@
             Margin="5"
             VerticalContentAlignment="Center"
             Name="SecondLevelGrouping"
-            ItemsSource="{Binding Path=GroupingList}"
-            SelectedItem="{Binding Path=SelectedSecondLevelGrouping}">
+            ItemsSource="{Binding Path=GroupingVM.GroupingList}"
+            SelectedItem="{Binding Path=GroupingVM.SelectedSecondLevelGrouping}">
             
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction
-                        Command="{Binding Path=SecondLevelGroupingChangedCommand}"/>
+                        Command="{Binding Path=GroupingVM.SecondLevelGroupingChangedCommand}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ComboBox>
@@ -87,13 +87,13 @@
             Margin="5"
             VerticalContentAlignment="Center"
             Name="ThirdLevelGrouping"
-            ItemsSource="{Binding Path=GroupingList}"
-            SelectedItem="{Binding Path=SelectedThirdLevelGrouping}">
+            ItemsSource="{Binding Path=GroupingVM.GroupingList}"
+            SelectedItem="{Binding Path=GroupingVM.SelectedThirdLevelGrouping}">
 
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction
-                        Command="{Binding Path=ThirdLevelGroupingChangedCommand}"/>
+                        Command="{Binding Path=GroupingVM.ThirdLevelGroupingChangedCommand}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ComboBox>
