@@ -36,7 +36,7 @@ namespace RevitDeclarations.Models {
 
             _priorities = _settings.PrioritiesConfig;
 
-            _roomConnectionAnalyzer = new RoomConnectionAnalyzer(project, _settings);
+            _roomConnectionAnalyzer = new RoomConnectionAnalyzer(project, _priorities);
         }
 
         public void CalculateRoomsForUtp() {

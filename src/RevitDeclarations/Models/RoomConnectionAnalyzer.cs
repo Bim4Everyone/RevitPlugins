@@ -7,7 +7,6 @@ using Autodesk.Revit.DB;
 namespace RevitDeclarations.Models {
     internal class RoomConnectionAnalyzer {
         private readonly ApartmentsProject _project;
-        private readonly ApartmentsSettings _settings;
         private readonly PrioritiesConfig _priorities;
 
         // Мастер-спальни 
@@ -17,11 +16,9 @@ namespace RevitDeclarations.Models {
         // Гардеробные с дверью (разделителем) в жилую комнату. Для УТП Гардеробная
         private IEnumerable<ElementId> _pantriesWithBedroom = new List<ElementId>();
 
-        public RoomConnectionAnalyzer(ApartmentsProject project, ApartmentsSettings settings) {
+        public RoomConnectionAnalyzer(ApartmentsProject project, PrioritiesConfig priorities) {
             _project = project;
-            _settings = settings;
-
-            _priorities = _settings.PrioritiesConfig;
+            _priorities = priorities;
         }
 
         public bool CheckIsMasterBathroom(ElementId roomId) {
@@ -104,7 +101,7 @@ namespace RevitDeclarations.Models {
             return roomByNames;
         }
 
-        private Dictionary<RoomPriority, List<ElementId>> GetRoomsBySeparators(IEnumerable<RoomSeparator> separators, 
+        private Dictionary<RoomPriority, List<ElementId>> GetRoomsBySeparators(IEnumerable<RoomSeparator> separators,
                                                                                RoomPriority priority, 
                                                                                List<ElementId> rooms) {
             var roomByNames = new Dictionary<RoomPriority, List<ElementId>>() {
