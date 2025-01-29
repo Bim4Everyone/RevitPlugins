@@ -92,6 +92,7 @@ namespace RevitRefreshLinks.ViewModels {
             foreach(var link in links) {
                 link.DisplayLinkStatus = GetLinkStatus(link.LinkStatus);
                 link.DisplayWorksetStatus = GetWorksetStatus(link.WorksetIsClosed);
+                link.SourceStatus = GetSourceStatus(link.SourceLinksCount);
                 LinksToUpdate.Add(link);
             }
         }
