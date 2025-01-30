@@ -14,21 +14,19 @@ using RevitKrChecker.Models.Interfaces;
 
 namespace RevitKrChecker.ViewModels {
     internal class ReportVM : BaseViewModel {
-        private readonly List<Element> _elems;
         private readonly List<ICheck> _stoppingChecks;
         private readonly List<ICheck> _nonStoppingChecks;
         private readonly RevitRepository _revitRepository;
         private readonly PluginConfig _pluginConfig;
+        private List<Element> _elems = new List<Element>();
 
         private string _selectedErrorTooltips;
 
         private ObservableCollection<ReportItemVM> _reportResult = new ObservableCollection<ReportItemVM>();
 
-        public ReportVM(List<Element> elements,
-                        ReportGroupingVM reportGroupingVM,
+        public ReportVM(ReportGroupingVM reportGroupingVM,
                         PluginConfig pluginConfig,
                         RevitRepository revitRepository) {
-            _elems = elements;
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             GroupingVM = reportGroupingVM;
@@ -96,6 +94,11 @@ namespace RevitKrChecker.ViewModels {
             settings.SelectedSecondLevelGrouping = GroupingVM.SelectedSecondLevelGrouping;
             settings.SelectedThirdLevelGrouping = GroupingVM.SelectedThirdLevelGrouping;
             _pluginConfig.SaveProjectConfig();
+        }
+
+        public void CheckElements(List<Element> elements) {
+            _elems = elements;
+            Reсheck();
         }
 
         private void UpdateTooltips(object obj) {

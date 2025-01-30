@@ -17,15 +17,18 @@ namespace RevitKrChecker.ViewModels {
     internal class MainVM : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly ReportVM _reportVM;
         private readonly IResolutionRoot _resolutionRoot;
 
         public MainVM(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
+            ReportVM reportVM,
             IResolutionRoot resolutionRoot) {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+            _reportVM = reportVM;
             _resolutionRoot = resolutionRoot;
 
             CheckElemsFromViewCommand = RelayCommand.Create(CheckElemsFromView);
@@ -47,12 +50,12 @@ namespace RevitKrChecker.ViewModels {
         }
 
         private void ShowReport(List<Element> elements) {
+            _reportVM.CheckElements(elements);
+
             ReportWindow reportWindow = _resolutionRoot.Get<ReportWindow>(
                 new PropertyValue(
                     nameof(ReportWindow.DataContext),
-                    _resolutionRoot.Get<ReportVM>(
-                        new ConstructorArgument(nameof(elements), elements))));
-
+                    _reportVM));
             reportWindow.Show();
         }
     }
