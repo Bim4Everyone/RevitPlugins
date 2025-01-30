@@ -26,12 +26,13 @@ namespace RevitRoomExtrusion.Models {
         public Document Document => ActiveUIDocument.Document;
 
         public View3D GetView3D(string familyName) {
-            string name3Dview = String.Format(
+            string name3Dview = string.Format(
                 _localizationService.GetLocalizedString("RevitRepository.ViewName"), Application.Username, familyName);
 
             var view = new FilteredElementCollector(Document)
-                .OfType<View3D>()
+                .OfClass(typeof(View3D))
                 .Where(v => v.Name.Equals(name3Dview, StringComparison.OrdinalIgnoreCase))
+                .Cast<View3D>()
                 .FirstOrDefault();
 
             if(view != null) {
