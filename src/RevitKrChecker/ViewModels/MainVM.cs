@@ -38,15 +38,15 @@ namespace RevitKrChecker.ViewModels {
 
         private void CheckElemsFromView() {
             List<Element> elements = _revitRepository.GetViewElements();
-            GetReportVM(elements);
+            ShowReport(elements);
         }
 
         private void CheckElemsFromPj() {
             List<Element> elements = _revitRepository.GetPjElements();
-            GetReportVM(elements);
+            ShowReport(elements);
         }
 
-        private void GetReportVM(List<Element> elements) {
+        private void ShowReport(List<Element> elements) {
             ReportWindow reportWindow = _resolutionRoot.Get<ReportWindow>(
                 new PropertyValue(
                     nameof(ReportWindow.DataContext),
