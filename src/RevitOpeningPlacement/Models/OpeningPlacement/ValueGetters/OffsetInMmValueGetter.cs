@@ -9,9 +9,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         private readonly IValueGetter<DoubleParamValue> _offsetInFeetValueGetter;
 
         /// <summary>
-        /// Класс, предоставляющий значение отметки отверстия в мм от начала проекта
+        /// Класс, предоставляющий значение отметки отверстия в мм
         /// </summary>
-        /// <param name="offsetInFeetValueGetter">Провайдер отметки отверстия в футах от начала проекта</param>
+        /// <param name="offsetInFeetValueGetter">Провайдер отметки отверстия в футах</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public OffsetInMmValueGetter(IValueGetter<DoubleParamValue> offsetInFeetValueGetter) {
             _offsetInFeetValueGetter = offsetInFeetValueGetter ?? throw new ArgumentNullException(nameof(offsetInFeetValueGetter));
