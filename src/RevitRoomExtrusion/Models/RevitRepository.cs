@@ -29,25 +29,20 @@ namespace RevitRoomExtrusion.Models {
             string name3Dview = String.Format(
                 _localizationService.GetLocalizedString("RevitRepository.ViewName"), Application.Username, familyName);
 
-            var views = new FilteredElementCollector(Document)
-                .OfCategory(BuiltInCategory.OST_Views)
-                .WhereElementIsNotElementType()
-                .ToElements()
-                .Cast<View>();
-            var existingView = views
-                .FirstOrDefault(v => v.Name.Equals(name3Dview, StringComparison.OrdinalIgnoreCase));
+            var view = new FilteredElementCollector(Document)
+                .OfType<View3D>()
+                .Where(v => v.Name.Equals(name3Dview, StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault();
 
-            if(existingView != null) {
-                return existingView as View3D;
+            if(view != null) {
+                return view;
             } else {
                 return CreateView3D(name3Dview);
             }
         }
 
         public List<Room> GetSelectedRooms() {
-            return ActiveUIDocument.Selection
-                .GetElementIds()
-                .Select(x => Document.GetElement(x))
+            return ActiveUIDocument.GetSelectedElements()
                 .OfType<Room>()
                 .ToList();
         }
@@ -55,7 +50,7 @@ namespace RevitRoomExtrusion.Models {
         public void SetSelectedRoom(ElementId elementId) {
             List<ElementId> listRoomElements = new List<ElementId>() {
                 elementId };
-            ActiveUIDocument.Selection.SetElementIds(listRoomElements);
+            ActiveUIDocument.SetSelectedElements(listRoomElements);
         }
 
         public FamilySymbol GetFamilySymbol(Family family) {
@@ -69,7 +64,6 @@ namespace RevitRoomExtrusion.Models {
         private View3D CreateView3D(string name3Dview) {
             var viewTypes = new FilteredElementCollector(Document)
                 .OfClass(typeof(ViewFamilyType))
-                .ToElements()
                 .Cast<ViewFamilyType>();
             var viewTypes3D = viewTypes
                 .Where(vt => vt.ViewFamily == ViewFamily.ThreeDimensional)

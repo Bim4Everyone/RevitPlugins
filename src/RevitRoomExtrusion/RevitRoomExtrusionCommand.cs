@@ -71,8 +71,6 @@ namespace RevitRoomExtrusion {
 
                 IMessageBoxService messageBoxService = kernel.Get<IMessageBoxService>();
                 ILocalizationService localizationService = kernel.Get<ILocalizationService>();
-                string stringMessegeBody = localizationService.GetLocalizedString("Command.MessegeBody");
-                string stringMessegeTitle = localizationService.GetLocalizedString("Command.MessegeTitle");
 
                 if(roomChecker.CheckSelection()) {
                     if(roomChecker.CheckRooms()) {
@@ -83,6 +81,8 @@ namespace RevitRoomExtrusion {
                         throw new OperationCanceledException();
                     }
                 } else {
+                    string stringMessegeBody = localizationService.GetLocalizedString("Command.MessegeBody");
+                    string stringMessegeTitle = localizationService.GetLocalizedString("Command.MessegeTitle");
                     messageBoxService.Show(
                         stringMessegeBody, stringMessegeTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                     throw new OperationCanceledException();

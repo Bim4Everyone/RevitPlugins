@@ -80,12 +80,14 @@ namespace RevitRoomExtrusion.Models {
             var family = new FilteredElementCollector(_revitRepository.Document)
                 .OfClass(typeof(Family))
                 .FirstOrDefault(f => f.Name.Equals(familyName, StringComparison.InvariantCultureIgnoreCase));
+
             if(family != null) {
                 var symbolId = new FilteredElementCollector(_revitRepository.Document)
                     .WherePasses(new FamilySymbolFilter(family.Id))
-                    .ToElementIds()
+                    .Select(selector => selector.Id)
                     .FirstOrDefault();
-                if(symbolId != null) {
+
+                if(symbolId.IsNotNull()) {
                     return new FilteredElementCollector(_revitRepository.Document)
                         .WherePasses(new FamilyInstanceFilter(_revitRepository.Document, symbolId))
                         .Any();

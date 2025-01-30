@@ -5,6 +5,7 @@ using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
@@ -47,34 +48,30 @@ namespace RevitRoomExtrusion.ViewModels {
         }
 
         private string GetParamNumber(Room room) {
-
             string roomGroupShortName = null;
-            string numberPrefix = null;
-
-            SharedParam sharedParam = SharedParamsConfig.Instance.RoomGroupShortName;
-            if(room.IsExistsParam(sharedParam)) {
-                roomGroupShortName = room.GetParamValue<string>(sharedParam);
-
-                if(room.IsExistsParamValue(sharedParam)) {
-                    numberPrefix = $"{roomGroupShortName}-";
+            SharedParam shortNameParam = SharedParamsConfig.Instance.RoomGroupShortName;
+            if(room.IsExistsParam(shortNameParam)) {
+                if(room.IsExistsParamValue(shortNameParam)) {
+                    roomGroupShortName = $"{room.GetParamValue<string>(shortNameParam)}-";
                 }
             }
-
-            Parameter numberParameter = room.get_Parameter(BuiltInParameter.ROOM_NUMBER);
-            if(numberParameter.AsString() != "") {
-                return $"{numberPrefix}{numberParameter.AsString()}";
-            } else {
-                return _localizationService.GetLocalizedString("RoomErrorViewModel.NoNumber");
+            SystemParam numberParameter = SystemParamsConfig.Instance[BuiltInParameter.ROOM_NUMBER];
+            if(room.IsExistsParam(numberParameter)) {
+                if(room.IsExistsParamValue(numberParameter)) {
+                    return $"{roomGroupShortName}{numberParameter}";
+                }
             }
+            return _localizationService.GetLocalizedString("RoomErrorViewModel.NoNumber");
         }
 
         private string GetParamName(Room room) {
-            Parameter nameParameter = room.get_Parameter(BuiltInParameter.ROOM_NAME);
-            if(nameParameter.AsString() != "") {
-                return nameParameter.AsString();
-            } else {
-                return _localizationService.GetLocalizedString("RoomErrorViewModel.NoName");
+            SystemParam nameParameter = SystemParamsConfig.Instance[BuiltInParameter.ROOM_NAME];
+            if(room.IsExistsParam(nameParameter)) {
+                if(room.IsExistsParamValue(nameParameter)) {
+                    return room.GetParamValue<string>(nameParameter);
+                }
             }
+            return _localizationService.GetLocalizedString("RoomErrorViewModel.NoName");
         }
     }
 }

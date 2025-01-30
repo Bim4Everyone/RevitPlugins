@@ -65,13 +65,12 @@ namespace RevitRoomExtrusion.Models {
 
         private ElementId GetMaterialElementId() {
             string materialName = _localizationService.GetLocalizedString("FamilyDocument.MaterialName");
-            var materials = new FilteredElementCollector(_familyDocument)
+            return new FilteredElementCollector(_familyDocument)
                     .OfClass(typeof(Material))
                     .WhereElementIsNotElementType()
-                    .ToElements();
-            return materials
-                .FirstOrDefault(mat => mat.Name.Equals(materialName, StringComparison.OrdinalIgnoreCase))
-                ?.Id;
+                    .Where(mat => mat.Name.Equals(materialName, StringComparison.OrdinalIgnoreCase))
+                    .FirstOrDefault()
+                    ?.Id;
         }
 
         private Extrusion CreateExtrusion(CurveArrArray curveArrArray, double amount) {
@@ -90,9 +89,9 @@ namespace RevitRoomExtrusion.Models {
         private void SetFamilyNameAndPath() {
             string extension = ".rfa";
             string tempDirectory = Path.GetTempPath();
-            string familyDocumentName = String.Format(
+            string familyDocumentName = string.Format(
                 _localizationService.GetLocalizedString("FamilyDocument.FamilyName"), _familyName, _location);
-            string fileName = String.Format("{0}{1}", familyDocumentName, extension);
+            string fileName = $"{familyDocumentName}{extension}";
             string familyDocumentPath = Path.Combine(tempDirectory, fileName);
 
             FamilyDocumentName = familyDocumentName;
@@ -102,7 +101,7 @@ namespace RevitRoomExtrusion.Models {
         private string GetTemplateFamilyPath() {
             string familyTemplatePath = _application.FamilyTemplatePath;
             string localizedString = _localizationService.GetLocalizedString("FamilyDocument.TemplateFamilyName");
-            return String.Format("{0}{1}", familyTemplatePath, localizedString);
+            return $"{familyTemplatePath}{localizedString}";
         }
     }
 }
