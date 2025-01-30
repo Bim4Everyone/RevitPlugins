@@ -21,4 +21,15 @@
     <system:String x:Key="ReportWindow.TargetParamName">Parameter to check</system:String>
     <system:String x:Key="ReportWindow.СheckName">Check name</system:String>
     <system:String x:Key="ReportWindow.ElementErrorTooltip">Error explanation</system:String>
+
+    <system:String x:Key="ReportWindow.ParameterValue">parameter value</system:String>
+    <system:String x:Key="ReportWindow.Missing">missing</system:String>
+    <system:String x:Key="ReportWindow.ByRule">by rule</system:String>
+
+    <system:String x:Key="ReportWindow.Equals">Equals</system:String>
+    <system:String x:Key="ReportWindow.NotEquals">not equals</system:String>
+    <system:String x:Key="ReportWindow.Contains">Contains</system:String>
+    <system:String x:Key="ReportWindow.NotContains">not contains</system:String>
+    <system:String x:Key="ReportWindow.StartsWith">Starts with</system:String>
+    <system:String x:Key="ReportWindow.NotStartsWith">not starts with</system:String>
 </ResourceDictionary>
