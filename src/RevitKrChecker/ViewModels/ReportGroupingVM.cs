@@ -2,13 +2,11 @@ using System.Collections.Generic;
 using System.Windows.Data;
 using System.Windows.Input;
 
-using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 namespace RevitKrChecker.ViewModels {
     internal class ReportGroupingVM : BaseViewModel {
-        private readonly ILocalizationService _localizationService;
         private string _notSelectedItem;
         private List<string> _groupingList;
         private IEnumerable<ReportItemVM> _reportResultCollection;
@@ -17,9 +15,7 @@ namespace RevitKrChecker.ViewModels {
         private string _selectedSecondLevelGrouping;
         private string _selectedThirdLevelGrouping;
 
-        public ReportGroupingVM(ILocalizationService localizationService) {
-            _localizationService = localizationService;
-
+        public ReportGroupingVM() {
             NotSelectedItem = SelectedFirstLevelGrouping = SelectedSecondLevelGrouping = SelectedThirdLevelGrouping
                 = "<Нет>";
             GroupingList = GetGroupingList();

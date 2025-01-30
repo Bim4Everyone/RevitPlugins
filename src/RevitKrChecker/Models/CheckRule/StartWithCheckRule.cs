@@ -1,11 +1,13 @@
+using dosymep.SimpleServices;
+
 using RevitKrChecker.Models.Interfaces;
 
 namespace RevitKrChecker.Models.CheckRule {
     public class StartWithCheckRule : ICheckRule {
 
-        public StartWithCheckRule() {
-            CheckRuleName = "Начинается с";
-            UnfulfilledRule = "не начинается";
+        public StartWithCheckRule(ILocalizationService localizationService) {
+            CheckRuleName = localizationService.GetLocalizedString("ReportWindow.StartsWith");
+            UnfulfilledRule = localizationService.GetLocalizedString("ReportWindow.NotStartsWith");
         }
 
         public string CheckRuleName { get; }

@@ -1,11 +1,13 @@
+using dosymep.SimpleServices;
+
 using RevitKrChecker.Models.Interfaces;
 
 namespace RevitKrChecker.Models.CheckRule {
     public class EqualCheckRule : ICheckRule {
 
-        public EqualCheckRule() {
-            CheckRuleName = "Равно";
-            UnfulfilledRule = "не равно";
+        public EqualCheckRule(ILocalizationService localizationService) {
+            CheckRuleName = localizationService.GetLocalizedString("ReportWindow.Equals");
+            UnfulfilledRule = localizationService.GetLocalizedString("ReportWindow.NotEquals");
         }
 
         public string CheckRuleName { get; }

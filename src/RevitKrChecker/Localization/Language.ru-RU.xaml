@@ -23,4 +23,13 @@
     <system:String x:Key="ReportWindow.ElementErrorTooltip">Объяснение ошибки</system:String>
 
     <system:String x:Key="ReportWindow.ParameterValue">значение параметра</system:String>
+    <system:String x:Key="ReportWindow.Missing">отсутствует</system:String>
+    <system:String x:Key="ReportWindow.ByRule">по правилу</system:String>
+
+    <system:String x:Key="ReportWindow.Equals">Равно</system:String>
+    <system:String x:Key="ReportWindow.NotEquals">не равно</system:String>
+    <system:String x:Key="ReportWindow.Contains">Содержит</system:String>
+    <system:String x:Key="ReportWindow.NotContains">не содержит</system:String>
+    <system:String x:Key="ReportWindow.StartsWith">Начинается с</system:String>
+    <system:String x:Key="ReportWindow.NotStartsWith">не начинается с</system:String>
 </ResourceDictionary>

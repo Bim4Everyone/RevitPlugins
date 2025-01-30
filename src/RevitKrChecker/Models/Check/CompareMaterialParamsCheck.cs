@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitKrChecker.Models.CheckOptions;
 using RevitKrChecker.Models.Interfaces;
@@ -12,9 +13,12 @@ using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
     public class CompareMaterialParamsCheck : ICheck {
+        private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public CompareMaterialParamsCheck(CompareCheckOptions checkOptions) {
+        public CompareMaterialParamsCheck(CompareCheckOptions checkOptions, ILocalizationService localizationService) {
+            _localizationService = localizationService;
+
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
 
@@ -67,7 +71,9 @@ namespace RevitKrChecker.Models.Check {
         }
 
         public string GetTooltip() {
-            return $"{CheckName}: значение параметра \"{TargetParamName}\" {CheckRule.UnfulfilledRule} \"{SourceParamName}\"";
+            // "значение параметра"
+            var parameterValue = _localizationService.GetLocalizedString("ReportWindow.ParameterValue");
+            return $"{CheckName}: {parameterValue} \"{TargetParamName}\" {CheckRule.UnfulfilledRule} \"{SourceParamName}\"";
         }
     }
 }

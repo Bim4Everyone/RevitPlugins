@@ -4,15 +4,20 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using RevitKrChecker.Models.CheckOptions;
 using RevitKrChecker.Models.Interfaces;
 using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
     public class TemplatesCompareElemParamsCheck : ICheck {
+        private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public TemplatesCompareElemParamsCheck(TemplatesCompareCheckOptions checkOptions) {
+        public TemplatesCompareElemParamsCheck(TemplatesCompareCheckOptions checkOptions, ILocalizationService localizationService) {
+            _localizationService = localizationService;
+
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
 
@@ -82,8 +87,12 @@ namespace RevitKrChecker.Models.Check {
         }
 
         public string GetTooltip() {
-            return $"{CheckName}: значение параметра \"{TargetParamName}\" {CheckRule.UnfulfilledRule}" +
-                $" \"{SourceParamName}\" по правилу: {GetDictForCompareAsStr()}";
+            // "значение параметра"
+            var parameterValue = _localizationService.GetLocalizedString("ReportWindow.ParameterValue");
+            // "по правилу"
+            var byRule = _localizationService.GetLocalizedString("ReportWindow.ByRule");
+            return $"{CheckName}: {parameterValue} \"{TargetParamName}\" {CheckRule.UnfulfilledRule}" +
+                $" \"{SourceParamName}\" {byRule}: {GetDictForCompareAsStr()}";
         }
     }
 }

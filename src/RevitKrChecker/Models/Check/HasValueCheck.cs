@@ -3,15 +3,20 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using RevitKrChecker.Models.CheckOptions;
 using RevitKrChecker.Models.Interfaces;
 using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models.Check {
     public class HasValueCheck : ICheck {
+        private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public HasValueCheck(HasValueCheckOptions checkOptions) {
+        public HasValueCheck(HasValueCheckOptions checkOptions, ILocalizationService localizationService) {
+            _localizationService = localizationService;
+
             CheckName = checkOptions.CheckName ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
 
             TargetParamName = checkOptions.TargetParamName ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
@@ -19,6 +24,7 @@ namespace RevitKrChecker.Models.Check {
 
             _paramService = new ParamValueService();
         }
+
 
         public string CheckName { get; }
         public string TargetParamName { get; }
@@ -42,7 +48,11 @@ namespace RevitKrChecker.Models.Check {
         }
 
         public string GetTooltip() {
-            return $"{CheckName}: значение параметра \"{TargetParamName}\" отсутствует";
+            // "значение параметра"
+            var parameterValue = _localizationService.GetLocalizedString("ReportWindow.ParameterValue");
+            // "отсутствует"
+            var missing = _localizationService.GetLocalizedString("ReportWindow.Missing");
+            return $"{CheckName}: {parameterValue} \"{TargetParamName}\" {missing}";
         }
     }
 }

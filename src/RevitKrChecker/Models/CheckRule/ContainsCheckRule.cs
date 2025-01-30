@@ -1,11 +1,13 @@
+using dosymep.SimpleServices;
+
 using RevitKrChecker.Models.Interfaces;
 
 namespace RevitKrChecker.Models.CheckRule {
     public class ContainsCheckRule : ICheckRule {
 
-        public ContainsCheckRule() {
-            CheckRuleName = "Содержит";
-            UnfulfilledRule = "не содержит";
+        public ContainsCheckRule(ILocalizationService localizationService) {
+            CheckRuleName = localizationService.GetLocalizedString("ReportWindow.Contains");
+            UnfulfilledRule = localizationService.GetLocalizedString("ReportWindow.NotContains");
         }
 
         public string CheckRuleName { get; }
