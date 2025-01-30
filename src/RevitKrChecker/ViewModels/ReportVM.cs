@@ -6,7 +6,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -20,7 +19,6 @@ namespace RevitKrChecker.ViewModels {
         private readonly List<ICheck> _nonStoppingChecks;
         private readonly RevitRepository _revitRepository;
         private readonly PluginConfig _pluginConfig;
-        private readonly ILocalizationService _localizationService;
 
         private string _selectedErrorTooltips;
 
@@ -29,12 +27,10 @@ namespace RevitKrChecker.ViewModels {
         public ReportVM(List<Element> elements,
                         ReportGroupingVM reportGroupingVM,
                         PluginConfig pluginConfig,
-                        RevitRepository revitRepository,
-                        ILocalizationService localizationService) {
+                        RevitRepository revitRepository) {
             _elems = elements;
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-            _localizationService = localizationService;
             GroupingVM = reportGroupingVM;
 
             _stoppingChecks = _revitRepository.StoppingChecks();
@@ -81,11 +77,14 @@ namespace RevitKrChecker.ViewModels {
         private void LoadConfig() {
             var settings = _pluginConfig.GetSettings(_revitRepository.Document);
             if(settings is null) { return; }
-            GroupingVM.SelectedThirdLevelGrouping = settings.SelectedThirdLevelGrouping;
+            GroupingVM.SelectedThirdLevelGrouping = settings.SelectedThirdLevelGrouping
+                 ?? GroupingVM.NotSelectedItem;
             GroupingVM.ThirdLevelGroupingChangedCommand.Execute(null);
-            GroupingVM.SelectedSecondLevelGrouping = settings.SelectedSecondLevelGrouping;
+            GroupingVM.SelectedSecondLevelGrouping = settings.SelectedSecondLevelGrouping
+                 ?? GroupingVM.NotSelectedItem;
             GroupingVM.SecondLevelGroupingChangedCommand.Execute(null);
-            GroupingVM.SelectedFirstLevelGrouping = settings.SelectedFirstLevelGrouping;
+            GroupingVM.SelectedFirstLevelGrouping = settings.SelectedFirstLevelGrouping
+                 ?? GroupingVM.NotSelectedItem;
             GroupingVM.FirstLevelGroupingChangedCommand.Execute(null);
         }
 

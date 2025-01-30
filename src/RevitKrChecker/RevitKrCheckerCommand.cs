@@ -17,6 +17,7 @@ using Ninject;
 using RevitKrChecker.Models;
 using RevitKrChecker.ViewModels;
 using RevitKrChecker.Views;
+using RevitKrChecker.Views.Converters;
 
 namespace RevitKrChecker {
     [Transaction(TransactionMode.Manual)]
@@ -45,6 +46,10 @@ namespace RevitKrChecker {
                 kernel.Bind<ReportGroupingVM>().ToSelf();
                 kernel.Bind<ReportWindow>().ToSelf()
                     .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                        c => c.Kernel.Get<ILocalizationService>());
+
+                kernel.Bind<LocalizationConverter>().ToSelf()
+                    .WithPropertyValue(nameof(LocalizationConverter.LocalizationService),
                         c => c.Kernel.Get<ILocalizationService>());
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;

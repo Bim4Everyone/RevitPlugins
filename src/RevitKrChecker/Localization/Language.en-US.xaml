@@ -8,20 +8,17 @@
     <system:String x:Key="MainWindow.GetFromView">Get elements from view</system:String>
     <system:String x:Key="MainWindow.GetFromProject">Get items from the entire project</system:String>
 
-    <system:String x:Key="MainWindow.Grouping">Grouping:</system:String>
-    <system:String x:Key="MainWindow.Expand">Expand</system:String>
-    <system:String x:Key="MainWindow.Collapse">Collapse</system:String>
-    <system:String x:Key="MainWindow.ErrorExplanations">Error explanations:</system:String>
-    <system:String x:Key="MainWindow.Show">Show</system:String>
-    <system:String x:Key="MainWindow.Recheck">Recheck</system:String>
+    <system:String x:Key="ReportWindow.Grouping">Grouping:</system:String>
+    <system:String x:Key="ReportWindow.Expand">Expand</system:String>
+    <system:String x:Key="ReportWindow.Collapse">Collapse</system:String>
+    <system:String x:Key="ReportWindow.ErrorExplanations">Error explanations:</system:String>
+    <system:String x:Key="ReportWindow.Show">Show</system:String>
+    <system:String x:Key="ReportWindow.Recheck">Recheck</system:String>
 
-    <system:String x:Key="MainWindow.ElementCategoryName">Category name</system:String>
-    <system:String x:Key="MainWindow.ElementTypeName">Type name</system:String>
-    <system:String x:Key="MainWindow.Elem">Element</system:String>
-    <system:String x:Key="MainWindow.TargetParamName">Parameter to check</system:String>
-    <system:String x:Key="MainWindow.СheckName">Check name</system:String>
-    <system:String x:Key="MainWindow.ElementErrorTooltip">Error explanation</system:String>
-
-    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="ReportWindow.ElementCategoryName">Category name</system:String>
+    <system:String x:Key="ReportWindow.ElementTypeName">Type name</system:String>
+    <system:String x:Key="ReportWindow.Elem">Element</system:String>
+    <system:String x:Key="ReportWindow.TargetParamName">Parameter to check</system:String>
+    <system:String x:Key="ReportWindow.СheckName">Check name</system:String>
+    <system:String x:Key="ReportWindow.ElementErrorTooltip">Error explanation</system:String>
 </ResourceDictionary>

@@ -14,6 +14,7 @@
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
     Height="100"
+    MinHeight="100"
     Width="500"
     MinWidth="500"
     d:DataContext="{d:DesignInstance vms:MainVM, IsDesignTimeCreatable=False}">

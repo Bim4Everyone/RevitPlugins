@@ -9,12 +9,18 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:vms="clr-namespace:RevitKrChecker.ViewModels"
     xmlns:local="clr-namespace:RevitKrChecker.Views"
+    xmlns:converters="clr-namespace:RevitKrChecker.Views.Converters"
         
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    Title="ReportWindow" 
+    Title="{DynamicResource MainWindow.Title}" 
     Height="600" Width="600"
     d:DataContext="{d:DesignInstance vms:ReportVM, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <converters:LocalizationConverter x:Key="LocalizationConverter" 
+            LocalizationService="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=LocalizationService}"/>
+    </Window.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -48,7 +54,7 @@
             Grid.Row="0"
             Grid.Column="0"
             Margin="5"
-            Text="Группировка:"/>
+            Text="{DynamicResource ReportWindow.Grouping}"/>
 
         <ComboBox
             Grid.Row="1"
@@ -58,6 +64,12 @@
             Name="FirstLevelGrouping"
             ItemsSource="{Binding Path=GroupingVM.GroupingList}"
             SelectedItem="{Binding Path=GroupingVM.SelectedFirstLevelGrouping}" >
+
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ., Converter={StaticResource ResourceKey=LocalizationConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
 
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
@@ -75,7 +87,13 @@
             Name="SecondLevelGrouping"
             ItemsSource="{Binding Path=GroupingVM.GroupingList}"
             SelectedItem="{Binding Path=GroupingVM.SelectedSecondLevelGrouping}">
-            
+
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ., Converter={StaticResource ResourceKey=LocalizationConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction
@@ -93,6 +111,12 @@
             ItemsSource="{Binding Path=GroupingVM.GroupingList}"
             SelectedItem="{Binding Path=GroupingVM.SelectedThirdLevelGrouping}">
 
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding ., Converter={StaticResource ResourceKey=LocalizationConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction
@@ -105,14 +129,16 @@
             Grid.Row="2"
             Grid.Column="1"
             Margin="5"
-            Content="Развернуть"
+            Padding="2"
+            Content="{DynamicResource ReportWindow.Expand}"
             Click="Button_Click_ListViewExpander_Expand"/>
 
         <Button
             Grid.Row="2"
             Grid.Column="2"
             Margin="5"
-            Content="Свернуть"
+            Padding="2"
+            Content="{DynamicResource ReportWindow.Collapse}"
             Click="Button_Click_ListViewExpander_Collapse"/>
         
         <ListView 
@@ -173,7 +199,7 @@
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Margin="5"
-            Text="Объяснения ошибок:"/>
+            Text="{DynamicResource ReportWindow.ErrorExplanations}"/>
 
         <Border 
             Grid.Row="5"
@@ -195,8 +221,8 @@
             Grid.Row="6"
             Grid.Column="1"
             Margin="5"
-            Padding="5"
-            Content="Показать"
+            Padding="2"
+            Content="{DynamicResource ReportWindow.Show}"
             Command="{Binding Path=ShowErrorElemsCommand}"
             CommandParameter="{Binding SelectedItems, ElementName=reportList}"/>
 
@@ -204,8 +230,8 @@
             Grid.Row="6"
             Grid.Column="2"
             Margin="5"
-            Padding="5"
-            Content="Перепроверить"
+            Padding="2"
+            Content="{DynamicResource ReportWindow.ReCheck}"
             Command="{Binding Path=ReсheckCommand}"/>
     </Grid>
 </base:PlatformWindow>

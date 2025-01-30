@@ -3,7 +3,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -18,18 +17,15 @@ namespace RevitKrChecker.ViewModels {
     internal class MainVM : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-        private readonly ILocalizationService _localizationService;
         private readonly IResolutionRoot _resolutionRoot;
 
         public MainVM(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
-            ILocalizationService localizationService,
             IResolutionRoot resolutionRoot) {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-            _localizationService = localizationService;
             _resolutionRoot = resolutionRoot;
 
             CheckElemsFromViewCommand = RelayCommand.Create(CheckElemsFromView);

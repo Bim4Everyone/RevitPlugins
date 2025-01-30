@@ -8,20 +8,19 @@
     <system:String x:Key="MainWindow.GetFromView">Получить элементы с вида</system:String>
     <system:String x:Key="MainWindow.GetFromProject">Получить элементы со всего проекта</system:String>
 
-    <system:String x:Key="MainWindow.Grouping">Группировка:</system:String>
-    <system:String x:Key="MainWindow.Expand">Развернуть</system:String>
-    <system:String x:Key="MainWindow.Collapse">Свернуть</system:String>
-    <system:String x:Key="MainWindow.ErrorExplanations">Объяснения ошибок:</system:String>
-    <system:String x:Key="MainWindow.Show">Показать</system:String>
-    <system:String x:Key="MainWindow.ReCheck">Перепроверить</system:String>
+    <system:String x:Key="ReportWindow.Grouping">Группировка:</system:String>
+    <system:String x:Key="ReportWindow.Expand">Развернуть</system:String>
+    <system:String x:Key="ReportWindow.Collapse">Свернуть</system:String>
+    <system:String x:Key="ReportWindow.ErrorExplanations">Объяснения ошибок:</system:String>
+    <system:String x:Key="ReportWindow.Show">Показать</system:String>
+    <system:String x:Key="ReportWindow.ReCheck">Перепроверить</system:String>
 
-    <system:String x:Key="MainWindow.ElementCategoryName">Имя категории</system:String>
-    <system:String x:Key="MainWindow.ElementTypeName">Имя типа</system:String>
-    <system:String x:Key="MainWindow.Elem">Элемент</system:String>
-    <system:String x:Key="MainWindow.TargetParamName">Проверяемый параметр</system:String>
-    <system:String x:Key="MainWindow.СheckName">Имя проверки</system:String>
-    <system:String x:Key="MainWindow.ElementErrorTooltip">Объяснение ошибки</system:String>
+    <system:String x:Key="ReportWindow.ElementCategoryName">Имя категории</system:String>
+    <system:String x:Key="ReportWindow.ElementTypeName">Имя типа</system:String>
+    <system:String x:Key="ReportWindow.Elem">Элемент</system:String>
+    <system:String x:Key="ReportWindow.TargetParamName">Проверяемый параметр</system:String>
+    <system:String x:Key="ReportWindow.СheckName">Имя проверки</system:String>
+    <system:String x:Key="ReportWindow.ElementErrorTooltip">Объяснение ошибки</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="ReportWindow.ParameterValue">значение параметра</system:String>
 </ResourceDictionary>
