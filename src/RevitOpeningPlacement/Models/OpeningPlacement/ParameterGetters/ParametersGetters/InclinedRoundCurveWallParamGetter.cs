@@ -35,8 +35,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, new WallThicknessValueGetter(_clash.Element2)).GetParamValue();
 
             //отметки отверстия
-            var bottomOffsetValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(_pointFinder);
-            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetOfRectangleOpeningInWallValueGetter(_pointFinder, heightValueGetter)).GetParamValue();
+            var elevationGetter = new ElevationValueGetter(_pointFinder, _clash.Element1.Document);
+            var bottomOffsetValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(elevationGetter);
+            yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, new CenterOffsetOfRectangleOpeningInWallValueGetter(elevationGetter, heightValueGetter)).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
             var offsetFeetFromLevelValueGetter = new OffsetFromLevelValueGetter(bottomOffsetValueGetter, _levelFinder);
             var levelFeetOffsetValueGetter = new LevelOffsetValueGetter(_levelFinder);

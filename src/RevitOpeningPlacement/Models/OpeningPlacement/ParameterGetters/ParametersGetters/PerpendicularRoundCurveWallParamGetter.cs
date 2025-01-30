@@ -42,14 +42,15 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             //отметки отверстия
             IValueGetter<DoubleParamValue> bottomOffsetMmValueGetter;
             IValueGetter<DoubleParamValue> centerOffsetMmValueGetter;
+            var elevationGetter = new ElevationValueGetter(_pointFinder, _clash.Element1.Document);
             if(openingTaskIsRound) {
                 //отверстие круглое
-                centerOffsetMmValueGetter = new CenterOffsetValueGetter(_pointFinder);
-                bottomOffsetMmValueGetter = new BottomOffsetValueGetter(_pointFinder, openingSizeGetter);
+                centerOffsetMmValueGetter = new CenterOffsetValueGetter(elevationGetter);
+                bottomOffsetMmValueGetter = new BottomOffsetValueGetter(elevationGetter, openingSizeGetter);
             } else {
                 // отверстие прямоугольное (квадратное)
-                centerOffsetMmValueGetter = new CenterOffsetOfRectangleOpeningInWallValueGetter(_pointFinder, openingSizeGetter);
-                bottomOffsetMmValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(_pointFinder);
+                centerOffsetMmValueGetter = new CenterOffsetOfRectangleOpeningInWallValueGetter(elevationGetter, openingSizeGetter);
+                bottomOffsetMmValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(elevationGetter);
             }
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, centerOffsetMmValueGetter).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetMmValueGetter).GetParamValue();
