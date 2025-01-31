@@ -24,6 +24,8 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private readonly IReportService _reportService;
         private readonly ReportWindow _reportWindow;
 
+        private readonly string _reinforcement = "ФОП_ТИП_Армирование";
+
         private List<DesignTypeVM> _designTypes = new List<DesignTypeVM>();
 
         public DesignTypeListVM(
@@ -66,7 +68,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// </summary>
         public bool FilterByDocPackage(object o) {
             if(MainVM == null) {
-                throw new ArgumentNullException(nameof(MainVM));
+                throw new System.InvalidOperationException(nameof(MainVM));
             }
 
             bool turnOffDockPackageFilt = MainVM.SelectedDockPackage == MainVM.FilterValueForNoFiltering;
@@ -147,7 +149,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 if(!designType.HasErrors) {
                     using(Transaction transaction = doc.StartTransaction("Запись коэффициентов армирования")) {
                         foreach(FormworkElement elem in designType.Formworks) {
-                            elem.RevitElement.SetParamValue("ФОП_ТИП_Армирование", designType.RebarCoef);
+                            elem.RevitElement.SetParamValue(_reinforcement, designType.RebarCoef);
                         }
                         transaction.Commit();
                     }
