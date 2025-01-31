@@ -3,7 +3,7 @@ using System;
 using pyRevitLabs.Json;
 
 namespace RevitDeclarations.Models {
-    public class RoomPriority {
+    public class RoomPriority : IEquatable<RoomPriority> {
         public RoomPriority(int number, string name) {
             OrdinalNumber = number;
             Name = name;
@@ -30,14 +30,17 @@ namespace RevitDeclarations.Models {
             return false;
         }
 
-        public override bool Equals(object obj) {
-            if(obj == null || GetType() != obj.GetType()) {
-                return false;
-            }
+        public bool Equals(RoomPriority other) {
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
 
-            RoomPriority priority = (RoomPriority)obj;
-            return CheckName(priority.Name);
+            return CheckName(other.Name);
         }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as RoomPriority);
+        }
+
 
         public override int GetHashCode() {
             return Name?.GetHashCode() ?? 0;
