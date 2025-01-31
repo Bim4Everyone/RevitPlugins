@@ -12,6 +12,13 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class RevitRepository {
+        private readonly List<ElementOnPhaseStatus> _statuses = new List<ElementOnPhaseStatus>() {
+                ElementOnPhaseStatus.Existing,
+                ElementOnPhaseStatus.Demolished,
+                ElementOnPhaseStatus.New,
+                ElementOnPhaseStatus.Temporary
+            };
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
@@ -69,7 +76,7 @@ namespace RevitDeclarations.Models {
         }
 
         public IReadOnlyCollection<FamilyInstance> GetDoorsOnPhase(Document document, Phase phase) {
-            ElementPhaseStatusFilter phaseFilter = GetPhaseFilter(phase);
+            var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
 
             return new FilteredElementCollector(document)
                 .OfCategory(BuiltInCategory.OST_Doors)
@@ -80,7 +87,7 @@ namespace RevitDeclarations.Models {
         }
 
         public IReadOnlyCollection<CurveElement> GetRoomSeparationLinesOnPhase(Document document, Phase phase) {
-            ElementPhaseStatusFilter phaseFilter = GetPhaseFilter(phase);
+            var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
 
             return new FilteredElementCollector(document)
                 .WhereElementIsNotElementType()
@@ -93,7 +100,7 @@ namespace RevitDeclarations.Models {
         public IReadOnlyCollection<FamilyInstance> GetBathInstancesOnPhase(Document document, Phase phase) {
             ElementCategoryFilter notDoorsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Doors, true);
             ElementCategoryFilter notWindowsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows, true);
-            ElementPhaseStatusFilter phaseFilter = GetPhaseFilter(phase);
+            var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
 
             /// Поиск семейств ванн и душевых кабин по наличию "ванна" или "душев" в имени семейства.
             /// Также исключается семейства с суффиксом "ова", например, заканчиваюищеся на "ованная"
@@ -147,17 +154,6 @@ namespace RevitDeclarations.Models {
                 .GetOrderedParameters()
                 .Where(x => x.StorageType == storageType)
                 .ToList();
-        }
-
-        private ElementPhaseStatusFilter GetPhaseFilter(Phase phase) {
-            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
-                ElementOnPhaseStatus.Existing,
-                ElementOnPhaseStatus.Demolished,
-                ElementOnPhaseStatus.New,
-                ElementOnPhaseStatus.Temporary
-            };
-
-            return new ElementPhaseStatusFilter(phase.Id, statuses);
         }
     }
 }
