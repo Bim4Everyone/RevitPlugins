@@ -159,6 +159,31 @@ namespace RevitApartmentPlans.Models {
         }
 
         /// <summary>
+        /// Копирует вид с детализацией.
+        /// </summary>
+        /// <param name="view">Вид для копирования</param>
+        /// <returns>Скопированный вид с детализацией.</returns>
+        /// <exception cref="InvalidOperationException">Исключение, если не удалось скопировать вид.</exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null.</exception>
+        public ViewPlan DuplicateView(ViewPlan view) {
+            if(view is null) {
+                throw new ArgumentNullException(nameof(view));
+            }
+            // при копировании видов, с которыми работает плагин, проблем быть не должно,
+            // но пусть будут исключения на всякий случай
+            const ViewDuplicateOption opts = ViewDuplicateOption.WithDetailing;
+            if(view.CanViewBeDuplicated(opts)) {
+                var id = view.Duplicate(opts);
+                if(id.IsNotNull()) {
+                    return Document.GetElement(id) as ViewPlan
+                        ?? throw new InvalidOperationException(
+                            $"Пустой id скопированного вида {view.Name} с детализацией");
+                }
+            }
+            throw new InvalidOperationException($"Не удалось скопировать вид {view.Name} с детализацией");
+        }
+
+        /// <summary>
         /// Возвращает тип шаблона вида: план этажа/план потолка
         /// </summary>
         /// <param name="template">Шаблон вида</param>
@@ -180,6 +205,15 @@ namespace RevitApartmentPlans.Models {
         /// </summary>
         public bool ActiveViewIsPlan() {
             return Document.ActiveView as ViewPlan != null;
+        }
+
+        /// <summary>
+        /// Возвращает активный вид (план)
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Исключение, если активынй вид не является планом</exception>
+        public ViewPlan GetActiveViewPlan() {
+            return Document.ActiveView as ViewPlan
+                ?? throw new InvalidOperationException("Активный вид не является планом");
         }
 
 

@@ -112,6 +112,9 @@
                               IsCaseSensitiveFilter="False"
                               PopupMaxHeight="250"
                               NullText="Выберите параметр для группировки" />
+            <dxe:CheckEdit EditValue="{Binding CopyDetail}"
+                           Content="Копировать с детализацией"
+                           Margin="5 0 0 0"/>
         </DockPanel>
 
         <Grid Grid.Row="1"
