@@ -24,10 +24,7 @@ namespace RevitDeclarations.Models {
         public int MaxRoomAmount { get; set; }
 
         public bool CheckName(string name) {
-            if(string.Equals(name, Name, StringComparison.OrdinalIgnoreCase)) {
-                return true;
-            }
-            return false;
+            return string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
         }
 
         public bool Equals(RoomPriority other) {
