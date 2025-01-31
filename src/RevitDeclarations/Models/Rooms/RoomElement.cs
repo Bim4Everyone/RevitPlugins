@@ -1,8 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
+
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 using pyRevitLabs.Json;
@@ -77,6 +79,13 @@ namespace RevitDeclarations.Models
 
         public int GetIntParamValue(Parameter parameter) {
             return RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
+        }
+
+        public IReadOnlyList<ElementId> GetBoundaries() {
+            return _revitRoom.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
+                .SelectMany(item => item)
+                .Select(item => item.ElementId)
+                .ToList();
         }
     }
 }

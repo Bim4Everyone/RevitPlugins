@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
-using System.Web.Security;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -13,6 +12,13 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class RevitRepository {
+        private readonly List<ElementOnPhaseStatus> _statuses = new List<ElementOnPhaseStatus>() {
+                ElementOnPhaseStatus.Existing,
+                ElementOnPhaseStatus.Demolished,
+                ElementOnPhaseStatus.New,
+                ElementOnPhaseStatus.Temporary
+            };
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
@@ -70,14 +76,7 @@ namespace RevitDeclarations.Models {
         }
 
         public IReadOnlyCollection<FamilyInstance> GetDoorsOnPhase(Document document, Phase phase) {
-            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
-                ElementOnPhaseStatus.Existing,
-                ElementOnPhaseStatus.Demolished,
-                ElementOnPhaseStatus.New,
-                ElementOnPhaseStatus.Temporary
-            };
-
-            ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, statuses);
+            var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
 
             return new FilteredElementCollector(document)
                 .OfCategory(BuiltInCategory.OST_Doors)
@@ -87,18 +86,21 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
+        public IReadOnlyCollection<CurveElement> GetRoomSeparationLinesOnPhase(Document document, Phase phase) {
+            var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
+
+            return new FilteredElementCollector(document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_RoomSeparationLines)
+                .WherePasses(phaseFilter)
+                .OfType<CurveElement>()
+                .ToList();
+        }
+
         public IReadOnlyCollection<FamilyInstance> GetBathInstancesOnPhase(Document document, Phase phase) {
             ElementCategoryFilter notDoorsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Doors, true);
             ElementCategoryFilter notWindowsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows, true);
-
-            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
-                ElementOnPhaseStatus.Existing,
-                ElementOnPhaseStatus.Demolished,
-                ElementOnPhaseStatus.New,
-                ElementOnPhaseStatus.Temporary
-            };
-
-            ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, statuses);
+            var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
 
             /// Поиск семейств ванн и душевых кабин по наличию "ванна" или "душев" в имени семейства.
             /// Также исключается семейства с суффиксом "ова", например, заканчиваюищеся на "ованная"
@@ -116,7 +118,7 @@ namespace RevitDeclarations.Models {
         }
 
         public IEnumerable<IEnumerable<RoomElement>> GroupRooms(IEnumerable<RoomElement> rooms,
-                                                   DeclarationSettings settings) {
+                                                                DeclarationSettings settings) {
             var multiStoreyAparts = rooms.Where(x => !string.IsNullOrEmpty(x.GetTextParamValue(settings.MultiStoreyParam)))
                 .GroupBy(r => new { l = r.GetTextParamValue(settings.MultiStoreyParam), s = r.GetTextParamValue(settings.SectionParam) })
                 .Select(g => new List<RoomElement>(g));

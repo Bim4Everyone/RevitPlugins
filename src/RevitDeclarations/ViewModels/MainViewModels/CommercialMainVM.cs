@@ -95,8 +95,8 @@ namespace RevitDeclarations.ViewModels {
             List<CommercialRooms> commercialRooms = projects
                 .SelectMany(x => x.RoomGroups)
                 .Cast<CommercialRooms>()
-                .OrderBy(x => x.Number, _stringComparer)
-                .ThenBy(x => x.Rooms.First().Number, _stringComparer)
+                .OrderBy(x => x.Number ?? "", _stringComparer)
+                .ThenBy(x => x.Rooms.First().Number ?? "", _stringComparer)
                 .ToList();
 
             _selectedFormat.Export(FullPath, commercialRooms);
