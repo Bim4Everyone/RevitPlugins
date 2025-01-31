@@ -15,15 +15,15 @@ using RevitRoomExtrusion.Models;
 
 namespace RevitRoomExtrusion.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private const string _defaultHeight = "2200"; // Распространенная высота машино-места для одноэтажного паркинга,
-                                                      // берется из задания на проектирование (ЗнП).
+        private const string _defaultHeightMm = "2200"; // Распространенная высота машино-места для одноэтажного паркинга,
+                                                        // берется из задания на проектирование (ЗнП).
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly FamilyCreator _familyCreator;
         private readonly ILocalizationService _localizationService;
 
         private string _errorText;
-        private string _extrusionHeight;
+        private string _extrusionHeightMm;
         private string _extrusionFamilyName;
 
         public MainViewModel(
@@ -49,9 +49,9 @@ namespace RevitRoomExtrusion.ViewModels {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
-        public string ExtrusionHeight {
-            get => _extrusionHeight;
-            set => this.RaiseAndSetIfChanged(ref _extrusionHeight, value);
+        public string ExtrusionHeightMm {
+            get => _extrusionHeightMm;
+            set => this.RaiseAndSetIfChanged(ref _extrusionHeightMm, value);
         }
         public string ExtrusionFamilyName {
             get => _extrusionFamilyName;
@@ -65,17 +65,27 @@ namespace RevitRoomExtrusion.ViewModels {
             SaveConfig();
             SelectedRooms = _revitRepository.GetSelectedRooms();
             View3D view3d = _revitRepository.GetView3D(_extrusionFamilyName);
-            double extrusionHeightDouble = Convert.ToDouble(_extrusionHeight);
+            double extrusionHeightDouble = Convert.ToDouble(_extrusionHeightMm);
             _familyCreator.CreateFamilies(SelectedRooms, view3d, _extrusionFamilyName, extrusionHeightDouble);
         }
 
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(_extrusionHeight)) {
-                ErrorText = _localizationService.GetLocalizedString("MainWindow.ExtrusionHeight");
+            if(string.IsNullOrEmpty(_extrusionHeightMm)) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ExtrusionHeightMm");
                 return false;
             }
-            if(!double.TryParse(_extrusionHeight, out double result)) {
+            if(!double.TryParse(_extrusionHeightMm, out double result)) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.HeightError");
+                return false;
+            }
+            if(result < 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.HeightErrorNegative");
+                return false;
+            } else if(result == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.HeightErrorZero");
+                return false;
+            } else if(result > 100000) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.HeightErrorBig");
                 return false;
             }
             if(string.IsNullOrEmpty(_extrusionFamilyName)) {
@@ -94,7 +104,7 @@ namespace RevitRoomExtrusion.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            ExtrusionHeight = setting?.ExtrusionHeight ?? _defaultHeight;
+            ExtrusionHeightMm = setting?.ExtrusionHeightMm ?? _defaultHeightMm;
             ExtrusionFamilyName = setting?.ExtrusionFamilyName
                 ?? _localizationService.GetLocalizedString("MainViewModel.DefaultFamilyName");
         }
@@ -102,7 +112,7 @@ namespace RevitRoomExtrusion.ViewModels {
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
-            setting.ExtrusionHeight = ExtrusionHeight;
+            setting.ExtrusionHeightMm = ExtrusionHeightMm;
             setting.ExtrusionFamilyName = ExtrusionFamilyName;
             _pluginConfig.SaveProjectConfig();
         }

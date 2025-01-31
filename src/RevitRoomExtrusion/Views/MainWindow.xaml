@@ -36,11 +36,11 @@
             <Label
                 Margin="5"
                 Padding="5"
-                Content="{DynamicResource MainWindow.ExtrusionHeight}" />
+                Content="{DynamicResource MainWindow.ExtrusionHeightMm}" />
             <TextBox
                 Margin="5"
                 Padding="5"
-                Text="{Binding ExtrusionHeight, UpdateSourceTrigger=PropertyChanged}" />
+                Text="{Binding ExtrusionHeightMm, UpdateSourceTrigger=PropertyChanged}" />
             <Label
                 Margin="5"
                 Padding="5"
