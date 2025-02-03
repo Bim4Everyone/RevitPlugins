@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -51,6 +52,9 @@ namespace RevitApartmentPlans {
                     .InSingletonScope();
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
+                kernel.Bind<LinkFilterProvider>()
+                    .ToSelf()
+                    .InSingletonScope();
 
                 kernel.UseXtraProgressDialog<MainViewModel>();
                 kernel.UseXtraMessageBox<MainViewModel>();

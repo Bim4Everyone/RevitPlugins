@@ -44,5 +44,10 @@ namespace RevitApartmentPlans.Models {
         /// Копировать с детализацией
         /// </summary>
         public bool CopyDetail { get; set; }
+
+        /// <summary>
+        /// Обрабатывать связанные файлы
+        /// </summary>
+        public bool ProcessLinks { get; set; }
     }
 }

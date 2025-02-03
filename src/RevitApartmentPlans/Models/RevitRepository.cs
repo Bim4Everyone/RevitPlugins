@@ -15,14 +15,15 @@ using RevitApartmentPlans.Services;
 namespace RevitApartmentPlans.Models {
     internal class RevitRepository {
         private readonly SpatialElementBoundaryOptions _spatialElementBoundaryOptions;
+        private readonly LinkFilterProvider _linkFilterProvider;
 
-
-        public RevitRepository(UIApplication uiApplication) {
+        public RevitRepository(UIApplication uiApplication, LinkFilterProvider linkFilterProvider) {
             _spatialElementBoundaryOptions = new SpatialElementBoundaryOptions() {
                 SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Finish,
                 StoreFreeBoundaryFaces = false
             };
             UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
+            _linkFilterProvider = linkFilterProvider ?? throw new ArgumentNullException(nameof(linkFilterProvider));
         }
 
 
@@ -92,17 +93,29 @@ namespace RevitApartmentPlans.Models {
         /// <exception cref="ArgumentException">Исключение, если название параметра пустое.</exception>
         public ICollection<Apartment> GetApartments(string paramName) {
             if(string.IsNullOrWhiteSpace(paramName)) { throw new ArgumentException(nameof(paramName)); }
-            Level level = GetLevelOfActivePlan();
 
-            return new FilteredElementCollector(Document, Document.ActiveView.Id)
-                .WherePasses(new RoomFilter())
-                .Cast<Room>()
-                .Where(r => r.Area > 0
-                    && r.LevelId == level.Id
-                    && r.IsExistsParamValue(paramName))
-                .GroupBy(r => r.GetParam(paramName).AsValueString())
+            return GetRoomsFromActiveDoc(paramName)
+                .GroupBy(r => r.Room.GetParam(paramName).AsValueString())
                 .Select(g => new Apartment(g.ToArray(), g.Key))
                 .ToArray();
+        }
+
+        public ICollection<Apartment> GetApartments(string paramName, bool processLinks) {
+            if(processLinks) {
+                List<RoomElement> rooms = new List<RoomElement>(GetRoomsFromActiveDoc(paramName));
+                var visibleLinks = GetVisibleLinks(GetActiveViewPlan());
+                foreach(var link in visibleLinks) {
+                    var transform = link.GetTransform();
+                    rooms.AddRange(_linkFilterProvider.GetFilter(link, GetActiveViewPlan())
+                        .WherePasses(new RoomFilter())
+                        .Cast<Room>()
+                        .Where(r => r.Area > 0 && r.IsExistsParamValue(paramName))
+                        .Select(r => new RoomElement(r)));
+                }
+                return rooms.Group
+            } else {
+                return GetApartments(paramName);
+            }
         }
 
         /// <summary>
@@ -127,7 +140,8 @@ namespace RevitApartmentPlans.Models {
         /// Метод для отладки. Создает квартиру из выбранных помещений
         /// </summary>
         public Apartment GetDebugApartment() {
-            return new Apartment(PickRooms(), "test");
+            var rooms = PickRooms();
+            return new Apartment(PickRooms(), "test", rooms.First().Level);
         }
 
         /// <summary>
@@ -217,12 +231,35 @@ namespace RevitApartmentPlans.Models {
         }
 
 
+        private ICollection<RevitLinkInstance> GetVisibleLinks(View view) {
+            return new FilteredElementCollector(Document, view.Id)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(RevitLinkInstance))
+                .ToElements()
+                .OfType<RevitLinkInstance>()
+                .ToArray();
+        }
+
+        private ICollection<RoomElement> GetRoomsFromActiveDoc(string paramName) {
+            if(string.IsNullOrWhiteSpace(paramName)) { throw new ArgumentException(nameof(paramName)); }
+            Level level = GetLevelOfActivePlan();
+
+            return new FilteredElementCollector(Document, GetActiveViewPlan().Id)
+                .WherePasses(new RoomFilter())
+                .Cast<Room>()
+                .Where(r => r.Area > 0
+                    && r.LevelId == level.Id
+                    && r.IsExistsParamValue(paramName))
+                .Select(r => new RoomElement(r))
+                .ToArray();
+        }
+
         /// <summary>
         /// Возвращает уровень, привязанный к активному виду, который должен быть планом
         /// </summary>
         /// <exception cref="InvalidOperationException">Исключение, если активный вид - не план</exception>
         private Level GetLevelOfActivePlan() {
-            var view = Document.ActiveView as ViewPlan;
+            var view = GetActiveViewPlan();
             if(view is null) {
                 throw new InvalidOperationException("Активный вид не является планом");
             }
