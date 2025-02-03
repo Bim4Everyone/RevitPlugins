@@ -15,8 +15,7 @@ namespace RevitDeclarations.Models {
         private readonly List<ElementOnPhaseStatus> _statuses = new List<ElementOnPhaseStatus>() {
                 ElementOnPhaseStatus.Existing,
                 ElementOnPhaseStatus.Demolished,
-                ElementOnPhaseStatus.New,
-                ElementOnPhaseStatus.Temporary
+                ElementOnPhaseStatus.New
             };
 
         public RevitRepository(UIApplication uiApplication) {
