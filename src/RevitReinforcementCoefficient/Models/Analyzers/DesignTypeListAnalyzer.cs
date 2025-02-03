@@ -84,7 +84,8 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
                 // Сделали преобразование null в "" из-за того, что фильтрация в GUI иначе нормально не отрабатывает
                 string docPackage = element.GetParamValue<string>(_documentationSet) ?? "";
                 string elemSection = element.GetParamValue<string>(_section) ?? "";
-                bool aboveZero = element.GetParamValue<int>(_organizationalLevel) > 0;
+                var organizationalLevelAsStr = element.GetParam(_organizationalLevel).AsValueString();
+                bool aboveZero = !organizationalLevelAsStr.Contains('-');
 
                 // Ищем подходящий тип конструкции среди уже существующих в списке
                 DesignTypeVM designType = designTypes.FirstOrDefault(
