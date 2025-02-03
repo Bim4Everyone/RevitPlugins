@@ -71,7 +71,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return GetFlexElementName(specificationElement);
             }
 
-            return $"{_name} {_nameAddon}";
+            return string.IsNullOrEmpty(_nameAddon) ? _name : $"{_name} {_nameAddon}";
         }
 
         /// <summary>
