@@ -14,24 +14,30 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
         private readonly ParamUtils _paramUtils;
         private readonly ElementFactory _elementFactory;
 
+        private readonly string _costsSpecMark = "обр_ФОП_Марка ведомости расхода";
+        private readonly string _documentationSet = "обр_ФОП_Раздел проекта";
+        private readonly string _section = "ФОП_Секция СМР";
+        private readonly string _organizationalLevel = "обр_ФОП_Орг. уровень";
+
         // Если номер формы у арматуры == 10000, то это семейства-оболочки, которые управляют другой арматурой, их не считаем
         private readonly string _paramForRebarShell = "обр_ФОП_Форма_номер";
         private readonly int _paramValueForRebarShell = 10000;
 
         private List<Element> _elementsForAnalize;
-
-        // TODO в дальнейшем поля выполнить через настройки и отдельный класс
-        private readonly List<string> _paramsForAll = new List<string>() {
-            "обр_ФОП_Марка ведомости расхода",
-            "обр_ФОП_Раздел проекта",
-            "обр_ФОП_Орг. уровень"
-        };
+        private readonly List<string> _paramsForAll;
 
 
         public DesignTypeListAnalyzer(RevitRepository revitRepository, ParamUtils paramUtils, ElementFactory elementFactory) {
             _revitRepository = revitRepository;
             _paramUtils = paramUtils;
             _elementFactory = elementFactory;
+
+            _paramsForAll = new List<string>() {
+                _costsSpecMark,
+                _documentationSet,
+                _section,
+                _organizationalLevel
+            };
         }
 
         /// <summary>
@@ -61,7 +67,7 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
                         continue;
                     }
 
-                    // Если значение параметра указывает, что это облочка, то пропускаем, этот элемент не участвует в расчетах
+                    // Если значение параметра указывает, что это оболочка, то пропускаем, этот элемент не участвует в расчетах
                     if(_paramUtils.GetParamValueAnywhere<int>(element, _paramForRebarShell) == _paramValueForRebarShell) {
                         continue;
                     }
@@ -73,21 +79,24 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
                 }
 
                 // Получение значений параметров, необходимых для распределения по типам конструкций
-                string typeName = element.GetParamValue<string>("обр_ФОП_Марка ведомости расхода");
+                string typeName = element.GetParamValue<string>(_costsSpecMark);
                 typeName = typeName ?? "";
-                string docPackage = element.GetParamValue<string>("обр_ФОП_Раздел проекта");
-                docPackage = docPackage ?? "";
                 // Сделали преобразование null в "" из-за того, что фильтрация в GUI иначе нормально не отрабатывает
-                bool aboveZero = element.GetParamValue<int>("обр_ФОП_Орг. уровень") > 0;
+                string docPackage = element.GetParamValue<string>(_documentationSet) ?? "";
+                string elemSection = element.GetParamValue<string>(_section) ?? "";
+                bool aboveZero = element.GetParamValue<int>(_organizationalLevel) > 0;
 
                 // Ищем подходящий тип конструкции среди уже существующих в списке
                 DesignTypeVM designType = designTypes.FirstOrDefault(
-                    e => e.TypeName == typeName && e.DocPackage == docPackage && e.AboveZero == aboveZero);
+                    e => e.TypeName == typeName
+                      && e.DocPackage == docPackage
+                      && e.ElemSection == elemSection
+                      && e.AboveZero == aboveZero);
 
                 // Если null, то создаем новый, если нет, то дописываем элемент в список уже существующего
                 ICommonElement specificElement = _elementFactory.CreateSpecificElement(element);
                 if(designType is null) {
-                    var newDesignType = new DesignTypeVM(typeName, docPackage, aboveZero, specificElement);
+                    var newDesignType = new DesignTypeVM(typeName, docPackage, elemSection, aboveZero, specificElement);
                     designTypes.Add(newDesignType);
                 } else {
                     designType.AddItem(specificElement);
