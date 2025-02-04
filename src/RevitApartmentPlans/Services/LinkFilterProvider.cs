@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
@@ -24,19 +23,7 @@ namespace RevitApartmentPlans.Services {
             var solid = GetCropSolid(activePlan);
             var transform = link.GetTransform();
             var box = solid.GetTransformedBoundingBox().TransformBoundingBox(transform.Inverse);
-            var t0 = new FilteredElementCollector(link.GetLinkDocument())
-                .WherePasses(new BoundingBoxIntersectsFilter(new Outline(box.Min, box.Max)));
-
-            var t01 = t0.WherePasses(new RoomFilter())
-                         .Cast<Room>()
-                         .Where(r => r.Area > 0 && r.IsExistsParamValue("Кем занято"))
-                         .ToArray();
-            var transformedSolid = SolidUtils.CreateTransformed(solid, transform.Inverse);
-            var t = new FilteredElementCollector(link.GetLinkDocument())
-                .WhereElementIsNotElementType()
-                .WherePasses(new ElementIntersectsSolidFilter(transformedSolid))
-                .WherePasses(new RoomFilter())
-                .ToElements();
+            // ElementIntersectsSolidFilter не фильтрует помещения
             return new FilteredElementCollector(link.GetLinkDocument())
                 .WherePasses(new BoundingBoxIntersectsFilter(new Outline(box.Min, box.Max)));
 #endif
