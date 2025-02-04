@@ -18,7 +18,9 @@ namespace RevitApartmentPlans.Services {
                 throw new ArgumentNullException(nameof(activePlan));
             }
 
-#if REVIT_2023_OR_LESS
+#if REVIT_2024_OR_GREATER
+            return new FilteredElementCollector(activePlan.Document, activePlan.Id, link.Id);
+#else
             var solid = GetCropSolid(activePlan);
             var transform = link.GetTransform();
             var box = solid.GetTransformedBoundingBox().TransformBoundingBox(transform.Inverse);
@@ -37,11 +39,10 @@ namespace RevitApartmentPlans.Services {
                 .ToElements();
             return new FilteredElementCollector(link.GetLinkDocument())
                 .WherePasses(new BoundingBoxIntersectsFilter(new Outline(box.Min, box.Max)));
-#else
-            return new FilteredElementCollector(activePlan.Document, activePlan.Id, link.Id);
 #endif
         }
 
+#if REVIT_2023_OR_LESS
         /// <summary>
         /// Строит солид путем выдавливания формы области подрезки от секущей плоскости вверх на 1 фут
         /// </summary>
@@ -91,5 +92,6 @@ namespace RevitApartmentPlans.Services {
 
             return viewRange.GetOffset(PlanViewPlane.CutPlane) + cutLevel.Elevation;
         }
+#endif
     }
 }
