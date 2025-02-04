@@ -35,7 +35,7 @@ namespace RevitApartmentPlans.ViewModels {
             get => _selectedParam;
             set {
                 RaiseAndSetIfChanged(ref _selectedParam, value);
-                UpdateApartments(value?.Name);
+                UpdateApartments(value?.Name, ProcessLinks);
             }
         }
 
@@ -45,11 +45,21 @@ namespace RevitApartmentPlans.ViewModels {
         public ObservableCollection<ParamViewModel> Parameters { get; }
 
 
-        private void UpdateApartments(string paramName) {
+        private bool _processLinks;
+        public bool ProcessLinks {
+            get => _processLinks;
+            set {
+                RaiseAndSetIfChanged(ref _processLinks, value);
+                UpdateApartments(SelectedParam?.Name, value);
+            }
+        }
+
+
+        private void UpdateApartments(string paramName, bool processLinks) {
             Apartments.Clear();
 
             if(!string.IsNullOrWhiteSpace(paramName)) {
-                ICollection<Apartment> apartments = _revitRepository.GetApartments(paramName);
+                ICollection<Apartment> apartments = _revitRepository.GetApartments(paramName, processLinks);
                 foreach(Apartment item in apartments) {
                     Apartments.Add(new ApartmentViewModel(item));
                 }
@@ -61,16 +71,14 @@ namespace RevitApartmentPlans.ViewModels {
             if(_revitRepository == null) { throw new ArgumentNullException(nameof(_revitRepository)); }
             if(Parameters == null) { throw new ArgumentNullException(nameof(Parameters)); }
 
-            string paramName = _pluginConfig.GetSettings(_revitRepository.Document)?.ParamName ?? string.Empty;
+            var settings = _pluginConfig.GetSettings(_revitRepository.Document);
+            string paramName = settings?.ParamName ?? string.Empty;
             SelectedParam = Parameters.FirstOrDefault(p => p.Name == paramName);
+            ProcessLinks = settings?.ProcessLinks ?? false;
         }
 
         private void ShowApartment(ApartmentViewModel apartmentViewModel) {
-            _revitRepository.ActiveUIDocument.Selection.SetElementIds(apartmentViewModel
-                .GetApartment()
-                .GetRooms()
-                .Select(r => r.Id)
-                .ToArray());
+            _revitRepository.ShowApartment(apartmentViewModel.GetApartment());
         }
 
         private bool CanShowApartment(ApartmentViewModel apartmentViewModel) {

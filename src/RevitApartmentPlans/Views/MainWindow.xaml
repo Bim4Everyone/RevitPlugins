@@ -115,7 +115,8 @@
             <dxe:CheckEdit EditValue="{Binding CopyDetail}"
                            Content="Копировать с детализацией"
                            Margin="5 0 0 0"/>
-            <dxe:CheckEdit EditValue="{Binding ProcessLinks}"
+            <dxe:CheckEdit
+                EditValue="{Binding ApartmentsViewModel.ProcessLinks}"
                            Content="Обрабатывать связи"
                            Margin="5 0 0 0"/>
         </DockPanel>

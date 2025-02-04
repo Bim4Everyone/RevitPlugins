@@ -91,12 +91,6 @@ namespace RevitApartmentPlans.ViewModels {
             set => RaiseAndSetIfChanged(ref _copyDetail, value);
         }
 
-        private bool _processLinks;
-        public bool ProcessLinks {
-            get => _processLinks;
-            set => RaiseAndSetIfChanged(ref _processLinks, value);
-
-        }
 
         private void LoadView() {
             LoadConfig();
@@ -170,7 +164,6 @@ namespace RevitApartmentPlans.ViewModels {
 
             OffsetMm = setting?.OffsetMm ?? _defaultOffsetMm;
             CopyDetail = setting?.CopyDetail ?? false;
-            ProcessLinks = setting?.ProcessLinks ?? false;
         }
 
         private void SaveConfig() {
@@ -180,7 +173,7 @@ namespace RevitApartmentPlans.ViewModels {
             setting.ParamName = ApartmentsViewModel?.SelectedParam?.Name ?? string.Empty;
             setting.ViewTemplates = ViewTemplatesViewModel?.ViewTemplates?.Select(t => t.GetTemplate().Id).ToArray();
             setting.CopyDetail = CopyDetail;
-            setting.ProcessLinks = ProcessLinks;
+            setting.ProcessLinks = ApartmentsViewModel?.ProcessLinks ?? false;
             _pluginConfig.SaveProjectConfig();
         }
     }

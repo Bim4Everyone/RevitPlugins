@@ -9,6 +9,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 
 using RevitApartmentPlans.Services;
 
@@ -34,17 +35,29 @@ namespace RevitApartmentPlans.Models {
 
 
         /// <summary>
-        /// Возвращает все замкнутые контуры границ помещения
+        /// Возвращает все замкнутые контуры границ помещения в координатах активного файла
         /// </summary>
         /// <param name="room">Помещение</param>
         /// <returns>Список всех замкнутых контуров границ помещения</returns>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public IList<CurveLoop> GetBoundaryCurveLoops(Room room) {
+        public IList<CurveLoop> GetBoundaryCurveLoops(RoomElement room) {
             if(room is null) { throw new ArgumentNullException(nameof(room)); }
 
-            return room.GetBoundarySegments(_spatialElementBoundaryOptions)
+            var boundaryLoops = room.Room.GetBoundarySegments(_spatialElementBoundaryOptions)
                 .Select(loop => CurveLoop.Create(loop.Select(c => c.GetCurve()).ToArray()))
                 .ToArray();
+            if(room.Transform.IsIdentity && boundaryLoops.Length > 0) {
+                return boundaryLoops;
+            } else {
+                UV point = new UV();
+                XYZ bottomDir = XYZ.BasisZ.Negate();
+                return room.Room.GetSolids()
+                    .SelectMany(s => s.Faces.OfType<PlanarFace>())
+                    .Where(f => f.ComputeNormal(point).IsAlmostEqualTo(bottomDir))
+                    .SelectMany(f => f.GetEdgesAsCurveLoops())
+                    .Select(c => CurveLoop.CreateViaTransform(c, room.Transform))
+                    .ToArray();
+            }
         }
 
         /// <summary>
@@ -94,10 +107,8 @@ namespace RevitApartmentPlans.Models {
         public ICollection<Apartment> GetApartments(string paramName) {
             if(string.IsNullOrWhiteSpace(paramName)) { throw new ArgumentException(nameof(paramName)); }
 
-            return GetRoomsFromActiveDoc(paramName)
-                .GroupBy(r => r.Room.GetParam(paramName).AsValueString())
-                .Select(g => new Apartment(g.ToArray(), g.Key))
-                .ToArray();
+            var rooms = GetRoomsFromActiveDoc(paramName);
+            return GetApartments(rooms, paramName);
         }
 
         public ICollection<Apartment> GetApartments(string paramName, bool processLinks) {
@@ -105,14 +116,13 @@ namespace RevitApartmentPlans.Models {
                 List<RoomElement> rooms = new List<RoomElement>(GetRoomsFromActiveDoc(paramName));
                 var visibleLinks = GetVisibleLinks(GetActiveViewPlan());
                 foreach(var link in visibleLinks) {
-                    var transform = link.GetTransform();
-                    rooms.AddRange(_linkFilterProvider.GetFilter(link, GetActiveViewPlan())
+                    rooms.AddRange(_linkFilterProvider.GetFilterOnView(link, GetActiveViewPlan())
                         .WherePasses(new RoomFilter())
                         .Cast<Room>()
                         .Where(r => r.Area > 0 && r.IsExistsParamValue(paramName))
-                        .Select(r => new RoomElement(r)));
+                        .Select(r => new RoomElement(r, link)));
                 }
-                return rooms.Group
+                return GetApartments(rooms, paramName);
             } else {
                 return GetApartments(paramName);
             }
@@ -141,7 +151,7 @@ namespace RevitApartmentPlans.Models {
         /// </summary>
         public Apartment GetDebugApartment() {
             var rooms = PickRooms();
-            return new Apartment(PickRooms(), "test", rooms.First().Level);
+            return new Apartment(PickRooms(), "test", rooms.First().Room.Level);
         }
 
         /// <summary>
@@ -230,6 +240,21 @@ namespace RevitApartmentPlans.Models {
                 ?? throw new InvalidOperationException("Активный вид не является планом");
         }
 
+        public void ShowApartment(Apartment apartment) {
+#if REVIT_2022_OR_LESS
+            ActiveUIDocument.Selection.SetElementIds(apartment
+                .GetRooms()
+                .Where(r => r.Transform.IsIdentity)
+                .Select(r => r.Room.Id)
+                .ToArray());
+#else
+            var references = apartment.GetRooms()
+                .Select(r => r.GetReference())
+                .ToArray();
+            ActiveUIDocument.Selection.SetReferences(references);
+#endif
+        }
+
 
         private ICollection<RevitLinkInstance> GetVisibleLinks(View view) {
             return new FilteredElementCollector(Document, view.Id)
@@ -251,6 +276,12 @@ namespace RevitApartmentPlans.Models {
                     && r.LevelId == level.Id
                     && r.IsExistsParamValue(paramName))
                 .Select(r => new RoomElement(r))
+                .ToArray();
+        }
+
+        private ICollection<Apartment> GetApartments(ICollection<RoomElement> rooms, string paramName) {
+            return rooms.GroupBy(r => r.Room.GetParamValue<string>(paramName))
+                .Select(g => new Apartment(g.ToArray(), g.Key))
                 .ToArray();
         }
 
@@ -278,17 +309,17 @@ namespace RevitApartmentPlans.Models {
         /// <summary>
         /// Метод для отладки. Возвращает помещения, выбранные в GUI Revit
         /// </summary>
-        private ICollection<Room> PickRooms() {
+        private ICollection<RoomElement> PickRooms() {
             ISelectionFilter filter = new SelectionFilterRooms(Document);
             IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
                 ObjectType.Element,
                 filter,
                 "Выберите помещения");
 
-            List<Room> rooms = new List<Room>();
+            List<RoomElement> rooms = new List<RoomElement>();
             foreach(var reference in references) {
                 if((reference != null) && (Document.GetElement(reference) is Room room) && (room.Area > 0)) {
-                    rooms.Add(room);
+                    rooms.Add(new RoomElement(room));
                 }
             }
             return rooms;

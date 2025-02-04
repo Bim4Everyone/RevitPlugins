@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 
 namespace RevitApartmentPlans.Services {
     internal class LinkFilterProvider {
-        public FilteredElementCollector GetFilter(RevitLinkInstance link, ViewPlan activePlan) {
+        public FilteredElementCollector GetFilterOnView(RevitLinkInstance link, ViewPlan activePlan) {
             if(link is null) {
                 throw new ArgumentNullException(nameof(link));
             }
@@ -19,9 +21,22 @@ namespace RevitApartmentPlans.Services {
 #if REVIT_2023_OR_LESS
             var solid = GetCropSolid(activePlan);
             var transform = link.GetTransform();
+            var box = solid.GetTransformedBoundingBox().TransformBoundingBox(transform.Inverse);
+            var t0 = new FilteredElementCollector(link.GetLinkDocument())
+                .WherePasses(new BoundingBoxIntersectsFilter(new Outline(box.Min, box.Max)));
+
+            var t01 = t0.WherePasses(new RoomFilter())
+                         .Cast<Room>()
+                         .Where(r => r.Area > 0 && r.IsExistsParamValue("Кем занято"))
+                         .ToArray();
             var transformedSolid = SolidUtils.CreateTransformed(solid, transform.Inverse);
+            var t = new FilteredElementCollector(link.GetLinkDocument())
+                .WhereElementIsNotElementType()
+                .WherePasses(new ElementIntersectsSolidFilter(transformedSolid))
+                .WherePasses(new RoomFilter())
+                .ToElements();
             return new FilteredElementCollector(link.GetLinkDocument())
-                .WherePasses(new ElementIntersectsSolidFilter(transformedSolid));
+                .WherePasses(new BoundingBoxIntersectsFilter(new Outline(box.Min, box.Max)));
 #else
             return new FilteredElementCollector(activePlan.Document, activePlan.Id, link.Id);
 #endif
@@ -43,7 +58,7 @@ namespace RevitApartmentPlans.Services {
         /// </summary>
         private IList<CurveLoop> GetShape(ViewPlan viewPlan, double z) {
             var shape = viewPlan.GetCropRegionShapeManager().GetCropShape().Select(loop => CopyToZ(loop, z)).ToArray();
-            if(shape is null) {
+            if(shape is null || shape.Length == 0) {
                 var box = viewPlan.GetBoundingBox();
 
                 var bottomLeft = new XYZ(box.Min.X, box.Min.Y, z);
@@ -74,7 +89,7 @@ namespace RevitApartmentPlans.Services {
             // поэтому берем уровень секущей плоскости
             var cutLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.CutPlane)) as Level;
 
-            return viewRange.GetOffset(PlanViewPlane.BottomClipPlane) + cutLevel.Elevation;
+            return viewRange.GetOffset(PlanViewPlane.CutPlane) + cutLevel.Elevation;
         }
     }
 }
