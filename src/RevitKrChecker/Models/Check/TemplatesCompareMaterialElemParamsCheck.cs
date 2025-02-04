@@ -80,14 +80,12 @@ namespace RevitKrChecker.Models.Check {
 
 
         private string GetDictForCompareAsStr() {
-            string answer = string.Empty;
             string separator = ", ";
 
-            foreach(string dictKey in DictForCompare.Keys) {
-                answer += $"{dictKey}: {DictForCompare[dictKey]}{separator}";
-            }
-            answer = answer.Substring(0, answer.LastIndexOf(separator));
-            return answer;
+            List<string> pairs = DictForCompare.Keys
+                .Select(key => $"\"{key}\": \"{DictForCompare[key]}\"")
+                .ToList();
+            return string.Join(separator, pairs);
         }
 
         public string GetTooltip() {

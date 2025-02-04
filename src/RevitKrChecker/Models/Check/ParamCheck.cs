@@ -63,14 +63,10 @@ namespace RevitKrChecker.Models.Check {
         }
 
         private string GetTrueValuesAsStr() {
-            string answer = string.Empty;
             string separator = ", ";
-
-            foreach(string trueValue in TrueValues) {
-                answer += $"{trueValue}{separator}";
-            }
-            answer = answer.Substring(0, answer.LastIndexOf(separator));
-            return answer;
+            return string.Join(separator,
+                TrueValues
+                .Select(val => $"\"{val}\""));
         }
 
         public string GetTooltip() {
