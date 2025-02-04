@@ -26,7 +26,7 @@
         <dxmvvm:EventToCommand EventName="Loaded"
                                Command="{Binding LoadViewCommand}" />
         <common:AttachServiceBehavior AttachableService="{Binding ProgressDialogFactory}" />
-        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
+        <common:AttachServiceBehavior AttachableService="{Binding ApartmentsViewModel.MessageBoxService}" />
     </dxmvvm:Interaction.Behaviors>
 
     <Window.Resources>
@@ -90,7 +90,7 @@
 
         <DockPanel Grid.Row="0"
                    Margin="5"
-                   HorizontalAlignment="Left">
+                   HorizontalAlignment="Stretch">
             <TextBlock Text="Отступ: "
                        TextAlignment="Center"
                        VerticalAlignment="Center" />
@@ -119,6 +119,25 @@
                 EditValue="{Binding ApartmentsViewModel.ProcessLinks}"
                            Content="Обрабатывать связи"
                            Margin="5 0 0 0"/>
+            <DockPanel HorizontalAlignment="Right">
+                <DockPanel.Resources>
+                    <Style TargetType="dx:SimpleButton">
+                            <Setter Property="Visibility"
+                                    Value="Hidden" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ApartmentsViewModel.ShowWarningButton}"
+                                         Value="True">
+                                <Setter Property="Visibility"
+                                        Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DockPanel.Resources>
+                <dx:SimpleButton Width="25"
+                                 Height="25"
+                                 Glyph="{dx:DXImage 'Images/Status/Warning_16x16.png'}"
+                                 Command="{Binding ApartmentsViewModel.ShowWarningCommand}" />
+            </DockPanel>
         </DockPanel>
 
         <Grid Grid.Row="1"

@@ -57,7 +57,7 @@ namespace RevitApartmentPlans {
                     .InSingletonScope();
 
                 kernel.UseXtraProgressDialog<MainViewModel>();
-                kernel.UseXtraMessageBox<MainViewModel>();
+                kernel.UseXtraMessageBox<ApartmentsViewModel>();
                 kernel.Bind<ApartmentsViewModel>()
                     .ToSelf()
                     .InSingletonScope();

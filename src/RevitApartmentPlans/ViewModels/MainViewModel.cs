@@ -12,7 +12,6 @@ namespace RevitApartmentPlans.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-        private readonly IMessageBoxService _messageBoxService;
         private readonly IViewPlanCreationService _viewPlanCreationService;
         private readonly ILengthConverter _lengthConverter;
         private readonly IProgressDialogFactory _progressDialogFactory;
@@ -37,7 +36,6 @@ namespace RevitApartmentPlans.ViewModels {
             RevitRepository revitRepository,
             ViewTemplatesViewModel viewTemplatesViewModel,
             ApartmentsViewModel apartmentsViewModel,
-            IMessageBoxService messageBoxService,
             IViewPlanCreationService viewPlanCreationService,
             ILengthConverter lengthConverter,
             IProgressDialogFactory progressDialogFactory
@@ -51,8 +49,6 @@ namespace RevitApartmentPlans.ViewModels {
                 ?? throw new System.ArgumentNullException(nameof(viewTemplatesViewModel));
             ApartmentsViewModel = apartmentsViewModel
                 ?? throw new System.ArgumentNullException(nameof(apartmentsViewModel));
-            _messageBoxService = messageBoxService
-                ?? throw new System.ArgumentNullException(nameof(messageBoxService));
             _viewPlanCreationService = viewPlanCreationService
                 ?? throw new System.ArgumentNullException(nameof(viewPlanCreationService));
             _lengthConverter = lengthConverter
@@ -64,7 +60,7 @@ namespace RevitApartmentPlans.ViewModels {
         }
 
         public IProgressDialogFactory ProgressDialogFactory => _progressDialogFactory;
-        public IMessageBoxService MessageBoxService => _messageBoxService;
+
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
