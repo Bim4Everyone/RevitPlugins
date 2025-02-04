@@ -280,8 +280,9 @@ namespace RevitApartmentPlans.Models {
         }
 
         private ICollection<Apartment> GetApartments(ICollection<RoomElement> rooms, string paramName) {
+            var level = GetLevelOfActivePlan();
             return rooms.GroupBy(r => r.Room.GetParamValue<string>(paramName))
-                .Select(g => new Apartment(g.ToArray(), g.Key))
+                .Select(g => new Apartment(g.ToArray(), g.Key, level))
                 .ToArray();
         }
 

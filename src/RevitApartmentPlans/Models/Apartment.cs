@@ -35,9 +35,6 @@ namespace RevitApartmentPlans.Models {
             LevelId = level.Id;
         }
 
-        public Apartment(ICollection<RoomElement> rooms, string name) : this(rooms, name, rooms.First().Room.Level) {
-        }
-
 
         /// <summary>
         /// Номер квартиры
