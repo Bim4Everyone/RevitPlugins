@@ -16,8 +16,11 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public CompareMaterialParamsCheck(CompareCheckOptions checkOptions, ILocalizationService localizationService) {
+        public CompareMaterialParamsCheck(CompareCheckOptions checkOptions,
+                                          ILocalizationService localizationService,
+                                          ParamValueService paramValueService) {
             _localizationService = localizationService;
+            _paramService = paramValueService;
 
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
@@ -26,7 +29,7 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             // Проверяем, что параметр для проверке на уровне материала
             TargetParamLevel = checkOptions.TargetParamLevel != ParamLevel.Material
-                ? throw new ArgumentException("Проверка предусмотрена только для проверки параметра материала")
+                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForElementParameter"))
                 : checkOptions.TargetParamLevel;
 
             CheckRule = checkOptions.CheckRule
@@ -37,8 +40,6 @@ namespace RevitKrChecker.Models.Check {
             SourceParamLevel = checkOptions.SourceParamLevel != ParamLevel.Material
                 ? throw new ArgumentException("Проверка предусмотрена только для проверки c параметрами материала")
                 : checkOptions.SourceParamLevel;
-
-            _paramService = new ParamValueService();
         }
 
         public string CheckName { get; }

@@ -15,8 +15,11 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public ParamCheck(ParamCheckOptions checkOptions, ILocalizationService localizationService) {
+        public ParamCheck(ParamCheckOptions checkOptions,
+                          ILocalizationService localizationService,
+                          ParamValueService paramValueService) {
             _localizationService = localizationService;
+            _paramService = paramValueService;
 
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
@@ -29,8 +32,6 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckRule));
             TrueValues = checkOptions.TrueValues
                 ?? throw new ArgumentNullException(nameof(checkOptions.TrueValues));
-
-            _paramService = new ParamValueService();
         }
 
 

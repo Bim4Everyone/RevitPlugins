@@ -2,8 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
-    <!-- Пример перевода на английский американский язык (google translate) -->
-
     <system:String x:Key="MainWindow.Title">Check model</system:String>
     <system:String x:Key="MainWindow.GetFromView">Get elements from view</system:String>
     <system:String x:Key="MainWindow.GetFromProject">Get items from the entire project</system:String>
@@ -32,4 +30,11 @@
     <system:String x:Key="ReportWindow.NotContains">not contains</system:String>
     <system:String x:Key="ReportWindow.StartsWith">Starts with</system:String>
     <system:String x:Key="ReportWindow.NotStartsWith">not starts with</system:String>
+
+    <system:String x:Key="ReportWindow.CheckNotForMaterialParameter">The check is not provided for checking the material parameter</system:String>
+    <system:String x:Key="ReportWindow.CheckNotForElementParameter">The check is not provided for checking the instance or type parameter</system:String>
+    <system:String x:Key="ReportWindow.CheckNotForCompareWithElementParameter">The check is not intended for comparison with instance or type parameters</system:String>
+    <system:String x:Key="ReportWindow.CheckNotForCompareWithMaterialParameter">The check is not intended for comparison with material parameters</system:String>
+
+    <system:String x:Key="ReportWindow.SetUnknownParameterLevel">Unknown parameter level specified</system:String>
 </ResourceDictionary>

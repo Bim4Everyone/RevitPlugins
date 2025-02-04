@@ -15,6 +15,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitKrChecker.Models;
+using RevitKrChecker.Models.Services;
 using RevitKrChecker.ViewModels;
 using RevitKrChecker.Views;
 using RevitKrChecker.Views.Converters;
@@ -28,6 +29,10 @@ namespace RevitKrChecker {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<ParamValueService>()
+                    .ToSelf()
+                    .InSingletonScope();
+
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();

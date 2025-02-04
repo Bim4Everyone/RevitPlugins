@@ -5,11 +5,18 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitKrChecker.Models.Interfaces;
 
 namespace RevitKrChecker.Models.Services {
-    internal class ParamValueService {
+    public class ParamValueService {
+        private readonly ILocalizationService _localizationService;
+
+        public ParamValueService(ILocalizationService localizationService) {
+            _localizationService = localizationService;
+        }
+
         public string GetParamValueToCheck(Element element, string paramName, ParamLevel paramLevel) {
             Document doc = element.Document;
             switch(paramLevel) {
@@ -24,7 +31,9 @@ namespace RevitKrChecker.Models.Services {
                         .Select(material => material.GetParam(paramName).AsValueString())
                         .FirstOrDefault();
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(paramLevel), "Задан неизвестный уровень параметра");
+                    throw new ArgumentOutOfRangeException(
+                        nameof(paramLevel),
+                        _localizationService.GetLocalizedString("ReportWindow.SetUnknownParameterLevel"));
             }
         }
 
@@ -46,7 +55,9 @@ namespace RevitKrChecker.Models.Services {
                         .Select(material => material.GetParam(paramName).AsValueString())
                         .ToList();
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(paramLevel), "Задан неизвестный уровень параметра");
+                    throw new ArgumentOutOfRangeException(
+                        nameof(paramLevel),
+                        _localizationService.GetLocalizedString("ReportWindow.SetUnknownParameterLevel"));
             }
         }
 

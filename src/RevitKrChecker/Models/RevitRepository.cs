@@ -11,10 +11,12 @@ using RevitKrChecker.Models.Check;
 using RevitKrChecker.Models.CheckOptions;
 using RevitKrChecker.Models.CheckRule;
 using RevitKrChecker.Models.Interfaces;
+using RevitKrChecker.Models.Services;
 
 namespace RevitKrChecker.Models {
     internal class RevitRepository {
         private readonly ILocalizationService _localizationService;
+        private readonly ParamValueService _paramValueService;
 
         private readonly List<BuiltInCategory> _categoriesForWork = new List<BuiltInCategory>() {
             BuiltInCategory.OST_Walls,
@@ -29,9 +31,12 @@ namespace RevitKrChecker.Models {
         };
 
 
-        public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
+        public RevitRepository(UIApplication uiApplication,
+                               ILocalizationService localizationService,
+                               ParamValueService paramValueService) {
             UIApplication = uiApplication;
             _localizationService = localizationService;
+            _paramValueService = paramValueService;
         }
 
         public UIApplication UIApplication { get; }
@@ -73,7 +78,8 @@ namespace RevitKrChecker.Models {
                         "Балка", "ЛМарш", "ЛПлощадка", "Парапет", "БПодготовка", "Подстилающий слой", "Колонна", "Пилон", "Свая", "Бортик",
                         "Термовкладыш", "Перекрытие", "Покрытие", "Засыпка", "Капитель", "Изоляция", "Стена", "Подпорная стена", "ФПлита" }
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             return stoppingChecks;
         }
@@ -90,7 +96,8 @@ namespace RevitKrChecker.Models {
                     CheckRule = new ContainsCheckRule(_localizationService),
                     TrueValues = new List<string>() { "Корпус", "Автостоянка", "Пристройка" }
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Параметр "Секция СМР" должен быть заполнен
             nonStoppingChecks.Add(new HasValueCheck(
@@ -99,7 +106,8 @@ namespace RevitKrChecker.Models {
                     TargetParamName = "ФОП_Секция СМР",
                     TargetParamLevel = ParamLevel.Instance
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Параметр "Этаж СМР" должен быть заполнен
             nonStoppingChecks.Add(new HasValueCheck(
@@ -108,7 +116,8 @@ namespace RevitKrChecker.Models {
                     TargetParamName = "ФОП_Этаж СМР",
                     TargetParamLevel = ParamLevel.Instance
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Параметр "Материал: Имя" начинается с: г02.02, г02.03, г02.04
             nonStoppingChecks.Add(new ParamCheck(
@@ -119,7 +128,8 @@ namespace RevitKrChecker.Models {
                     CheckRule = new StartWithCheckRule(_localizationService),
                     TrueValues = new List<string>() { "г02.02", "г02.03", "г02.04" }
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Параметр "Материал: Ключевая заметка" начинается с: г02.02, г02.03, г02.04
             nonStoppingChecks.Add(new ParamCheck(
@@ -130,7 +140,8 @@ namespace RevitKrChecker.Models {
                     CheckRule = new StartWithCheckRule(_localizationService),
                     TrueValues = new List<string>() { "г02.02", "г02.03", "г02.04" }
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Параметр "Материал: Описание" заполнен
             nonStoppingChecks.Add(new HasValueCheck(
@@ -139,7 +150,8 @@ namespace RevitKrChecker.Models {
                     TargetParamName = "Описание",
                     TargetParamLevel = ParamLevel.Material
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Параметр "ФОП_МТР_Наименование главы" равно: "Устройство фундамента", "Конструкции до отм. +/-0,000"
             // или "Конструкции выше отм. +/-0,000"
@@ -155,7 +167,8 @@ namespace RevitKrChecker.Models {
                         "Конструкции выше отм. +/-0,000"
                     }
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Параметр "ФОП_МТР_Наименование работы" должен быть заполнен
             nonStoppingChecks.Add(new HasValueCheck(
@@ -164,7 +177,8 @@ namespace RevitKrChecker.Models {
                     TargetParamName = "ФОП_МТР_Наименование работы",
                     TargetParamLevel = ParamLevel.Material
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Параметр "ФОП_МТР_Единица измерения" должен быть равен: "м", "м²", "м³", "шт."
             nonStoppingChecks.Add(new ParamCheck(
@@ -180,7 +194,8 @@ namespace RevitKrChecker.Models {
                                     "шт."
                     }
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Параметр "ФОП_МТР_Тип подсчета" должен быть равен "1", "2", "3", "4"
             nonStoppingChecks.Add(new ParamCheck(
@@ -196,7 +211,8 @@ namespace RevitKrChecker.Models {
                                                 "4"
                     }
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Значение параметра "Материал: Описание" содержится в "Материал: Имя"
             // Параметр "Материал: Имя" содержит параметр "Материал: Описание"
@@ -209,7 +225,8 @@ namespace RevitKrChecker.Models {
                     SourceParamName = "Описание",
                     SourceParamLevel = ParamLevel.Material,
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Код работы в "Материал: Ключевая пометка" соответствует коду работы в "Материал: Имя" (содержится в нем)
             // Параметр "Материал: Имя" содержит параметр "Материал: Ключевая пометка"
@@ -222,7 +239,8 @@ namespace RevitKrChecker.Models {
                     SourceParamName = "Ключевая пометка",
                     SourceParamLevel = ParamLevel.Material,
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // [ФОП_МТР_Единица измерения] соответствует [ФОП_МТР_Тип подсчета]:
             // ед.изм. "м" - подсчет "1";
@@ -246,7 +264,8 @@ namespace RevitKrChecker.Models {
                     },
                     DictForCompareRule = new EqualCheckRule(_localizationService)
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Код работы в "Материал: Ключевая пометка" соответствует "Имени типа" элемента:
             // код СОДЕРЖИТ "г02.02." - имя начинается "Ф_";
@@ -268,7 +287,8 @@ namespace RevitKrChecker.Models {
                     },
                     DictForCompareRule = new ContainsCheckRule(_localizationService)
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             // Код работы в [Материал: Ключевая пометка] соответствует [Материал: ФОП_МТР_Наименование главы]:
             // код СОДЕРЖИТ  "г02.02." - глава равно "Устройство фундамента";
@@ -291,7 +311,8 @@ namespace RevitKrChecker.Models {
                     },
                     DictForCompareRule = new ContainsCheckRule(_localizationService)
                 },
-                _localizationService));
+                _localizationService,
+                _paramValueService));
 
             return nonStoppingChecks;
         }

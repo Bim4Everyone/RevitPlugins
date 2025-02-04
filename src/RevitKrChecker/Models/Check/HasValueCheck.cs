@@ -14,15 +14,16 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public HasValueCheck(HasValueCheckOptions checkOptions, ILocalizationService localizationService) {
+        public HasValueCheck(HasValueCheckOptions checkOptions,
+                             ILocalizationService localizationService,
+                             ParamValueService paramValueService) {
             _localizationService = localizationService;
+            _paramService = paramValueService;
 
             CheckName = checkOptions.CheckName ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
 
             TargetParamName = checkOptions.TargetParamName ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             TargetParamLevel = checkOptions.TargetParamLevel;
-
-            _paramService = new ParamValueService();
         }
 
 

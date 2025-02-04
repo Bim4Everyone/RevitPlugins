@@ -16,8 +16,11 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public TemplatesCompareMaterialParamsCheck(TemplatesCompareCheckOptions checkOptions, ILocalizationService localizationService) {
+        public TemplatesCompareMaterialParamsCheck(TemplatesCompareCheckOptions checkOptions,
+                                                   ILocalizationService localizationService,
+                                                   ParamValueService paramValueService) {
             _localizationService = localizationService;
+            _paramService = paramValueService;
 
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
@@ -25,7 +28,7 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             // Проверяем, что параметр для проверке на уровне материала
             TargetParamLevel = checkOptions.TargetParamLevel != ParamLevel.Material
-                ? throw new ArgumentException("Проверка предусмотрена только для проверки параметра материала")
+                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForElementParameter"))
                 : checkOptions.TargetParamLevel;
 
             CheckRule = checkOptions.CheckRule
@@ -34,14 +37,12 @@ namespace RevitKrChecker.Models.Check {
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
             SourceParamLevel = checkOptions.SourceParamLevel != ParamLevel.Material
-                ? throw new ArgumentException("Проверка не предусмотрена для проверки c параметрами не материала")
+                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForCompareWithElementParameter"))
                 : checkOptions.SourceParamLevel;
 
             DictForCompare = checkOptions.DictForCompare
                 ?? throw new ArgumentNullException(nameof(checkOptions.DictForCompare));
             DictForCompareRule = checkOptions.DictForCompareRule;
-
-            _paramService = new ParamValueService();
         }
 
         public string CheckName { get; }

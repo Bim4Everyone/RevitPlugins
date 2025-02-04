@@ -16,8 +16,11 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public CompareMaterialElemParamsCheck(CompareCheckOptions checkOptions, ILocalizationService localizationService) {
+        public CompareMaterialElemParamsCheck(CompareCheckOptions checkOptions,
+                                              ILocalizationService localizationService,
+                                              ParamValueService paramValueService) {
             _localizationService = localizationService;
+            _paramService = paramValueService;
 
             CheckName = checkOptions.CheckName
                 ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
@@ -26,7 +29,7 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             // Проверяем, что параметр для проверки на уровне материала
             TargetParamLevel = checkOptions.TargetParamLevel != ParamLevel.Material
-                ? throw new ArgumentException("Проверка предусмотрена только для проверки параметра материала")
+                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForElementParameter"))
                 : checkOptions.TargetParamLevel;
 
             CheckRule = checkOptions.CheckRule
@@ -35,10 +38,8 @@ namespace RevitKrChecker.Models.Check {
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
             SourceParamLevel = checkOptions.SourceParamLevel is ParamLevel.Material
-                ? throw new ArgumentException("Проверка не предусмотрена для проверки c параметрами материала")
+                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForCompareWithMaterialParameter"))
                 : checkOptions.SourceParamLevel;
-
-            _paramService = new ParamValueService();
         }
 
 
