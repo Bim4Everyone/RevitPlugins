@@ -67,4 +67,10 @@
 
     <system:String
         x:Key="SelectLocalFoldersDialog.Title">Выберите папки со связями для обновления</system:String>
+
+    <system:String
+        x:Key="RsOpenFileWindow.Title">Выберите модели с Revit Server</system:String>
+    
+    <system:String
+        x:Key="RsOpenFolderWindow.Title">Выберите папку с Revit Server</system:String>
 </ResourceDictionary>
