@@ -15,6 +15,7 @@ namespace RevitMarkingElements.Views {
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
+            this.Close();
         }
     }
 }

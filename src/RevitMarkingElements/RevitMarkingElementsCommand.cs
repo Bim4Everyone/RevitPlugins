@@ -1,14 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -34,6 +28,14 @@ namespace RevitMarkingElements {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                Document document = uiApplication.ActiveUIDocument.Document;
+                View activeView = document.ActiveView;
+
+                if(!SelectedElementOnView(activeView)) {
+                    TaskDialog.Show("Ошибка", "Необходимо выбрать элементы на виде.");
+                    return;
+                }
+
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
@@ -56,6 +58,15 @@ namespace RevitMarkingElements {
 
                 Notification(kernel.Get<MainWindow>());
             }
+        }
+
+        private bool SelectedElementOnView(View view) {
+            UIApplication uiApp = new UIApplication(view.Document.Application);
+            UIDocument uiDoc = uiApp.ActiveUIDocument;
+
+            ICollection<ElementId> selectedIds = uiDoc.Selection.GetElementIds();
+
+            return selectedIds.Count > 0;
         }
     }
 }

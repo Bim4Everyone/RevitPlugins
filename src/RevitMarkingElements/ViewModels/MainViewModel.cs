@@ -201,15 +201,15 @@ namespace RevitMarkingElements.ViewModels {
                     continue;
 
                 var elementsOnLine = _revitRepository
-                    .GetElementsIntersectingLine(elements, line)
+                    .GetElementsIntersectingLine(elements, line.GeometryCurve)
                     .OrderBy(element => {
                         var point = _revitRepository.GetElementCoordinates(element);
-                        return lineCurve.Project(point)?.Parameter ?? double.MaxValue;
+                        var projection = lineCurve.Project(point);
+                        return projection?.Parameter ?? double.MaxValue;
                     })
                     .ToList();
 
                 sortedElements.AddRange(elementsOnLine);
-
             }
 
             return sortedElements;
@@ -249,7 +249,7 @@ namespace RevitMarkingElements.ViewModels {
             LoadCategories();
 
             var lineNumberingLabel = _localizationService.GetLocalizedString("MainWindow.LineNumberingLabel");
-            LineNumberingContent = $"{lineNumberingLabel} () ";
+            LineNumberingContent = $"{lineNumberingLabel} (0) ";
         }
 
         private void AcceptView() {

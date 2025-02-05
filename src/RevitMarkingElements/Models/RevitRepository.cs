@@ -1,3 +1,5 @@
+// Ignore Spelling: bbox
+
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,6 +14,7 @@ using dosymep.SimpleServices;
 
 namespace RevitMarkingElements.Models {
     internal class RevitRepository {
+
         private readonly ILocalizationService _localizationService;
         public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
             UIApplication = uiApplication;
@@ -41,23 +44,72 @@ namespace RevitMarkingElements.Models {
             return categories;
         }
 
-        public List<Element> GetElementsIntersectingLine(List<Element> elements, CurveElement lineElement) {
-            var line = lineElement.GeometryCurve;
-            if(line == null) {
-                return new List<Element>();
+        public List<Element> GetElementsIntersectingLine(List<Element> elements, Curve lineElement) {
+            List<Element> intersectingElements = new List<Element>();
+
+            foreach(var element in elements) {
+                GeometryElement geometryElement = element.get_Geometry(new Options());
+                if(geometryElement == null)
+                    continue;
+
+                bool isIntersecting = false;
+
+                foreach(GeometryObject geometryObject in geometryElement) {
+                    if(geometryObject is GeometryInstance geometryInstance) {
+                        GeometryElement instanceGeometry = geometryInstance.GetInstanceGeometry();
+
+                        foreach(GeometryObject instanceGeoObj in instanceGeometry) {
+                            if(instanceGeoObj is Solid solid) {
+                                if(solid.Faces.IsEmpty) {
+                                    continue;
+                                }
+                                Transform flattenTransform = Transform.CreateTranslation(new XYZ(0, 0, -solid.ComputeCentroid().Z));
+                                Solid flattenedSolid = SolidUtils.CreateTransformed(solid, flattenTransform);
+
+                                SolidCurveIntersectionOptions options = new SolidCurveIntersectionOptions {
+                                    ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
+                                };
+
+                                SolidCurveIntersection intersection = flattenedSolid.IntersectWithCurve(lineElement, options);
+
+                                if(intersection.SegmentCount > 0) {
+                                    for(int i = 0; i < intersection.SegmentCount; i++) {
+                                        Curve intersectedSegment = intersection.GetCurveSegment(i);
+
+                                        if(intersectedSegment.Length > 0.1) {
+                                            isIntersecting = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if(instanceGeoObj is Line line) {
+                                XYZ elementStart = new XYZ(line.GetEndPoint(0).X, line.GetEndPoint(0).Y, 0);
+                                XYZ elementEnd = new XYZ(line.GetEndPoint(1).X, line.GetEndPoint(1).Y, 0);
+
+                                if(elementStart.DistanceTo(elementEnd) < 0.1) {
+                                    continue;
+                                }
+
+                                Line projectedElementLine = Line.CreateBound(elementStart, elementEnd);
+                                SetComparisonResult result = lineElement.Intersect(projectedElementLine);
+                                if(result == SetComparisonResult.Overlap || result == SetComparisonResult.Subset) {
+                                    isIntersecting = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if(isIntersecting) {
+                    intersectingElements.Add(element);
+                }
             }
 
-            return elements.Where(element => {
-                var bbox = element.get_BoundingBox(null);
-                if(bbox == null)
-                    return false;
-
-                var center = (bbox.Min + bbox.Max) / 2.0;
-                // расстояние когда линия визуально и в действительности пересекает объект
-                var lineToObjectDistance = 13.3;
-                return line.Project(center)?.Distance < lineToObjectDistance;
-            }).ToList();
+            return intersectingElements;
         }
+
 
         public List<CurveElement> SelectLinesOnView() {
             var selectedLines = new List<CurveElement>();
