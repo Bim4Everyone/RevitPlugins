@@ -1,5 +1,3 @@
-// Ignore Spelling: bbox
-
 using System.Collections.Generic;
 using System.Linq;
 
@@ -117,7 +115,8 @@ namespace RevitMarkingElements.Models {
             var finishLineSelection = _localizationService.GetLocalizedString("MainWindow.FinishLineSelection");
             var isDone = false;
 
-
+            //Данная реализация была выбрана для того что бы получить объекты именно в том порядке
+            //в котором они были выбраны на виде. PickObjects не подходит т.к. возвращает элементы в порядке их размещения на виде
             while(!isDone) {
                 try {
                     var reference = ActiveUIDocument.Selection.PickObject(
@@ -137,10 +136,6 @@ namespace RevitMarkingElements.Models {
             }
 
             return selectedLines.Distinct(new CurveElementComparer()).ToList();
-        }
-
-        public Transaction CreateTransaction(string transactionName) {
-            return new Transaction(Document, transactionName);
         }
 
         public List<Element> GetElements(ElementId categoryId) {

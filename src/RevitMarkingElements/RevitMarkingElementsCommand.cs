@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -23,7 +25,7 @@ namespace RevitMarkingElements {
     [Transaction(TransactionMode.Manual)]
     public class RevitMarkingElementsCommand : BasePluginCommand {
         public RevitMarkingElementsCommand() {
-            PluginName = "RevitMarkingElements";
+            PluginName = "Маркировка элементов";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -31,18 +33,8 @@ namespace RevitMarkingElements {
                 Document document = uiApplication.ActiveUIDocument.Document;
                 View activeView = document.ActiveView;
 
-                if(!SelectedElementOnView(activeView)) {
-                    TaskDialog.Show("Ошибка", "Необходимо выбрать элементы на виде.");
-                    return;
-                }
-
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
-
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
-
+                kernel.Bind<RevitRepository>().ToSelf().InSingletonScope();
+                kernel.Bind<PluginConfig>().ToMethod(c => PluginConfig.GetPluginConfig());
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.DataContext),
@@ -51,22 +43,55 @@ namespace RevitMarkingElements {
                         c => c.Kernel.Get<ILocalizationService>());
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-
                 kernel.UseXtraLocalization(
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
 
+                ValidateSelectedElements(kernel, activeView);
+                ValidateCategories(kernel, document);
                 Notification(kernel.Get<MainWindow>());
             }
         }
 
-        private bool SelectedElementOnView(View view) {
+        private List<ElementId> GetSelectedElements(View view) {
             UIApplication uiApp = new UIApplication(view.Document.Application);
             UIDocument uiDoc = uiApp.ActiveUIDocument;
+            return uiDoc.Selection.GetElementIds().ToList();
+        }
 
-            ICollection<ElementId> selectedIds = uiDoc.Selection.GetElementIds();
+        private void ValidateSelectedElements(IKernel kernel, View view) {
+            var selectedIds = GetSelectedElements(view);
 
-            return selectedIds.Count > 0;
+            if(selectedIds.Count == 0) {
+                ShowError(kernel, "GeneralSettings.ErrorNoSelectedElements");
+            }
+        }
+
+        private void ValidateCategories(IKernel kernel, Document document) {
+            var selectedIds = GetSelectedElements(document.ActiveView);
+            var revitRepository = kernel.Get<RevitRepository>();
+            var allCategories = revitRepository.GetCategoriesWithMarkParam(BuiltInParameter.ALL_MODEL_MARK);
+
+            var elementCategories = selectedIds
+                .Select(id => document.GetElement(id)?.Category)
+                .Where(category => category != null)
+                .Distinct()
+                .ToList();
+
+            bool hasValidCategory = elementCategories.Any(category => allCategories.Any(c => c.Id == category.Id));
+
+            if(!hasValidCategory) {
+                ShowError(kernel, "GeneralSettings.CategoryMismatch");
+            }
+        }
+
+        private void ShowError(IKernel kernel, string messageKey) {
+            var localizationService = kernel.Get<ILocalizationService>();
+            string title = localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
+            string message = localizationService.GetLocalizedString(messageKey);
+
+            TaskDialog.Show(title, message);
+            throw new OperationCanceledException();
         }
     }
 }

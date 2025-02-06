@@ -23,5 +23,9 @@
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String x:Key="MainWindow.FinishLineSelection">"Press Esc to complete line selection"</system:String>
     <system:String x:Key="MainWindow.StartNumbericFrom">Start numbering with a number.</system:String>
-    <system:String x:Key="MainWindow.ErrorNoSelectedElements">Need select elements on view</system:String>
+    
+    <system:String x:Key="GeneralSettings.ErrorNoSelectedElements">Need select elements on view</system:String>
+    <system:String x:Key="GeneralSettings.ErrorMessage">Error</system:String>
+    <system:String x:Key="GeneralSettings.CategoryMismatch">The selected elements do not belong to the supported categories.</system:String>
+
 </ResourceDictionary>

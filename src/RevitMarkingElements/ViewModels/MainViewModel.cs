@@ -1,5 +1,3 @@
-// Ignore Spelling: bbox
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -163,7 +161,7 @@ namespace RevitMarkingElements.ViewModels {
                 : SortElementsByCoordinates(unprocessedElements);
 
             var transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
-            using(Transaction transaction = _revitRepository.CreateTransaction(transactionName)) {
+            using(Transaction transaction = _revitRepository.Document.StartTransaction(transactionName)) {
                 transaction.Start();
 
                 AssignMarks(sortedUnprocessedElements, processedElements, ref counter);
