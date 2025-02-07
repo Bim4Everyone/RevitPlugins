@@ -26,7 +26,10 @@ namespace RevitRoomExtrusion.Models {
         }
 
         public bool CheckInvalidRoom(Room room) {
-            return room.IsNotEnclosed() || room.IsRedundant() || CheckIntersectBoundary(room);
+            return room.IsNotEnclosed()
+                || room.IsRedundant()
+                || room.IsSelfCrossBoundaries()
+                || CheckIntersectBoundary(room);
         }
 
         public bool CheckIntersectBoundary(Room room) {

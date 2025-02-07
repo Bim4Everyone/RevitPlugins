@@ -40,7 +40,7 @@ namespace RevitRoomExtrusion.ViewModels {
                 errorDescription = _localizationService.GetLocalizedString("RoomErrorViewModel.RedundantError");
             } else if(room.IsNotEnclosed()) {
                 errorDescription = _localizationService.GetLocalizedString("RoomErrorViewModel.NotEnclosed");
-            } else if(_roomChecker.CheckIntersectBoundary(room)) {
+            } else if(room.IsSelfCrossBoundaries() || _roomChecker.CheckIntersectBoundary(room)) {
                 errorDescription = _localizationService.GetLocalizedString("RoomErrorViewModel.IntersectBoundary");
             }
             return errorDescription;
