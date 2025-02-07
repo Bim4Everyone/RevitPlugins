@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -33,6 +32,7 @@ namespace RevitMarkingElements {
                 Document document = uiApplication.ActiveUIDocument.Document;
                 View activeView = document.ActiveView;
 
+
                 kernel.Bind<RevitRepository>().ToSelf().InSingletonScope();
                 kernel.Bind<PluginConfig>().ToMethod(c => PluginConfig.GetPluginConfig());
                 kernel.Bind<MainViewModel>().ToSelf();
@@ -47,46 +47,30 @@ namespace RevitMarkingElements {
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
 
-                ValidateSelectedElements(kernel, activeView);
-                ValidateCategories(kernel, document);
+                var revitRepository = kernel.Get<RevitRepository>();
+                var localizationService = kernel.Get<ILocalizationService>();
+                ValidateSelectedElements(revitRepository, localizationService);
+                ValidateCategories(revitRepository, localizationService);
                 Notification(kernel.Get<MainWindow>());
             }
         }
 
-        private List<ElementId> GetSelectedElements(View view) {
-            UIApplication uiApp = new UIApplication(view.Document.Application);
-            UIDocument uiDoc = uiApp.ActiveUIDocument;
-            return uiDoc.Selection.GetElementIds().ToList();
-        }
-
-        private void ValidateSelectedElements(IKernel kernel, View view) {
-            var selectedIds = GetSelectedElements(view);
-
+        private void ValidateSelectedElements(RevitRepository revitRepository, ILocalizationService localizationService) {
+            var selectedIds = revitRepository.GetSelectedElements();
             if(selectedIds.Count == 0) {
-                ShowError(kernel, "GeneralSettings.ErrorNoSelectedElements");
+                ShowError(localizationService, "GeneralSettings.ErrorNoSelectedElements");
             }
         }
 
-        private void ValidateCategories(IKernel kernel, Document document) {
-            var selectedIds = GetSelectedElements(document.ActiveView);
-            var revitRepository = kernel.Get<RevitRepository>();
-            var allCategories = revitRepository.GetCategoriesWithMarkParam(BuiltInParameter.ALL_MODEL_MARK);
+        private void ValidateCategories(RevitRepository revitRepository, ILocalizationService localizationService) {
+            var validCategories = revitRepository.GetCategoriesWithMarkParam(BuiltInParameter.ALL_MODEL_MARK);
 
-            var elementCategories = selectedIds
-                .Select(id => document.GetElement(id)?.Category)
-                .Where(category => category != null)
-                .Distinct()
-                .ToList();
-
-            bool hasValidCategory = elementCategories.Any(category => allCategories.Any(c => c.Id == category.Id));
-
-            if(!hasValidCategory) {
-                ShowError(kernel, "GeneralSettings.CategoryMismatch");
+            if(!validCategories.Any()) {
+                ShowError(localizationService, "GeneralSettings.CategoryMismatch");
             }
         }
 
-        private void ShowError(IKernel kernel, string messageKey) {
-            var localizationService = kernel.Get<ILocalizationService>();
+        private void ShowError(ILocalizationService localizationService, string messageKey) {
             string title = localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
             string message = localizationService.GetLocalizedString(messageKey);
 

@@ -23,7 +23,6 @@
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String x:Key="MainWindow.FinishLineSelection">Нажмите Esc для завершения выбора линий.</system:String>
     <system:String x:Key="MainWindow.StartNumbericFrom">Начать нумерацию с числа.</system:String>
-    
     <system:String x:Key="GeneralSettings.ErrorNoSelectedElements">Необходимо выбрать элементы на виде</system:String>
     <system:String x:Key="GeneralSettings.ErrorMessage">Ошибка</system:String>
     <system:String x:Key="GeneralSettings.CategoryMismatch">Выбранные элементы не принадлежат поддерживаемым категориям.</system:String>

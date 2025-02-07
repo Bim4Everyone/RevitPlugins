@@ -33,7 +33,7 @@ namespace RevitMarkingElements.ViewModels {
         private bool _isLineNumberingSelected;
         private int _startNumber;
         private List<CurveElement> Lines { get; set; }
-        private List<ElementId> SelectedElementsIds { get; set; }
+        private List<Element> SelectedElements { get; set; }
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -46,7 +46,6 @@ namespace RevitMarkingElements.ViewModels {
 
             IsLineNumberingSelected = true;
             StartNumber = 1;
-            SelectedElementsIds = _revitRepository.GetSelectedElementsIds();
 
             //После закрытия окна выбора линий снять выделения с линии нельзя, только выбирать линии заново, пока оставили так
             SelectLinesCommand = RelayCommand.Create<MainWindow>(SelectLines);
@@ -139,9 +138,11 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private void NumberMarkingElements() {
-            var markingElements = _revitRepository.GetElements(SelectedCategoryId)
-                .Where(element => SelectedElementsIds.Contains(element.Id)).ToList();
+            var selectedElementIds = SelectedElements.Select(e => e.Id).ToHashSet();
 
+            var markingElements = _revitRepository.GetElementsByCategory(SelectedCategoryId)
+                .Where(element => selectedElementIds.Contains(element.Id))
+                .ToList();
 
             var processedElements = RenumberAll
                 ? new List<Element>()
@@ -162,7 +163,6 @@ namespace RevitMarkingElements.ViewModels {
 
             var transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
             using(Transaction transaction = _revitRepository.Document.StartTransaction(transactionName)) {
-                transaction.Start();
 
                 AssignMarks(sortedUnprocessedElements, processedElements, ref counter);
 
@@ -245,7 +245,7 @@ namespace RevitMarkingElements.ViewModels {
         private void LoadView() {
             LoadConfig();
             LoadCategories();
-
+            SelectedElements = _revitRepository.GetSelectedElements();
             var lineNumberingLabel = _localizationService.GetLocalizedString("MainWindow.LineNumberingLabel");
             LineNumberingContent = $"{lineNumberingLabel} (0) ";
         }
@@ -256,11 +256,6 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(SelectedElementsIds.Count == 0) {
-                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoSelectedElements");
-                return false;
-            }
-
             if(!IsLineNumberingSelected && !IsArrayNumberingSelected) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.SelectNumberingType");
                 return false;
