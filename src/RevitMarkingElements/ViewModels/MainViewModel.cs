@@ -24,9 +24,8 @@ namespace RevitMarkingElements.ViewModels {
 
         private string _errorText;
         private string _lineNumberingContent;
-        private string _selectedCategoryName;
         private List<Category> _categories;
-        private ElementId _selectedCategoryId;
+        private Category _selectedCategory;
         private bool _includeUnselected;
         private bool _renumberAll;
         private bool _isArrayNumberingSelected;
@@ -77,13 +76,10 @@ namespace RevitMarkingElements.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _categories, value);
         }
 
-        public string SelectedCategoryName {
-            get => _selectedCategoryName;
+        public Category SelectedCategory {
+            get => _selectedCategory;
             set {
-                this.RaiseAndSetIfChanged(ref _selectedCategoryName, value);
-
-                SelectedCategoryId = _categories
-                    .FirstOrDefault(category => category.Name == value)?.Id;
+                this.RaiseAndSetIfChanged(ref _selectedCategory, value);
             }
         }
 
@@ -106,11 +102,6 @@ namespace RevitMarkingElements.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _includeUnselected, value);
         }
 
-        public ElementId SelectedCategoryId {
-            get => _selectedCategoryId;
-            set => this.RaiseAndSetIfChanged(ref _selectedCategoryId, value);
-        }
-
         public bool RenumberAll {
             get => _renumberAll;
             set => this.RaiseAndSetIfChanged(ref _renumberAll, value);
@@ -120,7 +111,7 @@ namespace RevitMarkingElements.ViewModels {
             var allCategories = _revitRepository.GetSelectedElements().Select(item => item.Category).ToList();
 
             Categories = allCategories;
-            SelectedCategoryName = allCategories.FirstOrDefault(x => x.Id.AsBuiltInCategory() == _structuralColumns)?.Name;
+            SelectedCategory = allCategories.FirstOrDefault(x => x.GetBuiltInCategory() == _structuralColumns);
         }
 
         private void SelectLines(MainWindow mainWindow) {
@@ -139,7 +130,7 @@ namespace RevitMarkingElements.ViewModels {
 
         private void NumberMarkingElements() {
 
-            var markingElements = SelectedElements.Where(item => item.Category.Id == SelectedCategoryId)
+            var markingElements = SelectedElements.Where(item => item.Category.Id == SelectedCategory.Id)
                 .ToList();
 
             var processedElements = RenumberAll
@@ -270,14 +261,15 @@ namespace RevitMarkingElements.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            SelectedCategoryId = setting?.SelectedCategoryId ?? new ElementId(_structuralColumns);
+            var selectedCategory = _revitRepository.GetCategoryByBuiltInCategory(setting?.SelectedCategory ?? _structuralColumns);
+            SelectedCategory = selectedCategory;
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.SelectedCategoryId = SelectedCategoryId;
+            setting.SelectedCategory = SelectedCategory.GetBuiltInCategory();
             _pluginConfig.SaveProjectConfig();
         }
 

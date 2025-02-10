@@ -24,6 +24,6 @@ namespace RevitMarkingElements.Models {
 
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
-        public ElementId SelectedCategoryId { get; set; }
+        public BuiltInCategory SelectedCategory { get; set; }
     }
 }

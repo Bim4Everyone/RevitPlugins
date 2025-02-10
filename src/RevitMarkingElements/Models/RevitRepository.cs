@@ -112,7 +112,8 @@ namespace RevitMarkingElements.Models {
 
             var selectedElements = selectedElementIds
                  .Select(id => Document.GetElement(id))
-                 .Where(element => element != null).Where(item => item.IsExistsParam(BuiltInParameter.ALL_MODEL_MARK))
+                 .Where(element => element != null)
+                 .Where(item => item.IsExistsParam(BuiltInParameter.ALL_MODEL_MARK))
                  .ToList();
 
             return selectedElements;
@@ -130,6 +131,10 @@ namespace RevitMarkingElements.Models {
             }
 
             return null;
+        }
+
+        public Category GetCategoryByBuiltInCategory(BuiltInCategory builtInCategory) {
+            return Document.Settings.Categories.get_Item(builtInCategory);
         }
     }
 }

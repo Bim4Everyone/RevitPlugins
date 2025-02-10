@@ -57,16 +57,12 @@ namespace RevitMarkingElements {
             var selectedElement = revitRepository.GetSelectedElements();
 
             if(selectedElement.Count == 0) {
-                ShowError(localizationService, "GeneralSettings.ErrorNoSelectedElements");
+                string title = localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
+                string message = localizationService.GetLocalizedString("GeneralSettings.ErrorNoSelectedElements");
+
+                TaskDialog.Show(title, message);
+                throw new OperationCanceledException();
             }
-        }
-
-        private void ShowError(ILocalizationService localizationService, string messageKey) {
-            string title = localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
-            string message = localizationService.GetLocalizedString(messageKey);
-
-            TaskDialog.Show(title, message);
-            throw new OperationCanceledException();
         }
     }
 }
