@@ -61,10 +61,6 @@ namespace RevitMarkingElements.Models {
                         continue;
                     }
                 }
-
-                if(IsLineIntersectingElementLines(element, lineElement)) {
-                    intersectingElements.Add(element);
-                }
             }
 
             return intersectingElements;
@@ -82,45 +78,6 @@ namespace RevitMarkingElements.Models {
 
             return intersection.SegmentCount > 0 && intersection.GetCurveSegment(0).Length > 0.1;
         }
-
-        private bool IsLineIntersectingElementLines(Element element, Curve lineElement) {
-
-            XYZ lineStart = new XYZ(lineElement.GetEndPoint(0).X, lineElement.GetEndPoint(0).Y, 0);
-            XYZ lineEnd = new XYZ(lineElement.GetEndPoint(1).X, lineElement.GetEndPoint(1).Y, 0);
-            lineElement = Line.CreateBound(lineStart, lineEnd);
-
-            var geometryElement = element.get_Geometry(new Options());
-            if(geometryElement == null) {
-                return false;
-            }
-
-            foreach(var geometryObject in geometryElement) {
-                if(geometryObject is GeometryInstance instance) {
-                    var instanceGeometry = instance.GetInstanceGeometry();
-
-                    foreach(var instanceGeoObj in instanceGeometry) {
-                        if(instanceGeoObj is Line elementLine) {
-                            XYZ elementStart = new XYZ(elementLine.GetEndPoint(0).X, elementLine.GetEndPoint(0).Y, 0);
-                            XYZ elementEnd = new XYZ(elementLine.GetEndPoint(1).X, elementLine.GetEndPoint(1).Y, 0);
-
-                            if(elementStart.DistanceTo(elementEnd) < 0.0001) {
-                                continue;
-                            }
-
-                            var projectedElementLine = Line.CreateBound(elementStart, elementEnd);
-                            var result = lineElement.Intersect(projectedElementLine);
-
-                            if(result == SetComparisonResult.Overlap || result == SetComparisonResult.Subset) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
 
         public List<CurveElement> SelectLinesOnView() {
             var selectedLines = new List<CurveElement>();
@@ -148,12 +105,18 @@ namespace RevitMarkingElements.Models {
                 }
             }
 
-            return selectedLines
-                .GroupBy(line => line.Id)
-                .Select(group => group.First())
-                .ToList();
-        }
+            var uniqueLines = new List<CurveElement>();
+            var orderedIds = new List<ElementId>();
 
+            foreach(var line in selectedLines) {
+                if(!orderedIds.Contains(line.Id)) {
+                    orderedIds.Add(line.Id);
+                    uniqueLines.Add(line);
+                }
+            }
+
+            return uniqueLines;
+        }
         public List<Element> GetElementsByCategory(ElementId categoryId) {
             if(categoryId == null) {
                 return new List<Element>();

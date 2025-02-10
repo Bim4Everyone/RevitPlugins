@@ -138,7 +138,7 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private void NumberMarkingElements() {
-            var selectedElementIds = SelectedElements.Select(e => e.Id).ToHashSet();
+            var selectedElementIds = SelectedElements.Select(e => e.Id).ToList();
 
             var markingElements = _revitRepository.GetElementsByCategory(SelectedCategoryId)
                 .Where(element => selectedElementIds.Contains(element.Id))

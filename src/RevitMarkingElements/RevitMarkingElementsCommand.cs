@@ -56,8 +56,8 @@ namespace RevitMarkingElements {
         }
 
         private void ValidateSelectedElements(RevitRepository revitRepository, ILocalizationService localizationService) {
-            var selectedIds = revitRepository.GetSelectedElements();
-            if(selectedIds.Count == 0) {
+            var selectedElement = revitRepository.GetSelectedElements();
+            if(selectedElement.Count == 0) {
                 ShowError(localizationService, "GeneralSettings.ErrorNoSelectedElements");
             }
         }
