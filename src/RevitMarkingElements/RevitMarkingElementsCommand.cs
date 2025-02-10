@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -56,13 +55,9 @@ namespace RevitMarkingElements {
 
         private void ValidateSelectedElements(RevitRepository revitRepository, ILocalizationService localizationService) {
             var selectedElement = revitRepository.GetSelectedElements();
-            var categories = selectedElement.Select(item => item.Category).ToList();
 
             if(selectedElement.Count == 0) {
                 ShowError(localizationService, "GeneralSettings.ErrorNoSelectedElements");
-            }
-            if(!categories.Any()) {
-                ShowError(localizationService, "GeneralSettings.CategoryMismatch");
             }
         }
 

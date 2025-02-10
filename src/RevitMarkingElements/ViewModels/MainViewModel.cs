@@ -139,7 +139,7 @@ namespace RevitMarkingElements.ViewModels {
 
         private void NumberMarkingElements() {
 
-            var markingElements = _revitRepository.GetSelectedElements().Where(item => item.Category.Id == SelectedCategoryId)
+            var markingElements = SelectedElements.Where(item => item.Category.Id == SelectedCategoryId)
                 .ToList();
 
             var processedElements = RenumberAll
