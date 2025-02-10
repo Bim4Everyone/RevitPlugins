@@ -114,8 +114,7 @@
             <ComboBox
                 ItemsSource="{Binding Categories}"
                 DisplayMemberPath="Name"
-                SelectedValue="{Binding SelectedCategoryName}"
-                SelectedValuePath="Name"
+                SelectedItem="{Binding SelectedCategory}"
                 Margin="0,0,0,10" />
 
             <CheckBox

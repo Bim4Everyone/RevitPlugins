@@ -108,7 +108,13 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private void LoadCategories() {
-            var allCategories = _revitRepository.GetSelectedElements().Select(item => item.Category).ToList();
+            var allCategories = _revitRepository
+               .GetSelectedElements()
+               .Select(item => item.Category)
+               .Where(category => category != null)
+               .GroupBy(category => category.Id)
+               .Select(group => group.First())
+               .ToList();
 
             Categories = allCategories;
             SelectedCategory = allCategories.FirstOrDefault(x => x.GetBuiltInCategory() == _structuralColumns);
