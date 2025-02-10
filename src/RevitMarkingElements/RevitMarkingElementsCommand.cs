@@ -50,22 +50,18 @@ namespace RevitMarkingElements {
                 var revitRepository = kernel.Get<RevitRepository>();
                 var localizationService = kernel.Get<ILocalizationService>();
                 ValidateSelectedElements(revitRepository, localizationService);
-                ValidateCategories(revitRepository, localizationService);
                 Notification(kernel.Get<MainWindow>());
             }
         }
 
         private void ValidateSelectedElements(RevitRepository revitRepository, ILocalizationService localizationService) {
             var selectedElement = revitRepository.GetSelectedElements();
+            var categories = selectedElement.Select(item => item.Category).ToList();
+
             if(selectedElement.Count == 0) {
                 ShowError(localizationService, "GeneralSettings.ErrorNoSelectedElements");
             }
-        }
-
-        private void ValidateCategories(RevitRepository revitRepository, ILocalizationService localizationService) {
-            var validCategories = revitRepository.GetCategoriesWithMarkParam(BuiltInParameter.ALL_MODEL_MARK);
-
-            if(!validCategories.Any()) {
+            if(!categories.Any()) {
                 ShowError(localizationService, "GeneralSettings.CategoryMismatch");
             }
         }

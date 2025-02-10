@@ -25,21 +25,6 @@ namespace RevitMarkingElements.Models {
         public Application Application => UIApplication.Application;
         public Document Document => ActiveUIDocument.Document;
 
-        public List<Category> GetCategoriesWithMarkParam(BuiltInParameter markParam) {
-            var selectedElements = GetSelectedElements();
-
-            var categories = selectedElements
-                .OfType<FamilyInstance>()
-                .Where(element => element.IsExistsParam(markParam))
-                .Select(element => element.Category)
-                .Where(category => category != null)
-                .GroupBy(category => category.Id)
-                .Select(group => group.First())
-                .ToList();
-
-            return categories;
-        }
-
         public List<Element> GetElementsIntersectingLine(List<Element> elements, Curve lineElement) {
             var intersectingElements = new List<Element>();
 
@@ -85,8 +70,8 @@ namespace RevitMarkingElements.Models {
             var finishLineSelection = _localizationService.GetLocalizedString("MainWindow.FinishLineSelection");
             var isDone = false;
 
-            //Данная реализация была выбрана для того что бы получить объекты именно в том порядке
-            //в котором они были выбраны на виде. PickObjects не подходит т.к. возвращает элементы в порядке их размещения на виде
+            // Данная реализация была выбрана для того что бы получить объекты именно в том порядке,
+            // в котором они были выбраны на виде.
             while(!isDone) {
                 try {
                     var reference = ActiveUIDocument.Selection.PickObject(
@@ -106,7 +91,7 @@ namespace RevitMarkingElements.Models {
             }
 
             var uniqueLines = new List<CurveElement>();
-            var orderedIds = new List<ElementId>();
+            var orderedIds = new HashSet<ElementId>();
 
             foreach(var line in selectedLines) {
                 if(!orderedIds.Contains(line.Id)) {
@@ -116,19 +101,6 @@ namespace RevitMarkingElements.Models {
             }
 
             return uniqueLines;
-        }
-        public List<Element> GetElementsByCategory(ElementId categoryId) {
-            if(categoryId == null) {
-                return new List<Element>();
-            }
-
-            FilteredElementCollector collector = new FilteredElementCollector(Document);
-
-            return collector
-                .WherePasses(new ElementCategoryFilter(categoryId))
-                .WhereElementIsNotElementType()
-                .ToElements()
-                .ToList();
         }
 
         public List<Element> GetSelectedElements() {
@@ -140,7 +112,7 @@ namespace RevitMarkingElements.Models {
 
             var selectedElements = selectedElementIds
                  .Select(id => Document.GetElement(id))
-                 .Where(element => element != null)
+                 .Where(element => element != null).Where(item => item.IsExistsParam(BuiltInParameter.ALL_MODEL_MARK))
                  .ToList();
 
             return selectedElements;

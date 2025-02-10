@@ -117,7 +117,7 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private void LoadCategories() {
-            var allCategories = _revitRepository.GetCategoriesWithMarkParam(_markParam);
+            var allCategories = _revitRepository.GetSelectedElements().Select(item => item.Category).ToList();
 
             Categories = allCategories;
             SelectedCategoryName = allCategories.FirstOrDefault(x => x.Id.AsBuiltInCategory() == _structuralColumns)?.Name;
@@ -138,10 +138,8 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private void NumberMarkingElements() {
-            var selectedElementIds = SelectedElements.Select(e => e.Id).ToList();
 
-            var markingElements = _revitRepository.GetElementsByCategory(SelectedCategoryId)
-                .Where(element => selectedElementIds.Contains(element.Id))
+            var markingElements = _revitRepository.GetSelectedElements().Where(item => item.Category.Id == SelectedCategoryId)
                 .ToList();
 
             var processedElements = RenumberAll
