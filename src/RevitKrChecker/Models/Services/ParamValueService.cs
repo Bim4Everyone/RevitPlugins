@@ -62,13 +62,11 @@ namespace RevitKrChecker.Models.Services {
         }
 
         private string GetDictForCompareKeyByRule(Dictionary<string, string> dictForCompare,
-                                                  ICheckRule dictForCompareRule,
-                                                  string value) {
+                                                  ICheckRule dictForCompareRule, string value) {
             return dictForCompare.Keys.FirstOrDefault(key => dictForCompareRule.Check(value, key));
         }
 
-        public string GetValueByDict(Dictionary<string, string> dictForCompare,
-                                     ICheckRule dictForCompareRule,
+        public string GetValueByDict(Dictionary<string, string> dictForCompare, ICheckRule dictForCompareRule,
                                      string value) {
             string key = GetDictForCompareKeyByRule(dictForCompare, dictForCompareRule, value);
             return key is null ? null : dictForCompare[key];

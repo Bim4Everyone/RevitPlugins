@@ -95,7 +95,8 @@ namespace RevitKrChecker.ViewModels {
         }
 
         private void ReportResultGroupingUpdate() {
-            CollectionView reportResultCollectionView = (CollectionView) CollectionViewSource.GetDefaultView(_reportResultCollection);
+            CollectionView reportResultCollectionView =
+                (CollectionView) CollectionViewSource.GetDefaultView(_reportResultCollection);
 
             if(reportResultCollectionView is null) {
                 return;

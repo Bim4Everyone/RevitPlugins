@@ -14,15 +14,18 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public HasValueCheck(HasValueCheckOptions checkOptions,
-                             ILocalizationService localizationService,
-                             ParamValueService paramValueService) {
+        public HasValueCheck(
+            HasValueCheckOptions checkOptions,
+            ILocalizationService localizationService,
+            ParamValueService paramValueService) {
+
             _localizationService = localizationService;
             _paramService = paramValueService;
 
             CheckName = checkOptions.CheckName ?? throw new ArgumentNullException(nameof(checkOptions.CheckName));
 
-            TargetParamName = checkOptions.TargetParamName ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
+            TargetParamName = checkOptions.TargetParamName
+                ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             TargetParamLevel = checkOptions.TargetParamLevel;
         }
 
@@ -33,10 +36,12 @@ namespace RevitKrChecker.Models.Check {
 
 
         public bool Check(Element element, out CheckInfo info) {
-            if(element == null)
+            if(element == null) {
                 throw new ArgumentNullException(nameof(element));
+            }
 
-            List<string> targetParamValues = _paramService.GetParamValuesToCheck(element, TargetParamName, TargetParamLevel);
+            List<string> targetParamValues =
+                _paramService.GetParamValuesToCheck(element, TargetParamName, TargetParamLevel);
 
             foreach(var targetParamValue in targetParamValues) {
                 if(string.IsNullOrEmpty(targetParamValue)) {

@@ -5,11 +5,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitKrChecker.Views"
     xmlns:vms="clr-namespace:RevitKrChecker.ViewModels"
-    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
@@ -21,8 +19,10 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition
+                Width="*" />
+            <ColumnDefinition
+                Width="*" />
         </Grid.ColumnDefinitions>
 
         <Button
@@ -30,15 +30,13 @@
             Margin="10"
             Content="{DynamicResource MainWindow.GetFromView}"
             Click="ButtonOk_Click"
-            Command="{Binding Path=CheckElemsFromViewCommand}" 
-            />
+            Command="{Binding Path=CheckElemsFromViewCommand}" />
 
         <Button
             Grid.Column="1"
             Margin="10"
             Content="{DynamicResource MainWindow.GetFromProject}"
             Click="ButtonOk_Click"
-            Command="{Binding Path=CheckElemsFromPjCommand}"
-            />
+            Command="{Binding Path=CheckElemsFromPjCommand}" />
     </Grid>
 </base:PlatformWindow>

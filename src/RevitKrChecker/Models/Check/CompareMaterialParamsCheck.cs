@@ -16,9 +16,11 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public CompareMaterialParamsCheck(CompareCheckOptions checkOptions,
-                                          ILocalizationService localizationService,
-                                          ParamValueService paramValueService) {
+        public CompareMaterialParamsCheck(
+            CompareCheckOptions checkOptions,
+            ILocalizationService localizationService,
+            ParamValueService paramValueService) {
+
             _localizationService = localizationService;
             _paramService = paramValueService;
 
@@ -29,7 +31,8 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             // Проверяем, что параметр для проверке на уровне материала
             TargetParamLevel = checkOptions.TargetParamLevel != ParamLevel.Material
-                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForElementParameter"))
+                ? throw new ArgumentException(
+                    _localizationService.GetLocalizedString("ReportWindow.CheckNotForElementParameter"))
                 : checkOptions.TargetParamLevel;
 
             CheckRule = checkOptions.CheckRule
@@ -50,8 +53,9 @@ namespace RevitKrChecker.Models.Check {
         public ParamLevel SourceParamLevel { get; }
 
         public bool Check(Element element, out CheckInfo info) {
-            if(element == null)
+            if(element == null) {
                 throw new ArgumentNullException(nameof(element));
+            }
 
             Document doc = element.Document;
             List<Element> materials = element.GetMaterialIds(false)
@@ -74,7 +78,8 @@ namespace RevitKrChecker.Models.Check {
         public string GetTooltip() {
             // "значение параметра"
             var parameterValue = _localizationService.GetLocalizedString("ReportWindow.ParameterValue");
-            return $"{CheckName}: {parameterValue} \"{TargetParamName}\" {CheckRule.UnfulfilledRule} \"{SourceParamName}\"";
+            return $"{CheckName}: {parameterValue} \"{TargetParamName}\" " +
+                $"{CheckRule.UnfulfilledRule} \"{SourceParamName}\"";
         }
     }
 }

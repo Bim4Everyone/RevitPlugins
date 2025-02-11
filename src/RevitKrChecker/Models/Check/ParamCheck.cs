@@ -15,9 +15,11 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public ParamCheck(ParamCheckOptions checkOptions,
-                          ILocalizationService localizationService,
-                          ParamValueService paramValueService) {
+        public ParamCheck(
+            ParamCheckOptions checkOptions,
+            ILocalizationService localizationService,
+            ParamValueService paramValueService) {
+
             _localizationService = localizationService;
             _paramService = paramValueService;
 
@@ -46,10 +48,12 @@ namespace RevitKrChecker.Models.Check {
         }
 
         public bool Check(Element element, out CheckInfo info) {
-            if(element == null)
+            if(element == null) {
                 throw new ArgumentNullException(nameof(element));
+            }
 
-            List<string> targetParamValues = _paramService.GetParamValuesToCheck(element, TargetParamName, TargetParamLevel);
+            List<string> targetParamValues =
+                _paramService.GetParamValuesToCheck(element, TargetParamName, TargetParamLevel);
 
             // Каждый из значений (может быть несколько, если материалов несколько) должен соответствовать любому
             foreach(var targetParamValue in targetParamValues) {
@@ -72,7 +76,8 @@ namespace RevitKrChecker.Models.Check {
         public string GetTooltip() {
             // "значение параметра"
             var parameterValue = _localizationService.GetLocalizedString("ReportWindow.ParameterValue");
-            return $"{CheckName}: {parameterValue} \"{TargetParamName}\" {CheckRule.UnfulfilledRule} {GetTrueValuesAsStr()}";
+            return $"{CheckName}: {parameterValue} \"{TargetParamName}\" " +
+                $"{CheckRule.UnfulfilledRule} {GetTrueValuesAsStr()}";
         }
     }
 }

@@ -15,9 +15,11 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public CompareElemParamsCheck(CompareCheckOptions checkOptions,
-                                      ILocalizationService localizationService,
-                                      ParamValueService paramValueService) {
+        public CompareElemParamsCheck(
+            CompareCheckOptions checkOptions,
+            ILocalizationService localizationService,
+            ParamValueService paramValueService) {
+
             _localizationService = localizationService;
             _paramService = paramValueService;
 
@@ -27,7 +29,8 @@ namespace RevitKrChecker.Models.Check {
             TargetParamName = checkOptions.TargetParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             TargetParamLevel = checkOptions.TargetParamLevel is ParamLevel.Material
-                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForMaterialParameter"))
+                ? throw new ArgumentException(
+                    _localizationService.GetLocalizedString("ReportWindow.CheckNotForMaterialParameter"))
                 : checkOptions.TargetParamLevel;
 
             CheckRule = checkOptions.CheckRule
@@ -47,15 +50,18 @@ namespace RevitKrChecker.Models.Check {
         public ParamLevel SourceParamLevel { get; }
 
         private bool CheckAllValues(string targetParamValue, List<string> sourceParamValues) {
-            return sourceParamValues.All(sourceParamValue => CheckRule.Check(targetParamValue, sourceParamValue));
+            return sourceParamValues.All(sourceParamValue =>
+                CheckRule.Check(targetParamValue, sourceParamValue));
         }
 
         public bool Check(Element element, out CheckInfo info) {
-            if(element == null)
+            if(element == null) {
                 throw new ArgumentNullException(nameof(element));
+            }
 
             string targetParamValue = _paramService.GetParamValueToCheck(element, TargetParamName, TargetParamLevel);
-            List<string> sourceParamValues = _paramService.GetParamValuesToCheck(element, SourceParamName, SourceParamLevel);
+            List<string> sourceParamValues =
+                _paramService.GetParamValuesToCheck(element, SourceParamName, SourceParamLevel);
 
             // Значение проверяемого параметра должно соответствовать каждому из значений (может быть несколько,
             // если материалов несколько)
@@ -70,7 +76,8 @@ namespace RevitKrChecker.Models.Check {
         public string GetTooltip() {
             // "значение параметра"
             var parameterValue = _localizationService.GetLocalizedString("ReportWindow.ParameterValue");
-            return $"{CheckName}: {parameterValue} \"{TargetParamName}\" {CheckRule.UnfulfilledRule} \"{SourceParamName}\"";
+            return $"{CheckName}: {parameterValue} \"{TargetParamName}\" " +
+                $"{CheckRule.UnfulfilledRule} \"{SourceParamName}\"";
         }
     }
 }

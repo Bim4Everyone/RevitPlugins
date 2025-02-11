@@ -15,9 +15,11 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public TemplatesCompareElemParamsCheck(TemplatesCompareCheckOptions checkOptions,
-                                               ILocalizationService localizationService,
-                                               ParamValueService paramValueService) {
+        public TemplatesCompareElemParamsCheck(
+            TemplatesCompareCheckOptions checkOptions,
+            ILocalizationService localizationService,
+            ParamValueService paramValueService) {
+
             _localizationService = localizationService;
             _paramService = paramValueService;
 
@@ -28,7 +30,8 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             // Проверяем, что параметр для проверке не на уровне материала
             TargetParamLevel = checkOptions.TargetParamLevel is ParamLevel.Material
-                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForMaterialParameter"))
+                ? throw new ArgumentException(
+                    _localizationService.GetLocalizedString("ReportWindow.CheckNotForMaterialParameter"))
                 : checkOptions.TargetParamLevel;
 
             CheckRule = checkOptions.CheckRule
@@ -58,11 +61,13 @@ namespace RevitKrChecker.Models.Check {
         }
 
         public bool Check(Element element, out CheckInfo info) {
-            if(element == null)
+            if(element == null) {
                 throw new ArgumentNullException(nameof(element));
+            }
 
             string targetParamValue = _paramService.GetParamValueToCheck(element, TargetParamName, TargetParamLevel);
-            List<string> sourceParamValues = _paramService.GetParamValuesToCheck(element, SourceParamName, SourceParamLevel);
+            List<string> sourceParamValues =
+                _paramService.GetParamValuesToCheck(element, SourceParamName, SourceParamLevel);
             List<string> sourceParamValuesByDict = sourceParamValues
                 .Select(val => _paramService.GetValueByDict(DictForCompare, DictForCompareRule, val))
                 .ToList();

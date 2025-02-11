@@ -16,9 +16,11 @@ namespace RevitKrChecker.Models.Check {
         private readonly ILocalizationService _localizationService;
         private readonly ParamValueService _paramService;
 
-        public TemplatesCompareMaterialParamsCheck(TemplatesCompareCheckOptions checkOptions,
-                                                   ILocalizationService localizationService,
-                                                   ParamValueService paramValueService) {
+        public TemplatesCompareMaterialParamsCheck(
+            TemplatesCompareCheckOptions checkOptions,
+            ILocalizationService localizationService,
+            ParamValueService paramValueService) {
+
             _localizationService = localizationService;
             _paramService = paramValueService;
 
@@ -28,7 +30,8 @@ namespace RevitKrChecker.Models.Check {
                 ?? throw new ArgumentNullException(nameof(checkOptions.TargetParamName));
             // Проверяем, что параметр для проверке на уровне материала
             TargetParamLevel = checkOptions.TargetParamLevel != ParamLevel.Material
-                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForElementParameter"))
+                ? throw new ArgumentException(
+                    _localizationService.GetLocalizedString("ReportWindow.CheckNotForElementParameter"))
                 : checkOptions.TargetParamLevel;
 
             CheckRule = checkOptions.CheckRule
@@ -37,7 +40,8 @@ namespace RevitKrChecker.Models.Check {
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
             SourceParamLevel = checkOptions.SourceParamLevel != ParamLevel.Material
-                ? throw new ArgumentException(_localizationService.GetLocalizedString("ReportWindow.CheckNotForCompareWithElementParameter"))
+                ? throw new ArgumentException(
+                    _localizationService.GetLocalizedString("ReportWindow.CheckNotForCompareWithElementParameter"))
                 : checkOptions.SourceParamLevel;
 
             DictForCompare = checkOptions.DictForCompare
@@ -56,8 +60,10 @@ namespace RevitKrChecker.Models.Check {
 
 
         public bool Check(Element element, out CheckInfo info) {
-            if(element == null)
+            if(element == null) {
                 throw new ArgumentNullException(nameof(element));
+            }
+
             Document doc = element.Document;
             List<Element> materials = element.GetMaterialIds(false)
                            .Select(id => doc.GetElement(id))
@@ -66,7 +72,8 @@ namespace RevitKrChecker.Models.Check {
             foreach(Element material in materials) {
                 string targetParamValue = material.GetParam(TargetParamName).AsValueString();
                 string sourceParamValue = material.GetParam(SourceParamName).AsValueString();
-                string sourceParamValueByDict = _paramService.GetValueByDict(DictForCompare, DictForCompareRule, sourceParamValue);
+                string sourceParamValueByDict =
+                    _paramService.GetValueByDict(DictForCompare, DictForCompareRule, sourceParamValue);
 
                 if(!CheckRule.Check(targetParamValue, sourceParamValueByDict)) {
                     info = new CheckInfo(CheckName, TargetParamName, element, GetTooltip());
