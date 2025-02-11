@@ -1,9 +1,11 @@
+using System.Threading.Tasks;
+
 using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.Services {
     internal interface IFileSystem {
-        IDirectoryModel GetRootDirectory();
+        Task<IDirectoryModel> GetRootDirectory();
 
-        IDirectoryModel GetDirectory(string path);
+        Task<IDirectoryModel> GetDirectory(string path);
     }
 }
