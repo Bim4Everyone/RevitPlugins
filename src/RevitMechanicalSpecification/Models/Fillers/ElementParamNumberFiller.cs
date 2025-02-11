@@ -53,7 +53,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     if(host.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
                         double area = _calculator.GetFittingArea(host);
                         return Math.Round(
-                            UseStock(host, host.GetElementType(), BuiltInCategory.OST_DuctFitting, area), 2);
+                            UseStock(host, host.GetElementType(), BuiltInCategory.OST_DuctInsulations, area), 2);
                     }
                 }
 

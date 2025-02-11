@@ -499,7 +499,7 @@ namespace RevitOpeningPlacement.Services {
         }
 
         private ICollection<IConstructureLinkElementsProvider> GetLinkProviders(RevitRepository revitRepository) {
-            return revitRepository.GetConstructureLinks()
+            return revitRepository.GetSelectedRevitLinks()
                 .Select(link => new ConstructureLinkElementsProvider(revitRepository, link))
                 .ToArray();
         }
@@ -655,6 +655,9 @@ namespace RevitOpeningPlacement.Services {
             var thisBBoxInLinkCoordinates = mepTaskOutcoming.GetTransformedBBoxXYZ()
                 .TransformBoundingBox(link.DocumentTransform.Inverse);
             var openings = link.GetOpeningsReal();
+            if(openings.Count == 0) {
+                return Array.Empty<IOpeningReal>();
+            }
             var candidates = new FilteredElementCollector(link.Document, openings.Select(o => o.Id).ToArray())
                 .WherePasses(new BoundingBoxIntersectsFilter(thisSolidInLinkCoordinates.GetOutline()))
                 .ToElementIds();

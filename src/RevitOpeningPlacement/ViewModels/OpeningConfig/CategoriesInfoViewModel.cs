@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -34,11 +34,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
         public void InitializeParameters() {
-            var parameters =
-                _revitRepository.DocInfos
-                .GroupBy(item => item.Name)
-                .Select(group => group.ToList().First())
-                .SelectMany(item => _revitRepository.GetParameters(item.Doc, Categories))
+            var parameters = _revitRepository.GetParameters(_revitRepository.Doc, Categories)
                 .Distinct()
                 .Select(item => new ParameterViewModel(item))
                 .ToList();

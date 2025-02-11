@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -10,6 +12,12 @@ using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models {
     internal class RevitRepository {
+        private readonly List<ElementOnPhaseStatus> _statuses = new List<ElementOnPhaseStatus>() {
+                ElementOnPhaseStatus.Existing,
+                ElementOnPhaseStatus.Demolished,
+                ElementOnPhaseStatus.New
+            };
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
@@ -24,7 +32,10 @@ namespace RevitDeclarations.Models {
             IEnumerable<RevitLinkType> loadedLinkTypes = new FilteredElementCollector(Document)
                 .OfClass(typeof(RevitLinkType))
                 .Cast<RevitLinkType>()
+                .Where(x => !x.IsNestedLink)
                 .Where(x => x.GetLinkedFileStatus() == LinkedFileStatus.Loaded);
+
+            var temp = loadedLinkTypes.ToList();
 
             ElementClassFilter filter = new ElementClassFilter(typeof(RevitLinkInstance));
 
@@ -43,8 +54,8 @@ namespace RevitDeclarations.Models {
                 .FirstOrDefault();
         }
 
-        public IReadOnlyCollection<RoomElement> GetRoomsOnPhase(Document document, 
-                                                                Phase phase, 
+        public IReadOnlyCollection<RoomElement> GetRoomsOnPhase(Document document,
+                                                                Phase phase,
                                                                 DeclarationSettings settings) {
             var phaseProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
 
@@ -64,14 +75,7 @@ namespace RevitDeclarations.Models {
         }
 
         public IReadOnlyCollection<FamilyInstance> GetDoorsOnPhase(Document document, Phase phase) {
-            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
-                ElementOnPhaseStatus.Existing,
-                ElementOnPhaseStatus.Demolished,
-                ElementOnPhaseStatus.New,
-                ElementOnPhaseStatus.Temporary
-            };
-
-            ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, statuses);
+            var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
 
             return new FilteredElementCollector(document)
                 .OfCategory(BuiltInCategory.OST_Doors)
@@ -81,18 +85,21 @@ namespace RevitDeclarations.Models {
                 .ToList();
         }
 
+        public IReadOnlyCollection<CurveElement> GetRoomSeparationLinesOnPhase(Document document, Phase phase) {
+            var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
+
+            return new FilteredElementCollector(document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_RoomSeparationLines)
+                .WherePasses(phaseFilter)
+                .OfType<CurveElement>()
+                .ToList();
+        }
+
         public IReadOnlyCollection<FamilyInstance> GetBathInstancesOnPhase(Document document, Phase phase) {
             ElementCategoryFilter notDoorsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Doors, true);
             ElementCategoryFilter notWindowsFilter = new ElementCategoryFilter(BuiltInCategory.OST_Windows, true);
-
-            List<ElementOnPhaseStatus> statuses = new List<ElementOnPhaseStatus>() {
-                ElementOnPhaseStatus.Existing,
-                ElementOnPhaseStatus.Demolished,
-                ElementOnPhaseStatus.New,
-                ElementOnPhaseStatus.Temporary
-            };
-
-            ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, statuses);
+            var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _statuses);
 
             /// Поиск семейств ванн и душевых кабин по наличию "ванна" или "душев" в имени семейства.
             /// Также исключается семейства с суффиксом "ова", например, заканчиваюищеся на "ованная"
@@ -103,27 +110,28 @@ namespace RevitDeclarations.Models {
                 .WherePasses(notWindowsFilter)
                 .WherePasses(phaseFilter)
                 .OfType<FamilyInstance>()
-                .Where(x => x.Symbol.Family.Name.ToLower().Contains("ванна") || 
+                .Where(x => x.Symbol.Family.Name.ToLower().Contains("ванна") ||
                     x.Symbol.Family.Name.ToLower().Contains("душев"))
                 .Where(x => !x.Symbol.Family.Name.ToLower().Contains("ованна"))
                 .ToList();
         }
 
-        public IReadOnlyCollection<Apartment> GetApartments(IEnumerable<RoomElement> rooms, 
-                                                            DeclarationSettings settings) {
+        public IEnumerable<IEnumerable<RoomElement>> GroupRooms(IEnumerable<RoomElement> rooms,
+                                                                DeclarationSettings settings) {
             var multiStoreyAparts = rooms.Where(x => !string.IsNullOrEmpty(x.GetTextParamValue(settings.MultiStoreyParam)))
                 .GroupBy(r => new { l = r.GetTextParamValue(settings.MultiStoreyParam), s = r.GetTextParamValue(settings.SectionParam) })
-                .Select(g => new Apartment(g, settings))
-                .ToList();
+                .Select(g => new List<RoomElement>(g));
 
             var oneStoreyAparts = rooms.Where(x => string.IsNullOrEmpty(x.GetTextParamValue(settings.MultiStoreyParam)))
-                .GroupBy(r => new { r.RoomLevel, s = r.GetTextParamValue(settings.SectionParam), g = r.GetTextParamValue(settings.GroupingByGroupParam) })
-                .Select(g => new Apartment(g, settings))
-                .ToList();            
+                .GroupBy(r => new {
+                    r.RoomLevel,
+                    s = r.GetTextParamValue(settings.GroupingBySectionParam),
+                    g = r.GetTextParamValue(settings.GroupingByGroupParam)
+                })
+                .Select(g => new List<RoomElement>(g));
 
             return oneStoreyAparts
-                .Concat(multiStoreyAparts)
-                .ToList();
+                .Concat(multiStoreyAparts);
         }
 
         public IReadOnlyList<Phase> GetPhases() {

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 using Autodesk.Revit.DB;
 
@@ -34,12 +35,23 @@ namespace RevitOpeningPlacement.Models.Configs {
         public static OpeningConfig GetOpeningConfig(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
-            var config = new ProjectConfigBuilder()
-                .SetSerializer(new RevitClashConfigSerializer(new OpeningSerializationBinder(), document))
-                .SetPluginName(nameof(RevitOpeningPlacement))
-                .SetRevitVersion(ModuleEnvironment.RevitVersion)
-                .SetProjectConfigName(nameof(OpeningConfig) + ".json")
-                .Build<OpeningConfig>();
+            OpeningConfig config;
+            try {
+                config = GetOverriddenBuilder(document)
+                    .Build<OpeningConfig>();
+            } catch(JsonException) {
+                try {
+                    config = GetDefaultBuilder(document)
+                        .Build<OpeningConfig>();
+                } catch(JsonException) {
+                    // файл конфига по умолчанию был сохранен с использованием параметра,
+                    // который отсутствует в активном документе
+                    config = new OpeningConfig() {
+                        ProjectConfigPath = GetDefaultPath(),
+                        Serializer = new RevitClashConfigSerializer(new OpeningSerializationBinder(), document)
+                    };
+                }
+            }
             MepCategoryCollection defaultCollection = new MepCategoryCollection();
             if(config.Categories.Count == defaultCollection.Categories.Count) {
                 return config;
@@ -47,6 +59,32 @@ namespace RevitOpeningPlacement.Models.Configs {
                 config.Categories = defaultCollection;
                 return config;
             }
+        }
+
+        private static ProjectConfigBuilder GetOverriddenBuilder(Document document) {
+            var builder = GetDefaultBuilder(document);
+            var configPath = MepConfigPath.GetMepConfigPath(document).OpeningConfigPath;
+            if(!string.IsNullOrWhiteSpace(configPath) && File.Exists(configPath)) {
+                builder.SetProjectConfigPath(configPath);
+            }
+            return builder;
+        }
+
+        private static ProjectConfigBuilder GetDefaultBuilder(Document document) {
+            return new ProjectConfigBuilder()
+                 .SetSerializer(new RevitClashConfigSerializer(new OpeningSerializationBinder(), document))
+                 .SetPluginName(nameof(RevitOpeningPlacement))
+                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
+                 .SetProjectConfigName(nameof(OpeningConfig) + ".json");
+        }
+
+        private static string GetDefaultPath() {
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                "dosymep",
+                ModuleEnvironment.RevitVersion,
+                nameof(RevitOpeningPlacement),
+                nameof(OpeningConfig) + ".json");
         }
     }
 }

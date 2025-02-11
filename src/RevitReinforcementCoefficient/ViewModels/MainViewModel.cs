@@ -26,6 +26,8 @@ namespace RevitReinforcementCoefficient.ViewModels {
 
         private List<string> _dockPackages;
         private string _selectedDockPackage;
+        private List<string> _elemSections;
+        private string _selectedElemSection;
         private bool _calcСoefficientOnAverage = false;
 
         public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository, DesignTypeListVM designTypeListVM) {
@@ -75,6 +77,16 @@ namespace RevitReinforcementCoefficient.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _selectedDockPackage, value);
         }
 
+        public List<string> ElemSections {
+            get => _elemSections;
+            set => this.RaiseAndSetIfChanged(ref _elemSections, value);
+        }
+
+        public string SelectedElemSection {
+            get => _selectedElemSection;
+            set => this.RaiseAndSetIfChanged(ref _selectedElemSection, value);
+        }
+
         public string FilterValueForNoFiltering {
             get => _filterValueForNoFiltering;
             set => this.RaiseAndSetIfChanged(ref _filterValueForNoFiltering, value);
@@ -101,6 +113,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
             DesignTypesList.GetDesignTypes();
             DesignTypesList.SetFiltering(this);
             GetDockPackages();
+            GetElementSections();
         }
 
         /// <summary>
@@ -114,6 +127,22 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 .ToList();
             DockPackages.Insert(0, _filterValueForNoFiltering);
             SelectedDockPackage = DockPackages.FirstOrDefault();
+
+            // Обновляем вид принудительно, т.к. меняли коллекцию, по которой происходит фильтрация из кода
+            DesignTypesList.UpdateFiltering();
+        }
+
+        /// <summary>
+        /// Заполняем список секций по полученным элементам
+        /// </summary>
+        private void GetElementSections() {
+            ElemSections = DesignTypesList.DesignTypes
+                .Select(o => o.ElemSection)
+                .Distinct()
+                .OrderBy(o => o)
+                .ToList();
+            ElemSections.Insert(0, _filterValueForNoFiltering);
+            SelectedElemSection = ElemSections.FirstOrDefault();
 
             // Обновляем вид принудительно, т.к. меняли коллекцию, по которой происходит фильтрация из кода
             DesignTypesList.UpdateFiltering();
@@ -189,17 +218,17 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private void GetInfo() => DesignTypesList.GetInfo(СalcСoefficientOnAverage);
 
         /// <summary>
-        /// Запись значений коэффициенто армирования
+        /// Запись значений коэффициентов армирования
         /// </summary>
         private void WriteRebarCoef() => DesignTypesList.WriteRebarCoef(_revitRepository.Document);
 
         /// <summary>
-        /// Ставит галочки выбора у видимых с учетом фильтрации типов констуркций
+        /// Ставит галочки выбора у видимых с учетом фильтрации типов конструкций
         /// </summary>
         private void SelectAllVisible() => DesignTypesList.SelectAllVisible();
 
         /// <summary>
-        /// Снимает галочки выбора у видимых с учетом фильтрации типов констуркций
+        /// Снимает галочки выбора у видимых с учетом фильтрации типов конструкций
         /// </summary>
         private void UnselectAllVisible() => DesignTypesList.UnselectAllVisible();
     }

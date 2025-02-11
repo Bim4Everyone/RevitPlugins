@@ -6,28 +6,27 @@ using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
     internal class BottomOffsetOfOpeningInFloorValueGetter : LengthConverter, IValueGetter<DoubleParamValue> {
-        private readonly IPointFinder _pointFinder;
+        private readonly IValueGetter<DoubleParamValue> _elevationGetter;
         private readonly IValueGetter<DoubleParamValue> _thicknessInFeetParamGetter;
 
         /// <summary>
-        /// Конструктор класса, предоставляющего значение высотной отметки низа отверстия в мм от начала проекта, расположенного в перекрытии
+        /// Конструктор класса, предоставляющего значение высотной отметки низа отверстия в мм, расположенного в перекрытии
         /// </summary>
-        /// <param name="pointFinder">Объект, предоставляющий координату центра отверстия в футах</param>
+        /// <param name="elevationGetter">Объект, предоставляющий координату Z центра отверстия в футах</param>
         /// <param name="thicknessInFeetParamGetter">Объект, предоставляющий толщину отверстия в футах</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public BottomOffsetOfOpeningInFloorValueGetter(IPointFinder pointFinder, IValueGetter<DoubleParamValue> thicknessInFeetParamGetter) {
-            if(pointFinder is null) {
-                throw new ArgumentNullException(nameof(pointFinder));
-            }
-            if(thicknessInFeetParamGetter is null) {
-                throw new ArgumentNullException(nameof(thicknessInFeetParamGetter));
-            }
-            _pointFinder = pointFinder;
-            _thicknessInFeetParamGetter = thicknessInFeetParamGetter;
+        public BottomOffsetOfOpeningInFloorValueGetter(
+            IValueGetter<DoubleParamValue> elevationGetter,
+            IValueGetter<DoubleParamValue> thicknessInFeetParamGetter) {
+
+            _elevationGetter = elevationGetter
+                ?? throw new ArgumentNullException(nameof(elevationGetter));
+            _thicknessInFeetParamGetter = thicknessInFeetParamGetter
+                ?? throw new ArgumentNullException(nameof(thicknessInFeetParamGetter));
         }
 
         public DoubleParamValue GetValue() {
-            double offsetInFeet = _pointFinder.GetPoint().Z - _thicknessInFeetParamGetter.GetValue().TValue;
+            double offsetInFeet = _elevationGetter.GetValue().TValue - _thicknessInFeetParamGetter.GetValue().TValue;
             double offsetInMm = ConvertFromInternal(offsetInFeet);
             return new DoubleParamValue(Math.Round(offsetInMm));
         }

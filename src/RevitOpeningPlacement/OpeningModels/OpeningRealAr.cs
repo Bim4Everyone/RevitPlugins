@@ -86,7 +86,14 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// </summary>
         /// <param name="mepLinkElementsProviders">Коллекция связей с элементами ВИС и заданиями на отверстиями</param>
         public void UpdateStatus(ICollection<IMepLinkElementsProvider> mepLinkElementsProviders) {
-            Status = DetermineStatus(mepLinkElementsProviders);
+            try {
+                Status = DetermineStatus(mepLinkElementsProviders);
+            } catch(Exception ex) when(
+                ex is Autodesk.Revit.Exceptions.ApplicationException
+                || ex is NullReferenceException
+                || ex is ArgumentNullException) {
+                Status = OpeningRealStatus.Invalid;
+            }
         }
     }
 }

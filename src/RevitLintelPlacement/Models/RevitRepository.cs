@@ -22,8 +22,9 @@ namespace RevitLintelPlacement.Models {
 
     internal class RevitRepository {
         private readonly string _view3DName = "3D_Перемычки";
-        private static readonly string _settingsPath = @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
-        
+        private static readonly string _settingsPath =
+            @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
+
         private readonly BuiltInParameter[] _bottomBarHeightsParams = new[] {
             BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM,
             BuiltInParameter.INSTANCE_ELEVATION_PARAM,
@@ -88,7 +89,7 @@ namespace RevitLintelPlacement.Models {
 
             return documentName;
         }
-        
+
         public BasePoint GetBasePoint() {
             return (BasePoint) new FilteredElementCollector(_document)
                 .OfClass(typeof(BasePoint))
@@ -365,7 +366,7 @@ namespace RevitLintelPlacement.Models {
             //Если жб-стены или колонны не найдены, то уголок не нужен
             if(refWithContext == null)
                 return false;
-            
+
             var elementWidth = elementInWall.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth)
                                ?? elementInWall.Symbol.GetParamValueOrDefault(LintelsCommonConfig.OpeningWidth);
 
@@ -377,7 +378,7 @@ namespace RevitLintelPlacement.Models {
                 });
                 return false;
             }
-            
+
             //получение ближайшего элемента и его проверка
             var wallOrColumn = _document.GetElement(refWithContext.GetReference().ElementId);
 

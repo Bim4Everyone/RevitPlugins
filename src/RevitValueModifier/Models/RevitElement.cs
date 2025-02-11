@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.SimpleServices;
 
 namespace RevitValueModifier.Models {
@@ -19,8 +18,13 @@ namespace RevitValueModifier.Models {
             ElemName = Elem.Name;
 
             Parameters = Elem.Parameters.Cast<Parameter>().ToList();
-            var elemType = Elem.GetElementType();
-            Parameters.AddRange(elemType.Parameters.Cast<Parameter>().ToList());
+            // Пытаемся получить параметры на уровне типа элемента. Но не у всех выбранных элементов может быть тип
+            // Поэтому в случае, если типа у элемента нет, то параметры у него не запрашиваем
+            var elemTypeId = element.GetTypeId();
+            if(elemTypeId != ElementId.InvalidElementId) {
+                var elemType = element.Document.GetElement(elemTypeId);
+                Parameters.AddRange(elemType.Parameters.Cast<Parameter>().ToList());
+            }
         }
 
         private List<Parameter> Parameters { get; set; }
@@ -39,7 +43,7 @@ namespace RevitValueModifier.Models {
             }
             string value = parameter.AsValueString();
             if(string.IsNullOrEmpty(value)) {
-                return parameter.AsObject().ToString();
+                return string.Empty;
             }
             return value;
         }

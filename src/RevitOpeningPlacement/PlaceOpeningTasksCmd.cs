@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
@@ -26,6 +27,8 @@ using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.Services;
+using RevitOpeningPlacement.ViewModels.Links;
 using RevitOpeningPlacement.ViewModels.ReportViewModel;
 using RevitOpeningPlacement.Views;
 
@@ -50,6 +53,17 @@ namespace RevitOpeningPlacement {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<IDocTypesProvider>()
+                    .ToMethod(c => {
+                        return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.AR, DocTypeEnum.KR });
+                    })
+                    .InSingletonScope();
+                kernel.Bind<IRevitLinkTypesSetter>()
+                    .To<UserSelectedLinksSetter>()
+                    .InTransientScope();
+                kernel.Bind<IDocTypesHandler>()
+                    .To<DocTypesHandler>()
+                    .InSingletonScope();
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
@@ -62,6 +76,16 @@ namespace RevitOpeningPlacement {
                 kernel.Bind<ParameterFilterProvider>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<LinksSelectorViewModel>()
+                    .ToSelf()
+                    .InTransientScope();
+                kernel.Bind<LinksSelectorWindow>()
+                    .ToSelf()
+                    .InTransientScope()
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<LinksSelectorViewModel>());
+
+                kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
                 var revitRepository = kernel.Get<RevitRepository>();
                 PlaceOpeningTasks(uiApplication, revitRepository, Array.Empty<ElementId>());
@@ -74,9 +98,6 @@ namespace RevitOpeningPlacement {
             ElementId[] mepElements) {
 
             _duplicatedInstancesToRemoveIds.Clear();
-            if(!revitRepository.ContinueIfNotAllLinksLoaded()) {
-                throw new OperationCanceledException();
-            }
             if(!ModelCorrect(revitRepository)) {
                 throw new OperationCanceledException();
             }

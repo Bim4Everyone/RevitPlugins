@@ -77,12 +77,18 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             //отметки отверстия
             IValueGetter<DoubleParamValue> bottomOffsetMmValueGetter;
             IValueGetter<DoubleParamValue> centerOffsetMmValueGetter;
-            if(isRound) {
-                centerOffsetMmValueGetter = new CenterOffsetValueGetter(_pointFinder);
-                bottomOffsetMmValueGetter = new BottomOffsetValueGetter(_pointFinder, sizeInit.GetHeight());
+            ElevationValueGetter elevationGetter;
+            if(_createdByOpeningGroup) {
+                elevationGetter = new ElevationValueGetter(_pointFinder, _openingsGroup.Elements.First().GetFamilyInstance().Document);
             } else {
-                centerOffsetMmValueGetter = new CenterOffsetOfRectangleOpeningInWallValueGetter(_pointFinder, sizeInit.GetHeight());
-                bottomOffsetMmValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(_pointFinder);
+                elevationGetter = new ElevationValueGetter(_pointFinder, _mepElement.Document);
+            }
+            if(isRound) {
+                centerOffsetMmValueGetter = new CenterOffsetValueGetter(elevationGetter);
+                bottomOffsetMmValueGetter = new BottomOffsetValueGetter(elevationGetter, sizeInit.GetHeight());
+            } else {
+                centerOffsetMmValueGetter = new CenterOffsetOfRectangleOpeningInWallValueGetter(elevationGetter, sizeInit.GetHeight());
+                bottomOffsetMmValueGetter = new BottomOffsetOfRectangleOpeningInWallValueGetter(elevationGetter);
             }
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, centerOffsetMmValueGetter).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetMmValueGetter).GetParamValue();

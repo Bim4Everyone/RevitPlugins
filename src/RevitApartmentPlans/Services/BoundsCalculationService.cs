@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
 
 using RevitApartmentPlans.Models;
 
@@ -48,7 +47,7 @@ namespace RevitApartmentPlans.Services {
         /// </summary>
         /// <param name="room">Помещение</param>
         /// <returns>Внешний контур помещения</returns>
-        private CurveLoop GetOuterRoomBound(Room room) {
+        private CurveLoop GetOuterRoomBound(RoomElement room) {
             return _revitRepository.GetBoundaryCurveLoops(room)
                 .OrderByDescending(loop => loop.GetExactLength())
                 .First();

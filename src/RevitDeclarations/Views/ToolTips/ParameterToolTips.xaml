@@ -1,0 +1,157 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <system:String x:Key="ParamDocumentToolTip">
+        Проект на основе которого выводится список параметров для выбора.
+    </system:String>
+    <system:String x:Key="LastConfigToolTip">
+        Подгрузка параметров, которые использовались при последнем запуске скрипта в этом проекте.
+    </system:String>
+    <system:String x:Key="CompanyConfigToolTip">
+        Подгрузка параметров компании.
+    </system:String>
+
+    <system:String x:Key="FilterRoomsParamToolTip">
+        Параметр для фильтрации помещений для выгрузки.
+    </system:String>
+    <system:String x:Key="FilterRoomsValuesToolTip">
+        Значения для фильтрации групп помещений по параметру выше.
+        Скрипт обрабатывает только те помещения, которые СОДЕРЖАТ одно из введенных значений.
+        Регистр не учитывается.
+        Для создания нового значения фильтрации введите текст и нажмите "Добавить".
+        Для удаления значения нажмите на него.
+    </system:String>
+    <system:String x:Key="GroupBySectionParamApartToolTip">
+        Параметр, по которому помещения группируются по секциям. Если помещения имеют одинаковое 
+        значение этого параметра, то считается, что они относятся к одной секции.
+    </system:String>
+    <system:String x:Key="GroupBySectionParamCommerToolTip">
+        Параметр, по которому группируются нежилые помещения в основные группы.
+        Внутри этих групп происходит дополнительная группировка по следующему параметру.
+    </system:String>
+    <system:String x:Key="GroupBySectionParamPublicToolTip">
+        Параметр, по которому помещения группируются по секциям.
+        Если помещения имеют одинаковое значение этого параметра, то считается, что они относятся к одной секции.
+    </system:String>
+    <system:String x:Key="GroupByGroupApartParamToolTip">
+        Параметр, по которому помещения группируются по квартирам.
+        Если помещения на одном этаже имеют одинаковое значение этого параметра
+        и находятся в одной секции, то считается, что они относятся к одной квартире.
+    </system:String>
+    <system:String x:Key="GroupByGroupCommerParamToolTip">
+        Параметр, по которому помещения группируются внутри основных групп.
+        Помещения, сгруппированные по этому параметру объединяются в одну строку в декларации.
+    </system:String>
+    <system:String x:Key="MultiStoreyApartParamToolTip">
+        Параметр, по которому определяются двухуровневые квартиры. Все помещения, 
+        имеющие одинаковое значения этого параметра, будут считаться одной квартирой, 
+        даже если они находятся на разных уровнях. Для одноуровневых квартир параметр можно не заполнять.";
+    </system:String>
+    <system:String x:Key="MultiStoreyCommerParamToolTip">
+        Параметр, по которому определяются двухуровневые группы. Все помещения, 
+        имеющие одинаковое значения этого параметра, будут считаться одной группой, даже если они 
+        находятся на разных уровнях. Для одноуровневых групп параметр можно не заполнять.
+    </system:String>
+
+    <system:String x:Key="DepartmentParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Назначение"
+    </system:String>
+    <system:String x:Key="LevelParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Этаж расположения"
+    </system:String>
+    <system:String x:Key="SectionParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Номер подъезда"
+    </system:String>
+    <system:String x:Key="BuildingParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Номер корпуса"
+    </system:String>
+    <system:String x:Key="BuildingNumberParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Номер здания"
+    </system:String>
+    <system:String x:Key="ConstrWorkNumberParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Номер ОКС"
+    </system:String>
+    <system:String x:Key="ApartNumParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Номер на площадке"
+    </system:String>
+    <system:String x:Key="RoomsHeightParamToolTip">
+        Числовой параметр, значение которого выводится в столбец декларации "Высота потолков"
+    </system:String>
+    <system:String x:Key="ProjectNameToolTip">
+        Значение, которое выводится в столбец декларации "ИД Объекта"
+    </system:String>
+
+    <system:String x:Key="ApartAreaParamToolTip">
+        Числовой параметр, значение которого выводится в столбец декларации "Общая площадь без пониж. коэффициента"
+    </system:String>
+    <system:String x:Key="ApartAreaCoefParamToolTip">
+        Числовой параметр, значение которого выводится в столбец декларации "Общая площадь с пониж. коэффициентом"
+    </system:String>
+    <system:String x:Key="ApartAreaLivingParamToolTip">
+        Числовой параметр, значение которого выводится в столбец декларации "Жилая площадь"
+    </system:String>
+    <system:String x:Key="ApartAreaNonSumParamToolTip">
+        Числовой параметр, значение которого выводится в столбец декларации "Площадь квартиры без летних помещений"
+    </system:String>
+    <system:String x:Key="RoomsAmountParamToolTip">
+        Целочисленный параметр, значение которого выводится в столбец декларации "Количество комнат"
+    </system:String>
+    <system:String x:Key="ApartFullNumParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Сквозной номер квартиры"
+    </system:String>
+
+    <system:String x:Key="ConditionalNumberParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Условный номер".
+        В значение можно добавить префикс, для этого надо поставить галочку и выбрать параметр для префикса.
+    </system:String>
+    <system:String x:Key="ParkingSpaceClassParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Класс машино-места"
+    </system:String>
+    <system:String x:Key="CommercialAreaParamToolTip">
+        Числовой параметр, значение которого выводится в столбец декларации "Общая площадь".
+        Необходимо выбрать два параметра. Один для случая, когда группа состоит из нескольких помещений,
+        другой для случая, когда группа состоит из одного помещения.
+    </system:String>
+    <system:String x:Key="CommercialNameClassParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Наименование помещения".
+        Необходимо выбрать два параметра. Один для случая, когда группа состоит из нескольких помещений,
+        другой для случая, когда группа состоит из одного помещения.
+    </system:String>
+
+    <system:String x:Key="PublicAreaNumberParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "№ п/п".
+        В значение можно добавить префикс, для этого надо поставить галочку и выбрать параметр для префикса.
+    </system:String>
+    <system:String x:Key="PublicAreaNameParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Вид помещения"
+    </system:String>
+    <system:String x:Key="PublicAreaPositionParamToolTip">
+        Текстовые параметры, значения которых выводится в столбец декларации "Описание места расположения помещения".
+        Значение выводится в формате "Корпус 'Корпус', Секция 'Секция', 'Этаж' этаж".
+    </system:String>
+    <system:String x:Key="PublicAreaDepartmentParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец декларации "Назначение помещения"
+    </system:String>
+    <system:String x:Key="PublicAreaAreaParamToolTip">
+        Числовой параметр, значение которого выводится в столбец декларации "Площадь".
+        Необходимо выбрать два параметра. Один для случая, когда группа состоит из нескольких помещений,
+        другой для случая, когда группа состоит из одного помещения.
+    </system:String>
+
+    <system:String x:Key="RoomNameParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец с наименованием помещения.
+        Значение заполняется в формате "Имя_Номер".
+    </system:String>
+    <system:String x:Key="RoomNumberParamToolTip">
+        Текстовый параметр, значение которого выводится в столбец с номером помещения.
+        Значение заполняется в формате "Номер".
+    </system:String>
+    <system:String x:Key="RoomAreaParamToolTip">
+        Числовой параметр, значение которого выводится в столбец с площадью помещения без коэффициента.
+    </system:String>
+    <system:String x:Key="RoomAreaCoefParamToolTip">
+        Числовой параметр, значение которого выводится в столбец с площадью помещения с коэффициентом.
+    </system:String>
+
+</ResourceDictionary>

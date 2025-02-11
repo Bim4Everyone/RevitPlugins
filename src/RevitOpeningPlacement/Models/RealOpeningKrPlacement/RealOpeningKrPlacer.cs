@@ -27,6 +27,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         public const string RealOpeningKrDiameter = "ФОП_РАЗМ_Диаметр";
         public const string RealOpeningKrInWallWidth = "ФОП_РАЗМ_Ширина";
         public const string RealOpeningKrInWallHeight = "ФОП_РАЗМ_Высота";
+        public const string RealOpeningKrThickness = "ФОП_РАЗМ_Глубина";
         public const string RealOpeningKrInFloorHeight = "мод_ФОП_Габарит А";
         public const string RealOpeningKrInFloorWidth = "мод_ФОП_Габарит Б";
         public const string RealOpeningTaskId = "ФОП_ID задания";
@@ -267,6 +268,8 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
                 throw new OpeningNotPlacedException(exFrameworkNull.Message);
             } catch(ArgumentException exFrameworkArg) {
                 throw new OpeningNotPlacedException(exFrameworkArg.Message);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException exInvalid) {
+                throw new OpeningNotPlacedException(exInvalid.Message);
             }
         }
 

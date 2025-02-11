@@ -13,7 +13,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// <summary>
         /// Класс, предоставляющий значение отметки низа отверстия от уровня в единицах Revit
         /// </summary>
-        /// <param name="offsetMmValueGetter">Провайдер отметки низа отверстия в мм от начала проекта</param>
+        /// <param name="offsetMmValueGetter">Провайдер отметки низа отверстия в мм</param>
         /// <param name="levelFinder">Провайдер уровня, на котором размещается отверстие</param>
         /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public OffsetFromLevelValueGetter(

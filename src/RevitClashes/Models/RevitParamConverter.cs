@@ -14,7 +14,7 @@ using pyRevitLabs.Json.Linq;
 
 namespace RevitClashDetective.Models {
     /// <summary>
-    /// Класс для корректировки сериализации/десериализации типа <see cref="SystemParam"/> для корректировки свойства <see cref="SystemParam.StorageType"/>
+    /// РљР»Р°СЃСЃ РґР»СЏ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєРё СЃРµСЂРёР°Р»РёР·Р°С†РёРё/РґРµСЃРµСЂРёР°Р»РёР·Р°С†РёРё С‚РёРїР° <see cref="SystemParam"/> РґР»СЏ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєРё СЃРІРѕР№СЃС‚РІР° <see cref="SystemParam.StorageType"/>
     /// </summary>
     internal class RevitParamConverter : JsonConverter {
         private readonly Document _document;
@@ -23,10 +23,10 @@ namespace RevitClashDetective.Models {
         private readonly ProjectParamsConfig _projectParamsConfig = ProjectParamsConfig.Instance;
 
         /// <summary>
-        /// Конструктор конвертера типа <see cref="SystemParam"/> для корректировки назначения свойства <see cref="SystemParam.StorageType"/>
+        /// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕРЅРІРµСЂС‚РµСЂР° С‚РёРїР° <see cref="SystemParam"/> РґР»СЏ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєРё РЅР°Р·РЅР°С‡РµРЅРёСЏ СЃРІРѕР№СЃС‚РІР° <see cref="SystemParam.StorageType"/>
         /// </summary>
-        /// <param name="document">Документ, в котором запущена конвертация</param>
-        /// <exception cref="ArgumentNullException">Исключение, если входной параметр - пустая ссылка</exception>
+        /// <param name="document">Р”РѕРєСѓРјРµРЅС‚, РІ РєРѕС‚РѕСЂРѕРј Р·Р°РїСѓС‰РµРЅР° РєРѕРЅРІРµСЂС‚Р°С†РёСЏ</param>
+        /// <exception cref="ArgumentNullException">РСЃРєР»СЋС‡РµРЅРёРµ, РµСЃР»Рё РІС…РѕРґРЅРѕР№ РїР°СЂР°РјРµС‚СЂ - РїСѓСЃС‚Р°СЏ СЃСЃС‹Р»РєР°</exception>
         public RevitParamConverter(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
@@ -40,11 +40,11 @@ namespace RevitClashDetective.Models {
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
-            throw new NotImplementedException("Конвертер поддерживает только ReadJson метод");
+            throw new NotImplementedException("РљРѕРЅРІРµСЂС‚РµСЂ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ С‚РѕР»СЊРєРѕ ReadJson РјРµС‚РѕРґ");
         }
 
-        // свойство reader.Value возвращает текущее значение токена JSON
-        // метод reader.Read() читает передвигается на 1 токен к концу JSON файла
+        // СЃРІРѕР№СЃС‚РІРѕ reader.Value РІРѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ С‚РѕРєРµРЅР° JSON
+        // РјРµС‚РѕРґ reader.Read() С‡РёС‚Р°РµС‚ РїРµСЂРµРґРІРёРіР°РµС‚СЃСЏ РЅР° 1 С‚РѕРєРµРЅ Рє РєРѕРЅС†Сѓ JSON С„Р°Р№Р»Р°
         // https://stackoverflow.com/questions/23017716/json-net-how-to-deserialize-without-using-the-default-constructor
         // https://stackoverflow.com/questions/20995865/deserializing-json-to-abstract-class
         // https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/converters-how-to?pivots=dotnet-6-0#sample-factory-pattern-converter
@@ -54,13 +54,13 @@ namespace RevitClashDetective.Models {
             JObject jobj = JObject.Load(reader);
             string typeName = jobj["$type"].Value<string>()?.Split(',').FirstOrDefault();
             if(string.IsNullOrWhiteSpace(typeName)) {
-                throw new JsonSerializationException($"Не удалось получить название типа параметра");
+                throw new JsonSerializationException($"РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕР»СѓС‡РёС‚СЊ РЅР°Р·РІР°РЅРёРµ С‚РёРїР° РїР°СЂР°РјРµС‚СЂР°");
             }
 
             if(typeName.Equals(typeof(SystemParam).FullName)) {
 
                 string id = jobj["Id"].Value<string>();
-                if(string.IsNullOrWhiteSpace(id)) { throw new JsonSerializationException($"Не удалось получить свойство {nameof(RevitParam.Id)}"); }
+                if(string.IsNullOrWhiteSpace(id)) { throw new JsonSerializationException($"РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕР»СѓС‡РёС‚СЊ СЃРІРѕР№СЃС‚РІРѕ {nameof(RevitParam.Id)}"); }
                 BuiltInParameter builtInParameter = (BuiltInParameter) Enum.Parse(typeof(BuiltInParameter), id);
                 SystemParam systemParam = _systemParamsConfig.CreateRevitParam(_document, builtInParameter);
                 return systemParam;
@@ -68,28 +68,28 @@ namespace RevitClashDetective.Models {
             } else if(typeName.Equals(typeof(SharedParam).FullName)) {
 
                 string name = jobj["Name"].Value<string>();
-                if(string.IsNullOrWhiteSpace(name)) { throw new JsonSerializationException($"Не удалось получить свойство {nameof(RevitParam.Name)}"); }
+                if(string.IsNullOrWhiteSpace(name)) { throw new JsonSerializationException($"РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕР»СѓС‡РёС‚СЊ СЃРІРѕР№СЃС‚РІРѕ {nameof(RevitParam.Name)}"); }
                 try {
                     return _sharedParamsConfig.CreateRevitParam(_document, name);
                 } catch(ArgumentNullException) {
-                    throw new JsonSerializationException($"В документе \'{_document.PathName}\' отсутствует общий параметр \'{name}\'");
+                    throw new JsonSerializationException($"Р’ РґРѕРєСѓРјРµРЅС‚Рµ \'{_document.PathName}\' РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РѕР±С‰РёР№ РїР°СЂР°РјРµС‚СЂ \'{name}\'");
                 }
 
             } else if(typeName.Equals(typeof(ProjectParam).FullName)) {
 
                 string name = jobj["Name"].Value<string>();
-                if(string.IsNullOrWhiteSpace(name)) { throw new JsonSerializationException($"Не удалось получить свойство {nameof(RevitParam.Name)}"); }
+                if(string.IsNullOrWhiteSpace(name)) { throw new JsonSerializationException($"РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕР»СѓС‡РёС‚СЊ СЃРІРѕР№СЃС‚РІРѕ {nameof(RevitParam.Name)}"); }
                 try {
                     return _projectParamsConfig.CreateRevitParam(_document, name);
                 } catch(ArgumentNullException) {
-                    throw new JsonSerializationException($"В документе \'{_document.PathName}\' отсутствует параметр проекта \'{name}\'");
+                    throw new JsonSerializationException($"Р’ РґРѕРєСѓРјРµРЅС‚Рµ \'{_document.PathName}\' РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РїР°СЂР°РјРµС‚СЂ РїСЂРѕРµРєС‚Р° \'{name}\'");
                 }
 
             } else if(typeName.Equals(typeof(CustomParam).FullName)) {
 
                 return jobj.ToObject<CustomParam>();
 
-            } else { throw new JsonSerializationException($"Не поддерживаемое название типа параметра: {typeName}"); }
+            } else { throw new JsonSerializationException($"РќРµ РїРѕРґРґРµСЂР¶РёРІР°РµРјРѕРµ РЅР°Р·РІР°РЅРёРµ С‚РёРїР° РїР°СЂР°РјРµС‚СЂР°: {typeName}"); }
         }
     }
 }

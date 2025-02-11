@@ -25,6 +25,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         public const string RealOpeningArDiameter = "ФОП_РАЗМ_Диаметр";
         public const string RealOpeningArWidth = "ФОП_РАЗМ_Ширина проёма";
         public const string RealOpeningArHeight = "ФОП_РАЗМ_Высота проёма";
+        public const string RealOpeningArThickness = "ФОП_РАЗМ_Глубина проёма";
         public const string RealOpeningIsEom = "ЭОМ";
         public const string RealOpeningIsSs = "СС";
         public const string RealOpeningIsOv = "ОВ";

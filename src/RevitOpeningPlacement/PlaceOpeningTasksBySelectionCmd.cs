@@ -10,6 +10,7 @@ using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement {
     [Transaction(TransactionMode.Manual)]
@@ -21,6 +22,17 @@ namespace RevitOpeningPlacement {
 
         protected override void Execute(UIApplication uiApplication) {
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<IDocTypesProvider>()
+                    .ToMethod(c => {
+                        return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.AR, DocTypeEnum.KR });
+                    })
+                    .InSingletonScope();
+                kernel.Bind<IRevitLinkTypesSetter>()
+                    .To<DocTypeLoadedLinksSetter>()
+                    .InTransientScope();
+                kernel.Bind<IDocTypesHandler>()
+                    .To<DocTypesHandler>()
+                    .InSingletonScope();
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
@@ -33,6 +45,8 @@ namespace RevitOpeningPlacement {
                 kernel.Bind<ParameterFilterProvider>()
                     .ToSelf()
                     .InSingletonScope();
+
+                kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
                 var revitRepository = kernel.Get<RevitRepository>();
                 var selectedMepElements = revitRepository

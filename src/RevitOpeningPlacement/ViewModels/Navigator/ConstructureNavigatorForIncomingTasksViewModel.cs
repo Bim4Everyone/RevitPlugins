@@ -168,7 +168,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             ICollection<OpeningRealKr> realOpenings = _revitRepository.GetRealOpeningsKr();
             ICollection<ElementId> constructureElementsIds = _revitRepository.GetConstructureElementsIds();
             ICollection<IConstructureLinkElementsProvider> arLinks = _revitRepository
-                .GetArLinks()
+                .GetSelectedRevitLinks()
                 .Select(link => new ConstructureLinkElementsProvider(_revitRepository, link)
                     as IConstructureLinkElementsProvider)
                 .ToArray();
@@ -190,7 +190,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             ICollection<OpeningRealKr> realOpenings = _revitRepository.GetRealOpeningsKr();
             ICollection<ElementId> constructureElementsIds = _revitRepository.GetConstructureElementsIds();
             ICollection<IMepLinkElementsProvider> mepLinks = _revitRepository
-                .GetMepLinks()
+                .GetSelectedRevitLinks()
                 .Select(link => new MepLinkElementsProvider(link) as IMepLinkElementsProvider)
                 .ToArray();
 
@@ -247,7 +247,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                 foreach(var incomingTask in incomingTasks) {
                     ct.ThrowIfCancellationRequested();
                     progress.Report(i);
-                    incomingTask.UpdateStatus(realOpenings, constructureElementsIds);
+                    incomingTask.UpdateStatusAndHost(realOpenings, constructureElementsIds);
                     incomintTasksViewModels.Add(new OpeningArTaskIncomingViewModel(incomingTask));
                     i++;
                 }
