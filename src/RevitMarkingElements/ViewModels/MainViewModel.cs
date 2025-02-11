@@ -16,7 +16,6 @@ using RevitMarkingElements.Views;
 namespace RevitMarkingElements.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private const BuiltInParameter _markParam = BuiltInParameter.ALL_MODEL_MARK;
-        private const BuiltInCategory _structuralColumns = BuiltInCategory.OST_StructuralColumns;
 
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
@@ -109,15 +108,18 @@ namespace RevitMarkingElements.ViewModels {
 
         private void LoadCategories() {
             var allCategories = _revitRepository
-               .GetSelectedElements()
-               .Select(item => item.Category)
-               .Where(category => category != null)
-               .GroupBy(category => category.Id)
-               .Select(group => group.First())
-               .ToList();
+                .GetSelectedElements()
+                .Select(item => item.Category)
+                .Where(category => category != null)
+                .GroupBy(category => category.Id)
+                .Select(group => group.First())
+                .ToList();
 
             Categories = allCategories;
-            SelectedCategory = allCategories.FirstOrDefault(x => x.GetBuiltInCategory() == _structuralColumns);
+
+            if(SelectedCategory == null && Categories.Any()) {
+                SelectedCategory = Categories.FirstOrDefault();
+            }
         }
 
         private void SelectLines(MainWindow mainWindow) {
@@ -267,15 +269,14 @@ namespace RevitMarkingElements.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            var selectedCategory = _revitRepository.GetCategoryByBuiltInCategory(setting?.SelectedCategory ?? _structuralColumns);
-            SelectedCategory = selectedCategory;
+            SelectedCategory = _revitRepository.GetCategoryByElementId(setting.SelectedCategory);
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            setting.SelectedCategory = SelectedCategory.GetBuiltInCategory();
+            setting.SelectedCategory = SelectedCategory.Id;
             _pluginConfig.SaveProjectConfig();
         }
 

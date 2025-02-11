@@ -133,8 +133,12 @@ namespace RevitMarkingElements.Models {
             return null;
         }
 
-        public Category GetCategoryByBuiltInCategory(BuiltInCategory builtInCategory) {
-            return Document.Settings.Categories.get_Item(builtInCategory);
+        public Category GetCategoryByElementId(ElementId categoryId) {
+            if(categoryId == null || categoryId == ElementId.InvalidElementId) {
+                return null;
+            }
+
+            return Category.GetCategory(Document, categoryId);
         }
     }
 }
