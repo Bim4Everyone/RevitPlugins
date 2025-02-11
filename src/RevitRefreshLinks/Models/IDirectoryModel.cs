@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace RevitRefreshLinks.Models {
     internal interface IDirectoryModel : IFileSystemInfoModel {
-        Task<IDirectoryModel> GetParent();
+        Task<IDirectoryModel> GetParentAsync();
 
-        Task<IDirectoryModel> GetRoot();
+        Task<IDirectoryModel> GetRootAsync();
 
         Task<IDirectoryModel[]> GetDirectoriesAsync();
 

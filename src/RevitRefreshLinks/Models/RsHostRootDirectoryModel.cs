@@ -69,11 +69,11 @@ namespace RevitRefreshLinks.Models {
             }
         }
 
-        public async Task<IDirectoryModel> GetParent() {
+        public async Task<IDirectoryModel> GetParentAsync() {
             return await Task.FromResult(this);
         }
 
-        public async Task<IDirectoryModel> GetRoot() {
+        public async Task<IDirectoryModel> GetRootAsync() {
             return await Task.FromResult(this);
         }
     }

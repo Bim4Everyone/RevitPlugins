@@ -4,8 +4,8 @@ using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.Services {
     internal interface IFileSystem {
-        Task<IDirectoryModel> GetRootDirectory();
+        Task<IDirectoryModel> GetRootDirectoryAsync();
 
-        Task<IDirectoryModel> GetDirectory(string path);
+        Task<IDirectoryModel> GetDirectoryAsync(string path);
     }
 }

@@ -70,19 +70,19 @@ namespace RevitRefreshLinks.Models {
             }
         }
 
-        public virtual async Task<IDirectoryModel> GetParent() {
+        public virtual async Task<IDirectoryModel> GetParentAsync() {
             Uri uri = new Uri(FullName.Replace('\\', '/'));
             var parent = Path.GetDirectoryName(uri.LocalPath);
 
             if(string.IsNullOrWhiteSpace(parent)) {
-                return await GetRoot();
+                return await GetRootAsync();
             } else {
                 var contents = await _serverClient.GetFolderContentsAsync(parent);
                 return new RsDirectoryModel(contents, _serverClient);
             }
         }
 
-        public virtual async Task<IDirectoryModel> GetRoot() {
+        public virtual async Task<IDirectoryModel> GetRootAsync() {
             var rootContent = await _serverClient.GetRootFolderContentsAsync();
             return new RsRootDirectory(rootContent, _serverClient);
         }

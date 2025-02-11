@@ -17,7 +17,7 @@ namespace RevitRefreshLinks.Services {
         }
 
 
-        public async Task<IDirectoryModel> GetDirectory(string path) {
+        public async Task<IDirectoryModel> GetDirectoryAsync(string path) {
             Uri uri = new Uri(path.Replace(@"\", @"/"));
             IServerClient serverClient = _serverClients.FirstOrDefault(
                 item => item.ServerName.Equals(uri.Host, StringComparison.OrdinalIgnoreCase));
@@ -28,14 +28,14 @@ namespace RevitRefreshLinks.Services {
             string currentFolder = Path.GetFileName(uri.LocalPath);
 
             if(string.IsNullOrEmpty(currentFolder)) {
-                return await GetRootDirectory();
+                return await GetRootDirectoryAsync();
             } else {
                 var folderContents = await serverClient.GetFolderContentsAsync(currentFolder);
                 return new RsDirectoryModel(folderContents, serverClient);
             }
         }
 
-        public async Task<IDirectoryModel> GetRootDirectory() {
+        public async Task<IDirectoryModel> GetRootDirectoryAsync() {
             return await Task.FromResult(new RsHostRootDirectoryModel(_serverClients));
         }
     }

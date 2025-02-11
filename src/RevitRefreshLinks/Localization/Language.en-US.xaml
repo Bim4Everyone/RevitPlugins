@@ -67,4 +67,7 @@
 
     <system:String
         x:Key="SelectLocalFoldersDialog.Title">Select folders with links to update</system:String>
+
+    <system:String
+        x:Key="TODO">TODO</system:String>
 </ResourceDictionary>

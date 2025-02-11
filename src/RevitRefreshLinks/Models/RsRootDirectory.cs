@@ -25,11 +25,11 @@ namespace RevitRefreshLinks.Models {
         public override string Name { get; }
 
 
-        public override async Task<IDirectoryModel> GetParent() {
+        public override async Task<IDirectoryModel> GetParentAsync() {
             return await Task.FromResult(this);
         }
 
-        public override async Task<IDirectoryModel> GetRoot() {
+        public override async Task<IDirectoryModel> GetRootAsync() {
             return await Task.FromResult(this);
         }
     }
