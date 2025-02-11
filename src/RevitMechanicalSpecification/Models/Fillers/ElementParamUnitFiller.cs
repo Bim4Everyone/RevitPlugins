@@ -70,8 +70,9 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 return Config.SingleUnit;
             }
             if(_kitNames.Contains(unit)) {
-                return Config.SingleUnit;
+                return Config.KitUnit;
             }
+            
             return defaultUnit;
         }
 
@@ -96,9 +97,9 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             }
             if(element.Category.IsId(BuiltInCategory.OST_PipeInsulations)) {
                 return DefaultCheck(Config.MeterUnit);
+            } else {
+                return DefaultCheck(Config.SingleUnit);
             }
-
-            return Config.SingleUnit;
         }
     }
 }
