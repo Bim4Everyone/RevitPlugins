@@ -1,39 +1,44 @@
-
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitRefreshLinks.Models;
 using RevitRefreshLinks.Services;
 
 namespace RevitRefreshLinks.ViewModels {
-    internal class AddLinksViewModel : BaseViewModel {
-        private readonly IOneSourceLinksProvider _linksProvider;
+    internal class AddServerLinksViewModel : BaseViewModel {
+        private readonly IServerSourceLinksProvider _linksProvider;
         private readonly ILinksLoader _linksLoader;
 
-        public AddLinksViewModel(
-            IOneSourceLinksProvider linksProvider,
+        public AddServerLinksViewModel(
+            IServerSourceLinksProvider linksProvider,
             ILinksLoader linksLoader) {
 
             _linksProvider = linksProvider
                 ?? throw new System.ArgumentNullException(nameof(linksProvider));
             _linksLoader = linksLoader
                 ?? throw new System.ArgumentNullException(nameof(linksLoader));
+
+            AddLinksCommand = RelayCommand.CreateAsync(AddLinks);
         }
 
+        public ICommand AddLinksCommand { get; }
 
-        public bool ShowWindow() {
-            var links = _linksProvider.GetLinks();
+        public async Task AddLinks() {
+            var linksFromSource = await _linksProvider.GetServerLinksAsync();
             ICollection<(ILink Link, string Error)> errors;
             using(var progressDialogService = GetPlatformService<IProgressDialogService>()) {
                 var progress = progressDialogService.CreateProgress();
-                progressDialogService.MaxValue = links.Count;
+                progressDialogService.MaxValue = linksFromSource.Links.Count;
                 var ct = progressDialogService.CreateCancellationToken();
                 progressDialogService.Show();
 
-                errors = _linksLoader.AddLinks(links, progress, ct);
+                errors = _linksLoader.AddLinks(linksFromSource.Links, progress, ct);
             }
             if(errors.Count > 0) {
                 var msg = string.Join("\n\n",
@@ -45,7 +50,6 @@ namespace RevitRefreshLinks.ViewModels {
                     System.Windows.MessageBoxButton.OK,
                     System.Windows.MessageBoxImage.Warning);
             }
-            return true;
         }
     }
 }

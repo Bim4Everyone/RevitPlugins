@@ -152,7 +152,7 @@ namespace RevitRefreshLinks.ViewModels {
 
         private async Task SelectServerSource() {
             try {
-                var result = await _linksProvider.GetServerLinks();
+                var result = await _linksProvider.GetServerLinksAsync();
                 SelectedServerSource = result.SourceName;
                 ResetServerLinks(result.Links);
             } catch(OperationCanceledException) {

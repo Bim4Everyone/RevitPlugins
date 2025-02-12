@@ -30,13 +30,13 @@ namespace RevitRefreshLinks {
                 kernel.Bind<UIApplication>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<IOneSourceLinksProvider>()
-                    .To<OneFolderLinksProvider>()
+                kernel.Bind<ILocalSourceLinksProvider>()
+                    .To<FolderLinksProvider>()
                     .InSingletonScope();
                 kernel.Bind<ILinksLoader>()
                     .To<LinksLoader>()
                     .InSingletonScope();
-                kernel.Bind<AddLinksViewModel>()
+                kernel.Bind<AddLocalLinksViewModel>()
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<IConfigProvider>()
@@ -52,13 +52,13 @@ namespace RevitRefreshLinks {
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
                 var localizationService = kernel.Get<ILocalizationService>();
-                kernel.UseXtraOpenFileDialog<OneFolderLinksProvider>(
+                kernel.UseXtraOpenFileDialog<FolderLinksProvider>(
                     title: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Title"),
                     filter: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Filter"),
                     initialDirectory: GetInitialFolder(kernel),
                     multiSelect: true);
 
-                Notification(kernel.Get<AddLinksViewModel>().ShowWindow());
+                Notification(kernel.Get<AddLocalLinksViewModel>().ShowWindow());
             }
         }
 

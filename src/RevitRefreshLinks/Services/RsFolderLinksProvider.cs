@@ -1,42 +1,38 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-
-using dosymep.SimpleServices;
+using System.Threading.Tasks;
 
 using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.Services {
-    internal class OneFolderLinksProvider : IOneSourceLinksProvider {
+    internal class RsFolderLinksProvider : IServerSourceLinksProvider {
         private readonly RevitRepository _revitRepository;
         private readonly IConfigProvider _configProvider;
-        private readonly IOpenFileDialogService _openFileDialog;
+        private readonly IOpenFileDialog _openFileDialog;
 
-        public OneFolderLinksProvider(
+        public RsFolderLinksProvider(
             RevitRepository revitRepository,
             IConfigProvider configProvider,
-            IOpenFileDialogService openFileDialog) {
-
+            IOpenFileDialog openFileDialog) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _configProvider = configProvider ?? throw new ArgumentNullException(nameof(configProvider));
             _openFileDialog = openFileDialog ?? throw new ArgumentNullException(nameof(openFileDialog));
         }
 
 
-        public ICollection<ILink> GetLinks() {
+        public async Task<ILinksFromSource> GetServerLinksAsync() {
             if(_openFileDialog.ShowDialog()) {
-                var config = _configProvider.GetAddLinksFromFolderConfig();
+                var config = _configProvider.GetAddLinksFromServerConfig();
                 var settings = config.GetSettings(_revitRepository.Document)
                     ?? config.AddSettings(_revitRepository.Document);
-                settings.InitialFolderPath = _openFileDialog.File.DirectoryName;
+                settings.InitialServerPath = _openFileDialog.File.DirectoryName;
                 config.SaveProjectConfig();
 
-                const string rvtExtension = ".rvt";
-
-                return _openFileDialog.Files
-                    .Where(file => file.Extension.Equals(rvtExtension))
-                    .Select(file => new Link(file.FullName))
-                    .ToArray();
+                return await Task.FromResult(
+                    new LinksFromSource(settings.InitialServerPath,
+                        _openFileDialog.Files
+                            .Select(f => new Link(f.FullName))
+                            .ToArray()));
             } else {
                 throw new OperationCanceledException();
             }

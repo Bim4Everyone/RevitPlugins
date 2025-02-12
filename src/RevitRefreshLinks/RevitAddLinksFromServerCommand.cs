@@ -11,6 +11,7 @@ using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
+using RevitRefreshLinks.Extensions;
 using RevitRefreshLinks.Models;
 using RevitRefreshLinks.Services;
 using RevitRefreshLinks.ViewModels;
@@ -30,13 +31,13 @@ namespace RevitRefreshLinks {
                 kernel.Bind<UIApplication>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<IOneSourceLinksProvider>()
-                    .To<OneRsFolderLinksProvider>()
+                kernel.Bind<IServerSourceLinksProvider>()
+                    .To<RsFolderLinksProvider>()
                     .InSingletonScope();
                 kernel.Bind<ILinksLoader>()
                     .To<LinksLoader>()
                     .InSingletonScope();
-                kernel.Bind<AddLinksViewModel>()
+                kernel.Bind<AddServerLinksViewModel>()
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<IConfigProvider>()
@@ -52,9 +53,19 @@ namespace RevitRefreshLinks {
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
                 var localizationService = kernel.Get<ILocalizationService>();
+                kernel.UseRsOpenFileDialog(
+                    title: localizationService.GetLocalizedString("TODO"),
+                    initialDirectory: GetInitialServerFolder(kernel),
+                    multiSelect: true);
 
-                Notification(kernel.Get<AddLinksViewModel>().ShowWindow());
+                kernel.Get<AddServerLinksViewModel>().AddLinksCommand.Execute(default);
             }
+        }
+
+        private string GetInitialServerFolder(IKernel kernel) {
+            return kernel.Get<AddLinksFromServerConfig>()
+                .GetSettings(kernel.Get<UIApplication>().ActiveUIDocument.Document)
+                ?.InitialServerPath ?? string.Empty;
         }
     }
 }

@@ -4,9 +4,9 @@ namespace RevitRefreshLinks.Services {
     internal interface IOpenFileDialog : IOpenDialogBase {
         bool AddExtension { get; set; }
 
-        IFileModel FileName { get; set; }
+        IFileModel File { get; set; }
 
-        IFileModel[] FileNames { get; }
+        IFileModel[] Files { get; }
 
         string Filter { get; set; }
     }

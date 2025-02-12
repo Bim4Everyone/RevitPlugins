@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
 namespace RevitRefreshLinks.Models {
-    internal class SelectLinksResult : ISelectLinksResult {
-        public SelectLinksResult(string sourceName, ICollection<ILink> links) {
+    internal class LinksFromSource : ILinksFromSource {
+        public LinksFromSource(string sourceName, ICollection<ILink> links) {
             if(string.IsNullOrWhiteSpace(sourceName)) {
                 throw new System.ArgumentException(nameof(sourceName));
             }
