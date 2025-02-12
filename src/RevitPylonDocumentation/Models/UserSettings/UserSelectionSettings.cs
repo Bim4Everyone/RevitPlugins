@@ -7,11 +7,17 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private bool _needWorkWithTransverseViewFirst = false;
         private bool _needWorkWithTransverseViewSecond = false;
         private bool _needWorkWithTransverseViewThird = false;
+
         private bool _needWorkWithRebarSchedule = false;
         private bool _needWorkWithMaterialSchedule = false;
         private bool _needWorkWithSystemPartsSchedule = false;
         private bool _needWorkWithIfcPartsSchedule = false;
         private bool _needWorkWithLegend = false;
+
+        private bool _needWorkWithGeneralRebarView = false;
+        private bool _needWorkWithGeneralPerpendicularRebarView = false;
+        private bool _needWorkWithTransverseRebarView = false;
+        private bool _needWorkWithSkeletonSchedule = false;
 
 
         public bool NeedWorkWithGeneralView {
@@ -61,6 +67,26 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         public bool NeedWorkWithLegend {
             get => _needWorkWithLegend;
             set => RaiseAndSetIfChanged(ref _needWorkWithLegend, value);
+        }
+
+        public bool NeedWorkWithGeneralRebarView {
+            get => _needWorkWithGeneralRebarView;
+            set => RaiseAndSetIfChanged(ref _needWorkWithGeneralRebarView, value);
+        }
+
+        public bool NeedWorkWithGeneralPerpendicularRebarView {
+            get => _needWorkWithGeneralPerpendicularRebarView;
+            set => RaiseAndSetIfChanged(ref _needWorkWithGeneralPerpendicularRebarView, value);
+        }
+
+        public bool NeedWorkWithTransverseRebarView {
+            get => _needWorkWithTransverseRebarView;
+            set => RaiseAndSetIfChanged(ref _needWorkWithTransverseRebarView, value);
+        }
+
+        public bool NeedWorkWithSkeletonSchedule {
+            get => _needWorkWithSkeletonSchedule;
+            set => RaiseAndSetIfChanged(ref _needWorkWithSkeletonSchedule, value);
         }
     }
 }

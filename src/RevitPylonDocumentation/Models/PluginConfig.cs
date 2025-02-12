@@ -41,6 +41,10 @@ namespace RevitPylonDocumentation.Models {
             selectionSettings.NeedWorkWithSystemPartsSchedule = settings.NeedWorkWithSystemPartsSchedule;
             selectionSettings.NeedWorkWithIfcPartsSchedule = settings.NeedWorkWithIfcPartsSchedule;
             selectionSettings.NeedWorkWithLegend = settings.NeedWorkWithLegend;
+            selectionSettings.NeedWorkWithGeneralRebarView = settings.NeedWorkWithGeneralRebarView;
+            selectionSettings.NeedWorkWithGeneralPerpendicularRebarView = settings.NeedWorkWithGeneralPerpendicularRebarView;
+            selectionSettings.NeedWorkWithTransverseRebarView = settings.NeedWorkWithTransverseRebarView;
+            selectionSettings.NeedWorkWithSkeletonSchedule = settings.NeedWorkWithSkeletonSchedule;
 
             projectSettings.ProjectSection = settings.ProjectSection;
             projectSettings.ProjectSectionTemp = settings.ProjectSection;
@@ -193,6 +197,10 @@ namespace RevitPylonDocumentation.Models {
             settings.NeedWorkWithSystemPartsSchedule = selectionSettings.NeedWorkWithSystemPartsSchedule;
             settings.NeedWorkWithIfcPartsSchedule = selectionSettings.NeedWorkWithIfcPartsSchedule;
             settings.NeedWorkWithLegend = selectionSettings.NeedWorkWithLegend;
+            settings.NeedWorkWithGeneralRebarView = selectionSettings.NeedWorkWithGeneralRebarView;
+            settings.NeedWorkWithGeneralPerpendicularRebarView = selectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
+            settings.NeedWorkWithTransverseRebarView = selectionSettings.NeedWorkWithTransverseRebarView;
+            settings.NeedWorkWithSkeletonSchedule = selectionSettings.NeedWorkWithSkeletonSchedule;
 
             settings.ProjectSection = projectSettings.ProjectSection;
             settings.Mark = projectSettings.Mark;
@@ -283,6 +291,10 @@ namespace RevitPylonDocumentation.Models {
         public bool NeedWorkWithSystemPartsSchedule { get; set; }
         public bool NeedWorkWithIfcPartsSchedule { get; set; }
         public bool NeedWorkWithLegend { get; set; }
+        public bool NeedWorkWithGeneralRebarView { get; set; }
+        public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
+        public bool NeedWorkWithTransverseRebarView { get; set; }
+        public bool NeedWorkWithSkeletonSchedule { get; set; }
 
 
         public string ProjectSection { get; set; }

@@ -62,12 +62,15 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         public double TitleBlockWidth { get; set; }
 
 
-        // Видовые экраны разразов
+        // Видовые экраны разрезов
         public PylonView GeneralView { get; set; }
+        public PylonView GeneralRebarView { get; set; }
         public PylonView GeneralViewPerpendicular { get; set; }
+        public PylonView GeneralRebarViewPerpendicular { get; set; }
         public PylonView TransverseViewFirst { get; set; }
         public PylonView TransverseViewSecond { get; set; }
         public PylonView TransverseViewThird { get; set; }
+        public PylonView TransverseRebarView { get; set; }
 
 
 
@@ -76,6 +79,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         public PylonView MaterialSchedule { get; set; }
         public PylonView SystemPartsSchedule { get; set; }
         public PylonView IfcPartsSchedule { get; set; }
+        public PylonView SkeletonSchedule { get; set; }
 
 
         // Легенда примечаний

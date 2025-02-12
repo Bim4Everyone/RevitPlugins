@@ -396,6 +396,11 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
             SelectionSettings.NeedWorkWithLegend = false;
 
+            SelectionSettings.NeedWorkWithGeneralRebarView = false;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
+            SelectionSettings.NeedWorkWithTransverseRebarView = false;
+            SelectionSettings.NeedWorkWithSkeletonSchedule = false;
+
             MainWindow mainWindow = new MainWindow();
             mainWindow.DataContext = this;
             mainWindow.ShowDialog();
@@ -672,6 +677,10 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithSystemPartsSchedule = true;
             SelectionSettings.NeedWorkWithIfcPartsSchedule = true;
             SelectionSettings.NeedWorkWithLegend = true;
+            SelectionSettings.NeedWorkWithGeneralRebarView = true;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = true;
+            SelectionSettings.NeedWorkWithTransverseRebarView = true;
+            SelectionSettings.NeedWorkWithSkeletonSchedule = true;
         }
 
 
@@ -690,6 +699,10 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
             SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
             SelectionSettings.NeedWorkWithLegend = false;
+            SelectionSettings.NeedWorkWithGeneralRebarView = false;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
+            SelectionSettings.NeedWorkWithTransverseRebarView = false;
+            SelectionSettings.NeedWorkWithSkeletonSchedule = false;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 SheetInfo.GetViewNamesForWork();
             }
 
-            // Если листы был в проекте (когда плагин запускают для создания/размещения видов), то мы об этом знаем из RevitRepository
+            // Если листы были в проекте (когда плагин запускают для создания/размещения видов), то мы об этом знаем из RevitRepository
             if(SheetInfo.PylonViewSheet is null) {
                 SheetInfo.CreateSheet();
             } else {
@@ -46,6 +46,22 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
                 // Тут точно получили вид
             }
+
+
+
+            // ОСНОВНОЙ АРМАТУРНЫЙ ВИД
+            if(selectionSettings.NeedWorkWithGeneralRebarView) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.GeneralView.ViewElement is null) {
+                    // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                    if(!SheetInfo.GeneralView.ViewSectionCreator.TryCreateGeneralView(ViewModel.SelectedViewFamilyType)) {
+                        Repository.FindViewSectionInPj(SheetInfo.GeneralView);
+                    }
+                }
+                // Тут точно получили вид
+            }
+
+
 
 
             // ОСНОВНОЙ ПЕРПЕНДИКУЛЯРНЫЙ ВИД 
