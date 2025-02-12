@@ -6,9 +6,15 @@ namespace RevitPylonDocumentation.Models.UserSettings {
     internal class UserViewSectionSettings : BaseViewModel {
         private string _generalViewPrefixTemp = "";
         private string _generalViewSuffixTemp = "";
+        private string _generalViewRebarPrefixTemp = "";
+        private string _generalViewRebarSuffixTemp = "_Армирование";
         private string _generalViewPerpendicularPrefixTemp = "";
         private string _generalViewPerpendicularSuffixTemp = "_Боковой";
+        private string _generalViewPerpendicularRebarPrefixTemp = "";
+        private string _generalViewPerpendicularRebarSuffixTemp = "_Боковой_Армирование";
+
         private string _generalViewTemplateNameTemp = "!Новый РАЗРЕЗ";
+        private string _generalViewRebarTemplateNameTemp = "!Новый РАЗРЕЗ";
         private string _generalViewXOffsetTemp = "200";
         private string _generalViewYTopOffsetTemp = "2300";
         private string _generalViewYBottomOffsetTemp = "200";
@@ -22,7 +28,13 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _transverseViewThirdPrefixTemp = "";
         private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
         private string _transverseViewThirdElevationTemp = "1,25";
+
+        private string _transverseViewRebarPrefixTemp = "";
+        private string _transverseViewRebarSuffixTemp = "_Сеч.а-а";
+        private string _transverseViewRebarElevationTemp = "0,3";
+
         private string _transverseViewTemplateNameTemp = "!Новый РАЗРЕЗ";
+        private string _transverseViewRebarTemplateNameTemp = "!Новый РАЗРЕЗ";
         private string _transverseViewXOffsetTemp = "200";
         private string _transverseViewYOffsetTemp = "200";
 
@@ -47,6 +59,21 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _generalViewSuffixTemp, value);
         }
 
+
+        /// <summary>
+        /// /////////////////////////////////////////////////////////////////////
+        /// </summary>
+
+
+
+
+
+
+        /// <summary>
+        /// /////////////////////////////////////////////////////////////////////
+        /// </summary>
+
+
         public string GeneralViewPerpendicularPrefix { get; set; }
         public string GeneralViewPerpendicularPrefixTemp {
             get => _generalViewPerpendicularPrefixTemp;
@@ -59,10 +86,40 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _generalViewPerpendicularSuffixTemp, value);
         }
 
+        public string GeneralViewRebarPrefix { get; set; }
+        public string GeneralViewRebarPrefixTemp {
+            get => _generalViewRebarPrefixTemp;
+            set => RaiseAndSetIfChanged(ref _generalViewRebarPrefixTemp, value);
+        }
+
+        public string GeneralViewRebarSuffix { get; set; }
+        public string GeneralViewRebarSuffixTemp {
+            get => _generalViewRebarSuffixTemp;
+            set => RaiseAndSetIfChanged(ref _generalViewRebarSuffixTemp, value);
+        }
+
+        public string GeneralViewPerpendicularRebarPrefix { get; set; }
+        public string GeneralViewPerpendicularRebarPrefixTemp {
+            get => _generalViewPerpendicularRebarPrefixTemp;
+            set => RaiseAndSetIfChanged(ref _generalViewPerpendicularRebarPrefixTemp, value);
+        }
+
+        public string GeneralViewPerpendicularRebarSuffix { get; set; }
+        public string GeneralViewPerpendicularRebarSuffixTemp {
+            get => _generalViewPerpendicularRebarSuffixTemp;
+            set => RaiseAndSetIfChanged(ref _generalViewPerpendicularRebarSuffixTemp, value);
+        }
+
         public string GeneralViewTemplateName { get; set; }
         public string GeneralViewTemplateNameTemp {
             get => _generalViewTemplateNameTemp;
             set => RaiseAndSetIfChanged(ref _generalViewTemplateNameTemp, value);
+        }
+
+        public string GeneralViewRebarTemplateName { get; set; }
+        public string GeneralViewRebarTemplateNameTemp {
+            get => _generalViewRebarTemplateNameTemp;
+            set => RaiseAndSetIfChanged(ref _generalViewRebarTemplateNameTemp, value);
         }
 
         public string GeneralViewXOffset { get; set; }
@@ -138,10 +195,34 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _transverseViewThirdElevationTemp, value);
         }
 
+        public string TransverseViewRebarPrefix { get; set; }
+        public string TransverseViewRebarPrefixTemp {
+            get => _transverseViewRebarPrefixTemp;
+            set => RaiseAndSetIfChanged(ref _transverseViewRebarPrefixTemp, value);
+        }
+
+        public string TransverseViewRebarSuffix { get; set; }
+        public string TransverseViewRebarSuffixTemp {
+            get => _transverseViewRebarSuffixTemp;
+            set => RaiseAndSetIfChanged(ref _transverseViewRebarSuffixTemp, value);
+        }
+
+        public string TransverseViewRebarElevation { get; set; }
+        public string TransverseViewRebarElevationTemp {
+            get => _transverseViewRebarElevationTemp;
+            set => RaiseAndSetIfChanged(ref _transverseViewRebarElevationTemp, value);
+        }
+
         public string TransverseViewTemplateName { get; set; }
         public string TransverseViewTemplateNameTemp {
             get => _transverseViewTemplateNameTemp;
             set => RaiseAndSetIfChanged(ref _transverseViewTemplateNameTemp, value);
+        }
+
+        public string TransverseViewRebarTemplateName { get; set; }
+        public string TransverseViewRebarTemplateNameTemp {
+            get => _transverseViewRebarTemplateNameTemp;
+            set => RaiseAndSetIfChanged(ref _transverseViewRebarTemplateNameTemp, value);
         }
 
         public string TransverseViewXOffset { get; set; }
@@ -168,7 +249,13 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             GeneralViewPerpendicularPrefix = GeneralViewPerpendicularPrefixTemp;
             GeneralViewPerpendicularSuffix = GeneralViewPerpendicularSuffixTemp;
 
+            GeneralViewRebarPrefix = GeneralViewRebarPrefixTemp;
+            GeneralViewRebarSuffix = GeneralViewRebarSuffixTemp;
+            GeneralViewPerpendicularRebarPrefix = GeneralViewPerpendicularRebarPrefixTemp;
+            GeneralViewPerpendicularRebarSuffix = GeneralViewPerpendicularRebarSuffixTemp;
+
             GeneralViewTemplateName = GeneralViewTemplateNameTemp;
+            GeneralViewRebarTemplateName = GeneralViewRebarTemplateNameTemp;
             GeneralViewXOffset = GeneralViewXOffsetTemp;
             GeneralViewYTopOffset = GeneralViewYTopOffsetTemp;
             GeneralViewYBottomOffset = GeneralViewYBottomOffsetTemp;
@@ -183,7 +270,12 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             TransverseViewThirdSuffix = TransverseViewThirdSuffixTemp;
             TransverseViewThirdElevation = TransverseViewThirdElevationTemp;
 
+            TransverseViewRebarPrefix = TransverseViewRebarPrefixTemp;
+            TransverseViewRebarSuffix = TransverseViewRebarSuffixTemp;
+            TransverseViewRebarElevation = TransverseViewRebarElevationTemp;
+
             TransverseViewTemplateName = TransverseViewTemplateNameTemp;
+            TransverseViewRebarTemplateName = TransverseViewRebarTemplateNameTemp;
             TransverseViewXOffset = TransverseViewXOffsetTemp;
             TransverseViewYOffset = TransverseViewYOffsetTemp;
 
@@ -218,6 +310,9 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             }
             if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseViewThirdElevationTemp, out tempDouble)) {
                 ViewModel.ErrorText = "Значение возвышения третьего горизонтального вида некорректно";
+            }
+            if(!double.TryParse(ViewModel.ViewSectionSettings.TransverseViewRebarElevationTemp, out tempDouble)) {
+                ViewModel.ErrorText = "Значение возвышения горизонтального вида армирования некорректно";
             }
         }
     }

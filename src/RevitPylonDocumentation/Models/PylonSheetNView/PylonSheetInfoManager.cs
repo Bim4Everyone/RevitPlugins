@@ -50,16 +50,16 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
             // ОСНОВНОЙ АРМАТУРНЫЙ ВИД
-            if(selectionSettings.NeedWorkWithGeneralRebarView) {
-                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-                if(SheetInfo.GeneralView.ViewElement is null) {
-                    // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                    if(!SheetInfo.GeneralView.ViewSectionCreator.TryCreateGeneralView(ViewModel.SelectedViewFamilyType)) {
-                        Repository.FindViewSectionInPj(SheetInfo.GeneralView);
-                    }
-                }
-                // Тут точно получили вид
-            }
+            //if(selectionSettings.NeedWorkWithGeneralRebarView) {
+            //    // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+            //    if(SheetInfo.GeneralRebarView.ViewElement is null) {
+            //        // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+            //        if(!SheetInfo.GeneralRebarView.ViewSectionCreator.TryCreateGeneralView(ViewModel.SelectedViewFamilyType)) {
+            //            Repository.FindViewSectionInPj(SheetInfo.GeneralRebarView);
+            //        }
+            //    }
+            //    // Тут точно получили вид
+            //}
 
 
 
