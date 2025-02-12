@@ -1,0 +1,82 @@
+﻿<base:PlatformWindow
+    x:Class="RevitRefreshLinks.Views.FilesExplorerWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitRefreshLinks.Views"
+    xmlns:resources="clr-namespace:RevitRefreshLinks.Resources"
+    xmlns:vms="clr-namespace:RevitRefreshLinks.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    Title="{Binding Title}"
+    Height="450"
+    Width="800"
+    MinHeight="300"
+    MinWidth="500"
+    d:DataContext="{d:DesignInstance vms:FilesExplorerViewModel, IsDesignTimeCreatable=False}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Window.Resources>
+        <resources:BoolToSelectionModeConverter
+            x:Key="BoolToSelectionModeConverter" />
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="45" />
+        </Grid.RowDefinitions>
+
+        <ListView
+            ItemsSource="{Binding ActiveDirectory.Content}"
+            SelectedItem="{Binding SelectedFile}"
+            SelectionMode="{Binding MultiSelect, Converter={StaticResource BoolToSelectionModeConverter}}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel
+                        HorizontalAlignment="Stretch">
+                        <TextBlock
+                            Text="{Binding Name}" />
+                        <TextBlock
+                            Text="{Binding IsDirectory}" />
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListView>
+
+        <StackPanel
+            Grid.Row="1"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <Button
+                Width="80"
+                Margin="10"
+                Content="OK TODO"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
+
+            <Button
+                Width="80"
+                Margin="10"
+                Content="Ca TODO"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>

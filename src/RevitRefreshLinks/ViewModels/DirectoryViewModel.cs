@@ -27,17 +27,19 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
 
-        public async Task LoadContentAsync() {
+        public async Task LoadContentAsync(bool loadFiles = false) {
             Content.Clear();
             var folders = await _directoryModel.GetDirectoriesAsync();
             var foldersVms = folders.Select(d => new DirectoryViewModel(d)).ToArray();
             foreach(var folderVm in foldersVms) {
                 Content.Add(folderVm);
             }
-            var files = await _directoryModel.GetFilesAsync();
-            var filesVms = files.Select(f => new FileViewModel(f));
-            foreach(var fileVm in filesVms) {
-                Content.Add(fileVm);
+            if(loadFiles) {
+                var files = await _directoryModel.GetFilesAsync();
+                var filesVms = files.Select(f => new FileViewModel(f));
+                foreach(var fileVm in filesVms) {
+                    Content.Add(fileVm);
+                }
             }
         }
     }

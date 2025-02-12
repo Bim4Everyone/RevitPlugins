@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -10,22 +9,19 @@ using dosymep.WPF.ViewModels;
 using RevitRefreshLinks.Services;
 
 namespace RevitRefreshLinks.ViewModels {
-    internal class DirectoriesExplorerViewModel : BaseViewModel {
+    internal class FilesExplorerViewModel : BaseViewModel {
         private readonly IFileSystem _fileSystem;
         private readonly ILocalizationService _localizationService;
         private DirectoryViewModel _activeDirectory;
-        private DirectoryViewModel _selectedDirectory;
         private DirectoryViewModel _rootDirectory;
-        private ObservableCollection<DirectoryViewModel> _selectedDirectories;
+        private FileViewModel _selectedFile;
+        private ObservableCollection<FileViewModel> _selectedFiles;
         private string _title;
         private string _errorText;
         private bool _multiSelect;
         private string _initialDirectory;
 
-        public DirectoriesExplorerViewModel(
-            IFileSystem fileSystem,
-            ILocalizationService localizationService) {
-
+        public FilesExplorerViewModel(IFileSystem fileSystem, ILocalizationService localizationService) {
             _fileSystem = fileSystem
                 ?? throw new System.ArgumentNullException(nameof(fileSystem));
             _localizationService = localizationService
@@ -49,6 +45,7 @@ namespace RevitRefreshLinks.ViewModels {
 
         public ICommand AcceptViewCommand { get; }
 
+
         public DirectoryViewModel ActiveDirectory {
             get => _activeDirectory;
             set => RaiseAndSetIfChanged(ref _activeDirectory, value);
@@ -59,14 +56,14 @@ namespace RevitRefreshLinks.ViewModels {
             private set => RaiseAndSetIfChanged(ref _rootDirectory, value);
         }
 
-        public DirectoryViewModel SelectedDirectory {
-            get => _selectedDirectory;
-            set => RaiseAndSetIfChanged(ref _selectedDirectory, value);
+        public FileViewModel SelectedFile {
+            get => _selectedFile;
+            set => RaiseAndSetIfChanged(ref _selectedFile, value);
         }
 
-        public ObservableCollection<DirectoryViewModel> SelectedDirectories {
-            get => _selectedDirectories;
-            set => RaiseAndSetIfChanged(ref _selectedDirectories, value);
+        public ObservableCollection<FileViewModel> SelectedFiles {
+            get => _selectedFiles;
+            set => RaiseAndSetIfChanged(ref _selectedFiles, value);
         }
 
         public string Title {
@@ -96,18 +93,18 @@ namespace RevitRefreshLinks.ViewModels {
                 try {
                     ActiveDirectory = new DirectoryViewModel(
                         await _fileSystem.GetDirectoryAsync(InitialDirectory));
-                } catch(InvalidOperationException) {
+                } catch(System.InvalidOperationException) {
                     ActiveDirectory = RootDirectory;
                 }
             } else {
                 ActiveDirectory = RootDirectory;
             }
-            await ActiveDirectory.LoadContentAsync();
+            await ActiveDirectory.LoadContentAsync(true);
         }
 
         private async Task OpenFolderAsync(DirectoryViewModel folder) {
             ActiveDirectory = folder;
-            await ActiveDirectory.LoadContentAsync();
+            await ActiveDirectory.LoadContentAsync(true);
         }
 
         private bool CanOpenFolder(DirectoryViewModel folder) {
@@ -116,7 +113,7 @@ namespace RevitRefreshLinks.ViewModels {
 
         private async Task OpenParentFolderAsync() {
             ActiveDirectory = await ActiveDirectory.GetParent();
-            await ActiveDirectory.LoadContentAsync();
+            await ActiveDirectory.LoadContentAsync(true);
         }
 
         private bool CanOpenParentFolder() {
@@ -125,7 +122,7 @@ namespace RevitRefreshLinks.ViewModels {
 
         private async Task OpenRootFolderAsync() {
             ActiveDirectory = RootDirectory;
-            await ActiveDirectory.LoadContentAsync();
+            await ActiveDirectory.LoadContentAsync(true);
         }
 
         private void AcceptView() {
@@ -133,11 +130,11 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(MultiSelect && (SelectedDirectories is null || SelectedDirectories.Count == 0)) {
+            if(MultiSelect && (SelectedFiles is null || SelectedFiles.Count == 0)) {
                 ErrorText = _localizationService.GetLocalizedString("TODO");
                 return false;
             }
-            if(!MultiSelect && SelectedDirectory is null) {
+            if(!MultiSelect && SelectedFile is null) {
                 ErrorText = _localizationService.GetLocalizedString("TODO");
                 return false;
             }
