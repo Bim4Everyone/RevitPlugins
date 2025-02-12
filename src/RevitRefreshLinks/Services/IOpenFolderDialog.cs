@@ -1,7 +1,9 @@
+using RevitRefreshLinks.Models;
+
 namespace RevitRefreshLinks.Services {
     internal interface IOpenFolderDialog : IOpenDialogBase {
-        string FolderName { get; set; }
+        IDirectoryModel Folder { get; }
 
-        string[] FolderNames { get; }
+        IDirectoryModel[] Folders { get; }
     }
 }

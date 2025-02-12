@@ -26,9 +26,9 @@ namespace RevitRefreshLinks.Models {
         public async Task<IDirectoryModel[]> GetDirectoriesAsync() {
             List<IDirectoryModel> list = new List<IDirectoryModel>();
             foreach(var client in _serverClients) {
-                list.Add(new RsRootDirectory(await client.GetRootFolderContentsAsync(), client));
+                list.Add(new RsRootDirectory(client));
             }
-            return list.ToArray();
+            return await Task.FromResult(list.ToArray());
         }
 
         public async Task<IDirectoryModel[]> GetDirectoriesAsync(SearchOption searchOption) {

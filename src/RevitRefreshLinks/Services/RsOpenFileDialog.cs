@@ -1,11 +1,13 @@
 using System;
 
+using RevitRefreshLinks.Models;
+
 namespace RevitRefreshLinks.Services {
     internal class RsOpenFileDialog : IOpenFileDialog {
         public bool AddExtension { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string FileName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IFileModel FileName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public string[] FileNames => throw new NotImplementedException();
+        public IFileModel[] FileNames => throw new NotImplementedException();
 
         public string Filter { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public string Title { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

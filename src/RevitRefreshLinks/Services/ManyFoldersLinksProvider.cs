@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using dosymep.SimpleServices;
 
@@ -11,15 +13,18 @@ namespace RevitRefreshLinks.Services {
         private readonly RevitRepository _revitRepository;
         private readonly IConfigProvider _configProvider;
         private readonly IOpenFolderDialogService _openFolderDialog;
+        private readonly IOpenFolderDialog _rsOpenFolderDialog;
 
         public ManyFoldersLinksProvider(
             RevitRepository revitRepository,
             IConfigProvider configProvider,
-            IOpenFolderDialogService openFolderDialog) {
+            IOpenFolderDialogService openFolderDialog,
+            IOpenFolderDialog rsOpenFolderDialog) {
 
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _configProvider = configProvider ?? throw new ArgumentNullException(nameof(configProvider));
             _openFolderDialog = openFolderDialog ?? throw new ArgumentNullException(nameof(openFolderDialog));
+            _rsOpenFolderDialog = rsOpenFolderDialog ?? throw new ArgumentNullException(nameof(rsOpenFolderDialog));
         }
 
 
@@ -46,16 +51,23 @@ namespace RevitRefreshLinks.Services {
             }
         }
 
-        public ISelectLinksResult GetServerLinks() {
-            // TODO
-            // Временная заглушка для тестов плагина, пока не будет готово нормальное окно выбора папок из RS
-            string path = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "test\\RevitRefreshLinks\\rs-fullpath-list.txt");
-            if(!File.Exists(path)) {
-                File.Create(path);
+        public async Task<ISelectLinksResult> GetServerLinks() {
+            if(_rsOpenFolderDialog.ShowDialog()) {
+                var config = _configProvider.GetUpdateLinksConfig();
+                var settings = config.GetSettings(_revitRepository.Document)
+                    ?? config.AddSettings(_revitRepository.Document);
+                settings.InitialFolderPath = _rsOpenFolderDialog.Folder.FullName;
+                config.SaveProjectConfig();
+
+                var models = new List<IFileModel>();
+                foreach(var item in _rsOpenFolderDialog.Folders) {
+                    models.AddRange(await item.GetFilesAsync());
+                }
+                return new SelectLinksResult(_rsOpenFolderDialog.Folder.FullName,
+                    models.Select(m => new Link(m.FullName)).ToArray());
+            } else {
+                throw new OperationCanceledException();
             }
-            return new SelectLinksResult(path, File.ReadLines(path).Select(line => new Link(line)).ToArray());
         }
     }
 }

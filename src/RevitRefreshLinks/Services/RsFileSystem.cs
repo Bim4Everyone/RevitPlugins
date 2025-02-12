@@ -9,10 +9,10 @@ using dosymep.Revit.ServerClient;
 using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.Services {
-    internal class FileSystem : IFileSystem {
+    internal class RsFileSystem : IFileSystem {
         private readonly IReadOnlyCollection<IServerClient> _serverClients;
 
-        public FileSystem(IReadOnlyCollection<IServerClient> serverClients) {
+        public RsFileSystem(IReadOnlyCollection<IServerClient> serverClients) {
             _serverClients = serverClients ?? throw new ArgumentNullException(nameof(serverClients));
         }
 

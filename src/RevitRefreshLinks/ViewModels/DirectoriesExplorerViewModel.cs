@@ -7,14 +7,12 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitRefreshLinks.Models;
 using RevitRefreshLinks.Services;
 
 namespace RevitRefreshLinks.ViewModels {
     internal class DirectoriesExplorerViewModel : BaseViewModel {
         private readonly IFileSystem _fileSystem;
         private readonly ILocalizationService _localizationService;
-        private readonly IExplorerSettings _settings;
         private DirectoryViewModel _activeDirectory;
         private DirectoryViewModel _selectedDirectory;
         private DirectoryViewModel _rootDirectory;
@@ -22,18 +20,16 @@ namespace RevitRefreshLinks.ViewModels {
         private string _title;
         private string _errorText;
         private bool _multiSelect;
+        private string _initialDirectory;
 
         public DirectoriesExplorerViewModel(
             IFileSystem fileSystem,
-            ILocalizationService localizationService,
-            IExplorerSettings settings) {
+            ILocalizationService localizationService) {
 
             _fileSystem = fileSystem
                 ?? throw new System.ArgumentNullException(nameof(fileSystem));
             _localizationService = localizationService
                 ?? throw new System.ArgumentNullException(nameof(localizationService));
-            _settings = settings ??
-                throw new System.ArgumentNullException(nameof(settings));
 
             LoadViewCommand = RelayCommand.CreateAsync(LoadViewAsync);
             OpenFolderCommand = RelayCommand.CreateAsync<DirectoryViewModel>(OpenFolderAsync, CanOpenFolder);
@@ -77,7 +73,7 @@ namespace RevitRefreshLinks.ViewModels {
 
         public string Title {
             get => _title;
-            private set => RaiseAndSetIfChanged(ref _title, value);
+            set => RaiseAndSetIfChanged(ref _title, value);
         }
 
         public string ErrorText {
@@ -87,22 +83,21 @@ namespace RevitRefreshLinks.ViewModels {
 
         public bool MultiSelect {
             get => _multiSelect;
-            private set => RaiseAndSetIfChanged(ref _multiSelect, value);
+            set => RaiseAndSetIfChanged(ref _multiSelect, value);
+        }
+
+        public string InitialDirectory {
+            get => _initialDirectory;
+            set => RaiseAndSetIfChanged(ref _initialDirectory, value);
         }
 
         private async Task LoadViewAsync() {
-            if(!string.IsNullOrWhiteSpace(_settings.Title)) {
-                Title = _settings.Title;
-            } else {
-                Title = _localizationService.GetLocalizedString("DirectoriesExplorer.Title");
-            }
-
             RootDirectory = new DirectoryViewModel(await _fileSystem.GetRootDirectoryAsync());
 
-            if(!string.IsNullOrWhiteSpace(_settings.InitialDirectory)) {
+            if(!string.IsNullOrWhiteSpace(InitialDirectory)) {
                 try {
                     ActiveDirectory = new DirectoryViewModel(
-                        await _fileSystem.GetDirectoryAsync(_settings.InitialDirectory));
+                        await _fileSystem.GetDirectoryAsync(InitialDirectory));
                 } catch(InvalidOperationException) {
                     ActiveDirectory = RootDirectory;
                 }
@@ -110,7 +105,6 @@ namespace RevitRefreshLinks.ViewModels {
                 ActiveDirectory = RootDirectory;
             }
             await ActiveDirectory.LoadContentAsync();
-            MultiSelect = _settings.MultiSelect;
         }
 
         private async Task OpenFolderAsync(DirectoryViewModel folder) {
@@ -137,7 +131,7 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private void AcceptView() {
-
+            // TODO
         }
 
         private bool CanAcceptView() {

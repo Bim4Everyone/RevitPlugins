@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -8,12 +10,14 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit.ServerClient;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
+using RevitRefreshLinks.Extensions;
 using RevitRefreshLinks.Models;
 using RevitRefreshLinks.Services;
 using RevitRefreshLinks.ViewModels;
@@ -43,6 +47,9 @@ namespace RevitRefreshLinks {
                 kernel.Bind<IConfigProvider>()
                     .To<ConfigProvider>()
                     .InSingletonScope();
+                kernel.Bind<IFileSystem>()
+                    .To<RsFileSystem>()
+                    .InSingletonScope();
 
                 kernel.Bind<UpdateLinksConfig>()
                     .ToMethod(c => UpdateLinksConfig.GetPluginConfig());
@@ -56,6 +63,24 @@ namespace RevitRefreshLinks {
                         c => c.Kernel.Get<UpdateLinksViewModel>())
                     .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                         c => c.Kernel.Get<ILocalizationService>());
+                kernel.Bind<DirectoriesExplorerViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<DirectoriesExplorerWindow>()
+                    .ToSelf()
+                    .WithPropertyValue(nameof(Window.DataContext),
+                        c => c.Kernel.Get<DirectoriesExplorerViewModel>())
+                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                        c => c.Kernel.Get<ILocalizationService>());
+
+                kernel.Bind<IReadOnlyCollection<IServerClient>>()
+                    .ToMethod(c => c.Kernel.Get<Autodesk.Revit.ApplicationServices.Application>()
+                        .GetRevitServerNetworkHosts()
+                        .Select(item => new ServerClientBuilder()
+                        .SetServerName(item)
+                        .SetServerVersion(ModuleEnvironment.RevitVersion)
+                        .Build())
+                    .ToArray());
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
                 kernel.UseXtraLocalization(
@@ -64,20 +89,30 @@ namespace RevitRefreshLinks {
                 var localizationService = kernel.Get<ILocalizationService>();
                 kernel.UseXtraOpenFolderDialog<ManyFoldersLinksProvider>(
                     title: localizationService.GetLocalizedString("SelectLocalFoldersDialog.Title"),
-                    initialDirectory: GetInitialFolder(kernel),
+                    initialDirectory: GetInitialLocalFolder(kernel),
                     multiSelect: true);
                 kernel.UseXtraProgressDialog(
                     stepValue: 1,
                     displayTitleFormat: localizationService.GetLocalizedString("UpdateLinksWindow.Progress.Title"));
+                kernel.UseRsOpenFolderDialog(
+                    title: localizationService.GetLocalizedString("TODO"),
+                    initialDirectory: GetInitialServerFolder(kernel),
+                    multiSelect: true);
 
                 Notification(kernel.Get<UpdateLinksWindow>());
             }
         }
 
-        private string GetInitialFolder(IKernel kernel) {
+        private string GetInitialLocalFolder(IKernel kernel) {
             return kernel.Get<UpdateLinksConfig>()
                 .GetSettings(kernel.Get<UIApplication>().ActiveUIDocument.Document)
                 ?.InitialFolderPath ?? string.Empty;
+        }
+
+        private string GetInitialServerFolder(IKernel kernel) {
+            return kernel.Get<UpdateLinksConfig>()
+                .GetSettings(kernel.Get<UIApplication>().ActiveUIDocument.Document)
+                ?.InitialServerPath ?? string.Empty;
         }
     }
 }

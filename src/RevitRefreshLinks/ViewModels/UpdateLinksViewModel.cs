@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -41,7 +42,7 @@ namespace RevitRefreshLinks.ViewModels {
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             SelectLocalSourceCommand = RelayCommand.Create(SelectLocalSource);
-            SelectServerSourceCommand = RelayCommand.Create(SelectServerSource);
+            SelectServerSourceCommand = RelayCommand.CreateAsync(SelectServerSource);
             SelectAllLinksCommand = RelayCommand.Create(SelectAllLinks, CanSelectAny);
             UnselectAllLinksCommand = RelayCommand.Create(UnselectAllLinks, CanSelectAny);
             InvertSelectedLinksCommand = RelayCommand.Create(InvertSelectedLinks, CanSelectAny);
@@ -149,9 +150,9 @@ namespace RevitRefreshLinks.ViewModels {
             }
         }
 
-        private void SelectServerSource() {
+        private async Task SelectServerSource() {
             try {
-                var result = _linksProvider.GetServerLinks();
+                var result = await _linksProvider.GetServerLinks();
                 SelectedServerSource = result.SourceName;
                 ResetServerLinks(result.Links);
             } catch(OperationCanceledException) {

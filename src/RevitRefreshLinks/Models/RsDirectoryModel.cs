@@ -19,11 +19,11 @@ namespace RevitRefreshLinks.Models {
         }
 
 
-        public virtual bool Exists => true;
+        public bool Exists => true;
 
-        public virtual string FullName => _folderContents.Path;
+        public string FullName => _folderContents.Path;
 
-        public virtual string Name { get; }
+        public string Name { get; }
 
         public async Task<IDirectoryModel[]> GetDirectoriesAsync() {
             List<IDirectoryModel> dirs = new List<IDirectoryModel>();
@@ -70,7 +70,7 @@ namespace RevitRefreshLinks.Models {
             }
         }
 
-        public virtual async Task<IDirectoryModel> GetParentAsync() {
+        public async Task<IDirectoryModel> GetParentAsync() {
             Uri uri = new Uri(FullName.Replace('\\', '/'));
             var parent = Path.GetDirectoryName(uri.LocalPath);
 
@@ -82,9 +82,8 @@ namespace RevitRefreshLinks.Models {
             }
         }
 
-        public virtual async Task<IDirectoryModel> GetRootAsync() {
-            var rootContent = await _serverClient.GetRootFolderContentsAsync();
-            return new RsRootDirectory(rootContent, _serverClient);
+        public async Task<IDirectoryModel> GetRootAsync() {
+            return await Task.FromResult(new RsRootDirectory(_serverClient));
         }
     }
 }
