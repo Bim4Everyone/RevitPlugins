@@ -3,34 +3,34 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace RevitRefreshLinks.Resources {
-    internal static class ListViewBehavior {
+    internal static class ListBoxBehavior {
         public static readonly DependencyProperty SelectedItemsProperty =
             DependencyProperty.RegisterAttached(
                 "SelectedItems",
                 typeof(IList),
-                typeof(ListViewBehavior),
+                typeof(ListBoxBehavior),
                 new FrameworkPropertyMetadata(default, OnSelectedItemsChanged));
 
-        public static IList GetSelectedItems(ListView listView) {
-            return (IList) listView.GetValue(SelectedItemsProperty);
+        public static IList GetSelectedItems(ListBox listBox) {
+            return (IList) listBox.GetValue(SelectedItemsProperty);
         }
 
-        public static void SetSelectedItems(ListView listView, IList value) {
-            listView.SetValue(SelectedItemsProperty, value);
+        public static void SetSelectedItems(ListBox listBox, IList value) {
+            listBox.SetValue(SelectedItemsProperty, value);
         }
 
         private static void OnSelectedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            if(d is ListView listView) {
-                listView.SelectionChanged -= OnSelectionChanged;
-                listView.SelectionChanged += OnSelectionChanged;
+            if(d is ListBox listBox) {
+                listBox.SelectionChanged -= OnSelectionChanged;
+                listBox.SelectionChanged += OnSelectionChanged;
             }
         }
 
         private static void OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
-            if(sender is ListView listView) {
-                IList selectedItems = GetSelectedItems(listView);
+            if(sender is ListBox listBox) {
+                IList selectedItems = GetSelectedItems(listBox);
                 selectedItems.Clear();
-                foreach(var item in listView.SelectedItems) {
+                foreach(var item in listBox.SelectedItems) {
                     selectedItems.Add(item);
                 }
             }

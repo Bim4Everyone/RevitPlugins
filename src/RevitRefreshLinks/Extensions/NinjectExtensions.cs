@@ -141,15 +141,6 @@ namespace RevitRefreshLinks.Extensions {
                 .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                     c => c.Kernel.Get<ILocalizationService>());
 
-            kernel.Bind<IReadOnlyCollection<IServerClient>>()
-                .ToMethod(c => c.Kernel.Get<Autodesk.Revit.ApplicationServices.Application>()
-                    .GetRevitServerNetworkHosts()
-                    .Select(item => new ServerClientBuilder()
-                    .SetServerName(item)
-                    .SetServerVersion(ModuleEnvironment.RevitVersion)
-                    .Build())
-                .ToArray());
-
             kernel.Bind<IOpenFileDialog>()
                 .To<RsOpenFileDialog>()
                 .WithPropertyValue(nameof(IOpenFileDialog.Title), title)
