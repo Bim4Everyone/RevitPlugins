@@ -18,7 +18,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
         internal bool PlaceRebarSchedule() {
-            // Проверям вдруг спека не создалась
+            // Проверяем вдруг спека не создалась
             if(SheetInfo.RebarSchedule.ViewElement == null) {
                 return false;
             } else {
@@ -36,7 +36,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Рассчитываем и задаем корректную точку вставки спецификации арматуры пилона
             XYZ newCenter = new XYZ(
-                -SheetInfo.RebarSchedule.ViewportHalfWidth * 2 - 0.0095,
+                (-SheetInfo.RebarSchedule.ViewportHalfWidth * 2) - 0.0095,
                 SheetInfo.TitleBlockHeight - 0.032,
                 0);
             (SheetInfo.RebarSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -45,9 +45,65 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             return true;
         }
 
+        internal bool PlaceSkeletonSchedule() {
+            // Проверяем вдруг спека не создалась
+            if(SheetInfo.SkeletonSchedule.ViewElement == null) {
+                return false;
+            } else {
+                // Заполнеяем данные для задания
+                SheetInfo.SkeletonSchedule.ViewportName =
+                    ViewModel.SchedulesSettings.SkeletonSchedulePrefix
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.SchedulesSettings.SkeletonScheduleSuffix;
+            }
+
+            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.SkeletonSchedule)) {
+                return false;
+            }
+
+            // Рассчитываем и задаем корректную точку вставки спецификации арматуры пилона
+            XYZ newCenter = new XYZ(
+                (-SheetInfo.SkeletonSchedule.ViewportHalfWidth * 2) - 0.0095,
+                SheetInfo.TitleBlockHeight - 0.032,
+                0);
+            (SheetInfo.SkeletonSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
+
+            SheetInfo.SkeletonSchedule.ViewportCenter = newCenter;
+            return true;
+        }
+
+        internal bool PlaceSkeletonByElemsSchedule() {
+            // Проверяем вдруг спека не создалась
+            if(SheetInfo.SkeletonByElemsSchedule.ViewElement == null) {
+                return false;
+            } else {
+                // Заполнеяем данные для задания
+                SheetInfo.SkeletonByElemsSchedule.ViewportName =
+                    ViewModel.SchedulesSettings.SkeletonByElemsSchedulePrefix
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.SchedulesSettings.SkeletonByElemsScheduleSuffix;
+            }
+
+            // Передаем спеку армирования в метод по созданию видовых экранов в (0.0.0)
+            if(!PlaceScheduleViewport(SheetInfo.PylonViewSheet, SheetInfo.SkeletonByElemsSchedule)) {
+                return false;
+            }
+
+            // Рассчитываем и задаем корректную точку вставки спецификации арматуры пилона
+            XYZ newCenter = new XYZ(
+                (-SheetInfo.SkeletonByElemsSchedule.ViewportHalfWidth * 2) - 0.0095,
+                SheetInfo.TitleBlockHeight - 0.032,
+                0);
+            (SheetInfo.SkeletonByElemsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
+
+            SheetInfo.SkeletonByElemsSchedule.ViewportCenter = newCenter;
+            return true;
+        }
+
 
         internal bool PlaceMaterialSchedule() {
-            // Проверям вдруг спека не создалась
+            // Проверяем вдруг спека не создалась
             if(SheetInfo.MaterialSchedule.ViewElement == null) {
                 return false;
             } else {
@@ -65,13 +121,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
             XYZ newCenter = new XYZ(
-                    -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
-                    SheetInfo.TitleBlockHeight - SheetInfo.RebarSchedule.ViewportHalfHeight * 2 - 0.02505,
+                    (-SheetInfo.MaterialSchedule.ViewportHalfWidth * 2) - 0.0095,
+                    SheetInfo.TitleBlockHeight - (SheetInfo.RebarSchedule.ViewportHalfHeight * 2) - 0.02505,
                     0);
 
             if(SheetInfo.RebarSchedule.ViewportElement is null) {
                 newCenter = new XYZ(
-                    -SheetInfo.MaterialSchedule.ViewportHalfWidth * 2 - 0.0095,
+                    (-SheetInfo.MaterialSchedule.ViewportHalfWidth * 2) - 0.0095,
                     -0.1,
                     0);
             }
@@ -83,7 +139,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
         internal bool PlaceSystemPartsSchedule() {
-            // Проверям вдруг спека не создалась
+            // Проверяем вдруг спека не создалась
             if(SheetInfo.SystemPartsSchedule.ViewElement == null) {
                 return false;
             } else {
@@ -102,13 +158,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
             XYZ newCenter = new XYZ(
                     0,
-                    SheetInfo.TitleBlockHeight / 2 + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
+                    (SheetInfo.TitleBlockHeight / 2) + (SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2),
                     0);
 
             if(SheetInfo.IfcPartsSchedule.ViewportElement is null) {
                 newCenter = new XYZ(
-                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2,
-                    SheetInfo.TitleBlockHeight / 2 + SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2,
+                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - (SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2),
+                    (SheetInfo.TitleBlockHeight / 2) + (SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2),
                     0);
             }
 
@@ -119,7 +175,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
         internal bool PlaceIfcPartsSchedule() {
-            // Проверям вдруг спека не создалась
+            // Проверяем вдруг спека не создалась
             if(SheetInfo.IfcPartsSchedule.ViewElement == null) {
                 return false;
             } else {
@@ -138,13 +194,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
             XYZ newCenter = new XYZ(
                     0,
-                    SheetInfo.TitleBlockHeight / 2 + SheetInfo.IfcPartsSchedule.ViewportHalfHeight * 2,
+                    (SheetInfo.TitleBlockHeight / 2) + (SheetInfo.IfcPartsSchedule.ViewportHalfHeight * 2),
                     0);
 
             if(SheetInfo.SystemPartsSchedule.ViewportElement is null) {
                 newCenter = new XYZ(
-                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - SheetInfo.IfcPartsSchedule.ViewportHalfWidth * 2,
-                    SheetInfo.TitleBlockHeight / 2 + SheetInfo.IfcPartsSchedule.ViewportHalfHeight * 2,
+                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - (SheetInfo.IfcPartsSchedule.ViewportHalfWidth * 2),
+                    (SheetInfo.TitleBlockHeight / 2) + (SheetInfo.IfcPartsSchedule.ViewportHalfHeight * 2),
                     0);
             }
 

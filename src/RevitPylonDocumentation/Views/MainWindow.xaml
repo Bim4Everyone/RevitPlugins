@@ -3196,7 +3196,7 @@
                 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
-                        Width="1.35*" />
+                        Width="1.34*" />
                     <ColumnDefinition
                         Width="*" />
                 </Grid.ColumnDefinitions>
@@ -3460,6 +3460,8 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="*" />
                             <RowDefinition
                                 Height="*" />
                             <RowDefinition
@@ -3859,6 +3861,31 @@
                             Grid.Column="1"
                             Style="{StaticResource TextBlockWithTooltipStyle}"
                             Text="Спецификация каркаса">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock
+                                        Style="{StaticResource LegendStyle}" />
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+
+                        <CheckBox
+                            Grid.Row="15"
+                            Grid.Column="0"
+                            Style="{DynamicResource ToggleButtonWithTooltipStyle}"
+                            IsChecked="{Binding Path=SelectionSettings.NeedWorkWithSkeletonByElemsSchedule}">
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <TextBlock
+                                        Style="{StaticResource LegendStyle}" />
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
+                        <TextBlock
+                            Grid.Row="15"
+                            Grid.Column="1"
+                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                            Text="Спецификация элементов каркаса">
                             <TextBlock.ToolTip>
                                 <ToolTip>
                                     <TextBlock

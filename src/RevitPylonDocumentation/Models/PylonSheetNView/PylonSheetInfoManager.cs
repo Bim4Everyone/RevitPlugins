@@ -159,6 +159,30 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Тут точно получили вид
             }
 
+            // СПЕЦИФИКАЦИЯ КАРКАСОВ
+            if(selectionSettings.NeedWorkWithSkeletonSchedule) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.SkeletonSchedule.ViewElement is null) {
+                    // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                    if(!SheetInfo.SkeletonSchedule.ViewScheduleCreator.TryCreateSkeletonSchedule()) {
+                        Repository.FindViewScheduleInPj(SheetInfo.SkeletonSchedule);
+                    }
+                }
+                // Тут точно получили вид
+            }
+
+            // СПЕЦИФИКАЦИЯ ЭЛЕМЕНТОВ КАРКАСОВ
+            if(selectionSettings.NeedWorkWithSkeletonByElemsSchedule) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.SkeletonByElemsSchedule.ViewElement is null) {
+                    // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                    if(!SheetInfo.SkeletonByElemsSchedule.ViewScheduleCreator.TryCreateSkeletonByElemsSchedule()) {
+                        Repository.FindViewScheduleInPj(SheetInfo.SkeletonByElemsSchedule);
+                    }
+                }
+                // Тут точно получили вид
+            }
+
             // СПЕЦИФИКАЦИЯ МАТЕРИАЛОВ
             if(selectionSettings.NeedWorkWithMaterialSchedule) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
@@ -257,6 +281,18 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.RebarSchedule.ViewportElement is null) {
                     SheetInfo.RebarSchedule.ViewSchedulePlacer.PlaceRebarSchedule();
+                }
+            }
+            if(selectionSettings.NeedWorkWithSkeletonSchedule) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.SkeletonSchedule.ViewportElement is null) {
+                    SheetInfo.SkeletonSchedule.ViewSchedulePlacer.PlaceSkeletonSchedule();
+                }
+            }
+            if(selectionSettings.NeedWorkWithSkeletonByElemsSchedule) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.SkeletonByElemsSchedule.ViewportElement is null) {
+                    SheetInfo.SkeletonByElemsSchedule.ViewSchedulePlacer.PlaceSkeletonByElemsSchedule();
                 }
             }
             if(selectionSettings.NeedWorkWithMaterialSchedule) {

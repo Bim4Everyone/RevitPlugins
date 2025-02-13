@@ -33,6 +33,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             TransverseRebarViewSecond = new PylonView(ViewModel, Repository, this);
 
             RebarSchedule = new PylonView(ViewModel, Repository, this);
+            SkeletonSchedule = new PylonView(ViewModel, Repository, this);
+            SkeletonByElemsSchedule = new PylonView(ViewModel, Repository, this);
             MaterialSchedule = new PylonView(ViewModel, Repository, this);
             SystemPartsSchedule = new PylonView(ViewModel, Repository, this);
             IfcPartsSchedule = new PylonView(ViewModel, Repository, this);
@@ -85,6 +87,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         public PylonView SystemPartsSchedule { get; set; }
         public PylonView IfcPartsSchedule { get; set; }
         public PylonView SkeletonSchedule { get; set; }
+        public PylonView SkeletonByElemsSchedule { get; set; }
 
 
         // Легенда примечаний

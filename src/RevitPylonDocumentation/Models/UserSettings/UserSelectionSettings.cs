@@ -19,6 +19,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private bool _needWorkWithTransverseRebarViewFirst = false;
         private bool _needWorkWithTransverseRebarViewSecond = false;
         private bool _needWorkWithSkeletonSchedule = false;
+        private bool _needWorkWithSkeletonByElemsSchedule = false;
 
 
         public bool NeedWorkWithGeneralView {
@@ -93,6 +94,11 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         public bool NeedWorkWithSkeletonSchedule {
             get => _needWorkWithSkeletonSchedule;
             set => RaiseAndSetIfChanged(ref _needWorkWithSkeletonSchedule, value);
+        }
+
+        public bool NeedWorkWithSkeletonByElemsSchedule {
+            get => _needWorkWithSkeletonByElemsSchedule;
+            set => RaiseAndSetIfChanged(ref _needWorkWithSkeletonByElemsSchedule, value);
         }
     }
 }

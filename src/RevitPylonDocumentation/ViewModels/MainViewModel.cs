@@ -275,6 +275,16 @@ namespace RevitPylonDocumentation.ViewModels {
         public ViewSchedule ReferenceIfcPartsSchedule { get; set; }
 
         /// <summary>
+        /// Эталонная спецификация арматуры
+        /// </summary>
+        public ViewSchedule ReferenceSkeletonSchedule { get; set; }
+
+        /// <summary>
+        /// Эталонная спецификация арматуры
+        /// </summary>
+        public ViewSchedule ReferenceSkeletonByElemsSchedule { get; set; }
+
+        /// <summary>
         /// Фильтр списка марок пилонов
         /// </summary>
         public string HostsInfoFilter {
@@ -539,6 +549,13 @@ namespace RevitPylonDocumentation.ViewModels {
             ReferenceIfcPartsSchedule =
                 _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                     sch.Name.Equals(SchedulesSettings.IfcPartsScheduleName)) as ViewSchedule;
+
+            ReferenceSkeletonSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.SkeletonScheduleName)) as ViewSchedule;
+            ReferenceSkeletonByElemsSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.SkeletonByElemsScheduleName)) as ViewSchedule;
         }
 
         /// <summary>
@@ -738,6 +755,7 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithTransverseRebarViewFirst = true;
             SelectionSettings.NeedWorkWithTransverseRebarViewSecond = true;
             SelectionSettings.NeedWorkWithSkeletonSchedule = true;
+            SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = true;
         }
 
 
@@ -761,6 +779,7 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithTransverseRebarViewFirst = false;
             SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
             SelectionSettings.NeedWorkWithSkeletonSchedule = false;
+            SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
         }
     }
 }
