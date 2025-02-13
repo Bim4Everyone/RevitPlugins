@@ -92,6 +92,8 @@ namespace RevitPylonDocumentation.Models {
             viewSectionSettings.GeneralViewPerpendicularSuffixTemp = settings.GeneralViewPerpendicularSuffix;
             viewSectionSettings.GeneralViewTemplateName = settings.GeneralViewTemplateName;
             viewSectionSettings.GeneralViewTemplateNameTemp = settings.GeneralViewTemplateName;
+            viewSectionSettings.GeneralRebarViewTemplateName = settings.GeneralRebarViewTemplateName;
+            viewSectionSettings.GeneralRebarViewTemplateNameTemp = settings.GeneralRebarViewTemplateName;
 
 
 
@@ -122,6 +124,8 @@ namespace RevitPylonDocumentation.Models {
             viewSectionSettings.TransverseViewThirdElevationTemp = settings.TransverseViewThirdElevation;
             viewSectionSettings.TransverseViewTemplateName = settings.TransverseViewTemplateName;
             viewSectionSettings.TransverseViewTemplateNameTemp = settings.TransverseViewTemplateName;
+            viewSectionSettings.TransverseRebarViewTemplateName = settings.TransverseRebarViewTemplateName;
+            viewSectionSettings.TransverseRebarViewTemplateNameTemp = settings.TransverseRebarViewTemplateName;
 
             viewSectionSettings.TransverseViewXOffset = settings.TransverseViewXOffset;
             viewSectionSettings.TransverseViewXOffsetTemp = settings.TransverseViewXOffset;
@@ -228,6 +232,7 @@ namespace RevitPylonDocumentation.Models {
             settings.GeneralViewPerpendicularPrefix = viewSectionSettings.GeneralViewPerpendicularPrefix;
             settings.GeneralViewPerpendicularSuffix = viewSectionSettings.GeneralViewPerpendicularSuffix;
             settings.GeneralViewTemplateName = viewSectionSettings.GeneralViewTemplateName;
+            settings.GeneralRebarViewTemplateName = viewSectionSettings.GeneralRebarViewTemplateName;
             settings.GeneralViewXOffset = viewSectionSettings.GeneralViewXOffset;
             settings.GeneralViewYTopOffset = viewSectionSettings.GeneralViewYTopOffset;
             settings.GeneralViewYBottomOffset = viewSectionSettings.GeneralViewYBottomOffset;
@@ -242,6 +247,7 @@ namespace RevitPylonDocumentation.Models {
             settings.TransverseViewThirdSuffix = viewSectionSettings.TransverseViewThirdSuffix;
             settings.TransverseViewThirdElevation = viewSectionSettings.TransverseViewThirdElevation;
             settings.TransverseViewTemplateName = viewSectionSettings.TransverseViewTemplateName;
+            settings.TransverseRebarViewTemplateName = viewSectionSettings.TransverseRebarViewTemplateName;
 
             settings.TransverseViewXOffset = viewSectionSettings.TransverseViewXOffset;
             settings.TransverseViewYOffset = viewSectionSettings.TransverseViewYOffset;
@@ -318,6 +324,7 @@ namespace RevitPylonDocumentation.Models {
         public string GeneralViewPerpendicularPrefix { get; set; }
         public string GeneralViewPerpendicularSuffix { get; set; }
         public string GeneralViewTemplateName { get; set; }
+        public string GeneralRebarViewTemplateName { get; set; }
         public string GeneralViewXOffset { get; set; }
         public string GeneralViewYTopOffset { get; set; }
         public string GeneralViewYBottomOffset { get; set; }
@@ -331,6 +338,7 @@ namespace RevitPylonDocumentation.Models {
         public string TransverseViewThirdSuffix { get; set; }
         public string TransverseViewThirdElevation { get; set; }
         public string TransverseViewTemplateName { get; set; }
+        public string TransverseRebarViewTemplateName { get; set; }
         public string TransverseViewXOffset { get; set; }
         public string TransverseViewYOffset { get; set; }
         public string ViewFamilyTypeName { get; set; }

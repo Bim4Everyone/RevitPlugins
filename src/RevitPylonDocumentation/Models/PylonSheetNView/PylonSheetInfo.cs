@@ -23,10 +23,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             Manager = new PylonSheetInfoManager(ViewModel, Repository, this);
 
             GeneralView = new PylonView(ViewModel, Repository, this);
+            GeneralRebarView = new PylonView(ViewModel, Repository, this);
             GeneralViewPerpendicular = new PylonView(ViewModel, Repository, this);
+            GeneralRebarViewPerpendicular = new PylonView(ViewModel, Repository, this);
             TransverseViewFirst = new PylonView(ViewModel, Repository, this);
             TransverseViewSecond = new PylonView(ViewModel, Repository, this);
             TransverseViewThird = new PylonView(ViewModel, Repository, this);
+            TransverseRebarView = new PylonView(ViewModel, Repository, this);
 
             RebarSchedule = new PylonView(ViewModel, Repository, this);
             MaterialSchedule = new PylonView(ViewModel, Repository, this);

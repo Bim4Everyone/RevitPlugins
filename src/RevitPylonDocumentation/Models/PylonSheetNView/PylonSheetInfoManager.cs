@@ -48,20 +48,17 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
 
 
-
             // ОСНОВНОЙ АРМАТУРНЫЙ ВИД
-            //if(selectionSettings.NeedWorkWithGeneralRebarView) {
-            //    // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            //    if(SheetInfo.GeneralRebarView.ViewElement is null) {
-            //        // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-            //        if(!SheetInfo.GeneralRebarView.ViewSectionCreator.TryCreateGeneralView(ViewModel.SelectedViewFamilyType)) {
-            //            Repository.FindViewSectionInPj(SheetInfo.GeneralRebarView);
-            //        }
-            //    }
-            //    // Тут точно получили вид
-            //}
-
-
+            if(selectionSettings.NeedWorkWithGeneralRebarView) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.GeneralRebarView.ViewElement is null) {
+                    // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                    if(!SheetInfo.GeneralRebarView.ViewSectionCreator.TryCreateGeneralRebarView(ViewModel.SelectedViewFamilyType)) {
+                        Repository.FindViewSectionInPj(SheetInfo.GeneralRebarView);
+                    }
+                }
+                // Тут точно получили вид
+            }
 
 
             // ОСНОВНОЙ ПЕРПЕНДИКУЛЯРНЫЙ ВИД 
@@ -71,6 +68,19 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.GeneralViewPerpendicular.ViewSectionCreator.TryCreateGeneralPerpendicularView(ViewModel.SelectedViewFamilyType)) {
                         Repository.FindViewSectionInPj(SheetInfo.GeneralViewPerpendicular);
+                    }
+                }
+                // Тут точно получили вид
+            }
+
+
+            // ОСНОВНОЙ АРМАТУРНЫЙ ПЕРПЕНДИКУЛЯРНЫЙ ВИД 
+            if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement is null) {
+                    // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                    if(!SheetInfo.GeneralRebarViewPerpendicular.ViewSectionCreator.TryCreateGeneralRebarPerpendicularView(ViewModel.SelectedViewFamilyType)) {
+                        Repository.FindViewSectionInPj(SheetInfo.GeneralRebarViewPerpendicular);
                     }
                 }
                 // Тут точно получили вид
@@ -108,6 +118,18 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
                     if(!SheetInfo.TransverseViewThird.ViewSectionCreator.TryCreateTransverseView(ViewModel.SelectedViewFamilyType, 3)) {
                         Repository.FindViewSectionInPj(SheetInfo.TransverseViewThird);
+                    }
+                }
+                // Тут точно получили вид
+            }
+
+            // ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
+            if(selectionSettings.NeedWorkWithTransverseRebarView) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.TransverseRebarView.ViewElement is null) {
+                    // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                    if(!SheetInfo.TransverseRebarView.ViewSectionCreator.TryCreateTransverseRebarView(ViewModel.SelectedViewFamilyType)) {
+                        Repository.FindViewSectionInPj(SheetInfo.TransverseRebarView);
                     }
                 }
                 // Тут точно получили вид
@@ -170,10 +192,22 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.GeneralView.ViewSectionPlacer.PlaceGeneralViewport();
                 }
             }
+            if(selectionSettings.NeedWorkWithGeneralRebarView) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.GeneralRebarView.ViewportElement is null) {
+                    SheetInfo.GeneralRebarView.ViewSectionPlacer.PlaceGeneralRebarViewport();
+                }
+            }
             if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.GeneralViewPerpendicular.ViewportElement is null) {
                     SheetInfo.GeneralViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularViewport();
+                }
+            }
+            if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.GeneralRebarViewPerpendicular.ViewportElement is null) {
+                    SheetInfo.GeneralRebarViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularRebarViewport();
                 }
             }
             if(selectionSettings.NeedWorkWithTransverseViewFirst) {
@@ -194,6 +228,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.TransverseViewThird.ViewSectionPlacer.PlaceTransverseThirdViewPorts();
                 }
             }
+            if(selectionSettings.NeedWorkWithTransverseRebarView) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.TransverseRebarView.ViewportElement is null) {
+                    SheetInfo.TransverseRebarView.ViewSectionPlacer.PlaceTransverseRebarViewPort();
+                }
+            }
+
             if(selectionSettings.NeedWorkWithRebarSchedule) {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.RebarSchedule.ViewportElement is null) {

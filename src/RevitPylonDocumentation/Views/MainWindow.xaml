@@ -847,7 +847,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left"
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.GeneralViewRebarPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
+                                                Text="{Binding Path=ViewSectionSettings.GeneralRebarViewPrefixTemp, UpdateSourceTrigger=PropertyChanged}"
                                                 Width="174"
                                                 Height="25"
                                                 VerticalContentAlignment="Center">
@@ -877,7 +877,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left"
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=ViewSectionSettings.GeneralViewRebarSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
+                                                Text="{Binding Path=ViewSectionSettings.GeneralRebarViewSuffixTemp, UpdateSourceTrigger=PropertyChanged}"
                                                 Width="174"
                                                 Height="25"
                                                 VerticalContentAlignment="Center">
@@ -1038,7 +1038,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=ViewTemplatesInPj}"
-                                            SelectedItem="{Binding Path=SelectedGeneralViewRebarTemplate}">
+                                            SelectedItem="{Binding Path=SelectedGeneralRebarViewTemplate}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>
@@ -1486,7 +1486,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left"
                                                 Margin="10 0 5 0"
-                                                Text="{Binding Path=ViewSectionSettings.TransverseViewRebarPrefixTemp,
+                                                Text="{Binding Path=ViewSectionSettings.TransverseRebarViewPrefixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}"
                                                 Width="174"
                                                 Height="25"
@@ -1517,7 +1517,7 @@
                                                 Style="{StaticResource TextBoxWithTooltipStyle}"
                                                 HorizontalAlignment="Left"
                                                 Margin="5 0 10 0"
-                                                Text="{Binding Path=ViewSectionSettings.TransverseViewRebarSuffixTemp,
+                                                Text="{Binding Path=ViewSectionSettings.TransverseRebarViewSuffixTemp,
                                                 UpdateSourceTrigger=PropertyChanged}"
                                                 Width="174"
                                                 Height="25"
@@ -1675,7 +1675,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left"
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=ViewSectionSettings.TransverseViewRebarElevationTemp,
+                                            Text="{Binding Path=ViewSectionSettings.TransverseRebarViewElevationTemp,
                                             UpdateSourceTrigger=PropertyChanged}"
                                             Width="460"
                                             Height="25"
@@ -1765,7 +1765,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=ViewTemplatesInPj}"
-                                            SelectedItem="{Binding Path=SelectedTransverseViewRebarTemplate}">
+                                            SelectedItem="{Binding Path=SelectedTransverseRebarViewTemplate}">
 
                                             <ComboBox.ToolTip>
                                                 <ToolTip>

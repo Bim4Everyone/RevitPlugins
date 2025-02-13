@@ -31,9 +31,9 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _selectedProjectSection = string.Empty;
         private ViewFamilyType _selectedViewFamilyType;
         private View _selectedGeneralViewTemplate;
-        private View _selectedGeneralViewRebarTemplate;
+        private View _selectedGeneralRebarViewTemplate;
         private View _selectedTransverseViewTemplate;
-        private View _selectedTransverseViewRebarTemplate;
+        private View _selectedTransverseRebarViewTemplate;
         private View _selectedLegend;
         private FamilySymbol _selectedTitleBlock;
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
@@ -212,11 +212,11 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Выбранный пользователем шаблон вида основных видов армирования
         /// </summary>
-        public View SelectedGeneralViewRebarTemplate {
-            get => _selectedGeneralViewRebarTemplate;
+        public View SelectedGeneralRebarViewTemplate {
+            get => _selectedGeneralRebarViewTemplate;
             set {
-                this.RaiseAndSetIfChanged(ref _selectedGeneralViewRebarTemplate, value);
-                ViewSectionSettings.GeneralViewRebarTemplateNameTemp = value?.Name;
+                this.RaiseAndSetIfChanged(ref _selectedGeneralRebarViewTemplate, value);
+                ViewSectionSettings.GeneralRebarViewTemplateNameTemp = value?.Name;
             }
         }
 
@@ -234,11 +234,11 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Выбранный пользователем шаблон вида поперечных видов армирования
         /// </summary>
-        public View SelectedTransverseViewRebarTemplate {
-            get => _selectedTransverseViewRebarTemplate;
+        public View SelectedTransverseRebarViewTemplate {
+            get => _selectedTransverseRebarViewTemplate;
             set {
-                this.RaiseAndSetIfChanged(ref _selectedTransverseViewRebarTemplate, value);
-                ViewSectionSettings.TransverseViewRebarTemplateNameTemp = value?.Name;
+                this.RaiseAndSetIfChanged(ref _selectedTransverseRebarViewTemplate, value);
+                ViewSectionSettings.TransverseRebarViewTemplateNameTemp = value?.Name;
             }
         }
 
@@ -449,9 +449,9 @@ namespace RevitPylonDocumentation.ViewModels {
             FindReferenceSchedules();
 
             FindGeneralViewTemplate();
-            FindGeneralViewRebarTemplate();
+            FindGeneralRebarViewTemplate();
             FindTransverseViewTemplate();
-            FindTransverseViewRebarTemplate();
+            FindTransverseRebarViewTemplate();
             FindViewFamilyType();
             FindLegend();
             FindTitleBlock();
@@ -475,7 +475,7 @@ namespace RevitPylonDocumentation.ViewModels {
                 return;
             }
 
-            if(SelectedGeneralViewRebarTemplate is null) {
+            if(SelectedGeneralRebarViewTemplate is null) {
                 ErrorText = "Не выбран шаблон основных видов армирования";
                 return;
             }
@@ -485,7 +485,7 @@ namespace RevitPylonDocumentation.ViewModels {
                 return;
             }
 
-            if(SelectedTransverseViewRebarTemplate is null) {
+            if(SelectedTransverseRebarViewTemplate is null) {
                 ErrorText = "Не выбран шаблон поперечных видов армирования";
                 return;
             }
@@ -554,10 +554,10 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Получает шаблон для основных видов армирования по имени
         /// </summary>
-        public void FindGeneralViewRebarTemplate() {
-            if(ViewSectionSettings.GeneralViewRebarTemplateName != string.Empty) {
-                SelectedGeneralViewRebarTemplate = ViewTemplatesInPj
-                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralViewRebarTemplateName));
+        public void FindGeneralRebarViewTemplate() {
+            if(ViewSectionSettings.GeneralRebarViewTemplateName != string.Empty) {
+                SelectedGeneralRebarViewTemplate = ViewTemplatesInPj
+                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralRebarViewTemplateName));
             }
         }
 
@@ -574,10 +574,10 @@ namespace RevitPylonDocumentation.ViewModels {
         /// <summary>
         /// Получает шаблон для поперечных видов армирования по имени
         /// </summary>
-        public void FindTransverseViewRebarTemplate() {
-            if(ViewSectionSettings.TransverseViewRebarTemplateName != string.Empty) {
-                SelectedTransverseViewRebarTemplate = ViewTemplatesInPj
-                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseViewRebarTemplateName));
+        public void FindTransverseRebarViewTemplate() {
+            if(ViewSectionSettings.TransverseRebarViewTemplateName != string.Empty) {
+                SelectedTransverseRebarViewTemplate = ViewTemplatesInPj
+                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseRebarViewTemplateName));
             }
         }
 
