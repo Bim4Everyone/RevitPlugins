@@ -5,7 +5,6 @@ using System.Linq;
 using System.Windows.Data;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 using dosymep.WPF.ViewModels;
@@ -24,6 +23,8 @@ namespace RevitReinforcementCoefficient.ViewModels {
         private readonly DesignTypeAnalyzer _designTypeAnalyzer;
         private readonly IReportService _reportService;
         private readonly ReportWindow _reportWindow;
+
+        private readonly string _reinforcement = "ФОП_ТИП_Армирование";
 
         private List<DesignTypeVM> _designTypes = new List<DesignTypeVM>();
 
@@ -67,21 +68,41 @@ namespace RevitReinforcementCoefficient.ViewModels {
         /// </summary>
         public bool FilterByDocPackage(object o) {
             if(MainVM == null) {
-                TaskDialog.Show("Ошибка!", "Не найдена модель основного вида");
-                // TODO сделать иначе
+                throw new System.InvalidOperationException(nameof(MainVM));
             }
 
-            if(MainVM.SelectedDockPackage == MainVM.FilterValueForNoFiltering) {
+            bool turnOffDockPackageFilt = MainVM.SelectedDockPackage == MainVM.FilterValueForNoFiltering;
+            bool turnOffElemSectionFilt = MainVM.SelectedElemSection == MainVM.FilterValueForNoFiltering;
+
+            if(turnOffDockPackageFilt && turnOffElemSectionFilt) {
                 return true;
             }
 
-            // Если в параметре есть какое то значение (не null и не пустая строка (у нас это тоже null))
+            if(!turnOffDockPackageFilt && turnOffElemSectionFilt) {
+                return CheckByDocPackage(o);
+            } else if(turnOffDockPackageFilt && !turnOffElemSectionFilt) {
+                return CheckByElemSection(o);
+            } else {
+                return CheckByDocPackage(o) && CheckByElemSection(o);
+            }
+        }
+
+        private bool CheckByDocPackage(object o) {
             if(string.IsNullOrEmpty(MainVM.SelectedDockPackage)) {
                 return string.IsNullOrEmpty(((DesignTypeVM) o).DocPackage);
             } else {
                 return ((DesignTypeVM) o).DocPackage is null ? false : ((DesignTypeVM) o).DocPackage.Equals(MainVM.SelectedDockPackage);
             }
         }
+
+        private bool CheckByElemSection(object o) {
+            if(string.IsNullOrEmpty(MainVM.SelectedElemSection)) {
+                return string.IsNullOrEmpty(((DesignTypeVM) o).ElemSection);
+            } else {
+                return ((DesignTypeVM) o).ElemSection is null ? false : ((DesignTypeVM) o).ElemSection.Equals(MainVM.SelectedElemSection);
+            }
+        }
+
 
         public void GetInfo(bool calcСoefficientOnAverage) {
             List<DesignTypeVM> selectedDesignTypes = DesignTypes.Where(o => o.IsCheck).ToList();
@@ -120,7 +141,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
         }
 
         /// <summary>
-        /// Запись значений коэффициенто армирования
+        /// Запись значений коэффициентов армирования
         /// </summary>
         public void WriteRebarCoef(Document doc) {
             foreach(DesignTypeVM designType in DesignTypes.Where(o => o.IsCheck)) {
@@ -128,7 +149,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
                 if(!designType.HasErrors) {
                     using(Transaction transaction = doc.StartTransaction("Запись коэффициентов армирования")) {
                         foreach(FormworkElement elem in designType.Formworks) {
-                            elem.RevitElement.SetParamValue("ФОП_ТИП_Армирование", designType.RebarCoef);
+                            elem.RevitElement.SetParamValue(_reinforcement, designType.RebarCoef);
                         }
                         transaction.Commit();
                     }
@@ -137,7 +158,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
         }
 
         /// <summary>
-        /// Ставит галочки выбора у видимых с учетом фильтрации типов констуркций
+        /// Ставит галочки выбора у видимых с учетом фильтрации типов конструкций
         /// </summary>
         public void SelectAllVisible() {
             foreach(DesignTypeVM item in DesignTypes.Where(FilterByDocPackage)) {
@@ -146,7 +167,7 @@ namespace RevitReinforcementCoefficient.ViewModels {
         }
 
         /// <summary>
-        /// Снимает галочки выбора у видимых с учетом фильтрации типов констуркций
+        /// Снимает галочки выбора у видимых с учетом фильтрации типов конструкций
         /// </summary>
         public void UnselectAllVisible() {
             foreach(DesignTypeVM item in DesignTypes.Where(FilterByDocPackage)) {

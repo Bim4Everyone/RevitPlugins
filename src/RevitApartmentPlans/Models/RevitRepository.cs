@@ -9,20 +9,22 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 
 using RevitApartmentPlans.Services;
 
 namespace RevitApartmentPlans.Models {
     internal class RevitRepository {
         private readonly SpatialElementBoundaryOptions _spatialElementBoundaryOptions;
+        private readonly LinkFilterProvider _linkFilterProvider;
 
-
-        public RevitRepository(UIApplication uiApplication) {
+        public RevitRepository(UIApplication uiApplication, LinkFilterProvider linkFilterProvider) {
             _spatialElementBoundaryOptions = new SpatialElementBoundaryOptions() {
                 SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Finish,
                 StoreFreeBoundaryFaces = false
             };
             UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
+            _linkFilterProvider = linkFilterProvider ?? throw new ArgumentNullException(nameof(linkFilterProvider));
         }
 
 
@@ -33,17 +35,29 @@ namespace RevitApartmentPlans.Models {
 
 
         /// <summary>
-        /// Возвращает все замкнутые контуры границ помещения
+        /// Возвращает все замкнутые контуры границ помещения в координатах активного файла
         /// </summary>
         /// <param name="room">Помещение</param>
         /// <returns>Список всех замкнутых контуров границ помещения</returns>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public IList<CurveLoop> GetBoundaryCurveLoops(Room room) {
+        public IList<CurveLoop> GetBoundaryCurveLoops(RoomElement room) {
             if(room is null) { throw new ArgumentNullException(nameof(room)); }
 
-            return room.GetBoundarySegments(_spatialElementBoundaryOptions)
+            var boundaryLoops = room.Room.GetBoundarySegments(_spatialElementBoundaryOptions)
                 .Select(loop => CurveLoop.Create(loop.Select(c => c.GetCurve()).ToArray()))
                 .ToArray();
+            if(room.Transform.IsIdentity && boundaryLoops.Length > 0) {
+                return boundaryLoops;
+            } else {
+                UV point = new UV();
+                XYZ bottomDir = XYZ.BasisZ.Negate();
+                return room.Room.GetSolids()
+                    .SelectMany(s => s.Faces.OfType<PlanarFace>())
+                    .Where(f => f.ComputeNormal(point).IsAlmostEqualTo(bottomDir))
+                    .SelectMany(f => f.GetEdgesAsCurveLoops())
+                    .Select(c => CurveLoop.CreateViaTransform(c, room.Transform))
+                    .ToArray();
+            }
         }
 
         /// <summary>
@@ -92,17 +106,26 @@ namespace RevitApartmentPlans.Models {
         /// <exception cref="ArgumentException">Исключение, если название параметра пустое.</exception>
         public ICollection<Apartment> GetApartments(string paramName) {
             if(string.IsNullOrWhiteSpace(paramName)) { throw new ArgumentException(nameof(paramName)); }
-            Level level = GetLevelOfActivePlan();
 
-            return new FilteredElementCollector(Document, Document.ActiveView.Id)
-                .WherePasses(new RoomFilter())
-                .Cast<Room>()
-                .Where(r => r.Area > 0
-                    && r.LevelId == level.Id
-                    && r.IsExistsParamValue(paramName))
-                .GroupBy(r => r.GetParam(paramName).AsValueString())
-                .Select(g => new Apartment(g.ToArray(), g.Key))
-                .ToArray();
+            var rooms = GetRoomsFromActiveDoc(paramName);
+            return GetApartments(rooms, paramName);
+        }
+
+        public ICollection<Apartment> GetApartments(string paramName, bool processLinks) {
+            if(processLinks) {
+                List<RoomElement> rooms = new List<RoomElement>(GetRoomsFromActiveDoc(paramName));
+                var visibleLinks = GetVisibleLinks(GetActiveViewPlan());
+                foreach(var link in visibleLinks) {
+                    rooms.AddRange(_linkFilterProvider.GetFilterOnView(link, GetActiveViewPlan())
+                        .WherePasses(new RoomFilter())
+                        .Cast<Room>()
+                        .Where(r => r.Area > 0 && r.IsExistsParamValue(paramName))
+                        .Select(r => new RoomElement(r, link)));
+                }
+                return GetApartments(rooms, paramName);
+            } else {
+                return GetApartments(paramName);
+            }
         }
 
         /// <summary>
@@ -127,7 +150,8 @@ namespace RevitApartmentPlans.Models {
         /// Метод для отладки. Создает квартиру из выбранных помещений
         /// </summary>
         public Apartment GetDebugApartment() {
-            return new Apartment(PickRooms(), "test");
+            var rooms = PickRooms();
+            return new Apartment(PickRooms(), "test", rooms.First().Room.Level);
         }
 
         /// <summary>
@@ -159,6 +183,31 @@ namespace RevitApartmentPlans.Models {
         }
 
         /// <summary>
+        /// Копирует вид с детализацией.
+        /// </summary>
+        /// <param name="view">Вид для копирования</param>
+        /// <returns>Скопированный вид с детализацией.</returns>
+        /// <exception cref="InvalidOperationException">Исключение, если не удалось скопировать вид.</exception>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null.</exception>
+        public ViewPlan DuplicateView(ViewPlan view) {
+            if(view is null) {
+                throw new ArgumentNullException(nameof(view));
+            }
+            // при копировании видов, с которыми работает плагин, проблем быть не должно,
+            // но пусть будут исключения на всякий случай
+            const ViewDuplicateOption opts = ViewDuplicateOption.WithDetailing;
+            if(view.CanViewBeDuplicated(opts)) {
+                var id = view.Duplicate(opts);
+                if(id.IsNotNull()) {
+                    return Document.GetElement(id) as ViewPlan
+                        ?? throw new InvalidOperationException(
+                            $"Пустой id скопированного вида {view.Name} с детализацией");
+                }
+            }
+            throw new InvalidOperationException($"Не удалось скопировать вид {view.Name} с детализацией");
+        }
+
+        /// <summary>
         /// Возвращает тип шаблона вида: план этажа/план потолка
         /// </summary>
         /// <param name="template">Шаблон вида</param>
@@ -182,13 +231,67 @@ namespace RevitApartmentPlans.Models {
             return Document.ActiveView as ViewPlan != null;
         }
 
+        /// <summary>
+        /// Возвращает активный вид (план)
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Исключение, если активынй вид не является планом</exception>
+        public ViewPlan GetActiveViewPlan() {
+            return Document.ActiveView as ViewPlan
+                ?? throw new InvalidOperationException("Активный вид не является планом");
+        }
+
+        public void ShowApartment(Apartment apartment) {
+#if REVIT_2022_OR_LESS
+            ActiveUIDocument.Selection.SetElementIds(apartment
+                .GetRooms()
+                .Where(r => r.Transform.IsIdentity)
+                .Select(r => r.Room.Id)
+                .ToArray());
+#else
+            var references = apartment.GetRooms()
+                .Select(r => r.GetReference())
+                .ToArray();
+            ActiveUIDocument.Selection.SetReferences(references);
+#endif
+        }
+
+
+        private ICollection<RevitLinkInstance> GetVisibleLinks(View view) {
+            return new FilteredElementCollector(Document, view.Id)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(RevitLinkInstance))
+                .ToElements()
+                .OfType<RevitLinkInstance>()
+                .ToArray();
+        }
+
+        private ICollection<RoomElement> GetRoomsFromActiveDoc(string paramName) {
+            if(string.IsNullOrWhiteSpace(paramName)) { throw new ArgumentException(nameof(paramName)); }
+            Level level = GetLevelOfActivePlan();
+
+            return new FilteredElementCollector(Document, GetActiveViewPlan().Id)
+                .WherePasses(new RoomFilter())
+                .Cast<Room>()
+                .Where(r => r.Area > 0
+                    && r.LevelId == level.Id
+                    && r.IsExistsParamValue(paramName))
+                .Select(r => new RoomElement(r))
+                .ToArray();
+        }
+
+        private ICollection<Apartment> GetApartments(ICollection<RoomElement> rooms, string paramName) {
+            var level = GetLevelOfActivePlan();
+            return rooms.GroupBy(r => r.Room.GetParamValue<string>(paramName))
+                .Select(g => new Apartment(g.ToArray(), g.Key, level))
+                .ToArray();
+        }
 
         /// <summary>
         /// Возвращает уровень, привязанный к активному виду, который должен быть планом
         /// </summary>
         /// <exception cref="InvalidOperationException">Исключение, если активный вид - не план</exception>
         private Level GetLevelOfActivePlan() {
-            var view = Document.ActiveView as ViewPlan;
+            var view = GetActiveViewPlan();
             if(view is null) {
                 throw new InvalidOperationException("Активный вид не является планом");
             }
@@ -207,17 +310,17 @@ namespace RevitApartmentPlans.Models {
         /// <summary>
         /// Метод для отладки. Возвращает помещения, выбранные в GUI Revit
         /// </summary>
-        private ICollection<Room> PickRooms() {
+        private ICollection<RoomElement> PickRooms() {
             ISelectionFilter filter = new SelectionFilterRooms(Document);
             IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
                 ObjectType.Element,
                 filter,
                 "Выберите помещения");
 
-            List<Room> rooms = new List<Room>();
+            List<RoomElement> rooms = new List<RoomElement>();
             foreach(var reference in references) {
                 if((reference != null) && (Document.GetElement(reference) is Room room) && (room.Area > 0)) {
-                    rooms.Add(room);
+                    rooms.Add(new RoomElement(room));
                 }
             }
             return rooms;

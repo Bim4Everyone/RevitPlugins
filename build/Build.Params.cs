@@ -43,6 +43,12 @@ partial class Build {
     public string PluginName { get; set; }
 
     /// <summary>
+    /// Plugin type name.
+    /// </summary>
+    [Parameter("Plugin type name.")]
+    public PluginType PluginType { get; set; } = PluginType.Default;
+
+    /// <summary>
     /// Output directory.
     /// </summary>
     [Parameter("Output directory.")]
@@ -107,6 +113,8 @@ partial class Build {
     public class BuildParams {
         public BuildParams(Build build) {
             PluginName = build.PluginName;
+            PluginType = build.PluginType;
+            
             Output = build.Output ?? DefaultOutput;
             PublishDirectory = build.PublishDirectory ?? Output;
             Configuration = build.Configuration;
@@ -147,6 +155,11 @@ partial class Build {
         /// Project (plugin) name in solution.
         /// </summary>
         public string PluginName { get; }
+        
+        /// <summary>
+        /// Plugin type name.
+        /// </summary>
+        public PluginType PluginType { get; set; }
 
         /// <summary>
         /// Output directory. Default value is <see cref="DefaultOutput"/>.
@@ -230,9 +243,14 @@ partial class Build {
         public string TemplateName => "RevitPluginTemplate";
 
         /// <summary>
-        /// C# project template path.
+        /// Template path.
         /// </summary>
         public AbsolutePath TemplateDirectory => RootDirectory / ".github" / "templates" / TemplateName;
+        
+        /// <summary>
+        /// C# project template path.
+        /// </summary>
+        public AbsolutePath TemplateProjectDirectory => TemplateDirectory / "PluginProjectFiles";
 
         /// <summary>
         /// Workflow template file path.
@@ -248,11 +266,6 @@ partial class Build {
         /// Plugin project file.
         /// </summary>
         public AbsolutePath PluginFile => PluginDirectory / $"{PluginName}.csproj";
-
-        /// <summary>
-        /// Template plugin project file.
-        /// </summary>
-        public AbsolutePath PluginTemplateFile => RootDirectory / "src" / "RevitPlugins" / "RevitPlugins.csproj";
 
         /// <summary>
         /// Template bundle.

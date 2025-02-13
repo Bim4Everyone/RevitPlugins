@@ -1,0 +1,75 @@
+﻿<base:PlatformWindow
+    x:Class="RevitRoomExtrusion.Views.ErrorWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:RevitRoomExtrusion.Views"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterScreen"
+    Title="{DynamicResource ErrorWindow.Title}"
+    Height="500"
+    Width="900"
+    MinHeight="300"
+    MinWidth="600">
+
+    <Window.Resources>
+        <TextBlock
+            x:Key="StaticWarning"
+            Text="{DynamicResource ErrorWindow.Warning}" />
+        <TextBlock
+            x:Key="StaticTitle"
+            Text="{DynamicResource ErrorWindow.HeaderTitle}" />
+        <TextBlock
+            x:Key="StaticNumber"
+            Text="{DynamicResource ErrorWindow.HeaderNumber}" />
+        <TextBlock
+            x:Key="StaticLevel"
+            Text="{DynamicResource ErrorWindow.HeaderLevel}" />
+        <TextBlock
+            x:Key="StaticTypeError"
+            Text="{DynamicResource ErrorWindow.HeaderTypeError}" />
+    </Window.Resources>
+
+    <Grid
+        Margin="10">
+        <StackPanel>
+            <Label
+                Foreground="Orange"
+                Content="{StaticResource StaticWarning}" />
+            <DataGrid
+                Margin="0,10,0,0"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                ItemsSource="{Binding ErrorRooms}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn
+                        Header="ID">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Content="{Binding ElementId}"
+                                    Command="{Binding DataContext.ShowElementCommand, 
+                                    RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding ElementId}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn
+                        Header="{StaticResource StaticTitle}"
+                        Binding="{Binding RoomName}" />
+                    <DataGridTextColumn
+                        Header="{StaticResource StaticNumber}"
+                        Binding="{Binding RoomNumber}" />
+                    <DataGridTextColumn
+                        Header="{StaticResource StaticLevel}"
+                        Binding="{Binding LevelName}" />
+                    <DataGridTextColumn
+                        Header="{StaticResource StaticTypeError}"
+                        Binding="{Binding ErrorDescription}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>

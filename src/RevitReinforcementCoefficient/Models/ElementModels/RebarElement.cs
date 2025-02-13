@@ -11,7 +11,12 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
 
         // Соотношение между диаметром арматурного стержня и массой его одного метра
         private readonly Dictionary<double, double> _massPerLengthDict = new Dictionary<double, double>() {
+            { 4, 0.098},
+            { 5, 0.144},
+            { 6, 0.222},
+            { 7, 0.302},
             { 8, 0.395},
+            { 9, 0.499},
             { 10, 0.617},
             { 12, 0.888},
             { 14, 1.208},
@@ -74,7 +79,8 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
         public double Calculate() {
             int numberOfForm = _utils.GetParamValueAnywhere<int>(RevitElement, _numberOfFormParamName);
             double dimeter = _utils.GetParamValueAnywhere<double>(RevitElement, _dimeterParamName);
-            double dimeterInMm = UnitUtilsHelper.ConvertFromInternalValue(dimeter);
+            double dimeterInMm = Math.Round(UnitUtilsHelper.ConvertFromInternalValue(dimeter));
+
             int calcInLinearMeters = _utils.GetParamValueAnywhere<int>(RevitElement, _calcInLinearMetersParamName);
             int countInLevel = _utils.GetParamValueAnywhere<int>(RevitElement, _countInLevelParamName);
             int countOfLevel = _utils.GetParamValueAnywhere<int>(RevitElement, _countOfLevelParamName);
@@ -103,7 +109,7 @@ namespace RevitReinforcementCoefficient.Models.ElementModels {
             // @Базовый_Масса на единицу длины
             // Погонная масса арматуры
             double massPerUnitLength;
-            // Сравниваем номер формы арматурногно стержня и граничный номер формы для арматуры (обычно 2000)
+            // Сравниваем номер формы арматурного стержня и граничный номер формы для арматуры (обычно 2000)
             if(numberOfForm < _limitNumberOfForm) {
 
                 // TODO реализовать вывод в отчет с уведомлением, что один из стержней не посчитался

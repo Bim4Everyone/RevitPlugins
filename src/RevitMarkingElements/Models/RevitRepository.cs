@@ -132,13 +132,5 @@ namespace RevitMarkingElements.Models {
 
             return null;
         }
-
-        public Category GetCategoryByElementId(ElementId categoryId) {
-            if(categoryId == null || categoryId == ElementId.InvalidElementId) {
-                return null;
-            }
-
-            return Category.GetCategory(Document, categoryId);
-        }
     }
 }

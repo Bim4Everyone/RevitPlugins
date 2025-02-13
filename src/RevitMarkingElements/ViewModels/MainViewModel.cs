@@ -117,9 +117,7 @@ namespace RevitMarkingElements.ViewModels {
 
             Categories = allCategories;
 
-            if(SelectedCategory == null && Categories.Any()) {
-                SelectedCategory = Categories.FirstOrDefault();
-            }
+            SelectedCategory = Categories.FirstOrDefault();
         }
 
         private void SelectLines(MainWindow mainWindow) {
@@ -240,8 +238,8 @@ namespace RevitMarkingElements.ViewModels {
         }
 
         private void LoadView() {
-            LoadConfig();
             LoadCategories();
+            LoadConfig();
             SelectedElements = _revitRepository.GetSelectedElements();
             var lineNumberingLabel = _localizationService.GetLocalizedString("MainWindow.LineNumberingLabel");
             LineNumberingContent = $"{lineNumberingLabel} (0) ";
@@ -269,7 +267,7 @@ namespace RevitMarkingElements.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            SelectedCategory = _revitRepository.GetCategoryByElementId(setting.SelectedCategory);
+            SelectedCategory = Categories.FirstOrDefault(item => item.Id == setting.SelectedCategory);
         }
 
         private void SaveConfig() {

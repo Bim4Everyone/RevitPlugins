@@ -95,7 +95,9 @@ namespace RevitDeclarations.ViewModels {
             List<PublicArea> commercialRooms = projects
                 .SelectMany(x => x.RoomGroups)
                 .Cast<PublicArea>()
-                .OrderBy(x => x.Rooms.First().Number, _stringComparer)
+                .OrderByDescending(x => x.IsUnderground)
+                .ThenBy(x => x.RoomPosition ?? "", _stringComparer)
+                .ThenBy(x => x.Rooms.First().Number ?? "", _stringComparer)
                 .ToList();
 
             try {

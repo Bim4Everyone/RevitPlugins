@@ -2,9 +2,8 @@ using System;
 
 using pyRevitLabs.Json;
 
-namespace RevitDeclarations.Models
-{
-    public class RoomPriority {
+namespace RevitDeclarations.Models {
+    public class RoomPriority : IEquatable<RoomPriority> {
         public RoomPriority(int number, string name) {
             OrdinalNumber = number;
             Name = name;
@@ -25,10 +24,23 @@ namespace RevitDeclarations.Models
         public int MaxRoomAmount { get; set; }
 
         public bool CheckName(string name) {
-            if(string.Equals(name, this.Name, StringComparison.OrdinalIgnoreCase)) {
-                return true;
-            }
-            return false;
+            return string.Equals(name, Name, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool Equals(RoomPriority other) {
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+
+            return CheckName(other.Name);
+        }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as RoomPriority);
+        }
+
+
+        public override int GetHashCode() {
+            return Name?.GetHashCode() ?? 0;
         }
     }
 }

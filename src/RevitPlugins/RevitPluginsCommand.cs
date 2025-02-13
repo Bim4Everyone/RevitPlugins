@@ -1,19 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
@@ -25,46 +18,63 @@ using RevitPlugins.Models;
 using RevitPlugins.ViewModels;
 using RevitPlugins.Views;
 
-using Application = Autodesk.Revit.ApplicationServices.Application;
+namespace RevitPlugins;
 
-namespace RevitPlugins {
-    [Transaction(TransactionMode.Manual)]
-    public class RevitPluginsCommand : BasePluginCommand {
-        public RevitPluginsCommand() {
-            PluginName = "Пример команды";
-        }
+/// <summary>
+/// Класс команды Revit плагина.
+/// </summary>
+/// <remarks>
+/// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
+/// </remarks>
+[Transaction(TransactionMode.Manual)]
+public class RevitPluginsCommand : BasePluginCommand {
+    /// <summary>
+    /// Инициализирует команду плагина.
+    /// </summary>
+    public RevitPluginsCommand() {
+        PluginName = "Пример команды";
+    }
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = new StandardKernel()) {
-                kernel.Bind<UIApplication>()
-                    .ToConstant(uiApplication)
-                    .InTransientScope();
-                kernel.Bind<Application>()
-                    .ToConstant(uiApplication.Application)
-                    .InTransientScope();
+    /// <summary>
+    /// Метод выполнения основного кода плагина.
+    /// </summary>
+    /// <param name="uiApplication">Интерфейс взаимодействия с Revit.</param>
+    /// <remarks>
+    /// В случаях, когда не используется конфигурация
+    /// или локализация требуется удалять их использование полностью во всем проекте.
+    /// </remarks>
+    protected override void Execute(UIApplication uiApplication) {
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
 
-                kernel.Bind<RevitRepository>().ToSelf()
-                    .InSingletonScope();
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
 
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
+        // Настройка конфигурации плагина
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-                kernel.Bind<MainViewModel>().ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>())
-                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                        c => c.Kernel.Get<ILocalizationService>());
+        // Настройка запуска окна
+        kernel.Bind<MainViewModel>().ToSelf();
+        kernel.Bind<MainWindow>().ToSelf()
+            .WithPropertyValue(nameof(Window.DataContext),
+                c => c.Kernel.Get<MainViewModel>())
+            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                c => c.Kernel.Get<ILocalizationService>());
 
-                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-                kernel.UseXtraLocalization(
-                    $"/{assemblyName};component/Localization/Language.xaml",
-                    CultureInfo.GetCultureInfo("ru-RU"));
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseXtraLocalization(
+            $"/{assemblyName};component/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
-                Notification(kernel.Get<MainWindow>());
-            }
-        }
+        // Вызывает стандартное уведомление
+        Notification(kernel.Get<MainWindow>());
     }
 }

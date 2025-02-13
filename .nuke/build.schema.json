@@ -183,6 +183,14 @@
           "type": "string",
           "description": "Project (plugin) name in solution"
         },
+        "PluginType": {
+          "type": "string",
+          "description": "Plugin type name",
+          "enum": [
+            "Default",
+            "DevExpress"
+          ]
+        },
         "PublishDirectory": {
           "type": "string",
           "description": "Publish directory"

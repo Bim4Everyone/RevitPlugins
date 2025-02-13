@@ -85,6 +85,11 @@ namespace RevitDeclarations.Models {
                 .GetDoorsOnPhase(_document.Document, _phase);
         }
 
+        public IReadOnlyCollection<CurveElement> GetCurveSeparators() {
+            return _revitRepository
+                .GetRoomSeparationLinesOnPhase(_document.Document, _phase);
+        }
+
         public IReadOnlyCollection<FamilyInstance> GetBathInstances() {
             return _revitRepository.
                 GetBathInstancesOnPhase(_document.Document, _phase);
