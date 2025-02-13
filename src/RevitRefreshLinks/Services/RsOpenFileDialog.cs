@@ -1,21 +1,44 @@
 using System;
+using System.Linq;
 
 using RevitRefreshLinks.Models;
+using RevitRefreshLinks.ViewModels;
+using RevitRefreshLinks.Views;
 
 namespace RevitRefreshLinks.Services {
     internal class RsOpenFileDialog : IOpenFileDialog {
-        public bool AddExtension { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IFileModel File { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        private readonly FilesExplorerViewModel _explorerViewModel;
+        private readonly FilesExplorerWindow _explorerWindow;
 
-        public IFileModel[] Files => throw new NotImplementedException();
+        public RsOpenFileDialog(FilesExplorerViewModel explorerViewModel, FilesExplorerWindow explorerWindow) {
+            _explorerViewModel = explorerViewModel ?? throw new ArgumentNullException(nameof(explorerViewModel));
+            _explorerWindow = explorerWindow ?? throw new ArgumentNullException(nameof(explorerWindow));
+        }
 
-        public string Filter { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Title { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string InitialDirectory { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool MultiSelect { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public IFileModel File => _explorerViewModel.SelectedFile.FileModel;
+
+        public IFileModel[] Files => _explorerViewModel.SelectedFiles
+            .Select(f => f.FileModel)
+            .ToArray();
+
+        public string Title {
+            get => _explorerViewModel.Title;
+            set => _explorerViewModel.Title = value;
+        }
+
+        public string InitialDirectory {
+            get => _explorerViewModel.InitialDirectory;
+            set => _explorerViewModel.InitialDirectory = value;
+        }
+
+        public bool MultiSelect {
+            get => _explorerViewModel.MultiSelect;
+            set => _explorerViewModel.MultiSelect = value;
+        }
 
         public bool ShowDialog() {
-            throw new NotImplementedException();
+            return _explorerWindow.ShowDialog() ?? false;
         }
     }
 }

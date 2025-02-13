@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.Services {
-    internal class RsFolderLinksProvider : IServerSourceLinksProvider {
+    internal class RsLinksProvider : IServerSourceLinksProvider {
         private readonly RevitRepository _revitRepository;
         private readonly IConfigProvider _configProvider;
         private readonly IOpenFileDialog _openFileDialog;
 
-        public RsFolderLinksProvider(
+        public RsLinksProvider(
             RevitRepository revitRepository,
             IConfigProvider configProvider,
             IOpenFileDialog openFileDialog) {

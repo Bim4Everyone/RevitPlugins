@@ -28,17 +28,11 @@ namespace RevitRefreshLinks {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<UIApplication>()
-                    .ToSelf()
-                    .InSingletonScope();
                 kernel.Bind<IServerSourceLinksProvider>()
-                    .To<RsFolderLinksProvider>()
+                    .To<RsLinksProvider>()
                     .InSingletonScope();
                 kernel.Bind<ILinksLoader>()
                     .To<LinksLoader>()
-                    .InSingletonScope();
-                kernel.Bind<AddServerLinksViewModel>()
-                    .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<IConfigProvider>()
                     .To<ConfigProvider>()
@@ -47,6 +41,10 @@ namespace RevitRefreshLinks {
                 kernel.Bind<AddLinksFromServerConfig>()
                     .ToMethod(c => AddLinksFromServerConfig.GetPluginConfig())
                     .InTransientScope();
+
+                kernel.Bind<AddServerLinksViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
                 kernel.UseXtraLocalization(

@@ -8,6 +8,8 @@ namespace RevitRefreshLinks.ViewModels {
 
         public abstract string Name { get; }
 
+        public abstract string FullName { get; }
+
         public abstract bool IsDirectory { get; }
     }
 }

@@ -27,9 +27,6 @@ namespace RevitRefreshLinks {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<UIApplication>()
-                    .ToSelf()
-                    .InSingletonScope();
                 kernel.Bind<ILocalSourceLinksProvider>()
                     .To<FolderLinksProvider>()
                     .InSingletonScope();

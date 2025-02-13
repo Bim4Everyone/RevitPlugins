@@ -11,5 +11,11 @@ namespace RevitRefreshLinks.ViewModels {
         public override string Name => _fileModel.Name;
 
         public override bool IsDirectory => false;
+
+        public override string FullName => _fileModel.FullName;
+
+        public IFileModel FileModel => _fileModel;
+
+        public IDirectoryModel DirectoryModel => _fileModel.Directory;
     }
 }

@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -10,7 +8,6 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Revit.ServerClient;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
 using dosymep.Xpf.Core.Ninject;
@@ -35,9 +32,6 @@ namespace RevitRefreshLinks {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
-                kernel.Bind<UIApplication>()
-                    .ToSelf()
-                    .InSingletonScope();
                 kernel.Bind<ITwoSourceLinksProvider>()
                     .To<TwoSourcesLinksProvider>()
                     .InSingletonScope();
@@ -46,9 +40,6 @@ namespace RevitRefreshLinks {
                     .InSingletonScope();
                 kernel.Bind<IConfigProvider>()
                     .To<ConfigProvider>()
-                    .InSingletonScope();
-                kernel.Bind<IFileSystem>()
-                    .To<RsFileSystem>()
                     .InSingletonScope();
 
                 kernel.Bind<UpdateLinksConfig>()
@@ -63,24 +54,6 @@ namespace RevitRefreshLinks {
                         c => c.Kernel.Get<UpdateLinksViewModel>())
                     .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                         c => c.Kernel.Get<ILocalizationService>());
-                kernel.Bind<DirectoriesExplorerViewModel>()
-                    .ToSelf()
-                    .InSingletonScope();
-                kernel.Bind<DirectoriesExplorerWindow>()
-                    .ToSelf()
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<DirectoriesExplorerViewModel>())
-                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                        c => c.Kernel.Get<ILocalizationService>());
-
-                kernel.Bind<IReadOnlyCollection<IServerClient>>()
-                    .ToMethod(c => c.Kernel.Get<Autodesk.Revit.ApplicationServices.Application>()
-                        .GetRevitServerNetworkHosts()
-                        .Select(item => new ServerClientBuilder()
-                        .SetServerName(item)
-                        .SetServerVersion(ModuleEnvironment.RevitVersion)
-                        .Build())
-                    .ToArray());
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
                 kernel.UseXtraLocalization(

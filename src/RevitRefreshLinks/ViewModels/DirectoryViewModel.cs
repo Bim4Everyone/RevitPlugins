@@ -15,11 +15,12 @@ namespace RevitRefreshLinks.ViewModels {
 
         public override string Name => _directoryModel.Name;
 
-        public string FullName => _directoryModel.FullName;
+        public override string FullName => _directoryModel.FullName;
 
         public override bool IsDirectory => true;
 
         public IDirectoryModel DirectoryModel => _directoryModel;
+
         public ObservableCollection<PathInfoViewModel> Content { get; }
 
         public async Task<DirectoryViewModel> GetParent() {

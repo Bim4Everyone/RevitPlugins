@@ -1,8 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+
+using dosymep.Bim4Everyone;
+using dosymep.Revit.ServerClient;
+using dosymep.SimpleServices;
+using dosymep.WPF.Views;
 
 using Ninject;
 
 using RevitRefreshLinks.Services;
+using RevitRefreshLinks.ViewModels;
+using RevitRefreshLinks.Views;
 
 namespace RevitRefreshLinks.Extensions {
     internal static class NinjectExtensions {
@@ -22,6 +32,29 @@ namespace RevitRefreshLinks.Extensions {
             if(kernel == null) {
                 throw new ArgumentNullException(nameof(kernel));
             }
+
+            kernel.Bind<IFileSystem>()
+                .To<RsFileSystem>()
+                .WhenInjectedInto<DirectoriesExplorerViewModel>();
+
+            kernel.Bind<DirectoriesExplorerViewModel>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<DirectoriesExplorerWindow>()
+                .ToSelf()
+                .WithPropertyValue(nameof(Window.DataContext),
+                    c => c.Kernel.Get<DirectoriesExplorerViewModel>())
+                .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                    c => c.Kernel.Get<ILocalizationService>());
+
+            kernel.Bind<IReadOnlyCollection<IServerClient>>()
+                .ToMethod(c => c.Kernel.Get<Autodesk.Revit.ApplicationServices.Application>()
+                    .GetRevitServerNetworkHosts()
+                    .Select(item => new ServerClientBuilder()
+                    .SetServerName(item)
+                    .SetServerVersion(ModuleEnvironment.RevitVersion)
+                    .Build())
+                .ToArray());
 
             kernel.Bind<IOpenFolderDialog>()
                 .To<RsOpenFolderDialog>()
@@ -48,6 +81,29 @@ namespace RevitRefreshLinks.Extensions {
             if(kernel == null) {
                 throw new ArgumentNullException(nameof(kernel));
             }
+
+            kernel.Bind<IFileSystem>()
+                .To<RsFileSystem>()
+                .WhenInjectedInto<FilesExplorerViewModel>();
+
+            kernel.Bind<FilesExplorerViewModel>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<FilesExplorerWindow>()
+                .ToSelf()
+                .WithPropertyValue(nameof(Window.DataContext),
+                    c => c.Kernel.Get<FilesExplorerViewModel>())
+                .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                    c => c.Kernel.Get<ILocalizationService>());
+
+            kernel.Bind<IReadOnlyCollection<IServerClient>>()
+                .ToMethod(c => c.Kernel.Get<Autodesk.Revit.ApplicationServices.Application>()
+                    .GetRevitServerNetworkHosts()
+                    .Select(item => new ServerClientBuilder()
+                    .SetServerName(item)
+                    .SetServerVersion(ModuleEnvironment.RevitVersion)
+                    .Build())
+                .ToArray());
 
             kernel.Bind<IOpenFileDialog>()
                 .To<RsOpenFileDialog>()
