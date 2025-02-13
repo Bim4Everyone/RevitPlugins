@@ -83,6 +83,7 @@ namespace RevitRoughFinishingDesign.Models {
                 Line wallCurve = GetWallLine();
                 XYZ wallCurveCenter = wallCurve.Evaluate(0.5, false);
                 XYZ normalVector = XYZ.BasisZ.CrossProduct(wallCurve.Direction).Normalize();
+                XYZ secondBecor = XYZ.BasisZ.CrossProduct(wallCurve.Direction.Negate()).Normalize();
 
                 IList<XYZ> rightPoints = new List<XYZ>();
                 IList<XYZ> leftPoints = new List<XYZ>();
@@ -93,14 +94,14 @@ namespace RevitRoughFinishingDesign.Models {
                     XYZ leftPoint = new XYZ(wallCurveCenter.X, wallCurveCenter.Y, wallCurveCenter.Z)
                         - normalVector * step;
                     if(_room.IsPointInRoom(rightPoint)) {
-                        rightPoint.Add(rightPoint);
-
-                    } else if(_room.IsPointInRoom(leftPoint)) {
+                        rightPoints.Add(rightPoint);
+                    }
+                    if(_room.IsPointInRoom(leftPoint)) {
                         leftPoints.Add(leftPoint);
                     }
                 }
 
-                if(rightPoints.Count > leftPoints.Count) {
+                if(rightPoints.Count >= leftPoints.Count) {
                     _directionToRoom = normalVector;
                 } else {
                     _directionToRoom = -normalVector;

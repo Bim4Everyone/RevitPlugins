@@ -16,6 +16,8 @@ namespace RevitRoughFinishingDesign.Models {
         private ICollection<ElementId> _wallsInRoom;
         private readonly ICurveLoopsSimplifier _curveLoopsSimplifier;
         private Solid _roomActiveViewSolid;
+        private IList<CurveLoop> _simplifiedCurveList;
+        private IList<RoomBorder> _roomBorders;
 
         /// <summary>
         /// Смещение границ BoundingBox помещения, мм
@@ -98,23 +100,45 @@ namespace RevitRoughFinishingDesign.Models {
 
 
         public IList<CurveLoop> GetSimplifiedCurveLoops() {
-            SpatialElementBoundaryOptions spatialElementBoundaryOptions = new SpatialElementBoundaryOptions();
-            IList<IList<BoundarySegment>> boundarySegments = RevitRoom.GetBoundarySegments(spatialElementBoundaryOptions);
-            IList<CurveLoop> simplifiedCurveLoops = new List<CurveLoop>();
-            double zPoint = _revitRepository.GetVerticalPointFromActiveView();
-            foreach(var boundarySegment in boundarySegments) {
+            if(_simplifiedCurveList != null) {
+                return _simplifiedCurveList;
+            } else {
+                SpatialElementBoundaryOptions spatialElementBoundaryOptions = new SpatialElementBoundaryOptions();
+                IList<IList<BoundarySegment>> boundarySegments = RevitRoom.GetBoundarySegments(spatialElementBoundaryOptions);
+                IList<CurveLoop> simplifiedCurveLoops = new List<CurveLoop>();
+                double zPoint = _revitRepository.GetVerticalPointFromActiveView();
+                foreach(var boundarySegment in boundarySegments) {
 
-                CurveLoop curveLoop = new CurveLoop();
-                foreach(var curve in boundarySegment) {
-                    Curve oldCurve = curve.GetCurve();
-                    Curve newCorrectCurve = _revitRepository.TransformCurveToExactZ(oldCurve, zPoint);
-                    curveLoop.Append(newCorrectCurve);
+                    CurveLoop curveLoop = new CurveLoop();
+                    foreach(var curve in boundarySegment) {
+                        Curve oldCurve = curve.GetCurve();
+                        Curve newCorrectCurve = _revitRepository.TransformCurveToExactZ(oldCurve, zPoint);
+                        curveLoop.Append(newCorrectCurve);
+                    }
+
+                    CurveLoop simplifiedLoop = _curveLoopsSimplifier.Simplify(curveLoop);
+                    simplifiedCurveLoops.Add(simplifiedLoop);
+                    _simplifiedCurveList = simplifiedCurveLoops;
                 }
-
-                CurveLoop simplifiedLoop = _curveLoopsSimplifier.Simplify(curveLoop);
-                simplifiedCurveLoops.Add(simplifiedLoop);
             }
-            return simplifiedCurveLoops;
+            return _simplifiedCurveList;
+        }
+
+        public IList<RoomBorder> GetRoomBorders() {
+            if(_roomBorders != null) {
+                return _roomBorders;
+            } else {
+                IList<CurveLoop> simplifiedLoops = GetSimplifiedCurveLoops();
+                IList<RoomBorder> roomBorders = new List<RoomBorder>();
+
+                foreach(CurveLoop loop in simplifiedLoops) {
+                    foreach(Curve curve in loop) {
+                        roomBorders.Add(new RoomBorder(curve));
+                    }
+                }
+                _roomBorders = roomBorders;
+                return _roomBorders;
+            }
         }
 
         public void CreateTestSolids() {

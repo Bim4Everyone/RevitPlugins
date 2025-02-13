@@ -51,7 +51,20 @@ namespace RevitRoughFinishingDesign.Models {
                 .Where(el => el.LookupParameter("ФОП_Тип квартиры").AsString() != null)
                 .ToList();
         }
-
+        public IList<ElementId> GetWallTypeIdsInsideRoom(Room room) {
+            double zPoint = GetVerticalPointFromActiveView();
+            ICollection<ElementId> wallIds = GetWallsIds();
+            IList<ElementId> wallTypes = new List<ElementId>();
+            foreach(ElementId wallId in wallIds) {
+                Wall wallElement = Document.GetElement(wallId) as Wall;
+                Solid wallSolid = wallElement.GetSolids().First();
+                XYZ wallOrigin = wallSolid.ComputeCentroid();
+                if(room.IsPointInRoom(wallOrigin)) {
+                    wallTypes.Add(wallElement.WallType.Id);
+                }
+            }
+            return wallTypes;
+        }
         public ICollection<ElementId> GetWallsIds() {
             Options options = new Options() { DetailLevel = ViewDetailLevel.Fine };
             _wallsIds = _wallsIds ?? new FilteredElementCollector(Document, ActiveView.Id)
@@ -108,25 +121,32 @@ namespace RevitRoughFinishingDesign.Models {
             return Line.CreateBound(newStart, newEnd);
         }
 
-        public RoomBorder GetClosestCurveFromCurveList(Curve currentCurve, IList<Curve> curves) {
+        public RoomBorder GetClosestCurveFromCurveList(Curve currentCurve, IList<RoomBorder> curves) {
             XYZ centerOfCurrentCurve = currentCurve.Evaluate(0.5, true);
             double minDistance = double.PositiveInfinity;
-            Curve closestCurve = null;
-            foreach(Curve curve in curves) {
-                XYZ closestPoint = curve.Project(centerOfCurrentCurve).XYZPoint;
+            RoomBorder closestCurve = null;
+            foreach(RoomBorder curve in curves) {
+                XYZ closestPoint = curve.Curve.Project(centerOfCurrentCurve).XYZPoint;
                 double distance = centerOfCurrentCurve.DistanceTo(closestPoint);
                 if(distance < minDistance) {
                     minDistance = distance;
                     closestCurve = curve;
                 }
             }
-            return new RoomBorder(closestCurve);
+            return closestCurve;
         }
 
-        public RoomBorder GetClosestCurveFromCurveList(Curve currentCurve, IList<CurveLoop> curveLoops) {
-            IList<Curve> allCurves = curveLoops.SelectMany(loop => loop.ToList()).ToList();
-            return GetClosestCurveFromCurveList(currentCurve, allCurves);
-        }
+        //public RoomBorder GetClosestCurveFromCurveList(Curve currentCurve, IList<CurveLoop> curveLoops) {
+        //    IList<Curve> allCurves = curveLoops.SelectMany(loop => loop.ToList()).ToList();
+        //    return GetClosestCurveFromCurveList(currentCurve, allCurves);
+        //}
+
+        //public RoomBorder GetClosestCurveFromCurveList(Curve currentCurve, IList<RoomBorder> roomBorders) {
+        //    IList<Curve> allCurves = roomBorders.Select(rb => rb.Curve).ToList();
+        //    Curve closestCurve = GetClosestCurveFromCurveList(currentCurve, allCurves);
+
+        //    return roomBorders.First(rb => rb.Curve == closestCurve);
+        //}
 
         public XYZ GetOriginFromCurve(Curve curve) {
             if(curve is Arc arc) {

@@ -42,7 +42,14 @@ namespace RevitRoughFinishingDesign.ViewModels {
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
-
+        private string _lineOffset;
+        public string LineOffset {
+            get => _lineOffset;
+            set {
+                RaiseAndSetIfChanged(ref _lineOffset, value);
+                OnPropertyChanged(nameof(ErrorText));
+            }
+        }
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -60,7 +67,7 @@ namespace RevitRoughFinishingDesign.ViewModels {
         private void AcceptView() {
             IList<Room> rooms = _revitRepository.GetTestRooms();
             using(var transaction = _revitRepository.Document.StartTransaction("Тест")) {
-                _createsLinesForFinishing.DrawLines();
+                _createsLinesForFinishing.DrawLines(_pluginConfig);
                 //foreach(Room room in rooms) {
                 //    IList<WallDesignData> wallDesignData = _wallDesignDataGetter.GetWallDesignDatas();
                 //RevitRoomHandler roomHandler = new RevitRoomHandler(_revitRepository, room, _curveLoopsSimplifier);
@@ -72,24 +79,27 @@ namespace RevitRoughFinishingDesign.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(string.IsNullOrEmpty(SaveProperty)) {
-                ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+            if(!double.TryParse(LineOffset, out double result)) {
+                ErrorText = "Смещение не должно содержать символов или букв";
                 return false;
             }
-
             ErrorText = null;
             return true;
         }
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+            LineOffset = _pluginConfig.LineOffset.GetValueOrDefault(0).ToString();
 
             SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+            OnPropertyChanged(nameof(ErrorText));
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
+
+            _pluginConfig.LineOffset = double.Parse(LineOffset);
 
             setting.SaveProperty = SaveProperty;
             _pluginConfig.SaveProjectConfig();

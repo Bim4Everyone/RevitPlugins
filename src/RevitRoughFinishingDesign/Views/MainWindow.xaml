@@ -28,13 +28,57 @@
             <RowDefinition
                 Height="Auto" />
         </Grid.RowDefinitions>
+        <Grid 
+            Grid.Row="0"
+            Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition>
+                </ColumnDefinition>
+                <ColumnDefinition>
+                </ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <ComboBox Grid.Row="0" Grid.Column="0"
+                VerticalAlignment="Center"
+                Height="25"
+                VerticalContentAlignment="Center"
+                      Margin="100 25 100 0"
+                ItemsSource="{Binding WallType1}"
+                SelectedItem="{Binding SelectedWallType1}"/>
+                <ComboBox Grid.Row="0" Grid.Column="0"
+                VerticalAlignment="Center"
+                Height="25"
+                VerticalContentAlignment="Center"
+                      Margin="100 25 100 0"
+                ItemsSource="{Binding WallType2}"
+                SelectedItem="{Binding SelectedWallType2}"/>
+
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+                <ComboBox Grid.Row="0" Grid.Column="0"
+                VerticalAlignment="Center"
+                Height="25"
+                VerticalContentAlignment="Center"
+                      Margin="100 25 100 0"
+                ItemsSource="{Binding LineType1}"
+                SelectedItem="{Binding SelectedLineType1}"/>
+                <ComboBox Grid.Row="0" Grid.Column="0"
+                VerticalAlignment="Center"
+                Height="25"
+                VerticalContentAlignment="Center"
+                        Margin="100 25 100 0"
+                ItemsSource="{Binding LineType2}"
+                SelectedItem="{Binding SelectedLineType2}"/>
+
+            </StackPanel>
+        </Grid>
 
         <TextBox
             Grid.Row="0"
             Width="200"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
-            Text="{Binding SaveProperty,
+            Text="{Binding LineOffset,
                 UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel
