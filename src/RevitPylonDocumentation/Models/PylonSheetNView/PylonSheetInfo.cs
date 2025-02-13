@@ -29,7 +29,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             TransverseViewFirst = new PylonView(ViewModel, Repository, this);
             TransverseViewSecond = new PylonView(ViewModel, Repository, this);
             TransverseViewThird = new PylonView(ViewModel, Repository, this);
-            TransverseRebarView = new PylonView(ViewModel, Repository, this);
+            TransverseRebarViewFirst = new PylonView(ViewModel, Repository, this);
+            TransverseRebarViewSecond = new PylonView(ViewModel, Repository, this);
 
             RebarSchedule = new PylonView(ViewModel, Repository, this);
             MaterialSchedule = new PylonView(ViewModel, Repository, this);
@@ -73,7 +74,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         public PylonView TransverseViewFirst { get; set; }
         public PylonView TransverseViewSecond { get; set; }
         public PylonView TransverseViewThird { get; set; }
-        public PylonView TransverseRebarView { get; set; }
+        public PylonView TransverseRebarViewFirst { get; set; }
+        public PylonView TransverseRebarViewSecond { get; set; }
 
 
 

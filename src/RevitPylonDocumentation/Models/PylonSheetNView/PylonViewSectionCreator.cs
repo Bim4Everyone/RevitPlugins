@@ -264,12 +264,15 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             double minZ = bb.Min.Z;
             double maxZ = bb.Max.Z;
 
-            double coordinateX = (hostLength * 0.5) + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
-            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
-            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+            double coordinateX = (hostLength * 0.5)
+                + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+            double coordinateYTop = maxZ - originPoint.Z
+                + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+            double coordinateYBottom = minZ - originPoint.Z
+                - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
             XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.4);
-            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostLength * 0.4);
+            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostLength * 0.49);
 
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
             sectionBox.Transform = t;
@@ -403,7 +406,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             return true;
         }
 
-        public bool TryCreateTransverseRebarView(ViewFamilyType selectedViewFamilyType) {
+
+        public bool TryCreateTransverseRebarView(ViewFamilyType selectedViewFamilyType, int transverseRebarViewNum) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
             int count = 0;
             Element elemForWork = null;
@@ -442,14 +446,26 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             XYZ sectionBoxMin;
             XYZ sectionBoxMax;
             double elevation;
-            double coordinateX = (hostLength * 0.5) + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
-            double coordinateY = (hostWidth * 0.5) + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
+            double coordinateX = (hostLength * 0.5)
+                + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
+            double coordinateY = (hostWidth * 0.5)
+                + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
-            // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
-            elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewElevation);
+            if(transverseRebarViewNum == 1) {
+                // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
+                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z));
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z));
+            } else if(transverseRebarViewNum == 2) {
+                // Располагаем сечение на высоте 1/2 высоты пилона (или по пропорции, указанной пользователем)
+                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevation);
+
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z));
+            } else {
+                return false;
+            }
 
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
             sectionBox.Transform = t;
@@ -460,15 +476,27 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             try {
                 viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
                 if(viewSection != null) {
-                    viewSection.Name =
-                        ViewModel.ViewSectionSettings.TransverseRebarViewPrefix
-                        + SheetInfo.PylonKeyName
-                        + ViewModel.ViewSectionSettings.TransverseRebarViewSuffix;
-                    // Если был выбран шаблон вида, то назначаем
-                    if(ViewModel.SelectedTransverseRebarViewTemplate != null) {
-                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
+                    if(transverseRebarViewNum == 1) {
+                        viewSection.Name =
+                            ViewModel.ViewSectionSettings.TransverseRebarViewFirstPrefix
+                            + SheetInfo.PylonKeyName
+                            + ViewModel.ViewSectionSettings.TransverseRebarViewFirstSuffix;
+                        // Если был выбран шаблон вида, то назначаем
+                        if(ViewModel.SelectedTransverseRebarViewTemplate != null) {
+                            viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
+                        }
+                        SheetInfo.TransverseRebarViewFirst.ViewElement = viewSection;
+
+                    } else if(transverseRebarViewNum == 2) {
+                        viewSection.Name =
+                            ViewModel.ViewSectionSettings.TransverseRebarViewSecondPrefix
+                            + SheetInfo.PylonKeyName
+                            + ViewModel.ViewSectionSettings.TransverseRebarViewSecondSuffix;
+                        if(ViewModel.SelectedTransverseRebarViewTemplate != null) {
+                            viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
+                        }
+                        SheetInfo.TransverseRebarViewSecond.ViewElement = viewSection;
                     }
-                    SheetInfo.TransverseRebarView.ViewElement = viewSection;
                 }
             } catch(Exception) {
                 if(viewSection != null) {
@@ -478,6 +506,84 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
             return true;
         }
+
+
+
+        //public bool TryCreateTransverseRebarView(ViewFamilyType selectedViewFamilyType, int transverseViewNum) {
+        //    // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+        //    int count = 0;
+        //    Element elemForWork = null;
+        //    foreach(Element elem in SheetInfo.HostElems) {
+        //        elemForWork = elem;
+        //        count++;
+        //    }
+
+        //    if(elemForWork is null) { return false; }
+
+        //    double hostLength = 0;
+        //    double hostWidth = 0;
+        //    XYZ midlePoint = null;
+        //    XYZ hostVector = null;
+
+        //    // Заполняем нужные для объекта Transform поля
+        //    if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
+
+        //    // Формируем данные для объекта Transform
+        //    XYZ originPoint = midlePoint;
+        //    XYZ hostDir = hostVector.Normalize();
+        //    XYZ viewDir = XYZ.BasisZ.Negate();
+        //    XYZ upDir = viewDir.CrossProduct(hostDir);
+
+        //    // Передаем данные для объекта Transform
+        //    Transform t = Transform.Identity;
+        //    t.Origin = originPoint;
+        //    t.BasisX = hostDir;
+        //    t.BasisY = upDir;
+        //    t.BasisZ = viewDir;
+
+        //    BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
+        //    double minZ = bb.Min.Z;
+        //    double maxZ = bb.Max.Z;
+
+        //    XYZ sectionBoxMin;
+        //    XYZ sectionBoxMax;
+        //    double elevation;
+        //    double coordinateX = (hostLength * 0.5) + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
+        //    double coordinateY = (hostWidth * 0.5) + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
+
+        //    // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
+        //    elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
+
+        //    sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
+        //    sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z));
+
+        //    BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
+        //    sectionBox.Transform = t;
+        //    sectionBox.Min = sectionBoxMin;
+        //    sectionBox.Max = sectionBoxMax;
+
+        //    ViewSection viewSection = null;
+        //    try {
+        //        viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
+        //        if(viewSection != null) {
+        //            viewSection.Name =
+        //                ViewModel.ViewSectionSettings.TransverseRebarViewFirstPrefix
+        //                + SheetInfo.PylonKeyName
+        //                + ViewModel.ViewSectionSettings.TransverseRebarViewFirstSuffix;
+        //            // Если был выбран шаблон вида, то назначаем
+        //            if(ViewModel.SelectedTransverseRebarViewTemplate != null) {
+        //                viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
+        //            }
+        //            SheetInfo.TransverseRebarViewFirst.ViewElement = viewSection;
+        //        }
+        //    } catch(Exception) {
+        //        if(viewSection != null) {
+        //            Repository.Document.Delete(viewSection.Id);
+        //        }
+        //        return false;
+        //    }
+        //    return true;
+        //}
 
 
         public bool PrepareInfoForTransform(Element elemForWork, ref XYZ middlePoint, ref XYZ hostVector, ref double hostLength, ref double hostWidth) {

@@ -382,19 +382,19 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         }
 
 
-        internal bool PlaceTransverseRebarViewPort() {
+        internal bool PlaceTransverseRebarFirstViewPort() {
             // Проверяем вдруг вид не создался
-            if(SheetInfo.TransverseRebarView.ViewElement == null) {
+            if(SheetInfo.TransverseRebarViewFirst.ViewElement == null) {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.TransverseRebarView.ViewportTypeName = "Сечение_Номер вида";
-                SheetInfo.TransverseRebarView.ViewportNumber = "a";
-                SheetInfo.TransverseRebarView.ViewportName = "";
+                SheetInfo.TransverseRebarViewFirst.ViewportTypeName = "Сечение_Номер вида";
+                SheetInfo.TransverseRebarViewFirst.ViewportNumber = "a";
+                SheetInfo.TransverseRebarViewFirst.ViewportName = "";
             }
 
             // Передаем поперечный вид армирования пилона в метод по созданию видов в (0.0.0)
-            if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseRebarView)) {
+            if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseRebarViewFirst)) {
                 return false;
             }
 
@@ -440,16 +440,88 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             //        + SheetInfo.TransverseViewThird.ViewportHalfHeight;
             //}
 
-            newCenterX = -SheetInfo.TitleBlockWidth * 1.5;
-            newCenterY = UnitUtilsHelper.ConvertToInternalValue(-75);
+            newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.TransverseRebarViewFirst.ViewportHalfWidth + 0.065 - 2.0;
+            newCenterY = UnitUtilsHelper.ConvertToInternalValue(-50);
 
             XYZ newCenter = new XYZ(
                     newCenterX,
                     newCenterY,
                     0);
 
-            (SheetInfo.TransverseRebarView.ViewportElement as Viewport).SetBoxCenter(newCenter);
-            SheetInfo.TransverseRebarView.ViewportCenter = newCenter;
+            (SheetInfo.TransverseRebarViewFirst.ViewportElement as Viewport).SetBoxCenter(newCenter);
+            SheetInfo.TransverseRebarViewFirst.ViewportCenter = newCenter;
+            return true;
+        }
+
+
+        internal bool PlaceTransverseRebarSecondViewPort() {
+            // Проверяем вдруг вид не создался
+            if(SheetInfo.TransverseRebarViewSecond.ViewElement == null) {
+                return false;
+            } else {
+                // Заполнеяем данные для задания
+                SheetInfo.TransverseRebarViewSecond.ViewportTypeName = "Сечение_Номер вида";
+                SheetInfo.TransverseRebarViewSecond.ViewportNumber = "б";
+                SheetInfo.TransverseRebarViewSecond.ViewportName = "";
+            }
+
+            // Передаем поперечный вид армирования пилона в метод по созданию видов в (0.0.0)
+            if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseRebarViewSecond)) {
+                return false;
+            }
+
+            // Рассчитываем и задаем корректную точку вставки поперечного вида армирования пилона
+            //double generalViewX = 0;
+            //double generalViewPerpendicularX = 0;
+            double newCenterX = 0;
+            double newCenterY = 0;
+
+            //// Если видовой экран основного вида размещен на листе, то находим его Х центра
+            //if(SheetInfo.GeneralView.ViewportElement != null) {
+            //    generalViewX = SheetInfo.GeneralView.ViewportCenter.X;
+            //}
+
+            //// Если видовой экран основного перпендикулярного вида размещен на листе, то находим его Х центра
+            //if(SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
+            //    generalViewPerpendicularX = SheetInfo.GeneralViewPerpendicular.ViewportCenter.X;
+            //}
+
+            //// Определяем координату Х первого поперечного вида пилона
+            //if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
+            //    if(generalViewX > generalViewPerpendicularX) {
+            //        newCenterX = generalViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+            //    } else {
+            //        newCenterX = generalViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+            //    }
+            //} else if(SheetInfo.GeneralView.ViewportElement != null && SheetInfo.GeneralViewPerpendicular.ViewportElement is null) {
+            //    newCenterX = generalViewX + SheetInfo.GeneralView.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+            //} else if(SheetInfo.GeneralView.ViewportElement is null && SheetInfo.GeneralViewPerpendicular.ViewportElement != null) {
+            //    newCenterX = generalViewPerpendicularX + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth + SheetInfo.TransverseViewThird.ViewportHalfWidth;
+            //} else {
+            //    // Когда обоих видовых экранов нет на листе
+            //    newCenterX = SheetInfo.TitleBlockWidth / 2;
+            //}
+
+
+            //if(SheetInfo.TransverseViewSecond.ViewportElement is null) {
+            //    newCenterY = UnitUtilsHelper.ConvertToInternalValue(-75);
+
+            //} else {
+            //    newCenterY = SheetInfo.TransverseViewSecond.ViewportCenter.Y
+            //        + SheetInfo.TransverseViewSecond.ViewportHalfHeight
+            //        + SheetInfo.TransverseViewThird.ViewportHalfHeight;
+            //}
+
+            newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.TransverseRebarViewSecond.ViewportHalfWidth + 0.065 - 2.0;
+            newCenterY = UnitUtilsHelper.ConvertToInternalValue(-150);
+
+            XYZ newCenter = new XYZ(
+                    newCenterX,
+                    newCenterY,
+                    0);
+
+            (SheetInfo.TransverseRebarViewSecond.ViewportElement as Viewport).SetBoxCenter(newCenter);
+            SheetInfo.TransverseRebarViewSecond.ViewportCenter = newCenter;
             return true;
         }
 

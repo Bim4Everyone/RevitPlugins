@@ -16,7 +16,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         private bool _needWorkWithGeneralRebarView = false;
         private bool _needWorkWithGeneralPerpendicularRebarView = false;
-        private bool _needWorkWithTransverseRebarView = false;
+        private bool _needWorkWithTransverseRebarViewFirst = false;
+        private bool _needWorkWithTransverseRebarViewSecond = false;
         private bool _needWorkWithSkeletonSchedule = false;
 
 
@@ -79,9 +80,14 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _needWorkWithGeneralPerpendicularRebarView, value);
         }
 
-        public bool NeedWorkWithTransverseRebarView {
-            get => _needWorkWithTransverseRebarView;
-            set => RaiseAndSetIfChanged(ref _needWorkWithTransverseRebarView, value);
+        public bool NeedWorkWithTransverseRebarViewFirst {
+            get => _needWorkWithTransverseRebarViewFirst;
+            set => RaiseAndSetIfChanged(ref _needWorkWithTransverseRebarViewFirst, value);
+        }
+
+        public bool NeedWorkWithTransverseRebarViewSecond {
+            get => _needWorkWithTransverseRebarViewSecond;
+            set => RaiseAndSetIfChanged(ref _needWorkWithTransverseRebarViewSecond, value);
         }
 
         public bool NeedWorkWithSkeletonSchedule {

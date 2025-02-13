@@ -43,7 +43,8 @@ namespace RevitPylonDocumentation.Models {
             selectionSettings.NeedWorkWithLegend = settings.NeedWorkWithLegend;
             selectionSettings.NeedWorkWithGeneralRebarView = settings.NeedWorkWithGeneralRebarView;
             selectionSettings.NeedWorkWithGeneralPerpendicularRebarView = settings.NeedWorkWithGeneralPerpendicularRebarView;
-            selectionSettings.NeedWorkWithTransverseRebarView = settings.NeedWorkWithTransverseRebarView;
+            selectionSettings.NeedWorkWithTransverseRebarViewFirst = settings.NeedWorkWithTransverseRebarViewFirst;
+            selectionSettings.NeedWorkWithTransverseRebarViewSecond = settings.NeedWorkWithTransverseRebarViewSecond;
             selectionSettings.NeedWorkWithSkeletonSchedule = settings.NeedWorkWithSkeletonSchedule;
 
             projectSettings.ProjectSection = settings.ProjectSection;
@@ -203,7 +204,8 @@ namespace RevitPylonDocumentation.Models {
             settings.NeedWorkWithLegend = selectionSettings.NeedWorkWithLegend;
             settings.NeedWorkWithGeneralRebarView = selectionSettings.NeedWorkWithGeneralRebarView;
             settings.NeedWorkWithGeneralPerpendicularRebarView = selectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
-            settings.NeedWorkWithTransverseRebarView = selectionSettings.NeedWorkWithTransverseRebarView;
+            settings.NeedWorkWithTransverseRebarViewFirst = selectionSettings.NeedWorkWithTransverseRebarViewFirst;
+            settings.NeedWorkWithTransverseRebarViewSecond = selectionSettings.NeedWorkWithTransverseRebarViewSecond;
             settings.NeedWorkWithSkeletonSchedule = selectionSettings.NeedWorkWithSkeletonSchedule;
 
             settings.ProjectSection = projectSettings.ProjectSection;
@@ -299,7 +301,8 @@ namespace RevitPylonDocumentation.Models {
         public bool NeedWorkWithLegend { get; set; }
         public bool NeedWorkWithGeneralRebarView { get; set; }
         public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
-        public bool NeedWorkWithTransverseRebarView { get; set; }
+        public bool NeedWorkWithTransverseRebarViewFirst { get; set; }
+        public bool NeedWorkWithTransverseRebarViewSecond { get; set; }
         public bool NeedWorkWithSkeletonSchedule { get; set; }
 
 
@@ -339,6 +342,7 @@ namespace RevitPylonDocumentation.Models {
         public string TransverseViewThirdElevation { get; set; }
         public string TransverseViewTemplateName { get; set; }
         public string TransverseRebarViewTemplateName { get; set; }
+        public string TransverseRebarViewSecondTemplateName { get; set; }
         public string TransverseViewXOffset { get; set; }
         public string TransverseViewYOffset { get; set; }
         public string ViewFamilyTypeName { get; set; }

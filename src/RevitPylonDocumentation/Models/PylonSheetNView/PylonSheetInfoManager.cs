@@ -123,13 +123,25 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Тут точно получили вид
             }
 
-            // ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
-            if(selectionSettings.NeedWorkWithTransverseRebarView) {
+            // ПЕРВЫЙ ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
+            if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-                if(SheetInfo.TransverseRebarView.ViewElement is null) {
+                if(SheetInfo.TransverseRebarViewFirst.ViewElement is null) {
                     // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
-                    if(!SheetInfo.TransverseRebarView.ViewSectionCreator.TryCreateTransverseRebarView(ViewModel.SelectedViewFamilyType)) {
-                        Repository.FindViewSectionInPj(SheetInfo.TransverseRebarView);
+                    if(!SheetInfo.TransverseRebarViewFirst.ViewSectionCreator.TryCreateTransverseRebarView(ViewModel.SelectedViewFamilyType, 1)) {
+                        Repository.FindViewSectionInPj(SheetInfo.TransverseRebarViewFirst);
+                    }
+                }
+                // Тут точно получили вид
+            }
+
+            // ВТОРОЙ ПОПЕРЕЧНЫЙ ВИД АРМИРОВАНИЯ
+            if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.TransverseRebarViewSecond.ViewElement is null) {
+                    // Если вид не найден, то сначала пытаемся создать вид, а потом, если создание не успешно - будем искать в проекте
+                    if(!SheetInfo.TransverseRebarViewSecond.ViewSectionCreator.TryCreateTransverseRebarView(ViewModel.SelectedViewFamilyType, 2)) {
+                        Repository.FindViewSectionInPj(SheetInfo.TransverseRebarViewSecond);
                     }
                 }
                 // Тут точно получили вид
@@ -228,10 +240,16 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.TransverseViewThird.ViewSectionPlacer.PlaceTransverseThirdViewPorts();
                 }
             }
-            if(selectionSettings.NeedWorkWithTransverseRebarView) {
+            if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
                 // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.TransverseRebarView.ViewportElement is null) {
-                    SheetInfo.TransverseRebarView.ViewSectionPlacer.PlaceTransverseRebarViewPort();
+                if(SheetInfo.TransverseRebarViewFirst.ViewportElement is null) {
+                    SheetInfo.TransverseRebarViewFirst.ViewSectionPlacer.PlaceTransverseRebarFirstViewPort();
+                }
+            }
+            if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.TransverseRebarViewSecond.ViewportElement is null) {
+                    SheetInfo.TransverseRebarViewSecond.ViewSectionPlacer.PlaceTransverseRebarSecondViewPort();
                 }
             }
 
