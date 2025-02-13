@@ -53,10 +53,10 @@
         <DockPanel
             Grid.Row="1"
             VerticalAlignment="Stretch">
-            <ListBox
+            <ListView
                 ItemsSource="{Binding ActiveDirectory.Content}"
                 SelectionMode="{Binding MultiSelect, Converter={StaticResource BoolToSelectionModeConverter}}"
-                res:ListBoxBehavior.SelectedItems="{Binding SelectedItems}"
+                res:ListViewBehavior.SelectedItems="{Binding SelectedItems}"
                 SelectedItem="{Binding SelectedItem}"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
@@ -69,7 +69,7 @@
                             CommandParameter="{Binding SelectedItem}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <ListBox.ItemTemplate>
+                <ListView.ItemTemplate>
                     <DataTemplate>
                         <DockPanel
                             HorizontalAlignment="Stretch">
@@ -79,8 +79,8 @@
                                 Text="{Binding IsDirectory}" />
                         </DockPanel>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </ListView.ItemTemplate>
+            </ListView>
         </DockPanel>
 
         <StackPanel
