@@ -51,7 +51,11 @@ namespace RevitRefreshLinks {
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
                 var localizationService = kernel.Get<ILocalizationService>();
-                kernel.UseRsOpenFileDialog(
+                //kernel.UseRsOpenFileDialog(
+                //    title: localizationService.GetLocalizedString("TODO"),
+                //    initialDirectory: GetInitialServerFolder(kernel),
+                //    multiSelect: true);
+                kernel.UseMockOpenFileDialog(
                     title: localizationService.GetLocalizedString("TODO"),
                     initialDirectory: GetInitialServerFolder(kernel),
                     multiSelect: true);

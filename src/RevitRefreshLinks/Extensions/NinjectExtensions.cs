@@ -10,6 +10,7 @@ using dosymep.WPF.Views;
 
 using Ninject;
 
+using RevitRefreshLinks.Mock;
 using RevitRefreshLinks.Services;
 using RevitRefreshLinks.ViewModels;
 using RevitRefreshLinks.Views;
@@ -84,6 +85,50 @@ namespace RevitRefreshLinks.Extensions {
 
             kernel.Bind<IFileSystem>()
                 .To<RsFileSystem>()
+                .WhenInjectedInto<FilesExplorerViewModel>();
+
+            kernel.Bind<FilesExplorerViewModel>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<FilesExplorerWindow>()
+                .ToSelf()
+                .WithPropertyValue(nameof(Window.DataContext),
+                    c => c.Kernel.Get<FilesExplorerViewModel>())
+                .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
+                    c => c.Kernel.Get<ILocalizationService>());
+
+            kernel.Bind<IReadOnlyCollection<IServerClient>>()
+                .ToMethod(c => c.Kernel.Get<Autodesk.Revit.ApplicationServices.Application>()
+                    .GetRevitServerNetworkHosts()
+                    .Select(item => new ServerClientBuilder()
+                    .SetServerName(item)
+                    .SetServerVersion(ModuleEnvironment.RevitVersion)
+                    .Build())
+                .ToArray());
+
+            kernel.Bind<IOpenFileDialog>()
+                .To<RsOpenFileDialog>()
+                .WithPropertyValue(nameof(IOpenFileDialog.Title), title)
+                .WithPropertyValue(nameof(IOpenFileDialog.InitialDirectory), initialDirectory)
+                .WithPropertyValue(nameof(IOpenFileDialog.MultiSelect), multiSelect);
+
+            return kernel;
+        }
+
+        /// <summary>
+        /// Добавляет заглушку для работы с файловой системой ПК вместо RS. 
+        /// Использовать для отладки окна, чтобы не ждать ответов от RS.
+        /// </summary>
+        internal static IKernel UseMockOpenFileDialog(this IKernel kernel,
+            string title = "Выберите файлы с RS",
+            string initialDirectory = default,
+            bool multiSelect = false) {
+            if(kernel == null) {
+                throw new ArgumentNullException(nameof(kernel));
+            }
+
+            kernel.Bind<IFileSystem>()
+                .To<MockFileSystem>()
                 .WhenInjectedInto<FilesExplorerViewModel>();
 
             kernel.Bind<FilesExplorerViewModel>()
