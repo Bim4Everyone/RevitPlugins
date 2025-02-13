@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitRefreshLinks.Views"
-    xmlns:resources="clr-namespace:RevitRefreshLinks.Resources"
+    xmlns:res="clr-namespace:RevitRefreshLinks.Resources"
     xmlns:vms="clr-namespace:RevitRefreshLinks.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     mc:Ignorable="d"
@@ -25,7 +25,7 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Resources>
-        <resources:BoolToSelectionModeConverter
+        <res:BoolToSelectionModeConverter
             x:Key="BoolToSelectionModeConverter" />
     </Window.Resources>
     <Grid>
@@ -36,22 +36,44 @@
                 Height="45" />
         </Grid.RowDefinitions>
 
-        <ListView
-            ItemsSource="{Binding ActiveDirectory.Content}"
-            SelectedItem="{Binding SelectedFile}"
-            SelectionMode="{Binding MultiSelect, Converter={StaticResource BoolToSelectionModeConverter}}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <DockPanel
-                        HorizontalAlignment="Stretch">
-                        <TextBlock
-                            Text="{Binding Name}" />
-                        <TextBlock
-                            Text="{Binding IsDirectory}" />
-                    </DockPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListView>
+        <StackPanel>
+            <DockPanel
+                HorizontalAlignment="Left">
+                <Button
+                    Content="Go to root TODO"
+                    Command="{Binding OpenRootFolderCommand}" />
+                <Button
+                    Content="Go to parent TODO"
+                    Command="{Binding OpenParentFolderCommand}" />
+                <TextBlock
+                    Text="{Binding ActiveDirectory.FullName}" />
+            </DockPanel>
+            <ListView
+                ItemsSource="{Binding ActiveDirectory.Content}"
+                SelectionMode="{Binding MultiSelect, Converter={StaticResource BoolToSelectionModeConverter}}"
+                res:ListViewBehavior.SelectedItems="{Binding SelectedItems}"
+                SelectedItem="{Binding SelectedItem}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger
+                        EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction
+                            Command="{Binding OpenFolderCommand}"
+                            CommandParameter="{Binding SelectedItem}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel
+                            HorizontalAlignment="Stretch">
+                            <TextBlock
+                                Text="{Binding Name}" />
+                            <TextBlock
+                                Text="{Binding IsDirectory}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListView>
+        </StackPanel>
 
         <StackPanel
             Grid.Row="1"

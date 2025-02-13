@@ -12,10 +12,12 @@ namespace RevitRefreshLinks.ViewModels {
     internal class FilesExplorerViewModel : BaseViewModel {
         private readonly IFileSystem _fileSystem;
         private readonly ILocalizationService _localizationService;
+        private PathInfoViewModel _selectedItem;
         private DirectoryViewModel _activeDirectory;
         private DirectoryViewModel _rootDirectory;
         private FileViewModel _selectedFile;
-        private ObservableCollection<FileViewModel> _selectedFiles;
+        private ObservableCollection<FileViewModel> _selectedFiles = new ObservableCollection<FileViewModel>();
+        private ObservableCollection<PathInfoViewModel> _selectedItems = new ObservableCollection<PathInfoViewModel>();
         private string _title;
         private string _errorText;
         private bool _multiSelect;
@@ -28,6 +30,7 @@ namespace RevitRefreshLinks.ViewModels {
                 ?? throw new System.ArgumentNullException(nameof(localizationService));
 
             LoadViewCommand = RelayCommand.CreateAsync(LoadViewAsync);
+            //OpenFolderCommand = RelayCommand.CreateAsync<PathInfoViewModel>(OpenFolderAsync, CanOpenFolder);
             OpenFolderCommand = RelayCommand.CreateAsync<DirectoryViewModel>(OpenFolderAsync, CanOpenFolder);
             OpenParentFolderCommand = RelayCommand.CreateAsync(OpenParentFolderAsync, CanOpenParentFolder);
             OpenRootFolderCommand = RelayCommand.CreateAsync(OpenRootFolderAsync);
@@ -56,6 +59,11 @@ namespace RevitRefreshLinks.ViewModels {
             private set => RaiseAndSetIfChanged(ref _rootDirectory, value);
         }
 
+        public PathInfoViewModel SelectedItem {
+            get => _selectedItem;
+            set => RaiseAndSetIfChanged(ref _selectedItem, value);
+        }
+
         public FileViewModel SelectedFile {
             get => _selectedFile;
             set => RaiseAndSetIfChanged(ref _selectedFile, value);
@@ -64,6 +72,11 @@ namespace RevitRefreshLinks.ViewModels {
         public ObservableCollection<FileViewModel> SelectedFiles {
             get => _selectedFiles;
             set => RaiseAndSetIfChanged(ref _selectedFiles, value);
+        }
+
+        public ObservableCollection<PathInfoViewModel> SelectedItems {
+            get => _selectedItems;
+            set => RaiseAndSetIfChanged(ref _selectedItems, value);
         }
 
         public string Title {

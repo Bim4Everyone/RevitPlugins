@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 using dosymep.Revit.ServerClient;
@@ -22,20 +24,50 @@ namespace RevitRefreshLinks.Models {
 
         public string Name { get; }
 
-        public Task<IDirectoryModel[]> GetDirectoriesAsync() {
-            throw new NotImplementedException();
+        public async Task<IDirectoryModel[]> GetDirectoriesAsync() {
+            var contents = await _serverClient.GetRootFolderContentsAsync();
+            List<IDirectoryModel> dirs = new List<IDirectoryModel>();
+            foreach(var item in contents.Folders) {
+                var content = await _serverClient.GetFolderContentsAsync(item.Name);
+                dirs.Add(new RsDirectoryModel(content, _serverClient));
+            }
+            return dirs.ToArray();
         }
 
-        public Task<IDirectoryModel[]> GetDirectoriesAsync(SearchOption searchOption) {
-            throw new NotImplementedException();
+        public async Task<IDirectoryModel[]> GetDirectoriesAsync(SearchOption searchOption) {
+            switch(searchOption) {
+                case SearchOption.TopDirectoryOnly:
+                    return await GetDirectoriesAsync();
+                case SearchOption.AllDirectories: {
+                    var list = new List<IDirectoryModel>();
+                    var contents = await _serverClient.GetRecursiveFolderContentsAsync();
+                    return contents.Select(f => new RsDirectoryModel(f, _serverClient)).ToArray();
+                }
+                default:
+                    throw new InvalidOperationException($"Не поддерживаемая опция {searchOption}");
+            }
         }
 
-        public Task<IFileModel[]> GetFilesAsync() {
-            throw new NotImplementedException();
+        public async Task<IFileModel[]> GetFilesAsync() {
+            var contents = await _serverClient.GetRootFolderContentsAsync();
+            return contents.Models.Select(m => new RsFileModel(m, this)).ToArray();
         }
 
-        public Task<IFileModel[]> GetFilesAsync(SearchOption searchOption) {
-            throw new NotImplementedException();
+        public async Task<IFileModel[]> GetFilesAsync(SearchOption searchOption) {
+            switch(searchOption) {
+                case SearchOption.TopDirectoryOnly:
+                    return await GetFilesAsync();
+                case SearchOption.AllDirectories: {
+                    var list = new List<IDirectoryModel>();
+                    var contents = await _serverClient.GetRecursiveFolderContentsAsync();
+                    return contents.Select(c => new { Models = c.Models, FolderContents = c })
+                        .SelectMany(fc => fc.Models.Select(
+                            m => new RsFileModel(m, new RsDirectoryModel(fc.FolderContents, _serverClient))))
+                        .ToArray();
+                }
+                default:
+                    throw new InvalidOperationException($"Не поддерживаемая опция выбора файлов {searchOption}");
+            }
         }
 
         public async Task<IDirectoryModel> GetParentAsync() {
