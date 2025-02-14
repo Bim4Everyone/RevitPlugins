@@ -13,12 +13,11 @@ namespace RevitRoughFinishingDesign.Models {
             _wallDesignDataGetter = wallDesignDataGetter;
         }
 
-        public void DrawLines(PluginConfig config) {
-            IList<WallDesignData> wallDesignDatas = _wallDesignDataGetter.GetWallDesignDatas();
-            double offset = _revitRepository.ConvertToFeetFromMillimeters(config.LineOffset.Value);
+        public void DrawLines(RevitSettings settings) {
+            IList<WallDesignData> wallDesignDatas = _wallDesignDataGetter.GetWallDesignDatas(settings);
+            double offset = _revitRepository.ConvertToFeetFromMillimeters(settings?.LineOffset ?? 0);
             IList<DetailLineForFinishing> linesForDraw = new List<DetailLineForFinishing>();
             foreach(var wallDesignData in wallDesignDatas) {
-                //double offset = _revitRepository.ConvertToFeetFromMillimeters(30);
                 IList<Line> correctLines = MakeOffsetForLines(
                     wallDesignData,
                     offset);
@@ -26,20 +25,16 @@ namespace RevitRoughFinishingDesign.Models {
                     linesForDraw.Add(new DetailLineForFinishing(correctLine) {
                         LayerNumber = wallDesignData.LayerNumber,
                         Offset = offset,
-                        DistanceFromBorder = wallDesignData.DistanceFromBorder
+                        DistanceFromBorder = wallDesignData.DistanceFromBorder,
+                        LineStyleId = wallDesignData.LineStyleId
                     });
                 }
-                //foreach(Line line in correctLines) {
-                //    DetailLine detailLine = _revitRepository.Document.Create.NewDetailCurve(
-                //        _revitRepository.ActiveView, line) as DetailLine;
-                //    AssignLineStyle(detailLine, "!АИ_Потолок");
-                //}
             }
             linesForDraw = ConnectLines(linesForDraw);
             foreach(DetailLineForFinishing line in linesForDraw) {
                 DetailLine detailLine = _revitRepository.Document.Create.NewDetailCurve(
                         _revitRepository.ActiveView, line.LineForFinishing) as DetailLine;
-                AssignLineStyle(detailLine, "!АИ_Потолок");
+                AssignLineStyle(detailLine, line.LineStyleId);
             }
         }
 
@@ -94,9 +89,15 @@ namespace RevitRoughFinishingDesign.Models {
                 .GroupBy(l => l.LayerNumber);
             foreach(IList<DetailLineForFinishing> groupedLines in groupedResultLines) {
                 foreach(DetailLineForFinishing line in groupedLines) {
-                    IList<XYZ> closestIntersectionPoint = GetIntersectionsXYZPointsFromLines(line, groupedLines);
-                    line.LineForFinishing = AdjustBaseLine(line.LineForFinishing, closestIntersectionPoint);
-                    resultLines.Add(line);
+                    try {
+                        IList<XYZ> closestIntersectionPoint = GetIntersectionsXYZPointsFromLines(line, groupedLines);
+                        line.LineForFinishing = AdjustBaseLine(
+                            line.LineForFinishing,
+                            closestIntersectionPoint,
+                            line.Offset);
+                        resultLines.Add(line);
+                    } catch {
+                    }
                 }
             }
             return resultLines;
@@ -107,18 +108,19 @@ namespace RevitRoughFinishingDesign.Models {
             IList<DetailLineForFinishing> groupedLines) {
             XYZ currentDirection = currentLine.LineForFinishing.Direction.Normalize();
             XYZ intersectPoint = null;
-            double correctOffset = (currentLine.Offset * currentLine.LayerNumber) - currentLine.DistanceFromBorder;
-            Line extentedLine = ExtendLine(currentLine.LineForFinishing, correctOffset);
+            double correctOffset = currentLine.Offset;
+            Line currentExtendedLine = ExtendLine(currentLine.LineForFinishing, correctOffset);
             IList<XYZ> intersectionPoints = new List<XYZ>();
             foreach(DetailLineForFinishing line in groupedLines) {
                 XYZ lineDirection = line.LineForFinishing.Direction.Normalize();
                 if(lineDirection.IsAlmostEqualTo(currentDirection) || currentLine.Guid == line.Guid) {
                     continue;
                 }
+                Line extendedLine = ExtendLine(line.LineForFinishing, correctOffset);
                 // Проверяем, пересекаются ли линии
                 IntersectionResultArray results;
-                SetComparisonResult result = extentedLine
-                    .Intersect(line.LineForFinishing, out results);
+                SetComparisonResult result = currentExtendedLine
+                    .Intersect(extendedLine, out results);
 
                 if(result == SetComparisonResult.Overlap && results != null && results.Size > 0) {
                     intersectPoint = results.get_Item(0).XYZPoint; // Возвращаем первую точку пересечения
@@ -130,35 +132,40 @@ namespace RevitRoughFinishingDesign.Models {
         /// <summary>
         /// Задает тип линии (LineStyle) для DetailLine
         /// </summary>
-        private void AssignLineStyle(DetailLine detailLine, string lineStyleName) {
+        private void AssignLineStyle(DetailLine detailLine, ElementId lineStyleId) {
             Document doc = _revitRepository.Document;
             Categories categories = doc.Settings.Categories;
             Category linesCategory = categories.get_Item(BuiltInCategory.OST_Lines);
-
-            foreach(Category subCategory in linesCategory.SubCategories) {
-                if(subCategory.Name == lineStyleName) {
-                    detailLine.LineStyle = subCategory.GetGraphicsStyle(GraphicsStyleType.Projection);
+            IList<GraphicsStyle> lineStyles = _revitRepository.GetAllLineStyles();
+            foreach(GraphicsStyle lineStyle in lineStyles) {
+                if(lineStyle.Id == lineStyleId) {
+                    detailLine.LineStyle = lineStyle;
                     return;
                 }
             }
         }
 
-        public static Line AdjustBaseLine(
+        public Line AdjustBaseLine(
             Line baseLine,
-            IList<XYZ> intersectionPoints) {
-            if(intersectionPoints == null) {
+            IList<XYZ> intersectionPoints, double offset) {
+            if(intersectionPoints == null || intersectionPoints.Count == 0) {
                 return baseLine;
             }
-            Line revitBaseLine = baseLine;
-            XYZ startPoint = revitBaseLine.GetEndPoint(0);
-            XYZ endPoint = revitBaseLine.GetEndPoint(1);
-            foreach(XYZ intersectionPoint in intersectionPoints) {
-                double distanceToStart = revitBaseLine.GetEndPoint(0).DistanceTo(intersectionPoint);
-                double distanceToEnd = revitBaseLine.GetEndPoint(1).DistanceTo(intersectionPoint);
-                if(distanceToStart < distanceToEnd) {
-                    startPoint = intersectionPoint;
-                } else {
-                    endPoint = intersectionPoint;
+            XYZ startPoint = baseLine.GetEndPoint(0);
+            XYZ endPoint = baseLine.GetEndPoint(1);
+            Line extentedLine = ExtendLine(baseLine, offset);
+            if(intersectionPoints.Count == 2) {
+                return Line.CreateBound(intersectionPoints[0], intersectionPoints[1]);
+            } else {
+                foreach(XYZ intersectionPoint in intersectionPoints) {
+                    double distanceToStart = extentedLine.GetEndPoint(0).DistanceTo(intersectionPoint);
+                    double distanceToEnd = extentedLine.GetEndPoint(1).DistanceTo(intersectionPoint);
+
+                    if(distanceToStart < distanceToEnd) {
+                        startPoint = intersectionPoint;
+                    } else {
+                        endPoint = intersectionPoint;
+                    }
                 }
             }
             Line newLine = Line.CreateBound(startPoint, endPoint);

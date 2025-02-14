@@ -4,7 +4,7 @@
     
     <!-- Пример перевода на русский язык (google translate) -->
     
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
+    <system:String x:Key="MainWindow.Title">Оформление отделочных стен</system:String>
     <system:String x:Key="MainWindow.Hello">Привет Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 

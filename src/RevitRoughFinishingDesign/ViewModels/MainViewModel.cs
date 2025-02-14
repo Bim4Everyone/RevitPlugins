@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
@@ -50,6 +52,43 @@ namespace RevitRoughFinishingDesign.ViewModels {
                 OnPropertyChanged(nameof(ErrorText));
             }
         }
+
+        private ObservableCollection<WallTypeViewModel> _wallTypes = new ObservableCollection<WallTypeViewModel>();
+        public ObservableCollection<WallTypeViewModel> WallTypes {
+            get => _wallTypes;
+            set => this.RaiseAndSetIfChanged(ref _wallTypes, value);
+        }
+
+        private ObservableCollection<LineStyleViewModel> _lineStyles = new ObservableCollection<LineStyleViewModel>();
+        public ObservableCollection<LineStyleViewModel> LineStyles {
+            get => _lineStyles;
+            set => this.RaiseAndSetIfChanged(ref _lineStyles, value);
+        }
+
+        private ObservableCollection<PairViewModel> _items = new ObservableCollection<PairViewModel>();
+        public ObservableCollection<PairViewModel> Items {
+            get => _items;
+            set => this.RaiseAndSetIfChanged(ref _items, value);
+        }
+
+        private WallTypeViewModel _selectedWallType;
+        public WallTypeViewModel SelectedWallType {
+            get => _selectedWallType;
+            set {
+                RaiseAndSetIfChanged(ref _selectedWallType, value);
+                OnPropertyChanged(nameof(ErrorText));
+            }
+        }
+
+        private LineStyleViewModel _selectedLineStyle;
+        public LineStyleViewModel SelectedLineStyle {
+            get => _selectedLineStyle;
+            set {
+                RaiseAndSetIfChanged(ref _selectedLineStyle, value);
+                OnPropertyChanged(nameof(ErrorText));
+            }
+        }
+
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
@@ -65,17 +104,12 @@ namespace RevitRoughFinishingDesign.ViewModels {
         }
 
         private void AcceptView() {
-            IList<Room> rooms = _revitRepository.GetTestRooms();
+            SaveConfig();
+            RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
             using(var transaction = _revitRepository.Document.StartTransaction("Тест")) {
-                _createsLinesForFinishing.DrawLines(_pluginConfig);
-                //foreach(Room room in rooms) {
-                //    IList<WallDesignData> wallDesignData = _wallDesignDataGetter.GetWallDesignDatas();
-                //RevitRoomHandler roomHandler = new RevitRoomHandler(_revitRepository, room, _curveLoopsSimplifier);
-                //roomHandler.CreateTestLines();
-                //}
+                _createsLinesForFinishing.DrawLines(setting);
                 transaction.Commit();
             }
-            SaveConfig();
         }
 
         private bool CanAcceptView() {
@@ -89,19 +123,57 @@ namespace RevitRoughFinishingDesign.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            LineOffset = _pluginConfig.LineOffset.GetValueOrDefault(0).ToString();
+            LineOffset = setting?.LineOffset.GetValueOrDefault(0).ToString() ?? "0";
+            var pairModels = setting?.PairModels ?? new List<PairModel>();
+            WallTypes = new ObservableCollection<WallTypeViewModel>(
+                _revitRepository.GetWallTypesInsideRoomsOnActiveView()
+                .Select(fs => new WallTypeViewModel(fs))
+                .OrderBy(fs => fs.Name));
 
-            SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+            LineStyles = new ObservableCollection<LineStyleViewModel>(
+                _revitRepository.GetAllLineStyles()
+                .Select(fs => new LineStyleViewModel(fs))
+                .OrderBy(fs => fs.Name));
+
+            Items = GetRevitTypesData(WallTypes, LineStyles, pairModels);
+
             OnPropertyChanged(nameof(ErrorText));
+        }
+
+        private ObservableCollection<PairViewModel> GetRevitTypesData(
+            ICollection<WallTypeViewModel> allWallTypes,
+            ICollection<LineStyleViewModel> allLineStyles,
+            ICollection<PairModel> pairModels) {
+
+            ObservableCollection<PairViewModel> items = new ObservableCollection<PairViewModel>(
+            allWallTypes.Zip(allLineStyles, (wt, ls) => new PairViewModel(wt, ls)));
+            ICollection<ElementId> idCollection = pairModels
+                .Select(p => p.WallTypeId)
+                .ToArray();
+
+            foreach(PairViewModel item in items) {
+                PairModel pairModel = pairModels.FirstOrDefault(pm => pm.WallTypeId == item.WallTypeVM.WallTypeId);
+                if(pairModel != null) {
+                    LineStyleViewModel lineStyle =
+                        allLineStyles.FirstOrDefault(ls => ls.GraphicStyleId == pairModel.LineStyleId);
+                    if(lineStyle != null
+                        && lineStyle.GraphicStyleId != item.LineStyleVM.GraphicStyleId) {
+                        item.LineStyleVM = lineStyle;
+                    }
+                }
+            }
+            return items;
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-            _pluginConfig.LineOffset = double.Parse(LineOffset);
-
             setting.SaveProperty = SaveProperty;
+            setting.LineOffset = double.Parse(LineOffset);
+            setting.PairModels = Items
+                .Select(p => new PairModel(p.WallTypeVM.WallTypeId, p.LineStyleVM.GraphicStyleId))
+                .ToList();
             _pluginConfig.SaveProjectConfig();
         }
     }

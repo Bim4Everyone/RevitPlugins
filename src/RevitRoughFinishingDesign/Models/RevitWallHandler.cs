@@ -11,9 +11,11 @@ namespace RevitRoughFinishingDesign.Models {
     internal class RevitWallHandler {
         private readonly RevitRepository _revitRepository;
         private readonly Room _room;
-        private readonly Element _wall;
+        private readonly Element _wallElement;
         private XYZ _directionToRoom;
         private Solid _wallSolid;
+        private XYZ _wallCentroidPoint;
+        private ElementId _wallTypeId;
 
         /// <summary>
         /// Шаг создания точек для проверки направления
@@ -28,21 +30,32 @@ namespace RevitRoughFinishingDesign.Models {
         public RevitWallHandler(RevitRepository revitRepository, Room room, Element wall) {
             _revitRepository = revitRepository;
             _room = room;
-            _wall = wall;
+            _wallElement = wall;
         }
 
         private Solid GetWallSolid() {
             if(_wallSolid != null) {
                 return _wallSolid;
             } else {
-                _wallSolid = _wall.GetSolids().First();
+                _wallSolid = _wallElement.GetSolids().First();
                 return _wallSolid;
+            }
+        }
+
+        public ElementId GetWallTypeId() {
+            if(_wallTypeId != null) {
+                return _wallTypeId;
+            } else {
+                Wall wall = _wallElement as Wall;
+                ElementId wallTypeId = wall.WallType.Id;
+                _wallTypeId = wallTypeId;
+                return _wallTypeId;
             }
         }
 
         public Line GetWallLine() {
             double zPoint = _revitRepository.GetVerticalPointFromActiveView();
-            LocationCurve wallLine = _wall.Location as LocationCurve;
+            LocationCurve wallLine = _wallElement.Location as LocationCurve;
             if(wallLine.Curve is Line) {
                 Curve wallCurve = _revitRepository.TransformCurveToExactZ(wallLine.Curve, zPoint);
 
@@ -72,6 +85,18 @@ namespace RevitRoughFinishingDesign.Models {
             return insideLines;
         }
 
+        public XYZ GetWallCentroidPoint() {
+            if(_wallCentroidPoint != null) {
+                return _wallCentroidPoint;
+            } else {
+
+                double zPoint = _revitRepository.GetVerticalPointFromActiveView();
+                Solid wallSolid = GetWallSolid();
+                XYZ wallCentroidPoint = _revitRepository.TransformXYZToExactZ(wallSolid.ComputeCentroid(), zPoint);
+                _wallCentroidPoint = wallCentroidPoint;
+                return _wallCentroidPoint;
+            }
+        }
         /// <summary>
         /// Возвращает направление вектора внутрь помещения
         /// </summary>
@@ -81,18 +106,21 @@ namespace RevitRoughFinishingDesign.Models {
                 return _directionToRoom;
             } else {
                 Line wallCurve = GetWallLine();
-                XYZ wallCurveCenter = wallCurve.Evaluate(0.5, false);
+                XYZ wallCentroidPoint = GetWallCentroidPoint();
                 XYZ normalVector = XYZ.BasisZ.CrossProduct(wallCurve.Direction).Normalize();
-                XYZ secondBecor = XYZ.BasisZ.CrossProduct(wallCurve.Direction.Negate()).Normalize();
 
                 IList<XYZ> rightPoints = new List<XYZ>();
                 IList<XYZ> leftPoints = new List<XYZ>();
 
                 for(double step = _step; step < _step * _numberOfPoints; step += _step) {
-                    XYZ rightPoint = new XYZ(wallCurveCenter.X, wallCurveCenter.Y, wallCurveCenter.Z)
+                    XYZ rightPoint = new XYZ(wallCentroidPoint.X, wallCentroidPoint.Y, wallCentroidPoint.Z)
                         + normalVector * step;
-                    XYZ leftPoint = new XYZ(wallCurveCenter.X, wallCurveCenter.Y, wallCurveCenter.Z)
+                    XYZ leftPoint = new XYZ(wallCentroidPoint.X, wallCentroidPoint.Y, wallCentroidPoint.Z)
                         - normalVector * step;
+                    Line rLine = Line.CreateBound(rightPoint, new XYZ(0, 0, 0));
+                    Line lLine = Line.CreateBound(leftPoint, new XYZ(0, 0, 0));
+                    //_revitRepository.CreateTestModelLine(rLine);
+                    //_revitRepository.CreateTestModelLine(lLine);
                     if(_room.IsPointInRoom(rightPoint)) {
                         rightPoints.Add(rightPoint);
                     }

@@ -1,4 +1,4 @@
-using Autodesk.Revit.DB;
+using System.Collections.Generic;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -11,9 +11,6 @@ namespace RevitRoughFinishingDesign.Models {
         [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
-        public double? LineOffset { get; set; } = null; // Смещение линии для оформления
-        public ElementId WallType1 { get; set; } = ElementId.InvalidElementId;
-        public ElementId WallType2 { get; set; } = ElementId.InvalidElementId;
         public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
@@ -27,5 +24,7 @@ namespace RevitRoughFinishingDesign.Models {
     internal class RevitSettings : ProjectSettings {
         public override string ProjectName { get; set; }
         public string SaveProperty { get; set; }
+        public List<PairModel> PairModels { get; set; }
+        public double? LineOffset { get; set; } = null; // Смещение линии для оформления
     }
 }

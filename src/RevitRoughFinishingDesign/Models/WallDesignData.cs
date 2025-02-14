@@ -35,6 +35,11 @@ namespace RevitRoughFinishingDesign.Models {
         public int LayerNumber { get; set; }
 
         /// <summary>
+        /// Id типоразмера линий
+        /// </summary>
+        public ElementId LineStyleId { get; set; }
+
+        /// <summary>
         /// Вектор направления внутрь помещения
         /// </summary>
         public XYZ DirectionToRoom { get; set; }

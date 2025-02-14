@@ -16,6 +16,7 @@ namespace RevitRoughFinishingDesign.Models {
         private ICollection<ElementId> _wallsIds;
         private IList<GraphicsStyle> _lineStyles;
         private double _activeViewZPoint = -100000;
+        private ICollection<Room> _roomsOnActiveView;
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
             _spatialElementBoundaryOptions = new SpatialElementBoundaryOptions() {
@@ -36,6 +37,7 @@ namespace RevitRoughFinishingDesign.Models {
                 .ToElements()
                 .OfType<GraphicsStyle>()
                 .Where(gs => gs.GraphicsStyleCategory.CategoryType == CategoryType.Model &&
+                            !gs.GraphicsStyleCategory.Name.Contains("<") &&
                              gs.GraphicsStyleCategory.Parent != null &&
                              gs.GraphicsStyleCategory.Parent.Id ==
                              Document.Settings.Categories.get_Item(BuiltInCategory.OST_Lines).Id &&
@@ -44,27 +46,53 @@ namespace RevitRoughFinishingDesign.Models {
             return _lineStyles;
         }
 
-        public ICollection<Element> GetRoomsOnActiveView() {
-            return new FilteredElementCollector(Document, ActiveView.Id)
+        public ICollection<Room> GetRoomsOnActiveView() {
+            if(_roomsOnActiveView != null) {
+                return _roomsOnActiveView;
+            } else {
+
+                ICollection<Room> roomsOnActiveView = new FilteredElementCollector(Document, ActiveView.Id)
                 .WhereElementIsNotElementType()
                 .OfCategory(BuiltInCategory.OST_Rooms)
-                .Where(el => el.LookupParameter("ФОП_Тип квартиры").AsString() != null)
+                //.Where(el => el.LookupParameter("ФОП_Тип квартиры").AsString() != null)
+                .Where(el => el.get_Parameter(BuiltInParameter.ROOM_AREA).AsDouble() > 0)
+                .Cast<Room>()
                 .ToList();
+                _roomsOnActiveView = roomsOnActiveView;
+                return _roomsOnActiveView;
+            }
         }
-        public IList<ElementId> GetWallTypeIdsInsideRoom(Room room) {
+        public IList<WallType> GetWallTypesInsideRoomsOnActiveView() {
             double zPoint = GetVerticalPointFromActiveView();
             ICollection<ElementId> wallIds = GetWallsIds();
-            IList<ElementId> wallTypes = new List<ElementId>();
+            ICollection<Room> roomsOnActiveView = GetRoomsOnActiveView();
+            HashSet<ElementId> wallTypes = new HashSet<ElementId>();
+
+            foreach(Room room in roomsOnActiveView) {
+                foreach(ElementId wallId in wallIds) {
+                    Wall wallElement = Document.GetElement(wallId) as Wall;
+                    Solid wallSolid = wallElement.GetSolids().First();
+                    XYZ wallOrigin = wallSolid.ComputeCentroid();
+                    if(room.IsPointInRoom(wallOrigin)) {
+                        wallTypes.Add(wallElement.WallType.Id);
+                    }
+                }
+            }
+            return wallTypes.Select(id => Document.GetElement(id) as WallType).Where(wt => wt != null).ToList();
+        }
+
+        public IList<WallType> GetWallTypes() {
+            double zPoint = GetVerticalPointFromActiveView();
+            ICollection<ElementId> wallIds = GetWallsIds();
+            IList<WallType> wallTypes = new List<WallType>();
             foreach(ElementId wallId in wallIds) {
                 Wall wallElement = Document.GetElement(wallId) as Wall;
-                Solid wallSolid = wallElement.GetSolids().First();
-                XYZ wallOrigin = wallSolid.ComputeCentroid();
-                if(room.IsPointInRoom(wallOrigin)) {
-                    wallTypes.Add(wallElement.WallType.Id);
-                }
+                wallTypes.Add(wallElement.WallType);
             }
             return wallTypes;
         }
+
+
         public ICollection<ElementId> GetWallsIds() {
             Options options = new Options() { DetailLevel = ViewDetailLevel.Fine };
             _wallsIds = _wallsIds ?? new FilteredElementCollector(Document, ActiveView.Id)
@@ -100,7 +128,7 @@ namespace RevitRoughFinishingDesign.Models {
             }
         }
 
-        public IList<Room> GetTestRooms() {
+        public IList<Room> GetSelectedRooms() {
             return ActiveUIDocument
                 .GetSelectedElements()
                 .Where(el => el.Category.IsId(BuiltInCategory.OST_Rooms))
@@ -121,20 +149,60 @@ namespace RevitRoughFinishingDesign.Models {
             return Line.CreateBound(newStart, newEnd);
         }
 
-        public RoomBorder GetClosestCurveFromCurveList(Curve currentCurve, IList<RoomBorder> curves) {
+        public XYZ TransformXYZToExactZ(XYZ point, double exactZ) {
+            return new XYZ(point.X, point.Y, exactZ);
+        }
+        public static bool AreVectorsAligned(XYZ vector1, XYZ vector2) {
+            vector1 = vector1.Normalize();
+            vector2 = vector2.Normalize();
+            double dotProduct = vector1.DotProduct(vector2);
+            return Math.Abs(dotProduct - 1.0) < 1e-6 || Math.Abs(dotProduct + 1.0) < 1e-6;
+        }
+        public RoomBorder GetClosestCurveFromCurveList(Curve currentCurve, IList<RoomBorder> roomBorders) {
             XYZ centerOfCurrentCurve = currentCurve.Evaluate(0.5, true);
             double minDistance = double.PositiveInfinity;
-            RoomBorder closestCurve = null;
-            foreach(RoomBorder curve in curves) {
-                XYZ closestPoint = curve.Curve.Project(centerOfCurrentCurve).XYZPoint;
-                double distance = centerOfCurrentCurve.DistanceTo(closestPoint);
-                if(distance < minDistance) {
-                    minDistance = distance;
-                    closestCurve = curve;
+            RoomBorder closestBorder = null;
+            Line currentLine = currentCurve as Line;
+            XYZ currentDirection = currentLine.Direction.Normalize();
+            foreach(RoomBorder roomBorder in roomBorders) {
+                Line roomBorderLine = roomBorder.Curve as Line;
+                XYZ roomBorderDirection = roomBorderLine.Direction.Normalize();
+                //if(!currentDirection.IsAlmostEqualTo(roomBorderDirection)) {
+                //    continue;
+                //}
+                if(AreVectorsAligned(currentDirection, roomBorderDirection)) {
+                    XYZ closestPoint = roomBorder.Curve.Project(centerOfCurrentCurve).XYZPoint;
+                    double distance = centerOfCurrentCurve.DistanceTo(closestPoint);
+                    if(distance < minDistance) {
+                        minDistance = distance;
+                        closestBorder = roomBorder;
+                    }
                 }
             }
-            return closestCurve;
+            return closestBorder;
         }
+
+        //public RoomBorder GetClosestCurveFromXYZ(
+        //    XYZ centroidPoint, Curve currentCurve, IList<RoomBorder> roomBorders) {
+        //    double minDistance = double.PositiveInfinity;
+        //    RoomBorder closestBorder = null;
+        //    Line currentLine = currentCurve as Line;
+        //    XYZ currentCurveDirection = currentLine.Direction.Normalize();
+        //    foreach(RoomBorder roomBorder in roomBorders) {
+        //        Line roomBorderLine = roomBorder.Curve as Line;
+        //        XYZ roomBorderLineDirection = roomBorderLine.Direction.Normalize();
+        //        if(currentCurveDirection.IsAlmostEqualTo(roomBorderLineDirection)) {
+        //            continue;
+        //        }
+        //        XYZ closestPoint = roomBorder.Curve.Project(centroidPoint).XYZPoint;
+        //        double distance = centroidPoint.DistanceTo(closestPoint);
+        //        if(distance < minDistance) {
+        //            minDistance = distance;
+        //            closestBorder = roomBorder;
+        //        }
+        //    }
+        //    return closestBorder;
+        //}
 
         //public RoomBorder GetClosestCurveFromCurveList(Curve currentCurve, IList<CurveLoop> curveLoops) {
         //    IList<Curve> allCurves = curveLoops.SelectMany(loop => loop.ToList()).ToList();

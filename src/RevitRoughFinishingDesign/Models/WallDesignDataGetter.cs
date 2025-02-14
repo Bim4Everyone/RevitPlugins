@@ -58,8 +58,8 @@ namespace RevitRoughFinishingDesign.Models {
         //    return resultDesignDatas;
         //}
 
-        public IList<WallDesignData> GetWallDesignDatas() {
-            IList<Room> rooms = _revitRepository.GetTestRooms();
+        public IList<WallDesignData> GetWallDesignDatas(RevitSettings settings) {
+            IList<Room> rooms = _revitRepository.GetSelectedRooms();
             IList<WallDesignData> wallDesignDatas = new List<WallDesignData>();
 
             // Сбор всех данных по стенам из всех комнат
@@ -68,7 +68,7 @@ namespace RevitRoughFinishingDesign.Models {
                 ICollection<ElementId> wallsIdsInRoom = roomHandler.GetWallsFromRoom();
 
                 foreach(ElementId wallId in wallsIdsInRoom) {
-                    WallDesignData wallDesignData = GetWallDesignData(roomHandler, wallId);
+                    WallDesignData wallDesignData = GetWallDesignData(roomHandler, settings, wallId);
                     wallDesignDatas.Add(wallDesignData);
                 }
             }
@@ -94,24 +94,43 @@ namespace RevitRoughFinishingDesign.Models {
 
             return resultDesignDatas;
         }
+        public ElementId GetLineStyleId(RevitSettings settings, ElementId wallTypeId) {
+            List<PairModel> pairModels = settings?.PairModels;
+            ElementId lineStyle = ElementId.InvalidElementId;
+            foreach(PairModel pairModel in pairModels) {
+                if(pairModel.WallTypeId == wallTypeId) {
+                    lineStyle = pairModel.LineStyleId;
+                    break;
+                }
+            }
+            return lineStyle;
+        }
 
-        public WallDesignData GetWallDesignData(RevitRoomHandler roomHandler, ElementId wallId) {
+        public WallDesignData GetWallDesignData(
+            RevitRoomHandler roomHandler,
+            RevitSettings settings,
+            ElementId wallId) {
+
             IList<CurveLoop> curveLoops = roomHandler.GetSimplifiedCurveLoops();
             IList<RoomBorder> roomBorders = roomHandler.GetRoomBorders();
             Wall wall = _revitRepository.Document.GetElement(wallId) as Wall;
             RevitWallHandler wallHandler = new RevitWallHandler(_revitRepository, roomHandler.RevitRoom, wall);
+            ElementId lineStyleId = GetLineStyleId(settings, wallHandler.GetWallTypeId());
             Curve wallLine = wallHandler.GetWallLine();
+            XYZ wallCentroidPoint = wallHandler.GetWallCentroidPoint();
             RoomBorder closestBorderOfRoom = _revitRepository.GetClosestCurveFromCurveList(wallLine, roomBorders);
             IList<Line> wallLinesForDraw = wallHandler.GetWallLinesForDraw();
             double distanceFromBorder = GetDistanceFromRoomBorder(closestBorderOfRoom.Curve, wallLine);
             XYZ directionToRoom = wallHandler.GetDirectionToRoom();
+
             WallDesignData wallDesignData = new WallDesignData() {
                 WallId = wallId,
                 RoomBorder = closestBorderOfRoom,
                 WallLine = wallLine,
                 LinesForDraw = wallLinesForDraw,
                 DistanceFromBorder = distanceFromBorder,
-                DirectionToRoom = directionToRoom
+                DirectionToRoom = directionToRoom,
+                LineStyleId = lineStyleId
             };
 
             return wallDesignData;
