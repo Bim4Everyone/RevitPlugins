@@ -30,11 +30,12 @@ namespace RevitRefreshLinks.ViewModels {
                 ?? throw new System.ArgumentNullException(nameof(localizationService));
 
             LoadViewCommand = RelayCommand.CreateAsync(LoadViewAsync);
-            //OpenFolderCommand = RelayCommand.CreateAsync<PathInfoViewModel>(OpenFolderAsync, CanOpenFolder);
             OpenFolderCommand = RelayCommand.CreateAsync<DirectoryViewModel>(OpenFolderAsync, CanOpenFolder);
             OpenParentFolderCommand = RelayCommand.CreateAsync(OpenParentFolderAsync, CanOpenParentFolder);
             OpenRootFolderCommand = RelayCommand.CreateAsync(OpenRootFolderAsync);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+            OpenNextFolderCommand = RelayCommand.Create(OpenNextFolder, CanOpenNextFolder);
+            OpenPreviousFolderCommand = RelayCommand.Create(OpenPreviousFolder, CanOpenPreviousFolder);
         }
 
 
@@ -43,6 +44,10 @@ namespace RevitRefreshLinks.ViewModels {
         public ICommand OpenFolderCommand { get; }
 
         public ICommand OpenParentFolderCommand { get; }
+
+        public ICommand OpenPreviousFolderCommand { get; }
+
+        public ICommand OpenNextFolderCommand { get; }
 
         public ICommand OpenRootFolderCommand { get; }
 
@@ -154,6 +159,22 @@ namespace RevitRefreshLinks.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+
+        private void OpenPreviousFolder() {
+            // TODO
+        }
+
+        private bool CanOpenPreviousFolder() {
+            return false;
+        }
+
+        private void OpenNextFolder() {
+            // TODO
+        }
+
+        private bool CanOpenNextFolder() {
+            return false;
         }
     }
 }

@@ -12,6 +12,7 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{Binding Title}"
+    x:Name="_this"
     Height="450"
     Width="800"
     MinHeight="300"
@@ -29,6 +30,18 @@
             x:Key="BoolToSelectionModeConverter" />
         <res:PathInfoImageConverter
             x:Key="PathInfoImageConverter" />
+        <ObjectDataProvider
+            x:Key="HomeImg"
+            ObjectInstance="{x:Static res:IconResources.HomeImg}" />
+        <ObjectDataProvider
+            x:Key="ArrowLeftImg"
+            ObjectInstance="{x:Static res:IconResources.ArrowLeftImg}" />
+        <ObjectDataProvider
+            x:Key="ArrowRightImg"
+            ObjectInstance="{x:Static res:IconResources.ArrowRightImg}" />
+        <ObjectDataProvider
+            x:Key="ArrowUpImg"
+            ObjectInstance="{x:Static res:IconResources.ArrowUpImg}" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -44,12 +57,39 @@
             Grid.Row="0"
             HorizontalAlignment="Left">
             <Button
-                Content="Go to root TODO"
-                Command="{Binding OpenRootFolderCommand}" />
+                Width="20"
+                Command="{Binding OpenPreviousFolderCommand}">
+                <Button.Content>
+                    <Image
+                        Source="{Binding Source={StaticResource ArrowLeftImg}}" />
+                </Button.Content>
+            </Button>
             <Button
-                Content="Go to parent TODO"
-                Command="{Binding OpenParentFolderCommand}" />
+                Width="20"
+                Command="{Binding OpenNextFolderCommand}">
+                <Button.Content>
+                    <Image
+                        Source="{Binding Source={StaticResource ArrowRightImg}}" />
+                </Button.Content>
+            </Button>
+            <Button
+                Width="20"
+                Command="{Binding OpenParentFolderCommand}">
+                <Button.Content>
+                    <Image
+                        Source="{Binding Source={StaticResource ArrowUpImg}}" />
+                </Button.Content>
+            </Button>
+            <Button
+                Width="20"
+                Command="{Binding OpenRootFolderCommand}">
+                <Button.Content>
+                    <Image
+                        Source="{Binding Source={StaticResource HomeImg}}" />
+                </Button.Content>
+            </Button>
             <TextBlock
+                Margin="5 0 0 0 "
                 Text="{Binding ActiveDirectory.FullName}" />
         </DockPanel>
         <DockPanel
@@ -63,14 +103,10 @@
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
                 VerticalAlignment="Stretch">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger
-                        EventName="MouseDoubleClick">
-                        <i:InvokeCommandAction
-                            Command="{Binding OpenFolderCommand}"
-                            CommandParameter="{Binding SelectedItem}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
+                <i:Interaction.Behaviors>
+                    <res:ListViewDoubleClickBehavior
+                        Command="{Binding OpenFolderCommand}" />
+                </i:Interaction.Behaviors>
                 <ListView.View>
                     <GridView>
                         <GridViewColumn
