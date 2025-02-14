@@ -17,5 +17,7 @@ namespace RevitRefreshLinks.ViewModels {
         public IFileModel FileModel => _fileModel;
 
         public IDirectoryModel DirectoryModel => _fileModel.Directory;
+
+        public override long Length => _fileModel.Length;
     }
 }

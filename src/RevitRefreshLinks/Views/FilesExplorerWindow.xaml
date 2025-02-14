@@ -27,6 +27,8 @@
     <Window.Resources>
         <res:BoolToSelectionModeConverter
             x:Key="BoolToSelectionModeConverter" />
+        <res:PathInfoImageConverter
+            x:Key="PathInfoImageConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -69,17 +71,26 @@
                             CommandParameter="{Binding SelectedItem}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <DockPanel
-                            HorizontalAlignment="Stretch">
-                            <TextBlock
-                                Text="{Binding Name}" />
-                            <TextBlock
-                                Text="{Binding IsDirectory}" />
-                        </DockPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn
+                            Width="32">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image
+                                        Source="{Binding Converter={StaticResource PathInfoImageConverter}}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn
+                            Header="Name TODO"
+                            Width="600"
+                            DisplayMemberBinding="{Binding Name}" />
+                        <GridViewColumn
+                            Header="Length TODO"
+                            DisplayMemberBinding="{Binding Length}" />
+                    </GridView>
+                </ListView.View>
             </ListView>
         </DockPanel>
 

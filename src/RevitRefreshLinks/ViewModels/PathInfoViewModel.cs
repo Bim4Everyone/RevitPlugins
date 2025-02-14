@@ -11,5 +11,7 @@ namespace RevitRefreshLinks.ViewModels {
         public abstract string FullName { get; }
 
         public abstract bool IsDirectory { get; }
+
+        public abstract long Length { get; }
     }
 }

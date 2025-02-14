@@ -21,6 +21,8 @@ namespace RevitRefreshLinks.ViewModels {
 
         public IDirectoryModel DirectoryModel => _directoryModel;
 
+        public override long Length => 0;
+
         public ObservableCollection<PathInfoViewModel> Content { get; }
 
         public async Task<DirectoryViewModel> GetParent() {
