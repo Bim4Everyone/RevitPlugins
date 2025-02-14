@@ -52,9 +52,12 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         // Фильтрация спек
         private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFiltersTemp = new ObservableCollection<ScheduleFilterParamHelper>() {
             new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
+            new ScheduleFilterParamHelper("обр_ФОП_Изделие_Марка", ""),
+            new ScheduleFilterParamHelper("обр_ФОП_Группа КР", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
             new ScheduleFilterParamHelper("обр_ФОП_Орг. уровень", "обр_ФОП_Орг. уровень"),
             new ScheduleFilterParamHelper("обр_Метка основы_универсальная", "Марка"),
+            new ScheduleFilterParamHelper("обр_Метка основы", "Марка"),
             new ScheduleFilterParamHelper("Марка", "Марка")
         };
 

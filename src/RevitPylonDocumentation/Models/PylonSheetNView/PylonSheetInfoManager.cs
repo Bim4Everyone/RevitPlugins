@@ -277,28 +277,28 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
             }
 
-            if(selectionSettings.NeedWorkWithRebarSchedule) {
-                // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.RebarSchedule.ViewportElement is null) {
-                    SheetInfo.RebarSchedule.ViewSchedulePlacer.PlaceRebarSchedule();
-                }
-            }
             if(selectionSettings.NeedWorkWithSkeletonSchedule) {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.SkeletonSchedule.ViewportElement is null) {
                     SheetInfo.SkeletonSchedule.ViewSchedulePlacer.PlaceSkeletonSchedule();
                 }
             }
-            if(selectionSettings.NeedWorkWithSkeletonByElemsSchedule) {
+            if(selectionSettings.NeedWorkWithRebarSchedule) {
                 // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.SkeletonByElemsSchedule.ViewportElement is null) {
-                    SheetInfo.SkeletonByElemsSchedule.ViewSchedulePlacer.PlaceSkeletonByElemsSchedule();
+                if(SheetInfo.RebarSchedule.ViewportElement is null) {
+                    SheetInfo.RebarSchedule.ViewSchedulePlacer.PlaceRebarSchedule();
                 }
             }
             if(selectionSettings.NeedWorkWithMaterialSchedule) {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.MaterialSchedule.ViewportElement is null) {
                     SheetInfo.MaterialSchedule.ViewSchedulePlacer.PlaceMaterialSchedule();
+                }
+            }
+            if(selectionSettings.NeedWorkWithSkeletonByElemsSchedule) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.SkeletonByElemsSchedule.ViewportElement is null) {
+                    SheetInfo.SkeletonByElemsSchedule.ViewSchedulePlacer.PlaceSkeletonByElemsSchedule();
                 }
             }
             if(selectionSettings.NeedWorkWithSystemPartsSchedule) {
