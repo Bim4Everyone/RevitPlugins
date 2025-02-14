@@ -30,6 +30,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 SheetInfo.FindViewsNViewportsOnSheet();
                 SheetInfo.FindSchedulesNViewportsOnSheet();
                 SheetInfo.FindNoteLegendOnSheet();
+                SheetInfo.FindRebarLegendNodeOnSheet();
             }
 
             // Если вдруг по какой-то причине лист не был создан, то создание видов/видовых экранов не выполняем 
@@ -317,6 +318,12 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.LegendView.ViewportElement is null) {
                     SheetInfo.LegendView.LegendPlacer.PlaceNoteLegend();
+                }
+            }
+            if(selectionSettings.NeedWorkWithRebarNode) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.RebarNodeView.ViewportElement is null) {
+                    SheetInfo.RebarNodeView.LegendPlacer.PlaceRebarNodeLegend();
                 }
             }
         }

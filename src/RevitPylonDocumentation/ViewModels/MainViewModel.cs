@@ -35,6 +35,7 @@ namespace RevitPylonDocumentation.ViewModels {
         private View _selectedTransverseViewTemplate;
         private View _selectedTransverseRebarViewTemplate;
         private View _selectedLegend;
+        private View _selectedRebarNode;
         private FamilySymbol _selectedTitleBlock;
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
 
@@ -174,6 +175,17 @@ namespace RevitPylonDocumentation.ViewModels {
             set {
                 this.RaiseAndSetIfChanged(ref _selectedLegend, value);
                 ProjectSettings.LegendNameTemp = value?.Name;
+            }
+        }
+
+        /// <summary>
+        /// Выбранная пользователем легенда
+        /// </summary>
+        public View SelectedRebarNode {
+            get => _selectedRebarNode;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedRebarNode, value);
+                ProjectSettings.RebarNodeNameTemp = value?.Name;
             }
         }
 
@@ -423,17 +435,18 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithTransverseViewFirst = false;
             SelectionSettings.NeedWorkWithTransverseViewSecond = false;
             SelectionSettings.NeedWorkWithTransverseViewThird = false;
-
             SelectionSettings.NeedWorkWithRebarSchedule = false;
             SelectionSettings.NeedWorkWithMaterialSchedule = false;
             SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
             SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
             SelectionSettings.NeedWorkWithLegend = false;
-
             SelectionSettings.NeedWorkWithGeneralRebarView = false;
             SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
             SelectionSettings.NeedWorkWithTransverseRebarViewFirst = false;
+            SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
             SelectionSettings.NeedWorkWithSkeletonSchedule = false;
+            SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
+            SelectionSettings.NeedWorkWithRebarNode = false;
 
             MainWindow mainWindow = new MainWindow();
             mainWindow.DataContext = this;
@@ -464,6 +477,7 @@ namespace RevitPylonDocumentation.ViewModels {
             FindTransverseRebarViewTemplate();
             FindViewFamilyType();
             FindLegend();
+            FindRebarNode();
             FindTitleBlock();
 
             _settingsEdited = false;
@@ -502,6 +516,11 @@ namespace RevitPylonDocumentation.ViewModels {
 
             if(SelectedLegend is null) {
                 ErrorText = "Не выбрана легенда примечаний";
+                return;
+            }
+
+            if(SelectedRebarNode is null) {
+                ErrorText = "Не выбран узел армирования";
                 return;
             }
 
@@ -615,6 +634,16 @@ namespace RevitPylonDocumentation.ViewModels {
             if(ProjectSettings.LegendName != string.Empty) {
                 SelectedLegend = Legends
                     .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LegendName));
+            }
+        }
+
+        /// <summary>
+        /// Получает легенду узла армирования по имени
+        /// </summary>
+        public void FindRebarNode() {
+            if(ProjectSettings.RebarNodeName != string.Empty) {
+                SelectedRebarNode = Legends
+                    .FirstOrDefault(view => view.Name.Contains(ProjectSettings.RebarNodeName));
             }
         }
 
@@ -756,6 +785,7 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithTransverseRebarViewSecond = true;
             SelectionSettings.NeedWorkWithSkeletonSchedule = true;
             SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = true;
+            SelectionSettings.NeedWorkWithRebarNode = true;
         }
 
 
@@ -780,6 +810,7 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
             SelectionSettings.NeedWorkWithSkeletonSchedule = false;
             SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
+            SelectionSettings.NeedWorkWithRebarNode = false;
         }
     }
 }

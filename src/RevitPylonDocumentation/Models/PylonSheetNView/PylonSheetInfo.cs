@@ -40,6 +40,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             IfcPartsSchedule = new PylonView(ViewModel, Repository, this);
 
             LegendView = new PylonView(ViewModel, Repository, this);
+            RebarNodeView = new PylonView(ViewModel, Repository, this);
         }
 
         internal MainViewModel ViewModel { get; set; }
@@ -92,6 +93,9 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         // Легенда примечаний
         public PylonView LegendView { get; set; }
+
+        // Легенда узла армирования
+        public PylonView RebarNodeView { get; set; }
 
 
 
@@ -272,6 +276,25 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 if(LegendView.ViewElement is null && viewLegend.Name.Equals(ViewModel.SelectedLegend.Name)) {
                     LegendView.ViewElement = viewLegend;
                     LegendView.ViewportElement = viewportLegend;
+                    return;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Ищет и запоминает легенду узла армирования, размещенную на листе
+        /// </summary>
+        public void FindRebarLegendNodeOnSheet() {
+            foreach(ElementId id in PylonViewSheet.GetAllViewports()) {
+                Viewport viewportLegend = Repository.Document.GetElement(id) as Viewport;
+                View viewLegend = Repository.Document.GetElement(viewportLegend.ViewId) as View;
+
+                if(viewLegend is null) { continue; }
+
+                if(RebarNodeView.ViewElement is null && viewLegend.Name.Equals(ViewModel.SelectedRebarNode.Name)) {
+                    RebarNodeView.ViewElement = viewLegend;
+                    RebarNodeView.ViewportElement = viewportLegend;
                     return;
                 }
             }

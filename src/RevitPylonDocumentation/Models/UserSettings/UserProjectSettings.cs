@@ -28,6 +28,10 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _legendXOffsetTemp = "-100";
         private string _legendYOffsetTemp = "125";
 
+        private string _rebarNodeNameTemp = "КЖ_Узел ПК пилонов";
+        private string _rebarNodeXOffsetTemp = "-150";
+        private string _rebarNodeYOffsetTemp = "200";
+
         private string _pylonLengthParamNameTemp = "ФОП_РАЗМ_Длина";
         private string _pylonWidthParamNameTemp = "ФОП_РАЗМ_Ширина";
 
@@ -123,6 +127,24 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _legendYOffsetTemp, value);
         }
 
+        public string RebarNodeName { get; set; }
+        public string RebarNodeNameTemp {
+            get => _rebarNodeNameTemp;
+            set => RaiseAndSetIfChanged(ref _rebarNodeNameTemp, value);
+        }
+
+        public string RebarNodeXOffset { get; set; }
+        public string RebarNodeXOffsetTemp {
+            get => _rebarNodeXOffsetTemp;
+            set => RaiseAndSetIfChanged(ref _rebarNodeXOffsetTemp, value);
+        }
+
+        public string RebarNodeYOffset { get; set; }
+        public string RebarNodeYOffsetTemp {
+            get => _rebarNodeYOffsetTemp;
+            set => RaiseAndSetIfChanged(ref _rebarNodeYOffsetTemp, value);
+        }
+
         public string PylonLengthParamName { get; set; }
         public string PylonLengthParamNameTemp {
             get => _pylonLengthParamNameTemp;
@@ -154,8 +176,9 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             LegendXOffset = LegendXOffsetTemp;
             LegendYOffset = LegendYOffsetTemp;
 
-            LegendXOffset = LegendXOffsetTemp;
-
+            RebarNodeName = RebarNodeNameTemp;
+            RebarNodeXOffset = RebarNodeXOffsetTemp;
+            RebarNodeYOffset = RebarNodeYOffsetTemp;
 
             PylonLengthParamName = PylonLengthParamNameTemp;
             PylonWidthParamName = PylonWidthParamNameTemp;
@@ -178,9 +201,14 @@ namespace RevitPylonDocumentation.Models.UserSettings {
                 ViewModel.ErrorText = "Наименование параметра диспетчера 2 некорректно";
             }
 
-            // Проверяем, чтоб были заданы оффсеты видового экрана легенды
+            // Проверяем, чтоб были заданы офсеты видового экрана легенды
             if(LegendXOffset is null || LegendYOffset is null) {
                 ViewModel.ErrorText = "Не заданы отступы на листе для легенды примечений";
+            }
+
+            // Проверяем, чтоб были заданы офсеты видового экрана узла армирования
+            if(RebarNodeXOffset is null || RebarNodeYOffset is null) {
+                ViewModel.ErrorText = "Не заданы отступы на листе для узла армирования";
             }
 
             using(Transaction transaction = Repository.Document.StartTransaction("Проверка параметров на листе")) {

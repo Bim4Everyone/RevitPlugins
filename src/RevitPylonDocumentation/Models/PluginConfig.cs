@@ -47,6 +47,7 @@ namespace RevitPylonDocumentation.Models {
             selectionSettings.NeedWorkWithTransverseRebarViewSecond = settings.NeedWorkWithTransverseRebarViewSecond;
             selectionSettings.NeedWorkWithSkeletonSchedule = settings.NeedWorkWithSkeletonSchedule;
             selectionSettings.NeedWorkWithSkeletonByElemsSchedule = settings.NeedWorkWithSkeletonByElemsSchedule;
+            selectionSettings.NeedWorkWithRebarNode = settings.NeedWorkWithRebarNode;
 
             projectSettings.ProjectSection = settings.ProjectSection;
             projectSettings.ProjectSectionTemp = settings.ProjectSection;
@@ -82,7 +83,6 @@ namespace RevitPylonDocumentation.Models {
             projectSettings.LegendXOffset = settings.LegendXOffset;
             projectSettings.LegendXOffsetTemp = settings.LegendXOffset;
             projectSettings.LegendYOffset = settings.LegendYOffset;
-            projectSettings.LegendYOffsetTemp = settings.LegendYOffset;
 
             viewSectionSettings.GeneralViewPrefix = settings.GeneralViewPrefix;
             viewSectionSettings.GeneralViewPrefixTemp = settings.GeneralViewPrefix;
@@ -97,6 +97,13 @@ namespace RevitPylonDocumentation.Models {
             viewSectionSettings.GeneralRebarViewTemplateName = settings.GeneralRebarViewTemplateName;
             viewSectionSettings.GeneralRebarViewTemplateNameTemp = settings.GeneralRebarViewTemplateName;
 
+            projectSettings.RebarNodeYOffsetTemp = settings.RebarNodeYOffset;
+            projectSettings.RebarNodeName = settings.RebarNodeName;
+            projectSettings.RebarNodeNameTemp = settings.RebarNodeName;
+            projectSettings.RebarNodeXOffset = settings.RebarNodeXOffset;
+            projectSettings.RebarNodeXOffsetTemp = settings.RebarNodeXOffset;
+            projectSettings.RebarNodeYOffset = settings.RebarNodeYOffset;
+            projectSettings.RebarNodeYOffsetTemp = settings.RebarNodeYOffset;
 
 
             viewSectionSettings.GeneralViewXOffset = settings.GeneralViewXOffset;
@@ -236,6 +243,7 @@ namespace RevitPylonDocumentation.Models {
             settings.NeedWorkWithTransverseRebarViewSecond = selectionSettings.NeedWorkWithTransverseRebarViewSecond;
             settings.NeedWorkWithSkeletonSchedule = selectionSettings.NeedWorkWithSkeletonSchedule;
             settings.NeedWorkWithSkeletonByElemsSchedule = selectionSettings.NeedWorkWithSkeletonByElemsSchedule;
+            settings.NeedWorkWithRebarNode = selectionSettings.NeedWorkWithRebarNode;
 
             settings.ProjectSection = projectSettings.ProjectSection;
             settings.Mark = projectSettings.Mark;
@@ -279,6 +287,10 @@ namespace RevitPylonDocumentation.Models {
             settings.TransverseViewThirdElevation = viewSectionSettings.TransverseViewThirdElevation;
             settings.TransverseViewTemplateName = viewSectionSettings.TransverseViewTemplateName;
             settings.TransverseRebarViewTemplateName = viewSectionSettings.TransverseRebarViewTemplateName;
+
+            settings.RebarNodeName = projectSettings.RebarNodeName;
+            settings.RebarNodeXOffset = projectSettings.RebarNodeXOffset;
+            settings.RebarNodeYOffset = projectSettings.RebarNodeYOffset;
 
             settings.TransverseViewXOffset = viewSectionSettings.TransverseViewXOffset;
             settings.TransverseViewYOffset = viewSectionSettings.TransverseViewYOffset;
@@ -351,6 +363,7 @@ namespace RevitPylonDocumentation.Models {
         public bool NeedWorkWithTransverseRebarViewSecond { get; set; }
         public bool NeedWorkWithSkeletonSchedule { get; set; }
         public bool NeedWorkWithSkeletonByElemsSchedule { get; set; }
+        public bool NeedWorkWithRebarNode { get; set; }
 
 
         public string ProjectSection { get; set; }
@@ -400,6 +413,10 @@ namespace RevitPylonDocumentation.Models {
         public string SkeletonScheduleSuffix { get; set; }
         public string SkeletonByElemsSchedulePrefix { get; set; }
         public string SkeletonByElemsScheduleSuffix { get; set; }
+
+        public string RebarNodeName { get; set; }
+        public string RebarNodeXOffset { get; set; }
+        public string RebarNodeYOffset { get; set; }
 
         public string MaterialSchedulePrefix { get; set; }
         public string MaterialScheduleSuffix { get; set; }
