@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,7 +7,7 @@ using System.Threading.Tasks;
 using RevitRefreshLinks.Models;
 
 namespace RevitRefreshLinks.ViewModels {
-    internal class DirectoryViewModel : PathInfoViewModel {
+    internal class DirectoryViewModel : PathInfoViewModel, IEquatable<DirectoryViewModel> {
         private readonly IDirectoryModel _directoryModel;
 
         public DirectoryViewModel(IDirectoryModel directoryModel) {
@@ -25,10 +27,10 @@ namespace RevitRefreshLinks.ViewModels {
 
         public ObservableCollection<PathInfoViewModel> Content { get; }
 
+
         public async Task<DirectoryViewModel> GetParent() {
             return new DirectoryViewModel(await _directoryModel.GetParentAsync());
         }
-
 
         public async Task LoadContentAsync(bool loadFiles = false) {
             Content.Clear();
@@ -44,6 +46,21 @@ namespace RevitRefreshLinks.ViewModels {
                     Content.Add(fileVm);
                 }
             }
+        }
+
+        public bool Equals(DirectoryViewModel other) {
+            if(ReferenceEquals(null, other)) { return false; }
+            if(ReferenceEquals(this, other)) { return true; }
+
+            return FullName.Equals(other.FullName);
+        }
+
+        public override bool Equals(object obj) {
+            return Equals(obj as DirectoryViewModel);
+        }
+
+        public override int GetHashCode() {
+            return 733961487 + EqualityComparer<string>.Default.GetHashCode(FullName);
         }
     }
 }

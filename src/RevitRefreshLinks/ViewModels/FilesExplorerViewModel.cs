@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -32,10 +33,10 @@ namespace RevitRefreshLinks.ViewModels {
             LoadViewCommand = RelayCommand.CreateAsync(LoadViewAsync);
             OpenFolderCommand = RelayCommand.CreateAsync<DirectoryViewModel>(OpenFolderAsync, CanOpenFolder);
             OpenParentFolderCommand = RelayCommand.CreateAsync(OpenParentFolderAsync, CanOpenParentFolder);
-            OpenRootFolderCommand = RelayCommand.CreateAsync(OpenRootFolderAsync);
+            OpenRootFolderCommand = RelayCommand.CreateAsync(OpenRootFolderAsync, CanOpenRootFolder);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            OpenNextFolderCommand = RelayCommand.Create(OpenNextFolder, CanOpenNextFolder);
-            OpenPreviousFolderCommand = RelayCommand.Create(OpenPreviousFolder, CanOpenPreviousFolder);
+            OpenNextFolderCommand = RelayCommand.CreateAsync(OpenNextFolderAsync, CanOpenNextFolder);
+            OpenPreviousFolderCommand = RelayCommand.CreateAsync(OpenPreviousFolderAsync, CanOpenPreviousFolder);
         }
 
 
@@ -56,7 +57,11 @@ namespace RevitRefreshLinks.ViewModels {
 
         public DirectoryViewModel ActiveDirectory {
             get => _activeDirectory;
-            set => RaiseAndSetIfChanged(ref _activeDirectory, value);
+            set {
+                RaiseAndSetIfChanged(ref _activeDirectory, value);
+                OnPropertyChanged(nameof(NextDirs));
+                OnPropertyChanged(nameof(PreviousDirs));
+            }
         }
 
         public DirectoryViewModel RootDirectory {
@@ -83,6 +88,10 @@ namespace RevitRefreshLinks.ViewModels {
             get => _selectedItems;
             set => RaiseAndSetIfChanged(ref _selectedItems, value);
         }
+
+        public Stack<DirectoryViewModel> PreviousDirs { get; } = new Stack<DirectoryViewModel>();
+
+        public Stack<DirectoryViewModel> NextDirs { get; } = new Stack<DirectoryViewModel>();
 
         public string Title {
             get => _title;
@@ -121,8 +130,12 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private async Task OpenFolderAsync(DirectoryViewModel folder) {
-            ActiveDirectory = folder;
-            await ActiveDirectory.LoadContentAsync(true);
+            if(!ActiveDirectory.Equals(folder)) {
+                PreviousDirs.Push(ActiveDirectory);
+                NextDirs.Clear();
+                ActiveDirectory = folder;
+                await ActiveDirectory.LoadContentAsync(true);
+            }
         }
 
         private bool CanOpenFolder(DirectoryViewModel folder) {
@@ -130,17 +143,20 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private async Task OpenParentFolderAsync() {
-            ActiveDirectory = await ActiveDirectory.GetParent();
-            await ActiveDirectory.LoadContentAsync(true);
+            DirectoryViewModel parent = await ActiveDirectory.GetParent();
+            await OpenFolderAsync(parent);
         }
 
         private bool CanOpenParentFolder() {
-            return ActiveDirectory != null;
+            return ActiveDirectory != null && !ActiveDirectory.Equals(RootDirectory);
         }
 
         private async Task OpenRootFolderAsync() {
-            ActiveDirectory = RootDirectory;
-            await ActiveDirectory.LoadContentAsync(true);
+            await OpenFolderAsync(RootDirectory);
+        }
+
+        private bool CanOpenRootFolder() {
+            return RootDirectory != null && !RootDirectory.Equals(ActiveDirectory);
         }
 
         private void AcceptView() {
@@ -161,20 +177,28 @@ namespace RevitRefreshLinks.ViewModels {
             return true;
         }
 
-        private void OpenPreviousFolder() {
-            // TODO
+        private async Task OpenPreviousFolderAsync() {
+            if(PreviousDirs.Count > 0) {
+                NextDirs.Push(ActiveDirectory);
+                ActiveDirectory = PreviousDirs.Pop();
+                await ActiveDirectory.LoadContentAsync(true);
+            }
         }
 
         private bool CanOpenPreviousFolder() {
-            return false;
+            return PreviousDirs.Count > 0;
         }
 
-        private void OpenNextFolder() {
-            // TODO
+        private async Task OpenNextFolderAsync() {
+            if(NextDirs.Count > 0) {
+                PreviousDirs.Push(ActiveDirectory);
+                ActiveDirectory = NextDirs.Pop();
+                await ActiveDirectory.LoadContentAsync(true);
+            }
         }
 
         private bool CanOpenNextFolder() {
-            return false;
+            return NextDirs.Count > 0;
         }
     }
 }
