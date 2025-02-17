@@ -52,11 +52,11 @@ namespace RevitRefreshLinks {
                     CultureInfo.GetCultureInfo("ru-RU"));
                 var localizationService = kernel.Get<ILocalizationService>();
                 //kernel.UseRsOpenFileDialog(
-                //    title: localizationService.GetLocalizedString("TODO"),
+                //    title: localizationService.GetLocalizedString("RsOpenFileWindow.Title"),
                 //    initialDirectory: GetInitialServerFolder(kernel),
                 //    multiSelect: true);
                 kernel.UseMockOpenFileDialog(
-                    title: localizationService.GetLocalizedString("TODO"),
+                    title: localizationService.GetLocalizedString("RsOpenFileWindow.Title"),
                     initialDirectory: GetInitialServerFolder(kernel),
                     multiSelect: true);
 

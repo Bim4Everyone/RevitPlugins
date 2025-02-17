@@ -54,12 +54,7 @@
     <system:String
         x:Key="UpdateLinksWindow.Buttons.SelectServerFolder">Выбрать папку из RS</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.Buttons.Ok">ОК</system:String>
-    <system:String
-        x:Key="UpdateLinksWindow.Buttons.Cancel">Отмена</system:String>
-    <system:String
         x:Key="UpdateLinksWindow.Progress.Title">Обновление связей[{0}/{1}] ...</system:String>
-
     <system:String
         x:Key="SelectLinksFromFolderDialog.Title">Выберите связи для добавления</system:String>
     <system:String
@@ -70,10 +65,20 @@
 
     <system:String
         x:Key="RsOpenFileWindow.Title">Выберите модели с Revit Server</system:String>
-    
+    <system:String
+        x:Key="RsOpenFileWindow.List.Name">Имя</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.List.Size">Размер</system:String>
+
     <system:String
         x:Key="DirectoriesExplorer.Title">Выберите папку с Revit Server</system:String>
 
     <system:String
         x:Key="TODO">TODO</system:String>
+
+    <system:String
+        x:Key="AllWindow.Ok">ОК</system:String>
+
+    <system:String
+        x:Key="AllWindow.Cancel">Отмена</system:String>
 </ResourceDictionary>

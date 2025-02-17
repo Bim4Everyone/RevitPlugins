@@ -68,7 +68,7 @@ namespace RevitRefreshLinks {
                     stepValue: 1,
                     displayTitleFormat: localizationService.GetLocalizedString("UpdateLinksWindow.Progress.Title"));
                 kernel.UseRsOpenFolderDialog(
-                    title: localizationService.GetLocalizedString("TODO"),
+                    title: localizationService.GetLocalizedString("DirectoriesExplorer.Title"),
                     initialDirectory: GetInitialServerFolder(kernel),
                     multiSelect: true);
 

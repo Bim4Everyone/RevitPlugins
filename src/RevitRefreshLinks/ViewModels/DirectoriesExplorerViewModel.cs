@@ -134,11 +134,11 @@ namespace RevitRefreshLinks.ViewModels {
 
         private bool CanAcceptView() {
             if(MultiSelect && (SelectedDirectories is null || SelectedDirectories.Count == 0)) {
-                ErrorText = _localizationService.GetLocalizedString("TODO");
+                ErrorText = _localizationService.GetLocalizedString("SelectLocalFoldersDialog.Title");
                 return false;
             }
             if(!MultiSelect && SelectedDirectory is null) {
-                ErrorText = _localizationService.GetLocalizedString("TODO");
+                ErrorText = _localizationService.GetLocalizedString("SelectLocalFoldersDialog.Title");
                 return false;
             }
 

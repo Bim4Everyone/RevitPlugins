@@ -67,14 +67,14 @@
             <Button
                 Width="80"
                 Margin="10"
-                Content="OK TODO"
+                Content="{DynamicResource AllWindow.Ok}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <Button
                 Width="80"
                 Margin="10"
-                Content="Ca TODO"
+                Content="{DynamicResource AllWindow.Cancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>

@@ -184,7 +184,7 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private void AcceptView() {
-            // TODO
+            // nothing
         }
 
         private bool CanAcceptView() {

@@ -268,14 +268,14 @@
                 Width="80"
                 IsDefault="True"
                 Click="ButtonOk_Click"
-                Content="{DynamicResource UpdateLinksWindow.Buttons.Ok}"
+                Content="{DynamicResource AllWindow.Ok}"
                 Command="{Binding AcceptViewCommand}" />
 
             <Button
                 Margin="10"
                 Width="80"
                 IsCancel="True"
-                Content="{DynamicResource UpdateLinksWindow.Buttons.Cancel}"
+                Content="{DynamicResource AllWindow.Cancel}"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
