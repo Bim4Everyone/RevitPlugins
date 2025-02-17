@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -37,6 +40,8 @@ namespace RevitRefreshLinks.ViewModels {
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             OpenNextFolderCommand = RelayCommand.CreateAsync(OpenNextFolderAsync, CanOpenNextFolder);
             OpenPreviousFolderCommand = RelayCommand.CreateAsync(OpenPreviousFolderAsync, CanOpenPreviousFolder);
+
+            SelectedItems.CollectionChanged += SelectedItemsChanged;
         }
 
 
@@ -59,6 +64,8 @@ namespace RevitRefreshLinks.ViewModels {
             get => _activeDirectory;
             set {
                 RaiseAndSetIfChanged(ref _activeDirectory, value);
+                SelectedFile = null;
+                SelectedFiles.Clear();
                 OnPropertyChanged(nameof(NextDirs));
                 OnPropertyChanged(nameof(PreviousDirs));
             }
@@ -71,7 +78,10 @@ namespace RevitRefreshLinks.ViewModels {
 
         public PathInfoViewModel SelectedItem {
             get => _selectedItem;
-            set => RaiseAndSetIfChanged(ref _selectedItem, value);
+            set {
+                RaiseAndSetIfChanged(ref _selectedItem, value);
+                SelectedFile = value is FileViewModel file ? file : null;
+            }
         }
 
         public FileViewModel SelectedFile {
@@ -86,7 +96,15 @@ namespace RevitRefreshLinks.ViewModels {
 
         public ObservableCollection<PathInfoViewModel> SelectedItems {
             get => _selectedItems;
-            set => RaiseAndSetIfChanged(ref _selectedItems, value);
+            set {
+                RaiseAndSetIfChanged(ref _selectedItems, value);
+                SelectedFiles.Clear();
+                if(value != null) {
+                    foreach(var item in value.OfType<FileViewModel>()) {
+                        SelectedFiles.Add(item);
+                    }
+                }
+            }
         }
 
         public Stack<DirectoryViewModel> PreviousDirs { get; } = new Stack<DirectoryViewModel>();
@@ -165,11 +183,11 @@ namespace RevitRefreshLinks.ViewModels {
 
         private bool CanAcceptView() {
             if(MultiSelect && (SelectedFiles is null || SelectedFiles.Count == 0)) {
-                ErrorText = _localizationService.GetLocalizedString("TODO");
+                ErrorText = _localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Title");
                 return false;
             }
             if(!MultiSelect && SelectedFile is null) {
-                ErrorText = _localizationService.GetLocalizedString("TODO");
+                ErrorText = _localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Title");
                 return false;
             }
 
@@ -199,6 +217,22 @@ namespace RevitRefreshLinks.ViewModels {
 
         private bool CanOpenNextFolder() {
             return NextDirs.Count > 0;
+        }
+
+        private void SelectedItemsChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            if(e.Action == NotifyCollectionChangedAction.Reset) {
+                SelectedFiles.Clear();
+            }
+            var removedFiles = e.OldItems?.OfType<FileViewModel>().ToArray() ?? Array.Empty<FileViewModel>();
+            foreach(var item in removedFiles) {
+                SelectedFiles.Remove(item);
+            }
+            var addedFiles = e.NewItems?.OfType<FileViewModel>().ToArray() ?? Array.Empty<FileViewModel>();
+            foreach(var item in addedFiles) {
+                if(!SelectedFiles.Contains(item)) {
+                    SelectedFiles.Add(item);
+                }
+            }
         }
     }
 }
