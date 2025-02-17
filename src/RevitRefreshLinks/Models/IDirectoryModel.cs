@@ -11,8 +11,8 @@ namespace RevitRefreshLinks.Models {
 
         Task<IDirectoryModel[]> GetDirectoriesAsync(SearchOption searchOption);
 
-        Task<IFileModel[]> GetFilesAsync();
+        Task<IFileModel[]> GetFilesAsync(string filter = "*.*");
 
-        Task<IFileModel[]> GetFilesAsync(SearchOption searchOption);
+        Task<IFileModel[]> GetFilesAsync(SearchOption searchOption, string filter = "*.*");
     }
 }

@@ -25,6 +25,7 @@ namespace RevitRefreshLinks.ViewModels {
         private string _title;
         private string _errorText;
         private bool _multiSelect;
+        private string _filter;
         private string _initialDirectory;
 
         public FilesExplorerViewModel(IFileSystem fileSystem, ILocalizationService localizationService) {
@@ -131,6 +132,11 @@ namespace RevitRefreshLinks.ViewModels {
             set => RaiseAndSetIfChanged(ref _initialDirectory, value);
         }
 
+        public string Filter {
+            get => _filter;
+            set => RaiseAndSetIfChanged(ref _filter, value);
+        }
+
         private async Task LoadViewAsync() {
             RootDirectory = new DirectoryViewModel(await _fileSystem.GetRootDirectoryAsync());
 
@@ -144,7 +150,7 @@ namespace RevitRefreshLinks.ViewModels {
             } else {
                 ActiveDirectory = RootDirectory;
             }
-            await ActiveDirectory.LoadContentAsync(true);
+            await ActiveDirectory.LoadContentAsync(true, Filter);
         }
 
         private async Task OpenFolderAsync(DirectoryViewModel folder) {
@@ -152,7 +158,7 @@ namespace RevitRefreshLinks.ViewModels {
                 PreviousDirs.Push(ActiveDirectory);
                 NextDirs.Clear();
                 ActiveDirectory = folder;
-                await ActiveDirectory.LoadContentAsync(true);
+                await ActiveDirectory.LoadContentAsync(true, Filter);
             }
         }
 
@@ -199,7 +205,7 @@ namespace RevitRefreshLinks.ViewModels {
             if(PreviousDirs.Count > 0) {
                 NextDirs.Push(ActiveDirectory);
                 ActiveDirectory = PreviousDirs.Pop();
-                await ActiveDirectory.LoadContentAsync(true);
+                await ActiveDirectory.LoadContentAsync(true, Filter);
             }
         }
 
@@ -211,7 +217,7 @@ namespace RevitRefreshLinks.ViewModels {
             if(NextDirs.Count > 0) {
                 PreviousDirs.Push(ActiveDirectory);
                 ActiveDirectory = NextDirs.Pop();
-                await ActiveDirectory.LoadContentAsync(true);
+                await ActiveDirectory.LoadContentAsync(true, Filter);
             }
         }
 

@@ -49,14 +49,14 @@ namespace RevitRefreshLinks.Models {
             }
         }
 
-        public async Task<IFileModel[]> GetFilesAsync() {
+        public async Task<IFileModel[]> GetFilesAsync(string filter = "*.*") {
             return await Task.FromResult(_folderContents.Models.Select(f => new RsFileModel(f, this)).ToArray());
         }
 
-        public async Task<IFileModel[]> GetFilesAsync(SearchOption searchOption) {
+        public async Task<IFileModel[]> GetFilesAsync(SearchOption searchOption, string filter = "*.*") {
             switch(searchOption) {
                 case SearchOption.TopDirectoryOnly:
-                    return await GetFilesAsync();
+                    return await GetFilesAsync(filter);
                 case SearchOption.AllDirectories: {
                     var list = new List<IDirectoryModel>();
                     var contents = await _serverClient.GetRecursiveFolderContentsAsync(FullName);

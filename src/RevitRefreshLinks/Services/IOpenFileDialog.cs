@@ -5,5 +5,7 @@ namespace RevitRefreshLinks.Services {
         IFileModel File { get; }
 
         IFileModel[] Files { get; }
+
+        string Filter { get; set; }
     }
 }

@@ -78,7 +78,8 @@ namespace RevitRefreshLinks.Extensions {
         public static IKernel UseRsOpenFileDialog(this IKernel kernel,
             string title = "Выберите файлы с RS",
             string initialDirectory = default,
-            bool multiSelect = false) {
+            bool multiSelect = false,
+            string filter = "*.rvt") {
             if(kernel == null) {
                 throw new ArgumentNullException(nameof(kernel));
             }
@@ -110,7 +111,8 @@ namespace RevitRefreshLinks.Extensions {
                 .To<RsOpenFileDialog>()
                 .WithPropertyValue(nameof(IOpenFileDialog.Title), title)
                 .WithPropertyValue(nameof(IOpenFileDialog.InitialDirectory), initialDirectory)
-                .WithPropertyValue(nameof(IOpenFileDialog.MultiSelect), multiSelect);
+                .WithPropertyValue(nameof(IOpenFileDialog.MultiSelect), multiSelect)
+                .WithPropertyValue(nameof(IOpenFileDialog.Filter), filter);
 
             return kernel;
         }
@@ -122,7 +124,8 @@ namespace RevitRefreshLinks.Extensions {
         internal static IKernel UseMockOpenFileDialog(this IKernel kernel,
             string title = "Выберите файлы с RS",
             string initialDirectory = default,
-            bool multiSelect = false) {
+            bool multiSelect = false,
+            string filter = "*.rvt") {
             if(kernel == null) {
                 throw new ArgumentNullException(nameof(kernel));
             }
@@ -145,7 +148,9 @@ namespace RevitRefreshLinks.Extensions {
                 .To<RsOpenFileDialog>()
                 .WithPropertyValue(nameof(IOpenFileDialog.Title), title)
                 .WithPropertyValue(nameof(IOpenFileDialog.InitialDirectory), initialDirectory)
-                .WithPropertyValue(nameof(IOpenFileDialog.MultiSelect), multiSelect);
+                .WithPropertyValue(nameof(IOpenFileDialog.MultiSelect), multiSelect)
+                .WithPropertyValue(nameof(IOpenFileDialog.Filter), filter);
+
 
             return kernel;
         }

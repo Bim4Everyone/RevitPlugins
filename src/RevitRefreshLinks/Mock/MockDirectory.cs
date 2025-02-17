@@ -29,14 +29,14 @@ namespace RevitRefreshLinks.Mock {
             throw new NotImplementedException();
         }
 
-        public async Task<IFileModel[]> GetFilesAsync() {
+        public async Task<IFileModel[]> GetFilesAsync(string filter = "*.*") {
             return await Task.FromResult(
-                _directoryInfo.GetFiles()
+                _directoryInfo.GetFiles(filter)
                 .Select(f => new MockFile(f))
                 .ToArray());
         }
 
-        public Task<IFileModel[]> GetFilesAsync(SearchOption searchOption) {
+        public Task<IFileModel[]> GetFilesAsync(SearchOption searchOption, string filter = "*.*") {
             throw new NotImplementedException();
         }
 

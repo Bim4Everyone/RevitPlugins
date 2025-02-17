@@ -37,6 +37,12 @@ namespace RevitRefreshLinks.Services {
             set => _explorerViewModel.MultiSelect = value;
         }
 
+        public string Filter {
+            get => _explorerViewModel.Filter;
+            set => _explorerViewModel.Filter = value;
+        }
+
+
         public bool ShowDialog() {
             return _explorerWindow.ShowDialog() ?? false;
         }
