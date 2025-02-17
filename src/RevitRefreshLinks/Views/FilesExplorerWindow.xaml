@@ -42,6 +42,15 @@
         <ObjectDataProvider
             x:Key="ArrowUpImg"
             ObjectInstance="{x:Static res:IconResources.ArrowUpImg}" />
+        <ObjectDataProvider
+            x:Key="UpdateImg"
+            ObjectInstance="{x:Static res:IconResources.UpdateImg}" />
+        <Style
+            TargetType="{x:Type GridViewColumnHeader}">
+            <Setter
+                Property="HorizontalContentAlignment"
+                Value="Left" />
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -55,7 +64,7 @@
 
         <DockPanel
             Grid.Row="0"
-            HorizontalAlignment="Left">
+            HorizontalAlignment="Stretch">
             <Button
                 Width="20"
                 Command="{Binding OpenPreviousFolderCommand}">
@@ -91,6 +100,19 @@
             <TextBlock
                 Margin="5 0 0 0 "
                 Text="{Binding ActiveDirectory.FullName}" />
+            <DockPanel
+                HorizontalAlignment="Right"
+                DockPanel.Dock="Right">
+                <Button
+                    DockPanel.Dock="Right"
+                    Width="20"
+                    Command="{Binding UpdateViewCommand}">
+                    <Button.Content>
+                        <Image
+                            Source="{Binding Source={StaticResource UpdateImg}}" />
+                    </Button.Content>
+                </Button>
+            </DockPanel>
         </DockPanel>
         <DockPanel
             Grid.Row="1"

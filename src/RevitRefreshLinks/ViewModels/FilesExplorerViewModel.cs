@@ -41,6 +41,7 @@ namespace RevitRefreshLinks.ViewModels {
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             OpenNextFolderCommand = RelayCommand.CreateAsync(OpenNextFolderAsync, CanOpenNextFolder);
             OpenPreviousFolderCommand = RelayCommand.CreateAsync(OpenPreviousFolderAsync, CanOpenPreviousFolder);
+            UpdateViewCommand = RelayCommand.CreateAsync(UpdateView, CanUpdateView);
 
             SelectedItems.CollectionChanged += SelectedItemsChanged;
         }
@@ -59,6 +60,8 @@ namespace RevitRefreshLinks.ViewModels {
         public ICommand OpenRootFolderCommand { get; }
 
         public ICommand AcceptViewCommand { get; }
+
+        public ICommand UpdateViewCommand { get; }
 
 
         public DirectoryViewModel ActiveDirectory {
@@ -181,6 +184,14 @@ namespace RevitRefreshLinks.ViewModels {
 
         private bool CanOpenRootFolder() {
             return RootDirectory != null && !RootDirectory.Equals(ActiveDirectory);
+        }
+
+        private async Task UpdateView() {
+            await ActiveDirectory.LoadContentAsync(true, Filter);
+        }
+
+        private bool CanUpdateView() {
+            return ActiveDirectory != null;
         }
 
         private void AcceptView() {
