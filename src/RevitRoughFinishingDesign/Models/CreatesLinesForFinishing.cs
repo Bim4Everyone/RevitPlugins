@@ -46,6 +46,7 @@ namespace RevitRoughFinishingDesign.Models {
             foreach(Line line in linesForCorrect) {
 
                 XYZ alongsideVector = line.Direction.Normalize();
+
                 // Получаем начальную и конечную точку линии
                 XYZ startPoint = line.GetEndPoint(0);
                 XYZ endPoint = line.GetEndPoint(1);
@@ -55,33 +56,11 @@ namespace RevitRoughFinishingDesign.Models {
                 XYZ newStartPoint = startPoint + directionToRoom * (correctOffset);
                 XYZ newEndPoint = endPoint + directionToRoom * (correctOffset);
 
-                //Удлиняем линию
-                //newStartPoint = newStartPoint - alongsideVector * (correctOffset);
-                //newEndPoint = newEndPoint + alongsideVector * (correctOffset);
-                // Создаем новую линию с обновленными точками
                 Line newLine = Line.CreateBound(newStartPoint, newEndPoint);
                 correctLines.Add(newLine);
             }
             return correctLines;
         }
-
-        //public bool IsCornerLine(Line line, IList<Line> allLines, double tolerance = 1e-6) {
-        //    XYZ startPoint = line.GetEndPoint(0);
-        //    XYZ endPoint = line.GetEndPoint(1);
-        //    XYZ direction = line.Direction.Normalize();
-
-        //    bool hasDifferentDirectionAtStart = allLines.Any(l =>
-        //        l != line &&
-        //        l.GetEndPoint(0).IsAlmostEqualTo(startPoint, tolerance) || l.GetEndPoint(1).IsAlmostEqualTo(startPoint, tolerance) &&
-        //        !l.Direction.Normalize().IsAlmostEqualTo(direction, tolerance));
-
-        //    bool hasDifferentDirectionAtEnd = allLines.Any(l =>
-        //        l != line &&
-        //        l.GetEndPoint(0).IsAlmostEqualTo(endPoint, tolerance) || l.GetEndPoint(1).IsAlmostEqualTo(endPoint, tolerance) &&
-        //        !l.Direction.Normalize().IsAlmostEqualTo(direction, tolerance));
-
-        //    return hasDifferentDirectionAtStart || hasDifferentDirectionAtEnd;
-        //}
 
         public IList<DetailLineForFinishing> ConnectLines(IList<DetailLineForFinishing> lines) {
             IList<DetailLineForFinishing> resultLines = new List<DetailLineForFinishing>();
@@ -129,6 +108,7 @@ namespace RevitRoughFinishingDesign.Models {
             }
             return intersectionPoints;
         }
+
         /// <summary>
         /// Задает тип линии (LineStyle) для DetailLine
         /// </summary>

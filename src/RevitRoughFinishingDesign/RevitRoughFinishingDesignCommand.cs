@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
@@ -6,7 +7,6 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
@@ -21,12 +21,15 @@ using RevitRoughFinishingDesign.Views;
 
 namespace RevitRoughFinishingDesign {
     [Transaction(TransactionMode.Manual)]
-    public class RevitRoughFinishingDesignCommand : BasePluginCommand {
+    public class RevitRoughFinishingDesignCommand : IExternalCommand {
         public RevitRoughFinishingDesignCommand() {
             PluginName = "RevitRoughFinishingDesign";
         }
 
-        protected override void Execute(UIApplication uiApplication) {
+        public string PluginName { get; }
+
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements) {
+            UIApplication uiApplication = commandData.Application;
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
@@ -54,7 +57,31 @@ namespace RevitRoughFinishingDesign {
                     CultureInfo.GetCultureInfo("ru-RU"));
 
                 Notification(kernel.Get<MainWindow>());
+                return Result.Succeeded;
             }
         }
+
+
+        protected void Notification(Window window) {
+            Notification(window.ShowDialog());
+        }
+        protected T GetPlatformService<T>() {
+            return ServicesProvider.GetPlatformService<T>();
+        }
+
+        protected void Notification(bool? dialogResult) {
+            if(dialogResult == null) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выход из скрипта.", "C#")
+                    .ShowAsync();
+            } else if(dialogResult == true) {
+                GetPlatformService<INotificationService>()
+                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
+                    .ShowAsync();
+            } else if(dialogResult == false) {
+                throw new OperationCanceledException();
+            }
+        }
+
     }
 }

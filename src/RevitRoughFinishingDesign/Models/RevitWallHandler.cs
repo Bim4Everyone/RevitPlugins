@@ -117,10 +117,6 @@ namespace RevitRoughFinishingDesign.Models {
                         + normalVector * step;
                     XYZ leftPoint = new XYZ(wallCentroidPoint.X, wallCentroidPoint.Y, wallCentroidPoint.Z)
                         - normalVector * step;
-                    Line rLine = Line.CreateBound(rightPoint, new XYZ(0, 0, 0));
-                    Line lLine = Line.CreateBound(leftPoint, new XYZ(0, 0, 0));
-                    //_revitRepository.CreateTestModelLine(rLine);
-                    //_revitRepository.CreateTestModelLine(lLine);
                     if(_room.IsPointInRoom(rightPoint)) {
                         rightPoints.Add(rightPoint);
                     }

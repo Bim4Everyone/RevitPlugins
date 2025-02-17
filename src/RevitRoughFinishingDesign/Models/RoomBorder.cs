@@ -12,8 +12,6 @@ namespace RevitRoughFinishingDesign.Models {
 
         public Curve Curve { get; }
 
-
         public Guid Guid { get; }
-
     }
 }

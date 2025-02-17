@@ -39,21 +39,14 @@
             ItemsSource="{Binding Items}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <DockPanel HorizontalAlignment="Center"
-                               VerticalAlignment="Center">
-                        <!--<ComboBox
-                            VerticalAlignment="Center"
-                            Height="25"
-                            Width="200"
-                            VerticalContentAlignment="Center"
-                            Margin="5"
-                            ItemsSource="{Binding DataContext.WallTypes, ElementName=_this}"
-                            SelectedItem="{Binding WallTypeVM}" />-->
+                    <DockPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
                         <TextBlock
                             VerticalAlignment="Center"
                             Width="350"
                             Margin="5"
-                            Text="{Binding WallTypeVM}"/>
+                            Text="{Binding WallTypeVM}" />
                         <ComboBox
                             VerticalAlignment="Center"
                             Height="25"
@@ -66,10 +59,11 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <StackPanel Grid.Row="0" 
-                    Orientation="Horizontal" 
-                    VerticalAlignment ="Center"
-                    HorizontalAlignment="Center">
+        <StackPanel
+            Grid.Row="0"
+            Orientation="Horizontal"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center">
             <TextBlock
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
@@ -77,14 +71,13 @@
                 Text="Отступ линий, в мм:" />
             <TextBox
                 Grid.Row="0"
-                Width="200"
+                Width="50"
                 Margin="5"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Text="{Binding LineOffset,
         UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
-        
 
         <StackPanel
             Grid.Row="2"

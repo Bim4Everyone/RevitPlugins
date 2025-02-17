@@ -1,0 +1,10 @@
+<RevitAddIns>
+	<AddIn Type="Command">
+		<ClientId>BEED0978-CCB1-44BB-92C9-C670D662659A</ClientId>
+		<Assembly>RevitRoughFinishingDesign\RevitRoughFinishingDesign_2022.dll</Assembly>
+		<FullClassName>RevitRoughFinishingDesign.RevitRoughFinishingDesignCommand</FullClassName>
+		<VendorId>DiBrainz</VendorId>
+		<Text>Оформление черновой отделки</Text>
+		<VendorDescription>DiBrainz</VendorDescription>
+	</AddIn>
+</RevitAddIns>

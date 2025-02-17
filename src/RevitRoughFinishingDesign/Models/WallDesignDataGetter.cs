@@ -17,47 +17,6 @@ namespace RevitRoughFinishingDesign.Models {
             _curveLoopsSimplifier = curveLoopsSimplifier;
         }
 
-        //public IList<WallDesignData> GetWallDesignDatas() {
-        //    IList<Room> rooms = _revitRepository.GetTestRooms();
-        //    IList<WallDesignData> wallDesignDatas = new List<WallDesignData>();
-        //    IList<WallDesignData> resultDesignDatas = new List<WallDesignData>();
-
-        //    foreach(Room room in rooms) {
-        //        RevitRoomHandler roomHandler = new RevitRoomHandler(_revitRepository, room, _curveLoopsSimplifier);
-        //        ICollection<ElementId> wallsIdsInRoom = roomHandler.GetWallsFromRoom();
-        //        foreach(ElementId wallId in wallsIdsInRoom) {
-        //            WallDesignData wallDesignData = GetWallDesignData(roomHandler, wallId);
-        //            wallDesignDatas.Add(wallDesignData);
-        //        }
-        //        //wallDesignDatas = wallDesignDatas
-        //        //        .OrderBy(w => _revitRepository.GetOriginFromCurve(w.BorderOfRoom))
-        //        //        .ToList();
-        //        //var groupedWallDesignDatas = wallDesignDatas
-        //        //    .GroupBy(w => _revitRepository.GetOriginFromCurve(w.BorderOfRoom));
-        //        var groupedWallDesignDatas = wallDesignDatas
-        //            .GroupBy(w => w.BorderOfRoom.Evaluate(0.5, true)) // Берем среднюю точку
-        //            .OrderBy(g => g.Key.X)
-        //            .ThenBy(g => g.Key.Y)
-        //            .ThenBy(g => g.Key.Z);
-
-        //        foreach(var group in groupedWallDesignDatas) {
-        //            XYZ origin = group.Key; // Уникальная координата группы
-
-        //            // Сортируем wallData по расстоянию
-        //            IList<WallDesignData> sortedWallData = group
-        //                .OrderBy(x => x.DistanceFromBorder) // Сортировка по возрастанию дистанции
-        //                .ToList();
-
-        //            // Назначаем LayerNumber на основе позиции в отсортированном списке
-        //            for(int i = 0; i < sortedWallData.Count; i++) {
-        //                sortedWallData[i].LayerNumber = i;
-        //                resultDesignDatas.Add(sortedWallData[i]);
-        //            }
-        //        }
-        //    }
-        //    return resultDesignDatas;
-        //}
-
         public IList<WallDesignData> GetWallDesignDatas(RevitSettings settings) {
             IList<Room> rooms = _revitRepository.GetSelectedRooms();
             IList<WallDesignData> wallDesignDatas = new List<WallDesignData>();
