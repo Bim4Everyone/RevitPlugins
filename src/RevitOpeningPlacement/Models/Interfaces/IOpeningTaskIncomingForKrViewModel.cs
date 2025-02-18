@@ -40,5 +40,10 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// Комментарий задания на отверстие
         /// </summary>
         string Comment { get; }
+
+        /// <summary>
+        /// Хост задания на отверстие из активного файла
+        /// </summary>
+        IOpeningTaskHost Host { get; }
     }
 }

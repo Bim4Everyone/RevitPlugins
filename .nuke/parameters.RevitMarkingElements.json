@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitMarkingElements",
+  "PublishDirectory": "03.KR.extension\\КР.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/59856/pencil",
+  "BundleName": "Маркировка элементов",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "03.KR.extension\\КР.tab\\Документация.panel\\Маркировка.pulldown"
+}

@@ -12,12 +12,23 @@ namespace RevitApartmentPlans.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-        private readonly IMessageBoxService _messageBoxService;
         private readonly IViewPlanCreationService _viewPlanCreationService;
         private readonly ILengthConverter _lengthConverter;
         private readonly IProgressDialogFactory _progressDialogFactory;
+        /// <summary>
+        /// Минимальное значение отступа подрезки контура квартиры в мм
+        /// </summary>
         private const double _minOffsetMm = 0;
+        /// <summary>
+        /// Максимальное значение отступа подрезки контура квартиры в мм.
+        /// Принято с целью разумно ограничить ввод пользователя.
+        /// </summary>
         private const double _maxOffsetMm = 2000;
+        /// <summary>
+        /// Значение отступа подрезки контура квартиры в мм по умолчанию. 
+        /// Принято исходя из наиболее часто встречающейся толщины межквартирных стен в 200 мм.
+        /// </summary>
+        private const double _defaultOffsetMm = 200;
 
 
         public MainViewModel(
@@ -25,7 +36,6 @@ namespace RevitApartmentPlans.ViewModels {
             RevitRepository revitRepository,
             ViewTemplatesViewModel viewTemplatesViewModel,
             ApartmentsViewModel apartmentsViewModel,
-            IMessageBoxService messageBoxService,
             IViewPlanCreationService viewPlanCreationService,
             ILengthConverter lengthConverter,
             IProgressDialogFactory progressDialogFactory
@@ -39,8 +49,6 @@ namespace RevitApartmentPlans.ViewModels {
                 ?? throw new System.ArgumentNullException(nameof(viewTemplatesViewModel));
             ApartmentsViewModel = apartmentsViewModel
                 ?? throw new System.ArgumentNullException(nameof(apartmentsViewModel));
-            _messageBoxService = messageBoxService
-                ?? throw new System.ArgumentNullException(nameof(messageBoxService));
             _viewPlanCreationService = viewPlanCreationService
                 ?? throw new System.ArgumentNullException(nameof(viewPlanCreationService));
             _lengthConverter = lengthConverter
@@ -52,7 +60,7 @@ namespace RevitApartmentPlans.ViewModels {
         }
 
         public IProgressDialogFactory ProgressDialogFactory => _progressDialogFactory;
-        public IMessageBoxService MessageBoxService => _messageBoxService;
+
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
 
@@ -71,6 +79,12 @@ namespace RevitApartmentPlans.ViewModels {
         public double OffsetMm {
             get => _offsetMm;
             set => RaiseAndSetIfChanged(ref _offsetMm, value);
+        }
+
+        private bool _copyDetail;
+        public bool CopyDetail {
+            get => _copyDetail;
+            set => RaiseAndSetIfChanged(ref _copyDetail, value);
         }
 
 
@@ -95,12 +109,22 @@ namespace RevitApartmentPlans.ViewModels {
                 var ct = progressDialogService.CreateCancellationToken();
                 progressDialogService.Show();
 
-                _viewPlanCreationService.CreateViews(
-                    selectedApartments,
-                    selectedTemplates,
-                    _lengthConverter.ConvertToInternal(OffsetMm),
-                    progress,
-                    ct);
+                if(CopyDetail) {
+                    _viewPlanCreationService.CreateViews(
+                        selectedApartments,
+                        selectedTemplates,
+                        _lengthConverter.ConvertToInternal(OffsetMm),
+                        _revitRepository.GetActiveViewPlan(),
+                        progress,
+                        ct);
+                } else {
+                    _viewPlanCreationService.CreateViews(
+                        selectedApartments,
+                        selectedTemplates,
+                        _lengthConverter.ConvertToInternal(OffsetMm),
+                        progress,
+                        ct);
+                }
             }
 
         }
@@ -134,7 +158,8 @@ namespace RevitApartmentPlans.ViewModels {
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-            OffsetMm = setting?.OffsetMm ?? 200;
+            OffsetMm = setting?.OffsetMm ?? _defaultOffsetMm;
+            CopyDetail = setting?.CopyDetail ?? false;
         }
 
         private void SaveConfig() {
@@ -143,6 +168,8 @@ namespace RevitApartmentPlans.ViewModels {
             setting.OffsetMm = OffsetMm;
             setting.ParamName = ApartmentsViewModel?.SelectedParam?.Name ?? string.Empty;
             setting.ViewTemplates = ViewTemplatesViewModel?.ViewTemplates?.Select(t => t.GetTemplate().Id).ToArray();
+            setting.CopyDetail = CopyDetail;
+            setting.ProcessLinks = ApartmentsViewModel?.ProcessLinks ?? false;
             _pluginConfig.SaveProjectConfig();
         }
     }

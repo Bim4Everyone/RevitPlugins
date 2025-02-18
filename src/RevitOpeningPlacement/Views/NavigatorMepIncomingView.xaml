@@ -219,7 +219,7 @@
                             <dxg:GridColumn ReadOnly="True"
                                             Width="60"
                                             Header="Основа"
-                                            FieldName="HostName" />
+                                            FieldName="Host.Name" />
                             <dxg:GridColumn ReadOnly="True"
                                             Width="50"
                                             Header="Система ВИС"

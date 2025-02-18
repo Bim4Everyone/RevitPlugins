@@ -6,16 +6,24 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB.Architecture;
 
-namespace RevitDeclarations.Models
-{
+namespace RevitDeclarations.Models {
     internal class PublicArea : RoomGroup {
         private readonly PublicAreasSettings _settings;
+
+        private readonly string _roomPosition;
+        private readonly bool _isUnderground;
 
         public PublicArea(IEnumerable<RoomElement> rooms, 
                           DeclarationSettings settings, 
                           RoomParamProvider paramProvider)
             : base(rooms, settings, paramProvider) {
             _settings = (PublicAreasSettings) settings;
+
+            _roomPosition = _paramProvider.GetRoomsPosition(this);
+
+            if(_roomPosition.IndexOf("подземный", StringComparison.OrdinalIgnoreCase) >= 0) {
+                _isUnderground = true;
+            }
         }
 
         public string DeclarationNumber => 
@@ -34,7 +42,7 @@ namespace RevitDeclarations.Models
 
         public string GroupName => _firstRoom.Name;
 
-        public string RoomPosition =>
-            _paramProvider.GetRoomsPosition(this);
+        public string RoomPosition => _roomPosition;
+        public bool IsUnderground => _isUnderground;
     }
 }

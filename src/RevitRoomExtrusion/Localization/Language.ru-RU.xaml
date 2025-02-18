@@ -1,0 +1,44 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="FamilyDocument.TransactionName">Категория, выдавливание, материал</system:String>
+    <system:String x:Key="FamilyDocument.MaterialName">стекло</system:String>
+    <system:String x:Key="FamilyDocument.FamilyName">Држ_Проверка_{0}_Отм.{1}</system:String>
+    <system:String x:Key="FamilyDocument.TemplateFamilyName">\Метрическая система, типовая модель.rft</system:String>
+
+    <system:String x:Key="FamilyLoader.TransactionNameLoad">Загрузка семейства дорожек</system:String>
+    <system:String x:Key="FamilyLoader.TransactionNamePlace">Размещение семейства дорожек</system:String>
+    
+    <system:String x:Key="RevitRepository.TransactionNameCreate">Создание 3D вида для проверки дорожек</system:String>
+    <system:String x:Key="RevitRepository.ViewName">${0}/{1}/Проверка дорожек</system:String>
+
+    <system:String x:Key="MainViewModel.DefaultFamilyName">Машино-места</system:String>
+
+    <system:String x:Key="RoomErrorViewModel.RedundantError">Помещение избыточно</system:String>
+    <system:String x:Key="RoomErrorViewModel.NotEnclosed">Помещение не окружено</system:String>
+    <system:String x:Key="RoomErrorViewModel.IntersectBoundary">Помещение не ограничено разделителями</system:String>
+    <system:String x:Key="RoomErrorViewModel.NoNumber">Нет номера</system:String>
+    <system:String x:Key="RoomErrorViewModel.NoName">Нет имени</system:String>
+
+    <system:String x:Key="ErrorWindow.Title">Ошибки помещений</system:String>
+    <system:String x:Key="ErrorWindow.Warning">Выбраны помещения с ошибками. Для корректной работы плагина, исправьте ошибки</system:String>
+    <system:String x:Key="ErrorWindow.HeaderTitle">Наименование</system:String>
+    <system:String x:Key="ErrorWindow.HeaderNumber">Номер</system:String>
+    <system:String x:Key="ErrorWindow.HeaderLevel">Уровень</system:String>
+    <system:String x:Key="ErrorWindow.HeaderTypeError">Тип ошибки</system:String>
+
+    <system:String x:Key="MainWindow.Title">Выдавливание помещений</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Выдавить</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
+    <system:String x:Key="MainWindow.ExtrusionHeightMm">Введите высоту выдавливания (в миллиметрах)</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Введите имя семейства</system:String>
+    <system:String x:Key="MainWindow.HeightError">Высота должна быть числом</system:String>
+    <system:String x:Key="MainWindow.HeightErrorNegative">Высота должна быть положительной</system:String>
+    <system:String x:Key="MainWindow.HeightErrorZero">Высота должна быть больше нуля</system:String>
+    <system:String x:Key="MainWindow.HeightErrorBig">Высота не может превышать 100 метров</system:String>
+    <system:String x:Key="MainWindow.NameError">Имя содержит недопустимые символы</system:String>
+    <system:String x:Key="Command.MessegeBody">Пожалуйста, выберите помещения</system:String>
+    <system:String x:Key="Command.MessegeTitle">Ошибка выбора</system:String>
+
+</ResourceDictionary>

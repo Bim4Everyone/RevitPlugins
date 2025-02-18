@@ -52,12 +52,45 @@ namespace RevitApartmentPlans.Services {
             return views;
         }
 
+        public ICollection<ViewPlan> CreateViews(
+            ICollection<Apartment> apartments,
+            ICollection<ViewPlan> templates,
+            double feetOffset,
+            ViewPlan detailView,
+            IProgress<int> progress = null,
+            CancellationToken ct = default) {
+
+            List<ViewPlan> views = new List<ViewPlan>();
+            using(Transaction t = _revitRepository.Document.StartTransaction("Создание планов квартир")) {
+                var i = 0;
+                foreach(var apartment in apartments) {
+                    ct.ThrowIfCancellationRequested();
+                    var createdViews = CreateViews(apartment, templates, feetOffset, detailView);
+                    if(createdViews.Count > 0) {
+                        views.AddRange(createdViews);
+                    }
+                    progress?.Report(++i);
+                }
+                t.Commit();
+            }
+            return views;
+        }
+
 
         private ViewPlan CreateView(Apartment apartment, ViewPlan template, CurveLoop cropShape) {
             var viewPlan = ViewPlan.Create(
                 _revitRepository.Document,
                 _revitRepository.GetViewFamilyTypeId(template),
                 apartment.LevelId);
+            return FinishView(viewPlan, apartment, template, cropShape);
+        }
+
+        private ViewPlan CreateView(Apartment apartment, ViewPlan template, CurveLoop cropShape, ViewPlan detailView) {
+            var viewPlan = _revitRepository.DuplicateView(detailView);
+            return FinishView(viewPlan, apartment, template, cropShape);
+        }
+
+        private ViewPlan FinishView(ViewPlan viewPlan, Apartment apartment, ViewPlan template, CurveLoop cropShape) {
             viewPlan.CropBoxActive = true;
             viewPlan.CropBoxVisible = true;
 
@@ -97,6 +130,19 @@ namespace RevitApartmentPlans.Services {
 
             return templates
                 .Select(t => CreateView(apartment, t, loop))
+                .ToArray();
+        }
+
+        private ICollection<ViewPlan> CreateViews(
+            Apartment apartment,
+            ICollection<ViewPlan> templates,
+            double feetOffset,
+            ViewPlan detailView) {
+
+            CurveLoop loop = _boundsCalculateService.CreateBounds(apartment, feetOffset);
+
+            return templates
+                .Select(t => CreateView(apartment, t, loop, detailView))
                 .ToArray();
         }
 

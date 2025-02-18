@@ -39,5 +39,15 @@ namespace RevitApartmentPlans.Models {
         /// Id всех выбранных пользователем шаблонов видов для создания планов
         /// </summary>
         public ElementId[] ViewTemplates { get; set; }
+
+        /// <summary>
+        /// Копировать с детализацией
+        /// </summary>
+        public bool CopyDetail { get; set; }
+
+        /// <summary>
+        /// Обрабатывать связанные файлы
+        /// </summary>
+        public bool ProcessLinks { get; set; }
     }
 }
