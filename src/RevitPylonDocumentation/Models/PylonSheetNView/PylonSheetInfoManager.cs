@@ -223,16 +223,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             // Принудительно регеним документ, иначе запрашиваемые габариты видовых экранов будут некорректны
             Repository.Document.Regenerate();
 
+            // Размещение видов опалубки
             if(selectionSettings.NeedWorkWithGeneralView) {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.GeneralView.ViewportElement is null) {
                     SheetInfo.GeneralView.ViewSectionPlacer.PlaceGeneralViewport();
-                }
-            }
-            if(selectionSettings.NeedWorkWithGeneralRebarView) {
-                // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.GeneralRebarView.ViewportElement is null) {
-                    SheetInfo.GeneralRebarView.ViewSectionPlacer.PlaceGeneralRebarViewport();
                 }
             }
             if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
@@ -241,34 +236,36 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.GeneralViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularViewport();
                 }
             }
-            if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
+            if(selectionSettings.NeedWorkWithTransverseViewThird) {
                 // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.GeneralRebarViewPerpendicular.ViewportElement is null) {
-                    SheetInfo.GeneralRebarViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularRebarViewport();
-                }
-            }
-            if(selectionSettings.NeedWorkWithTransverseViewFirst) {
-                // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.TransverseViewFirst.ViewportElement is null) {
-                    SheetInfo.TransverseViewFirst.ViewSectionPlacer.PlaceTransverseFirstViewPorts();
+                if(SheetInfo.TransverseViewThird.ViewportElement is null) {
+                    SheetInfo.TransverseViewThird.ViewSectionPlacer.PlaceTransverseThirdViewPort();
                 }
             }
             if(selectionSettings.NeedWorkWithTransverseViewSecond) {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.TransverseViewSecond.ViewportElement is null) {
-                    SheetInfo.TransverseViewSecond.ViewSectionPlacer.PlaceTransverseSecondViewPorts();
+                    SheetInfo.TransverseViewSecond.ViewSectionPlacer.PlaceTransverseSecondViewPort();
                 }
             }
-            if(selectionSettings.NeedWorkWithTransverseViewThird) {
+            if(selectionSettings.NeedWorkWithTransverseViewFirst) {
                 // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.TransverseViewThird.ViewportElement is null) {
-                    SheetInfo.TransverseViewThird.ViewSectionPlacer.PlaceTransverseThirdViewPorts();
+                if(SheetInfo.TransverseViewFirst.ViewportElement is null) {
+                    SheetInfo.TransverseViewFirst.ViewSectionPlacer.PlaceTransverseFirstViewPort();
                 }
             }
-            if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
+
+            // Размещение видов арматурного каркаса
+            if(selectionSettings.NeedWorkWithGeneralRebarView) {
                 // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.TransverseRebarViewFirst.ViewportElement is null) {
-                    SheetInfo.TransverseRebarViewFirst.ViewSectionPlacer.PlaceTransverseRebarFirstViewPort();
+                if(SheetInfo.GeneralRebarView.ViewportElement is null) {
+                    SheetInfo.GeneralRebarView.ViewSectionPlacer.PlaceGeneralRebarViewport();
+                }
+            }
+            if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.GeneralRebarViewPerpendicular.ViewportElement is null) {
+                    SheetInfo.GeneralRebarViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularRebarViewport();
                 }
             }
             if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
@@ -277,7 +274,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.TransverseRebarViewSecond.ViewSectionPlacer.PlaceTransverseRebarSecondViewPort();
                 }
             }
+            if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.TransverseRebarViewFirst.ViewportElement is null) {
+                    SheetInfo.TransverseRebarViewFirst.ViewSectionPlacer.PlaceTransverseRebarFirstViewPort();
+                }
+            }
 
+            // Размещение спецификаций
             if(selectionSettings.NeedWorkWithSkeletonSchedule) {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.SkeletonSchedule.ViewportElement is null) {
@@ -314,6 +318,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.IfcPartsSchedule.ViewSchedulePlacer.PlaceIfcPartsSchedule();
                 }
             }
+
+            // Размещение примечания и узла армирования
             if(selectionSettings.NeedWorkWithLegend) {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.LegendView.ViewportElement is null) {
