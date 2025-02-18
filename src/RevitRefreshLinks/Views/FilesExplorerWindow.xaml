@@ -175,6 +175,7 @@
                 <i:Interaction.Behaviors>
                     <res:ListViewDoubleClickBehavior
                         Command="{Binding OpenFolderCommand}" />
+                    <res:ListViewHorizontalScrollBehavior />
                 </i:Interaction.Behaviors>
                 <ListView.View>
                     <GridView>
@@ -192,7 +193,7 @@
                             Width="600"
                             DisplayMemberBinding="{Binding Name}" />
                         <GridViewColumn
-                            Width="50"
+                            Width="100"
                             Header="{DynamicResource RsOpenFileWindow.List.Size}"
                             DisplayMemberBinding="{Binding Length, Converter={StaticResource FileSizeConverter}}" />
                     </GridView>
