@@ -205,7 +205,7 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanOpenRootFolder() {
-            return !AnyCmdIsExecuting && RootDirectory != null && !RootDirectory.Equals(ActiveDirectory);
+            return !AnyCmdIsExecuting && RootDirectory != null;
         }
 
         private async Task UpdateView() {
