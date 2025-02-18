@@ -51,6 +51,38 @@
                 Property="HorizontalContentAlignment"
                 Value="Left" />
         </Style>
+        <Style
+            TargetType="DockPanel"
+            x:Key="ProgressPanel">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding DataContext.AnyCmdIsExecuting, ElementName=_this}"
+                    Value="True">
+                    <Setter
+                        Property="Visibility"
+                        Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+            <Setter
+                Property="Visibility"
+                Value="Hidden" />
+        </Style>
+        <Style
+            TargetType="DockPanel"
+            x:Key="ListViewPanel">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding DataContext.AnyCmdIsExecuting, ElementName=_this}"
+                    Value="True">
+                    <Setter
+                        Property="Visibility"
+                        Value="Hidden" />
+                </DataTrigger>
+            </Style.Triggers>
+            <Setter
+                Property="Visibility"
+                Value="Visible" />
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -116,6 +148,19 @@
         </DockPanel>
         <DockPanel
             Grid.Row="1"
+            Style="{StaticResource ProgressPanel}"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center">
+            <ProgressBar
+                Height="2"
+                Width="250"
+                Foreground="Gray"
+                IsIndeterminate="True">
+            </ProgressBar>
+        </DockPanel>
+        <DockPanel
+            Style="{StaticResource ListViewPanel}"
+            Grid.Row="1"
             VerticalAlignment="Stretch">
             <ListView
                 ItemsSource="{Binding ActiveDirectory.Content}"
@@ -145,6 +190,7 @@
                             Width="600"
                             DisplayMemberBinding="{Binding Name}" />
                         <GridViewColumn
+                            Width="50"
                             Header="{DynamicResource RsOpenFileWindow.List.Size}"
                             DisplayMemberBinding="{Binding Length}" />
                     </GridView>
