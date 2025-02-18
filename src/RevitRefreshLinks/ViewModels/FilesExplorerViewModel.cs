@@ -175,7 +175,7 @@ namespace RevitRefreshLinks.ViewModels {
             } else {
                 ActiveDirectory = RootDirectory;
             }
-            await ActiveDirectory.LoadContentAsync(true, Filter);
+            await LoadContentIfEmpty(ActiveDirectory);
         }
 
         private async Task OpenFolderAsync(DirectoryViewModel folder) {
@@ -183,7 +183,7 @@ namespace RevitRefreshLinks.ViewModels {
                 PreviousDirs.Push(ActiveDirectory);
                 NextDirs.Clear();
                 ActiveDirectory = folder;
-                await ActiveDirectory.LoadContentAsync(true, Filter);
+                await LoadContentIfEmpty(ActiveDirectory);
             }
         }
 
@@ -242,7 +242,7 @@ namespace RevitRefreshLinks.ViewModels {
             if(PreviousDirs.Count > 0) {
                 NextDirs.Push(ActiveDirectory);
                 ActiveDirectory = PreviousDirs.Pop();
-                await ActiveDirectory.LoadContentAsync(true, Filter);
+                await LoadContentIfEmpty(ActiveDirectory);
             }
         }
 
@@ -254,12 +254,18 @@ namespace RevitRefreshLinks.ViewModels {
             if(NextDirs.Count > 0) {
                 PreviousDirs.Push(ActiveDirectory);
                 ActiveDirectory = NextDirs.Pop();
-                await ActiveDirectory.LoadContentAsync(true, Filter);
+                await LoadContentIfEmpty(ActiveDirectory);
             }
         }
 
         private bool CanOpenNextFolder() {
             return !AnyCmdIsExecuting && NextDirs.Count > 0;
+        }
+
+        private async Task LoadContentIfEmpty(DirectoryViewModel dir) {
+            if(dir?.Content?.Count == 0) {
+                await dir.LoadContentAsync(true, Filter);
+            }
         }
 
         private void SelectedItemsChanged(object sender, NotifyCollectionChangedEventArgs e) {
@@ -277,7 +283,6 @@ namespace RevitRefreshLinks.ViewModels {
                 }
             }
         }
-
 
         private void CmdIsExecutingChanged(object sender, PropertyChangedEventArgs e) {
             AnyCmdIsExecuting = LoadViewCommand.IsExecuting
