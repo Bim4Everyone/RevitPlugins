@@ -65,9 +65,9 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
             XYZ newCenter = new XYZ(
-                    (-SheetInfo.RebarSchedule.ViewportHalfWidth * 2) - 0.0095,
-                    -0.1,
-                    0);
+                (-SheetInfo.RebarSchedule.ViewportHalfWidth * 2) - 0.0095,
+                SheetInfo.TitleBlockHeight - 0.032,
+                0);
 
             if(SheetInfo.SkeletonSchedule.ViewportElement != null) {
                 newCenter = new XYZ(
