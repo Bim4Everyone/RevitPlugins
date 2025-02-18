@@ -11,7 +11,7 @@ namespace RevitRefreshLinks.Resources {
         public SelectionMode FalseValue { get; set; }
 
         public BoolToSelectionModeConverter() {
-            TrueValue = SelectionMode.Multiple;
+            TrueValue = SelectionMode.Extended;
             FalseValue = SelectionMode.Single;
         }
 
