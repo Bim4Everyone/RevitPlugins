@@ -69,6 +69,8 @@
         x:Key="RsOpenFileWindow.List.Name">Имя</system:String>
     <system:String
         x:Key="RsOpenFileWindow.List.Size">Размер</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.ExecutingCmdCheck">Дождитесь завершения предыдущей команды</system:String>
 
     <system:String
         x:Key="DirectoriesExplorer.Title">Выберите папку с Revit Server</system:String>

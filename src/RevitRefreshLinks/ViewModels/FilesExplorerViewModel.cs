@@ -47,21 +47,21 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
 
-        public ICommand LoadViewCommand { get; }
+        public IAsyncCommand LoadViewCommand { get; }
 
-        public ICommand OpenFolderCommand { get; }
+        public IAsyncCommand OpenFolderCommand { get; }
 
-        public ICommand OpenParentFolderCommand { get; }
+        public IAsyncCommand OpenParentFolderCommand { get; }
 
-        public ICommand OpenPreviousFolderCommand { get; }
+        public IAsyncCommand OpenPreviousFolderCommand { get; }
 
-        public ICommand OpenNextFolderCommand { get; }
+        public IAsyncCommand OpenNextFolderCommand { get; }
 
-        public ICommand OpenRootFolderCommand { get; }
+        public IAsyncCommand OpenRootFolderCommand { get; }
 
         public ICommand AcceptViewCommand { get; }
 
-        public ICommand UpdateViewCommand { get; }
+        public IAsyncCommand UpdateViewCommand { get; }
 
 
         public DirectoryViewModel ActiveDirectory {
@@ -166,7 +166,7 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanOpenFolder(DirectoryViewModel folder) {
-            return folder != null;
+            return !AnyCmdIsExecuting() && folder != null;
         }
 
         private async Task OpenParentFolderAsync() {
@@ -175,7 +175,7 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanOpenParentFolder() {
-            return ActiveDirectory != null && !ActiveDirectory.Equals(RootDirectory);
+            return !AnyCmdIsExecuting() && ActiveDirectory != null && !ActiveDirectory.Equals(RootDirectory);
         }
 
         private async Task OpenRootFolderAsync() {
@@ -183,7 +183,7 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanOpenRootFolder() {
-            return RootDirectory != null && !RootDirectory.Equals(ActiveDirectory);
+            return !AnyCmdIsExecuting() && RootDirectory != null && !RootDirectory.Equals(ActiveDirectory);
         }
 
         private async Task UpdateView() {
@@ -191,7 +191,7 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanUpdateView() {
-            return ActiveDirectory != null;
+            return !AnyCmdIsExecuting() && ActiveDirectory != null;
         }
 
         private void AcceptView() {
@@ -199,6 +199,10 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanAcceptView() {
+            if(AnyCmdIsExecuting()) {
+                ErrorText = _localizationService.GetLocalizedString("RsOpenFileWindow.ExecutingCmdCheck");
+                return false;
+            }
             if(MultiSelect && (SelectedFiles is null || SelectedFiles.Count == 0)) {
                 ErrorText = _localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Title");
                 return false;
@@ -221,7 +225,7 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanOpenPreviousFolder() {
-            return PreviousDirs.Count > 0;
+            return !AnyCmdIsExecuting() && PreviousDirs.Count > 0;
         }
 
         private async Task OpenNextFolderAsync() {
@@ -233,7 +237,7 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanOpenNextFolder() {
-            return NextDirs.Count > 0;
+            return !AnyCmdIsExecuting() && NextDirs.Count > 0;
         }
 
         private void SelectedItemsChanged(object sender, NotifyCollectionChangedEventArgs e) {
@@ -250,6 +254,16 @@ namespace RevitRefreshLinks.ViewModels {
                     SelectedFiles.Add(item);
                 }
             }
+        }
+
+        private bool AnyCmdIsExecuting() {
+            return LoadViewCommand.IsExecuting
+                || OpenFolderCommand.IsExecuting
+                || OpenParentFolderCommand.IsExecuting
+                || OpenPreviousFolderCommand.IsExecuting
+                || OpenNextFolderCommand.IsExecuting
+                || OpenRootFolderCommand.IsExecuting
+                || UpdateViewCommand.IsExecuting;
         }
     }
 }
