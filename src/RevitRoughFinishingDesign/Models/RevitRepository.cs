@@ -62,8 +62,8 @@ namespace RevitRoughFinishingDesign.Models {
                 return _roomsOnActiveView;
             }
         }
+
         public IList<WallType> GetWallTypesInsideRoomsOnActiveView() {
-            double zPoint = GetVerticalPointFromActiveView();
             ICollection<ElementId> wallIds = GetWallsIds();
             ICollection<Room> roomsOnActiveView = GetRoomsOnActiveView();
             HashSet<ElementId> wallTypes = new HashSet<ElementId>();
@@ -82,7 +82,6 @@ namespace RevitRoughFinishingDesign.Models {
         }
 
         public IList<WallType> GetWallTypes() {
-            double zPoint = GetVerticalPointFromActiveView();
             ICollection<ElementId> wallIds = GetWallsIds();
             IList<WallType> wallTypes = new List<WallType>();
             foreach(ElementId wallId in wallIds) {
@@ -140,6 +139,19 @@ namespace RevitRoughFinishingDesign.Models {
             // Получаем начало и конец кривой
             XYZ start = curve.GetEndPoint(0);
             XYZ end = curve.GetEndPoint(1);
+
+            // Создаем новые точки с заданной координатой Z
+            XYZ newStart = new XYZ(start.X, start.Y, exactZ);
+            XYZ newEnd = new XYZ(end.X, end.Y, exactZ);
+
+            // Создаем новую кривую на основе измененных точек
+            return Line.CreateBound(newStart, newEnd);
+        }
+
+        public Line TransformLineToExactZ(Line line, double exactZ) {
+            // Получаем начало и конец кривой
+            XYZ start = line.GetEndPoint(0);
+            XYZ end = line.GetEndPoint(1);
 
             // Создаем новые точки с заданной координатой Z
             XYZ newStart = new XYZ(start.X, start.Y, exactZ);

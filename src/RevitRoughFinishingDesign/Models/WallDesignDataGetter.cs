@@ -75,8 +75,7 @@ namespace RevitRoughFinishingDesign.Models {
             Wall wall = _revitRepository.Document.GetElement(wallId) as Wall;
             RevitWallHandler wallHandler = new RevitWallHandler(_revitRepository, roomHandler.RevitRoom, wall);
             ElementId lineStyleId = GetLineStyleId(settings, wallHandler.GetWallTypeId());
-            Curve wallLine = wallHandler.GetWallLine();
-            XYZ wallCentroidPoint = wallHandler.GetWallCentroidPoint();
+            Curve wallLine = wallHandler.GetWallLineOnActiveView();
             RoomBorder closestBorderOfRoom = _revitRepository.GetClosestCurveFromCurveList(wallLine, roomBorders);
             IList<Line> wallLinesForDraw = wallHandler.GetWallLinesForDraw();
             double distanceFromBorder = GetDistanceFromRoomBorder(closestBorderOfRoom.Curve, wallLine);

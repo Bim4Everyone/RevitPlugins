@@ -8,6 +8,9 @@ namespace RevitRoughFinishingDesign.Models {
         private readonly RevitRepository _revitRepository;
         private readonly WallDesignDataGetter _wallDesignDataGetter;
 
+        private const double _maxDistanceFromBorder = 400; //мм, если стена находится на указанном расстоянии
+                                                           //от границы - она остается на своем месте без смещения
+
         public CreatesLinesForFinishing(RevitRepository revitRepository, WallDesignDataGetter wallDesignDataGetter) {
             _revitRepository = revitRepository;
             _wallDesignDataGetter = wallDesignDataGetter;
@@ -43,21 +46,24 @@ namespace RevitRoughFinishingDesign.Models {
             IList<Line> linesForCorrect = wallDesignData.LinesForDraw;
             XYZ directionToRoom = wallDesignData.DirectionToRoom;
             double numberOfLayer = wallDesignData.LayerNumber;
+            double tolerance = _revitRepository.ConvertToFeetFromMillimeters(_maxDistanceFromBorder);
             foreach(Line line in linesForCorrect) {
+                if(wallDesignData.DistanceFromBorder < tolerance) {
 
-                XYZ alongsideVector = line.Direction.Normalize();
+                    // Получаем начальную и конечную точку линии
+                    XYZ startPoint = line.GetEndPoint(0);
+                    XYZ endPoint = line.GetEndPoint(1);
+                    double correctOffset = (offset * numberOfLayer) - wallDesignData.DistanceFromBorder;
 
-                // Получаем начальную и конечную точку линии
-                XYZ startPoint = line.GetEndPoint(0);
-                XYZ endPoint = line.GetEndPoint(1);
-                double correctOffset = (offset * numberOfLayer) - wallDesignData.DistanceFromBorder;
+                    // Сдвигаем обе точки на заданное смещение внутрь помещения
+                    XYZ newStartPoint = startPoint + directionToRoom * (correctOffset);
+                    XYZ newEndPoint = endPoint + directionToRoom * (correctOffset);
 
-                // Сдвигаем обе точки на заданное смещение внутрь помещения
-                XYZ newStartPoint = startPoint + directionToRoom * (correctOffset);
-                XYZ newEndPoint = endPoint + directionToRoom * (correctOffset);
-
-                Line newLine = Line.CreateBound(newStartPoint, newEndPoint);
-                correctLines.Add(newLine);
+                    Line newLine = Line.CreateBound(newStartPoint, newEndPoint);
+                    correctLines.Add(newLine);
+                } else {
+                    correctLines.Add(line);
+                }
             }
             return correctLines;
         }

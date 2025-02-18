@@ -1,6 +1,6 @@
 <RevitAddIns>
 	<AddIn Type="Command">
-		<ClientId>BEED0978-CCB1-44BB-92C9-C670D662659A</ClientId>
+		<ClientId>6CF7C4EE-94D1-4B4F-A5DF-9A5AC83B9B51</ClientId>
 		<Assembly>RevitRoughFinishingDesign\RevitRoughFinishingDesign_2022.dll</Assembly>
 		<FullClassName>RevitRoughFinishingDesign.RevitRoughFinishingDesignCommand</FullClassName>
 		<VendorId>DiBrainz</VendorId>

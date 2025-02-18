@@ -16,6 +16,7 @@ namespace RevitRoughFinishingDesign.Models {
         private Solid _wallSolid;
         private XYZ _wallCentroidPoint;
         private ElementId _wallTypeId;
+        private Line _wallLine;
 
         /// <summary>
         /// Шаг создания точек для проверки направления
@@ -53,17 +54,41 @@ namespace RevitRoughFinishingDesign.Models {
             }
         }
 
-        public Line GetWallLine() {
-            double zPoint = _revitRepository.GetVerticalPointFromActiveView();
-            LocationCurve wallLine = _wallElement.Location as LocationCurve;
-            if(wallLine.Curve is Line) {
-                Curve wallCurve = _revitRepository.TransformCurveToExactZ(wallLine.Curve, zPoint);
-
-                return wallCurve as Line;
+        public Line GetWallLineOnActiveView() {
+            if(_wallLine != null) {
+                return _wallLine;
             } else {
-                throw new Exception("Дуги не обрабатываются");
+                XYZ centroidPoint = GetWallCentroidPointOnActiveView();
+                double zPoint = centroidPoint.Z;
+
+                LocationCurve wallLine = _wallElement.Location as LocationCurve;
+                if(wallLine.Curve is Line) {
+                    Curve wallCurve = _revitRepository.TransformCurveToExactZ(wallLine.Curve, zPoint);
+                    _wallLine = wallCurve as Line;
+                    return _wallLine;
+                } else {
+                    throw new Exception("Дуги не обрабатываются");
+                }
             }
         }
+
+        public Line GetWallLineFromSolid() {
+            XYZ centroidSolidWallPoint = GetWallSolidCentroidPoint();
+            double zPoint = centroidSolidWallPoint.Z;
+
+            LocationCurve wallLine = _wallElement.Location as LocationCurve;
+            Curve wallCurve = _revitRepository.TransformCurveToExactZ(wallLine.Curve, zPoint);
+            return wallCurve as Line;
+        }
+
+        //private Line GetWallLineInMiddlePoint(Line wallLine) {
+        //    XYZ wallCentroidPoint = GetWallCentroidPointOnActiveView();
+        //    double wallLength = wallLine.Length;
+        //    XYZ alongsideVector = wallLine.Direction.Normalize();
+        //    XYZ startPoint = wallCentroidPoint + alongsideVector * (wallLength / 2);
+        //    XYZ endPoint = wallCentroidPoint - alongsideVector * (wallLength / 2);
+        //    return Line.CreateBound(startPoint, endPoint);
+        //}
 
         public IList<Line> GetWallLinesForDraw() {
             IList<Line> insideLines = new List<Line>();
@@ -71,21 +96,21 @@ namespace RevitRoughFinishingDesign.Models {
                 ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
             };
             Solid wallSolid = GetWallSolid();
-            Line wallLine = GetWallLine();
+            Line wallLine = GetWallLineFromSolid();
+            double zPoint = _revitRepository.GetVerticalPointFromActiveView();
             SolidCurveIntersection intersection = wallSolid.IntersectWithCurve(wallLine, intersectOptInside);
-
             if(intersection.SegmentCount > 0) {
                 for(int i = 0; i < intersection.SegmentCount; i++) {
                     Curve segment = intersection.GetCurveSegment(i);
                     if(segment is Line lineSegment) {
-                        insideLines.Add(lineSegment);
+                        insideLines.Add(_revitRepository.TransformLineToExactZ(lineSegment, zPoint));
                     }
                 }
             }
             return insideLines;
         }
 
-        public XYZ GetWallCentroidPoint() {
+        public XYZ GetWallCentroidPointOnActiveView() {
             if(_wallCentroidPoint != null) {
                 return _wallCentroidPoint;
             } else {
@@ -97,6 +122,13 @@ namespace RevitRoughFinishingDesign.Models {
                 return _wallCentroidPoint;
             }
         }
+
+        public XYZ GetWallSolidCentroidPoint() {
+            Solid wallSolid = GetWallSolid();
+            XYZ wallCentroidPoint = wallSolid.ComputeCentroid();
+            return wallCentroidPoint;
+        }
+
         /// <summary>
         /// Возвращает направление вектора внутрь помещения
         /// </summary>
@@ -105,8 +137,8 @@ namespace RevitRoughFinishingDesign.Models {
             if(_directionToRoom != null) {
                 return _directionToRoom;
             } else {
-                Line wallCurve = GetWallLine();
-                XYZ wallCentroidPoint = GetWallCentroidPoint();
+                Line wallCurve = GetWallLineOnActiveView();
+                XYZ wallCentroidPoint = GetWallCentroidPointOnActiveView();
                 XYZ normalVector = XYZ.BasisZ.CrossProduct(wallCurve.Direction).Normalize();
 
                 IList<XYZ> rightPoints = new List<XYZ>();
@@ -132,10 +164,6 @@ namespace RevitRoughFinishingDesign.Models {
                 }
                 return _directionToRoom;
             }
-        }
-
-        public static implicit operator RevitWallHandler(RevitRoomHandler v) {
-            throw new NotImplementedException();
         }
     }
 }
