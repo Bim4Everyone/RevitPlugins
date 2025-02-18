@@ -41,7 +41,8 @@ namespace RevitKrChecker.Models.Check {
             SourceParamName = checkOptions.SourceParamName
                 ?? throw new ArgumentNullException(nameof(checkOptions.SourceParamName));
             SourceParamLevel = checkOptions.SourceParamLevel != ParamLevel.Material
-                ? throw new ArgumentException("Проверка предусмотрена только для проверки c параметрами материала")
+                ? throw new ArgumentException(
+                    _localizationService.GetLocalizedString("ReportWindow.CheckNotForCompareWithElementParameter"))
                 : checkOptions.SourceParamLevel;
         }
 
