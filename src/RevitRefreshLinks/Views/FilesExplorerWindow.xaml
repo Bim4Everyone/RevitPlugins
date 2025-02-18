@@ -30,6 +30,8 @@
             x:Key="BoolToSelectionModeConverter" />
         <res:PathInfoImageConverter
             x:Key="PathInfoImageConverter" />
+        <res:FileSizeConverter
+            x:Key="FileSizeConverter" />
         <ObjectDataProvider
             x:Key="HomeImg"
             ObjectInstance="{x:Static res:IconResources.HomeImg}" />
@@ -192,7 +194,7 @@
                         <GridViewColumn
                             Width="50"
                             Header="{DynamicResource RsOpenFileWindow.List.Size}"
-                            DisplayMemberBinding="{Binding Length}" />
+                            DisplayMemberBinding="{Binding Length, Converter={StaticResource FileSizeConverter}}" />
                     </GridView>
                 </ListView.View>
             </ListView>
