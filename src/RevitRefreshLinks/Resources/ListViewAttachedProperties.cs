@@ -3,12 +3,12 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace RevitRefreshLinks.Resources {
-    internal static class ListViewBehavior {
+    internal static class ListViewAttachedProperties {
         public static readonly DependencyProperty SelectedItemsProperty =
             DependencyProperty.RegisterAttached(
                 "SelectedItems",
                 typeof(IList),
-                typeof(ListViewBehavior),
+                typeof(ListViewAttachedProperties),
                 new FrameworkPropertyMetadata(default, OnSelectedItemsChanged));
 
         public static IList GetSelectedItems(ListView listView) {

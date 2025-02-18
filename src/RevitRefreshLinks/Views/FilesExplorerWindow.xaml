@@ -167,7 +167,7 @@
             <ListView
                 ItemsSource="{Binding ActiveDirectory.Content}"
                 SelectionMode="{Binding MultiSelect, Converter={StaticResource BoolToSelectionModeConverter}}"
-                res:ListViewBehavior.SelectedItems="{Binding SelectedItems}"
+                res:ListViewAttachedProperties.SelectedItems="{Binding SelectedItems}"
                 SelectedItem="{Binding SelectedItem}"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
