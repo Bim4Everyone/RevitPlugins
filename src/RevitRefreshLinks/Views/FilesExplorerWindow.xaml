@@ -85,6 +85,16 @@
                 Property="Visibility"
                 Value="Visible" />
         </Style>
+        <Style
+            TargetType="Button"
+            x:Key="BarButton">
+            <Setter
+                Property="Width"
+                Value="25" />
+            <Setter
+                Property="BorderThickness"
+                Value="0" />
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -100,7 +110,7 @@
             Grid.Row="0"
             HorizontalAlignment="Stretch">
             <Button
-                Width="20"
+                Style="{StaticResource BarButton}"
                 Command="{Binding OpenPreviousFolderCommand}">
                 <Button.Content>
                     <Image
@@ -108,7 +118,7 @@
                 </Button.Content>
             </Button>
             <Button
-                Width="20"
+                Style="{StaticResource BarButton}"
                 Command="{Binding OpenNextFolderCommand}">
                 <Button.Content>
                     <Image
@@ -116,7 +126,7 @@
                 </Button.Content>
             </Button>
             <Button
-                Width="20"
+                Style="{StaticResource BarButton}"
                 Command="{Binding OpenParentFolderCommand}">
                 <Button.Content>
                     <Image
@@ -124,42 +134,56 @@
                 </Button.Content>
             </Button>
             <Button
-                Width="20"
+                Style="{StaticResource BarButton}"
                 Command="{Binding OpenRootFolderCommand}">
                 <Button.Content>
                     <Image
                         Source="{Binding Source={StaticResource HomeImg}}" />
                 </Button.Content>
             </Button>
-            <TextBlock
-                Margin="5 0 0 0 "
-                Text="{Binding ActiveDirectory.FullName}" />
             <DockPanel
-                HorizontalAlignment="Right"
-                DockPanel.Dock="Right">
-                <Button
-                    DockPanel.Dock="Right"
-                    Width="20"
-                    Command="{Binding UpdateViewCommand}">
-                    <Button.Content>
-                        <Image
-                            Source="{Binding Source={StaticResource UpdateImg}}" />
-                    </Button.Content>
-                </Button>
+                LastChildFill="True">
+                <DockPanel
+                    HorizontalAlignment="Right"
+                    DockPanel.Dock="Right">
+                    <Button
+                        DockPanel.Dock="Right"
+                        Style="{StaticResource BarButton}"
+                        Command="{Binding UpdateViewCommand}">
+                        <Button.Content>
+                            <Image
+                                Source="{Binding Source={StaticResource UpdateImg}}" />
+                        </Button.Content>
+                    </Button>
+                </DockPanel>
+                <DockPanel
+                    Background="#F4F4F4">
+                    <TextBlock
+                        Margin="5 0 0 0 "
+                        VerticalAlignment="Center"
+                        TextAlignment="Left"
+                        HorizontalAlignment="Left"
+                        FontWeight="SemiBold"
+                        Text="{Binding ActiveDirectory.FullName}" />
+                </DockPanel>
             </DockPanel>
         </DockPanel>
-        <DockPanel
+        <Border
             Grid.Row="1"
-            Style="{StaticResource ProgressPanel}"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center">
-            <ProgressBar
-                Height="2"
-                Width="250"
-                Foreground="Gray"
-                IsIndeterminate="True">
-            </ProgressBar>
-        </DockPanel>
+            BorderBrush="Gray"
+            BorderThickness="1">
+            <DockPanel
+                Style="{StaticResource ProgressPanel}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+                <ProgressBar
+                    Height="2"
+                    Width="250"
+                    Foreground="Gray"
+                    IsIndeterminate="True">
+                </ProgressBar>
+            </DockPanel>
+        </Border>
         <DockPanel
             Style="{StaticResource ListViewPanel}"
             Grid.Row="1"
