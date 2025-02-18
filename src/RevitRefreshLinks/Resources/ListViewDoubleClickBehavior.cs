@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,7 +18,6 @@ namespace RevitRefreshLinks.Resources {
             set => SetValue(CommandProperty, value);
         }
 
-
         protected override void OnAttached() {
             base.OnAttached();
             AssociatedObject.MouseDoubleClick += OnMouseDoubleClick;
@@ -31,8 +31,12 @@ namespace RevitRefreshLinks.Resources {
         private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e) {
             if(sender is ListView && e.OriginalSource is FrameworkElement originalSource) {
                 var clickedItem = originalSource.DataContext;
-                if(clickedItem != null && Command.CanExecute(clickedItem)) {
-                    Command.Execute(clickedItem);
+                try {
+                    if(clickedItem != null && Command != null && Command.CanExecute(clickedItem)) {
+                        Command.Execute(clickedItem);
+                    }
+                } catch(InvalidCastException) {
+                    // pass
                 }
             }
         }
