@@ -11,6 +11,7 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource UpdateLinksWindow.Title}"
+    x:Name="_this"
     Height="450"
     Width="800"
     MinHeight="300"
@@ -89,6 +90,38 @@
                     Property="Foreground"
                     Value="Black" />
             </Style>
+            <Style
+                TargetType="FrameworkElement"
+                x:Key="VisibleOnExecuting">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.SelectServerSourceCommand.IsExecuting, ElementName=_this}"
+                        Value="True">
+                        <Setter
+                            Property="Visibility"
+                            Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+                <Setter
+                    Property="Visibility"
+                    Value="Hidden" />
+            </Style>
+            <Style
+                TargetType="FrameworkElement"
+                x:Key="HiddenOnExecuting">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding DataContext.SelectServerSourceCommand.IsExecuting, ElementName=_this}"
+                        Value="True">
+                        <Setter
+                            Property="Visibility"
+                            Value="Hidden" />
+                    </DataTrigger>
+                </Style.Triggers>
+                <Setter
+                    Property="Visibility"
+                    Value="Visible" />
+            </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition
@@ -111,8 +144,25 @@
 
         <DockPanel
             Grid.Row="0"
+            Grid.Column="0"
+            Grid.RowSpan="4"
             Grid.ColumnSpan="3"
+            Style="{StaticResource VisibleOnExecuting}"
+            VerticalAlignment="Center"
             HorizontalAlignment="Center">
+            <ProgressBar
+                Height="2"
+                Width="250"
+                Foreground="Gray"
+                IsIndeterminate="True">
+            </ProgressBar>
+        </DockPanel>
+
+        <DockPanel
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            HorizontalAlignment="Center"
+            Style="{StaticResource HiddenOnExecuting}">
             <Button
                 Height="25"
                 Width="200"
@@ -131,7 +181,8 @@
             Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="3"
-            Margin="10,5,10,0">
+            Margin="10,5,10,0"
+            Style="{StaticResource HiddenOnExecuting}">
 
             <DockPanel>
                 <TextBlock
@@ -167,6 +218,7 @@
             BorderThickness="1"
             IsReadOnly="False"
             HeadersVisibility="Column"
+            Style="{StaticResource HiddenOnExecuting}"
             ItemsSource="{Binding LinksToUpdate}">
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn
@@ -230,7 +282,8 @@
         <DockPanel
             Grid.Row="3"
             Grid.ColumnSpan="3"
-            HorizontalAlignment="Center">
+            HorizontalAlignment="Center"
+            Style="{StaticResource HiddenOnExecuting}">
 
             <Button
                 Margin="10"

@@ -41,7 +41,7 @@ namespace RevitRefreshLinks.ViewModels {
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            SelectLocalSourceCommand = RelayCommand.Create(SelectLocalSource);
+            SelectLocalSourceCommand = RelayCommand.Create(SelectLocalSource, CanSelectLocalSource);
             SelectServerSourceCommand = RelayCommand.CreateAsync(SelectServerSource);
             SelectAllLinksCommand = RelayCommand.Create(SelectAllLinks, CanSelectAny);
             UnselectAllLinksCommand = RelayCommand.Create(UnselectAllLinks, CanSelectAny);
@@ -55,7 +55,7 @@ namespace RevitRefreshLinks.ViewModels {
 
         public ICommand SelectLocalSourceCommand { get; }
 
-        public ICommand SelectServerSourceCommand { get; }
+        public IAsyncCommand SelectServerSourceCommand { get; }
 
         public ICommand SelectAllLinksCommand { get; }
 
@@ -114,6 +114,10 @@ namespace RevitRefreshLinks.ViewModels {
         }
 
         private bool CanAcceptView() {
+            if(SelectServerSourceCommand.IsExecuting) {
+                ErrorText = _localizationService.GetLocalizedString("DirectoriesExplorer.ExecutingCmdCheck");
+                return false;
+            }
             if(string.IsNullOrWhiteSpace(SelectedLocalSource) && string.IsNullOrWhiteSpace(SelectedServerSource)) {
                 ErrorText = _localizationService.GetLocalizedString("UpdateLinksWindow.EmptySourcesCheck");
                 return false;
@@ -135,7 +139,7 @@ namespace RevitRefreshLinks.ViewModels {
 
 
         private bool CanSelectAny() {
-            return LinksToUpdate.Any(l => l.CanSelect);
+            return !SelectServerSourceCommand.IsExecuting && LinksToUpdate.Any(l => l.CanSelect);
         }
 
         private void UnselectAllLinks() {
@@ -168,6 +172,10 @@ namespace RevitRefreshLinks.ViewModels {
             } catch(OperationCanceledException) {
                 // pass
             }
+        }
+
+        private bool CanSelectLocalSource() {
+            return !SelectServerSourceCommand.IsExecuting;
         }
 
         private void UpdateLinkSources() {

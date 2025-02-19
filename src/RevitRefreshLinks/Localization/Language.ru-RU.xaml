@@ -74,6 +74,8 @@
 
     <system:String
         x:Key="DirectoriesExplorer.Title">Выберите папку с Revit Server</system:String>
+    <system:String
+        x:Key="DirectoriesExplorer.ExecutingCmdCheck">Дождитесь завершения предыдущей команды</system:String>
 
     <system:String
         x:Key="TODO">TODO</system:String>
