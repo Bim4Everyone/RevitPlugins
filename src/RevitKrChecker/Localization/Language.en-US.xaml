@@ -1,0 +1,40 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <system:String x:Key="MainWindow.Title">Check model</system:String>
+    <system:String x:Key="MainWindow.GetFromView">Get elements from view</system:String>
+    <system:String x:Key="MainWindow.GetFromProject">Get items from the entire project</system:String>
+
+    <system:String x:Key="ReportWindow.Grouping">Grouping:</system:String>
+    <system:String x:Key="ReportWindow.Expand">Expand</system:String>
+    <system:String x:Key="ReportWindow.Collapse">Collapse</system:String>
+    <system:String x:Key="ReportWindow.ErrorExplanations">Error explanations:</system:String>
+    <system:String x:Key="ReportWindow.Show">Show</system:String>
+    <system:String x:Key="ReportWindow.Recheck">Recheck</system:String>
+
+    <system:String x:Key="ReportWindow.ElementCategoryName">Category name</system:String>
+    <system:String x:Key="ReportWindow.ElementTypeName">Type name</system:String>
+    <system:String x:Key="ReportWindow.Elem">Element</system:String>
+    <system:String x:Key="ReportWindow.TargetParamName">Parameter to check</system:String>
+    <system:String x:Key="ReportWindow.СheckName">Check name</system:String>
+    <system:String x:Key="ReportWindow.ElementErrorTooltip">Error explanation</system:String>
+
+    <system:String x:Key="ReportWindow.ParameterValue">parameter value</system:String>
+    <system:String x:Key="ReportWindow.Missing">missing</system:String>
+    <system:String x:Key="ReportWindow.ByRule">by rule</system:String>
+
+    <system:String x:Key="ReportWindow.Equals">Equals</system:String>
+    <system:String x:Key="ReportWindow.NotEquals">not equals</system:String>
+    <system:String x:Key="ReportWindow.Contains">Contains</system:String>
+    <system:String x:Key="ReportWindow.NotContains">not contains</system:String>
+    <system:String x:Key="ReportWindow.StartsWith">Starts with</system:String>
+    <system:String x:Key="ReportWindow.NotStartsWith">not starts with</system:String>
+
+    <system:String x:Key="ReportWindow.CheckNotForMaterialParameter">The check is not provided for checking the material parameter</system:String>
+    <system:String x:Key="ReportWindow.CheckNotForElementParameter">The check is not provided for checking the instance or type parameter</system:String>
+    <system:String x:Key="ReportWindow.CheckNotForCompareWithElementParameter">The check is not intended for comparison with instance or type parameters</system:String>
+    <system:String x:Key="ReportWindow.CheckNotForCompareWithMaterialParameter">The check is not intended for comparison with material parameters</system:String>
+
+    <system:String x:Key="ReportWindow.SetUnknownParameterLevel">Unknown parameter level specified</system:String>
+</ResourceDictionary>
