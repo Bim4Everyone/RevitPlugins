@@ -58,25 +58,17 @@ namespace RevitRefreshLinks.Services {
             CancellationToken ct = default) {
 
             var errors = new List<(ILink Link, string Error)>();
-            using(var tGroup = _revitRepository.Document.StartTransactionGroup("Обновление связей")) {
-                var i = 0;
-                foreach(var item in links) {
-                    ct.ThrowIfCancellationRequested();
-                    using(var transaction = _revitRepository.Document.StartTransaction("Обновление связи")) {
-                        bool success = _revitRepository.ReloadLink(
-                            item.LocalLink,
-                            item.SourceLink.FullPath,
-                            out string error);
-                        if(success) {
-                            transaction.Commit();
-                        } else {
-                            transaction.RollBack();
-                            errors.Add((item.SourceLink, error));
-                        }
-                    }
-                    progress?.Report(++i);
+            var i = 0;
+            foreach(var item in links) {
+                ct.ThrowIfCancellationRequested();
+                bool success = _revitRepository.ReloadLink(
+                    item.LocalLink,
+                    item.SourceLink.FullPath,
+                    out string error);
+                if(!success) {
+                    errors.Add((item.SourceLink, error));
                 }
-                tGroup.Assimilate();
+                progress?.Report(++i);
             }
             return errors;
         }
