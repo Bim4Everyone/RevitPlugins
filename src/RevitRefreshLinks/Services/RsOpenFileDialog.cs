@@ -3,16 +3,15 @@ using System.Linq;
 
 using RevitRefreshLinks.Models;
 using RevitRefreshLinks.ViewModels;
-using RevitRefreshLinks.Views;
 
 namespace RevitRefreshLinks.Services {
     internal class RsOpenFileDialog : IOpenFileDialog {
         private readonly FilesExplorerViewModel _explorerViewModel;
-        private readonly FilesExplorerWindow _explorerWindow;
+        private readonly IFilesExplorerWindowProvider _windowProvider;
 
-        public RsOpenFileDialog(FilesExplorerViewModel explorerViewModel, FilesExplorerWindow explorerWindow) {
+        public RsOpenFileDialog(FilesExplorerViewModel explorerViewModel, IFilesExplorerWindowProvider windowProvider) {
             _explorerViewModel = explorerViewModel ?? throw new ArgumentNullException(nameof(explorerViewModel));
-            _explorerWindow = explorerWindow ?? throw new ArgumentNullException(nameof(explorerWindow));
+            _windowProvider = windowProvider ?? throw new ArgumentNullException(nameof(windowProvider));
         }
 
 
@@ -44,7 +43,7 @@ namespace RevitRefreshLinks.Services {
 
 
         public bool ShowDialog() {
-            return _explorerWindow.ShowDialog() ?? false;
+            return _windowProvider.GetFilesExplorerWindow().ShowDialog() ?? false;
         }
     }
 }

@@ -43,10 +43,14 @@ namespace RevitRefreshLinks.Extensions {
                 .InSingletonScope();
             kernel.Bind<DirectoriesExplorerWindow>()
                 .ToSelf()
+                .InTransientScope()
                 .WithPropertyValue(nameof(Window.DataContext),
                     c => c.Kernel.Get<DirectoriesExplorerViewModel>())
                 .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                     c => c.Kernel.Get<ILocalizationService>());
+            kernel.Bind<IDirectoriesExplorerWindowProvider>()
+                .To<ExplorerWindowProvider>()
+                .InSingletonScope();
 
             kernel.Bind<IReadOnlyCollection<IServerClient>>()
                 .ToMethod(c => c.Kernel.Get<Autodesk.Revit.ApplicationServices.Application>()
@@ -93,10 +97,14 @@ namespace RevitRefreshLinks.Extensions {
                 .InSingletonScope();
             kernel.Bind<FilesExplorerWindow>()
                 .ToSelf()
+                .InTransientScope()
                 .WithPropertyValue(nameof(Window.DataContext),
                     c => c.Kernel.Get<FilesExplorerViewModel>())
                 .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                     c => c.Kernel.Get<ILocalizationService>());
+            kernel.Bind<IFilesExplorerWindowProvider>()
+                .To<ExplorerWindowProvider>()
+                .InSingletonScope();
 
             kernel.Bind<IReadOnlyCollection<IServerClient>>()
                 .ToMethod(c => c.Kernel.Get<Autodesk.Revit.ApplicationServices.Application>()
@@ -139,10 +147,14 @@ namespace RevitRefreshLinks.Extensions {
                 .InSingletonScope();
             kernel.Bind<FilesExplorerWindow>()
                 .ToSelf()
+                .InTransientScope()
                 .WithPropertyValue(nameof(Window.DataContext),
                     c => c.Kernel.Get<FilesExplorerViewModel>())
                 .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
                     c => c.Kernel.Get<ILocalizationService>());
+            kernel.Bind<IFilesExplorerWindowProvider>()
+                .To<ExplorerWindowProvider>()
+                .InSingletonScope();
 
             kernel.Bind<IOpenFileDialog>()
                 .To<RsOpenFileDialog>()
@@ -150,7 +162,6 @@ namespace RevitRefreshLinks.Extensions {
                 .WithPropertyValue(nameof(IOpenFileDialog.InitialDirectory), initialDirectory)
                 .WithPropertyValue(nameof(IOpenFileDialog.MultiSelect), multiSelect)
                 .WithPropertyValue(nameof(IOpenFileDialog.Filter), filter);
-
 
             return kernel;
         }

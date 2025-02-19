@@ -3,19 +3,18 @@ using System.Linq;
 
 using RevitRefreshLinks.Models;
 using RevitRefreshLinks.ViewModels;
-using RevitRefreshLinks.Views;
 
 namespace RevitRefreshLinks.Services {
     internal class RsOpenFolderDialog : IOpenFolderDialog {
         private readonly DirectoriesExplorerViewModel _explorerViewModel;
-        private readonly DirectoriesExplorerWindow _explorerWindow;
+        private readonly IDirectoriesExplorerWindowProvider _windowProvider;
 
         public RsOpenFolderDialog(
             DirectoriesExplorerViewModel explorerViewModel,
-            DirectoriesExplorerWindow explorerWindow) {
+            IDirectoriesExplorerWindowProvider windowProvider) {
 
             _explorerViewModel = explorerViewModel ?? throw new ArgumentNullException(nameof(explorerViewModel));
-            _explorerWindow = explorerWindow ?? throw new ArgumentNullException(nameof(explorerWindow));
+            _windowProvider = windowProvider ?? throw new ArgumentNullException(nameof(windowProvider));
         }
         public IDirectoryModel Folder => _explorerViewModel.SelectedDirectory.DirectoryModel;
 
@@ -39,7 +38,7 @@ namespace RevitRefreshLinks.Services {
         }
 
         public bool ShowDialog() {
-            return _explorerWindow.ShowDialog() ?? false;
+            return _windowProvider.GetDirectoriesExplorerWindow().ShowDialog() ?? false;
         }
     }
 }
