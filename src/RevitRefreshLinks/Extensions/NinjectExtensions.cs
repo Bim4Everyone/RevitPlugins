@@ -10,7 +10,6 @@ using dosymep.WPF.Views;
 
 using Ninject;
 
-using RevitRefreshLinks.Mock;
 using RevitRefreshLinks.Services;
 using RevitRefreshLinks.ViewModels;
 using RevitRefreshLinks.Views;
@@ -114,47 +113,6 @@ namespace RevitRefreshLinks.Extensions {
                     .SetServerVersion(ModuleEnvironment.RevitVersion)
                     .Build())
                 .ToArray());
-
-            kernel.Bind<IOpenFileDialog>()
-                .To<RsOpenFileDialog>()
-                .WithPropertyValue(nameof(IOpenFileDialog.Title), title)
-                .WithPropertyValue(nameof(IOpenFileDialog.InitialDirectory), initialDirectory)
-                .WithPropertyValue(nameof(IOpenFileDialog.MultiSelect), multiSelect)
-                .WithPropertyValue(nameof(IOpenFileDialog.Filter), filter);
-
-            return kernel;
-        }
-
-        /// <summary>
-        /// Добавляет заглушку для работы с файловой системой ПК вместо RS. 
-        /// Использовать для отладки окна, чтобы не ждать ответов от RS.
-        /// </summary>
-        internal static IKernel UseMockOpenFileDialog(this IKernel kernel,
-            string title = "Выберите файлы с RS",
-            string initialDirectory = default,
-            bool multiSelect = false,
-            string filter = "*.rvt") {
-            if(kernel == null) {
-                throw new ArgumentNullException(nameof(kernel));
-            }
-
-            kernel.Bind<IFileSystem>()
-                .To<MockFileSystem>()
-                .WhenInjectedInto<FilesExplorerViewModel>();
-
-            kernel.Bind<FilesExplorerViewModel>()
-                .ToSelf()
-                .InSingletonScope();
-            kernel.Bind<FilesExplorerWindow>()
-                .ToSelf()
-                .InTransientScope()
-                .WithPropertyValue(nameof(Window.DataContext),
-                    c => c.Kernel.Get<FilesExplorerViewModel>())
-                .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                    c => c.Kernel.Get<ILocalizationService>());
-            kernel.Bind<IFilesExplorerWindowProvider>()
-                .To<ExplorerWindowProvider>()
-                .InSingletonScope();
 
             kernel.Bind<IOpenFileDialog>()
                 .To<RsOpenFileDialog>()
