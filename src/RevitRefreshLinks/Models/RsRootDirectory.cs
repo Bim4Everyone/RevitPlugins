@@ -15,12 +15,13 @@ namespace RevitRefreshLinks.Models {
 
         public RsRootDirectory(IServerClient serverClient) {
             _serverClient = serverClient ?? throw new ArgumentNullException(nameof(serverClient));
+            FullName = new UriBuilder("rsn", _serverClient.ServerName).Uri.ToString();
             Name = _serverClient.ServerName;
         }
 
         public bool Exists => true;
 
-        public string FullName => _serverClient.ServerName;
+        public string FullName { get; }
 
         public string Name { get; }
 

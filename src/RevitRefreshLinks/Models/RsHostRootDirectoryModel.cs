@@ -19,9 +19,9 @@ namespace RevitRefreshLinks.Models {
 
         public bool Exists => true;
 
-        public string FullName => "RSN";
+        public string FullName => "rsn://";
 
-        public string Name => "RSN";
+        public string Name => FullName;
 
         public async Task<IDirectoryModel[]> GetDirectoriesAsync() {
             List<IDirectoryModel> list = new List<IDirectoryModel>();

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using dosymep.Revit.ServerClient;
 using dosymep.Revit.ServerClient.DataContracts;
 
+
 namespace RevitRefreshLinks.Models {
     internal class RsDirectoryModel : IDirectoryModel {
         private readonly FolderContents _folderContents;
@@ -15,13 +16,14 @@ namespace RevitRefreshLinks.Models {
         public RsDirectoryModel(FolderContents folderContents, IServerClient serverClient) {
             _folderContents = folderContents ?? throw new ArgumentNullException(nameof(folderContents));
             _serverClient = serverClient ?? throw new ArgumentNullException(nameof(serverClient));
+            FullName = new UriBuilder("rsn", _serverClient.ServerName, -1, _folderContents.Path).Uri.ToString();
             Name = Path.GetFileName(_folderContents.Path);
         }
 
 
         public bool Exists => true;
 
-        public string FullName => _folderContents.Path;
+        public string FullName { get; }
 
         public string Name { get; }
 
@@ -29,7 +31,7 @@ namespace RevitRefreshLinks.Models {
             List<IDirectoryModel> dirs = new List<IDirectoryModel>();
             foreach(var item in _folderContents.Folders) {
                 dirs.Add(new RsDirectoryModel(
-                    await _serverClient.GetFolderContentsAsync(Path.Combine(FullName, item.Name)),
+                    await _serverClient.GetFolderContentsAsync(Path.Combine(_folderContents.Path, item.Name)),
                     _serverClient));
             }
             return dirs.ToArray();
@@ -41,7 +43,7 @@ namespace RevitRefreshLinks.Models {
                     return await GetDirectoriesAsync();
                 case SearchOption.AllDirectories: {
                     var list = new List<IDirectoryModel>();
-                    var contents = await _serverClient.GetRecursiveFolderContentsAsync(FullName);
+                    var contents = await _serverClient.GetRecursiveFolderContentsAsync(_folderContents.Path);
                     return contents.Select(f => new RsDirectoryModel(f, _serverClient)).ToArray();
                 }
                 default:
@@ -59,7 +61,7 @@ namespace RevitRefreshLinks.Models {
                     return await GetFilesAsync(filter);
                 case SearchOption.AllDirectories: {
                     var list = new List<IDirectoryModel>();
-                    var contents = await _serverClient.GetRecursiveFolderContentsAsync(FullName);
+                    var contents = await _serverClient.GetRecursiveFolderContentsAsync(_folderContents.Path);
                     return contents.Select(c => new { Models = c.Models, FolderContents = c })
                         .SelectMany(fc => fc.Models.Select(
                             m => new RsFileModel(m, new RsDirectoryModel(fc.FolderContents, _serverClient))))
@@ -71,7 +73,7 @@ namespace RevitRefreshLinks.Models {
         }
 
         public async Task<IDirectoryModel> GetParentAsync() {
-            Uri uri = new Uri(FullName.Replace('\\', '/'));
+            Uri uri = new Uri(FullName);
             var parent = Path.GetDirectoryName(uri.LocalPath);
 
             if(string.IsNullOrWhiteSpace(parent)) {

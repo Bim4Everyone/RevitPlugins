@@ -1,4 +1,4 @@
-using System.IO;
+using System;
 
 using dosymep.Revit.ServerClient.DataContracts;
 
@@ -9,7 +9,7 @@ namespace RevitRefreshLinks.Models {
         public RsFileModel(ModelData modelData, IDirectoryModel directory) {
             _modelData = modelData ?? throw new System.ArgumentNullException(nameof(modelData));
             Directory = directory ?? throw new System.ArgumentNullException(nameof(directory));
-            FullName = Path.Combine(Directory.FullName, _modelData.Name);
+            FullName = new Uri(new Uri(Directory.FullName), _modelData.Name).ToString();
         }
 
         public string Name => _modelData.Name;
