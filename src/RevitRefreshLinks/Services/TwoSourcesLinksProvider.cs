@@ -56,12 +56,12 @@ namespace RevitRefreshLinks.Services {
                 var config = _configProvider.GetUpdateLinksConfig();
                 var settings = config.GetSettings(_revitRepository.Document)
                     ?? config.AddSettings(_revitRepository.Document);
-                settings.InitialFolderPath = _rsOpenFolderDialog.Folder.FullName;
+                settings.InitialServerPath = _rsOpenFolderDialog.InitialDirectory;
                 config.SaveProjectConfig();
 
                 var models = new List<IFileModel>();
                 foreach(var item in _rsOpenFolderDialog.Folders) {
-                    models.AddRange(await item.GetFilesAsync());
+                    models.AddRange(await item.GetFilesAsync(SearchOption.AllDirectories));
                 }
                 return new LinksFromSource(_rsOpenFolderDialog.Folder.FullName,
                     models.Select(m => new Link(m.FullName)).ToArray());

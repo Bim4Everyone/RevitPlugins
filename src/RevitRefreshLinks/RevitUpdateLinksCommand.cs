@@ -63,14 +63,14 @@ namespace RevitRefreshLinks {
                 kernel.UseXtraOpenFolderDialog<TwoSourcesLinksProvider>(
                     title: localizationService.GetLocalizedString("SelectLocalFoldersDialog.Title"),
                     initialDirectory: GetInitialLocalFolder(kernel),
-                    multiSelect: true);
+                    multiSelect: false);
                 kernel.UseXtraProgressDialog(
                     stepValue: 1,
                     displayTitleFormat: localizationService.GetLocalizedString("UpdateLinksWindow.Progress.Title"));
                 kernel.UseRsOpenFolderDialog(
                     title: localizationService.GetLocalizedString("DirectoriesExplorer.Title"),
                     initialDirectory: GetInitialServerFolder(kernel),
-                    multiSelect: true);
+                    multiSelect: false);
 
                 Notification(kernel.Get<UpdateLinksWindow>());
             }
