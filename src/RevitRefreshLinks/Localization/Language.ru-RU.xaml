@@ -54,7 +54,7 @@
     <system:String
         x:Key="UpdateLinksWindow.Buttons.SelectServerFolder">Выбрать папку из RS</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.Progress.Title">Обновление связей[{0}/{1}] ...</system:String>
+        x:Key="UpdateLinksWindow.Progress.Title">Обновление связей [{0}/{1}] ...</system:String>
     <system:String
         x:Key="SelectLinksFromFolderDialog.Title">Выберите связи для добавления</system:String>
     <system:String
@@ -78,11 +78,7 @@
         x:Key="DirectoriesExplorer.ExecutingCmdCheck">Дождитесь завершения предыдущей команды</system:String>
 
     <system:String
-        x:Key="TODO">TODO</system:String>
-
-    <system:String
         x:Key="AllWindow.Ok">ОК</system:String>
-
     <system:String
         x:Key="AllWindow.Cancel">Отмена</system:String>
 </ResourceDictionary>

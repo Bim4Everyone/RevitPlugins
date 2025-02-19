@@ -54,14 +54,9 @@
     <system:String
         x:Key="UpdateLinksWindow.Buttons.SelectServerFolder">Select RS folder</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.Buttons.Ok">OK</system:String>
+        x:Key="UpdateLinksWindow.Progress.Title">Update links [{0}/{1}] ...</system:String>
     <system:String
-        x:Key="UpdateLinksWindow.Buttons.Cancel">Cancel</system:String>
-    <system:String
-        x:Key="UpdateLinksWindow.Progress.Title">Links update [{0}/{1}] ...</system:String>
-
-    <system:String
-        x:Key="SelectLinksFromFolderDialog.Title">Select link files to add</system:String>
+        x:Key="SelectLinksFromFolderDialog.Title">Select links to add</system:String>
     <system:String
         x:Key="SelectLinksFromFolderDialog.Filter">Revit files (*.rvt)|*.rvt</system:String>
 
@@ -69,5 +64,21 @@
         x:Key="SelectLocalFoldersDialog.Title">Select folders with links to update</system:String>
 
     <system:String
-        x:Key="TODO">TODO</system:String>
+        x:Key="RsOpenFileWindow.Title">Select models from Revit Server</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.List.Name">Name</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.List.Size">Size</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.ExecutingCmdCheck">Wait for the previous command to complete</system:String>
+
+    <system:String
+        x:Key="DirectoriesExplorer.Title">Select folder from Revit Server</system:String>
+    <system:String
+        x:Key="DirectoriesExplorer.ExecutingCmdCheck">Wait for the previous command to complete</system:String>
+
+    <system:String
+        x:Key="AllWindow.Ok">OK</system:String>
+    <system:String
+        x:Key="AllWindow.Cancel">Cancel</system:String>
 </ResourceDictionary>
