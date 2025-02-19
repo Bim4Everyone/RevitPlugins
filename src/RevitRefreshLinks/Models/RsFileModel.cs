@@ -9,7 +9,7 @@ namespace RevitRefreshLinks.Models {
         public RsFileModel(ModelData modelData, IDirectoryModel directory) {
             _modelData = modelData ?? throw new System.ArgumentNullException(nameof(modelData));
             Directory = directory ?? throw new System.ArgumentNullException(nameof(directory));
-            FullName = new Uri(new Uri(Directory.FullName), _modelData.Name).ToString();
+            FullName = new Uri(new Uri(Directory.FullName.TrimEnd('/') + '/'), _modelData.Name).ToString();
         }
 
         public string Name => _modelData.Name;

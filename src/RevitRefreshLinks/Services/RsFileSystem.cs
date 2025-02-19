@@ -25,13 +25,17 @@ namespace RevitRefreshLinks.Services {
                 throw new InvalidOperationException($"Не был найден сервер \"{uri.Host}\".");
             }
 
-            string currentFolder = Path.GetFileName(uri.LocalPath);
+            string currentFolder = Path.Combine(Path.GetDirectoryName(uri.LocalPath), Path.GetFileName(uri.LocalPath));
 
             if(string.IsNullOrEmpty(currentFolder)) {
                 return await GetRootDirectoryAsync();
             } else {
-                var folderContents = await serverClient.GetFolderContentsAsync(currentFolder);
-                return new RsDirectoryModel(folderContents, serverClient);
+                try {
+                    var folderContents = await serverClient.GetFolderContentsAsync(currentFolder);
+                    return new RsDirectoryModel(folderContents, serverClient);
+                } catch(Exception) {
+                    return await GetRootDirectoryAsync();
+                }
             }
         }
 
