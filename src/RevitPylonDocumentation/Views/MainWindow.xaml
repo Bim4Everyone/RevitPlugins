@@ -17,9 +17,9 @@
     Height="750"
     MinHeight="750"
     MaxHeight="750"
-    Width="700"
-    MinWidth="700"
-    MaxWidth="700"
+    Width="720"
+    MinWidth="720"
+    MaxWidth="720"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     x:Name="window"
     Loaded="Window_Loaded">
@@ -3343,7 +3343,7 @@
                 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
-                        Width="1.34*" />
+                        Width="1.25*" />
                     <ColumnDefinition
                         Width="*" />
                 </Grid.ColumnDefinitions>
@@ -3430,7 +3430,7 @@
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition
-                            Width="1.6*" />
+                            Width="1.62*" />
                         <ColumnDefinition
                             Width="*" />
                         <ColumnDefinition
@@ -3495,14 +3495,16 @@
                         <ColumnDefinition
                             Width="*" />
                         <ColumnDefinition
-                            Width="1.03*" />
+                            Width="1.2*" />
+                        <ColumnDefinition
+                            Width="1.3*" />
                     </Grid.ColumnDefinitions>
 
                     <Button
                         Grid.Column="0"
                         Style="{StaticResource SimpleButtonStyle}"
-                        Margin="5 0 5 2"
-                        Width="132"
+                        Margin="0 0 0 2"
+                        Width="85"
                         FontSize="12"
                         Content="Выбрать все"
                         HorizontalAlignment="Left"
@@ -3515,13 +3517,27 @@
                     <Button
                         Grid.Column="1"
                         Style="{StaticResource SimpleButtonStyle}"
-                        Margin="5 0 10 2"
-                        Width="132"
+                        Margin="0 0 0 2"
+                        Width="105"
                         FontSize="12"
                         Content="Отменить выбор"
                         HorizontalAlignment="Right"
                         Command="{Binding Path=UnselectAllFuncInGUICommand}"
                         ToolTip="Нажмите, чтобы передвинуть тумблеры влево у всех видов/спецификаций ниже"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1" />
+                    
+                    <Button
+                        Grid.Column="2"
+                        Style="{StaticResource SimpleButtonStyle}"
+                        Margin="0 0 10 2"
+                        Width="100"
+                        FontSize="12"
+                        Content="Инвертировать"
+                        HorizontalAlignment="Right"
+                        Command="{Binding Path=InvertAllFuncInGUICommand}"
+                        ToolTip="Нажмите, чтобы инвертировать тумблеры"
                         ToolTipService.InitialShowDelay="1000"
                         ToolTipService.ShowDuration="20000"
                         ToolTipService.BetweenShowDelay="1" />

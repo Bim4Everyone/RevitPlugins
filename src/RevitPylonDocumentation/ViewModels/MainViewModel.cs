@@ -79,6 +79,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
             SelectAllFuncInGUICommand = RelayCommand.Create(SelectAllFuncInGUI);
             UnselectAllFuncInGUICommand = RelayCommand.Create(UnselectAllFuncInGUI);
+            InvertAllFuncInGUICommand = RelayCommand.Create(InvertAllFuncInGUI);
         }
 
 
@@ -96,6 +97,7 @@ namespace RevitPylonDocumentation.ViewModels {
         public ICommand UnselectAllHostsInfoInGUICommand { get; }
         public ICommand SelectAllFuncInGUICommand { get; }
         public ICommand UnselectAllFuncInGUICommand { get; }
+        public ICommand InvertAllFuncInGUICommand { get; }
 
         /// <summary>
         /// Настройки выбора пользователя (с какими компонентами должен работать плагин) с предыдущего сеанса
@@ -811,6 +813,31 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithSkeletonSchedule = false;
             SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
             SelectionSettings.NeedWorkWithRebarNode = false;
+        }
+
+
+        /// <summary>
+        /// Инвертирует галки выбора у всех, доступных для создания, видимых в GUI.
+        /// Отрабатывает при нажатии на кнопку "Инвертировать" возле списка тумблеров в GUI
+        /// </summary>
+        private void InvertAllFuncInGUI() {
+            SelectionSettings.NeedWorkWithGeneralView = !SelectionSettings.NeedWorkWithGeneralView;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularView = !SelectionSettings.NeedWorkWithGeneralPerpendicularView;
+            SelectionSettings.NeedWorkWithTransverseViewFirst = !SelectionSettings.NeedWorkWithTransverseViewFirst;
+            SelectionSettings.NeedWorkWithTransverseViewSecond = !SelectionSettings.NeedWorkWithTransverseViewSecond;
+            SelectionSettings.NeedWorkWithTransverseViewThird = !SelectionSettings.NeedWorkWithTransverseViewThird;
+            SelectionSettings.NeedWorkWithRebarSchedule = !SelectionSettings.NeedWorkWithRebarSchedule;
+            SelectionSettings.NeedWorkWithMaterialSchedule = !SelectionSettings.NeedWorkWithMaterialSchedule;
+            SelectionSettings.NeedWorkWithSystemPartsSchedule = !SelectionSettings.NeedWorkWithSystemPartsSchedule;
+            SelectionSettings.NeedWorkWithIfcPartsSchedule = !SelectionSettings.NeedWorkWithIfcPartsSchedule;
+            SelectionSettings.NeedWorkWithLegend = !SelectionSettings.NeedWorkWithLegend;
+            SelectionSettings.NeedWorkWithGeneralRebarView = !SelectionSettings.NeedWorkWithGeneralRebarView;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = !SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
+            SelectionSettings.NeedWorkWithTransverseRebarViewFirst = !SelectionSettings.NeedWorkWithTransverseRebarViewFirst;
+            SelectionSettings.NeedWorkWithTransverseRebarViewSecond = !SelectionSettings.NeedWorkWithTransverseRebarViewSecond;
+            SelectionSettings.NeedWorkWithSkeletonSchedule = !SelectionSettings.NeedWorkWithSkeletonSchedule;
+            SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = !SelectionSettings.NeedWorkWithSkeletonByElemsSchedule;
+            SelectionSettings.NeedWorkWithRebarNode = !SelectionSettings.NeedWorkWithRebarNode;
         }
     }
 }
