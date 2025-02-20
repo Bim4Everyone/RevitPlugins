@@ -117,10 +117,78 @@
         <Setter Property="Text" Value="Суффикс - часть имени бокового вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_ЖБ&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_ЖБ&quot;" />
     </Style>
 
+    
+    <Style
+        x:Key="GeneralRebarViewNameStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
 
+        <Setter
+            Property="Text"
+            Value="Префикс и суффикс имени основного вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени основного армирования вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс." />
+    </Style>
+
+    <Style
+        x:Key="GeneralRebarViewPrefixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Префикс - часть имени основного вида армирования пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени основного вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style
+        x:Key="GeneralRebarViewSuffixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Суффикс - часть имени основного вида армирования пилона, которая должна идти после указания марки пилона.&#10;Например, в имени основного вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_ЖБ&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_ЖБ&quot;" />
+    </Style>
+
+    
+    <Style
+        x:Key="GeneralRebarViewPerpendicularNameStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Префикс и суффикс имени бокового вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_ЖБ&quot; - это суффикс." />
+    </Style>
+
+    <Style
+        x:Key="GeneralRebarViewPerpendicularPrefixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Префикс - часть имени бокового вида армирования пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style
+        x:Key="GeneralRebarViewPerpendicularSuffixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Суффикс - часть имени бокового вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени бокового вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_ЖБ&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_ЖБ&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_ЖБ&quot;" />
+    </Style>
+
+    
     <Style x:Key="GeneralViewTemplateStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
         <Setter Property="Text" Value="Шаблон вида, который необходимо применить к основному и боковому виду при их создании." />
+    </Style>
+
+    <Style
+        x:Key="GeneralRebarViewTemplateStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Шаблон вида, который необходимо применить к основному и боковому виду армирования при их создании." />
     </Style>
 
     <Style x:Key="GeneralViewTypeStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
@@ -203,23 +271,106 @@
 
     <Style x:Key="TransViewThirdNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
-        <Setter Property="Text" Value="Префикс и суффикс имени второго горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс." />
+        <Setter Property="Text" Value="Префикс и суффикс имени третьего горизонтального вида пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени третьего горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.3-3&quot; - это суффикс." />
     </Style>
 
     <Style x:Key="TransViewThirdPrefixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
-        <Setter Property="Text" Value="Префикс - часть имени второго горизонтального вида пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+        <Setter Property="Text" Value="Префикс - часть имени третьего горизонтального вида пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени третьего горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
     </Style>
 
     <Style x:Key="TransViewThirdSuffixStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
-        <Setter Property="Text" Value="Суффикс - часть имени второго горизонтального вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени второго горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.3-3&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.3-3&quot;" />
+        <Setter Property="Text" Value="Суффикс - часть имени третьего горизонтального вида пилона, которая должна идти после указания марки пилона.&#10;Например, в имени третьего горизонтального вида пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.3-3&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.3-3&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.3-3&quot;" />
     </Style>
 
     <Style x:Key="TransViewThirdElevationStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
         <Setter Property="Text" Value="Положение горизонтального разреза относительно пилона задается при помощи пропорции: высота секущей плоскости горизонтального разреза от низа пилона разделить на высоту пилона.&#10;Так, если задать &quot;0,5&quot;, то сечение разреза будет расположено на половине высоты пилона. &quot;1,25&quot; - на четверть высоты пилона выше верхней грани пилона. В качестве разделителя у пропорции необходимо использовать запятую.&#10;Для третьего горизонтального вида стандартным значением является &quot;1,25&quot;" />
     </Style>
+    
+
+    <Style
+        x:Key="TransRebarViewFirstNameStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Префикс и суффикс имени первого горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени первого горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.1-1&quot; - это суффикс." />
+    </Style>
+
+    <Style
+        x:Key="TransRebarViewFirstPrefixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Префикс - часть имени первого горизонтального вида армирования пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени первого горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style
+        x:Key="TransRebarViewFirstSuffixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Суффикс - часть имени первого горизонтального вида армирования пилона, которая должна идти после указания марки пилона.&#10;Например, в имени первого горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.1-1&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.1-1&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.1-1&quot;" />
+    </Style>
+
+    <Style
+        x:Key="TransRebarViewFirstElevationStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Положение горизонтального разреза армирования относительно пилона задается при помощи пропорции: высота секущей плоскости горизонтального разреза от низа пилона разделить на высоту пилона.&#10;Так, если задать &quot;0,5&quot;, то сечение разреза будет расположено на половине высоты пилона. &quot;1,25&quot; - на четверть высоты пилона выше верхней грани пилона. В качестве разделителя у пропорции необходимо использовать запятую.&#10;Для первого горизонтального вида стандартным значением является &quot;0,25&quot;" />
+    </Style>
+
+    
+    <Style
+        x:Key="TransRebarViewSecondNameStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Префикс и суффикс имени второго горизонтального вида армирования пилона, т.е. то, что должно идти в названии вида перед указанием марки пилона и после нее.&#10;Например, в имени второго горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс,&#10;&quot;_Сеч.2-2&quot; - это суффикс." />
+    </Style>
+
+    <Style
+        x:Key="TransRebarViewSecondPrefixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Префикс - часть имени второго горизонтального вида армирования пилона, которая должна идти перед указанием марки пилона.&#10;Например, в имени второго горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;Пилон &quot; - это префикс.&#10;Значит в этом окне вы должны записать: &quot;Пилон &quot;" />
+    </Style>
+
+    <Style
+        x:Key="TransRebarViewSecondSuffixStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Суффикс - часть имени второго горизонтального вида армирования пилона, которая должна идти после указания марки пилона.&#10;Например, в имени второго горизонтального вида армирования пилона:&#10;&quot;Пилон 12.30.25-12⌀20-П1_Сеч.2-2&quot;,&#10;где &quot;12.30.25-12⌀20-П1&quot; - это марка пилона,&#10;&quot;_Сеч.2-2&quot; - это суффикс.&#10;Значит в этом окне вы должны записать: &quot;_Сеч.2-2&quot;" />
+    </Style>
+
+    <Style
+        x:Key="TransRebarViewSecondElevationStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Положение горизонтального разреза армирования относительно пилона задается при помощи пропорции: высота секущей плоскости горизонтального разреза от низа пилона разделить на высоту пилона.&#10;Так, если задать &quot;0,5&quot;, то сечение разреза будет расположено на половине высоты пилона. &quot;1,25&quot; - на четверть высоты пилона выше верхней грани пилона. В качестве разделителя у пропорции необходимо использовать запятую.&#10;Для второго горизонтального вида стандартным значением является &quot;0,5&quot;" />
+    </Style>
+    
 
     <Style x:Key="TransViewTemplateStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
 
@@ -471,7 +622,74 @@
         <Setter Property="Text" Value="Передвиньте тумблер вправо, если хотите, чтобы плагин разместил на листах у выбранных пилонов легенду примечания" />
     </Style>
 
+    <Style
+        x:Key="GeneralRebarViewStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
 
+        <Setter
+            Property="Text"
+            Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов основной вид каркаса" />
+    </Style>
     
+    <Style
+        x:Key="GeneralPerpendicularRebarViewStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов боковой вид каркаса" />
+    </Style>
+    
+    <Style
+        x:Key="TransverseRebarViewFirstStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов первый поперечный разрез каркаса" />
+    </Style>
+    
+    <Style
+        x:Key="TransverseRebarViewSecondStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов второй поперечный разрез каркаса" />
+    </Style>
+    
+    <Style
+        x:Key="SkeletonScheduleStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов общую спецификацию каркаса" />
+    </Style>
+    
+    <Style
+        x:Key="SkeletonByElemsScheduleStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Передвиньте тумблер вправо, если хотите, чтобы плагин создал и разместил на листах у выбранных пилонов поэлементную спецификацию каркаса" />
+    </Style>
+    
+    <Style
+        x:Key="RebarNodeStyle"
+        TargetType="{x:Type TextBlock}"
+        BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter
+            Property="Text"
+            Value="Передвиньте тумблер вправо, если хотите, чтобы плагин разместил на листах у выбранных пилонов узел армирования" />
+    </Style>
 
 </ResourceDictionary>
