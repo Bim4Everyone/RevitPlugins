@@ -103,13 +103,24 @@ namespace RevitRefreshLinks.ViewModels {
                 .Where(t => t.IsSelected && t.SourceLinksCount == 1)
                 .Select(t => new LinkPair(t.GetLinkType(), t.GetSourceLinks().First()))
                 .ToArray();
+            ICollection<(ILink Link, string Error)> errors;
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.MaxValue = linkPairs.Length;
                 var progress = pb.CreateProgress();
                 var ct = pb.CreateCancellationToken();
                 pb.Show();
 
-                _linksLoader.UpdateLinks(linkPairs, progress, ct);
+                errors = _linksLoader.UpdateLinks(linkPairs, progress, ct);
+            }
+            if(errors?.Count > 0) {
+                var msg = string.Join("\n\n",
+                    errors.GroupBy(e => e.Error)
+                    .Select(e => $"{e.Key}:\n{string.Join("\n", e.Select(i => i.Link.Name))}"));
+                GetPlatformService<IMessageBoxService>()
+                    .Show(msg,
+                    _localizationService.GetLocalizedString("MessageBox.Title.ErrorUpdateLink"),
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Warning);
             }
         }
 

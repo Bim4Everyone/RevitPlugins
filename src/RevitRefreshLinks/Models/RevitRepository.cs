@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitRefreshLinks.Models {
     internal class RevitRepository {
@@ -16,10 +17,11 @@ namespace RevitRefreshLinks.Models {
             = new RevitLinkOptions(false, new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets));
         private readonly WorksetConfiguration _worksetConfiguration
             = new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets);
+        private readonly ILocalizationService _localizationService;
 
-
-        public RevitRepository(UIApplication uiApplication) {
-            UIApplication = uiApplication;
+        public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
+            UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         }
 
 
@@ -43,10 +45,10 @@ namespace RevitRefreshLinks.Models {
                 RevitLinkInstance.Create(Document, linkLoadResult.ElementId, ImportPlacement.Shared);
                 return true;
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                error = "Файл с другой системой координат";
+                error = _localizationService.GetLocalizedString("LinkLoader.Error.Coordinates");
                 return false;
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                error = "Файл создан в другой версии Revit";
+                error = _localizationService.GetLocalizedString("LinkLoader.Error.Version");
                 return false;
             }
         }
@@ -58,10 +60,10 @@ namespace RevitRefreshLinks.Models {
                 var linkLoadResult = link.LoadFrom(modelPath, _worksetConfiguration);
                 return LinkLoadResult.IsCodeSuccess(linkLoadResult.LoadResult);
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                error = "Файл с другой системой координат";
+                error = _localizationService.GetLocalizedString("LinkLoader.Error.Coordinates");
                 return false;
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                error = "Файл создан в другой версии Revit";
+                error = _localizationService.GetLocalizedString("LinkLoader.Error.Version");
                 return false;
             }
         }

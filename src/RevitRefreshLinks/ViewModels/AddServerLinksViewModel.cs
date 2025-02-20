@@ -13,14 +13,18 @@ using RevitRefreshLinks.Services;
 namespace RevitRefreshLinks.ViewModels {
     internal class AddServerLinksViewModel : BaseViewModel {
         private readonly IServerSourceLinksProvider _linksProvider;
+        private readonly ILocalizationService _localizationService;
         private readonly ILinksLoader _linksLoader;
 
         public AddServerLinksViewModel(
             IServerSourceLinksProvider linksProvider,
+            ILocalizationService localizationService,
             ILinksLoader linksLoader) {
 
             _linksProvider = linksProvider
                 ?? throw new System.ArgumentNullException(nameof(linksProvider));
+            _localizationService = localizationService
+                ?? throw new System.ArgumentNullException(nameof(localizationService));
             _linksLoader = linksLoader
                 ?? throw new System.ArgumentNullException(nameof(linksLoader));
 
@@ -40,13 +44,13 @@ namespace RevitRefreshLinks.ViewModels {
 
                 errors = _linksLoader.AddLinks(linksFromSource.Links, progress, ct);
             }
-            if(errors.Count > 0) {
+            if(errors?.Count > 0) {
                 var msg = string.Join("\n\n",
                     errors.GroupBy(e => e.Error)
                     .Select(e => $"{e.Key}:\n{string.Join("\n", e.Select(i => i.Link.Name))}"));
                 GetPlatformService<IMessageBoxService>()
                     .Show(msg,
-                    "Ошибки добавления связей",
+                    _localizationService.GetLocalizedString("MessageBox.Title.ErrorAddLink"),
                     System.Windows.MessageBoxButton.OK,
                     System.Windows.MessageBoxImage.Warning);
             }

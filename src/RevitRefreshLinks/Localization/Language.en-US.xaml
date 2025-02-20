@@ -61,6 +61,19 @@
         x:Key="SelectLinksFromFolderDialog.Filter">Revit files (*.rvt)|*.rvt</system:String>
 
     <system:String
+        x:Key="LinkLoader.Transaction.AddLinks">Add links</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.Coordinates">File with different shared coordinates</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.Version">File was created in a different Revit version</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.AlreadyAdded">File has already been added</system:String>
+    <system:String
+        x:Key="MessageBox.Title.ErrorAddLink">Errors when adding links</system:String>
+    <system:String
+        x:Key="MessageBox.Title.ErrorUpdateLink">Errors when updating links</system:String>
+
+    <system:String
         x:Key="SelectLocalFoldersDialog.Title">Select folders with links to update</system:String>
 
     <system:String

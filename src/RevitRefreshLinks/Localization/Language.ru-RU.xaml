@@ -61,6 +61,19 @@
         x:Key="SelectLinksFromFolderDialog.Filter">Revit файлы (*.rvt)|*.rvt</system:String>
 
     <system:String
+        x:Key="LinkLoader.Transaction.AddLinks">Добавление связей</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.Coordinates">Файл с другой системой координат</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.Version">Файл создан в другой версии Revit</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.AlreadyAdded">Файл уже добавлен в документ</system:String>
+    <system:String
+        x:Key="MessageBox.Title.ErrorAddLink">Ошибки добавления связей</system:String>
+    <system:String
+        x:Key="MessageBox.Title.ErrorUpdateLink">Ошибки обновления связей</system:String>
+
+    <system:String
         x:Key="SelectLocalFoldersDialog.Title">Выберите папки со связями для обновления</system:String>
 
     <system:String
