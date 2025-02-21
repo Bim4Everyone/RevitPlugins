@@ -264,7 +264,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         private bool PointIsOnFace(PlanarFace face, XYZ point) {
             var plane = Plane.CreateByNormalAndOrigin(face.FaceNormal, face.Origin);
             plane.Project(point, out UV _, out double distance);
-            return distance > 0.000001;
+            return distance < 0.000001;
         }
 
         /// <summary>
