@@ -30,6 +30,7 @@ namespace RevitDeclarations.Models {
         [JsonProperty("type")]
         public override string Department => _paramProvider.GetDepartment(_firstRoom, "Нежилые помещения");
         public string ParkingSpaceClass => _firstRoom.GetTextParamValue(_settings.ParkingSpaceClass);
+        public string ParkingInfo => _firstRoom.GetTextParamValue(_settings.ParkingInfo);
 
         public string DeclarationNumber =>
             _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber);

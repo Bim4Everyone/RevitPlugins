@@ -32,6 +32,7 @@ namespace RevitDeclarations.Models {
         public bool AddPrefixToNumber { get; set; }
         public string RoomsHeightParam { get; set; }
         public string ParkingSpaceClass { get; set; }
+        public string ParkingInfo { get; set; }
         public string GroupNameParam { get; set; }
 
         public CommercialConfigSettings GetCompanyConfig() {
@@ -53,6 +54,7 @@ namespace RevitDeclarations.Models {
                 ApartmentAreaParam = SharedParamsConfig.Instance.ApartmentArea.Name,
                 RoomsHeightParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_HEIGHT),
                 ParkingSpaceClass = SharedParamsConfig.Instance.ParkingSpaceClass.Name,
+                ParkingInfo = SharedParamsConfig.Instance.ApartmentNameExtra.Name,
                 GroupNameParam = SharedParamsConfig.Instance.ApartmentGroupName.Name,
 
                 ProjectNameID = "",

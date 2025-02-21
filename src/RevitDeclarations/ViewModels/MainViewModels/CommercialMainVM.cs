@@ -155,13 +155,14 @@ namespace RevitDeclarations.ViewModels {
 
 
         private void SetCommSettings() {
-            CommercialParamsVM apartParamsVM = (CommercialParamsVM) _parametersViewModel;
-            _settings.BuildingNumberParam = apartParamsVM.SelectedBuildingNumberParam;
-            _settings.ConstrWorksNumberParam = apartParamsVM.SelectedConstrWorksNumberParam;
-            _settings.RoomsHeightParam = apartParamsVM.SelectedRoomsHeightParam;
-            _settings.ParkingSpaceClass = apartParamsVM.SelectedParkingSpaceClass;
-            _settings.GroupNameParam = apartParamsVM.SelectedGroupNameParam;
-            _settings.AddPrefixToNumber = apartParamsVM.AddPrefixToNumber;
+            CommercialParamsVM commercialParamsVM = (CommercialParamsVM) _parametersViewModel;
+            _settings.BuildingNumberParam = commercialParamsVM.SelectedBuildingNumberParam;
+            _settings.ConstrWorksNumberParam = commercialParamsVM.SelectedConstrWorksNumberParam;
+            _settings.RoomsHeightParam = commercialParamsVM.SelectedRoomsHeightParam;
+            _settings.ParkingSpaceClass = commercialParamsVM.SelectedParkingSpaceClass;
+            _settings.ParkingInfo = commercialParamsVM.SelectedParkingInfo;
+            _settings.GroupNameParam = commercialParamsVM.SelectedGroupNameParam;
+            _settings.AddPrefixToNumber = commercialParamsVM.AddPrefixToNumber;
         }
     }
 }

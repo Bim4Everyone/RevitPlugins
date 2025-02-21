@@ -20,8 +20,9 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows[0][8] = "Высота потолков, м";
             _headerTable.Rows[0][9] = "Тип расположения";
             _headerTable.Rows[0][10] = "Класс машино-места";
-            _headerTable.Rows[0][11] = "Наименование помещения";
-            _headerTable.Rows[0][12] = "ИД объекта";
+            _headerTable.Rows[0][11] = "Применимость";
+            _headerTable.Rows[0][12] = "Наименование помещения";
+            _headerTable.Rows[0][13] = "ИД объекта";
         }
 
         protected override void FillMainTable() {
@@ -39,8 +40,9 @@ namespace RevitDeclarations.Models {
                 _mainTable.Rows[rowNumber][8] = commercialRooms.RoomsHeight;
                 _mainTable.Rows[rowNumber][9] = "";
                 _mainTable.Rows[rowNumber][10] = commercialRooms.ParkingSpaceClass ?? "";
-                _mainTable.Rows[rowNumber][11] = commercialRooms.GroupName ?? "";
-                _mainTable.Rows[rowNumber][12] = _settings.ProjectName ?? "";
+                _mainTable.Rows[rowNumber][11] = commercialRooms.ParkingInfo ?? "";
+                _mainTable.Rows[rowNumber][12] = commercialRooms.GroupName ?? "";
+                _mainTable.Rows[rowNumber][13] = _settings.ProjectName ?? "";
 
                 rowNumber++;
             }

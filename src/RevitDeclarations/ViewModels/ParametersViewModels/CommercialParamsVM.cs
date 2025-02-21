@@ -18,6 +18,7 @@ namespace RevitDeclarations.ViewModels {
         private Parameter _selectedConstrWorksNumberParam;
         private Parameter _selectedRoomsHeightParam;
         private Parameter _selectedParkingSpaceClass;
+        private Parameter _selectedParkingInfo;
 
         public CommercialParamsVM(RevitRepository revitRepository, MainViewModel mainViewModel)
             : base(revitRepository, mainViewModel) {            
@@ -43,6 +44,10 @@ namespace RevitDeclarations.ViewModels {
         public Parameter SelectedParkingSpaceClass {
             get => _selectedParkingSpaceClass;
             set => RaiseAndSetIfChanged(ref _selectedParkingSpaceClass, value);
+        }
+        public Parameter SelectedParkingInfo {
+            get => _selectedParkingInfo;
+            set => RaiseAndSetIfChanged(ref _selectedParkingInfo, value);
         }
 
         public override List<Parameter> AllSelectedParameters {
@@ -122,6 +127,8 @@ namespace RevitDeclarations.ViewModels {
                 .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.RoomsHeightParam);
             SelectedParkingSpaceClass = TextParameters
                 .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.ParkingSpaceClass);
+            SelectedParkingInfo = TextParameters
+                .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.ParkingInfo);
             ProjectName = commercialConfigSettings.ProjectNameID;
 
             SelectedRoomNumberParam = TextParameters
