@@ -249,11 +249,7 @@ namespace RevitOpeningPlacement.OpeningModels {
 
             foreach(PlanarFace thisFace in thisPlanarFaces) {
                 foreach(PlanarFace otherFace in othersPlanarFaces) {
-                    // FaceNormal.Negate() для заданий на отверстия, которые касаются снаружи
-                    // FaceNormal для заданий на отверстия, которые находятся внутри другого и касаются изнутри
-                    if(PointIsOnFace(thisFace, otherFace.Origin)
-                        && (thisFace.FaceNormal.IsAlmostEqualTo(otherFace.FaceNormal.Negate()) ||
-                        thisFace.FaceNormal.IsAlmostEqualTo(otherFace.FaceNormal))) {
+                    if(FacesOverlap(thisFace, otherFace)) {
                         return true;
                     }
                 }
@@ -261,10 +257,22 @@ namespace RevitOpeningPlacement.OpeningModels {
             return false;
         }
 
-        private bool PointIsOnFace(PlanarFace face, XYZ point) {
-            var plane = Plane.CreateByNormalAndOrigin(face.FaceNormal, face.Origin);
-            plane.Project(point, out UV _, out double distance);
-            return distance < 0.000001;
+        private bool FacesOverlap(PlanarFace first, PlanarFace second) {
+            // FaceNormal.Negate() для заданий на отверстия, которые касаются снаружи
+            // FaceNormal для заданий на отверстия, которые находятся внутри другого и касаются изнутри
+            if(first.FaceNormal.IsAlmostEqualTo(second.FaceNormal.Negate())
+                || first.FaceNormal.IsAlmostEqualTo(second.FaceNormal)) {
+                var firstCurves = first.GetEdgesAsCurveLoops().SelectMany(l => l.ToArray()).ToArray();
+                var secondCurves = second.GetEdgesAsCurveLoops().SelectMany(l => l.ToArray()).ToArray();
+                foreach(var firstCurve in firstCurves) {
+                    foreach(var secondCurve in secondCurves) {
+                        if(firstCurve.Intersect(secondCurve) != SetComparisonResult.Disjoint) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         /// <summary>
