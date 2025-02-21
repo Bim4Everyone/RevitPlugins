@@ -37,6 +37,17 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
 
 
         /// <summary>
+        /// Возвращает трансформацию группы заданий на отверстия по самому большому элементу
+        /// </summary>
+        public Transform GetTransform() {
+            return _elements
+                .OrderByDescending(o => o.GetSolid()?.Volume ?? 0)
+                .FirstOrDefault()
+                ?.GetFamilyInstance()
+                .GetTotalTransform() ?? Transform.Identity;
+        }
+
+        /// <summary>
         /// Возвращает генератор задания на отверстие, 
         /// </summary>
         /// <exception cref="InvalidOperationException">Исключение, если не удалось выполнить операцию</exception>

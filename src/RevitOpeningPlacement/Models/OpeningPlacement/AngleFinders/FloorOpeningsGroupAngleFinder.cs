@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -24,7 +23,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders {
 
 
         public Rotates GetAngle() {
-            var transform = _openingsGroup.Elements.First().GetFamilyInstance().GetTotalTransform();
+            var transform = _openingsGroup.GetTransform();
             var angle = XYZ.BasisY.AngleTo(transform.BasisY);
             return (transform.BasisY.X <= 0 && transform.BasisY.Y <= 0) || (transform.BasisY.X <= 0 && transform.BasisY.Y >= 0) ? new Rotates(0, 0, angle) : new Rotates(0, 0, -angle);
         }

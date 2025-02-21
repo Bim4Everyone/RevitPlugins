@@ -19,7 +19,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
 
         public XYZ GetPoint() {
             // получаем трансформацию от начала проекта первого задания
-            var transform = _group.Elements.First().GetFamilyInstance().GetTotalTransform();
+            var transform = _group.GetTransform();
             // находим бокс, ограничивающий все задания из группы в координатах относительно первого задания
             var bb = _group.Elements
                 .Select(item => SolidUtils

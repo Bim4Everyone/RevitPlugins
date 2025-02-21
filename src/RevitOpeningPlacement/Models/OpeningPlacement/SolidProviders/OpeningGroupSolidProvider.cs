@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -17,7 +17,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.SolidProviders {
             _openingsGroup = openingsGroup;
         }
         public Solid GetSolid() {
-            var transform = _openingsGroup.Elements.First().GetFamilyInstance().GetTotalTransform();
+            var transform = _openingsGroup.GetTransform();
             return _openingsGroup.Elements.Select(item => SolidUtils.CreateTransformed(item.GetSolid(), transform.Inverse))
                .Select(item => item.GetTransformedBoundingBox())
                .ToList()
