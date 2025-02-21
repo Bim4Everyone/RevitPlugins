@@ -268,41 +268,6 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Проверяет, одинаковы ли точки в коллекциях
-        /// </summary>
-        /// <param name="firstPoints">Первая коллекция точек</param>
-        /// <param name="secondPoints">Вторая коллекция точек</param>
-        /// <returns>True, если количество точек в коллекциях одинаково и если все точки из первой коллекции также есть во второй коллекции, иначе False</returns>
-        private bool TheseAreTheSamePoints(ICollection<XYZ> firstPoints, ICollection<XYZ> secondPoints) {
-            if(firstPoints.Count != secondPoints.Count) {
-                return false;
-            }
-            foreach(XYZ point in firstPoints) {
-                if(!secondPoints.Any(secondPoint => secondPoint.IsAlmostEqualTo(point))) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Возвращает угловые точки плоской грани.
-        /// Если грань - круг, будут возвращены 2 крайние точки диаметра
-        /// </summary>
-        private ICollection<XYZ> GetCornerPoints(PlanarFace planarFace) {
-            CurveLoop longestLoop = planarFace.GetEdgesAsCurveLoops().OrderByDescending(cLoop => cLoop.GetExactLength()).FirstOrDefault();
-            if(longestLoop != null) {
-                HashSet<XYZ> result = new HashSet<XYZ>();
-                foreach(Curve curve in longestLoop) {
-                    result.Add(curve.GetEndPoint(0));
-                }
-                return result;
-            } else {
-                return Array.Empty<XYZ>();
-            }
-        }
-
-        /// <summary>
         /// Возвращает коллекцию плоских поверхностей солида
         /// </summary>
         /// <param name="solid">Солид</param>
