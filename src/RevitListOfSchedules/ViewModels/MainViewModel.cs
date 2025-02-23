@@ -1,3 +1,6 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -17,8 +20,14 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
     private string _errorText;
-    private string _saveProperty;
-    
+
+    private ObservableCollection<LinkViewModel> _links;
+    private ObservableCollection<LinkViewModel> _selectedLinks;
+
+    private ObservableCollection<SheetViewModel> _sheets;
+    private ObservableCollection<SheetViewModel> _selectedSheets;
+
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
@@ -29,20 +38,31 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
-        
+
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+
+        Links = GetLinks();
+        Sheets = GetSheets();
+
+        SelectedLinks = new ObservableCollection<LinkViewModel>();
+        SelectedSheets = new ObservableCollection<SheetViewModel>();
+
+
+        foreach(var link in Links) {
+            link.SelectionChanged += OnLinkSelectionChanged;
+        }
     }
 
     /// <summary>
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
@@ -57,12 +77,72 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
+    public ObservableCollection<LinkViewModel> Links {
+        get => _links;
+        set => RaiseAndSetIfChanged(ref _links, value);
+    }
+    public ObservableCollection<LinkViewModel> SelectedLinks {
+        get => _selectedLinks;
+        set => RaiseAndSetIfChanged(ref _selectedLinks, value);
+    }
+
+    public ObservableCollection<SheetViewModel> Sheets {
+        get => _sheets;
+        set => RaiseAndSetIfChanged(ref _sheets, value);
+    }
+    public ObservableCollection<SheetViewModel> SelectedSheets {
+        get => _selectedSheets;
+        set => RaiseAndSetIfChanged(ref _selectedSheets, value);
+    }
+
+
+    // Загружаем с основного документа все линки через _revitRepository
+    private ObservableCollection<LinkViewModel> GetLinks() {
+        ObservableCollection<LinkViewModel> links = [];
+        foreach(LinkTypeElement linkDocumentType in _revitRepository.GetLinkTypes()) {
+            links.Add(new LinkViewModel(linkDocumentType));
+        }
+        return links;
+    }
+
+    // При изменении события, выполняем метод добавления в выбранные линки отмеченный линк
+    private void OnLinkSelectionChanged(object sender, EventArgs e) {
+        if(sender is LinkViewModel link) {
+            if(link.IsChecked) {
+                if(!SelectedLinks.Contains(link)) {
+                    SelectedLinks.Add(link);
+                    AddLinkSheets(link);
+                }
+            } else {
+                if(SelectedLinks.Contains(link)) {
+                    SelectedLinks.Remove(link);
+                    DeleteLinkSheets(link);
+                }
+            }
+        }
+    }
+
+    // Загружаем с основного документа все листы через _revitRepository
+    private ObservableCollection<SheetViewModel> GetSheets() {
+        return new ObservableCollection<SheetViewModel>(
+            _revitRepository.GetSheetElements(_revitRepository.Document)
+                .Select(sheetElement => new SheetViewModel(sheetElement))
+                .OrderBy(sheetElement => sheetElement.AlbumName)
+        );
+    }
+
+    private void AddLinkSheets(LinkViewModel linkViewModel) {
+        foreach(SheetElement sheetElement in _revitRepository.GetSheetElements(_revitRepository.GetLinkDocument(linkViewModel))) {
+            _sheets.Add(new SheetViewModel(sheetElement, linkViewModel.Id));
+        }
+    }
+
+    private void DeleteLinkSheets(LinkViewModel linkViewModel) {
+        for(int i = _sheets.Count - 1; i >= 0; i--) {
+            if(_sheets[i].Id == linkViewModel.Id) {
+                _sheets.RemoveAt(i);
+            }
+        }
     }
 
     /// <summary>
@@ -92,13 +172,8 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
-        }
-
         ErrorText = null;
-        return true;
+        return false;
     }
 
     /// <summary>
@@ -106,8 +181,6 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
 
     /// <summary>
@@ -116,8 +189,6 @@ internal class MainViewModel : BaseViewModel {
     private void SaveConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-        setting.SaveProperty = SaveProperty;
         _pluginConfig.SaveProjectConfig();
     }
 }
