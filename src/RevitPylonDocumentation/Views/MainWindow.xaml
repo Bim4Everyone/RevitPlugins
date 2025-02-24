@@ -3158,6 +3158,424 @@
                                     </StackPanel>
                                 </GroupBox>
 
+                                
+                                <!-- Спецификация каркасов -->
+                                <GroupBox
+                                    Margin="5 0 5 10">
+                                    <GroupBox.Header>
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Grid.Row="0"
+                                            Margin="5 10 0 0"
+                                            FontSize="14"
+                                            Text="Правила создания спецификации каркасов"
+                                            ToolTip="Правила, по которым будет создаваться спецификация каркасов для пилонов" />
+                                    </GroupBox.Header>
+
+                                    <StackPanel>
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Маска имени спецификации каркасов">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonScheduleNameStyle}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            Margin="0 0 0 10">
+                                            <TextBox
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
+                                                HorizontalAlignment="Left"
+                                                Margin="10 0 5 0"
+                                                Text="{Binding Path=SchedulesSettings.SkeletonSchedulePrefixTemp,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                                Width="174"
+                                                Height="25"
+                                                VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock
+                                                            Style="{StaticResource SkeletonSchedulePrefixStyle}" />
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger
+                                                        EventName="TextChanged">
+                                                        <i:InvokeCommandAction
+                                                            Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
+
+                                            <TextBlock
+                                                Style="{StaticResource TextBlockStyle}"
+                                                Text="Марка пилона" />
+
+                                            <TextBox
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
+                                                HorizontalAlignment="Left"
+                                                Margin="5 0 10 0"
+                                                Text="{Binding Path=SchedulesSettings.SkeletonScheduleSuffixTemp,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                                Width="174"
+                                                Height="25"
+                                                VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock
+                                                            Style="{StaticResource SkeletonScheduleSuffixStyle}" />
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger
+                                                        EventName="TextChanged">
+                                                        <i:InvokeCommandAction
+                                                            Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
+                                        </StackPanel>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Имя для поиска эталонной спецификации каркасов">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonScheduleNameStyle}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.SkeletonScheduleNameTemp,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonScheduleNameStyle}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="В параметр для группировки диспетчера 1">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonScheduleDisp1Style}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.SkeletonScheduleDisp1Temp,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonScheduleDisp1Style}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="В параметр для группировки диспетчера 2">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonScheduleDisp2Style}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.SkeletonScheduleDisp2Temp,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip
+                                                    ToolTipService.ShowDuration="500000">
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonScheduleDisp2Style}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                    </StackPanel>
+                                </GroupBox>
+
+                                <!-- Спецификация элементов каркасов -->
+                                <GroupBox
+                                    Margin="5 0 5 10">
+                                    <GroupBox.Header>
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Grid.Row="0"
+                                            Margin="5 10 0 0"
+                                            FontSize="14"
+                                            Text="Правила создания спецификации элементов каркасов"
+                                            ToolTip="Правила, по которым будет создаваться спецификация элементов каркасов для пилонов" />
+                                    </GroupBox.Header>
+
+                                    <StackPanel>
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Маска имени спецификации элементов каркасов">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonByElemsScheduleNameStyle}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            Margin="0 0 0 10">
+                                            <TextBox
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
+                                                HorizontalAlignment="Left"
+                                                Margin="10 0 5 0"
+                                                Text="{Binding Path=SchedulesSettings.SkeletonByElemsSchedulePrefixTemp,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                                Width="174"
+                                                Height="25"
+                                                VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock
+                                                            Style="{StaticResource SkeletonByElemsSchedulePrefixStyle}" />
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger
+                                                        EventName="TextChanged">
+                                                        <i:InvokeCommandAction
+                                                            Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
+
+                                            <TextBlock
+                                                Style="{StaticResource TextBlockStyle}"
+                                                Text="Марка пилона" />
+
+                                            <TextBox
+                                                Style="{StaticResource TextBoxWithTooltipStyle}"
+                                                HorizontalAlignment="Left"
+                                                Margin="5 0 10 0"
+                                                Text="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleSuffixTemp,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                                Width="174"
+                                                Height="25"
+                                                VerticalContentAlignment="Center">
+
+                                                <TextBox.ToolTip>
+                                                    <ToolTip>
+                                                        <TextBlock
+                                                            Style="{StaticResource SkeletonByElemsScheduleSuffixStyle}" />
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger
+                                                        EventName="TextChanged">
+                                                        <i:InvokeCommandAction
+                                                            Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </TextBox>
+                                        </StackPanel>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Имя для поиска эталонной спецификации элементов каркасов">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonByElemsScheduleNameStyle}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleNameTemp,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonByElemsScheduleNameStyle}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="В параметр для группировки диспетчера 1">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonByElemsScheduleDisp1Style}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp1Temp,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonByElemsScheduleDisp1Style}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="В параметр для группировки диспетчера 2">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonByElemsScheduleDisp2Style}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=SchedulesSettings.SkeletonByElemsScheduleDisp2Temp,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip
+                                                    ToolTipService.ShowDuration="500000">
+                                                    <TextBlock
+                                                        Style="{StaticResource SkeletonByElemsScheduleDisp2Style}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                    </StackPanel>
+                                </GroupBox>
+
+                                <!-- Правила фильтров в спецификациях -->
                                 <GroupBox
                                     Margin="5 0 5 10">
                                     <GroupBox.Header>
