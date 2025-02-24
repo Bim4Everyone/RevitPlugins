@@ -200,8 +200,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
             double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
-            XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.4);
-            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostLength * 0.4);
+            XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
+            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0);
 
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
             sectionBox.Transform = t;
@@ -271,8 +271,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             double coordinateYBottom = minZ - originPoint.Z
                 - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
-            XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.4);
-            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostLength * 0.49);
+            XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
+            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0);
 
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
             sectionBox.Transform = t;
