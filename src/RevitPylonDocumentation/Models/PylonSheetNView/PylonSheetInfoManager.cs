@@ -62,6 +62,16 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
 
 
+            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО АРМАТУРНОГО ВИДА
+            if(selectionSettings.NeedWorkWithGeneralRebarView) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.GeneralRebarView.ViewElement != null) {
+                    SheetInfo.GeneralRebarView.ViewDimensionCreator
+                        .TryCreateGeneralRebarViewDimensions();
+                }
+            }
+
+
             // ОСНОВНОЙ ПЕРПЕНДИКУЛЯРНЫЙ ВИД 
             if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
@@ -85,6 +95,16 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     }
                 }
                 // Тут точно получили вид
+            }
+
+
+            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО АРМАТУРНОГО ПЕРПЕНДИКУЛЯРНОГО ВИДА
+            if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement != null) {
+                    SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
+                        .TryCreateGeneralRebarPerpendicularViewDimensions();
+                }
             }
 
 
