@@ -7,6 +7,9 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewSectionPlacer {
+        private readonly string _viewportTypeWithTitle = "Заголовок на листе";
+        private readonly string _viewportTypeWithNumber = "Сечение_Номер вида";
+
         internal PylonViewSectionPlacer(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
             Repository = repository;
@@ -26,7 +29,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.GeneralView.ViewportTypeName = "Заголовок на листе";
+                SheetInfo.GeneralView.ViewportTypeName = _viewportTypeWithTitle;
                 SheetInfo.GeneralView.ViewportNumber = "100";
                 SheetInfo.GeneralView.ViewportName =
                     ViewModel.ViewSectionSettings.GeneralViewPrefix
@@ -72,8 +75,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.GeneralRebarView.ViewportTypeName = "Заголовок на листе";
-                SheetInfo.GeneralRebarView.ViewportNumber = "102";
+                SheetInfo.GeneralRebarView.ViewportTypeName = _viewportTypeWithTitle;
+                SheetInfo.GeneralRebarView.ViewportNumber = "101";
                 SheetInfo.GeneralRebarView.ViewportName =
                     ViewModel.ViewSectionSettings.GeneralRebarViewPrefix
                     + SheetInfo.PylonKeyName
@@ -124,8 +127,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.GeneralViewPerpendicular.ViewportTypeName = "Заголовок на листе";
-                SheetInfo.GeneralViewPerpendicular.ViewportNumber = "101";
+                SheetInfo.GeneralViewPerpendicular.ViewportTypeName = _viewportTypeWithNumber;
+                SheetInfo.GeneralViewPerpendicular.ViewportNumber = "4";
                 SheetInfo.GeneralViewPerpendicular.ViewportName =
                     ViewModel.ViewSectionSettings.GeneralViewPerpendicularPrefix
                     + SheetInfo.PylonKeyName
@@ -162,8 +165,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.GeneralRebarViewPerpendicular.ViewportTypeName = "Заголовок на листе";
-                SheetInfo.GeneralRebarViewPerpendicular.ViewportNumber = "103";
+                SheetInfo.GeneralRebarViewPerpendicular.ViewportTypeName = _viewportTypeWithNumber;
+
+                if(SheetInfo.TransverseRebarViewSecond.ViewportElement is null) {
+                    SheetInfo.GeneralRebarViewPerpendicular.ViewportNumber = "б";
+                } else {
+                    SheetInfo.GeneralRebarViewPerpendicular.ViewportNumber = "в";
+                }
                 SheetInfo.GeneralRebarViewPerpendicular.ViewportName =
                     ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix
                     + SheetInfo.PylonKeyName
@@ -211,7 +219,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.TransverseViewFirst.ViewportTypeName = "Сечение_Номер вида";
+                SheetInfo.TransverseViewFirst.ViewportTypeName = _viewportTypeWithNumber;
                 SheetInfo.TransverseViewFirst.ViewportNumber = "1";
                 SheetInfo.TransverseViewFirst.ViewportName = "";
             }
@@ -275,7 +283,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.TransverseViewSecond.ViewportTypeName = "Сечение_Номер вида";
+                SheetInfo.TransverseViewSecond.ViewportTypeName = _viewportTypeWithNumber;
                 SheetInfo.TransverseViewSecond.ViewportNumber = "2";
                 SheetInfo.TransverseViewSecond.ViewportName = "";
             }
@@ -338,7 +346,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.TransverseViewThird.ViewportTypeName = "Сечение_Номер вида";
+                SheetInfo.TransverseViewThird.ViewportTypeName = _viewportTypeWithNumber;
                 SheetInfo.TransverseViewThird.ViewportNumber = "3";
                 SheetInfo.TransverseViewThird.ViewportName = "";
             }
@@ -406,7 +414,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.TransverseRebarViewFirst.ViewportTypeName = "Сечение_Номер вида";
+                SheetInfo.TransverseRebarViewFirst.ViewportTypeName = _viewportTypeWithNumber;
                 SheetInfo.TransverseRebarViewFirst.ViewportNumber = "a";
                 SheetInfo.TransverseRebarViewFirst.ViewportName = "";
             }
@@ -457,7 +465,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             } else {
                 // Заполнеяем данные для задания
-                SheetInfo.TransverseRebarViewSecond.ViewportTypeName = "Сечение_Номер вида";
+                SheetInfo.TransverseRebarViewSecond.ViewportTypeName = _viewportTypeWithNumber;
                 SheetInfo.TransverseRebarViewSecond.ViewportNumber = "б";
                 SheetInfo.TransverseRebarViewSecond.ViewportName = "";
             }

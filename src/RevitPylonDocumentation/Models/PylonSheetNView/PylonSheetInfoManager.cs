@@ -262,12 +262,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.GeneralRebarView.ViewSectionPlacer.PlaceGeneralRebarViewport();
                 }
             }
-            if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
-                // Если видовой экран на листе не найден, то размещаем
-                if(SheetInfo.GeneralRebarViewPerpendicular.ViewportElement is null) {
-                    SheetInfo.GeneralRebarViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularRebarViewport();
-                }
-            }
             if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.TransverseRebarViewSecond.ViewportElement is null) {
@@ -278,6 +272,12 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.TransverseRebarViewFirst.ViewportElement is null) {
                     SheetInfo.TransverseRebarViewFirst.ViewSectionPlacer.PlaceTransverseRebarFirstViewPort();
+                }
+            }
+            if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
+                // Если видовой экран на листе не найден, то размещаем
+                if(SheetInfo.GeneralRebarViewPerpendicular.ViewportElement is null) {
+                    SheetInfo.GeneralRebarViewPerpendicular.ViewSectionPlacer.PlaceGeneralPerpendicularRebarViewport();
                 }
             }
 
