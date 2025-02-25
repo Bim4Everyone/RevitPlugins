@@ -195,6 +195,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             MaterialSchedule.ViewName = ViewModel.SchedulesSettings.MaterialSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.MaterialScheduleSuffix;
             SystemPartsSchedule.ViewName = ViewModel.SchedulesSettings.SystemPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SystemPartsScheduleSuffix;
             IfcPartsSchedule.ViewName = ViewModel.SchedulesSettings.IfcPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.IfcPartsScheduleSuffix;
+
+            GeneralRebarView.ViewName = ViewModel.ViewSectionSettings.GeneralRebarViewPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralRebarViewSuffix;
+            GeneralRebarViewPerpendicular.ViewName = ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
+            TransverseRebarViewFirst.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewFirstPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewFirstSuffix;
+            TransverseRebarViewSecond.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewSecondPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewSecondSuffix;
+
+            SkeletonSchedule.ViewName = ViewModel.SchedulesSettings.SkeletonSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SkeletonScheduleSuffix;
+            SkeletonByElemsSchedule.ViewName = ViewModel.SchedulesSettings.SkeletonByElemsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SkeletonByElemsScheduleSuffix;
         }
 
 
@@ -220,6 +228,16 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     continue;
                 }
 
+                // GeneralRebarView
+                if(GeneralRebarView.ViewElement is null && viewSection.Name.Equals(GeneralRebarView.ViewName)) {
+                    GeneralRebarView.ViewElement = viewSection;
+                    GeneralRebarView.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutViewport(GeneralRebarView, viewport);
+                    continue;
+                }
+
                 // GeneralViewPerpendicular
                 if(GeneralViewPerpendicular.ViewElement is null && viewSection.Name.Equals(GeneralViewPerpendicular.ViewName)) {
                     GeneralViewPerpendicular.ViewElement = viewSection;
@@ -227,6 +245,16 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
                     // Получение центра и габаритов видового экрана
                     GetInfoAboutViewport(GeneralViewPerpendicular, viewport);
+                    continue;
+                }
+
+                // GeneralRebarViewPerpendicular
+                if(GeneralRebarViewPerpendicular.ViewElement is null && viewSection.Name.Equals(GeneralRebarViewPerpendicular.ViewName)) {
+                    GeneralRebarViewPerpendicular.ViewElement = viewSection;
+                    GeneralRebarViewPerpendicular.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutViewport(GeneralRebarViewPerpendicular, viewport);
                     continue;
                 }
 
@@ -257,6 +285,26 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
                     // Получение центра и габаритов видового экрана
                     GetInfoAboutViewport(TransverseViewThird, viewport);
+                    continue;
+                }
+
+                // TransverseRebarViewFirst
+                if(TransverseRebarViewFirst.ViewElement is null && viewSection.Name.Equals(TransverseRebarViewFirst.ViewName)) {
+                    TransverseRebarViewFirst.ViewElement = viewSection;
+                    TransverseRebarViewFirst.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutViewport(TransverseRebarViewFirst, viewport);
+                    continue;
+                }
+
+                // TransverseRebarViewSecond
+                if(TransverseRebarViewSecond.ViewElement is null && viewSection.Name.Equals(TransverseRebarViewSecond.ViewName)) {
+                    TransverseRebarViewSecond.ViewElement = viewSection;
+                    TransverseRebarViewSecond.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutViewport(TransverseRebarViewSecond, viewport);
                     continue;
                 }
             }
@@ -349,6 +397,26 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
                     // Получение центра и габаритов видового экрана
                     GetInfoAboutScheduleSheetInstance(IfcPartsSchedule, viewport);
+                    continue;
+                }
+
+                // SkeletonSchedule
+                if(SkeletonSchedule.ViewElement is null && viewSchedule.Name.Equals(SkeletonSchedule.ViewName)) {
+                    SkeletonSchedule.ViewElement = viewSchedule;
+                    SkeletonSchedule.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutScheduleSheetInstance(SkeletonSchedule, viewport);
+                    continue;
+                }
+
+                // SkeletonByElemsSchedule
+                if(SkeletonByElemsSchedule.ViewElement is null && viewSchedule.Name.Equals(SkeletonByElemsSchedule.ViewName)) {
+                    SkeletonByElemsSchedule.ViewElement = viewSchedule;
+                    SkeletonByElemsSchedule.ViewportElement = viewport;
+
+                    // Получение центра и габаритов видового экрана
+                    GetInfoAboutScheduleSheetInstance(SkeletonByElemsSchedule, viewport);
                     continue;
                 }
             }

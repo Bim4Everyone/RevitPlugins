@@ -83,6 +83,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             }
 
+            viewSection.CropBoxVisible = false;
             SheetInfo.GeneralView.ViewElement = viewSection;
             return true;
         }
@@ -155,6 +156,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 return false;
             }
 
+            viewSection.CropBoxVisible = false;
             SheetInfo.GeneralRebarView.ViewElement = viewSection;
             return true;
         }
@@ -223,6 +225,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
                 return false;
             }
+
+            viewSection.CropBoxVisible = false;
             SheetInfo.GeneralViewPerpendicular.ViewElement = viewSection;
             return true;
         }
@@ -297,6 +301,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
                 return false;
             }
+
+            viewSection.CropBoxVisible = false;
             SheetInfo.GeneralRebarViewPerpendicular.ViewElement = viewSection;
             return true;
         }
@@ -403,6 +409,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
                 return false;
             }
+
+            viewSection.CropBoxVisible = false;
             return true;
         }
 
@@ -504,6 +512,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
                 return false;
             }
+
+            viewSection.CropBoxVisible = false;
             return true;
         }
 

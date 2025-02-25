@@ -35,6 +35,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
                 Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
 
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1);
+                ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
+                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
+
                 Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top);
                 ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
                 Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
@@ -132,7 +136,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
 
-
         private Line GetDimensionLine(View view, FamilyInstance rebar, DimensionOffsetType dimensionOffsetType,
                                       double offsetCoefficient = 1) {
             var pt1 = new XYZ(0, 0, 0);
@@ -214,9 +217,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     return;
                 }
 
-                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom);
+                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 0.1);
                 ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
                 Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
+
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 0.5);
+                ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
+                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
             } catch(Exception) { }
         }
 
@@ -230,9 +237,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     return;
                 }
 
-                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top);
+                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 0.1);
                 ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
                 Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
+
+                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 0.5);
+                ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт", "край" });
+                Dimension dimensionTopEdge = doc.Create.NewDimension(view, dimensionLineTopEdge, refArrayTopEdge);
             } catch(Exception) { }
         }
     }

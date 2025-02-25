@@ -93,7 +93,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 SheetInfo.SetTitleBlockSize(Repository.Document, 2, 1);
             }
 
-            double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralView.ViewportHalfWidth + 0.065;
+            double newCenterX = -SheetInfo.TitleBlockWidth + SheetInfo.GeneralRebarView.ViewportHalfWidth + 0.065;
 
             // Рассчитываем и задаем корректную точку вставки основного вида армирования пилона, если есть другие виды
             PylonView refPylonView = null;
