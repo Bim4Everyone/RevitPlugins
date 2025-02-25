@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -23,14 +23,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         }
 
         public XYZ GetPoint() {
-            var transform = _group.Elements.First().GetFamilyInstance().GetTotalTransform();
+            var transform = _group.GetTransform();
             var bb = _group.Elements.Select(item => SolidUtils.CreateTransformed(item.GetSolid(), transform.Inverse))
                 .Select(item => item.GetTransformedBoundingBox())
                 .ToList()
                 .CreateUnitedBoundingBox();
             var center = bb.Min + (bb.Max - bb.Min) / 2;
             var zRoundCoordinate = _group.IsCylinder ? RoundFeetToMillimeters(center.Z, _heightRound) : RoundFeetToMillimeters(bb.Min.Z, _heightRound);
-            return _group.Elements.First().GetFamilyInstance().GetTotalTransform().OfPoint(new XYZ(center.X, bb.Min.Y, zRoundCoordinate));
+            return _group.GetTransform().OfPoint(new XYZ(center.X, bb.Min.Y, zRoundCoordinate));
         }
     }
 }
