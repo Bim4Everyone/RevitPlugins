@@ -62,15 +62,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
 
 
-            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО АРМАТУРНОГО ВИДА
-            if(selectionSettings.NeedWorkWithGeneralRebarView) {
-                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-                if(SheetInfo.GeneralRebarView.ViewElement != null) {
-                    SheetInfo.GeneralRebarView.ViewDimensionCreator
-                        .TryCreateGeneralRebarViewDimensions();
-                }
-            }
-
 
             // ОСНОВНОЙ ПЕРПЕНДИКУЛЯРНЫЙ ВИД 
             if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
@@ -350,6 +341,46 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Если видовой экран на листе не найден, то размещаем
                 if(SheetInfo.RebarNodeView.ViewportElement is null) {
                     SheetInfo.RebarNodeView.LegendPlacer.PlaceRebarNodeLegend();
+                }
+            }
+
+
+
+            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО АРМАТУРНОГО ВИДА
+            if(selectionSettings.NeedWorkWithGeneralRebarView) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.GeneralRebarView.ViewElement != null) {
+                    SheetInfo.GeneralRebarView.ViewDimensionCreator
+                        .TryCreateGeneralRebarViewDimensions();
+                }
+            }
+
+            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО АРМАТУРНОГО ВИДА
+            if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement != null) {
+                    SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
+                        .TryCreateGeneralRebarPerpendicularViewDimensions();
+                    SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
+                        .TryCreateGeneralRebarPerpendicularViewAdditionalDimensions();
+                }
+            }
+
+            // ОБРАЗМЕРИВАНИЕ ПЕРВОГО ПОПЕРЕЧНОГО ВИД АРМИРОВАНИЯ
+            if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.TransverseRebarViewFirst.ViewElement != null) {
+                    SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
+                        .TryCreateTransverseRebarViewFirstDimensions();
+                }
+            }
+
+            // ОБРАЗМЕРИВАНИЕ ВТОРОГО ПОПЕРЕЧНОГО ВИД АРМИРОВАНИЯ
+            if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.TransverseRebarViewSecond.ViewElement != null) {
+                    SheetInfo.TransverseRebarViewSecond.ViewDimensionCreator
+                        .TryCreateTransverseRebarViewSecondDimensions();
                 }
             }
         }
