@@ -61,6 +61,88 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             return true;
         }
 
+        public bool TryCreateSkeletonSchedule() {
+            if(ViewModel.ReferenceSkeletonSchedule is null || !ViewModel.ReferenceSkeletonSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+                return false;
+            }
+
+            ElementId scheduleId = null;
+            ViewSchedule viewSchedule = null;
+            try {
+                scheduleId = ViewModel.ReferenceSkeletonSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+                viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+                if(viewSchedule != null) {
+                    viewSchedule.Name =
+                        ViewModel.SchedulesSettings.SkeletonSchedulePrefix
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.SchedulesSettings.SkeletonScheduleSuffix;
+
+                    // Задаем сортировку
+                    SetScheduleDispatcherParameter(
+                        viewSchedule,
+                        ViewModel.ProjectSettings.DispatcherGroupingFirst,
+                        ViewModel.SchedulesSettings.SkeletonScheduleDisp1);
+                    SetScheduleDispatcherParameter(
+                        viewSchedule,
+                        ViewModel.ProjectSettings.DispatcherGroupingSecond,
+                        ViewModel.SchedulesSettings.SkeletonScheduleDisp2);
+
+                    // Задаем фильтры спецификации
+                    SetScheduleFilters(viewSchedule);
+                }
+            } catch(Exception) {
+                if(scheduleId != null) {
+                    Repository.Document.Delete(scheduleId);
+                }
+                return false;
+            }
+
+            SheetInfo.SkeletonSchedule.ViewElement = viewSchedule;
+            return true;
+        }
+
+
+        public bool TryCreateSkeletonByElemsSchedule() {
+            if(ViewModel.ReferenceSkeletonByElemsSchedule is null
+                || !ViewModel.ReferenceSkeletonByElemsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+                return false;
+            }
+
+            ElementId scheduleId = null;
+            ViewSchedule viewSchedule = null;
+            try {
+                scheduleId = ViewModel.ReferenceSkeletonByElemsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+                viewSchedule = Repository.Document.GetElement(scheduleId) as ViewSchedule;
+                if(viewSchedule != null) {
+                    viewSchedule.Name =
+                        ViewModel.SchedulesSettings.SkeletonByElemsSchedulePrefix
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.SchedulesSettings.SkeletonByElemsScheduleSuffix;
+
+                    // Задаем сортировку
+                    SetScheduleDispatcherParameter(
+                        viewSchedule,
+                        ViewModel.ProjectSettings.DispatcherGroupingFirst,
+                        ViewModel.SchedulesSettings.SkeletonByElemsScheduleDisp1);
+                    SetScheduleDispatcherParameter(
+                        viewSchedule,
+                        ViewModel.ProjectSettings.DispatcherGroupingSecond,
+                        ViewModel.SchedulesSettings.SkeletonByElemsScheduleDisp2);
+
+                    // Задаем фильтры спецификации
+                    SetScheduleFilters(viewSchedule);
+                }
+            } catch(Exception) {
+                if(scheduleId != null) {
+                    Repository.Document.Delete(scheduleId);
+                }
+                return false;
+            }
+
+            SheetInfo.SkeletonByElemsSchedule.ViewElement = viewSchedule;
+            return true;
+        }
+
 
         public bool TryCreateMaterialSchedule() {
             if(ViewModel.ReferenceMaterialSchedule is null || !ViewModel.ReferenceMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { return false; }
