@@ -6,21 +6,21 @@ namespace RevitListOfSchedules.ViewModels {
     internal class SheetViewModel {
 
 
-        public SheetViewModel(SheetElement sheetElement, ElementId id = null) {
+        public SheetViewModel(SheetElement sheetElement, ElementId linkTypeId = null) {
 
 
             Name = sheetElement.Name;
             Number = sheetElement.Number;
             AlbumName = sheetElement.AlbumName;
-            ChangeNumber = sheetElement.ChangeNumber;
-            Id = id;
+            RevisionNumber = sheetElement.RevisionNumber;
+            LinkTypeId = linkTypeId;
 
         }
 
         public string Name { get; }
         public string Number { get; }
         public string AlbumName { get; }
-        public string ChangeNumber { get; }
-        public ElementId Id { get; }
+        public string RevisionNumber { get; }
+        public ElementId LinkTypeId { get; }
     }
 }

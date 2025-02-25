@@ -27,6 +27,9 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<SheetViewModel> _sheets;
     private ObservableCollection<SheetViewModel> _selectedSheets;
 
+    private ObservableCollection<GroupParameterViewModel> _groupParameters;
+    private GroupParameterViewModel _selectedGroupParameter;
+
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -52,10 +55,14 @@ internal class MainViewModel : BaseViewModel {
         SelectedLinks = new ObservableCollection<LinkViewModel>();
         SelectedSheets = new ObservableCollection<SheetViewModel>();
 
-
+        // Подписка на события в LinkViewModel
         foreach(var link in Links) {
             link.SelectionChanged += OnLinkSelectionChanged;
         }
+
+        GroupParameters = GetGroupParameters();
+        SelectedGroupParameter = GroupParameters.Last();
+
     }
 
     /// <summary>
@@ -95,17 +102,26 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedSheets, value);
     }
 
+    public ObservableCollection<GroupParameterViewModel> GroupParameters {
+        get => _groupParameters;
+        set => RaiseAndSetIfChanged(ref _groupParameters, value);
+    }
+    public GroupParameterViewModel SelectedGroupParameter {
+        get => _selectedGroupParameter;
+        set => RaiseAndSetIfChanged(ref _selectedGroupParameter, value);
+    }
 
     // Загружаем с основного документа все линки через _revitRepository
     private ObservableCollection<LinkViewModel> GetLinks() {
         ObservableCollection<LinkViewModel> links = [];
-        foreach(LinkTypeElement linkDocumentType in _revitRepository.GetLinkTypes()) {
-            links.Add(new LinkViewModel(linkDocumentType));
+        foreach(LinkTypeElement linkTypeElement in _revitRepository.GetLinkTypeElements()) {
+            links.Add(new LinkViewModel(linkTypeElement));
         }
         return links;
     }
 
-    // При изменении события, выполняем метод добавления в выбранные линки отмеченный линк
+    // При изменении события, выполняем метод добавления/удаления в SelectedSheets отмеченный линк и добавляем/удаляем
+    // листы в Sheets
     private void OnLinkSelectionChanged(object sender, EventArgs e) {
         if(sender is LinkViewModel link) {
             if(link.IsChecked) {
@@ -131,19 +147,33 @@ internal class MainViewModel : BaseViewModel {
         );
     }
 
+    // Добавляем листы из связей. Дописать !!! Сорстировку при добавлении только этого альбома
     private void AddLinkSheets(LinkViewModel linkViewModel) {
         foreach(SheetElement sheetElement in _revitRepository.GetSheetElements(_revitRepository.GetLinkDocument(linkViewModel))) {
             _sheets.Add(new SheetViewModel(sheetElement, linkViewModel.Id));
         }
     }
 
+    // Удаляем листы из связей
     private void DeleteLinkSheets(LinkViewModel linkViewModel) {
         for(int i = _sheets.Count - 1; i >= 0; i--) {
-            if(_sheets[i].Id == linkViewModel.Id) {
+            if(_sheets[i].LinkTypeId == linkViewModel.Id) {
                 _sheets.RemoveAt(i);
             }
         }
     }
+
+    private ObservableCollection<GroupParameterViewModel> GetGroupParameters() {
+        var firstSheet = _revitRepository.GetSheets(_revitRepository.Document).FirstOrDefault();
+        ObservableCollection<GroupParameterViewModel> list = [];
+
+        if(firstSheet != null) {
+
+            return new ObservableCollection<GroupParameterViewModel>(
+                _revitRepository.GetBrowserParameters(firstSheet.Id)
+                .Where(firstSheet => firstSheet != null)
+                .Select(elementId => new GroupParameterViewModel(_revitRepository.Document, elementId)));
+        }
 
     /// <summary>
     /// Метод загрузки главного окна.

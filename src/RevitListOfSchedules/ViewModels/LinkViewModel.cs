@@ -26,7 +26,7 @@ namespace RevitListOfSchedules.ViewModels {
             Status = GetStatus();
             Id = linkElement.Id;
 
-            ReloadCommand = RelayCommand.Create(ReloadLinkDocument, CanReloadLinkDocument);
+            ReloadCommand = RelayCommand.Create(ReloadLinkType, CanReloadLinkType);
         }
 
         public ICommand ReloadCommand { get; set; }
@@ -58,12 +58,12 @@ namespace RevitListOfSchedules.ViewModels {
             return changed;
         }
 
-        private void ReloadLinkDocument() {
+        private void ReloadLinkType() {
             _linkElement.Reload();
             Status = GetStatus();
         }
 
-        private bool CanReloadLinkDocument() {
+        private bool CanReloadLinkType() {
             if(_isChecked) {
                 return true;
             }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -45,7 +46,11 @@ internal class RevitRepository {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
-    public Collection<LinkTypeElement> GetLinkTypes() {
+    public List<ViewSheet> Sheets => GetSheets(Document);
+
+
+
+    public Collection<LinkTypeElement> GetLinkTypeElements() {
         var listRevitLinkTypes = new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_RvtLinks)
             .OfClass(typeof(RevitLinkType))
@@ -68,18 +73,28 @@ internal class RevitRepository {
     }
 
     public Collection<SheetElement> GetSheetElements(Document document) {
-        var sheets = new FilteredElementCollector(document)
-            .OfCategory(BuiltInCategory.OST_Sheets)
-            .Cast<ViewSheet>()
-            .ToList();
-        return new Collection<SheetElement>(sheets
+        return new Collection<SheetElement>(GetSheets(document)
             .Select(sheet => new SheetElement(sheet))
             .OrderBy(sheet => Convert.ToInt32(sheet.Number))
             .ToList());
     }
 
-    public ElementId GetBrowserParameters() {
-        ElementId elementId = null;
-        return elementId;
+    public List<ViewSheet> GetSheets(Document document) {
+        return new FilteredElementCollector(document)
+            .OfCategory(BuiltInCategory.OST_Sheets)
+            .Cast<ViewSheet>()
+            .ToList();
     }
+
+    public IList<ElementId> GetBrowserParameters(ElementId revitSheetId) {
+
+        BrowserOrganization browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
+        IList<FolderItemInfo> itemInfo = browserOrganization.GetFolderItems(revitSheetId);
+
+        return itemInfo.Count > 0 ? itemInfo.Select(item => item.ElementId).ToList() : null;
+    }
+
+
+
+
 }

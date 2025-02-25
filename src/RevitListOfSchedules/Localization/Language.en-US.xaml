@@ -3,8 +3,31 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     
 
-    <system:String x:Key="MainWindow.Title">List of schedules</system:String>    
+    <system:String 
+        x:Key="MainWindow.Title">List of schedules</system:String>
+    <system:String
+        x:Key="MainWindow.ReloadButton">Reload link</system:String>
+    <system:String
+        x:Key="MainWindow.GroupParametersLabel">Grouping parameter:</system:String>
+    <system:String
+        x:Key="MainWindow.NumberParametersLabel">Number parameter:</system:String>
+    <system:String
+        x:Key="MainWindow.RevisionParametersLabel">Revision parameter:</system:String>
+    <system:String
+        x:Key="MainWindow.LinkName">Link name</system:String>
+    <system:String
+        x:Key="MainWindow.LinkFullName">Link full name</system:String>
+    <system:String
+        x:Key="MainWindow.Reload">Reload</system:String>    
+    <system:String
+        x:Key="MainWindow.SheetNumber">Sheet number</system:String>
+    <system:String
+        x:Key="MainWindow.SheetName">Sheet name</system:String>
+    <system:String
+        x:Key="MainWindow.SheetRevisionNumber">Revision number</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">Create</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String 
+        x:Key="MainWindow.ButtonOk">Create</system:String>
+    <system:String 
+        x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>

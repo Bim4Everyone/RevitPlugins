@@ -24,14 +24,14 @@ namespace RevitListOfSchedules.Models {
 
             AlbumName = SetParam(sheetAlbumParam);
 
-            ChangeNumber = SetParam(changeAlbumParam);
+            RevisionNumber = SetParam(changeAlbumParam);
 
         }
 
         public string Name { get; }
         public string Number { get; }
         public string AlbumName { get; }
-        public string ChangeNumber { get; }
+        public string RevisionNumber { get; }
 
 
         private string SetParam(SharedParam sharedParam) {

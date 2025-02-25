@@ -11,16 +11,15 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{DynamicResource MainWindow.Title}"
-    Width="1600"
-    Height="600"
-    MinWidth="1600"
-    MinHeight="600"
+    Width="1500"
+    Height="700"
+    MinWidth="1500"
+    MinHeight="700"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
         <local:StatusToImageConverter
             x:Key="StatusToImageConverter" />
-
         <CollectionViewSource
             x:Key="GroupedAlbums"
             Source="{Binding Sheets}">
@@ -29,7 +28,24 @@
                     PropertyName="AlbumName" />
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
-
+        <TextBlock
+            x:Key="LinkName"
+            Text="{DynamicResource MainWindow.LinkName}" />
+        <TextBlock
+            x:Key="LinkFullName"
+            Text="{DynamicResource MainWindow.LinkFullName}" />
+        <TextBlock
+            x:Key="Reload"
+            Text="{DynamicResource MainWindow.Reload}" />
+        <TextBlock
+            x:Key="SheetNumber"
+            Text="{DynamicResource MainWindow.SheetNumber}" />
+        <TextBlock
+            x:Key="SheetName"
+            Text="{DynamicResource MainWindow.SheetName}" />
+        <TextBlock
+            x:Key="SheetRevisionNumber"
+            Text="{DynamicResource MainWindow.SheetRevisionNumber}" />        
     </Window.Resources>
 
     <b:Interaction.Triggers>
@@ -39,18 +55,17 @@
                 Command="{Binding LoadViewCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
-                Height="45" />
+                Height="70" />
             <RowDefinition />
             <RowDefinition
                 Height="45" />
-        </Grid.RowDefinitions>
-        
+        </Grid.RowDefinitions>        
         <Grid.ColumnDefinitions>
-            <ColumnDefinition />
+            <ColumnDefinition 
+                Width="Auto"/>
             <ColumnDefinition 
                 Width="Auto"/>
             <ColumnDefinition />
@@ -60,50 +75,52 @@
             Grid.RowSpan="3"
             Width="3"
             HorizontalAlignment="Center">            
-        </GridSplitter>                
-        
-        <Button           
-            Content="Обновить связь"
-            VerticalAlignment="Center"
-            Margin="10" 
+        </GridSplitter>              
+        <Button
             Width="200"
-            HorizontalAlignment="Left"/>         
+            Margin="20"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Left"
+            Content="{DynamicResource MainWindow.ReloadButton}" />         
         <StackPanel
             Grid.Row="0"
             Grid.Column="2"
-            Orientation="Horizontal">
+            Orientation="Horizontal">            
             <Label
+                Margin="10,5,10,0"
                 VerticalAlignment="Center"
-                Margin="10"
-                Content="Выберите параметр группировки:"/>
-            <ComboBox                
-                VerticalAlignment="Center"
-                Margin="10"
-                Width="150"
-                HorizontalAlignment="Right" />
-            <Label
-                VerticalAlignment="Center"
-                Margin="10"
-                Content="Выберите параметр номера листа:" />
+                Content="{DynamicResource MainWindow.GroupParametersLabel}" />
             <ComboBox
-                VerticalAlignment="Center"
+                Width="200"
                 Margin="10"
-                Width="150"
-                HorizontalAlignment="Right" />
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                DisplayMemberPath="Name"
+                ItemsSource="{Binding GroupParameters}"                    
+                SelectedItem="{Binding SelectedGroupParameter}"/>             
+            <Label
+                Margin="10,5,10,0"
+                VerticalAlignment="Center"
+                Content="{DynamicResource MainWindow.NumberParametersLabel}" />
+            <ComboBox
+                Width="200"
+                Margin="10"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                ItemsSource="{Binding NumberParameters}"                    
+                SelectedItem="{Binding SelectedNumberParameter}" />                         
         </StackPanel>
-
         <DataGrid
-            Background="White"
-            Margin="10"
             Grid.Row="1"
-            Grid.Column="0"
-            ItemsSource="{Binding Links}"
-            SelectedItem="{Binding SelectedLinkDocuments, Mode=TwoWay}"
+            Grid.Column="0"            
+            Margin="10"  
             AutoGenerateColumns="False"
             GridLinesVisibility="All"
+            Background="White"
             HorizontalGridLinesBrush="LightGray"
-            VerticalGridLinesBrush="LightGray">
-
+            VerticalGridLinesBrush="LightGray"
+            RowHeaderWidth="0"
+            ItemsSource="{Binding Links}">
             <DataGrid.Columns>
                 <DataGridTemplateColumn
                     Width="40">
@@ -111,6 +128,7 @@
                         <DataTemplate>
                             <CheckBox 
                                 HorizontalAlignment="Center"
+                                VerticalAlignment="Center"                                
                                 IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -128,21 +146,22 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn
-                    Header="Name"
-                    Binding="{Binding Name}"
-                    Width="200" />
+                    Width="200"
+                    Header="{StaticResource LinkName}"
+                    Binding="{Binding Name}" />
                 <DataGridTextColumn
-                    Header="Full Name"
-                    Binding="{Binding FullName}"
-                    Width="*" />                 
+                    Width="300"
+                    Header="{StaticResource LinkFullName}"
+                    Binding="{Binding FullName}" />                 
                 <DataGridTemplateColumn
-                    Width="100">
+                    Width="100"
+                    Header="{StaticResource Reload}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button
-                                Content="Обновить"
+                            <Button  
                                 Width="100"
                                 HorizontalAlignment="Center"
+                                Content="{DynamicResource MainWindow.Reload}"                                
                                 Command="{Binding ReloadCommand, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -150,33 +169,33 @@
             </DataGrid.Columns>
         </DataGrid>
         <DataGrid
-            Background="White"
-            Margin="10"
             Grid.Row="1"
             Grid.Column="2"
-            ItemsSource="{Binding Source={StaticResource GroupedAlbums}}"
+            Margin="10"                       
             AutoGenerateColumns="False"
             GridLinesVisibility="All"
+            Background="White"
             HorizontalGridLinesBrush="LightGray"
             VerticalGridLinesBrush="LightGray"
-            RowHeaderWidth="0">
+            RowHeaderWidth="0"
+            ItemsSource="{Binding Source={StaticResource GroupedAlbums}}">
             <DataGrid.Columns>
                 <DataGridTextColumn
-                    Header=" "
                     Width="20"
+                    Header=" "                    
                     IsReadOnly="True" />
                 <DataGridTextColumn
-                    Header="Номер"                    
-                    Binding="{Binding Number}"
-                    Width="100" />
+                    Width="100"
+                    Header="{StaticResource SheetNumber}"                   
+                    Binding="{Binding Number}" />
                 <DataGridTextColumn
-                    Header="Имя"
-                    Binding="{Binding Name}"
-                    Width="600" />
+                    Width="400"
+                    Header="{StaticResource SheetName}"
+                    Binding="{Binding Name}" />
                 <DataGridTextColumn
-                    Header="Change Name"
-                    Binding="{Binding ChangeNumber}"
-                    Width="*" />
+                    Width="*"
+                    Header="{StaticResource SheetRevisionNumber}"
+                    Binding="{Binding RevisionNumber}" />
             </DataGrid.Columns>
             <DataGrid.GroupStyle>
                 <GroupStyle>
@@ -205,13 +224,13 @@
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
+                Text="{Binding ErrorText, UpdateSourceTrigger=PropertyChanged}" />
             <Button
                 Width="80"
                 Margin="10"
                 Content="{DynamicResource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
+                Command="{Binding AcceptViewCommand, UpdateSourceTrigger=PropertyChanged}" />
             <Button
                 Width="80"
                 Margin="10"
@@ -221,4 +240,3 @@
         </StackPanel>
     </Grid>
 </base:PlatformWindow>
-

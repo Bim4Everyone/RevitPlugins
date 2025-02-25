@@ -1,11 +1,33 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">    
 
-    <system:String x:Key="MainWindow.Title">Ведомость спецификаций</system:String>    
+    <system:String 
+        x:Key="MainWindow.Title">Ведомость спецификаций</system:String>    
+    <system:String
+        x:Key="MainWindow.ReloadButton">Обновить связь</system:String>
+    <system:String
+        x:Key="MainWindow.GroupParametersLabel">Параметр группировки:</system:String>
+    <system:String
+        x:Key="MainWindow.NumberParametersLabel">Параметр номера:</system:String>
+    <system:String
+        x:Key="MainWindow.RevisionParametersLabel">Параметр изменения:</system:String>
+    <system:String
+        x:Key="MainWindow.LinkName">Наименование связи</system:String>
+    <system:String
+        x:Key="MainWindow.LinkFullName">Полное наименование связи</system:String>
+    <system:String
+        x:Key="MainWindow.Reload">Обновить</system:String>
+    <system:String
+        x:Key="MainWindow.SheetNumber">Номер листа</system:String>
+    <system:String
+        x:Key="MainWindow.SheetName">Наименование листа</system:String>
+    <system:String
+        x:Key="MainWindow.SheetRevisionNumber">Номер изменения</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">Создать</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String 
+        x:Key="MainWindow.ButtonOk">Создать</system:String>
+    <system:String 
+        x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 
 </ResourceDictionary>
