@@ -7,7 +7,7 @@ using Autodesk.Revit.DB.Architecture;
 
 namespace RevitRoomExtrusion.Models {
     internal class RoomElement {
-        private readonly Document _document;
+        private readonly RevitRepository _revitRepository;
         private readonly Room _room;
         private readonly View3D _view3D;
         private readonly double _normalDirection = -100000;
@@ -18,8 +18,8 @@ namespace RevitRoomExtrusion.Models {
                 BuiltInCategory.OST_Floors
             });
 
-        public RoomElement(Document document, Room room, View3D view3D) {
-            _document = document;
+        public RoomElement(RevitRepository revitRepository, Room room, View3D view3D) {
+            _revitRepository = revitRepository;
             _room = room;
             _view3D = view3D;
             LocationPoint locationPoint = room.Location as LocationPoint;
@@ -36,11 +36,12 @@ namespace RevitRoomExtrusion.Models {
             BoundingBoxXYZ boundingBox = _room.get_BoundingBox(null);
             XYZ pointCenter = (boundingBox.Max + boundingBox.Min) / 2;
             XYZ pointDirection = new XYZ(pointCenter.X, pointCenter.Y, _normalDirection);
+
             ReferenceWithContext referenceWithContext = GetReferenceWithContext(pointCenter, pointDirection);
             double foundElementLocation;
             if(referenceWithContext != null) {
                 double proximity = referenceWithContext.Proximity;
-                foundElementLocation = pointCenter.Z - proximity;
+                foundElementLocation = pointCenter.Z - proximity - _revitRepository.GetBasePointLocation();
             } else {
                 foundElementLocation = boundingBox.Min.Z;
             }

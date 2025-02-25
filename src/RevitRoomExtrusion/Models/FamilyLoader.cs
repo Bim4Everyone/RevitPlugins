@@ -64,7 +64,7 @@ namespace RevitRoomExtrusion.Models {
             }
 
             double locationFt = UnitUtils.ConvertToInternalUnits(location, UnitTypeId.Millimeters);
-            double locationPlace = locationFt - locationRoom;
+            double locationPlace = locationFt - locationRoom + _revitRepository.GetBasePointLocation();
             string transactionNamePlace = _localizationService.GetLocalizedString("FamilyLoader.TransactionNamePlace");
             using(Transaction t = _revitRepository.Document.StartTransaction(transactionNamePlace)) {
                 XYZ xyz = new XYZ(0, 0, locationPlace);
