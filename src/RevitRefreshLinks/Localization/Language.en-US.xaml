@@ -1,0 +1,97 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="UpdateLinksWindow.Title">Link update</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.EmptySelectionCheck">Select links to update.</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.EmptySourcesCheck">Select source with link.</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.LocalFolder">Local source:</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.ServerFolder">Revit Server source:</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.LinkName.Header">Link name</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Header">Workset status</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Opened">Opened</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Closed">Closed</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Header">Link status</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Loaded">Loaded</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Unloaded">Unloaded</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.LocallyUnloaded">Locally unload</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.NotFound">Not found</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.ClosedWorkset">Closed workset</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Unknown">Unknown</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Header">Source</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Found">Found</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.NotFound">Not found</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Duplicated">Duplicated</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.SelectAll">Select all</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.UnselectAll">Unselect all</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.Invert">Invert</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.SelectLocalFolder">Select local folder</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.SelectServerFolder">Select RS folder</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Progress.Title">Update links [{0}/{1}] ...</system:String>
+    <system:String
+        x:Key="SelectLinksFromFolderDialog.Title">Select links to add</system:String>
+    <system:String
+        x:Key="SelectLinksFromFolderDialog.Filter">Revit files (*.rvt)|*.rvt</system:String>
+
+    <system:String
+        x:Key="LinkLoader.Transaction.AddLinks">Add links</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.Coordinates">File with different shared coordinates</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.Version">File was created in a different Revit version</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.AlreadyAdded">File has already been added</system:String>
+    <system:String
+        x:Key="MessageBox.Title.ErrorAddLink">Errors when adding links</system:String>
+    <system:String
+        x:Key="MessageBox.Title.ErrorUpdateLink">Errors when updating links</system:String>
+
+    <system:String
+        x:Key="SelectLocalFoldersDialog.Title">Select folders with links to update</system:String>
+
+    <system:String
+        x:Key="RsOpenFileWindow.Title">Select models from Revit Server</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.List.Name">Name</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.List.Size">Size</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.ExecutingCmdCheck">Wait for the previous command to complete</system:String>
+
+    <system:String
+        x:Key="DirectoriesExplorer.Title">Select folder from Revit Server</system:String>
+    <system:String
+        x:Key="DirectoriesExplorer.ExecutingCmdCheck">Wait for the previous command to complete</system:String>
+
+    <system:String
+        x:Key="AllWindow.Ok">OK</system:String>
+    <system:String
+        x:Key="AllWindow.Cancel">Cancel</system:String>
+</ResourceDictionary>
