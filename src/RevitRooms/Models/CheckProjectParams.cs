@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -124,7 +124,9 @@ namespace RevitRooms.Models {
             yield return SchedulesConfig.Instance.RoomsCheckDeviationAreas;
             yield return SchedulesConfig.Instance.RoomsCheckTypes;
             yield return SchedulesConfig.Instance.RoomsCheckGroupTypes;
+            yield return SchedulesConfig.Instance.RoomsCheckFixedAreas;
             yield return SchedulesConfig.Instance.RoomsMultiLevel;
+            yield return SchedulesConfig.Instance.RoomsSummer;
         }
 
         public CheckProjectParams ReplaceKeySchedules(IEnumerable<KeyScheduleRule> keyScheduleRules) {
