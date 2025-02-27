@@ -10,10 +10,6 @@
     <system:String
         x:Key="MainWindow.GroupParametersLabel">Grouping parameter:</system:String>
     <system:String
-        x:Key="MainWindow.NumberParametersLabel">Number parameter:</system:String>
-    <system:String
-        x:Key="MainWindow.RevisionParametersLabel">Revision parameter:</system:String>
-    <system:String
         x:Key="MainWindow.LinkName">Link name</system:String>
     <system:String
         x:Key="MainWindow.LinkFullName">Link full name</system:String>

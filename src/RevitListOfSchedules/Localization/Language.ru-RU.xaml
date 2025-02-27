@@ -7,11 +7,7 @@
     <system:String
         x:Key="MainWindow.ReloadButton">Обновить связь</system:String>
     <system:String
-        x:Key="MainWindow.GroupParametersLabel">Параметр группировки:</system:String>
-    <system:String
-        x:Key="MainWindow.NumberParametersLabel">Параметр номера:</system:String>
-    <system:String
-        x:Key="MainWindow.RevisionParametersLabel">Параметр изменения:</system:String>
+        x:Key="MainWindow.GroupParametersLabel">Параметр группировки:</system:String>    
     <system:String
         x:Key="MainWindow.LinkName">Наименование связи</system:String>
     <system:String

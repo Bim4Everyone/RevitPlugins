@@ -46,11 +46,8 @@ internal class RevitRepository {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
-    public List<ViewSheet> Sheets => GetSheets(Document);
 
-
-
-    public Collection<LinkTypeElement> GetLinkTypeElements() {
+    public IList<LinkTypeElement> GetLinkTypeElements() {
         var listRevitLinkTypes = new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_RvtLinks)
             .OfClass(typeof(RevitLinkType))
@@ -72,29 +69,40 @@ internal class RevitRepository {
             .GetLinkDocument();
     }
 
-    public Collection<SheetElement> GetSheetElements(Document document) {
-        return new Collection<SheetElement>(GetSheets(document)
+    public IList<SheetElement> GetSheetElements(Document document) {
+        return new Collection<SheetElement>(GetViewSheets(document)
             .Select(sheet => new SheetElement(sheet))
             .OrderBy(sheet => Convert.ToInt32(sheet.Number))
             .ToList());
     }
 
-    public List<ViewSheet> GetSheets(Document document) {
+    public IList<ViewSheet> GetViewSheets(Document document) {
         return new FilteredElementCollector(document)
             .OfCategory(BuiltInCategory.OST_Sheets)
             .Cast<ViewSheet>()
             .ToList();
     }
 
-    public IList<ElementId> GetBrowserParameters(ElementId revitSheetId) {
+    public IList<Parameter> GetBrowserParameters(ViewSheet viewSheet) {
 
-        BrowserOrganization browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
-        IList<FolderItemInfo> itemInfo = browserOrganization.GetFolderItems(revitSheetId);
-
-        return itemInfo.Count > 0 ? itemInfo.Select(item => item.ElementId).ToList() : null;
+        IList<Parameter> listOfParameters = new List<Parameter>();
+        if(viewSheet != null) {
+            var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
+            IList<FolderItemInfo> itemsInfo = browserOrganization.GetFolderItems(viewSheet.Id);
+            foreach(FolderItemInfo itemInfo in itemsInfo) {
+                foreach(Parameter parameter in viewSheet.Parameters) {
+                    if(itemInfo.ElementId == parameter.Id) {
+                        listOfParameters.Add(parameter);
+                    }
+                }
+            }
+        }
+        return listOfParameters;
     }
 
 
 
 
 }
+
+

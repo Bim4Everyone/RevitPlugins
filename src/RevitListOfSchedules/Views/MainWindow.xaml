@@ -91,24 +91,14 @@
                 VerticalAlignment="Center"
                 Content="{DynamicResource MainWindow.GroupParametersLabel}" />
             <ComboBox
-                Width="200"
+                Width="250"
                 Margin="10"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Right"
                 DisplayMemberPath="Name"
                 ItemsSource="{Binding GroupParameters}"                    
                 SelectedItem="{Binding SelectedGroupParameter}"/>             
-            <Label
-                Margin="10,5,10,0"
-                VerticalAlignment="Center"
-                Content="{DynamicResource MainWindow.NumberParametersLabel}" />
-            <ComboBox
-                Width="200"
-                Margin="10"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Right"
-                ItemsSource="{Binding NumberParameters}"                    
-                SelectedItem="{Binding SelectedNumberParameter}" />                         
+                                     
         </StackPanel>
         <DataGrid
             Grid.Row="1"

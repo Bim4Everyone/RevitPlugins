@@ -13,28 +13,18 @@ using RevitListOfSchedules.Models;
 namespace RevitListOfSchedules.ViewModels {
     internal class LinkViewModel : BaseViewModel {
 
+        public event EventHandler SelectionChanged;
+
         private readonly LinkTypeElement _linkElement;
-        private string _status;
         private bool _isChecked;
 
         public LinkViewModel(LinkTypeElement linkElement) {
-
             _linkElement = linkElement;
-
-            Name = linkElement.Name;
-            FullName = linkElement.FullName;
-            Status = GetStatus();
-            Id = linkElement.Id;
-
             ReloadCommand = RelayCommand.Create(ReloadLinkType, CanReloadLinkType);
+            Status = GetStatus();
         }
 
         public ICommand ReloadCommand { get; set; }
-
-        public string Status {
-            get => _status;
-            set => RaiseAndSetIfChanged(ref _status, value);
-        }
 
         public bool IsChecked {
             get => _isChecked;
@@ -45,11 +35,10 @@ namespace RevitListOfSchedules.ViewModels {
             }
         }
 
-        public string Name { get; }
-        public string FullName { get; }
-        public ElementId Id { get; }
-
-        public event EventHandler SelectionChanged;
+        public string Status { get; private set; }
+        public string Name => _linkElement.Name;
+        public string FullName => _linkElement.FullName;
+        public ElementId Id => _linkElement.Id;
 
         private bool SetAndNotifyIfChanged<T>(ref T backingField, T newValue,
             [CallerMemberName] string propertyName = null) {

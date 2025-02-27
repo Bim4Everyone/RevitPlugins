@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -11,9 +14,7 @@ using RevitListOfSchedules.Models;
 
 namespace RevitListOfSchedules.ViewModels;
 
-/// <summary>
-/// Основная ViewModel главного окна плагина.
-/// </summary>
+
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
@@ -23,20 +24,12 @@ internal class MainViewModel : BaseViewModel {
 
     private ObservableCollection<LinkViewModel> _links;
     private ObservableCollection<LinkViewModel> _selectedLinks;
-
     private ObservableCollection<SheetViewModel> _sheets;
     private ObservableCollection<SheetViewModel> _selectedSheets;
-
     private ObservableCollection<GroupParameterViewModel> _groupParameters;
     private GroupParameterViewModel _selectedGroupParameter;
 
 
-    /// <summary>
-    /// Создает экземпляр основной ViewModel главного окна.
-    /// </summary>
-    /// <param name="pluginConfig">Настройки плагина.</param>
-    /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
@@ -50,35 +43,26 @@ internal class MainViewModel : BaseViewModel {
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
         Links = GetLinks();
-        Sheets = GetSheets();
-
         SelectedLinks = new ObservableCollection<LinkViewModel>();
+
+        GroupParameters = GetGroupParameters();
+        SelectedGroupParameter = GroupParameters.Last();
+
+        Sheets = GetSheets();
         SelectedSheets = new ObservableCollection<SheetViewModel>();
+
+        // Подписка на события для обновления Sheets
+        PropertyChanged += OnPropertyChanged;
 
         // Подписка на события в LinkViewModel
         foreach(var link in Links) {
             link.SelectionChanged += OnLinkSelectionChanged;
         }
-
-        GroupParameters = GetGroupParameters();
-        SelectedGroupParameter = GroupParameters.Last();
-
     }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
     public ICommand LoadViewCommand { get; }
-
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
-    /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
-    /// </summary>
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
@@ -138,23 +122,39 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-    // Загружаем с основного документа все листы через _revitRepository
     private ObservableCollection<SheetViewModel> GetSheets() {
-        return new ObservableCollection<SheetViewModel>(
-            _revitRepository.GetSheetElements(_revitRepository.Document)
-                .Select(sheetElement => new SheetViewModel(sheetElement))
-                .OrderBy(sheetElement => sheetElement.AlbumName)
-        );
+        var mainDocumentSheets = _revitRepository.GetSheetElements(_revitRepository.Document)
+            .Select(sheetElement => new SheetViewModel(sheetElement) {
+                SheetParameter = SelectedGroupParameter.Parameter
+            })
+            .OrderBy(sheetElement => Convert.ToInt32(sheetElement.Number));
+
+        var allSheets = mainDocumentSheets.ToList();
+
+        foreach(var linkViewModel in SelectedLinks) {
+            var linkDocumentSheets = _revitRepository.GetSheetElements((_revitRepository.GetLinkDocument(linkViewModel)))
+                .Select(sheetElement => new SheetViewModel(sheetElement) {
+                    SheetParameter = SelectedGroupParameter.Parameter
+                })
+                .OrderBy(sheetElement => Convert.ToInt32(sheetElement.Number));
+
+            allSheets.AddRange(linkDocumentSheets);
+        }
+        return new ObservableCollection<SheetViewModel>(allSheets.OrderBy(sheet => sheet.AlbumName));
     }
 
-    // Добавляем листы из связей. Дописать !!! Сорстировку при добавлении только этого альбома
+    // Добавляем листы из связей в _sheets. Дописать !!! Сорстировку при добавлении только этого альбома
     private void AddLinkSheets(LinkViewModel linkViewModel) {
         foreach(SheetElement sheetElement in _revitRepository.GetSheetElements(_revitRepository.GetLinkDocument(linkViewModel))) {
-            _sheets.Add(new SheetViewModel(sheetElement, linkViewModel.Id));
+            _sheets.Add(new SheetViewModel(sheetElement, linkViewModel.Id) {
+                SheetParameter = SelectedGroupParameter.Parameter
+            });
         }
+        UpdateSheets();
     }
 
-    // Удаляем листы из связей
+
+    // Удаляем листы из _sheets из связей
     private void DeleteLinkSheets(LinkViewModel linkViewModel) {
         for(int i = _sheets.Count - 1; i >= 0; i--) {
             if(_sheets[i].LinkTypeId == linkViewModel.Id) {
@@ -163,62 +163,67 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
+    // Добавляем в список GroupParameters
     private ObservableCollection<GroupParameterViewModel> GetGroupParameters() {
-        var firstSheet = _revitRepository.GetSheets(_revitRepository.Document).FirstOrDefault();
+        var firstSheet = _revitRepository.GetViewSheets(_revitRepository.Document)
+            .FirstOrDefault();
+
         ObservableCollection<GroupParameterViewModel> list = [];
-
         if(firstSheet != null) {
-
-            return new ObservableCollection<GroupParameterViewModel>(
-                _revitRepository.GetBrowserParameters(firstSheet.Id)
-                .Where(firstSheet => firstSheet != null)
-                .Select(elementId => new GroupParameterViewModel(_revitRepository.Document, elementId)));
+            IList<Parameter> listOfParameter = _revitRepository.GetBrowserParameters(firstSheet);
+            if(listOfParameter != null) {
+                foreach(Parameter parameter in listOfParameter) {
+                    list.Add(new GroupParameterViewModel(parameter));
+                }
+            } else {
+                list.Add(new GroupParameterViewModel());
+            }
+        } else {
+            list.Add(new GroupParameterViewModel());
         }
+        return list;
+    }
 
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
+    // В зависимости от SelectedGroupParameter обновляем сортировку в Sheets
+    private void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(SelectedGroupParameter)) {
+            UpdateSheets();
+        }
+    }
+    // Метод обновления листов в Sheets
+    private void UpdateSheets() {
+        var newSheets = new ObservableCollection<SheetViewModel>(
+            _sheets
+            .Select(sheetViewModel => {
+                sheetViewModel.SheetParameter = SelectedGroupParameter.Parameter;
+                return sheetViewModel;
+            })
+            .OrderBy(sheetViewModel => Convert.ToInt32(sheetViewModel.Number))
+            .OrderBy(sheetViewModel => sheetViewModel.AlbumName));
+        Sheets = newSheets;
+    }
+
     private void LoadView() {
         LoadConfig();
     }
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
     private void AcceptView() {
         SaveConfig();
     }
 
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
     private bool CanAcceptView() {
         ErrorText = null;
         return false;
     }
 
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
     }
 
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
     private void SaveConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
         _pluginConfig.SaveProjectConfig();
     }
 }
+
