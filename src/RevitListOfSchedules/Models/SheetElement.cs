@@ -6,24 +6,26 @@ using dosymep.Bim4Everyone.SharedParams;
 namespace RevitListOfSchedules.Models {
     internal class SheetElement {
 
+        private readonly ViewSheet _viewSheet;
+        private readonly SharedParam _sheetNumberParam;
+        private readonly string _name;
+        private readonly string _number;
+        private readonly string _revisionNumber;
+
         public SheetElement(ViewSheet viewSheet) {
-
-            SharedParam sheetNumberParam = SharedParamsConfig.Instance.StampSheetNumber;
-            SharedParam changeAlbumParam = SharedParamsConfig.Instance.Level;
-
-            Sheet = viewSheet;
-            Name = Sheet.Name;
-            Number = SetParam(sheetNumberParam);
-            RevisionNumber = SetParam(changeAlbumParam);
+            _viewSheet = viewSheet;
+            _sheetNumberParam = SharedParamsConfig.Instance.StampSheetNumber;
+            _name = _viewSheet.Name;
+            _number = SetNumberParam(_sheetNumberParam);
+            _revisionNumber = GetRevisionString();
         }
 
-        public string Name { get; }
-        public string Number { get; }
-        public string RevisionNumber { get; }
-        public ViewSheet Sheet { get; }
+        public ViewSheet Sheet => _viewSheet;
+        public string Name => _name;
+        public string Number => _number;
+        public string RevisionNumber => _revisionNumber;
 
-
-        private string SetParam(SharedParam sharedParam) {
+        private string SetNumberParam(SharedParam sharedParam) {
             string value = null;
             if(Sheet.IsExistsParam(sharedParam)) {
                 if(Sheet.IsExistsParamValue(sharedParam)) {
@@ -31,6 +33,10 @@ namespace RevitListOfSchedules.Models {
                 }
             }
             return value;
+        }
+
+        private string GetRevisionString() {
+            return "Изм.1";
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -21,7 +22,6 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
     private string _errorText;
-
     private ObservableCollection<LinkViewModel> _links;
     private ObservableCollection<LinkViewModel> _selectedLinks;
     private ObservableCollection<SheetViewModel> _sheets;
@@ -39,9 +39,6 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
-        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-
         Links = GetLinks();
         SelectedLinks = new ObservableCollection<LinkViewModel>();
 
@@ -58,9 +55,14 @@ internal class MainViewModel : BaseViewModel {
         foreach(var link in Links) {
             link.SelectionChanged += OnLinkSelectionChanged;
         }
+
+        LoadViewCommand = RelayCommand.Create(LoadView);
+        ReloadLinksCommand = RelayCommand.Create(ReloadLinks, CanReloadLinks);
+        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
     public ICommand LoadViewCommand { get; }
+    public ICommand ReloadLinksCommand { get; }
     public ICommand AcceptViewCommand { get; }
 
     public string ErrorText {
@@ -72,6 +74,7 @@ internal class MainViewModel : BaseViewModel {
         get => _links;
         set => RaiseAndSetIfChanged(ref _links, value);
     }
+
     public ObservableCollection<LinkViewModel> SelectedLinks {
         get => _selectedLinks;
         set => RaiseAndSetIfChanged(ref _selectedLinks, value);
@@ -81,6 +84,7 @@ internal class MainViewModel : BaseViewModel {
         get => _sheets;
         set => RaiseAndSetIfChanged(ref _sheets, value);
     }
+
     public ObservableCollection<SheetViewModel> SelectedSheets {
         get => _selectedSheets;
         set => RaiseAndSetIfChanged(ref _selectedSheets, value);
@@ -90,6 +94,7 @@ internal class MainViewModel : BaseViewModel {
         get => _groupParameters;
         set => RaiseAndSetIfChanged(ref _groupParameters, value);
     }
+
     public GroupParameterViewModel SelectedGroupParameter {
         get => _selectedGroupParameter;
         set => RaiseAndSetIfChanged(ref _selectedGroupParameter, value);
@@ -127,32 +132,29 @@ internal class MainViewModel : BaseViewModel {
             .Select(sheetElement => new SheetViewModel(sheetElement) {
                 SheetParameter = SelectedGroupParameter.Parameter
             })
-            .OrderBy(sheetElement => Convert.ToInt32(sheetElement.Number));
-
-        var allSheets = mainDocumentSheets.ToList();
+            .ToList();
 
         foreach(var linkViewModel in SelectedLinks) {
-            var linkDocumentSheets = _revitRepository.GetSheetElements((_revitRepository.GetLinkDocument(linkViewModel)))
+            Document linkDocument = _revitRepository.GetLinkDocument(linkViewModel);
+            var linkDocumentSheets = _revitRepository.GetSheetElements(linkDocument)
                 .Select(sheetElement => new SheetViewModel(sheetElement) {
                     SheetParameter = SelectedGroupParameter.Parameter
-                })
-                .OrderBy(sheetElement => Convert.ToInt32(sheetElement.Number));
-
-            allSheets.AddRange(linkDocumentSheets);
+                });
+            mainDocumentSheets.AddRange(linkDocumentSheets);
         }
-        return new ObservableCollection<SheetViewModel>(allSheets.OrderBy(sheet => sheet.AlbumName));
+        return SortSheets(new ObservableCollection<SheetViewModel>(mainDocumentSheets));
     }
 
-    // Добавляем листы из связей в _sheets. Дописать !!! Сорстировку при добавлении только этого альбома
+
+    // Добавляем листы из связей в _sheets.
     private void AddLinkSheets(LinkViewModel linkViewModel) {
         foreach(SheetElement sheetElement in _revitRepository.GetSheetElements(_revitRepository.GetLinkDocument(linkViewModel))) {
             _sheets.Add(new SheetViewModel(sheetElement, linkViewModel.Id) {
                 SheetParameter = SelectedGroupParameter.Parameter
             });
         }
-        UpdateSheets();
+        UpdateGroupParameter();
     }
-
 
     // Удаляем листы из _sheets из связей
     private void DeleteLinkSheets(LinkViewModel linkViewModel) {
@@ -187,21 +189,65 @@ internal class MainViewModel : BaseViewModel {
     // В зависимости от SelectedGroupParameter обновляем сортировку в Sheets
     private void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
         if(e.PropertyName == nameof(SelectedGroupParameter)) {
-            UpdateSheets();
+            UpdateGroupParameter();
         }
     }
     // Метод обновления листов в Sheets
-    private void UpdateSheets() {
+    private void UpdateGroupParameter() {
         var newSheets = new ObservableCollection<SheetViewModel>(
             _sheets
             .Select(sheetViewModel => {
                 sheetViewModel.SheetParameter = SelectedGroupParameter.Parameter;
                 return sheetViewModel;
-            })
-            .OrderBy(sheetViewModel => Convert.ToInt32(sheetViewModel.Number))
-            .OrderBy(sheetViewModel => sheetViewModel.AlbumName));
-        Sheets = newSheets;
+            }));
+
+        Sheets = SortSheets(newSheets);
     }
+
+    private ObservableCollection<SheetViewModel> SortSheets(ObservableCollection<SheetViewModel> sheetViewModels) {
+        var sortedSheets = sheetViewModels
+            .OrderBy(sheetViewModel => GetIntFromString(sheetViewModel.Number))
+            .OrderBy(sheetViewModel => sheetViewModel.AlbumName)
+            .ToList();
+        return new ObservableCollection<SheetViewModel>(sortedSheets);
+    }
+
+    private double GetIntFromString(string stringParameter) {
+        if(int.TryParse(stringParameter, out var value)) {
+            return value;
+        }
+        return 0;
+    }
+
+    private void ReloadLinks() {
+
+        using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+            progressDialogService.MaxValue = _selectedLinks.Count;
+            progressDialogService.StepValue = progressDialogService.MaxValue / 10;
+            progressDialogService.DisplayTitleFormat = "Обновление связанных файлов... [{0}]\\[{1}]";
+            var progress = progressDialogService.CreateProgress();
+            var ct = progressDialogService.CreateCancellationToken();
+            progressDialogService.Show();
+
+            int i = 0;
+            foreach(var selectedLink in _selectedLinks) {
+                ct.ThrowIfCancellationRequested();
+                progress.Report(i++);
+                selectedLink.ReloadLinkType();
+            }
+        }
+        Sheets = GetSheets();
+    }
+
+    private bool CanReloadLinks() {
+        if(_selectedLinks.Count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 
     private void LoadView() {
         LoadConfig();
@@ -212,8 +258,12 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
+        if(SelectedSheets.Count == 0) {
+            ErrorText = "Выберите листы для создания ведомости";
+            return false;
+        }
         ErrorText = null;
-        return false;
+        return true;
     }
 
     private void LoadConfig() {

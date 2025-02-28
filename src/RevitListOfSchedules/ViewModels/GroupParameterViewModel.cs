@@ -3,18 +3,20 @@ using Autodesk.Revit.DB;
 namespace RevitListOfSchedules.ViewModels {
     public class GroupParameterViewModel {
 
-        public GroupParameterViewModel(Parameter parameter = null) {
+        private readonly Parameter _parameter;
+        private readonly string _name;
 
-            Parameter = parameter;
-            Name = GetParamName();
+        public GroupParameterViewModel(Parameter parameter = null) {
+            _parameter = parameter;
+            _name = GetParamName();
         }
 
-        public string Name { get; }
-        public Parameter Parameter { get; }
+        public Parameter Parameter => _parameter;
+        public string Name => _name;
 
         public string GetParamName() {
-            if(Parameter != null) {
-                return Parameter.Definition.Name;
+            if(_parameter != null) {
+                return _parameter.Definition.Name;
             } else {
                 return "< Нет параметра группировки >";
             }

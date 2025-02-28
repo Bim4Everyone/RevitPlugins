@@ -47,7 +47,7 @@ namespace RevitListOfSchedules.ViewModels {
             return changed;
         }
 
-        private void ReloadLinkType() {
+        public void ReloadLinkType() {
             _linkElement.Reload();
             Status = GetStatus();
         }

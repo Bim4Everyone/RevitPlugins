@@ -81,7 +81,8 @@
             Margin="20"
             VerticalAlignment="Center"
             HorizontalAlignment="Left"
-            Content="{DynamicResource MainWindow.ReloadButton}" />         
+            Content="{DynamicResource MainWindow.ReloadButton}"
+            Command="{Binding ReloadLinksCommand, UpdateSourceTrigger=PropertyChanged}" />
         <StackPanel
             Grid.Row="0"
             Grid.Column="2"
@@ -110,7 +111,7 @@
             HorizontalGridLinesBrush="LightGray"
             VerticalGridLinesBrush="LightGray"
             RowHeaderWidth="0"
-            ItemsSource="{Binding Links}">
+            ItemsSource="{Binding Links}" >
             <DataGrid.Columns>
                 <DataGridTemplateColumn
                     Width="40">
@@ -124,7 +125,8 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn
-                    Width="17">
+                    Width="17"
+                    IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image
@@ -137,14 +139,16 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn
                     Width="200"
+                    IsReadOnly="True"
                     Header="{StaticResource LinkName}"
                     Binding="{Binding Name}" />
                 <DataGridTextColumn
                     Width="300"
+                    IsReadOnly="True"
                     Header="{StaticResource LinkFullName}"
                     Binding="{Binding FullName}" />                 
                 <DataGridTemplateColumn
-                    Width="100"
+                    Width="100"                    
                     Header="{StaticResource Reload}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -168,7 +172,9 @@
             HorizontalGridLinesBrush="LightGray"
             VerticalGridLinesBrush="LightGray"
             RowHeaderWidth="0"
-            ItemsSource="{Binding Source={StaticResource GroupedAlbums}}">
+            IsReadOnly="True"
+            ItemsSource="{Binding Source={StaticResource GroupedAlbums}}"
+            SelectedItem="{Binding SelectedSheets, UpdateSourceTrigger=PropertyChanged}">
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Width="20"
