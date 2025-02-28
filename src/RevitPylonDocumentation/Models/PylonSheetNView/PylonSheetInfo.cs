@@ -224,7 +224,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     GeneralView.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutViewport(GeneralView, viewport);
+                    GetInfoAboutViewport(GeneralView, viewport, false);
                     continue;
                 }
 
@@ -234,7 +234,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     GeneralRebarView.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutViewport(GeneralRebarView, viewport);
+                    GetInfoAboutViewport(GeneralRebarView, viewport, false);
                     continue;
                 }
 
@@ -244,7 +244,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     GeneralViewPerpendicular.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutViewport(GeneralViewPerpendicular, viewport);
+                    GetInfoAboutViewport(GeneralViewPerpendicular, viewport, false);
                     continue;
                 }
 
@@ -254,7 +254,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     GeneralRebarViewPerpendicular.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutViewport(GeneralRebarViewPerpendicular, viewport);
+                    GetInfoAboutViewport(GeneralRebarViewPerpendicular, viewport, false);
                     continue;
                 }
 
@@ -264,7 +264,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     TransverseViewFirst.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutViewport(TransverseViewFirst, viewport);
+                    GetInfoAboutViewport(TransverseViewFirst, viewport, true);
                     continue;
                 }
 
@@ -274,7 +274,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     TransverseViewSecond.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutViewport(TransverseViewSecond, viewport);
+                    GetInfoAboutViewport(TransverseViewSecond, viewport, true);
                     continue;
                 }
 
@@ -284,7 +284,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     TransverseViewThird.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutViewport(TransverseViewThird, viewport);
+                    GetInfoAboutViewport(TransverseViewThird, viewport, true);
                     continue;
                 }
 
@@ -294,7 +294,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     TransverseRebarViewFirst.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutViewport(TransverseRebarViewFirst, viewport);
+                    GetInfoAboutViewport(TransverseRebarViewFirst, viewport, true);
                     continue;
                 }
 
@@ -304,7 +304,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     TransverseRebarViewSecond.ViewportElement = viewport;
 
                     // Получение центра и габаритов видового экрана
-                    GetInfoAboutViewport(TransverseRebarViewSecond, viewport);
+                    GetInfoAboutViewport(TransverseRebarViewSecond, viewport, true);
                     continue;
                 }
             }
@@ -426,7 +426,19 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// <summary>
         /// Получение и сохранение информации о центре и габаритах видового экрана
         /// </summary>
-        public void GetInfoAboutViewport(PylonView pylonView, Viewport viewport) {
+        public void GetInfoAboutViewport(PylonView pylonView, Viewport viewport, bool needHideSections) {
+            ElementId viewTemplateId = ElementId.InvalidElementId;
+            Category sectionCategory = default(Category);
+            if(needHideSections) {
+                viewTemplateId = pylonView.ViewElement.ViewTemplateId;
+                pylonView.ViewElement.ViewTemplateId = ElementId.InvalidElementId;
+
+                // Получаем категорию "Разрезы"
+                sectionCategory = Category.GetCategory(Repository.Document, BuiltInCategory.OST_Sections);
+                // Отключаем видимость категории "Разрезы" на этом виде
+                pylonView.ViewElement.SetCategoryHidden(sectionCategory.Id, true);
+            }
+
             XYZ viewportCenter = viewport.GetBoxCenter();
             Outline viewportOutline = viewport.GetBoxOutline();
             double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
@@ -435,6 +447,12 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             pylonView.ViewportCenter = viewportCenter;
             pylonView.ViewportHalfWidth = viewportHalfWidth;
             pylonView.ViewportHalfHeight = viewportHalfHeight;
+
+            if(needHideSections) {
+                // Отключаем видимость категории "Разрезы" на этом виде
+                pylonView.ViewElement.SetCategoryHidden(sectionCategory.Id, false);
+                pylonView.ViewElement.ViewTemplateId = viewTemplateId;
+            }
         }
 
 
