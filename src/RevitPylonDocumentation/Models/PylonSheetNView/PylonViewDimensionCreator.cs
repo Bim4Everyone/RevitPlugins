@@ -31,11 +31,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     return;
                 }
 
-                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 0.7);
+                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom);
                 ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
                 Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
 
-                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.2);
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.5);
                 ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
                 Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
 
@@ -138,20 +138,63 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         private Line GetDimensionLine(View view, FamilyInstance rebar, DimensionOffsetType dimensionOffsetType,
                                       double offsetCoefficient = 1) {
+            // Задаем дефолтные точки на случай, если не сработает получение
             var pt1 = new XYZ(0, 0, 0);
             var pt2 = new XYZ(0, 100, 0);
 
-            BoundingBoxXYZ bbox = rebar.get_BoundingBox(view);
-            var upDirection = GetViewDirections(view).UpDirection;
-            var downDirection = upDirection.Negate();
+            // Если взять краевую точку рамки подрезки вида, то она будет в локальных координатах вида
+            // Для перевода в глобальные координаты получим объект Transform
+            // Получаем начало локальной системы координат вида в глобальной системе координат
+            XYZ origin = view.Origin;
+            XYZ viewDirection = view.ViewDirection;
+            XYZ upDirection = view.UpDirection;
+            XYZ rightDirection = view.RightDirection;
 
+            // Создаем матрицу трансформации
+            Transform transform = Transform.Identity;
+            transform.Origin = origin;
+            transform.BasisX = rightDirection;
+            transform.BasisY = upDirection;
+            transform.BasisZ = viewDirection;
+
+            BoundingBoxXYZ bbox = rebar.get_BoundingBox(view);
             switch(dimensionOffsetType) {
                 case DimensionOffsetType.Top:
-                    pt1 = bbox.Max + upDirection.Multiply(offsetCoefficient);
+                    // Получаем единичный вектор вида направления вверх
+                    var upDirectionNormalized = upDirection.Normalize();
+                    // Получаем отступ для более корректного размещения размера относительно арматуры
+                    var offsetTop = upDirectionNormalized.Multiply(offsetCoefficient);
+
+                    // Получаем правую верхнюю точку рамки подрезки вида
+                    var cropBoxMax = view.CropBox.Max;
+                    // Переводим ее в глобальную систему координат + отступ
+                    XYZ globalMaxPoint = transform.OfPoint(cropBoxMax) + offsetTop;
+
+                    // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
+                    pt1 = bbox.Max + offsetTop;
+
+                    // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
+                    // то ставим по рамки подрезки
+                    pt1 = pt1.Z > globalMaxPoint.Z ? new XYZ(pt1.X, pt1.Y, globalMaxPoint.Z) : pt1;
                     pt2 = pt1 + view.RightDirection;
                     break;
                 case DimensionOffsetType.Bottom:
-                    pt1 = bbox.Min + downDirection.Multiply(offsetCoefficient);
+                    // Получаем единичный вектор вида направления вниз
+                    var downDirectionNormalized = upDirection.Normalize().Negate();
+                    // Получаем отступ для более корректного размещения размера относительно арматуры
+                    var offsetBottom = downDirectionNormalized.Multiply(offsetCoefficient);
+
+                    // Получаем левую нижнюю точку рамки подрезки вида
+                    var cropBoxMin = view.CropBox.Min;
+                    // Переводим ее в глобальную систему координат + отступ
+                    XYZ globalMinPoint = transform.OfPoint(cropBoxMin) + offsetBottom;
+
+                    // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
+                    pt1 = bbox.Min + offsetBottom;
+
+                    // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
+                    // то ставим по рамки подрезки
+                    pt1 = pt1.Z < globalMinPoint.Z ? new XYZ(pt1.X, pt1.Y, globalMinPoint.Z) : pt1;
                     pt2 = pt1 + view.RightDirection;
                     break;
                 case DimensionOffsetType.Left:
@@ -164,10 +207,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             return Line.CreateBound(pt1, pt2);
         }
 
-
-        private (XYZ RightDirection, XYZ UpDirection) GetViewDirections(View view) {
-            return (view.RightDirection.Normalize(), view.UpDirection.Normalize());
-        }
 
 
         private ReferenceArray GetDimensionRefs(FamilyInstance rebar, char keyRefNamePart,
@@ -217,11 +256,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     return;
                 }
 
-                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, -0.8);
+                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
                 ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
                 Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
 
-                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, -0.3);
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
                 ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
                 Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
             } catch(Exception) { }
@@ -237,11 +276,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     return;
                 }
 
-                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, -0.8);
+                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2);
                 ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
                 Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
 
-                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, -0.3);
+                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2.5);
                 ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт", "край" });
                 Dimension dimensionTopEdge = doc.Create.NewDimension(view, dimensionLineTopEdge, refArrayTopEdge);
             } catch(Exception) { }

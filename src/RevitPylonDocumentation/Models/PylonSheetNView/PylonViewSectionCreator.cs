@@ -21,12 +21,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         public bool TryCreateGeneralView(ViewFamilyType selectedViewFamilyType) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            //int count = 0;
-            //Element elemForWork = null;
-            //foreach(Element elem in SheetInfo.HostElems) {
-            //    elemForWork = elem;
-            //    count++;
-            //}
             Element elemForWork = SheetInfo.HostElems[0];
 
             if(elemForWork is null) { return false; }
@@ -92,12 +86,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         public bool TryCreateGeneralRebarView(ViewFamilyType selectedViewFamilyType) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            //int count = 0;
-            //Element elemForWork = null;
-            //foreach(Element elem in SheetInfo.HostElems) {
-            //    elemForWork = elem;
-            //    count++;
-            //}
             Element elemForWork = SheetInfo.HostElems[0];
 
             if(elemForWork is null) { return false; }
@@ -166,12 +154,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         public bool TryCreateGeneralPerpendicularView(ViewFamilyType selectedViewFamilyType) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            //int count = 0;
-            //Element elemForWork = null;
-            //foreach(Element elem in SheetInfo.HostElems) {
-            //    elemForWork = elem;
-            //    count++;
-            //}
             Element elemForWork = SheetInfo.HostElems[0];
 
             if(elemForWork is null) { return false; }
@@ -237,12 +219,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         public bool TryCreateGeneralRebarPerpendicularView(ViewFamilyType selectedViewFamilyType) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            //int count = 0;
-            //Element elemForWork = null;
-            //foreach(Element elem in SheetInfo.HostElems) {
-            //    elemForWork = elem;
-            //    count++;
-            //}
             Element elemForWork = SheetInfo.HostElems[0];
 
             if(elemForWork is null) { return false; }
@@ -314,12 +290,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         public bool TryCreateTransverseView(ViewFamilyType selectedViewFamilyType, int transverseViewNum) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            //int count = 0;
-            //Element elemForWork = null;
-            //foreach(Element elem in SheetInfo.HostElems) {
-            //    elemForWork = elem;
-            //    count++;
-            //}
             Element elemForWork = SheetInfo.HostElems[0];
 
             if(elemForWork is null) { return false; }
@@ -422,12 +392,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         public bool TryCreateTransverseRebarView(ViewFamilyType selectedViewFamilyType, int transverseRebarViewNum) {
             // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            //int count = 0;
-            //Element elemForWork = null;
-            //foreach(Element elem in SheetInfo.HostElems) {
-            //    elemForWork = elem;
-            //    count++;
-            //}
             Element elemForWork = SheetInfo.HostElems[0];
 
             if(elemForWork is null) { return false; }
