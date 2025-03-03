@@ -111,7 +111,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
             XYZ newCenter = new XYZ(
                     newCenterX,
-                    SheetInfo.TitleBlockHeight - SheetInfo.GeneralRebarView.ViewportHalfHeight - 0.016,
+                    SheetInfo.TitleBlockHeight - SheetInfo.GeneralRebarView.ViewportHalfHeight - 0.05,
                     0);
 
             (SheetInfo.GeneralRebarView.ViewportElement as Viewport).SetBoxCenter(newCenter);
@@ -546,7 +546,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                         //report += string.Format("Вы работаете в Revit 2020 или 2021, поэтому метку имени вида \"{0}\" необходимо будет спозиционировать на листе самостоятельно" 
                         //+ Environment.NewLine, ViewElement.Name);
 #else
-            viewPort.LabelOffset = new XYZ(pylonView.ViewportHalfWidth, (2 * pylonView.ViewportHalfHeight) - 0.022, 0);
+            viewPort.LabelOffset = new XYZ(pylonView.ViewportHalfWidth, 2 * pylonView.ViewportHalfHeight, 0);
 #endif
             return true;
         }

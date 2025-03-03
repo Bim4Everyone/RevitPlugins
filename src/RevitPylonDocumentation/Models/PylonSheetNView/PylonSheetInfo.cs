@@ -117,7 +117,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
 
             FindTitleBlock();
-            SetTitleBlockSize(Repository.Document);
+            // Если пользователь выбрал создание основного или бокового вида каркаса, то нужна большая рамка А1
+            var sels = ViewModel.SelectionSettings;
+            if(sels.NeedWorkWithGeneralRebarView || sels.NeedWorkWithGeneralPerpendicularRebarView) {
+                SetTitleBlockSize(Repository.Document, 1, 1);
+            } else {
+                SetTitleBlockSize(Repository.Document);
+            }
             return true;
         }
 
@@ -427,17 +433,17 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// Получение и сохранение информации о центре и габаритах видового экрана
         /// </summary>
         public void GetInfoAboutViewport(PylonView pylonView, Viewport viewport, bool needHideSections) {
-            ElementId viewTemplateId = ElementId.InvalidElementId;
-            Category sectionCategory = default(Category);
-            if(needHideSections) {
-                viewTemplateId = pylonView.ViewElement.ViewTemplateId;
-                pylonView.ViewElement.ViewTemplateId = ElementId.InvalidElementId;
+            //ElementId viewTemplateId = ElementId.InvalidElementId;
+            //Category sectionCategory = default(Category);
+            //if(needHideSections) {
+            //    viewTemplateId = pylonView.ViewElement.ViewTemplateId;
+            //    pylonView.ViewElement.ViewTemplateId = ElementId.InvalidElementId;
 
-                // Получаем категорию "Разрезы"
-                sectionCategory = Category.GetCategory(Repository.Document, BuiltInCategory.OST_Sections);
-                // Отключаем видимость категории "Разрезы" на этом виде
-                pylonView.ViewElement.SetCategoryHidden(sectionCategory.Id, true);
-            }
+            //    // Получаем категорию "Разрезы"
+            //    sectionCategory = Category.GetCategory(Repository.Document, BuiltInCategory.OST_Sections);
+            //    // Отключаем видимость категории "Разрезы" на этом виде
+            //    pylonView.ViewElement.SetCategoryHidden(sectionCategory.Id, true);
+            //}
 
             XYZ viewportCenter = viewport.GetBoxCenter();
             Outline viewportOutline = viewport.GetBoxOutline();
@@ -448,11 +454,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             pylonView.ViewportHalfWidth = viewportHalfWidth;
             pylonView.ViewportHalfHeight = viewportHalfHeight;
 
-            if(needHideSections) {
-                // Отключаем видимость категории "Разрезы" на этом виде
-                pylonView.ViewElement.SetCategoryHidden(sectionCategory.Id, false);
-                pylonView.ViewElement.ViewTemplateId = viewTemplateId;
-            }
+            //if(needHideSections) {
+            //    // Отключаем видимость категории "Разрезы" на этом виде
+            //    pylonView.ViewElement.SetCategoryHidden(sectionCategory.Id, false);
+            //    pylonView.ViewElement.ViewTemplateId = viewTemplateId;
+            //}
         }
 
 
