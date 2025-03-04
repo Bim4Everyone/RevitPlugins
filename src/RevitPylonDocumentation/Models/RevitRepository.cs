@@ -190,13 +190,17 @@ namespace RevitPylonDocumentation.Models {
                     HostsInfo.Add(pylonSheetInfo);
                 } else {
                     double elemZ = elem.get_BoundingBox(null).Min.Z;
-                    // Для корректного создания видов нужно, чтобы первым стоял элемент с самой низкой отметкой
+                    // Для корректного создания видов нужно, чтобы первым в списке стоял элемент с самой низкой отметкой
                     if(testPylonSheetInfo.HostElems[0].get_BoundingBox(null).Min.Z > elemZ) {
                         testPylonSheetInfo.HostElems.Insert(0, elem);
                     } else {
                         testPylonSheetInfo.HostElems.Add(elem);
                     }
 
+                    // Проверяем, что опалубочные модели пилонов отстоят друг от друга на небольшом расстоянии
+                    // Если это не так, то значит ошибка в проекте
+                    // Пилоны с одинаковой маркой и значением параметра фильтрации типовых пилонов могут стоять только
+                    // рядом, например, это могут быть двухэтажные пилоны
                     XYZ pt1 = elem.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls
                         ? (elem.Location as LocationCurve).Curve.GetEndPoint(0)
                         : (elem.Location as LocationPoint).Point;

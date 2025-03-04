@@ -35,9 +35,9 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
                 Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
 
-                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.5);
-                ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
-                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
+                Line dimensionLineBottomEdges = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.5);
+                ReferenceArray refArrayBottomEdges = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
+                Dimension dimensionBottomEdges = doc.Create.NewDimension(view, dimensionLineBottomEdges, refArrayBottomEdges);
 
                 Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top);
                 ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
@@ -122,11 +122,15 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 .ToElements();
 
             foreach(Element rebar in rebars) {
+                // Фильтрация по комплекту документации
+                if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != SheetInfo.ProjectSection) {
+                    continue;
+                }
+                // Фильтарция по имени семейства
                 FamilySymbol rebarType = Repository.Document.GetElement(rebar.GetTypeId()) as FamilySymbol;
                 if(rebarType is null) {
                     continue;
                 }
-
                 if(rebarType.FamilyName.Equals("IFC_Пилон_Верт.Арм.")) {
                     return rebar as FamilyInstance;
                 }
@@ -209,25 +213,25 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
 
-        private ReferenceArray GetDimensionRefs(FamilyInstance rebar, char keyRefNamePart,
-                                                List<string> importantRefNameParts) {
+        private ReferenceArray GetDimensionRefs(FamilyInstance elem, char keyRefNamePart,
+                                                List<string> importantRefNameParts, ReferenceArray refArray = null) {
             var references = new List<Reference>();
             foreach(FamilyInstanceReferenceType referenceType in Enum.GetValues(typeof(FamilyInstanceReferenceType))) {
-                references.AddRange(rebar.GetReferences(referenceType));
+                references.AddRange(elem.GetReferences(referenceType));
             }
 
             // # является управляющим символом, сигнализирующим, что плоскость нужно использовать для образмеривания
             // и разделяющим имя плоскости на имя параметра проверки и остальной текст с ключевыми словами
-            ReferenceArray refArray = new ReferenceArray();
+            refArray = refArray ?? new ReferenceArray();
             importantRefNameParts.Add(keyRefNamePart.ToString());
             foreach(Reference reference in references) {
-                string referenceName = rebar.GetReferenceName(reference);
+                string referenceName = elem.GetReferenceName(reference);
                 if(!importantRefNameParts.All(namePart => referenceName.Contains(namePart))) {
                     continue;
                 }
 
                 string paramName = referenceName.Split(keyRefNamePart)[0];
-                int paramValue = paramName == string.Empty ? 1 : GetParamValueAnywhere(rebar, paramName);
+                int paramValue = paramName == string.Empty ? 1 : GetParamValueAnywhere(elem, paramName);
 
                 if(paramValue == 1) {
                     refArray.Append(reference);
@@ -269,6 +273,71 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         public void TryCreateTransverseRebarViewSecondDimensions() {
             var doc = Repository.Document;
             View view = SheetInfo.TransverseRebarViewSecond.ViewElement;
+
+            try {
+                var rebar = GetSkeletonRebar(view);
+                if(rebar is null) {
+                    return;
+                }
+
+                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2);
+                ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
+                Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
+
+                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2.5);
+                ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт", "край" });
+                Dimension dimensionTopEdge = doc.Create.NewDimension(view, dimensionLineTopEdge, refArrayTopEdge);
+            } catch(Exception) { }
+        }
+
+
+        public void TryCreateTransverseViewFirstDimensions() {
+            var doc = Repository.Document;
+            View view = SheetInfo.TransverseViewFirst.ViewElement;
+
+            try {
+                var rebar = GetSkeletonRebar(view);
+                if(rebar is null) {
+                    return;
+                }
+
+                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
+                ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
+                Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
+
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
+                ReferenceArray refArrayEdges = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
+                refArrayEdges = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
+                                                 new List<string>() { "фронт", "край" }, refArrayEdges);
+                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayEdges);
+            } catch(Exception) { }
+        }
+
+
+        public void TryCreateTransverseViewSecondDimensions() {
+            var doc = Repository.Document;
+            View view = SheetInfo.TransverseViewSecond.ViewElement;
+
+            try {
+                var rebar = GetSkeletonRebar(view);
+                if(rebar is null) {
+                    return;
+                }
+
+                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
+                ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
+                Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
+
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
+                ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
+                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
+            } catch(Exception) { }
+        }
+
+
+        public void TryCreateTransverseViewThirdDimensions() {
+            var doc = Repository.Document;
+            View view = SheetInfo.TransverseViewThird.ViewElement;
 
             try {
                 var rebar = GetSkeletonRebar(view);

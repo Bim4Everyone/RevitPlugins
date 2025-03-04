@@ -241,7 +241,32 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
 
+            // ОБРАЗМЕРИВАНИЕ ПЕРВОГО ПОПЕРЕЧНОГО ВИД
+            if(selectionSettings.NeedWorkWithTransverseViewFirst) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.TransverseViewFirst.ViewElement != null) {
+                    SheetInfo.TransverseViewFirst.ViewDimensionCreator
+                        .TryCreateTransverseViewFirstDimensions();
+                }
+            }
 
+            // ОБРАЗМЕРИВАНИЕ ВТОРОГО ПОПЕРЕЧНОГО ВИД
+            if(selectionSettings.NeedWorkWithTransverseViewSecond) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.TransverseViewSecond.ViewElement != null) {
+                    SheetInfo.TransverseViewSecond.ViewDimensionCreator
+                        .TryCreateTransverseViewSecondDimensions();
+                }
+            }
+
+            // ОБРАЗМЕРИВАНИЕ ТРЕТЬЕГО ПОПЕРЕЧНОГО ВИД
+            if(selectionSettings.NeedWorkWithTransverseViewThird) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.TransverseViewThird.ViewElement != null) {
+                    SheetInfo.TransverseViewThird.ViewDimensionCreator
+                        .TryCreateTransverseViewThirdDimensions();
+                }
+            }
 
             // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО АРМАТУРНОГО ВИДА
             if(selectionSettings.NeedWorkWithGeneralRebarView) {
