@@ -7,46 +7,36 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
+using dosymep.SimpleServices;
+
 using RevitListOfSchedules.ViewModels;
 
 namespace RevitListOfSchedules.Models;
 
-/// <summary>
-/// Класс доступа к документу и приложению Revit.
-/// </summary>
-/// <remarks>
-/// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
-/// </remarks>
 internal class RevitRepository {
-    /// <summary>
-    /// Создает экземпляр репозитория.
-    /// </summary>
-    /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(UIApplication uiApplication) {
+    private readonly ILocalizationService _localizationService;
+
+    public const string FamilyParamNumber = "Номер листа";
+    public const string FamilyParamName = "Наименование спецификации";
+    public const string FamilyParamRevision = "Примечание";
+    public const string ScheduleName = "Ведомость спецификаций и ведомостей";
+
+    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _localizationService = localizationService;
     }
 
-    /// <summary>
-    /// Класс доступа к интерфейсу Revit.
-    /// </summary>
     public UIApplication UIApplication { get; }
-
-    /// <summary>
-    /// Класс доступа к интерфейсу документа Revit.
-    /// </summary>
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-
-    /// <summary>
-    /// Класс доступа к приложению Revit.
-    /// </summary>
     public Application Application => UIApplication.Application;
-
-    /// <summary>
-    /// Класс доступа к документу Revit.
-    /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
-
+    // Метод получения типа "Связанный файл"
     public IList<LinkTypeElement> GetLinkTypeElements() {
         var listRevitLinkTypes = new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_RvtLinks)
@@ -59,6 +49,7 @@ internal class RevitRepository {
             .ToList());
     }
 
+    // Метод получения документа "Связанный файл"
     public Document GetLinkDocument(LinkViewModel linkViewModel) {
         return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_RvtLinks)
@@ -69,6 +60,7 @@ internal class RevitRepository {
             .GetLinkDocument();
     }
 
+    // Метод получения списка SheetElement по Document (основной или связанный)
     public IList<SheetElement> GetSheetElements(Document document) {
         return new Collection<SheetElement>(GetViewSheets(document)
             .Select(sheet => new SheetElement(sheet))
@@ -76,6 +68,7 @@ internal class RevitRepository {
             .ToList());
     }
 
+    // Метод получения списка ViewSheet по Document (основной или связанный)
     public IList<ViewSheet> GetViewSheets(Document document) {
         return new FilteredElementCollector(document)
             .OfCategory(BuiltInCategory.OST_Sheets)
@@ -83,16 +76,26 @@ internal class RevitRepository {
             .ToList();
     }
 
-    public IList<Parameter> GetBrowserParameters(ViewSheet viewSheet) {
 
-        IList<Parameter> listOfParameters = new List<Parameter>();
+    // Метод получения списка Parameter по которым организован браузер проекта (листы)
+    public IList<RevitParam> GetBrowserParameters(ViewSheet viewSheet) {
+        IList<RevitParam> listOfParameters = new List<RevitParam>();
         if(viewSheet != null) {
             var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
             IList<FolderItemInfo> itemsInfo = browserOrganization.GetFolderItems(viewSheet.Id);
             foreach(FolderItemInfo itemInfo in itemsInfo) {
-                foreach(Parameter parameter in viewSheet.Parameters) {
-                    if(itemInfo.ElementId == parameter.Id) {
-                        listOfParameters.Add(parameter);
+                if(itemInfo.ElementId.IsSystemId()) {
+                    BuiltInParameter param = itemInfo.ElementId.AsBuiltInParameter();
+                    RevitParam revitParam = SystemParamsConfig.Instance.CreateRevitParam(Document, param);
+                    listOfParameters.Add(revitParam);
+                } else {
+                    Element element = Document.GetElement(itemInfo.ElementId);
+                    if(element is SharedParameterElement) {
+                        RevitParam revitParam = SharedParamsConfig.Instance.CreateRevitParam(Document, element.Name);
+                        listOfParameters.Add(revitParam);
+                    } else {
+                        RevitParam revitParam = ProjectParamsConfig.Instance.CreateRevitParam(Document, element.Name);
+                        listOfParameters.Add(revitParam);
                     }
                 }
             }
@@ -101,8 +104,68 @@ internal class RevitRepository {
     }
 
 
+    // Метод получения чертежного вида, существующего или создание нового
+    public ViewDrafting GetViewDrafting(string familyName) {
+        string nameView = string.Format(
+            _localizationService.GetLocalizedString("RevitRepository.ViewName"), familyName);
+        var view = new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewFamilyType))
+            .Where(v => v.Name.Equals(nameView, StringComparison.OrdinalIgnoreCase))
+            .Cast<ViewDrafting>()
+            .FirstOrDefault();
+        if(view != null) {
+            return view;
+        } else {
+            return CreateViewDrafting(nameView);
+        }
+    }
 
+    // Метод создания нового чертежного вида
+    private ViewDrafting CreateViewDrafting(string nameView) {
+        var viewTypes = new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewFamilyType))
+            .Cast<ViewFamilyType>();
+        var viewFamilyType = viewTypes
+            .Where(vt => vt.ViewFamily == ViewFamily.Drafting)
+            .First();
+        string transactionName = _localizationService.GetLocalizedString("RevitRepository.TransactionNameCreate");
+        using(Transaction t = Document.StartTransaction(transactionName)) {
+            ViewDrafting view = ViewDrafting.Create(Document, viewFamilyType.Id);
+            view.Name = nameView;
+            t.Commit();
+            return view;
+        }
+    }
+
+    public IList<ViewSchedule> GetSchedules(Document document, ViewSheet viewSheet) {
+        if(document == null || viewSheet == null) {
+            return null;
+        }
+        var scheduleInstances = new FilteredElementCollector(document)
+            .OfClass(typeof(ScheduleSheetInstance))
+            .Cast<ScheduleSheetInstance>()
+            .Where(schedule => schedule.OwnerViewId == viewSheet.Id)
+            .Where(schedule => schedule.SegmentIndex == 0 || schedule.SegmentIndex == -1)
+            .ToList();
+        if(!scheduleInstances.Any()) {
+            return null;
+        }
+        return scheduleInstances
+            .Select(element => document.GetElement(element.ScheduleId))
+            .OfType<ViewSchedule>()
+            .ToList();
+    }
+
+    public FamilySymbol GetFamilySymbol(Family family) {
+        ElementFilter filter = new FamilySymbolFilter(family.Id);
+        return new FilteredElementCollector(Document)
+            .WherePasses(filter)
+            .Cast<FamilySymbol>()
+            .First();
+    }
 
 }
+
+
 
 

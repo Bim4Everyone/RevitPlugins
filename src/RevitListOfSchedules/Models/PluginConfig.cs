@@ -1,8 +1,11 @@
+using System.Collections.ObjectModel;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Serializers;
 
 using pyRevitLabs.Json;
+
+using RevitListOfSchedules.ViewModels;
 
 namespace RevitListOfSchedules.Models;
 
@@ -58,9 +61,14 @@ internal class RevitSettings : ProjectSettings {
     /// Наименование проекта. Системное свойство. (Не трогать)
     /// </summary>
     public override string ProjectName { get; set; }
-    
+
     /// <summary>
     /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
     /// </summary>
-    public string SaveProperty { get; set; }
+    public ObservableCollection<LinkViewModel> SelectedLinks { get; set; }
+    public GroupParameterViewModel SelectedGroupParameter { get; set; }
+    public ObservableCollection<SheetViewModel> SelectedSheets { get; set; }
+
+
+
 }

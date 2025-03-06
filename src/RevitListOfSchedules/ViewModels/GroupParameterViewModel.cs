@@ -1,22 +1,22 @@
-using Autodesk.Revit.DB;
+using dosymep.Bim4Everyone;
 
 namespace RevitListOfSchedules.ViewModels {
     public class GroupParameterViewModel {
 
-        private readonly Parameter _parameter;
+        private readonly RevitParam _parameter;
         private readonly string _name;
 
-        public GroupParameterViewModel(Parameter parameter = null) {
+        public GroupParameterViewModel(RevitParam parameter = null) {
             _parameter = parameter;
             _name = GetParamName();
         }
 
-        public Parameter Parameter => _parameter;
+        public RevitParam Parameter => _parameter;
         public string Name => _name;
 
         public string GetParamName() {
             if(_parameter != null) {
-                return _parameter.Definition.Name;
+                return _parameter.Name;
             } else {
                 return "< Нет параметра группировки >";
             }

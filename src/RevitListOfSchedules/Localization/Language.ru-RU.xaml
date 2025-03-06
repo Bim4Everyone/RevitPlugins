@@ -25,5 +25,30 @@
         x:Key="MainWindow.ButtonOk">Создать</system:String>
     <system:String 
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String
+        x:Key="TempFamilyDocument.TemplateFamilyName">\Аннотации\Метрическая система, типовая аннотация.rft</system:String>
+    <system:String
+        x:Key="TempFamilyDocument.FamilyName">Ведомость_Спецификаций_{0}</system:String>
+    <system:String
+        x:Key="TempFamilyDocument.TransactionName">Параметры, окружность</system:String>
+
+    <system:String
+        x:Key="RevitRepository.TransactionNameCreate">Создание чертежного вида для ведомости спецификаций</system:String>
+    <system:String
+        x:Key="RevitRepository.ViewName">Ведомость спецификаций_{0}</system:String>
+
+    <system:String
+        x:Key="FamilyLoader.TransactionNameLoad">Загрузка семейства аннотаций</system:String>
+    <system:String
+        x:Key="FamilyLoader.TransactionNamePlace">Размещение семейства аннотаций</system:String>
+
+    <system:String
+        x:Key="MainViewModel.ProgressBarText1">"Обновление связанных файлов... [{0}]\[{1}]"</system:String>
+    <system:String
+        x:Key="MainViewModel.ProgressBarText2">"Обработка листов... [{0}]\[{1}]"</system:String>
+    <system:String
+        x:Key="MainViewModel.ErrorText">"Выберите листы для создания ведомости спецификаций"</system:String>
+    <system:String
+        x:Key="ScheduleElement.TransactionName">"Создание ведомости спецификаций"</system:String>
 
 </ResourceDictionary>

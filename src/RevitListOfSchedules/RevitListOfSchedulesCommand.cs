@@ -51,6 +51,12 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<FamilyLoader>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<FamilyLoadOptions>()
+            .ToSelf()
+            .InSingletonScope();
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()

@@ -16,6 +16,7 @@ namespace RevitListOfSchedules.ViewModels {
         public event EventHandler SelectionChanged;
 
         private readonly LinkTypeElement _linkElement;
+        private string _status;
         private bool _isChecked;
 
         public LinkViewModel(LinkTypeElement linkElement) {
@@ -26,6 +27,13 @@ namespace RevitListOfSchedules.ViewModels {
 
         public ICommand ReloadCommand { get; set; }
 
+        public string Name => _linkElement.Name;
+        public string FullName => _linkElement.FullName;
+        public ElementId Id => _linkElement.Id;
+        public string Status {
+            get => _status;
+            set => RaiseAndSetIfChanged(ref _status, value);
+        }
         public bool IsChecked {
             get => _isChecked;
             set {
@@ -34,11 +42,6 @@ namespace RevitListOfSchedules.ViewModels {
                 }
             }
         }
-
-        public string Status { get; private set; }
-        public string Name => _linkElement.Name;
-        public string FullName => _linkElement.FullName;
-        public ElementId Id => _linkElement.Id;
 
         private bool SetAndNotifyIfChanged<T>(ref T backingField, T newValue,
             [CallerMemberName] string propertyName = null) {

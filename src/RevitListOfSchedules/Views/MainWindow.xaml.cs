@@ -20,7 +20,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string PluginName => nameof(RevitListOfSchedules);
-    
+
     /// <summary>
     /// Наименование файла конфигурации.
     /// </summary>
@@ -28,7 +28,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string ProjectConfigName => nameof(MainWindow);
-    
+
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
     }

@@ -45,7 +45,7 @@
             Text="{DynamicResource MainWindow.SheetName}" />
         <TextBlock
             x:Key="SheetRevisionNumber"
-            Text="{DynamicResource MainWindow.SheetRevisionNumber}" />        
+            Text="{DynamicResource MainWindow.SheetRevisionNumber}" />
     </Window.Resources>
 
     <b:Interaction.Triggers>
@@ -62,20 +62,20 @@
             <RowDefinition />
             <RowDefinition
                 Height="45" />
-        </Grid.RowDefinitions>        
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition 
-                Width="Auto"/>
-            <ColumnDefinition 
-                Width="Auto"/>
+            <ColumnDefinition
+                Width="Auto" />
+            <ColumnDefinition
+                Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <GridSplitter
             Grid.Column="1"
             Grid.RowSpan="3"
             Width="3"
-            HorizontalAlignment="Center">            
-        </GridSplitter>              
+            HorizontalAlignment="Center">
+        </GridSplitter>
         <Button
             Width="200"
             Margin="20"
@@ -86,7 +86,7 @@
         <StackPanel
             Grid.Row="0"
             Grid.Column="2"
-            Orientation="Horizontal">            
+            Orientation="Horizontal">
             <Label
                 Margin="10,5,10,0"
                 VerticalAlignment="Center"
@@ -97,30 +97,30 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Right"
                 DisplayMemberPath="Name"
-                ItemsSource="{Binding GroupParameters}"                    
-                SelectedItem="{Binding SelectedGroupParameter}"/>             
-                                     
+                ItemsSource="{Binding GroupParameters}"
+                SelectedItem="{Binding SelectedGroupParameter}" />
+
         </StackPanel>
         <DataGrid
             Grid.Row="1"
-            Grid.Column="0"            
-            Margin="10"  
+            Grid.Column="0"
+            Margin="10"
             AutoGenerateColumns="False"
             GridLinesVisibility="All"
             Background="White"
             HorizontalGridLinesBrush="LightGray"
             VerticalGridLinesBrush="LightGray"
             RowHeaderWidth="0"
-            ItemsSource="{Binding Links}" >
+            ItemsSource="{Binding Links}">
             <DataGrid.Columns>
                 <DataGridTemplateColumn
                     Width="40">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <CheckBox 
+                            <CheckBox
                                 HorizontalAlignment="Center"
-                                VerticalAlignment="Center"                                
-                                IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}"/>
+                                VerticalAlignment="Center"
+                                IsChecked="{Binding IsChecked, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -132,7 +132,7 @@
                             <Image
                                 Width="17"
                                 Height="17"
-                                Source="{Binding Status, Converter={StaticResource StatusToImageConverter}}">                                
+                                Source="{Binding Status, Converter={StaticResource StatusToImageConverter}}">
                             </Image>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -146,16 +146,16 @@
                     Width="300"
                     IsReadOnly="True"
                     Header="{StaticResource LinkFullName}"
-                    Binding="{Binding FullName}" />                 
+                    Binding="{Binding FullName}" />
                 <DataGridTemplateColumn
-                    Width="100"                    
+                    Width="100"
                     Header="{StaticResource Reload}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button  
+                            <Button
                                 Width="100"
                                 HorizontalAlignment="Center"
-                                Content="{DynamicResource MainWindow.Reload}"                                
+                                Content="{DynamicResource MainWindow.Reload}"
                                 Command="{Binding ReloadCommand, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -165,7 +165,7 @@
         <DataGrid
             Grid.Row="1"
             Grid.Column="2"
-            Margin="10"                       
+            Margin="10"
             AutoGenerateColumns="False"
             GridLinesVisibility="All"
             Background="White"
@@ -174,15 +174,23 @@
             RowHeaderWidth="0"
             IsReadOnly="True"
             ItemsSource="{Binding Source={StaticResource GroupedAlbums}}"
-            SelectedItem="{Binding SelectedSheets, UpdateSourceTrigger=PropertyChanged}">
+            SelectionMode="Extended">
+            <b:Interaction.Triggers>
+                <b:EventTrigger
+                    EventName="SelectionChanged">
+                    <b:InvokeCommandAction
+                        Command="{Binding UpdateSelectedSheetsCommand}"
+                        CommandParameter="{Binding SelectedItems, RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Width="20"
-                    Header=" "                    
+                    Header=" "
                     IsReadOnly="True" />
                 <DataGridTextColumn
                     Width="100"
-                    Header="{StaticResource SheetNumber}"                   
+                    Header="{StaticResource SheetNumber}"
                     Binding="{Binding Number}" />
                 <DataGridTextColumn
                     Width="400"
@@ -215,7 +223,7 @@
             Grid.Row="2"
             Grid.ColumnSpan="3"
             Orientation="Horizontal"
-            HorizontalAlignment="Right">            
+            HorizontalAlignment="Right">
             <TextBlock
                 Margin="10"
                 Foreground="Orange"
