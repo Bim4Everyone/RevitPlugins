@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectProps", "ProjectProp
 	ProjectSection(SolutionItems) = preProject
 		src\_ProjectProps\DevExpress.props = src\_ProjectProps\DevExpress.props
 		src\_ProjectProps\RevitClashes.props = src\_ProjectProps\RevitClashes.props
+		src\_ProjectProps\WpfUI.props = src\_ProjectProps\WpfUI.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dosymep", "dosymep", "{064729BC-2CB6-4910-9C93-C687F7E2B1CD}"
