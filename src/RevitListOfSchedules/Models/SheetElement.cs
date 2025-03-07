@@ -1,22 +1,21 @@
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Revit;
 
 namespace RevitListOfSchedules.Models {
     internal class SheetElement {
-
         private readonly ViewSheet _viewSheet;
-        private readonly SharedParam _sheetNumberParam;
+        private readonly ParamFactory _paramFactory;
         private readonly string _name;
         private readonly string _number;
         private readonly string _revisionNumber;
 
-        public SheetElement(ViewSheet viewSheet) {
+        public SheetElement(ViewSheet viewSheet, ParamFactory paramFactory) {
             _viewSheet = viewSheet;
-            _sheetNumberParam = SharedParamsConfig.Instance.StampSheetNumber;
+            _paramFactory = paramFactory;
             _name = _viewSheet.Name;
-            _number = SetNumberParam(_sheetNumberParam);
+            _number = SetNumberParam();
             _revisionNumber = GetRevisionString();
         }
 
@@ -25,18 +24,29 @@ namespace RevitListOfSchedules.Models {
         public string Number => _number;
         public string RevisionNumber => _revisionNumber;
 
-        private string SetNumberParam(SharedParam sharedParam) {
+        private string SetNumberParam() {
             string value = null;
-            if(Sheet.IsExistsParam(sharedParam)) {
-                if(Sheet.IsExistsParamValue(sharedParam)) {
-                    value = Sheet.GetParamValueOrDefault<string>(sharedParam);
+            if(Sheet.IsExistsParam(_paramFactory.SharedParamNumber)) {
+                if(Sheet.IsExistsParamValue(_paramFactory.SharedParamNumber)) {
+                    value = Sheet.GetParamValueOrDefault<string>(_paramFactory.SharedParamNumber);
                 }
             }
             return value;
         }
 
         private string GetRevisionString() {
-            return "Изм.1";
+            string startstring = "Изм.";
+            string resultstringrevision = string.Empty;
+            for(int i = 0; i < _paramFactory.SharedParamsRevision.Count; i++) {
+                if(_viewSheet.IsExistsParam(_paramFactory.SharedParamsRevision[i])) {
+                    if(_viewSheet.IsExistsParamValue(_paramFactory.SharedParamsRevision[i])) {
+                        string paramValue = _viewSheet.GetParamValue<string>(_paramFactory.SharedParamsRevision[i]);
+                        string paramValueRevision = _viewSheet.GetParamValue<string>(_paramFactory.SharedParamsRevisionValue[i]);
+                        resultstringrevision += string.Concat(startstring, paramValue, $"({paramValueRevision}); ");
+                    }
+                }
+            }
+            return resultstringrevision;
         }
     }
 }

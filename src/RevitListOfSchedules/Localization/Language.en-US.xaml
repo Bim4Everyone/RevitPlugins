@@ -37,17 +37,15 @@
     <system:String
         x:Key="RevitRepository.TransactionNameCreate">Create a ViewDrafting for a List of Schedules</system:String>
     <system:String
+        x:Key="RevitRepository.TransactionNameDelete">Delete a family instances</system:String>
+    <system:String
         x:Key="RevitRepository.ViewName">List of Schedules_{0}</system:String>
 
     <system:String
         x:Key="FamilyLoader.TransactionNameLoad">Loading a family of annotations</system:String>
     <system:String
         x:Key="FamilyLoader.TransactionNamePlace">Placing a family of annotations</system:String>
-
-    <system:String
-        x:Key="MainViewModel.ProgressBarText1">"Reload link files... [{0}]\[{1}]"</system:String>
-    <system:String
-        x:Key="MainViewModel.ProgressBarText2">"Sheet processing... [{0}]\[{1}]"</system:String>
+    
     <system:String
         x:Key="MainViewModel.ErrorText">"Select sheets to create a list of schedules"</system:String>
 

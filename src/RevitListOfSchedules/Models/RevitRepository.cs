@@ -20,15 +20,12 @@ namespace RevitListOfSchedules.Models;
 
 internal class RevitRepository {
     private readonly ILocalizationService _localizationService;
+    private readonly ParamFactory _paramFactory;
 
-    public const string FamilyParamNumber = "Номер листа";
-    public const string FamilyParamName = "Наименование спецификации";
-    public const string FamilyParamRevision = "Примечание";
-    public const string ScheduleName = "Ведомость спецификаций и ведомостей";
-
-    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
+    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService, ParamFactory paramFactory) {
         UIApplication = uiApplication;
         _localizationService = localizationService;
+        _paramFactory = paramFactory;
     }
 
     public UIApplication UIApplication { get; }
@@ -63,7 +60,7 @@ internal class RevitRepository {
     // Метод получения списка SheetElement по Document (основной или связанный)
     public IList<SheetElement> GetSheetElements(Document document) {
         return new Collection<SheetElement>(GetViewSheets(document)
-            .Select(sheet => new SheetElement(sheet))
+            .Select(sheet => new SheetElement(sheet, _paramFactory))
             .OrderBy(sheet => Convert.ToInt32(sheet.Number))
             .ToList());
     }
@@ -75,7 +72,6 @@ internal class RevitRepository {
             .Cast<ViewSheet>()
             .ToList();
     }
-
 
     // Метод получения списка Parameter по которым организован браузер проекта (листы)
     public IList<RevitParam> GetBrowserParameters(ViewSheet viewSheet) {
@@ -103,13 +99,12 @@ internal class RevitRepository {
         return listOfParameters;
     }
 
-
     // Метод получения чертежного вида, существующего или создание нового
     public ViewDrafting GetViewDrafting(string familyName) {
         string nameView = string.Format(
             _localizationService.GetLocalizedString("RevitRepository.ViewName"), familyName);
         var view = new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewFamilyType))
+            .OfClass(typeof(ViewDrafting))
             .Where(v => v.Name.Equals(nameView, StringComparison.OrdinalIgnoreCase))
             .Cast<ViewDrafting>()
             .FirstOrDefault();
@@ -137,7 +132,7 @@ internal class RevitRepository {
         }
     }
 
-    public IList<ViewSchedule> GetSchedules(Document document, ViewSheet viewSheet) {
+    public IList<ViewSchedule> GetScheduleInstances(Document document, ViewSheet viewSheet) {
         if(document == null || viewSheet == null) {
             return null;
         }
@@ -164,8 +159,28 @@ internal class RevitRepository {
             .First();
     }
 
+    public void DeleteFamilyInstance(View view) {
+        var instances = new FilteredElementCollector(Document, view.Id)
+            .OfType<FamilyInstance>()
+            .Select(instance => instance.Id)
+            .ToList();
+        string transactionName = _localizationService.GetLocalizedString("RevitRepository.TransactionNameDelete");
+        using(Transaction t = Document.StartTransaction(transactionName)) {
+            foreach(var instance in instances) {
+                Document.Delete(instance);
+            }
+            t.Commit();
+        }
+    }
+
+    public bool IsExistView(string name) {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewSchedule))
+            .Where(v => v.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+            .Cast<ViewSchedule>()
+            .ToList()
+            .Count > 0;
+    }
+
+
 }
-
-
-
-

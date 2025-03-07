@@ -1,88 +1,159 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
+using RevitListOfSchedules.ViewModels;
+
 
 namespace RevitListOfSchedules.Models {
     internal class TempFamilyDocument {
         private readonly ILocalizationService _localizationService;
-        private readonly Application _application;
-        private readonly Document _familyDocument;
+        private readonly RevitRepository _revitRepository;
+        private readonly FamilyLoadOptions _familyLoadOptions;
+
+        private readonly string _albumName;
+        private readonly string _familyTemplatePath;
         private readonly string _familyName;
+        private readonly string _familyPath;
+        private readonly FamilySymbol _familySymbol;
+
         private readonly int _diameterArc = 5;
 
         public TempFamilyDocument(
-            ILocalizationService localizationService, Application application, string familyName) {
-            _localizationService = localizationService;
-            _application = application;
-            _familyDocument = _application.NewFamilyDocument(GetTemplateFamilyPath());
-            _familyName = familyName;
+            ILocalizationService localizationService,
+            RevitRepository revitRepository,
+            FamilyLoadOptions familyLoadOptions,
+            string albumName) {
 
-            SetFamilyNameAndPath();
+            _localizationService = localizationService;
+            _revitRepository = revitRepository;
+            _familyLoadOptions = familyLoadOptions;
+            _albumName = albumName;
+            _familyTemplatePath = GetTemplateFamilyPath();
+            _familyName = GetFamilyName();
+            _familyPath = GetFamilyPath();
+            CreateDocument();
+            _familySymbol = LoadFamilySymbol();
         }
 
-        public string FamilyDocumentName { get; private set; }
-        public string FamilyDocumentPath { get; private set; }
+        public FamilySymbol FamilySymbol => _familySymbol;
 
-        public Document CreateDocument() {
+        public IList<FamilyInstance> PlaceFamilyInstance(
+            View view, SheetViewModel sheetViewModel, IList<ViewSchedule> viewSchedules) {
+
+            IList<FamilyInstance> familyInstanceList = [];
+
+            string transactionNamePlace = _localizationService.GetLocalizedString("FamilyLoader.TransactionNamePlace");
+            using(Transaction t = _revitRepository.Document.StartTransaction(transactionNamePlace)) {
+                foreach(ViewSchedule schedule in viewSchedules) {
+                    TableData table_data = schedule.GetTableData();
+                    TableSectionData head_data = table_data.GetSectionData(SectionType.Header);
+                    string result = head_data == null
+                        ? schedule.Name
+                        : head_data.GetCellText(0, 0);
+                    XYZ xyz = XYZ.Zero;
+                    FamilyInstance familyInstance = _revitRepository.Document.Create.NewFamilyInstance(xyz, _familySymbol, view);
+                    familyInstanceList.Add(familyInstance);
+                    familyInstance.SetParamValue(ParamFactory.FamilyParamNumber, sheetViewModel.Number);
+                    familyInstance.SetParamValue(ParamFactory.FamilyParamName, result);
+                    familyInstance.SetParamValue(ParamFactory.FamilyParamRevision, sheetViewModel.RevisionNumber);
+                }
+                t.Commit();
+            }
+            return familyInstanceList;
+        }
+
+
+
+        private string GetTemplateFamilyPath() {
+            string familyTemplatePath = _revitRepository.Application.FamilyTemplatePath;
+            string localizedString = _localizationService.GetLocalizedString("TempFamilyDocument.TemplateFamilyName");
+            return $"{familyTemplatePath}{localizedString}";
+        }
+
+        private string GetFamilyName() {
+            return string.Format(
+                _localizationService.GetLocalizedString("TempFamilyDocument.FamilyName"), _albumName);
+        }
+
+        private string GetFamilyPath() {
+            string extension = ".rfa";
+            string tempDirectory = Path.GetTempPath();
+            string familyDocumentName = string.Format(_familyName, _albumName);
+            string fileName = $"{familyDocumentName}{extension}";
+            return Path.Combine(tempDirectory, fileName);
+        }
+
+        private Document CreateDocument() {
+            Document document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
             string transactionName = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionName");
-            using(Transaction t = _familyDocument.StartTransaction(transactionName)) {
-                CreateParameters();
-                CreateCircle();
+            using(Transaction t = document.StartTransaction(transactionName)) {
+                CreateParameters(document);
+                CreateCircle(document);
                 t.Commit();
             }
             SaveAsOptions opt = new SaveAsOptions {
                 OverwriteExistingFile = true
             };
-            _familyDocument.SaveAs(FamilyDocumentPath, opt);
-            _familyDocument.Close(false);
-            return _familyDocument;
+            document.SaveAs(_familyPath, opt);
+            document.Close(false);
+            return document;
         }
 
-        private void CreateParameters() {
-            FamilyManager familyManager = _familyDocument.FamilyManager;
-            FamilyParameter familyParameter2 = familyManager
-                .AddParameter(RevitRepository.FamilyParamNumber, GroupTypeId.Text, SpecTypeId.String.Text, true);
-            FamilyParameter familyParameter1 = familyManager
-                .AddParameter(RevitRepository.FamilyParamName, GroupTypeId.Text, SpecTypeId.String.Text, true);
-            FamilyParameter familyParameter3 = familyManager
-                .AddParameter(RevitRepository.FamilyParamRevision, GroupTypeId.Text, SpecTypeId.String.Text, true);
+        private void CreateParameters(Document document) {
+            FamilyManager familyManager = document.FamilyManager;
+            familyManager.AddParameter(ParamFactory.FamilyParamNumber, GroupTypeId.Text, SpecTypeId.String.Text, true);
+            familyManager.AddParameter(ParamFactory.FamilyParamName, GroupTypeId.Text, SpecTypeId.String.Text, true);
+            familyManager.AddParameter(ParamFactory.FamilyParamRevision, GroupTypeId.Text, SpecTypeId.String.Text, true);
         }
 
-        private void CreateCircle() {
-            ViewSheet viewPlan = new FilteredElementCollector(_familyDocument)
+        private void CreateCircle(Document document) {
+            ViewSheet viewPlan = new FilteredElementCollector(document)
                 .OfClass(typeof(ViewSheet))
                 .Cast<ViewSheet>()
                 .First();
-            Autodesk.Revit.Creation.FamilyItemFactory familyCreator = _familyDocument.FamilyCreate;
+            Autodesk.Revit.Creation.FamilyItemFactory familyCreator = document.FamilyCreate;
             double diameterArc = UnitUtils.ConvertToInternalUnits(_diameterArc, UnitTypeId.Millimeters);
             Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero);
             Arc circle = Arc.Create(plane, diameterArc / 2, 0, 2 * Math.PI);
             familyCreator.NewDetailCurve(viewPlan, circle);
         }
 
-        private void SetFamilyNameAndPath() {
-            string extension = ".rfa";
-            string tempDirectory = Path.GetTempPath();
-            string familyDocumentName = string.Format(
-                _localizationService.GetLocalizedString("TempFamilyDocument.FamilyName"), _familyName);
-            string fileName = $"{familyDocumentName}{extension}";
-            string familyDocumentPath = Path.Combine(tempDirectory, fileName);
+        private FamilySymbol LoadFamilySymbol() {
+            FamilySymbol familySymbol = null;
+            string transactionNameLoad = _localizationService.GetLocalizedString("FamilyLoader.TransactionNameLoad");
+            using(Transaction t = _revitRepository.Document.StartTransaction(transactionNameLoad)) {
 
-            FamilyDocumentName = familyDocumentName;
-            FamilyDocumentPath = familyDocumentPath;
+                _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out Family family);
+
+                familySymbol = _revitRepository.GetFamilySymbol(family);
+
+                if(familySymbol != null) {
+                    if(!familySymbol.IsActive) {
+                        familySymbol.Activate();
+                    }
+                }
+                t.Commit();
+            }
+            DeleteFamilySymbol();
+            return familySymbol;
         }
 
-        private string GetTemplateFamilyPath() {
-            string familyTemplatePath = _application.FamilyTemplatePath;
-            string localizedString = _localizationService.GetLocalizedString("TempFamilyDocument.TemplateFamilyName");
-            return $"{familyTemplatePath}{localizedString}";
+        private void DeleteFamilySymbol() {
+            try {
+                if(File.Exists(_familyPath)) {
+                    File.Delete(_familyPath);
+                }
+            } catch(UnauthorizedAccessException) {
+            }
         }
+
+
     }
 }

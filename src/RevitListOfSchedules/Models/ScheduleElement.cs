@@ -20,7 +20,6 @@ namespace RevitListOfSchedules.Models {
             _localizationService = localizationService;
             _famSymbol = famSymbol;
             _famInstance = famInstance;
-
             CreateSchedule();
         }
 
@@ -39,14 +38,14 @@ namespace RevitListOfSchedules.Models {
                 ScheduleDefinition scheduleDef = vewSchedule.Definition;
 
                 appearanceSection.ClearCell(0, 0);
-                appearanceSection.SetCellText(0, 0, RevitRepository.ScheduleName);
+                appearanceSection.SetCellText(0, 0, ParamFactory.ScheduleName);
 
                 ScheduleField noteField1 = vewSchedule.Definition
-                    .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(RevitRepository.FamilyParamNumber).Id);
+                    .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(ParamFactory.FamilyParamNumber).Id);
                 ScheduleField noteField2 = vewSchedule.Definition
-                    .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(RevitRepository.FamilyParamName).Id);
+                    .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(ParamFactory.FamilyParamName).Id);
                 ScheduleField noteField3 = vewSchedule.Definition
-                    .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(RevitRepository.FamilyParamRevision).Id);
+                    .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(ParamFactory.FamilyParamRevision).Id);
 
                 double firstLastCollumn = UnitUtils.ConvertToInternalUnits(30, UnitTypeId.Millimeters);
                 double secondCollumn = UnitUtils.ConvertToInternalUnits(110, UnitTypeId.Millimeters);
