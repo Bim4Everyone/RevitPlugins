@@ -115,6 +115,135 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         }
 
 
+
+
+        public void TryCreateTransverseRebarViewFirstDimensions() {
+            var doc = Repository.Document;
+            View view = SheetInfo.TransverseRebarViewFirst.ViewElement;
+
+            try {
+                var rebar = GetSkeletonRebar(view);
+                if(rebar is null) {
+                    return;
+                }
+
+                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
+                ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
+                Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
+
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
+                ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
+                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
+            } catch(Exception) { }
+        }
+
+        public void TryCreateTransverseRebarViewSecondDimensions() {
+            var doc = Repository.Document;
+            View view = SheetInfo.TransverseRebarViewSecond.ViewElement;
+
+            try {
+                var rebar = GetSkeletonRebar(view);
+                if(rebar is null) {
+                    return;
+                }
+
+                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2);
+                ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
+                Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
+
+                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2.5);
+                ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт", "край" });
+                Dimension dimensionTopEdge = doc.Create.NewDimension(view, dimensionLineTopEdge, refArrayTopEdge);
+            } catch(Exception) { }
+        }
+
+
+        public void TryCreateTransverseViewFirstDimensions() {
+            var doc = Repository.Document;
+            View view = SheetInfo.TransverseViewFirst.ViewElement;
+
+            try {
+                var rebar = GetSkeletonRebar(view);
+                if(rebar is null) {
+                    return;
+                }
+
+                // Размер по каждому стержню армирования + грани опалубки пилона (положение сверху)
+                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 1.5);
+                ReferenceArray refArrayRebarBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
+                refArrayRebarBottom = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
+                                                       new List<string>() { "фронт", "край" }, refArrayRebarBottom);
+                Dimension dimensionRebarBottom = doc.Create.NewDimension(view, dimensionLineTop, refArrayRebarBottom);
+
+                // Размер по граням опалубки пилона (положение снизу 1)
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
+                ReferenceArray refArrayFormworkEdges = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
+                                                                        new List<string>() { "фронт", "край" });
+                Dimension dimensionFormworkEdges = doc.Create.NewDimension(view, dimensionLineBottomEdge,
+                                                                           refArrayFormworkEdges);
+
+                // Размер по граням опалубки пилона + оси (положение снизу 2) 
+                var grids = new FilteredElementCollector(doc, view.Id)
+                    .OfCategory(BuiltInCategory.OST_Grids)
+                    .Cast<Grid>()
+                    .ToList();
+
+                if(grids.Count > 0) {
+                    Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.5);
+                    ReferenceArray refArrayFormworkEdgesNGrids = GetDimensionRefs(view, grids, new XYZ(0, 1, 0),
+                                                                                  refArrayFormworkEdges);
+                    Dimension dimensionFormworkEdgesNGrids = doc.Create.NewDimension(view, dimensionLineBottom,
+                                                                                     refArrayFormworkEdgesNGrids);
+                }
+            } catch(Exception) { }
+        }
+
+
+        public void TryCreateTransverseViewSecondDimensions() {
+            var doc = Repository.Document;
+            View view = SheetInfo.TransverseViewSecond.ViewElement;
+
+            try {
+                var rebar = GetSkeletonRebar(view);
+                if(rebar is null) {
+                    return;
+                }
+
+                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
+                ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
+                Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
+
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
+                ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
+                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
+            } catch(Exception) { }
+        }
+
+
+        public void TryCreateTransverseViewThirdDimensions() {
+            var doc = Repository.Document;
+            View view = SheetInfo.TransverseViewThird.ViewElement;
+
+            try {
+                var rebar = GetSkeletonRebar(view);
+                if(rebar is null) {
+                    return;
+                }
+
+                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2);
+                ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
+                Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
+
+                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2.5);
+                ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт", "край" });
+                Dimension dimensionTopEdge = doc.Create.NewDimension(view, dimensionLineTopEdge, refArrayTopEdge);
+            } catch(Exception) { }
+        }
+
+
+
+
+
         private FamilyInstance GetSkeletonRebar(View view) {
             var rebars = new FilteredElementCollector(Repository.Document, view.Id)
                 .OfCategory(BuiltInCategory.OST_Rebar)
@@ -213,6 +342,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
 
+
+
+
+
         private ReferenceArray GetDimensionRefs(FamilyInstance elem, char keyRefNamePart,
                                                 List<string> importantRefNameParts, ReferenceArray refArray = null) {
             var references = new List<Reference>();
@@ -241,118 +374,52 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         }
 
 
+        private ReferenceArray GetDimensionRefs(View view, List<Grid> grids, XYZ direction, ReferenceArray refArray = null) {
+
+            XYZ origin = view.Origin;
+            XYZ viewDirection = view.ViewDirection;
+            XYZ upDirection = view.UpDirection;
+            XYZ rightDirection = view.RightDirection;
+
+            // Создаем матрицу трансформации
+            Transform transform = Transform.Identity;
+            transform.Origin = origin;
+            transform.BasisX = rightDirection;
+            transform.BasisY = upDirection;
+            transform.BasisZ = viewDirection;
+
+            refArray = refArray ?? new ReferenceArray();
+            // Нормализуем направление, заданное для проверки
+            XYZ normalizedDirection = direction.Normalize();
+
+            foreach(Grid grid in grids) {
+                if(grid.Curve is Line line) {
+                    // Получаем направление линии оси
+                    XYZ lineDirection = line.Direction.Normalize();
+
+                    XYZ lineDirectionByView = transform.OfVector(lineDirection);
+
+
+                    if(lineDirectionByView.IsAlmostEqualTo(normalizedDirection, 0.01)
+                        || lineDirectionByView.IsAlmostEqualTo(normalizedDirection.Negate(), 0.01)) {
+
+                        Reference gridRef = new Reference(grid);
+                        if(gridRef != null) {
+                            refArray.Append(gridRef);
+                        }
+                    }
+                }
+            }
+
+            return refArray;
+        }
+
+
         private int GetParamValueAnywhere(Element elem, string paramName) {
             var paramValue = elem.GetParamValueOrDefault<int>(paramName, 0);
             return paramValue == 0
                 ? Repository.Document.GetElement(elem.GetTypeId()).GetParamValueOrDefault<int>(paramName, 0)
                 : paramValue;
-        }
-
-
-
-        public void TryCreateTransverseRebarViewFirstDimensions() {
-            var doc = Repository.Document;
-            View view = SheetInfo.TransverseRebarViewFirst.ViewElement;
-
-            try {
-                var rebar = GetSkeletonRebar(view);
-                if(rebar is null) {
-                    return;
-                }
-
-                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
-                ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
-                Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
-
-                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
-                ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
-                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
-            } catch(Exception) { }
-        }
-
-        public void TryCreateTransverseRebarViewSecondDimensions() {
-            var doc = Repository.Document;
-            View view = SheetInfo.TransverseRebarViewSecond.ViewElement;
-
-            try {
-                var rebar = GetSkeletonRebar(view);
-                if(rebar is null) {
-                    return;
-                }
-
-                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2);
-                ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
-                Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
-
-                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2.5);
-                ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт", "край" });
-                Dimension dimensionTopEdge = doc.Create.NewDimension(view, dimensionLineTopEdge, refArrayTopEdge);
-            } catch(Exception) { }
-        }
-
-
-        public void TryCreateTransverseViewFirstDimensions() {
-            var doc = Repository.Document;
-            View view = SheetInfo.TransverseViewFirst.ViewElement;
-
-            try {
-                var rebar = GetSkeletonRebar(view);
-                if(rebar is null) {
-                    return;
-                }
-
-                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
-                ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
-                Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
-
-                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
-                ReferenceArray refArrayEdges = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
-                refArrayEdges = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
-                                                 new List<string>() { "фронт", "край" }, refArrayEdges);
-                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayEdges);
-            } catch(Exception) { }
-        }
-
-
-        public void TryCreateTransverseViewSecondDimensions() {
-            var doc = Repository.Document;
-            View view = SheetInfo.TransverseViewSecond.ViewElement;
-
-            try {
-                var rebar = GetSkeletonRebar(view);
-                if(rebar is null) {
-                    return;
-                }
-
-                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
-                ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
-                Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
-
-                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
-                ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
-                Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
-            } catch(Exception) { }
-        }
-
-
-        public void TryCreateTransverseViewThirdDimensions() {
-            var doc = Repository.Document;
-            View view = SheetInfo.TransverseViewThird.ViewElement;
-
-            try {
-                var rebar = GetSkeletonRebar(view);
-                if(rebar is null) {
-                    return;
-                }
-
-                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2);
-                ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
-                Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
-
-                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2.5);
-                ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт", "край" });
-                Dimension dimensionTopEdge = doc.Create.NewDimension(view, dimensionLineTopEdge, refArrayTopEdge);
-            } catch(Exception) { }
         }
     }
 }
