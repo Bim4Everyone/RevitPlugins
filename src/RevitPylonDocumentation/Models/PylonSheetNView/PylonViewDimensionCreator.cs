@@ -168,33 +168,66 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     return;
                 }
 
-                // Размер по каждому стержню армирования + грани опалубки пилона (положение сверху)
-                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 1.5);
-                ReferenceArray refArrayRebarBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
-                refArrayRebarBottom = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
-                                                       new List<string>() { "фронт", "край" }, refArrayRebarBottom);
-                Dimension dimensionRebarBottom = doc.Create.NewDimension(view, dimensionLineTop, refArrayRebarBottom);
-
-                // Размер по граням опалубки пилона (положение снизу 1)
-                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
-                ReferenceArray refArrayFormworkEdges = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
-                                                                        new List<string>() { "фронт", "край" });
-                Dimension dimensionFormworkEdges = doc.Create.NewDimension(view, dimensionLineBottomEdge,
-                                                                           refArrayFormworkEdges);
-
-                // Размер по граням опалубки пилона + оси (положение снизу 2) 
                 var grids = new FilteredElementCollector(doc, view.Id)
                     .OfCategory(BuiltInCategory.OST_Grids)
                     .Cast<Grid>()
                     .ToList();
 
-                if(grids.Count > 0) {
-                    Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.5);
-                    ReferenceArray refArrayFormworkEdgesNGrids = GetDimensionRefs(view, grids, new XYZ(0, 1, 0),
-                                                                                  refArrayFormworkEdges);
-                    Dimension dimensionFormworkEdgesNGrids = doc.Create.NewDimension(view, dimensionLineBottom,
-                                                                                     refArrayFormworkEdgesNGrids);
-                }
+
+                //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
+                // Размер по ФРОНТУ опалубка (положение снизу 1)
+                Line dimensionLineBottomFirst = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 3);
+                ReferenceArray refArrayFormworkFront = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
+                                                                        new List<string>() { "фронт", "край" });
+                Dimension dimensionFormworkFront = doc.Create.NewDimension(view, dimensionLineBottomFirst,
+                                                                           refArrayFormworkFront);
+
+                //// Размер по ФРОНТУ опалубка + армирование (положение сверху)
+                //Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 0);
+                //// Добавляем ссылки на арматурные стержни
+                //ReferenceArray refArrayFormworkRebarFront = GetDimensionRefs(rebar, '#',
+                //                                                             new List<string>() { "низ", "фронт" },
+                //                                                             refArrayFormworkFront);
+                //Dimension dimensionFormworkRebarFrontBottom = doc.Create.NewDimension(view, dimensionLineTop,
+                //                                                                      refArrayFormworkRebarFront);
+
+                //if(grids.Count > 0) {
+                //    // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
+                //    Line dimensionLineBottomSecond = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.5);
+                //    ReferenceArray refArrayFormworkGridFront = GetDimensionRefs(view, grids, new XYZ(0, 1, 0),
+                //                                                                  refArrayFormworkFront);
+                //    Dimension dimensionFormworkGridFront = doc.Create.NewDimension(view, dimensionLineBottomSecond,
+                //                                                                   refArrayFormworkGridFront);
+                //}
+
+                #region
+                ////ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
+                //// Размер по ТОРЦУ опалубка (положение справа 1)
+                //Line dimensionLineRightFirst = GetDimensionLine(view, rebar, DimensionOffsetType.Right, 1.5);
+                //ReferenceArray refArrayFormworkSide = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
+                //                                                       new List<string>() { "торец", "край" });
+                //Dimension dimensionFormworkSide = doc.Create.NewDimension(view, dimensionLineRightFirst,
+                //                                                          refArrayFormworkSide);
+
+
+                //// Размер по ТОРЦУ опалубка + армирование (положение справа 2)
+                //Line dimensionLineRightSecond = GetDimensionLine(view, rebar, DimensionOffsetType.Right);
+                //// Добавляем ссылки на арматурные стержни
+                //ReferenceArray refArrayFormworkRebarSide = GetDimensionRefs(rebar, '#',
+                //                                                            new List<string>() { "низ", "торец" },
+                //                                                            refArrayFormworkSide);
+                //Dimension dimensionFormworkRebarSide = doc.Create.NewDimension(view, dimensionLineRightSecond,
+                //                                                                      refArrayFormworkRebarSide);
+
+                //if(grids.Count > 0) {
+                //    // Размер по ТОРЦУ опалубка + оси (положение слева 1)
+                //    Line dimensionLineLeft = GetDimensionLine(view, rebar, DimensionOffsetType.Left);
+                //    ReferenceArray refArrayFormworkGridSide = GetDimensionRefs(view, grids, new XYZ(1, 0, 0),
+                //                                                               refArrayFormworkSide);
+                //    Dimension dimensionFormworkGridSide = doc.Create.NewDimension(view, dimensionLineLeft,
+                //                                                                  refArrayFormworkGridSide);
+                //}
+                #endregion
             } catch(Exception) { }
         }
 
@@ -304,11 +337,24 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     XYZ globalMaxPoint = transform.OfPoint(cropBoxMax) + offsetTop;
 
                     // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                    pt1 = bbox.Max + offsetTop;
+                    if(upDirection.X == -1 || (upDirection.Y == -1)) {
+                        pt1 = bbox.Min + offsetTop;
+                    } else {
+                        pt1 = bbox.Max + offsetTop;
+                    }
+
+                    //// Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
+                    //pt1 = bbox.Max + offsetTop;
 
                     // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
                     // то ставим по рамки подрезки
-                    pt1 = pt1.Z > globalMaxPoint.Z ? new XYZ(pt1.X, pt1.Y, globalMaxPoint.Z) : pt1;
+                    //pt1 = pt1.Y > globalMaxPoint.Y ? new XYZ(pt1.X, globalMaxPoint.Y, pt1.Z) : pt1;
+
+                    if(pt1.Y > globalMaxPoint.Y) {
+                        pt1 = new XYZ(pt1.X, globalMaxPoint.Y, pt1.Z);
+                    }
+
+
                     pt2 = pt1 + view.RightDirection;
                     break;
                 case DimensionOffsetType.Bottom:
@@ -319,15 +365,47 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
                     // Получаем левую нижнюю точку рамки подрезки вида
                     var cropBoxMin = view.CropBox.Min;
-                    // Переводим ее в глобальную систему координат + отступ
-                    XYZ globalMinPoint = transform.OfPoint(cropBoxMin) + offsetBottom;
+                    // Переводим ее в глобальную систему координат
+                    XYZ cropBoxMinGlobal = transform.OfPoint(cropBoxMin);
 
                     // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                    pt1 = bbox.Min + offsetBottom;
+                    if(upDirection.X == -1 || (upDirection.Y == -1)) {
+                        pt1 = bbox.Max + offsetBottom;
+                    } else {
+                        pt1 = bbox.Min + offsetBottom;
+                    }
 
                     // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
-                    // то ставим по рамки подрезки
-                    pt1 = pt1.Z < globalMinPoint.Z ? new XYZ(pt1.X, pt1.Y, globalMinPoint.Z) : pt1;
+                    // то ставим по рамке подрезки
+                    //pt1 = pt1.Y < globalMinPoint.Y ? new XYZ(pt1.X, globalMinPoint.Y, pt1.Z) : pt1;
+
+                    var xUpDirectionRounded = Math.Round(upDirection.X);
+                    var yUpDirectionRounded = Math.Round(upDirection.Y);
+
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
+                        if(pt1.Y < cropBoxMinGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                        }
+                    }
+
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
+                        if(pt1.Y > cropBoxMinGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                        }
+                    }
+
+                    if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.X < cropBoxMinGlobal.X) {
+                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.X, pt1.Z);
+                        }
+                    }
+
+                    if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.X > cropBoxMinGlobal.X) {
+                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.X, pt1.Z);
+                        }
+                    }
+
                     pt2 = pt1 + view.RightDirection;
                     break;
                 case DimensionOffsetType.Left:
