@@ -176,29 +176,29 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
                 //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
                 // Размер по ФРОНТУ опалубка (положение снизу 1)
-                Line dimensionLineBottomFirst = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 3);
+                Line dimensionLineBottomFirst = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
                 ReferenceArray refArrayFormworkFront = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
                                                                         new List<string>() { "фронт", "край" });
                 Dimension dimensionFormworkFront = doc.Create.NewDimension(view, dimensionLineBottomFirst,
                                                                            refArrayFormworkFront);
 
-                //// Размер по ФРОНТУ опалубка + армирование (положение сверху)
-                //Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 0);
-                //// Добавляем ссылки на арматурные стержни
-                //ReferenceArray refArrayFormworkRebarFront = GetDimensionRefs(rebar, '#',
-                //                                                             new List<string>() { "низ", "фронт" },
-                //                                                             refArrayFormworkFront);
-                //Dimension dimensionFormworkRebarFrontBottom = doc.Create.NewDimension(view, dimensionLineTop,
-                //                                                                      refArrayFormworkRebarFront);
+                // Размер по ФРОНТУ опалубка + армирование (положение сверху)
+                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2);
+                // Добавляем ссылки на арматурные стержни
+                ReferenceArray refArrayFormworkRebarFront = GetDimensionRefs(rebar, '#',
+                                                                             new List<string>() { "низ", "фронт" },
+                                                                             refArrayFormworkFront);
+                Dimension dimensionFormworkRebarFrontBottom = doc.Create.NewDimension(view, dimensionLineTop,
+                                                                                      refArrayFormworkRebarFront);
 
-                //if(grids.Count > 0) {
-                //    // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
-                //    Line dimensionLineBottomSecond = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.5);
-                //    ReferenceArray refArrayFormworkGridFront = GetDimensionRefs(view, grids, new XYZ(0, 1, 0),
-                //                                                                  refArrayFormworkFront);
-                //    Dimension dimensionFormworkGridFront = doc.Create.NewDimension(view, dimensionLineBottomSecond,
-                //                                                                   refArrayFormworkGridFront);
-                //}
+                if(grids.Count > 0) {
+                    // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
+                    Line dimensionLineBottomSecond = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.5);
+                    ReferenceArray refArrayFormworkGridFront = GetDimensionRefs(view, grids, new XYZ(0, 1, 0),
+                                                                                  refArrayFormworkFront);
+                    Dimension dimensionFormworkGridFront = doc.Create.NewDimension(view, dimensionLineBottomSecond,
+                                                                                   refArrayFormworkGridFront);
+                }
 
                 #region
                 ////ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
@@ -316,6 +316,9 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             XYZ upDirection = view.UpDirection;
             XYZ rightDirection = view.RightDirection;
 
+            var xUpDirectionRounded = Math.Round(upDirection.X);
+            var yUpDirectionRounded = Math.Round(upDirection.Y);
+
             // Создаем матрицу трансформации
             Transform transform = Transform.Identity;
             transform.Origin = origin;
@@ -333,8 +336,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
                     // Получаем правую верхнюю точку рамки подрезки вида
                     var cropBoxMax = view.CropBox.Max;
-                    // Переводим ее в глобальную систему координат + отступ
-                    XYZ globalMaxPoint = transform.OfPoint(cropBoxMax) + offsetTop;
+                    // Переводим ее в глобальную систему координат
+                    XYZ cropBoxMaxGlobal = transform.OfPoint(cropBoxMax);
 
                     // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
                     if(upDirection.X == -1 || (upDirection.Y == -1)) {
@@ -343,17 +346,31 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                         pt1 = bbox.Max + offsetTop;
                     }
 
-                    //// Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                    //pt1 = bbox.Max + offsetTop;
-
                     // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
                     // то ставим по рамки подрезки
-                    //pt1 = pt1.Y > globalMaxPoint.Y ? new XYZ(pt1.X, globalMaxPoint.Y, pt1.Z) : pt1;
-
-                    if(pt1.Y > globalMaxPoint.Y) {
-                        pt1 = new XYZ(pt1.X, globalMaxPoint.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
+                        if(pt1.Y > cropBoxMaxGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                        }
                     }
 
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
+                        if(pt1.Y < cropBoxMaxGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                        }
+                    }
+
+                    if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.X > cropBoxMaxGlobal.X) {
+                            pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                        }
+                    }
+
+                    if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.X < cropBoxMaxGlobal.X) {
+                            pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                        }
+                    }
 
                     pt2 = pt1 + view.RightDirection;
                     break;
@@ -377,11 +394,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
                     // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
                     // то ставим по рамке подрезки
-                    //pt1 = pt1.Y < globalMinPoint.Y ? new XYZ(pt1.X, globalMinPoint.Y, pt1.Z) : pt1;
-
-                    var xUpDirectionRounded = Math.Round(upDirection.X);
-                    var yUpDirectionRounded = Math.Round(upDirection.Y);
-
                     if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
                         if(pt1.Y < cropBoxMinGlobal.Y) {
                             pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
@@ -396,13 +408,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
                     if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
                         if(pt1.X < cropBoxMinGlobal.X) {
-                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.X, pt1.Z);
+                            pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
                         }
                     }
 
                     if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
                         if(pt1.X > cropBoxMinGlobal.X) {
-                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.X, pt1.Z);
+                            pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
                         }
                     }
 
@@ -425,7 +437,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
         private ReferenceArray GetDimensionRefs(FamilyInstance elem, char keyRefNamePart,
-                                                List<string> importantRefNameParts, ReferenceArray refArray = null) {
+                                                List<string> importantRefNameParts, ReferenceArray oldRefArray = null) {
             var references = new List<Reference>();
             foreach(FamilyInstanceReferenceType referenceType in Enum.GetValues(typeof(FamilyInstanceReferenceType))) {
                 references.AddRange(elem.GetReferences(referenceType));
@@ -433,7 +445,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // # является управляющим символом, сигнализирующим, что плоскость нужно использовать для образмеривания
             // и разделяющим имя плоскости на имя параметра проверки и остальной текст с ключевыми словами
-            refArray = refArray ?? new ReferenceArray();
+            ReferenceArray refArray = new ReferenceArray();
+            if(oldRefArray != null) {
+                foreach(Reference reference in oldRefArray) {
+                    refArray.Append(reference);
+                }
+            }
+
             importantRefNameParts.Add(keyRefNamePart.ToString());
             foreach(Reference reference in references) {
                 string referenceName = elem.GetReferenceName(reference);
@@ -452,7 +470,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         }
 
 
-        private ReferenceArray GetDimensionRefs(View view, List<Grid> grids, XYZ direction, ReferenceArray refArray = null) {
+        private ReferenceArray GetDimensionRefs(View view, List<Grid> grids, XYZ direction, ReferenceArray oldRefArray = null) {
 
             XYZ origin = view.Origin;
             XYZ viewDirection = view.ViewDirection;
@@ -466,7 +484,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             transform.BasisY = upDirection;
             transform.BasisZ = viewDirection;
 
-            refArray = refArray ?? new ReferenceArray();
+            ReferenceArray refArray = new ReferenceArray();
+            if(oldRefArray != null) {
+                foreach(Reference reference in oldRefArray) {
+                    refArray.Append(reference);
+                }
+            }
+
             // Нормализуем направление, заданное для проверки
             XYZ normalizedDirection = direction.Normalize();
 
