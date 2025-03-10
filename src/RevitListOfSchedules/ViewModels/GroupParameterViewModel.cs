@@ -1,12 +1,14 @@
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 
 namespace RevitListOfSchedules.ViewModels {
     public class GroupParameterViewModel {
-
+        private readonly ILocalizationService _localizationService;
         private readonly RevitParam _parameter;
         private readonly string _name;
 
-        public GroupParameterViewModel(RevitParam parameter = null) {
+        public GroupParameterViewModel(ILocalizationService localizationService, RevitParam parameter = null) {
+            _localizationService = localizationService;
             _parameter = parameter;
             _name = GetParamName();
         }
@@ -18,7 +20,7 @@ namespace RevitListOfSchedules.ViewModels {
             if(_parameter != null) {
                 return _parameter.Name;
             } else {
-                return "< Нет параметра группировки >";
+                return _localizationService.GetLocalizedString("GroupParameter.NoParameter");
             }
         }
     }

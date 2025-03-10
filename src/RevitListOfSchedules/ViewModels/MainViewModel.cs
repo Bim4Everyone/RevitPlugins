@@ -58,6 +58,7 @@ namespace RevitListOfSchedules.ViewModels {
             // Подписка на события в LinkViewModel
             foreach(var link in Links) {
                 link.SelectionChanged += OnLinkSelectionChanged;
+                link.StatusChanged += OnLinkStatusChanged;
             }
 
             LoadViewCommand = RelayCommand.Create(LoadView);
@@ -133,19 +134,29 @@ namespace RevitListOfSchedules.ViewModels {
             }
         }
 
+        private void OnLinkStatusChanged(object sender, EventArgs e) {
+            if(sender is LinkViewModel link) {
+                if(link.StatusBool) {
+                    AddLinkSheets(link);
+                } else {
+                    DeleteLinkSheets(link);
+                }
+            }
+        }
+
         // Добавляем листы из связей и из основного документа в Sheets.
         private ObservableCollection<SheetViewModel> GetSheets() {
             var mainDocumentSheets = _revitRepository.GetSheetElements(_revitRepository.Document)
-                .Select(sheetElement => new SheetViewModel(sheetElement) {
-                    SheetParameter = SelectedGroupParameter.Parameter
+                .Select(sheetElement => new SheetViewModel(_localizationService, sheetElement) {
+                    GroupParameter = SelectedGroupParameter.Parameter
                 })
                 .ToList();
 
             foreach(var linkViewModel in SelectedLinks) {
                 Document linkDocument = _revitRepository.GetLinkDocument(linkViewModel);
                 var linkDocumentSheets = _revitRepository.GetSheetElements(linkDocument)
-                    .Select(sheetElement => new SheetViewModel(sheetElement, linkViewModel) {
-                        SheetParameter = SelectedGroupParameter.Parameter
+                    .Select(sheetElement => new SheetViewModel(_localizationService, sheetElement, linkViewModel) {
+                        GroupParameter = SelectedGroupParameter.Parameter
                     });
                 mainDocumentSheets.AddRange(linkDocumentSheets);
             }
@@ -156,8 +167,8 @@ namespace RevitListOfSchedules.ViewModels {
         // Добавляем листы связей в _sheets.
         private void AddLinkSheets(LinkViewModel linkViewModel) {
             foreach(SheetElement sheetElement in _revitRepository.GetSheetElements(_revitRepository.GetLinkDocument(linkViewModel))) {
-                _sheets.Add(new SheetViewModel(sheetElement, linkViewModel) {
-                    SheetParameter = SelectedGroupParameter.Parameter
+                _sheets.Add(new SheetViewModel(_localizationService, sheetElement, linkViewModel) {
+                    GroupParameter = SelectedGroupParameter.Parameter
                 });
             }
             UpdateGroupParameter();
@@ -181,12 +192,12 @@ namespace RevitListOfSchedules.ViewModels {
                 IList<RevitParam> listOfParameter = _revitRepository.GetBrowserParameters(firstSheet);
                 if(listOfParameter.Count > 0) {
                     foreach(RevitParam parameter in listOfParameter) {
-                        list.Add(new GroupParameterViewModel(parameter));
+                        list.Add(new GroupParameterViewModel(_localizationService, parameter));
                     }
                 }
             }
             if(list.Count == 0) {
-                list.Add(new GroupParameterViewModel());
+                list.Add(new GroupParameterViewModel(_localizationService));
             }
             return list;
         }
@@ -203,7 +214,7 @@ namespace RevitListOfSchedules.ViewModels {
             var newSheets = new ObservableCollection<SheetViewModel>(
                 _sheets
                 .Select(sheetViewModel => {
-                    sheetViewModel.SheetParameter = SelectedGroupParameter.Parameter;
+                    sheetViewModel.GroupParameter = SelectedGroupParameter.Parameter;
                     return sheetViewModel;
                 }));
 
@@ -269,25 +280,19 @@ namespace RevitListOfSchedules.ViewModels {
         }
 
         private void LoadView() {
-            //LoadConfig();
+            LoadConfig();
         }
 
         private void AcceptView() {
-            //SaveConfig();
-
+            SaveConfig();
             IEnumerable<IGrouping<string, SheetViewModel>> groupedSheets = SelectedSheets
                 .GroupBy(sheet => sheet.AlbumName);
-
             foreach(IGrouping<string, SheetViewModel> groupSheets in groupedSheets) {
-
                 string groupKey = groupSheets.Key;
-
                 TempFamilyDocument tempFamilyDocument = new TempFamilyDocument(
                     _localizationService, _revitRepository, _familyLoadOptions, groupKey);
-
                 ViewDrafting viewDrafting = _revitRepository.GetViewDrafting(groupKey);
                 _revitRepository.DeleteFamilyInstance(viewDrafting);
-
                 using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
                     progressDialogService.MaxValue = groupSheets.ToList().Count;
                     progressDialogService.StepValue = progressDialogService.MaxValue / 10;
@@ -295,7 +300,6 @@ namespace RevitListOfSchedules.ViewModels {
                     var progress = progressDialogService.CreateProgress();
                     var ct = progressDialogService.CreateCancellationToken();
                     progressDialogService.Show();
-
 
                     FamilyInstance familyInstance = null;
                     int i = 0;
@@ -305,7 +309,6 @@ namespace RevitListOfSchedules.ViewModels {
                         Document document = sheetViewModel.LinkViewModel == null
                         ? _revitRepository.Document
                         : _revitRepository.GetLinkDocument(sheetViewModel.LinkViewModel);
-
                         var schedules = _revitRepository.GetScheduleInstances(document, sheetViewModel.ViewSheet);
                         if(schedules != null) {
                             familyInstance = tempFamilyDocument.PlaceFamilyInstance(viewDrafting, sheetViewModel, schedules)
@@ -333,16 +336,16 @@ namespace RevitListOfSchedules.ViewModels {
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
             //SelectedLinks = setting?.SelectedLinks ?? SelectedLinks;
-            //SelectedGroupParameter = setting?.SelectedGroupParameter ?? GroupParameters.Last();
             //SelectedSheets = setting?.SelectedSheets ?? SelectedSheets;
+
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
             //setting.SelectedLinks = SelectedLinks;
-            //setting.SelectedGroupParameter = SelectedGroupParameter;
             //setting.SelectedSheets = SelectedSheets;
+
             _pluginConfig.SaveProjectConfig();
         }
     }

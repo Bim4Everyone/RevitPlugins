@@ -66,7 +66,6 @@ internal class RevitSettings : ProjectSettings {
     /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
     /// </summary>
     public ObservableCollection<LinkViewModel> SelectedLinks { get; set; }
-    public GroupParameterViewModel SelectedGroupParameter { get; set; }
     public ObservableCollection<SheetViewModel> SelectedSheets { get; set; }
 
 

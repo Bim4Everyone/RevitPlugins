@@ -1,7 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">    
-
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
     <system:String 
         x:Key="MainWindow.Title">Ведомость спецификаций</system:String>    
     <system:String
@@ -20,7 +19,6 @@
         x:Key="MainWindow.SheetName">Наименование листа</system:String>
     <system:String
         x:Key="MainWindow.SheetRevisionNumber">Номер изменения</system:String>
-
     <system:String 
         x:Key="MainWindow.ButtonOk">Создать</system:String>
     <system:String 
@@ -31,22 +29,20 @@
         x:Key="TempFamilyDocument.FamilyName">Ведомость_Спецификаций_{0}</system:String>
     <system:String
         x:Key="TempFamilyDocument.TransactionName">Параметры, окружность</system:String>
-
     <system:String
         x:Key="RevitRepository.TransactionNameCreate">Создание чертежного вида для ведомости спецификаций</system:String>
     <system:String
         x:Key="RevitRepository.TransactionNameDelete">Удаление экземпляров семейства</system:String>
     <system:String
         x:Key="RevitRepository.ViewName">Ведомость спецификаций_{0}</system:String>
-
     <system:String
         x:Key="FamilyLoader.TransactionNameLoad">Загрузка семейства аннотаций</system:String>
     <system:String
         x:Key="FamilyLoader.TransactionNamePlace">Размещение семейства аннотаций</system:String>
-    
     <system:String
-        x:Key="MainViewModel.ErrorText">"Выберите листы для создания ведомости спецификаций"</system:String>
+        x:Key="MainViewModel.ErrorText">Выберите листы для создания ведомости спецификаций</system:String>
     <system:String
-        x:Key="ScheduleElement.TransactionName">"Создание ведомости спецификаций"</system:String>
-
+        x:Key="ScheduleElement.TransactionName">Создание ведомости спецификаций</system:String>
+    <system:String
+        x:Key="GroupParameter.NoParameter">Нет параметра группировки</system:String>
 </ResourceDictionary>

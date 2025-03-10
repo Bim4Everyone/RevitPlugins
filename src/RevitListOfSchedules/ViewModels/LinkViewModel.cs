@@ -12,28 +12,33 @@ using RevitListOfSchedules.Models;
 
 namespace RevitListOfSchedules.ViewModels {
     internal class LinkViewModel : BaseViewModel {
-
         public event EventHandler SelectionChanged;
-
+        public event EventHandler StatusChanged;
         private readonly LinkTypeElement _linkElement;
         private string _status;
         private bool _isChecked;
 
         public LinkViewModel(LinkTypeElement linkElement) {
             _linkElement = linkElement;
-            ReloadCommand = RelayCommand.Create(ReloadLinkType, CanReloadLinkType);
             Status = GetStatus();
+
+            ReloadCommand = RelayCommand.Create(ReloadLinkType, CanReloadLinkType);
         }
-
         public ICommand ReloadCommand { get; set; }
-
         public string Name => _linkElement.Name;
         public string FullName => _linkElement.FullName;
         public ElementId Id => _linkElement.Id;
+        public bool StatusBool { get; private set; }
+
         public string Status {
             get => _status;
-            set => RaiseAndSetIfChanged(ref _status, value);
+            set {
+                if(SetAndNotifyIfChanged(ref _status, value)) {
+                    StatusChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
+
         public bool IsChecked {
             get => _isChecked;
             set {
@@ -63,8 +68,13 @@ namespace RevitListOfSchedules.ViewModels {
         }
 
         private string GetStatus() {
+            StatusBool = GetStatusBool();
             return $"{_linkElement.RevitLink.AttachmentType}_{_linkElement.RevitLink.GetLinkedFileStatus()}";
+
         }
 
+        private bool GetStatusBool() {
+            return _linkElement.RevitLink.GetLinkedFileStatus() is LinkedFileStatus.Loaded;
+        }
     }
 }
