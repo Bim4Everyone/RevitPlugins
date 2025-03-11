@@ -239,7 +239,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
 
-
+            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО ВИДА
+            if(selectionSettings.NeedWorkWithGeneralView) {
+                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+                if(SheetInfo.GeneralView.ViewElement != null) {
+                    SheetInfo.GeneralView.ViewDimensionCreator
+                        .TryCreateGeneralViewDimensions();
+                }
+            }
 
             // ОБРАЗМЕРИВАНИЕ ПЕРВОГО ПОПЕРЕЧНОГО ВИД
             if(selectionSettings.NeedWorkWithTransverseViewFirst) {

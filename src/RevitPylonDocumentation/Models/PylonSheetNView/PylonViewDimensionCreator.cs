@@ -27,6 +27,48 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         internal PylonSheetInfo SheetInfo { get; set; }
 
 
+        public void TryCreateGeneralViewDimensions() {
+            var doc = Repository.Document;
+            View view = SheetInfo.GeneralView.ViewElement;
+
+            try {
+                var rebar = GetSkeletonRebar(view);
+                if(rebar is null) {
+                    return;
+                }
+
+                var grids = new FilteredElementCollector(doc, view.Id)
+                    .OfCategory(BuiltInCategory.OST_Grids)
+                    .Cast<Grid>()
+                    .ToList();
+
+
+                //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
+                // Размер по ФРОНТУ опалубка (положение снизу 1)
+                Line dimensionLineBottomFirst = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
+                ReferenceArray refArrayFormworkFront = GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#',
+                                                                        new List<string>() { "фронт", "край" });
+                Dimension dimensionFormworkFront = doc.Create.NewDimension(view, dimensionLineBottomFirst,
+                                                                           refArrayFormworkFront);
+
+                if(grids.Count > 0) {
+                    // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
+                    Line dimensionLineBottomSecond = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1.5);
+                    ReferenceArray refArrayFormworkGridFront = GetDimensionRefs(view, grids, new XYZ(0, 1, 0),
+                                                                                  refArrayFormworkFront);
+                    Dimension dimensionFormworkGridFront = doc.Create.NewDimension(view, dimensionLineBottomSecond,
+                                                                                   refArrayFormworkGridFront);
+                }
+            } catch(Exception) { }
+        }
+
+
+
+
+
+
+
+
         public void TryCreateGeneralRebarViewDimensions() {
             var doc = Repository.Document;
             View view = SheetInfo.GeneralRebarView.ViewElement;
