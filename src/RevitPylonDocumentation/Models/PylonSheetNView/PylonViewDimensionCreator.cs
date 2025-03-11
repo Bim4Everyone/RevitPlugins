@@ -12,6 +12,10 @@ using Grid = Autodesk.Revit.DB.Grid;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewDimensionCreator {
+        private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
+        private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
+
+
         internal PylonViewDimensionCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
             Repository = repository;
@@ -129,13 +133,23 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     return;
                 }
 
-                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
+                //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
+                Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 0.5);
                 ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
                 Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
 
-                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
+                Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 1);
                 ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
                 Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
+
+                //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
+                // Размер по ТОРЦУ армирование (положение справа 2)
+                Line dimensionLineRightSecond = GetDimensionLine(view, rebar, DimensionOffsetType.Right, 0.5);
+                // Добавляем ссылки на арматурные стержни
+                ReferenceArray refArrayRebarSide = GetDimensionRefs(rebar, '#',
+                                                                    new List<string>() { "низ", "торец", "край" });
+                Dimension dimensionFormworkRebarSide = doc.Create.NewDimension(view, dimensionLineRightSecond,
+                                                                                      refArrayRebarSide);
             } catch(Exception) { }
         }
 
@@ -149,13 +163,24 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     return;
                 }
 
-                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2);
+                //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
+                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 0.5);
                 ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
                 Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
 
-                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2.5);
-                ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт", "край" });
+                Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 1);
+                ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#',
+                                                                  new List<string>() { "верх", "фронт", "край" });
                 Dimension dimensionTopEdge = doc.Create.NewDimension(view, dimensionLineTopEdge, refArrayTopEdge);
+
+                //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
+                // Размер по ТОРЦУ армирование (положение справа 2)
+                Line dimensionLineRightSecond = GetDimensionLine(view, rebar, DimensionOffsetType.Right, 0.5);
+                // Добавляем ссылки на арматурные стержни
+                ReferenceArray refArrayRebarSide = GetDimensionRefs(rebar, '#',
+                                                                    new List<string>() { "низ", "торец", "край" });
+                Dimension dimensionFormworkRebarSide = doc.Create.NewDimension(view, dimensionLineRightSecond,
+                                                                                      refArrayRebarSide);
             } catch(Exception) { }
         }
 
@@ -166,54 +191,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         }
 
 
-
-
-
         public void TryCreateTransverseViewSecondDimensions() {
-            //var doc = Repository.Document;
-            //View view = SheetInfo.TransverseViewSecond.ViewElement;
-
-            //try {
-            //    var rebar = GetSkeletonRebar(view);
-            //    if(rebar is null) {
-            //        return;
-            //    }
-
-            //    Line dimensionLineBottom = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2);
-            //    ReferenceArray refArrayBottom = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт" });
-            //    Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom);
-
-            //    Line dimensionLineBottomEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 2.5);
-            //    ReferenceArray refArrayBottomEdge = GetDimensionRefs(rebar, '#', new List<string>() { "низ", "фронт", "край" });
-            //    Dimension dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge);
-            //} catch(Exception) { }
-
-
             View view = SheetInfo.TransverseViewSecond.ViewElement;
             TryCreateTransverseViewDimensions(view, false);
         }
 
 
         public void TryCreateTransverseViewThirdDimensions() {
-            //var doc = Repository.Document;
-            //View view = SheetInfo.TransverseViewThird.ViewElement;
-
-            //try {
-            //    var rebar = GetSkeletonRebar(view);
-            //    if(rebar is null) {
-            //        return;
-            //    }
-
-            //    Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2);
-            //    ReferenceArray refArrayTop = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт" });
-            //    Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop);
-
-            //    Line dimensionLineTopEdge = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 2.5);
-            //    ReferenceArray refArrayTopEdge = GetDimensionRefs(rebar, '#', new List<string>() { "верх", "фронт", "край" });
-            //    Dimension dimensionTopEdge = doc.Create.NewDimension(view, dimensionLineTopEdge, refArrayTopEdge);
-            //} catch(Exception) { }
-
-
             View view = SheetInfo.TransverseViewThird.ViewElement;
             TryCreateTransverseViewDimensions(view, true);
         }
@@ -243,15 +227,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 Dimension dimensionFormworkFront = doc.Create.NewDimension(view, dimensionLineBottomFirst,
                                                                            refArrayFormworkFront);
 
-                // Размер по ФРОНТУ опалубка + армирование (положение сверху)
-                Line dimensionLineTop = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 1);
-                // Добавляем ссылки на арматурные стержни
-                ReferenceArray refArrayFormworkRebarFront = GetDimensionRefs(rebar, '#',
-                                                                             new List<string>() { rebarPart, "фронт" },
-                                                                             refArrayFormworkFront);
-                Dimension dimensionFormworkRebarFrontBottom = doc.Create.NewDimension(view, dimensionLineTop,
-                                                                                      refArrayFormworkRebarFront);
-
                 if(grids.Count > 0) {
                     // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
                     Line dimensionLineBottomSecond = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 0.5);
@@ -259,6 +234,36 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                                                                                   refArrayFormworkFront);
                     Dimension dimensionFormworkGridFront = doc.Create.NewDimension(view, dimensionLineBottomSecond,
                                                                                    refArrayFormworkGridFront);
+                }
+
+                // Определяем наличие в каркасе Г-образных стержней
+                var firstLRebarParamValue = GetParamValueAnywhere(rebar, _hasFirstLRebarParamName) == 1;
+                var secondLRebarParamValue = GetParamValueAnywhere(rebar, _hasSecondLRebarParamName) == 1;
+
+                bool allRebarAreL = firstLRebarParamValue && secondLRebarParamValue;
+                bool hasLRebar = firstLRebarParamValue || secondLRebarParamValue;
+
+                if(!(onTopOfRebar && allRebarAreL)) {
+                    // Размер по ФРОНТУ опалубка + армирование (положение сверху 1)
+                    Line dimensionLineTopFirst = GetDimensionLine(view, rebar, DimensionOffsetType.Top, 0.5);
+                    // Добавляем ссылки на арматурные стержни
+                    ReferenceArray refArrayFormworkRebarFrontFirst = GetDimensionRefs(rebar, '#',
+                                                                                 new List<string>() { rebarPart, "фронт" },
+                                                                                 refArrayFormworkFront);
+                    Dimension dimensionFormworkRebarFrontFirst = doc.Create.NewDimension(view, dimensionLineTopFirst,
+                                                                                          refArrayFormworkRebarFrontFirst);
+                }
+
+
+                // Размер по ФРОНТУ опалубка + армирование в случае, если есть Г-стержни (положение снизу 0)
+                if(onTopOfRebar && hasLRebar) {
+                    Line dimensionLineTopSecond = GetDimensionLine(view, rebar, DimensionOffsetType.Bottom, 0);
+                    // Добавляем ссылки на арматурные стержни
+                    ReferenceArray refArrayFormworkRebarFrontSecond = GetDimensionRefs(rebar, '#',
+                                                                                 new List<string>() { "низ", "фронт" },
+                                                                                 refArrayFormworkFront);
+                    Dimension dimensionFormworkRebarFrontSecond = doc.Create.NewDimension(view, dimensionLineTopSecond,
+                                                                                          refArrayFormworkRebarFrontSecond);
                 }
 
 
@@ -291,7 +296,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
             } catch(Exception) { }
         }
-
 
 
         private FamilyInstance GetSkeletonRebar(View view) {
