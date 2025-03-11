@@ -33,10 +33,20 @@ namespace RevitMirroredElements.ViewModels {
 
         public MainViewModel(
             PluginConfig pluginConfig,
-            RevitRepository revitRepository) {
+            RevitRepository revitRepository, ISerializationService serializationService,
+            ILanguageService languageService, ILocalizationService localizationService,
+            IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+
+            SerializationService = serializationService;
+
+            LanguageService = languageService;
+            LocalizationService = localizationService;
+
+            UIThemeService = uiThemeService;
+            ThemeUpdaterService = themeUpdaterService;
 
             SelectedElementScope = ElementScope.NotSelected;
             SelectedGroupType = ElementGroupType.NotSelected;
@@ -51,6 +61,12 @@ namespace RevitMirroredElements.ViewModels {
         public ICommand SelectCategoriesCommand { get; }
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
+
+        public ISerializationService SerializationService { get; }
+        public ILanguageService LanguageService { get; }
+        public ILocalizationService LocalizationService { get; }
+        public IUIThemeService UIThemeService { get; }
+        public IUIThemeUpdaterService ThemeUpdaterService { get; }
 
         public List<FamilyInstance> SelectedElements {
             get => _selectedElements;
@@ -141,7 +157,14 @@ namespace RevitMirroredElements.ViewModels {
         }
 
         private void SelectCategories() {
-            var categoriesWindow = new CategoriesWindow();
+            var categoriesWindow = new CategoriesWindow(
+                LoggerService, 
+                SerializationService, 
+                LanguageService, 
+                LocalizationService,
+                UIThemeService, 
+                ThemeUpdaterService
+               );
             var categoriesViewWindow = new CategoriesViewModel(_revitRepository, SelectedCategories);
             categoriesWindow.DataContext = categoriesViewWindow;
             if(categoriesWindow.ShowDialog() == true) {

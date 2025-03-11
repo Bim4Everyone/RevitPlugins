@@ -6,6 +6,10 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
+
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -30,19 +34,22 @@ namespace RevitMirroredElements {
                     return;
                 }
 
+                // Настройка доступа к Revit
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
 
+                // Настройка конфигурации плагина
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                var mainWindow = kernel.Bind<MainWindow>()
-                    .ToSelf()
-                    .InTransientScope()
-                    .WithPropertyValue(nameof(MainWindow.DataContext), c => c.Kernel.Get<MainViewModel>())
-                    .WithPropertyValue(nameof(MainWindow.Title), PluginName);
+                // Используем сервис обновления тем для WinUI
+                kernel.UseWpfUIThemeUpdater();
 
+                // Настройка запуска окна
+                kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+                // Вызывает стандартное уведомление
                 Notification(kernel.Get<MainWindow>());
             }
 
