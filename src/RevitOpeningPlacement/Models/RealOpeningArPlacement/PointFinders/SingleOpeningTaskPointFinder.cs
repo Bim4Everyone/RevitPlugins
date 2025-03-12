@@ -30,7 +30,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.PointFinders {
                 case OpeningType.WallRound:
                 case OpeningType.WallRectangle:
                     var point = _openingMepTaskIncoming.Location;
-                    return new XYZ(point.X, point.Y, RoundToFloorFeetToMillimeters(point.Z, 10));
+                    return new XYZ(point.X, point.Y, RoundToFloorFeetToMillimeters(point.Z));
                 default:
                     return _openingMepTaskIncoming.Location;
             }
