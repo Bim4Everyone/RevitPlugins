@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitPylonDocumentation.ViewModels;
 
 using Grid = Autodesk.Revit.DB.Grid;
+using Reference = Autodesk.Revit.DB.Reference;
+using Transform = Autodesk.Revit.DB.Transform;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewDimensionCreator {
         private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
         private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
+        private readonly string _formNumberParamName = "обр_ФОП_Форма_номер";
+        private readonly int _formNumberForVerticalRebarMax = 1499;
+        private readonly int _formNumberForVerticalRebarMin = 1101;
 
 
         internal PylonViewDimensionCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
@@ -62,10 +69,22 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             } catch(Exception) { }
         }
 
+        public void TryCreateTransverseViewFirstDimensions() {
+            View view = SheetInfo.TransverseViewFirst.ViewElement;
+            TryCreateTransverseViewDimensions(view, false);
+        }
 
 
+        public void TryCreateTransverseViewSecondDimensions() {
+            View view = SheetInfo.TransverseViewSecond.ViewElement;
+            TryCreateTransverseViewDimensions(view, false);
+        }
 
 
+        public void TryCreateTransverseViewThirdDimensions() {
+            View view = SheetInfo.TransverseViewThird.ViewElement;
+            TryCreateTransverseViewDimensions(view, true);
+        }
 
 
 
@@ -165,6 +184,140 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
 
+
+
+        public void TryCreateTransverseRebarViewFirstMarks() {
+            var doc = Repository.Document;
+            View view = SheetInfo.TransverseRebarViewFirst.ViewElement;
+
+            try {
+                var simpleRebars = GetSimpleRebars(view);
+
+                // Получаем CropBox вида
+                BoundingBoxXYZ cropBox = view.CropBox;
+
+                // Получаем минимальную точку подрезки (нижний левый угол) в локальной системе координат вида
+                XYZ cornerTopRightLocal = cropBox.Max;
+                XYZ cornerBottomLeftLocal = cropBox.Min;
+                XYZ cornerTopLeftLocal = new XYZ(cornerBottomLeftLocal.X, cornerTopRightLocal.Y, 0);
+                XYZ cornerBottomRightLocal = new XYZ(cornerTopRightLocal.X, cornerBottomLeftLocal.Y, 0);
+
+
+                // Преобразуем точку в глобальные координаты
+                Transform transform = cropBox.Transform;  // Преобразование из локальной системы вида в глобальную
+                XYZ cornerTopRightGlobal = transform.OfPoint(cornerTopRightLocal);
+                XYZ cornerBottomLeftGlobal = transform.OfPoint(cornerBottomLeftLocal);
+                XYZ cornerTopLeftGlobal = transform.OfPoint(cornerTopLeftLocal);
+                XYZ cornerBottomRightGlobal = transform.OfPoint(cornerBottomRightLocal);
+
+
+                // Находим нужный типоразмер марки (FamilySymbol)
+                FamilySymbol tagSymbol = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_RebarTags)
+                    .WhereElementIsElementType()
+                    .FirstOrDefault(e => e.Name == "Поз., Диаметр / Комментарий - Полка 10") as FamilySymbol;
+
+                if(tagSymbol == null) {
+                    TaskDialog.Show("Ошибка", "Типоразмер марки не найден.");
+                    return;
+                }
+
+                // Убедимся, что типоразмер активен
+                if(!tagSymbol.IsActive) {
+                    tagSymbol.Activate();
+                }
+
+
+                // Находим нужный типоразмер аннотации (FamilySymbol)
+                FamilySymbol annotationSymbol = new FilteredElementCollector(doc)
+                    .OfCategory(BuiltInCategory.OST_GenericAnnotation)
+                    .WhereElementIsElementType()
+                    .FirstOrDefault(e => e.Name == "Без засечки") as FamilySymbol;
+
+                if(annotationSymbol == null) {
+                    TaskDialog.Show("Ошибка", "Типоразмер аннотации не найден.");
+                    return;
+                }
+
+                // Убедимся, что типоразмер активен
+                if(!annotationSymbol.IsActive) {
+                    annotationSymbol.Activate();
+                }
+
+
+
+                // ЛЕВЫЙ НИЖНИЙ УГОЛ
+                FamilyInstance bottomLeftElement = GetElementByCorner(simpleRebars, cornerBottomLeftGlobal) as FamilyInstance;
+
+                // Устанавливаем значение комментария у арматуры, к которой привяжем марку
+                bottomLeftElement.SetParamValue("Комментарии", $"{simpleRebars.Count / 2} шт.");
+
+                var xOffsetBottomLeft = view.RightDirection.Normalize().Negate().Multiply(1);
+                var yOffsetBottomLeft = view.UpDirection.Normalize().Negate().Multiply(0.5);
+
+                // Получаем точку для размещения марки (например, центр элемента)
+                LocationPoint locationBottomLeft = bottomLeftElement.Location as LocationPoint;
+                XYZ pointBottomLeft = locationBottomLeft.Point + xOffsetBottomLeft + yOffsetBottomLeft;
+
+                // Создаем марку
+                var markBottomLeft = IndependentTag.Create(doc, tagSymbol.Id, view.Id, new Reference(bottomLeftElement),
+                                              true, TagOrientation.Horizontal, pointBottomLeft);
+                markBottomLeft.TagHeadPosition = pointBottomLeft;
+
+
+                // ЛЕВЫЙ ВЕРХНИЙ УГОЛ
+                FamilyInstance topLeftElement = GetElementByCorner(simpleRebars, cornerTopLeftGlobal) as FamilyInstance;
+
+                // Устанавливаем значение комментария у арматуры, к которой привяжем марку
+                topLeftElement.SetParamValue("Комментарии", $"{simpleRebars.Count / 2} шт.");
+
+                var xOffsetTopLeft = view.RightDirection.Normalize().Negate().Multiply(1);
+                var yOffsetTopLeft = view.UpDirection.Normalize().Multiply(0.5);
+
+                // Получаем точку для размещения марки (например, центр элемента)
+                LocationPoint locationTopLeft = topLeftElement.Location as LocationPoint;
+                XYZ pointTopLeft = locationTopLeft.Point + xOffsetTopLeft + yOffsetTopLeft;
+
+                // Создаем марку
+                var markTopLeft = IndependentTag.Create(doc, tagSymbol.Id, view.Id, new Reference(topLeftElement),
+                                              true, TagOrientation.Horizontal, pointTopLeft);
+                markTopLeft.TagHeadPosition = pointTopLeft;
+
+
+
+                // ПРАВЫЙ НИЖНИЙ УГОЛ
+                FamilyInstance bottomRightElement = GetElementByCorner(simpleRebars, cornerBottomRightGlobal) as FamilyInstance;
+
+                var xOffsetBottomRight = view.RightDirection.Normalize().Multiply(2);
+                var yOffsetBottomRight = view.UpDirection.Normalize().Negate().Multiply(0.5);
+
+                // Получаем точку для размещения марки (например, центр элемента)
+                LocationPoint locationBottomRight = bottomRightElement.Location as LocationPoint;
+                XYZ pointBottomRight = locationBottomRight.Point + xOffsetBottomRight + yOffsetBottomRight;
+
+
+                // Создаем экземпляр аннотации
+                AnnotationSymbol annotationInstance = doc.Create.NewFamilyInstance(
+                    pointBottomRight, // Точка размещения тела аннотации
+                    annotationSymbol,    // Типоразмер аннотации
+                    view) as AnnotationSymbol;               // Вид, в котором размещается аннотация
+
+                // Устанавливаем значение верхнего текста у выноски
+                annotationInstance.SetParamValue("Текст верх", "ГОСТ 14098-2014-Н1-Рш");
+
+                // Устанавливаем значение длины полки под текстом, чтобы текст влез
+                annotationInstance.SetParamValue("Ширина полки", UnitUtilsHelper.ConvertToInternalValue(40));
+
+                // Добавляем и устанавливаем точку привязки выноски
+                annotationInstance.addLeader();
+                Leader leader = annotationInstance.GetLeaders().FirstOrDefault();
+                if(leader != null) {
+                    leader.End = locationBottomRight.Point; // Точка на элементе
+                }
+            } catch(Exception) { }
+        }
+
+
         public void TryCreateTransverseRebarViewFirstDimensions() {
             var doc = Repository.Document;
             View view = SheetInfo.TransverseRebarViewFirst.ViewElement;
@@ -194,6 +347,55 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                                                                                       refArrayRebarSide);
             } catch(Exception) { }
         }
+
+
+
+        private List<Element> GetSimpleRebars(View view) {
+            var rebars = new FilteredElementCollector(Repository.Document, view.Id)
+                .OfCategory(BuiltInCategory.OST_Rebar)
+                .WhereElementIsNotElementType()
+                .ToElements();
+
+            var simpleRebars = new List<Element>();
+            foreach(Element rebar in rebars) {
+                // Фильтрация по комплекту документации
+                if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != SheetInfo.ProjectSection) {
+                    continue;
+                }
+                // Фильтрация по номеру формы - отсев вертикальных стержней армирования
+                var formNumber = rebar.GetParamValue<int>(_formNumberParamName);
+                if(formNumber >= _formNumberForVerticalRebarMin && formNumber <= _formNumberForVerticalRebarMax) {
+                    simpleRebars.Add(rebar);
+                }
+            }
+            return simpleRebars;
+        }
+
+
+        private Element GetElementByCorner(List<Element> elements, XYZ cornerPoint) {
+            // Находим элемент, ближайший к этой точке
+            Element bottomLeftElement = null;
+            double minDistance = double.MaxValue;
+
+            foreach(Element element in elements) {
+                if(element.Location is LocationPoint locationPoint) {
+                    XYZ elementPoint = locationPoint.Point;
+                    double distance = elementPoint.DistanceTo(cornerPoint);  // Расстояние до элемента
+
+                    if(distance < minDistance) {
+                        minDistance = distance;
+                        bottomLeftElement = element;
+                    }
+                }
+            }
+
+            return bottomLeftElement;
+        }
+
+
+
+
+
 
         public void TryCreateTransverseRebarViewSecondDimensions() {
             var doc = Repository.Document;
@@ -227,22 +429,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         }
 
 
-        public void TryCreateTransverseViewFirstDimensions() {
-            View view = SheetInfo.TransverseViewFirst.ViewElement;
-            TryCreateTransverseViewDimensions(view, false);
-        }
 
 
-        public void TryCreateTransverseViewSecondDimensions() {
-            View view = SheetInfo.TransverseViewSecond.ViewElement;
-            TryCreateTransverseViewDimensions(view, false);
-        }
-
-
-        public void TryCreateTransverseViewThirdDimensions() {
-            View view = SheetInfo.TransverseViewThird.ViewElement;
-            TryCreateTransverseViewDimensions(view, true);
-        }
 
 
         private void TryCreateTransverseViewDimensions(View view, bool onTopOfRebar) {
@@ -362,7 +550,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
             return null;
         }
-
 
 
         private Line GetDimensionLine(View view, FamilyInstance rebar, DimensionOffsetType dimensionOffsetType,
@@ -569,9 +756,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
             return Line.CreateBound(pt1, pt2);
         }
-
-
-
 
 
 

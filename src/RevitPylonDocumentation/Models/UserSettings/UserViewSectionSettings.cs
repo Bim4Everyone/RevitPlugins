@@ -31,7 +31,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         private string _transverseRebarViewFirstPrefixTemp = "Каркас ";
         private string _transverseRebarViewFirstSuffixTemp = "_Сеч.а-а";
-        private string _transverseRebarViewFirstElevationTemp = "0,6";
+        private string _transverseRebarViewFirstElevationTemp = "0,3";
         private string _transverseRebarViewSecondPrefixTemp = "Каркас ";
         private string _transverseRebarViewSecondSuffixTemp = "_Сеч.б-б";
         private string _transverseRebarViewSecondElevationTemp = "1,1";

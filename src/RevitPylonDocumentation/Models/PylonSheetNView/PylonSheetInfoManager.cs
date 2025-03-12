@@ -301,6 +301,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 if(SheetInfo.TransverseRebarViewFirst.ViewElement != null) {
                     SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
                         .TryCreateTransverseRebarViewFirstDimensions();
+                    SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
+                        .TryCreateTransverseRebarViewFirstMarks();
                 }
             }
 
