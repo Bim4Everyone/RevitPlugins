@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -46,7 +46,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
         /// <param name="ftValue">Размер в футах, который нужно округлить до заданного количества миллиметров</param>
         /// <param name="mmRound">Значение округления в миллиметрах</param>
         /// <returns>Размер в футах, округленный до заданного количества миллиметров</returns>
-        protected double RoundToFloorFeetToMillimeters(double ftValue, int mmRound) {
+        protected double RoundToFloorFeetToMillimeters(double ftValue, int mmRound = 1) {
             var ftRound = mmRound > 0 ? GetFeetRound(mmRound) : GetFeetRound(1);
             return Math.Floor(Math.Round(ftValue / ftRound, _digitsRound, MidpointRounding.AwayFromZero)) * ftRound;
         }

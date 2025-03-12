@@ -25,7 +25,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.PointFinders {
         public XYZ GetPoint() {
             var x = (_bbox.Max.X + _bbox.Min.X) / 2;
             var y = (_bbox.Max.Y + _bbox.Min.Y) / 2;
-            var z = RoundToFloorFeetToMillimeters(_bbox.Min.Z, 10);
+            var z = RoundToFloorFeetToMillimeters(_bbox.Min.Z);
             return new XYZ(x, y, z);
         }
     }
