@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -41,6 +42,12 @@ namespace RevitPlatformSettings.Views {
 
         public HyperLinkEditWithImage() {
             InitializeComponent();
+        }
+
+        private void Hyperlink_OnClick(object sender, RoutedEventArgs e) {
+            if(!string.IsNullOrEmpty(NavigationUrl)) {
+                Process.Start(NavigationUrl);
+            }
         }
     }
 }

@@ -1,38 +1,34 @@
-<UserControl x:Class="RevitPlatformSettings.Views.HyperLinkEditWithImage"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:RevitPlatformSettings.Views"
-             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-             xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
+<UserControl
+    x:Class="RevitPlatformSettings.Views.HyperLinkEditWithImage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 
-             x:Name="_this"
-             mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <dxe:HyperlinkEdit
-        AllowAutoNavigate="True"
+    x:Name="_this"
+    mc:Ignorable="d"
+    d:DesignHeight="50" d:DesignWidth="300">
+
+    <Hyperlink
+        TextDecorations="None"
         Command="{Binding Command, ElementName=_this}"
-        EditValue="{Binding EditValue, ElementName=_this}"
-        NavigationUrl="{Binding NavigationUrl, ElementName=_this}">
-        <dxe:HyperlinkEdit.EditTemplate>
-            <ControlTemplate>
-                <StackPanel Orientation="Horizontal">
-                    <Image
-                        Width="20"
-                        Height="20"
-                        Cursor="Hand"
-                        Source="{Binding ImageSource, ElementName=_this}" />
-                    <TextBlock
-                        x:Name="PART_Editor"
-                        FontSize="20"
-                        TextWrapping="{Binding Path=(dxe:BaseEdit.OwnerEdit).TextWrapping, RelativeSource={RelativeSource Self}}"
-                        TextTrimming="{Binding Path=(dxe:BaseEdit.OwnerEdit).TextTrimming, RelativeSource={RelativeSource Self}}"
-                        Style="{DynamicResource {themes:HyperLinkEditThemeKey ResourceKey=TextBlockStyle}}"
-                        dx:FocusHelper2.Focusable="False" />
-                </StackPanel>
-            </ControlTemplate>
-        </dxe:HyperlinkEdit.EditTemplate>
-    </dxe:HyperlinkEdit>
+        ToolTip="{Binding NavigationUrl, ElementName=_this}"
+        NavigateUri="{Binding NavigationUrl, ElementName=_this}"
+        Click="Hyperlink_OnClick">
+        
+        <Image
+            Width="20"
+            Height="20"
+            Cursor="Hand"
+            VerticalAlignment="Center"
+            Source="{Binding ImageSource, ElementName=_this}" />
+
+        <TextBlock
+            FontSize="20"
+            VerticalAlignment="Center"
+            TextDecorations="Underline"
+            Text="{Binding EditValue, ElementName=_this}" />
+        
+    </Hyperlink>
+
 </UserControl>
