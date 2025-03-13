@@ -5,6 +5,8 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.ViewModels;
 
@@ -14,6 +16,8 @@ using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.Models {
     internal class RevitRepository {
+        private readonly double _maxDistanceBetweenPylon = 10;
+
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
         }
@@ -122,7 +126,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
         /// <summary>
-        /// Получает информацию толко о выбранном пилоне
+        /// Получает информацию только о выбранном пилоне
         /// </summary>
         public void GetHostData(MainViewModel mainViewModel, IList<Element> elems) {
             HostsInfo.Clear();
@@ -142,7 +146,7 @@ namespace RevitPylonDocumentation.Models {
         /// </summary>
         private void AnalizePylons(MainViewModel mainViewModel, IList<Element> elems) {
             foreach(Element elem in elems) {
-                if(!elem.Name.Contains("Пилон")) { continue; }
+                if(!elem.Name.Contains("Пилон") && !elem.Name.Contains("Колонна")) { continue; }
 
                 // Запрашиваем параметр фильтрации типовых пилонов. Если он не равен заданному, то отсеиваем этот пилон
                 Parameter typicalPylonParameter = elem.LookupParameter(mainViewModel.ProjectSettings.TypicalPylonFilterParameter);
@@ -151,7 +155,8 @@ namespace RevitPylonDocumentation.Models {
                     return;
                 }
 
-                if(typicalPylonParameter.AsString() is null || typicalPylonParameter.AsString() != mainViewModel.ProjectSettings.TypicalPylonFilterValue) { continue; }
+                if(typicalPylonParameter.AsString() is null
+                    || typicalPylonParameter.AsString() != mainViewModel.ProjectSettings.TypicalPylonFilterValue) { continue; }
 
                 // Запрашиваем Раздел проекта
                 Parameter projectSectionParameter = elem.LookupParameter(mainViewModel.ProjectSettings.ProjectSection);
@@ -173,7 +178,7 @@ namespace RevitPylonDocumentation.Models {
                 if(hostMark is null) { continue; }
 
                 PylonSheetInfo testPylonSheetInfo = HostsInfo
-                    .Where(item => item.PylonKeyName.Equals(hostMark))
+                    .Where(item => item.PylonKeyName.Equals(hostMark) && item.ProjectSection.Equals(projectSection))
                     .FirstOrDefault();
 
                 if(testPylonSheetInfo is null) {
@@ -184,8 +189,30 @@ namespace RevitPylonDocumentation.Models {
 
                     HostsInfo.Add(pylonSheetInfo);
                 } else {
-                    testPylonSheetInfo.HostElems.Add(elem);
-                    mainViewModel.ErrorText = "Найдены пилоны с одинаковой маркой";
+                    double elemZ = elem.get_BoundingBox(null).Min.Z;
+                    // Для корректного создания видов нужно, чтобы первым в списке стоял элемент с самой низкой отметкой
+                    if(testPylonSheetInfo.HostElems[0].get_BoundingBox(null).Min.Z > elemZ) {
+                        testPylonSheetInfo.HostElems.Insert(0, elem);
+                    } else {
+                        testPylonSheetInfo.HostElems.Add(elem);
+                    }
+
+                    // Проверяем, что опалубочные модели пилонов отстоят друг от друга на небольшом расстоянии
+                    // Если это не так, то значит ошибка в проекте
+                    // Пилоны с одинаковой маркой и значением параметра фильтрации типовых пилонов могут стоять только
+                    // рядом, например, это могут быть двухэтажные пилоны
+                    XYZ pt1 = elem.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls
+                        ? (elem.Location as LocationCurve).Curve.GetEndPoint(0)
+                        : (elem.Location as LocationPoint).Point;
+
+                    var elemForCompareByDistance = testPylonSheetInfo.HostElems[0];
+                    XYZ pt2 = elemForCompareByDistance.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls
+                        ? (elemForCompareByDistance.Location as LocationCurve).Curve.GetEndPoint(0)
+                        : (elemForCompareByDistance.Location as LocationPoint).Point;
+
+                    if(pt1.DistanceTo(pt2) > _maxDistanceBetweenPylon) {
+                        mainViewModel.ErrorText = "Найдены пилоны с одинаковой маркой";
+                    }
                 }
             }
         }
@@ -228,6 +255,27 @@ namespace RevitPylonDocumentation.Models {
                     break;
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Ищет типоразмер по имени типа
+        /// </summary>
+        public FamilySymbol FindSymbol(BuiltInCategory builtInCategory, string typeName) {
+            FamilySymbol symbol = new FilteredElementCollector(Document)
+                .OfCategory(builtInCategory)
+                .WhereElementIsElementType()
+                .FirstOrDefault(e => e.Name == typeName) as FamilySymbol;
+
+            if(symbol is null) {
+                return null;
+            }
+
+            // Убедимся, что типоразмер активен
+            if(!symbol.IsActive) {
+                symbol.Activate();
+            }
+            return symbol;
         }
     }
 }
