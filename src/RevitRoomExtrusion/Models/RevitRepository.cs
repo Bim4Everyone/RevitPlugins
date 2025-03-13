@@ -77,5 +77,10 @@ namespace RevitRoomExtrusion.Models {
                 return view3D;
             }
         }
+
+        public double GetBasePointLocation() {
+            BasePoint basePoint = BasePoint.GetProjectBasePoint(Document);
+            return basePoint.Position.Z;
+        }
     }
 }

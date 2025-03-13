@@ -22,7 +22,7 @@ namespace RevitRoomExtrusion.Models {
 
         public void CreateFamilies(List<Room> listRoom, View3D view3D, string familyName, double extrusionHeight) {
             List<RoomElement> roomElements = listRoom
-                .Select(room => new RoomElement(_revitRepository.Document, room, view3D))
+                .Select(room => new RoomElement(_revitRepository, room, view3D))
                 .ToList();
 
             IEnumerable<IGrouping<int, RoomElement>> groupedRooms = roomElements

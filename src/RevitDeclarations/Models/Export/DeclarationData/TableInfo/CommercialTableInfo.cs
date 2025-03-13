@@ -23,7 +23,7 @@ namespace RevitDeclarations.Models {
             _commercialRooms = commercialRooms;
             _settings = settings;
 
-            _columnsTotalNumber = 13;
+            _columnsTotalNumber = 14;
             _summerRoomsStart = 0;
             _otherRoomsStart = 0;
             _utpStart = 0;

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Web.Security;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -100,15 +99,15 @@ namespace RevitRoomTagPlacement.Models {
                 return selectedAparts
                     .SelectMany(x => x.Rooms)
                     .ToList();
-            } 
+            }
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupRandom) {
                 return selectedAparts
-                    .Select(x => x.MaxAreaRoom)
+                    .SelectMany(x => x.MaxAreaRooms)
                     .ToList();
             } 
             else if(groupPlacementWay == GroupPlacementWay.OneRoomPerGroupByName) {
                 return selectedAparts
-                    .Select(x => x.GetRoomByName(roomName))
+                    .SelectMany(x => x.GetRoomsByName(roomName))
                     .ToList();
             } 
             else {
@@ -144,9 +143,9 @@ namespace RevitRoomTagPlacement.Models {
                         /* Невозможно отфильтровать помещения из связанного файла для активного вида.
                            Способ получения помещений через CustomExporter не работает, так как помещения не экспортируются.
                            В качестве решения принято брать все помещения из связанного файла и размещать марку на каждом.
-                           В таком случае все марки размещаются в проекте, но если помещение отсутствует на виде, то марка не отображается.
-                           Для удаления марок, которые не отображаются, скрипт пытается получить BoundingBox для каждой марки, 
-                           если он null, то марка удаляется.                         
+                           В таком случае все марки размещаются в проекте, но если помещение отсутствует на виде, 
+                           то марка не отображается. Для удаления марок, которые не отображаются, скрипт пытается получить 
+                           BoundingBox для каждой марки, если он null, то марка удаляется.                         
                            */
 
                         RoomTag newTag;

@@ -6,6 +6,7 @@ namespace RevitDeclarations.Models {
         public Parameter ConstrWorksNumberParam { get; set; }
         public Parameter RoomsHeightParam { get; set; }
         public Parameter ParkingSpaceClass { get; set; }
+        public Parameter ParkingInfo { get; set; }
 
         public Parameter GroupNameParam { get; set; }
         public bool AddPrefixToNumber { get; set; }

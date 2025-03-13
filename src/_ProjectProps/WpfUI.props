@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <Compile Include="..\dosymep\WpfUIPlatformWindow.cs" Link="dosymep\WpfUI\WpfUIPlatformWindow.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="WPF-UI" Version="4.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="dosymep.WpfCore">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.WpfCore.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.WpfCore.Ninject">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.WpfCore.Ninject.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.WpfUI.Core">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.WpfUI.Core.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+
+        <Reference Include="dosymep.WpfUI.Core.Ninject">
+            <HintPath>$(AppData)\pyRevit\Extensions\BIM4Everyone.lib\dosymep_libs\libs\dosymep.WpfUI.Core.Ninject.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+</Project>
