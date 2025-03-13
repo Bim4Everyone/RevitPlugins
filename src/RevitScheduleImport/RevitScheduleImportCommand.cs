@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -10,7 +9,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -45,17 +45,14 @@ namespace RevitScheduleImport {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
-                kernel.Bind<MainViewModel>().ToSelf();
-                kernel.Bind<MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>())
-                    .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                        c => c.Kernel.Get<ILocalizationService>());
+                kernel.UseWpfUIThemeUpdater();
+
+                kernel.BindMainWindow<MainViewModel, MainWindow>();
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-                kernel.UseXtraMessageBox<MainViewModel>();
-                kernel.UseXtraLocalization(
+                kernel.UseWpfUIMessageBox<MainViewModel>();
+                kernel.UseWpfLocalization(
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
                 var localizationService = kernel.Get<ILocalizationService>();
