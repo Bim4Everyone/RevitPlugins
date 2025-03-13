@@ -1,9 +1,10 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:views="clr-namespace:RevitPlatformSettings.Views"
-                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-                    xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings">
-    
+                    xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
+                    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+
     <DataTemplate DataType="{x:Type settings:TelemetrySettingsViewModel}">
 
         <ScrollViewer
@@ -20,95 +21,95 @@
                 <GroupBox
                     Grid.Row="0"
                     Margin="10"
-                    Header="{DynamicResource TelemetrySettings.LogTrace}">
+                    Header="{me:LocalizationSource TelemetrySettings.LogTrace}">
 
                     <StackPanel>
 
                         <views:CustomEditControl
-                            EditText="{DynamicResource TelemetrySettings.LogTraceIsActive}">
+                            EditText="{me:LocalizationSource TelemetrySettings.LogTraceIsActive}">
 
-                            <dxe:CheckEdit
-                                IsReadOnly="True"
+                            <CheckBox
+                                IsHitTestVisible="False"
                                 HorizontalAlignment="Right"
-                                EditValue="{Binding Path=LogTraceIsActive, Mode=OneWay}" />
+                                IsChecked="{Binding Path=LogTraceIsActive, Mode=OneWay}" />
 
                         </views:CustomEditControl>
-                        
+
                         <views:CustomEditControl
-                            EditText="{DynamicResource TelemetrySettings.LogTraceLogLevel}">
+                            EditText="{me:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
 
-                            <dxe:ComboBoxEdit
+                            <ComboBox
                                 IsReadOnly="True"
-                                EditValue="{Binding Path=LogTraceLogLevel, Mode=OneWay}" />
+                                SelectedItem="{Binding Path=LogTraceLogLevel, Mode=OneWay}" />
 
                         </views:CustomEditControl>
-                        
+
                         <views:CustomEditControl
-                            EditText="{DynamicResource TelemetrySettings.LogTraceServerName}">
+                            EditText="{me:LocalizationSource TelemetrySettings.LogTraceServerName}">
 
-                            <dxe:ButtonEdit
+                            <ui:TextBox
                                 IsReadOnly="True"
-                                EditValue="{Binding Path=LogTraceServerName, Mode=OneWay}" />
+                                Text="{Binding Path=LogTraceServerName, Mode=OneWay}" />
 
                         </views:CustomEditControl>
-                        
+
                     </StackPanel>
-                    
+
                 </GroupBox>
-                
+
                 <GroupBox
                     Grid.Row="1"
                     Margin="10"
-                    Header="{DynamicResource TelemetrySettings.LogTraceJournal}">
+                    Header="{me:LocalizationSource TelemetrySettings.LogTraceJournal}">
 
                     <StackPanel>
 
                         <views:CustomEditControl
-                            EditText="{DynamicResource TelemetrySettings.LogTraceJournalIsActive}">
+                            EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalIsActive}">
 
-                            <dxe:CheckEdit
-                                IsReadOnly="True"
+                            <CheckBox
+                                IsHitTestVisible="False"
                                 HorizontalAlignment="Right"
-                                EditValue="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}" />
+                                IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}" />
 
                         </views:CustomEditControl>
-                        
-                        <views:CustomEditControl
-                            EditText="{DynamicResource TelemetrySettings.LogTraceJournalUseUtc}">
 
-                            <dxe:CheckEdit
-                                IsReadOnly="True"
+                        <views:CustomEditControl
+                            EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
+
+                            <CheckBox
+                                IsHitTestVisible="False"
                                 HorizontalAlignment="Right"
-                                EditValue="{Binding Path=LogTraceJournalUseUtc, Mode=OneWay}" />
+                                IsChecked="{Binding Path=LogTraceJournalUseUtc, Mode=OneWay}" />
 
                         </views:CustomEditControl>
-                        
-                        <views:CustomEditControl
-                            EditText="{DynamicResource TelemetrySettings.LogTraceJournalLogLevel}">
 
-                            <dxe:ComboBoxEdit
+                        <views:CustomEditControl
+                            EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
+
+                            <ComboBox
                                 IsReadOnly="True"
-                                EditValue="{Binding Path=LogTraceJournalLogLevel, Mode=OneWay}" />
+                                SelectedItem="{Binding Path=LogTraceJournalLogLevel, Mode=OneWay}" />
 
                         </views:CustomEditControl>
-                        
-                        <views:CustomEditControl
-                            EditText="{DynamicResource TelemetrySettings.LogTraceJournalOutputTemplate}">
 
-                            <dxe:TextEdit
+                        <views:CustomEditControl
+                            EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
+
+                            <ui:TextBox
                                 MaxWidth="300"
                                 IsReadOnly="True"
-                                EditValue="{Binding Path=LogTraceJournalOutputTemplate, Mode=OneWay}" />
+                                Text="{Binding Path=LogTraceJournalOutputTemplate, Mode=OneWay}" />
 
                         </views:CustomEditControl>
-                        
+
                     </StackPanel>
-                    
-                    </GroupBox>
-                
+
+                </GroupBox>
+
             </Grid>
-            
+
         </ScrollViewer>
-        
+
     </DataTemplate>
 </ResourceDictionary>
