@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -73,25 +74,69 @@ internal class RevitRepository {
             .ToList();
     }
 
-    // Метод получения списка Parameter по которым организован браузер проекта (листы)
-    public IList<RevitParam> GetBrowserParameters(ViewSheet viewSheet) {
-        IList<RevitParam> listOfParameters = new List<RevitParam>();
+    // Метод получения списка всех параметров листа и браузера проекта
+    public List<RevitParam> GetGroupParameters(ViewSheet viewSheet) {
+        List<RevitParam> listOfParameters = new List<RevitParam>();
         if(viewSheet != null) {
-            var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
-            IList<FolderItemInfo> itemsInfo = browserOrganization.GetFolderItems(viewSheet.Id);
-            foreach(FolderItemInfo itemInfo in itemsInfo) {
-                if(itemInfo.ElementId.IsSystemId()) {
-                    BuiltInParameter param = itemInfo.ElementId.AsBuiltInParameter();
+            List<ElementId> viewParamElementIds = GetViewParameterElementIds(viewSheet);
+            List<RevitParam> viewParams = GetRevitParams(viewParamElementIds);
+            if(viewParams.Count > 0) {
+                List<RevitParam> sortedList = viewParams.OrderBy(param => param.Name).ToList();
+                listOfParameters.AddRange(sortedList);
+                List<ElementId> browserParamElementIds = GetBrowserParameterElementIds(viewSheet);
+                if(browserParamElementIds.Count > 0) {
+                    RevitParam browserParam = GetRevitParams(browserParamElementIds).Last();
+                    int index = listOfParameters.FindIndex(param => param.Equals(browserParam));
+                    if(index != -1) {
+                        listOfParameters.RemoveAt(index);
+                        listOfParameters.Insert(0, browserParam);
+                    }
+                }
+            }
+        }
+        return listOfParameters;
+    }
+
+    private List<ElementId> GetBrowserParameterElementIds(ViewSheet viewSheet) {
+        List<ElementId> listOfElementIds = new List<ElementId>();
+        var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
+        IList<FolderItemInfo> itemsInfo = browserOrganization.GetFolderItems(viewSheet.Id);
+        foreach(var item in itemsInfo) {
+            listOfElementIds.Add(item.ElementId);
+        }
+        return listOfElementIds;
+    }
+
+    private List<ElementId> GetViewParameterElementIds(ViewSheet viewSheet) {
+        List<ElementId> listOfElementIds = new List<ElementId>();
+        foreach(Parameter parameter in viewSheet.Parameters) {
+            listOfElementIds.Add(parameter.Id);
+        }
+        return listOfElementIds;
+    }
+
+    private List<RevitParam> GetRevitParams(List<ElementId> elementIds) {
+        List<RevitParam> listOfParameters = new List<RevitParam>();
+        if(elementIds.Count > 0) {
+            foreach(ElementId elementId in elementIds) {
+                if(elementId.IsSystemId()) {
+                    BuiltInParameter param = elementId.AsBuiltInParameter();
                     RevitParam revitParam = SystemParamsConfig.Instance.CreateRevitParam(Document, param);
-                    listOfParameters.Add(revitParam);
+                    if(revitParam.StorageType == StorageType.String) {
+                        listOfParameters.Add(revitParam);
+                    }
                 } else {
-                    Element element = Document.GetElement(itemInfo.ElementId);
+                    Element element = Document.GetElement(elementId);
                     if(element is SharedParameterElement) {
                         RevitParam revitParam = SharedParamsConfig.Instance.CreateRevitParam(Document, element.Name);
-                        listOfParameters.Add(revitParam);
+                        if(revitParam.StorageType == StorageType.String) {
+                            listOfParameters.Add(revitParam);
+                        }
                     } else {
                         RevitParam revitParam = ProjectParamsConfig.Instance.CreateRevitParam(Document, element.Name);
-                        listOfParameters.Add(revitParam);
+                        if(revitParam.StorageType == StorageType.String) {
+                            listOfParameters.Add(revitParam);
+                        }
                     }
                 }
             }
@@ -182,5 +227,13 @@ internal class RevitRepository {
             .Count > 0;
     }
 
-
+    public string LegalizeString(string original) {
+        char[] invalidChars = Path.GetInvalidPathChars()
+           .Concat(Path.GetInvalidFileNameChars())
+           .Distinct()
+           .ToArray();
+        return new(original
+            .Select(c => invalidChars.Contains(c) ? '_' : c)
+            .ToArray());
+    }
 }

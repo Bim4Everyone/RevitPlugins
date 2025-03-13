@@ -11,6 +11,7 @@ namespace RevitListOfSchedules.ViewModels {
         private readonly SheetElement _sheetElement;
         private readonly LinkViewModel _linkViewModel;
         private readonly ViewSheet _viewSheet;
+        private readonly ElementId _elementId;
         private readonly string _name;
         private readonly string _number;
         private readonly string _revisionNumber;
@@ -24,6 +25,7 @@ namespace RevitListOfSchedules.ViewModels {
             _sheetElement = sheetElement;
             _linkViewModel = linkViewModel;
             _viewSheet = _sheetElement.Sheet;
+            _elementId = _viewSheet.Id;
             _name = _sheetElement.Name;
             _number = _sheetElement.Number;
             _revisionNumber = _sheetElement.RevisionNumber;
@@ -32,6 +34,7 @@ namespace RevitListOfSchedules.ViewModels {
         public LinkViewModel LinkViewModel => _linkViewModel;
         public ViewSheet ViewSheet => _viewSheet;
         public RevitParam GroupParameter { get; set; }
+        public ElementId Id => _elementId;
         public string Name => _name;
         public string Number => _number;
         public string RevisionNumber => _revisionNumber;
@@ -39,7 +42,11 @@ namespace RevitListOfSchedules.ViewModels {
 
         private string GetAlbumName() {
             if(GroupParameter != null) {
-                return _sheetElement.Sheet.GetParamValue<string>(GroupParameter);
+                if(_sheetElement.Sheet.IsExistsParamValue(GroupParameter)) {
+                    return _sheetElement.Sheet.GetParamValue<string>(GroupParameter);
+                } else {
+                    return _localizationService.GetLocalizedString("GroupValue.NoValue");
+                }
             }
             return _localizationService.GetLocalizedString("GroupParameter.NoParameter");
         }

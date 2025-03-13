@@ -1,11 +1,11 @@
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
 using pyRevitLabs.Json;
-
-using RevitListOfSchedules.ViewModels;
 
 namespace RevitListOfSchedules.Models;
 
@@ -65,9 +65,6 @@ internal class RevitSettings : ProjectSettings {
     /// <summary>
     /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
     /// </summary>
-    public ObservableCollection<LinkViewModel> SelectedLinks { get; set; }
-    public ObservableCollection<SheetViewModel> SelectedSheets { get; set; }
-
-
-
+    public IList<ElementId> SelectedLinks { get; set; }
+    public string GroupParameter { get; set; }
 }

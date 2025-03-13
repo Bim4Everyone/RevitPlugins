@@ -8,29 +8,27 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
+using RevitListOfSchedules.Interfaces;
 using RevitListOfSchedules.ViewModels;
 
 
 namespace RevitListOfSchedules.Models {
-    internal class TempFamilyDocument {
+    internal class TempFamilyDocument : IFamilyDocument {
+        private const int _diameterArc = 5;
         private readonly ILocalizationService _localizationService;
         private readonly RevitRepository _revitRepository;
         private readonly FamilyLoadOptions _familyLoadOptions;
-
         private readonly string _albumName;
         private readonly string _familyTemplatePath;
         private readonly string _familyName;
         private readonly string _familyPath;
         private readonly FamilySymbol _familySymbol;
 
-        private readonly int _diameterArc = 5;
-
         public TempFamilyDocument(
             ILocalizationService localizationService,
             RevitRepository revitRepository,
             FamilyLoadOptions familyLoadOptions,
             string albumName) {
-
             _localizationService = localizationService;
             _revitRepository = revitRepository;
             _familyLoadOptions = familyLoadOptions;
@@ -44,32 +42,30 @@ namespace RevitListOfSchedules.Models {
 
         public FamilySymbol FamilySymbol => _familySymbol;
 
-        public IList<FamilyInstance> PlaceFamilyInstance(
+        public IList<FamilyInstance> PlaceFamilyInstances(
             View view, SheetViewModel sheetViewModel, IList<ViewSchedule> viewSchedules) {
-
             IList<FamilyInstance> familyInstanceList = [];
-
-            string transactionNamePlace = _localizationService.GetLocalizedString("FamilyLoader.TransactionNamePlace");
-            using(Transaction t = _revitRepository.Document.StartTransaction(transactionNamePlace)) {
-                foreach(ViewSchedule schedule in viewSchedules) {
-                    TableData table_data = schedule.GetTableData();
-                    TableSectionData head_data = table_data.GetSectionData(SectionType.Header);
-                    string result = head_data == null
-                        ? schedule.Name
-                        : head_data.GetCellText(0, 0);
-                    XYZ xyz = XYZ.Zero;
-                    FamilyInstance familyInstance = _revitRepository.Document.Create.NewFamilyInstance(xyz, _familySymbol, view);
-                    familyInstanceList.Add(familyInstance);
-                    familyInstance.SetParamValue(ParamFactory.FamilyParamNumber, sheetViewModel.Number);
-                    familyInstance.SetParamValue(ParamFactory.FamilyParamName, result);
-                    familyInstance.SetParamValue(ParamFactory.FamilyParamRevision, sheetViewModel.RevisionNumber);
-                }
-                t.Commit();
+            foreach(ViewSchedule schedule in viewSchedules) {
+                TableData table_data = schedule.GetTableData();
+                TableSectionData head_data = table_data.GetSectionData(SectionType.Header);
+                string result = head_data == null
+                    ? schedule.Name
+                    : head_data.GetCellText(0, 0);
+                FamilyInstance familyInstance = CreateInstance(
+                    view, result, sheetViewModel.Number, sheetViewModel.RevisionNumber);
+                familyInstanceList.Add(familyInstance);
             }
             return familyInstanceList;
         }
 
-
+        public FamilyInstance CreateInstance(View view, string name, string number, string revisionNumber) {
+            XYZ xyz = XYZ.Zero;
+            FamilyInstance familyInstance = _revitRepository.Document.Create.NewFamilyInstance(xyz, _familySymbol, view);
+            familyInstance.SetParamValue(ParamFactory.FamilyParamNumber, number);
+            familyInstance.SetParamValue(ParamFactory.FamilyParamName, name);
+            familyInstance.SetParamValue(ParamFactory.FamilyParamRevision, revisionNumber);
+            return familyInstance;
+        }
 
         private string GetTemplateFamilyPath() {
             string familyTemplatePath = _revitRepository.Application.FamilyTemplatePath;
@@ -127,7 +123,7 @@ namespace RevitListOfSchedules.Models {
 
         private FamilySymbol LoadFamilySymbol() {
             FamilySymbol familySymbol = null;
-            string transactionNameLoad = _localizationService.GetLocalizedString("FamilyLoader.TransactionNameLoad");
+            string transactionNameLoad = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionNameLoad");
             using(Transaction t = _revitRepository.Document.StartTransaction(transactionNameLoad)) {
 
                 _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out Family family);
@@ -153,7 +149,5 @@ namespace RevitListOfSchedules.Models {
             } catch(UnauthorizedAccessException) {
             }
         }
-
-
     }
 }

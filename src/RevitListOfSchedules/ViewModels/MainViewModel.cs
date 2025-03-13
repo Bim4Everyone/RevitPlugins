@@ -9,6 +9,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -22,7 +23,6 @@ namespace RevitListOfSchedules.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
         private readonly FamilyLoadOptions _familyLoadOptions;
-
         private string _errorText;
         private ObservableCollection<LinkViewModel> _links;
         private ObservableCollection<LinkViewModel> _selectedLinks;
@@ -30,7 +30,6 @@ namespace RevitListOfSchedules.ViewModels {
         private ObservableCollection<SheetViewModel> _selectedSheets;
         private ObservableCollection<GroupParameterViewModel> _groupParameters;
         private GroupParameterViewModel _selectedGroupParameter;
-
 
         public MainViewModel(
             PluginConfig pluginConfig,
@@ -47,7 +46,7 @@ namespace RevitListOfSchedules.ViewModels {
             SelectedLinks = new ObservableCollection<LinkViewModel>();
 
             GroupParameters = GetGroupParameters();
-            SelectedGroupParameter = GroupParameters.LastOrDefault();
+            SelectedGroupParameter = GroupParameters.First();
 
             Sheets = GetSheets();
             SelectedSheets = new ObservableCollection<SheetViewModel>();
@@ -151,7 +150,6 @@ namespace RevitListOfSchedules.ViewModels {
                     GroupParameter = SelectedGroupParameter.Parameter
                 })
                 .ToList();
-
             foreach(var linkViewModel in SelectedLinks) {
                 Document linkDocument = _revitRepository.GetLinkDocument(linkViewModel);
                 var linkDocumentSheets = _revitRepository.GetSheetElements(linkDocument)
@@ -189,7 +187,7 @@ namespace RevitListOfSchedules.ViewModels {
                 .FirstOrDefault();
             ObservableCollection<GroupParameterViewModel> list = new ObservableCollection<GroupParameterViewModel>();
             if(firstSheet != null) {
-                IList<RevitParam> listOfParameter = _revitRepository.GetBrowserParameters(firstSheet);
+                IList<RevitParam> listOfParameter = _revitRepository.GetGroupParameters(firstSheet);
                 if(listOfParameter.Count > 0) {
                     foreach(RevitParam parameter in listOfParameter) {
                         list.Add(new GroupParameterViewModel(_localizationService, parameter));
@@ -217,7 +215,6 @@ namespace RevitListOfSchedules.ViewModels {
                     sheetViewModel.GroupParameter = SelectedGroupParameter.Parameter;
                     return sheetViewModel;
                 }));
-
             Sheets = SortSheets(newSheets);
         }
 
@@ -240,7 +237,6 @@ namespace RevitListOfSchedules.ViewModels {
 
         // Метод обновления нескольких ссылок
         private void ReloadLinks() {
-
             using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
                 progressDialogService.MaxValue = _selectedLinks.Count;
                 progressDialogService.StepValue = progressDialogService.MaxValue / 10;
@@ -248,7 +244,6 @@ namespace RevitListOfSchedules.ViewModels {
                 var progress = progressDialogService.CreateProgress();
                 var ct = progressDialogService.CreateCancellationToken();
                 progressDialogService.Show();
-
                 int i = 0;
                 foreach(var selectedLink in _selectedLinks) {
                     ct.ThrowIfCancellationRequested();
@@ -267,7 +262,7 @@ namespace RevitListOfSchedules.ViewModels {
             }
         }
 
-        // Метод обновления списка SelectedSheets в зависимости от выбора юзера
+        //Метод обновления списка SelectedSheets в зависимости от выбора юзера
         private void UpdateSelectedSheets(object selectedItems) {
             if(selectedItems is IList items) {
                 SelectedSheets.Clear();
@@ -287,21 +282,42 @@ namespace RevitListOfSchedules.ViewModels {
             SaveConfig();
             IEnumerable<IGrouping<string, SheetViewModel>> groupedSheets = SelectedSheets
                 .GroupBy(sheet => sheet.AlbumName);
-            foreach(IGrouping<string, SheetViewModel> groupSheets in groupedSheets) {
-                string groupKey = groupSheets.Key;
-                TempFamilyDocument tempFamilyDocument = new TempFamilyDocument(
-                    _localizationService, _revitRepository, _familyLoadOptions, groupKey);
-                ViewDrafting viewDrafting = _revitRepository.GetViewDrafting(groupKey);
-                _revitRepository.DeleteFamilyInstance(viewDrafting);
-                using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
-                    progressDialogService.MaxValue = groupSheets.ToList().Count;
-                    progressDialogService.StepValue = progressDialogService.MaxValue / 10;
-                    progressDialogService.DisplayTitleFormat = "Обработка листов... [{0}]\\[{1}]";
-                    var progress = progressDialogService.CreateProgress();
-                    var ct = progressDialogService.CreateCancellationToken();
-                    progressDialogService.Show();
 
-                    FamilyInstance familyInstance = null;
+            foreach(IGrouping<string, SheetViewModel> groupSheets in groupedSheets) {
+                string groupKey = _revitRepository.LegalizeString(groupSheets.Key);
+
+                TempFamilyDocument tempFamDoc = new TempFamilyDocument(
+                    _localizationService, _revitRepository, _familyLoadOptions, groupKey);
+
+                ViewDrafting viewDrafting = _revitRepository.GetViewDrafting(groupKey);
+
+                _revitRepository.DeleteFamilyInstance(viewDrafting);
+
+                List<FamilyInstance> familyInstanceList = CreateInstances(tempFamDoc, groupSheets, viewDrafting);
+
+                FamilySymbol familySymbol = tempFamDoc.FamilySymbol;
+                if(!_revitRepository.IsExistView(familySymbol.Name)) {
+                    ScheduleElement scheduleElement = new ScheduleElement(
+                        _localizationService, _revitRepository, familySymbol, familyInstanceList.First());
+                }
+            }
+        }
+
+        private List<FamilyInstance> CreateInstances(
+            TempFamilyDocument tempFamilyDocument,
+            IGrouping<string, SheetViewModel> groupSheets,
+            ViewDrafting viewDrafting) {
+            List<FamilyInstance> familyInstanceList = [];
+            using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+                progressDialogService.MaxValue = groupSheets.ToList().Count;
+                progressDialogService.StepValue = progressDialogService.MaxValue / 10;
+                progressDialogService.DisplayTitleFormat = "Обработка листов... [{0}]\\[{1}]";
+                var progress = progressDialogService.CreateProgress();
+                var ct = progressDialogService.CreateCancellationToken();
+                progressDialogService.Show();
+
+                string transactionNamePlace = _localizationService.GetLocalizedString("MainViewModel.TransactionNamePlace");
+                using(Transaction t = _revitRepository.Document.StartTransaction(transactionNamePlace)) {
                     int i = 0;
                     foreach(var sheetViewModel in groupSheets) {
                         ct.ThrowIfCancellationRequested();
@@ -311,17 +327,18 @@ namespace RevitListOfSchedules.ViewModels {
                         : _revitRepository.GetLinkDocument(sheetViewModel.LinkViewModel);
                         var schedules = _revitRepository.GetScheduleInstances(document, sheetViewModel.ViewSheet);
                         if(schedules != null) {
-                            familyInstance = tempFamilyDocument.PlaceFamilyInstance(viewDrafting, sheetViewModel, schedules)
-                                .First();
+                            var instances = tempFamilyDocument.PlaceFamilyInstances(viewDrafting, sheetViewModel, schedules);
+                            familyInstanceList.AddRange(instances);
                         }
                     }
-                    FamilySymbol familySymbol = tempFamilyDocument.FamilySymbol;
-                    if(!_revitRepository.IsExistView(familySymbol.Name)) {
-                        ScheduleElement scheduleElement = new ScheduleElement(
-                            _localizationService, _revitRepository, familySymbol, familyInstance);
+                    if(familyInstanceList.Count == 0) {
+                        FamilyInstance familyInstance = tempFamilyDocument.CreateInstance(viewDrafting, "", "", "");
+                        familyInstanceList.Add(familyInstance);
                     }
+                    t.Commit();
                 }
             }
+            return familyInstanceList;
         }
 
         private bool CanAcceptView() {
@@ -335,20 +352,33 @@ namespace RevitListOfSchedules.ViewModels {
 
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            //SelectedLinks = setting?.SelectedLinks ?? SelectedLinks;
-            //SelectedSheets = setting?.SelectedSheets ?? SelectedSheets;
-
+            var selectedLinkIds = setting?.SelectedLinks ?? new List<ElementId>();
+            SelectedLinks.Clear();
+            foreach(var linkId in selectedLinkIds) {
+                var link = Links.FirstOrDefault(link => link.Id == linkId);
+                if(link != null) {
+                    SelectedLinks.Add(link);
+                    link.IsChecked = true;
+                    AddLinkSheets(link);
+                }
+            }
+            string selectedGroupParameterId = setting?.GroupParameter ?? string.Empty;
+            foreach(GroupParameterViewModel groupParameter in GroupParameters) {
+                var param = GroupParameters.FirstOrDefault(param => param.Id == selectedGroupParameterId);
+                if(param != null) {
+                    SelectedGroupParameter = param;
+                }
+            }
         }
 
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
-            //setting.SelectedLinks = SelectedLinks;
-            //setting.SelectedSheets = SelectedSheets;
-
+            setting.SelectedLinks = SelectedLinks
+                .Select(link => link.Id)
+                .ToList();
+            setting.GroupParameter = SelectedGroupParameter.Id;
             _pluginConfig.SaveProjectConfig();
         }
     }
 }
-
-

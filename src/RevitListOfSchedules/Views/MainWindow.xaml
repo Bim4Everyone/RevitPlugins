@@ -98,7 +98,7 @@
                 HorizontalAlignment="Right"
                 DisplayMemberPath="Name"
                 ItemsSource="{Binding GroupParameters}"
-                SelectedItem="{Binding SelectedGroupParameter}" />
+                SelectedItem="{Binding SelectedGroupParameter}" />            
 
         </StackPanel>
         <DataGrid
@@ -163,6 +163,7 @@
             </DataGrid.Columns>
         </DataGrid>
         <DataGrid
+            x:Name="SecondDataGrid"
             Grid.Row="1"
             Grid.Column="2"
             Margin="10"
@@ -173,8 +174,9 @@
             VerticalGridLinesBrush="LightGray"
             RowHeaderWidth="0"
             IsReadOnly="True"
-            ItemsSource="{Binding Source={StaticResource GroupedAlbums}}"
+            ItemsSource="{Binding Source={StaticResource GroupedAlbums}}"            
             SelectionMode="Extended">
+            
             <b:Interaction.Triggers>
                 <b:EventTrigger
                     EventName="SelectionChanged">
@@ -183,6 +185,7 @@
                         CommandParameter="{Binding SelectedItems, RelativeSource={RelativeSource AncestorType=DataGrid}}" />
                 </b:EventTrigger>
             </b:Interaction.Triggers>
+
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Width="20"
