@@ -12,11 +12,11 @@ namespace RevitPlatformSettings.ViewModels.Settings {
         private readonly IExtensionsService<BuiltinExtension> _builtinService;
         private readonly IExtensionsService<ThirdPartyExtension> _thirdPartyService;
 
-        public ExtensionsSettingsViewModel(int id, int parentId, string settingsName,
+        public ExtensionsSettingsViewModel(string settingsName,
             IExtensionViewModelFactory extensionFactory,
             IExtensionsService<BuiltinExtension> builtinService,
             IExtensionsService<ThirdPartyExtension> thirdPartyService)
-            : base(id, parentId, settingsName) {
+            : base(settingsName) {
             _extensionFactory = extensionFactory;
             _builtinService = builtinService;
             _thirdPartyService = thirdPartyService;

@@ -17,11 +17,11 @@ namespace RevitPlatformSettings.ViewModels.Settings {
         private int? _notificationVisibleMaxCount;
 
         public GeneralSettingsViewModel(
-            int id, int parentId, string settingsName,
+            string settingsName,
             IPlatformSettingsService platformSettingsService,
             IUIThemeService uiThemeService,
             ILanguageService languageService)
-            : base(id, parentId, settingsName) {
+            : base(settingsName) {
             _platformSettingsService = platformSettingsService;
             _uiThemeService = uiThemeService;
             _languageService = languageService;

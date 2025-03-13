@@ -18,18 +18,17 @@ namespace RevitPlatformSettings.ViewModels {
         private ObservableCollection<SettingsViewModel> _settings;
 
         public MainViewModel(
-            ILocalizationService localizationService, 
+            ILocalizationService localizationService,
             ISettingsViewModelFactory settingsViewModelFactory) {
-            
             _localizationService = localizationService;
             _settingsViewModelFactory = settingsViewModelFactory;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
-            ApplyViewCommand = RelayCommand.Create(ApplyView);
+            AcceptViewCommand = RelayCommand.Create(ApplyView);
         }
 
         public ICommand LoadViewCommand { get; }
-        public ICommand ApplyViewCommand { get; }
+        public ICommand AcceptViewCommand { get; }
 
         public string ErrorText {
             get => _errorText;
@@ -47,27 +46,24 @@ namespace RevitPlatformSettings.ViewModels {
         }
 
         private void LoadView() {
-            Settings = new ObservableCollection<SettingsViewModel>() {
-                _settingsViewModelFactory.Create<SettingsViewModel>(0, 0, 
-                    _localizationService.GetLocalizedString("SettingsNode.Title")),
-                
-                _settingsViewModelFactory.Create<GeneralSettingsViewModel>(1, 0, 
+            var root = _settingsViewModelFactory.Create<SettingsViewModel>(
+                _localizationService.GetLocalizedString("SettingsNode.Title"));
+
+            root.Settings = new ObservableCollection<SettingsViewModel>() {
+                _settingsViewModelFactory.Create<GeneralSettingsViewModel>(
                     _localizationService.GetLocalizedString("GeneralSettings.Title")),
-                
-                _settingsViewModelFactory.Create<ExtensionsSettingsViewModel>(2, 0, 
+                _settingsViewModelFactory.Create<ExtensionsSettingsViewModel>(
                     _localizationService.GetLocalizedString("ExtensionSettings.Title")),
-                
-                _settingsViewModelFactory.Create<RevitParamsSettingsViewModel>(3, 0, 
+                _settingsViewModelFactory.Create<RevitParamsSettingsViewModel>(
                     _localizationService.GetLocalizedString("RevitParamsSettings.Title")),
-                
-                _settingsViewModelFactory.Create<TelemetrySettingsViewModel>(4, 0, 
+                _settingsViewModelFactory.Create<TelemetrySettingsViewModel>(
                     _localizationService.GetLocalizedString("TelemetrySettings.Title")),
-                
-                _settingsViewModelFactory.Create<AboutSettingsViewModel>(5, 0, 
+                _settingsViewModelFactory.Create<AboutSettingsViewModel>(
                     _localizationService.GetLocalizedString("AboutSettings.Title")),
             };
 
-            Setting = Settings[1];
+            Settings = new ObservableCollection<SettingsViewModel>() {root};
+            //Setting = Settings[1];
         }
 
         private void ApplyView() {

@@ -79,15 +79,7 @@ namespace RevitPlatformSettings {
                 kernel.UseWpfUIThemeUpdater();
 
                 kernel.Bind<OpenSourceWindow>().ToSelf();
-
-                kernel.Bind<MainViewModel>().ToSelf()
-                    .InSingletonScope();
-
-                kernel.Bind<MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>())
-                    .WithPropertyValue(nameof(ThemedPlatformWindow.LocalizationService),
-                        c => c.Kernel.Get<ILocalizationService>());
+                kernel.BindMainWindow<MainViewModel, MainWindow>();
                 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
