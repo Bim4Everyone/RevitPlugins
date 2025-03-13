@@ -239,7 +239,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
 
-            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО ВИДА
+            // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ВИДА
             if(selectionSettings.NeedWorkWithGeneralView) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.GeneralView.ViewElement != null) {
@@ -248,7 +248,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
             }
 
-            // ОБРАЗМЕРИВАНИЕ ПЕРВОГО ПОПЕРЕЧНОГО ВИД
+            // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИД
             if(selectionSettings.NeedWorkWithTransverseViewFirst) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.TransverseViewFirst.ViewElement != null) {
@@ -257,7 +257,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
             }
 
-            // ОБРАЗМЕРИВАНИЕ ВТОРОГО ПОПЕРЕЧНОГО ВИД
+            // СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИД
             if(selectionSettings.NeedWorkWithTransverseViewSecond) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.TransverseViewSecond.ViewElement != null) {
@@ -266,7 +266,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
             }
 
-            // ОБРАЗМЕРИВАНИЕ ТРЕТЬЕГО ПОПЕРЕЧНОГО ВИД
+            // СОЗДАНИЕ АННОТАЦИЙ ТРЕТЬЕГО ПОПЕРЕЧНОГО ВИД
             if(selectionSettings.NeedWorkWithTransverseViewThird) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.TransverseViewThird.ViewElement != null) {
@@ -275,7 +275,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
             }
 
-            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО АРМАТУРНОГО ВИДА
+            // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО АРМАТУРНОГО ВИДА
             if(selectionSettings.NeedWorkWithGeneralRebarView) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.GeneralRebarView.ViewElement != null) {
@@ -284,7 +284,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
             }
 
-            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО АРМАТУРНОГО ВИДА
+            // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО АРМАТУРНОГО ВИДА
             if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement != null) {
@@ -295,18 +295,18 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
             }
 
-            // ОБРАЗМЕРИВАНИЕ ПЕРВОГО ПОПЕРЕЧНОГО ВИД АРМИРОВАНИЯ
+            // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИД АРМИРОВАНИЯ
             if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.TransverseRebarViewFirst.ViewElement != null) {
                     SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
                         .TryCreateTransverseRebarViewFirstDimensions();
-                    SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
+                    SheetInfo.TransverseRebarViewFirst.ViewMarkCreator
                         .TryCreateTransverseRebarViewFirstMarks();
                 }
             }
 
-            // ОБРАЗМЕРИВАНИЕ ВТОРОГО ПОПЕРЕЧНОГО ВИД АРМИРОВАНИЯ
+            // СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИД АРМИРОВАНИЯ
             if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.TransverseRebarViewSecond.ViewElement != null) {
@@ -314,9 +314,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                         .TryCreateTransverseRebarViewSecondDimensions();
                 }
             }
-
-
-
 
 
 

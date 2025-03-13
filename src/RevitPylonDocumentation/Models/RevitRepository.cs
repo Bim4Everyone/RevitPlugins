@@ -256,5 +256,26 @@ namespace RevitPylonDocumentation.Models {
                 }
             }
         }
+
+
+        /// <summary>
+        /// Ищет типоразмер по имени типа
+        /// </summary>
+        public FamilySymbol FindSymbol(BuiltInCategory builtInCategory, string typeName) {
+            FamilySymbol symbol = new FilteredElementCollector(Document)
+                .OfCategory(builtInCategory)
+                .WhereElementIsElementType()
+                .FirstOrDefault(e => e.Name == typeName) as FamilySymbol;
+
+            if(symbol is null) {
+                return null;
+            }
+
+            // Убедимся, что типоразмер активен
+            if(!symbol.IsActive) {
+                symbol.Activate();
+            }
+            return symbol;
+        }
     }
 }
