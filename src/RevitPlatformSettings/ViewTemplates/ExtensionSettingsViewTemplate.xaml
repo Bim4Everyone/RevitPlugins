@@ -39,12 +39,10 @@
                     MaxWidth="43">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <DataTemplate>
-                                <CheckBox
-                                    Name="PART_Editor"
-                                    IsEnabled="{Binding Items[0].AllowChangeEnabled}"
-                                    IsChecked="{Binding Items[0].IsEnabled, UpdateSourceTrigger=PropertyChanged}" />
-                            </DataTemplate>
+                            <CheckBox
+                                Name="PART_Editor"
+                                IsEnabled="{Binding Items[0].AllowChangeEnabled}"
+                                IsChecked="{Binding Items[0].IsEnabled, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
