@@ -2,17 +2,16 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
                     xmlns:views="clr-namespace:RevitPlatformSettings.Views"
-                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-                    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-                    xmlns:services="clr-namespace:dosymep.SimpleServices;assembly=dosymep.SimpleServices"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore">
+                    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+                    xmlns:ss="clr-namespace:dosymep.SimpleServices;assembly=dosymep.SimpleServices"
+                    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm">
     <DataTemplate DataType="{x:Type settings:GeneralSettingsViewModel}">
-        
-        <ScrollViewer 
+
+        <ScrollViewer
             VerticalScrollBarVisibility="Auto"
             HorizontalScrollBarVisibility="Auto">
-            
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -70,7 +69,7 @@
                             <ComboBox
                                 IsReadOnly="True"
                                 SelectedItem="{Binding Path=HostTheme, Mode=OneWay}"
-                                ItemsSource="{dxe:EnumItemsSource EnumType=services:UIThemes}" />
+                                ItemsSource="{me:EnumToItemsSource EnumType=ss:UIThemes}" />
 
                         </views:CustomEditControl>
 
@@ -115,7 +114,7 @@
 
                             <ComboBox
                                 SelectedItem="{Binding Path=NotificationScreen}"
-                                ItemsSource="{dxe:EnumItemsSource EnumType=dxmvvm:NotificationScreen}" />
+                                ItemsSource="{me:EnumToItemsSource EnumType=dxmvvm:NotificationScreen}" />
 
                         </views:CustomEditControl>
 
@@ -124,17 +123,17 @@
 
                             <ComboBox
                                 SelectedItem="{Binding Path=NotificationPosition}"
-                                ItemsSource="{dxe:EnumItemsSource EnumType=dxmvvm:NotificationPosition}" />
+                                ItemsSource="{me:EnumToItemsSource EnumType=dxmvvm:NotificationPosition}" />
 
                         </views:CustomEditControl>
-                        
+
                     </StackPanel>
 
                 </GroupBox>
-                
+
             </Grid>
-            
+
         </ScrollViewer>
-        
+
     </DataTemplate>
 </ResourceDictionary>

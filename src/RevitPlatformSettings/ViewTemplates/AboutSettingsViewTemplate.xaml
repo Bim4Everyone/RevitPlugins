@@ -1,11 +1,8 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
-                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-                    xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
                     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-                    xmlns:views="clr-namespace:RevitPlatformSettings.Views"
-                    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm">
+                    xmlns:views="clr-namespace:RevitPlatformSettings.Views">
     <DataTemplate DataType="{x:Type settings:AboutSettingsViewModel}">
         <Grid>
             <Grid.ColumnDefinitions>
