@@ -1,98 +1,118 @@
-<views:ThemedPlatformWindow
+<core:WpfUIPlatformWindow
     x:Class="RevitPlatformSettings.Views.OpenSourceWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:RevitPlatformSettings.Views"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:views="clr-namespace:dosymep.WPF.Views"
-    
+
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:viewModels="clr-namespace:RevitPlatformSettings.ViewModels"
+    xmlns:views="clr-namespace:RevitPlatformSettings.Views"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+
     WindowStartupLocation="CenterOwner"
 
     x:Name="_this"
     mc:Ignorable="d"
     Height="450" Width="800"
-    Title="{DynamicResource OpenSourceWindow.Title}">
-    
+    Title="{me:LocalizationSource OpenSourceWindow.Title}"
+    d:DataContext="{d:DesignInstance views:OpenSourceItem, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <TextBlock
+            x:Key="AuthorColumnHeader"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource OpenSourceWindow.Author}" />
+
+        <TextBlock
+            x:Key="SoftwareColumnHeader"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource OpenSourceWindow.Software}" />
+
+        <TextBlock
+            x:Key="LicenseColumnHeader"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource OpenSourceWindow.License}" />
+
+        <CollectionViewSource
+            x:Key="Items"
+            Source="{Binding Items, ElementName=_this}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="ItemType" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+        
+        <Style 
+            x:Key="HyperLink"
+            TargetType="TextBlock">
+            <EventSetter Event="Hyperlink.Click" Handler="OnHyperlinkClick" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="45" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxg:GridControl
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource OpenSourceWindow.Title}" />
+
+        <DataGrid
             Grid.Row="1"
-            AutoExpandAllGroups="True"
-            ItemsSource="{Binding Items, ElementName=_this}">
+            IsReadOnly="True"
+            AutoGenerateColumns="False"
+            CanUserSortColumns="False"
+            CanUserReorderColumns="False"
+            ItemsSource="{Binding Source={StaticResource Items}}">
 
-            <dxg:GridColumn
-                GroupIndex="0"
-                FieldName="ItemType"
-                Header="{DynamicResource OpenSourceWindow.ItemType}" />
-            
-            <dxg:GridColumn
-                FieldName="AuthorName"
-                Header="{DynamicResource OpenSourceWindow.Author}">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:HyperlinkEdit
-                            Name="PART_Editor"
-                            AllowAutoNavigate="True"
-                            EditValue="{Binding RowData.Row.AuthorName}"
-                            NavigationUrl="{Binding RowData.Row.AuthorNavigationUrl}" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+            <DataGrid.Columns>
+                <DataGridHyperlinkColumn
+                    ElementStyle="{StaticResource HyperLink}"
+                    Binding="{Binding AuthorNavigationUrl}"
+                    ContentBinding="{Binding AuthorName}"
+                    Header="{StaticResource AuthorColumnHeader}" />
 
-            <dxg:GridColumn
-                FieldName="SoftwareName"
-                Header="{DynamicResource OpenSourceWindow.Software}">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:HyperlinkEdit
-                            Name="PART_Editor"
-                            AllowAutoNavigate="True"
-                            EditValue="{Binding RowData.Row.SoftwareName}"
-                            NavigationUrl="{Binding RowData.Row.SoftwareNavigationUrl}" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+                <DataGridHyperlinkColumn
+                    ElementStyle="{StaticResource HyperLink}"
+                    Binding="{Binding SoftwareNavigationUrl}"
+                    ContentBinding="{Binding SoftwareName}"
+                    Header="{StaticResource SoftwareColumnHeader}" />
 
-            <dxg:GridColumn
-                FieldName="LicenseName"
-                Header="{DynamicResource OpenSourceWindow.License}">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:HyperlinkEdit
-                            Name="PART_Editor"
-                            AllowAutoNavigate="True"
-                            EditValue="{Binding RowData.Row.LicenseName}"
-                            NavigationUrl="{Binding RowData.Row.LicenseNavigationUrl}" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
+                <DataGridHyperlinkColumn
+                    ElementStyle="{StaticResource HyperLink}"
+                    Binding="{Binding LicenseNavigationUrl}"
+                    ContentBinding="{Binding LicenseName}"
+                    Header="{StaticResource LicenseColumnHeader}" />
+            </DataGrid.Columns>
 
-            <dxg:GridControl.View>
-                <dxg:TableView
-                    AutoWidth="True"
-                    AllowEditing="False"
-                    AllowSorting="False"
-                    AllowGrouping="False"
-                    ShowGroupPanel="False" />
-            </dxg:GridControl.View>
+            <DataGrid.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                Margin="10"
+                                FontWeight="Bold">
+                                <Run Text="{DynamicResource OpenSourceWindow.ItemType}" />
+                                <Run Text=": " />
+                                <Run Text="{Binding Items[0].ItemType}" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
 
-        </dxg:GridControl>
+        </DataGrid>
 
-        <dx:SimpleButton
+        <ui:Button
             Grid.Row="2"
             Width="80"
             Margin="10"
+            IsCancel="True"
             HorizontalAlignment="Right"
-            Content="{DynamicResource OpenSourceWindow.ButtonCancel}"
-            IsCancel="True" />
+            Content="{me:LocalizationSource OpenSourceWindow.ButtonCancel}" />
     </Grid>
-</views:ThemedPlatformWindow>
+</core:WpfUIPlatformWindow>

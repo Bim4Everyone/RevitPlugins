@@ -9,6 +9,8 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -72,6 +74,11 @@ namespace RevitPlatformSettings {
                 kernel.Bind<ExtensionsSettingsViewModel>().ToSelf();
                 kernel.Bind<RevitParamsSettingsViewModel>().ToSelf();
                 kernel.Bind<AboutSettingsViewModel>().ToSelf();
+                
+                // Используем сервис обновления тем для WinUI
+                kernel.UseWpfUIThemeUpdater();
+
+                kernel.Bind<OpenSourceWindow>().ToSelf();
 
                 kernel.Bind<MainViewModel>().ToSelf()
                     .InSingletonScope();
@@ -84,7 +91,7 @@ namespace RevitPlatformSettings {
                 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-                kernel.UseXtraLocalization(
+                kernel.UseWpfLocalization(
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
                 

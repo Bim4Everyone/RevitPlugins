@@ -4,19 +4,25 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitPlatformSettings.Views;
 
 namespace RevitPlatformSettings.ViewModels.Settings {
     internal sealed class AboutSettingsViewModel : SettingsViewModel {
+        private readonly IResolutionRoot _resolutionRoot;
         private readonly ILocalizationService _localizationService;
         private readonly IPlatformSettingsService _platformSettingsService;
 
         public AboutSettingsViewModel(
             int id, int parentId, string settingsName,
+            IResolutionRoot resolutionRoot,
             ILocalizationService localizationService,
             IPlatformSettingsService platformSettingsService)
             : base(id, parentId, settingsName) {
-
+            
+            _resolutionRoot = resolutionRoot;
             _localizationService = localizationService;
             _platformSettingsService = platformSettingsService;
 
@@ -47,7 +53,7 @@ namespace RevitPlatformSettings.ViewModels.Settings {
             _localizationService.GetLocalizedString("AboutSettings.PlatformDescription", PlatformName);
 
         private void ShowOpenSourceDialog() {
-            new OpenSourceWindow(_localizationService).ShowDialog();
+            _resolutionRoot.Get<OpenSourceWindow>().ShowDialog();
         }
     }
 }
