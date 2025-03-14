@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -8,7 +8,7 @@ using dosymep.Bim4Everyone.SharedParams;
 using RevitRooms.ViewModels;
 
 namespace RevitRooms.Models.Calculation {
-    internal class RoomsCountCalculation : IntParamCalculation {
+    internal class RoomsCountCalculation : CurrencyParamCalculation {
         public RoomsCountCalculation() {
             RevitParam = SharedParamsConfig.Instance.RoomsCount;
         }
