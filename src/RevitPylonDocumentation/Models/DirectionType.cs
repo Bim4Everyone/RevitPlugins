@@ -1,8 +1,12 @@
 namespace RevitPylonDocumentation.Models {
-    public enum CornerType {
+    public enum DirectionType {
+        Top,
         RightTop,
+        Right,
         RightBottom,
+        Bottom,
         LeftBottom,
+        Left,
         LeftTop
     }
 }

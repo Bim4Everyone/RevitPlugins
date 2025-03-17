@@ -434,7 +434,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
 
                 sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z));
+                // Дальняя секущая плоскость разреза будет немного выше низа опалубки пилона
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + 0.1 - originPoint.Z));
             } else if(transverseRebarViewNum == 2) {
                 // Располагаем сечение на высоте 1/2 высоты пилона (или по пропорции, указанной пользователем)
                 elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevation);

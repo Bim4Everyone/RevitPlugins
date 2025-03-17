@@ -4,9 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Revit;
-
 using RevitPylonDocumentation.ViewModels;
 
 using Grid = Autodesk.Revit.DB.Grid;
@@ -18,10 +15,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
         private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
 
+        private readonly ParamValueService _paramValueService;
+
         internal PylonViewDimensionCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
             Repository = repository;
             SheetInfo = pylonSheetInfo;
+
+            _paramValueService = new ParamValueService(repository);
         }
 
         internal MainViewModel ViewModel { get; set; }
@@ -280,8 +281,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
 
                 // Определяем наличие в каркасе Г-образных стержней
-                var firstLRebarParamValue = GetParamValueAnywhere(rebar, _hasFirstLRebarParamName) == 1;
-                var secondLRebarParamValue = GetParamValueAnywhere(rebar, _hasSecondLRebarParamName) == 1;
+                var firstLRebarParamValue = _paramValueService.GetParamValueAnywhere(rebar, _hasFirstLRebarParamName) == 1;
+                var secondLRebarParamValue = _paramValueService.GetParamValueAnywhere(rebar, _hasSecondLRebarParamName) == 1;
 
                 bool allRebarAreL = firstLRebarParamValue && secondLRebarParamValue;
                 bool hasLRebar = firstLRebarParamValue || secondLRebarParamValue;
@@ -570,7 +571,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
 
                 string paramName = referenceName.Split(keyRefNamePart)[0];
-                int paramValue = paramName == string.Empty ? 1 : GetParamValueAnywhere(elem, paramName);
+                int paramValue = paramName == string.Empty ? 1 : _paramValueService.GetParamValueAnywhere(elem, paramName);
 
                 if(paramValue == 1) {
                     refArray.Append(reference);
@@ -623,14 +624,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
 
             return refArray;
-        }
-
-
-        private int GetParamValueAnywhere(Element elem, string paramName) {
-            var paramValue = elem.GetParamValueOrDefault<int>(paramName, 0);
-            return paramValue == 0
-                ? Repository.Document.GetElement(elem.GetTypeId()).GetParamValueOrDefault<int>(paramName, 0)
-                : paramValue;
         }
     }
 }

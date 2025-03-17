@@ -10,8 +10,6 @@ using RevitPylonDocumentation.ViewModels;
 namespace RevitPylonDocumentation.Models {
     public class RebarFinder {
         private readonly string _formNumberParamName = "обр_ФОП_Форма_номер";
-        private readonly int _formNumberForVerticalRebarMax = 1499;
-        private readonly int _formNumberForVerticalRebarMin = 1101;
 
         internal RebarFinder(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
@@ -46,7 +44,7 @@ namespace RevitPylonDocumentation.Models {
             return null;
         }
 
-        public List<Element> GetSimpleRebars(View view) {
+        public List<Element> GetSimpleRebars(View view, int formNumberMin, int formNumberMax) {
             var rebars = new FilteredElementCollector(Repository.Document, view.Id)
                 .OfCategory(BuiltInCategory.OST_Rebar)
                 .WhereElementIsNotElementType()
@@ -60,7 +58,7 @@ namespace RevitPylonDocumentation.Models {
                 }
                 // Фильтрация по номеру формы - отсев вертикальных стержней армирования
                 var formNumber = rebar.GetParamValue<int>(_formNumberParamName);
-                if(formNumber >= _formNumberForVerticalRebarMin && formNumber <= _formNumberForVerticalRebarMax) {
+                if(formNumber >= formNumberMin && formNumber <= formNumberMax) {
                     simpleRebars.Add(rebar);
                 }
             }

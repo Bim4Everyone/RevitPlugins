@@ -13,7 +13,10 @@ namespace RevitPylonDocumentation.Models {
         public XYZ CornerLeftBottomGlobal { get; set; }
         public XYZ CornerLeftTopGlobal { get; set; }
         public XYZ CornerRightBottomGlobal { get; set; }
-
+        public XYZ QuadrantTopGlobal { get; private set; }
+        public XYZ QuadrantRightGlobal { get; private set; }
+        public XYZ QuadrantBottomGlobal { get; private set; }
+        public XYZ QuadrantLeftGlobal { get; private set; }
 
         public void AnalyzeCorners() {
             // Получаем CropBox вида
@@ -25,6 +28,10 @@ namespace RevitPylonDocumentation.Models {
             XYZ cornerLeftTopLocal = new XYZ(cornerLeftBottomLocal.X, cornerRightTopLocal.Y, 0);
             XYZ cornerRightBottomLocal = new XYZ(cornerRightTopLocal.X, cornerLeftBottomLocal.Y, 0);
 
+            XYZ quadrantTopLocal = (cornerLeftTopLocal + cornerRightTopLocal) / 2;
+            XYZ quadrantRightLocal = (cornerRightTopLocal + cornerRightBottomLocal) / 2;
+            XYZ quadrantBottomLocal = (cornerLeftBottomLocal + cornerRightBottomLocal) / 2;
+            XYZ quadrantLeftLocal = (cornerLeftBottomLocal + cornerLeftTopLocal) / 2;
 
             // Преобразуем точку в глобальные координаты
             Transform transform = cropBox.Transform;  // Преобразование из локальной системы вида в глобальную
@@ -32,75 +39,118 @@ namespace RevitPylonDocumentation.Models {
             CornerLeftBottomGlobal = transform.OfPoint(cornerLeftBottomLocal);
             CornerLeftTopGlobal = transform.OfPoint(cornerLeftTopLocal);
             CornerRightBottomGlobal = transform.OfPoint(cornerRightBottomLocal);
+
+            QuadrantTopGlobal = transform.OfPoint(quadrantTopLocal);
+            QuadrantRightGlobal = transform.OfPoint(quadrantRightLocal);
+            QuadrantBottomGlobal = transform.OfPoint(quadrantBottomLocal);
+            QuadrantLeftGlobal = transform.OfPoint(quadrantLeftLocal);
         }
 
 
+        public Element GetElementByDirection(List<Element> elements, DirectionType directionType) {
+            XYZ pointForCompare = default;
+            switch(directionType) {
+                case DirectionType.Top:
+                    pointForCompare = QuadrantTopGlobal;
+                    break;
+                case DirectionType.Right:
+                    pointForCompare = QuadrantRightGlobal;
+                    break;
+                case DirectionType.Bottom:
+                    pointForCompare = QuadrantBottomGlobal;
+                    break;
+                case DirectionType.Left:
+                    pointForCompare = QuadrantLeftGlobal;
+                    break;
 
-        public Element GetElementByCorner(List<Element> elements, CornerType cornerType) {
-            XYZ cornerPoint = default;
-            switch(cornerType) {
-                case CornerType.RightTop:
-                    cornerPoint = CornerRightTopGlobal;
+                case DirectionType.RightTop:
+                    pointForCompare = CornerRightTopGlobal;
                     break;
-                case CornerType.RightBottom:
-                    cornerPoint = CornerRightBottomGlobal;
+                case DirectionType.RightBottom:
+                    pointForCompare = CornerRightBottomGlobal;
                     break;
-                case CornerType.LeftBottom:
-                    cornerPoint = CornerLeftBottomGlobal;
+                case DirectionType.LeftBottom:
+                    pointForCompare = CornerLeftBottomGlobal;
                     break;
-                case CornerType.LeftTop:
-                    cornerPoint = CornerLeftTopGlobal;
+                case DirectionType.LeftTop:
+                    pointForCompare = CornerLeftTopGlobal;
                     break;
                 default:
                     return null;
             }
 
             // Находим элемент, ближайший к этой точке
-            Element bottomLeftElement = null;
+            Element neededElement = null;
             double minDistance = double.MaxValue;
             foreach(Element element in elements) {
-                if(element.Location is LocationPoint locationPoint) {
-                    XYZ elementPoint = locationPoint.Point;
-                    double distance = elementPoint.DistanceTo(cornerPoint);  // Расстояние до элемента
+                // Получаем середину BoundingBox объекта
+                BoundingBoxXYZ boundingBox = element.get_BoundingBox(_view);
+                var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
 
-                    if(distance < minDistance) {
-                        minDistance = distance;
-                        bottomLeftElement = element;
-                    }
+                // Получаем и сравниваем расстояние от точки для сравнения до центра BoundingBox
+                double distance = midleOfBoundingBox.DistanceTo(pointForCompare);
+                if(distance < minDistance) {
+                    minDistance = distance;
+                    neededElement = element;
                 }
+
+                //if(element.Location is LocationPoint locationPoint) {
+                //    XYZ elementPoint = locationPoint.Point;
+
+                //}
             }
-            return bottomLeftElement;
+            return neededElement;
         }
 
 
-        public XYZ GetPointByCorner(View view, Element element, CornerType cornerType) {
-            XYZ xOffset = new XYZ();
-            XYZ yOffset = new XYZ();
-
+        public XYZ GetPointByDirection(View view, Element element, DirectionType cornerType, double xOffsetCoef, double yOffsetCoef) {
+            XYZ xOffset = default;
+            XYZ yOffset = default;
+            // Получаем вектора смещения в зависимости от выбранного направления
             switch(cornerType) {
-                case CornerType.RightTop:
-                    xOffset = view.RightDirection.Normalize().Multiply(2);
-                    yOffset = view.UpDirection.Normalize().Multiply(0.4);
+                case DirectionType.Top:
+                    xOffset = new XYZ();
+                    yOffset = view.UpDirection.Normalize();
                     break;
-                case CornerType.RightBottom:
-                    xOffset = view.RightDirection.Normalize().Multiply(2);
-                    yOffset = view.UpDirection.Normalize().Negate().Multiply(0.4);
+                case DirectionType.Right:
+                    xOffset = view.RightDirection.Normalize();
+                    yOffset = new XYZ();
                     break;
-                case CornerType.LeftBottom:
-                    xOffset = view.RightDirection.Normalize().Negate().Multiply(1);
-                    yOffset = view.UpDirection.Normalize().Negate().Multiply(0.4);
+                case DirectionType.Bottom:
+                    xOffset = new XYZ();
+                    yOffset = view.UpDirection.Normalize().Negate();
                     break;
-                case CornerType.LeftTop:
-                    xOffset = view.RightDirection.Normalize().Negate().Multiply(1);
-                    yOffset = view.UpDirection.Normalize().Multiply(0.4);
+                case DirectionType.Left:
+                    xOffset = view.RightDirection.Normalize().Negate();
+                    yOffset = new XYZ();
+                    break;
+
+                case DirectionType.RightTop:
+                    xOffset = view.RightDirection.Normalize();
+                    yOffset = view.UpDirection.Normalize();
+                    break;
+                case DirectionType.RightBottom:
+                    xOffset = view.RightDirection.Normalize();
+                    yOffset = view.UpDirection.Normalize().Negate();
+                    break;
+                case DirectionType.LeftBottom:
+                    xOffset = view.RightDirection.Normalize().Negate();
+                    yOffset = view.UpDirection.Normalize().Negate();
+                    break;
+                case DirectionType.LeftTop:
+                    xOffset = view.RightDirection.Normalize().Negate();
+                    yOffset = view.UpDirection.Normalize();
                     break;
                 default:
                     break;
             }
+            xOffset = xOffset.Multiply(xOffsetCoef);
+            yOffset = yOffset.Multiply(yOffsetCoef);
 
             // Получаем точку для размещения марки
-            LocationPoint locationBottomRight = element.Location as LocationPoint;
-            return locationBottomRight.Point + xOffset + yOffset;
+            BoundingBoxXYZ boundingBox = element.get_BoundingBox(view);
+            var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
+            return midleOfBoundingBox + xOffset + yOffset;
         }
     }
 }
