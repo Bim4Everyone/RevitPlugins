@@ -128,14 +128,12 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public override int GetHashCode() {
             int hashCode = 1681366416;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + EqualityComparer<List<ClashViewModel>>.Default.GetHashCode(Clashes);
             return hashCode;
         }
 
         public bool Equals(ReportViewModel other) {
             return other != null
-                && Name == other.Name
-                && EqualityComparer<List<ClashViewModel>>.Default.Equals(Clashes, other.Clashes);
+                && Name == other.Name;
         }
     }
 }
