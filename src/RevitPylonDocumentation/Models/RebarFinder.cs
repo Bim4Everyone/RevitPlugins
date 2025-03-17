@@ -11,18 +11,16 @@ namespace RevitPylonDocumentation.Models {
     public class RebarFinder {
         private readonly string _formNumberParamName = "обр_ФОП_Форма_номер";
 
-        internal RebarFinder(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+        internal RebarFinder(MainViewModel mvm, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
-            Repository = repository;
             SheetInfo = pylonSheetInfo;
         }
 
         internal MainViewModel ViewModel { get; set; }
-        internal RevitRepository Repository { get; set; }
         internal PylonSheetInfo SheetInfo { get; set; }
 
         public FamilyInstance GetSkeletonRebar(View view) {
-            var rebars = new FilteredElementCollector(Repository.Document, view.Id)
+            var rebars = new FilteredElementCollector(view.Document, view.Id)
                 .OfCategory(BuiltInCategory.OST_Rebar)
                 .WhereElementIsNotElementType()
                 .ToElements();
@@ -33,7 +31,7 @@ namespace RevitPylonDocumentation.Models {
                     continue;
                 }
                 // Фильтарция по имени семейства
-                FamilySymbol rebarType = Repository.Document.GetElement(rebar.GetTypeId()) as FamilySymbol;
+                FamilySymbol rebarType = view.Document.GetElement(rebar.GetTypeId()) as FamilySymbol;
                 if(rebarType is null) {
                     continue;
                 }
@@ -45,7 +43,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
         public List<Element> GetSimpleRebars(View view, int formNumberMin, int formNumberMax) {
-            var rebars = new FilteredElementCollector(Repository.Document, view.Id)
+            var rebars = new FilteredElementCollector(view.Document, view.Id)
                 .OfCategory(BuiltInCategory.OST_Rebar)
                 .WhereElementIsNotElementType()
                 .ToElements();

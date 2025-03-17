@@ -423,7 +423,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             XYZ sectionBoxMin;
             XYZ sectionBoxMax;
-            double elevation;
+            //double elevation;
             double coordinateX = (hostLength * 0.5)
                 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
             double coordinateY = (hostWidth * 0.5)
@@ -431,17 +431,18 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             if(transverseRebarViewNum == 1) {
                 // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
-                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
+                double viewFirstElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
 
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * viewFirstElevation) - originPoint.Z));
                 // Дальняя секущая плоскость разреза будет немного выше низа опалубки пилона
                 sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + 0.1 - originPoint.Z));
             } else if(transverseRebarViewNum == 2) {
                 // Располагаем сечение на высоте 1/2 высоты пилона (или по пропорции, указанной пользователем)
-                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevation);
+                double viewFirstElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
+                double viewSecondElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevation);
 
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z));
+                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * viewSecondElevation) - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (((maxZ - minZ) * viewFirstElevation) + 0.1) - originPoint.Z));
             } else {
                 return false;
             }

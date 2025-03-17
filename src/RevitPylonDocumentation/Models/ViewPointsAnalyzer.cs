@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 namespace RevitPylonDocumentation.Models {
-    public class ViewCornersAnalyzer {
+    public class ViewPointsAnalyzer {
         private readonly View _view;
-        public ViewCornersAnalyzer(View view) {
+        public ViewPointsAnalyzer(View view) {
             _view = view;
         }
 
@@ -83,7 +83,6 @@ namespace RevitPylonDocumentation.Models {
             Element neededElement = null;
             double minDistance = double.MaxValue;
             foreach(Element element in elements) {
-
                 if(getByBoundingBox) {
                     // Получаем середину BoundingBox объекта
                     BoundingBoxXYZ boundingBox = element.get_BoundingBox(_view);
@@ -103,11 +102,6 @@ namespace RevitPylonDocumentation.Models {
                         neededElement = element;
                     }
                 }
-
-                //if(element.Location is LocationPoint locationPoint) {
-                //    XYZ elementPoint = locationPoint.Point;
-
-                //}
             }
             return neededElement;
         }
@@ -159,7 +153,6 @@ namespace RevitPylonDocumentation.Models {
             yOffset = yOffset.Multiply(yOffsetCoef);
 
             // Получаем точку для размещения марки
-
             if(getByBoundingBox) {
                 BoundingBoxXYZ boundingBox = element.get_BoundingBox(view);
                 var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
