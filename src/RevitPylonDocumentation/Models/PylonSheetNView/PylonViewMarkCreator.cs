@@ -69,47 +69,60 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             var firstLRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonRebar, _hasFirstLRebarParamName) == 1;
             var secondLRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonRebar, _hasSecondLRebarParamName) == 1;
 
-            bool hasLRebar = firstLRebarParamValue || secondLRebarParamValue;
+            if(firstLRebarParamValue || secondLRebarParamValue) {
+                // ЛЕВЫЙ НИЖНИЙ УГОЛ
+                // Получаем референс-элемент
+                FamilyInstance leftBottomElement = cornersAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom, false) as FamilyInstance;
+
+                // Устанавливаем значение комментария у арматуры, к которой привяжем марку
+                leftBottomElement.SetParamValue(_commentParamName, $"{simpleRebars.Count / 2} шт.");
+
+                // Получаем точку в которую нужно поставить аннотацию
+                XYZ pointLeftBottom = cornersAnalyzer.GetPointByDirection(view, leftBottomElement, DirectionType.LeftBottom, 1, 0.4, false);
+
+                // Создаем марку арматуры
+                CreateRebarTag(view, pointLeftBottom, tagSymbol, leftBottomElement);
 
 
 
+                // ЛЕВЫЙ ВЕРХНИЙ УГОЛ
+                // Получаем референс-элемент
+                FamilyInstance leftTopElement = cornersAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftTop, false) as FamilyInstance;
 
-            // ЛЕВЫЙ НИЖНИЙ УГОЛ
-            // Получаем референс-элемент
-            FamilyInstance leftBottomElement = cornersAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom) as FamilyInstance;
+                // Устанавливаем значение комментария у арматуры, к которой привяжем марку
+                leftTopElement.SetParamValue(_commentParamName, $"{simpleRebars.Count / 2} шт.");
 
-            // Устанавливаем значение комментария у арматуры, к которой привяжем марку
-            leftBottomElement.SetParamValue(_commentParamName, $"{simpleRebars.Count / 2} шт.");
+                // Получаем точку в которую нужно поставить аннотацию
+                XYZ pointLeftTop = cornersAnalyzer.GetPointByDirection(view, leftTopElement, DirectionType.LeftTop, 1, 0.4, false);
 
-            // Получаем точку в которую нужно поставить аннотацию
-            XYZ pointLeftBottom = cornersAnalyzer.GetPointByDirection(view, leftBottomElement, DirectionType.LeftBottom, 1, 0.4);
+                // Создаем марку арматуры
+                CreateRebarTag(view, pointLeftTop, tagSymbol, leftTopElement);
+            } else {
+                // ЛЕВЫЙ НИЖНИЙ УГОЛ
+                // Получаем референс-элемент
+                FamilyInstance leftBottomElement = cornersAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom, false) as FamilyInstance;
 
-            // Создаем марку арматуры
-            CreateRebarTag(view, pointLeftBottom, tagSymbol, leftBottomElement);
+                // Устанавливаем значение комментария у арматуры, к которой привяжем марку
+                leftBottomElement.SetParamValue(_commentParamName, $"{simpleRebars.Count} шт.");
+
+                // Получаем точку в которую нужно поставить аннотацию
+                XYZ pointLeftBottom = cornersAnalyzer.GetPointByDirection(view, leftBottomElement, DirectionType.LeftBottom, 1, 0.4, false);
+
+                // Создаем марку арматуры
+                CreateRebarTag(view, pointLeftBottom, tagSymbol, leftBottomElement);
+            }
 
 
 
-            // ЛЕВЫЙ ВЕРХНИЙ УГОЛ
-            // Получаем референс-элемент
-            FamilyInstance leftTopElement = cornersAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftTop) as FamilyInstance;
-
-            // Устанавливаем значение комментария у арматуры, к которой привяжем марку
-            leftTopElement.SetParamValue(_commentParamName, $"{simpleRebars.Count / 2} шт.");
-
-            // Получаем точку в которую нужно поставить аннотацию
-            XYZ pointLeftTop = cornersAnalyzer.GetPointByDirection(view, leftTopElement, DirectionType.LeftTop, 1, 0.4);
-
-            // Создаем марку арматуры
-            CreateRebarTag(view, pointLeftTop, tagSymbol, leftTopElement);
 
 
 
             // ПРАВЫЙ НИЖНИЙ УГОЛ
             // Получаем референс-элемент
-            FamilyInstance rightBottomElement = cornersAnalyzer.GetElementByDirection(simpleRebars, DirectionType.RightBottom) as FamilyInstance;
+            FamilyInstance rightBottomElement = cornersAnalyzer.GetElementByDirection(simpleRebars, DirectionType.RightBottom, false) as FamilyInstance;
 
             // Получаем точку в которую нужно поставить аннотацию
-            XYZ pointRightBottom = cornersAnalyzer.GetPointByDirection(view, rightBottomElement, DirectionType.RightBottom, 2, 0.4);
+            XYZ pointRightBottom = cornersAnalyzer.GetPointByDirection(view, rightBottomElement, DirectionType.RightBottom, 2, 0.4, false);
 
             // Создаем типовую аннотацию для обозначения ГОСТа
             CreateGostTag(view, pointRightBottom, annotationSymbol, rightBottomElement);
@@ -121,11 +134,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
             // simplePlates
             // Получаем референс-элемент
-            Element topPlate = cornersAnalyzer.GetElementByDirection(simplePlates, DirectionType.Top);
+            Element topPlate = cornersAnalyzer.GetElementByDirection(simplePlates, DirectionType.Top, true);
 
             // Получаем точку в которую нужно поставить аннотацию
-            XYZ pointTopPlateLeader = cornersAnalyzer.GetPointByDirection(view, topPlate, DirectionType.Right, 0.2, 0);
-            XYZ pointTopPlate = cornersAnalyzer.GetPointByDirection(view, topPlate, DirectionType.LeftBottom, 0.5, 0.4);
+            XYZ pointTopPlateLeader = cornersAnalyzer.GetPointByDirection(view, topPlate, DirectionType.Right, 0.2, 0, true);
+            XYZ pointTopPlate = cornersAnalyzer.GetPointByDirection(view, topPlate, DirectionType.LeftBottom, 0.5, 0.4, true);
 
             // Создаем марку арматуры
             var topPlateTag = CreateRebarTag(view, pointTopPlate, tagSymbol, topPlate);
@@ -137,11 +150,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
             // Получаем референс-элемент
-            Element bottomPlate = cornersAnalyzer.GetElementByDirection(simplePlates, DirectionType.Bottom);
+            Element bottomPlate = cornersAnalyzer.GetElementByDirection(simplePlates, DirectionType.Bottom, true);
 
             // Получаем точку в которую нужно поставить аннотацию
-            XYZ pointBottomPlateLeader = cornersAnalyzer.GetPointByDirection(view, bottomPlate, DirectionType.Left, 0.2, 0);
-            XYZ pointBottomPlate = cornersAnalyzer.GetPointByDirection(view, bottomPlate, DirectionType.RightTop, 0.45, 0.3);
+            XYZ pointBottomPlateLeader = cornersAnalyzer.GetPointByDirection(view, bottomPlate, DirectionType.Left, 0.2, 0, true);
+            XYZ pointBottomPlate = cornersAnalyzer.GetPointByDirection(view, bottomPlate, DirectionType.RightTop, 0.45, 0.3, true);
 
             // Создаем марку арматуры
             var bottomPlateTag = CreateRebarTag(view, pointBottomPlate, tagSymbol, bottomPlate);
@@ -162,11 +175,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
             // Получаем референс-элемент
-            Element leftPlate = cornersAnalyzer.GetElementByDirection(simplePlates, DirectionType.Left);
+            Element leftPlate = cornersAnalyzer.GetElementByDirection(simplePlates, DirectionType.Left, true);
 
             // Получаем точку в которую нужно поставить аннотацию
-            XYZ pointLeftPlateLeader = cornersAnalyzer.GetPointByDirection(view, leftPlate, DirectionType.Bottom, 0.4, 0);
-            XYZ pointLeftPlate = cornersAnalyzer.GetPointByDirection(view, leftPlate, DirectionType.LeftBottom, 0.8, 0.3);
+            XYZ pointLeftPlateLeader = cornersAnalyzer.GetPointByDirection(view, leftPlate, DirectionType.Bottom, 0.4, 0, true);
+            XYZ pointLeftPlate = cornersAnalyzer.GetPointByDirection(view, leftPlate, DirectionType.LeftBottom, 0.8, 0.3, true);
 
             // Создаем марку арматуры
             var leftPlateTag = CreateRebarTag(view, pointLeftPlate, tagSymbol, leftPlate);
@@ -180,11 +193,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
             // Получаем референс-элемент
-            Element rightPlate = cornersAnalyzer.GetElementByDirection(simplePlates, DirectionType.Right);
+            Element rightPlate = cornersAnalyzer.GetElementByDirection(simplePlates, DirectionType.Right, true);
 
             // Получаем точку в которую нужно поставить аннотацию
-            XYZ pointRightPlateLeader = cornersAnalyzer.GetPointByDirection(view, rightPlate, DirectionType.Top, 0.4, 0);
-            XYZ pointRightPlate = cornersAnalyzer.GetPointByDirection(view, rightPlate, DirectionType.RightTop, 0.8, 0.6);
+            XYZ pointRightPlateLeader = cornersAnalyzer.GetPointByDirection(view, rightPlate, DirectionType.Top, 0.4, 0, true);
+            XYZ pointRightPlate = cornersAnalyzer.GetPointByDirection(view, rightPlate, DirectionType.RightTop, 0.8, 0.6, true);
 
             // Создаем марку арматуры
             var rightPlateTag = CreateRebarTag(view, pointRightPlate, tagSymbol, rightPlate);

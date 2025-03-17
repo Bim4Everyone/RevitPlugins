@@ -47,7 +47,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public Element GetElementByDirection(List<Element> elements, DirectionType directionType) {
+        public Element GetElementByDirection(List<Element> elements, DirectionType directionType, bool getByBoundingBox) {
             XYZ pointForCompare = default;
             switch(directionType) {
                 case DirectionType.Top:
@@ -83,15 +83,25 @@ namespace RevitPylonDocumentation.Models {
             Element neededElement = null;
             double minDistance = double.MaxValue;
             foreach(Element element in elements) {
-                // Получаем середину BoundingBox объекта
-                BoundingBoxXYZ boundingBox = element.get_BoundingBox(_view);
-                var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
 
-                // Получаем и сравниваем расстояние от точки для сравнения до центра BoundingBox
-                double distance = midleOfBoundingBox.DistanceTo(pointForCompare);
-                if(distance < minDistance) {
-                    minDistance = distance;
-                    neededElement = element;
+                if(getByBoundingBox) {
+                    // Получаем середину BoundingBox объекта
+                    BoundingBoxXYZ boundingBox = element.get_BoundingBox(_view);
+                    var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
+
+                    // Получаем и сравниваем расстояние от точки для сравнения до центра BoundingBox
+                    double distance = midleOfBoundingBox.DistanceTo(pointForCompare);
+                    if(distance < minDistance) {
+                        minDistance = distance;
+                        neededElement = element;
+                    }
+                } else {
+                    XYZ elementPoint = (element.Location as LocationPoint).Point;
+                    double distance = elementPoint.DistanceTo(pointForCompare);
+                    if(distance < minDistance) {
+                        minDistance = distance;
+                        neededElement = element;
+                    }
                 }
 
                 //if(element.Location is LocationPoint locationPoint) {
@@ -103,7 +113,8 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public XYZ GetPointByDirection(View view, Element element, DirectionType cornerType, double xOffsetCoef, double yOffsetCoef) {
+        public XYZ GetPointByDirection(View view, Element element, DirectionType cornerType,
+                                       double xOffsetCoef, double yOffsetCoef, bool getByBoundingBox) {
             XYZ xOffset = default;
             XYZ yOffset = default;
             // Получаем вектора смещения в зависимости от выбранного направления
@@ -148,9 +159,15 @@ namespace RevitPylonDocumentation.Models {
             yOffset = yOffset.Multiply(yOffsetCoef);
 
             // Получаем точку для размещения марки
-            BoundingBoxXYZ boundingBox = element.get_BoundingBox(view);
-            var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
-            return midleOfBoundingBox + xOffset + yOffset;
+
+            if(getByBoundingBox) {
+                BoundingBoxXYZ boundingBox = element.get_BoundingBox(view);
+                var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
+                return midleOfBoundingBox + xOffset + yOffset;
+            } else {
+                XYZ elementPoint = (element.Location as LocationPoint).Point;
+                return elementPoint + xOffset + yOffset;
+            }
         }
     }
 }
