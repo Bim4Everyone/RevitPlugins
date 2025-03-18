@@ -302,7 +302,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
                         .TryCreateTransverseRebarViewFirstDimensions();
                     SheetInfo.TransverseRebarViewFirst.ViewMarkCreator
-                        .TryCreateTransverseRebarViewFirstMarks();
+                        .TryCreateTransverseRebarViewMarks();
                 }
             }
 
@@ -312,8 +312,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 if(SheetInfo.TransverseRebarViewSecond.ViewElement != null) {
                     SheetInfo.TransverseRebarViewSecond.ViewDimensionCreator
                         .TryCreateTransverseRebarViewSecondDimensions();
-                    SheetInfo.TransverseRebarViewFirst.ViewMarkCreator
-                        .TryCreateTransverseRebarViewSecondMarks();
+                    SheetInfo.TransverseRebarViewSecond.ViewMarkCreator
+                        .TryCreateTransverseRebarViewMarks();
                 }
             }
 

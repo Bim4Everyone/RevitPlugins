@@ -2,25 +2,29 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitPylonDocumentation.Models.PylonSheetNView;
+
 namespace RevitPylonDocumentation.Models {
     public class ViewPointsAnalyzer {
-        private readonly View _view;
-        public ViewPointsAnalyzer(View view) {
-            _view = view;
+        private readonly PylonView _viewOfPylon;
+        private bool _checked;
+        private XYZ _cornerRightTopGlobal;
+        private XYZ _cornerLeftBottomGlobal;
+        private XYZ _cornerLeftTopGlobal;
+        private XYZ _cornerRightBottomGlobal;
+        private XYZ _quadrantTopGlobal;
+        private XYZ _quadrantRightGlobal;
+        private XYZ _quadrantBottomGlobal;
+        private XYZ _quadrantLeftGlobal;
+
+        public ViewPointsAnalyzer(PylonView pylonView) {
+            _viewOfPylon = pylonView;
+            _checked = false;
         }
 
-        public XYZ CornerRightTopGlobal { get; set; }
-        public XYZ CornerLeftBottomGlobal { get; set; }
-        public XYZ CornerLeftTopGlobal { get; set; }
-        public XYZ CornerRightBottomGlobal { get; set; }
-        public XYZ QuadrantTopGlobal { get; private set; }
-        public XYZ QuadrantRightGlobal { get; private set; }
-        public XYZ QuadrantBottomGlobal { get; private set; }
-        public XYZ QuadrantLeftGlobal { get; private set; }
-
-        public void AnalyzeCorners() {
+        private void AnalyzeViewControlPoints() {
             // Получаем CropBox вида
-            BoundingBoxXYZ cropBox = _view.CropBox;
+            BoundingBoxXYZ cropBox = _viewOfPylon.ViewElement.CropBox;
 
             // Получаем минимальную точку подрезки (нижний левый угол) в локальной системе координат вида
             XYZ cornerRightTopLocal = cropBox.Max;
@@ -35,45 +39,51 @@ namespace RevitPylonDocumentation.Models {
 
             // Преобразуем точку в глобальные координаты
             Transform transform = cropBox.Transform;  // Преобразование из локальной системы вида в глобальную
-            CornerRightTopGlobal = transform.OfPoint(cornerRightTopLocal);
-            CornerLeftBottomGlobal = transform.OfPoint(cornerLeftBottomLocal);
-            CornerLeftTopGlobal = transform.OfPoint(cornerLeftTopLocal);
-            CornerRightBottomGlobal = transform.OfPoint(cornerRightBottomLocal);
+            _cornerRightTopGlobal = transform.OfPoint(cornerRightTopLocal);
+            _cornerLeftBottomGlobal = transform.OfPoint(cornerLeftBottomLocal);
+            _cornerLeftTopGlobal = transform.OfPoint(cornerLeftTopLocal);
+            _cornerRightBottomGlobal = transform.OfPoint(cornerRightBottomLocal);
 
-            QuadrantTopGlobal = transform.OfPoint(quadrantTopLocal);
-            QuadrantRightGlobal = transform.OfPoint(quadrantRightLocal);
-            QuadrantBottomGlobal = transform.OfPoint(quadrantBottomLocal);
-            QuadrantLeftGlobal = transform.OfPoint(quadrantLeftLocal);
+            _quadrantTopGlobal = transform.OfPoint(quadrantTopLocal);
+            _quadrantRightGlobal = transform.OfPoint(quadrantRightLocal);
+            _quadrantBottomGlobal = transform.OfPoint(quadrantBottomLocal);
+            _quadrantLeftGlobal = transform.OfPoint(quadrantLeftLocal);
+
+            _checked = true;
         }
 
 
         public Element GetElementByDirection(List<Element> elements, DirectionType directionType, bool getByBoundingBox) {
+            if(!_checked) {
+                AnalyzeViewControlPoints();
+            }
+
             XYZ pointForCompare = default;
             switch(directionType) {
                 case DirectionType.Top:
-                    pointForCompare = QuadrantTopGlobal;
+                    pointForCompare = _quadrantTopGlobal;
                     break;
                 case DirectionType.Right:
-                    pointForCompare = QuadrantRightGlobal;
+                    pointForCompare = _quadrantRightGlobal;
                     break;
                 case DirectionType.Bottom:
-                    pointForCompare = QuadrantBottomGlobal;
+                    pointForCompare = _quadrantBottomGlobal;
                     break;
                 case DirectionType.Left:
-                    pointForCompare = QuadrantLeftGlobal;
+                    pointForCompare = _quadrantLeftGlobal;
                     break;
 
                 case DirectionType.RightTop:
-                    pointForCompare = CornerRightTopGlobal;
+                    pointForCompare = _cornerRightTopGlobal;
                     break;
                 case DirectionType.RightBottom:
-                    pointForCompare = CornerRightBottomGlobal;
+                    pointForCompare = _cornerRightBottomGlobal;
                     break;
                 case DirectionType.LeftBottom:
-                    pointForCompare = CornerLeftBottomGlobal;
+                    pointForCompare = _cornerLeftBottomGlobal;
                     break;
                 case DirectionType.LeftTop:
-                    pointForCompare = CornerLeftTopGlobal;
+                    pointForCompare = _cornerLeftTopGlobal;
                     break;
                 default:
                     return null;
@@ -85,7 +95,7 @@ namespace RevitPylonDocumentation.Models {
             foreach(Element element in elements) {
                 if(getByBoundingBox) {
                     // Получаем середину BoundingBox объекта
-                    BoundingBoxXYZ boundingBox = element.get_BoundingBox(_view);
+                    BoundingBoxXYZ boundingBox = element.get_BoundingBox(_viewOfPylon.ViewElement);
                     var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
 
                     // Получаем и сравниваем расстояние от точки для сравнения до центра BoundingBox
@@ -107,8 +117,9 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public XYZ GetPointByDirection(View view, Element element, DirectionType cornerType,
+        public XYZ GetPointByDirection(Element element, DirectionType cornerType,
                                        double xOffsetCoef, double yOffsetCoef, bool getByBoundingBox) {
+            var view = _viewOfPylon.ViewElement;
             XYZ xOffset = default;
             XYZ yOffset = default;
             // Получаем вектора смещения в зависимости от выбранного направления
