@@ -15,7 +15,7 @@
         x:Key="MainWindow.ComboBoxTitle">Schedule category:</system:String>
     <system:String
         x:Key="MainWindow.ComboBoxTooltip">Excel is imported into the header of the "fictitious schedule" by the specified category. 
-        It is important to select such category which elements are not exist in the model.</system:String>
+        It is important to select such category which is not used in the model.</system:String>
 
     <system:String
         x:Key="OpenFileDialog.Title">Select Excel file</system:String>
