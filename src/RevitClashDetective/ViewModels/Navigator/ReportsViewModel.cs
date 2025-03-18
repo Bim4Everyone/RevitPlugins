@@ -38,6 +38,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             LoadCommand = RelayCommand.Create(Load);
             DeleteCommand = RelayCommand.Create(Delete, CanDelete);
             SelectClashCommand = RelayCommand.Create<ClashViewModel>(SelectClash, CanSelectClash);
+            SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
         }
 
 
@@ -45,6 +46,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public ICommand OpenClashDetectorCommand { get; }
         public ICommand LoadCommand { get; }
         public ICommand DeleteCommand { get; }
+        public ICommand SaveAllReportsCommand { get; }
 
         public ObservableCollection<ReportViewModel> Reports {
             get => _reports;
@@ -143,6 +145,16 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 && p.Clash != null
                 && p.Clash.MainElement != null
                 && p.Clash.OtherElement != null;
+        }
+
+        private void SaveAllReports() {
+            foreach(var report in Reports) {
+                report.SaveCommand.Execute(default);
+            }
+        }
+
+        private bool CanSaveAllReports() {
+            return Reports.Count > 0;
         }
     }
 }
