@@ -132,7 +132,7 @@
             <dxdo:LayoutGroup x:Name="layoutRoot"
                               AllowSplitters="True"
                               Orientation="Vertical">
-                <dxdo:LayoutPanel Caption="Входящие задания на отверстия"
+                <dxdo:LayoutPanel Caption="Входящие задания на отверстия из АР"
                                   ShowPinButton="False"
                                   ShowCloseButton="False">
                     <dxg:GridControl x:Name="_dgIncomingTasks"
