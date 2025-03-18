@@ -10,11 +10,11 @@ using RevitClashDetective.Models.Clashes;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.OpeningModels {
-    internal class OpeningTaskHost : IOpeningTaskHost, ISelectorAndHighlighter, IEquatable<OpeningTaskHost> {
+    internal class OpeningKrHost : IOpeningKrHost, ISelectorAndHighlighter, IEquatable<OpeningKrHost> {
         private const string _krModelPartParam = "обр_ФОП_Раздел проекта";
         private readonly Element _element;
 
-        public OpeningTaskHost(Element element) {
+        public OpeningKrHost(Element element) {
             _element = element ?? throw new ArgumentNullException(nameof(element));
 
             Name = element.Name;
@@ -25,7 +25,7 @@ namespace RevitOpeningPlacement.OpeningModels {
         /// <summary>
         /// Создает экземпляр класса с пустыми значениями свойств
         /// </summary>
-        public OpeningTaskHost() {
+        public OpeningKrHost() {
             Name = string.Empty;
             Id = ElementId.InvalidElementId;
             KrModelPart = string.Empty;
@@ -39,10 +39,10 @@ namespace RevitOpeningPlacement.OpeningModels {
         public string KrModelPart { get; }
 
         public override bool Equals(object obj) {
-            return Equals(obj as OpeningTaskHost);
+            return Equals(obj as OpeningKrHost);
         }
 
-        public bool Equals(OpeningTaskHost other) {
+        public bool Equals(OpeningKrHost other) {
             if(ReferenceEquals(other, null)) {
                 return false;
             }

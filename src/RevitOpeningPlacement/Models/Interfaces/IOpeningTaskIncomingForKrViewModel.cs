@@ -44,6 +44,6 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         /// <summary>
         /// Хост задания на отверстие из активного файла
         /// </summary>
-        IOpeningTaskHost Host { get; }
+        IOpeningKrHost Host { get; }
     }
 }
