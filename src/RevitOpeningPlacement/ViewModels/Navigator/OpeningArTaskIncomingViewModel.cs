@@ -69,6 +69,20 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public IOpeningKrHost Host { get; }
 
+        public string Thickness => string.Empty;
+
+        public string CenterOffset => string.Empty;
+
+        public string BottomOffset => string.Empty;
+
+        public string MepSystem => string.Empty;
+
+        public string Username => string.Empty;
+
+        public string FamilyShortName => string.Empty;
+
+        public string Description => string.Empty;
+
         public override bool Equals(object obj) {
             return (obj != null)
                 && (obj is OpeningArTaskIncomingViewModel vmOther)

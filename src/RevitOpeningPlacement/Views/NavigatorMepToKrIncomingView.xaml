@@ -234,6 +234,21 @@
                                 FieldName="Height" />
                             <dxg:GridColumn
                                 ReadOnly="True"
+                                Width="40"
+                                Header="Толщина"
+                                FieldName="Thickness" />
+                            <dxg:GridColumn
+                                ReadOnly="True"
+                                Width="60"
+                                Header="Отм. оси"
+                                FieldName="CenterOffset" />
+                            <dxg:GridColumn
+                                ReadOnly="True"
+                                Width="60"
+                                Header="Отм. низа"
+                                FieldName="BottomOffset" />
+                            <dxg:GridColumn
+                                ReadOnly="True"
                                 Width="60"
                                 Header="Id"
                                 FieldName="OpeningId" />
@@ -244,7 +259,7 @@
                                 FieldName="Host.Name" />
                             <dxg:GridColumn
                                 ReadOnly="True"
-                                Width="60"
+                                Width="50"
                                 Header="Id основы"
                                 FieldName="Host.Id" />
                             <dxg:GridColumn
@@ -263,14 +278,34 @@
                             </dxg:GridColumn>
                             <dxg:GridColumn
                                 ReadOnly="True"
-                                Width="70"
+                                Width="50"
                                 Header="Раздел КР"
                                 FieldName="Host.KrModelPart" />
                             <dxg:GridColumn
                                 ReadOnly="True"
-                                Width="60"
+                                Width="50"
+                                Header="Система ВИС"
+                                FieldName="MepSystem" />
+                            <dxg:GridColumn
+                                ReadOnly="True"
+                                Width="50"
                                 Header="Комментарий"
                                 FieldName="Comment" />
+                            <dxg:GridColumn
+                                ReadOnly="True"
+                                Width="50"
+                                Header="Создатель"
+                                FieldName="Username" />
+                            <dxg:GridColumn
+                                ReadOnly="True"
+                                Width="50"
+                                Header="Тип отверстия"
+                                FieldName="FamilyShortName" />
+                            <dxg:GridColumn
+                                ReadOnly="True"
+                                Width="50"
+                                Header="Описание пересечения"
+                                FieldName="Description" />
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </dxdo:LayoutPanel>
