@@ -23,7 +23,6 @@ namespace RevitMirroredElements.Views {
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
             DialogResult = false;
-            Close();
         }
     }
 }

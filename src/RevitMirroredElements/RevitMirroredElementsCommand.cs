@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -46,13 +48,22 @@ namespace RevitMirroredElements {
                 // Используем сервис обновления тем для WinUI
                 kernel.UseWpfUIThemeUpdater();
 
-                // Настройка запуска окна
                 kernel.BindMainWindow<MainViewModel, MainWindow>();
+                kernel.BindOtherWindow<CategoriesViewModel, CategoriesWindow>(); 
+
+                // Настройка локализации,
+                // получение имени сборки откуда брать текст
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+                // Настройка локализации,
+                // установка дефолтной локализации "ru-RU"
+                kernel.UseWpfLocalization(
+                    $"/{assemblyName};component/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
 
                 // Вызывает стандартное уведомление
                 Notification(kernel.Get<MainWindow>());
             }
-
         }
 
         private bool IsSupportedView(View view) {

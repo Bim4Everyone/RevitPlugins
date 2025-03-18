@@ -11,7 +11,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
-    Title="Проверка на зеркальность"
+    Title="{me:LocalizationSource CategoryWindow.Title}"
     Height="450"
     Width="300"
     MinHeight="450"  
@@ -41,19 +41,24 @@
                 Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox
-            Margin="10,5,10,5"
-            Grid.Row="0"
-            VerticalAlignment="Center"
-            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+        <ui:TitleBar
+         Grid.Row="0"
+         Title="{me:LocalizationSource CategoryWindow.Title}"/>
+
         <TextBlock
-            Text="Введите для поиска..."
+            Text="{me:LocalizationSource CategoryWindow.EnterToSearch}"
             IsHitTestVisible="False"
-            Margin="15,5,0,5"
+            Margin="15,40,10,5"
             Grid.Row="0"
             Foreground="Gray"
             VerticalAlignment="Center"
             Visibility="{Binding HasSearchText, Converter={StaticResource BoolToVisibilityConverter}}" />
+        <TextBox
+            Margin="10,40,10,5"
+            Grid.Row="0"
+            VerticalAlignment="Center"
+            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+        
 
         <DataGrid
             Grid.Row="1"
@@ -62,6 +67,8 @@
             HeadersVisibility="Column"
             CanUserAddRows="False"
             IsReadOnly="True"
+            BorderBrush="Black"
+            BorderThickness="1"
             ItemsSource="{Binding FilteredCategories, UpdateSourceTrigger=PropertyChanged}">
             <DataGrid.Columns>
                 <DataGridTemplateColumn
@@ -76,8 +83,8 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn
-                    Header="Категория"
+                <DataGridTextColumn 
+                    Header="{me:LocalizationSource CategoryWindow.Category}"
                     Width="*"
                     IsReadOnly="True"
                     Binding="{Binding Name}" />
@@ -89,7 +96,7 @@
             Orientation="Vertical"
             HorizontalAlignment="Center">
             <CheckBox
-                Content="Выбрать все / Отменить все"
+                Content="{me:LocalizationSource CategoryWindow.SelectAll}"
                 Margin="0,0,0,0"
                 IsChecked="{Binding AllCategoriesSelected, Mode=TwoWay}" />
             <StackPanel
@@ -98,14 +105,14 @@
                 <Button
                     Margin="10"
                     Width="80"
-                    Content="ОК"
+                    Content="{me:LocalizationSource MainWindow.ButtonOk}"
                     IsDefault="True"
                     Click="ButtonOk_Click" />
 
                 <Button
                     Margin="10"
                     Width="80"
-                    Content="Отмена"
+                    Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                     IsCancel="True"
                     Click="ButtonCancel_Click" />
             </StackPanel>

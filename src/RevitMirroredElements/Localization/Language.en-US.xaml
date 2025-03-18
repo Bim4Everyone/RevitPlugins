@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на английский американский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Checking for mirroring</system:String>
+    <system:String x:Key="MainWindow.ButtonSelect">Select</system:String>
+    <system:String x:Key="MainWindow.ActiveView">In active view</system:String>
+    <system:String x:Key="MainWindow.WholeProject">In the entire project</system:String>
+    <system:String x:Key="MainWindow.VisibilityHeader">Visibility</system:String>
+    <system:String x:Key="MainWindow.FilterDescription">Apply color mirroring filter temporarily for active view</system:String>
+    <system:String x:Key="MainWindow.PluginDescription">Plugin fills the parameter 'ФОП_Зеркальность'
+        '0' - element unchanged
+        '1' - element mirrored</system:String>
+    <system:String x:Key="MainWindow.ButtonSelectTooltip">Select elements in the view</system:String>
+    <system:String x:Key="MainWindow.ButtonSelectCategoriesTooltip">Select categories</system:String>
+    <system:String x:Key="RevitRepository.MirrorFilterName">Mirroring Check</system:String>
+    <system:String x:Key="RevitRepository.Parameter">Parameter</system:String>
+    <system:String x:Key="RevitRepository.NotFound">not found.</system:String>
+    <system:String x:Key="Transaction.SetParam">Filling mirror parameters</system:String>
+    <system:String x:Key="Transaction.SettingTemporaryView">Configuring temporary view for mirroring</system:String>
+    <system:String x:Key="CategoryWindow.EnterToSearch">Enter to search...</system:String>
+    <system:String x:Key="CategoryWindow.Title">Select Categories</system:String>
+    <system:String x:Key="CategoryWindow.Category">Category</system:String>
+    <system:String x:Key="CategoryWindow.SelectAll">Select All / Deselect All</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+</ResourceDictionary>
