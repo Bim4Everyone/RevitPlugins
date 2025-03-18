@@ -308,6 +308,27 @@
                                             IsSmart="True"
                                             FieldName="LevelName" />
                             <dxg:GridColumn ReadOnly="True"
+                                            Width="*"
+                                            Header="Основа"
+                                            FieldName="Host.Name" />
+                            <dxg:GridColumn Width="30"
+                                            ReadOnly="True"
+                                            SortMode="Custom"
+                                            AllowResizing="False">
+                                <dxg:GridColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <dx:SimpleButton
+                                            Glyph="{dx:DXImage 'DevAV/Actions/Search_16x16.png'}"
+                                            Command="{Binding ElementName=_this, Path=DataContext.SelectCommand}"
+                                            CommandParameter="{Binding Row.Host}" />
+                                    </DataTemplate>
+                                </dxg:GridColumn.CellTemplate>
+                            </dxg:GridColumn>
+                            <dxg:GridColumn ReadOnly="True"
+                                            Width="70"
+                                            Header="Раздел КР"
+                                            FieldName="Host.KrModelPart" />
+                            <dxg:GridColumn ReadOnly="True"
                                             Width="200"
                                             Header="Семейство"
                                             IsSmart="True"
