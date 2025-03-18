@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
+using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.RevitClashReport {
@@ -26,7 +28,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 var filteredClashes = report.Clashes
                     .Select(item => item.SetRevitRepository(revitRepository))
                     .Where(item => item.IsValid(docNames));
-                report.Clashes = filteredClashes;
+                report.Clashes = new ReadOnlyCollection<ClashModel>(filteredClashes.ToArray());
             }
             return reports;
         }

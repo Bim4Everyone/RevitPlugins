@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 using RevitClashDetective.Models.Clashes;
 
@@ -9,14 +11,17 @@ namespace RevitClashDetective.Models.RevitClashReport {
             if(string.IsNullOrWhiteSpace(name)) {
                 throw new ArgumentException(nameof(name));
             }
+            if(clashes is null) {
+                throw new ArgumentNullException(nameof(clashes));
+            }
 
             Name = name;
-            Clashes = clashes ?? throw new ArgumentNullException(nameof(clashes));
+            Clashes = new ReadOnlyCollection<ClashModel>(clashes.ToArray());
         }
 
 
         public string Name { get; }
-        public IEnumerable<ClashModel> Clashes { get; set; }
+        public IReadOnlyCollection<ClashModel> Clashes { get; set; }
 
 
         public override bool Equals(object obj) {
