@@ -37,6 +37,11 @@ namespace RevitOpeningPlacement.Models.Interfaces {
         string Status { get; }
 
         /// <summary>
+        /// Дата создания отверстия
+        /// </summary>
+        string Date { get; }
+
+        /// <summary>
         /// Комментарий задания на отверстие
         /// </summary>
         string Comment { get; }

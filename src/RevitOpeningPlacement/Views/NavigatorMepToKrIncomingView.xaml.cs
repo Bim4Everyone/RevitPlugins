@@ -35,9 +35,10 @@ namespace RevitOpeningPlacement.Views {
         private void NavigatorView_Loaded(object sender, RoutedEventArgs e) {
             _dgIncomingTasks.GroupBy(_dgIncomingTasks.Columns[1]);
             _dgIncomingTasks.GroupBy(_dgIncomingTasks.Columns[2]);
+            _dgIncomingTasks.GroupBy(_dgIncomingTasks.Columns[3]);
 
-            _dgIncomingTasks.SortBy(_dgIncomingTasks.Columns[7], DevExpress.Data.ColumnSortOrder.Descending);
-            _dgIncomingTasks.SortBy(_dgIncomingTasks.Columns[6]);
+            _dgIncomingTasks.SortBy(_dgIncomingTasks.Columns[11], DevExpress.Data.ColumnSortOrder.Descending);
+            _dgIncomingTasks.SortBy(_dgIncomingTasks.Columns[10]);
 
             _dgOpeningsReal.GroupBy(_dgOpeningsReal.Columns[1]);
             _dgOpeningsReal.SortBy(_dgOpeningsReal.Columns[6], DevExpress.Data.ColumnSortOrder.Descending);

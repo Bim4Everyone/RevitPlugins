@@ -83,6 +83,8 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
 
         public string Description => string.Empty;
 
+        public string Date => string.Empty;
+
         public override bool Equals(object obj) {
             return (obj != null)
                 && (obj is OpeningArTaskIncomingViewModel vmOther)
