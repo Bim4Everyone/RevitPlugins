@@ -25,9 +25,7 @@ namespace dosymep.WpfUI.Core {
 
         private readonly WindowInteropHelper _windowInteropHelper;
 
-        public WpfUIPlatformWindow() {
-            
-        }
+        public WpfUIPlatformWindow() { }
 
         public WpfUIPlatformWindow(
             ILoggerService loggerService,

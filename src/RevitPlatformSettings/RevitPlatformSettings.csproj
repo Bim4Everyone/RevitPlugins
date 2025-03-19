@@ -13,15 +13,23 @@
     
     
     <ItemGroup>
-
-        <Resource Include="assets\theme-win10dark\icons8-download-96.png" />
-        <Resource Include="assets\theme-win10dark\icons8-message-96.png" />
-        <Resource Include="assets\theme-win10dark\icons8-news-96.png" />
-        <Resource Include="assets\theme-win10dark\icons8-github-96.png" />
-
-        <Resource Include="assets\theme-win10light\icons8-download-96.png" />
-        <Resource Include="assets\theme-win10light\icons8-message-96.png" />
-        <Resource Include="assets\theme-win10light\icons8-news-96.png" />
-        <Resource Include="assets\theme-win10light\icons8-github-96.png" />
+        <Resource Include="assets\images\theme-dark\icons8-download-96.png" />
+        <Resource Include="assets\images\theme-dark\icons8-github-96.png" />
+        <Resource Include="assets\images\theme-dark\icons8-message-96.png" />
+        <Resource Include="assets\images\theme-dark\icons8-news-96.png" />
+        <Resource Include="assets\images\theme-light\icons8-download-96.png" />
+        <Resource Include="assets\images\theme-light\icons8-github-96.png" />
+        <Resource Include="assets\images\theme-light\icons8-message-96.png" />
+        <Resource Include="assets\images\theme-light\icons8-news-96.png" />
+    </ItemGroup>
+    
+    
+    <ItemGroup>
+      <Page Update="assets\Localization\Language.en-US.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
+      <Page Update="assets\Localization\Language.ru-RU.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </Page>
     </ItemGroup>
 </Project>
