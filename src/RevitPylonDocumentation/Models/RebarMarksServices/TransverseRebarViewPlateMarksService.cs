@@ -20,7 +20,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
 
 
 
-        public void CreateTransversePlateTopMark(List<Element> simplePlates) {
+        public void CreateTopMark(List<Element> simplePlates) {
 
             // Получаем референс-элемент
             Element topPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Top, true);
@@ -39,7 +39,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
         }
 
 
-        public void CreateTransversePlateBottomMark(List<Element> simplePlates) {
+        public void CreateBottomMark(List<Element> simplePlates) {
             // Получаем референс-элемент
             Element bottomPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Bottom, true);
 
@@ -57,7 +57,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
         }
 
 
-        public void CreateTransversePlateLeftMark(List<Element> simplePlates) {
+        public void CreateLeftMark(List<Element> simplePlates) {
             // Получаем референс-элемент
             Element leftPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Left, true);
 
@@ -76,7 +76,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
 
 
 
-        public void CreateTransversePlateRightMark(List<Element> simplePlates) {
+        public void CreateRightMark(List<Element> simplePlates) {
             // Получаем референс-элемент
             Element rightPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Right, true);
 

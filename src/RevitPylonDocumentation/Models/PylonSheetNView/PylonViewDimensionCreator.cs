@@ -337,7 +337,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
                 if(grids.Count > 0) {
                     // Размер по ТОРЦУ опалубка + оси (положение слева 1)
-                    Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Left, 0.5);
+                    Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Left, 1.2);
                     ReferenceArray refArrayFormworkGridSide = dimensionBaseService.GetDimensionRefs(grids, new XYZ(1, 0, 0),
                                                                                refArrayFormworkSide);
                     Dimension dimensionFormworkGridSide = doc.Create.NewDimension(view, dimensionLineLeft,

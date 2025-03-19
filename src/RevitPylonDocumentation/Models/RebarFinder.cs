@@ -62,5 +62,54 @@ namespace RevitPylonDocumentation.Models {
             }
             return simpleRebars;
         }
+
+
+        public List<Element> GetSimpleRebars(View view, int formNumberMin, int formNumberMax,
+                                             int formNumberMinException, int formNumberMaxException) {
+            var rebars = new FilteredElementCollector(view.Document, view.Id)
+                .OfCategory(BuiltInCategory.OST_Rebar)
+                .WhereElementIsNotElementType()
+                .ToElements();
+
+            var simpleRebars = new List<Element>();
+            foreach(Element rebar in rebars) {
+                // Фильтрация по комплекту документации
+                if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != SheetInfo.ProjectSection) {
+                    continue;
+                }
+                // Фильтрация по номеру формы - отсев вертикальных стержней армирования
+                var formNumber = rebar.GetParamValue<int>(_formNumberParamName);
+                bool includeInNeededRange = formNumber >= formNumberMin && formNumber <= formNumberMax;
+                bool includeInExceptionRange = formNumber >= formNumberMinException && formNumber <= formNumberMaxException;
+
+                if(includeInNeededRange && !includeInExceptionRange) {
+                    simpleRebars.Add(rebar);
+                }
+            }
+            return simpleRebars;
+        }
+
+
+
+        public List<Element> GetSimpleRebars(View view, int neededFormNumber) {
+            var rebars = new FilteredElementCollector(view.Document, view.Id)
+                .OfCategory(BuiltInCategory.OST_Rebar)
+                .WhereElementIsNotElementType()
+                .ToElements();
+
+            var simpleRebars = new List<Element>();
+            foreach(Element rebar in rebars) {
+                // Фильтрация по комплекту документации
+                if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != SheetInfo.ProjectSection) {
+                    continue;
+                }
+                // Фильтрация по номеру формы - отсев вертикальных стержней армирования
+                var formNumber = rebar.GetParamValue<int>(_formNumberParamName);
+                if(formNumber == neededFormNumber) {
+                    simpleRebars.Add(rebar);
+                }
+            }
+            return simpleRebars;
+        }
     }
 }

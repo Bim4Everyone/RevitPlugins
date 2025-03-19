@@ -9,13 +9,17 @@ using View = Autodesk.Revit.DB.View;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewMarkCreator {
-        private readonly int _formNumberForVerticalRebarMax = 1499;
-        private readonly int _formNumberForVerticalRebarMin = 1101;
         private readonly int _formNumberForSkeletonPlatesMax = 2999;
         private readonly int _formNumberForSkeletonPlatesMin = 2001;
 
         private readonly int _formNumberForClampsMax = 1599;
         private readonly int _formNumberForClampsMin = 1500;
+
+        private readonly int _formNumberForVerticalRebarMax = 1499;
+        private readonly int _formNumberForVerticalRebarMin = 1101;
+
+        private readonly int _formNumberForCBarMax = 1202;
+        private readonly int _formNumberForCBarMin = 1202;
 
         private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
         private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
@@ -69,13 +73,16 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         private void CreateTransverseViewBarMarks(View view) {
             var simpleClamps = _rebarFinder.GetSimpleRebars(view, _formNumberForClampsMin, _formNumberForClampsMax);
-            var simpleRebars = _rebarFinder.GetSimpleRebars(view, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax);
+            var simpleRebars = _rebarFinder.GetSimpleRebars(view, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax,
+                                                            _formNumberForCBarMin, _formNumberForCBarMax);
+            var simpleCBars = _rebarFinder.GetSimpleRebars(view, _formNumberForCBarMin);
 
-            _transverseViewBarMarksService.CreateLeftTopMarks(simpleClamps, simpleRebars);
+            _transverseViewBarMarksService.CreateLeftTopMark(simpleClamps, simpleRebars);
+            _transverseViewBarMarksService.CreateRightTopMark(simpleClamps, simpleRebars);
+            _transverseViewBarMarksService.CreateLeftBottomMark(simpleRebars);
 
+            _transverseViewBarMarksService.CreateLeftMark(simpleCBars, simpleRebars);
         }
-
-
 
 
 
@@ -83,10 +90,9 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             View view = ViewOfPylon.ViewElement;
             try {
                 CreateTransverseRebarViewBarMarks(view);
-                CreatePlateMarks(view);
+                CreateTransverseRebarViewPlateMarks(view);
             } catch(Exception) { }
         }
-
 
 
         private void CreateTransverseRebarViewBarMarks(View view) {
@@ -112,18 +118,18 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         }
 
 
-        private void CreatePlateMarks(View view) {
+        private void CreateTransverseRebarViewPlateMarks(View view) {
             var simplePlates = _rebarFinder.GetSimpleRebars(view, _formNumberForSkeletonPlatesMin, _formNumberForSkeletonPlatesMax);
             if(simplePlates.Count == 0) {
                 return;
             }
-            _transverseRebarViewPlateMarksService.CreateTransversePlateTopMark(simplePlates);
+            _transverseRebarViewPlateMarksService.CreateTopMark(simplePlates);
 
-            _transverseRebarViewPlateMarksService.CreateTransversePlateBottomMark(simplePlates);
+            _transverseRebarViewPlateMarksService.CreateBottomMark(simplePlates);
 
-            _transverseRebarViewPlateMarksService.CreateTransversePlateLeftMark(simplePlates);
+            _transverseRebarViewPlateMarksService.CreateLeftMark(simplePlates);
 
-            _transverseRebarViewPlateMarksService.CreateTransversePlateRightMark(simplePlates);
+            _transverseRebarViewPlateMarksService.CreateRightMark(simplePlates);
         }
     }
 }
