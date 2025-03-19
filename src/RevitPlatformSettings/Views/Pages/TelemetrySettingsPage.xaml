@@ -1,0 +1,119 @@
+<core:WpfUIPlatformPage
+    x:Class="RevitPlatformSettings.Views.Pages.TelemetrySettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
+    xmlns:markupExtensions="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:views="clr-namespace:RevitPlatformSettings.Views"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+
+    x:ClassModifier="internal"
+
+    mc:Ignorable="d"
+
+    Width="800"
+    Height="450"
+
+    x:Name="_this"
+    d:DataContext="{d:DesignInstance settings:TelemetrySettingsViewModel, IsDesignTimeCreatable=False}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <GroupBox
+            Grid.Row="0"
+            Margin="10"
+            Header="{markupExtensions:LocalizationSource TelemetrySettings.LogTrace}">
+
+            <StackPanel>
+
+                <views:CustomEditControl
+                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceIsActive}">
+
+                    <CheckBox
+                        IsHitTestVisible="False"
+                        HorizontalAlignment="Right"
+                        IsChecked="{Binding Path=LogTraceIsActive, Mode=OneWay}" />
+
+                </views:CustomEditControl>
+
+                <views:CustomEditControl
+                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
+
+                    <ComboBox
+                        IsReadOnly="True"
+                        SelectedItem="{Binding Path=LogTraceLogLevel, Mode=OneWay}" />
+
+                </views:CustomEditControl>
+
+                <views:CustomEditControl
+                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceServerName}">
+
+                    <ui:TextBox
+                        IsReadOnly="True"
+                        Text="{Binding Path=LogTraceServerName, Mode=OneWay}" />
+
+                </views:CustomEditControl>
+
+            </StackPanel>
+
+        </GroupBox>
+
+        <GroupBox
+            Grid.Row="1"
+            Margin="10"
+            Header="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournal}">
+
+            <StackPanel>
+
+                <views:CustomEditControl
+                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournalIsActive}">
+
+                    <CheckBox
+                        IsHitTestVisible="False"
+                        HorizontalAlignment="Right"
+                        IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}" />
+
+                </views:CustomEditControl>
+
+                <views:CustomEditControl
+                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
+
+                    <CheckBox
+                        IsHitTestVisible="False"
+                        HorizontalAlignment="Right"
+                        IsChecked="{Binding Path=LogTraceJournalUseUtc, Mode=OneWay}" />
+
+                </views:CustomEditControl>
+
+                <views:CustomEditControl
+                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
+
+                    <ComboBox
+                        IsReadOnly="True"
+                        SelectedItem="{Binding Path=LogTraceJournalLogLevel, Mode=OneWay}" />
+
+                </views:CustomEditControl>
+
+                <views:CustomEditControl
+                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
+
+                    <ui:TextBox
+                        MaxWidth="300"
+                        IsReadOnly="True"
+                        Text="{Binding Path=LogTraceJournalOutputTemplate, Mode=OneWay}" />
+
+                </views:CustomEditControl>
+
+            </StackPanel>
+
+        </GroupBox>
+
+    </Grid>
+</core:WpfUIPlatformPage>

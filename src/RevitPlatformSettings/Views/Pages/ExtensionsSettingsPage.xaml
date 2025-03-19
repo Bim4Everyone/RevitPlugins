@@ -1,0 +1,86 @@
+<core:WpfUIPlatformPage
+    x:Class="RevitPlatformSettings.Views.Pages.ExtensionsSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+
+    x:ClassModifier="internal"
+
+    mc:Ignorable="d"
+
+    Width="800"
+    Height="450"
+
+    x:Name="_this"
+    d:DataContext="{d:DesignInstance settings:ExtensionsSettingsViewModel, IsDesignTimeCreatable=False}">
+
+    <Page.Resources>
+        <TextBlock
+            x:Key="NameColumnHeader"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource ExtensionSettings.NameGridColumn}" />
+
+        <TextBlock
+            x:Key="DescriptionColumnHeader"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource ExtensionSettings.DescriptionGridColumn}" />
+
+        <DataTemplate x:Key="GridCheckColumnTemplate">
+            <CheckBox
+                Name="PART_Editor"
+                IsEnabled="{Binding Items[0].AllowChangeEnabled}"
+                IsChecked="{Binding Items[0].IsEnabled, UpdateSourceTrigger=PropertyChanged}" />
+        </DataTemplate>
+        
+        <CollectionViewSource
+            x:Key="GroupExtensions"
+            Source="{Binding Extensions}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Category" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+    </Page.Resources>
+
+    <DataGrid
+        AutoGenerateColumns="False"
+        CanUserSortColumns="False"
+        CanUserReorderColumns="False"
+        ItemsSource="{Binding Source={StaticResource GroupExtensions}}">
+
+        <DataGrid.GroupStyle>
+            <GroupStyle>
+                <GroupStyle.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Margin="10"
+                            FontWeight="Bold">
+                            <Run Text="{DynamicResource ExtensionSettings.CategoryGridColumn}" />
+                            <Run Text=": " />
+                            <Run Text="{Binding Items[0].Category}" />
+                        </TextBlock>
+                    </DataTemplate>
+                </GroupStyle.HeaderTemplate>
+            </GroupStyle>
+        </DataGrid.GroupStyle>
+
+        <DataGrid.Columns>
+            <DataGridTemplateColumn
+                Width="43"
+                MinWidth="43"
+                MaxWidth="43"
+                CellTemplate="{StaticResource GridCheckColumnTemplate}" />
+
+            <DataGridTextColumn
+                Binding="{Binding Name}"
+                Header="{StaticResource NameColumnHeader}" />
+
+            <DataGridTextColumn
+                Binding="{Binding Description}"
+                Header="{StaticResource DescriptionColumnHeader}" />
+        </DataGrid.Columns>
+    </DataGrid>
+</core:WpfUIPlatformPage>

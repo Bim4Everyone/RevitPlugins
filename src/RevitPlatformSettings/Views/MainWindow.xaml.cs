@@ -2,9 +2,12 @@
 
 using dosymep.SimpleServices;
 
+using Wpf.Ui.Abstractions;
+
 namespace RevitPlatformSettings.Views {
     public partial class MainWindow {
         public MainWindow(
+            INavigationViewPageProvider navigationViewPageProvider,
             ILoggerService loggerService,
             ISerializationService serializationService,
             ILanguageService languageService, ILocalizationService localizationService,
@@ -14,6 +17,7 @@ namespace RevitPlatformSettings.Views {
                 languageService, localizationService,
                 uiThemeService, themeUpdaterService) {
             InitializeComponent();
+            _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
         }
         
         public override string PluginName => nameof(RevitPlatformSettings);

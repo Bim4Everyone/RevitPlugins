@@ -21,6 +21,9 @@ using RevitPlatformSettings.Services;
 using RevitPlatformSettings.ViewModels;
 using RevitPlatformSettings.ViewModels.Settings;
 using RevitPlatformSettings.Views;
+using RevitPlatformSettings.Views.Pages;
+
+using Wpf.Ui.Abstractions;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
@@ -69,24 +72,64 @@ namespace RevitPlatformSettings {
                 kernel.Bind<ISettingsViewModelFactory>()
                     .To<SettingsViewModelFactory>();
 
-                kernel.Bind<SettingsViewModel>().ToSelf();
-                kernel.Bind<GeneralSettingsViewModel>().ToSelf();
-                kernel.Bind<ExtensionsSettingsViewModel>().ToSelf();
-                kernel.Bind<RevitParamsSettingsViewModel>().ToSelf();
-                kernel.Bind<AboutSettingsViewModel>().ToSelf();
+                kernel.Bind<SettingsPage>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<SettingsViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                kernel.Bind<GeneralSettingsPage>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<GeneralSettingsViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                kernel.Bind<ExtensionsSettingsPage>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ExtensionsSettingsViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                kernel.Bind<RevitParamsSettingsPage>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<RevitParamsSettingsViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
                 
+                kernel.Bind<TelemetrySettingsPage>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<TelemetrySettingsViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                kernel.Bind<AboutSettingsPage>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<AboutSettingsViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                kernel.Bind<INavigationViewPageProvider>()
+                    .To<NavigationViewPageProvider>()
+                    .InSingletonScope();
+
                 // Используем сервис обновления тем для WinUI
                 kernel.UseWpfUIThemeUpdater();
 
                 kernel.Bind<OpenSourceWindow>().ToSelf();
                 kernel.BindMainWindow<MainViewModel, MainWindow>();
-                
+
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
                 kernel.UseWpfLocalization(
-                    $"/{assemblyName};component/Localization/Language.xaml",
+                    $"/{assemblyName};component/assets/localization/language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
-                
+
                 return kernel.Get<MainWindow>().ShowDialog();
             }
         }

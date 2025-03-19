@@ -9,6 +9,7 @@
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:pages="clr-namespace:RevitPlatformSettings.Views.Pages"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -19,19 +20,6 @@
     x:Name="_this"
     d:DataContext="{d:DesignInstance viewModels:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../ViewTemplates/SettingsViewTemplate.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/GeneralSettingsViewTemplate.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/ExtensionSettingsViewTemplate.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/RevitParamsSettingsViewTemplate.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/TelemetrySettingsViewTemplate.xaml" />
-                <ResourceDictionary Source="../ViewTemplates/AboutSettingsViewTemplate.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
-
     <b:Interaction.Triggers>
         <b:EventTrigger
             EventName="Loaded">
@@ -41,12 +29,6 @@
     </b:Interaction.Triggers>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="5" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -55,38 +37,48 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <TreeView
-            x:Name="_settings"
+        <ui:NavigationView
             Grid.Row="1"
-            Grid.Column="0"
-            ItemsSource="{Binding Settings}">
+            Header="{me:LocalizationSource SettingsNode.Title}"
+            x:Name="_rootNavigationView">
 
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Settings}">
-                    <TextBlock Text="{Binding SettingsName}" />
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
+            <ui:NavigationView.MenuItemsSource>
+                <x:Array Type="{x:Type ui:NavigationViewItem}">
+                    <ui:NavigationViewItem
+                        Content="{me:LocalizationSource GeneralSettings.Title}"
+                        Icon="{ui:SymbolIcon Settings16}"
+                        TargetPageType="{x:Type pages:GeneralSettingsPage}" />
 
-        </TreeView>
+                    <ui:NavigationViewItem
+                        Content="{me:LocalizationSource ExtensionSettings.Title}"
+                        Icon="{ui:SymbolIcon Settings16}"
+                        TargetPageType="{x:Type pages:ExtensionsSettingsPage}" />
 
-        <GridSplitter
-            Grid.Row="1"
-            Grid.Column="1"
-            HorizontalAlignment="Stretch" />
+                    <ui:NavigationViewItem
+                        Content="{me:LocalizationSource RevitParamsSettings.Title}"
+                        Icon="{ui:SymbolIcon Settings16}"
+                        TargetPageType="{x:Type pages:RevitParamsSettingsPage}" />
 
-        <ContentControl
-            Grid.Row="1"
-            Grid.Column="2"
-            Content="{Binding SelectedItem, ElementName=_settings}" />
+                    <ui:NavigationViewItem
+                        Content="{me:LocalizationSource TelemetrySettings.Title}"
+                        Icon="{ui:SymbolIcon Settings16}"
+                        TargetPageType="{x:Type pages:TelemetrySettingsPage}" />
+                </x:Array>
+            </ui:NavigationView.MenuItemsSource>
+
+            <ui:NavigationView.FooterMenuItemsSource>
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource AboutSettings.Title}"
+                    Icon="{ui:SymbolIcon Info16}"
+                    TargetPageType="{x:Type pages:AboutSettingsPage}" />
+            </ui:NavigationView.FooterMenuItemsSource>
+
+        </ui:NavigationView>
 
         <StackPanel
             Grid.Row="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 

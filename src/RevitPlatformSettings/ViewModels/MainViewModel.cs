@@ -8,6 +8,8 @@ using dosymep.WPF.ViewModels;
 using RevitPlatformSettings.Factories;
 using RevitPlatformSettings.ViewModels.Settings;
 
+using Wpf.Ui.Controls;
+
 namespace RevitPlatformSettings.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly ILocalizationService _localizationService;
@@ -63,7 +65,6 @@ namespace RevitPlatformSettings.ViewModels {
             };
 
             Settings = new ObservableCollection<SettingsViewModel>() {root};
-            //Setting = Settings[1];
         }
 
         private void ApplyView() {
