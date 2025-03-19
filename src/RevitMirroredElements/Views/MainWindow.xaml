@@ -20,9 +20,9 @@
     MinWidth="350"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <core:WpfUIPlatformWindow.Resources>
+    <Window.Resources>
         <conv:EnumToBoolConverter x:Key="EnumToBoolConverter" />
-    </core:WpfUIPlatformWindow.Resources>
+    </Window.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -53,6 +53,7 @@
                 VerticalAlignment="Center"
                 GroupName="GroupType"
                 Content="{Binding SelectedElementsText}"
+                ToolTip="{me:LocalizationSource MainWindow.CheckMirrorSelectedElements}"
                 IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedElements}" />
 
                     <Button
@@ -72,11 +73,13 @@
                     </Grid.ColumnDefinitions>
 
                     <RadioButton
-                Grid.Column="0"
-                VerticalAlignment="Center"
-                GroupName="GroupType"
-                Content="{Binding SelectedCategoriesText}"
-                IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedCategories}" />
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        GroupName="GroupType"
+                        Content="{Binding SelectedCategoriesText}"
+                        ToolTip="{Binding SelectedCategoriesNameText}"
+                        IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedCategories}" />
+
 
                     <Button
                 Width="80"
@@ -90,15 +93,17 @@
                 <StackPanel Orientation="Horizontal" Margin="20,10,0,0">
                     <StackPanel>
                         <RadioButton
-                    Content="{me:LocalizationSource MainWindow.ActiveView}" 
                     GroupName="ElementScope"
                     Margin="0,0,0,5"
+                    Content="{me:LocalizationSource MainWindow.ActiveView}"
+                    ToolTip="{Binding ActiveViewText}"
                     IsEnabled="{Binding IsCategoriesSelected}"
                     IsChecked="{Binding SelectedElementScope, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ActiveView}" />
 
                         <RadioButton
-                    Content="{me:LocalizationSource MainWindow.WholeProject}"
                     GroupName="ElementScope"
+                    Content="{me:LocalizationSource MainWindow.WholeProject}"
+                    ToolTip="{Binding WholeProjectText}"
                     IsEnabled="{Binding IsCategoriesSelected}"
                     IsChecked="{Binding SelectedElementScope, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=WholeProject}" />
                     </StackPanel>

@@ -15,18 +15,22 @@
     <system:String x:Key="MainWindow.PluginDescription">Плагин заполняет параметр 'ФОП_Зеркальность'
 '0' - элемент без изменений
 '1' - элемент отзеркален</system:String>
+    <system:String x:Key="MainWindow.CheckMirrorCategories">Проверить на зеркальность следующие категории элементов</system:String>
+    <system:String x:Key="MainWindow.ProgressTitleFormat">Заполнение</system:String>
+    <system:String x:Key="MainWindow.SelectedElements">Выбранные элементы</system:String>
+    <system:String x:Key="MainWindow.SelectedCategories">Выбранные категории</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFilter">Необходимо выбрать фильтр</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectElements">Необходимо выбрать элементы</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectCategories">Необходимо выбрать категории</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectScope">Необходимо выбрать область</system:String>
+    <system:String x:Key="MainWindow.CheckMirrorSelectedElements">Проверить на зеркальность выбранные элементы на виде</system:String>
+    <system:String x:Key="MainWindow.SelectCategoriesHint">Необходимо нажать кнопку "Выбор" для выбора категорий</system:String>
+    <system:String x:Key="MainWindow.CheckMirrorCategoriesElements">Проверить на зеркальности элементы у выбранных категорий</system:String>
     <system:String x:Key="Transaction.SetParam">Заполнение параметров зеркальности</system:String>
     <system:String x:Key="Transaction.SettingTemporaryView">Настройка временного вида для зеркальности</system:String>
     <system:String x:Key="RevitRepository.MirrorFilterName">Проверка зеркальности</system:String>
     <system:String x:Key="RevitRepository.Parameter">Параметр</system:String>
     <system:String x:Key="RevitRepository.NotFound">не найден.</system:String>
-    <system:String x:Key="MainViewModel.ProgressTitleFormat">Заполнение</system:String>
-    <system:String x:Key="MainViewModel.SelectedElements">Выбранные элементы</system:String>
-    <system:String x:Key="MainViewModel.SelectedCategories">Выбранные категории</system:String>
-    <system:String x:Key="MainViewModel.ErrorSelectFilter">Необходимо выбрать фильтр</system:String>
-    <system:String x:Key="MainViewModel.ErrorSelectElements">Необходимо выбрать элементы</system:String>
-    <system:String x:Key="MainViewModel.ErrorSelectCategories">Необходимо выбрать категории</system:String>
-    <system:String x:Key="MainViewModel.ErrorSelectScope">Необходимо выбрать область</system:String>
     <system:String x:Key="CategoryWindow.EnterToSearch">Введите для поиска...</system:String>
     <system:String x:Key="CategoryWindow.Title">Выбор категорий</system:String>
     <system:String x:Key="CategoryWindow.Category">Категория</system:String>

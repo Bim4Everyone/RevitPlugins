@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -14,8 +15,11 @@ using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
+using Ninject.Activation;
 
+using RevitMirroredElements.Interfaces;
 using RevitMirroredElements.Models;
+using RevitMirroredElements.Services;
 using RevitMirroredElements.ViewModels;
 using RevitMirroredElements.Views;
 
@@ -45,11 +49,16 @@ namespace RevitMirroredElements {
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig());
 
+                kernel.Bind<ICategorySelectionService>()
+                    .To<CategorySelectionService>()
+                    .InSingletonScope()
+                    .WithConstructorArgument<Func<CategoriesWindow>>(ctx => () => ctx.Kernel.Get<CategoriesWindow>());
+
                 // Используем сервис обновления тем для WinUI
                 kernel.UseWpfUIThemeUpdater();
 
                 kernel.BindMainWindow<MainViewModel, MainWindow>();
-                kernel.BindOtherWindow<CategoriesViewModel, CategoriesWindow>(); 
+                kernel.BindOtherWindow<CategoriesViewModel, CategoriesWindow>();
 
                 // Настройка локализации,
                 // получение имени сборки откуда брать текст

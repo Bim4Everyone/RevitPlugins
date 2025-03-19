@@ -12,6 +12,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitMirroredElements.Interfaces;
 using RevitMirroredElements.Models;
 using RevitMirroredElements.Views;
 
@@ -20,12 +21,15 @@ namespace RevitMirroredElements.ViewModels {
 
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
-        private readonly CategoriesWindow _categoriesWindow;
+        private readonly ICategorySelectionService _categorySelectionService;
         private readonly ILocalizationService _localizationService;
 
         private string _errorText;
         private string _selectedElementsText;
+        private string _activeViewText;
+        private string _wholeProjectText; 
         private string _selectedCategoriesText;
+        private string _selectedCategoriesNameText;
 
         private bool _enableFilter;
 
@@ -37,13 +41,13 @@ namespace RevitMirroredElements.ViewModels {
 
         public MainViewModel(
             PluginConfig pluginConfig,
-            RevitRepository revitRepository, 
-            CategoriesWindow categoriesWindow,
+            RevitRepository revitRepository,
+            ICategorySelectionService categorySelectionService,
             ILocalizationService localizationService) {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
-            _categoriesWindow = categoriesWindow;
+            _categorySelectionService = categorySelectionService;
             _localizationService = localizationService;
 
             SelectedElementScope = ElementScope.NotSelected;
@@ -66,7 +70,10 @@ namespace RevitMirroredElements.ViewModels {
         }
         public List<Category> SelectedCategories {
             get => _selectedCategories;
-            set => this.RaiseAndSetIfChanged(ref _selectedCategories, value);
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedCategories, value);
+                UpdateSelectedCategoriesText();
+            }
         }
         public List<FamilyInstance> NeedParameterElements {
             get => _needParameterElements;
@@ -80,9 +87,21 @@ namespace RevitMirroredElements.ViewModels {
             get => _selectedElementsText;
             set => this.RaiseAndSetIfChanged(ref _selectedElementsText, value);
         }
+        public string ActiveViewText {
+            get => _activeViewText;
+            set => this.RaiseAndSetIfChanged(ref _activeViewText, value);
+        }
+        public string WholeProjectText {
+            get => _wholeProjectText;
+            set => this.RaiseAndSetIfChanged(ref _wholeProjectText, value);
+        }
         public string SelectedCategoriesText {
             get => _selectedCategoriesText;
             set => this.RaiseAndSetIfChanged(ref _selectedCategoriesText, value);
+        }
+        public string SelectedCategoriesNameText {
+            get => _selectedCategoriesNameText;
+            set => this.RaiseAndSetIfChanged(ref _selectedCategoriesNameText, value);
         }
         public bool EnableFilter {
             get => _enableFilter;
@@ -127,7 +146,7 @@ namespace RevitMirroredElements.ViewModels {
 
         private IProgressDialogService CreateProgressDialog(List<FamilyInstance> elements) {
             var window = GetPlatformService<IProgressDialogService>();
-            var progressTitleText = _localizationService.GetLocalizedString("MainViewModel.ProgressTitleFormat");
+            var progressTitleText = _localizationService.GetLocalizedString("MainWindow.ProgressTitleFormat");
             window.DisplayTitleFormat = $"{progressTitleText} [{{0}}\\{{1}}]";
             window.MaxValue = elements.Count;
             window.StepValue = 10;
@@ -143,7 +162,7 @@ namespace RevitMirroredElements.ViewModels {
             mainWindow.Hide();
             try {
                 _selectedElements = _revitRepository.SelectElementsOnView();
-                var selectedElementsText = _localizationService.GetLocalizedString("MainViewModel.SelectedElements");
+                var selectedElementsText = _localizationService.GetLocalizedString("MainWindow.SelectedElements");
                 SelectedElementsText = $"{selectedElementsText} ({_selectedElements?.Count ?? 0})";
             } finally {
                 mainWindow.ShowDialog();
@@ -151,21 +170,35 @@ namespace RevitMirroredElements.ViewModels {
         }
 
         private void SelectCategories() {
-            var categoriesViewWindow = new CategoriesViewModel(_revitRepository, SelectedCategories);
-            _categoriesWindow.DataContext = categoriesViewWindow;
-            if(_categoriesWindow.ShowDialog() == true) {
-                SelectedCategories = categoriesViewWindow.GetSelectedCategories();
-                var selectedCategoriesText = _localizationService.GetLocalizedString("MainViewModel.SelectedCategories");
-                SelectedCategoriesText = $"{selectedCategoriesText} ({SelectedCategories?.Count ?? 0})";
+            SelectedCategories = _categorySelectionService.SelectCategories();
+            var selectedCategoriesText = _localizationService.GetLocalizedString("MainWindow.SelectedCategories");
+            SelectedCategoriesText = $"{selectedCategoriesText} ({SelectedCategories?.Count ?? 0})";
+        }
+
+        private void UpdateSelectedCategoriesText() {
+            var selectedCategoriesText = _localizationService.GetLocalizedString("MainWindow.CheckMirrorCategories");
+            if(SelectedCategories == null || SelectedCategories.Count == 0) {
+                SelectedCategoriesNameText = $"{selectedCategoriesText}:\n ";
+                return;
             }
+
+            string categoriesNames = string.Join("\n• ", SelectedCategories.Select(c => c.Name));
+
+            SelectedCategoriesNameText = $"{selectedCategoriesText}:\n• {categoriesNames}";
         }
 
         private void LoadView() {
             LoadConfig();
             _revitRepository.UpdateParams();
             _selectedElements = _revitRepository.GetSelectedElements();
-            var selectedElementsText = _localizationService.GetLocalizedString("MainViewModel.SelectedElements");
-            var selectedCategoriesText = _localizationService.GetLocalizedString("MainViewModel.SelectedCategories");
+            var selectedElementsText = _localizationService.GetLocalizedString("MainWindow.SelectedElements");
+            var selectedCategoriesText = _localizationService.GetLocalizedString("MainWindow.SelectedCategories");
+            var activeViewText = _localizationService.GetLocalizedString("MainWindow.ActiveView");
+            var wholeProjectText = _localizationService.GetLocalizedString("MainWindow.WholeProject");
+            var checkMirrorCategoriesElements = _localizationService.GetLocalizedString("MainWindow.CheckMirrorCategoriesElements");
+
+            ActiveViewText = $"{checkMirrorCategoriesElements} {activeViewText.ToLower()}";
+            WholeProjectText = $"{checkMirrorCategoriesElements} {wholeProjectText.ToLower()}";
             SelectedElementsText = $"{selectedElementsText} ({_selectedElements?.Count ?? 0})";
             SelectedCategoriesText = $"{selectedCategoriesText} ({SelectedCategories?.Count ?? 0})";
         }
@@ -196,19 +229,19 @@ namespace RevitMirroredElements.ViewModels {
 
         private bool CanAcceptView() {
             if(SelectedGroupType == ElementGroupType.NotSelected) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorSelectFilter");
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectFilter");
                 return false;
             }
             if(SelectedGroupType == ElementGroupType.SelectedElements && SelectedElements.Count == 0) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorSelectElements");
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectElements");
                 return false;
             }
-            if(SelectedGroupType == ElementGroupType.SelectedCategories && SelectedCategories == null) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorSelectCategories");
+            if(SelectedGroupType == ElementGroupType.SelectedCategories && (SelectedCategories == null || SelectedCategories.Count == 0)) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectCategories");
                 return false;
             }
             if(SelectedGroupType == ElementGroupType.SelectedCategories && SelectedElementScope == ElementScope.NotSelected) {
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorSelectScope");
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectScope");
                 return false;
             }
             ErrorText = null;
