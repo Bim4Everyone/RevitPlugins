@@ -34,7 +34,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Width = _openingTask.DisplayWidth;
             Status = _openingTask.Status.GetDescription();
             Comment = _openingTask.Comment;
-            Host = _openingTask.Host is null ? new OpeningTaskHost() : new OpeningTaskHost(_openingTask.Host);
+            Host = _openingTask.Host is null ? new OpeningKrHost() : new OpeningKrHost(_openingTask.Host);
         }
 
 
@@ -67,7 +67,23 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// </summary>
         public string Comment { get; } = string.Empty;
 
-        public IOpeningTaskHost Host { get; }
+        public IOpeningKrHost Host { get; }
+
+        public string Thickness => string.Empty;
+
+        public string CenterOffset => string.Empty;
+
+        public string BottomOffset => string.Empty;
+
+        public string MepSystem => string.Empty;
+
+        public string Username => string.Empty;
+
+        public string FamilyShortName => string.Empty;
+
+        public string Description => string.Empty;
+
+        public string Date => string.Empty;
 
         public override bool Equals(object obj) {
             return (obj != null)

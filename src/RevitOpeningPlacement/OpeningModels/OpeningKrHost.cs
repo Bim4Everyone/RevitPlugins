@@ -10,22 +10,27 @@ using RevitClashDetective.Models.Clashes;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.OpeningModels {
-    internal class OpeningTaskHost : IOpeningTaskHost, ISelectorAndHighlighter, IEquatable<OpeningTaskHost> {
+    internal class OpeningKrHost : IOpeningKrHost, ISelectorAndHighlighter, IEquatable<OpeningKrHost> {
         private const string _krModelPartParam = "обр_ФОП_Раздел проекта";
         private readonly Element _element;
 
-        public OpeningTaskHost(Element element) {
-            _element = element ?? throw new ArgumentNullException(nameof(element));
+        /// <summary>
+        /// Создает экземпляр класса хоста на основе заданного элемента
+        /// </summary>
+        /// <param name="host">Элемент - хост</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        public OpeningKrHost(Element host) {
+            _element = host ?? throw new ArgumentNullException(nameof(host));
 
-            Name = element.Name;
-            Id = element.Id;
-            KrModelPart = element.GetSharedParamValueOrDefault(_krModelPartParam, string.Empty);
+            Name = host.Name;
+            Id = host.Id;
+            KrModelPart = host.GetSharedParamValueOrDefault(_krModelPartParam, string.Empty);
         }
 
         /// <summary>
         /// Создает экземпляр класса с пустыми значениями свойств
         /// </summary>
-        public OpeningTaskHost() {
+        public OpeningKrHost() {
             Name = string.Empty;
             Id = ElementId.InvalidElementId;
             KrModelPart = string.Empty;
@@ -39,10 +44,10 @@ namespace RevitOpeningPlacement.OpeningModels {
         public string KrModelPart { get; }
 
         public override bool Equals(object obj) {
-            return Equals(obj as OpeningTaskHost);
+            return Equals(obj as OpeningKrHost);
         }
 
-        public bool Equals(OpeningTaskHost other) {
+        public bool Equals(OpeningKrHost other) {
             if(ReferenceEquals(other, null)) {
                 return false;
             }
