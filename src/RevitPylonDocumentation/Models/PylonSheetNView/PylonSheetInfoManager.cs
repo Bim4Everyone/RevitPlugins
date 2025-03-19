@@ -302,7 +302,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
                         .TryCreateTransverseRebarViewFirstDimensions();
                     SheetInfo.TransverseRebarViewFirst.ViewMarkCreator
-                        .TryCreateTransverseRebarViewMarks();
+                        .TryCreateTransverseRebarMarks();
                 }
             }
 
@@ -313,7 +313,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.TransverseRebarViewSecond.ViewDimensionCreator
                         .TryCreateTransverseRebarViewSecondDimensions();
                     SheetInfo.TransverseRebarViewSecond.ViewMarkCreator
-                        .TryCreateTransverseRebarViewMarks();
+                        .TryCreateTransverseRebarMarks();
                 }
             }
 
