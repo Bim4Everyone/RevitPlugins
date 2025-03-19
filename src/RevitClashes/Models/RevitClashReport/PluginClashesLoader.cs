@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 using Autodesk.Revit.DB;
 
@@ -19,12 +20,14 @@ namespace RevitClashDetective.Models.RevitClashReport {
 
         public string FilePath { get; }
 
-        public IEnumerable<ClashModel> GetClashes() {
+        public IEnumerable<ReportModel> GetReports() {
             try {
                 var configLoader = new ConfigLoader(_document);
-                return configLoader.Load<ClashesConfig>(FilePath).Clashes;
+                var clashes = configLoader.Load<ClashesConfig>(FilePath).Clashes;
+                var name = Path.GetFileNameWithoutExtension(FilePath);
+                return new ReportModel[] { new ReportModel(name, clashes) };
             } catch(pyRevitLabs.Json.JsonSerializationException) {
-                throw new ArgumentException("Неверный файл конфигурации.");
+                throw new ArgumentException("РќРµРІРµСЂРЅС‹Р№ С„Р°Р№Р» РєРѕРЅС„РёРіСѓСЂР°С†РёРё.");
             }
 
         }
