@@ -6,8 +6,8 @@ using dosymep.Revit;
 
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
-namespace RevitPylonDocumentation.Models {
-    internal class TransverseRebarBarMarksService {
+namespace RevitPylonDocumentation.Models.RebarMarksServices {
+    internal class TransverseRebarViewBarMarksService {
         private readonly string _commentParamName = "Комментарии";
 
         private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
@@ -15,7 +15,7 @@ namespace RevitPylonDocumentation.Models {
         private readonly FamilySymbol _tagSymbol;
         private readonly FamilySymbol _gostTagSymbol;
 
-        public TransverseRebarBarMarksService(PylonView pylonView, RevitRepository revitRepository) {
+        public TransverseRebarViewBarMarksService(PylonView pylonView, RevitRepository revitRepository) {
             _viewPointsAnalyzer = new ViewPointsAnalyzer(pylonView);
             _annotationService = new AnnotationService(pylonView);
 
@@ -27,7 +27,7 @@ namespace RevitPylonDocumentation.Models {
 
 
 
-        public void CreateLeftBottomMarks(List<Element> simpleRebars, bool hasLRebar) {
+        public void CreateLeftBottomMark(List<Element> simpleRebars, bool hasLRebar) {
             // Получаем референс-элемент
             Element leftBottomElement = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom, false);
 
@@ -48,7 +48,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public void CreateLeftTopMarks(List<Element> simpleRebars) {
+        public void CreateLeftTopMark(List<Element> simpleRebars) {
             // Получаем референс-элемент
             Element leftTopElement = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftTop, false);
 
@@ -63,7 +63,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public void CreateRightBottomMarks(List<Element> simpleRebars) {
+        public void CreateRightBottomMark(List<Element> simpleRebars) {
             // Получаем референс-элемент
             Element rightBottomElement = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.RightBottom, false);
 

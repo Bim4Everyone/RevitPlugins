@@ -117,8 +117,8 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public XYZ GetPointByDirection(Element element, DirectionType cornerType,
-                                       double xOffsetCoef, double yOffsetCoef, bool getByBoundingBox) {
+        private (XYZ xOffset, XYZ yOffset) GetOffsetsByDirection(DirectionType cornerType,
+                                                                 double xOffsetCoef, double yOffsetCoef) {
             var view = _viewOfPylon.ViewElement;
             XYZ xOffset = default;
             XYZ yOffset = default;
@@ -162,16 +162,34 @@ namespace RevitPylonDocumentation.Models {
             }
             xOffset = xOffset.Multiply(xOffsetCoef);
             yOffset = yOffset.Multiply(yOffsetCoef);
+            return (xOffset, yOffset);
+        }
+
+
+
+        public XYZ GetPointByDirection(Element element, DirectionType directionType,
+                                       double xOffsetCoef, double yOffsetCoef, bool getByBoundingBox) {
+            var offsets = GetOffsetsByDirection(directionType, xOffsetCoef, yOffsetCoef);
+            var xOffset = offsets.xOffset;
+            var yOffset = offsets.yOffset;
 
             // Получаем точку для размещения марки
             if(getByBoundingBox) {
-                BoundingBoxXYZ boundingBox = element.get_BoundingBox(view);
+                BoundingBoxXYZ boundingBox = element.get_BoundingBox(_viewOfPylon.ViewElement);
                 var midleOfBoundingBox = (boundingBox.Max + boundingBox.Min) / 2;
                 return midleOfBoundingBox + xOffset + yOffset;
             } else {
                 XYZ elementPoint = (element.Location as LocationPoint).Point;
                 return elementPoint + xOffset + yOffset;
             }
+        }
+
+        public XYZ GetPointByDirection(XYZ point, DirectionType directionType, int xOffsetCoef, double yOffsetCoef) {
+            var offsets = GetOffsetsByDirection(directionType, xOffsetCoef, yOffsetCoef);
+            var xOffset = offsets.xOffset;
+            var yOffset = offsets.yOffset;
+
+            return point + xOffset + yOffset;
         }
     }
 }

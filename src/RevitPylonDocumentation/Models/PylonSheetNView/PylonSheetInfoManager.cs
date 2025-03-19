@@ -254,6 +254,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 if(SheetInfo.TransverseViewFirst.ViewElement != null) {
                     SheetInfo.TransverseViewFirst.ViewDimensionCreator
                         .TryCreateTransverseViewFirstDimensions();
+                    SheetInfo.TransverseViewFirst.ViewMarkCreator
+                        .TryCreateTransverseViewMarks();
                 }
             }
 
@@ -302,7 +304,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
                         .TryCreateTransverseRebarViewFirstDimensions();
                     SheetInfo.TransverseRebarViewFirst.ViewMarkCreator
-                        .TryCreateTransverseRebarMarks();
+                        .TryCreateTransverseRebarViewMarks();
                 }
             }
 
@@ -313,7 +315,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     SheetInfo.TransverseRebarViewSecond.ViewDimensionCreator
                         .TryCreateTransverseRebarViewSecondDimensions();
                     SheetInfo.TransverseRebarViewSecond.ViewMarkCreator
-                        .TryCreateTransverseRebarMarks();
+                        .TryCreateTransverseRebarViewMarks();
                 }
             }
 

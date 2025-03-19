@@ -2,6 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
+using RevitPylonDocumentation.Models.RebarMarksServices;
 using RevitPylonDocumentation.ViewModels;
 
 using View = Autodesk.Revit.DB.View;
@@ -13,6 +14,9 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         private readonly int _formNumberForSkeletonPlatesMax = 2999;
         private readonly int _formNumberForSkeletonPlatesMin = 2001;
 
+        private readonly int _formNumberForClampsMax = 1599;
+        private readonly int _formNumberForClampsMin = 1500;
+
         private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
         private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
 
@@ -21,8 +25,9 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         private readonly AnnotationService _annotationService;
         private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
 
-        private readonly TransverseRebarBarMarksService _transverseRebarBarMarksService;
-        private readonly TransverseRebarPlateMarksService _transverseRebarPlateMarksService;
+        private readonly TransverseRebarViewBarMarksService _transverseRebarViewBarMarksService;
+        private readonly TransverseRebarViewPlateMarksService _transverseRebarViewPlateMarksService;
+        private readonly TransverseViewBarMarksService _transverseViewBarMarksService;
         private readonly FamilySymbol _tagSymbol;
         private readonly FamilySymbol _gostTagSymbol;
 
@@ -38,8 +43,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             _annotationService = new AnnotationService(ViewOfPylon);
             _viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
 
-            _transverseRebarBarMarksService = new TransverseRebarBarMarksService(ViewOfPylon, Repository);
-            _transverseRebarPlateMarksService = new TransverseRebarPlateMarksService(ViewOfPylon, Repository);
+            _transverseViewBarMarksService = new TransverseViewBarMarksService(ViewOfPylon, Repository);
+
+            _transverseRebarViewBarMarksService = new TransverseRebarViewBarMarksService(ViewOfPylon, Repository);
+            _transverseRebarViewPlateMarksService = new TransverseRebarViewPlateMarksService(ViewOfPylon, Repository);
 
             // Находим типоразмер марки несущей арматуры
             _tagSymbol = Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10");
@@ -53,17 +60,36 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         internal PylonView ViewOfPylon { get; set; }
 
 
-        public void TryCreateTransverseRebarMarks() {
+        public void TryCreateTransverseViewMarks() {
             View view = ViewOfPylon.ViewElement;
             try {
-                CreateTransverseBarMarks(view);
+                CreateTransverseViewBarMarks(view);
+            } catch(Exception) { }
+        }
+
+        private void CreateTransverseViewBarMarks(View view) {
+            var simpleClamps = _rebarFinder.GetSimpleRebars(view, _formNumberForClampsMin, _formNumberForClampsMax);
+            var simpleRebars = _rebarFinder.GetSimpleRebars(view, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax);
+
+            _transverseViewBarMarksService.CreateLeftTopMarks(simpleClamps, simpleRebars);
+
+        }
+
+
+
+
+
+        public void TryCreateTransverseRebarViewMarks() {
+            View view = ViewOfPylon.ViewElement;
+            try {
+                CreateTransverseRebarViewBarMarks(view);
                 CreatePlateMarks(view);
             } catch(Exception) { }
         }
 
 
 
-        private void CreateTransverseBarMarks(View view) {
+        private void CreateTransverseRebarViewBarMarks(View view) {
             var skeletonRebar = _rebarFinder.GetSkeletonRebar(view);
             var simpleRebars = _rebarFinder.GetSimpleRebars(view, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax);
 
@@ -73,16 +99,16 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             if(firstLRebarParamValue || secondLRebarParamValue) {
                 // ЛЕВЫЙ НИЖНИЙ УГОЛ
-                _transverseRebarBarMarksService.CreateLeftBottomMarks(simpleRebars, true);
+                _transverseRebarViewBarMarksService.CreateLeftBottomMark(simpleRebars, true);
 
                 // ЛЕВЫЙ ВЕРХНИЙ УГОЛ
-                _transverseRebarBarMarksService.CreateLeftTopMarks(simpleRebars);
+                _transverseRebarViewBarMarksService.CreateLeftTopMark(simpleRebars);
             } else {
                 // ЛЕВЫЙ НИЖНИЙ УГОЛ
-                _transverseRebarBarMarksService.CreateLeftBottomMarks(simpleRebars, false);
+                _transverseRebarViewBarMarksService.CreateLeftBottomMark(simpleRebars, false);
             }
             // ПРАВЫЙ НИЖНИЙ УГОЛ
-            _transverseRebarBarMarksService.CreateRightBottomMarks(simpleRebars);
+            _transverseRebarViewBarMarksService.CreateRightBottomMark(simpleRebars);
         }
 
 
@@ -91,13 +117,13 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             if(simplePlates.Count == 0) {
                 return;
             }
-            _transverseRebarPlateMarksService.CreateTransversePlateTopMarks(simplePlates);
+            _transverseRebarViewPlateMarksService.CreateTransversePlateTopMark(simplePlates);
 
-            _transverseRebarPlateMarksService.CreateTransversePlateBottomMarks(simplePlates);
+            _transverseRebarViewPlateMarksService.CreateTransversePlateBottomMark(simplePlates);
 
-            _transverseRebarPlateMarksService.CreateTransversePlateLeftMarks(simplePlates);
+            _transverseRebarViewPlateMarksService.CreateTransversePlateLeftMark(simplePlates);
 
-            _transverseRebarPlateMarksService.CreateTransversePlateRightMarks(simplePlates);
+            _transverseRebarViewPlateMarksService.CreateTransversePlateRightMark(simplePlates);
         }
     }
 }

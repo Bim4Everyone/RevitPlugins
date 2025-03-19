@@ -4,13 +4,13 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
-namespace RevitPylonDocumentation.Models {
-    internal class TransverseRebarPlateMarksService {
+namespace RevitPylonDocumentation.Models.RebarMarksServices {
+    internal class TransverseRebarViewPlateMarksService {
         private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
         private readonly AnnotationService _annotationService;
         private readonly FamilySymbol _tagSymbol;
 
-        public TransverseRebarPlateMarksService(PylonView pylonView, RevitRepository revitRepository) {
+        public TransverseRebarViewPlateMarksService(PylonView pylonView, RevitRepository revitRepository) {
             _viewPointsAnalyzer = new ViewPointsAnalyzer(pylonView);
             _annotationService = new AnnotationService(pylonView);
 
@@ -20,7 +20,7 @@ namespace RevitPylonDocumentation.Models {
 
 
 
-        public void CreateTransversePlateTopMarks(List<Element> simplePlates) {
+        public void CreateTransversePlateTopMark(List<Element> simplePlates) {
 
             // Получаем референс-элемент
             Element topPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Top, true);
@@ -39,7 +39,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public void CreateTransversePlateBottomMarks(List<Element> simplePlates) {
+        public void CreateTransversePlateBottomMark(List<Element> simplePlates) {
             // Получаем референс-элемент
             Element bottomPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Bottom, true);
 
@@ -57,7 +57,7 @@ namespace RevitPylonDocumentation.Models {
         }
 
 
-        public void CreateTransversePlateLeftMarks(List<Element> simplePlates) {
+        public void CreateTransversePlateLeftMark(List<Element> simplePlates) {
             // Получаем референс-элемент
             Element leftPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Left, true);
 
@@ -76,7 +76,7 @@ namespace RevitPylonDocumentation.Models {
 
 
 
-        public void CreateTransversePlateRightMarks(List<Element> simplePlates) {
+        public void CreateTransversePlateRightMark(List<Element> simplePlates) {
             // Получаем референс-элемент
             Element rightPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Right, true);
 
