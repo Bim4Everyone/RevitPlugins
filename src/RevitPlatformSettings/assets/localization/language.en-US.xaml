@@ -53,7 +53,7 @@
     <system:String x:Key="RevitParamsSettings.Title">Platform params</system:String>
     <system:String x:Key="RevitParamsSettings.IdGridColumn">Id</system:String>
     <system:String x:Key="RevitParamsSettings.NameGridColumn">Name</system:String>
-    <system:String x:Key="RevitParamsSettings.StorageTypeGridColumn">StorageType</system:String>
+    <system:String x:Key="RevitParamsSettings.StorageTypeGridColumn">Storage type</system:String>
     
     <system:String x:Key="SettingsView.Prompt">Please select settings in left.</system:String>
     
@@ -86,4 +86,17 @@
     
     <system:String x:Key="NotificationPosition.TopRight">Top right</system:String>
     <system:String x:Key="NotificationPosition.BottomRight">Bottom right</system:String>
+    
+    <system:String x:Key="StorageType.None">None</system:String>
+    <system:String x:Key="StorageType.Integer">Integer</system:String>
+    <system:String x:Key="StorageType.Double">Double</system:String>
+    <system:String x:Key="StorageType.String">String</system:String>
+    <system:String x:Key="StorageType.ElementId">ElementId</system:String>
+    
+    <system:String x:Key="LogEventLevel.Verbose">Verbose</system:String>
+    <system:String x:Key="LogEventLevel.Debug">Debug</system:String>
+    <system:String x:Key="LogEventLevel.Information">Information</system:String>
+    <system:String x:Key="LogEventLevel.Warning">Warning</system:String>
+    <system:String x:Key="LogEventLevel.Error">Error</system:String>
+    <system:String x:Key="LogEventLevel.Fatal">Fatal errors</system:String>
 </ResourceDictionary>

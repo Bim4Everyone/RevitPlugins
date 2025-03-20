@@ -6,9 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
-    xmlns:markupExtensions="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:views="clr-namespace:RevitPlatformSettings.Views"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:logs="clr-namespace:Serilog.Events;assembly=Serilog"
 
     x:ClassModifier="internal"
 
@@ -26,12 +27,12 @@
         <GroupBox
             Grid.Row="0"
             Margin="10"
-            Header="{markupExtensions:LocalizationSource TelemetrySettings.LogTrace}">
+            Header="{me:LocalizationSource TelemetrySettings.LogTrace}">
 
             <StackPanel>
 
                 <views:CustomEditControl
-                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceIsActive}">
+                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceIsActive}">
 
                     <CheckBox
                         IsEnabled="False"
@@ -42,20 +43,20 @@
                 </views:CustomEditControl>
 
                 <views:CustomEditControl
-                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
+                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
 
                     <ComboBox
                         IsReadOnly="True"
                         IsEnabled="False"
-                        SelectedIndex="0">
-                        <ComboBoxItem
-                            Content="{Binding LogTraceLogLevel}" />
-                    </ComboBox>
+                        SelectedValuePath="Value"
+                        DisplayMemberPath="DisplayName"
+                        ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
+                        SelectedValue="{Binding LogTraceJournalLogLevel, Mode=OneWay}" />
 
                 </views:CustomEditControl>
 
                 <views:CustomEditControl
-                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceServerName}">
+                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceServerName}">
 
                     <ui:TextBox
                         IsReadOnly="True"
@@ -71,12 +72,12 @@
         <GroupBox
             Grid.Row="1"
             Margin="10"
-            Header="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournal}">
+            Header="{me:LocalizationSource TelemetrySettings.LogTraceJournal}">
 
             <StackPanel>
 
                 <views:CustomEditControl
-                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournalIsActive}">
+                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalIsActive}">
 
                     <CheckBox
                         IsEnabled="False"
@@ -87,7 +88,7 @@
                 </views:CustomEditControl>
 
                 <views:CustomEditControl
-                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
+                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
 
                     <CheckBox
                         IsHitTestVisible="False"
@@ -98,20 +99,20 @@
                 </views:CustomEditControl>
 
                 <views:CustomEditControl
-                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
+                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
 
                     <ComboBox
                         IsReadOnly="True"
                         IsEnabled="False"
-                        SelectedIndex="0">
-                        <ComboBoxItem
-                            Content="{Binding LogTraceJournalLogLevel}" />
-                    </ComboBox>
+                        SelectedValuePath="Value"
+                        DisplayMemberPath="DisplayName"
+                        ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
+                        SelectedValue="{Binding LogTraceJournalLogLevel, Mode=OneWay}" />
 
                 </views:CustomEditControl>
 
                 <views:CustomEditControl
-                    EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
+                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
 
                     <ui:TextBox
                         MaxWidth="300"

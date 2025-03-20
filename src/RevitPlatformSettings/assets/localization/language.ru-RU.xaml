@@ -54,7 +54,7 @@
     <system:String x:Key="RevitParamsSettings.Title">Параметры платформы</system:String>
     <system:String x:Key="RevitParamsSettings.IdGridColumn">Id</system:String>
     <system:String x:Key="RevitParamsSettings.NameGridColumn">Наименование</system:String>
-    <system:String x:Key="RevitParamsSettings.StorageTypeGridColumn">StorageType</system:String>
+    <system:String x:Key="RevitParamsSettings.StorageTypeGridColumn">Тип данных</system:String>
     
     <system:String x:Key="SettingsView.Prompt">Выберите настройки слева в дереве.</system:String>
     
@@ -88,4 +88,17 @@
     
     <system:String x:Key="NotificationPosition.TopRight">Сверху справа</system:String>
     <system:String x:Key="NotificationPosition.BottomRight">Снизу справа</system:String>
+    
+    <system:String x:Key="StorageType.None">Ничего</system:String>
+    <system:String x:Key="StorageType.Integer">Целое</system:String>
+    <system:String x:Key="StorageType.Double">Вещественное</system:String>
+    <system:String x:Key="StorageType.String">Строковое</system:String>
+    <system:String x:Key="StorageType.ElementId">Идентификатор</system:String>
+    
+    <system:String x:Key="LogEventLevel.Verbose">Подробное</system:String>
+    <system:String x:Key="LogEventLevel.Debug">Отладочное</system:String>
+    <system:String x:Key="LogEventLevel.Information">Информационное</system:String>
+    <system:String x:Key="LogEventLevel.Warning">Предупреждающее</system:String>
+    <system:String x:Key="LogEventLevel.Error">Ошибки</system:String>
+    <system:String x:Key="LogEventLevel.Fatal">Фатальные ошибки</system:String>
 </ResourceDictionary>

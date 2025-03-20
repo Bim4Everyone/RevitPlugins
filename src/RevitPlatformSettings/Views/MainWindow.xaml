@@ -41,9 +41,8 @@
 
         <ui:NavigationView
             Grid.Row="1"
-            Header="{me:LocalizationSource SettingsNode.Title}"
             x:Name="_rootNavigationView">
-            
+
             <ui:NavigationView.MenuItemsSource>
                 <x:Array Type="{x:Type ui:NavigationViewItem}">
                     <ui:NavigationViewItem
