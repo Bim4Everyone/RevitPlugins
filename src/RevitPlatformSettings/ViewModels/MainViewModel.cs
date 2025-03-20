@@ -8,23 +8,17 @@ using dosymep.WPF.ViewModels;
 using RevitPlatformSettings.Factories;
 using RevitPlatformSettings.ViewModels.Settings;
 
+using Wpf.Ui.Abstractions.Controls;
 using Wpf.Ui.Controls;
 
 namespace RevitPlatformSettings.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly ILocalizationService _localizationService;
-        private readonly ISettingsViewModelFactory _settingsViewModelFactory;
-
         private string _errorText;
-        private SettingsViewModel _setting;
-        private ObservableCollection<SettingsViewModel> _settings;
+        
+        private ObservableCollection<INavigationViewItem> _navigationViewItems;
+        private ObservableCollection<INavigationViewItem> _footerNavigationViewItems;
 
-        public MainViewModel(
-            ILocalizationService localizationService,
-            ISettingsViewModelFactory settingsViewModelFactory) {
-            _localizationService = localizationService;
-            _settingsViewModelFactory = settingsViewModelFactory;
-
+        public MainViewModel() {
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(ApplyView);
         }
@@ -37,40 +31,24 @@ namespace RevitPlatformSettings.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public SettingsViewModel Setting {
-            get => _setting;
-            set => this.RaiseAndSetIfChanged(ref _setting, value);
+        public ObservableCollection<INavigationViewItem> NavigationViewItems {
+            get => _navigationViewItems;
+            set => _navigationViewItems = value;
         }
 
-        public ObservableCollection<SettingsViewModel> Settings {
-            get => _settings;
-            set => this.RaiseAndSetIfChanged(ref _settings, value);
+        public ObservableCollection<INavigationViewItem> FooterNavigationViewItems {
+            get => _footerNavigationViewItems;
+            set => _footerNavigationViewItems = value;
         }
 
         private void LoadView() {
-            var root = _settingsViewModelFactory.Create<SettingsViewModel>(
-                _localizationService.GetLocalizedString("SettingsNode.Title"));
-
-            root.Settings = new ObservableCollection<SettingsViewModel>() {
-                _settingsViewModelFactory.Create<GeneralSettingsViewModel>(
-                    _localizationService.GetLocalizedString("GeneralSettings.Title")),
-                _settingsViewModelFactory.Create<ExtensionsSettingsViewModel>(
-                    _localizationService.GetLocalizedString("ExtensionSettings.Title")),
-                _settingsViewModelFactory.Create<RevitParamsSettingsViewModel>(
-                    _localizationService.GetLocalizedString("RevitParamsSettings.Title")),
-                _settingsViewModelFactory.Create<TelemetrySettingsViewModel>(
-                    _localizationService.GetLocalizedString("TelemetrySettings.Title")),
-                _settingsViewModelFactory.Create<AboutSettingsViewModel>(
-                    _localizationService.GetLocalizedString("AboutSettings.Title")),
-            };
-
-            Settings = new ObservableCollection<SettingsViewModel>() {root};
+            
         }
 
         private void ApplyView() {
-            foreach(SettingsViewModel settingsViewModel in Settings) {
-                settingsViewModel.SaveSettings();
-            }
+            // foreach(SettingsViewModel settingsViewModel in Settings) {
+            //     settingsViewModel.SaveSettings();
+            // }
         }
     }
 }

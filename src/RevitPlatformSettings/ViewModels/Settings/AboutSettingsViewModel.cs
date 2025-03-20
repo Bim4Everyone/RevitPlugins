@@ -16,11 +16,9 @@ namespace RevitPlatformSettings.ViewModels.Settings {
         private readonly IPlatformSettingsService _platformSettingsService;
 
         public AboutSettingsViewModel(
-            string settingsName,
             IResolutionRoot resolutionRoot,
             ILocalizationService localizationService,
-            IPlatformSettingsService platformSettingsService)
-            : base(settingsName) {
+            IPlatformSettingsService platformSettingsService) {
             
             _resolutionRoot = resolutionRoot;
             _localizationService = localizationService;

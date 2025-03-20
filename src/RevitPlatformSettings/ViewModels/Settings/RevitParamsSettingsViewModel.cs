@@ -8,8 +8,7 @@ using dosymep.Bim4Everyone.SharedParams;
 
 namespace RevitPlatformSettings.ViewModels.Settings {
     internal class RevitParamsSettingsViewModel : SettingsViewModel {
-        public RevitParamsSettingsViewModel(string settingsName)
-            : base(settingsName) {
+        public RevitParamsSettingsViewModel() {
             IEnumerable<RevitParam> revitParams = SharedParamsConfig.Instance.GetRevitParams()
                 .Union(ProjectParamsConfig.Instance.GetRevitParams());
 
