@@ -3,6 +3,9 @@ using System.Globalization;
 using System.Windows.Controls;
 
 using dosymep.SimpleServices;
+using dosymep.WpfCore.Behaviors;
+
+using Microsoft.Xaml.Behaviors;
 
 namespace dosymep.WpfUI.Core {
     public class WpfUIPlatformUserControl : UserControl, IHasTheme, IHasLocalization {
@@ -25,6 +28,9 @@ namespace dosymep.WpfUI.Core {
 
             UIThemeService.UIThemeChanged += _ => ThemeChanged?.Invoke(_);
             LanguageService.LanguageChanged += _ => LanguageChanged?.Invoke(_);
+            
+            Interaction.GetBehaviors(this).Add(new WpfThemeBehavior());
+            Interaction.GetBehaviors(this).Add(new WpfLocalizationBehavior());
         }
 
         public ILoggerService LoggerService { get; }

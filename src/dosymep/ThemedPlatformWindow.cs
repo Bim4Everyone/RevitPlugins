@@ -32,15 +32,13 @@ namespace dosymep.WPF.Views {
 
         public ThemedPlatformWindow() {
             LanguageService = GetPlatformService<ILanguageService>();
-            
+
             UIThemeService = GetPlatformService<IUIThemeService>();
             UIThemeUpdaterService = GetPlatformService<IUIThemeUpdaterService>();
-            
+
             UIThemeService.UIThemeChanged += OnUIThemeChanged;
-            
-            _windowInteropHelper = new WindowInteropHelper(this) {
-                Owner = Process.GetCurrentProcess().MainWindowHandle
-            };
+
+            _windowInteropHelper = new WindowInteropHelper(this) {Owner = Process.GetCurrentProcess().MainWindowHandle};
         }
 
         /// <summary>
@@ -52,7 +50,7 @@ namespace dosymep.WPF.Views {
         /// Наименование файла конфигурации.
         /// </summary>
         public virtual string ProjectConfigName { get; }
-        
+
         /// <summary>
         /// Сервис локализации окон.
         /// </summary>
@@ -67,12 +65,12 @@ namespace dosymep.WPF.Views {
         /// Предоставляет доступ к текущему языку платформы.
         /// </summary>
         protected ILanguageService LanguageService { get; }
-        
+
         /// <summary>
         /// Предоставляет доступ к настройкам темы платформы.
         /// </summary>
         protected IUIThemeService UIThemeService { get; }
-        
+
         /// <summary>
         /// Сервис по обновлению темы у окна.
         /// </summary>
@@ -85,9 +83,9 @@ namespace dosymep.WPF.Views {
         protected override void OnSourceInitialized(EventArgs e) {
             UpdateTheme();
             LocalizationService?.SetLocalization(LanguageService.HostLanguage, this);
-            
+
             base.OnSourceInitialized(e);
-            
+
             PlatformWindowConfig config = GetProjectConfig();
             if(config.WindowPlacement.HasValue) {
                 this.SetPlacement(config.WindowPlacement.Value);
@@ -118,7 +116,7 @@ namespace dosymep.WPF.Views {
         }
 
         private void UpdateTheme() {
-            UIThemeUpdaterService.SetTheme(this, UIThemeService.HostTheme);
+            UIThemeUpdaterService.SetTheme((FrameworkElement) this, UIThemeService.HostTheme);
         }
     }
 }

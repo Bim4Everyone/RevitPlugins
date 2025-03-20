@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Interop;
 
 using dosymep.Bim4Everyone;
@@ -73,7 +74,6 @@ namespace dosymep.WpfUI.Core {
         public virtual string ProjectConfigName { get; } = nameof(WpfUIPlatformWindow);
 
         protected override void OnSourceInitialized(EventArgs e) {
-            UpdateTheme();
             LocalizationService?.SetLocalization(LanguageService.HostLanguage, this);
 
             base.OnSourceInitialized(e);
@@ -87,7 +87,6 @@ namespace dosymep.WpfUI.Core {
         protected override void OnClosing(CancelEventArgs e) {
             base.OnClosing(e);
 
-            UIThemeService.UIThemeChanged -= OnUIThemeChanged;
 
             PlatformWindowConfig config = GetProjectConfig();
             config.WindowPlacement = this.GetPlacement();
@@ -101,14 +100,6 @@ namespace dosymep.WpfUI.Core {
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(ProjectConfigName + ".json")
                 .Build<PlatformWindowConfig>();
-        }
-
-        private void OnUIThemeChanged(UIThemes obj) {
-            UpdateTheme();
-        }
-
-        private void UpdateTheme() {
-            ThemeUpdaterService.SetTheme(this, UIThemeService.HostTheme);
         }
     }
 }
