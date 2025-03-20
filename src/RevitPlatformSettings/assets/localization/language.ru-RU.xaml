@@ -80,4 +80,12 @@
     <system:String x:Key="OpenSourceWindow.OpenSourceLicense">Бесплатная OpenSource</system:String>
     <system:String x:Key="OpenSourceWindow.OnlineDocumentation">Онлайн документация</system:String>
     
+    <system:String x:Key="UIThemes.Dark">Темная</system:String>
+    <system:String x:Key="UIThemes.Light">Светлая</system:String>
+    
+    <system:String x:Key="NotificationScreen.Primary">Основной</system:String>
+    <system:String x:Key="NotificationScreen.ApplicationWindow">Окно приложения</system:String>
+    
+    <system:String x:Key="NotificationPosition.TopRight">Сверху справа</system:String>
+    <system:String x:Key="NotificationPosition.BottomRight">Снизу справа</system:String>
 </ResourceDictionary>

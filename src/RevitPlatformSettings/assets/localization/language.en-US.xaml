@@ -77,4 +77,13 @@
     <system:String x:Key="OpenSourceWindow.DevExpressLicense">DevExpress License</system:String>
     <system:String x:Key="OpenSourceWindow.OpenSourceLicense">OpenSource License</system:String>
     <system:String x:Key="OpenSourceWindow.OnlineDocumentation">Online Documentation</system:String>
+    
+    <system:String x:Key="UIThemes.Dark">Dark</system:String>
+    <system:String x:Key="UIThemes.Light">Light</system:String>
+    
+    <system:String x:Key="NotificationScreen.Primary">Primary</system:String>
+    <system:String x:Key="NotificationScreen.ApplicationWindow">Application window</system:String>
+    
+    <system:String x:Key="NotificationPosition.TopRight">Top right</system:String>
+    <system:String x:Key="NotificationPosition.BottomRight">Bottom right</system:String>
 </ResourceDictionary>
