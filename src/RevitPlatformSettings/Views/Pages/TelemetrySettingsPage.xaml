@@ -10,6 +10,7 @@
     xmlns:views="clr-namespace:RevitPlatformSettings.Views"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:logs="clr-namespace:Serilog.Events;assembly=Serilog"
+    xmlns:edits="clr-namespace:RevitPlatformSettings.Views.Edits"
 
     x:ClassModifier="internal"
 
@@ -31,7 +32,7 @@
 
             <StackPanel>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource TelemetrySettings.LogTraceIsActive}">
 
                     <CheckBox
@@ -40,9 +41,9 @@
                         HorizontalAlignment="Right"
                         IsChecked="{Binding Path=LogTraceIsActive, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
 
                     <ComboBox
@@ -53,9 +54,9 @@
                         ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
                         SelectedValue="{Binding LogTraceJournalLogLevel, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource TelemetrySettings.LogTraceServerName}">
 
                     <ui:TextBox
@@ -63,7 +64,7 @@
                         IsEnabled="False"
                         Text="{Binding Path=LogTraceServerName, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
             </StackPanel>
 
@@ -76,7 +77,7 @@
 
             <StackPanel>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalIsActive}">
 
                     <CheckBox
@@ -85,9 +86,9 @@
                         HorizontalAlignment="Right"
                         IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
 
                     <CheckBox
@@ -96,9 +97,9 @@
                         IsEnabled="False"
                         IsChecked="{Binding Path=LogTraceJournalUseUtc, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
 
                     <ComboBox
@@ -109,9 +110,9 @@
                         ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
                         SelectedValue="{Binding LogTraceJournalLogLevel, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
 
                     <ui:TextBox
@@ -120,7 +121,7 @@
                         IsEnabled="False"
                         Text="{Binding Path=LogTraceJournalOutputTemplate, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
             </StackPanel>
 

@@ -11,6 +11,7 @@
     xmlns:ss="clr-namespace:dosymep.SimpleServices;assembly=dosymep.SimpleServices"
     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:edits="clr-namespace:RevitPlatformSettings.Views.Edits"
 
     x:ClassModifier="internal"
 
@@ -33,7 +34,7 @@
 
             <StackPanel>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource GeneralSettings.CorpName}">
 
                     <ui:TextBox
@@ -41,9 +42,9 @@
                         IsEnabled="False"
                         Text="{Binding Path=CorpName, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource GeneralSettings.SettingsPath}">
 
                     <ui:TextBox
@@ -51,9 +52,9 @@
                         IsEnabled="False"
                         Text="{Binding Path=SettingsPath, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource GeneralSettings.SettingsImagePath}">
 
                     <ui:TextBox
@@ -61,7 +62,7 @@
                         IsEnabled="False"
                         Text="{Binding Path=SettingsImagePath, Mode=OneWay}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
             </StackPanel>
         </GroupBox>
@@ -73,7 +74,7 @@
 
             <StackPanel>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource GeneralSettings.HostTheme}">
 
                     <ComboBox
@@ -84,9 +85,9 @@
                         SelectedValue="{Binding Path=HostTheme, Mode=OneWay}"
                         ItemsSource="{me:EnumToItemsSource EnumType=ss:UIThemes}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource GeneralSettings.HostLanguage}">
 
                     <ComboBox
@@ -97,7 +98,7 @@
                             Content="{Binding HostLanguage}" />
                     </ComboBox>
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
             </StackPanel>
         </GroupBox>
@@ -109,24 +110,24 @@
 
             <StackPanel>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource GeneralSettings.NotificationIsActive}">
 
                     <CheckBox
                         HorizontalAlignment="Right"
                         IsChecked="{Binding Path=NotificationIsActive}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource GeneralSettings.NotificationVisibleMaxCount}">
 
                     <ui:TextBox
                         Text="{Binding Path=NotificationVisibleMaxCount}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource GeneralSettings.NotificationScreen}">
 
                     <ComboBox
@@ -135,9 +136,9 @@
                         SelectedValue="{Binding Path=NotificationScreen}"
                         ItemsSource="{me:EnumToItemsSource EnumType=dxmvvm:NotificationScreen}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
-                <views:CustomEditControl
+                <edits:CustomEditControl
                     EditText="{me:LocalizationSource GeneralSettings.NotificationPosition}">
 
                     <ComboBox
@@ -146,7 +147,7 @@
                         SelectedValue="{Binding Path=NotificationPosition}"
                         ItemsSource="{me:EnumToItemsSource EnumType=dxmvvm:NotificationPosition}" />
 
-                </views:CustomEditControl>
+                </edits:CustomEditControl>
 
             </StackPanel>
 

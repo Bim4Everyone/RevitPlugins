@@ -8,6 +8,7 @@
     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:edits="clr-namespace:RevitPlatformSettings.Views.Edits"
 
     x:ClassModifier="internal"
 
@@ -39,27 +40,27 @@
                 TextWrapping="Wrap"
                 Text="{Binding PlatformDescription}" />
 
-            <views:HyperLinkEditWithImage
+            <edits:HyperLinkEditWithImage
                 EditValue="{me:LocalizationSource AboutSettings.PlatformLinkText}"
                 NavigationUrl="{Binding PlatformPageUrl}"
                 ImageSource="{Binding ImagePath}" />
 
-            <views:HyperLinkEditWithImage
+            <edits:HyperLinkEditWithImage
                 EditValue="{me:LocalizationSource AboutSettings.PlatformNewsChannel}"
                 NavigationUrl="{Binding NewsChatUrl}"
                 ImageSource="{me:QualifiedImage assets/images/icons8-news-96.png}" />
 
-            <views:HyperLinkEditWithImage
+            <edits:HyperLinkEditWithImage
                 EditValue="{me:LocalizationSource AboutSettings.PlatformMainChat}"
                 NavigationUrl="{Binding MainChatUrl}"
                 ImageSource="{me:QualifiedImage assets/images/icons8-message-96.png}" />
 
-            <views:HyperLinkEditWithImage
+            <edits:HyperLinkEditWithImage
                 EditValue="{me:LocalizationSource AboutSettings.PlatformDownload}"
                 NavigationUrl="{Binding DownloadLinkUrl}"
                 ImageSource="{me:QualifiedImage assets/images/icons8-download-96.png}" />
 
-            <views:HyperLinkEditWithImage
+            <edits:HyperLinkEditWithImage
                 EditValue="{me:LocalizationSource AboutSettings.OpenSource}"
                 ImageSource="{me:QualifiedImage assets/images/icons8-github-96.png}"
                 Command="{Binding ShowOpenSourceDialogCommand}" />

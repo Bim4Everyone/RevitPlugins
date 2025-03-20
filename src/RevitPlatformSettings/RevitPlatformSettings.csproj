@@ -31,5 +31,15 @@
       <Page Update="assets\Localization\Language.ru-RU.xaml">
         <Generator>MSBuild:Compile</Generator>
       </Page>
+      <Page Update="Views\Editors\CustomEditControl.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Views\Editors\HyperLinkEditWithImage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
     </ItemGroup>
 </Project>
