@@ -86,8 +86,7 @@ namespace dosymep.WpfUI.Core {
 
         protected override void OnClosing(CancelEventArgs e) {
             base.OnClosing(e);
-
-
+            
             PlatformWindowConfig config = GetProjectConfig();
             config.WindowPlacement = this.GetPlacement();
             config.SaveProjectConfig();

@@ -116,7 +116,7 @@ namespace dosymep.WPF.Views {
         }
 
         private void UpdateTheme() {
-            UIThemeUpdaterService.SetTheme((FrameworkElement) this, UIThemeService.HostTheme);
+            UIThemeUpdaterService.SetTheme(UIThemeService.HostTheme, this);
         }
     }
 }
