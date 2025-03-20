@@ -11,9 +11,6 @@
 
     mc:Ignorable="d"
 
-    Width="800"
-    Height="450"
-
     x:Name="_this"
     d:DataContext="{d:DesignInstance settings:SettingsViewModel, IsDesignTimeCreatable=False}">
     <Grid>

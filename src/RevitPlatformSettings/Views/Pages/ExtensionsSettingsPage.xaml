@@ -12,9 +12,6 @@
 
     mc:Ignorable="d"
 
-    Width="800"
-    Height="450"
-
     x:Name="_this"
     d:DataContext="{d:DesignInstance settings:ExtensionsSettingsViewModel, IsDesignTimeCreatable=False}">
 
@@ -32,8 +29,8 @@
         <DataTemplate x:Key="GridCheckColumnTemplate">
             <CheckBox
                 Name="PART_Editor"
-                IsEnabled="{Binding Items[0].AllowChangeEnabled}"
-                IsChecked="{Binding Items[0].IsEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                IsEnabled="{Binding AllowChangeEnabled}"
+                IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged}" />
         </DataTemplate>
         
         <CollectionViewSource
@@ -60,7 +57,7 @@
                             FontWeight="Bold">
                             <Run Text="{DynamicResource ExtensionSettings.CategoryGridColumn}" />
                             <Run Text=": " />
-                            <Run Text="{Binding Items[0].Category}" />
+                            <Run Text="{Binding Category}" />
                         </TextBlock>
                     </DataTemplate>
                 </GroupStyle.HeaderTemplate>
@@ -69,9 +66,9 @@
 
         <DataGrid.Columns>
             <DataGridTemplateColumn
-                Width="43"
-                MinWidth="43"
-                MaxWidth="43"
+                Width="70"
+                MinWidth="70"
+                MaxWidth="70"
                 CellTemplate="{StaticResource GridCheckColumnTemplate}" />
 
             <DataGridTextColumn

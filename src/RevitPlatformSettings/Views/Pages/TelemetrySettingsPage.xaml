@@ -14,9 +14,6 @@
 
     mc:Ignorable="d"
 
-    Width="800"
-    Height="450"
-
     x:Name="_this"
     d:DataContext="{d:DesignInstance settings:TelemetrySettingsViewModel, IsDesignTimeCreatable=False}">
     <Grid>
@@ -37,6 +34,7 @@
                     EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceIsActive}">
 
                     <CheckBox
+                        IsEnabled="False"
                         IsHitTestVisible="False"
                         HorizontalAlignment="Right"
                         IsChecked="{Binding Path=LogTraceIsActive, Mode=OneWay}" />
@@ -48,7 +46,11 @@
 
                     <ComboBox
                         IsReadOnly="True"
-                        SelectedItem="{Binding Path=LogTraceLogLevel, Mode=OneWay}" />
+                        IsEnabled="False"
+                        SelectedIndex="0">
+                        <ComboBoxItem
+                            Content="{Binding LogTraceLogLevel}" />
+                    </ComboBox>
 
                 </views:CustomEditControl>
 
@@ -57,6 +59,7 @@
 
                     <ui:TextBox
                         IsReadOnly="True"
+                        IsEnabled="False"
                         Text="{Binding Path=LogTraceServerName, Mode=OneWay}" />
 
                 </views:CustomEditControl>
@@ -76,6 +79,7 @@
                     EditText="{markupExtensions:LocalizationSource TelemetrySettings.LogTraceJournalIsActive}">
 
                     <CheckBox
+                        IsEnabled="False"
                         IsHitTestVisible="False"
                         HorizontalAlignment="Right"
                         IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}" />
@@ -88,6 +92,7 @@
                     <CheckBox
                         IsHitTestVisible="False"
                         HorizontalAlignment="Right"
+                        IsEnabled="False"
                         IsChecked="{Binding Path=LogTraceJournalUseUtc, Mode=OneWay}" />
 
                 </views:CustomEditControl>
@@ -97,7 +102,11 @@
 
                     <ComboBox
                         IsReadOnly="True"
-                        SelectedItem="{Binding Path=LogTraceJournalLogLevel, Mode=OneWay}" />
+                        IsEnabled="False"
+                        SelectedIndex="0">
+                        <ComboBoxItem
+                            Content="{Binding LogTraceJournalLogLevel}" />
+                    </ComboBox>
 
                 </views:CustomEditControl>
 
@@ -107,6 +116,7 @@
                     <ui:TextBox
                         MaxWidth="300"
                         IsReadOnly="True"
+                        IsEnabled="False"
                         Text="{Binding Path=LogTraceJournalOutputTemplate, Mode=OneWay}" />
 
                 </views:CustomEditControl>
