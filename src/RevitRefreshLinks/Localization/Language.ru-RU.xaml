@@ -1,0 +1,97 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="UpdateLinksWindow.Title">Обновление связей</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.EmptySelectionCheck">Выберите связи для обновления.</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.EmptySourcesCheck">Выберите папку со связями.</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.LocalFolder">Локальная папка:</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.ServerFolder">Revit Server папка:</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.LinkName.Header">Имя связи</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Header">Рабочий набор</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Opened">Открыт</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Workset.Closed">Закрыт</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Header">Статус связи</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Loaded">Загружена</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Unloaded">Выгружена</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.LocallyUnloaded">Выгружена локально</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.NotFound">Не найдена</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.ClosedWorkset">В закрытом РН</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Link.Unknown">Не определено</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Header">Источник</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Found">Найден</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.NotFound">Не найден</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Source.Duplicated">Дублируется</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.SelectAll">Выбрать все</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.UnselectAll">Снять выбор</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.List.Button.Invert">Инвертировать</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.SelectLocalFolder">Выбрать локальную папку</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Buttons.SelectServerFolder">Выбрать папку из RS</system:String>
+    <system:String
+        x:Key="UpdateLinksWindow.Progress.Title">Обновление связей [{0}/{1}] ...</system:String>
+    <system:String
+        x:Key="SelectLinksFromFolderDialog.Title">Выберите связи для добавления</system:String>
+    <system:String
+        x:Key="SelectLinksFromFolderDialog.Filter">Revit файлы (*.rvt)|*.rvt</system:String>
+
+    <system:String
+        x:Key="LinkLoader.Transaction.AddLinks">Добавление связей</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.Coordinates">Файл с другой системой координат</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.Version">Файл создан в другой версии Revit</system:String>
+    <system:String
+        x:Key="LinkLoader.Error.AlreadyAdded">Файл уже добавлен в документ</system:String>
+    <system:String
+        x:Key="MessageBox.Title.ErrorAddLink">Ошибки добавления связей</system:String>
+    <system:String
+        x:Key="MessageBox.Title.ErrorUpdateLink">Ошибки обновления связей</system:String>
+
+    <system:String
+        x:Key="SelectLocalFoldersDialog.Title">Выберите папки со связями для обновления</system:String>
+
+    <system:String
+        x:Key="RsOpenFileWindow.Title">Выберите модели с Revit Server</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.List.Name">Имя</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.List.Size">Размер</system:String>
+    <system:String
+        x:Key="RsOpenFileWindow.ExecutingCmdCheck">Дождитесь завершения предыдущей команды</system:String>
+
+    <system:String
+        x:Key="DirectoriesExplorer.Title">Выберите папку с Revit Server</system:String>
+    <system:String
+        x:Key="DirectoriesExplorer.ExecutingCmdCheck">Дождитесь завершения предыдущей команды</system:String>
+
+    <system:String
+        x:Key="AllWindow.Ok">ОК</system:String>
+    <system:String
+        x:Key="AllWindow.Cancel">Отмена</system:String>
+</ResourceDictionary>

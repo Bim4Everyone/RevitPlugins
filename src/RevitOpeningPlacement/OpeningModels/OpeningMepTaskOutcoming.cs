@@ -249,12 +249,7 @@ namespace RevitOpeningPlacement.OpeningModels {
 
             foreach(PlanarFace thisFace in thisPlanarFaces) {
                 foreach(PlanarFace otherFace in othersPlanarFaces) {
-                    // FaceNormal.Negate() для заданий на отверстия, которые касаются снаружи
-                    // FaceNormal для заданий на отверстия, которые находятся внутри другого и касаются изнутри
-                    if((Math.Abs(thisFace.Area - otherFace.Area) < 0.000001)
-                        && (thisFace.FaceNormal.IsAlmostEqualTo(otherFace.FaceNormal.Negate()) ||
-                            thisFace.FaceNormal.IsAlmostEqualTo(otherFace.FaceNormal))
-                        && TheseAreTheSamePoints(GetCornerPoints(thisFace), GetCornerPoints(otherFace))) {
+                    if(FacesOverlap(thisFace, otherFace)) {
                         return true;
                     }
                 }
@@ -262,39 +257,22 @@ namespace RevitOpeningPlacement.OpeningModels {
             return false;
         }
 
-        /// <summary>
-        /// Проверяет, одинаковы ли точки в коллекциях
-        /// </summary>
-        /// <param name="firstPoints">Первая коллекция точек</param>
-        /// <param name="secondPoints">Вторая коллекция точек</param>
-        /// <returns>True, если количество точек в коллекциях одинаково и если все точки из первой коллекции также есть во второй коллекции, иначе False</returns>
-        private bool TheseAreTheSamePoints(ICollection<XYZ> firstPoints, ICollection<XYZ> secondPoints) {
-            if(firstPoints.Count != secondPoints.Count) {
-                return false;
-            }
-            foreach(XYZ point in firstPoints) {
-                if(!secondPoints.Any(secondPoint => secondPoint.IsAlmostEqualTo(point))) {
-                    return false;
+        private bool FacesOverlap(PlanarFace first, PlanarFace second) {
+            // FaceNormal.Negate() для заданий на отверстия, которые касаются снаружи
+            // FaceNormal для заданий на отверстия, которые находятся внутри другого и касаются изнутри
+            if(first.FaceNormal.IsAlmostEqualTo(second.FaceNormal.Negate())
+                || first.FaceNormal.IsAlmostEqualTo(second.FaceNormal)) {
+                var firstCurves = first.GetEdgesAsCurveLoops().SelectMany(l => l.ToArray()).ToArray();
+                var secondCurves = second.GetEdgesAsCurveLoops().SelectMany(l => l.ToArray()).ToArray();
+                foreach(var firstCurve in firstCurves) {
+                    foreach(var secondCurve in secondCurves) {
+                        if(firstCurve.Intersect(secondCurve) != SetComparisonResult.Disjoint) {
+                            return true;
+                        }
+                    }
                 }
             }
-            return true;
-        }
-
-        /// <summary>
-        /// Возвращает угловые точки плоской грани.
-        /// Если грань - круг, будут возвращены 2 крайние точки диаметра
-        /// </summary>
-        private ICollection<XYZ> GetCornerPoints(PlanarFace planarFace) {
-            CurveLoop longestLoop = planarFace.GetEdgesAsCurveLoops().OrderByDescending(cLoop => cLoop.GetExactLength()).FirstOrDefault();
-            if(longestLoop != null) {
-                HashSet<XYZ> result = new HashSet<XYZ>();
-                foreach(Curve curve in longestLoop) {
-                    result.Add(curve.GetEndPoint(0));
-                }
-                return result;
-            } else {
-                return Array.Empty<XYZ>();
-            }
+            return false;
         }
 
         /// <summary>
