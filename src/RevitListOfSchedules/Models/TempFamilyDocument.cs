@@ -14,6 +14,7 @@ using RevitListOfSchedules.ViewModels;
 
 namespace RevitListOfSchedules.Models {
     internal class TempFamilyDocument : IFamilyDocument {
+        private const string _extension = ".rfa";
         private const int _diameterArc = 5;
         private readonly ILocalizationService _localizationService;
         private readonly RevitRepository _revitRepository;
@@ -79,10 +80,9 @@ namespace RevitListOfSchedules.Models {
         }
 
         private string GetFamilyPath() {
-            string extension = ".rfa";
             string tempDirectory = Path.GetTempPath();
             string familyDocumentName = string.Format(_familyName, _albumName);
-            string fileName = $"{familyDocumentName}{extension}";
+            string fileName = $"{familyDocumentName}{_extension}";
             return Path.Combine(tempDirectory, fileName);
         }
 

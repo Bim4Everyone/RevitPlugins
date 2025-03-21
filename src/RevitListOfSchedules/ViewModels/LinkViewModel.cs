@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -12,47 +9,36 @@ using RevitListOfSchedules.Models;
 
 namespace RevitListOfSchedules.ViewModels {
     internal class LinkViewModel : BaseViewModel {
-        public event EventHandler SelectionChanged;
-        public event EventHandler StatusChanged;
+
         private readonly LinkTypeElement _linkElement;
         private string _status;
         private bool _isChecked;
+        private bool _isLoaded;
 
         public LinkViewModel(LinkTypeElement linkElement) {
             _linkElement = linkElement;
-            Status = GetStatus();
+            _status = GetStatus();
 
             ReloadCommand = RelayCommand.Create(ReloadLinkType, CanReloadLinkType);
         }
         public ICommand ReloadCommand { get; set; }
+        public ElementId Id => _linkElement.Id;
         public string Name => _linkElement.Name;
         public string FullName => _linkElement.FullName;
-        public ElementId Id => _linkElement.Id;
-        public bool StatusBool { get; private set; }
 
         public string Status {
             get => _status;
-            set {
-                if(SetAndNotifyIfChanged(ref _status, value)) {
-                    StatusChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
+            private set => RaiseAndSetIfChanged(ref _status, value);
+        }
+
+        public bool IsLoaded {
+            get => _isLoaded;
+            set => RaiseAndSetIfChanged(ref _isLoaded, value, nameof(IsLoaded));
         }
 
         public bool IsChecked {
             get => _isChecked;
-            set {
-                if(SetAndNotifyIfChanged(ref _isChecked, value)) {
-                    SelectionChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        private bool SetAndNotifyIfChanged<T>(ref T backingField, T newValue,
-            [CallerMemberName] string propertyName = null) {
-            bool changed = !EqualityComparer<T>.Default.Equals(backingField, newValue);
-            RaiseAndSetIfChanged(ref backingField, newValue, propertyName);
-            return changed;
+            set => RaiseAndSetIfChanged(ref _isChecked, value, nameof(IsChecked));
         }
 
         public void ReloadLinkType() {
@@ -68,13 +54,13 @@ namespace RevitListOfSchedules.ViewModels {
         }
 
         private string GetStatus() {
-            StatusBool = GetStatusBool();
+            SetStatus();
             return $"{_linkElement.RevitLink.AttachmentType}_{_linkElement.RevitLink.GetLinkedFileStatus()}";
 
         }
 
-        private bool GetStatusBool() {
-            return _linkElement.RevitLink.GetLinkedFileStatus() is LinkedFileStatus.Loaded;
+        private void SetStatus() {
+            IsLoaded = _linkElement.RevitLink.GetLinkedFileStatus() is LinkedFileStatus.Loaded;
         }
     }
 }

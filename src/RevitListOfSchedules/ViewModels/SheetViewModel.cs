@@ -42,11 +42,8 @@ namespace RevitListOfSchedules.ViewModels {
 
         private string GetAlbumName() {
             if(GroupParameter != null) {
-                if(_sheetElement.Sheet.IsExistsParamValue(GroupParameter)) {
-                    return _sheetElement.Sheet.GetParamValue<string>(GroupParameter);
-                } else {
-                    return _localizationService.GetLocalizedString("GroupValue.NoValue");
-                }
+                return _sheetElement.Sheet.GetParamValueOrDefault<string>(GroupParameter)
+                    ?? _localizationService.GetLocalizedString("GroupValue.NoValue");
             }
             return _localizationService.GetLocalizedString("GroupParameter.NoParameter");
         }

@@ -42,6 +42,10 @@
     <system:String
         x:Key="MainViewModel.TransactionNamePlace">Размещение семейства аннотаций</system:String>
     <system:String
+        x:Key="MainViewModel.ProgressTitleLinks">Обновление связанных файлов... [{0}]\[{1}]</system:String>
+    <system:String
+        x:Key="MainViewModel.ProgressTitleSheets">Обработка листов... [{0}]\[{1}]</system:String>
+    <system:String
         x:Key="ScheduleElement.TransactionName">Создание ведомости спецификаций</system:String>
     <system:String
         x:Key="GroupParameter.NoParameter">Нет параметра группировки</system:String>

@@ -42,6 +42,10 @@
     <system:String
         x:Key="MainViewModel.TransactionNamePlace">Placing a family of annotations</system:String>
     <system:String
+        x:Key="MainViewModel.ProgressTitleLinks">Reload links... [{0}]\[{1}]</system:String>
+    <system:String
+        x:Key="MainViewModel.ProgressTitleSheets">Processing sheets... [{0}]\[{1}]</system:String>
+    <system:String
         x:Key="ScheduleElement.TransactionName">Create a list of schedules</system:String>
     <system:String
         x:Key="GroupParameter.NoParameter">No group parameter</system:String>

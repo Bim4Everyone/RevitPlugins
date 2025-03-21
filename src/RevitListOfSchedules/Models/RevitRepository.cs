@@ -22,17 +22,20 @@ namespace RevitListOfSchedules.Models;
 internal class RevitRepository {
     private readonly ILocalizationService _localizationService;
     private readonly ParamFactory _paramFactory;
+    private readonly IList<SheetElement> _sheetElements;
 
     public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService, ParamFactory paramFactory) {
         UIApplication = uiApplication;
         _localizationService = localizationService;
         _paramFactory = paramFactory;
+        _sheetElements = GetSheetElements(Document);
     }
 
     public UIApplication UIApplication { get; }
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
+    public IList<SheetElement> SheetElements => _sheetElements;
 
     // Метод получения типа "Связанный файл"
     public IList<LinkTypeElement> GetLinkTypeElements() {
@@ -75,45 +78,46 @@ internal class RevitRepository {
     }
 
     // Метод получения списка всех параметров листа и браузера проекта
-    public List<RevitParam> GetGroupParameters(ViewSheet viewSheet) {
+    public List<RevitParam> GetGroupParameters() {
+
+        ElementId sheetCategoryId = new ElementId(BuiltInCategory.OST_Sheets);
+        ICollection<ElementId> categories = new List<ElementId> { sheetCategoryId };
+        var filterableParameters = ParameterFilterUtilities.GetFilterableParametersInCommon(Document, categories);
+
         List<RevitParam> listOfParameters = new List<RevitParam>();
-        if(viewSheet != null) {
-            List<ElementId> viewParamElementIds = GetViewParameterElementIds(viewSheet);
-            List<RevitParam> viewParams = GetRevitParams(viewParamElementIds);
-            if(viewParams.Count > 0) {
-                List<RevitParam> sortedList = viewParams.OrderBy(param => param.Name).ToList();
-                listOfParameters.AddRange(sortedList);
-                List<ElementId> browserParamElementIds = GetBrowserParameterElementIds(viewSheet);
-                if(browserParamElementIds.Count > 0) {
-                    RevitParam browserParam = GetRevitParams(browserParamElementIds).Last();
-                    int index = listOfParameters.FindIndex(param => param.Equals(browserParam));
-                    if(index != -1) {
-                        listOfParameters.RemoveAt(index);
-                        listOfParameters.Insert(0, browserParam);
-                    }
+        List<RevitParam> viewParams = GetRevitParams(filterableParameters.ToList());
+
+        if(viewParams.Count > 0) {
+            List<RevitParam> sortedList = viewParams.OrderBy(param => param.Name).ToList();
+            listOfParameters.AddRange(sortedList);
+            List<ElementId> browserParamElementIds = GetBrowserParameterElementIds();
+            if(browserParamElementIds.Count > 0) {
+                RevitParam browserParam = GetRevitParams(browserParamElementIds).Last();
+                int index = listOfParameters.FindIndex(param => param.Equals(browserParam));
+                if(index != -1) {
+                    listOfParameters.RemoveAt(index);
+                    listOfParameters.Insert(0, browserParam);
                 }
             }
         }
         return listOfParameters;
     }
 
-    private List<ElementId> GetBrowserParameterElementIds(ViewSheet viewSheet) {
+    private List<ElementId> GetBrowserParameterElementIds() {
         List<ElementId> listOfElementIds = new List<ElementId>();
-        var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
-        IList<FolderItemInfo> itemsInfo = browserOrganization.GetFolderItems(viewSheet.Id);
-        foreach(var item in itemsInfo) {
-            listOfElementIds.Add(item.ElementId);
+        var projectSheets = GetViewSheets(Document);
+        if(projectSheets.Count > 0) {
+            var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
+            IList<FolderItemInfo> itemsInfo = browserOrganization.GetFolderItems(projectSheets.First().Id);
+            foreach(var item in itemsInfo) {
+                listOfElementIds.Add(item.ElementId);
+            }
         }
         return listOfElementIds;
     }
 
-    private List<ElementId> GetViewParameterElementIds(ViewSheet viewSheet) {
-        List<ElementId> listOfElementIds = new List<ElementId>();
-        foreach(Parameter parameter in viewSheet.Parameters) {
-            listOfElementIds.Add(parameter.Id);
-        }
-        return listOfElementIds;
-    }
+
+
 
     private List<RevitParam> GetRevitParams(List<ElementId> elementIds) {
         List<RevitParam> listOfParameters = new List<RevitParam>();
