@@ -41,7 +41,9 @@
 
         <ui:NavigationView
             Grid.Row="1"
-            x:Name="_rootNavigationView">
+            x:Name="_rootNavigationView"
+            HeaderVisibility="Collapsed"
+            PaneTitle="{me:LocalizationSource MainWindow.Title}">
 
             <ui:NavigationView.MenuItemsSource>
                 <x:Array Type="{x:Type ui:NavigationViewItem}">

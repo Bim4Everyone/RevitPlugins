@@ -1,4 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -7,18 +11,27 @@ using dosymep.WPF.ViewModels;
 
 using RevitPlatformSettings.Factories;
 using RevitPlatformSettings.ViewModels.Settings;
+using RevitPlatformSettings.Views.Pages;
 
+using Wpf.Ui.Abstractions;
 using Wpf.Ui.Abstractions.Controls;
 using Wpf.Ui.Controls;
 
 namespace RevitPlatformSettings.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private string _errorText;
-        
-        private ObservableCollection<INavigationViewItem> _navigationViewItems;
-        private ObservableCollection<INavigationViewItem> _footerNavigationViewItems;
+        private readonly INavigationViewPageProvider _pageProvider;
 
-        public MainViewModel() {
+        private readonly Type[] _pages = new[] {
+            typeof(AboutSettingsPage), 
+            typeof(ExtensionsSettingsPage), typeof(GeneralSettingsPage),
+            typeof(RevitParamsSettingsPage), typeof(TelemetrySettingsPage)
+        };
+        
+        private string _errorText;
+
+        public MainViewModel(INavigationViewPageProvider pageProvider) {
+            _pageProvider = pageProvider;
+            
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(ApplyView);
         }
@@ -31,24 +44,21 @@ namespace RevitPlatformSettings.ViewModels {
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public ObservableCollection<INavigationViewItem> NavigationViewItems {
-            get => _navigationViewItems;
-            set => _navigationViewItems = value;
-        }
-
-        public ObservableCollection<INavigationViewItem> FooterNavigationViewItems {
-            get => _footerNavigationViewItems;
-            set => _footerNavigationViewItems = value;
-        }
-
         private void LoadView() {
-            
+            // pass
         }
 
         private void ApplyView() {
-            // foreach(SettingsViewModel settingsViewModel in Settings) {
-            //     settingsViewModel.SaveSettings();
-            // }
+            IEnumerable<SettingsViewModel> settings = _pages
+                .Select(item => _pageProvider.GetPage(item))
+                .Where(item => item != null)
+                .OfType<Page>()
+                .Select(item => item.DataContext)
+                .OfType<SettingsViewModel>();
+
+            foreach(SettingsViewModel settingsViewModel in settings) {
+                settingsViewModel.SaveSettings();
+            }
         }
     }
 }
