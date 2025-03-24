@@ -20,7 +20,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             _annotationService = new AnnotationService(pylonView);
 
             // Находим типоразмер марки несущей арматуры
-            _tagSymbol = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10");
+            _tagSymbol = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10, Засечка");
             // Находим типоразмер типовой аннотации для метки ГОСТа сварки
             _gostTagSymbol = revitRepository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
         }

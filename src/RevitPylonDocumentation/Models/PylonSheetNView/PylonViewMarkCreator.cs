@@ -1,7 +1,5 @@
 using System;
 
-using Autodesk.Revit.DB;
-
 using RevitPylonDocumentation.Models.RebarMarksServices;
 using RevitPylonDocumentation.ViewModels;
 
@@ -26,14 +24,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         private readonly ParamValueService _paramValueService;
         private readonly RebarFinder _rebarFinder;
-        private readonly AnnotationService _annotationService;
-        private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
 
         private readonly TransverseRebarViewBarMarksService _transverseRebarViewBarMarksService;
         private readonly TransverseRebarViewPlateMarksService _transverseRebarViewPlateMarksService;
         private readonly TransverseViewBarMarksService _transverseViewBarMarksService;
-        private readonly FamilySymbol _tagSymbol;
-        private readonly FamilySymbol _gostTagSymbol;
 
         internal PylonViewMarkCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
                                       PylonView pylonView) {
@@ -44,18 +38,10 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             _paramValueService = new ParamValueService(repository);
             _rebarFinder = new RebarFinder(ViewModel, SheetInfo);
-            _annotationService = new AnnotationService(ViewOfPylon);
-            _viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
 
             _transverseViewBarMarksService = new TransverseViewBarMarksService(ViewOfPylon, Repository);
-
             _transverseRebarViewBarMarksService = new TransverseRebarViewBarMarksService(ViewOfPylon, Repository);
             _transverseRebarViewPlateMarksService = new TransverseRebarViewPlateMarksService(ViewOfPylon, Repository);
-
-            // Находим типоразмер марки несущей арматуры
-            _tagSymbol = Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10");
-            // Находим типоразмер типовой аннотации для метки ГОСТа сварки
-            _gostTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
         }
 
         internal MainViewModel ViewModel { get; set; }
