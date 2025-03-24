@@ -341,8 +341,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Располагаем сечение на высоте 5/4 высоты пилона (или по пропорции, указанной пользователем)
                 elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewThirdElevation);
 
+                double coordinateZBottom;
+                if(elevation >= 1) {
+                    coordinateZBottom = -(minZ + ((maxZ - minZ) * 0.999) - originPoint.Z);
+                } else {
+                    coordinateZBottom = -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z);
+                }
                 sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z));
+                sectionBoxMax = new XYZ(coordinateX, coordinateY, coordinateZBottom);
             } else {
                 return false;
             }

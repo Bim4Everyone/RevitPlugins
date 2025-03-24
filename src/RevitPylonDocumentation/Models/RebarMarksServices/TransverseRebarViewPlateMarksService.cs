@@ -44,8 +44,8 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             Element bottomPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Bottom, true);
 
             // Получаем точку в которую нужно поставить аннотацию
-            XYZ pointBottomPlateLeader = _viewPointsAnalyzer.GetPointByDirection(bottomPlate, DirectionType.Left, 0.2, 0, true);
-            XYZ pointBottomPlate = _viewPointsAnalyzer.GetPointByDirection(bottomPlate, DirectionType.RightTop, 0.45, 0.3, true);
+            XYZ pointBottomPlateLeader = _viewPointsAnalyzer.GetPointByDirection(bottomPlate, DirectionType.Left, 0.3, 0, true);
+            XYZ pointBottomPlate = _viewPointsAnalyzer.GetPointByDirection(bottomPlate, DirectionType.RightTop, 0.35, 0.3, true);
 
             // Создаем марку арматуры
             var bottomPlateTag = _annotationService.CreateRebarTag(pointBottomPlate, _tagSymbol, bottomPlate);
