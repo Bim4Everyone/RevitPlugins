@@ -49,10 +49,8 @@
                     <ComboBox
                         IsReadOnly="True"
                         IsEnabled="False"
-                        SelectedValuePath="Value"
-                        DisplayMemberPath="DisplayName"
                         ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
-                        SelectedValue="{Binding LogTraceJournalLogLevel, Mode=OneWay}" />
+                        SelectedValue="{Binding LogTraceLogLevel, Mode=OneWay}" />
 
                 </edits:CustomEditControl>
 
@@ -105,8 +103,6 @@
                     <ComboBox
                         IsReadOnly="True"
                         IsEnabled="False"
-                        SelectedValuePath="Value"
-                        DisplayMemberPath="DisplayName"
                         ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
                         SelectedValue="{Binding LogTraceJournalLogLevel, Mode=OneWay}" />
 

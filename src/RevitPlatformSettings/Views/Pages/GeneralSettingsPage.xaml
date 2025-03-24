@@ -80,10 +80,8 @@
                     <ComboBox
                         IsReadOnly="True"
                         IsEnabled="False"
-                        SelectedValuePath="Value"
-                        DisplayMemberPath="DisplayName"
-                        SelectedValue="{Binding Path=HostTheme, Mode=OneWay}"
-                        ItemsSource="{me:EnumToItemsSource EnumType=ss:UIThemes}" />
+                        ItemsSource="{me:EnumToItemsSource ss:UIThemes}"
+                        SelectedValue="{Binding HostTheme, Mode=OneWay}" />
 
                 </edits:CustomEditControl>
 
@@ -131,8 +129,6 @@
                     EditText="{me:LocalizationSource GeneralSettings.NotificationScreen}">
 
                     <ComboBox
-                        SelectedValuePath="Value"
-                        DisplayMemberPath="DisplayName"
                         SelectedValue="{Binding Path=NotificationScreen}"
                         ItemsSource="{me:EnumToItemsSource EnumType=dxmvvm:NotificationScreen}" />
 
@@ -142,8 +138,6 @@
                     EditText="{me:LocalizationSource GeneralSettings.NotificationPosition}">
 
                     <ComboBox
-                        SelectedValuePath="Value"
-                        DisplayMemberPath="DisplayName"
                         SelectedValue="{Binding Path=NotificationPosition}"
                         ItemsSource="{me:EnumToItemsSource EnumType=dxmvvm:NotificationPosition}" />
 
