@@ -11,11 +11,13 @@
     xmlns:views="clr-namespace:RevitPlatformSettings.Views"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 
-    WindowStartupLocation="CenterOwner"
+    WindowStartupLocation="CenterScreen"
 
     x:Name="_this"
     mc:Ignorable="d"
-    Height="450" Width="800"
+    
+    Height="550" Width="700"
+    
     Title="{me:LocalizationSource OpenSourceWindow.Title}"
     d:DataContext="{d:DesignInstance views:OpenSourceItem, IsDesignTimeCreatable=False}">
 

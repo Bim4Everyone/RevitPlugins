@@ -12,10 +12,10 @@
     xmlns:pages="clr-namespace:RevitPlatformSettings.Views.Pages"
 
     mc:Ignorable="d"
-    WindowStartupLocation="CenterOwner"
+    WindowStartupLocation="CenterScreen"
 
     Title="{me:LocalizationSource MainWindow.Title}"
-    Height="450" Width="800"
+    Height="600" Width="1000"
 
     x:Name="_this"
     d:DataContext="{d:DesignInstance viewModels:MainViewModel, IsDesignTimeCreatable=False}">
