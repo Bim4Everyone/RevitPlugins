@@ -1,95 +1,118 @@
-﻿<base:ThemedPlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitCreateViewSheet.Views.CreateViewSheetWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     mc:Ignorable="d"
-    Height="550" Width="900"
-    MinHeight="450" MinWidth="800"
-    Title="Создание листов" WindowStartupLocation="CenterOwner"
-    x:Name="_this">
+    WindowStartupLocation="CenterOwner"
+    Title="{me:LocalizationSource MainWindow.Title}"
+    Height="550"
+    Width="900"
+    MinHeight="450"
+    MinWidth="800"
+    d:DataContext="{d:DesignInstance vms:AppViewModel, IsDesignTimeCreatable=False}">
 
-    <Grid Margin="10">
+    <Grid
+        Margin="10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition
+                Width="150" />
+            <ColumnDefinition
+                Width="*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition Height="Auto"/>
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Margin="0 0 10 0">
-            <dxe:TextEdit IsReadOnly="True" EditMode="InplaceActive" >Количество листов</dxe:TextEdit>
-            <dxe:TextEdit  EditValue="{Binding CountCreateView, UpdateSourceTrigger=PropertyChanged}" />
+        <StackPanel
+            Margin="0 0 10 0">
+            <ui:TextBox
+                IsReadOnly="True">Количество листов</ui:TextBox>
+            <ui:TextBox
+                Text="{Binding CountCreateView, UpdateSourceTrigger=PropertyChanged}" />
 
-            <dxe:TextEdit Margin="0 5 0 0" IsReadOnly="True" EditMode="InplaceActive" >Альбом</dxe:TextEdit>
-            <dxe:ComboBoxEdit IsCaseSensitiveSearch="False" AutoComplete="True"
-                              ItemsSource="{Binding AlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
-                              EditValue="{Binding AlbumBlueprints, UpdateSourceTrigger=PropertyChanged}" />
+            <ui:TextBox
+                Margin="0 5 0 0"
+                IsReadOnly="True">Альбом</ui:TextBox>
+            <ComboBox
+                IsTextSearchCaseSensitive="False"
+                ItemsSource="{Binding AlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
+                SelectedItem="{Binding AlbumBlueprints, UpdateSourceTrigger=PropertyChanged}" />
 
-            <dx:SimpleButton Margin="0 5 0 0" Content="Создать листы" ToolTipService.ShowOnDisabled="true"
-                             Command="{Binding CreateViewSheetCommand}"
-                             ToolTip="{Binding CreateErrorText}" />
+            <ui:Button
+                Margin="0 5 0 0"
+                Content="Создать листы"
+                ToolTipService.ShowOnDisabled="true"
+                Command="{Binding CreateViewSheetCommand}"
+                ToolTip="{Binding CreateErrorText}" />
         </StackPanel>
 
-        <dxg:GridControl
+        <DataGrid
             Grid.Column="1"
             Grid.Row="0"
-            SelectionMode="Row"
+            SelectionMode="Single"
             x:Name="_viewSheets"
             ItemsSource="{Binding ViewSheets}"
             SelectedItem="{Binding ViewSheet, UpdateSourceTrigger=PropertyChanged}">
-            <dxg:GridControl.View>
-                <dxg:TableView x:Name="_gridView" AutoWidth="True" />
-            </dxg:GridControl.View>
-            <dxg:GridColumn>
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dx:SimpleButton Content="Удалить лист" Name="PART_Editor"
-                                         Command="{Binding ElementName=_this, Path=DataContext.RemoveViewSheetCommand}"
-                                         CommandParameter="{Binding ElementName=_this, Path=DataContext.ViewSheet}" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
-            <dxg:GridColumn Header="Наименование" Width="250" FieldName="Name" />
-            <dxg:GridColumn Header="Основная надпись" FieldName="TitleBlock" Width="350">
-                <dxg:GridColumn.CellTemplate>
-                    <DataTemplate>
-                        <dxe:ComboBoxEdit
-                            Name="PART_Editor"
-                            IsTextEditable="False"
-                            ItemsSource="{Binding ElementName=_this, Path=DataContext.TitleBlocks}" />
-                    </DataTemplate>
-                </dxg:GridColumn.CellTemplate>
-            </dxg:GridColumn>
-        </dxg:GridControl>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:Button
+                                Content="Удалить лист"
+                                Name="PART_Editor"
+                                Command="{Binding ElementName=_this, Path=DataContext.RemoveViewSheetCommand}"
+                                CommandParameter="{Binding ElementName=_this, Path=DataContext.ViewSheet}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn
+                    Header="Наименование"
+                    Width="250"
+                    Binding="{Binding Name}" />
+                <DataGridComboBoxColumn
+                    Header="Основная надпись"
+                    ItemsSource="{Binding TitleBlocks}"
+                    SelectedItemBinding="{Binding TitleBlock}"
+                    Width="350">
+                </DataGridComboBoxColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
-        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 10 0 0" Orientation="Horizontal" HorizontalAlignment="Right">
-            <dxe:TextEdit
-                Margin="5 0"
-                IsReadOnly="True"
-                EditMode="InplaceActive"
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Margin="0 10 0 0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <ui:TextBlock
+                Margin="10"
                 Foreground="Orange"
-                EditValue="{Binding ErrorText}" />
-            <dx:SimpleButton
-                Margin="10 0"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+            <ui:Button
+                Margin="10"
+                Width="80"
                 Content="ОК"
-                Width="80"
-                Height="25"
                 Click="ButtonOk_Click"
+                Appearance="Info"
                 Command="{Binding CreateViewSheetsCommand}" />
-            <dx:SimpleButton
-                Content="Отмена"
+            <ui:Button
+                Margin="10"
                 Width="80"
-                Height="25"
+                Content="Отмена"
+                IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:ThemedPlatformWindow>
+</core:WpfUIPlatformWindow>

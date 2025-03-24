@@ -1,9 +1,8 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
@@ -24,8 +23,8 @@ namespace RevitCreateViewSheet.ViewModels {
         private string _albumBlueprints;
         private ViewSheetViewModel _viewSheet;
 
-        public AppViewModel(UIApplication uiApplication) {
-            _revitRepository = new RevitRepository(uiApplication);
+        public AppViewModel(RevitRepository revitRepository) {
+            _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
 
             RemoveViewSheetCommand = new RelayCommand(RemoveViewSheet, CanRemoveViewSheet);
             CreateViewSheetCommand = new RelayCommand(CreateViewSheet, CanCreateViewSheet);
@@ -103,7 +102,7 @@ namespace RevitCreateViewSheet.ViewModels {
             return true;
         }
 
-        public void CreateViewSheets(object p) {           
+        public void CreateViewSheets(object p) {
             int lastIndex = _revitRepository.GetLastViewSheetIndex(AlbumBlueprints);
             lastIndex++;
             using(var transaction = new Transaction(_revitRepository.Document)) {

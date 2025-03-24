@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep;
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
-using dosymep.Bim4Everyone.Templates;
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
+using Ninject;
+
+using RevitCreateViewSheet.Models;
 using RevitCreateViewSheet.ViewModels;
 using RevitCreateViewSheet.Views;
 
@@ -26,19 +24,23 @@ namespace RevitCreateViewSheet {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            var application = uiApplication.Application;
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
 
-            var uiDocument = uiApplication.ActiveUIDocument;
-            var document = uiDocument.Document;
+                kernel.UseWpfUIThemeUpdater();
 
-            var projectParameters = ProjectParameters.Create(application);
-            projectParameters.SetupRevitParams(document, SharedParamsConfig.Instance.AlbumBlueprints, SharedParamsConfig.Instance.StampSheetNumber);
+                kernel.BindMainWindow<AppViewModel, CreateViewSheetWindow>();
 
-            var window = new CreateViewSheetWindow() {
-                DataContext = new AppViewModel(uiApplication)
-            };
-            
-            Notification(window);
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+                kernel.UseWpfLocalization(
+                    $"/{assemblyName};component/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
+
+                Notification(kernel.Get<CreateViewSheetWindow>());
+            }
         }
     }
 }

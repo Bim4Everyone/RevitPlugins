@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -10,28 +8,24 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.Revit.Comparators;
 
 namespace RevitCreateViewSheet.Models {
     public class RevitRepository {
-        private readonly UIApplication _uiApplication;
 
         public RevitRepository(UIApplication uiApplication) {
-            _uiApplication = uiApplication;
+            UIApplication = uiApplication;
+
+            InitializeParameters(Application, Document);
         }
 
-        public Application Application {
-            get => _uiApplication.Application;
-        }
+        public UIApplication UIApplication { get; }
+        public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
 
-        public Document Document {
-            get => UIDocument.Document;
-        }
-
-        public UIDocument UIDocument {
-            get => _uiApplication.ActiveUIDocument;
-        }
+        public Application Application => UIApplication.Application;
+        public Document Document => ActiveUIDocument.Document;
 
 
         public ViewSheet CreateViewSheet(FamilySymbol familySymbol) {
@@ -39,7 +33,7 @@ namespace RevitCreateViewSheet.Models {
         }
 
         public string GetDefaultAlbum() {
-            return UIDocument.GetSelectedElements()
+            return ActiveUIDocument.GetSelectedElements()
                 .OfType<ViewSheet>()
                 .Select(item => (string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints))
                 .Distinct()
@@ -83,6 +77,13 @@ namespace RevitCreateViewSheet.Models {
         private int? GetViewSheetIndex(ViewSheet viewSheet) {
             string index = viewSheet?.SheetNumber.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
             return int.TryParse(index, out int result) ? result : (int?) null;
+        }
+
+        private void InitializeParameters(Application application, Document document) {
+            var projectParameters = ProjectParameters.Create(application);
+            projectParameters.SetupRevitParams(document,
+                SharedParamsConfig.Instance.AlbumBlueprints,
+                SharedParamsConfig.Instance.StampSheetNumber);
         }
     }
 }
