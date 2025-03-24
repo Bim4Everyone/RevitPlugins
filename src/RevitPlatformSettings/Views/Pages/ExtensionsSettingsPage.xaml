@@ -43,7 +43,9 @@
     </Page.Resources>
 
     <DataGrid
+        SelectionMode="Single"
         AutoGenerateColumns="False"
+        CanUserResizeRows="False"
         CanUserSortColumns="False"
         CanUserReorderColumns="False"
         ItemsSource="{Binding Source={StaticResource GroupExtensions}}">

@@ -36,7 +36,9 @@
     <Grid>
         <DataGrid
             IsReadOnly="True"
+            SelectionMode="Single"
             AutoGenerateColumns="False"
+            CanUserResizeRows="False"
             CanUserSortColumns="False"
             CanUserReorderColumns="False"
             ItemsSource="{Binding RevitParams}">
