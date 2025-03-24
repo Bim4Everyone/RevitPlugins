@@ -13,8 +13,7 @@
         TextDecorations="None"
         Command="{Binding Command, ElementName=_this}"
         ToolTip="{Binding NavigationUrl, ElementName=_this}"
-        NavigateUri="{Binding NavigationUrl, ElementName=_this}"
-        RequestNavigate="Hyperlink_OnClick">
+        Click="Hyperlink_OnClick">
         
         <Image
             Width="20"
