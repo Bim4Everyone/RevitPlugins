@@ -26,9 +26,5 @@ namespace RevitMirroredElements.Views {
             DialogResult = false;
             Close(); 
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e) {
-
-        }
     }
 }

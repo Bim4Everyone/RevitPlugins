@@ -10,22 +10,22 @@
     <system:String x:Key="MainWindow.WholeProject">In the entire project</system:String>
     <system:String x:Key="MainWindow.VisibilityHeader">Visibility</system:String>
     <system:String x:Key="MainWindow.FilterDescription">Apply color mirroring filter temporarily for active view</system:String>
-    <system:String x:Key="MainWindow.PluginDescription">Plugin fills the parameter 'ФОП_Зеркальность'
-        '0' - element unchanged
-        '1' - element mirrored</system:String>
+    <system:String x:Key="MainWindow.PluginDescription">Plugin fills the parameter</system:String>
+    <system:String x:Key="MainWindow.PluginDescriptionState">'0' - element unchanged, '1' - mirrored element</system:String>
     <system:String x:Key="MainWindow.CheckMirrorCategories">Check the mirroring of the following element categories</system:String>
     <system:String x:Key="MainWindow.ButtonSelectTooltip">Select elements in the view</system:String>
     <system:String x:Key="MainWindow.ButtonSelectCategoriesTooltip">Select categories</system:String>
     <system:String x:Key="MainWindow.ProgressTitleFormat">Filling</system:String>
-    <system:String x:Key="MainWindow.SelectedElements">Selected elements</system:String>
-    <system:String x:Key="MainWindow.SelectedCategories">Selected categories</system:String>
+    <system:String x:Key="MainWindow.SelectedElements">Selected elements: ({0})</system:String>
+    <system:String x:Key="MainWindow.SelectedCategories">Selected categories: ({0})</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFilter">You must select a filter</system:String>
     <system:String x:Key="MainWindow.ErrorSelectElements">You must select elements</system:String>
     <system:String x:Key="MainWindow.ErrorSelectCategories">You must select categories</system:String>
     <system:String x:Key="MainWindow.ErrorSelectScope">You must select a scope</system:String>
     <system:String x:Key="MainWindow.CheckMirrorSelectedElements">Check the mirroring of selected elements in the view</system:String>
     <system:String x:Key="MainWindow.SelectCategoriesHint">You need to press the "Select" button to choose categories</system:String>
-    <system:String x:Key="MainWindow.CheckMirrorCategoriesElements">Check the mirroring of elements in selected categories</system:String>
+    <system:String x:Key="MainWindow.CheckMirrorCategoriesElements">Check the mirroring of elements in selected categories {0}</system:String>
+    <system:String x:Key="MainWindow.PressEscToCancel">Press ESC to cancel</system:String>
     <system:String x:Key="RevitRepository.MirrorFilterName">Mirroring Check</system:String>
     <system:String x:Key="RevitRepository.Parameter">Parameter</system:String>
     <system:String x:Key="RevitRepository.NotFound">not found.</system:String>

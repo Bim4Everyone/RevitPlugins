@@ -9,23 +9,22 @@
     <system:String x:Key="MainWindow.ActiveView">В активном виде</system:String>
     <system:String x:Key="MainWindow.WholeProject">Во всём проекте</system:String>
     <system:String x:Key="MainWindow.VisibilityHeader">Видимость</system:String>
-    <system:String x:Key="MainWindow.ButtonSelectTooltip">Выбрать элементы на виде</system:String>
+    <system:String x:Key="MainWindow.ButtonSelectTooltip">Выбрать элементы на виде. Для отмены нажмите ESC</system:String>
     <system:String x:Key="MainWindow.ButtonSelectCategoriesTooltip">Выбрать категории</system:String>
     <system:String x:Key="MainWindow.FilterDescription">Применить фильтр зеркальности по цвету во временном виде для активного вида</system:String>
-    <system:String x:Key="MainWindow.PluginDescription">Плагин заполняет параметр 'ФОП_Зеркальность'
-'0' - элемент без изменений
-'1' - элемент отзеркален</system:String>
+    <system:String x:Key="MainWindow.PluginDescription">Плагин заполняет параметр</system:String>
+    <system:String x:Key="MainWindow.PluginDescriptionState">'0' - элемент без изменений '1' - элемент отзеркален</system:String>
     <system:String x:Key="MainWindow.CheckMirrorCategories">Проверить на зеркальность следующие категории элементов</system:String>
     <system:String x:Key="MainWindow.ProgressTitleFormat">Заполнение</system:String>
-    <system:String x:Key="MainWindow.SelectedElements">Выбранные элементы</system:String>
-    <system:String x:Key="MainWindow.SelectedCategories">Выбранные категории</system:String>
+    <system:String x:Key="MainWindow.SelectedElements">Выбранные элементы: ({0})</system:String>
+    <system:String x:Key="MainWindow.SelectedCategories">Выбранные категории: ({0})</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFilter">Необходимо выбрать фильтр</system:String>
     <system:String x:Key="MainWindow.ErrorSelectElements">Необходимо выбрать элементы</system:String>
     <system:String x:Key="MainWindow.ErrorSelectCategories">Необходимо выбрать категории</system:String>
     <system:String x:Key="MainWindow.ErrorSelectScope">Необходимо выбрать область</system:String>
     <system:String x:Key="MainWindow.CheckMirrorSelectedElements">Проверить на зеркальность выбранные элементы на виде</system:String>
     <system:String x:Key="MainWindow.SelectCategoriesHint">Необходимо нажать кнопку "Выбор" для выбора категорий</system:String>
-    <system:String x:Key="MainWindow.CheckMirrorCategoriesElements">Проверить на зеркальности элементы у выбранных категорий</system:String>
+    <system:String x:Key="MainWindow.CheckMirrorCategoriesElements">Проверить на зеркальности элементы у выбранных категорий {0}</system:String>
     <system:String x:Key="Transaction.SetParam">Заполнение параметров зеркальности</system:String>
     <system:String x:Key="Transaction.SettingTemporaryView">Настройка временного вида для зеркальности</system:String>
     <system:String x:Key="RevitRepository.MirrorFilterName">Проверка зеркальности</system:String>

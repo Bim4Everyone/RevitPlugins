@@ -9,6 +9,6 @@ using Autodesk.Revit.DB;
 namespace RevitMirroredElements.Interfaces
 {
     public interface ICategorySelectionService {
-        List<Category> SelectCategories();
+        List<Category> SelectCategories(List<Category> currentSelection);
     }
 }

@@ -14,10 +14,10 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    Height="500"
-    Width="350"
-    MinHeight="500"  
-    MinWidth="350"
+    Height="450"
+    Width="700"
+    MinHeight="450"  
+    MinWidth="700"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
@@ -87,7 +87,7 @@
                 Content="{me:LocalizationSource MainWindow.ButtonSelect}"
                 ToolTip="{me:LocalizationSource MainWindow.ButtonSelectCategoriesTooltip}"       
                 HorizontalAlignment="Right"
-                Command="{Binding SelectCategoriesCommand}" Click="Button_Click" />
+                Command="{Binding SelectCategoriesCommand}"/>
                 </Grid>
 
                 <StackPanel Orientation="Horizontal" Margin="20,10,0,0">
@@ -126,16 +126,23 @@
             Width="250" />
             </StackPanel>
 
-            <TextBlock
-        TextWrapping="Wrap"
-        Margin="0,10,0,15"
-        Text="{me:LocalizationSource MainWindow.PluginDescription}" />
+            <StackPanel Margin="0,10,0,15">
+                <TextBlock TextWrapping="Wrap">
+                    <Run Text="{me:LocalizationSource MainWindow.PluginDescription}" />
+                    <Run Text=" " />
+                    <Run Text="{Binding ElementMirroringParamName}"/>
+                </TextBlock>
+
+                    <TextBlock 
+                TextWrapping="Wrap"
+                Text="{me:LocalizationSource MainWindow.PluginDescriptionState}" />
+            </StackPanel>
 
         </StackPanel>
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Right">
             <TextBlock
-        Margin="0,0,0,5"
+        Margin="0,0,5,5"
         TextWrapping="Wrap"
         Foreground="Orange"
         HorizontalAlignment="Center"
@@ -143,9 +150,10 @@
         Text="{Binding ErrorText}" />
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button
+                <ui:Button
             Margin="10"
             Width="80"
+            Appearance="Info"
             Content="{me:LocalizationSource MainWindow.ButtonOk}"
             IsDefault="True"
             Click="ButtonOk_Click"

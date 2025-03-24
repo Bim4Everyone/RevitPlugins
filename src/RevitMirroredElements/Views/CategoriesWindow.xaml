@@ -18,10 +18,10 @@
     MinWidth="300"
     ResizeMode="CanResizeWithGrip">
 
-    <core:WpfUIPlatformWindow.Resources>
+    <Window.Resources>
         <conv:BoolToVisibilityConverter
             x:Key="BoolToVisibilityConverter" />
-    </core:WpfUIPlatformWindow.Resources>
+    </Window.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger
@@ -102,9 +102,10 @@
             <StackPanel
                 Orientation="Horizontal"
                 HorizontalAlignment="Right">
-                <Button
+                <ui:Button
                     Margin="10"
                     Width="80"
+                    Appearance="Info"
                     Content="{me:LocalizationSource MainWindow.ButtonOk}"
                     IsDefault="True"
                     Click="ButtonOk_Click" />

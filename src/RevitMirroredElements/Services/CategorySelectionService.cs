@@ -12,19 +12,23 @@ using RevitMirroredElements.Views;
 
 namespace RevitMirroredElements.Services
 {
-    public class CategorySelectionService : ICategorySelectionService {
+    internal class CategorySelectionService : ICategorySelectionService {
         private readonly Func<CategoriesWindow> _createCategoriesWindow;
+        private readonly RevitRepository _revitRepository;
 
-        public CategorySelectionService(Func<CategoriesWindow> createCategoriesWindow) {
+        public CategorySelectionService(Func<CategoriesWindow> createCategoriesWindow, RevitRepository revitRepository) {
             _createCategoriesWindow = createCategoriesWindow;
+            _revitRepository = revitRepository;
         }
 
-        public List<Category> SelectCategories() {
-            var categoriesWindow = _createCategoriesWindow();
-            if(categoriesWindow.ShowDialog() == true) {
-                return ((CategoriesViewModel) categoriesWindow.DataContext).GetSelectedCategories();
+        public List<Category> SelectCategories(List<Category> currentSelection) {
+            var window = _createCategoriesWindow();
+            window.DataContext = new CategoriesViewModel(_revitRepository, currentSelection);
+            if(window.ShowDialog() == true) {
+                return ((CategoriesViewModel) window.DataContext).GetSelectedCategories();
             }
-            return new List<Category>();
+
+            return null;
         }
     }
 }
