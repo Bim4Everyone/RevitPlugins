@@ -46,7 +46,7 @@
     <system:String x:Key="AboutSettings.PlatformDownload">Download platform setup</system:String>
 
     <system:String x:Key="ExtensionSettings.Title">Extensions</system:String>
-    <system:String x:Key="ExtensionSettings.CategoryGridColumn">Category</system:String>
+    <system:String x:Key="ExtensionSettings.CategoryGridColumn">Category: {0}</system:String>
     <system:String x:Key="ExtensionSettings.NameGridColumn">Name</system:String>
     <system:String x:Key="ExtensionSettings.DescriptionGridColumn">Description</system:String>
     

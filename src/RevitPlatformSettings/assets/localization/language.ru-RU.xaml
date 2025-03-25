@@ -47,7 +47,7 @@
     <system:String x:Key="AboutSettings.PlatformDownload">Загрузка установщика платформы</system:String>
     
     <system:String x:Key="ExtensionSettings.Title">Расширения</system:String>
-    <system:String x:Key="ExtensionSettings.CategoryGridColumn">Категория</system:String>
+    <system:String x:Key="ExtensionSettings.CategoryGridColumn">Категория: {0}</system:String>
     <system:String x:Key="ExtensionSettings.NameGridColumn">Имя</system:String>
     <system:String x:Key="ExtensionSettings.DescriptionGridColumn">Описание</system:String>
     

@@ -32,7 +32,7 @@
                 IsEnabled="{Binding AllowChangeEnabled}"
                 IsChecked="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged}" />
         </DataTemplate>
-        
+
         <CollectionViewSource
             x:Key="GroupExtensions"
             Source="{Binding Extensions}">
@@ -52,17 +52,31 @@
 
         <DataGrid.GroupStyle>
             <GroupStyle>
-                <GroupStyle.HeaderTemplate>
-                    <DataTemplate>
-                        <TextBlock
-                            Margin="10"
-                            FontWeight="Bold">
-                            <Run Text="{DynamicResource ExtensionSettings.CategoryGridColumn}" />
-                            <Run Text=": " />
-                            <Run Text="{Binding Category}" />
-                        </TextBlock>
-                    </DataTemplate>
-                </GroupStyle.HeaderTemplate>
+                <GroupStyle.ContainerStyle>
+                    <Style TargetType="{x:Type GroupItem}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type GroupItem}">
+                                    <Grid>
+                                        <Expander IsExpanded="True">
+                                            <Expander.Header>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock
+                                                        Margin="10"
+                                                        FontWeight="Bold"
+                                                        Text="{Binding Name, 
+                                                            StringFormat={StaticResource ExtensionSettings.CategoryGridColumn}}">
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Expander.Header>
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </GroupStyle.ContainerStyle>
             </GroupStyle>
         </DataGrid.GroupStyle>
 
