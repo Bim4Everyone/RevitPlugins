@@ -16,7 +16,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _generalViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ВЕРТ_Пилоны";
         private string _generalRebarViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ВЕРТ_Пилоны_Каркас";
         private string _generalViewXOffsetTemp = "200";
-        private string _generalViewYTopOffsetTemp = "2300";
+        private string _generalViewYTopOffsetTemp = "1300";
         private string _generalViewYBottomOffsetTemp = "200";
 
         private string _transverseViewFirstPrefixTemp = "";

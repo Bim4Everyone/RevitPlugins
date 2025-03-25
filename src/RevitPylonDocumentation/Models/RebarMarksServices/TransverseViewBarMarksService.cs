@@ -67,7 +67,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
 
         public void CreateRightTopMark(List<Element> simpleClamps, List<Element> simpleRebars) {
             // Получаем референс-элемент
-            Element rightClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Right, false);
+            Element rightClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Right, true);
             Element rightTopVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.RightTop, false);
 
             // Устанавливаем значение комментария у арматуры, к которой привяжем марку
@@ -95,7 +95,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             Element leftCBar = _viewPointsAnalyzer.GetElementByDirection(simpleCBars, DirectionType.Left, true);
 
             // Получаем точку в которую нужно поставить аннотацию
-            XYZ pointLeft = _viewPointsAnalyzer.GetPointByDirection(leftCBar, DirectionType.LeftBottom, 1.5, 0.1, true);
+            XYZ pointLeft = _viewPointsAnalyzer.GetPointByDirection(leftCBar, DirectionType.LeftBottom, 1.3, 0.1, true);
 
             foreach(Element simpleCBar in simpleCBars) {
                 // Устанавливаем значение комментария у арматуры, к которой привяжем марку
