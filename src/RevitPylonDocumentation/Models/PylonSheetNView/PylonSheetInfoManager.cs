@@ -88,17 +88,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 // Тут точно получили вид
             }
 
-
-            // ОБРАЗМЕРИВАНИЕ ОСНОВНОГО АРМАТУРНОГО ПЕРПЕНДИКУЛЯРНОГО ВИДА
-            if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
-                // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-                if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement != null) {
-                    SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
-                        .TryCreateGeneralRebarPerpendicularViewDimensions();
-                }
-            }
-
-
             // ПЕРВЫЙ ПОПЕРЕЧНЫЙ ВИД
             if(selectionSettings.NeedWorkWithTransverseViewFirst) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
@@ -229,6 +218,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                     }
                 }
                 // Тут точно получили вид
+
             }
 
 
@@ -290,7 +280,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
             }
 
-            // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО АРМАТУРНОГО ВИДА
+            // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ПЕРПЕНДИКУЛЯРНОГО АРМАТУРНОГО ВИДА
             if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
                 // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
                 if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement != null) {

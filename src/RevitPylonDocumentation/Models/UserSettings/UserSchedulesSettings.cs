@@ -29,7 +29,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
         // Названия эталонных спек
         private string _rebarScheduleNameTemp = "01_(КЖ...)_СА_Базовая_(Марка пилона)";
-        private string _materialScheduleNameTemp = "01_(КЖ...)_СМ_Базовая_(Марка пилона)";
+        private string _materialScheduleNameTemp = "01_(КЖ...)_СМ_Базовая_(Марка пилона)_Одноэтажный";
         private string _systemPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_Системная";
         private string _ifcPartsScheduleNameTemp = "01_(КЖ...)_ВД_(Марка пилона)_IFC";
         private string _skeletonScheduleNameTemp = "01_(КЖ...)_Изделия_(Марка)";
@@ -53,6 +53,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private ObservableCollection<ScheduleFilterParamHelper> _paramsForScheduleFiltersTemp = new ObservableCollection<ScheduleFilterParamHelper>() {
             new ScheduleFilterParamHelper("обр_ФОП_Форма_номер", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Изделие_Марка", ""),
+            new ScheduleFilterParamHelper("обр_ФОП_Фильтрация 1", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Группа КР", ""),
             new ScheduleFilterParamHelper("обр_ФОП_Раздел проекта", "обр_ФОП_Раздел проекта"),
             new ScheduleFilterParamHelper("обр_ФОП_Орг. уровень", "обр_ФОП_Орг. уровень"),

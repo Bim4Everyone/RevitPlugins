@@ -13,8 +13,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _generalRebarViewPerpendicularPrefixTemp = "Каркас ";
         private string _generalRebarViewPerpendicularSuffixTemp = "_Боковой";
 
-        private string _generalViewTemplateNameTemp = "!Новый РАЗРЕЗ";
-        private string _generalRebarViewTemplateNameTemp = "!Новый РАЗРЕЗ";
+        private string _generalViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ВЕРТ_Пилоны";
+        private string _generalRebarViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ВЕРТ_Пилоны_Каркас";
         private string _generalViewXOffsetTemp = "200";
         private string _generalViewYTopOffsetTemp = "2300";
         private string _generalViewYBottomOffsetTemp = "200";
@@ -27,7 +27,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _transverseViewSecondElevationTemp = "0,5";
         private string _transverseViewThirdPrefixTemp = "";
         private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
-        private string _transverseViewThirdElevationTemp = "1,25";
+        private string _transverseViewThirdElevationTemp = "1,1";
 
         private string _transverseRebarViewFirstPrefixTemp = "Каркас ";
         private string _transverseRebarViewFirstSuffixTemp = "_Сеч.а-а";
@@ -36,10 +36,10 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _transverseRebarViewSecondSuffixTemp = "_Сеч.б-б";
         private string _transverseRebarViewSecondElevationTemp = "1,1";
 
-        private string _transverseViewTemplateNameTemp = "!Новый РАЗРЕЗ";
-        private string _transverseRebarViewTemplateNameTemp = "!Новый РАЗРЕЗ";
-        private string _transverseViewXOffsetTemp = "200";
-        private string _transverseViewYOffsetTemp = "200";
+        private string _transverseViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны";
+        private string _transverseRebarViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны_Каркас";
+        private string _transverseViewXOffsetTemp = "400";
+        private string _transverseViewYOffsetTemp = "600";
 
         private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Номер вида без номера листа";
 
