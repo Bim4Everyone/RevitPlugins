@@ -42,8 +42,8 @@ namespace RevitMechanicalSpecification.Service {
             _userName = document.Application.Username;
             _document = document;
 
-            _specConfiguration = new SpecConfiguration(_document);
             _paramChecker = new ParamChecker();
+            _specConfiguration = new SpecConfiguration(_document);
             _maskReplacer = new MaskReplacer(_specConfiguration);
         }
 
