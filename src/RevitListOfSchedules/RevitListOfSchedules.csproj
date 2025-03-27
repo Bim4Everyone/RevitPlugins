@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <LangVersion>12</LangVersion>
+        <UseDevExpress>false</UseDevExpress>
+    </PropertyGroup>
+    <ItemGroup>
+      <None Remove="Resources\AttachmentLoaded.png" />
+      <None Remove="Resources\AttachmentUnloaded.png" />
+      <None Remove="Resources\LocalUnloaded.png" />
+      <None Remove="Resources\OverlayLoaded.png" />
+      <None Remove="Resources\OverlayUnloaded.png" />
+    </ItemGroup>
+    <ItemGroup>
+      <Resource Include="Resources\AttachmentLoaded.png" />
+      <Resource Include="Resources\AttachmentUnloaded.png" />
+      <Resource Include="Resources\LocalUnloaded.png" />
+      <Resource Include="Resources\OverlayLoaded.png" />
+      <Resource Include="Resources\OverlayUnloaded.png" />
+    </ItemGroup>
+</Project>
