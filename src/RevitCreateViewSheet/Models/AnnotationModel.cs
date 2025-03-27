@@ -13,18 +13,26 @@ namespace RevitCreateViewSheet.Models {
             Sheet = sheetModel ?? throw new ArgumentNullException(nameof(sheetModel));
             _annotationSymbol = annotationSymbol ?? throw new ArgumentNullException(nameof(annotationSymbol));
             _location = (_annotationSymbol.Location as LocationPoint)?.Point;
+            FamilyName = annotationSymbol.AnnotationSymbolType.FamilyName;
+            SymbolName = annotationSymbol.AnnotationSymbolType.Name;
             State = EntityState.Unchanged;
         }
 
         public AnnotationModel(SheetModel sheetModel, AnnotationSymbolType annotationSymbolType) {
             Sheet = sheetModel ?? throw new ArgumentNullException(nameof(sheetModel));
             _annotationType = annotationSymbolType ?? throw new ArgumentNullException(nameof(annotationSymbolType));
+            FamilyName = _annotationType.FamilyName;
+            SymbolName = _annotationType.Name;
             State = EntityState.Added;
         }
 
         public EntityState State { get; private set; }
 
         public SheetModel Sheet { get; }
+
+        public string FamilyName { get; }
+
+        public string SymbolName { get; }
 
 
         public void SetLocation(XYZ point) {
