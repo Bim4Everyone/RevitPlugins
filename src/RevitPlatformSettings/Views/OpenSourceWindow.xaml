@@ -7,7 +7,6 @@
 
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    xmlns:viewModels="clr-namespace:RevitPlatformSettings.ViewModels"
     xmlns:views="clr-namespace:RevitPlatformSettings.Views"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 
@@ -15,9 +14,9 @@
 
     x:Name="_this"
     mc:Ignorable="d"
-    
+
     Height="550" Width="700"
-    
+
     Title="{me:LocalizationSource OpenSourceWindow.Title}"
     d:DataContext="{d:DesignInstance views:OpenSourceItem, IsDesignTimeCreatable=False}">
 
@@ -44,8 +43,8 @@
                 <PropertyGroupDescription PropertyName="ItemType" />
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
-        
-        <Style 
+
+        <Style
             x:Key="HyperLink"
             TargetType="TextBlock">
             <EventSetter Event="Hyperlink.Click" Handler="OnHyperlinkClick" />

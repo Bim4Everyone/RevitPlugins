@@ -14,20 +14,20 @@
         Command="{Binding Command, ElementName=_this}"
         ToolTip="{Binding NavigationUrl, ElementName=_this}"
         Click="Hyperlink_OnClick">
-        
+
         <Image
             Width="20"
             Height="20"
             Cursor="Hand"
             VerticalAlignment="Center"
             Source="{Binding ImageSource, ElementName=_this}" />
-        
+
         <TextBlock
             FontSize="20"
             VerticalAlignment="Center"
             TextDecorations="Underline"
             Text="{Binding EditValue, ElementName=_this}" />
-        
+
     </Hyperlink>
 
 </UserControl>

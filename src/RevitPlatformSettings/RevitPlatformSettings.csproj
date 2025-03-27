@@ -2,44 +2,45 @@
     <PropertyGroup>
         <UseWpfUI>true</UseWpfUI>
         <UseDevExpress>true</UseDevExpress>
+        <LangVersion>12</LangVersion>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="Serilog" Version="2.10.0">
             <PrivateAssets>all</PrivateAssets>
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
     </ItemGroup>
-    
-    
+
+
     <ItemGroup>
-        <Resource Include="assets\images\theme-dark\icons8-download-96.png" />
-        <Resource Include="assets\images\theme-dark\icons8-github-96.png" />
-        <Resource Include="assets\images\theme-dark\icons8-message-96.png" />
-        <Resource Include="assets\images\theme-dark\icons8-news-96.png" />
-        <Resource Include="assets\images\theme-light\icons8-download-96.png" />
-        <Resource Include="assets\images\theme-light\icons8-github-96.png" />
-        <Resource Include="assets\images\theme-light\icons8-message-96.png" />
-        <Resource Include="assets\images\theme-light\icons8-news-96.png" />
+        <Resource Include="assets\images\theme-dark\icons8-download-96.png"/>
+        <Resource Include="assets\images\theme-dark\icons8-github-96.png"/>
+        <Resource Include="assets\images\theme-dark\icons8-message-96.png"/>
+        <Resource Include="assets\images\theme-dark\icons8-news-96.png"/>
+        <Resource Include="assets\images\theme-light\icons8-download-96.png"/>
+        <Resource Include="assets\images\theme-light\icons8-github-96.png"/>
+        <Resource Include="assets\images\theme-light\icons8-message-96.png"/>
+        <Resource Include="assets\images\theme-light\icons8-news-96.png"/>
     </ItemGroup>
-    
-    
+
+
     <ItemGroup>
-      <Page Update="assets\Localization\Language.en-US.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-      <Page Update="assets\Localization\Language.ru-RU.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </Page>
-      <Page Update="Views\Editors\CustomEditControl.xaml">
-        <Generator>MSBuild:Compile</Generator>
-        <XamlRuntime>Wpf</XamlRuntime>
-        <SubType>Designer</SubType>
-      </Page>
-      <Page Update="Views\Editors\HyperLinkEditWithImage.xaml">
-        <Generator>MSBuild:Compile</Generator>
-        <XamlRuntime>Wpf</XamlRuntime>
-        <SubType>Designer</SubType>
-      </Page>
+        <Page Update="assets\Localization\Language.en-US.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="assets\Localization\Language.ru-RU.xaml">
+            <Generator>MSBuild:Compile</Generator>
+        </Page>
+        <Page Update="Views\Editors\CustomEditControl.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Views\Editors\HyperLinkEditWithImage.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
     </ItemGroup>
 </Project>

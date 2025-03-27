@@ -9,49 +9,48 @@ using Ninject.Syntax;
 
 using RevitPlatformSettings.Views;
 
-namespace RevitPlatformSettings.ViewModels.Settings {
-    internal sealed class AboutSettingsViewModel : SettingsViewModel {
-        private readonly IResolutionRoot _resolutionRoot;
-        private readonly ILocalizationService _localizationService;
-        private readonly IPlatformSettingsService _platformSettingsService;
+namespace RevitPlatformSettings.ViewModels.Settings;
 
-        public AboutSettingsViewModel(
-            IResolutionRoot resolutionRoot,
-            ILocalizationService localizationService,
-            IPlatformSettingsService platformSettingsService) {
-            
-            _resolutionRoot = resolutionRoot;
-            _localizationService = localizationService;
-            _platformSettingsService = platformSettingsService;
+internal sealed class AboutSettingsViewModel : SettingsViewModel {
+    private readonly ILocalizationService _localizationService;
+    private readonly IPlatformSettingsService _platformSettingsService;
+    private readonly IResolutionRoot _resolutionRoot;
 
-            ImagePath = _platformSettingsService.CorpSettings?.ImagePath
-                        ?? "/dosymep.Bim4Everyone;component/assets/Bim4Everyone.png";
+    public AboutSettingsViewModel(
+        IResolutionRoot resolutionRoot,
+        ILocalizationService localizationService,
+        IPlatformSettingsService platformSettingsService) {
+        _resolutionRoot = resolutionRoot;
+        _localizationService = localizationService;
+        _platformSettingsService = platformSettingsService;
 
-            PlatformName = _platformSettingsService.CorpSettings?.Name;
-            PlatformPageUrl = _platformSettingsService.SocialsSettings?.PlatformPageUrl;
+        ImagePath = _platformSettingsService.CorpSettings?.ImagePath
+                    ?? "/dosymep.Bim4Everyone;component/assets/Bim4Everyone.png";
 
-            NewsChatUrl = _platformSettingsService.SocialsSettings?.NewsChatUrl;
-            MainChatUrl = _platformSettingsService.SocialsSettings?.MainChatUrl;
-            DownloadLinkUrl = _platformSettingsService.SocialsSettings?.DownloadLinkUrl;
+        PlatformName = _platformSettingsService.CorpSettings?.Name;
+        PlatformPageUrl = _platformSettingsService.SocialsSettings?.PlatformPageUrl;
 
-            ShowOpenSourceDialogCommand = RelayCommand.Create(ShowOpenSourceDialog);
-        }
+        NewsChatUrl = _platformSettingsService.SocialsSettings?.NewsChatUrl;
+        MainChatUrl = _platformSettingsService.SocialsSettings?.MainChatUrl;
+        DownloadLinkUrl = _platformSettingsService.SocialsSettings?.DownloadLinkUrl;
 
-        public ICommand ShowOpenSourceDialogCommand { get; }
+        ShowOpenSourceDialogCommand = RelayCommand.Create(ShowOpenSourceDialog);
+    }
 
-        public string ImagePath { get; }
-        public string PlatformName { get; }
-        public string PlatformPageUrl { get; }
+    public ICommand ShowOpenSourceDialogCommand { get; }
 
-        public string NewsChatUrl { get; }
-        public string MainChatUrl { get; }
-        public string DownloadLinkUrl { get; }
+    public string ImagePath { get; }
+    public string PlatformName { get; }
+    public string PlatformPageUrl { get; }
 
-        public string PlatformDescription =>
-            _localizationService.GetLocalizedString("AboutSettings.PlatformDescription", PlatformName);
+    public string NewsChatUrl { get; }
+    public string MainChatUrl { get; }
+    public string DownloadLinkUrl { get; }
 
-        private void ShowOpenSourceDialog() {
-            _resolutionRoot.Get<OpenSourceWindow>().ShowDialog();
-        }
+    public string PlatformDescription =>
+        _localizationService.GetLocalizedString("AboutSettings.PlatformDescription", PlatformName);
+
+    private void ShowOpenSourceDialog() {
+        _resolutionRoot.Get<OpenSourceWindow>().ShowDialog();
     }
 }

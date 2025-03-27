@@ -1,9 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using dosymep.WPF.ViewModels;
 
-using dosymep.WPF.ViewModels;
+namespace RevitPlatformSettings.ViewModels.Settings;
 
-namespace RevitPlatformSettings.ViewModels.Settings {
-    internal class SettingsViewModel : BaseViewModel {
-        public virtual void SaveSettings() { }
-    }
+internal class SettingsViewModel : BaseViewModel {
+    public virtual void SaveSettings() { }
 }

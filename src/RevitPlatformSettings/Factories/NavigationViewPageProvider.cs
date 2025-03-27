@@ -5,16 +5,16 @@ using Ninject.Syntax;
 
 using Wpf.Ui.Abstractions;
 
-namespace RevitPlatformSettings.Factories {
-    internal sealed class NavigationViewPageProvider : INavigationViewPageProvider {
-        private readonly IResolutionRoot _resolutionRoot;
+namespace RevitPlatformSettings.Factories;
 
-        public NavigationViewPageProvider(IResolutionRoot resolutionRoot) {
-            _resolutionRoot = resolutionRoot;
-        }
+internal sealed class NavigationViewPageProvider : INavigationViewPageProvider {
+    private readonly IResolutionRoot _resolutionRoot;
 
-        public object GetPage(Type pageType) {
-            return _resolutionRoot.Get(pageType);
-        }
+    public NavigationViewPageProvider(IResolutionRoot resolutionRoot) {
+        _resolutionRoot = resolutionRoot;
+    }
+
+    public object GetPage(Type pageType) {
+        return _resolutionRoot.Get(pageType);
     }
 }

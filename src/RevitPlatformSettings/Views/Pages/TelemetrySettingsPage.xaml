@@ -7,7 +7,6 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    xmlns:views="clr-namespace:RevitPlatformSettings.Views"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:logs="clr-namespace:Serilog.Events;assembly=Serilog"
     xmlns:edits="clr-namespace:RevitPlatformSettings.Views.Edits"

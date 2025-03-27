@@ -65,8 +65,7 @@
                                                         Margin="10"
                                                         FontWeight="Bold"
                                                         Text="{Binding Name, 
-                                                            StringFormat={StaticResource ExtensionSettings.CategoryGridColumn}}">
-                                                    </TextBlock>
+                                                            StringFormat={StaticResource ExtensionSettings.CategoryGridColumn}}" />
                                                 </StackPanel>
                                             </Expander.Header>
                                             <ItemsPresenter />

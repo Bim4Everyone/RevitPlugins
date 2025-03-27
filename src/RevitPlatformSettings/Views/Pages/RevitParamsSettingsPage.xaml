@@ -51,7 +51,7 @@
                 <DataGridTextColumn
                     Binding="{Binding Name}"
                     Header="{StaticResource NameColumnHeader}" />
-                
+
                 <DataGridComboBoxColumn
                     SelectedValuePath="Value"
                     DisplayMemberPath="DisplayName"

@@ -2,31 +2,31 @@ using dosymep.Bim4Everyone.SimpleServices;
 
 using Serilog.Events;
 
-namespace RevitPlatformSettings.ViewModels.Settings {
-    internal sealed class TelemetrySettingsViewModel : SettingsViewModel {
-        private readonly IPlatformSettingsService _platformSettingsService;
+namespace RevitPlatformSettings.ViewModels.Settings;
 
-        public TelemetrySettingsViewModel(
-            IPlatformSettingsService platformSettingsService) {
-            _platformSettingsService = platformSettingsService;
+internal sealed class TelemetrySettingsViewModel : SettingsViewModel {
+    private readonly IPlatformSettingsService _platformSettingsService;
 
-            LogTraceIsActive = _platformSettingsService.LogTrace.IsActive;
-            LogTraceLogLevel = _platformSettingsService.LogTrace.LogLevel;
-            LogTraceServerName = _platformSettingsService.LogTrace.ServerName;
+    public TelemetrySettingsViewModel(
+        IPlatformSettingsService platformSettingsService) {
+        _platformSettingsService = platformSettingsService;
 
-            LogTraceJournalIsActive = _platformSettingsService.LogTraceJournal.IsActive;
-            LogTraceJournalUseUtc = _platformSettingsService.LogTraceJournal.UseUtc;
-            LogTraceJournalLogLevel = _platformSettingsService.LogTraceJournal.LogLevel;
-            LogTraceJournalOutputTemplate = _platformSettingsService.LogTraceJournal.OutputTemplate;
-        }
-        
-        public bool? LogTraceIsActive { get; }
-        public LogEventLevel? LogTraceLogLevel { get; }
-        public string LogTraceServerName { get; }
+        LogTraceIsActive = _platformSettingsService.LogTrace.IsActive;
+        LogTraceLogLevel = _platformSettingsService.LogTrace.LogLevel;
+        LogTraceServerName = _platformSettingsService.LogTrace.ServerName;
 
-        public bool? LogTraceJournalIsActive { get; }
-        public bool? LogTraceJournalUseUtc { get; }
-        public LogEventLevel? LogTraceJournalLogLevel { get; }
-        public string LogTraceJournalOutputTemplate { get; }
+        LogTraceJournalIsActive = _platformSettingsService.LogTraceJournal.IsActive;
+        LogTraceJournalUseUtc = _platformSettingsService.LogTraceJournal.UseUtc;
+        LogTraceJournalLogLevel = _platformSettingsService.LogTraceJournal.LogLevel;
+        LogTraceJournalOutputTemplate = _platformSettingsService.LogTraceJournal.OutputTemplate;
     }
+
+    public bool? LogTraceIsActive { get; }
+    public LogEventLevel? LogTraceLogLevel { get; }
+    public string LogTraceServerName { get; }
+
+    public bool? LogTraceJournalIsActive { get; }
+    public bool? LogTraceJournalUseUtc { get; }
+    public LogEventLevel? LogTraceJournalLogLevel { get; }
+    public string LogTraceJournalOutputTemplate { get; }
 }
