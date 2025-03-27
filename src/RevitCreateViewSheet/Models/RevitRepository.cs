@@ -28,10 +28,6 @@ namespace RevitCreateViewSheet.Models {
         public Document Document => ActiveUIDocument.Document;
 
 
-        public ViewSheet CreateViewSheet(FamilySymbol familySymbol) {
-            return ViewSheet.Create(Document, familySymbol.Id);
-        }
-
         public string GetDefaultAlbum() {
             return ActiveUIDocument.GetSelectedElements()
                 .OfType<ViewSheet>()
@@ -72,6 +68,53 @@ namespace RevitCreateViewSheet.Models {
                 .LastOrDefault();
 
             return GetViewSheetIndex(viewSheet) ?? 1;
+        }
+
+        public void RemoveElement(ElementId id) {
+            Document.Delete(id);
+        }
+
+        public void CreateAnnotation(View view2D, FamilySymbol familySymbol, XYZ point) {
+            Document.Create.NewFamilyInstance(point, familySymbol, view2D);
+        }
+
+        internal ScheduleSheetInstance CreateSchedule(ElementId viewSheetId, ElementId scheduleViewId, XYZ point) {
+            return ScheduleSheetInstance.Create(Document, viewSheetId, scheduleViewId, point);
+        }
+
+        internal Viewport CreateViewPort(ElementId viewSheetId, ElementId viewId, ElementId viewportTypeId, XYZ point) {
+            var viewport = Viewport.Create(Document, viewSheetId, viewId, point);
+            return UpdateViewPort(viewport, viewportTypeId);
+        }
+
+        internal Viewport UpdateViewPort(Viewport viewport, ElementId viewportTypeId) {
+            viewport.SetParamValue(BuiltInParameter.ELEM_TYPE_PARAM, viewportTypeId);
+            return viewport;
+        }
+
+        internal ViewSheet CreateViewSheet(SheetModel sheetModel) {
+            var sheet = ViewSheet.Create(Document, sheetModel.TitleBlockSymbolId);
+            return UpdateViewSheet(sheet, sheetModel, false);
+        }
+
+        internal ViewSheet UpdateViewSheet(ViewSheet sheet, SheetModel sheetModel) {
+            return UpdateViewSheet(sheet, sheetModel, true);
+        }
+
+        private ViewSheet UpdateViewSheet(ViewSheet sheet, SheetModel sheetModel, bool updateTitleBlock) {
+            if(updateTitleBlock) {
+                var titleId = sheet.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_TitleBlocks))
+                    .FirstOrDefault();
+                if(titleId.IsNotNull()) {
+                    var symbol = Document.GetElement(sheetModel.TitleBlockSymbolId) as FamilySymbol;
+                    (Document.GetElement(titleId) as FamilyInstance).Symbol = symbol;
+                }
+            }
+            sheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, sheetModel.SheetNumber);
+            sheet.SetParamValue(SharedParamsConfig.Instance.AlbumBlueprints, sheetModel.AlbumBlueprints);
+            sheet.SetParamValue(BuiltInParameter.SHEET_NAME, sheetModel.Name);
+            sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{sheetModel.AlbumBlueprints}-{sheetModel.SheetNumber}");
+            return sheet;
         }
 
         private int? GetViewSheetIndex(ViewSheet viewSheet) {
