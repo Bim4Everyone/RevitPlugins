@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -401,7 +401,7 @@ namespace RevitRooms.ViewModels {
                 // Подсчет площадей помещений
                 foreach(var level in levels) {
                     foreach(var spatialElement in level.GetRooms(phases)) {
-                        if(IsFillLevel) {
+                        if(IsFillLevel && !spatialElement.IsLevelFix) {
                             // Заполняем параметр Этаж
                             _revitRepository.UpdateLevelSharedParam(spatialElement.Element, levelNames);
                         }

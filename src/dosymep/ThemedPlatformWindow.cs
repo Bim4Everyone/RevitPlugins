@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -113,12 +113,13 @@ namespace dosymep.WPF.Views {
                 .Build<PlatformWindowConfig>();
         }
 
+
         private void OnUIThemeChanged(UIThemes obj) {
             UpdateTheme();
         }
 
         private void UpdateTheme() {
-            UIThemeUpdaterService.SetTheme(this, UIThemeService.HostTheme);
+            UIThemeUpdaterService.SetTheme(UIThemeService.HostTheme, this);
         }
     }
 }
