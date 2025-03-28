@@ -19,6 +19,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public bool IsPlaced { get; }
 
+        public ScheduleModel ScheduleModel => _scheduleModel;
+
 
         public bool Equals(ScheduleViewModel other) {
             return other is not null

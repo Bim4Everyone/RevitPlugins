@@ -21,9 +21,14 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public bool IsPlaced { get; }
 
+        public ViewPortModel ViewPortModel => _viewPortModel;
+
         public ViewPortTypeViewModel ViewPortType {
             get => _viewPortType;
-            set => RaiseAndSetIfChanged(ref _viewPortType, value);
+            set {
+                RaiseAndSetIfChanged(ref _viewPortType, value);
+                _viewPortModel.ViewPortType = value?.ViewType;
+            }
         }
 
 

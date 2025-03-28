@@ -38,24 +38,38 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public bool IsPlaced { get; }
 
+        public SheetModel SheetModel => _sheetModel;
+
         public string Name {
             get => _name;
-            set => RaiseAndSetIfChanged(ref _name, value);
+            set {
+                RaiseAndSetIfChanged(ref _name, value);
+                _sheetModel.Name = value;
+            }
         }
 
         public string AlbumBlueprint {
             get => _albumBlueprint;
-            set => RaiseAndSetIfChanged(ref _albumBlueprint, value);
+            set {
+                RaiseAndSetIfChanged(ref _albumBlueprint, value);
+                _sheetModel.AlbumBlueprint = value;
+            }
         }
 
         public string SheetNumber {
             get => _sheetNumber;
-            set => RaiseAndSetIfChanged(ref _sheetNumber, value);
+            set {
+                RaiseAndSetIfChanged(ref _sheetNumber, value);
+                _sheetModel.SheetNumber = value;
+            }
         }
 
         public TitleBlockViewModel TitleBlock {
             get => _titleBlock;
-            set => RaiseAndSetIfChanged(ref _titleBlock, value);
+            set {
+                RaiseAndSetIfChanged(ref _titleBlock, value);
+                _sheetModel.TitleBlockSymbol = value?.TitleBlockSymbol;
+            }
         }
 
         public ObservableCollection<ViewPortViewModel> ViewPorts { get; }

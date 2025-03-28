@@ -15,13 +15,9 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
 
-        public ElementId TitleBlockSymbolId {
-            get => _familySymbol.Id;
-        }
+        public FamilySymbol TitleBlockSymbol => _familySymbol;
 
-        public string Name {
-            get => $"{_familySymbol.FamilyName}: {_familySymbol.Name}";
-        }
+        public string Name => $"{_familySymbol.FamilyName}: {_familySymbol.Name}";
 
         public bool Equals(TitleBlockViewModel other) {
             return other is not null

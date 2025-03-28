@@ -28,30 +28,20 @@ namespace RevitCreateViewSheet.Models {
         public Document Document => ActiveUIDocument.Document;
 
 
-        public string GetDefaultAlbum() {
-            return ActiveUIDocument.GetSelectedElements()
-                .OfType<ViewSheet>()
-                .Select(item => (string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints))
-                .Distinct()
-                .FirstOrDefault();
-        }
-
-        public List<string> GetAlbumsBlueprints() {
+        public ICollection<string> GetAlbumsBlueprints() {
             return GetViewSheets()
-                .Select(item => (string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints))
-                .Where(item => item?.EndsWith("BIM") == false)
-                .OrderBy(item => item)
+                .Select(item => item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints, string.Empty))
                 .Distinct()
-                .ToList();
+                .OrderBy(item => item, new LogicalStringComparer())
+                .ToArray();
         }
 
-        public List<FamilySymbol> GetTitleBlocks() {
-            var category = Category.GetCategory(Document, BuiltInCategory.OST_TitleBlocks);
+        public ICollection<FamilySymbol> GetTitleBlocks() {
             return new FilteredElementCollector(Document)
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .OfClass(typeof(FamilySymbol))
                 .OfType<FamilySymbol>()
-                .Where(item => item.Category.Id == category.Id)
-                .ToList();
+                .ToArray();
         }
 
         public int GetLastViewSheetIndex(string albumBlueprints) {

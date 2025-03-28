@@ -21,6 +21,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public bool IsPlaced { get; }
 
+        public AnnotationModel AnnotationModel => _annotationModel;
+
 
         public bool Equals(AnnotationViewModel other) {
             return other is not null
