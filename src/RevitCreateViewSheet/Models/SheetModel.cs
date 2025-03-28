@@ -10,50 +10,67 @@ using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 namespace RevitCreateViewSheet.Models {
-    internal class SheetModel : IModel, IEquatable<SheetModel> {
+    internal class SheetModel : IEntity, IEquatable<SheetModel> {
         private readonly List<AnnotationModel> _annotations;
         private readonly List<ScheduleModel> _schedules;
         private readonly List<ViewPortModel> _viewPorts;
         private ViewSheet _viewSheet;
-        private string _drawingSet;
+        private string _albumBlueprint;
         private string _sheetNumber;
         private string _name;
-        private ElementId _titleBlockSymbolId;
+        private FamilySymbol _titleBlockSymbol;
 
-        public SheetModel(ViewSheet viewSheet) {
-            _viewSheet = viewSheet ?? throw new ArgumentNullException(nameof(viewSheet));
-            _annotations = GetAnnotationModels(viewSheet);
-            _schedules = GetSchedules(viewSheet);
-            _viewPorts = GetViewPorts(viewSheet);
+        public SheetModel(
+            ViewSheet viewSheet,
+            FamilySymbol titleBlockSymbol) {
 
-            _drawingSet = viewSheet.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints, string.Empty);
-            _sheetNumber = viewSheet.GetParamValueOrDefault(SharedParamsConfig.Instance.StampSheetNumber, string.Empty);
-            _name = viewSheet.GetParamValueOrDefault(BuiltInParameter.SHEET_NAME, string.Empty);
-            _titleBlockSymbolId = GetTitleBlockSymbolId(viewSheet);
+            if(viewSheet is null) {
+                throw new ArgumentNullException(nameof(viewSheet));
+            }
+            if(titleBlockSymbol is null) {
+                throw new ArgumentNullException(nameof(titleBlockSymbol));
+            }
+
+            _viewSheet = viewSheet;
+            _titleBlockSymbol = titleBlockSymbol;
+            _viewPorts = GetViewPortModels(_viewSheet);
+            _schedules = GetScheduleModels(_viewSheet);
+            _annotations = GetAnnotationModels(_viewSheet);
+
+            _albumBlueprint = viewSheet.GetParamValueOrDefault(
+                SharedParamsConfig.Instance.AlbumBlueprints, string.Empty);
+            _sheetNumber = viewSheet.GetParamValueOrDefault(
+                SharedParamsConfig.Instance.StampSheetNumber, string.Empty);
+            _name = viewSheet.GetParamValueOrDefault(
+                BuiltInParameter.SHEET_NAME, string.Empty);
             State = EntityState.Unchanged;
         }
 
-        public SheetModel() {
-            _annotations = new List<AnnotationModel>();
-            _schedules = new List<ScheduleModel>();
-            _viewPorts = new List<ViewPortModel>();
+        public SheetModel(FamilySymbol titleBlockSymbol) {
+            if(titleBlockSymbol is null) {
+                throw new ArgumentNullException(nameof(titleBlockSymbol));
+            }
 
-            _drawingSet = string.Empty;
+            _titleBlockSymbol = titleBlockSymbol;
+            _annotations = [];
+            _schedules = [];
+            _viewPorts = [];
+
+            _albumBlueprint = string.Empty;
             _sheetNumber = string.Empty;
             _name = string.Empty;
-            _titleBlockSymbolId = ElementId.InvalidElementId;
             State = EntityState.Added;
         }
 
 
         public EntityState State { get; private set; }
 
-        public string AlbumBlueprints {
-            get => _drawingSet;
+        public string AlbumBlueprint {
+            get => _albumBlueprint;
             set {
-                if(value != _drawingSet) {
-                    _drawingSet = value;
-                    State = EntityState.Modified;
+                if(value != _albumBlueprint) {
+                    _albumBlueprint = value;
+                    SetModifiedState();
                 }
             }
         }
@@ -63,7 +80,7 @@ namespace RevitCreateViewSheet.Models {
             set {
                 if(value != _sheetNumber) {
                     _sheetNumber = value;
-                    State = EntityState.Modified;
+                    SetModifiedState();
                 }
             }
         }
@@ -73,17 +90,17 @@ namespace RevitCreateViewSheet.Models {
             set {
                 if(value != _name) {
                     _name = value;
-                    State = EntityState.Modified;
+                    SetModifiedState();
                 }
             }
         }
 
-        public ElementId TitleBlockSymbolId {
-            get => _titleBlockSymbolId;
+        public FamilySymbol TitleBlockSymbol {
+            get => _titleBlockSymbol;
             set {
-                if(value != _titleBlockSymbolId) {
-                    _titleBlockSymbolId = value;
-                    State = EntityState.Modified;
+                if(value != _titleBlockSymbol) {
+                    _titleBlockSymbol = value;
+                    SetModifiedState();
                 }
             }
         }
@@ -93,7 +110,7 @@ namespace RevitCreateViewSheet.Models {
             if(_viewSheet is not null) {
                 return _viewSheet;
             } else {
-                throw new InvalidOperationException("Необходимо сначала сохранить созданный лист");
+                throw new InvalidOperationException("Лист еще не создан в модели Revit");
             }
         }
 
@@ -105,12 +122,15 @@ namespace RevitCreateViewSheet.Models {
 
         public void AddViewPort(ViewPortModel viewPort) {
             _viewPorts.Add(viewPort);
-            State = EntityState.Modified;
+            SetModifiedState();
         }
 
         public void RemoveViewPort(ViewPortModel viewPort) {
-            _viewPorts.FirstOrDefault(v => v.Equals(viewPort))?.MarkAsDeleted();
-            State = EntityState.Modified;
+            var existingViewPort = _viewPorts.FirstOrDefault(v => v.Equals(viewPort));
+            if(existingViewPort is not null) {
+                existingViewPort.MarkAsDeleted();
+                SetModifiedState();
+            }
         }
 
         public IReadOnlyCollection<ScheduleModel> GetSchedules() {
@@ -121,12 +141,15 @@ namespace RevitCreateViewSheet.Models {
 
         public void AddSchedule(ScheduleModel schedule) {
             _schedules.Add(schedule);
-            State = EntityState.Modified;
+            SetModifiedState();
         }
 
         public void RemoveSchedule(ScheduleModel schedule) {
-            _schedules.FirstOrDefault(s => s.Equals(schedule))?.MarkAsDeleted();
-            State = EntityState.Modified;
+            var existingSchedule = _schedules.FirstOrDefault(s => s.Equals(schedule));
+            if(existingSchedule is not null) {
+                existingSchedule.MarkAsDeleted();
+                SetModifiedState();
+            }
         }
 
         public IReadOnlyCollection<AnnotationModel> GetAnnotations() {
@@ -137,12 +160,15 @@ namespace RevitCreateViewSheet.Models {
 
         public void AddAnnotation(AnnotationModel annotation) {
             _annotations.Add(annotation);
-            State = EntityState.Modified;
+            SetModifiedState();
         }
 
         public void RemoveAnnotation(AnnotationModel annotation) {
-            _annotations.FirstOrDefault(a => a.Equals(annotation))?.MarkAsDeleted();
-            State = EntityState.Modified;
+            var existingAnnotation = _annotations.FirstOrDefault(a => a.Equals(annotation));
+            if(existingAnnotation is not null) {
+                existingAnnotation.MarkAsDeleted();
+                SetModifiedState();
+            }
         }
 
         public void MarkAsDeleted() {
@@ -151,15 +177,17 @@ namespace RevitCreateViewSheet.Models {
 
         public void SaveChanges(RevitRepository repository) {
             if(State == EntityState.Deleted && _viewSheet is not null) {
-                repository.RemoveElement(_viewSheet.Id);
+                repository.DeleteElement(_viewSheet.Id);
 
             } else if(State == EntityState.Modified && _viewSheet is not null) {
+                Validate();
                 repository.UpdateViewSheet(_viewSheet, this);
                 SaveNestedItems(repository);
                 State = EntityState.Unchanged;
 
             } else if(State == EntityState.Added
                 || State == EntityState.Modified && _viewSheet is null) {
+                Validate();
                 _viewSheet = repository.CreateViewSheet(this);
                 SaveNestedItems(repository);
                 State = EntityState.Unchanged;
@@ -192,8 +220,7 @@ namespace RevitCreateViewSheet.Models {
         }
 
         private List<AnnotationModel> GetAnnotationModels(ViewSheet viewSheet) {
-            var doc = viewSheet.Document;
-            return new FilteredElementCollector(doc)
+            return new FilteredElementCollector(viewSheet.Document)
                 .WhereElementIsNotElementType()
                 .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
                 .OfClass(typeof(AnnotationSymbol))
@@ -203,9 +230,8 @@ namespace RevitCreateViewSheet.Models {
                 .ToList();
         }
 
-        private List<ScheduleModel> GetSchedules(ViewSheet viewSheet) {
-            var doc = viewSheet.Document;
-            return new FilteredElementCollector(doc)
+        private List<ScheduleModel> GetScheduleModels(ViewSheet viewSheet) {
+            return new FilteredElementCollector(viewSheet.Document)
                 .WhereElementIsNotElementType()
                 .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
                 .OfClass(typeof(ScheduleSheetInstance))
@@ -215,9 +241,8 @@ namespace RevitCreateViewSheet.Models {
                 .ToList();
         }
 
-        private List<ViewPortModel> GetViewPorts(ViewSheet viewSheet) {
-            var doc = viewSheet.Document;
-            return new FilteredElementCollector(doc)
+        private List<ViewPortModel> GetViewPortModels(ViewSheet viewSheet) {
+            return new FilteredElementCollector(viewSheet.Document)
                 .WhereElementIsNotElementType()
                 .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
                 .OfClass(typeof(Viewport))
@@ -227,13 +252,25 @@ namespace RevitCreateViewSheet.Models {
                 .ToList();
         }
 
-        private ElementId GetTitleBlockSymbolId(ViewSheet viewSheet) {
-            var doc = viewSheet.Document;
-            return new FilteredElementCollector(doc)
-                .WhereElementIsNotElementType()
-                .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
-                .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                .FirstElementId();
+        private void SetModifiedState() {
+            if(State != EntityState.Added) {
+                State = EntityState.Modified;
+            }
+        }
+
+        private void Validate() {
+            if(string.IsNullOrWhiteSpace(AlbumBlueprint)) {
+                throw new InvalidOperationException($"Сначала необходимо назначить {nameof(AlbumBlueprint)}");
+            }
+            if(string.IsNullOrWhiteSpace(SheetNumber)) {
+                throw new InvalidOperationException($"Сначала необходимо назначить {nameof(SheetNumber)}");
+            }
+            if(string.IsNullOrWhiteSpace(Name)) {
+                throw new InvalidOperationException($"Сначала необходимо назначить {nameof(Name)}");
+            }
+            if(TitleBlockSymbol is null) {
+                throw new InvalidOperationException($"Сначала необходимо назначить {nameof(TitleBlockSymbol)}");
+            }
         }
     }
 }

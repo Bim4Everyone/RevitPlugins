@@ -4,15 +4,14 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 namespace RevitCreateViewSheet.Models {
-    internal class AnnotationModel : IModel, IEquatable<AnnotationModel> {
+    internal class AnnotationModel : IEntity, IEquatable<AnnotationModel> {
         private readonly AnnotationSymbol _annotationSymbol;
         private readonly AnnotationSymbolType _annotationType;
-        private XYZ _location;
 
         public AnnotationModel(SheetModel sheetModel, AnnotationSymbol annotationSymbol) {
             Sheet = sheetModel ?? throw new ArgumentNullException(nameof(sheetModel));
             _annotationSymbol = annotationSymbol ?? throw new ArgumentNullException(nameof(annotationSymbol));
-            _location = (_annotationSymbol.Location as LocationPoint)?.Point;
+            Location = (_annotationSymbol.Location as LocationPoint)?.Point;
             FamilyName = annotationSymbol.AnnotationSymbolType.FamilyName;
             SymbolName = annotationSymbol.AnnotationSymbolType.Name;
             State = EntityState.Unchanged;
@@ -28,6 +27,8 @@ namespace RevitCreateViewSheet.Models {
 
         public EntityState State { get; private set; }
 
+        public XYZ Location { get; set; }
+
         public SheetModel Sheet { get; }
 
         public string FamilyName { get; }
@@ -35,22 +36,18 @@ namespace RevitCreateViewSheet.Models {
         public string SymbolName { get; }
 
 
-        public void SetLocation(XYZ point) {
-            _location = point ?? throw new ArgumentNullException(nameof(point));
-        }
-
         public void MarkAsDeleted() {
             State = EntityState.Deleted;
         }
 
         public void SaveChanges(RevitRepository repository) {
             if(State == EntityState.Deleted && _annotationSymbol is not null) {
-                repository.RemoveElement(_annotationSymbol.Id);
+                repository.DeleteElement(_annotationSymbol.Id);
             } else if(State == EntityState.Added && _annotationType is not null) {
-                if(_location is null) {
-                    throw new InvalidOperationException("Сначала необходимо назначить Location аннотации");
+                if(Location is null) {
+                    throw new InvalidOperationException($"Сначала необходимо назначить {nameof(Location)}");
                 }
-                repository.CreateAnnotation(Sheet.GetViewSheet(), _annotationType, _location);
+                repository.CreateAnnotation(Sheet.GetViewSheet(), _annotationType, Location);
                 State = EntityState.Unchanged;
             }
         }

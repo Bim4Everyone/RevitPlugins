@@ -45,13 +45,6 @@ namespace RevitCreateViewSheet.Models {
                 .ToList();
         }
 
-        public List<ViewSheet> GetViewSheets() {
-            return new FilteredElementCollector(Document)
-                .OfClass(typeof(ViewSheet))
-                .OfType<ViewSheet>()
-                .ToList();
-        }
-
         public List<FamilySymbol> GetTitleBlocks() {
             var category = Category.GetCategory(Document, BuiltInCategory.OST_TitleBlocks);
             return new FilteredElementCollector(Document)
@@ -70,12 +63,18 @@ namespace RevitCreateViewSheet.Models {
             return GetViewSheetIndex(viewSheet) ?? 1;
         }
 
-        public void RemoveElement(ElementId id) {
+        public void DeleteElement(ElementId id) {
             Document.Delete(id);
         }
 
         public void CreateAnnotation(View view2D, FamilySymbol familySymbol, XYZ point) {
             Document.Create.NewFamilyInstance(point, familySymbol, view2D);
+        }
+
+        internal ICollection<SheetModel> GetSheetModels() {
+            return GetViewSheets()
+                .Select(s => new SheetModel(s, GetTitleBlockSymbol(s)))
+                .ToArray();
         }
 
         internal ScheduleSheetInstance CreateSchedule(ElementId viewSheetId, ElementId scheduleViewId, XYZ point) {
@@ -93,7 +92,7 @@ namespace RevitCreateViewSheet.Models {
         }
 
         internal ViewSheet CreateViewSheet(SheetModel sheetModel) {
-            var sheet = ViewSheet.Create(Document, sheetModel.TitleBlockSymbolId);
+            var sheet = ViewSheet.Create(Document, sheetModel.TitleBlockSymbol.Id);
             return UpdateViewSheet(sheet, sheetModel, false);
         }
 
@@ -106,20 +105,20 @@ namespace RevitCreateViewSheet.Models {
                 var titleId = sheet.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_TitleBlocks))
                     .FirstOrDefault();
                 if(titleId.IsNotNull()) {
-                    var symbol = Document.GetElement(sheetModel.TitleBlockSymbolId) as FamilySymbol;
+                    var symbol = Document.GetElement(sheetModel.TitleBlockSymbol.Id) as FamilySymbol;
                     (Document.GetElement(titleId) as FamilyInstance).Symbol = symbol;
                 }
             }
             sheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, sheetModel.SheetNumber);
-            sheet.SetParamValue(SharedParamsConfig.Instance.AlbumBlueprints, sheetModel.AlbumBlueprints);
+            sheet.SetParamValue(SharedParamsConfig.Instance.AlbumBlueprints, sheetModel.AlbumBlueprint);
             sheet.SetParamValue(BuiltInParameter.SHEET_NAME, sheetModel.Name);
-            sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{sheetModel.AlbumBlueprints}-{sheetModel.SheetNumber}");
+            sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{sheetModel.AlbumBlueprint}-{sheetModel.SheetNumber}");
             return sheet;
         }
 
         private int? GetViewSheetIndex(ViewSheet viewSheet) {
-            string index = viewSheet?.SheetNumber.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
-            return int.TryParse(index, out int result) ? result : (int?) null;
+            string index = viewSheet?.SheetNumber.Split(['-'], StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+            return int.TryParse(index, out int result) ? result : null;
         }
 
         private void InitializeParameters(Application application, Document document) {
@@ -127,6 +126,25 @@ namespace RevitCreateViewSheet.Models {
             projectParameters.SetupRevitParams(document,
                 SharedParamsConfig.Instance.AlbumBlueprints,
                 SharedParamsConfig.Instance.StampSheetNumber);
+        }
+
+        private ICollection<ViewSheet> GetViewSheets() {
+            return new FilteredElementCollector(Document)
+                .OfClass(typeof(ViewSheet))
+                .OfType<ViewSheet>()
+                .ToArray();
+        }
+
+        private FamilySymbol GetTitleBlockSymbol(ViewSheet viewSheet) {
+            var titleBlock = new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                .FirstElement() as FamilyInstance;
+            if(titleBlock is null) {
+                throw new InvalidOperationException($"У листа {viewSheet.Name} отсутствует основная надпись");
+            }
+            return titleBlock.Symbol;
         }
     }
 }
