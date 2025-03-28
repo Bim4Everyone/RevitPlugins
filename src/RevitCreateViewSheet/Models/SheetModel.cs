@@ -20,6 +20,12 @@ namespace RevitCreateViewSheet.Models {
         private string _name;
         private FamilySymbol _titleBlockSymbol;
 
+        /// <summary>
+        /// Создает модель существующего листа
+        /// </summary>
+        /// <param name="viewSheet">Лист</param>
+        /// <param name="titleBlockSymbol">Типоразмер основной надписи листа</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SheetModel(
             ViewSheet viewSheet,
             FamilySymbol titleBlockSymbol) {
@@ -46,6 +52,11 @@ namespace RevitCreateViewSheet.Models {
             State = EntityState.Unchanged;
         }
 
+        /// <summary>
+        /// Создает модель нового листа
+        /// </summary>
+        /// <param name="titleBlockSymbol">Типоразмер основной надписи листа</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SheetModel(FamilySymbol titleBlockSymbol) {
             if(titleBlockSymbol is null) {
                 throw new ArgumentNullException(nameof(titleBlockSymbol));

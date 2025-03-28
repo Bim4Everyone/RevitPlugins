@@ -8,6 +8,12 @@ namespace RevitCreateViewSheet.Models {
         private readonly AnnotationSymbol _annotationSymbol;
         private readonly AnnotationSymbolType _annotationType;
 
+        /// <summary>
+        /// Конструирует модель существующей аннотации на листе
+        /// </summary>
+        /// <param name="sheetModel">Модель листа</param>
+        /// <param name="annotationSymbol">Экземпляр аннотации</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public AnnotationModel(SheetModel sheetModel, AnnotationSymbol annotationSymbol) {
             Sheet = sheetModel ?? throw new ArgumentNullException(nameof(sheetModel));
             _annotationSymbol = annotationSymbol ?? throw new ArgumentNullException(nameof(annotationSymbol));
@@ -17,6 +23,12 @@ namespace RevitCreateViewSheet.Models {
             State = EntityState.Unchanged;
         }
 
+        /// <summary>
+        /// Конструирует модель новой аннотации на листе
+        /// </summary>
+        /// <param name="sheetModel">Модель листа</param>
+        /// <param name="annotationSymbolType">Типоразмер аннотации</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public AnnotationModel(SheetModel sheetModel, AnnotationSymbolType annotationSymbolType) {
             Sheet = sheetModel ?? throw new ArgumentNullException(nameof(sheetModel));
             _annotationType = annotationSymbolType ?? throw new ArgumentNullException(nameof(annotationSymbolType));

@@ -11,6 +11,12 @@ namespace RevitCreateViewSheet.Models {
         private readonly View _view;
         private ElementType _viewPortType;
 
+        /// <summary>
+        /// Создает модель размещенного на листе видового экрана
+        /// </summary>
+        /// <param name="sheet">Модель листа</param>
+        /// <param name="viewport">Видовой экран, размещенный на листе</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public ViewPortModel(SheetModel sheet, Viewport viewport) {
             Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
             _viewport = viewport ?? throw new ArgumentNullException(nameof(viewport));
@@ -20,6 +26,13 @@ namespace RevitCreateViewSheet.Models {
             State = EntityState.Unchanged;
         }
 
+        /// <summary>
+        /// Создает модель нового видового экрана
+        /// </summary>
+        /// <param name="sheet">Модель листа</param>
+        /// <param name="view">Вид для размещения</param>
+        /// <param name="viewPortType">Типоразмер видового экрана</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public ViewPortModel(SheetModel sheet, View view, ElementType viewPortType) {
             Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
             _view = view ?? throw new ArgumentNullException(nameof(view));

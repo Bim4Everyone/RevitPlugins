@@ -8,6 +8,12 @@ namespace RevitCreateViewSheet.Models {
         private readonly ScheduleSheetInstance _scheduleInstance;
         private readonly ViewSchedule _schedule;
 
+        /// <summary>
+        /// Создает модель размещенной на листе спецификации
+        /// </summary>
+        /// <param name="sheet">Модель листа</param>
+        /// <param name="scheduleInstance">Размещенный на листе экземпляр спецификации</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public ScheduleModel(SheetModel sheet, ScheduleSheetInstance scheduleInstance) {
             Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
             _scheduleInstance = scheduleInstance ?? throw new ArgumentNullException(nameof(scheduleInstance));
@@ -16,6 +22,12 @@ namespace RevitCreateViewSheet.Models {
             State = EntityState.Unchanged;
         }
 
+        /// <summary>
+        /// Создает модель новой спецификации на листе
+        /// </summary>
+        /// <param name="sheet">Модель листа</param>
+        /// <param name="schedule">Спецификация</param>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public ScheduleModel(SheetModel sheet, ViewSchedule schedule) {
             Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
             _schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
