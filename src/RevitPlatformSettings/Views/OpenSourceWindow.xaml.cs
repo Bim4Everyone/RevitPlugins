@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Documents;
 
 using DevExpress.Mvvm.Native;
 using DevExpress.Xpf.Bars;
@@ -10,9 +13,19 @@ using dosymep.SimpleServices;
 
 namespace RevitPlatformSettings.Views {
     public sealed partial class OpenSourceWindow {
-        public OpenSourceWindow(ILocalizationService localizationService) {
-            LocalizationService = localizationService;
+        public OpenSourceWindow() {
 
+        }
+
+        public OpenSourceWindow(
+            ILoggerService loggerService,
+            ISerializationService serializationService,
+            ILanguageService languageService, ILocalizationService localizationService,
+            IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+            : base(loggerService,
+                serializationService,
+                languageService, localizationService,
+                uiThemeService, themeUpdaterService) {
             string siteType = localizationService.GetLocalizedString("OpenSourceWindow.SiteType");
             string toolType = localizationService.GetLocalizedString("OpenSourceWindow.ToolType");
             string libraryType = localizationService.GetLocalizedString("OpenSourceWindow.LibraryType");
@@ -234,11 +247,16 @@ namespace RevitPlatformSettings.Views {
         public override string ProjectConfigName => nameof(OpenSourceWindow);
 
         public ObservableCollection<OpenSourceItem> Items { get; }
+
+        private void OnHyperlinkClick(object sender, RoutedEventArgs e) {
+            Uri navigateUri = ((Hyperlink) e.OriginalSource).NavigateUri;
+            Process.Start(navigateUri.AbsoluteUri);
+        }
     }
 
     public class OpenSourceItem {
         public string ItemType { get; set; }
-        
+
         public string AuthorName { get; set; }
         public string AuthorNavigationUrl { get; set; }
 

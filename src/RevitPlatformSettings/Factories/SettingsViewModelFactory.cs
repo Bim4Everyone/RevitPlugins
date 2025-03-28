@@ -13,10 +13,8 @@ namespace RevitPlatformSettings.Factories {
             _resolutionRoot = resolutionRoot;
         }
 
-        public T Create<T>(int id, int parentId, string settingsName) where T : SettingsViewModel {
+        public T Create<T>(string settingsName) where T : SettingsViewModel {
             return _resolutionRoot.Get<T>(
-                new ConstructorArgument(nameof(id), id),
-                new ConstructorArgument(nameof(parentId), parentId),
                 new ConstructorArgument(nameof(settingsName), settingsName)
             );
         }

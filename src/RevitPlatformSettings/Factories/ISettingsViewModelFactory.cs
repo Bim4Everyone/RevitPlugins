@@ -3,6 +3,6 @@ using RevitPlatformSettings.ViewModels.Settings;
 
 namespace RevitPlatformSettings.Factories {
     internal interface ISettingsViewModelFactory {
-        T Create<T>(int id, int parentId, string settingsName) where T : SettingsViewModel;
+        T Create<T>(string settingsName) where T : SettingsViewModel;
     }
 }

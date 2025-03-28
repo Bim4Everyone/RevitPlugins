@@ -1,8 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 
-namespace RevitPlatformSettings.Views {
+namespace RevitPlatformSettings.Views.Edits {
     [DefaultProperty(nameof(EditControl))]
     [System.Windows.Markup.ContentProperty(nameof(EditControl))]
     public partial class CustomEditControl {

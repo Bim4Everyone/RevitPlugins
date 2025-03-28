@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Windows;
 using System.Windows.Interop;
 
 using dosymep.Bim4Everyone;
@@ -24,6 +26,8 @@ namespace dosymep.WpfUI.Core {
         public event Action<CultureInfo> LanguageChanged;
 
         private readonly WindowInteropHelper _windowInteropHelper;
+
+        public WpfUIPlatformWindow() { }
 
         public WpfUIPlatformWindow(
             ILoggerService loggerService,
@@ -71,42 +75,14 @@ namespace dosymep.WpfUI.Core {
         public virtual string ProjectConfigName { get; } = nameof(WpfUIPlatformWindow);
 
         protected override void OnSourceInitialized(EventArgs e) {
-            UpdateTheme();
-            LocalizationService?.SetLocalization(LanguageService.HostLanguage, this);
-
             base.OnSourceInitialized(e);
-
-            PlatformWindowConfig config = GetProjectConfig();
-            if(config.WindowPlacement.HasValue) {
-                this.SetPlacement(config.WindowPlacement.Value);
-            }
-        }
-
-        protected override void OnClosing(CancelEventArgs e) {
-            base.OnClosing(e);
-
-            UIThemeService.UIThemeChanged -= OnUIThemeChanged;
-
-            PlatformWindowConfig config = GetProjectConfig();
-            config.WindowPlacement = this.GetPlacement();
-            config.SaveProjectConfig();
-        }
-
-        protected virtual PlatformWindowConfig GetProjectConfig() {
-            return new ProjectConfigBuilder()
-                .SetSerializer(new ConfigSerializer())
-                .SetPluginName(PluginName)
-                .SetRevitVersion(ModuleEnvironment.RevitVersion)
-                .SetProjectConfigName(ProjectConfigName + ".json")
-                .Build<PlatformWindowConfig>();
-        }
-
-        private void OnUIThemeChanged(UIThemes obj) {
-            UpdateTheme();
-        }
-
-        private void UpdateTheme() {
-            ThemeUpdaterService.SetTheme(this, UIThemeService.HostTheme);
+            Interaction.GetBehaviors(this)
+                .Add(new WpfSavePositionBehavior() {
+                    SerializationService = SerializationService,
+                    ConfigPath = Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                        "dosymep", ModuleEnvironment.RevitVersion, PluginName, ProjectConfigName + ".json"),
+                });
         }
     }
 }

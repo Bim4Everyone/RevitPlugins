@@ -7,9 +7,7 @@ namespace RevitPlatformSettings.ViewModels.Settings {
         private readonly IPlatformSettingsService _platformSettingsService;
 
         public TelemetrySettingsViewModel(
-            int id, int parentId, string settingsName,
-            IPlatformSettingsService platformSettingsService)
-            : base(id, parentId, settingsName) {
+            IPlatformSettingsService platformSettingsService) {
             _platformSettingsService = platformSettingsService;
 
             LogTraceIsActive = _platformSettingsService.LogTrace.IsActive;

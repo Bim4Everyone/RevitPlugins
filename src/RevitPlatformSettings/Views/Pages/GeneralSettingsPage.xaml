@@ -1,0 +1,151 @@
+<core:WpfUIPlatformPage
+    x:Class="RevitPlatformSettings.Views.Pages.GeneralSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:views="clr-namespace:RevitPlatformSettings.Views"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:ss="clr-namespace:dosymep.SimpleServices;assembly=dosymep.SimpleServices"
+    xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:edits="clr-namespace:RevitPlatformSettings.Views.Edits"
+
+    x:ClassModifier="internal"
+
+    mc:Ignorable="d"
+
+    x:Name="_this"
+    d:DataContext="{d:DesignInstance settings:GeneralSettingsViewModel, IsDesignTimeCreatable=False}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <GroupBox
+            Grid.Row="0"
+            Margin="10"
+            Header="{me:LocalizationSource GeneralSettings.CorpSettings}">
+
+            <StackPanel>
+
+                <edits:CustomEditControl
+                    EditText="{me:LocalizationSource GeneralSettings.CorpName}">
+
+                    <ui:TextBox
+                        IsReadOnly="True"
+                        IsEnabled="False"
+                        Text="{Binding Path=CorpName, Mode=OneWay}" />
+
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    EditText="{me:LocalizationSource GeneralSettings.SettingsPath}">
+
+                    <ui:TextBox
+                        IsReadOnly="True"
+                        IsEnabled="False"
+                        Text="{Binding Path=SettingsPath, Mode=OneWay}" />
+
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    EditText="{me:LocalizationSource GeneralSettings.SettingsImagePath}">
+
+                    <ui:TextBox
+                        IsReadOnly="True"
+                        IsEnabled="False"
+                        Text="{Binding Path=SettingsImagePath, Mode=OneWay}" />
+
+                </edits:CustomEditControl>
+
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox
+            Grid.Row="1"
+            Margin="10"
+            Header="{me:LocalizationSource GeneralSettings.AppearanceSettings}">
+
+            <StackPanel>
+
+                <edits:CustomEditControl
+                    EditText="{me:LocalizationSource GeneralSettings.HostTheme}">
+
+                    <ComboBox
+                        IsReadOnly="True"
+                        IsEnabled="False"
+                        ItemsSource="{me:EnumToItemsSource ss:UIThemes}"
+                        SelectedValue="{Binding HostTheme, Mode=OneWay}" />
+
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    EditText="{me:LocalizationSource GeneralSettings.HostLanguage}">
+
+                    <ComboBox
+                        IsReadOnly="True"
+                        IsEnabled="False"
+                        SelectedIndex="0">
+                        <ComboBoxItem
+                            Content="{Binding HostLanguage}" />
+                    </ComboBox>
+
+                </edits:CustomEditControl>
+
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox
+            Grid.Row="2"
+            Margin="10"
+            Header="{me:LocalizationSource GeneralSettings.Notification}">
+
+            <StackPanel>
+
+                <edits:CustomEditControl
+                    EditText="{me:LocalizationSource GeneralSettings.NotificationIsActive}">
+
+                    <CheckBox
+                        HorizontalAlignment="Right"
+                        IsChecked="{Binding Path=NotificationIsActive}" />
+
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    EditText="{me:LocalizationSource GeneralSettings.NotificationVisibleMaxCount}">
+
+                    <ui:TextBox
+                        Text="{Binding Path=NotificationVisibleMaxCount}" />
+
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    EditText="{me:LocalizationSource GeneralSettings.NotificationScreen}">
+
+                    <ComboBox
+                        SelectedValue="{Binding Path=NotificationScreen}"
+                        ItemsSource="{me:EnumToItemsSource EnumType=dxmvvm:NotificationScreen}" />
+
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    EditText="{me:LocalizationSource GeneralSettings.NotificationPosition}">
+
+                    <ComboBox
+                        SelectedValue="{Binding Path=NotificationPosition}"
+                        ItemsSource="{me:EnumToItemsSource EnumType=dxmvvm:NotificationPosition}" />
+
+                </edits:CustomEditControl>
+
+            </StackPanel>
+
+        </GroupBox>
+
+    </Grid>
+</core:WpfUIPlatformPage>

@@ -1,9 +1,9 @@
+using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace RevitPlatformSettings.Views {
+namespace RevitPlatformSettings.Views.Edits {
     public partial class HyperLinkEditWithImage {
         public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register(
             nameof(ImageSource), typeof(ImageSource), typeof(HyperLinkEditWithImage),
@@ -41,6 +41,12 @@ namespace RevitPlatformSettings.Views {
 
         public HyperLinkEditWithImage() {
             InitializeComponent();
+        }
+
+        private void Hyperlink_OnClick(object sender, RoutedEventArgs e) {
+            if(!string.IsNullOrEmpty(NavigationUrl)) {
+                Process.Start(NavigationUrl);
+            }
         }
     }
 }

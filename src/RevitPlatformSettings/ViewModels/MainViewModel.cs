@@ -1,4 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -7,71 +11,52 @@ using dosymep.WPF.ViewModels;
 
 using RevitPlatformSettings.Factories;
 using RevitPlatformSettings.ViewModels.Settings;
+using RevitPlatformSettings.Views.Pages;
+
+using Wpf.Ui.Abstractions;
+using Wpf.Ui.Abstractions.Controls;
+using Wpf.Ui.Controls;
 
 namespace RevitPlatformSettings.ViewModels {
     internal class MainViewModel : BaseViewModel {
-        private readonly ILocalizationService _localizationService;
-        private readonly ISettingsViewModelFactory _settingsViewModelFactory;
+        private readonly INavigationViewPageProvider _pageProvider;
 
+        private readonly Type[] _pages = new[] {
+            typeof(AboutSettingsPage), 
+            typeof(ExtensionsSettingsPage), typeof(GeneralSettingsPage),
+            typeof(RevitParamsSettingsPage), typeof(TelemetrySettingsPage)
+        };
+        
         private string _errorText;
-        private SettingsViewModel _setting;
-        private ObservableCollection<SettingsViewModel> _settings;
 
-        public MainViewModel(
-            ILocalizationService localizationService, 
-            ISettingsViewModelFactory settingsViewModelFactory) {
+        public MainViewModel(INavigationViewPageProvider pageProvider) {
+            _pageProvider = pageProvider;
             
-            _localizationService = localizationService;
-            _settingsViewModelFactory = settingsViewModelFactory;
-
             LoadViewCommand = RelayCommand.Create(LoadView);
-            ApplyViewCommand = RelayCommand.Create(ApplyView);
+            AcceptViewCommand = RelayCommand.Create(ApplyView);
         }
 
         public ICommand LoadViewCommand { get; }
-        public ICommand ApplyViewCommand { get; }
+        public ICommand AcceptViewCommand { get; }
 
         public string ErrorText {
             get => _errorText;
             set => this.RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public SettingsViewModel Setting {
-            get => _setting;
-            set => this.RaiseAndSetIfChanged(ref _setting, value);
-        }
-
-        public ObservableCollection<SettingsViewModel> Settings {
-            get => _settings;
-            set => this.RaiseAndSetIfChanged(ref _settings, value);
-        }
-
         private void LoadView() {
-            Settings = new ObservableCollection<SettingsViewModel>() {
-                _settingsViewModelFactory.Create<SettingsViewModel>(0, 0, 
-                    _localizationService.GetLocalizedString("SettingsNode.Title")),
-                
-                _settingsViewModelFactory.Create<GeneralSettingsViewModel>(1, 0, 
-                    _localizationService.GetLocalizedString("GeneralSettings.Title")),
-                
-                _settingsViewModelFactory.Create<ExtensionsSettingsViewModel>(2, 0, 
-                    _localizationService.GetLocalizedString("ExtensionSettings.Title")),
-                
-                _settingsViewModelFactory.Create<RevitParamsSettingsViewModel>(3, 0, 
-                    _localizationService.GetLocalizedString("RevitParamsSettings.Title")),
-                
-                _settingsViewModelFactory.Create<TelemetrySettingsViewModel>(4, 0, 
-                    _localizationService.GetLocalizedString("TelemetrySettings.Title")),
-                
-                _settingsViewModelFactory.Create<AboutSettingsViewModel>(5, 0, 
-                    _localizationService.GetLocalizedString("AboutSettings.Title")),
-            };
-
-            Setting = Settings[1];
+            // pass
         }
 
         private void ApplyView() {
-            foreach(SettingsViewModel settingsViewModel in Settings) {
+            IEnumerable<SettingsViewModel> settings = _pages
+                .Select(item => _pageProvider.GetPage(item))
+                .Where(item => item != null)
+                .OfType<Page>()
+                .Select(item => item.DataContext)
+                .OfType<SettingsViewModel>();
+
+            foreach(SettingsViewModel settingsViewModel in settings) {
                 settingsViewModel.SaveSettings();
             }
         }
