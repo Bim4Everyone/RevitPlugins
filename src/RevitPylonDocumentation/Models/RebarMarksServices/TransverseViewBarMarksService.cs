@@ -13,7 +13,8 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
         private readonly PylonView _pylonView;
         private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
         private readonly AnnotationService _annotationService;
-        private readonly FamilySymbol _tagSymbol;
+        private readonly FamilySymbol _tagSymbolWithSerif;
+        private readonly FamilySymbol _tagSymbolWithoutSerif;
         private readonly FamilySymbol _tagSkeletonSymbol;
 
         public TransverseViewBarMarksService(PylonView pylonView, RevitRepository revitRepository) {
@@ -22,9 +23,13 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             _annotationService = new AnnotationService(pylonView);
 
             // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
-            _tagSymbol = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10, Засечка");
+            // Без засечки на конце
+            _tagSymbolWithoutSerif = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10");
+            // С засечкой на конце
+            _tagSymbolWithSerif = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10, Засечка");
+
             // Находим типоразмер марки несущей арматуры для обозначения марки изделия
-            _tagSkeletonSymbol = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Изделие_Марка - Полка 30, Засечка");
+            _tagSkeletonSymbol = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Изделие_Марка - Полка 30");
         }
 
 
@@ -52,7 +57,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             XYZ pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(leftTopVerticalBar, DirectionType.LeftTop, 1.2, 0.6, false);
 
             // Создаем марку арматуры
-            var leftTopTag = _annotationService.CreateRebarTag(pointLeftTop, _tagSymbol, leftClamp);
+            var leftTopTag = _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithoutSerif, leftClamp);
 
 #if REVIT_2022_OR_GREATER
             leftTopTag.LeaderEndCondition = LeaderEndCondition.Free;
@@ -77,7 +82,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             XYZ pointRightTop = _viewPointsAnalyzer.GetPointByDirection(rightTopVerticalBar, DirectionType.RightTop, 1.2, 0.6, false);
 
             // Создаем марку арматуры
-            var rightTopTag = _annotationService.CreateRebarTag(pointRightTop, _tagSymbol, rightClamp);
+            var rightTopTag = _annotationService.CreateRebarTag(pointRightTop, _tagSymbolWithoutSerif, rightClamp);
 
 #if REVIT_2022_OR_GREATER
             rightTopTag.LeaderEndCondition = LeaderEndCondition.Free;
@@ -103,7 +108,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             }
 
             // Создаем марку арматуры
-            var leftTag = _annotationService.CreateRebarTag(pointLeft, _tagSymbol, simpleCBars);
+            var leftTag = _annotationService.CreateRebarTag(pointLeft, _tagSymbolWithSerif, simpleCBars);
             leftTag.LeaderEndCondition = LeaderEndCondition.Free;
 
 #if REVIT_2022_OR_GREATER

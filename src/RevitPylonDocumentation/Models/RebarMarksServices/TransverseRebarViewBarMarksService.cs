@@ -12,15 +12,16 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
 
         private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
         private readonly AnnotationService _annotationService;
-        private readonly FamilySymbol _tagSymbol;
+        private readonly FamilySymbol _tagSymbolWithoutSerif;
         private readonly FamilySymbol _gostTagSymbol;
 
         public TransverseRebarViewBarMarksService(PylonView pylonView, RevitRepository revitRepository) {
             _viewPointsAnalyzer = new ViewPointsAnalyzer(pylonView);
             _annotationService = new AnnotationService(pylonView);
 
-            // Находим типоразмер марки несущей арматуры
-            _tagSymbol = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10, Засечка");
+            // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
+            // Без засечки на конце
+            _tagSymbolWithoutSerif = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10");
             // Находим типоразмер типовой аннотации для метки ГОСТа сварки
             _gostTagSymbol = revitRepository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
         }
@@ -44,7 +45,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             XYZ pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(leftBottomElement, DirectionType.LeftBottom, 1, 0.4, false);
 
             // Создаем марку арматуры
-            _annotationService.CreateRebarTag(pointLeftBottom, _tagSymbol, leftBottomElement);
+            _annotationService.CreateRebarTag(pointLeftBottom, _tagSymbolWithoutSerif, leftBottomElement);
         }
 
 
@@ -59,7 +60,7 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             XYZ pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(leftTopElement, DirectionType.LeftTop, 1, 0.4, false);
 
             // Создаем марку арматуры
-            _annotationService.CreateRebarTag(pointLeftTop, _tagSymbol, leftTopElement);
+            _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithoutSerif, leftTopElement);
         }
 
 
