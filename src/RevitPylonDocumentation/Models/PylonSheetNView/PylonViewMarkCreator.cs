@@ -21,6 +21,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
         private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
+        private readonly string _hasDifferentRebarParamName = "ст_РАЗНЫЕ";
 
         private readonly ParamValueService _paramValueService;
         private readonly RebarFinder _rebarFinder;
@@ -88,8 +89,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             // Определяем наличие в каркасе Г-образных стержней
             var firstLRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonRebar, _hasFirstLRebarParamName) == 1;
             var secondLRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonRebar, _hasSecondLRebarParamName) == 1;
+            var differentRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonRebar, _hasDifferentRebarParamName) == 1;
 
-            if(firstLRebarParamValue || secondLRebarParamValue) {
+            // Если у нас есть Г-образные стержни или стержни разной длины, то нужно ставить две разные марки
+            // Если нет - то допускается поставить одну марку, которая будет характеризовать все стрежни (они же одинаковые)
+            if(firstLRebarParamValue || secondLRebarParamValue || differentRebarParamValue) {
                 // ЛЕВЫЙ НИЖНИЙ УГОЛ
                 _transverseRebarViewBarMarksService.CreateLeftBottomMark(simpleRebars, true);
 
