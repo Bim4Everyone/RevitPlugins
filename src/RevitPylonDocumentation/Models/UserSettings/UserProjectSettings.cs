@@ -24,13 +24,13 @@ namespace RevitPylonDocumentation.Models.UserSettings {
         private string _typicalPylonFilterParameterTemp = "обр_ФОП_Фильтрация 1";
         private string _typicalPylonFilterValueTemp = "на 1 шт.";
 
-        private string _legendNameTemp = "Указания для пилонов";
+        private string _legendNameTemp = "Указания для пилонов корпуса";
         private string _legendXOffsetTemp = "-100";
-        private string _legendYOffsetTemp = "125";
+        private string _legendYOffsetTemp = "130";
 
         private string _rebarNodeNameTemp = "КЖ_Узел ПК пилонов";
         private string _rebarNodeXOffsetTemp = "-150";
-        private string _rebarNodeYOffsetTemp = "200";
+        private string _rebarNodeYOffsetTemp = "210";
 
         private string _pylonLengthParamNameTemp = "ФОП_РАЗМ_Длина";
         private string _pylonWidthParamNameTemp = "ФОП_РАЗМ_Ширина";
