@@ -19,10 +19,9 @@ namespace RevitListOfSchedules.Models {
         private readonly ILocalizationService _localizationService;
         private readonly RevitRepository _revitRepository;
         private readonly FamilyLoadOptions _familyLoadOptions;
-        private readonly string _albumName;
         private readonly string _familyTemplatePath;
-        private readonly string _familyName;
         private readonly string _familyPath;
+        private readonly string _tempDirectory = Path.GetTempPath();
         private readonly FamilySymbol _familySymbol;
 
         public TempFamilyDocument(
@@ -30,14 +29,23 @@ namespace RevitListOfSchedules.Models {
             RevitRepository revitRepository,
             FamilyLoadOptions familyLoadOptions,
             string albumName) {
+
             _localizationService = localizationService;
             _revitRepository = revitRepository;
             _familyLoadOptions = familyLoadOptions;
-            _albumName = albumName;
-            _familyTemplatePath = GetTemplateFamilyPath();
-            _familyName = GetFamilyName();
-            _familyPath = GetFamilyPath();
+
+            string familyTemplatePath = _revitRepository.Application.FamilyTemplatePath;
+            string localizedString = _localizationService.GetLocalizedString("TempFamilyDocument.TemplateFamilyName");
+            _familyTemplatePath = $"{familyTemplatePath}{localizedString}";
+
+            string familyName = string.Format(
+                _localizationService.GetLocalizedString("TempFamilyDocument.FamilyName"), albumName);
+            string familyDocumentName = string.Format(familyName, albumName);
+            string fileName = $"{familyDocumentName}{_extension}";
+            _familyPath = Path.Combine(_tempDirectory, fileName);
+
             CreateDocument();
+
             _familySymbol = LoadFamilySymbol();
         }
 
@@ -66,24 +74,6 @@ namespace RevitListOfSchedules.Models {
             familyInstance.SetParamValue(ParamFactory.FamilyParamName, name);
             familyInstance.SetParamValue(ParamFactory.FamilyParamRevision, revisionNumber);
             return familyInstance;
-        }
-
-        private string GetTemplateFamilyPath() {
-            string familyTemplatePath = _revitRepository.Application.FamilyTemplatePath;
-            string localizedString = _localizationService.GetLocalizedString("TempFamilyDocument.TemplateFamilyName");
-            return $"{familyTemplatePath}{localizedString}";
-        }
-
-        private string GetFamilyName() {
-            return string.Format(
-                _localizationService.GetLocalizedString("TempFamilyDocument.FamilyName"), _albumName);
-        }
-
-        private string GetFamilyPath() {
-            string tempDirectory = Path.GetTempPath();
-            string familyDocumentName = string.Format(_familyName, _albumName);
-            string fileName = $"{familyDocumentName}{_extension}";
-            return Path.Combine(tempDirectory, fileName);
         }
 
         private Document CreateDocument() {
