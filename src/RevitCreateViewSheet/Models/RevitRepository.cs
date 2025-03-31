@@ -37,10 +37,51 @@ namespace RevitCreateViewSheet.Models {
         }
 
         public ICollection<FamilySymbol> GetTitleBlocks() {
-            return new FilteredElementCollector(Document)
+            var titleBlocks = new FilteredElementCollector(Document)
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .OfClass(typeof(FamilySymbol))
                 .OfType<FamilySymbol>()
+                .ToArray();
+            if(titleBlocks.Length == 0) {
+                throw new InvalidOperationException("В проект не загружено ни одно семейство основной надписи.");
+            }
+            return titleBlocks;
+        }
+
+        public ICollection<ElementType> GetViewPortTypes() {
+            Viewport viewport = new FilteredElementCollector(Document)
+                .OfClass(typeof(Viewport))
+                .FirstElement() as Viewport;
+            string errorMsg = "Не удалось получить список типов видовых экранов. " +
+                "Создайте видовой экран на каком-либо листе вручную и перезапустите плагин.";
+            ICollection<ElementId> viewportTypeIds;
+            if(viewport is not null) {
+                viewportTypeIds = viewport.GetValidTypes();
+            } else {
+                try {
+                    using(var transaction = Document.StartTransaction("temp")) {
+                        var titleBlockId = GetTitleBlocks().First().Id;
+                        ViewSheet viewSheet = ViewSheet.Create(Document, titleBlockId);
+                        var view = new FilteredElementCollector(Document)
+                            .OfClass(typeof(ViewPlan))
+                            .OfType<ViewPlan>()
+                            .First(v => Viewport.CanAddViewToSheet(Document, viewSheet.Id, v.Id));
+                        // если вид пустой, то CanAddViewToSheet возвращает true, но вставить на лист его нельзя.
+                        // Надо создать какой-то элемент на виде.
+                        Document.Create.NewDetailCurve(view, Line.CreateBound(view.Origin, view.Origin + XYZ.BasisX));
+                        viewport = Viewport.Create(Document, viewSheet.Id, view.Id, viewSheet.Origin);
+                        viewportTypeIds = viewport?.GetValidTypes();
+                        transaction.RollBack();
+                    }
+                } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                    throw new InvalidOperationException(errorMsg);
+                }
+            }
+            if(viewportTypeIds is null || viewportTypeIds.Count == 0) {
+                throw new InvalidOperationException(errorMsg);
+            }
+            return viewportTypeIds.Select(Document.GetElement)
+                .OfType<ElementType>()
                 .ToArray();
         }
 
