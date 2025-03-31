@@ -89,6 +89,7 @@ namespace RevitListOfSchedules.ViewModels {
             set => RaiseAndSetIfChanged(ref _selectedGroupParameter, value);
         }
 
+        // Метод загрузки окна
         private void LoadView() {
 
             Links = GetLinks();
@@ -110,6 +111,7 @@ namespace RevitListOfSchedules.ViewModels {
             LoadConfig();
         }
 
+        // Метод загрузки конфигурации пользователя
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
             var selectedLinkIds = setting?.SelectedLinks ?? new List<ElementId>();
@@ -132,6 +134,7 @@ namespace RevitListOfSchedules.ViewModels {
             SelectedLinks = links;
         }
 
+        // Метод подписанный на событие изменения выделенных связанных файлов
         private void OnLinkChanged(object sender, PropertyChangedEventArgs e) {
             if(sender is LinkViewModel link) {
                 switch(e.PropertyName) {
@@ -155,7 +158,7 @@ namespace RevitListOfSchedules.ViewModels {
             }
         }
 
-        // В зависимости от SelectedGroupParameter обновляем сортировку в Sheets
+        // Метод подписанный на событие изменения параметра группировки
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
             if(e.PropertyName == nameof(SelectedGroupParameter)) {
                 UpdateGroupParameter();
@@ -171,7 +174,7 @@ namespace RevitListOfSchedules.ViewModels {
             return links;
         }
 
-        // Добавляем листы из связей и из основного документа в Sheets.
+        // Добавляем листы из основного документа
         private ObservableCollection<SheetViewModel> GetSheets() {
             var mainDocumentSheets = new ObservableCollection<SheetViewModel>();
 
@@ -184,6 +187,7 @@ namespace RevitListOfSchedules.ViewModels {
             return mainDocumentSheets;
         }
 
+        // Добавляем листы из связанного документа
         private ObservableCollection<SheetViewModel> GetLinkSheetViewModels(LinkViewModel linkViewModel) {
             ObservableCollection<SheetViewModel> sheetViewModels = new ObservableCollection<SheetViewModel>();
             Document linkDocument = _revitRepository.GetLinkDocument(linkViewModel);
@@ -232,17 +236,15 @@ namespace RevitListOfSchedules.ViewModels {
         }
 
 
-        // Метод обновления листов в Sheets в зависимости от параметра
+        // Метод обновления листов в зависимости от параметра
         private void UpdateGroupParameter() {
-            ObservableCollection<SheetViewModel> sheetViewModels = [];
-            foreach(SheetViewModel sheetViewModel in _sheets) {
+            foreach(var sheetViewModel in _sheets) {
                 sheetViewModel.GroupParameter = SelectedGroupParameter.Parameter;
-                sheetViewModels.Add(sheetViewModel);
             }
-            SortSheets(Sheets);
+            SortSheets(_sheets);
         }
 
-        // Метод сортировки листов в Sheets
+        // Метод сортировки листов
         private void SortSheets(ObservableCollection<SheetViewModel> sheetviewmodels) {
             List<SheetViewModel> sortedList = [.. sheetviewmodels];
             sortedList.Sort(new SheetViewModelComparer());
@@ -283,7 +285,7 @@ namespace RevitListOfSchedules.ViewModels {
             return true;
         }
 
-        //Метод обновления списка SelectedSheets в зависимости от выбора юзера
+        // Метод обновления списка SelectedSheets в зависимости от выбора юзера
         private void UpdateSelectedSheets(object selectedItems) {
             if(selectedItems is IList items) {
                 SelectedSheets.Clear();
@@ -295,6 +297,7 @@ namespace RevitListOfSchedules.ViewModels {
             }
         }
 
+        // Основной метод
         private void AcceptView() {
             SaveConfig();
             IEnumerable<IGrouping<string, SheetViewModel>> groupedSheets = SelectedSheets
@@ -331,6 +334,7 @@ namespace RevitListOfSchedules.ViewModels {
             return true;
         }
 
+        // Метод создания семейств
         private List<FamilyInstance> CreateInstances(
             TempFamilyDocument tempFamilyDocument,
             IGrouping<string, SheetViewModel> groupSheets,
@@ -365,6 +369,7 @@ namespace RevitListOfSchedules.ViewModels {
             return familyInstanceList;
         }
 
+        // Метод размещения семейств
         private List<FamilyInstance> GetFamilyInstances(
             SheetViewModel sheetViewModel, TempFamilyDocument tempFamilyDocument, ViewDrafting viewDrafting) {
             List<FamilyInstance> familyInstanceList = [];
@@ -380,6 +385,7 @@ namespace RevitListOfSchedules.ViewModels {
             return familyInstanceList;
         }
 
+        // Метод сохранения конфигурации пользователя
         private void SaveConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
