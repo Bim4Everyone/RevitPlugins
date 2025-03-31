@@ -277,11 +277,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                                                                            refArrayFormworkFront);
 
                 if(grids.Count > 0) {
-                    // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
-                    Line dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Bottom, 0.5);
+                    // Размер по ФРОНТУ опалубка + оси (положение сверху 1)
+                    Line dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Top, 0.5);
                     ReferenceArray refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, new XYZ(0, 1, 0),
                                                                                   refArrayFormworkFront);
-                    Dimension dimensionFormworkGridFront = doc.Create.NewDimension(view, dimensionLineBottomSecond,
+                    Dimension dimensionFormworkGridFront = doc.Create.NewDimension(view, dimensionLineTopSecond,
                                                                                    refArrayFormworkGridFront);
                 }
 
@@ -293,14 +293,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 bool hasLRebar = firstLRebarParamValue || secondLRebarParamValue;
 
                 if(!(onTopOfRebar && allRebarAreL)) {
-                    // Размер по ФРОНТУ опалубка + армирование (положение сверху 1)
-                    Line dimensionLineTopFirst = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Top, 0.5);
+                    // Размер по ФРОНТУ опалубка + армирование (положение снизу 2)
+                    Line dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Bottom, 0.5);
                     // Добавляем ссылки на арматурные стержни
-                    ReferenceArray refArrayFormworkRebarFrontFirst = dimensionBaseService.GetDimensionRefs(rebar, '#',
+                    ReferenceArray refArrayFormworkRebarFrontSecond = dimensionBaseService.GetDimensionRefs(rebar, '#',
                                                                                  new List<string>() { rebarPart, "фронт" },
                                                                                  refArrayFormworkFront);
-                    Dimension dimensionFormworkRebarFrontFirst = doc.Create.NewDimension(view, dimensionLineTopFirst,
-                                                                                          refArrayFormworkRebarFrontFirst);
+                    Dimension dimensionFormworkRebarFrontFirst = doc.Create.NewDimension(view, dimensionLineBottomSecond,
+                                                                                          refArrayFormworkRebarFrontSecond);
                 }
 
 
