@@ -13,6 +13,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitCreateViewSheet.Models;
+using RevitCreateViewSheet.Services;
 using RevitCreateViewSheet.ViewModels;
 using RevitCreateViewSheet.Views;
 
@@ -28,18 +29,22 @@ namespace RevitCreateViewSheet {
                 kernel.Bind<RevitRepository>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<SheetsSaver>()
+                    .ToSelf()
+                    .InSingletonScope();
 
                 kernel.UseWpfUIThemeUpdater();
 
-                kernel.BindMainWindow<AppViewModel, CreateViewSheetWindow>();
+                kernel.BindMainWindow<MainViewModel, MainWindow>();
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
                 kernel.UseWpfLocalization(
                     $"/{assemblyName};component/Localization/Language.xaml",
                     CultureInfo.GetCultureInfo("ru-RU"));
+                kernel.UseWpfUIProgressDialog<MainViewModel>();
 
-                Notification(kernel.Get<CreateViewSheetWindow>());
+                Notification(kernel.Get<MainWindow>());
             }
         }
     }
