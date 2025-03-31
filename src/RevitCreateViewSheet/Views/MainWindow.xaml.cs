@@ -4,8 +4,8 @@ using dosymep.SimpleServices;
 
 namespace RevitCreateViewSheet.Views;
 
-public partial class CreateViewSheetWindow {
-    public CreateViewSheetWindow(
+public partial class MainWindow {
+    public MainWindow(
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService,
@@ -22,7 +22,7 @@ public partial class CreateViewSheetWindow {
     }
 
     public override string PluginName => nameof(RevitCreateViewSheet);
-    public override string ProjectConfigName => nameof(CreateViewSheetWindow);
+    public override string ProjectConfigName => nameof(MainWindow);
 
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;

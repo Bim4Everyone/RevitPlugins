@@ -1,0 +1,212 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitCreateViewSheet.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    Title="{me:LocalizationSource MainWindow.Title}"
+    Height="550"
+    Width="900"
+    MinHeight="450"
+    MinWidth="800"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <b:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+    </b:Interaction.Behaviors>
+    <Grid>
+        <Grid.Resources>
+            <Style
+                TargetType="ui:TextBlock"
+                x:Key="HideableTextBlock">
+                <Style.Triggers>
+                    <Trigger
+                        Property="Text"
+                        Value="">
+                        <Setter
+                            Property="Visibility"
+                            Value="Collapsed" />
+                    </Trigger>
+                    <Trigger
+                        Property="Text"
+                        Value="{x:Null}">
+                        <Setter
+                            Property="Visibility"
+                            Value="Collapsed" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="Менеджер листов" />
+        <DockPanel
+            Grid.Row="1">
+            <Grid
+                Margin="5 5 5 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition
+                        Height="Auto" />
+                </Grid.RowDefinitions>
+                <GroupBox
+                    Grid.Row="0"
+                    Margin="0 0 0 10"
+                    Header="Генерация листов">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="250" />
+                            <ColumnDefinition
+                                Width="250" />
+                            <ColumnDefinition
+                                Width="80" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition
+                                Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <ui:TextBlock
+                            Text="Альбом"></ui:TextBlock>
+                        <ComboBox
+                            Grid.Row="1"
+                            IsTextSearchCaseSensitive="False"
+                            Height="40"
+                            MinHeight="40"
+                            IsEditable="True"
+                            ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <ui:TextBlock
+                            Grid.Column="1"
+                            Text="Штамп">
+                        </ui:TextBlock>
+                        <ComboBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            IsTextSearchCaseSensitive="False"
+                            Height="40"
+                            MinHeight="40"
+                            IsEditable="True"
+                            DisplayMemberPath="Name"
+                            ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <ui:TextBlock
+                            Grid.Column="2"
+                            Grid.ColumnSpan="2"
+                            Text="Кол-во листов">
+                        </ui:TextBlock>
+                        <ui:TextBox
+                            Grid.Column="2"
+                            Grid.Row="1"
+                            Height="40"
+                            Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <ui:Button
+                            Grid.Column="3"
+                            Grid.Row="1"
+                            Width="80"
+                            Height="40"
+                            Content="Создать"
+                            HorizontalAlignment="Left"
+                            Appearance="Info"
+                            Command="{Binding AddViewSheetsCommand}" />
+
+                        <ui:TextBlock
+                            Grid.Row="2"
+                            Grid.ColumnSpan="4"
+                            Foreground="Orange"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource HideableTextBlock}"
+                            Text="{Binding AddSheetsErrorText}">
+                        </ui:TextBlock>
+                    </Grid>
+                </GroupBox>
+
+                <DataGrid
+                    Grid.Row="1"
+                    SelectionMode="Single"
+                    x:Name="_viewSheets"
+                    AutoGenerateColumns="False"
+                    ItemsSource="{Binding AllSheets}"
+                    SelectedItem="{Binding ViewSheet, UpdateSourceTrigger=PropertyChanged}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Content="Удалить лист" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            Header="Наименование"
+                            Width="250"
+                            Binding="{Binding Name}" />
+                        <DataGridComboBoxColumn
+                            Header="Основная надпись"
+                            DisplayMemberPath="Name"
+                            ItemsSource="{Binding AllTitleBlocks}"
+                            SelectedItemBinding="{Binding TitleBlock}"
+                            Width="350">
+                        </DataGridComboBoxColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </DockPanel>
+
+        <StackPanel
+            Grid.Row="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <ui:TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+            <ui:Button
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                Click="ButtonOk_Click"
+                Appearance="Info"
+                Command="{Binding CreateViewSheetsCommand}" />
+            <ui:Button
+                Margin="10"
+                Width="80"
+                Content="Отмена"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</core:WpfUIPlatformWindow>

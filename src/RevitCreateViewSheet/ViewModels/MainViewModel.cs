@@ -1,13 +1,7 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
-using dosymep.Revit;
 using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -18,17 +12,20 @@ using RevitCreateViewSheet.Services;
 
 namespace RevitCreateViewSheet.ViewModels {
     internal class MainViewModel : BaseViewModel {
+        private const int _maxSheetsCountToAdd = 1000;
+
         private readonly RevitRepository _revitRepository;
         private readonly SheetsSaver _sheetsSaver;
         private readonly ILocalizationService _localizationService;
         private readonly IProgressDialogFactory _progressDialogFactory;
+        private readonly ObservableCollection<SheetViewModel> _allSheets;
 
         private TitleBlockViewModel _addSheetsTitleBlock;
         private string _errorText;
         private string _createErrorText;
         private string _countCreateView;
         private string _albumBlueprints;
-        private SheetViewModel _viewSheet;
+        private SheetViewModel _selectedSheet;
 
         public MainViewModel(
             RevitRepository revitRepository,
@@ -47,16 +44,19 @@ namespace RevitCreateViewSheet.ViewModels {
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            RemoveViewSheetCommand = new RelayCommand(RemoveViewSheet, CanRemoveViewSheet);
-            CreateViewSheetCommand = new RelayCommand(CreateViewSheet, CanCreateViewSheet);
-            CreateViewSheetsCommand = new RelayCommand(CreateViewSheets, CanCreateViewSheets);
+            RemoveViewSheetCommand = RelayCommand.Create<SheetViewModel>(RemoveViewSheet, CanRemoveViewSheet);
+            AddViewSheetsCommand = RelayCommand.Create(AddViewSheets, CanAddViewSheets);
 
-            AllSheets = new ObservableCollection<SheetViewModel>();
-            AllAlbumsBlueprints = [.. _revitRepository.GetAlbumsBlueprints()];
+            var comparer = new LogicalStringComparer();
+            Sheets = [];
+            _allSheets = [];
+            AllAlbumsBlueprints = [.. _revitRepository.GetAlbumsBlueprints()
+                .OrderBy(item => item, comparer)];
             AllTitleBlocks = [.. _revitRepository.GetTitleBlocks()
                 .Select(item => new TitleBlockViewModel(item))
-                .OrderBy(item => item.Name, new LogicalStringComparer())];
-            AllViewPortTypes = new ObservableCollection<ViewPortTypeViewModel>(//TODO нужна функция по получению типоразмеров видовых экранов);
+                .OrderBy(item => item.Name, comparer)];
+            AllViewPortTypes = [.. _revitRepository.GetViewPortTypes().Select(v => new ViewPortTypeViewModel(v))
+                .OrderBy(item => item.Name, comparer)];
 
             AddSheetsCount = "1";
             AddSheetsAlbumBlueprint = AllAlbumsBlueprints.FirstOrDefault();
@@ -66,24 +66,32 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public IProgressDialogFactory ProgressDialogFactory => _progressDialogFactory;
 
+        public ICommand RemoveViewSheetCommand { get; }
+
+        public ICommand AddViewSheetsCommand { get; }
+
+        public ICommand LoadViewCommand { get; }
+
+        public ICommand AcceptViewCommand { get; }
+
         public string ErrorText {
             get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+            set => RaiseAndSetIfChanged(ref _errorText, value);
         }
 
-        public string CreateErrorText {
+        public string AddSheetsErrorText {
             get => _createErrorText;
-            set => this.RaiseAndSetIfChanged(ref _createErrorText, value);
+            set => RaiseAndSetIfChanged(ref _createErrorText, value);
         }
 
         public string AddSheetsCount {
             get => _countCreateView;
-            set => this.RaiseAndSetIfChanged(ref _countCreateView, value);
+            set => RaiseAndSetIfChanged(ref _countCreateView, value);
         }
 
         public string AddSheetsAlbumBlueprint {
             get => _albumBlueprints;
-            set => this.RaiseAndSetIfChanged(ref _albumBlueprints, value);
+            set => RaiseAndSetIfChanged(ref _albumBlueprints, value);
         }
 
         public TitleBlockViewModel AddSheetsTitleBlock {
@@ -91,22 +99,12 @@ namespace RevitCreateViewSheet.ViewModels {
             set => RaiseAndSetIfChanged(ref _addSheetsTitleBlock, value);
         }
 
-        public SheetViewModel ViewSheet {
-            get => _viewSheet;
-            set => this.RaiseAndSetIfChanged(ref _viewSheet, value);
+        public SheetViewModel SelectedSheet {
+            get => _selectedSheet;
+            set => RaiseAndSetIfChanged(ref _selectedSheet, value);
         }
 
-        public ICommand RemoveViewSheetCommand { get; }
-
-        public ICommand CreateViewSheetCommand { get; }
-
-        public ICommand CreateViewSheetsCommand { get; }
-
-        public ICommand LoadViewCommand { get; }
-
-        public ICommand AcceptViewCommand { get; }
-
-        public ObservableCollection<SheetViewModel> AllSheets { get; }
+        public ObservableCollection<SheetViewModel> Sheets { get; }
 
         public ObservableCollection<string> AllAlbumsBlueprints { get; }
 
@@ -115,92 +113,68 @@ namespace RevitCreateViewSheet.ViewModels {
         public ObservableCollection<ViewPortTypeViewModel> AllViewPortTypes { get; }
 
 
-        private void RemoveViewSheet(object p) {
-            AllSheets.Remove((SheetViewModel) p);
-        }
-
-        private bool CanRemoveViewSheet(object p) {
-            return true;
-        }
-
-        private void CreateViewSheet(object p) {
-            foreach(int index in Enumerable.Range(0, int.Parse(AddSheetsCount))) {
-                throw new System.NotImplementedException();
-            }
-        }
-
-        private bool CanCreateViewSheet(object p) {
-            if(!int.TryParse(_countCreateView, out _)) {
-                CreateErrorText = "Количество листов должно быть числовым значением.";
-                return false;
-            }
-
-            if(int.Parse(_countCreateView) <= 0) {
-                CreateErrorText = "Количество листов должно быть не отрицательным.";
-                return false;
-            }
-
-            CreateErrorText = null;
-            return true;
-        }
-
-        private void CreateViewSheets(object p) {
-            int lastIndex = _revitRepository.GetLastViewSheetIndex(AddSheetsAlbumBlueprint);
-            lastIndex++;
-            using(var transaction = new Transaction(_revitRepository.Document)) {
-                transaction.Start("Создание видов");
-
-                foreach(var viewSheetViewModel in AllSheets) {
-                    ViewSheet viewSheet = default;
-
-                    viewSheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, lastIndex.ToString());
-                    viewSheet.SetParamValue(SharedParamsConfig.Instance.AlbumBlueprints, AddSheetsAlbumBlueprint);
-                    viewSheet.SetParamValue(BuiltInParameter.SHEET_NAME, viewSheetViewModel.Name);
-                    viewSheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{AddSheetsAlbumBlueprint}-{lastIndex++}");
-                    throw new System.NotImplementedException();
-                }
-
-                transaction.Commit();
-            }
-        }
-
-        private bool CanCreateViewSheets(object p) {
-            if(string.IsNullOrEmpty(AddSheetsAlbumBlueprint)) {
-                ErrorText = "Выберите альбом.";
-                return false;
-            }
-
-            if(AllSheets.Count == 0) {
-                ErrorText = "Добавьте создаваемые листы.";
-                return false;
-            }
-
-            if(!AllSheets.All(item => !string.IsNullOrEmpty(item.Name))) {
-                ErrorText = "У всех листов должно быть заполнено наименование.";
-                return false;
-            }
-
-            if(!AllSheets.All(item => item.TitleBlock != null)) {
-                ErrorText = "У всех листов должна быть выбрана основная надпись.";
-                return false;
-            }
-
-            ErrorText = null;
-            return true;
-        }
-
         private void LoadView() {
             var sheets = _revitRepository.GetSheetModels()
                 .Select(s => new SheetViewModel(s))
                 .OrderBy(s => s.AlbumBlueprint + s.SheetNumber, new LogicalStringComparer())
                 .ToArray();
             for(int i = 0; i < sheets.Length; i++) {
-                AllSheets.Add(sheets[i]);
+                Sheets.Add(sheets[i]);
+                _allSheets.Add(sheets[i]);
             }
         }
 
+        private void AddViewSheets() {
+            foreach(int index in Enumerable.Range(0, int.Parse(AddSheetsCount))) {
+                throw new System.NotImplementedException();
+            }
+        }
+
+        private bool CanAddViewSheets() {
+            if(string.IsNullOrWhiteSpace(AddSheetsAlbumBlueprint)) {
+                AddSheetsErrorText = "Выберите альбом.";
+                return false;
+            }
+
+            if(AddSheetsTitleBlock is null) {
+                AddSheetsErrorText = "Выберите штамп.";
+                return false;
+            }
+
+            if(!int.TryParse(AddSheetsCount, out _)) {
+                AddSheetsErrorText = "Количество листов должно быть числовым значением.";
+                return false;
+            }
+
+            if(int.TryParse(AddSheetsCount, out int number) && number > _maxSheetsCountToAdd) {
+                AddSheetsErrorText = "Количество листов должно быть числовым значением.";
+                return false;
+            }
+
+            if(int.Parse(AddSheetsCount) <= 0) {
+                AddSheetsErrorText = "Количество листов должно быть не отрицательным.";
+                return false;
+            }
+
+            AddSheetsErrorText = null;
+            return true;
+        }
+
+        private void RemoveViewSheet(SheetViewModel sheet) {
+            if(sheet.IsPlaced) {
+                sheet.SheetModel.MarkAsDeleted();
+            } else {
+                _allSheets.Remove(sheet);
+            }
+            Sheets.Remove(sheet);
+        }
+
+        private bool CanRemoveViewSheet(SheetViewModel sheet) {
+            return sheet is not null;
+        }
+
         private void AcceptView() {
-            var sheets = AllSheets.Select(s => s.SheetModel).Where(s => s.State != EntityState.Unchanged).ToArray();
+            var sheets = _allSheets.Select(s => s.SheetModel).Where(s => s.State != EntityState.Unchanged).ToArray();
             if(sheets.Any()) {
                 using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
                     progressDialogService.StepValue = 1;
@@ -216,7 +190,28 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAcceptView() {
-            throw new NotImplementedException();
+            if(Sheets.Any(item => string.IsNullOrWhiteSpace(item.AlbumBlueprint))) {
+                ErrorText = "У всех листов должно быть заполнен альбом.";
+                return false;
+            }
+
+            if(Sheets.Any(item => string.IsNullOrWhiteSpace(item.SheetNumber))) {
+                ErrorText = "У всех листов должно быть задан номер.";
+                return false;
+            }
+
+            if(Sheets.Any(item => string.IsNullOrWhiteSpace(item.Name))) {
+                ErrorText = "У всех листов должно быть заполнено наименование.";
+                return false;
+            }
+
+            if(Sheets.Any(item => item.TitleBlock is null)) {
+                ErrorText = "У всех листов должна быть выбрана основная надпись.";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
         }
     }
 }
