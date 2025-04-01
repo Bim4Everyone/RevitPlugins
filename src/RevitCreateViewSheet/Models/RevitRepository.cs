@@ -143,7 +143,7 @@ namespace RevitCreateViewSheet.Models {
             sheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, sheetModel.SheetNumber);
             sheet.SetParamValue(SharedParamsConfig.Instance.AlbumBlueprints, sheetModel.AlbumBlueprint);
             sheet.SetParamValue(BuiltInParameter.SHEET_NAME, sheetModel.Name);
-            sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{sheetModel.AlbumBlueprint}-{sheetModel.SheetNumber}");
+            sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{sheetModel.AlbumBlueprint}-{sheetModel.SheetNumber}"); // TODO уточнить, надо ли обновлять системный номер и как его заполнять с нуля
             return sheet;
         }
 

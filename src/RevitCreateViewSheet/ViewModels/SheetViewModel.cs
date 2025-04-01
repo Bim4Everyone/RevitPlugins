@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -110,11 +111,11 @@ namespace RevitCreateViewSheet.ViewModels {
 
 
         private void AddView() {
-
+            throw new NotImplementedException("TODO");
         }
 
         private void RemoveView(ViewPortViewModel view) {
-            ViewPorts.Remove(view);
+            throw new NotImplementedException("TODO");
         }
 
         private bool CanRemoveView(ViewPortViewModel view) {
@@ -122,11 +123,12 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void AddSchedule() {
+            throw new NotImplementedException("TODO");
 
         }
 
         private void RemoveSchedule(ScheduleViewModel scheduleView) {
-            Schedules.Remove(scheduleView);
+            throw new NotImplementedException("TODO");
         }
 
         private bool CanRemoveSchedule(ScheduleViewModel scheduleView) {
@@ -134,11 +136,11 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void AddAnnotation() {
-
+            throw new NotImplementedException("TODO");
         }
 
         private void RemoveAnnotation(AnnotationViewModel annotationView) {
-            Annotations.Remove(annotationView);
+            throw new NotImplementedException("TODO");
         }
 
         private bool CanRemoveAnnotation(AnnotationViewModel annotationView) {
