@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using dosymep.Revit.Comparators;
@@ -18,14 +19,15 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly SheetsSaver _sheetsSaver;
         private readonly ILocalizationService _localizationService;
         private readonly IProgressDialogFactory _progressDialogFactory;
-        private readonly ObservableCollection<SheetViewModel> _allSheets;
 
         private TitleBlockViewModel _addSheetsTitleBlock;
         private string _errorText;
         private string _createErrorText;
         private string _countCreateView;
         private string _albumBlueprints;
+        private string _sheetsFilter;
         private SheetViewModel _selectedSheet;
+        private CollectionViewSource _visibleSheets;
 
         public MainViewModel(
             RevitRepository revitRepository,
@@ -48,8 +50,7 @@ namespace RevitCreateViewSheet.ViewModels {
             AddViewSheetsCommand = RelayCommand.Create(AddViewSheets, CanAddViewSheets);
 
             var comparer = new LogicalStringComparer();
-            Sheets = [];
-            _allSheets = [];
+            AllSheets = [];
             AllAlbumsBlueprints = [.. _revitRepository.GetAlbumsBlueprints()
                 .OrderBy(item => item, comparer)];
             AllTitleBlocks = [.. _revitRepository.GetTitleBlocks()
@@ -73,6 +74,14 @@ namespace RevitCreateViewSheet.ViewModels {
         public ICommand LoadViewCommand { get; }
 
         public ICommand AcceptViewCommand { get; }
+
+        public string SheetsFilter {
+            get => _sheetsFilter;
+            set {
+                RaiseAndSetIfChanged(ref _sheetsFilter, value);
+                VisibleSheets.View.Refresh();
+            }
+        }
 
         public string ErrorText {
             get => _errorText;
@@ -104,7 +113,12 @@ namespace RevitCreateViewSheet.ViewModels {
             set => RaiseAndSetIfChanged(ref _selectedSheet, value);
         }
 
-        public ObservableCollection<SheetViewModel> Sheets { get; }
+        public CollectionViewSource VisibleSheets {
+            get => _visibleSheets;
+            set => RaiseAndSetIfChanged(ref _visibleSheets, value);
+        }
+
+        public ObservableCollection<SheetViewModel> AllSheets { get; }
 
         public ObservableCollection<string> AllAlbumsBlueprints { get; }
 
@@ -114,19 +128,38 @@ namespace RevitCreateViewSheet.ViewModels {
 
 
         private void LoadView() {
+            var existState = _localizationService.GetLocalizedString("SheetViewModel.IsPlacedTextState.Exist");
             var sheets = _revitRepository.GetSheetModels()
-                .Select(s => new SheetViewModel(s))
+                .Select(s => new SheetViewModel(s) { IsPlacedTextStatus = existState })
                 .OrderBy(s => s.AlbumBlueprint + s.SheetNumber, new LogicalStringComparer())
                 .ToArray();
             for(int i = 0; i < sheets.Length; i++) {
-                Sheets.Add(sheets[i]);
-                _allSheets.Add(sheets[i]);
+                AllSheets.Add(sheets[i]);
             }
+            VisibleSheets = new CollectionViewSource() { Source = AllSheets };
+            VisibleSheets.Filter += SheetsFilterHandler;
         }
 
         private void AddViewSheets() {
+            var newState = _localizationService.GetLocalizedString("SheetViewModel.IsPlacedTextState.New");
+            var indexes = AllSheets.Where(s => s.SheetModel.State != EntityState.Deleted)
+                .Select(s => new { IsNumber = int.TryParse(s.SheetNumber, out int number), Number = number })
+                .Where(c => c.IsNumber)
+                .ToArray();
+            int lastIndex = indexes.Length > 0 ? indexes.Max(c => c.Number) : 0;
+            var titleBlock = AddSheetsTitleBlock;
+            var albumBlueprint = AddSheetsAlbumBlueprint;
             foreach(int index in Enumerable.Range(0, int.Parse(AddSheetsCount))) {
-                throw new System.NotImplementedException();
+                ++lastIndex;
+                var sheetModel = new SheetModel(titleBlock.TitleBlockSymbol) {
+                    AlbumBlueprint = albumBlueprint,
+                    SheetNumber = lastIndex.ToString(),
+                    Name = $"{_localizationService.GetLocalizedString("TODO")} {lastIndex}"
+                };
+                var sheetViewModel = new SheetViewModel(sheetModel) {
+                    IsPlacedTextStatus = newState
+                };
+                AllSheets.Add(sheetViewModel);
             }
         }
 
@@ -147,7 +180,7 @@ namespace RevitCreateViewSheet.ViewModels {
             }
 
             if(int.TryParse(AddSheetsCount, out int number) && number > _maxSheetsCountToAdd) {
-                AddSheetsErrorText = "Количество листов должно быть числовым значением.";
+                AddSheetsErrorText = string.Format("Количество листов не должно быть больше {0}.", _maxSheetsCountToAdd);
                 return false;
             }
 
@@ -164,9 +197,9 @@ namespace RevitCreateViewSheet.ViewModels {
             if(sheet.IsPlaced) {
                 sheet.SheetModel.MarkAsDeleted();
             } else {
-                _allSheets.Remove(sheet);
+                AllSheets.Remove(sheet);
             }
-            Sheets.Remove(sheet);
+            VisibleSheets.View.Refresh();
         }
 
         private bool CanRemoveViewSheet(SheetViewModel sheet) {
@@ -174,7 +207,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void AcceptView() {
-            var sheets = _allSheets.Select(s => s.SheetModel).Where(s => s.State != EntityState.Unchanged).ToArray();
+            var sheets = AllSheets.Select(s => s.SheetModel).Where(s => s.State != EntityState.Unchanged).ToArray();
             if(sheets.Any()) {
                 using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
                     progressDialogService.StepValue = 1;
@@ -190,28 +223,48 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(Sheets.Any(item => string.IsNullOrWhiteSpace(item.AlbumBlueprint))) {
+            if(AllSheets.Any(item => string.IsNullOrWhiteSpace(item.AlbumBlueprint))) {
                 ErrorText = "У всех листов должно быть заполнен альбом.";
                 return false;
             }
 
-            if(Sheets.Any(item => string.IsNullOrWhiteSpace(item.SheetNumber))) {
+            if(AllSheets.Any(item => string.IsNullOrWhiteSpace(item.SheetNumber))) {
                 ErrorText = "У всех листов должно быть задан номер.";
                 return false;
             }
 
-            if(Sheets.Any(item => string.IsNullOrWhiteSpace(item.Name))) {
+            if(AllSheets.Any(item => string.IsNullOrWhiteSpace(item.Name))) {
                 ErrorText = "У всех листов должно быть заполнено наименование.";
                 return false;
             }
 
-            if(Sheets.Any(item => item.TitleBlock is null)) {
+            if(AllSheets.Any(item => item.TitleBlock is null)) {
                 ErrorText = "У всех листов должна быть выбрана основная надпись.";
                 return false;
             }
 
             ErrorText = null;
             return true;
+        }
+
+        private void SheetsFilterHandler(object sender, FilterEventArgs e) {
+            if(e.Item is SheetViewModel sheetViewModel) {
+                if(sheetViewModel.SheetModel.State == EntityState.Deleted) {
+                    e.Accepted = false;
+                    return;
+                }
+                if(!string.IsNullOrWhiteSpace(SheetsFilter)) {
+                    if(!sheetViewModel.AlbumBlueprint.Contains(SheetsFilter)
+                        && !sheetViewModel.SheetNumber.Contains(SheetsFilter)
+                        && !sheetViewModel.Name.Contains(SheetsFilter)
+                        && (!sheetViewModel.TitleBlock?.Name.Contains(SheetsFilter) ?? false)
+                        && !sheetViewModel.IsPlacedTextStatus.Contains(SheetsFilter)) {
+
+                        e.Accepted = false;
+                        return;
+                    }
+                }
+            }
         }
     }
 }

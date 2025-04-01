@@ -14,6 +14,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private string _albumBlueprint;
         private string _sheetNumber;
         private TitleBlockViewModel _titleBlock;
+        private string _isPlacedTextStatus;
 
         public SheetViewModel(SheetModel sheetModel) {
             _sheetModel = sheetModel ?? throw new System.ArgumentNullException(nameof(sheetModel));
@@ -70,6 +71,11 @@ namespace RevitCreateViewSheet.ViewModels {
                 RaiseAndSetIfChanged(ref _titleBlock, value);
                 _sheetModel.TitleBlockSymbol = value?.TitleBlockSymbol;
             }
+        }
+
+        public string IsPlacedTextStatus {
+            get => _isPlacedTextStatus;
+            set => RaiseAndSetIfChanged(ref _isPlacedTextStatus, value);
         }
 
         public ObservableCollection<ViewPortViewModel> ViewPorts { get; }

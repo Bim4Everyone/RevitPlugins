@@ -23,6 +23,13 @@
             AttachableService="{Binding ProgressDialogFactory}">
         </wpfbehaviors:WpfAttachServiceBehavior>
     </b:Interaction.Behaviors>
+    <b:Interaction.Triggers>
+        <b:EventTrigger
+            EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
     <Grid>
         <Grid.Resources>
             <Style
@@ -68,123 +75,165 @@
                 <Grid.RowDefinitions>
                     <RowDefinition
                         Height="Auto" />
+                    <RowDefinition
+                        Height="Auto" />
                     <RowDefinition />
                     <RowDefinition
                         Height="Auto" />
+                    <RowDefinition
+                        Height="Auto" />
                 </Grid.RowDefinitions>
-                <GroupBox
+
+                <Grid
                     Grid.Row="0"
-                    Margin="0 0 0 10"
-                    Header="Генерация листов">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="250" />
-                            <ColumnDefinition
-                                Width="250" />
-                            <ColumnDefinition
-                                Width="80" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition
-                                Height="Auto" />
-                        </Grid.RowDefinitions>
+                    Margin="0 0 0 10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="250" />
+                        <ColumnDefinition
+                            Width="250" />
+                        <ColumnDefinition
+                            Width="80" />
+                        <ColumnDefinition
+                            Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition
+                            Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                        <ui:TextBlock
-                            Text="Альбом"></ui:TextBlock>
-                        <ComboBox
-                            Grid.Row="1"
-                            IsTextSearchCaseSensitive="False"
-                            Height="40"
-                            MinHeight="40"
-                            IsEditable="True"
-                            ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
-                            Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:TextBlock
+                        Text="Альбом"></ui:TextBlock>
+                    <ComboBox
+                        Grid.Row="1"
+                        IsTextSearchCaseSensitive="False"
+                        Height="40"
+                        MinHeight="40"
+                        IsEditable="True"
+                        ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <ui:TextBlock
-                            Grid.Column="1"
-                            Text="Штамп">
-                        </ui:TextBlock>
-                        <ComboBox
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            IsTextSearchCaseSensitive="False"
-                            Height="40"
-                            MinHeight="40"
-                            IsEditable="True"
-                            DisplayMemberPath="Name"
-                            ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
-                            SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:TextBlock
+                        Grid.Column="1"
+                        Text="Штамп">
+                    </ui:TextBlock>
+                    <ComboBox
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        IsTextSearchCaseSensitive="False"
+                        Height="40"
+                        MinHeight="40"
+                        IsEditable="True"
+                        DisplayMemberPath="Name"
+                        ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
+                        SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <ui:TextBlock
-                            Grid.Column="2"
-                            Grid.ColumnSpan="2"
-                            Text="Кол-во листов">
-                        </ui:TextBlock>
-                        <ui:TextBox
-                            Grid.Column="2"
-                            Grid.Row="1"
-                            Height="40"
-                            Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:TextBlock
+                        Grid.Column="2"
+                        Grid.ColumnSpan="2"
+                        Text="Кол-во листов">
+                    </ui:TextBlock>
+                    <ui:TextBox
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        Height="40"
+                        Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <ui:Button
-                            Grid.Column="3"
-                            Grid.Row="1"
-                            Width="80"
-                            Height="40"
-                            Content="Создать"
-                            HorizontalAlignment="Left"
-                            Appearance="Info"
-                            Command="{Binding AddViewSheetsCommand}" />
+                    <ui:Button
+                        Grid.Column="3"
+                        Grid.Row="1"
+                        Width="80"
+                        Height="40"
+                        Content="Создать"
+                        HorizontalAlignment="Left"
+                        Appearance="Info"
+                        Command="{Binding AddViewSheetsCommand}" />
 
-                        <ui:TextBlock
-                            Grid.Row="2"
-                            Grid.ColumnSpan="4"
-                            Foreground="Orange"
-                            VerticalAlignment="Center"
-                            Style="{StaticResource HideableTextBlock}"
-                            Text="{Binding AddSheetsErrorText}">
-                        </ui:TextBlock>
-                    </Grid>
-                </GroupBox>
+                    <ui:TextBlock
+                        Grid.Row="2"
+                        Grid.ColumnSpan="4"
+                        Foreground="Orange"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource HideableTextBlock}"
+                        Text="{Binding AddSheetsErrorText}">
+                    </ui:TextBlock>
+
+                    <DockPanel
+                        Grid.Row="3"
+                        Margin="0 10 0 0"
+                        Grid.ColumnSpan="4">
+                        <StackPanel>
+                            <ui:TextBlock
+                                Text="Фильтр листов" />
+                            <ui:TextBox
+                                Text="{Binding SheetsFilter, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Grid>
 
                 <DataGrid
-                    Grid.Row="1"
-                    SelectionMode="Single"
-                    x:Name="_viewSheets"
+                    Grid.Row="2"
+                    SelectionMode="Extended"
                     AutoGenerateColumns="False"
-                    ItemsSource="{Binding AllSheets}"
-                    SelectedItem="{Binding ViewSheet, UpdateSourceTrigger=PropertyChanged}">
+                    ItemsSource="{Binding VisibleSheets.View}"
+                    SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            Header="Альбом"
+                            Width="Auto"
+                            Binding="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
+                        <DataGridTextColumn
+                            Header="Номер листа"
+                            Width="Auto"
+                            Binding="{Binding SheetNumber, UpdateSourceTrigger=PropertyChanged}" />
+                        <DataGridTextColumn
+                            Header="Имя листа"
+                            Width="250"
+                            Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                        <DataGridTemplateColumn
+                            Header="Основная надпись"
+                            Width="350">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <ui:Button
-                                        Content="Удалить лист" />
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        IsTextSearchCaseSensitive="False"
+                                        Height="40"
+                                        MinHeight="40"
+                                        IsEditable="True"
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                        SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         <DataGridTextColumn
-                            Header="Наименование"
-                            Width="250"
-                            Binding="{Binding Name}" />
-                        <DataGridComboBoxColumn
-                            Header="Основная надпись"
-                            DisplayMemberPath="Name"
-                            ItemsSource="{Binding AllTitleBlocks}"
-                            SelectedItemBinding="{Binding TitleBlock}"
-                            Width="350">
-                        </DataGridComboBoxColumn>
+                            Header="Статус"
+                            Width="Auto"
+                            IsReadOnly="True"
+                            Binding="{Binding IsPlacedTextStatus}" />
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Appearance="Danger"
+                                        Command="{Binding Path=DataContext.RemoveViewSheetCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="{ui:SymbolIcon Delete16}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
         </DockPanel>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Orientation="Horizontal"
@@ -200,7 +249,7 @@
                 Content="ОК"
                 Click="ButtonOk_Click"
                 Appearance="Info"
-                Command="{Binding CreateViewSheetsCommand}" />
+                Command="{Binding AcceptViewCommand}" />
             <ui:Button
                 Margin="10"
                 Width="80"
