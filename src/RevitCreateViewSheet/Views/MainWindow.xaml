@@ -17,6 +17,8 @@
     Width="900"
     MinHeight="450"
     MinWidth="800"
+    d:Width="1500"
+    d:Height="600"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <b:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
@@ -83,9 +85,20 @@
                     <RowDefinition
                         Height="Auto" />
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="2*"
+                        MinWidth="100" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                    <ColumnDefinition
+                        Width="1*"
+                        MinWidth="100" />
+                </Grid.ColumnDefinitions>
 
                 <Grid
                     Grid.Row="0"
+                    Grid.ColumnSpan="3"
                     Margin="0 0 0 10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition
@@ -174,62 +187,283 @@
                     </DockPanel>
                 </Grid>
 
-                <DataGrid
+                <GroupBox
+                    Header="Листы"
                     Grid.Row="2"
-                    SelectionMode="Extended"
-                    AutoGenerateColumns="False"
-                    ItemsSource="{Binding VisibleSheets.View}"
-                    SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Header="Альбом"
-                            Width="Auto"
-                            Binding="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
-                        <DataGridTextColumn
-                            Header="Номер листа"
-                            Width="Auto"
-                            Binding="{Binding SheetNumber, UpdateSourceTrigger=PropertyChanged}" />
-                        <DataGridTextColumn
-                            Header="Имя листа"
-                            Width="250"
-                            Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-                        <DataGridTemplateColumn
-                            Header="Основная надпись"
-                            Width="350">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ComboBox
-                                        Grid.Row="1"
-                                        Grid.Column="1"
-                                        IsTextSearchCaseSensitive="False"
-                                        Height="40"
-                                        MinHeight="40"
-                                        IsEditable="True"
-                                        DisplayMemberPath="Name"
-                                        ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                        SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn
-                            Header="Статус"
-                            Width="Auto"
-                            IsReadOnly="True"
-                            Binding="{Binding IsPlacedTextStatus}" />
-                        <DataGridTemplateColumn>
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ui:Button
-                                        Appearance="Danger"
-                                        Command="{Binding Path=DataContext.RemoveViewSheetCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                        CommandParameter="{Binding}"
-                                        Content="{ui:SymbolIcon Delete16}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                    Grid.Column="0">
+                    <DataGrid
+                        SelectionMode="Extended"
+                        AutoGenerateColumns="False"
+                        VirtualizingPanel.VirtualizationMode="Recycling"
+                        VirtualizingPanel.IsVirtualizing="True"
+                        ItemsSource="{Binding VisibleSheets.View}"
+                        SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn
+                                Header="Альбом"
+                                Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBox
+                                            Text="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Header="Номер листа"
+                                Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBox
+                                            Text="{Binding SheetNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Header="Имя листа"
+                                Width="250">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBox
+                                            Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Header="Основная надпись"
+                                Width="350">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            IsTextSearchCaseSensitive="False"
+                                            Height="40"
+                                            MinHeight="40"
+                                            IsEditable="True"
+                                            DisplayMemberPath="Name"
+                                            ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                            SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                Width="Auto"
+                                Header="Статус">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:TextBlock
+                                            Text="{Binding IsPlaced, Converter={StaticResource BoolToLocalizedStringConverter}}">
+                                        </ui:TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:Button
+                                            Appearance="Danger"
+                                            Command="{Binding Path=DataContext.RemoveViewSheetCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Content="{ui:SymbolIcon Delete16}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
 
-                    </DataGrid.Columns>
-                </DataGrid>
+                <GridSplitter
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Width="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Stretch" />
+
+                <GroupBox
+                    Grid.Row="2"
+                    Grid.Column="2">
+                    <GroupBox.Header>
+                        <DockPanel>
+                            <ui:TextBlock
+                                Text="Элементы на листе: " />
+                            <ui:TextBlock
+                                Text="{Binding SelectedSheet.Name}" />
+                        </DockPanel>
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                MinHeight="150" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                MinHeight="150" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                MinHeight="150" />
+                        </Grid.RowDefinitions>
+                        <GroupBox
+                            Header="Виды">
+                            <DockPanel
+                                LastChildFill="True">
+                                <ui:Button
+                                    Height="Auto"
+                                    Width="Auto"
+                                    HorizontalAlignment="Left"
+                                    DockPanel.Dock="Bottom"
+                                    Content="{ui:SymbolIcon Add16}"
+                                    Command="{Binding SelectedSheet.AddViewCommand}" />
+                                <DataGrid
+                                    SelectionMode="Single"
+                                    AutoGenerateColumns="False"
+                                    VirtualizingPanel.VirtualizationMode="Recycling"
+                                    VirtualizingPanel.IsVirtualizing="True"
+                                    ItemsSource="{Binding SelectedSheet.ViewPorts}"
+                                    SelectedItem="{Binding SelectedSheet.SelectedViewPort}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn
+                                            Header="Название"
+                                            Width="200"
+                                            IsReadOnly="True"
+                                            Binding="{Binding ViewName}" />
+                                        <DataGridTemplateColumn
+                                            Header="Тип видового экрана"
+                                            Width="200">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox
+                                                        Grid.Row="1"
+                                                        Grid.Column="1"
+                                                        IsTextSearchCaseSensitive="False"
+                                                        Height="40"
+                                                        MinHeight="40"
+                                                        IsEditable="True"
+                                                        DisplayMemberPath="Name"
+                                                        ItemsSource="{Binding Path=DataContext.AllViewPortTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                        SelectedItem="{Binding ViewPortType, UpdateSourceTrigger=PropertyChanged}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn
+                                            Width="Auto"
+                                            Header="Статус">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ui:TextBlock
+                                                        Text="{Binding IsPlaced, Converter={StaticResource BoolToLocalizedStringConverter}}">
+                                                    </ui:TextBlock>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </GroupBox>
+
+                        <GridSplitter
+                            Grid.Row="1"
+                            Height="2"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center" />
+
+                        <GroupBox
+                            Grid.Row="2"
+                            Header="Спецификации">
+                            <DockPanel
+                                LastChildFill="True">
+                                <ui:Button
+                                    Height="Auto"
+                                    Width="Auto"
+                                    HorizontalAlignment="Left"
+                                    DockPanel.Dock="Bottom"
+                                    Content="{ui:SymbolIcon Add16}"
+                                    Command="{Binding SelectedSheet.AddScheduleCommand}" />
+                                <DataGrid
+                                    DockPanel.Dock="Top"
+                                    SelectionMode="Single"
+                                    AutoGenerateColumns="False"
+                                    VirtualizingPanel.VirtualizationMode="Recycling"
+                                    VirtualizingPanel.IsVirtualizing="True"
+                                    ItemsSource="{Binding SelectedSheet.Schedules}"
+                                    SelectedItem="{Binding SelectedSheet.SelectedSchedule}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn
+                                            Header="Название"
+                                            Width="200"
+                                            IsReadOnly="True"
+                                            Binding="{Binding Name}" />
+                                        <DataGridTemplateColumn
+                                            Width="Auto"
+                                            Header="Статус">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ui:TextBlock
+                                                        Text="{Binding IsPlaced, Converter={StaticResource BoolToLocalizedStringConverter}}">
+                                                    </ui:TextBlock>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </GroupBox>
+
+                        <GridSplitter
+                            Grid.Row="3"
+                            Height="2"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center" />
+
+                        <GroupBox
+                            Grid.Row="4"
+                            Header="Аннотации">
+                            <DockPanel
+                                LastChildFill="True">
+                                <ui:Button
+                                    Height="Auto"
+                                    Width="Auto"
+                                    HorizontalAlignment="Left"
+                                    DockPanel.Dock="Bottom"
+                                    Content="{ui:SymbolIcon Add16}"
+                                    Command="{Binding SelectedSheet.AddAnnotationCommand}" />
+                                <DataGrid
+                                    DockPanel.Dock="Top"
+                                    SelectionMode="Single"
+                                    AutoGenerateColumns="False"
+                                    VirtualizingPanel.VirtualizationMode="Recycling"
+                                    VirtualizingPanel.IsVirtualizing="True"
+                                    ItemsSource="{Binding SelectedSheet.Annotations}"
+                                    SelectedItem="{Binding SelectedSheet.SelectedAnnotation}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn
+                                            Header="Семейство"
+                                            Width="200"
+                                            IsReadOnly="True"
+                                            Binding="{Binding FamilyName}" />
+                                        <DataGridTextColumn
+                                            Header="Тип"
+                                            Width="200"
+                                            IsReadOnly="True"
+                                            Binding="{Binding SymbolName}" />
+                                        <DataGridTemplateColumn
+                                            Width="Auto"
+                                            Header="Статус">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ui:TextBlock
+                                                        Text="{Binding IsPlaced, Converter={StaticResource BoolToLocalizedStringConverter}}">
+                                                    </ui:TextBlock>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </GroupBox>
+                    </Grid>
+                </GroupBox>
             </Grid>
         </DockPanel>
 

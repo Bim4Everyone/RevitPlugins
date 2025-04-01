@@ -128,9 +128,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
 
         private void LoadView() {
-            var existState = _localizationService.GetLocalizedString("SheetViewModel.IsPlacedTextState.Exist");
             var sheets = _revitRepository.GetSheetModels()
-                .Select(s => new SheetViewModel(s) { IsPlacedTextStatus = existState })
+                .Select(s => new SheetViewModel(s))
                 .OrderBy(s => s.AlbumBlueprint + s.SheetNumber, new LogicalStringComparer())
                 .ToArray();
             for(int i = 0; i < sheets.Length; i++) {
@@ -141,7 +140,6 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void AddViewSheets() {
-            var newState = _localizationService.GetLocalizedString("SheetViewModel.IsPlacedTextState.New");
             var indexes = AllSheets.Where(s => s.SheetModel.State != EntityState.Deleted)
                 .Select(s => new { IsNumber = int.TryParse(s.SheetNumber, out int number), Number = number })
                 .Where(c => c.IsNumber)
@@ -156,9 +154,7 @@ namespace RevitCreateViewSheet.ViewModels {
                     SheetNumber = lastIndex.ToString(),
                     Name = $"{_localizationService.GetLocalizedString("TODO")} {lastIndex}"
                 };
-                var sheetViewModel = new SheetViewModel(sheetModel) {
-                    IsPlacedTextStatus = newState
-                };
+                var sheetViewModel = new SheetViewModel(sheetModel);
                 AllSheets.Add(sheetViewModel);
             }
         }
@@ -257,8 +253,7 @@ namespace RevitCreateViewSheet.ViewModels {
                     if(!sheetViewModel.AlbumBlueprint.Contains(SheetsFilter)
                         && !sheetViewModel.SheetNumber.Contains(SheetsFilter)
                         && !sheetViewModel.Name.Contains(SheetsFilter)
-                        && (!sheetViewModel.TitleBlock?.Name.Contains(SheetsFilter) ?? false)
-                        && !sheetViewModel.IsPlacedTextStatus.Contains(SheetsFilter)) {
+                        && (!sheetViewModel.TitleBlock?.Name.Contains(SheetsFilter) ?? false)) {
 
                         e.Accepted = false;
                         return;

@@ -14,7 +14,9 @@ namespace RevitCreateViewSheet.ViewModels {
         private string _albumBlueprint;
         private string _sheetNumber;
         private TitleBlockViewModel _titleBlock;
-        private string _isPlacedTextStatus;
+        private ViewPortViewModel _selectedViewPort;
+        private ScheduleViewModel _selectedSchedule;
+        private AnnotationViewModel _selectedAnnotation;
 
         public SheetViewModel(SheetModel sheetModel) {
             _sheetModel = sheetModel ?? throw new System.ArgumentNullException(nameof(sheetModel));
@@ -73,19 +75,26 @@ namespace RevitCreateViewSheet.ViewModels {
             }
         }
 
-        public string IsPlacedTextStatus {
-            get => _isPlacedTextStatus;
-            set => RaiseAndSetIfChanged(ref _isPlacedTextStatus, value);
+        public ViewPortViewModel SelectedViewPort {
+            get => _selectedViewPort;
+            set => RaiseAndSetIfChanged(ref _selectedViewPort, value);
+        }
+
+        public ScheduleViewModel SelectedSchedule {
+            get => _selectedSchedule;
+            set => RaiseAndSetIfChanged(ref _selectedSchedule, value);
+        }
+
+        public AnnotationViewModel SelectedAnnotation {
+            get => _selectedAnnotation;
+            set => RaiseAndSetIfChanged(ref _selectedAnnotation, value);
         }
 
         public ObservableCollection<ViewPortViewModel> ViewPorts { get; }
 
-
         public ObservableCollection<ScheduleViewModel> Schedules { get; }
 
-
         public ObservableCollection<AnnotationViewModel> Annotations { get; }
-
 
         public ICommand AddViewCommand { get; }
 
