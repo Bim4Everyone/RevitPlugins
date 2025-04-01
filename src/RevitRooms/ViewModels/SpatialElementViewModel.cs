@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -112,6 +112,7 @@ namespace RevitRooms.ViewModels {
         }
 
         public bool IsNumberFix => Element.GetParamValueOrDefault<int>(ProjectParamsConfig.Instance.IsRoomNumberFix) == 1;
+        public bool IsLevelFix => Element.GetParamValueOrDefault<int>(ProjectParamsConfig.Instance.IsRoomLevelFix) == 1;
 
         public double ComputeRoomAreaWithRatio() {
             // Area = 0 - по умолчанию
