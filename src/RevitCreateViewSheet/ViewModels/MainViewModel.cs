@@ -175,7 +175,7 @@ namespace RevitCreateViewSheet.ViewModels {
             }
 
             if(!int.TryParse(AddSheetsCount, out _)) {
-                AddSheetsErrorText = "Количество листов должно быть числовым значением.";
+                AddSheetsErrorText = "Количество листов должно быть целым числом.";
                 return false;
             }
 
@@ -185,7 +185,7 @@ namespace RevitCreateViewSheet.ViewModels {
             }
 
             if(int.Parse(AddSheetsCount) <= 0) {
-                AddSheetsErrorText = "Количество листов должно быть не отрицательным.";
+                AddSheetsErrorText = "Количество листов должно быть положительным числом.";
                 return false;
             }
 

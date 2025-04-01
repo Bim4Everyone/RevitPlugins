@@ -100,11 +100,12 @@
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
-                        <RowDefinition
-                            Height="Auto" />
+                        <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
 
                     <ui:TextBlock
+                        Grid.Row="0"
                         Text="Альбом"></ui:TextBlock>
                     <ComboBox
                         Grid.Row="1"
