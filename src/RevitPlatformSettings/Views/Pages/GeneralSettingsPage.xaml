@@ -23,22 +23,16 @@
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Disabled">
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <StackPanel
+            Orientation="Vertical">
 
-            <GroupBox
-                Grid.Row="0"
-                Margin="10"
+            <edits:CustomGroupEditControl
                 Header="{me:LocalizationSource GeneralSettings.CorpSettings}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource GeneralSettings.CorpName}">
+                        Header="{me:LocalizationSource GeneralSettings.CorpName}">
 
                         <ui:TextBox
                             IsReadOnly="True"
@@ -48,7 +42,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource GeneralSettings.SettingsPath}">
+                        Header="{me:LocalizationSource GeneralSettings.SettingsPath}">
 
                         <ui:TextBox
                             IsReadOnly="True"
@@ -58,7 +52,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource GeneralSettings.SettingsImagePath}">
+                        Header="{me:LocalizationSource GeneralSettings.SettingsImagePath}">
 
                         <ui:TextBox
                             IsReadOnly="True"
@@ -68,17 +62,15 @@
                     </edits:CustomEditControl>
 
                 </StackPanel>
-            </GroupBox>
+            </edits:CustomGroupEditControl>
 
-            <GroupBox
-                Grid.Row="1"
-                Margin="10"
+            <edits:CustomGroupEditControl
                 Header="{me:LocalizationSource GeneralSettings.AppearanceSettings}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource GeneralSettings.HostTheme}">
+                        Header="{me:LocalizationSource GeneralSettings.HostTheme}">
 
                         <ComboBox
                             IsReadOnly="True"
@@ -89,7 +81,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource GeneralSettings.HostLanguage}">
+                        Header="{me:LocalizationSource GeneralSettings.HostLanguage}">
 
                         <ComboBox
                             IsReadOnly="True"
@@ -102,26 +94,17 @@
                     </edits:CustomEditControl>
 
                 </StackPanel>
-            </GroupBox>
+            </edits:CustomGroupEditControl>
 
-            <GroupBox
-                Grid.Row="2"
-                Margin="10"
-                Header="{me:LocalizationSource GeneralSettings.Notification}">
+            <edits:CustomGroupEditControl
+                ToogleSwitchVisible="True"
+                Header="{me:LocalizationSource GeneralSettings.Notification}"
+                IsChecked="{Binding Path=NotificationIsActive}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource GeneralSettings.NotificationIsActive}">
-
-                        <CheckBox
-                            HorizontalAlignment="Right"
-                            IsChecked="{Binding Path=NotificationIsActive}" />
-
-                    </edits:CustomEditControl>
-
-                    <edits:CustomEditControl
-                        EditText="{me:LocalizationSource GeneralSettings.NotificationVisibleMaxCount}">
+                        Header="{me:LocalizationSource GeneralSettings.NotificationVisibleMaxCount}">
 
                         <ui:TextBox
                             Text="{Binding Path=NotificationVisibleMaxCount}" />
@@ -129,7 +112,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource GeneralSettings.NotificationScreen}">
+                        Header="{me:LocalizationSource GeneralSettings.NotificationScreen}">
 
                         <ComboBox
                             SelectedValue="{Binding Path=NotificationScreen}"
@@ -138,7 +121,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource GeneralSettings.NotificationPosition}">
+                        Header="{me:LocalizationSource GeneralSettings.NotificationPosition}">
 
                         <ComboBox
                             SelectedValue="{Binding Path=NotificationPosition}"
@@ -148,7 +131,7 @@
 
                 </StackPanel>
 
-            </GroupBox>
-        </Grid>
+            </edits:CustomGroupEditControl>
+        </StackPanel>
     </ScrollViewer>
 </core:WpfUIPlatformPage>

@@ -14,6 +14,7 @@
     ScrollViewer.CanContentScroll="False"
 
     x:Name="_this"
+    d:DesignHeight="300" d:DesignWidth="300"
     d:DataContext="{d:DesignInstance settings:RevitParamsSettingsViewModel, IsDesignTimeCreatable=False}">
 
     <Page.Resources>

@@ -99,4 +99,7 @@
     <system:String x:Key="LogEventLevel.Warning">Warning</system:String>
     <system:String x:Key="LogEventLevel.Error">Error</system:String>
     <system:String x:Key="LogEventLevel.Fatal">Fatal errors</system:String>
+    
+    <system:String x:Key="ToggleSwitch.On">On</system:String>
+    <system:String x:Key="ToggleSwitch.Off">Off</system:String>
 </ResourceDictionary>

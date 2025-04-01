@@ -10,44 +10,32 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:logs="clr-namespace:Serilog.Events;assembly=Serilog"
     xmlns:edits="clr-namespace:RevitPlatformSettings.Views.Edits"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
 
     mc:Ignorable="d"
     x:ClassModifier="internal"
     ScrollViewer.CanContentScroll="False"
 
     x:Name="_this"
+    d:DesignHeight="300" d:DesignWidth="300"
     d:DataContext="{d:DesignInstance settings:TelemetrySettingsViewModel, IsDesignTimeCreatable=False}">
 
     <ScrollViewer
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Auto">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
 
-            <GroupBox
-                Grid.Row="0"
-                Margin="10"
-                Header="{me:LocalizationSource TelemetrySettings.LogTrace}">
+        <StackPanel Orientation="Vertical">
+
+            <edits:CustomGroupEditControl
+                ToogleSwitchVisible="True"
+                Icon="{ui:SymbolIcon PlaySettings20}"
+                Header="{me:LocalizationSource TelemetrySettings.LogTrace}"
+                IsChecked="{Binding Path=LogTraceIsActive, Mode=OneWay}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceIsActive}">
-
-                        <CheckBox
-                            IsEnabled="False"
-                            IsHitTestVisible="False"
-                            HorizontalAlignment="Right"
-                            IsChecked="{Binding Path=LogTraceIsActive, Mode=OneWay}" />
-
-                    </edits:CustomEditControl>
-
-                    <edits:CustomEditControl
-                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
 
                         <ComboBox
                             IsReadOnly="True"
@@ -58,7 +46,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceServerName}">
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceServerName}">
 
                         <ui:TextBox
                             IsReadOnly="True"
@@ -68,29 +56,17 @@
                     </edits:CustomEditControl>
 
                 </StackPanel>
+            </edits:CustomGroupEditControl>
 
-            </GroupBox>
-
-            <GroupBox
-                Grid.Row="1"
-                Margin="10"
-                Header="{me:LocalizationSource TelemetrySettings.LogTraceJournal}">
+            <edits:CustomGroupEditControl
+                ToogleSwitchVisible="True"
+                Header="{me:LocalizationSource TelemetrySettings.LogTraceJournal}"
+                IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalIsActive}">
-
-                        <CheckBox
-                            IsEnabled="False"
-                            IsHitTestVisible="False"
-                            HorizontalAlignment="Right"
-                            IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}" />
-
-                    </edits:CustomEditControl>
-
-                    <edits:CustomEditControl
-                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
 
                         <CheckBox
                             IsHitTestVisible="False"
@@ -101,7 +77,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
 
                         <ComboBox
                             IsReadOnly="True"
@@ -112,7 +88,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
 
                         <ui:TextBox
                             MaxWidth="300"
@@ -124,8 +100,8 @@
 
                 </StackPanel>
 
-            </GroupBox>
+            </edits:CustomGroupEditControl>
 
-        </Grid>
+        </StackPanel>
     </ScrollViewer>
 </core:WpfUIPlatformPage>

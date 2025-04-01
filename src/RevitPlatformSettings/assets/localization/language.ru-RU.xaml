@@ -101,4 +101,7 @@
     <system:String x:Key="LogEventLevel.Warning">Предупреждающее</system:String>
     <system:String x:Key="LogEventLevel.Error">Ошибки</system:String>
     <system:String x:Key="LogEventLevel.Fatal">Фатальные ошибки</system:String>
+    
+    <system:String x:Key="ToggleSwitch.On">Включено</system:String>
+    <system:String x:Key="ToggleSwitch.Off">Выключено</system:String>
 </ResourceDictionary>

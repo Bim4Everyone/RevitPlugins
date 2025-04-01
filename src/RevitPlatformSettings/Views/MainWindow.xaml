@@ -50,15 +50,20 @@
             Grid.Row="0"
             x:Name="_rootNavigationView"
             FrameMargin="0"
-            OpenPaneLength="180"
+            OpenPaneLength="200"
             IsPaneOpen="True"
             PaneDisplayMode="Left"
             IsBackButtonVisible="Visible"
             IsPaneVisible="True"
             IsPaneToggleVisible="True"
             TitleBar="{Binding ElementName=_titleBar}"
-            MenuItemsSource="{Binding MenuItems, Mode=OneWay}"
-            FooterMenuItemsSource="{Binding FooterMenuItems, Mode=OneWay}">
+            BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
+            
+            <ui:NavigationView.Header>
+                <StackPanel Margin="42,20,42,20">
+                    <ui:BreadcrumbBar x:Name="_breadcrumbBar" />
+                </StackPanel>
+            </ui:NavigationView.Header>
 
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
