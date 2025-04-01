@@ -234,7 +234,7 @@ namespace RevitCreateViewSheet.Models {
             return new FilteredElementCollector(viewSheet.Document)
                 .WhereElementIsNotElementType()
                 .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
-                .OfClass(typeof(AnnotationSymbol))
+                .OfCategory(BuiltInCategory.OST_GenericAnnotation)
                 .ToElements()
                 .OfType<AnnotationSymbol>()
                 .Select(a => new AnnotationModel(this, a))
