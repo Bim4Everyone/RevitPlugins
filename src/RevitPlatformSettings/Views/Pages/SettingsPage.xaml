@@ -7,9 +7,9 @@
     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
 
-    x:ClassModifier="internal"
-
     mc:Ignorable="d"
+    x:ClassModifier="internal"
+    ScrollViewer.CanContentScroll="False"
 
     x:Name="_this"
     d:DataContext="{d:DesignInstance settings:SettingsViewModel, IsDesignTimeCreatable=False}">

@@ -1,6 +1,11 @@
 ﻿using System.Windows;
+using System.Windows.Threading;
+
+using DevExpress.XtraRichEdit.Native;
 
 using dosymep.SimpleServices;
+
+using RevitPlatformSettings.Views.Pages;
 
 using Wpf.Ui.Abstractions;
 
@@ -19,6 +24,9 @@ public partial class MainWindow {
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
+        Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => {
+            _rootNavigationView.Navigate(typeof(GeneralSettingsPage));
+        });
     }
 
     public override string PluginName => nameof(RevitPlatformSettings);

@@ -9,9 +9,9 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:db="clr-namespace:Autodesk.Revit.DB;assembly=RevitAPI"
 
-    x:ClassModifier="internal"
-
     mc:Ignorable="d"
+    x:ClassModifier="internal"
+    ScrollViewer.CanContentScroll="False"
 
     x:Name="_this"
     d:DataContext="{d:DesignInstance settings:RevitParamsSettingsViewModel, IsDesignTimeCreatable=False}">

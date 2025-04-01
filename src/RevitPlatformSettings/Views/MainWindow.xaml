@@ -13,9 +13,12 @@
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterScreen"
+    ExtendsContentIntoTitleBar="True"
 
     Title="{me:LocalizationSource MainWindow.Title}"
     Height="600" Width="1000"
+
+    Icon="pack://application:,,,/dosymep.Bim4Everyone;component/assets/Bim4Everyone.png"
 
     x:Name="_this"
     d:DataContext="{d:DesignInstance viewModels:MainViewModel, IsDesignTimeCreatable=False}">
@@ -30,56 +33,65 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            x:Name="_titleBar"
+            Title="{me:LocalizationSource MainWindow.Title}">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/dosymep.Bim4Everyone;component/assets/Bim4Everyone.png" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
 
         <ui:NavigationView
-            Grid.Row="1"
+            Grid.Row="0"
             x:Name="_rootNavigationView"
-            HeaderVisibility="Collapsed"
-            PaneTitle="{me:LocalizationSource MainWindow.Title}">
+            FrameMargin="0"
+            OpenPaneLength="180"
+            IsPaneOpen="True"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Visible"
+            IsPaneVisible="True"
+            IsPaneToggleVisible="True"
+            TitleBar="{Binding ElementName=_titleBar}"
+            MenuItemsSource="{Binding MenuItems, Mode=OneWay}"
+            FooterMenuItemsSource="{Binding FooterMenuItems, Mode=OneWay}">
 
-            <ui:NavigationView.MenuItemsSource>
-                <x:Array Type="{x:Type ui:NavigationViewItem}">
-                    <ui:NavigationViewItem
-                        Content="{me:LocalizationSource GeneralSettings.Title}"
-                        Icon="{ui:SymbolIcon Settings16}"
-                        TargetPageType="{x:Type pages:GeneralSettingsPage}" />
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource GeneralSettings.Title}"
+                    Icon="{ui:SymbolIcon Settings16}"
+                    TargetPageType="{x:Type pages:GeneralSettingsPage}" />
 
-                    <ui:NavigationViewItem
-                        Content="{me:LocalizationSource ExtensionSettings.Title}"
-                        Icon="{ui:SymbolIcon Settings16}"
-                        TargetPageType="{x:Type pages:ExtensionsSettingsPage}" />
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource ExtensionSettings.Title}"
+                    Icon="{ui:SymbolIcon Settings16}"
+                    TargetPageType="{x:Type pages:ExtensionsSettingsPage}" />
 
-                    <ui:NavigationViewItem
-                        Content="{me:LocalizationSource RevitParamsSettings.Title}"
-                        Icon="{ui:SymbolIcon Settings16}"
-                        TargetPageType="{x:Type pages:RevitParamsSettingsPage}" />
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource RevitParamsSettings.Title}"
+                    Icon="{ui:SymbolIcon Settings16}"
+                    TargetPageType="{x:Type pages:RevitParamsSettingsPage}" />
 
-                    <ui:NavigationViewItem
-                        Content="{me:LocalizationSource TelemetrySettings.Title}"
-                        Icon="{ui:SymbolIcon Settings16}"
-                        TargetPageType="{x:Type pages:TelemetrySettingsPage}" />
-                </x:Array>
-            </ui:NavigationView.MenuItemsSource>
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource TelemetrySettings.Title}"
+                    Icon="{ui:SymbolIcon Settings16}"
+                    TargetPageType="{x:Type pages:TelemetrySettingsPage}" />
+            </ui:NavigationView.MenuItems>
 
-            <ui:NavigationView.FooterMenuItemsSource>
+            <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource AboutSettings.Title}"
                     Icon="{ui:SymbolIcon Info16}"
                     TargetPageType="{x:Type pages:AboutSettingsPage}" />
-            </ui:NavigationView.FooterMenuItemsSource>
-
+            </ui:NavigationView.FooterMenuItems>
         </ui:NavigationView>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="1"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 

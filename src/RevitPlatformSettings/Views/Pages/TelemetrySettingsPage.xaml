@@ -11,116 +11,121 @@
     xmlns:logs="clr-namespace:Serilog.Events;assembly=Serilog"
     xmlns:edits="clr-namespace:RevitPlatformSettings.Views.Edits"
 
-    x:ClassModifier="internal"
-
     mc:Ignorable="d"
+    x:ClassModifier="internal"
+    ScrollViewer.CanContentScroll="False"
 
     x:Name="_this"
     d:DataContext="{d:DesignInstance settings:TelemetrySettingsViewModel, IsDesignTimeCreatable=False}">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
 
-        <GroupBox
-            Grid.Row="0"
-            Margin="10"
-            Header="{me:LocalizationSource TelemetrySettings.LogTrace}">
+    <ScrollViewer
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-            <StackPanel>
+            <GroupBox
+                Grid.Row="0"
+                Margin="10"
+                Header="{me:LocalizationSource TelemetrySettings.LogTrace}">
 
-                <edits:CustomEditControl
-                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceIsActive}">
+                <StackPanel>
 
-                    <CheckBox
-                        IsEnabled="False"
-                        IsHitTestVisible="False"
-                        HorizontalAlignment="Right"
-                        IsChecked="{Binding Path=LogTraceIsActive, Mode=OneWay}" />
+                    <edits:CustomEditControl
+                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceIsActive}">
 
-                </edits:CustomEditControl>
+                        <CheckBox
+                            IsEnabled="False"
+                            IsHitTestVisible="False"
+                            HorizontalAlignment="Right"
+                            IsChecked="{Binding Path=LogTraceIsActive, Mode=OneWay}" />
 
-                <edits:CustomEditControl
-                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
+                    </edits:CustomEditControl>
 
-                    <ComboBox
-                        IsReadOnly="True"
-                        IsEnabled="False"
-                        ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
-                        SelectedValue="{Binding LogTraceLogLevel, Mode=OneWay}" />
+                    <edits:CustomEditControl
+                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
 
-                </edits:CustomEditControl>
+                        <ComboBox
+                            IsReadOnly="True"
+                            IsEnabled="False"
+                            ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
+                            SelectedValue="{Binding LogTraceLogLevel, Mode=OneWay}" />
 
-                <edits:CustomEditControl
-                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceServerName}">
+                    </edits:CustomEditControl>
 
-                    <ui:TextBox
-                        IsReadOnly="True"
-                        IsEnabled="False"
-                        Text="{Binding Path=LogTraceServerName, Mode=OneWay}" />
+                    <edits:CustomEditControl
+                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceServerName}">
 
-                </edits:CustomEditControl>
+                        <ui:TextBox
+                            IsReadOnly="True"
+                            IsEnabled="False"
+                            Text="{Binding Path=LogTraceServerName, Mode=OneWay}" />
 
-            </StackPanel>
+                    </edits:CustomEditControl>
 
-        </GroupBox>
+                </StackPanel>
 
-        <GroupBox
-            Grid.Row="1"
-            Margin="10"
-            Header="{me:LocalizationSource TelemetrySettings.LogTraceJournal}">
+            </GroupBox>
 
-            <StackPanel>
+            <GroupBox
+                Grid.Row="1"
+                Margin="10"
+                Header="{me:LocalizationSource TelemetrySettings.LogTraceJournal}">
 
-                <edits:CustomEditControl
-                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalIsActive}">
+                <StackPanel>
 
-                    <CheckBox
-                        IsEnabled="False"
-                        IsHitTestVisible="False"
-                        HorizontalAlignment="Right"
-                        IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}" />
+                    <edits:CustomEditControl
+                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalIsActive}">
 
-                </edits:CustomEditControl>
+                        <CheckBox
+                            IsEnabled="False"
+                            IsHitTestVisible="False"
+                            HorizontalAlignment="Right"
+                            IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}" />
 
-                <edits:CustomEditControl
-                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
+                    </edits:CustomEditControl>
 
-                    <CheckBox
-                        IsHitTestVisible="False"
-                        HorizontalAlignment="Right"
-                        IsEnabled="False"
-                        IsChecked="{Binding Path=LogTraceJournalUseUtc, Mode=OneWay}" />
+                    <edits:CustomEditControl
+                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
 
-                </edits:CustomEditControl>
+                        <CheckBox
+                            IsHitTestVisible="False"
+                            HorizontalAlignment="Right"
+                            IsEnabled="False"
+                            IsChecked="{Binding Path=LogTraceJournalUseUtc, Mode=OneWay}" />
 
-                <edits:CustomEditControl
-                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
+                    </edits:CustomEditControl>
 
-                    <ComboBox
-                        IsReadOnly="True"
-                        IsEnabled="False"
-                        ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
-                        SelectedValue="{Binding LogTraceJournalLogLevel, Mode=OneWay}" />
+                    <edits:CustomEditControl
+                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
 
-                </edits:CustomEditControl>
+                        <ComboBox
+                            IsReadOnly="True"
+                            IsEnabled="False"
+                            ItemsSource="{me:EnumToItemsSource logs:LogEventLevel}"
+                            SelectedValue="{Binding LogTraceJournalLogLevel, Mode=OneWay}" />
 
-                <edits:CustomEditControl
-                    EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
+                    </edits:CustomEditControl>
 
-                    <ui:TextBox
-                        MaxWidth="300"
-                        IsReadOnly="True"
-                        IsEnabled="False"
-                        Text="{Binding Path=LogTraceJournalOutputTemplate, Mode=OneWay}" />
+                    <edits:CustomEditControl
+                        EditText="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
 
-                </edits:CustomEditControl>
+                        <ui:TextBox
+                            MaxWidth="300"
+                            IsReadOnly="True"
+                            IsEnabled="False"
+                            Text="{Binding Path=LogTraceJournalOutputTemplate, Mode=OneWay}" />
 
-            </StackPanel>
+                    </edits:CustomEditControl>
 
-        </GroupBox>
+                </StackPanel>
 
-    </Grid>
+            </GroupBox>
+
+        </Grid>
+    </ScrollViewer>
 </core:WpfUIPlatformPage>

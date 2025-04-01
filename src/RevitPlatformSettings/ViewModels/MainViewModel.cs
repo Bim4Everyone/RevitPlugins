@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,6 +12,7 @@ using RevitPlatformSettings.ViewModels.Settings;
 using RevitPlatformSettings.Views.Pages;
 
 using Wpf.Ui.Abstractions;
+using Wpf.Ui.Controls;
 
 namespace RevitPlatformSettings.ViewModels;
 
@@ -18,7 +20,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly INavigationViewPageProvider _pageProvider;
 
     private readonly Type[] _pages = new[] {
-        typeof(AboutSettingsPage), typeof(ExtensionsSettingsPage), typeof(GeneralSettingsPage),
+        typeof(AboutSettingsPage),
+        typeof(ExtensionsSettingsPage), typeof(GeneralSettingsPage),
         typeof(RevitParamsSettingsPage), typeof(TelemetrySettingsPage)
     };
 
