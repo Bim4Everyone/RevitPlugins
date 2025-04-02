@@ -27,12 +27,16 @@
             Orientation="Vertical">
 
             <edits:CustomGroupEditControl
-                Header="{me:LocalizationSource GeneralSettings.CorpSettings}">
+                Icon="{ui:SymbolIcon Building24}"
+                Header="{me:LocalizationSource GeneralSettings.CorpSettings}"
+                Description="{me:LocalizationSource GeneralSettings.CorpSettingsDescription}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource GeneralSettings.CorpName}">
+                        Icon="{ui:SymbolIcon BuildingGovernment24}"
+                        Header="{me:LocalizationSource GeneralSettings.CorpName}"
+                        Description="{me:LocalizationSource GeneralSettings.CorpNameDescription}">
 
                         <ui:TextBox
                             IsReadOnly="True"
@@ -42,7 +46,9 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource GeneralSettings.SettingsPath}">
+                        Icon="{ui:SymbolIcon SlideSettings24}"
+                        Header="{me:LocalizationSource GeneralSettings.SettingsPath}"
+                        Description="{me:LocalizationSource GeneralSettings.SettingsPathDescription}">
 
                         <ui:TextBox
                             IsReadOnly="True"
@@ -52,7 +58,9 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource GeneralSettings.SettingsImagePath}">
+                        Icon="{ui:SymbolIcon ImageSearch24}"
+                        Header="{me:LocalizationSource GeneralSettings.SettingsImagePath}"
+                        Description="{me:LocalizationSource GeneralSettings.SettingsImagePathDescription}">
 
                         <ui:TextBox
                             IsReadOnly="True"
@@ -65,12 +73,16 @@
             </edits:CustomGroupEditControl>
 
             <edits:CustomGroupEditControl
-                Header="{me:LocalizationSource GeneralSettings.AppearanceSettings}">
+                Icon="{ui:SymbolIcon DualScreenMirror24}"
+                Header="{me:LocalizationSource GeneralSettings.AppearanceSettings}"
+                Description="{me:LocalizationSource GeneralSettings.AppearanceSettingsDescription}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource GeneralSettings.HostTheme}">
+                        Icon="{ui:SymbolIcon DarkTheme24}"
+                        Header="{me:LocalizationSource GeneralSettings.HostTheme}"
+                        Description="{me:LocalizationSource GeneralSettings.HostThemeDescription}">
 
                         <ComboBox
                             IsReadOnly="True"
@@ -81,7 +93,9 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource GeneralSettings.HostLanguage}">
+                        Icon="{ui:SymbolIcon LocalLanguage24}"
+                        Header="{me:LocalizationSource GeneralSettings.HostLanguage}"
+                        Description="{me:LocalizationSource GeneralSettings.HostLanguageDescription}">
 
                         <ComboBox
                             IsReadOnly="True"
@@ -98,13 +112,17 @@
 
             <edits:CustomGroupEditControl
                 ToogleSwitchVisible="True"
+                Icon="{ui:SymbolIcon AlertOn24}"
                 Header="{me:LocalizationSource GeneralSettings.Notification}"
+                Description="{me:LocalizationSource GeneralSettings.NotificationDescription}"
                 IsChecked="{Binding Path=NotificationIsActive}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource GeneralSettings.NotificationVisibleMaxCount}">
+                        Icon="{ui:SymbolIcon AlertBadge24}"
+                        Header="{me:LocalizationSource GeneralSettings.NotificationVisibleMaxCount}"
+                        Description="{me:LocalizationSource GeneralSettings.NotificationVisibleMaxCountDescription}">
 
                         <ui:TextBox
                             Text="{Binding Path=NotificationVisibleMaxCount}" />
@@ -112,7 +130,9 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource GeneralSettings.NotificationScreen}">
+                        Icon="{ui:SymbolIcon ChannelAlert24}"
+                        Header="{me:LocalizationSource GeneralSettings.NotificationScreen}"
+                        Description="{me:LocalizationSource GeneralSettings.NotificationScreenDescription}">
 
                         <ComboBox
                             SelectedValue="{Binding Path=NotificationScreen}"
@@ -121,7 +141,9 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource GeneralSettings.NotificationPosition}">
+                        Icon="{ui:SymbolIcon DualScreenClosedAlert24}"
+                        Header="{me:LocalizationSource GeneralSettings.NotificationPosition}"
+                        Description="{me:LocalizationSource GeneralSettings.NotificationPositionDescription}">
 
                         <ComboBox
                             SelectedValue="{Binding Path=NotificationPosition}"

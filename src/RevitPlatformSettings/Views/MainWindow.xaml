@@ -68,22 +68,22 @@
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource GeneralSettings.Title}"
-                    Icon="{ui:SymbolIcon Settings16}"
+                    Icon="{ui:SymbolIcon AppGeneric24}"
                     TargetPageType="{x:Type pages:GeneralSettingsPage}" />
 
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource ExtensionSettings.Title}"
-                    Icon="{ui:SymbolIcon Settings16}"
+                    Icon="{ui:SymbolIcon BoxCheckmark24}"
                     TargetPageType="{x:Type pages:ExtensionsSettingsPage}" />
 
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource RevitParamsSettings.Title}"
-                    Icon="{ui:SymbolIcon Settings16}"
+                    Icon="{ui:SymbolIcon WindowBulletList20}"
                     TargetPageType="{x:Type pages:RevitParamsSettingsPage}" />
 
                 <ui:NavigationViewItem
                     Content="{me:LocalizationSource TelemetrySettings.Title}"
-                    Icon="{ui:SymbolIcon Settings16}"
+                    Icon="{ui:SymbolIcon TaskListSquareDatabase20}"
                     TargetPageType="{x:Type pages:TelemetrySettingsPage}" />
             </ui:NavigationView.MenuItems>
 

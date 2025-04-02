@@ -28,14 +28,17 @@
 
             <edits:CustomGroupEditControl
                 ToogleSwitchVisible="True"
-                Icon="{ui:SymbolIcon PlaySettings20}"
+                Icon="{ui:SymbolIcon BookDatabase24}"
                 Header="{me:LocalizationSource TelemetrySettings.LogTrace}"
+                Description="{me:LocalizationSource TelemetrySettings.LogTraceDescription}"
                 IsChecked="{Binding Path=LogTraceIsActive, Mode=OneWay}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource TelemetrySettings.LogTraceLogLevel}">
+                        Icon="{ui:SymbolIcon DatabaseLightning20}"
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceLogLevel}"
+                        Description="{me:LocalizationSource TelemetrySettings.LogTraceLogLevelDescription}">
 
                         <ComboBox
                             IsReadOnly="True"
@@ -46,7 +49,9 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource TelemetrySettings.LogTraceServerName}">
+                        Icon="{ui:SymbolIcon Server24}"
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceServerName}"
+                        Description="{me:LocalizationSource TelemetrySettings.LogTraceServerNameDescription}">
 
                         <ui:TextBox
                             IsReadOnly="True"
@@ -60,13 +65,17 @@
 
             <edits:CustomGroupEditControl
                 ToogleSwitchVisible="True"
+                Icon="{ui:SymbolIcon BookDatabase24}"
                 Header="{me:LocalizationSource TelemetrySettings.LogTraceJournal}"
-                IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}">
+                IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}"
+                Description="{me:LocalizationSource TelemetrySettings.LogTraceServerNameDescription}">
 
                 <StackPanel>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}">
+                        Icon="{ui:SymbolIcon Timer24}"
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtc}"
+                        Description="{me:LocalizationSource TelemetrySettings.LogTraceJournalUseUtcDescription}">
 
                         <CheckBox
                             IsHitTestVisible="False"
@@ -77,7 +86,9 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}">
+                        Icon="{ui:SymbolIcon DatabaseLightning20}"
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevel}"
+                        Description="{me:LocalizationSource TelemetrySettings.LogTraceJournalLogLevelDescription}">
 
                         <ComboBox
                             IsReadOnly="True"
@@ -88,7 +99,9 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Header="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}">
+                        Icon="{ui:SymbolIcon TextEditStyle24}"
+                        Header="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplate}"
+                        Description="{me:LocalizationSource TelemetrySettings.LogTraceJournalOutputTemplateDescription}">
 
                         <ui:TextBox
                             MaxWidth="300"
