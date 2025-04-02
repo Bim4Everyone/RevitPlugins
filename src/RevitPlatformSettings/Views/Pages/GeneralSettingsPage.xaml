@@ -115,7 +115,7 @@
                 Icon="{ui:SymbolIcon AlertOn24}"
                 Header="{me:LocalizationSource GeneralSettings.Notification}"
                 Description="{me:LocalizationSource GeneralSettings.NotificationDescription}"
-                IsChecked="{Binding Path=NotificationIsActive}">
+                IsChecked="{Binding Path=NotificationIsActive, Mode=TwoWay}">
 
                 <StackPanel>
 

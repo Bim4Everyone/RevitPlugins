@@ -58,7 +58,7 @@
                     Margin="0,0,16,0"
                     OnContent="{me:LocalizationSource ToggleSwitch.On}"
                     OffContent="{me:LocalizationSource ToggleSwitch.Off}"
-                    IsChecked="{Binding IsChecked, ElementName=_this}"
+                    IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}"
                     Visibility="{Binding ToogleSwitchVisible, 
                         ElementName=_this, Converter={StaticResource ToggleSwitchVisible}}" />
             </Grid>
