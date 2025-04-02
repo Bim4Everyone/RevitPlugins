@@ -11,31 +11,70 @@
     <system:String x:Key="GeneralSettings.Title">General</system:String>
     
     <system:String x:Key="GeneralSettings.CorpSettings">Corp settings</system:String>
+    <system:String x:Key="GeneralSettings.CorpSettingsDescription">Corporate settings for managing company parameters</system:String>
+    
     <system:String x:Key="GeneralSettings.CorpName">Corp settings name</system:String>
+    <system:String x:Key="GeneralSettings.CorpNameDescription">Sets the company name</system:String>
+    
     <system:String x:Key="GeneralSettings.SettingsPath">Path to corp settings</system:String>
+    <system:String x:Key="GeneralSettings.SettingsPathDescription">Sets the path to the corporate settings file</system:String>
+    
     <system:String x:Key="GeneralSettings.SettingsImagePath">Path to corp settings image</system:String>
+    <system:String x:Key="GeneralSettings.SettingsImagePathDescription">Sets the path to the corp settings image</system:String>
     
     <system:String x:Key="GeneralSettings.AppearanceSettings">Appearance</system:String>
+    <system:String x:Key="GeneralSettings.AppearanceSettingsDescription">Interface appearance settings</system:String>
+    
     <system:String x:Key="GeneralSettings.HostTheme">Theme</system:String>
+    <system:String x:Key="GeneralSettings.HostThemeDescription">Sets the interface theme</system:String>
+    
     <system:String x:Key="GeneralSettings.HostLanguage">Language</system:String>
-    
-    <system:String x:Key="TelemetrySettings.Title">Telemetry</system:String>
-    <system:String x:Key="TelemetrySettings.LogTrace">Trace</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceIsActive">Enable</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceLogLevel">Trace level</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceServerName">Server URL</system:String>
-    
-    <system:String x:Key="TelemetrySettings.LogTraceJournal">Journal Revit</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalIsActive">Enable</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtc">Use UTC time stamp</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevel">Journal level logging</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplate">Template journal logging</system:String>
+    <system:String x:Key="GeneralSettings.HostLanguageDescription">Sets the language used in the application</system:String>
     
     <system:String x:Key="GeneralSettings.Notification">Notifications</system:String>
+    <system:String x:Key="GeneralSettings.NotificationDescription">User notification settings</system:String>
+    
     <system:String x:Key="GeneralSettings.NotificationIsActive">Enable</system:String>
+    <system:String x:Key="GeneralSettings.NotificationIsActiveDescription">Toggles the notification system on or off</system:String>
+    
     <system:String x:Key="GeneralSettings.NotificationVisibleMaxCount">Count</system:String>
+    <system:String x:Key="GeneralSettings.NotificationVisibleMaxCountDescription">Sets the maximum number of visible notifications</system:String>
+    
     <system:String x:Key="GeneralSettings.NotificationScreen">Main screen</system:String>
+    <system:String x:Key="GeneralSettings.NotificationScreenDescription">Sets the screen for displaying notifications.</system:String>
+    
     <system:String x:Key="GeneralSettings.NotificationPosition">Position on screen</system:String>
+    <system:String x:Key="GeneralSettings.NotificationPositionDescription">Sets the position of notifications on the screen</system:String>
+    
+    <system:String x:Key="TelemetrySettings.Title">Telemetry</system:String>
+    <system:String x:Key="TelemetrySettings.TitleDescription">Telemetry settings for collecting application performance data</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTrace">Trace</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceDescription">Log trace settings for tracking actions within the application</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceIsActive">Enable</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceIsActiveDescription">Toggles log trace on or off</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceLogLevel">Trace level</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceLogLevelDescription">Sets the log trace detail level</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceServerName">Server URL</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceServerNameDescription">Sets the server name for sending log trace</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournal">Journal Revit</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalDescription">Revit journal settings for recording actions and events</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournalIsActive">Enable</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalIsActiveDescription">Toggles the activity of log recording in the Revit journal</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtc">Use UTC time stamp</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtcDescription">Toggles the use of UTC time zone</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevel">Journal level logging</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevelDescription">Sets the log detail level for the Revit journal</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplate">Template journal logging</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplateDescription">Sets the output template for log entries in the Revit journal</system:String>
     
     <system:String x:Key="AboutSettings.Title">About</system:String>
     <system:String x:Key="AboutSettings.OpenSource">Third-party Software</system:String>

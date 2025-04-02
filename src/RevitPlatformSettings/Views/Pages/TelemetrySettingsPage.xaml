@@ -68,7 +68,7 @@
                 Icon="{ui:SymbolIcon BookDatabase24}"
                 Header="{me:LocalizationSource TelemetrySettings.LogTraceJournal}"
                 IsChecked="{Binding Path=LogTraceJournalIsActive, Mode=OneWay}"
-                Description="{me:LocalizationSource TelemetrySettings.LogTraceServerNameDescription}">
+                Description="{me:LocalizationSource TelemetrySettings.LogTraceJournalDescription}">
 
                 <StackPanel>
 

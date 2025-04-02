@@ -11,32 +11,70 @@
     <system:String x:Key="GeneralSettings.Title">Основные</system:String>
     
     <system:String x:Key="GeneralSettings.CorpSettings">Корпоративные настройки</system:String>
-    <system:String x:Key="GeneralSettings.CorpName">Имя настроек</system:String>
+    <system:String x:Key="GeneralSettings.CorpSettingsDescription">Корпоративные настройки для управления параметрами компании</system:String>
+    
+    <system:String x:Key="GeneralSettings.CorpName">Имя компании</system:String>
+    <system:String x:Key="GeneralSettings.CorpNameDescription">Устанавливает название компании</system:String>
+    
     <system:String x:Key="GeneralSettings.SettingsPath">Путь до корпоративных настроек</system:String>
+    <system:String x:Key="GeneralSettings.SettingsPathDescription">Устанавливает путь к папке корпоративных настроек</system:String>
+    
     <system:String x:Key="GeneralSettings.SettingsImagePath">Путь до корпоративного изображения</system:String>
+    <system:String x:Key="GeneralSettings.SettingsImagePathDescription">Устанавливает путь к корпоративному изображению</system:String>
     
     <system:String x:Key="GeneralSettings.AppearanceSettings">Внешний вид</system:String>
+    <system:String x:Key="GeneralSettings.AppearanceSettingsDescription">Настройки внешнего вида интерфейса</system:String>
+    
     <system:String x:Key="GeneralSettings.HostTheme">Тема интерфейса</system:String>
+    <system:String x:Key="GeneralSettings.HostThemeDescription">Устанавливает тему оформления интерфейса</system:String>
+    
     <system:String x:Key="GeneralSettings.HostLanguage">Используемый язык</system:String>
-    
-    <system:String x:Key="TelemetrySettings.Title">Телеметрия</system:String>
-    <system:String x:Key="TelemetrySettings.LogTrace">Трассировка</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceIsActive">Включить</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceLogLevel">Уровень трассировки</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceServerName">URL сервера</system:String>
-    
-    <system:String x:Key="TelemetrySettings.LogTraceJournal">Журнал Revit</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalIsActive">Включить</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtc">Использовать часовой пояс UTC</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevel">Уровень журналирования</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplate">Шаблон событий журналирования</system:String>
-    
+    <system:String x:Key="GeneralSettings.Description">Устанавливает язык, используемый в программе</system:String>
     
     <system:String x:Key="GeneralSettings.Notification">Уведомления</system:String>
+    <system:String x:Key="GeneralSettings.NotificationDescription">Настройки уведомлений для пользователя</system:String>
+    
     <system:String x:Key="GeneralSettings.NotificationIsActive">Включить</system:String>
+    <system:String x:Key="GeneralSettings.NotificationIsActiveDescription">Включает или выключает систему уведомлений</system:String>
+    
     <system:String x:Key="GeneralSettings.NotificationVisibleMaxCount">Количество</system:String>
+    <system:String x:Key="GeneralSettings.NotificationVisibleMaxCountDescription">Устанавливает максимальное количество видимых уведомлений</system:String>
+    
     <system:String x:Key="GeneralSettings.NotificationScreen">Основной экран</system:String>
+    <system:String x:Key="GeneralSettings.NotificationScreenDescription">Устанавливает экран для отображения уведомлений</system:String>
+    
     <system:String x:Key="GeneralSettings.NotificationPosition">Позиция на экране</system:String>
+    <system:String x:Key="GeneralSettings.NotificationPositionDescription">Устанавливает позицию отображения уведомлений на экране</system:String>
+    
+    <system:String x:Key="TelemetrySettings.Title">Телеметрия</system:String>
+    <system:String x:Key="TelemetrySettings.TitleDescription">Настройки телеметрии для сбора данных о работе программы</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTrace">Трассировка</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceDescription">Настройки трассировки для отслеживания действий в программе</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceIsActive">Включить</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceIsActiveDescription">Включает или выключает трассировку</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceLogLevel">Уровень трассировки</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceLogLevelDescription">Устанавливает уровень детализации для трассировки</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceServerName">URL сервера</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceServerNameDescription">Устанавливает имя сервера для отправки логов трассировки</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournal">Журнал Revit</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalDescription">Настройки журнала Revit для записи действий и событий</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournalIsActive">Включить</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalIsActiveDescription">Включает или выключает активность записи логов в журнал Revit</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtc">Использовать часовой пояс UTC</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtc Description">Включает или выключает использование часового пояса UTC</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevel">Уровень журналирования</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevelDescription">Устанавливает уровень детализации логов для журнала Revit</system:String>
+    
+    <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplate">Шаблон событий журналирования</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplateDescription">Устанавливает шаблон вывода для записи логов в журнал Revit</system:String>
     
     <system:String x:Key="AboutSettings.Title">О программе</system:String>
     <system:String x:Key="AboutSettings.OpenSource">Стороннее ПО</system:String>
