@@ -17,7 +17,8 @@
 
     Title="{me:LocalizationSource MainWindow.Title}"
     Height="600" Width="1000"
-
+    MinHeight="600" MinWidth="1000"
+    
     Icon="pack://application:,,,/dosymep.Bim4Everyone;component/assets/Bim4Everyone.png"
 
     x:Name="_this"
