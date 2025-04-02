@@ -28,7 +28,7 @@ internal sealed class RevitParamDescriptionConverter : IValueConverter {
             }
             
             yield return revitParam.StorageType.ToString();
-#if REVIT2020
+#if REVIT_2020
             yield return revitParam.UnitType.ToString();
 #else
             yield return revitParam.UnitType == ForgeTypeIdExtensions.EmptyForgeTypeId
