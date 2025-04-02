@@ -27,6 +27,7 @@
         <StackPanel Orientation="Vertical">
 
             <edits:CustomGroupEditControl
+                IsEnabled="False"
                 ToogleSwitchVisible="True"
                 Icon="{ui:SymbolIcon BookDatabase24}"
                 Header="{me:LocalizationSource TelemetrySettings.LogTrace}"
@@ -64,6 +65,7 @@
             </edits:CustomGroupEditControl>
 
             <edits:CustomGroupEditControl
+                IsEnabled="False"
                 ToogleSwitchVisible="True"
                 Icon="{ui:SymbolIcon BookDatabase24}"
                 Header="{me:LocalizationSource TelemetrySettings.LogTraceJournal}"
