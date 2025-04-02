@@ -11,5 +11,5 @@
   "IconUrl": "https://img.icons8.com/wired/64/edit-property.png",
   "BundleName": "РН связей",
   "BundleType": "InvokeButton",
-  "BundleOutput": "01.BIM.extension\\BIM.tab\\Проверки.panel"
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\Связи.panel"
 }

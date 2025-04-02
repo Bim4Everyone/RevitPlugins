@@ -1,5 +1,10 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -14,11 +19,11 @@ namespace RevitCorrectNamingCheck.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
-    private readonly ILocalizationService _localizationService;
 
     private string _errorText;
-    private string _saveProperty;
-    
+
+    private List<LinkedFile> _linkedFiles;
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
@@ -27,12 +32,10 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(
         PluginConfig pluginConfig,
-        RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        RevitRepository revitRepository) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
-        _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -49,20 +52,14 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
-    /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
-    /// </summary>
+    public List<LinkedFile> LinkedFiles {
+        get => _linkedFiles;
+        set => RaiseAndSetIfChanged(ref _linkedFiles, value);
+    }
+
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
-
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
     }
 
     /// <summary>
@@ -70,6 +67,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
+        LinkedFiles = _revitRepository.GetLinkedFiles();
         LoadConfig();
     }
 
@@ -92,11 +90,6 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
-        }
-
         ErrorText = null;
         return true;
     }
@@ -106,8 +99,6 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
 
     /// <summary>
@@ -117,7 +108,6 @@ internal class MainViewModel : BaseViewModel {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.SaveProperty = SaveProperty;
         _pluginConfig.SaveProjectConfig();
     }
 }

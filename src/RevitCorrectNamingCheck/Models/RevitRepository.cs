@@ -1,6 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Controls;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitCorrectNamingCheck.Models;
 
@@ -10,13 +20,21 @@ namespace RevitCorrectNamingCheck.Models;
 /// <remarks>
 /// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
 /// </remarks>
+//bimModelPartsService
 internal class RevitRepository {
+    private readonly IBimModelPartsService _bimModelPartsService;
+    private readonly ILocalizationService _localizationService;
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
     /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(UIApplication uiApplication) {
+
+    public RevitRepository(UIApplication uiApplication,
+        IBimModelPartsService bimModelPartsService,
+        ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _bimModelPartsService = bimModelPartsService;
+        _localizationService = localizationService;
     }
 
     /// <summary>
@@ -38,4 +56,55 @@ internal class RevitRepository {
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
+
+    public List<LinkedFile> GetLinkedFiles() {
+        var result = new List<LinkedFile>();
+
+        var linkTypes = GetRevitLinkTypes();
+        var linkInstances = GetRevitLinkInstances();
+        var bimModelParts = _bimModelPartsService.GetBimModelParts().ToList();
+
+        var linkedFilebuilder = new LinkedFileBuilder();
+
+        foreach(var linkType in linkTypes) {
+            var instances = linkInstances.Where(x => x.GetTypeId() == linkType.Id);
+
+            foreach(var instance in instances) {
+                var typeWorkset = new WorksetInfo(linkType.WorksetId, GetWorksetName(linkType));
+                var instanceWorkset = new WorksetInfo(instance.WorksetId, GetWorksetName(instance));
+
+                var linkedFile = linkedFilebuilder.Build(linkType.Id, linkType.Name, typeWorkset, instanceWorkset, bimModelParts);
+                result.Add(linkedFile);
+            }
+        }
+        return result;
+    }
+
+    private List<RevitLinkType> GetRevitLinkTypes() {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(RevitLinkType))
+            .Cast<RevitLinkType>()
+            .ToList();
+    }
+
+    private List<RevitLinkInstance> GetRevitLinkInstances() {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(RevitLinkInstance))
+            .WhereElementIsNotElementType()
+            .Cast<RevitLinkInstance>()
+            .ToList();
+    }
+
+    private string GetWorksetName(Element element) {
+        var undefinedText = _localizationService.GetLocalizedString("MainWindow.Undefined");
+
+        var param = element.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM);
+        if(param == null) {
+            return undefinedText;
+        }
+
+        int worksetId = param.AsInteger();
+        var workset = Document.GetWorksetTable().GetWorkset(new WorksetId(worksetId));
+        return workset?.Name ?? undefinedText;
+    }
 }

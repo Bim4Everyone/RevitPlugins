@@ -1,4 +1,4 @@
-<base:PlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitCorrectNamingCheck.Views.MainWindow"
 
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -9,67 +9,116 @@
 
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:vms="clr-namespace:RevitCorrectNamingCheck.ViewModels"
-
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore" 
+    xmlns:local="clr-namespace:RevitCorrectNamingCheck.Views.Selectors"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    Title="{DynamicResource MainWindow.Title}"
+    Title="{me:LocalizationSource MainWindow.Title}"
 
-    Width="800"
-    Height="450"
+    Width="600"
+    Height="400"
 
-    MinWidth="800"
-    MinHeight="450"
-
+    MinWidth="600"
+    MinHeight="400"
+    
+    Topmost="True"
+    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <b:Interaction.Triggers>
         <b:EventTrigger
-            EventName="Loaded">
+        EventName="Loaded">
             <b:InvokeCommandAction
-                Command="{Binding LoadViewCommand}" />
+            Command="{Binding LoadViewCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Templates/WorksetTemplates.xaml" />
+                <ResourceDictionary Source="Templates/LinkedFileTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="*" />
-            <RowDefinition
-                Height="45" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <TextBox
-            Grid.Row="0"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+
+        <ui:TitleBar
+        Grid.Row="0"
+        Title="{me:LocalizationSource MainWindow.Title}"/>
+
+        <DataGrid ItemsSource="{Binding LinkedFiles}"
+          AutoGenerateColumns="False"
+          HeadersVisibility="Column"
+          CanUserAddRows="False"
+          CanUserDeleteRows="False"
+          GridLinesVisibility="All"          
+          Margin="10,30,10,10"
+          IsReadOnly="True">
+
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="{me:LocalizationSource MainWindow.LinkedFile}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <StaticResource ResourceKey="LinkedFileTemplate"/>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="{me:LocalizationSource MainWindow.WorksetType}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl 
+                                Content="{Binding TypeWorkset}"
+                                ContentTemplateSelector="{StaticResource WorksetSelector}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="{me:LocalizationSource MainWindow.Instance}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentControl 
+                                Content="{Binding InstanceWorkset}"
+                                ContentTemplateSelector="{StaticResource WorksetSelector}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
         <StackPanel
-            Grid.Row="1"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
+        Grid.Row="2"
+        Orientation="Horizontal"
+        HorizontalAlignment="Right">
 
-            <TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
+            <ui:TextBlock
+            Margin="10"
+            Foreground="Orange"
+            VerticalAlignment="Center"
+            Text="{Binding ErrorText}" />
 
-            <Button
-                Width="80"
-                Margin="10"
-                Content="{DynamicResource MainWindow.ButtonOk}"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
+            <ui:Button
+            Margin="10"
+            Width="80"
+            Appearance="Info"
+            Content="{me:LocalizationSource MainWindow.ButtonOk}"
+            Click="ButtonOk_Click"
+            Command="{Binding AcceptViewCommand}" />
 
-            <Button
-                Width="80"
-                Margin="10"
-                Content="{DynamicResource MainWindow.ButtonCancel}"
-                IsCancel="True"
-                Click="ButtonCancel_Click" />
+            <ui:Button
+            Margin="10"
+            Width="80"
+            Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+            IsCancel="True"
+            Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</core:WpfUIPlatformWindow>

@@ -1,4 +1,6 @@
+using System;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -10,6 +12,8 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -56,13 +60,14 @@ public class RevitCorrectNamingCheckCommand : BasePluginCommand {
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
+        kernel.Bind<IBimModelPartsService>()
+                   .ToMethod(c => GetPlatformService<IBimModelPartsService>());
+
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
         // Настройка запуска окна
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -70,11 +75,43 @@ public class RevitCorrectNamingCheckCommand : BasePluginCommand {
 
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
-        kernel.UseXtraLocalization(
+        kernel.UseWpfLocalization(
             $"/{assemblyName};component/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+        var revitRepository = kernel.Get<RevitRepository>();
+        var localizationService = kernel.Get<ILocalizationService>();
+        ValidateLinkedFiles(revitRepository, localizationService);
+
+        // Создаем окно через контейнер
+        var window = kernel.Get<MainWindow>();
+        // Инициализируем и показываем как немодальное
+        InitializeNonModalWindow(window, kernel);
+    }
+
+    private void ValidateLinkedFiles(RevitRepository revitRepository, ILocalizationService localizationService) {
+        var linkedFiles = revitRepository.GetLinkedFiles();
+
+        if(linkedFiles.Count == 0) {
+            string title = localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
+            string message = localizationService.GetLocalizedString("GeneralSettings.ErrorNoLinkedFiles");
+
+            TaskDialog.Show(title, message);
+            throw new OperationCanceledException();
+        }
+    }
+
+    private void InitializeNonModalWindow(Window window, IKernel kernel) {
+        window.Show();
+        window.Hide();
+
+        window.Closed += (s, e) => {
+            if(window == Application.Current.Windows.OfType<Window>().LastOrDefault()) {
+                kernel?.Dispose();
+                kernel = null;
+            }
+        };
+
+        window.Show();
     }
 }
