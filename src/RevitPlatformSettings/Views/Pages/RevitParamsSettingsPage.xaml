@@ -8,6 +8,9 @@
     xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:db="clr-namespace:Autodesk.Revit.DB;assembly=RevitAPI"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:bim4Everyone="clr-namespace:dosymep.Bim4Everyone;assembly=dosymep.Bim4Everyone"
+    xmlns:converters="clr-namespace:RevitPlatformSettings.Converters"
 
     mc:Ignorable="d"
     x:ClassModifier="internal"
@@ -18,48 +21,66 @@
     d:DataContext="{d:DesignInstance settings:RevitParamsSettingsViewModel, IsDesignTimeCreatable=False}">
 
     <Page.Resources>
-        <TextBlock
-            x:Key="IdColumnHeader"
-            TextWrapping="Wrap"
-            Text="{me:LocalizationSource RevitParamsSettings.IdGridColumn}" />
-
-        <TextBlock
-            x:Key="NameColumnHeader"
-            TextWrapping="Wrap"
-            Text="{me:LocalizationSource RevitParamsSettings.NameGridColumn}" />
-
-        <TextBlock
-            x:Key="StorageTypeColumnHeader"
-            TextWrapping="Wrap"
-            Text="{me:LocalizationSource RevitParamsSettings.StorageTypeGridColumn}" />
+        <converters:RevitParamImageConverter x:Key="ParamImageConverter" />
+        <converters:RevitParamDescriptionConverter x:Key="ParamDescriptionConverter" />
     </Page.Resources>
 
     <Grid>
-        <DataGrid
-            IsReadOnly="True"
+        <ui:ListView
             SelectionMode="Single"
-            AutoGenerateColumns="False"
-            CanUserResizeRows="False"
-            CanUserSortColumns="False"
-            CanUserReorderColumns="False"
             ItemsSource="{Binding RevitParams}">
 
-            <DataGrid.Columns>
-                <DataGridTextColumn
-                    Binding="{Binding Id}"
-                    Header="{StaticResource IdColumnHeader}" />
 
-                <DataGridTextColumn
-                    Binding="{Binding Name}"
-                    Header="{StaticResource NameColumnHeader}" />
+            <ui:ListView.ItemTemplate>
+                <DataTemplate DataType="{x:Type bim4Everyone:RevitParam}">
+                    <Grid Margin="8,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                <DataGridComboBoxColumn
-                    SelectedValuePath="Value"
-                    DisplayMemberPath="DisplayName"
-                    SelectedValueBinding="{Binding StorageType}"
-                    ItemsSource="{me:EnumToItemsSource db:StorageType}"
-                    Header="{StaticResource StorageTypeColumnHeader}" />
-            </DataGrid.Columns>
-        </DataGrid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <ui:SymbolIcon
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Grid.Column="0"
+                            Width="32"
+                            Height="32"
+                            Margin="6"
+                            Symbol="{Binding 
+                                Converter={StaticResource ParamImageConverter}}" />
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="12,6,0,0"
+                            FontWeight="Bold">
+
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} ({1})">
+                                    <Binding Path="Name" />
+                                    <Binding Path="Id" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+
+                        </TextBlock>
+
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="12,0,0,6"
+                            Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{Binding 
+                                Converter={StaticResource ParamDescriptionConverter}}" />
+
+                    </Grid>
+                </DataTemplate>
+            </ui:ListView.ItemTemplate>
+
+        </ui:ListView>
     </Grid>
 </core:WpfUIPlatformPage>
