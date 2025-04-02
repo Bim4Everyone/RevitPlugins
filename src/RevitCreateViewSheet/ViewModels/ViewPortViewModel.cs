@@ -6,7 +6,7 @@ using dosymep.WPF.ViewModels;
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
-    internal class ViewPortViewModel : BaseViewModel, IEquatable<ViewPortViewModel> {
+    internal class ViewPortViewModel : BaseViewModel, IEquatable<ViewPortViewModel>, IEntityViewModel {
         private readonly ViewPortModel _viewPortModel;
         private ViewPortTypeViewModel _viewPortType;
 
@@ -20,6 +20,8 @@ namespace RevitCreateViewSheet.ViewModels {
         public string ViewName => _viewPortModel.Name;
 
         public bool IsPlaced { get; }
+
+        public IEntity Entity => ViewPortModel;
 
         public ViewPortModel ViewPortModel => _viewPortModel;
 

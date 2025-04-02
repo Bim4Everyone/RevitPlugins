@@ -19,7 +19,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly SheetsSaver _sheetsSaver;
         private readonly ILocalizationService _localizationService;
         private readonly IProgressDialogFactory _progressDialogFactory;
-
+        private readonly ISheetItemsFactory _sheetItemsFactory;
         private TitleBlockViewModel _addSheetsTitleBlock;
         private string _errorText;
         private string _createErrorText;
@@ -33,7 +33,8 @@ namespace RevitCreateViewSheet.ViewModels {
             RevitRepository revitRepository,
             SheetsSaver sheetsSaver,
             ILocalizationService localizationService,
-            IProgressDialogFactory progressDialogFactory) {
+            IProgressDialogFactory progressDialogFactory,
+            ISheetItemsFactory sheetItemsFactory) {
 
             _revitRepository = revitRepository
                 ?? throw new System.ArgumentNullException(nameof(revitRepository));
@@ -43,11 +44,12 @@ namespace RevitCreateViewSheet.ViewModels {
                 ?? throw new System.ArgumentNullException(nameof(localizationService));
             _progressDialogFactory = progressDialogFactory
                 ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
-
+            _sheetItemsFactory = sheetItemsFactory
+                ?? throw new System.ArgumentNullException(nameof(sheetItemsFactory));
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            RemoveViewSheetCommand = RelayCommand.Create<SheetViewModel>(RemoveViewSheet, CanRemoveViewSheet);
-            AddViewSheetsCommand = RelayCommand.Create(AddViewSheets, CanAddViewSheets);
+            RemoveSheetCommand = RelayCommand.Create<SheetViewModel>(RemoveSheet, CanRemoveSheet);
+            AddSheetsCommand = RelayCommand.Create(AddSheets, CanAddSheets);
 
             var comparer = new LogicalStringComparer();
             AllSheets = [];
@@ -67,9 +69,9 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public IProgressDialogFactory ProgressDialogFactory => _progressDialogFactory;
 
-        public ICommand RemoveViewSheetCommand { get; }
+        public ICommand RemoveSheetCommand { get; }
 
-        public ICommand AddViewSheetsCommand { get; }
+        public ICommand AddSheetsCommand { get; }
 
         public ICommand LoadViewCommand { get; }
 
@@ -139,7 +141,7 @@ namespace RevitCreateViewSheet.ViewModels {
             VisibleSheets.Filter += SheetsFilterHandler;
         }
 
-        private void AddViewSheets() {
+        private void AddSheets() {
             var indexes = AllSheets.Where(s => s.SheetModel.State != EntityState.Deleted)
                 .Select(s => new { IsNumber = int.TryParse(s.SheetNumber, out int number), Number = number })
                 .Where(c => c.IsNumber)
@@ -159,7 +161,7 @@ namespace RevitCreateViewSheet.ViewModels {
             }
         }
 
-        private bool CanAddViewSheets() {
+        private bool CanAddSheets() {
             if(string.IsNullOrWhiteSpace(AddSheetsAlbumBlueprint)) {
                 AddSheetsErrorText = "Выберите альбом.";
                 return false;
@@ -189,7 +191,7 @@ namespace RevitCreateViewSheet.ViewModels {
             return true;
         }
 
-        private void RemoveViewSheet(SheetViewModel sheet) {
+        private void RemoveSheet(SheetViewModel sheet) {
             if(sheet.IsPlaced) {
                 sheet.SheetModel.MarkAsDeleted();
             } else {
@@ -198,7 +200,7 @@ namespace RevitCreateViewSheet.ViewModels {
             VisibleSheets.View.Refresh();
         }
 
-        private bool CanRemoveViewSheet(SheetViewModel sheet) {
+        private bool CanRemoveSheet(SheetViewModel sheet) {
             return sheet is not null;
         }
 

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -36,6 +37,33 @@ namespace RevitCreateViewSheet {
                 kernel.UseWpfUIThemeUpdater();
 
                 kernel.BindMainWindow<MainViewModel, MainWindow>();
+                kernel.Bind<AnnotationModelCreatorViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<AnnotationModelCreatorWindow>()
+                    .ToSelf()
+                    .InTransientScope()
+                    .WithPropertyValue(
+                        nameof(Window.DataContext),
+                        c => c.Kernel.Get<AnnotationModelCreatorViewModel>());
+                kernel.Bind<ScheduleModelCreatorViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ScheduleModelCreatorWindow>()
+                    .ToSelf()
+                    .InTransientScope()
+                    .WithPropertyValue(
+                        nameof(Window.DataContext),
+                        c => c.Kernel.Get<ScheduleModelCreatorViewModel>());
+                kernel.Bind<ViewPortModelCreatorViewModel>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<ViewPortModelCreatorWindow>()
+                    .ToSelf()
+                    .InTransientScope()
+                    .WithPropertyValue(
+                        nameof(Window.DataContext),
+                        c => c.Kernel.Get<ViewPortModelCreatorViewModel>());
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 

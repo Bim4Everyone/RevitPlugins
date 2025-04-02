@@ -6,7 +6,7 @@ using dosymep.WPF.ViewModels;
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
-    internal class ScheduleViewModel : BaseViewModel, IEquatable<ScheduleViewModel> {
+    internal class ScheduleViewModel : BaseViewModel, IEquatable<ScheduleViewModel>, IEntityViewModel {
         private readonly ScheduleModel _scheduleModel;
 
         public ScheduleViewModel(ScheduleModel scheduleModel) {
@@ -18,6 +18,8 @@ namespace RevitCreateViewSheet.ViewModels {
         public string Name => _scheduleModel.Name;
 
         public bool IsPlaced { get; }
+
+        public IEntity Entity => ScheduleModel;
 
         public ScheduleModel ScheduleModel => _scheduleModel;
 

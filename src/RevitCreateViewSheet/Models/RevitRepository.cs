@@ -99,7 +99,51 @@ namespace RevitCreateViewSheet.Models {
         }
 
         public void CreateAnnotation(View view2D, FamilySymbol familySymbol, XYZ point) {
+            if(!familySymbol.IsActive) {
+                familySymbol.Activate();
+            }
             Document.Create.NewFamilyInstance(point, familySymbol, view2D);
+        }
+
+        public ICollection<View> GetNotPlacedViews() {
+            var placedViews = new FilteredElementCollector(Document)
+                .OfClass(typeof(ViewSheet))
+                .WhereElementIsNotElementType()
+                .OfType<ViewSheet>()
+                .SelectMany(sheet => {
+                    ElementId[] _ = [.. sheet.GetAllPlacedViews(), .. new ElementId[] { sheet.Id }];
+                    return _;
+                })
+                .ToHashSet();
+            return new FilteredElementCollector(Document)
+                .OfClass(typeof(View))
+                .WhereElementIsNotElementType()
+                .OfType<View>()
+                .Where(v => v.CanBePrinted && !placedViews.Contains(v.Id))
+                .ToArray();
+        }
+
+        public ICollection<AnnotationSymbolType> GetAllAnnotationSymbols() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsElementType()
+                .OfCategory(BuiltInCategory.OST_GenericAnnotation)
+                .OfType<AnnotationSymbolType>()
+                .ToArray();
+        }
+
+        public ICollection<ViewSchedule> GetNotPlacedSchedules() {
+            var placedSchedulesIds = new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(ScheduleSheetInstance))
+                .OfType<ScheduleSheetInstance>()
+                .Select(s => s.ScheduleId)
+                .ToHashSet();
+            return new FilteredElementCollector(Document)
+                .Excluding(placedSchedulesIds)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(ViewSchedule))
+                .OfType<ViewSchedule>()
+                .ToArray();
         }
 
         internal ICollection<SheetModel> GetSheetModels() {

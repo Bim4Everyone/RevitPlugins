@@ -6,7 +6,7 @@ using dosymep.WPF.ViewModels;
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
-    internal class AnnotationViewModel : BaseViewModel, IEquatable<AnnotationViewModel> {
+    internal class AnnotationViewModel : BaseViewModel, IEquatable<AnnotationViewModel>, IEntityViewModel {
         private readonly AnnotationModel _annotationModel;
 
         public AnnotationViewModel(AnnotationModel annotationModel) {
@@ -20,6 +20,8 @@ namespace RevitCreateViewSheet.ViewModels {
         public string SymbolName => _annotationModel.SymbolName;
 
         public bool IsPlaced { get; }
+
+        public IEntity Entity => AnnotationModel;
 
         public AnnotationModel AnnotationModel => _annotationModel;
 
