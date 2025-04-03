@@ -33,6 +33,9 @@ namespace RevitCreateViewSheet {
                 kernel.Bind<SheetsSaver>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<ISheetItemsFactory>()
+                    .To<SheetItemsFactory>()
+                    .InSingletonScope();
 
                 kernel.UseWpfUIThemeUpdater();
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
@@ -50,6 +51,9 @@ namespace RevitCreateViewSheet.ViewModels {
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             RemoveSheetCommand = RelayCommand.Create<SheetViewModel>(RemoveSheet, CanRemoveSheet);
             AddSheetsCommand = RelayCommand.Create(AddSheets, CanAddSheets);
+            AddViewPortCommand = RelayCommand.Create(AddViewPort, CanAddSheetItem);
+            AddScheduleCommand = RelayCommand.Create(AddSchedule, CanAddSheetItem);
+            AddAnnotationCommand = RelayCommand.Create(AddAnnotation, CanAddSheetItem);
 
             var comparer = new LogicalStringComparer();
             AllSheets = [];
@@ -76,6 +80,12 @@ namespace RevitCreateViewSheet.ViewModels {
         public ICommand LoadViewCommand { get; }
 
         public ICommand AcceptViewCommand { get; }
+
+        public ICommand AddViewPortCommand { get; }
+
+        public ICommand AddScheduleCommand { get; }
+
+        public ICommand AddAnnotationCommand { get; }
 
         public string SheetsFilter {
             get => _sheetsFilter;
@@ -162,6 +172,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAddSheets() {
+            // TODO добавить валидацию через NamingUtild.IsValidName
             if(string.IsNullOrWhiteSpace(AddSheetsAlbumBlueprint)) {
                 AddSheetsErrorText = "Выберите альбом.";
                 return false;
@@ -221,6 +232,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAcceptView() {
+            // TODO добавить валидацию через NamingUtild.IsValidName
             if(AllSheets.Any(item => string.IsNullOrWhiteSpace(item.AlbumBlueprint))) {
                 ErrorText = "У всех листов должно быть заполнен альбом.";
                 return false;
@@ -262,6 +274,40 @@ namespace RevitCreateViewSheet.ViewModels {
                     }
                 }
             }
+        }
+
+        private void AddViewPort() {
+            try {
+                var viewPort = _sheetItemsFactory.CreateViewPort(SelectedSheet.SheetModel);
+                SelectedSheet.SheetModel.AddViewPort(viewPort);
+                SelectedSheet.AllViewPorts.Add(new ViewPortViewModel(viewPort));
+            } catch(OperationCanceledException) {
+                return;
+            }
+        }
+
+        private void AddSchedule() {
+            try {
+                var schedule = _sheetItemsFactory.CreateSchedule(SelectedSheet.SheetModel);
+                SelectedSheet.SheetModel.AddSchedule(schedule);
+                SelectedSheet.AllSchedules.Add(new ScheduleViewModel(schedule));
+            } catch(OperationCanceledException) {
+                return;
+            }
+        }
+
+        private void AddAnnotation() {
+            try {
+                var annotation = _sheetItemsFactory.CreateAnnotation(SelectedSheet.SheetModel);
+                SelectedSheet.SheetModel.AddAnnotation(annotation);
+                SelectedSheet.AllAnnotations.Add(new AnnotationViewModel(annotation));
+            } catch(OperationCanceledException) {
+                return;
+            }
+        }
+
+        private bool CanAddSheetItem() {
+            return SelectedSheet is not null;
         }
     }
 }

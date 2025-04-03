@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.Revit.Comparators;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -15,7 +16,8 @@ namespace RevitCreateViewSheet.ViewModels {
         public AnnotationModelCreatorViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
             AnnotationSymbolTypes = [.. _revitRepository.GetAllAnnotationSymbols()
-                .Select(a => new AnnotationSymbolTypeViewModel(a))];
+                .Select(a => new AnnotationSymbolTypeViewModel(a))
+                .OrderBy(a => a.RichName, new LogicalStringComparer())];
             AcceptView = RelayCommand.Create(() => { }, CanAcceptView);
         }
 

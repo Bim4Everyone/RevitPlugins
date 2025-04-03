@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.Revit.Comparators;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -17,9 +18,11 @@ namespace RevitCreateViewSheet.ViewModels {
         public ViewPortModelCreatorViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             Views = [.. _revitRepository.GetNotPlacedViews()
-                .Select(v => new ViewViewModel(v))];
+                .Select(v => new ViewViewModel(v))
+                .OrderBy(a => a.Name, new LogicalStringComparer())];
             ViewPortTypes = [.. _revitRepository.GetViewPortTypes()
-                .Select(v => new ViewPortTypeViewModel(v))];
+                .Select(v => new ViewPortTypeViewModel(v))
+                .OrderBy(a => a.Name, new LogicalStringComparer())];
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);
         }
 

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -40,11 +39,8 @@ namespace RevitCreateViewSheet.ViewModels {
             VisibleAnnotations = new CollectionViewSource() { Source = AllAnnotations };
             VisibleAnnotations.Filter += EntitiesFilterHandler;
 
-            AddViewCommand = RelayCommand.Create(AddView);
             RemoveViewCommand = RelayCommand.Create<ViewPortViewModel>(RemoveView, CanRemoveView);
-            AddScheduleCommand = RelayCommand.Create(AddSchedule);
             RemoveScheduleCommand = RelayCommand.Create<ScheduleViewModel>(RemoveSchedule, CanRemoveSchedule);
-            AddAnnotationCommand = RelayCommand.Create(AddAnnotation);
             RemoveAnnotationCommand = RelayCommand.Create<AnnotationViewModel>(RemoveAnnotation, CanRemoveAnnotation);
         }
 
@@ -114,22 +110,12 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public ObservableCollection<AnnotationViewModel> AllAnnotations { get; }
 
-        public ICommand AddViewCommand { get; }
-
         public ICommand RemoveViewCommand { get; }
-
-        public ICommand AddScheduleCommand { get; }
 
         public ICommand RemoveScheduleCommand { get; }
 
-        public ICommand AddAnnotationCommand { get; }
-
         public ICommand RemoveAnnotationCommand { get; }
 
-
-        private void AddView() {
-            throw new NotImplementedException("TODO");
-        }
 
         private void RemoveView(ViewPortViewModel view) {
             RemoveEntity(view, AllViewPorts, VisibleViewPorts.View);
@@ -139,21 +125,12 @@ namespace RevitCreateViewSheet.ViewModels {
             return view is not null;
         }
 
-        private void AddSchedule() {
-            throw new NotImplementedException("TODO");
-
-        }
-
         private void RemoveSchedule(ScheduleViewModel scheduleView) {
             RemoveEntity(scheduleView, AllSchedules, VisibleSchedules.View);
         }
 
         private bool CanRemoveSchedule(ScheduleViewModel scheduleView) {
             return scheduleView is not null;
-        }
-
-        private void AddAnnotation() {
-            throw new NotImplementedException("TODO");
         }
 
         private void RemoveAnnotation(AnnotationViewModel annotationView) {
