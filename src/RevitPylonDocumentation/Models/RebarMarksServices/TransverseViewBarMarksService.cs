@@ -2,14 +2,10 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
-
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models.RebarMarksServices {
     internal class TransverseViewBarMarksService {
-        private readonly string _commentParamName = "Комментарии";
-
         private readonly PylonView _pylonView;
         private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
         private readonly AnnotationService _annotationService;
@@ -24,9 +20,9 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
 
             // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
             // Без засечки на конце
-            _tagSymbolWithoutSerif = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10");
+            _tagSymbolWithoutSerif = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Шаг - Полка 10");
             // С засечкой на конце
-            _tagSymbolWithSerif = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10, Засечка");
+            _tagSymbolWithSerif = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Шаг - Полка 10, Засечка");
 
             // Находим типоразмер марки несущей арматуры для обозначения марки изделия
             _tagSkeletonSymbol = revitRepository.FindSymbol(BuiltInCategory.OST_RebarTags, "Изделие_Марка - Полка 30");
@@ -50,9 +46,6 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             Element leftClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Left, false);
             Element leftTopVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftTop, false);
 
-            // Устанавливаем значение комментария у арматуры, к которой привяжем марку
-            leftClamp.SetParamValue(_commentParamName, "шаг 100");
-
             // Получаем точку в которую нужно поставить аннотацию
             XYZ pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(leftTopVerticalBar, DirectionType.LeftTop, 1.2, 0.6, false);
 
@@ -74,9 +67,6 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
             // Получаем референс-элемент
             Element rightClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Right, true);
             Element rightTopVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.RightTop, false);
-
-            // Устанавливаем значение комментария у арматуры, к которой привяжем марку
-            rightClamp.SetParamValue(_commentParamName, "шаг 100");
 
             // Получаем точку в которую нужно поставить аннотацию
             XYZ pointRightTop = _viewPointsAnalyzer.GetPointByDirection(rightTopVerticalBar, DirectionType.RightTop, 1.2, 0.6, false);
@@ -101,11 +91,6 @@ namespace RevitPylonDocumentation.Models.RebarMarksServices {
 
             // Получаем точку в которую нужно поставить аннотацию
             XYZ pointLeft = _viewPointsAnalyzer.GetPointByDirection(leftCBar, DirectionType.LeftBottom, 1.3, 0.1, true);
-
-            foreach(Element simpleCBar in simpleCBars) {
-                // Устанавливаем значение комментария у арматуры, к которой привяжем марку
-                simpleCBar.SetParamValue(_commentParamName, "шаг 100");
-            }
 
             // Создаем марку арматуры
             var leftTag = _annotationService.CreateRebarTag(pointLeft, _tagSymbolWithSerif, simpleCBars);
