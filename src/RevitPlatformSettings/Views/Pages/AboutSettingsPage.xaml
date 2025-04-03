@@ -8,7 +8,8 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:edits="clr-namespace:RevitPlatformSettings.Views.Edits"
-    
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+
     mc:Ignorable="d"
     x:ClassModifier="internal"
     ScrollViewer.CanContentScroll="False"
@@ -16,55 +17,80 @@
     x:Name="_this"
     d:DesignHeight="300" d:DesignWidth="300"
     d:DataContext="{d:DesignInstance settings:AboutSettingsViewModel, IsDesignTimeCreatable=False}">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
 
-        <Image
-            Grid.Column="0"
-            Height="200"
-            Margin="10"
-            VerticalAlignment="Top"
-            Source="{Binding Path=ImagePath}" />
+    <ScrollViewer
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Disabled">
 
-        <StackPanel Grid.Column="1" Orientation="Vertical">
-            <TextBlock
-                FontSize="50"
-                Text="{Binding Path=PlatformName}" />
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-            <TextBlock
-                Margin="0 15"
-                Foreground="Gray"
-                TextWrapping="Wrap"
-                Text="{Binding PlatformDescription}" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-            <edits:HyperLinkEditWithImage
-                EditValue="{me:LocalizationSource AboutSettings.PlatformLinkText}"
-                NavigationUrl="{Binding PlatformPageUrl}"
-                ImageSource="{Binding ImagePath}" />
+            <Image
+                Grid.Row="0"
+                Grid.Column="0"
+                Height="150"
+                Margin="10"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Source="{Binding Path=ImagePath}" />
 
-            <edits:HyperLinkEditWithImage
-                EditValue="{me:LocalizationSource AboutSettings.PlatformNewsChannel}"
-                NavigationUrl="{Binding NewsChatUrl}"
-                ImageSource="{me:QualifiedImage assets/images/icons8-news-96.png}" />
+            <StackPanel
+                Grid.Row="0"
+                Grid.Column="1"
+                Orientation="Vertical"
+                VerticalAlignment="Center">
 
-            <edits:HyperLinkEditWithImage
-                EditValue="{me:LocalizationSource AboutSettings.PlatformMainChat}"
-                NavigationUrl="{Binding MainChatUrl}"
-                ImageSource="{me:QualifiedImage assets/images/icons8-message-96.png}" />
+                <ui:TextBlock
+                    FontSize="36"
+                    FontTypography="Body"
+                    Text="{Binding Path=PlatformName}" />
 
-            <edits:HyperLinkEditWithImage
-                EditValue="{me:LocalizationSource AboutSettings.PlatformDownload}"
-                NavigationUrl="{Binding DownloadLinkUrl}"
-                ImageSource="{me:QualifiedImage assets/images/icons8-download-96.png}" />
+                <ui:TextBlock
+                    TextWrapping="Wrap"
+                    FontSize="20"
+                    Text="{Binding PlatformDescription}"
+                    Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
 
-            <edits:HyperLinkEditWithImage
-                EditValue="{me:LocalizationSource AboutSettings.OpenSource}"
-                ImageSource="{me:QualifiedImage assets/images/icons8-github-96.png}"
-                Command="{Binding ShowOpenSourceDialogCommand}" />
+            <StackPanel
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Orientation="Vertical">
 
-        </StackPanel>
-    </Grid>
+                <edits:HyperLinkEditWithImage
+                    EditValue="{me:LocalizationSource AboutSettings.PlatformLinkText}"
+                    NavigationUrl="{Binding PlatformPageUrl}"
+                    ImageSource="{Binding ImagePath}" />
+
+                <edits:HyperLinkEditWithImage
+                    EditValue="{me:LocalizationSource AboutSettings.PlatformNewsChannel}"
+                    NavigationUrl="{Binding NewsChatUrl}"
+                    ImageSource="{me:QualifiedImage assets/images/icons8-news-96.png}" />
+
+                <edits:HyperLinkEditWithImage
+                    EditValue="{me:LocalizationSource AboutSettings.PlatformMainChat}"
+                    NavigationUrl="{Binding MainChatUrl}"
+                    ImageSource="{me:QualifiedImage assets/images/icons8-message-96.png}" />
+
+                <edits:HyperLinkEditWithImage
+                    EditValue="{me:LocalizationSource AboutSettings.PlatformDownload}"
+                    NavigationUrl="{Binding DownloadLinkUrl}"
+                    ImageSource="{me:QualifiedImage assets/images/icons8-download-96.png}" />
+
+                <edits:HyperLinkEditWithImage
+                    EditValue="{me:LocalizationSource AboutSettings.OpenSource}"
+                    ImageSource="{me:QualifiedImage assets/images/icons8-github-96.png}"
+                    Command="{Binding ShowOpenSourceDialogCommand}" />
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </core:WpfUIPlatformPage>

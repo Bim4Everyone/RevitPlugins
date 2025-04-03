@@ -4,30 +4,72 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 
     x:Name="_this"
     mc:Ignorable="d"
     d:DesignHeight="50" d:DesignWidth="300">
 
-    <Hyperlink
-        TextDecorations="None"
-        Command="{Binding Command, ElementName=_this}"
-        ToolTip="{Binding NavigationUrl, ElementName=_this}"
-        Click="Hyperlink_OnClick">
+    <Border
+        VerticalAlignment="Center"
+        HorizontalAlignment="Stretch"
+        SnapsToDevicePixels="True"
+        OverridesDefaultStyle="True"
+        Margin="{DynamicResource CardControlContentMargin}"
+        Padding="{DynamicResource CardControlPadding}"
+        Background="{DynamicResource CardBackground}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+        FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
+        CornerRadius="{DynamicResource ControlCornerRadius}">
+        <TextBlock>
+            <Hyperlink
+                TextDecorations="None"
+                Command="{Binding Command, ElementName=_this}"
+                ToolTip="{Binding NavigationUrl, ElementName=_this}"
+                Click="Hyperlink_OnClick">
 
-        <Image
-            Width="20"
-            Height="20"
-            Cursor="Hand"
-            VerticalAlignment="Center"
-            Source="{Binding ImageSource, ElementName=_this}" />
+                <Grid>
 
-        <TextBlock
-            FontSize="20"
-            VerticalAlignment="Center"
-            TextDecorations="Underline"
-            Text="{Binding EditValue, ElementName=_this}" />
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-    </Hyperlink>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Grid.Column="0"
+                        Height="42"
+                        Width="42"
+                        Margin="{DynamicResource CardControlIconMargin}"
+                        VerticalAlignment="Center"
+                        Focusable="False"
+                        Source="{Binding ImageSource, ElementName=_this}" />
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        FontSize="16"
+                        FontTypography="Body"
+                        TextDecorations="Underline"
+                        Text="{Binding EditValue, ElementName=_this}" />
+
+                    <ui:TextBlock
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        FontSize="12"
+                        Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                        Text="{Binding EditValue, ElementName=_this}" />
+
+                </Grid>
+            </Hyperlink>
+        </TextBlock>
+    </Border>
 
 </UserControl>
