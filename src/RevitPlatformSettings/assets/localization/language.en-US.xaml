@@ -77,12 +77,22 @@
     <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplateDescription">Sets the output template for log entries in the Revit journal</system:String>
     
     <system:String x:Key="AboutSettings.Title">About</system:String>
-    <system:String x:Key="AboutSettings.OpenSource">Third-party Software</system:String>
     <system:String x:Key="AboutSettings.PlatformDescription">{0} is a platform created to simplify the development of design documentation in Autodesk Revit.</system:String>
+    
+    <system:String x:Key="AboutSettings.OpenSource">Third-party Software</system:String>
+    <system:String x:Key="AboutSettings.OpenSourceDescription">Opens a dialog with links to third-party software</system:String>
+    
     <system:String x:Key="AboutSettings.PlatformLinkText">Project website</system:String>
+    <system:String x:Key="AboutSettings.PlatformLinkTextDescription">Link to the official project website</system:String>
+    
     <system:String x:Key="AboutSettings.PlatformNewsChannel">News channel</system:String>
+    <system:String x:Key="AboutSettings.PlatformNewsChannelDescription">Link to the project news channel</system:String>
+    
     <system:String x:Key="AboutSettings.PlatformMainChat">Main group chat</system:String>
+    <system:String x:Key="AboutSettings.PlatformMainChatDescription">Link to the main group chat</system:String>
+    
     <system:String x:Key="AboutSettings.PlatformDownload">Download platform setup</system:String>
+    <system:String x:Key="AboutSettings.PlatformDownloadDescription">Link to download the platform setup file</system:String>
 
     <system:String x:Key="ExtensionSettings.Title">Extensions</system:String>
     <system:String x:Key="ExtensionSettings.CategoryGridColumn">Category: {0}</system:String>

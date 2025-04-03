@@ -77,12 +77,23 @@
     <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplateDescription">Устанавливает шаблон вывода для записи логов в журнал Revit</system:String>
     
     <system:String x:Key="AboutSettings.Title">О программе</system:String>
-    <system:String x:Key="AboutSettings.OpenSource">Стороннее ПО</system:String>
     <system:String x:Key="AboutSettings.PlatformDescription">{0} - это платформа созданная для упрощения разработки проектной документации в Autodesk Revit.</system:String>
+    
+    <system:String x:Key="AboutSettings.OpenSource">Стороннее ПО</system:String>
+    <system:String x:Key="AboutSettings.OpenSourceDescription">Открывает диалоговое окно со ссылками на стороннее ПО</system:String>
+    
     <system:String x:Key="AboutSettings.PlatformLinkText">Ссылка на проект</system:String>
+    <system:String x:Key="AboutSettings.PlatformLinkTextDescription">Ссылка на официальный сайт проекта</system:String>
+    
     <system:String x:Key="AboutSettings.PlatformNewsChannel">Канал новостей</system:String>
+    <system:String x:Key="AboutSettings.PlatformNewsChannelDescription">Ссылка на канал с новостями проекта</system:String>
+    
     <system:String x:Key="AboutSettings.PlatformMainChat">Обсуждение платформы</system:String>
+    <system:String x:Key="AboutSettings.PlatformMainChatDescription">Ссылка на основной групповой чат</system:String>
+    
     <system:String x:Key="AboutSettings.PlatformDownload">Загрузка установщика платформы</system:String>
+    <system:String x:Key="AboutSettings.PlatformDownloadDescription">Ссылка для загрузки установочного файла платформы</system:String>
+    
     
     <system:String x:Key="ExtensionSettings.Title">Расширения</system:String>
     <system:String x:Key="ExtensionSettings.CategoryGridColumn">Категория: {0}</system:String>

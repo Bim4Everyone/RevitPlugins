@@ -68,26 +68,31 @@
 
                 <edits:HyperLinkEditWithImage
                     Header="{me:LocalizationSource AboutSettings.PlatformLinkText}"
+                    Description="{me:LocalizationSource AboutSettings.PlatformLinkTextDescription}"
                     NavigationUrl="{Binding PlatformPageUrl}"
                     Icon="{Binding ImagePath}" />
 
                 <edits:HyperLinkEditWithImage
                     Header="{me:LocalizationSource AboutSettings.PlatformNewsChannel}"
+                    Description="{me:LocalizationSource AboutSettings.PlatformNewsChannelDescription}"
                     NavigationUrl="{Binding NewsChatUrl}"
                     Icon="{me:QualifiedImage assets/images/icons8-news-96.png}" />
 
                 <edits:HyperLinkEditWithImage
                     Header="{me:LocalizationSource AboutSettings.PlatformMainChat}"
+                    Description="{me:LocalizationSource AboutSettings.PlatformMainChatDescription}"
                     NavigationUrl="{Binding MainChatUrl}"
                     Icon="{me:QualifiedImage assets/images/icons8-message-96.png}" />
 
                 <edits:HyperLinkEditWithImage
                     Header="{me:LocalizationSource AboutSettings.PlatformDownload}"
+                    Description="{me:LocalizationSource AboutSettings.PlatformDownloadDescription}"
                     NavigationUrl="{Binding DownloadLinkUrl}"
                     Icon="{me:QualifiedImage assets/images/icons8-download-96.png}" />
 
                 <edits:HyperLinkEditWithImage
                     Header="{me:LocalizationSource AboutSettings.OpenSource}"
+                    Description="{me:LocalizationSource AboutSettings.OpenSourceDescription}"
                     Icon="{me:QualifiedImage assets/images/icons8-github-96.png}"
                     Command="{Binding ShowOpenSourceDialogCommand}" />
             </StackPanel>
