@@ -9,19 +9,19 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitListOfSchedules.Interfaces;
-using RevitListOfSchedules.ViewModels;
 
 
 namespace RevitListOfSchedules.Models {
     internal class TempFamilyDocument : IFamilyDocument {
         private const string _extension = ".rfa";
-        private const int _diameterArc = 5;
+        private const int _diameterArc = 5; // Диаметр окружности для семейства. Выбрано 5 чтобы его было видно на виде.
         private readonly ILocalizationService _localizationService;
         private readonly RevitRepository _revitRepository;
         private readonly FamilyLoadOptions _familyLoadOptions;
         private readonly string _familyTemplatePath;
         private readonly string _familyPath;
         private readonly string _tempDirectory = Path.GetTempPath();
+        private readonly string _albumName;
         private readonly FamilySymbol _familySymbol;
 
         public TempFamilyDocument(
@@ -33,17 +33,15 @@ namespace RevitListOfSchedules.Models {
             _localizationService = localizationService;
             _revitRepository = revitRepository;
             _familyLoadOptions = familyLoadOptions;
+            _albumName = albumName;
 
             string familyTemplatePath = _revitRepository.Application.FamilyTemplatePath;
-            string localizedString = _localizationService.GetLocalizedString("TempFamilyDocument.TemplateFamilyName");
-            _familyTemplatePath = $"{familyTemplatePath}{localizedString}";
 
-            string familyName = string.Format(
-                _localizationService.GetLocalizedString("TempFamilyDocument.FamilyName"), albumName);
-            string familyDocumentName = string.Format(familyName, albumName);
-            string fileName = $"{familyDocumentName}{_extension}";
-            _familyPath = Path.Combine(_tempDirectory, fileName);
+            _familyTemplatePath = _localizationService.GetLocalizedString(
+                "TempFamilyDocument.TemplateFamilyName", familyTemplatePath);
 
+            _familyPath = _localizationService.GetLocalizedString(
+                "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
             CreateDocument();
 
             _familySymbol = LoadFamilySymbol();
@@ -51,18 +49,15 @@ namespace RevitListOfSchedules.Models {
 
         public FamilySymbol FamilySymbol => _familySymbol;
 
-        public IList<FamilyInstance> PlaceFamilyInstances(
-            View view, SheetViewModel sheetViewModel, IList<ViewSchedule> viewSchedules) {
-            IList<FamilyInstance> familyInstanceList = [];
-            foreach(ViewSchedule schedule in viewSchedules) {
-                TableData table_data = schedule.GetTableData();
-                TableSectionData head_data = table_data.GetSectionData(SectionType.Header);
-                string result = head_data == null
-                    ? schedule.Name
-                    : head_data.GetCellText(0, 0);
-                FamilyInstance familyInstance = CreateInstance(
-                    view, result, sheetViewModel.Number, sheetViewModel.RevisionNumber);
-                familyInstanceList.Add(familyInstance);
+        public List<FamilyInstance> GetFamilyInstances(
+            Document document, ViewSheet viewSheet, string number, string revisionNumber, ViewDrafting viewDrafting) {
+
+            List<FamilyInstance> familyInstanceList = [];
+            var schedules = _revitRepository.GetScheduleInstances(document, viewSheet);
+
+            if(schedules != null) {
+                var instances = PlaceFamilyInstances(viewDrafting, number, revisionNumber, schedules);
+                familyInstanceList.AddRange(instances);
             }
             return familyInstanceList;
         }
@@ -76,12 +71,28 @@ namespace RevitListOfSchedules.Models {
             return familyInstance;
         }
 
+        private IList<FamilyInstance> PlaceFamilyInstances(
+            View view, string number, string revisionNumber, IList<ViewSchedule> viewSchedules) {
+            IList<FamilyInstance> familyInstanceList = [];
+            foreach(ViewSchedule schedule in viewSchedules) {
+                TableData table_data = schedule.GetTableData();
+                TableSectionData head_data = table_data.GetSectionData(SectionType.Header);
+                string result = head_data == null
+                    ? schedule.Name
+                    : head_data.GetCellText(0, 0);
+                FamilyInstance familyInstance = CreateInstance(view, result, number, revisionNumber);
+                familyInstanceList.Add(familyInstance);
+            }
+            return familyInstanceList;
+        }
+
         private Document CreateDocument() {
             Document document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
             string transactionName = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionName");
             using(Transaction t = document.StartTransaction(transactionName)) {
                 CreateParameters(document);
                 CreateCircle(document);
+                ModifyDefaultText(document, _albumName);
                 t.Commit();
             }
             SaveAsOptions opt = new SaveAsOptions {
@@ -111,13 +122,20 @@ namespace RevitListOfSchedules.Models {
             familyCreator.NewDetailCurve(viewPlan, circle);
         }
 
+        private void ModifyDefaultText(Document document, string text) {
+            TextNote textNote = new FilteredElementCollector(document)
+                .OfClass(typeof(TextNote))
+                .Cast<TextNote>()
+                .First();
+            textNote.Text = text;
+        }
+
         private FamilySymbol LoadFamilySymbol() {
             FamilySymbol familySymbol = null;
             string transactionNameLoad = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionNameLoad");
             using(Transaction t = _revitRepository.Document.StartTransaction(transactionNameLoad)) {
 
                 _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out Family family);
-
                 familySymbol = _revitRepository.GetFamilySymbol(family);
 
                 if(familySymbol != null) {

@@ -6,10 +6,13 @@ using dosymep.SimpleServices;
 namespace RevitListOfSchedules.Models {
     internal class ScheduleElement {
 
+        private const int _firstLastCollumn = 30;
+        private const int _firstSecondCollumn = 110;
         private readonly ILocalizationService _localizationService;
         private readonly RevitRepository _revitRepository;
         private readonly FamilySymbol _famSymbol;
         private readonly FamilyInstance _famInstance;
+
 
         public ScheduleElement(
             ILocalizationService localizationService,
@@ -47,8 +50,8 @@ namespace RevitListOfSchedules.Models {
                 ScheduleField noteField3 = vewSchedule.Definition
                     .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(ParamFactory.FamilyParamRevision).Id);
 
-                double firstLastCollumn = UnitUtils.ConvertToInternalUnits(30, UnitTypeId.Millimeters);
-                double secondCollumn = UnitUtils.ConvertToInternalUnits(110, UnitTypeId.Millimeters);
+                double firstLastCollumn = UnitUtils.ConvertToInternalUnits(_firstLastCollumn, UnitTypeId.Millimeters);
+                double secondCollumn = UnitUtils.ConvertToInternalUnits(_firstSecondCollumn, UnitTypeId.Millimeters);
 
                 noteField1.GridColumnWidth = firstLastCollumn;
                 noteField2.GridColumnWidth = secondCollumn;

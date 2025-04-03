@@ -38,11 +38,6 @@ namespace RevitListOfSchedules.Converters {
             string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
             return $"pack://application:,,,/{assemblyName};component/Resources/";
         }
-
-
-
     }
-
-
 }
 

@@ -24,9 +24,9 @@
     <system:String 
         x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TemplateFamilyName">\English\Annotations\Metric Generic Annotation.rft</system:String>
+        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\English\Annotations\Metric Generic Annotation.rft</system:String>
     <system:String
-        x:Key="TempFamilyDocument.FamilyName">List_Of_Schedules_{0}</system:String>
+        x:Key="TempFamilyDocument.FamilyName">{0}List_Of_Schedules_{1}{2}</system:String>
     <system:String
         x:Key="TempFamilyDocument.TransactionName">Parameters, circle</system:String>
     <system:String
@@ -40,7 +40,7 @@
     <system:String
         x:Key="MainViewModel.ErrorText">Select sheets to create a list of schedules</system:String>
     <system:String
-        x:Key="MainViewModel.TransactionNamePlace">Placing a family of annotations</system:String>
+        x:Key="MainViewModel.TransactionName">Placing a family of annotations</system:String>
     <system:String
         x:Key="MainViewModel.ProgressTitleLinks">Reload links... [{0}]\[{1}]</system:String>
     <system:String

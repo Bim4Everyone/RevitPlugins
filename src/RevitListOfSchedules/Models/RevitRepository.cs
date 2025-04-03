@@ -15,8 +15,6 @@ using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using RevitListOfSchedules.ViewModels;
-
 namespace RevitListOfSchedules.Models;
 
 internal class RevitRepository {
@@ -51,12 +49,12 @@ internal class RevitRepository {
     }
 
     // Метод получения документа "Связанный файл"
-    public Document GetLinkDocument(LinkViewModel linkViewModel) {
+    public Document GetLinkDocument(ElementId id) {
         return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_RvtLinks)
             .OfClass(typeof(RevitLinkInstance))
             .Cast<RevitLinkInstance>()
-            .Where(instance => instance.GetTypeId() == linkViewModel.Id)
+            .Where(instance => instance.GetTypeId() == id)
             .First()
             .GetLinkDocument();
     }
@@ -103,51 +101,6 @@ internal class RevitRepository {
         return listOfParameters;
     }
 
-    private List<ElementId> GetBrowserParameterElementIds() {
-        List<ElementId> listOfElementIds = new List<ElementId>();
-        var projectSheets = GetViewSheets(Document);
-        if(projectSheets.Count > 0) {
-            var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
-            IList<FolderItemInfo> itemsInfo = browserOrganization.GetFolderItems(projectSheets.First().Id);
-            foreach(var item in itemsInfo) {
-                listOfElementIds.Add(item.ElementId);
-            }
-        }
-        return listOfElementIds;
-    }
-
-
-
-
-    private List<RevitParam> GetRevitParams(List<ElementId> elementIds) {
-        List<RevitParam> listOfParameters = new List<RevitParam>();
-        if(elementIds.Count > 0) {
-            foreach(ElementId elementId in elementIds) {
-                if(elementId.IsSystemId()) {
-                    BuiltInParameter param = elementId.AsBuiltInParameter();
-                    RevitParam revitParam = SystemParamsConfig.Instance.CreateRevitParam(Document, param);
-                    if(revitParam.StorageType == StorageType.String) {
-                        listOfParameters.Add(revitParam);
-                    }
-                } else {
-                    Element element = Document.GetElement(elementId);
-                    if(element is SharedParameterElement) {
-                        RevitParam revitParam = SharedParamsConfig.Instance.CreateRevitParam(Document, element.Name);
-                        if(revitParam.StorageType == StorageType.String) {
-                            listOfParameters.Add(revitParam);
-                        }
-                    } else {
-                        RevitParam revitParam = ProjectParamsConfig.Instance.CreateRevitParam(Document, element.Name);
-                        if(revitParam.StorageType == StorageType.String) {
-                            listOfParameters.Add(revitParam);
-                        }
-                    }
-                }
-            }
-        }
-        return listOfParameters;
-    }
-
     // Метод получения чертежного вида, существующего или создание нового
     public ViewDrafting GetViewDrafting(string familyName) {
         string nameView = string.Format(
@@ -163,24 +116,6 @@ internal class RevitRepository {
             return CreateViewDrafting(nameView);
         }
     }
-
-    // Метод создания нового чертежного вида
-    private ViewDrafting CreateViewDrafting(string nameView) {
-        var viewTypes = new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewFamilyType))
-            .Cast<ViewFamilyType>();
-        var viewFamilyType = viewTypes
-            .Where(vt => vt.ViewFamily == ViewFamily.Drafting)
-            .First();
-        string transactionName = _localizationService.GetLocalizedString("RevitRepository.TransactionNameCreate");
-        using(Transaction t = Document.StartTransaction(transactionName)) {
-            ViewDrafting view = ViewDrafting.Create(Document, viewFamilyType.Id);
-            view.Name = nameView;
-            t.Commit();
-            return view;
-        }
-    }
-
     public IList<ViewSchedule> GetScheduleInstances(Document document, ViewSheet viewSheet) {
         if(document == null || viewSheet == null) {
             return null;
@@ -208,7 +143,7 @@ internal class RevitRepository {
             .First();
     }
 
-    public void DeleteFamilyInstance(View view) {
+    public void DeleteFamilyInstances(View view) {
         var instances = new FilteredElementCollector(Document, view.Id)
             .OfType<FamilyInstance>()
             .Select(instance => instance.Id)
@@ -240,4 +175,72 @@ internal class RevitRepository {
             .Select(c => invalidChars.Contains(c) ? '_' : c)
             .ToArray());
     }
+
+    public void CreateSchedule(TempFamilyDocument tempDoc, FamilyInstance familyInstance) {
+        FamilySymbol familySymbol = tempDoc.FamilySymbol;
+        if(!IsExistView(familySymbol.Name)) {
+            ScheduleElement scheduleElement = new ScheduleElement(
+                _localizationService, this, familySymbol, familyInstance);
+        }
+    }
+
+    private List<ElementId> GetBrowserParameterElementIds() {
+        List<ElementId> listOfElementIds = new List<ElementId>();
+        var projectSheets = GetViewSheets(Document);
+        if(projectSheets.Count > 0) {
+            var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(Document);
+            IList<FolderItemInfo> itemsInfo = browserOrganization.GetFolderItems(projectSheets.First().Id);
+            foreach(var item in itemsInfo) {
+                listOfElementIds.Add(item.ElementId);
+            }
+        }
+        return listOfElementIds;
+    }
+
+    private List<RevitParam> GetRevitParams(List<ElementId> elementIds) {
+        List<RevitParam> listOfParameters = new List<RevitParam>();
+        if(elementIds.Count > 0) {
+            foreach(ElementId elementId in elementIds) {
+                if(elementId.IsSystemId()) {
+                    BuiltInParameter param = elementId.AsBuiltInParameter();
+                    RevitParam revitParam = SystemParamsConfig.Instance.CreateRevitParam(Document, param);
+                    if(revitParam.StorageType == StorageType.String) {
+                        listOfParameters.Add(revitParam);
+                    }
+                } else {
+                    Element element = Document.GetElement(elementId);
+                    if(element is SharedParameterElement) {
+                        RevitParam revitParam = SharedParamsConfig.Instance.CreateRevitParam(Document, element.Name);
+                        if(revitParam.StorageType == StorageType.String) {
+                            listOfParameters.Add(revitParam);
+                        }
+                    } else {
+                        RevitParam revitParam = ProjectParamsConfig.Instance.CreateRevitParam(Document, element.Name);
+                        if(revitParam.StorageType == StorageType.String) {
+                            listOfParameters.Add(revitParam);
+                        }
+                    }
+                }
+            }
+        }
+        return listOfParameters;
+    }
+
+    // Метод создания нового чертежного вида
+    private ViewDrafting CreateViewDrafting(string nameView) {
+        var viewTypes = new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewFamilyType))
+            .Cast<ViewFamilyType>();
+        var viewFamilyType = viewTypes
+            .Where(vt => vt.ViewFamily == ViewFamily.Drafting)
+            .First();
+        string transactionName = _localizationService.GetLocalizedString("RevitRepository.TransactionNameCreate");
+        using(Transaction t = Document.StartTransaction(transactionName)) {
+            ViewDrafting view = ViewDrafting.Create(Document, viewFamilyType.Id);
+            view.Name = nameView;
+            t.Commit();
+            return view;
+        }
+    }
 }
+

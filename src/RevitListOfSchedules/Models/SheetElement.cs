@@ -28,7 +28,7 @@ namespace RevitListOfSchedules.Models {
         public string RevisionNumber => _revisionNumber;
 
         private string SetNumberParam() {
-            return Sheet.GetParamValueOrDefault<string>(_paramFactory.SharedParamNumber, null);
+            return Sheet.GetParamValueOrDefault<string>(_paramFactory.SharedParamNumber);
         }
 
         private string GetRevisionString() {

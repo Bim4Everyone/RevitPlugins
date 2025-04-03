@@ -7,7 +7,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
@@ -45,7 +44,7 @@ namespace RevitListOfSchedules.ViewModels {
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             ReloadLinksCommand = RelayCommand.Create(ReloadLinks, CanReloadLinks);
-            UpdateSelectedSheetsCommand = RelayCommand.Create<object>(UpdateSelectedSheets);
+            UpdateSelectedSheetsCommand = RelayCommand.Create<IList>(UpdateSelectedSheets);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         }
 
@@ -92,13 +91,14 @@ namespace RevitListOfSchedules.ViewModels {
         // Метод загрузки окна
         private void LoadView() {
 
-            Links = GetLinks();
+            Links = new ObservableCollection<LinkViewModel>(GetLinks());
             SelectedLinks = new ObservableCollection<LinkViewModel>();
 
-            GroupParameters = GetGroupParameters();
+            GroupParameters = new ObservableCollection<GroupParameterViewModel>(GetGroupParameters());
             SelectedGroupParameter = GroupParameters.First();
 
-            Sheets = GetSheets();
+            Sheets = new ObservableCollection<SheetViewModel>(GetSheets());
+
             SelectedSheets = new ObservableCollection<SheetViewModel>();
 
             // Подписка на события для обновления Sheets
@@ -111,27 +111,17 @@ namespace RevitListOfSchedules.ViewModels {
             LoadConfig();
         }
 
-        // Метод загрузки конфигурации пользователя
         private void LoadConfig() {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
             var selectedLinkIds = setting?.SelectedLinks ?? new List<ElementId>();
-            SelectedLinks.Clear();
-            ObservableCollection<LinkViewModel> links = new ObservableCollection<LinkViewModel>();
             foreach(var linkId in selectedLinkIds) {
                 var link = Links.FirstOrDefault(link => link.Id == linkId);
                 if(link != null) {
-                    links.Add(link);
                     link.IsChecked = true;
                 }
             }
             string selectedGroupParameterId = setting?.GroupParameter ?? string.Empty;
-            foreach(GroupParameterViewModel groupParameter in GroupParameters) {
-                var param = GroupParameters.FirstOrDefault(param => param.Id == selectedGroupParameterId);
-                if(param != null) {
-                    SelectedGroupParameter = param;
-                }
-            }
-            SelectedLinks = links;
+            SelectedGroupParameter = GroupParameters.FirstOrDefault(param => param.Id == selectedGroupParameterId);
         }
 
         // Метод подписанный на событие изменения выделенных связанных файлов
@@ -166,41 +156,27 @@ namespace RevitListOfSchedules.ViewModels {
         }
 
         // Загружаем с основного документа все линки через _revitRepository
-        private ObservableCollection<LinkViewModel> GetLinks() {
-            ObservableCollection<LinkViewModel> links = [];
-            foreach(LinkTypeElement linkTypeElement in _revitRepository.GetLinkTypeElements()) {
-                links.Add(new LinkViewModel(linkTypeElement));
-            }
-            return links;
+        private IEnumerable<LinkViewModel> GetLinks() {
+            return _revitRepository.GetLinkTypeElements()
+                .Select(item => new LinkViewModel(item));
         }
 
         // Добавляем листы из основного документа
-        private ObservableCollection<SheetViewModel> GetSheets() {
-            var mainDocumentSheets = new ObservableCollection<SheetViewModel>();
-
-            foreach(SheetElement sheet in _revitRepository.SheetElements) {
-                SheetViewModel sheetViewModel = new SheetViewModel(_localizationService, sheet) {
+        private IEnumerable<SheetViewModel> GetSheets() {
+            return _revitRepository.SheetElements
+                .Select(item => new SheetViewModel(_localizationService, item) {
                     GroupParameter = SelectedGroupParameter.Parameter
-                };
-                mainDocumentSheets.Add(sheetViewModel);
-            }
-            return mainDocumentSheets;
+                })
+                .OrderBy(item => item, new SheetViewModelComparer());
         }
 
-        // Добавляем листы из связанного документа
-        private ObservableCollection<SheetViewModel> GetLinkSheetViewModels(LinkViewModel linkViewModel) {
-            ObservableCollection<SheetViewModel> sheetViewModels = new ObservableCollection<SheetViewModel>();
-            Document linkDocument = _revitRepository.GetLinkDocument(linkViewModel);
-            var linkDocumentSheets = _revitRepository.GetSheetElements(linkDocument);
-
-            foreach(SheetElement sheet in linkDocumentSheets) {
-                SheetViewModel sheetViewModel = new SheetViewModel(_localizationService, sheet, linkViewModel) {
-                    GroupParameter = SelectedGroupParameter.Parameter,
-                };
-                sheetViewModels.Add(sheetViewModel);
-            }
-            SortSheets(sheetViewModels);
-            return sheetViewModels;
+        private IEnumerable<SheetViewModel> GetLinkSheetViewModels(LinkViewModel linkViewModel) {
+            Document linkDocument = _revitRepository.GetLinkDocument(linkViewModel.Id);
+            return _revitRepository.GetSheetElements(linkDocument)
+                .Select(item => new SheetViewModel(_localizationService, item, linkViewModel) {
+                    GroupParameter = SelectedGroupParameter.Parameter
+                })
+                .OrderBy(item => item, new SheetViewModelComparer());
         }
 
         // Добавляем листы связей в _sheets.
@@ -208,7 +184,7 @@ namespace RevitListOfSchedules.ViewModels {
             foreach(var sheet in GetLinkSheetViewModels(linkViewModel)) {
                 _sheets.Add(sheet);
             }
-            SortSheets(Sheets);
+            SortSheets(_sheets);
         }
 
         // Удаляем листы связей из _sheets
@@ -221,20 +197,17 @@ namespace RevitListOfSchedules.ViewModels {
         }
 
         // Добавляем GroupParameterViewModel в список GroupParameters
-        private ObservableCollection<GroupParameterViewModel> GetGroupParameters() {
-            ObservableCollection<GroupParameterViewModel> list = new ObservableCollection<GroupParameterViewModel>();
-            IList<RevitParam> listOfParameter = _revitRepository.GetGroupParameters();
-            if(listOfParameter.Count > 0) {
-                foreach(RevitParam parameter in listOfParameter) {
-                    list.Add(new GroupParameterViewModel(_localizationService, parameter));
-                }
-            }
-            if(list.Count == 0) {
-                list.Add(new GroupParameterViewModel(_localizationService));
-            }
-            return list;
-        }
+        private IEnumerable<GroupParameterViewModel> GetGroupParameters() {
+            var groupParams = _revitRepository.GetGroupParameters();
 
+            if(groupParams.Count == 0) {
+                yield return new GroupParameterViewModel(_localizationService);
+            }
+
+            foreach(var param in groupParams) {
+                yield return new GroupParameterViewModel(_localizationService, param);
+            }
+        }
 
         // Метод обновления листов в зависимости от параметра
         private void UpdateGroupParameter() {
@@ -246,11 +219,18 @@ namespace RevitListOfSchedules.ViewModels {
 
         // Метод сортировки листов
         private void SortSheets(ObservableCollection<SheetViewModel> sheetviewmodels) {
-            List<SheetViewModel> sortedList = [.. sheetviewmodels];
-            sortedList.Sort(new SheetViewModelComparer());
+            var sorted = sheetviewmodels.OrderBy(item => item, new SheetViewModelComparer()).ToList();
             sheetviewmodels.Clear();
-            foreach(var sheet in sortedList) {
-                sheetviewmodels.Add(sheet);
+            foreach(var item in sorted) {
+                sheetviewmodels.Add(item);
+            }
+        }
+
+        // Метод обновления списка SelectedSheets в зависимости от выбора юзера
+        private void UpdateSelectedSheets(IList selectedItems) {
+            SelectedSheets.Clear();
+            foreach(var item in selectedItems.OfType<SheetViewModel>()) {
+                SelectedSheets.Add(item);
             }
         }
 
@@ -259,8 +239,7 @@ namespace RevitListOfSchedules.ViewModels {
             using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
                 progressDialogService.MaxValue = _selectedLinks.Count;
                 progressDialogService.StepValue = progressDialogService.MaxValue / 10;
-                string progressTitleLinks = _localizationService.GetLocalizedString("MainViewModel.ProgressTitleLinks");
-                progressDialogService.DisplayTitleFormat = progressTitleLinks;
+                progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitleLinks");
                 var progress = progressDialogService.CreateProgress();
                 var ct = progressDialogService.CreateCancellationToken();
                 progressDialogService.Show();
@@ -272,53 +251,56 @@ namespace RevitListOfSchedules.ViewModels {
                     selectedLink.ReloadLinkType();
                 }
             }
-            Sheets = GetSheets();
+            SortSheets(_sheets);
             SelectedSheets.Clear();
         }
 
         private bool CanReloadLinks() {
             if(SelectedLinks != null) {
-                if(SelectedLinks.Count == 0) {
-                    return false;
+                if(SelectedLinks.Count != 0) {
+                    return true;
                 }
             }
-            return true;
-        }
-
-        // Метод обновления списка SelectedSheets в зависимости от выбора юзера
-        private void UpdateSelectedSheets(object selectedItems) {
-            if(selectedItems is IList items) {
-                SelectedSheets.Clear();
-                foreach(var item in items) {
-                    if(item is SheetViewModel sheet) {
-                        SelectedSheets.Add(sheet);
-                    }
-                }
-            }
+            return false;
         }
 
         // Основной метод
         private void AcceptView() {
             SaveConfig();
-            IEnumerable<IGrouping<string, SheetViewModel>> groupedSheets = SelectedSheets
-                .GroupBy(sheet => sheet.AlbumName);
+            using(var progressService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+                progressService.MaxValue = _selectedSheets.Count;
+                progressService.StepValue = progressService.MaxValue / 10;
+                progressService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitleSheets");
+                var progress = progressService.CreateProgress();
+                var ct = progressService.CreateCancellationToken();
+                progressService.Show();
 
-            foreach(IGrouping<string, SheetViewModel> groupSheets in groupedSheets) {
-                string groupKey = _revitRepository.LegalizeString(groupSheets.Key);
+                var groupedSheets = SelectedSheets.GroupBy(sheet => sheet.AlbumName);
+                int i = 0;
+                foreach(var group in groupedSheets) {
+                    string legalName = _revitRepository.LegalizeString(group.Key);
+                    var viewDraft = _revitRepository.GetViewDrafting(legalName);
+                    var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, legalName);
+                    _revitRepository.DeleteFamilyInstances(viewDraft);
 
-                TempFamilyDocument tempFamDoc = new TempFamilyDocument(
-                    _localizationService, _revitRepository, _familyLoadOptions, groupKey);
+                    string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
+                    using(var t = _revitRepository.Document.StartTransaction(transactionName)) {
+                        var instances = new List<FamilyInstance>();
+                        foreach(SheetViewModel sheet in group) {
+                            ct.ThrowIfCancellationRequested();
+                            progress.Report(i++);
+                            var doc = sheet.LinkViewModel == null
+                            ? _revitRepository.Document
+                            : _revitRepository.GetLinkDocument(sheet.LinkViewModel.Id);
+                            instances.AddRange(tempDoc.GetFamilyInstances(
+                                doc, sheet.ViewSheet, sheet.Number, sheet.RevisionNumber, viewDraft));
+                        }
+                        if(!instances.Any())
+                            instances.Add(tempDoc.CreateInstance(viewDraft, "", "", ""));
 
-                ViewDrafting viewDrafting = _revitRepository.GetViewDrafting(groupKey);
-
-                _revitRepository.DeleteFamilyInstance(viewDrafting);
-
-                List<FamilyInstance> familyInstanceList = CreateInstances(tempFamDoc, groupSheets, viewDrafting);
-
-                FamilySymbol familySymbol = tempFamDoc.FamilySymbol;
-                if(!_revitRepository.IsExistView(familySymbol.Name)) {
-                    ScheduleElement scheduleElement = new ScheduleElement(
-                        _localizationService, _revitRepository, familySymbol, familyInstanceList.First());
+                        t.Commit();
+                        _revitRepository.CreateSchedule(tempDoc, instances.First());
+                    }
                 }
             }
         }
@@ -332,57 +314,6 @@ namespace RevitListOfSchedules.ViewModels {
             }
             ErrorText = null;
             return true;
-        }
-
-        // Метод создания семейств
-        private List<FamilyInstance> CreateInstances(
-            TempFamilyDocument tempFamilyDocument,
-            IGrouping<string, SheetViewModel> groupSheets,
-            ViewDrafting viewDrafting) {
-
-            List<FamilyInstance> familyInstanceList = [];
-            using(var progressDialogService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
-                progressDialogService.MaxValue = groupSheets.ToList().Count;
-                progressDialogService.StepValue = progressDialogService.MaxValue / 10;
-                string progressTitleLinks = _localizationService.GetLocalizedString("MainViewModel.ProgressTitleSheets");
-                progressDialogService.DisplayTitleFormat = progressTitleLinks;
-                var progress = progressDialogService.CreateProgress();
-                var ct = progressDialogService.CreateCancellationToken();
-                progressDialogService.Show();
-
-                string transactionNamePlace = _localizationService.GetLocalizedString("MainViewModel.TransactionNamePlace");
-                using(Transaction t = _revitRepository.Document.StartTransaction(transactionNamePlace)) {
-                    int i = 0;
-                    foreach(var sheetViewModel in groupSheets) {
-                        ct.ThrowIfCancellationRequested();
-                        progress.Report(i++);
-                        familyInstanceList.AddRange(GetFamilyInstances(sheetViewModel, tempFamilyDocument, viewDrafting));
-                    }
-
-                    if(familyInstanceList.Count == 0) {
-                        FamilyInstance familyInstance = tempFamilyDocument.CreateInstance(viewDrafting, "", "", "");
-                        familyInstanceList.Add(familyInstance);
-                    }
-                    t.Commit();
-                }
-            }
-            return familyInstanceList;
-        }
-
-        // Метод размещения семейств
-        private List<FamilyInstance> GetFamilyInstances(
-            SheetViewModel sheetViewModel, TempFamilyDocument tempFamilyDocument, ViewDrafting viewDrafting) {
-            List<FamilyInstance> familyInstanceList = [];
-            Document document = sheetViewModel.LinkViewModel == null
-                ? _revitRepository.Document
-                : _revitRepository.GetLinkDocument(sheetViewModel.LinkViewModel);
-            var schedules = _revitRepository.GetScheduleInstances(document, sheetViewModel.ViewSheet);
-
-            if(schedules != null) {
-                var instances = tempFamilyDocument.PlaceFamilyInstances(viewDrafting, sheetViewModel, schedules);
-                familyInstanceList.AddRange(instances);
-            }
-            return familyInstanceList;
         }
 
         // Метод сохранения конфигурации пользователя

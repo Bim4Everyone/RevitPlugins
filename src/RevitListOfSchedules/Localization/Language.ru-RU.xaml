@@ -24,9 +24,9 @@
     <system:String 
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TemplateFamilyName">\Аннотации\Метрическая система, типовая аннотация.rft</system:String>
+        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\Аннотации\Метрическая система, типовая аннотация.rft</system:String>
     <system:String
-        x:Key="TempFamilyDocument.FamilyName">Ведомость_Спецификаций_{0}</system:String>
+        x:Key="TempFamilyDocument.FamilyName">{0}Ведомость_Спецификаций_{1}{2}</system:String>
     <system:String
         x:Key="TempFamilyDocument.TransactionName">Параметры, окружность</system:String>
     <system:String
@@ -40,7 +40,7 @@
     <system:String
         x:Key="MainViewModel.ErrorText">Выберите листы для создания ведомости спецификаций</system:String>
     <system:String
-        x:Key="MainViewModel.TransactionNamePlace">Размещение семейства аннотаций</system:String>
+        x:Key="MainViewModel.TransactionName">Размещение семейства аннотаций</system:String>
     <system:String
         x:Key="MainViewModel.ProgressTitleLinks">Обновление связанных файлов... [{0}]\[{1}]</system:String>
     <system:String
