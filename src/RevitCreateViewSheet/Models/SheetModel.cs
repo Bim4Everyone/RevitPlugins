@@ -271,16 +271,16 @@ namespace RevitCreateViewSheet.Models {
 
         private void Validate() {
             if(string.IsNullOrWhiteSpace(AlbumBlueprint)) {
-                throw new InvalidOperationException($"Сначала необходимо назначить {nameof(AlbumBlueprint)}");
+                throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(AlbumBlueprint)}");
             }
             if(string.IsNullOrWhiteSpace(SheetNumber)) {
-                throw new InvalidOperationException($"Сначала необходимо назначить {nameof(SheetNumber)}");
+                throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(SheetNumber)}");
             }
             if(string.IsNullOrWhiteSpace(Name)) {
-                throw new InvalidOperationException($"Сначала необходимо назначить {nameof(Name)}");
+                throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(Name)}");
             }
             if(TitleBlockSymbol is null) {
-                throw new InvalidOperationException($"Сначала необходимо назначить {nameof(TitleBlockSymbol)}");
+                throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(TitleBlockSymbol)}");
             }
         }
     }

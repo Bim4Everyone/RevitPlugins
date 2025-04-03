@@ -57,7 +57,7 @@ namespace RevitCreateViewSheet.Models {
                 repository.DeleteElement(_annotationSymbol.Id);
             } else if(State == EntityState.Added && _annotationType is not null) {
                 if(Location is null) {
-                    throw new InvalidOperationException($"Сначала необходимо назначить {nameof(Location)}");
+                    throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(Location)}");
                 }
                 repository.CreateAnnotation(Sheet.GetViewSheet(), _annotationType, Location);
                 State = EntityState.Unchanged;

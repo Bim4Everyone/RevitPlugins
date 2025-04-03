@@ -71,17 +71,17 @@ namespace RevitCreateViewSheet.Models {
 
             } else if(State == EntityState.Modified && _viewport is not null) {
                 if(ViewPortType is null) {
-                    throw new InvalidOperationException($"Сначала необходимо назначить {nameof(ViewPortType)}");
+                    throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(ViewPortType)}");
                 }
                 repository.UpdateViewPort(_viewport, ViewPortType.Id);
                 State = EntityState.Unchanged;
 
             } else if(State == EntityState.Added && _view is not null) {
                 if(Location is null) {
-                    throw new InvalidOperationException($"Сначала необходимо назначить {nameof(Location)}");
+                    throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(Location)}");
                 }
                 if(ViewPortType is null) {
-                    throw new InvalidOperationException($"Сначала необходимо назначить {nameof(ViewPortType)}");
+                    throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(ViewPortType)}");
                 }
                 repository.CreateViewPort(Sheet.GetViewSheet().Id, _view.Id, ViewPortType.Id, Location);
                 State = EntityState.Unchanged;
