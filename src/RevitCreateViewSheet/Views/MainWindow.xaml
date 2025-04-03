@@ -242,7 +242,6 @@
                                             IsTextSearchCaseSensitive="False"
                                             Height="40"
                                             MinHeight="40"
-                                            IsEditable="True"
                                             DisplayMemberPath="Name"
                                             ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                             SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
@@ -348,7 +347,6 @@
                                                             IsTextSearchCaseSensitive="False"
                                                             Height="40"
                                                             MinHeight="40"
-                                                            IsEditable="True"
                                                             DisplayMemberPath="Name"
                                                             ItemsSource="{Binding Path=DataContext.AllViewPortTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                                             SelectedItem="{Binding ViewPortType, UpdateSourceTrigger=PropertyChanged}" />
