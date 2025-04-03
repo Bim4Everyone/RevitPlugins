@@ -50,7 +50,7 @@
                         Margin="{DynamicResource CardControlIconMargin}"
                         VerticalAlignment="Center"
                         Focusable="False"
-                        Source="{Binding ImageSource, ElementName=_this}" />
+                        Source="{Binding Icon, ElementName=_this}" />
 
                     <ui:TextBlock
                         Grid.Row="0"
@@ -58,14 +58,14 @@
                         FontSize="16"
                         FontTypography="Body"
                         TextDecorations="Underline"
-                        Text="{Binding EditValue, ElementName=_this}" />
+                        Text="{Binding Header, ElementName=_this}" />
 
                     <ui:TextBlock
                         Grid.Row="1"
                         Grid.Column="1"
                         FontSize="12"
                         Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                        Text="{Binding EditValue, ElementName=_this}" />
+                        Text="{Binding Description, ElementName=_this}" />
 
                 </Grid>
             </Hyperlink>
