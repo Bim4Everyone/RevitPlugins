@@ -29,7 +29,7 @@
     <system:String x:Key="GeneralSettings.HostThemeDescription">Устанавливает тему оформления интерфейса</system:String>
     
     <system:String x:Key="GeneralSettings.HostLanguage">Используемый язык</system:String>
-    <system:String x:Key="GeneralSettings.Description">Устанавливает язык, используемый в программе</system:String>
+    <system:String x:Key="GeneralSettings.HostLanguageDescription">Устанавливает язык, используемый в программе</system:String>
     
     <system:String x:Key="GeneralSettings.Notification">Уведомления</system:String>
     <system:String x:Key="GeneralSettings.NotificationDescription">Настройки уведомлений для пользователя</system:String>
@@ -56,25 +56,25 @@
     <system:String x:Key="TelemetrySettings.LogTraceIsActiveDescription">Включает или выключает трассировку</system:String>
     
     <system:String x:Key="TelemetrySettings.LogTraceLogLevel">Уровень трассировки</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceLogLevelDescription">Устанавливает уровень детализации для трассировки</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceLogLevelDescription">Устанавливает уровень детализации для логов</system:String>
     
     <system:String x:Key="TelemetrySettings.LogTraceServerName">URL сервера</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceServerNameDescription">Устанавливает имя сервера для отправки логов трассировки</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceServerNameDescription">Устанавливает имя сервера для отправки логов</system:String>
     
     <system:String x:Key="TelemetrySettings.LogTraceJournal">Журнал Revit</system:String>
     <system:String x:Key="TelemetrySettings.LogTraceJournalDescription">Настройки журнала Revit для записи действий и событий</system:String>
     
     <system:String x:Key="TelemetrySettings.LogTraceJournalIsActive">Включить</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalIsActiveDescription">Включает или выключает активность записи логов в журнал Revit</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalIsActiveDescription">Устанавливает активность записи логов в журнал Revit</system:String>
     
     <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtc">Использовать часовой пояс UTC</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtc Description">Включает или выключает использование часового пояса UTC</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalUseUtcDescription">Устанавливает использование часового пояса UTC</system:String>
     
     <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevel">Уровень журналирования</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevelDescription">Устанавливает уровень детализации логов для журнала Revit</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalLogLevelDescription">Устанавливает уровень детализации логов</system:String>
     
     <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplate">Шаблон событий журналирования</system:String>
-    <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplateDescription">Устанавливает шаблон вывода для записи логов в журнал Revit</system:String>
+    <system:String x:Key="TelemetrySettings.LogTraceJournalOutputTemplateDescription">Устанавливает шаблон вывода для записи</system:String>
     
     <system:String x:Key="AboutSettings.Title">О программе</system:String>
     <system:String x:Key="AboutSettings.PlatformDescription">{0} - это платформа созданная для упрощения разработки проектной документации в Autodesk Revit.</system:String>
