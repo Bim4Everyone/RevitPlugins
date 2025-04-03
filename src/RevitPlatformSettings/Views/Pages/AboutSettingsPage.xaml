@@ -1,0 +1,101 @@
+<core:WpfUIPlatformPage
+    x:Class="RevitPlatformSettings.Views.Pages.AboutSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:edits="clr-namespace:RevitPlatformSettings.Views.Edits"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+
+    mc:Ignorable="d"
+    x:ClassModifier="internal"
+    ScrollViewer.CanContentScroll="False"
+
+    x:Name="_this"
+    d:DesignHeight="300" d:DesignWidth="300"
+    d:DataContext="{d:DesignInstance settings:AboutSettingsViewModel, IsDesignTimeCreatable=False}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Image
+            Grid.Row="0"
+            Grid.Column="0"
+            Height="150"
+            Margin="10"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Source="{Binding Path=ImagePath}" />
+
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="1"
+            Orientation="Vertical"
+            VerticalAlignment="Center">
+
+            <ui:TextBlock
+                FontSize="36"
+                FontTypography="Body"
+                Text="{Binding Path=PlatformName}" />
+
+            <ui:TextBlock
+                TextWrapping="Wrap"
+                FontSize="20"
+                Text="{Binding PlatformDescription}"
+                Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
+
+        <ScrollViewer
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">
+            
+            <StackPanel
+                Orientation="Vertical">
+
+                <edits:HyperLinkEditWithImage
+                    Header="{me:LocalizationSource AboutSettings.PlatformLinkText}"
+                    Description="{me:LocalizationSource AboutSettings.PlatformLinkTextDescription}"
+                    NavigationUrl="{Binding PlatformPageUrl}"
+                    Icon="{Binding ImagePath}" />
+
+                <edits:HyperLinkEditWithImage
+                    Header="{me:LocalizationSource AboutSettings.PlatformNewsChannel}"
+                    Description="{me:LocalizationSource AboutSettings.PlatformNewsChannelDescription}"
+                    NavigationUrl="{Binding NewsChatUrl}"
+                    Icon="{me:QualifiedImage assets/images/icons8-news-96.png}" />
+
+                <edits:HyperLinkEditWithImage
+                    Header="{me:LocalizationSource AboutSettings.PlatformMainChat}"
+                    Description="{me:LocalizationSource AboutSettings.PlatformMainChatDescription}"
+                    NavigationUrl="{Binding MainChatUrl}"
+                    Icon="{me:QualifiedImage assets/images/icons8-message-96.png}" />
+
+                <edits:HyperLinkEditWithImage
+                    Header="{me:LocalizationSource AboutSettings.PlatformDownload}"
+                    Description="{me:LocalizationSource AboutSettings.PlatformDownloadDescription}"
+                    NavigationUrl="{Binding DownloadLinkUrl}"
+                    Icon="{me:QualifiedImage assets/images/icons8-download-96.png}" />
+
+                <edits:HyperLinkEditWithImage
+                    Header="{me:LocalizationSource AboutSettings.OpenSource}"
+                    Description="{me:LocalizationSource AboutSettings.OpenSourceDescription}"
+                    Icon="{me:QualifiedImage assets/images/icons8-github-96.png}"
+                    Command="{Binding ShowOpenSourceDialogCommand}" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</core:WpfUIPlatformPage>
