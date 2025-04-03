@@ -201,7 +201,7 @@ namespace RevitCreateViewSheet.Models {
             var stampParam = SharedParamsConfig.Instance.StampSheetNumber;
             var projectParameters = ProjectParameters.Create(application);
             if(!document.IsExistsParam(albumParam)) {
-                projectParameters.SetupRevitParams(document, stampParam);
+                projectParameters.SetupRevitParams(document, albumParam);
             }
             if(!document.IsExistsParam(stampParam)) {
                 projectParameters.SetupRevitParam(document, stampParam);
