@@ -268,7 +268,7 @@
                                             Appearance="Danger"
                                             Command="{Binding Path=DataContext.RemoveSheetCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                             CommandParameter="{Binding}"
-                                            Content="{ui:SymbolIcon Delete16}" />
+                                            Content="{ui:SymbolIcon Delete24}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -319,7 +319,7 @@
                                         Width="Auto"
                                         HorizontalAlignment="Left"
                                         DockPanel.Dock="Bottom"
-                                        Content="{ui:SymbolIcon Add16}"
+                                        Content="{ui:SymbolIcon Add24}"
                                         Command="{Binding AddViewPortCommand}" />
                                     <ui:DataGrid
                                         SelectionMode="Single"
@@ -367,6 +367,17 @@
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
+                                            <DataGridTemplateColumn>
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <ui:Button
+                                                            Appearance="Danger"
+                                                            Command="{Binding Path=DataContext.SelectedSheet.RemoveViewCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Content="{ui:SymbolIcon Delete24}" />
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
                                         </ui:DataGrid.Columns>
                                     </ui:DataGrid>
                                 </DockPanel>
@@ -388,7 +399,7 @@
                                         Width="Auto"
                                         HorizontalAlignment="Left"
                                         DockPanel.Dock="Bottom"
-                                        Content="{ui:SymbolIcon Add16}"
+                                        Content="{ui:SymbolIcon Add24}"
                                         Command="{Binding AddScheduleCommand}" />
                                     <ui:DataGrid
                                         DockPanel.Dock="Top"
@@ -419,6 +430,17 @@
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
+                                            <DataGridTemplateColumn>
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <ui:Button
+                                                            Appearance="Danger"
+                                                            Command="{Binding Path=DataContext.SelectedSheet.RemoveScheduleCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Content="{ui:SymbolIcon Delete24}" />
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
                                         </ui:DataGrid.Columns>
                                     </ui:DataGrid>
                                 </DockPanel>
@@ -440,7 +462,7 @@
                                         Width="Auto"
                                         HorizontalAlignment="Left"
                                         DockPanel.Dock="Bottom"
-                                        Content="{ui:SymbolIcon Add16}"
+                                        Content="{ui:SymbolIcon Add24}"
                                         Command="{Binding AddAnnotationCommand}" />
                                     <ui:DataGrid
                                         DockPanel.Dock="Top"
@@ -473,6 +495,17 @@
                                                             HorizontalAlignment="Center"
                                                             Text="{Binding IsPlaced, Converter={StaticResource BoolToLocalizedStringConverter}}">
                                                         </ui:TextBlock>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                            <DataGridTemplateColumn>
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <ui:Button
+                                                            Appearance="Danger"
+                                                            Command="{Binding Path=DataContext.SelectedSheet.RemoveAnnotationCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Content="{ui:SymbolIcon Delete24}" />
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
