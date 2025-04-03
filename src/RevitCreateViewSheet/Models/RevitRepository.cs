@@ -197,10 +197,15 @@ namespace RevitCreateViewSheet.Models {
         }
 
         private void InitializeParameters(Application application, Document document) {
+            var albumParam = SharedParamsConfig.Instance.AlbumBlueprints;
+            var stampParam = SharedParamsConfig.Instance.StampSheetNumber;
             var projectParameters = ProjectParameters.Create(application);
-            projectParameters.SetupRevitParams(document,
-                SharedParamsConfig.Instance.AlbumBlueprints,
-                SharedParamsConfig.Instance.StampSheetNumber);
+            if(!document.IsExistsParam(albumParam)) {
+                projectParameters.SetupRevitParams(document, stampParam);
+            }
+            if(!document.IsExistsParam(stampParam)) {
+                projectParameters.SetupRevitParam(document, stampParam);
+            }
         }
 
         private ICollection<ViewSheet> GetViewSheets() {
