@@ -15,7 +15,7 @@
         HorizontalAlignment="Stretch"
         SnapsToDevicePixels="True"
         OverridesDefaultStyle="True"
-        Margin="14,0"
+        Margin="14,0 14 14"
         Padding="{DynamicResource CardControlPadding}"
         Background="{DynamicResource CardBackground}"
         BorderBrush="{DynamicResource CardBorderBrush}"

@@ -18,52 +18,52 @@
     d:DesignHeight="300" d:DesignWidth="300"
     d:DataContext="{d:DesignInstance settings:AboutSettingsViewModel, IsDesignTimeCreatable=False}">
 
-    <ScrollViewer
-        VerticalScrollBarVisibility="Auto"
-        HorizontalScrollBarVisibility="Disabled">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <Image
+            Grid.Row="0"
+            Grid.Column="0"
+            Height="150"
+            Margin="10"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Source="{Binding Path=ImagePath}" />
 
-            <Image
-                Grid.Row="0"
-                Grid.Column="0"
-                Height="150"
-                Margin="10"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                Source="{Binding Path=ImagePath}" />
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="1"
+            Orientation="Vertical"
+            VerticalAlignment="Center">
 
+            <ui:TextBlock
+                FontSize="36"
+                FontTypography="Body"
+                Text="{Binding Path=PlatformName}" />
+
+            <ui:TextBlock
+                TextWrapping="Wrap"
+                FontSize="20"
+                Text="{Binding PlatformDescription}"
+                Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
+
+        <ScrollViewer
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">
+            
             <StackPanel
-                Grid.Row="0"
-                Grid.Column="1"
-                Orientation="Vertical"
-                VerticalAlignment="Center">
-
-                <ui:TextBlock
-                    FontSize="36"
-                    FontTypography="Body"
-                    Text="{Binding Path=PlatformName}" />
-
-                <ui:TextBlock
-                    TextWrapping="Wrap"
-                    FontSize="20"
-                    Text="{Binding PlatformDescription}"
-                    Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
-
-            <StackPanel
-                Grid.Row="1"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
                 Orientation="Vertical">
 
                 <edits:HyperLinkEditWithImage
@@ -96,6 +96,6 @@
                     Icon="{me:QualifiedImage assets/images/icons8-github-96.png}"
                     Command="{Binding ShowOpenSourceDialogCommand}" />
             </StackPanel>
-        </Grid>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </core:WpfUIPlatformPage>
