@@ -10,8 +10,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
     mc:Ignorable="d"
-    Height="450"
-    Width="800"
+    Height="300"
+    Width="500"
+    MinHeight="300"
+    MinWidth="500"
+    MaxHeight="300"
+    MaxWidth="500"
+    ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:ViewPortModelCreatorViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
@@ -37,7 +42,7 @@
             </ui:TextBlock>
             <ComboBox
                 MinWidth="200"
-                Width="200"
+                Width="300"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"
@@ -48,9 +53,14 @@
                 ToolTip="{me:LocalizationSource TODO}"
                 ItemsSource="{Binding Views}"
                 SelectedItem="{Binding SelectedView}" />
+            <ui:TextBlock
+                Margin="10"
+                TextAlignment="Center"
+                Text="{me:LocalizationSource TODO}">
+            </ui:TextBlock>
             <ComboBox
                 MinWidth="200"
-                Width="200"
+                Width="300"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"

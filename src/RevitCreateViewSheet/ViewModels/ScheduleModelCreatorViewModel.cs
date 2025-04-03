@@ -33,8 +33,18 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAcceptView() {
-            // TODO добавить ErrorText
-            return SelectedViewSchedule is not null;
+            if(ViewSchedules.Count == 0) {
+                ErrorText = "Все спецификации уже размещены на листах TODO";
+                return false;
+            }
+
+            if(SelectedViewSchedule is null) {
+                ErrorText = "Выберите спецификацию TODO";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
         }
     }
 }

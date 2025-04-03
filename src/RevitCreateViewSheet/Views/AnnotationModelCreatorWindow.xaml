@@ -11,8 +11,13 @@
     xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    Height="450"
-    Width="800"
+    Height="300"
+    Width="500"
+    MinHeight="300"
+    MinWidth="500"
+    MaxHeight="300"
+    MaxWidth="500"
+    ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:AnnotationModelCreatorViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
@@ -38,7 +43,7 @@
             </ui:TextBlock>
             <ComboBox
                 MinWidth="200"
-                Width="200"
+                Width="300"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"

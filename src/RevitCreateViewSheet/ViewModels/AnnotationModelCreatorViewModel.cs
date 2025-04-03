@@ -32,10 +32,19 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
 
-
         private bool CanAcceptView() {
-            // TODO добавить ErrorText
-            return SelectedAnnotationSymbolType is not null;
+            if(AnnotationSymbolTypes.Count == 0) {
+                ErrorText = "В проекте отсутствуют семейства аннотаций TODO";
+                return false;
+            }
+
+            if(SelectedAnnotationSymbolType is null) {
+                ErrorText = "Выберите типоразмер аннотации TODO";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
         }
     }
 }

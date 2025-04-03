@@ -40,9 +40,28 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAcceptView() {
-            // TODO добавить ErrorText
-            return SelectedView is not null
-                && SelectedViewPortType is not null;
+            if(Views.Count == 0) {
+                ErrorText = "Все виды уже добавлены на листы TODO";
+                return false;
+            }
+
+            if(ViewPortTypes.Count == 0) {
+                ErrorText = "В проекте отсутствуют типоразмеры видовых экранов TODO";
+                return false;
+            }
+
+            if(SelectedView is null) {
+                ErrorText = "Выберите вид TODO";
+                return false;
+            }
+
+            if(SelectedViewPortType is null) {
+                ErrorText = "Выберите тип видового экрана TODO";
+                return false;
+            }
+
+            ErrorText = null;
+            return true;
         }
     }
 }
