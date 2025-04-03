@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -172,9 +174,13 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAddSheets() {
-            // TODO добавить валидацию через NamingUtild.IsValidName
             if(string.IsNullOrWhiteSpace(AddSheetsAlbumBlueprint)) {
                 AddSheetsErrorText = "Выберите альбом.";
+                return false;
+            }
+
+            if(!NamingUtils.IsValidName(AddSheetsAlbumBlueprint)) {
+                AddSheetsErrorText = $"Некорректное название альбома '{AddSheetsAlbumBlueprint}'";
                 return false;
             }
 
@@ -232,9 +238,13 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAcceptView() {
-            // TODO добавить валидацию через NamingUtild.IsValidName
             if(AllSheets.Any(item => string.IsNullOrWhiteSpace(item.AlbumBlueprint))) {
                 ErrorText = "У всех листов должно быть заполнен альбом.";
+                return false;
+            }
+
+            if(AllSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.AlbumBlueprint)) is SheetViewModel sheet) {
+                ErrorText = $"У листа '{sheet.Name}' недопустимый альбом.";
                 return false;
             }
 
@@ -243,8 +253,18 @@ namespace RevitCreateViewSheet.ViewModels {
                 return false;
             }
 
+            if(AllSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetNumber)) is SheetViewModel sheet1) {
+                ErrorText = $"У листа '{sheet1.Name}' недопустимый номер.";
+                return false;
+            }
+
             if(AllSheets.Any(item => string.IsNullOrWhiteSpace(item.Name))) {
                 ErrorText = "У всех листов должно быть заполнено наименование.";
+                return false;
+            }
+
+            if(AllSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.Name)) is SheetViewModel sheet2) {
+                ErrorText = $"У листа '{sheet2.Name}' недопустимое название.";
                 return false;
             }
 
