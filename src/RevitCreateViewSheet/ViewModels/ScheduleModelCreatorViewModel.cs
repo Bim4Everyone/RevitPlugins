@@ -19,6 +19,7 @@ namespace RevitCreateViewSheet.ViewModels {
             ViewSchedules = [.. _revitRepository.GetNotPlacedSchedules()
                 .Select(s => new ViewScheduleViewModel(s))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
+            SelectedViewSchedule = ViewSchedules.FirstOrDefault();
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);
         }
 

@@ -118,7 +118,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
 
         private void RemoveView(ViewPortViewModel view) {
-            RemoveEntity(view, AllViewPorts, VisibleViewPorts.View);
+            _sheetModel.RemoveViewPort(view.ViewPortModel);
+            RemoveEntityViewModel(view, AllViewPorts, VisibleViewPorts.View);
         }
 
         private bool CanRemoveView(ViewPortViewModel view) {
@@ -126,7 +127,8 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void RemoveSchedule(ScheduleViewModel scheduleView) {
-            RemoveEntity(scheduleView, AllSchedules, VisibleSchedules.View);
+            _sheetModel.RemoveSchedule(scheduleView.ScheduleModel);
+            RemoveEntityViewModel(scheduleView, AllSchedules, VisibleSchedules.View);
         }
 
         private bool CanRemoveSchedule(ScheduleViewModel scheduleView) {
@@ -134,7 +136,8 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void RemoveAnnotation(AnnotationViewModel annotationView) {
-            RemoveEntity(annotationView, AllAnnotations, VisibleAnnotations.View);
+            _sheetModel.RemoveAnnotation(annotationView.AnnotationModel);
+            RemoveEntityViewModel(annotationView, AllAnnotations, VisibleAnnotations.View);
         }
 
         private bool CanRemoveAnnotation(AnnotationViewModel annotationView) {
@@ -150,14 +153,12 @@ namespace RevitCreateViewSheet.ViewModels {
             }
         }
 
-        private void RemoveEntity<T>(
+        private void RemoveEntityViewModel<T>(
             T entityViewModel,
             ObservableCollection<T> allEntities,
             ICollectionView viewToRefresh) where T : IEntityViewModel {
 
-            if(entityViewModel.IsPlaced) {
-                entityViewModel.Entity.MarkAsDeleted();
-            } else {
+            if(!entityViewModel.IsPlaced) {
                 allEntities.Remove(entityViewModel);
             }
             viewToRefresh.Refresh();

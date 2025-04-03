@@ -23,6 +23,8 @@ namespace RevitCreateViewSheet.ViewModels {
             ViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
+            SelectedView = Views.FirstOrDefault();
+            SelectedViewPortType = ViewPortTypes.FirstOrDefault();
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);
         }
 

@@ -18,6 +18,7 @@ namespace RevitCreateViewSheet.ViewModels {
             AnnotationSymbolTypes = [.. _revitRepository.GetAllAnnotationSymbols()
                 .Select(a => new AnnotationSymbolTypeViewModel(a))
                 .OrderBy(a => a.RichName, new LogicalStringComparer())];
+            SelectedAnnotationSymbolType = AnnotationSymbolTypes.FirstOrDefault();
             AcceptView = RelayCommand.Create(() => { }, CanAcceptView);
         }
 
