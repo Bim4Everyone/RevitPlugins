@@ -16,7 +16,7 @@ public partial class MainWindow {
      ISerializationService serializationService,
      ILanguageService languageService, ILocalizationService localizationService,
      IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
-     : base(loggerService,
+    : base(loggerService,
          serializationService,
          languageService, localizationService,
          uiThemeService, themeUpdaterService) {
@@ -30,7 +30,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string PluginName => nameof(RevitCorrectNamingCheck);
-    
+
     /// <summary>
     /// Наименование файла конфигурации.
     /// </summary>

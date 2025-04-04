@@ -1,8 +1,6 @@
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -11,10 +9,8 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -36,7 +32,7 @@ public class RevitCorrectNamingCheckCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitCorrectNamingCheckCommand() {
-        PluginName = "RevitCorrectNamingCheck";
+        PluginName = "Проверка РН связей";
     }
 
     /// <summary>
@@ -60,9 +56,6 @@ public class RevitCorrectNamingCheckCommand : BasePluginCommand {
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.Bind<IBimModelPartsService>()
-                   .ToMethod(c => GetPlatformService<IBimModelPartsService>());
-
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
@@ -76,17 +69,15 @@ public class RevitCorrectNamingCheckCommand : BasePluginCommand {
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
         kernel.UseWpfLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+            $"/{assemblyName};component//Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         var revitRepository = kernel.Get<RevitRepository>();
         var localizationService = kernel.Get<ILocalizationService>();
         ValidateLinkedFiles(revitRepository, localizationService);
 
-        // Создаем окно через контейнер
         var window = kernel.Get<MainWindow>();
-        // Инициализируем и показываем как немодальное
-        InitializeNonModalWindow(window, kernel);
+        window.Show();
     }
 
     private void ValidateLinkedFiles(RevitRepository revitRepository, ILocalizationService localizationService) {
@@ -99,19 +90,5 @@ public class RevitCorrectNamingCheckCommand : BasePluginCommand {
             TaskDialog.Show(title, message);
             throw new OperationCanceledException();
         }
-    }
-
-    private void InitializeNonModalWindow(Window window, IKernel kernel) {
-        window.Show();
-        window.Hide();
-
-        window.Closed += (s, e) => {
-            if(window == Application.Current.Windows.OfType<Window>().LastOrDefault()) {
-                kernel?.Dispose();
-                kernel = null;
-            }
-        };
-
-        window.Show();
     }
 }

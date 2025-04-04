@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -59,12 +57,10 @@ internal class RevitRepository {
 
     public List<LinkedFile> GetLinkedFiles() {
         var result = new List<LinkedFile>();
+        var linkedFileEnricher = new LinkedFileEnricher(_bimModelPartsService);
 
         var linkTypes = GetRevitLinkTypes();
         var linkInstances = GetRevitLinkInstances();
-        var bimModelParts = _bimModelPartsService.GetBimModelParts().ToList();
-
-        var linkedFilebuilder = new LinkedFileBuilder();
 
         foreach(var linkType in linkTypes) {
             var instances = linkInstances.Where(x => x.GetTypeId() == linkType.Id);
@@ -72,8 +68,9 @@ internal class RevitRepository {
             foreach(var instance in instances) {
                 var typeWorkset = new WorksetInfo(linkType.WorksetId, GetWorksetName(linkType));
                 var instanceWorkset = new WorksetInfo(instance.WorksetId, GetWorksetName(instance));
+                var linkedFile = new LinkedFile(linkType.Id, linkType.Name, typeWorkset, instanceWorkset);
 
-                var linkedFile = linkedFilebuilder.Build(linkType.Id, linkType.Name, typeWorkset, instanceWorkset, bimModelParts);
+                linkedFileEnricher.Enrich(linkedFile);
                 result.Add(linkedFile);
             }
         }
