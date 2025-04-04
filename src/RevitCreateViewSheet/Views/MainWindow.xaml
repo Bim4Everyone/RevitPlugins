@@ -10,6 +10,7 @@
     xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="550"
@@ -19,6 +20,10 @@
     d:Width="1500"
     d:Height="600"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <res:SheetViewModelComparer
+            x:Key="SheetViewModelComparer" />
+    </Window.Resources>
     <b:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding ProgressDialogFactory}">
@@ -198,10 +203,12 @@
                         VerticalScrollBarVisibility="Auto"
                         HorizontalScrollBarVisibility="Auto"
                         CanUserResizeColumns="True"
+                        res:CustomSortBehavior.AllowCustomSort="True"
                         ItemsSource="{Binding VisibleSheets.View}"
                         SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
                         <ui:DataGrid.Columns>
                             <DataGridTemplateColumn
+                                SortMemberPath="AlbumBlueprint"
                                 Header="Альбом"
                                 Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -212,7 +219,9 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn
+                                SortMemberPath="SheetNumber"
                                 Header="Номер листа"
+                                res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}"
                                 Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -222,6 +231,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn
+                                SortMemberPath="Name"
                                 Header="Имя листа"
                                 Width="250">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -232,6 +242,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn
+                                SortMemberPath="TitleBlock.Name"
                                 Header="Основная надпись"
                                 Width="350">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -249,6 +260,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn
+                                SortMemberPath="IsPlaced"
                                 Width="Auto"
                                 Header="Статус">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -338,6 +350,7 @@
                                                 Binding="{Binding ViewName}" />
                                             <DataGridTemplateColumn
                                                 Header="Тип видового экрана"
+                                                SortMemberPath="ViewPortType.Name"
                                                 Width="200">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
@@ -354,6 +367,7 @@
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
                                             <DataGridTemplateColumn
+                                                SortMemberPath="IsPlaced"
                                                 Width="Auto"
                                                 Header="Статус">
                                                 <DataGridTemplateColumn.CellTemplate>
@@ -418,6 +432,7 @@
                                                 Binding="{Binding Name}" />
                                             <DataGridTemplateColumn
                                                 Width="Auto"
+                                                SortMemberPath="IsPlaced"
                                                 Header="Статус">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
@@ -486,6 +501,7 @@
                                                 Binding="{Binding SymbolName}" />
                                             <DataGridTemplateColumn
                                                 Width="Auto"
+                                                SortMemberPath="IsPlaced"
                                                 Header="Статус">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
