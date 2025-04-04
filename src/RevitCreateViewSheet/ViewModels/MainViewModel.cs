@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -213,6 +214,10 @@ namespace RevitCreateViewSheet.ViewModels {
                 sheet.SheetModel.MarkAsDeleted();
             } else {
                 AllSheets.Remove(sheet);
+            }
+            var editableView = VisibleSheets.View as IEditableCollectionView;
+            if(editableView?.IsEditingItem ?? false) {
+                editableView.CommitEdit();
             }
             VisibleSheets.View.Refresh();
         }
