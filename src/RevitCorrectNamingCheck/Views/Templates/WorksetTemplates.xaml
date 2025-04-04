@@ -1,0 +1,51 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:RevitCorrectNamingCheck.Views.Selectors">
+
+    <DataTemplate x:Key="CorrectTemplate">
+        <TextBlock 
+            Text="{Binding Name}"
+            MinWidth="150"
+            ToolTip="{DynamicResource WorksetNameStatus.WorksetCorrect}"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="PartialCorrectTemplate">
+        <TextBlock
+        Text="{Binding Name}"
+        MinWidth="150"
+        Background="Khaki"
+        ToolTip="{DynamicResource WorksetNameStatus.PartialCorrect}"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="IncorrectTemplate">
+        <TextBlock 
+            Text="{Binding Name}"
+            MinWidth="150"
+            Background="LightCoral"
+            ToolTip="{DynamicResource WorksetNameStatus.Incorrect}"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="NoMatchTemplate">
+        <TextBlock 
+            Text="{Binding Name}"
+            MinWidth="150"
+            Background="LightCoral"
+            ToolTip="{DynamicResource WorksetNameStatus.NoMatch}"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="DisabledTemplate">
+        <TextBlock 
+        Text="{Binding Name}" 
+        Background="LightGray"
+        Foreground="Gray"
+        MinWidth="150"
+        FontStyle="Italic" />
+    </DataTemplate>
+
+    <local:WorksetTemplateSelector x:Key="WorksetSelector"
+                               CorrectTemplate="{StaticResource CorrectTemplate}"
+                               PartialCorrectTemplate ="{StaticResource PartialCorrectTemplate}"
+                               IncorrectTemplate="{StaticResource IncorrectTemplate}"
+                               NoMatchTemplate ="{StaticResource NoMatchTemplate}"
+                               DisabledTemplate="{StaticResource DisabledTemplate}"/>
+</ResourceDictionary>
