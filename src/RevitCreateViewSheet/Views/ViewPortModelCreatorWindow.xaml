@@ -51,7 +51,7 @@
                 DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
                 ToolTip="{me:LocalizationSource TODO}"
-                ItemsSource="{Binding EnabledViews}"
+                ItemsSource="{Binding ViewsForSelection}"
                 SelectedItem="{Binding SelectedView}" />
             <ui:TextBlock
                 Margin="10"

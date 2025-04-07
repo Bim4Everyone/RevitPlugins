@@ -66,7 +66,7 @@ namespace RevitCreateViewSheet.Services {
                 var selectedView = creatorView.SelectedView;
                 var selectedViewPortType = creatorView.SelectedViewPortType;
 
-                creatorView.SelectedView = creatorView.EnabledViews.FirstOrDefault();
+                creatorView.SelectedView = creatorView.ViewsForSelection.FirstOrDefault();
                 return new ViewPortModel(sheetModel, selectedView.View, selectedViewPortType.ViewType);
             }
             throw new OperationCanceledException();
