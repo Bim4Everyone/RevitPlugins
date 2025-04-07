@@ -238,7 +238,9 @@
                         VerticalScrollBarVisibility="Auto"
                         HorizontalScrollBarVisibility="Auto"
                         CanUserResizeColumns="True"
+                        res:DataGridSyncEditToSelectedItemProperty.SyncEditToSelectedItem="True"
                         res:CustomSortBehavior.AllowCustomSort="True"
+                        res:DataGridSelectedItemsProperty.SelectedItems="{Binding SelectedSheets}"
                         ItemsSource="{Binding VisibleSheets.View}"
                         SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
                         <ui:DataGrid.Columns>

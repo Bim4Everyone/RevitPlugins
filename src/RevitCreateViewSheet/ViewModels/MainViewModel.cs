@@ -39,6 +39,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private string _sheetsFilter;
         private SheetViewModel _selectedSheet;
         private CollectionViewSource _visibleSheets;
+        private ObservableCollection<SheetViewModel> _selectedSheets;
 
         public MainViewModel(
             RevitRepository revitRepository,
@@ -69,6 +70,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
             _sheetItemsFactory = sheetItemsFactory
                 ?? throw new System.ArgumentNullException(nameof(sheetItemsFactory));
+            _selectedSheets = [];
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             RemoveSheetCommand = RelayCommand.Create<SheetViewModel>(RemoveSheet, CanRemoveSheet);
@@ -156,7 +158,22 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public SheetViewModel SelectedSheet {
             get => _selectedSheet;
-            set => RaiseAndSetIfChanged(ref _selectedSheet, value);
+            set {
+                if(!(_selectedSheet?.Equals(value) ?? false)) {
+                    if(_selectedSheet is not null) {
+                        _selectedSheet.PropertyChanged -= OnSelectedSheetChanged;
+                    }
+                    RaiseAndSetIfChanged(ref _selectedSheet, value);
+                    if(_selectedSheet is not null) {
+                        _selectedSheet.PropertyChanged += OnSelectedSheetChanged;
+                    }
+                }
+            }
+        }
+
+        public ObservableCollection<SheetViewModel> SelectedSheets {
+            get => _selectedSheets;
+            set => RaiseAndSetIfChanged(ref _selectedSheets, value);
         }
 
         public CollectionViewSource VisibleSheets {
@@ -443,6 +460,30 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private bool CanSaveSheets() {
             return GetNotDeletedSheets().Count > 0;
+        }
+
+        private void OnSelectedSheetChanged(object sender, PropertyChangedEventArgs e) {
+            if(string.IsNullOrWhiteSpace(e.PropertyName)) {
+                return;
+            }
+
+            var prop = typeof(SheetViewModel).GetProperty(e.PropertyName);
+            if(prop == null) {
+                return;
+            }
+            if(prop.Name == nameof(SheetViewModel.AlbumBlueprint)
+                || prop.Name == nameof(SheetViewModel.Name)
+                || prop.Name == nameof(SheetViewModel.TitleBlock)) {
+                // мультиредактирование только для названия, альбома и основной надписи
+                var newValue = prop.GetValue(SelectedSheet);
+
+                SheetViewModel[] sheets = [.. SelectedSheets];
+                foreach(var item in sheets) {
+                    if(!item.Equals(SelectedSheet)) {
+                        prop.SetValue(item, newValue);
+                    }
+                }
+            }
         }
     }
 }
