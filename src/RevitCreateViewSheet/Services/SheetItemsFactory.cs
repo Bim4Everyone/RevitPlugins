@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+
+using Autodesk.Revit.DB;
 
 using Ninject;
 using Ninject.Syntax;
@@ -18,6 +21,10 @@ namespace RevitCreateViewSheet.Services {
 
 
         public AnnotationModel CreateAnnotation(SheetModel sheetModel) {
+            if(sheetModel is null) {
+                throw new ArgumentNullException(nameof(sheetModel));
+            }
+
             var window = _resolutionRoot.Get<AnnotationModelCreatorWindow>();
             if(window.ShowDialog() ?? false) {
                 var symbol = (window.DataContext as AnnotationModelCreatorViewModel)
@@ -29,26 +36,37 @@ namespace RevitCreateViewSheet.Services {
         }
 
         public ScheduleModel CreateSchedule(SheetModel sheetModel) {
+            if(sheetModel is null) {
+                throw new ArgumentNullException(nameof(sheetModel));
+            }
+
             var window = _resolutionRoot.Get<ScheduleModelCreatorWindow>();
             if(window.ShowDialog() ?? false) {
                 var creatorView = window.DataContext as ScheduleModelCreatorViewModel;
                 var selectedSchedule = creatorView.SelectedViewSchedule;
-                creatorView.ViewSchedules.Remove(selectedSchedule);
                 creatorView.SelectedViewSchedule = creatorView.ViewSchedules.FirstOrDefault();
                 return new ScheduleModel(sheetModel, selectedSchedule.ViewSchedule);
             }
             throw new OperationCanceledException();
         }
 
-        public ViewPortModel CreateViewPort(SheetModel sheetModel) {
+        public ViewPortModel CreateViewPort(SheetModel sheetModel, ICollection<View> disabledViews) {
+            if(sheetModel is null) {
+                throw new ArgumentNullException(nameof(sheetModel));
+            }
+
+            if(disabledViews is null) {
+                throw new ArgumentNullException(nameof(disabledViews));
+            }
+
+            var creatorView = _resolutionRoot.Get<ViewPortModelCreatorViewModel>();
+            creatorView.SetDisabledViews(disabledViews);
             var window = _resolutionRoot.Get<ViewPortModelCreatorWindow>();
             if(window.ShowDialog() ?? false) {
-                var creatorView = window.DataContext as ViewPortModelCreatorViewModel;
                 var selectedView = creatorView.SelectedView;
                 var selectedViewPortType = creatorView.SelectedViewPortType;
 
-                creatorView.Views.Remove(selectedView);
-                creatorView.SelectedView = creatorView.Views.FirstOrDefault();
+                creatorView.SelectedView = creatorView.EnabledViews.FirstOrDefault();
                 return new ViewPortModel(sheetModel, selectedView.View, selectedViewPortType.ViewType);
             }
             throw new OperationCanceledException();

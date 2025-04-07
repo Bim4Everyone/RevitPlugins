@@ -105,21 +105,16 @@ namespace RevitCreateViewSheet.Models {
             Document.Create.NewFamilyInstance(point, familySymbol, view2D);
         }
 
-        public ICollection<View> GetNotPlacedViews() {
-            var placedViews = new FilteredElementCollector(Document)
-                .OfClass(typeof(ViewSheet))
-                .WhereElementIsNotElementType()
-                .OfType<ViewSheet>()
-                .SelectMany(sheet => {
-                    ElementId[] _ = [.. sheet.GetAllPlacedViews(), .. new ElementId[] { sheet.Id }];
-                    return _;
-                })
-                .ToHashSet();
+        /// <summary>
+        /// Возвращает все виды из активного документа, которые не являются листами 
+        /// и которые могут быть размещены на листах в качестве видовых экранов.
+        /// </summary>
+        public ICollection<View> GetAllViewsForViewPorts() {
             return new FilteredElementCollector(Document)
                 .OfClass(typeof(View))
                 .WhereElementIsNotElementType()
                 .OfType<View>()
-                .Where(v => v.CanBePrinted && !placedViews.Contains(v.Id))
+                .Where(v => v.CanBePrinted && IsViewTypeValidForViewPort(v.ViewType))
                 .ToArray();
         }
 
@@ -144,6 +139,29 @@ namespace RevitCreateViewSheet.Models {
                 .OfClass(typeof(ViewSchedule))
                 .OfType<ViewSchedule>()
                 .ToArray();
+        }
+
+        /// <summary>
+        /// Перечень типов видов, которые можно добавлять на листы в качестве видовых экранов.
+        /// </summary>
+        /// <param name="viewType">Тип вида</param>
+        /// <returns>True, если плагин поддерживает вставку данного типа вида на лист в качестве видового экрана, 
+        /// иначе false</returns>
+        public bool IsViewTypeValidForViewPort(ViewType viewType) {
+            return viewType switch {
+                ViewType.FloorPlan => true,
+                ViewType.CeilingPlan => true,
+                ViewType.EngineeringPlan => true,
+                ViewType.AreaPlan => true,
+                ViewType.Section => true,
+                ViewType.Elevation => true,
+                ViewType.Detail => true,
+                ViewType.ThreeD => true,
+                ViewType.Rendering => true,
+                ViewType.DraftingView => true,
+                ViewType.Legend => true,
+                _ => false
+            };
         }
 
         internal ICollection<SheetModel> GetSheetModels() {
@@ -184,10 +202,10 @@ namespace RevitCreateViewSheet.Models {
                     (Document.GetElement(titleId) as FamilyInstance).Symbol = symbol;
                 }
             }
-            sheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, sheetModel.SheetNumber);
+            sheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, sheetModel.SheetCustomNumber);
             sheet.SetParamValue(SharedParamsConfig.Instance.AlbumBlueprints, sheetModel.AlbumBlueprint);
             sheet.SetParamValue(BuiltInParameter.SHEET_NAME, sheetModel.Name);
-            sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, $"{sheetModel.AlbumBlueprint}-{sheetModel.SheetNumber}"); // TODO уточнить, надо ли обновлять системный номер и как его заполнять с нуля
+            sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, sheetModel.SheetNumber);
             return sheet;
         }
 

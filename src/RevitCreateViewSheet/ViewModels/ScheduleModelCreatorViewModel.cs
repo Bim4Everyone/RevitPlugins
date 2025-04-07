@@ -1,5 +1,5 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
@@ -24,7 +24,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
 
-        public ObservableCollection<ViewScheduleViewModel> ViewSchedules { get; }
+        public IReadOnlyCollection<ViewScheduleViewModel> ViewSchedules { get; }
 
         public ViewScheduleViewModel SelectedViewSchedule { get; set; }
 

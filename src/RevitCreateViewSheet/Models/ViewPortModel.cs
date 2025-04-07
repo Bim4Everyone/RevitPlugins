@@ -18,8 +18,12 @@ namespace RevitCreateViewSheet.Models {
         /// <param name="viewport">Видовой экран, размещенный на листе</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public ViewPortModel(SheetModel sheet, Viewport viewport) {
-            Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
-            _viewport = viewport ?? throw new ArgumentNullException(nameof(viewport));
+            Sheet = sheet
+                ?? throw new ArgumentNullException(nameof(sheet));
+            _viewport = viewport
+                ?? throw new ArgumentNullException(nameof(viewport));
+            _view = _viewport.Document.GetElement(_viewport.ViewId) as View
+                ?? throw new ArgumentNullException(nameof(viewport.ViewId));
             Location = viewport.GetBoxCenter();
             _viewPortType = viewport.GetElementType();
             Name = viewport.Document.GetElement(viewport.ViewId).Name;
@@ -49,6 +53,8 @@ namespace RevitCreateViewSheet.Models {
         public string Name { get; }
 
         public SheetModel Sheet { get; }
+
+        public View View => _view;
 
         public ElementType ViewPortType {
             get => _viewPortType;

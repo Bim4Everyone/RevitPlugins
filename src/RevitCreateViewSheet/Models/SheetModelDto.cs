@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Autodesk.Revit.DB;
+
+using pyRevitLabs.Json;
+
+namespace RevitCreateViewSheet.Models {
+    internal class SheetModelDto {
+        public SheetModelDto(SheetModel sheetModel) {
+            AlbumBlueprint = sheetModel.AlbumBlueprint;
+            SheetCustomNumber = sheetModel.SheetCustomNumber;
+            Name = sheetModel.Name;
+            TitleBlockSymbolName = sheetModel.TitleBlockSymbol.Name;
+        }
+
+        [JsonConstructor]
+        public SheetModelDto() { }
+
+        public string AlbumBlueprint { get; set; }
+
+        /// <summary>
+        /// Ш.Номер листа
+        /// </summary>
+        public string SheetCustomNumber { get; set; }
+
+        public string Name { get; set; }
+
+        public string TitleBlockSymbolName { get; set; }
+
+        public SheetModel CreateSheetModel(ICollection<FamilySymbol> titleBlocks) {
+            if(titleBlocks is null) {
+                throw new ArgumentNullException(nameof(titleBlocks));
+            }
+            if(titleBlocks.Count < 1) {
+                throw new ArgumentOutOfRangeException(nameof(titleBlocks));
+            }
+
+            var symbol = titleBlocks.FirstOrDefault(t => t.Name == Name) ?? titleBlocks.First();
+            return new SheetModel(symbol) {
+                AlbumBlueprint = AlbumBlueprint,
+                SheetCustomNumber = SheetCustomNumber,
+                SheetNumber = $"{AlbumBlueprint}-{SheetCustomNumber}",
+                Name = Name
+            };
+        }
+    }
+}

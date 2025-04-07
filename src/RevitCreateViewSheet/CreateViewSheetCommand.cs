@@ -10,6 +10,7 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -67,6 +68,10 @@ namespace RevitCreateViewSheet {
                     .WithPropertyValue(
                         nameof(Window.DataContext),
                         c => c.Kernel.Get<ViewPortModelCreatorViewModel>());
+
+                kernel.UseXtraSaveFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");
+                kernel.UseXtraOpenFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");
+                kernel.UseWpfUIMessageBox<MainViewModel>();
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 

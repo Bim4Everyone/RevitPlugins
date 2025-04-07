@@ -28,6 +28,15 @@
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding ProgressDialogFactory}">
         </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
     </b:Interaction.Behaviors>
     <b:Interaction.Triggers>
         <b:EventTrigger
@@ -113,6 +122,10 @@
                             Width="80" />
                         <ColumnDefinition
                             Width="Auto" />
+                        <ColumnDefinition
+                            Width="Auto" />
+                        <ColumnDefinition
+                            Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition />
@@ -168,6 +181,28 @@
                         HorizontalAlignment="Left"
                         Appearance="Info"
                         Command="{Binding AddSheetsCommand}" />
+                    
+                    <ui:Button
+                        Grid.Column="5"
+                        Grid.Row="1"
+                        Width="40"
+                        Height="40"
+                        HorizontalAlignment="Left"
+                        Appearance="Info"
+                        ToolTip="Сохранить конфигурацию листов"
+                        Content="{ui:SymbolIcon ArrowUpload24}"
+                        Command="{Binding SaveSheetsCommand}" />
+
+                    <ui:Button
+                        Grid.Column="4"
+                        Grid.Row="1"
+                        Width="40"
+                        Height="40"
+                        HorizontalAlignment="Left"
+                        Appearance="Info"
+                        ToolTip="Загрузить листы из файла"
+                        Content="{ui:SymbolIcon ArrowDownload24}"
+                        Command="{Binding LoadSheetsCommand}" />
 
                     <ui:TextBlock
                         Grid.Row="2"
@@ -219,17 +254,25 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn
-                                SortMemberPath="SheetNumber"
-                                Header="Номер листа"
+                                SortMemberPath="SheetCustomNumber"
+                                Header="Ш.Номер листа"
                                 res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}"
                                 Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ui:TextBox
-                                            Text="{Binding SheetNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                            Text="{Binding SheetCustomNumber, UpdateSourceTrigger=PropertyChanged}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
+                            <DataGridTextColumn
+                                SortMemberPath="SheetNumber"
+                                Binding="{Binding SheetNumber}"
+                                Header="Номер листа"
+                                IsReadOnly="True"
+                                res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}"
+                                Width="Auto">
+                            </DataGridTextColumn>
                             <DataGridTemplateColumn
                                 SortMemberPath="Name"
                                 Header="Имя листа"

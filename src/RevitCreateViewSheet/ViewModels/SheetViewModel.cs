@@ -15,6 +15,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private string _name;
         private string _albumBlueprint;
         private string _sheetNumber;
+        private string _sheetCustomNumber;
         private TitleBlockViewModel _titleBlock;
         private ViewPortViewModel _selectedViewPort;
         private ScheduleViewModel _selectedSchedule;
@@ -25,6 +26,7 @@ namespace RevitCreateViewSheet.ViewModels {
             _albumBlueprint = _sheetModel.AlbumBlueprint;
             _name = _sheetModel.Name;
             _sheetNumber = _sheetModel.SheetNumber;
+            _sheetCustomNumber = _sheetModel.SheetCustomNumber;
             _titleBlock = new TitleBlockViewModel(_sheetModel.TitleBlockSymbol);
             IsPlaced = sheetModel.State == EntityState.Unchanged;
 
@@ -64,14 +66,30 @@ namespace RevitCreateViewSheet.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _albumBlueprint, value);
                 _sheetModel.AlbumBlueprint = value;
+                SheetNumber = $"{value}-{SheetCustomNumber}";
             }
         }
 
+        /// <summary>
+        /// Системный номер листа
+        /// </summary>
         public string SheetNumber {
             get => _sheetNumber;
             set {
                 RaiseAndSetIfChanged(ref _sheetNumber, value);
                 _sheetModel.SheetNumber = value;
+            }
+        }
+
+        /// <summary>
+        /// Ш.Номер листа
+        /// </summary>
+        public string SheetCustomNumber {
+            get => _sheetCustomNumber;
+            set {
+                RaiseAndSetIfChanged(ref _sheetCustomNumber, value);
+                _sheetModel.SheetCustomNumber = value;
+                SheetNumber = $"{AlbumBlueprint}-{value}";
             }
         }
 

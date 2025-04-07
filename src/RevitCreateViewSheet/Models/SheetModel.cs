@@ -16,6 +16,7 @@ namespace RevitCreateViewSheet.Models {
         private readonly List<ViewPortModel> _viewPorts;
         private ViewSheet _viewSheet;
         private string _albumBlueprint;
+        private string _sheetCustomNumber;
         private string _sheetNumber;
         private string _name;
         private FamilySymbol _titleBlockSymbol;
@@ -46,6 +47,8 @@ namespace RevitCreateViewSheet.Models {
             _albumBlueprint = viewSheet.GetParamValueOrDefault(
                 SharedParamsConfig.Instance.AlbumBlueprints, string.Empty);
             _sheetNumber = viewSheet.GetParamValueOrDefault(
+                BuiltInParameter.SHEET_NUMBER, string.Empty);
+            _sheetCustomNumber = viewSheet.GetParamValueOrDefault(
                 SharedParamsConfig.Instance.StampSheetNumber, string.Empty);
             _name = viewSheet.GetParamValueOrDefault(
                 BuiltInParameter.SHEET_NAME, string.Empty);
@@ -86,11 +89,27 @@ namespace RevitCreateViewSheet.Models {
             }
         }
 
+        /// <summary>
+        /// Системный номер листа
+        /// </summary>
         public string SheetNumber {
             get => _sheetNumber;
             set {
                 if(value != _sheetNumber) {
                     _sheetNumber = value;
+                    SetModifiedState();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ш.Номер листа
+        /// </summary>
+        public string SheetCustomNumber {
+            get => _sheetCustomNumber;
+            set {
+                if(value != _sheetCustomNumber) {
+                    _sheetCustomNumber = value;
                     SetModifiedState();
                 }
             }
@@ -237,6 +256,7 @@ namespace RevitCreateViewSheet.Models {
                 .OfCategory(BuiltInCategory.OST_GenericAnnotation)
                 .ToElements()
                 .OfType<AnnotationSymbol>()
+                .Where(a => a.SuperComponent is null)
                 .Select(a => new AnnotationModel(this, a))
                 .ToList();
         }
