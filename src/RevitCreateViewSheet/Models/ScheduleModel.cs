@@ -54,7 +54,8 @@ namespace RevitCreateViewSheet.Models {
                 repository.DeleteElement(_scheduleInstance.Id);
             } else if(State == EntityState.Added && _schedule is not null) {
                 if(Location is null) {
-                    throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(Location)}");
+                    throw new InvalidOperationException(
+                        $"Перед сохранением новой спецификации необходимо назначить {nameof(Location)}");
                 }
                 repository.CreateSchedule(Sheet.GetViewSheet().Id, _schedule.Id, Location);
                 State = EntityState.Unchanged;

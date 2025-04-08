@@ -284,7 +284,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void AcceptView() {
-            var sheets = AllSheets.Select(s => s.SheetModel).Where(s => s.State != EntityState.Unchanged).ToArray();
+            var sheets = AllSheets.Select(s => s.SheetModel).ToArray();
             if(sheets.Any()) {
                 using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
                     progressDialogService.StepValue = 1;

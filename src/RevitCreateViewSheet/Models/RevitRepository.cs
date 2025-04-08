@@ -85,15 +85,6 @@ namespace RevitCreateViewSheet.Models {
                 .ToArray();
         }
 
-        public int GetLastViewSheetIndex(string albumBlueprints) {
-            ViewSheet viewSheet = GetViewSheets()
-                .Where(item => ((string) item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints))?.Equals(albumBlueprints) == true)
-                .OrderBy(item => item, new ViewSheetComparer())
-                .LastOrDefault();
-
-            return GetViewSheetIndex(viewSheet) ?? 1;
-        }
-
         public void DeleteElement(ElementId id) {
             Document.Delete(id);
         }
@@ -176,6 +167,9 @@ namespace RevitCreateViewSheet.Models {
 
         internal Viewport CreateViewPort(ElementId viewSheetId, ElementId viewId, ElementId viewportTypeId, XYZ point) {
             var viewport = Viewport.Create(Document, viewSheetId, viewId, point);
+            var view = Document.GetElement(viewId) as View;
+            view.CropBoxActive = true;
+            view.CropBoxVisible = true;
             return UpdateViewPort(viewport, viewportTypeId);
         }
 
@@ -207,11 +201,6 @@ namespace RevitCreateViewSheet.Models {
             sheet.SetParamValue(BuiltInParameter.SHEET_NAME, sheetModel.Name);
             sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, sheetModel.SheetNumber);
             return sheet;
-        }
-
-        private int? GetViewSheetIndex(ViewSheet viewSheet) {
-            string index = viewSheet?.SheetNumber.Split(['-'], StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
-            return int.TryParse(index, out int result) ? result : null;
         }
 
         private void InitializeParameters(Application application, Document document) {

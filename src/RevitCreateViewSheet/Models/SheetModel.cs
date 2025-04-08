@@ -221,6 +221,8 @@ namespace RevitCreateViewSheet.Models {
                 _viewSheet = repository.CreateViewSheet(this);
                 SaveNestedItems(repository);
                 State = EntityState.Unchanged;
+            } else {
+                SaveNestedItems(repository);
             }
         }
 
@@ -238,13 +240,32 @@ namespace RevitCreateViewSheet.Models {
         }
 
         private void SaveNestedItems(RevitRepository repository) {
+            var origin = _viewSheet.Origin;
+            var annotationsOrigin = origin + new XYZ(0, 3, 0);
+            XYZ annotationsIncrementer = new(0.5, 0, 0);
             foreach(var annotation in _annotations) {
+                if(annotation.State == EntityState.Added) {
+                    annotation.Location = annotationsOrigin;
+                    annotationsOrigin += annotationsIncrementer;
+                }
                 annotation.SaveChanges(repository);
             }
+            var schedulesOrigin = origin + new XYZ(0, 2, 0);
+            XYZ schedulesIncrementer = new(0.75, 0, 0);
             foreach(var schedule in _schedules) {
+                if(schedule.State == EntityState.Added) {
+                    schedule.Location = schedulesOrigin;
+                    schedulesOrigin += schedulesIncrementer;
+                }
                 schedule.SaveChanges(repository);
             }
+            var viewsOrigin = origin + new XYZ(0, 1, 0);
+            XYZ viewsIncrementer = new(1, 0, 0);
             foreach(var viewPort in _viewPorts) {
+                if(viewPort.State == EntityState.Added) {
+                    viewPort.Location = viewsOrigin;
+                    viewsOrigin += viewsIncrementer;
+                }
                 viewPort.SaveChanges(repository);
             }
         }
