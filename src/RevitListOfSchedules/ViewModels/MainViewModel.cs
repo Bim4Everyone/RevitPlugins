@@ -23,6 +23,7 @@ namespace RevitListOfSchedules.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
         private readonly FamilyLoadOptions _familyLoadOptions;
+        private readonly ParamFactory _paramFactory;
         private string _errorText;
         private ObservableCollection<LinkViewModel> _links;
         private ObservableCollection<LinkViewModel> _selectedLinks;
@@ -35,12 +36,14 @@ namespace RevitListOfSchedules.ViewModels {
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
             ILocalizationService localizationService,
-            FamilyLoadOptions familyLoadOptions) {
+            FamilyLoadOptions familyLoadOptions,
+            ParamFactory paramFactory) {
 
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
             _localizationService = localizationService;
             _familyLoadOptions = familyLoadOptions;
+            _paramFactory = paramFactory;
 
             LoadViewCommand = RelayCommand.Create(LoadView);
             ReloadLinksCommand = RelayCommand.Create(ReloadLinks, CanReloadLinks);
@@ -198,7 +201,7 @@ namespace RevitListOfSchedules.ViewModels {
 
         // Добавляем GroupParameterViewModel в список GroupParameters
         private IEnumerable<GroupParameterViewModel> GetGroupParameters() {
-            var groupParams = _revitRepository.GetGroupParameters();
+            var groupParams = _paramFactory.GetGroupParameters(_revitRepository);
 
             if(groupParams.Count == 0) {
                 yield return new GroupParameterViewModel(_localizationService);
@@ -267,42 +270,7 @@ namespace RevitListOfSchedules.ViewModels {
         // Основной метод
         private void AcceptView() {
             SaveConfig();
-            using(var progressService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
-                progressService.MaxValue = _selectedSheets.Count;
-                progressService.StepValue = progressService.MaxValue / 10;
-                progressService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitleSheets");
-                var progress = progressService.CreateProgress();
-                var ct = progressService.CreateCancellationToken();
-                progressService.Show();
-
-                var groupedSheets = SelectedSheets.GroupBy(sheet => sheet.AlbumName);
-                int i = 0;
-                foreach(var group in groupedSheets) {
-                    string legalName = _revitRepository.LegalizeString(group.Key);
-                    var viewDraft = _revitRepository.GetViewDrafting(legalName);
-                    var tempDoc = new TempFamilyDocument(_localizationService, _revitRepository, _familyLoadOptions, legalName);
-                    _revitRepository.DeleteFamilyInstances(viewDraft);
-
-                    string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
-                    using(var t = _revitRepository.Document.StartTransaction(transactionName)) {
-                        var instances = new List<FamilyInstance>();
-                        foreach(SheetViewModel sheet in group) {
-                            ct.ThrowIfCancellationRequested();
-                            progress.Report(i++);
-                            var doc = sheet.LinkViewModel == null
-                            ? _revitRepository.Document
-                            : _revitRepository.GetLinkDocument(sheet.LinkViewModel.Id);
-                            instances.AddRange(tempDoc.GetFamilyInstances(
-                                doc, sheet.ViewSheet, sheet.Number, sheet.RevisionNumber, viewDraft));
-                        }
-                        if(!instances.Any())
-                            instances.Add(tempDoc.CreateInstance(viewDraft, "", "", ""));
-
-                        t.Commit();
-                        _revitRepository.CreateSchedule(tempDoc, instances.First());
-                    }
-                }
-            }
+            SheetProcessing();
         }
 
         private bool CanAcceptView() {
@@ -325,6 +293,74 @@ namespace RevitListOfSchedules.ViewModels {
                 .ToList();
             setting.GroupParameter = SelectedGroupParameter.Id;
             _pluginConfig.SaveProjectConfig();
+        }
+
+        private void SheetProcessing() {
+            using(var progressService = ServicesProvider.GetPlatformService<IProgressDialogService>()) {
+                progressService.MaxValue = _selectedSheets.Count;
+                progressService.StepValue = progressService.MaxValue / 10;
+                progressService.DisplayTitleFormat = _localizationService.GetLocalizedString("MainViewModel.ProgressTitleSheets");
+                var progress = progressService.CreateProgress();
+                var ct = progressService.CreateCancellationToken();
+                progressService.Show();
+
+                string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
+                using(var t = _revitRepository.Document.StartTransaction(transactionName)) {
+                    IEnumerable<IGrouping<string, SheetViewModel>> groupedSheets = SelectedSheets
+                        .GroupBy(sheet => sheet.AlbumName);
+                    int i = 0;
+                    foreach(var group in groupedSheets) {
+
+                        string legalName = PathCharValidator.LegalizeString(group.Key);
+                        var viewDraft = _revitRepository.GetViewDrafting(legalName);
+                        var tempDoc = new TempFamilyDocument(
+                            _localizationService, _revitRepository, _familyLoadOptions, legalName);
+
+                        DeleteInstances(viewDraft);
+
+                        var createInstanceOptions = new CreateInstanceOptions() {
+                            TempDoc = tempDoc,
+                            ViewDraft = viewDraft,
+                            Counter = i,
+                            Progress = progress,
+                            CancellationToken = ct
+                        };
+                        var instances = CreateInstances(group, createInstanceOptions);
+
+                        CreateSchedule(tempDoc, instances.First());
+                    }
+                    t.Commit();
+                }
+            }
+        }
+
+        private List<FamilyInstance> CreateInstances(
+            IGrouping<string, SheetViewModel> group, CreateInstanceOptions createInstanceOptions) {
+
+            var instances = new List<FamilyInstance>();
+            foreach(SheetViewModel sheet in group) {
+                createInstanceOptions.CancellationToken.ThrowIfCancellationRequested();
+                createInstanceOptions.Progress.Report(createInstanceOptions.Counter++);
+
+                var doc = sheet.LinkViewModel == null
+                ? _revitRepository.Document
+                : _revitRepository.GetLinkDocument(sheet.LinkViewModel.Id);
+
+                instances.AddRange(createInstanceOptions.TempDoc.GetFamilyInstances(
+                    doc, sheet.ViewSheet, sheet.Number, sheet.RevisionNumber, createInstanceOptions.ViewDraft));
+            }
+            if(!instances.Any())
+                instances.Add(createInstanceOptions.TempDoc.CreateInstance(createInstanceOptions.ViewDraft, "", "", ""));
+
+            return instances;
+        }
+
+        private void DeleteInstances(View view) {
+            _revitRepository.DeleteFamilyInstances(view);
+        }
+
+        private void CreateSchedule(TempFamilyDocument tempDoc, FamilyInstance instance) {
+            _revitRepository.CreateSchedule(tempDoc, instance);
         }
     }
 }

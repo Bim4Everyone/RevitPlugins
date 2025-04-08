@@ -132,18 +132,14 @@ namespace RevitListOfSchedules.Models {
 
         private FamilySymbol LoadFamilySymbol() {
             FamilySymbol familySymbol = null;
-            string transactionNameLoad = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionNameLoad");
-            using(Transaction t = _revitRepository.Document.StartTransaction(transactionNameLoad)) {
 
-                _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out Family family);
-                familySymbol = _revitRepository.GetFamilySymbol(family);
+            _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out Family family);
+            familySymbol = _revitRepository.GetFamilySymbol(family);
 
-                if(familySymbol != null) {
-                    if(!familySymbol.IsActive) {
-                        familySymbol.Activate();
-                    }
+            if(familySymbol != null) {
+                if(!familySymbol.IsActive) {
+                    familySymbol.Activate();
                 }
-                t.Commit();
             }
             DeleteFamilySymbol();
             return familySymbol;

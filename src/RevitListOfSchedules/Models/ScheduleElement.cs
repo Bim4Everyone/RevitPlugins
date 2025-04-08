@@ -1,64 +1,64 @@
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.SimpleServices;
 
 namespace RevitListOfSchedules.Models {
     internal class ScheduleElement {
+        private const int _firstLastColumnWidthMm = 30;
+        private const int _middleColumnWidthMm = 110;
 
-        private const int _firstLastCollumn = 30;
-        private const int _firstSecondCollumn = 110;
-        private readonly ILocalizationService _localizationService;
         private readonly RevitRepository _revitRepository;
-        private readonly FamilySymbol _famSymbol;
-        private readonly FamilyInstance _famInstance;
-
+        private readonly FamilySymbol _familySymbol;
+        private readonly FamilyInstance _familyInstance;
 
         public ScheduleElement(
-            ILocalizationService localizationService,
             RevitRepository revitRepository,
-            FamilySymbol famSymbol,
-            FamilyInstance famInstance) {
+            FamilySymbol familySymbol,
+            FamilyInstance familyInstance) {
             _revitRepository = revitRepository;
-            _localizationService = localizationService;
-            _famSymbol = famSymbol;
-            _famInstance = famInstance;
+            _familySymbol = familySymbol;
+            _familyInstance = familyInstance;
             CreateSchedule();
         }
 
-        private void CreateSchedule() {
+        public void CreateSchedule() {
+            var schedule = ViewSchedule.CreateNoteBlock(_revitRepository.Document, _familySymbol.Family.Id);
+            schedule.Name = _familySymbol.Name;
 
-            string transactionNamePlace = _localizationService.GetLocalizedString("ScheduleElement.TransactionName");
-            using(Transaction t = _revitRepository.Document.StartTransaction(transactionNamePlace)) {
+            ConfigureScheduleColumns(schedule);
+            ConfigureScheduleHeader(schedule);
+        }
 
-                ViewSchedule vewSchedule = ViewSchedule.CreateNoteBlock(_revitRepository.Document, _famSymbol.Family.Id);
+        private void ConfigureScheduleColumns(ViewSchedule schedule) {
+            var definition = schedule.Definition;
 
-                vewSchedule.Name = _famSymbol.Name;
+            var noteField1 = definition.AddField(
+                ScheduleFieldType.Instance,
+                _familyInstance.GetParam(ParamFactory.FamilyParamNumber).Id);
 
-                TableData tableData = vewSchedule.GetTableData();
-                TableSectionData appearanceSection = tableData.GetSectionData(SectionType.Header);
+            var noteField2 = definition.AddField(
+                ScheduleFieldType.Instance,
+                _familyInstance.GetParam(ParamFactory.FamilyParamName).Id);
 
-                ScheduleDefinition scheduleDef = vewSchedule.Definition;
+            var noteField3 = definition.AddField(
+                ScheduleFieldType.Instance,
+                _familyInstance.GetParam(ParamFactory.FamilyParamRevision).Id);
 
-                appearanceSection.ClearCell(0, 0);
-                appearanceSection.SetCellText(0, 0, ParamFactory.ScheduleName);
+            noteField1.GridColumnWidth = ConvertToInternalUnits(_firstLastColumnWidthMm);
+            noteField2.GridColumnWidth = ConvertToInternalUnits(_middleColumnWidthMm);
+            noteField3.GridColumnWidth = ConvertToInternalUnits(_firstLastColumnWidthMm);
+        }
 
-                ScheduleField noteField1 = vewSchedule.Definition
-                    .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(ParamFactory.FamilyParamNumber).Id);
-                ScheduleField noteField2 = vewSchedule.Definition
-                    .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(ParamFactory.FamilyParamName).Id);
-                ScheduleField noteField3 = vewSchedule.Definition
-                    .AddField(ScheduleFieldType.Instance, _famInstance.GetParam(ParamFactory.FamilyParamRevision).Id);
+        private void ConfigureScheduleHeader(ViewSchedule schedule) {
+            var tableData = schedule.GetTableData();
+            var appearanceSection = tableData.GetSectionData(SectionType.Header);
 
-                double firstLastCollumn = UnitUtils.ConvertToInternalUnits(_firstLastCollumn, UnitTypeId.Millimeters);
-                double secondCollumn = UnitUtils.ConvertToInternalUnits(_firstSecondCollumn, UnitTypeId.Millimeters);
+            appearanceSection.ClearCell(0, 0);
+            appearanceSection.SetCellText(0, 0, ParamFactory.ScheduleName);
+        }
 
-                noteField1.GridColumnWidth = firstLastCollumn;
-                noteField2.GridColumnWidth = secondCollumn;
-                noteField3.GridColumnWidth = firstLastCollumn;
-
-                t.Commit();
-            }
+        private double ConvertToInternalUnits(double millimeters) {
+            return UnitUtils.ConvertToInternalUnits(millimeters, UnitTypeId.Millimeters);
         }
     }
 }

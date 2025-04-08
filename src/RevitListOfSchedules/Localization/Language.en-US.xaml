@@ -28,25 +28,17 @@
     <system:String
         x:Key="TempFamilyDocument.FamilyName">{0}List_Of_Schedules_{1}{2}</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TransactionName">Parameters, circle</system:String>
-    <system:String
-        x:Key="TempFamilyDocument.TransactionNameLoad">Loading a family of annotations</system:String>    
-    <system:String
-        x:Key="RevitRepository.TransactionNameCreate">Create a ViewDrafting for a List of Schedules</system:String>
-    <system:String
-        x:Key="RevitRepository.TransactionNameDelete">Delete a family instances</system:String>
+        x:Key="TempFamilyDocument.TransactionName">Parameters, circle</system:String>       
     <system:String
         x:Key="RevitRepository.ViewName">List_Of_Schedules_{0}</system:String>    
     <system:String
         x:Key="MainViewModel.ErrorText">Select sheets to create a list of schedules</system:String>
     <system:String
-        x:Key="MainViewModel.TransactionName">Placing a family of annotations</system:String>
+        x:Key="MainViewModel.TransactionName">Create schedules</system:String>
     <system:String
         x:Key="MainViewModel.ProgressTitleLinks">Reload links... [{0}]\[{1}]</system:String>
     <system:String
-        x:Key="MainViewModel.ProgressTitleSheets">Processing sheets... [{0}]\[{1}]</system:String>
-    <system:String
-        x:Key="ScheduleElement.TransactionName">Create a list of schedules</system:String>
+        x:Key="MainViewModel.ProgressTitleSheets">Processing sheets... [{0}]\[{1}]</system:String>    
     <system:String
         x:Key="GroupParameter.NoParameter">No group parameter</system:String>
     <system:String
