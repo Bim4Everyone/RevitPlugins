@@ -66,7 +66,7 @@ namespace RevitCreateViewSheet.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _albumBlueprint, value);
                 _sheetModel.AlbumBlueprint = value;
-                SheetNumber = $"{value}-{SheetCustomNumber}";
+                SheetNumber = GetSheetNumber(value, SheetCustomNumber);
             }
         }
 
@@ -89,7 +89,7 @@ namespace RevitCreateViewSheet.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _sheetCustomNumber, value);
                 _sheetModel.SheetCustomNumber = value;
-                SheetNumber = $"{AlbumBlueprint}-{value}";
+                SheetNumber = GetSheetNumber(AlbumBlueprint, value);
             }
         }
 
@@ -180,6 +180,11 @@ namespace RevitCreateViewSheet.ViewModels {
                 allEntities.Remove(entityViewModel);
             }
             viewToRefresh.Refresh();
+        }
+
+        private string GetSheetNumber(string albumBlueprint, string sheetCustomNumber) {
+            string[] strs = [albumBlueprint, sheetCustomNumber];
+            return string.Join("-", strs.Where(s => !string.IsNullOrWhiteSpace(s)));
         }
     }
 }
