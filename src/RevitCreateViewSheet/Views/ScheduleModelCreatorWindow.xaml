@@ -50,6 +50,7 @@
                 HorizontalAlignment="Center"
                 DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
                 ToolTip="{me:LocalizationSource TODO}"
                 ItemsSource="{Binding ViewSchedules}"
                 SelectedItem="{Binding SelectedViewSchedule}" />

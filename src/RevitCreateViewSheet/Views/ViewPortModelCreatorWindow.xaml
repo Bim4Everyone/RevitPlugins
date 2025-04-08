@@ -49,6 +49,7 @@
                 HorizontalAlignment="Center"
                 DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
                 ToolTip="{me:LocalizationSource TODO}"
                 ItemsSource="{Binding ViewTypes}"
                 SelectedItem="{Binding SelectedViewType}" />
@@ -66,6 +67,7 @@
                 HorizontalAlignment="Center"
                 DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
                 ToolTip="{me:LocalizationSource TODO}"
                 ItemsSource="{Binding ViewsForSelection}"
                 SelectedItem="{Binding SelectedView}" />
@@ -83,6 +85,7 @@
                 HorizontalAlignment="Center"
                 DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
                 ToolTip="{me:LocalizationSource TODO}"
                 ItemsSource="{Binding ViewPortTypes}"
                 SelectedItem="{Binding SelectedViewPortType}" />

@@ -50,6 +50,7 @@
                 HorizontalAlignment="Center"
                 DisplayMemberPath="RichName"
                 TextSearch.TextPath="RichName"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
                 ToolTip="{me:LocalizationSource TODO}"
                 ItemsSource="{Binding AnnotationSymbolTypes}"
                 SelectedItem="{Binding SelectedAnnotationSymbolType}" />

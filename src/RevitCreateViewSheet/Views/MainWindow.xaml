@@ -158,6 +158,7 @@
                         MinHeight="40"
                         IsEditable="True"
                         DisplayMemberPath="Name"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
                         ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
                         SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -299,6 +300,7 @@
                                             Height="40"
                                             MinHeight="40"
                                             DisplayMemberPath="Name"
+                                            ScrollViewer.VerticalScrollBarVisibility="Visible"
                                             ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                             SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
                                     </DataTemplate>
