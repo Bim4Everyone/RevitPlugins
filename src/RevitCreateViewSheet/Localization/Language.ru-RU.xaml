@@ -14,12 +14,37 @@
         x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
-    
+
     <system:String
         x:Key="TODO">TODO</system:String>
-    
+
     <system:String
         x:Key="EntityState.Exist">Сущ.</system:String>
     <system:String
         x:Key="EntityState.New">Нов.</system:String>
+
+    <system:String
+        x:Key="RevitViewType.Any">Любой</system:String>
+    <system:String
+        x:Key="RevitViewType.FloorPlan">План этажа</system:String>
+    <system:String
+        x:Key="RevitViewType.CeilingPlan">План потолка</system:String>
+    <system:String
+        x:Key="RevitViewType.EngineeringPlan">План несущих конструкций</system:String>
+    <system:String
+        x:Key="RevitViewType.AreaPlan">План зонирования</system:String>
+    <system:String
+        x:Key="RevitViewType.Section">Разрез</system:String>
+    <system:String
+        x:Key="RevitViewType.Elevation">Фасад</system:String>
+    <system:String
+        x:Key="RevitViewType.Detail">Вид узла</system:String>
+    <system:String
+        x:Key="RevitViewType.ThreeD">3D</system:String>
+    <system:String
+        x:Key="RevitViewType.Rendering">Визуализация</system:String>
+    <system:String
+        x:Key="RevitViewType.DraftingView">Чертежный вид</system:String>
+    <system:String
+        x:Key="RevitViewType.Legend">Легенда</system:String>
 </ResourceDictionary>

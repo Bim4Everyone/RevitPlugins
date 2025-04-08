@@ -10,12 +10,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
     mc:Ignorable="d"
-    Height="300"
-    Width="500"
-    MinHeight="300"
-    MinWidth="500"
-    MaxHeight="300"
-    MaxWidth="500"
+    Height="400"
+    Width="600"
+    MinHeight="400"
+    MinWidth="600"
+    MaxHeight="400"
+    MaxWidth="600"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:ViewPortModelCreatorViewModel, IsDesignTimeCreatable=False}">
     <Grid>
@@ -41,8 +41,24 @@
                 Text="{me:LocalizationSource TODO}">
             </ui:TextBlock>
             <ComboBox
-                MinWidth="200"
-                Width="300"
+                MinWidth="450"
+                IsEditable="True"
+                IsTextSearchEnabled="True"
+                IsTextSearchCaseSensitive="False"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                DisplayMemberPath="Name"
+                TextSearch.TextPath="Name"
+                ToolTip="{me:LocalizationSource TODO}"
+                ItemsSource="{Binding ViewTypes}"
+                SelectedItem="{Binding SelectedViewType}" />
+            <ui:TextBlock
+                Margin="10"
+                TextAlignment="Center"
+                Text="{me:LocalizationSource TODO}">
+            </ui:TextBlock>
+            <ComboBox
+                MinWidth="450"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"
@@ -59,8 +75,7 @@
                 Text="{me:LocalizationSource TODO}">
             </ui:TextBlock>
             <ComboBox
-                MinWidth="200"
-                Width="300"
+                MinWidth="450"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"

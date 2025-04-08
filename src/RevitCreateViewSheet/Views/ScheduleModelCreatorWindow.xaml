@@ -42,8 +42,7 @@
                 Text="{me:LocalizationSource TODO}">
             </ui:TextBlock>
             <ComboBox
-                MinWidth="200"
-                Width="300"
+                MinWidth="400"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"

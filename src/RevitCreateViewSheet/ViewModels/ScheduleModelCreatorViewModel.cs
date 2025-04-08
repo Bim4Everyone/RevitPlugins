@@ -13,6 +13,7 @@ namespace RevitCreateViewSheet.ViewModels {
     internal class ScheduleModelCreatorViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private string _errorText;
+        private ViewScheduleViewModel _selectedSchedule;
 
         public ScheduleModelCreatorViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -26,7 +27,10 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public IReadOnlyCollection<ViewScheduleViewModel> ViewSchedules { get; }
 
-        public ViewScheduleViewModel SelectedViewSchedule { get; set; }
+        public ViewScheduleViewModel SelectedViewSchedule {
+            get => _selectedSchedule;
+            set => RaiseAndSetIfChanged(ref _selectedSchedule, value);
+        }
 
         public ICommand AcceptViewCommand { get; }
 

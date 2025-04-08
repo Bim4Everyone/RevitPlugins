@@ -12,6 +12,7 @@ namespace RevitCreateViewSheet.ViewModels {
     internal class AnnotationModelCreatorViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private string _errorText;
+        private AnnotationSymbolTypeViewModel _selectedAnnotation;
 
         public AnnotationModelCreatorViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
@@ -25,7 +26,10 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public IReadOnlyCollection<AnnotationSymbolTypeViewModel> AnnotationSymbolTypes { get; }
 
-        public AnnotationSymbolTypeViewModel SelectedAnnotationSymbolType { get; set; }
+        public AnnotationSymbolTypeViewModel SelectedAnnotationSymbolType {
+            get => _selectedAnnotation;
+            set => RaiseAndSetIfChanged(ref _selectedAnnotation, value);
+        }
 
         public ICommand AcceptView { get; }
 

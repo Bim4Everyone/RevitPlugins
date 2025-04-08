@@ -22,4 +22,29 @@
         x:Key="EntityState.Exist">Exist</system:String>
     <system:String
         x:Key="EntityState.New">New</system:String>
+
+    <system:String
+        x:Key="RevitViewType.Any">Any</system:String>
+    <system:String
+        x:Key="RevitViewType.FloorPlan">Floor plan</system:String>
+    <system:String
+        x:Key="RevitViewType.CeilingPlan">Ceiling plan</system:String>
+    <system:String
+        x:Key="RevitViewType.EngineeringPlan">Engineering plan</system:String>
+    <system:String
+        x:Key="RevitViewType.AreaPlan">Area plan</system:String>
+    <system:String
+        x:Key="RevitViewType.Section">Section</system:String>
+    <system:String
+        x:Key="RevitViewType.Elevation">Elevation</system:String>
+    <system:String
+        x:Key="RevitViewType.Detail">Detail</system:String>
+    <system:String
+        x:Key="RevitViewType.ThreeD">ThreeD</system:String>
+    <system:String
+        x:Key="RevitViewType.Rendering">Rendering</system:String>
+    <system:String
+        x:Key="RevitViewType.DraftingView">Drafting view</system:String>
+    <system:String
+        x:Key="RevitViewType.Legend">Legend</system:String>
 </ResourceDictionary>

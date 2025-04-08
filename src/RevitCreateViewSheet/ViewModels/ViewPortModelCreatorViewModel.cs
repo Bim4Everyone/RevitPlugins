@@ -17,11 +17,22 @@ namespace RevitCreateViewSheet.ViewModels {
     internal class ViewPortModelCreatorViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
+        /// <summary>
+        /// Все виды в документе Revit, для которых можно создать видовые экраны. Размещенные и не размещенные.
+        /// </summary>
         private readonly List<ViewViewModel> _allViews;
+        /// <summary>
+        /// Виды которые доступны для выбора пользователя. (Не размещенные виды)
+        /// </summary>
         private readonly List<ViewViewModel> _allEnabledViews;
+        /// <summary>
+        /// Виды, соответствующие выбранному пользователем типу видов. Это итоговая коллекция, которую видит пользователь
+        /// </summary>
         private readonly ObservableCollection<ViewViewModel> _viewsForSelection;
         private string _errorText;
+        private ViewPortTypeViewModel _selectedViewPortType;
         private ViewTypeViewModel _selectedViewType;
+        private ViewViewModel _selectedView;
 
         public ViewPortModelCreatorViewModel(RevitRepository revitRepository, ILocalizationService localizationService) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -46,24 +57,39 @@ namespace RevitCreateViewSheet.ViewModels {
             get => _selectedViewType;
             set {
                 RaiseAndSetIfChanged(ref _selectedViewType, value);
-                // TODO сделать обновление списка видов для выбора
+                UpdateViewsForSelection(value?.ViewType ?? RevitViewType.Any);
             }
         }
 
+        /// <summary>
+        /// Типы видов для выбора: план этажа, план потолка, разрез и т.д.
+        /// </summary>
         public IReadOnlyCollection<ViewTypeViewModel> ViewTypes { get; }
 
+        /// <summary>
+        /// Виды, соответствующие выбранному пользователем типу видов. Это итоговая коллекция, которую видит пользователь
+        /// </summary>
         public ReadOnlyObservableCollection<ViewViewModel> ViewsForSelection { get; }
 
+        public ViewViewModel SelectedView {
+            get => _selectedView;
+            set => RaiseAndSetIfChanged(ref _selectedView, value);
+        }
+
+        /// <summary>
+        /// Типоразмеры для видовых экранов
+        /// </summary>
         public IReadOnlyCollection<ViewPortTypeViewModel> ViewPortTypes { get; }
 
-        public ViewViewModel SelectedView { get; set; }
-
-        public ViewPortTypeViewModel SelectedViewPortType { get; set; }
+        public ViewPortTypeViewModel SelectedViewPortType {
+            get => _selectedViewPortType;
+            set => RaiseAndSetIfChanged(ref _selectedViewPortType, value);
+        }
 
         public ICommand AcceptViewCommand { get; }
 
         /// <summary>
-        /// Убирает возможность выбрать заданные виды для создания видовых экранов.
+        /// Выключает отображение заданных видов для создания видовых экранов.
         /// </summary>
         /// <param name="disabledViews">Коллекция видов, которые надо убрать из выбора для пользователя.</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
@@ -78,6 +104,7 @@ namespace RevitCreateViewSheet.ViewModels {
                     _allEnabledViews.Add(_allViews[i]);
                 }
             }
+            UpdateViewsForSelection(SelectedViewType?.ViewType ?? RevitViewType.Any);
         }
 
         public string ErrorText {
@@ -86,13 +113,13 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(ViewsForSelection.Count == 0) {
-                ErrorText = "Все виды уже добавлены на листы TODO";
+            if(SelectedViewType is null) {
+                ErrorText = "Выберите тип вида TODO";
                 return false;
             }
 
-            if(ViewPortTypes.Count == 0) {
-                ErrorText = "В проекте отсутствуют типоразмеры видовых экранов TODO";
+            if(ViewsForSelection.Count == 0) {
+                ErrorText = "Нет доступных видов заданного типа TODO";
                 return false;
             }
 
@@ -115,6 +142,56 @@ namespace RevitCreateViewSheet.ViewModels {
                 .Cast<RevitViewType>()
                 .Select(v => new ViewTypeViewModel(v,
                     _localizationService.GetLocalizedString($"{nameof(RevitViewType)}.{v}")))];
+        }
+
+        private void UpdateViewsForSelection(RevitViewType revitViewType) {
+            _viewsForSelection.Clear();
+            switch(revitViewType) {
+                case RevitViewType.FloorPlan:
+                case RevitViewType.CeilingPlan:
+                case RevitViewType.EngineeringPlan:
+                case RevitViewType.AreaPlan:
+                case RevitViewType.Section:
+                case RevitViewType.Elevation:
+                case RevitViewType.Detail:
+                case RevitViewType.ThreeD:
+                case RevitViewType.Rendering:
+                case RevitViewType.DraftingView:
+                case RevitViewType.Legend: {
+                    ViewType vType = ConvertToViewType(revitViewType);
+                    foreach(var item in _allEnabledViews
+                        .Where(v => v.View.ViewType == vType)
+                        .OrderBy(v => v.Name, new LogicalStringComparer())) {
+                        _viewsForSelection.Add(item);
+                    }
+                    break;
+                }
+                case RevitViewType.Any:
+                default: {
+                    foreach(var item in _allEnabledViews.OrderBy(v => v.Name, new LogicalStringComparer())) {
+                        _viewsForSelection.Add(item);
+                    }
+                    break;
+                }
+            }
+            SelectedView = _viewsForSelection.FirstOrDefault();
+        }
+
+        private ViewType ConvertToViewType(RevitViewType revitViewType) {
+            return revitViewType switch {
+                RevitViewType.FloorPlan => ViewType.FloorPlan,
+                RevitViewType.CeilingPlan => ViewType.CeilingPlan,
+                RevitViewType.EngineeringPlan => ViewType.EngineeringPlan,
+                RevitViewType.AreaPlan => ViewType.AreaPlan,
+                RevitViewType.Section => ViewType.Section,
+                RevitViewType.Elevation => ViewType.Elevation,
+                RevitViewType.Detail => ViewType.Detail,
+                RevitViewType.ThreeD => ViewType.ThreeD,
+                RevitViewType.Rendering => ViewType.Rendering,
+                RevitViewType.DraftingView => ViewType.DraftingView,
+                RevitViewType.Legend => ViewType.Legend,
+                _ => throw new NotSupportedException()
+            };
         }
     }
 }
