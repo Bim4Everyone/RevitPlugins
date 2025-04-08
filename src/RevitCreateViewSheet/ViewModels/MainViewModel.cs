@@ -366,6 +366,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 if(!string.IsNullOrWhiteSpace(SheetsFilter)) {
                     if(!sheetViewModel.AlbumBlueprint.Contains(SheetsFilter)
                         && !sheetViewModel.SheetNumber.Contains(SheetsFilter)
+                        && !sheetViewModel.SheetCustomNumber.Contains(SheetsFilter)
                         && !sheetViewModel.Name.Contains(SheetsFilter)
                         && (!sheetViewModel.TitleBlock?.Name.Contains(SheetsFilter) ?? false)) {
 
