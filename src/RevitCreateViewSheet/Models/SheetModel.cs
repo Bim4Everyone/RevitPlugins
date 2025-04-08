@@ -136,6 +136,11 @@ namespace RevitCreateViewSheet.Models {
         }
 
 
+        /// <summary>
+        /// Возвращает ссылку на лист в модели ревит
+        /// </summary>
+        /// <returns>Лист в модели ревит</returns>
+        /// <exception cref="InvalidOperationException">Исключение, если лист еще не создан</exception>
         public ViewSheet GetViewSheet() {
             if(_viewSheet is not null) {
                 return _viewSheet;

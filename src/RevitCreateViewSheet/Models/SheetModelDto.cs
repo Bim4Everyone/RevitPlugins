@@ -39,10 +39,10 @@ namespace RevitCreateViewSheet.Models {
 
             var symbol = titleBlocks.FirstOrDefault(t => t.Name == Name) ?? titleBlocks.First();
             return new SheetModel(symbol) {
-                AlbumBlueprint = AlbumBlueprint,
-                SheetCustomNumber = SheetCustomNumber,
-                SheetNumber = $"{AlbumBlueprint}-{SheetCustomNumber}",
-                Name = Name
+                AlbumBlueprint = AlbumBlueprint ?? string.Empty,
+                SheetCustomNumber = SheetCustomNumber ?? string.Empty,
+                SheetNumber = string.Join("-", [AlbumBlueprint, SheetCustomNumber]),
+                Name = Name ?? string.Empty
             };
         }
     }

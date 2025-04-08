@@ -204,7 +204,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void AddSheets() {
             var indexes = AllSheets.Where(s => s.SheetModel.State != EntityState.Deleted)
-                .Select(s => new { IsNumber = int.TryParse(s.SheetNumber, out int number), Number = number })
+                .Select(s => new { IsNumber = int.TryParse(s.SheetCustomNumber, out int number), Number = number })
                 .Where(c => c.IsNumber)
                 .ToArray();
             int lastIndex = indexes.Length > 0 ? indexes.Max(c => c.Number) : 0;
@@ -212,12 +212,12 @@ namespace RevitCreateViewSheet.ViewModels {
             var albumBlueprint = AddSheetsAlbumBlueprint;
             foreach(int index in Enumerable.Range(0, int.Parse(AddSheetsCount))) {
                 ++lastIndex;
-                var sheetModel = new SheetModel(titleBlock.TitleBlockSymbol) {
+                var sheetModel = new SheetModel(titleBlock.TitleBlockSymbol);
+                var sheetViewModel = new SheetViewModel(sheetModel) {
                     AlbumBlueprint = albumBlueprint,
-                    SheetNumber = lastIndex.ToString(),
+                    SheetCustomNumber = lastIndex.ToString(),
                     Name = $"{_localizationService.GetLocalizedString("TODO")} {lastIndex}"
                 };
-                var sheetViewModel = new SheetViewModel(sheetModel);
                 AllSheets.Add(sheetViewModel);
             }
         }
@@ -323,29 +323,24 @@ namespace RevitCreateViewSheet.ViewModels {
                 return false;
             }
 
-            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetNumber))
-                is SheetViewModel sheetInvalidNumber) {
-                ErrorText = $"У листа '{sheetInvalidNumber.Name}' недопустимый номер.";
+            if(notDeletedSheets.Any(s => string.IsNullOrWhiteSpace(s.SheetNumber))) {
+                ErrorText = $"У всех листов должен быть заполнен системный номер";
                 return false;
             }
 
-            //if(notDeletedSheets.Any(item => string.IsNullOrWhiteSpace(item.AlbumBlueprint))) {
-            //    ErrorText = "У всех листов должен быть заполнен альбом.";
-            //    return false; //TODO
-            //}
+            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetNumber))
+                is SheetViewModel sheetInvalidNumber) {
+                ErrorText = $"У листа '{sheetInvalidNumber.Name}' недопустимый системный номер.";
+                return false;
+            }
 
-            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.AlbumBlueprint))
+            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.AlbumBlueprint ?? string.Empty))
                 is SheetViewModel sheetInvalidAlbum) {
                 ErrorText = $"У листа '{sheetInvalidAlbum.Name}' недопустимый альбом.";
                 return false;
             }
 
-            //if(notDeletedSheets.Any(item => string.IsNullOrWhiteSpace(item.SheetCustomNumber))) {
-            //    ErrorText = "У всех листов должен быть задан Ш.Номер листа.";
-            //    return false;
-            //}
-
-            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetCustomNumber))
+            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetCustomNumber ?? string.Empty))
                 is SheetViewModel sheetInvalidSheetCustomNumber) {
                 ErrorText = $"У листа '{sheetInvalidSheetCustomNumber.Name}' недопустимый Ш.Номер листа.";
                 return false;
@@ -385,6 +380,10 @@ namespace RevitCreateViewSheet.ViewModels {
                 //   - на одном листе нельзя разместить несколько экземпляров одного и того же вида
                 //   - легенды можно размещать на листах повторно на других листах
                 var viewsOnSheet = SelectedSheet.GetViewPorts();
+                //var viewsCannotBePlaced = _revitRepository.GetAllViewsForViewPorts()
+                //    .Where(v => !_revitRepository.CanPlaceViewOnSheet(SelectedSheet.SheetModel, v))
+                //    .ToArray(); //TODO доработать получение видов, которые нельзя разместить на листе
+
                 var viewPort = _sheetItemsFactory.CreateViewPort(
                     SelectedSheet.SheetModel,
                     GetNotDeletedSheets()

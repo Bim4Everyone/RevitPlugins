@@ -89,11 +89,15 @@ namespace RevitCreateViewSheet.Models {
             Document.Delete(id);
         }
 
-        public void CreateAnnotation(View view2D, FamilySymbol familySymbol, XYZ point) {
+        public FamilyInstance CreateAnnotation(View view2D, FamilySymbol familySymbol, XYZ point) {
             if(!familySymbol.IsActive) {
                 familySymbol.Activate();
             }
-            Document.Create.NewFamilyInstance(point, familySymbol, view2D);
+            var instance = Document.Create.NewFamilyInstance(point, familySymbol, view2D);
+            if(instance is null) {
+                throw new InvalidOperationException("Не удалось создать аннотацию");
+            }
+            return instance;
         }
 
         /// <summary>
@@ -155,6 +159,27 @@ namespace RevitCreateViewSheet.Models {
             };
         }
 
+        internal bool CanPlaceViewOnSheet(SheetModel sheetModel, View view) {
+            if(sheetModel is null) {
+                throw new ArgumentNullException(nameof(sheetModel));
+            }
+
+            if(view is null) {
+                throw new ArgumentNullException(nameof(view));
+            }
+            bool result = false;
+            try {
+                result = Viewport.CanAddViewToSheet(Document, sheetModel.GetViewSheet().Id, view.Id);
+            } catch(InvalidOperationException) {
+                using(var trans = Document.StartTransaction("temp")) {
+                    var sheet = ViewSheet.Create(Document, GetTitleBlocks().First().Id);
+                    result = sheet is not null && Viewport.CanAddViewToSheet(Document, sheet.Id, view.Id);
+                    trans.RollBack();
+                }
+            }
+            return result && ViewHasElements(view);
+        }
+
         internal ICollection<SheetModel> GetSheetModels() {
             return GetViewSheets()
                 .Select(s => new SheetModel(s, GetTitleBlockSymbol(s)))
@@ -162,11 +187,18 @@ namespace RevitCreateViewSheet.Models {
         }
 
         internal ScheduleSheetInstance CreateSchedule(ElementId viewSheetId, ElementId scheduleViewId, XYZ point) {
-            return ScheduleSheetInstance.Create(Document, viewSheetId, scheduleViewId, point);
+            var scheduleInstance = ScheduleSheetInstance.Create(Document, viewSheetId, scheduleViewId, point);
+            if(scheduleInstance is null) {
+                throw new InvalidOperationException("Не удалось создать спецификацию");
+            }
+            return scheduleInstance;
         }
 
         internal Viewport CreateViewPort(ElementId viewSheetId, ElementId viewId, ElementId viewportTypeId, XYZ point) {
             var viewport = Viewport.Create(Document, viewSheetId, viewId, point);
+            if(viewport is null) {
+                throw new InvalidOperationException($"Не удалось создать видовой экран");
+            }
             var view = Document.GetElement(viewId) as View;
             view.CropBoxActive = true;
             view.CropBoxVisible = true;
@@ -180,6 +212,9 @@ namespace RevitCreateViewSheet.Models {
 
         internal ViewSheet CreateViewSheet(SheetModel sheetModel) {
             var sheet = ViewSheet.Create(Document, sheetModel.TitleBlockSymbol.Id);
+            if(sheet is null) {
+                throw new InvalidOperationException("Не удалось создать лист");
+            }
             return UpdateViewSheet(sheet, sheetModel, false);
         }
 
@@ -232,6 +267,16 @@ namespace RevitCreateViewSheet.Models {
                 throw new InvalidOperationException($"У листа {viewSheet.Name} отсутствует основная надпись");
             }
             return titleBlock.Symbol;
+        }
+
+        private bool ViewHasElements(View view) {
+            if(view is null) {
+                throw new ArgumentNullException(nameof(view));
+            }
+            return new FilteredElementCollector(view.Document, view.Id)
+                .WhereElementIsNotElementType()
+                .WherePasses(new VisibleInViewFilter(view.Document, view.Id))
+                .Any();
         }
     }
 }
