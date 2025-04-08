@@ -381,13 +381,17 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void AddViewPort() {
             try {
-                // Легенды можно размещать на листах повторно
+                // Особенности размещения видов на листах в ревите:
+                //   - на одном листе нельзя разместить несколько экземпляров одного и того же вида
+                //   - легенды можно размещать на листах повторно на других листах
+                var viewsOnSheet = SelectedSheet.GetViewPorts();
                 var viewPort = _sheetItemsFactory.CreateViewPort(
                     SelectedSheet.SheetModel,
                     GetNotDeletedSheets()
                     .SelectMany(s => s.GetViewPorts())
+                    .Where(v => v.ViewPortModel.View.ViewType != ViewType.Legend)
+                    .Union(viewsOnSheet)
                     .Select(v => v.ViewPortModel.View)
-                    .Where(v => v.ViewType != ViewType.Legend)
                     .ToArray());
                 SelectedSheet.SheetModel.AddViewPort(viewPort);
                 SelectedSheet.AddView(new ViewPortViewModel(viewPort));
