@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -12,6 +14,9 @@ using RevitCreateViewSheet.Models;
 namespace RevitCreateViewSheet.ViewModels {
     internal class SheetViewModel : BaseViewModel, IEntityViewModel {
         private readonly SheetModel _sheetModel;
+        private readonly ObservableCollection<ViewPortViewModel> _allViewPorts;
+        private readonly ObservableCollection<ScheduleViewModel> _allSchedules;
+        private readonly ObservableCollection<AnnotationViewModel> _allAnnotations;
         private string _name;
         private string _albumBlueprint;
         private string _sheetNumber;
@@ -30,15 +35,15 @@ namespace RevitCreateViewSheet.ViewModels {
             _titleBlock = new TitleBlockViewModel(_sheetModel.TitleBlockSymbol);
             IsPlaced = sheetModel.State == EntityState.Unchanged;
 
-            AllViewPorts = [.. _sheetModel.GetViewPorts().Select(v => new ViewPortViewModel(v))];
-            AllSchedules = [.. _sheetModel.GetSchedules().Select(s => new ScheduleViewModel(s))];
-            AllAnnotations = [.. _sheetModel.GetAnnotations().Select(a => new AnnotationViewModel(a))];
+            _allViewPorts = [.. _sheetModel.GetViewPorts().Select(v => new ViewPortViewModel(v))];
+            _allSchedules = [.. _sheetModel.GetSchedules().Select(s => new ScheduleViewModel(s))];
+            _allAnnotations = [.. _sheetModel.GetAnnotations().Select(a => new AnnotationViewModel(a))];
 
-            VisibleViewPorts = new CollectionViewSource() { Source = AllViewPorts };
+            VisibleViewPorts = new CollectionViewSource() { Source = _allViewPorts };
             VisibleViewPorts.Filter += EntitiesFilterHandler;
-            VisibleSchedules = new CollectionViewSource() { Source = AllSchedules };
+            VisibleSchedules = new CollectionViewSource() { Source = _allSchedules };
             VisibleSchedules.Filter += EntitiesFilterHandler;
-            VisibleAnnotations = new CollectionViewSource() { Source = AllAnnotations };
+            VisibleAnnotations = new CollectionViewSource() { Source = _allAnnotations };
             VisibleAnnotations.Filter += EntitiesFilterHandler;
 
             RemoveViewCommand = RelayCommand.Create<ViewPortViewModel>(RemoveView, CanRemoveView);
@@ -122,12 +127,6 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public CollectionViewSource VisibleAnnotations { get; }
 
-        public ObservableCollection<ViewPortViewModel> AllViewPorts { get; }
-
-        public ObservableCollection<ScheduleViewModel> AllSchedules { get; }
-
-        public ObservableCollection<AnnotationViewModel> AllAnnotations { get; }
-
         public ICommand RemoveViewCommand { get; }
 
         public ICommand RemoveScheduleCommand { get; }
@@ -135,9 +134,44 @@ namespace RevitCreateViewSheet.ViewModels {
         public ICommand RemoveAnnotationCommand { get; }
 
 
+        public void AddView(ViewPortViewModel view) {
+            if(view is null) {
+                throw new ArgumentNullException(nameof(view));
+            }
+            if(view.ViewPortModel.State != EntityState.Deleted) {
+                _allViewPorts.Add(view);
+            }
+        }
+
+        public void AddSchedule(ScheduleViewModel schedule) {
+            if(schedule is null) {
+                throw new ArgumentNullException(nameof(schedule));
+            }
+            if(schedule.ScheduleModel.State != EntityState.Deleted) {
+                _allSchedules.Add(schedule);
+            }
+        }
+
+        public void AddAnnotation(AnnotationViewModel annotation) {
+            if(annotation is null) {
+                throw new ArgumentNullException(nameof(annotation));
+            }
+            if(annotation.AnnotationModel.State != EntityState.Deleted) {
+                _allAnnotations.Add(annotation);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию видовых экранов с листа, которые не удалены
+        /// </summary>
+        /// <returns>Коллекция не удаленных видовых экранов</returns>
+        public IReadOnlyCollection<ViewPortViewModel> GetViewPorts() {
+            return [.. _allViewPorts.Where(v => v.ViewPortModel.State != EntityState.Deleted)];
+        }
+
         private void RemoveView(ViewPortViewModel view) {
             _sheetModel.RemoveViewPort(view.ViewPortModel);
-            RemoveEntityViewModel(view, AllViewPorts, VisibleViewPorts.View);
+            RemoveEntityViewModel(view, _allViewPorts, VisibleViewPorts.View);
         }
 
         private bool CanRemoveView(ViewPortViewModel view) {
@@ -146,7 +180,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void RemoveSchedule(ScheduleViewModel scheduleView) {
             _sheetModel.RemoveSchedule(scheduleView.ScheduleModel);
-            RemoveEntityViewModel(scheduleView, AllSchedules, VisibleSchedules.View);
+            RemoveEntityViewModel(scheduleView, _allSchedules, VisibleSchedules.View);
         }
 
         private bool CanRemoveSchedule(ScheduleViewModel scheduleView) {
@@ -155,7 +189,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void RemoveAnnotation(AnnotationViewModel annotationView) {
             _sheetModel.RemoveAnnotation(annotationView.AnnotationModel);
-            RemoveEntityViewModel(annotationView, AllAnnotations, VisibleAnnotations.View);
+            RemoveEntityViewModel(annotationView, _allAnnotations, VisibleAnnotations.View);
         }
 
         private bool CanRemoveAnnotation(AnnotationViewModel annotationView) {

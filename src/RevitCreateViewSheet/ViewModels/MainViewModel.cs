@@ -385,12 +385,12 @@ namespace RevitCreateViewSheet.ViewModels {
                 var viewPort = _sheetItemsFactory.CreateViewPort(
                     SelectedSheet.SheetModel,
                     GetNotDeletedSheets()
-                    .SelectMany(s => s.AllViewPorts)
+                    .SelectMany(s => s.GetViewPorts())
                     .Select(v => v.ViewPortModel.View)
                     .Where(v => v.ViewType != ViewType.Legend)
                     .ToArray());
                 SelectedSheet.SheetModel.AddViewPort(viewPort);
-                SelectedSheet.AllViewPorts.Add(new ViewPortViewModel(viewPort));
+                SelectedSheet.AddView(new ViewPortViewModel(viewPort));
             } catch(OperationCanceledException) {
                 return;
             }
@@ -400,7 +400,7 @@ namespace RevitCreateViewSheet.ViewModels {
             try {
                 var schedule = _sheetItemsFactory.CreateSchedule(SelectedSheet.SheetModel);
                 SelectedSheet.SheetModel.AddSchedule(schedule);
-                SelectedSheet.AllSchedules.Add(new ScheduleViewModel(schedule));
+                SelectedSheet.AddSchedule(new ScheduleViewModel(schedule));
             } catch(OperationCanceledException) {
                 return;
             }
@@ -410,7 +410,7 @@ namespace RevitCreateViewSheet.ViewModels {
             try {
                 var annotation = _sheetItemsFactory.CreateAnnotation(SelectedSheet.SheetModel);
                 SelectedSheet.SheetModel.AddAnnotation(annotation);
-                SelectedSheet.AllAnnotations.Add(new AnnotationViewModel(annotation));
+                SelectedSheet.AddAnnotation(new AnnotationViewModel(annotation));
             } catch(OperationCanceledException) {
                 return;
             }
