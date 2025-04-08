@@ -323,7 +323,7 @@
                                         <ui:Button
                                             Appearance="Danger"
                                             Command="{Binding Path=DataContext.RemoveSheetCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                            CommandParameter="{Binding}"
+                                            CommandParameter="{Binding Path=DataContext.SelectedSheets, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                             Content="{ui:SymbolIcon Delete24}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

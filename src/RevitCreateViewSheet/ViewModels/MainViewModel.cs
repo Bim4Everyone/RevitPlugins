@@ -73,7 +73,7 @@ namespace RevitCreateViewSheet.ViewModels {
             _selectedSheets = [];
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            RemoveSheetCommand = RelayCommand.Create<SheetViewModel>(RemoveSheet, CanRemoveSheet);
+            RemoveSheetCommand = RelayCommand.Create<ICollection<SheetViewModel>>(RemoveSheet, CanRemoveSheet);
             AddSheetsCommand = RelayCommand.Create(AddSheets, CanAddSheets);
             AddViewPortCommand = RelayCommand.Create(AddViewPort, CanAddSheetItem);
             AddScheduleCommand = RelayCommand.Create(AddSchedule, CanAddSheetItem);
@@ -257,17 +257,19 @@ namespace RevitCreateViewSheet.ViewModels {
             return true;
         }
 
-        private void RemoveSheet(SheetViewModel sheet) {
+        private void RemoveSheet(ICollection<SheetViewModel> sheets) {
             if(_messageBoxService.Show(
-                $"Вы действительно хотите удалить лист {sheet.Name}?",
+                $"Вы действительно хотите удалить листы ({sheets.Count} шт.)?",
                 "Предупреждение",
                 System.Windows.MessageBoxButton.YesNo,
                 System.Windows.MessageBoxImage.Warning) == System.Windows.MessageBoxResult.Yes) {
 
-                if(sheet.IsPlaced) {
-                    sheet.SheetModel.MarkAsDeleted();
-                } else {
-                    AllSheets.Remove(sheet);
+                foreach(SheetViewModel sheet in sheets) {
+                    if(sheet.IsPlaced) {
+                        sheet.SheetModel.MarkAsDeleted();
+                    } else {
+                        AllSheets.Remove(sheet);
+                    }
                 }
                 var editableView = VisibleSheets.View as IEditableCollectionView;
                 if(editableView?.IsEditingItem ?? false) {
@@ -277,8 +279,8 @@ namespace RevitCreateViewSheet.ViewModels {
             }
         }
 
-        private bool CanRemoveSheet(SheetViewModel sheet) {
-            return sheet is not null;
+        private bool CanRemoveSheet(ICollection<SheetViewModel> sheets) {
+            return sheets is not null && sheets.Count > 0;
         }
 
         private void AcceptView() {
