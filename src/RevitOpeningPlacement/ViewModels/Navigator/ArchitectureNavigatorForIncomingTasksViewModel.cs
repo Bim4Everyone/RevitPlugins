@@ -237,9 +237,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                     ct.ThrowIfCancellationRequested();
                     progress.Report(i);
                     openingReal.UpdateStatus(mepLinks);
-                    if(openingReal.Status != OpeningModels.Enums.OpeningRealStatus.Correct) {
-                        openingsRealViewModels.Add(new OpeningRealArViewModel(openingReal));
-                    }
+                    openingsRealViewModels.Add(new OpeningRealArViewModel(openingReal));
                     i++;
                 }
             }

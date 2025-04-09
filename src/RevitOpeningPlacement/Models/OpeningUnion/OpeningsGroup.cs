@@ -116,7 +116,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
                     result.Add(descriptionItem.Trim());
                 }
             }
-            return string.Join("; ", result);
+            return string.Join("; ", result.OrderBy(s => s));
         }
 
 

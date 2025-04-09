@@ -41,7 +41,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void LoadReport() {
             var openWindow = GetPlatformService<IOpenFileDialogService>();
-            openWindow.Filter = "ClashReport |*.html";
+            openWindow.Filter = "ClashReport |*.xml";
 
             if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
                 throw new OperationCanceledException();
@@ -56,7 +56,9 @@ namespace RevitClashDetective.ViewModels.Navigator {
             Name = Path.GetFileNameWithoutExtension(path);
             RevitClashesLoader reportLoader = new RevitClashesLoader(_revitRepository, path);
             if(reportLoader.IsValid()) {
-                Clashes = new ObservableCollection<ClashViewModel>(reportLoader.GetClashes()
+                var report = reportLoader.GetReports().First();
+                Name = report.Name;
+                Clashes = new ObservableCollection<ClashViewModel>(report.Clashes
                         .Select(item => new ClashViewModel(_revitRepository, item)));
             }
         }

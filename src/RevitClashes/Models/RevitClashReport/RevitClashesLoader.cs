@@ -20,20 +20,20 @@ namespace RevitClashDetective.Models.RevitClashReport {
             FilePath = path;
         }
 
-        public IEnumerable<ClashModel> GetClashes() {
+        public IEnumerable<ReportModel> GetReports() {
             if(string.IsNullOrEmpty(FilePath)) {
                 throw new ArgumentException($"'{nameof(FilePath)}' cannot be null or empty.", nameof(FilePath));
             }
 
             if(!File.Exists(FilePath)) {
-                throw new ArgumentException($"���� \"{FilePath}\" ����������.", nameof(FilePath));
+                throw new ArgumentException($"Файл \"{FilePath}\" Отсутствует.", nameof(FilePath));
             }
 
             if(!IsCorrectFileName(FilePath)) {
-                throw new ArgumentException($"������ ����� � ��������� ������ � ������ �����.");
+                throw new ArgumentException("Нельзя загрузить проверки, сделанные в другом проекте..");
             }
 
-            return File.ReadAllLines(FilePath).Skip(3)
+            var clashes = File.ReadAllLines(FilePath).Skip(3)
                                           .Select(item => Regex.Matches(item, @"<td>(?'value'.+?)</td>")
                                                                            .Cast<Match>()
                                                                            .Select(i => i.Groups["value"].Value.Split(':'))
@@ -46,6 +46,7 @@ namespace RevitClashDetective.Models.RevitClashReport {
                                           .Where(item => item.LeftElement != null && item.RightElement != null)
                                           .Select(item => new ClashModel(_revitRepository, item.LeftElement, item.RightElement))
                                           .ToArray();
+            return new ReportModel[] { new ReportModel(Path.GetFileNameWithoutExtension(FilePath), clashes) };
         }
 
         public bool IsValid() {

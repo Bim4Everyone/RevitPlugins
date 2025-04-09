@@ -34,6 +34,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             LevelName = GetLevelName(openingReal);
             TaskInfo = GetTaskInfo(openingReal);
             FamilyName = GetFamilyName(openingReal);
+            Host = new OpeningKrHost(openingReal.GetFamilyInstance().Host);
         }
 
 
@@ -81,6 +82,11 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// Название семейства
         /// </summary>
         public string FamilyName { get; } = string.Empty;
+
+        /// <summary>
+        /// Основа чистового отверстия
+        /// </summary>
+        public IOpeningKrHost Host { get; }
 
         public override bool Equals(object obj) {
             return (obj != null)

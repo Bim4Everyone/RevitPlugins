@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Height = _openingTask.DisplayHeight;
             Thickness = _openingTask.DisplayThickness;
             FamilyShortName = _openingTask.FamilyShortName;
-            Host = _openingTask.Host is null ? new OpeningTaskHost() : new OpeningTaskHost(_openingTask.Host);
+            Host = _openingTask.Host is null ? new OpeningKrHost() : new OpeningKrHost(_openingTask.Host);
             Status = _openingTask.Status.GetDescription();
             Comment = _openingTask.Comment;
             Username = _openingTask.Username;
@@ -125,7 +125,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// </summary>
         public string Username { get; } = string.Empty;
 
-        public IOpeningTaskHost Host { get; }
+        public IOpeningKrHost Host { get; }
 
         public override bool Equals(object obj) {
             return (obj != null)
