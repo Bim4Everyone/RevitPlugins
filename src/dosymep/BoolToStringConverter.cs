@@ -17,11 +17,19 @@ namespace dosymep.WPF.Converters {
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             bool? boolValue = (bool?) value;
-            return boolValue.HasValue ? WhenTrue : WhenFalse;
+            return boolValue == true ? WhenTrue : WhenFalse;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            throw new NotImplementedException();
+            if(value?.Equals(WhenTrue) == true) {
+                return true;
+            }
+
+            if(value?.Equals(WhenFalse) == true) {
+                return false;
+            }
+
+            return default;
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider) {
