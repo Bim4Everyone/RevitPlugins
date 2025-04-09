@@ -1,0 +1,86 @@
+<core:WpfUIPlatformPage
+    x:Class="RevitPlatformSettings.Views.Pages.RevitParamsSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:settings="clr-namespace:RevitPlatformSettings.ViewModels.Settings"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:db="clr-namespace:Autodesk.Revit.DB;assembly=RevitAPI"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:bim4Everyone="clr-namespace:dosymep.Bim4Everyone;assembly=dosymep.Bim4Everyone"
+    xmlns:converters="clr-namespace:RevitPlatformSettings.Converters"
+
+    mc:Ignorable="d"
+    x:ClassModifier="internal"
+    ScrollViewer.CanContentScroll="False"
+
+    x:Name="_this"
+    d:DesignHeight="300" d:DesignWidth="300"
+    d:DataContext="{d:DesignInstance settings:RevitParamsSettingsViewModel, IsDesignTimeCreatable=False}">
+
+    <Page.Resources>
+        <converters:RevitParamImageConverter x:Key="ParamImageConverter" />
+        <converters:RevitParamDescriptionConverter x:Key="ParamDescriptionConverter" />
+    </Page.Resources>
+
+    <Grid>
+        <ui:ListView
+            SelectionMode="Single"
+            ItemsSource="{Binding RevitParams}">
+
+
+            <ui:ListView.ItemTemplate>
+                <DataTemplate DataType="{x:Type bim4Everyone:RevitParam}">
+                    <Grid Margin="8,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <ui:SymbolIcon
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Grid.Column="0"
+                            Width="32"
+                            Height="32"
+                            Margin="6"
+                            Symbol="{Binding 
+                                Converter={StaticResource ParamImageConverter}}" />
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="12,6,0,0"
+                            FontWeight="Bold">
+
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} ({1})">
+                                    <Binding Path="Name" />
+                                    <Binding Path="Id" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+
+                        </TextBlock>
+
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="12,0,0,6"
+                            Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{Binding 
+                                Converter={StaticResource ParamDescriptionConverter}}" />
+
+                    </Grid>
+                </DataTemplate>
+            </ui:ListView.ItemTemplate>
+
+        </ui:ListView>
+    </Grid>
+</core:WpfUIPlatformPage>
