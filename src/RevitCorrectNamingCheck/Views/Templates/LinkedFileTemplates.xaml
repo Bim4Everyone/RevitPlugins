@@ -1,6 +1,5 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <DataTemplate x:Key="LinkedFileTemplate">
         <TextBlock Text="{Binding Name}">
@@ -9,12 +8,12 @@
                     <Setter Property="Foreground" Value="Black" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding FileNameStatus}" Value="None">
-                            <Setter Property="Background" Value="LightCoral"/>
-                            <Setter Property="ToolTip" Value="{DynamicResource WorksetNameStatus.NoMatch}" />
+                            <Setter Property="Background" Value="MistyRose"/>
+                            <Setter Property="ToolTip" Value="{DynamicResource FileNameStatus.NotFoundTags}" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding FileNameStatus}" Value="Incorrect">
-                            <Setter Property="Background" Value="LightCoral"/>
-                            <Setter Property="ToolTip" Value="{DynamicResource WorksetNameStatus.MultipleTags}" />
+                            <Setter Property="Background" Value="MistyRose"/>
+                            <Setter Property="ToolTip" Value="{DynamicResource FileNameStatus.MultipleTags}" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

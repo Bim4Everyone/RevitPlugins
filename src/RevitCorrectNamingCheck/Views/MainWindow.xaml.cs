@@ -38,10 +38,6 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string ProjectConfigName => nameof(MainWindow);
-    
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-        Close();
-    }
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         Close();

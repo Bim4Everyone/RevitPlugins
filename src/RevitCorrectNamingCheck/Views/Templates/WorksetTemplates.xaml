@@ -21,7 +21,7 @@
         <TextBlock 
             Text="{Binding Name}"
             MinWidth="150"
-            Background="LightCoral"
+            Background="MistyRose"
             ToolTip="{DynamicResource WorksetNameStatus.Incorrect}"/>
     </DataTemplate>
 
@@ -29,7 +29,7 @@
         <TextBlock 
             Text="{Binding Name}"
             MinWidth="150"
-            Background="LightCoral"
+            Background="MistyRose"
             ToolTip="{DynamicResource WorksetNameStatus.NoMatch}"/>
     </DataTemplate>
 

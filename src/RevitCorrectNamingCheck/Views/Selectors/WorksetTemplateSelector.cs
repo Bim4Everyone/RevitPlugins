@@ -19,6 +19,14 @@ namespace RevitCorrectNamingCheck.Views.Selectors
         public DataTemplate NoMatchTemplate { get; set; }
         public DataTemplate DisabledTemplate { get; set; }
 
+        private static T FindParent<T>(DependencyObject child) where T : DependencyObject {
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
+            while(parent != null && parent is not T) {
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+            return parent as T;
+        }
+
         public override DataTemplate SelectTemplate(object item, DependencyObject container) {
             var linkedFile = FindParent<DataGridRow>(container)?.DataContext as LinkedFile;
 
@@ -37,14 +45,6 @@ namespace RevitCorrectNamingCheck.Views.Selectors
             }
 
             return base.SelectTemplate(item, container);
-        }
-
-        private static T FindParent<T>(DependencyObject child) where T : DependencyObject {
-            DependencyObject parent = VisualTreeHelper.GetParent(child);
-            while(parent != null && parent is not T) {
-                parent = VisualTreeHelper.GetParent(parent);
-            }
-            return parent as T;
         }
     }
 }

@@ -22,6 +22,6 @@
     <system:String x:Key="GeneralSettings.ErrorMessage">Error</system:String>
 
     <system:String x:Key="MainWindow.Undefined">Undefined</system:String>
-    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonRefresh">Refresh</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>

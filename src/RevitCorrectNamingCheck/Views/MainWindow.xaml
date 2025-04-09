@@ -54,7 +54,9 @@
         Grid.Row="0"
         Title="{me:LocalizationSource MainWindow.Title}"/>
 
-        <DataGrid ItemsSource="{Binding LinkedFiles}"
+        <DataGrid 
+          Grid.Row="1"
+          ItemsSource="{Binding LinkedFiles}"
           AutoGenerateColumns="False"
           HeadersVisibility="Column"
           CanUserAddRows="False"
@@ -96,13 +98,13 @@
         Grid.Row="2"
         Orientation="Horizontal"
         HorizontalAlignment="Right">
-
+            
             <ui:Button
             Margin="10"
-            Width="80"
+            Width="85"
             Appearance="Info"
-            Content="{me:LocalizationSource MainWindow.ButtonOk}"
-            Click="ButtonOk_Click" />
+            Content="{me:LocalizationSource MainWindow.ButtonRefresh}"
+            Command="{Binding LoadViewCommand}"  />
 
             <ui:Button
             Margin="10"

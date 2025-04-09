@@ -42,6 +42,6 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
-        //LinkedFiles = _revitRepository.GetLinkedFiles();
+        LinkedFiles = _revitRepository.GetLinkedFiles();
     }
 }

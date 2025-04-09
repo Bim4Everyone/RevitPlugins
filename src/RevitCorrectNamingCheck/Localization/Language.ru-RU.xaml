@@ -21,6 +21,6 @@
     <system:String x:Key="GeneralSettings.ErrorMessage">Ошибка</system:String>
 
     <system:String x:Key="MainWindow.Undefined">Не определено</system:String>
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonRefresh">Обновить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>

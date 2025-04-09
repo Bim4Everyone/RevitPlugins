@@ -21,6 +21,43 @@ namespace RevitCorrectNamingCheck.Models
             _bimModelPartsService = bimModelPartsService;
         }
 
+        private void SetWorksetInfo(WorksetInfo workset, BimModelPart currentPart, List<string> bimIdentifiers) {
+            workset.WorksetNameStatus = GetWorksetNameStatus(workset.Name, currentPart, bimIdentifiers);
+        }
+
+        private NameStatus GetFileNameStatus(string name, List<string> bimIdentifiers) {
+            int matches = bimIdentifiers.Count(part => NamingRulesHelper.ContainsPart(name, part));
+
+            if(matches == 0) {
+                return NameStatus.None;
+            }
+
+            if(matches == 1) {
+                return NameStatus.Correct;
+            }
+
+            return NameStatus.Incorrect;
+        }
+
+        private NameStatus GetWorksetNameStatus(string worksetName, BimModelPart currentPart, List<string> identifiers) {
+            int matches = identifiers.Count(part => NamingRulesHelper.ContainsPart(worksetName, part));
+            bool isCurrent = NamingRulesHelper.MatchesCurrentPart(worksetName, currentPart);
+            bool isLink = NamingRulesHelper.IsLinkWorkset(worksetName);
+
+            if(matches == 0) {
+                return NameStatus.None;
+            }
+
+            if(matches == 1) {
+                if(isCurrent) {
+                    return isLink ? NameStatus.Correct : NameStatus.PartialCorrect;
+                }
+                return NameStatus.None;
+            }
+
+            return NameStatus.Incorrect;
+        }
+
         public LinkedFile Enrich(LinkedFile linkedFile) {
 
             var bimModelParts = _bimModelPartsService.GetBimModelParts().ToList();
@@ -30,9 +67,9 @@ namespace RevitCorrectNamingCheck.Models
                 .Distinct()
                 .ToList();
 
-            var fileNameStatus = GetFileNameStatus(linkedFile.Name, bimIdentifiers);
+            linkedFile.FileNameStatus = GetFileNameStatus(linkedFile.Name, bimIdentifiers);
 
-            if(fileNameStatus == NameStatus.Correct) {
+            if(linkedFile.FileNameStatus == NameStatus.Correct) {
                 var currentPart = _bimModelPartsService.GetBimModelPart(linkedFile.Name);
 
                 SetWorksetInfo(linkedFile.TypeWorkset, currentPart, bimIdentifiers);
@@ -40,34 +77,6 @@ namespace RevitCorrectNamingCheck.Models
             }
 
             return linkedFile;
-        }
-
-        private void SetWorksetInfo(WorksetInfo workset, BimModelPart currentPart, List<string> bimIdentifiers) {
-            workset.WorksetNameStatus = GetWorksetNameStatus(workset.Name, currentPart, bimIdentifiers);
-        }
-
-        private NameStatus GetFileNameStatus(string name, List<string> bimIdentifiers) {
-            int matches = bimIdentifiers.Count(part => NamingRulesHelper.ContainsPart(name, part));
-            return matches == 1 ? NameStatus.Correct : NameStatus.Incorrect;
-        }
-
-        private NameStatus GetWorksetNameStatus(string worksetName, BimModelPart currentPart, List<string> identifiers) {
-            int matchCount = identifiers.Count(part => NamingRulesHelper.ContainsPart(worksetName, part));
-            bool isCurrent = NamingRulesHelper.MatchesCurrentPart(worksetName, currentPart);
-            bool isLink = NamingRulesHelper.IsLinkWorkset(worksetName);
-
-            if(matchCount == 0) {
-                return NameStatus.None;
-            }
-                
-            if(matchCount == 1) {
-                if(isCurrent) {
-                    return isLink ? NameStatus.Correct : NameStatus.PartialCorrect;
-                }
-                return NameStatus.None;
-            }
-
-            return NameStatus.Incorrect;
         }
     }
 }

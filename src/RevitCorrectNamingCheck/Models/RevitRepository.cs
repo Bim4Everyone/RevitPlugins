@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -55,28 +56,6 @@ internal class RevitRepository {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
-    public List<LinkedFile> GetLinkedFiles() {
-        var result = new List<LinkedFile>();
-        var linkedFileEnricher = new LinkedFileEnricher(_bimModelPartsService);
-
-        var linkTypes = GetRevitLinkTypes();
-        var linkInstances = GetRevitLinkInstances();
-
-        foreach(var linkType in linkTypes) {
-            var instances = linkInstances.Where(x => x.GetTypeId() == linkType.Id);
-
-            foreach(var instance in instances) {
-                var typeWorkset = new WorksetInfo(linkType.WorksetId, GetWorksetName(linkType));
-                var instanceWorkset = new WorksetInfo(instance.WorksetId, GetWorksetName(instance));
-                var linkedFile = new LinkedFile(linkType.Id, linkType.Name, typeWorkset, instanceWorkset);
-
-                linkedFileEnricher.Enrich(linkedFile);
-                result.Add(linkedFile);
-            }
-        }
-        return result;
-    }
-
     private List<RevitLinkType> GetRevitLinkTypes() {
         return new FilteredElementCollector(Document)
             .OfClass(typeof(RevitLinkType))
@@ -103,5 +82,27 @@ internal class RevitRepository {
         int worksetId = param.AsInteger();
         var workset = Document.GetWorksetTable().GetWorkset(new WorksetId(worksetId));
         return workset?.Name ?? undefinedText;
+    }
+
+    public List<LinkedFile> GetLinkedFiles() {
+        var result = new List<LinkedFile>();
+        var linkedFileEnricher = new LinkedFileEnricher(_bimModelPartsService);
+
+        var linkTypes = GetRevitLinkTypes();
+        var linkInstances = GetRevitLinkInstances();
+
+        foreach(var linkType in linkTypes) {
+            var instances = linkInstances.Where(x => x.GetTypeId() == linkType.Id);
+
+            foreach(var instance in instances) {
+                var typeWorkset = new WorksetInfo(linkType.WorksetId, GetWorksetName(linkType));
+                var instanceWorkset = new WorksetInfo(instance.WorksetId, GetWorksetName(instance));
+                var linkedFile = new LinkedFile(linkType.Id, linkType.Name, typeWorkset, instanceWorkset);
+
+                linkedFileEnricher.Enrich(linkedFile);
+                result.Add(linkedFile);
+            }
+        }
+        return result;
     }
 }
