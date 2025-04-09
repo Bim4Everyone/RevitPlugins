@@ -121,15 +121,8 @@ namespace RevitCreateViewSheet.Models {
                 .ToArray();
         }
 
-        public ICollection<ViewSchedule> GetNotPlacedSchedules() {
-            var placedSchedulesIds = new FilteredElementCollector(Document)
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(ScheduleSheetInstance))
-                .OfType<ScheduleSheetInstance>()
-                .Select(s => s.ScheduleId)
-                .ToHashSet();
+        public ICollection<ViewSchedule> GetAllSchedules() {
             return new FilteredElementCollector(Document)
-                .Excluding(placedSchedulesIds)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(ViewSchedule))
                 .OfType<ViewSchedule>()
