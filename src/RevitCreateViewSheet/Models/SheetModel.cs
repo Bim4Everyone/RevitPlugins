@@ -208,14 +208,16 @@ namespace RevitCreateViewSheet.Models {
                 repository.DeleteElement(_viewSheet.Id);
 
             } else if(State == EntityState.Modified && _viewSheet is not null) {
-                Validate();
                 repository.UpdateViewSheet(_viewSheet, this);
                 SaveNestedItems(repository);
                 State = EntityState.Unchanged;
 
             } else if(State == EntityState.Added
                 || State == EntityState.Modified && _viewSheet is null) {
-                Validate();
+                if(TitleBlockSymbol is null) {
+                    throw new InvalidOperationException(
+                        $"Перед сохранением необходимо назначить {nameof(TitleBlockSymbol)}");
+                }
                 _viewSheet = repository.CreateViewSheet(this);
                 SaveNestedItems(repository);
                 State = EntityState.Unchanged;
@@ -301,21 +303,6 @@ namespace RevitCreateViewSheet.Models {
         private void SetModifiedState() {
             if(State != EntityState.Added) {
                 State = EntityState.Modified;
-            }
-        }
-
-        private void Validate() {
-            if(string.IsNullOrWhiteSpace(AlbumBlueprint)) {
-                throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(AlbumBlueprint)}");
-            }
-            if(string.IsNullOrWhiteSpace(SheetNumber)) {
-                throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(SheetNumber)}");
-            }
-            if(string.IsNullOrWhiteSpace(Name)) {
-                throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(Name)}");
-            }
-            if(TitleBlockSymbol is null) {
-                throw new InvalidOperationException($"Перед сохранением необходимо назначить {nameof(TitleBlockSymbol)}");
             }
         }
     }
