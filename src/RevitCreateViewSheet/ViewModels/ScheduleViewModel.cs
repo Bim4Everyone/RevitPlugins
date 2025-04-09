@@ -8,6 +8,7 @@ using RevitCreateViewSheet.Models;
 namespace RevitCreateViewSheet.ViewModels {
     internal class ScheduleViewModel : BaseViewModel, IEquatable<ScheduleViewModel>, IEntityViewModel {
         private readonly ScheduleModel _scheduleModel;
+        private int _countOnSheets;
 
         public ScheduleViewModel(ScheduleModel scheduleModel) {
             _scheduleModel = scheduleModel ?? throw new ArgumentNullException(nameof(scheduleModel));
@@ -22,6 +23,14 @@ namespace RevitCreateViewSheet.ViewModels {
         public IEntity Entity => ScheduleModel;
 
         public ScheduleModel ScheduleModel => _scheduleModel;
+
+        /// <summary>
+        /// Количество данной спецификации на всех листах
+        /// </summary>
+        public int CountOnSheets {
+            get => _countOnSheets;
+            set => RaiseAndSetIfChanged(ref _countOnSheets, value);
+        }
 
 
         public bool Equals(ScheduleViewModel other) {

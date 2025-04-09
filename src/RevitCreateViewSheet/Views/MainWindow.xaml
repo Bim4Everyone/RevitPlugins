@@ -474,9 +474,14 @@
                                         <ui:DataGrid.Columns>
                                             <DataGridTextColumn
                                                 Header="Название"
-                                                Width="200"
+                                                Width="350"
                                                 IsReadOnly="True"
                                                 Binding="{Binding Name}" />
+                                            <DataGridTextColumn
+                                                Header="Кол-во"
+                                                Width="50"
+                                                IsReadOnly="True"
+                                                Binding="{Binding CountOnSheets}" />
                                             <DataGridTemplateColumn
                                                 Width="Auto"
                                                 SortMemberPath="IsPlaced"
