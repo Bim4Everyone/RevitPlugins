@@ -32,7 +32,9 @@ namespace RevitCreateViewSheet.ViewModels {
             _name = _sheetModel.Name;
             _sheetNumber = _sheetModel.SheetNumber;
             _sheetCustomNumber = _sheetModel.SheetCustomNumber;
-            _titleBlock = new TitleBlockViewModel(_sheetModel.TitleBlockSymbol);
+            if(_sheetModel.TitleBlockSymbol is not null) {
+                _titleBlock = new TitleBlockViewModel(_sheetModel.TitleBlockSymbol);
+            }
             IsPlaced = sheetModel.State == EntityState.Unchanged;
 
             _allViewPorts = [.. _sheetModel.GetViewPorts().Select(v => new ViewPortViewModel(v))];

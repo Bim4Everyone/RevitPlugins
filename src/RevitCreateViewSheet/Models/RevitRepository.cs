@@ -152,27 +152,6 @@ namespace RevitCreateViewSheet.Models {
             };
         }
 
-        internal bool CanPlaceViewOnSheet(SheetModel sheetModel, View view) {
-            if(sheetModel is null) {
-                throw new ArgumentNullException(nameof(sheetModel));
-            }
-
-            if(view is null) {
-                throw new ArgumentNullException(nameof(view));
-            }
-            bool result = false;
-            try {
-                result = Viewport.CanAddViewToSheet(Document, sheetModel.GetViewSheet().Id, view.Id);
-            } catch(InvalidOperationException) {
-                using(var trans = Document.StartTransaction("temp")) {
-                    var sheet = ViewSheet.Create(Document, GetTitleBlocks().First().Id);
-                    result = sheet is not null && Viewport.CanAddViewToSheet(Document, sheet.Id, view.Id);
-                    trans.RollBack();
-                }
-            }
-            return result && ViewHasElements(view);
-        }
-
         internal ICollection<SheetModel> GetSheetModels() {
             return GetViewSheets()
                 .Select(s => new SheetModel(s, GetTitleBlockSymbol(s)))
@@ -216,12 +195,14 @@ namespace RevitCreateViewSheet.Models {
         }
 
         private ViewSheet UpdateViewSheet(ViewSheet sheet, SheetModel sheetModel, bool updateTitleBlock) {
-            if(updateTitleBlock) {
+            if(updateTitleBlock && sheetModel.TitleBlockSymbol is not null) {
                 var titleId = sheet.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_TitleBlocks))
                     .FirstOrDefault();
+                var symbol = Document.GetElement(sheetModel.TitleBlockSymbol.Id) as FamilySymbol;
                 if(titleId.IsNotNull()) {
-                    var symbol = Document.GetElement(sheetModel.TitleBlockSymbol.Id) as FamilySymbol;
                     (Document.GetElement(titleId) as FamilyInstance).Symbol = symbol;
+                } else {
+                    Document.Create.NewFamilyInstance(sheet.Origin, symbol, sheet);
                 }
             }
             sheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, sheetModel.SheetCustomNumber);
@@ -250,26 +231,21 @@ namespace RevitCreateViewSheet.Models {
                 .ToArray();
         }
 
+        /// <summary>
+        /// Возвращает типоразмер основной надписи листа, если она есть. Если ее нет, то будет возвращен null.
+        /// </summary>
+        /// <param name="viewSheet">Лист в модели Revit</param>
+        /// <returns>Типоразмер основной надписи на листе или null</returns>
         private FamilySymbol GetTitleBlockSymbol(ViewSheet viewSheet) {
-            var titleBlock = new FilteredElementCollector(Document)
+            var titles = new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
-                .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
+                .OfClass(typeof(FamilyInstance))
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                .FirstElement() as FamilyInstance;
-            if(titleBlock is null) {
-                throw new InvalidOperationException($"У листа {viewSheet.Name} отсутствует основная надпись");
-            }
-            return titleBlock.Symbol;
-        }
-
-        private bool ViewHasElements(View view) {
-            if(view is null) {
-                throw new ArgumentNullException(nameof(view));
-            }
-            return new FilteredElementCollector(view.Document, view.Id)
-                .WhereElementIsNotElementType()
-                .WherePasses(new VisibleInViewFilter(view.Document, view.Id))
-                .Any();
+                .OfType<FamilyInstance>()
+                .ToArray();
+            return titles
+                .FirstOrDefault(t => t.GetParamValue<string>(BuiltInParameter.SHEET_NUMBER) == viewSheet.SheetNumber)
+                ?.Symbol;
         }
     }
 }

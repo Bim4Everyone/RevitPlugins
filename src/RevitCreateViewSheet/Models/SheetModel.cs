@@ -27,17 +27,10 @@ namespace RevitCreateViewSheet.Models {
         /// <param name="viewSheet">Лист</param>
         /// <param name="titleBlockSymbol">Типоразмер основной надписи листа</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public SheetModel(
-            ViewSheet viewSheet,
-            FamilySymbol titleBlockSymbol) {
-
+        public SheetModel(ViewSheet viewSheet, FamilySymbol titleBlockSymbol = default) {
             if(viewSheet is null) {
                 throw new ArgumentNullException(nameof(viewSheet));
             }
-            if(titleBlockSymbol is null) {
-                throw new ArgumentNullException(nameof(titleBlockSymbol));
-            }
-
             _viewSheet = viewSheet;
             _titleBlockSymbol = titleBlockSymbol;
             _viewPorts = GetViewPortModels(_viewSheet);
@@ -299,13 +292,9 @@ namespace RevitCreateViewSheet.Models {
         }
 
         private List<ViewPortModel> GetViewPortModels(ViewSheet viewSheet) {
-            return new FilteredElementCollector(viewSheet.Document)
-                .WhereElementIsNotElementType()
-                .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
-                .OfClass(typeof(Viewport))
-                .ToElements()
-                .OfType<Viewport>()
-                .Select(v => new ViewPortModel(this, v))
+            var doc = viewSheet.Document;
+            return viewSheet.GetAllViewports()
+                .Select(id => new ViewPortModel(this, doc.GetElement(id) as Viewport))
                 .ToList();
         }
 

@@ -17,7 +17,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public ScheduleModelCreatorViewModel(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            ViewSchedules = [.. _revitRepository.GetNotPlacedSchedules()
+            ViewSchedules = [.. _revitRepository.GetAllSchedules()
                 .Select(s => new ViewScheduleViewModel(s))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
             SelectedViewSchedule = ViewSchedules.FirstOrDefault();
