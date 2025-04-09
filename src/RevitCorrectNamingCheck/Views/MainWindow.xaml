@@ -101,7 +101,7 @@
             
             <ui:Button
             Margin="10"
-            Width="85"
+            Width="90"
             Appearance="Info"
             Content="{me:LocalizationSource MainWindow.ButtonRefresh}"
             Command="{Binding LoadViewCommand}"  />
