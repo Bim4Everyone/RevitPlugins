@@ -1,18 +1,24 @@
+using Autodesk.Revit.DB;
+
+using RevitCreateViewSheet.Services;
+
 namespace RevitCreateViewSheet.Models {
     internal interface IEntity {
         /// <summary>
-        /// Состояние объекта
+        /// Сервис для сохранения изменений над объектом
         /// </summary>
-        EntityState State { get; }
+        IEntitySaver Saver { get; }
 
         /// <summary>
-        /// Помечает объект на удаление
+        /// True, если элемент существует в модели Revit, иначе False
         /// </summary>
-        void MarkAsDeleted();
+        bool Exists { get; }
 
         /// <summary>
-        /// Применяет изменения объекта в документе Revit
+        /// Пытается получить Id существующего элемента из модели Revit.
         /// </summary>
-        void SaveChanges(RevitRepository repository);
+        /// <param name="id">Id существующего элемента Revit</param>
+        /// <returns>True, если элемент существует в Revit, иначе False</returns>
+        bool TryGetExistId(out ElementId id);
     }
 }

@@ -12,12 +12,15 @@ using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.Revit.Comparators;
 
+using RevitCreateViewSheet.Services;
+
 namespace RevitCreateViewSheet.Models {
-    public class RevitRepository {
+    internal class RevitRepository {
+        private readonly EntitySaverProvider _entitySaverProvider;
 
-        public RevitRepository(UIApplication uiApplication) {
-            UIApplication = uiApplication;
-
+        public RevitRepository(UIApplication uiApplication, EntitySaverProvider entitySaverProvider) {
+            UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
+            _entitySaverProvider = entitySaverProvider ?? throw new ArgumentNullException(nameof(entitySaverProvider));
             InitializeParameters(Application, Document);
         }
 
@@ -154,7 +157,9 @@ namespace RevitCreateViewSheet.Models {
 
         internal ICollection<SheetModel> GetSheetModels() {
             return GetViewSheets()
-                .Select(s => new SheetModel(s, GetTitleBlockSymbol(s)))
+                .Select(s => new SheetModel(s, _entitySaverProvider.GetExistsEntitySaver()) {
+                    TitleBlockSymbol = GetTitleBlockSymbol(s)
+                })
                 .ToArray();
         }
 

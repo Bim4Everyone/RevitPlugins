@@ -22,16 +22,18 @@ namespace RevitCreateViewSheet.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private const int _maxSheetsCountToAdd = 1000;
 
-        private readonly ObservableCollection<SheetViewModel> _allSheets;
+        private readonly ObservableCollection<SheetViewModel> _sheets;
         private readonly RevitRepository _revitRepository;
-        private readonly SheetsSaver _sheetsSaver;
+        private readonly EntitiesHandler _sheetsSaver;
+        private readonly EntitiesTracker _entitiesTracker;
+        private readonly EntitySaverProvider _entitySaverProvider;
         private readonly IConfigSerializer _configSerializer;
         private readonly ILocalizationService _localizationService;
         private readonly IMessageBoxService _messageBoxService;
         private readonly IOpenFileDialogService _openFileService;
         private readonly ISaveFileDialogService _saveFileService;
         private readonly IProgressDialogFactory _progressFactory;
-        private readonly ISheetItemsFactory _sheetItemsFactory;
+        private readonly SheetItemsFactory _sheetItemsFactory;
         private TitleBlockViewModel _addSheetsTitleBlock;
         private string _errorText;
         private string _createErrorText;
@@ -44,17 +46,21 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public MainViewModel(
             RevitRepository revitRepository,
-            SheetsSaver sheetsSaver,
+            EntitiesHandler entitiesHandler,
+            EntitiesTracker entitiesTracker,
+            EntitySaverProvider entitySaverProvider,
+            SheetItemsFactory sheetItemsFactory,
             IConfigSerializer configSerializer,
             ILocalizationService localizationService,
             IMessageBoxService messageBoxService,
             IOpenFileDialogService openFileDialogService,
             ISaveFileDialogService saveFileDialogService,
-            IProgressDialogFactory progressDialogFactory,
-            ISheetItemsFactory sheetItemsFactory) {
+            IProgressDialogFactory progressDialogFactory) {
 
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            _sheetsSaver = sheetsSaver ?? throw new ArgumentNullException(nameof(sheetsSaver));
+            _sheetsSaver = entitiesHandler ?? throw new ArgumentNullException(nameof(entitiesHandler));
+            _entitiesTracker = entitiesTracker ?? throw new ArgumentNullException(nameof(entitiesTracker));
+            _entitySaverProvider = entitySaverProvider ?? throw new ArgumentNullException(nameof(entitySaverProvider));
             _configSerializer = configSerializer ?? throw new ArgumentNullException(nameof(configSerializer));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
@@ -67,14 +73,11 @@ namespace RevitCreateViewSheet.ViewModels {
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             RemoveSheetCommand = RelayCommand.Create<ICollection<SheetViewModel>>(RemoveSheet, CanRemoveSheet);
             AddSheetsCommand = RelayCommand.Create(AddSheets, CanAddSheets);
-            AddViewPortCommand = RelayCommand.Create(AddViewPort, CanAddSheetItem);
-            AddScheduleCommand = RelayCommand.Create(AddSchedule, CanAddSheetItem);
-            AddAnnotationCommand = RelayCommand.Create(AddAnnotation, CanAddSheetItem);
             LoadSheetsCommand = RelayCommand.Create(LoadSheets);
             SaveSheetsCommand = RelayCommand.Create(SaveSheets, CanSaveSheets);
 
             var comparer = new LogicalStringComparer();
-            _allSheets = [];
+            _sheets = [];
             AllAlbumsBlueprints = [.. _revitRepository.GetAlbumsBlueprints().OrderBy(item => item, comparer)];
             AllTitleBlocks = [.. _revitRepository.GetTitleBlocks()
                 .Select(item => new TitleBlockViewModel(item))
@@ -103,12 +106,6 @@ namespace RevitCreateViewSheet.ViewModels {
         public ICommand LoadViewCommand { get; }
 
         public ICommand AcceptViewCommand { get; }
-
-        public ICommand AddViewPortCommand { get; }
-
-        public ICommand AddScheduleCommand { get; }
-
-        public ICommand AddAnnotationCommand { get; }
 
         public ICommand LoadSheetsCommand { get; }
 
@@ -182,18 +179,18 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void LoadView() {
             var sheets = _revitRepository.GetSheetModels()
-                .Select(s => new SheetViewModel(s))
+                .Select(s => new SheetViewModel(s, _entitiesTracker, _sheetItemsFactory))
                 .OrderBy(s => s.AlbumBlueprint + s.SheetNumber, new LogicalStringComparer())
                 .ToArray();
             for(int i = 0; i < sheets.Length; i++) {
-                _allSheets.Add(sheets[i]);
+                _sheets.Add(sheets[i]);
             }
-            VisibleSheets = new CollectionViewSource() { Source = _allSheets };
+            VisibleSheets = new CollectionViewSource() { Source = _sheets };
             VisibleSheets.Filter += SheetsFilterHandler;
         }
 
         private void AddSheets() {
-            var indexes = _allSheets.Where(s => s.SheetModel.State != EntityState.Deleted)
+            var indexes = _sheets
                 .Select(s => new { IsNumber = int.TryParse(s.SheetCustomNumber, out int number), Number = number })
                 .Where(c => c.IsNumber)
                 .ToArray();
@@ -202,13 +199,13 @@ namespace RevitCreateViewSheet.ViewModels {
             var albumBlueprint = AddSheetsAlbumBlueprint;
             foreach(int index in Enumerable.Range(0, int.Parse(AddSheetsCount))) {
                 ++lastIndex;
-                var sheetModel = new SheetModel(titleBlock.TitleBlockSymbol);
-                var sheetViewModel = new SheetViewModel(sheetModel) {
+                var sheetModel = new SheetModel(titleBlock.TitleBlockSymbol, _entitySaverProvider.GetNewEntitySaver());
+                var sheetViewModel = new SheetViewModel(sheetModel, _entitiesTracker, _sheetItemsFactory) {
                     AlbumBlueprint = albumBlueprint,
                     SheetCustomNumber = lastIndex.ToString(),
                     Name = $"{_localizationService.GetLocalizedString("TODO")} {lastIndex}"
                 };
-                _allSheets.Add(sheetViewModel);
+                _sheets.Add(sheetViewModel);
             }
         }
 
@@ -255,11 +252,8 @@ namespace RevitCreateViewSheet.ViewModels {
                 System.Windows.MessageBoxImage.Warning) == System.Windows.MessageBoxResult.Yes) {
 
                 foreach(SheetViewModel sheet in sheets) {
-                    if(sheet.IsPlaced) {
-                        sheet.SheetModel.MarkAsDeleted();
-                    } else {
-                        _allSheets.Remove(sheet);
-                    }
+                    _entitiesTracker.AddToRemovedEntities(sheet.SheetModel);
+                    _sheets.Remove(sheet);
                 }
                 var editableView = VisibleSheets.View as IEditableCollectionView;
                 if(editableView?.IsEditingItem ?? false) {
@@ -274,7 +268,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void AcceptView() {
-            var sheets = _allSheets.Select(s => s.SheetModel).ToArray();
+            var sheets = _sheets.Select(s => s.SheetModel).ToArray();
             if(sheets.Any()) {
                 using(var progressDialogService = _progressFactory.CreateDialog()) {
                     progressDialogService.StepValue = 1;
@@ -284,48 +278,47 @@ namespace RevitCreateViewSheet.ViewModels {
                     var ct = progressDialogService.CreateCancellationToken();
                     progressDialogService.Show();
 
-                    _sheetsSaver.SaveSheets(sheets, progress, ct);
+                    _sheetsSaver.HandleEntities(progress, ct);
                 }
             }
         }
 
         private bool CanAcceptView() {
-            var notDeletedSheets = GetNotDeletedSheets();
-            if(notDeletedSheets.Any(item => string.IsNullOrWhiteSpace(item.Name))) {
+            if(_sheets.Any(item => string.IsNullOrWhiteSpace(item.Name))) {
                 ErrorText = "У всех листов должно быть заполнено наименование.";
                 return false;
             }
 
-            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.Name)) is SheetViewModel sheet2) {
+            if(_sheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.Name)) is SheetViewModel sheet2) {
                 ErrorText = $"У листа '{sheet2.Name}' недопустимое название.";
                 return false;
             }
 
-            var group = notDeletedSheets.GroupBy(item => item.SheetNumber)
+            var group = _sheets.GroupBy(item => item.SheetNumber)
                 .FirstOrDefault(g => g.Count() > 1);
             if(group is not null) {
                 ErrorText = $"У листов повторяется номер {group.Key}.";
                 return false;
             }
 
-            if(notDeletedSheets.Any(s => string.IsNullOrWhiteSpace(s.SheetNumber))) {
+            if(_sheets.Any(s => string.IsNullOrWhiteSpace(s.SheetNumber))) {
                 ErrorText = $"У всех листов должен быть заполнен системный номер";
                 return false;
             }
 
-            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetNumber))
+            if(_sheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetNumber))
                 is SheetViewModel sheetInvalidNumber) {
                 ErrorText = $"У листа '{sheetInvalidNumber.Name}' недопустимый системный номер.";
                 return false;
             }
 
-            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.AlbumBlueprint ?? string.Empty))
+            if(_sheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.AlbumBlueprint ?? string.Empty))
                 is SheetViewModel sheetInvalidAlbum) {
                 ErrorText = $"У листа '{sheetInvalidAlbum.Name}' недопустимый альбом.";
                 return false;
             }
 
-            if(notDeletedSheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetCustomNumber ?? string.Empty))
+            if(_sheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetCustomNumber ?? string.Empty))
                 is SheetViewModel sheetInvalidSheetCustomNumber) {
                 ErrorText = $"У листа '{sheetInvalidSheetCustomNumber.Name}' недопустимый Ш.Номер листа.";
                 return false;
@@ -335,16 +328,8 @@ namespace RevitCreateViewSheet.ViewModels {
             return true;
         }
 
-        private ICollection<SheetViewModel> GetNotDeletedSheets() {
-            return [.. _allSheets.Where(s => s.SheetModel.State != EntityState.Deleted)];
-        }
-
         private void SheetsFilterHandler(object sender, FilterEventArgs e) {
             if(e.Item is SheetViewModel sheetViewModel) {
-                if(sheetViewModel.SheetModel.State == EntityState.Deleted) {
-                    e.Accepted = false;
-                    return;
-                }
                 if(!string.IsNullOrWhiteSpace(SheetsFilter)) {
                     if(!sheetViewModel.AlbumBlueprint.Contains(SheetsFilter)
                         && !sheetViewModel.SheetNumber.Contains(SheetsFilter)
@@ -359,50 +344,6 @@ namespace RevitCreateViewSheet.ViewModels {
             }
         }
 
-        private void AddViewPort() {
-            try {
-                // Особенности размещения видов на листах в ревите:
-                //   - на одном листе нельзя разместить несколько экземпляров одного и того же вида
-                //   - легенды можно размещать на листах повторно на других листах
-                var viewPort = _sheetItemsFactory.CreateViewPort(
-                    SelectedSheet.SheetModel,
-                    GetNotDeletedSheets()
-                    .SelectMany(s => s.GetViewPorts())
-                    .Where(v => v.ViewPortModel.View.ViewType != ViewType.Legend)
-                    .Union(SelectedSheet.GetViewPorts())
-                    .Select(v => v.ViewPortModel.View)
-                    .ToArray());
-                SelectedSheet.SheetModel.AddViewPort(viewPort);
-                SelectedSheet.AddView(new ViewPortViewModel(viewPort));
-            } catch(OperationCanceledException) {
-                return;
-            }
-        }
-
-        private void AddSchedule() {
-            try {
-                var schedule = _sheetItemsFactory.CreateSchedule(SelectedSheet.SheetModel);
-                SelectedSheet.SheetModel.AddSchedule(schedule);
-                SelectedSheet.AddSchedule(new ScheduleViewModel(schedule));
-            } catch(OperationCanceledException) {
-                return;
-            }
-        }
-
-        private void AddAnnotation() {
-            try {
-                var annotation = _sheetItemsFactory.CreateAnnotation(SelectedSheet.SheetModel);
-                SelectedSheet.SheetModel.AddAnnotation(annotation);
-                SelectedSheet.AddAnnotation(new AnnotationViewModel(annotation));
-            } catch(OperationCanceledException) {
-                return;
-            }
-        }
-
-        private bool CanAddSheetItem() {
-            return SelectedSheet is not null;
-        }
-
         private void LoadSheets() {
             var config = PluginConfig.GetPluginConfig(_configSerializer);
             var settings = config.GetSettings(_revitRepository.Document)
@@ -415,10 +356,13 @@ namespace RevitCreateViewSheet.ViewModels {
                     _openFileService.File.FullName));
                 var titleBlocks = AllTitleBlocks.Select(t => t.TitleBlockSymbol).ToArray();
                 var newSheetViewModels = sheetDtos.Sheets?
-                    .Select(s => new SheetViewModel(s.CreateSheetModel(titleBlocks)))
+                    .Select(s => new SheetViewModel(
+                        s.CreateSheetModel(titleBlocks, _entitySaverProvider.GetNewEntitySaver()),
+                        _entitiesTracker,
+                        _sheetItemsFactory))
                     ?? [];
                 foreach(var sheetViewModel in newSheetViewModels) {
-                    _allSheets.Add(sheetViewModel);
+                    _sheets.Add(sheetViewModel);
                 }
 
                 settings.FileDialogInitialDirectory = Path.GetDirectoryName(_openFileService.File.FullName);
@@ -435,7 +379,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 config.GetSettings(_revitRepository.Document)?.FileDialogInitialDirectory ?? string.Empty,
                 "sheets_config.json")) {
 
-                var sheetDtos = new SheetsCreationDto(GetNotDeletedSheets().Select(s => s.SheetModel));
+                var sheetDtos = new SheetsCreationDto(_sheets.Select(s => s.SheetModel));
                 var path = _saveFileService.File.FullName;
                 File.WriteAllText(path, _configSerializer.Serialize(sheetDtos));
 
@@ -445,7 +389,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanSaveSheets() {
-            return GetNotDeletedSheets().Count > 0;
+            return _sheets.Count > 0;
         }
 
         private void OnSelectedSheetChanged(object sender, PropertyChangedEventArgs e) {

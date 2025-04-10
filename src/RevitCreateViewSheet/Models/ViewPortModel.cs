@@ -5,11 +5,11 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitCreateViewSheet.Services;
+
 namespace RevitCreateViewSheet.Models {
     internal class ViewPortModel : IEntity, IEquatable<ViewPortModel> {
         private readonly Viewport _viewport;
-        private readonly View _view;
-        private ElementType _viewPortType;
 
         /// <summary>
         /// Создает модель размещенного на листе видового экрана
@@ -17,17 +17,18 @@ namespace RevitCreateViewSheet.Models {
         /// <param name="sheet">Модель листа</param>
         /// <param name="viewport">Видовой экран, размещенный на листе</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public ViewPortModel(SheetModel sheet, Viewport viewport) {
+        public ViewPortModel(SheetModel sheet, Viewport viewport, ExistsEntitySaver entitySaver) {
             Sheet = sheet
                 ?? throw new ArgumentNullException(nameof(sheet));
             _viewport = viewport
                 ?? throw new ArgumentNullException(nameof(viewport));
-            _view = _viewport.Document.GetElement(_viewport.ViewId) as View
+            View = _viewport.Document.GetElement(_viewport.ViewId) as View
                 ?? throw new ArgumentNullException(nameof(viewport.ViewId));
+            Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
             Location = viewport.GetBoxCenter();
-            _viewPortType = viewport.GetElementType();
+            ViewPortType = viewport.GetElementType();
             Name = viewport.Document.GetElement(viewport.ViewId).Name;
-            State = EntityState.Unchanged;
+            Exists = true;
         }
 
         /// <summary>
@@ -37,16 +38,17 @@ namespace RevitCreateViewSheet.Models {
         /// <param name="view">Вид для размещения</param>
         /// <param name="viewPortType">Типоразмер видового экрана</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public ViewPortModel(SheetModel sheet, View view, ElementType viewPortType) {
+        public ViewPortModel(SheetModel sheet, View view, ElementType viewPortType, NewEntitySaver entitySaver) {
             Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
-            _view = view ?? throw new ArgumentNullException(nameof(view));
-            _viewPortType = viewPortType ?? throw new ArgumentNullException(nameof(viewPortType));
+            View = view ?? throw new ArgumentNullException(nameof(view));
+            ViewPortType = viewPortType ?? throw new ArgumentNullException(nameof(viewPortType));
+            Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
             Name = view.Name;
-            State = EntityState.Added;
+            Exists = false;
         }
 
 
-        public EntityState State { get; private set; }
+        public bool Exists { get; }
 
         public XYZ Location { get; set; }
 
@@ -54,47 +56,27 @@ namespace RevitCreateViewSheet.Models {
 
         public SheetModel Sheet { get; }
 
-        public View View => _view;
+        public View View { get; }
 
-        public ElementType ViewPortType {
-            get => _viewPortType;
-            set {
-                _viewPortType = value;
-                if(State != EntityState.Added) {
-                    State = EntityState.Modified;
-                }
+        public IEntitySaver Saver { get; }
+
+        public ElementType ViewPortType { get; set; }
+
+
+        public bool TryGetExistId(out ElementId id) {
+            if(Exists && _viewport is null) {
+                throw new InvalidOperationException();
             }
+            id = Exists ? _viewport.Id : null;
+            return Exists;
         }
 
-
-        public void MarkAsDeleted() {
-            State = EntityState.Deleted;
-        }
-
-        public void SaveChanges(RevitRepository repository) {
-            if(State == EntityState.Deleted && _viewport is not null) {
-                repository.DeleteElement(_viewport.Id);
-
-            } else if(State == EntityState.Modified && _viewport is not null) {
-                if(ViewPortType is null) {
-                    throw new InvalidOperationException(
-                        $"Перед сохранением измененного видового экрана необходимо назначить {nameof(ViewPortType)}");
-                }
-                repository.UpdateViewPort(_viewport, ViewPortType.Id);
-                State = EntityState.Unchanged;
-
-            } else if(State == EntityState.Added && _view is not null) {
-                if(Location is null) {
-                    throw new InvalidOperationException(
-                        $"Перед сохранением нового видового экрана необходимо назначить {nameof(Location)}");
-                }
-                if(ViewPortType is null) {
-                    throw new InvalidOperationException(
-                        $"Перед сохранением нового видового экрана необходимо назначить {nameof(ViewPortType)}");
-                }
-                repository.CreateViewPort(Sheet.GetViewSheet().Id, _view.Id, ViewPortType.Id, Location);
-                State = EntityState.Unchanged;
+        public bool TryGetViewport(out Viewport viewport) {
+            if(Exists && _viewport is null) {
+                throw new InvalidOperationException();
             }
+            viewport = Exists ? _viewport : null;
+            return Exists;
         }
 
         public bool Equals(ViewPortModel other) {

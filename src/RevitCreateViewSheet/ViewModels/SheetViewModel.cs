@@ -1,22 +1,22 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Windows.Data;
 using System.Windows.Input;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitCreateViewSheet.Models;
+using RevitCreateViewSheet.Services;
 
 namespace RevitCreateViewSheet.ViewModels {
-    internal class SheetViewModel : BaseViewModel, IEntityViewModel {
+    internal class SheetViewModel : BaseViewModel {
         private readonly SheetModel _sheetModel;
-        private readonly ObservableCollection<ViewPortViewModel> _allViewPorts;
-        private readonly ObservableCollection<ScheduleViewModel> _allSchedules;
-        private readonly ObservableCollection<AnnotationViewModel> _allAnnotations;
+        private readonly EntitiesTracker _entitiesTracker;
+        private readonly SheetItemsFactory _sheetItemsFactory;
+        private readonly ObservableCollection<ViewPortViewModel> _viewPorts;
+        private readonly ObservableCollection<ScheduleViewModel> _schedules;
+        private readonly ObservableCollection<AnnotationViewModel> _annotations;
         private string _name;
         private string _albumBlueprint;
         private string _sheetNumber;
@@ -26,8 +26,14 @@ namespace RevitCreateViewSheet.ViewModels {
         private ScheduleViewModel _selectedSchedule;
         private AnnotationViewModel _selectedAnnotation;
 
-        public SheetViewModel(SheetModel sheetModel) {
-            _sheetModel = sheetModel ?? throw new System.ArgumentNullException(nameof(sheetModel));
+        public SheetViewModel(
+            SheetModel sheetModel,
+            EntitiesTracker entitiesTracker,
+            SheetItemsFactory sheetItemsFactory) {
+
+            _sheetModel = sheetModel ?? throw new ArgumentNullException(nameof(sheetModel));
+            _entitiesTracker = entitiesTracker ?? throw new ArgumentNullException(nameof(entitiesTracker));
+            _sheetItemsFactory = sheetItemsFactory ?? throw new ArgumentNullException(nameof(sheetItemsFactory));
             _albumBlueprint = _sheetModel.AlbumBlueprint;
             _name = _sheetModel.Name;
             _sheetNumber = _sheetModel.SheetNumber;
@@ -35,28 +41,26 @@ namespace RevitCreateViewSheet.ViewModels {
             if(_sheetModel.TitleBlockSymbol is not null) {
                 _titleBlock = new TitleBlockViewModel(_sheetModel.TitleBlockSymbol);
             }
-            IsPlaced = sheetModel.State == EntityState.Unchanged;
+            IsPlaced = sheetModel.Exists;
 
-            _allViewPorts = [.. _sheetModel.GetViewPorts().Select(v => new ViewPortViewModel(v))];
-            _allSchedules = [.. _sheetModel.GetSchedules().Select(s => new ScheduleViewModel(s))];
-            _allAnnotations = [.. _sheetModel.GetAnnotations().Select(a => new AnnotationViewModel(a))];
+            _viewPorts = [.. _sheetModel.ViewPorts.Select(v => new ViewPortViewModel(v))];
+            _schedules = [.. _sheetModel.Schedules.Select(s => new ScheduleViewModel(s))];
+            _annotations = [.. _sheetModel.Annotations.Select(a => new AnnotationViewModel(a))];
 
-            VisibleViewPorts = new CollectionViewSource() { Source = _allViewPorts };
-            VisibleViewPorts.Filter += EntitiesFilterHandler;
-            VisibleSchedules = new CollectionViewSource() { Source = _allSchedules };
-            VisibleSchedules.Filter += EntitiesFilterHandler;
-            VisibleAnnotations = new CollectionViewSource() { Source = _allAnnotations };
-            VisibleAnnotations.Filter += EntitiesFilterHandler;
+            ViewPorts = new ReadOnlyObservableCollection<ViewPortViewModel>(_viewPorts);
+            Schedules = new ReadOnlyObservableCollection<ScheduleViewModel>(_schedules);
+            Annotations = new ReadOnlyObservableCollection<AnnotationViewModel>(_annotations);
 
-            RemoveViewCommand = RelayCommand.Create<ViewPortViewModel>(RemoveView, CanRemoveView);
+            AddViewPortCommand = RelayCommand.Create(AddViewPort);
+            RemoveViewPortCommand = RelayCommand.Create<ViewPortViewModel>(RemoveViewPort, CanRemoveViewPort);
+            AddScheduleCommand = RelayCommand.Create(AddSchedule);
             RemoveScheduleCommand = RelayCommand.Create<ScheduleViewModel>(RemoveSchedule, CanRemoveSchedule);
+            AddAnnotationCommand = RelayCommand.Create(AddAnnotation);
             RemoveAnnotationCommand = RelayCommand.Create<AnnotationViewModel>(RemoveAnnotation, CanRemoveAnnotation);
         }
 
 
         public bool IsPlaced { get; }
-
-        public IEntity Entity => SheetModel;
 
         public SheetModel SheetModel => _sheetModel;
 
@@ -123,66 +127,72 @@ namespace RevitCreateViewSheet.ViewModels {
             set => RaiseAndSetIfChanged(ref _selectedAnnotation, value);
         }
 
-        public CollectionViewSource VisibleViewPorts { get; }
+        public ReadOnlyObservableCollection<ViewPortViewModel> ViewPorts { get; }
 
-        public CollectionViewSource VisibleSchedules { get; }
+        public ReadOnlyObservableCollection<ScheduleViewModel> Schedules { get; }
 
-        public CollectionViewSource VisibleAnnotations { get; }
+        public ReadOnlyObservableCollection<AnnotationViewModel> Annotations { get; }
 
-        public ICommand RemoveViewCommand { get; }
+        public ICommand AddViewPortCommand { get; }
+
+        public ICommand RemoveViewPortCommand { get; }
+
+        public ICommand AddScheduleCommand { get; }
 
         public ICommand RemoveScheduleCommand { get; }
+
+        public ICommand AddAnnotationCommand { get; }
 
         public ICommand RemoveAnnotationCommand { get; }
 
 
-        public void AddView(ViewPortViewModel view) {
-            if(view is null) {
-                throw new ArgumentNullException(nameof(view));
-            }
-            if(view.ViewPortModel.State != EntityState.Deleted) {
-                _allViewPorts.Add(view);
-            }
-        }
-
-        public void AddSchedule(ScheduleViewModel schedule) {
-            if(schedule is null) {
-                throw new ArgumentNullException(nameof(schedule));
-            }
-            if(schedule.ScheduleModel.State != EntityState.Deleted) {
-                _allSchedules.Add(schedule);
+        private void AddViewPort() {
+            try {
+                var viewPort = new ViewPortViewModel(_sheetItemsFactory.CreateViewPort(_sheetModel));
+                if(_entitiesTracker.AddAliveViewPort(viewPort.ViewPortModel)) {
+                    _viewPorts.Add(viewPort);
+                }
+            } catch(OperationCanceledException) {
+                return;
             }
         }
 
-        public void AddAnnotation(AnnotationViewModel annotation) {
-            if(annotation is null) {
-                throw new ArgumentNullException(nameof(annotation));
+        private void AddSchedule() {
+            try {
+                var schedule = new ScheduleViewModel(_sheetItemsFactory.CreateSchedule(_sheetModel));
+                if(_entitiesTracker.AddAliveSchedule(schedule.ScheduleModel)) {
+                    _schedules.Add(schedule);
+                }
+            } catch(OperationCanceledException) {
+                return;
             }
-            if(annotation.AnnotationModel.State != EntityState.Deleted) {
-                _allAnnotations.Add(annotation);
+        }
+
+        private void AddAnnotation() {
+            try {
+                var annotation = new AnnotationViewModel(_sheetItemsFactory.CreateAnnotation(_sheetModel));
+                if(_entitiesTracker.AddAliveAnnotation(annotation.AnnotationModel)) {
+                    _annotations.Add(annotation);
+                }
+            } catch(OperationCanceledException) {
+                return;
             }
         }
 
-        /// <summary>
-        /// Возвращает коллекцию видовых экранов с листа, которые не удалены
-        /// </summary>
-        /// <returns>Коллекция не удаленных видовых экранов</returns>
-        public IReadOnlyCollection<ViewPortViewModel> GetViewPorts() {
-            return [.. _allViewPorts.Where(v => v.ViewPortModel.State != EntityState.Deleted)];
+        private void RemoveViewPort(ViewPortViewModel viewPort) {
+            _sheetModel.ViewPorts.Remove(viewPort.ViewPortModel);
+            _entitiesTracker.AddToRemovedEntities(viewPort.ViewPortModel);
+            _viewPorts.Remove(viewPort);
         }
 
-        private void RemoveView(ViewPortViewModel view) {
-            _sheetModel.RemoveViewPort(view.ViewPortModel);
-            RemoveEntityViewModel(view, _allViewPorts, VisibleViewPorts.View);
-        }
-
-        private bool CanRemoveView(ViewPortViewModel view) {
-            return view is not null;
+        private bool CanRemoveViewPort(ViewPortViewModel viewPort) {
+            return viewPort is not null;
         }
 
         private void RemoveSchedule(ScheduleViewModel scheduleView) {
-            _sheetModel.RemoveSchedule(scheduleView.ScheduleModel);
-            RemoveEntityViewModel(scheduleView, _allSchedules, VisibleSchedules.View);
+            _sheetModel.Schedules.Remove(scheduleView.ScheduleModel);
+            _entitiesTracker.AddToRemovedEntities(scheduleView.ScheduleModel);
+            _schedules.Remove(scheduleView);
         }
 
         private bool CanRemoveSchedule(ScheduleViewModel scheduleView) {
@@ -190,32 +200,13 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void RemoveAnnotation(AnnotationViewModel annotationView) {
-            _sheetModel.RemoveAnnotation(annotationView.AnnotationModel);
-            RemoveEntityViewModel(annotationView, _allAnnotations, VisibleAnnotations.View);
+            _sheetModel.Annotations.Remove(annotationView.AnnotationModel);
+            _entitiesTracker.AddToRemovedEntities(annotationView.AnnotationModel);
+            _annotations.Remove(annotationView);
         }
 
         private bool CanRemoveAnnotation(AnnotationViewModel annotationView) {
             return annotationView is not null;
-        }
-
-        private void EntitiesFilterHandler(object sender, FilterEventArgs e) {
-            if(e.Item is IEntityViewModel sheetViewModel) {
-                if(sheetViewModel.Entity.State == EntityState.Deleted) {
-                    e.Accepted = false;
-                    return;
-                }
-            }
-        }
-
-        private void RemoveEntityViewModel<T>(
-            T entityViewModel,
-            ObservableCollection<T> allEntities,
-            ICollectionView viewToRefresh) where T : IEntityViewModel {
-
-            if(!entityViewModel.IsPlaced) {
-                allEntities.Remove(entityViewModel);
-            }
-            viewToRefresh.Refresh();
         }
 
         private string GetSheetNumber(string albumBlueprint, string sheetCustomNumber) {

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitCreateViewSheet.Services;
+
 namespace RevitCreateViewSheet.Models {
     internal class ScheduleModel : IEntity, IEquatable<ScheduleModel> {
         private readonly ScheduleSheetInstance _scheduleInstance;
-        private readonly ViewSchedule _schedule;
 
         /// <summary>
         /// Создает модель размещенной на листе спецификации
@@ -14,12 +15,15 @@ namespace RevitCreateViewSheet.Models {
         /// <param name="sheet">Модель листа</param>
         /// <param name="scheduleInstance">Размещенный на листе экземпляр спецификации</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public ScheduleModel(SheetModel sheet, ScheduleSheetInstance scheduleInstance) {
+        public ScheduleModel(SheetModel sheet, ScheduleSheetInstance scheduleInstance, ExistsEntitySaver entitySaver) {
             Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
             _scheduleInstance = scheduleInstance ?? throw new ArgumentNullException(nameof(scheduleInstance));
+            Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
+            ViewSchedule = _scheduleInstance.Document.GetElement(_scheduleInstance.ScheduleId) as ViewSchedule
+                ?? throw new ArgumentNullException(nameof(_scheduleInstance.ScheduleId));
             Location = scheduleInstance.Point;
             Name = scheduleInstance.Name;
-            State = EntityState.Unchanged;
+            Exists = true;
         }
 
         /// <summary>
@@ -28,38 +32,39 @@ namespace RevitCreateViewSheet.Models {
         /// <param name="sheet">Модель листа</param>
         /// <param name="schedule">Спецификация</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public ScheduleModel(SheetModel sheet, ViewSchedule schedule) {
+        public ScheduleModel(SheetModel sheet, ViewSchedule schedule, NewEntitySaver entitySaver) {
             Sheet = sheet ?? throw new ArgumentNullException(nameof(sheet));
-            _schedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
+            ViewSchedule = schedule ?? throw new ArgumentNullException(nameof(schedule));
+            Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
             Name = schedule.Name;
-            State = EntityState.Added;
+            Exists = false;
         }
 
 
-        public EntityState State { get; private set; }
+        public bool Exists { get; }
 
         public XYZ Location { get; set; }
 
         public SheetModel Sheet { get; }
 
+        public ViewSchedule ViewSchedule { get; }
+
         public string Name { get; }
 
+        public IEntitySaver Saver { get; }
 
-        public void MarkAsDeleted() {
-            State = EntityState.Deleted;
+
+        public bool TryGetExistId(out ElementId id) {
+            id = Exists ? _scheduleInstance.Id : null;
+            return Exists;
         }
 
-        public void SaveChanges(RevitRepository repository) {
-            if(State == EntityState.Deleted && _scheduleInstance is not null) {
-                repository.DeleteElement(_scheduleInstance.Id);
-            } else if(State == EntityState.Added && _schedule is not null) {
-                if(Location is null) {
-                    throw new InvalidOperationException(
-                        $"Перед сохранением новой спецификации необходимо назначить {nameof(Location)}");
-                }
-                repository.CreateSchedule(Sheet.GetViewSheet().Id, _schedule.Id, Location);
-                State = EntityState.Unchanged;
+        public bool TryGetScheduleInstance(out ScheduleSheetInstance instance) {
+            if(Exists && _scheduleInstance is null) {
+                throw new InvalidOperationException();
             }
+            instance = Exists ? _scheduleInstance : null;
+            return Exists;
         }
 
         public bool Equals(ScheduleModel other) {

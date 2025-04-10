@@ -6,12 +6,12 @@ using dosymep.WPF.ViewModels;
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
-    internal class AnnotationViewModel : BaseViewModel, IEquatable<AnnotationViewModel>, IEntityViewModel {
+    internal class AnnotationViewModel : BaseViewModel, IEquatable<AnnotationViewModel> {
         private readonly AnnotationModel _annotationModel;
 
         public AnnotationViewModel(AnnotationModel annotationModel) {
             _annotationModel = annotationModel ?? throw new ArgumentNullException(nameof(annotationModel));
-            IsPlaced = annotationModel.State == EntityState.Unchanged;
+            IsPlaced = annotationModel.Exists;
         }
 
 

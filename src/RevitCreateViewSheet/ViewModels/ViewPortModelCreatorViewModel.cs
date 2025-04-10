@@ -12,10 +12,12 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitCreateViewSheet.Models;
+using RevitCreateViewSheet.Services;
 
 namespace RevitCreateViewSheet.ViewModels {
     internal class ViewPortModelCreatorViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
+        private readonly EntitiesTracker _entitiesTracker;
         private readonly ILocalizationService _localizationService;
         /// <summary>
         /// Все виды в документе Revit, для которых можно создать видовые экраны. Размещенные и не размещенные.
@@ -24,7 +26,7 @@ namespace RevitCreateViewSheet.ViewModels {
         /// <summary>
         /// Виды которые доступны для выбора пользователя. (Не размещенные виды)
         /// </summary>
-        private readonly List<ViewViewModel> _allEnabledViews;
+        private readonly List<ViewViewModel> _enabledViews;
         /// <summary>
         /// Виды, соответствующие выбранному пользователем типу видов. Это итоговая коллекция, которую видит пользователь
         /// </summary>
@@ -34,21 +36,26 @@ namespace RevitCreateViewSheet.ViewModels {
         private ViewTypeViewModel _selectedViewType;
         private ViewViewModel _selectedView;
 
-        public ViewPortModelCreatorViewModel(RevitRepository revitRepository, ILocalizationService localizationService) {
+        public ViewPortModelCreatorViewModel(
+            RevitRepository revitRepository,
+            EntitiesTracker entitiesTracker,
+            ILocalizationService localizationService) {
+
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _entitiesTracker = entitiesTracker ?? throw new ArgumentNullException(nameof(entitiesTracker));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _allViews = [.. _revitRepository.GetAllViewsForViewPorts()
                 .Select(v => new ViewViewModel(v))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
-            _allEnabledViews = [.. _allViews];
-            _viewsForSelection = [.. _allEnabledViews];
-            ViewsForSelection = new ReadOnlyObservableCollection<ViewViewModel>(_viewsForSelection);
+            _enabledViews = [.. _allViews];
+            _viewsForSelection = [.. _enabledViews];
+            Views = new ReadOnlyObservableCollection<ViewViewModel>(_viewsForSelection);
             ViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
             ViewTypes = InitializeViewTypes();
             SelectedViewType = ViewTypes.First();
-            SelectedView = ViewsForSelection.FirstOrDefault();
+            SelectedView = Views.FirstOrDefault();
             SelectedViewPortType = ViewPortTypes.FirstOrDefault();
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);
         }
@@ -69,7 +76,7 @@ namespace RevitCreateViewSheet.ViewModels {
         /// <summary>
         /// Виды, соответствующие выбранному пользователем типу видов. Это итоговая коллекция, которую видит пользователь
         /// </summary>
-        public ReadOnlyObservableCollection<ViewViewModel> ViewsForSelection { get; }
+        public ReadOnlyObservableCollection<ViewViewModel> Views { get; }
 
         public ViewViewModel SelectedView {
             get => _selectedView;
@@ -93,15 +100,22 @@ namespace RevitCreateViewSheet.ViewModels {
         /// </summary>
         /// <param name="disabledViews">Коллекция видов, которые надо убрать из выбора для пользователя.</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public void SetDisabledViews(ICollection<View> disabledViews) {
-            if(disabledViews is null) {
-                throw new ArgumentNullException(nameof(disabledViews));
+        public void UpdateEnabledViews(SheetModel sheetModel) {
+            if(sheetModel is null) {
+                throw new ArgumentNullException(nameof(sheetModel));
             }
-            var disabledViewViewModels = disabledViews.Select(v => new ViewViewModel(v)).ToHashSet();
-            _allEnabledViews.Clear();
+            // Особенности размещения видов на листах в ревите:
+            //   - на одном листе нельзя разместить несколько экземпляров одного и того же вида
+            //   - легенды можно размещать на листах повторно на других листах
+            var disabledViews = _entitiesTracker.AliveViewPorts
+                .Where(v => v.View.ViewType != ViewType.Legend)
+                .Union(sheetModel.ViewPorts)
+                .Select(v => new ViewViewModel(v.View))
+                .ToHashSet();
+            _enabledViews.Clear();
             for(int i = 0; i < _allViews.Count; i++) {
-                if(!disabledViewViewModels.Contains(_allViews[i])) {
-                    _allEnabledViews.Add(_allViews[i]);
+                if(!disabledViews.Contains(_allViews[i])) {
+                    _enabledViews.Add(_allViews[i]);
                 }
             }
             UpdateViewsForSelection(SelectedViewType?.ViewType ?? RevitViewType.Any);
@@ -118,7 +132,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 return false;
             }
 
-            if(ViewsForSelection.Count == 0) {
+            if(Views.Count == 0) {
                 ErrorText = "Нет доступных видов заданного типа TODO";
                 return false;
             }
@@ -159,7 +173,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 case RevitViewType.DraftingView:
                 case RevitViewType.Legend: {
                     ViewType vType = ConvertToViewType(revitViewType);
-                    foreach(var item in _allEnabledViews
+                    foreach(var item in _enabledViews
                         .Where(v => v.View.ViewType == vType)
                         .OrderBy(v => v.Name, new LogicalStringComparer())) {
                         _viewsForSelection.Add(item);
@@ -168,7 +182,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 }
                 case RevitViewType.Any:
                 default: {
-                    foreach(var item in _allEnabledViews.OrderBy(v => v.Name, new LogicalStringComparer())) {
+                    foreach(var item in _enabledViews.OrderBy(v => v.Name, new LogicalStringComparer())) {
                         _viewsForSelection.Add(item);
                     }
                     break;

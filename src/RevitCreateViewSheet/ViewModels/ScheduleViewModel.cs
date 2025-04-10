@@ -6,13 +6,13 @@ using dosymep.WPF.ViewModels;
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
-    internal class ScheduleViewModel : BaseViewModel, IEquatable<ScheduleViewModel>, IEntityViewModel {
+    internal class ScheduleViewModel : BaseViewModel, IEquatable<ScheduleViewModel> {
         private readonly ScheduleModel _scheduleModel;
         private int _countOnSheets;
 
         public ScheduleViewModel(ScheduleModel scheduleModel) {
             _scheduleModel = scheduleModel ?? throw new ArgumentNullException(nameof(scheduleModel));
-            IsPlaced = scheduleModel.State == EntityState.Unchanged;
+            IsPlaced = scheduleModel.Exists;
         }
 
 

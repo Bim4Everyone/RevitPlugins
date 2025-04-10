@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-
-using Autodesk.Revit.DB;
 
 using Ninject;
 using Ninject.Syntax;
@@ -12,11 +9,13 @@ using RevitCreateViewSheet.ViewModels;
 using RevitCreateViewSheet.Views;
 
 namespace RevitCreateViewSheet.Services {
-    internal class SheetItemsFactory : ISheetItemsFactory {
+    internal class SheetItemsFactory {
         private readonly IResolutionRoot _resolutionRoot;
+        private readonly EntitySaverProvider _entitySaverProvider;
 
-        public SheetItemsFactory(IResolutionRoot resolutionRoot) {
+        public SheetItemsFactory(IResolutionRoot resolutionRoot, EntitySaverProvider entitySaverProvider) {
             _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
+            _entitySaverProvider = entitySaverProvider ?? throw new ArgumentNullException(nameof(entitySaverProvider));
         }
 
 
@@ -30,7 +29,7 @@ namespace RevitCreateViewSheet.Services {
                 var symbol = (window.DataContext as AnnotationModelCreatorViewModel)
                     .SelectedAnnotationSymbolType
                     .AnnotationSymbolType;
-                return new AnnotationModel(sheetModel, symbol);
+                return new AnnotationModel(sheetModel, symbol, _entitySaverProvider.GetNewEntitySaver());
             }
             throw new OperationCanceledException();
         }
@@ -45,29 +44,29 @@ namespace RevitCreateViewSheet.Services {
                 var creatorView = window.DataContext as ScheduleModelCreatorViewModel;
                 var selectedSchedule = creatorView.SelectedViewSchedule;
                 creatorView.SelectedViewSchedule = creatorView.ViewSchedules.FirstOrDefault();
-                return new ScheduleModel(sheetModel, selectedSchedule.ViewSchedule);
+                return new ScheduleModel(
+                    sheetModel,
+                    selectedSchedule.ViewSchedule,
+                    _entitySaverProvider.GetNewEntitySaver());
             }
             throw new OperationCanceledException();
         }
 
-        public ViewPortModel CreateViewPort(SheetModel sheetModel, ICollection<View> disabledViews) {
+        public ViewPortModel CreateViewPort(SheetModel sheetModel) {
             if(sheetModel is null) {
                 throw new ArgumentNullException(nameof(sheetModel));
             }
-
-            if(disabledViews is null) {
-                throw new ArgumentNullException(nameof(disabledViews));
-            }
-
-            var creatorView = _resolutionRoot.Get<ViewPortModelCreatorViewModel>();
-            creatorView.SetDisabledViews(disabledViews);
+            var creatorViewModel = _resolutionRoot.Get<ViewPortModelCreatorViewModel>();
+            creatorViewModel.UpdateEnabledViews(sheetModel);
             var window = _resolutionRoot.Get<ViewPortModelCreatorWindow>();
             if(window.ShowDialog() ?? false) {
-                var selectedView = creatorView.SelectedView;
-                var selectedViewPortType = creatorView.SelectedViewPortType;
-
-                creatorView.SelectedView = creatorView.ViewsForSelection.FirstOrDefault();
-                return new ViewPortModel(sheetModel, selectedView.View, selectedViewPortType.ViewType);
+                var selectedView = creatorViewModel.SelectedView;
+                var selectedViewPortType = creatorViewModel.SelectedViewPortType;
+                return new ViewPortModel(
+                    sheetModel,
+                    selectedView.View,
+                    selectedViewPortType.ViewType,
+                    _entitySaverProvider.GetNewEntitySaver());
             }
             throw new OperationCanceledException();
         }
