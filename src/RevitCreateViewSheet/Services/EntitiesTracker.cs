@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -41,24 +40,100 @@ namespace RevitCreateViewSheet.Services {
             return [.. _removedEntities];
         }
 
-        public bool AddToRemovedEntities(IEntity entity) {
-            throw new NotImplementedException();
+        public void AddToRemovedEntities(IEntity entity) {
+            if(entity is SheetModel sheet) {
+                if(sheet.TryGetExistId(out ElementId sheetId)) {
+                    _removedEntities.Add(sheetId);
+                }
+                _aliveSheets.Remove(sheet);
+                foreach(var viewPort in sheet.ViewPorts) {
+                    if(viewPort.TryGetExistId(out ElementId viewPortId)) {
+                        _removedEntities.Add(viewPortId);
+                    }
+                    _aliveViewPorts.Remove(viewPort);
+                }
+                foreach(var schedule in sheet.Schedules) {
+                    if(schedule.TryGetExistId(out ElementId scheduleId)) {
+                        _removedEntities.Add(scheduleId);
+                    }
+                    _aliveSchedules.Remove(schedule);
+                }
+                foreach(var annotation in sheet.Annotations) {
+                    if(annotation.TryGetExistId(out ElementId annotationId)) {
+                        _removedEntities.Add(annotationId);
+                    }
+                    _aliveAnnotations.Remove(annotation);
+                }
+            } else if(entity is ViewPortModel viewPort) {
+                if(viewPort.TryGetExistId(out ElementId viewPortId)) {
+                    _removedEntities.Add(viewPortId);
+                }
+                _aliveViewPorts.Remove(viewPort);
+
+            } else if(entity is ScheduleModel schedule) {
+                if(schedule.TryGetExistId(out ElementId scheduleId)) {
+                    _removedEntities.Add(scheduleId);
+                }
+                _aliveSchedules.Remove(schedule);
+
+            } else if(entity is AnnotationModel annotation) {
+                if(annotation.TryGetExistId(out ElementId annotationId)) {
+                    _removedEntities.Add(annotationId);
+                }
+                _aliveAnnotations.Remove(annotation);
+            }
         }
 
         public bool AddAliveSheet(SheetModel sheet) {
-            throw new NotImplementedException();
+            if(!sheet.Exists || sheet.Exists
+                && sheet.TryGetExistId(out ElementId viewSheetId)
+                && !_removedEntities.Contains(viewSheetId)) {
+
+                _aliveSheets.Add(sheet);
+                return true;
+            }
+            return false;
         }
 
         public bool AddAliveViewPort(ViewPortModel viewPort) {
-            throw new NotImplementedException();
+            if(!viewPort.Exists || viewPort.Exists
+                && viewPort.TryGetExistId(out ElementId viewPortId)
+                && !_removedEntities.Contains(viewPortId)) {
+
+                _aliveViewPorts.Add(viewPort);
+                return true;
+            }
+            return false;
         }
 
         public bool AddAliveSchedule(ScheduleModel schedule) {
-            throw new NotImplementedException();
+            if(!schedule.Exists || schedule.Exists
+                && schedule.TryGetExistId(out ElementId scheduleId)
+                && !_removedEntities.Contains(scheduleId)) {
+
+                _aliveSchedules.Add(schedule);
+                return true;
+            }
+            return false;
         }
 
         public bool AddAliveAnnotation(AnnotationModel annotation) {
-            throw new NotImplementedException();
+            if(!annotation.Exists || annotation.Exists
+                && annotation.TryGetExistId(out ElementId annotationId)
+                && !_removedEntities.Contains(annotationId)) {
+
+                _aliveAnnotations.Add(annotation);
+                return true;
+            }
+            return false;
+        }
+
+        public int GetTrackedEntitiesCount() {
+            return _removedEntities.Count
+                + _aliveSheets.Count
+                + _aliveViewPorts.Count
+                + _aliveSchedules.Count
+                + _aliveAnnotations.Count;
         }
     }
 }

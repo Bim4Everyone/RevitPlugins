@@ -4,82 +4,57 @@ using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.Services {
     internal class NewEntitySaver : IEntitySaver {
-        public void Save(SheetModel sheetModel) {
-            throw new NotImplementedException();
-            //if(State == EntityState.Deleted && _viewSheet is not null) {
-            //    repository.DeleteElement(_viewSheet.Id);
+        private readonly RevitRepository _revitRepository;
+        // TODO локализация
+        public NewEntitySaver(RevitRepository revitRepository) {
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        }
 
-            //} else if(State == EntityState.Modified && _viewSheet is not null) {
-            //    repository.UpdateViewSheet(_viewSheet, this);
-            //    SaveNestedItems(repository);
-            //    State = EntityState.Unchanged;
-            //} else if(State == EntityState.Added
-            //    || State == EntityState.Modified && _viewSheet is null) {
-            //    if(TitleBlockSymbol is null) {
-            //        throw new InvalidOperationException(
-            //            $"Перед сохранением необходимо назначить {nameof(TitleBlockSymbol)}");
-            //    }
-            //    _viewSheet = repository.CreateViewSheet(this);
-            //    SaveNestedItems(repository);
-            //    State = EntityState.Unchanged;
-            //} else {
-            //    SaveNestedItems(repository);
-            //}
+        public void Save(SheetModel sheetModel) {
+            if(sheetModel.TitleBlockSymbol is null) {
+                throw new InvalidOperationException($"У листа не задана основная надпись");
+            }
+            if(string.IsNullOrWhiteSpace(sheetModel.SheetNumber)) {
+                throw new InvalidOperationException($"У листа не задан номер");
+            }
+            _revitRepository.CreateViewSheet(sheetModel);
         }
 
         public void Save(ViewPortModel viewModel) {
-            throw new NotImplementedException();
-            //if(State == EntityState.Deleted && _viewport is not null) {
-            //    repository.DeleteElement(_viewport.Id);
-
-            //} else if(State == EntityState.Modified && _viewport is not null) {
-            //    if(ViewPortType is null) {
-            //        throw new InvalidOperationException(
-            //            $"Перед сохранением измененного видового экрана необходимо назначить {nameof(ViewPortType)}");
-            //    }
-            //    repository.UpdateViewPort(_viewport, ViewPortType.Id);
-            //    State = EntityState.Unchanged;
-
-            //} else if(State == EntityState.Added && _view is not null) {
-            //    if(Location is null) {
-            //        throw new InvalidOperationException(
-            //            $"Перед сохранением нового видового экрана необходимо назначить {nameof(Location)}");
-            //    }
-            //    if(ViewPortType is null) {
-            //        throw new InvalidOperationException(
-            //            $"Перед сохранением нового видового экрана необходимо назначить {nameof(ViewPortType)}");
-            //    }
-            //    repository.CreateViewPort(Sheet.GetViewSheet().Id, _view.Id, ViewPortType.Id, Location);
-            //    State = EntityState.Unchanged;
-            //}
+            if(!viewModel.Sheet.TryGetViewSheet(out var viewSheet)) {
+                throw new InvalidOperationException($"Нельзя разместить видовой экран на еще не созданный лист");
+            }
+            if(viewModel.Location is null) {
+                throw new InvalidOperationException(
+                    $"Перед сохранением нового видового экрана необходимо назначить {nameof(viewModel.Location)}");
+            }
+            if(viewModel.ViewPortType is null) {
+                throw new InvalidOperationException(
+                    $"Перед сохранением нового видового экрана необходимо назначить {nameof(viewModel.ViewPortType)}");
+            }
+            _revitRepository.CreateViewPort(viewSheet.Id, viewModel.View.Id, viewModel.ViewPortType.Id, viewModel.Location);
         }
 
         public void Save(ScheduleModel scheduleModel) {
-            throw new NotImplementedException();
-            //if(State == EntityState.Deleted && _scheduleInstance is not null) {
-            //    repository.DeleteElement(_scheduleInstance.Id);
-            //} else if(State == EntityState.Added && _schedule is not null) {
-            //    if(Location is null) {
-            //        throw new InvalidOperationException(
-            //            $"Перед сохранением новой спецификации необходимо назначить {nameof(Location)}");
-            //    }
-            //    repository.CreateSchedule(Sheet.GetViewSheet().Id, _schedule.Id, Location);
-            //    State = EntityState.Unchanged;
-            //}
+            if(!scheduleModel.Sheet.TryGetViewSheet(out var viewSheet)) {
+                throw new InvalidOperationException($"Нельзя разместить спецификацию на еще не созданный лист");
+            }
+            if(scheduleModel.Location is null) {
+                throw new InvalidOperationException(
+                    $"Перед сохранением новой спецификации необходимо назначить {nameof(scheduleModel.Location)}");
+            }
+            _revitRepository.CreateSchedule(viewSheet.Id, scheduleModel.ViewSchedule.Id, scheduleModel.Location);
         }
 
         public void Save(AnnotationModel annotationModel) {
-            throw new NotImplementedException();
-            //if(State == EntityState.Deleted && _annotationSymbol is not null) {
-            //    repository.DeleteElement(_annotationSymbol.Id);
-            //} else if(State == EntityState.Added && _annotationType is not null) {
-            //    if(Location is null) {
-            //        throw new InvalidOperationException(
-            //            $"Перед сохранением новой аннотации необходимо назначить {nameof(Location)}");
-            //    }
-            //    repository.CreateAnnotation(Sheet.GetViewSheet(), _annotationType, Location);
-            //    State = EntityState.Unchanged;
-            //}
+            if(!annotationModel.Sheet.TryGetViewSheet(out var viewSheet)) {
+                throw new InvalidOperationException($"Нельзя разместить спецификацию на еще не созданный лист");
+            }
+            if(annotationModel.Location is null) {
+                throw new InvalidOperationException(
+                    $"Перед сохранением новой аннотации необходимо назначить {nameof(annotationModel.Location)}");
+            }
+            _revitRepository.CreateAnnotation(viewSheet, annotationModel.AnnotationSymbolType, annotationModel.Location);
         }
     }
 }

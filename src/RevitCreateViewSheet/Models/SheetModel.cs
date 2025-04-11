@@ -12,7 +12,7 @@ using RevitCreateViewSheet.Services;
 
 namespace RevitCreateViewSheet.Models {
     internal class SheetModel : IEntity, IEquatable<SheetModel> {
-        private readonly ViewSheet _viewSheet;
+        private ViewSheet _viewSheet;
 
         /// <summary>
         /// Создает модель существующего листа
@@ -95,26 +95,28 @@ namespace RevitCreateViewSheet.Models {
             if(Exists && _viewSheet is null) {
                 throw new InvalidOperationException();
             }
-            viewSheet = Exists ? _viewSheet : null;
-            return Exists;
+            viewSheet = _viewSheet;
+            return viewSheet is not null;
         }
 
         /// <summary>
-        /// Возвращает ссылку на лист в модели ревит
+        /// Назначает ссылку на новый лист в модели ревит, если данный лист еще не существовал
         /// </summary>
-        /// <returns>Лист в модели ревит</returns>
-        /// <exception cref="InvalidOperationException">Исключение, если лист еще не создан</exception>
-        public ViewSheet GetViewSheet() {
-            if(_viewSheet is not null) {
-                return _viewSheet;
-            } else {
-                throw new InvalidOperationException("Лист еще не создан в модели Revit");
+        /// <param name="viewSheet">Лист в модели ревит, представляющий текущий SheetModel</param>
+        /// <returns>True, если SheetModel - новый лист, иначе False</returns>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        public bool TrySetNewViewSheet(ViewSheet viewSheet) {
+            if(Exists) {
+                return false;
             }
+            _viewSheet = viewSheet ?? throw new ArgumentNullException(nameof(viewSheet));
+            return true;
         }
 
         public bool Equals(SheetModel other) {
             return other is not null
-                && _viewSheet?.Id == other._viewSheet?.Id;
+                && (ReferenceEquals(this, other)
+                || _viewSheet?.Id == other._viewSheet?.Id);
         }
 
         public override bool Equals(object obj) {
@@ -126,7 +128,7 @@ namespace RevitCreateViewSheet.Models {
         }
 
         public void SetContentLocations() {
-            var origin = _viewSheet.Origin;
+            var origin = new XYZ();
             var annotationsOrigin = origin + new XYZ(0, 3, 0);
             XYZ annotationsIncrementer = new(0.5, 0, 0);
             foreach(var annotation in Annotations) {

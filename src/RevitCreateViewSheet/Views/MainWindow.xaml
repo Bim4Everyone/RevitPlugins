@@ -378,7 +378,7 @@
                                         HorizontalAlignment="Left"
                                         DockPanel.Dock="Bottom"
                                         Content="{ui:SymbolIcon Add24}"
-                                        Command="{Binding AddViewPortCommand}" />
+                                        Command="{Binding SelectedSheet.AddViewPortCommand}" />
                                     <ui:DataGrid
                                         SelectionMode="Single"
                                         AutoGenerateColumns="False"
@@ -387,7 +387,7 @@
                                         VerticalScrollBarVisibility="Auto"
                                         HorizontalScrollBarVisibility="Auto"
                                         CanUserResizeColumns="True"
-                                        ItemsSource="{Binding SelectedSheet.VisibleViewPorts.View}"
+                                        ItemsSource="{Binding SelectedSheet.ViewPorts}"
                                         SelectedItem="{Binding SelectedSheet.SelectedViewPort}">
                                         <ui:DataGrid.Columns>
                                             <DataGridTextColumn
@@ -459,7 +459,7 @@
                                         HorizontalAlignment="Left"
                                         DockPanel.Dock="Bottom"
                                         Content="{ui:SymbolIcon Add24}"
-                                        Command="{Binding AddScheduleCommand}" />
+                                        Command="{Binding SelectedSheet.AddScheduleCommand}" />
                                     <ui:DataGrid
                                         DockPanel.Dock="Top"
                                         SelectionMode="Single"
@@ -469,7 +469,7 @@
                                         VerticalScrollBarVisibility="Auto"
                                         HorizontalScrollBarVisibility="Auto"
                                         CanUserResizeColumns="True"
-                                        ItemsSource="{Binding SelectedSheet.VisibleSchedules.View}"
+                                        ItemsSource="{Binding SelectedSheet.Schedules}"
                                         SelectedItem="{Binding SelectedSheet.SelectedSchedule}">
                                         <ui:DataGrid.Columns>
                                             <DataGridTextColumn
@@ -528,7 +528,7 @@
                                         HorizontalAlignment="Left"
                                         DockPanel.Dock="Bottom"
                                         Content="{ui:SymbolIcon Add24}"
-                                        Command="{Binding AddAnnotationCommand}" />
+                                        Command="{Binding SelectedSheet.AddAnnotationCommand}" />
                                     <ui:DataGrid
                                         DockPanel.Dock="Top"
                                         SelectionMode="Single"
@@ -538,7 +538,7 @@
                                         VerticalScrollBarVisibility="Auto"
                                         HorizontalScrollBarVisibility="Auto"
                                         CanUserResizeColumns="True"
-                                        ItemsSource="{Binding SelectedSheet.VisibleAnnotations.View}"
+                                        ItemsSource="{Binding SelectedSheet.Annotations}"
                                         SelectedItem="{Binding SelectedSheet.SelectedAnnotation}">
                                         <ui:DataGrid.Columns>
                                             <DataGridTextColumn

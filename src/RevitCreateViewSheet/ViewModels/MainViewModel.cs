@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private readonly ObservableCollection<SheetViewModel> _sheets;
         private readonly RevitRepository _revitRepository;
-        private readonly EntitiesHandler _sheetsSaver;
+        private readonly EntitiesHandler _sheetsHandler;
         private readonly EntitiesTracker _entitiesTracker;
         private readonly EntitySaverProvider _entitySaverProvider;
         private readonly IConfigSerializer _configSerializer;
@@ -58,7 +59,7 @@ namespace RevitCreateViewSheet.ViewModels {
             IProgressDialogFactory progressDialogFactory) {
 
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            _sheetsSaver = entitiesHandler ?? throw new ArgumentNullException(nameof(entitiesHandler));
+            _sheetsHandler = entitiesHandler ?? throw new ArgumentNullException(nameof(entitiesHandler));
             _entitiesTracker = entitiesTracker ?? throw new ArgumentNullException(nameof(entitiesTracker));
             _entitySaverProvider = entitySaverProvider ?? throw new ArgumentNullException(nameof(entitySaverProvider));
             _configSerializer = configSerializer ?? throw new ArgumentNullException(nameof(configSerializer));
@@ -185,8 +186,21 @@ namespace RevitCreateViewSheet.ViewModels {
             for(int i = 0; i < sheets.Length; i++) {
                 _sheets.Add(sheets[i]);
             }
+            UpdateSchedulesCount();
+            ((INotifyCollectionChanged) _entitiesTracker.AliveSchedules).CollectionChanged += OnSchedulesChanged;
             VisibleSheets = new CollectionViewSource() { Source = _sheets };
             VisibleSheets.Filter += SheetsFilterHandler;
+        }
+
+        private void OnSchedulesChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            UpdateSchedulesCount();
+        }
+
+        private void UpdateSchedulesCount() {
+            var dict = _entitiesTracker.AliveSchedules.GroupBy(s => s.Name).ToDictionary(g => g.Key, g => g.Count());
+            foreach(var schedule in _sheets.SelectMany(s => s.Schedules)) {
+                schedule.CountOnSheets = dict.TryGetValue(schedule.Name, out int count) ? count : 1;
+            }
         }
 
         private void AddSheets() {
@@ -273,12 +287,12 @@ namespace RevitCreateViewSheet.ViewModels {
                 using(var progressDialogService = _progressFactory.CreateDialog()) {
                     progressDialogService.StepValue = 1;
                     progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("TODO");
-                    progressDialogService.MaxValue = sheets.Length;
+                    progressDialogService.MaxValue = _entitiesTracker.GetTrackedEntitiesCount();
                     var progress = progressDialogService.CreateProgress();
                     var ct = progressDialogService.CreateCancellationToken();
                     progressDialogService.Show();
 
-                    _sheetsSaver.HandleEntities(progress, ct);
+                    _sheetsHandler.HandleTrackedEntities(progress, ct);
                 }
             }
         }

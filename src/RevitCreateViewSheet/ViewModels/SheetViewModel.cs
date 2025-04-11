@@ -46,6 +46,7 @@ namespace RevitCreateViewSheet.ViewModels {
             _viewPorts = [.. _sheetModel.ViewPorts.Select(v => new ViewPortViewModel(v))];
             _schedules = [.. _sheetModel.Schedules.Select(s => new ScheduleViewModel(s))];
             _annotations = [.. _sheetModel.Annotations.Select(a => new AnnotationViewModel(a))];
+            InitializeTrackedEntities();
 
             ViewPorts = new ReadOnlyObservableCollection<ViewPortViewModel>(_viewPorts);
             Schedules = new ReadOnlyObservableCollection<ScheduleViewModel>(_schedules);
@@ -149,9 +150,8 @@ namespace RevitCreateViewSheet.ViewModels {
         private void AddViewPort() {
             try {
                 var viewPort = new ViewPortViewModel(_sheetItemsFactory.CreateViewPort(_sheetModel));
-                if(_entitiesTracker.AddAliveViewPort(viewPort.ViewPortModel)) {
-                    _viewPorts.Add(viewPort);
-                }
+                _viewPorts.Add(viewPort);
+                _entitiesTracker.AddAliveViewPort(viewPort.ViewPortModel);
             } catch(OperationCanceledException) {
                 return;
             }
@@ -160,9 +160,8 @@ namespace RevitCreateViewSheet.ViewModels {
         private void AddSchedule() {
             try {
                 var schedule = new ScheduleViewModel(_sheetItemsFactory.CreateSchedule(_sheetModel));
-                if(_entitiesTracker.AddAliveSchedule(schedule.ScheduleModel)) {
-                    _schedules.Add(schedule);
-                }
+                _schedules.Add(schedule);
+                _entitiesTracker.AddAliveSchedule(schedule.ScheduleModel);
             } catch(OperationCanceledException) {
                 return;
             }
@@ -171,9 +170,8 @@ namespace RevitCreateViewSheet.ViewModels {
         private void AddAnnotation() {
             try {
                 var annotation = new AnnotationViewModel(_sheetItemsFactory.CreateAnnotation(_sheetModel));
-                if(_entitiesTracker.AddAliveAnnotation(annotation.AnnotationModel)) {
-                    _annotations.Add(annotation);
-                }
+                _annotations.Add(annotation);
+                _entitiesTracker.AddAliveAnnotation(annotation.AnnotationModel);
             } catch(OperationCanceledException) {
                 return;
             }
@@ -181,8 +179,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void RemoveViewPort(ViewPortViewModel viewPort) {
             _sheetModel.ViewPorts.Remove(viewPort.ViewPortModel);
-            _entitiesTracker.AddToRemovedEntities(viewPort.ViewPortModel);
             _viewPorts.Remove(viewPort);
+            _entitiesTracker.AddToRemovedEntities(viewPort.ViewPortModel);
         }
 
         private bool CanRemoveViewPort(ViewPortViewModel viewPort) {
@@ -191,8 +189,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void RemoveSchedule(ScheduleViewModel scheduleView) {
             _sheetModel.Schedules.Remove(scheduleView.ScheduleModel);
-            _entitiesTracker.AddToRemovedEntities(scheduleView.ScheduleModel);
             _schedules.Remove(scheduleView);
+            _entitiesTracker.AddToRemovedEntities(scheduleView.ScheduleModel);
         }
 
         private bool CanRemoveSchedule(ScheduleViewModel scheduleView) {
@@ -201,8 +199,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void RemoveAnnotation(AnnotationViewModel annotationView) {
             _sheetModel.Annotations.Remove(annotationView.AnnotationModel);
-            _entitiesTracker.AddToRemovedEntities(annotationView.AnnotationModel);
             _annotations.Remove(annotationView);
+            _entitiesTracker.AddToRemovedEntities(annotationView.AnnotationModel);
         }
 
         private bool CanRemoveAnnotation(AnnotationViewModel annotationView) {
@@ -212,6 +210,19 @@ namespace RevitCreateViewSheet.ViewModels {
         private string GetSheetNumber(string albumBlueprint, string sheetCustomNumber) {
             string[] strs = [albumBlueprint, sheetCustomNumber];
             return string.Join("-", strs.Where(s => !string.IsNullOrWhiteSpace(s)));
+        }
+
+        private void InitializeTrackedEntities() {
+            _entitiesTracker.AddAliveSheet(_sheetModel);
+            foreach(var viewPort in _sheetModel.ViewPorts) {
+                _entitiesTracker.AddAliveViewPort(viewPort);
+            }
+            foreach(var schedule in _sheetModel.Schedules) {
+                _entitiesTracker.AddAliveSchedule(schedule);
+            }
+            foreach(var annotation in _sheetModel.Annotations) {
+                _entitiesTracker.AddAliveAnnotation(annotation);
+            }
         }
     }
 }
