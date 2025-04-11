@@ -151,6 +151,7 @@ namespace RevitCreateViewSheet.ViewModels {
             try {
                 var viewPort = new ViewPortViewModel(_sheetItemsFactory.CreateViewPort(_sheetModel));
                 _viewPorts.Add(viewPort);
+                _sheetModel.ViewPorts.Add(viewPort.ViewPortModel);
                 _entitiesTracker.AddAliveViewPort(viewPort.ViewPortModel);
             } catch(OperationCanceledException) {
                 return;
@@ -161,6 +162,7 @@ namespace RevitCreateViewSheet.ViewModels {
             try {
                 var schedule = new ScheduleViewModel(_sheetItemsFactory.CreateSchedule(_sheetModel));
                 _schedules.Add(schedule);
+                _sheetModel.Schedules.Add(schedule.ScheduleModel);
                 _entitiesTracker.AddAliveSchedule(schedule.ScheduleModel);
             } catch(OperationCanceledException) {
                 return;
@@ -171,6 +173,7 @@ namespace RevitCreateViewSheet.ViewModels {
             try {
                 var annotation = new AnnotationViewModel(_sheetItemsFactory.CreateAnnotation(_sheetModel));
                 _annotations.Add(annotation);
+                _sheetModel.Annotations.Add(annotation.AnnotationModel);
                 _entitiesTracker.AddAliveAnnotation(annotation.AnnotationModel);
             } catch(OperationCanceledException) {
                 return;
@@ -178,8 +181,8 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void RemoveViewPort(ViewPortViewModel viewPort) {
-            _sheetModel.ViewPorts.Remove(viewPort.ViewPortModel);
             _viewPorts.Remove(viewPort);
+            _sheetModel.ViewPorts.Remove(viewPort.ViewPortModel);
             _entitiesTracker.AddToRemovedEntities(viewPort.ViewPortModel);
         }
 
@@ -188,8 +191,8 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void RemoveSchedule(ScheduleViewModel scheduleView) {
-            _sheetModel.Schedules.Remove(scheduleView.ScheduleModel);
             _schedules.Remove(scheduleView);
+            _sheetModel.Schedules.Remove(scheduleView.ScheduleModel);
             _entitiesTracker.AddToRemovedEntities(scheduleView.ScheduleModel);
         }
 
@@ -198,8 +201,8 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void RemoveAnnotation(AnnotationViewModel annotationView) {
-            _sheetModel.Annotations.Remove(annotationView.AnnotationModel);
             _annotations.Remove(annotationView);
+            _sheetModel.Annotations.Remove(annotationView.AnnotationModel);
             _entitiesTracker.AddToRemovedEntities(annotationView.AnnotationModel);
         }
 

@@ -72,7 +72,7 @@ namespace RevitCreateViewSheet.ViewModels {
             _selectedSheets = [];
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            RemoveSheetCommand = RelayCommand.Create<ICollection<SheetViewModel>>(RemoveSheet, CanRemoveSheet);
+            RemoveSheetsCommand = RelayCommand.Create<ICollection<SheetViewModel>>(RemoveSheets, CanRemoveSheet);
             AddSheetsCommand = RelayCommand.Create(AddSheets, CanAddSheets);
             LoadSheetsCommand = RelayCommand.Create(LoadSheets);
             SaveSheetsCommand = RelayCommand.Create(SaveSheets, CanSaveSheets);
@@ -100,7 +100,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public IMessageBoxService MessageBoxService => _messageBoxService;
 
-        public ICommand RemoveSheetCommand { get; }
+        public ICommand RemoveSheetsCommand { get; }
 
         public ICommand AddSheetsCommand { get; }
 
@@ -198,7 +198,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void UpdateSchedulesCount() {
             var dict = _entitiesTracker.AliveSchedules.GroupBy(s => s.Name).ToDictionary(g => g.Key, g => g.Count());
-            foreach(var schedule in _sheets.SelectMany(s => s.Schedules)) {
+            foreach(var schedule in _sheets.SelectMany(s => s.Schedules).ToArray()) {
                 schedule.CountOnSheets = dict.TryGetValue(schedule.Name, out int count) ? count : 1;
             }
         }
@@ -258,14 +258,14 @@ namespace RevitCreateViewSheet.ViewModels {
             return true;
         }
 
-        private void RemoveSheet(ICollection<SheetViewModel> sheets) {
+        private void RemoveSheets(ICollection<SheetViewModel> sheets) {
             if(_messageBoxService.Show(
                 $"Вы действительно хотите удалить листы ({sheets.Count} шт.)?",
                 "Предупреждение",
                 System.Windows.MessageBoxButton.YesNo,
                 System.Windows.MessageBoxImage.Warning) == System.Windows.MessageBoxResult.Yes) {
 
-                foreach(SheetViewModel sheet in sheets) {
+                foreach(SheetViewModel sheet in sheets.ToArray()) {
                     _entitiesTracker.AddToRemovedEntities(sheet.SheetModel);
                     _sheets.Remove(sheet);
                 }

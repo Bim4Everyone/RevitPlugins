@@ -20,7 +20,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 .Select(a => new AnnotationSymbolTypeViewModel(a))
                 .OrderBy(a => a.RichName, new LogicalStringComparer())];
             SelectedAnnotationSymbolType = AnnotationSymbolTypes.FirstOrDefault();
-            AcceptView = RelayCommand.Create(() => { }, CanAcceptView);
+            AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);
         }
 
 
@@ -31,7 +31,7 @@ namespace RevitCreateViewSheet.ViewModels {
             set => RaiseAndSetIfChanged(ref _selectedAnnotation, value);
         }
 
-        public ICommand AcceptView { get; }
+        public ICommand AcceptViewCommand { get; }
 
         public string ErrorText {
             get => _errorText;

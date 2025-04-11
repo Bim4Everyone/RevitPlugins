@@ -69,7 +69,7 @@
                 TextSearch.TextPath="Name"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
                 ToolTip="{me:LocalizationSource TODO}"
-                ItemsSource="{Binding ViewsForSelection}"
+                ItemsSource="{Binding Views}"
                 SelectedItem="{Binding SelectedView}" />
             <ui:TextBlock
                 Margin="10"
