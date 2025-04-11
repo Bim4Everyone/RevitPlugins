@@ -74,13 +74,12 @@ internal class RevitRepository {
     private string GetWorksetName(Element element) {
         var undefinedText = _localizationService.GetLocalizedString("MainWindow.Undefined");
 
-        var param = element.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM);
-        if(param == null) {
+        int? worksetId = element.GetParamValueOrDefault<int?>(BuiltInParameter.ELEM_PARTITION_PARAM);
+        if(worksetId is null) {
             return undefinedText;
         }
 
-        int worksetId = param.AsInteger();
-        var workset = Document.GetWorksetTable().GetWorkset(new WorksetId(worksetId));
+        var workset = Document.GetWorksetTable().GetWorkset(new WorksetId(worksetId.Value));
         return workset?.Name ?? undefinedText;
     }
 

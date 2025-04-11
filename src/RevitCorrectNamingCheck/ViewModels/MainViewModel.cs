@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 
-
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -21,6 +21,7 @@ internal class MainViewModel : BaseViewModel {
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
+    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
 
@@ -31,7 +32,7 @@ internal class MainViewModel : BaseViewModel {
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     public List<LinkedFile> LinkedFiles {
         get => _linkedFiles;
         set => RaiseAndSetIfChanged(ref _linkedFiles, value);

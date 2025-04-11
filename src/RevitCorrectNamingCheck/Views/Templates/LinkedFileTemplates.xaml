@@ -2,23 +2,25 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <DataTemplate x:Key="LinkedFileTemplate">
-        <TextBlock Text="{Binding Name}">
-            <TextBlock.Style>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="Black" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding FileNameStatus}" Value="None">
-                            <Setter Property="Background" Value="MistyRose"/>
-                            <Setter Property="ToolTip" Value="{DynamicResource FileNameStatus.NotFoundTags}" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding FileNameStatus}" Value="Incorrect">
-                            <Setter Property="Background" Value="MistyRose"/>
-                            <Setter Property="ToolTip" Value="{DynamicResource FileNameStatus.MultipleTags}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-    </DataTemplate>
+        <Border x:Name="StatusBorder"
+                Padding="6,2"
+                CornerRadius="6"
+                Background="Transparent">
+            <TextBlock Text="{Binding Name}" Foreground="Black" />
+        </Border>
 
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding FileNameStatus}" Value="None">
+                <Setter TargetName="StatusBorder" Property="Background" Value="MistyRose"/>
+                <Setter TargetName="StatusBorder" Property="ToolTip" 
+                        Value="{DynamicResource FileNameStatus.NotFoundTags}" />
+            </DataTrigger>
+
+            <DataTrigger Binding="{Binding FileNameStatus}" Value="Incorrect">
+                <Setter TargetName="StatusBorder" Property="Background" Value="MistyRose"/>
+                <Setter TargetName="StatusBorder" Property="ToolTip" 
+                        Value="{DynamicResource FileNameStatus.MultipleTags}" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
 </ResourceDictionary>
