@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.sln",
+  "PluginName": "RevitCorrectNamingCheck",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://img.icons8.com/wired/64/edit-property.png",
+  "BundleName": "РН связей",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\Связи.panel"
+}
