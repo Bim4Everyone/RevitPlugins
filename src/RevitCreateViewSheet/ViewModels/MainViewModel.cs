@@ -282,17 +282,21 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void AcceptView() {
-            var sheets = _sheets.Select(s => s.SheetModel).ToArray();
-            if(sheets.Any()) {
-                using(var progressDialogService = _progressFactory.CreateDialog()) {
-                    progressDialogService.StepValue = 1;
-                    progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("TODO");
-                    progressDialogService.MaxValue = _entitiesTracker.GetTrackedEntitiesCount();
-                    var progress = progressDialogService.CreateProgress();
-                    var ct = progressDialogService.CreateCancellationToken();
-                    progressDialogService.Show();
+            using(var progressDialogService = _progressFactory.CreateDialog()) {
+                progressDialogService.StepValue = 1;
+                progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("TODO");
+                progressDialogService.MaxValue = _entitiesTracker.GetTrackedEntitiesCount();
+                var progress = progressDialogService.CreateProgress();
+                var ct = progressDialogService.CreateCancellationToken();
+                progressDialogService.Show();
 
-                    _sheetsHandler.HandleTrackedEntities(progress, ct);
+                string error = _sheetsHandler.HandleTrackedEntities(progress, ct);
+                if(!string.IsNullOrWhiteSpace(error)) {
+                    _messageBoxService.Show(
+                        error,
+                        "Предупреждение",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Warning);
                 }
             }
         }

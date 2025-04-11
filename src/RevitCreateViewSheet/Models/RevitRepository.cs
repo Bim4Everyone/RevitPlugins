@@ -88,8 +88,13 @@ namespace RevitCreateViewSheet.Models {
                 .ToArray();
         }
 
-        public void DeleteElement(ElementId id) {
-            Document.Delete(id);
+        public bool DeleteElement(ElementId id) {
+            try {
+                Document.Delete(id);
+                return true;
+            } catch(Autodesk.Revit.Exceptions.ArgumentException) {
+                return false;
+            }
         }
 
         public FamilyInstance CreateAnnotation(View view2D, FamilySymbol familySymbol, XYZ point) {
