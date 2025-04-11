@@ -7,22 +7,19 @@ using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
     internal class ScheduleViewModel : BaseViewModel, IEquatable<ScheduleViewModel> {
-        private readonly ScheduleModel _scheduleModel;
         private int _countOnSheets;
 
         public ScheduleViewModel(ScheduleModel scheduleModel) {
-            _scheduleModel = scheduleModel ?? throw new ArgumentNullException(nameof(scheduleModel));
+            ScheduleModel = scheduleModel ?? throw new ArgumentNullException(nameof(scheduleModel));
             IsPlaced = scheduleModel.Exists;
         }
 
 
-        public string Name => _scheduleModel.Name;
+        public string Name => ScheduleModel.Name;
 
         public bool IsPlaced { get; }
 
-        public IEntity Entity => ScheduleModel;
-
-        public ScheduleModel ScheduleModel => _scheduleModel;
+        public ScheduleModel ScheduleModel { get; }
 
         /// <summary>
         /// Количество данной спецификации на всех листах
@@ -35,7 +32,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public bool Equals(ScheduleViewModel other) {
             return other is not null
-                && _scheduleModel.Equals(other._scheduleModel);
+                && ScheduleModel.Equals(other.ScheduleModel);
         }
 
         public override bool Equals(object obj) {
@@ -43,7 +40,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public override int GetHashCode() {
-            return 539060726 + EqualityComparer<ScheduleModel>.Default.GetHashCode(_scheduleModel);
+            return 539060726 + EqualityComparer<ScheduleModel>.Default.GetHashCode(ScheduleModel);
         }
     }
 }

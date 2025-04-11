@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 
@@ -22,7 +23,7 @@ namespace RevitCreateViewSheet.ViewModels {
         /// <summary>
         /// Все виды в документе Revit, для которых можно создать видовые экраны. Размещенные и не размещенные.
         /// </summary>
-        private readonly List<ViewViewModel> _allViews;
+        private readonly IReadOnlyCollection<ViewViewModel> _allViews;
         /// <summary>
         /// Виды которые доступны для выбора пользователя. (Не размещенные виды)
         /// </summary>
@@ -112,11 +113,14 @@ namespace RevitCreateViewSheet.ViewModels {
                 .Union(sheetModel.ViewPorts)
                 .Select(v => new ViewViewModel(v.View))
                 .ToHashSet();
+            Debug.Print(_allViews.Count.ToString());
+            Debug.Print(_allViews.Select(v => v.View.Id).Distinct().Count().ToString());
+            var enabledViews = _allViews
+                .Where(v => !disabledViews.Contains(v))
+                .OrderBy(v => v.Name, new LogicalStringComparer());
             _enabledViews.Clear();
-            for(int i = 0; i < _allViews.Count; i++) {
-                if(!disabledViews.Contains(_allViews[i])) {
-                    _enabledViews.Add(_allViews[i]);
-                }
+            foreach(var view in enabledViews) {
+                _enabledViews.Add(view);
             }
             UpdateViewsForSelection(SelectedViewType?.ViewType ?? RevitViewType.Any);
         }

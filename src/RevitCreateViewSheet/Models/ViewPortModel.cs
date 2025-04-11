@@ -82,7 +82,7 @@ namespace RevitCreateViewSheet.Models {
         public bool Equals(ViewPortModel other) {
             return other is not null
                 && Sheet.Equals(other.Sheet)
-                && _viewport?.Id == other._viewport?.Id;
+                && View.Id == other.View.Id;
         }
 
         public override bool Equals(object obj) {
@@ -91,7 +91,7 @@ namespace RevitCreateViewSheet.Models {
 
         public override int GetHashCode() {
             int hashCode = 1305361952;
-            hashCode = hashCode * -1521134295 + EqualityComparer<ElementId>.Default.GetHashCode(_viewport?.Id);
+            hashCode = hashCode * -1521134295 + EqualityComparer<ElementId>.Default.GetHashCode(View.Id);
             hashCode = hashCode * -1521134295 + EqualityComparer<SheetModel>.Default.GetHashCode(Sheet);
             return hashCode;
         }

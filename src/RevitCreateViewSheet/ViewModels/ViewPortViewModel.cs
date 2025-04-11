@@ -7,36 +7,33 @@ using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
     internal class ViewPortViewModel : BaseViewModel, IEquatable<ViewPortViewModel> {
-        private readonly ViewPortModel _viewPortModel;
         private ViewPortTypeViewModel _viewPortType;
 
         public ViewPortViewModel(ViewPortModel viewPortModel) {
-            _viewPortModel = viewPortModel ?? throw new ArgumentNullException(nameof(viewPortModel));
-            _viewPortType = new ViewPortTypeViewModel(_viewPortModel.ViewPortType);
-            IsPlaced = _viewPortModel.Exists;
+            ViewPortModel = viewPortModel ?? throw new ArgumentNullException(nameof(viewPortModel));
+            _viewPortType = new ViewPortTypeViewModel(ViewPortModel.ViewPortType);
+            IsPlaced = ViewPortModel.Exists;
         }
 
 
-        public string ViewName => _viewPortModel.Name;
+        public string ViewName => ViewPortModel.Name;
 
         public bool IsPlaced { get; }
 
-        public IEntity Entity => ViewPortModel;
-
-        public ViewPortModel ViewPortModel => _viewPortModel;
+        public ViewPortModel ViewPortModel { get; }
 
         public ViewPortTypeViewModel ViewPortType {
             get => _viewPortType;
             set {
                 RaiseAndSetIfChanged(ref _viewPortType, value);
-                _viewPortModel.ViewPortType = value?.ViewType;
+                ViewPortModel.ViewPortType = value?.ViewType;
             }
         }
 
 
         public bool Equals(ViewPortViewModel other) {
             return other is not null
-                && ViewName == other.ViewName;
+                && ViewPortModel.Equals(other.ViewPortModel);
         }
 
         public override bool Equals(object obj) {
@@ -44,7 +41,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public override int GetHashCode() {
-            return 539060726 + EqualityComparer<string>.Default.GetHashCode(ViewName);
+            return 539060726 + EqualityComparer<ViewPortModel>.Default.GetHashCode(ViewPortModel);
         }
     }
 }
