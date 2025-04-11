@@ -174,6 +174,7 @@ namespace RevitCreateViewSheet.Models {
                 .OfClass(typeof(ScheduleSheetInstance))
                 .ToElements()
                 .OfType<ScheduleSheetInstance>()
+                .Where(s => !s.IsTitleblockRevisionSchedule)
                 .Select(s => new ScheduleModel(this, s, entitySaver))
                 .ToList();
         }
