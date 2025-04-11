@@ -28,7 +28,7 @@ namespace RevitMirroredElements.Services
                 return ((CategoriesViewModel) window.DataContext).GetSelectedCategories();
             }
 
-            return null;
+            return new List<Category>();
         }
     }
 }

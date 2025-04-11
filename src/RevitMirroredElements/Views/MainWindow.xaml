@@ -141,15 +141,15 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Right">
-            <TextBlock
-        Margin="0,0,5,5"
-        TextWrapping="Wrap"
-        Foreground="Orange"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        Text="{Binding ErrorText}" />
-
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock
+            Margin="0,0,5,5"
+            TextWrapping="Wrap"
+            Foreground="Orange"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Text="{Binding ErrorText}" />
+
                 <ui:Button
             Margin="10"
             Width="80"
