@@ -162,10 +162,43 @@ namespace RevitCreateViewSheet.Models {
         }
 
         internal ICollection<SheetModel> GetSheetModels() {
-            return GetViewSheets()
-                .Select(s => new SheetModel(s, _entitySaverProvider.GetExistsEntitySaver()) {
-                    TitleBlockSymbol = GetTitleBlockSymbol(s)
-                })
+            ICollection<ViewSheet> viewSheets = GetViewSheets();
+            ICollection<Viewport> viewports = GetViewPorts();
+            ICollection<ScheduleSheetInstance> schedules = GetSchedules();
+            ICollection<AnnotationSymbol> annotations = GetAnnotations();
+            return viewSheets.Select(sheet => new SheetModel(sheet,
+                viewports.Where(v => v.SheetId == sheet.Id).ToArray(),
+                schedules.Where(s => s.OwnerViewId == sheet.Id).ToArray(),
+                annotations.Where(a => a.OwnerViewId == sheet.Id).ToArray(),
+                _entitySaverProvider.GetExistsEntitySaver()) {
+                TitleBlockSymbol = GetTitleBlockSymbol(sheet)
+            })
+                .ToArray();
+        }
+
+        internal ICollection<AnnotationSymbol> GetAnnotations() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfCategory(BuiltInCategory.OST_GenericAnnotation)
+                .OfType<AnnotationSymbol>()
+                .Where(a => a.SuperComponent is null)
+                .ToArray();
+        }
+
+        internal ICollection<ScheduleSheetInstance> GetSchedules() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(ScheduleSheetInstance))
+                .OfType<ScheduleSheetInstance>()
+                .Where(s => !s.IsTitleblockRevisionSchedule)
+                .ToArray();
+        }
+
+        internal ICollection<Viewport> GetViewPorts() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(Viewport))
+                .OfType<Viewport>()
                 .ToArray();
         }
 

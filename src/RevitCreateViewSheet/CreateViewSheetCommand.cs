@@ -51,8 +51,6 @@ namespace RevitCreateViewSheet {
 
                 Notification(kernel.Get<MainWindow>());
             }
-
-
         }
 
         private void AddEntitiesServices(IKernel kernel) {

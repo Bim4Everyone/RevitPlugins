@@ -18,13 +18,27 @@ namespace RevitCreateViewSheet.Models {
         /// Создает модель существующего листа
         /// </summary>
         /// <param name="viewSheet">Лист</param>
+        /// <param name="viewports">Видовые экраны на листе</param>
+        /// <param name="schedules">Спецификации на листе</param>
+        /// <param name="annotations">Аннотации на листе</param>
+        /// <param name="entitySaver">Сервис для сохранения листа в модели Revit</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public SheetModel(ViewSheet viewSheet, ExistsEntitySaver entitySaver) {
+        public SheetModel(
+            ViewSheet viewSheet,
+            ICollection<Viewport> viewports,
+            ICollection<ScheduleSheetInstance> schedules,
+            ICollection<AnnotationSymbol> annotations,
+            ExistsEntitySaver entitySaver) {
+
             _viewSheet = viewSheet ?? throw new ArgumentNullException(nameof(viewSheet));
             Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
-            ViewPorts = GetViewPortModels(_viewSheet, entitySaver);
-            Schedules = GetScheduleModels(_viewSheet, entitySaver);
-            Annotations = GetAnnotationModels(_viewSheet, entitySaver);
+
+            ViewPorts = viewports?.Select(v => new ViewPortModel(this, v, entitySaver)).ToList()
+                ?? throw new ArgumentNullException(nameof(viewports));
+            Schedules = schedules?.Select(s => new ScheduleModel(this, s, entitySaver)).ToList()
+                ?? throw new ArgumentNullException(nameof(schedules));
+            Annotations = annotations?.Select(a => new AnnotationModel(this, a, entitySaver)).ToList()
+                ?? throw new ArgumentNullException(nameof(annotations));
 
             AlbumBlueprint = viewSheet.GetParamValueOrDefault(
                 SharedParamsConfig.Instance.AlbumBlueprints, string.Empty);
@@ -153,37 +167,6 @@ namespace RevitCreateViewSheet.Models {
                     viewsOrigin += viewsIncrementer;
                 }
             }
-        }
-
-        private List<AnnotationModel> GetAnnotationModels(ViewSheet viewSheet, ExistsEntitySaver entitySaver) {
-            return new FilteredElementCollector(viewSheet.Document)
-                .WhereElementIsNotElementType()
-                .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
-                .OfCategory(BuiltInCategory.OST_GenericAnnotation)
-                .ToElements()
-                .OfType<AnnotationSymbol>()
-                .Where(a => a.SuperComponent is null)
-                .Select(a => new AnnotationModel(this, a, entitySaver))
-                .ToList();
-        }
-
-        private List<ScheduleModel> GetScheduleModels(ViewSheet viewSheet, ExistsEntitySaver entitySaver) {
-            return new FilteredElementCollector(viewSheet.Document)
-                .WhereElementIsNotElementType()
-                .WherePasses(new ElementOwnerViewFilter(viewSheet.Id))
-                .OfClass(typeof(ScheduleSheetInstance))
-                .ToElements()
-                .OfType<ScheduleSheetInstance>()
-                .Where(s => !s.IsTitleblockRevisionSchedule)
-                .Select(s => new ScheduleModel(this, s, entitySaver))
-                .ToList();
-        }
-
-        private List<ViewPortModel> GetViewPortModels(ViewSheet viewSheet, ExistsEntitySaver entitySaver) {
-            var doc = viewSheet.Document;
-            return viewSheet.GetAllViewports()
-                .Select(id => new ViewPortModel(this, doc.GetElement(id) as Viewport, entitySaver))
-                .ToList();
         }
     }
 }
