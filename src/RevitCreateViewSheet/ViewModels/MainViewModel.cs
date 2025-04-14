@@ -259,12 +259,12 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private void RemoveSheets(ICollection<SheetViewModel> sheets) {
-            if(_messageBoxService.Show(
-                $"Вы действительно хотите удалить листы ({sheets.Count} шт.)?",
-                "Предупреждение",
-                System.Windows.MessageBoxButton.YesNo,
-                System.Windows.MessageBoxImage.Warning) == System.Windows.MessageBoxResult.Yes) {
-
+            if(sheets.Any(s => s.SheetModel.TryGetExistId(out var sheetId)
+                && _revitRepository.Document.ActiveView.Id == sheetId)) {
+                ShowOkWarning($"Нельзя удалить активный лист {_revitRepository.Document.ActiveView.Name}");
+                return;
+            }
+            if(ShowYesNoWarning($"Вы действительно хотите удалить листы ({sheets.Count} шт.)?")) {
                 foreach(SheetViewModel sheet in sheets.ToArray()) {
                     _entitiesTracker.AddToRemovedEntities(sheet.SheetModel);
                     _sheets.Remove(sheet);
@@ -292,11 +292,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
                 string error = _sheetsHandler.HandleTrackedEntities(progress, ct);
                 if(!string.IsNullOrWhiteSpace(error)) {
-                    _messageBoxService.Show(
-                        error,
-                        "Предупреждение",
-                        System.Windows.MessageBoxButton.OK,
-                        System.Windows.MessageBoxImage.Warning);
+                    ShowOkWarning(error);
                 }
             }
         }
@@ -431,6 +427,30 @@ namespace RevitCreateViewSheet.ViewModels {
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Показывает предупреждение с OK кнопкой
+        /// </summary>
+        private void ShowOkWarning(string msg) {
+            // TODO localization
+            _messageBoxService.Show(
+                msg,
+                "Предупреждение",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Warning);
+        }
+
+        /// <summary>
+        /// Показывает предупреждение с Yes/No кнопками
+        /// </summary>
+        private bool ShowYesNoWarning(string msg) {
+            // TODO localization
+            return _messageBoxService.Show(
+                msg,
+                "Предупреждение",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Warning) == System.Windows.MessageBoxResult.Yes;
         }
     }
 }
