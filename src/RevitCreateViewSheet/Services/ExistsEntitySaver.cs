@@ -12,21 +12,22 @@ namespace RevitCreateViewSheet.Services {
 
 
         public void Save(SheetModel sheetModel) {
-            if(!sheetModel.TryGetViewSheet(out var viewSheet)) {
+            if(!sheetModel.TryGetViewSheet(out _)) {
                 throw new InvalidOperationException();
             }
-            _revitRepository.UpdateViewSheet(viewSheet, sheetModel);
+            _revitRepository.UpdateViewSheet(sheetModel);
         }
 
-        public void Save(ViewPortModel viewModel) {
-            if(!viewModel.TryGetViewport(out var viewPort)) {
+        public void Save(ViewPortModel viewPortModel) {
+            if(!viewPortModel.TryGetViewport(out _)) {
                 throw new InvalidOperationException();
             }
-            if(viewModel.ViewPortType is null) {
+            if(viewPortModel.ViewPortType is null) {
                 throw new InvalidOperationException(
-                    $"Перед сохранением измененного видового экрана необходимо назначить {nameof(viewModel.ViewPortType)}");
+                    $"Перед сохранением измененного видового экрана необходимо назначить " +
+                    $"{nameof(viewPortModel.ViewPortType)}");
             }
-            _revitRepository.UpdateViewPort(viewPort, viewModel.ViewPortType.Id);
+            _revitRepository.UpdateViewPort(viewPortModel);
         }
 
         public void Save(ScheduleModel scheduleModel) {

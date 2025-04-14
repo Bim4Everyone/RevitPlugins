@@ -9,7 +9,7 @@ using RevitCreateViewSheet.Services;
 
 namespace RevitCreateViewSheet.Models {
     internal class ViewPortModel : IEntity, IEquatable<ViewPortModel> {
-        private readonly Viewport _viewport;
+        private Viewport _viewport;
 
         /// <summary>
         /// Создает модель размещенного на листе видового экрана
@@ -28,6 +28,7 @@ namespace RevitCreateViewSheet.Models {
             Location = (viewport.Location as LocationPoint)?.Point;
             ViewPortType = viewport.GetElementType();
             Name = viewport.Document.GetElement(viewport.ViewId).Name;
+            InitialViewPortType = ViewPortType;
             Exists = true;
         }
 
@@ -44,6 +45,7 @@ namespace RevitCreateViewSheet.Models {
             ViewPortType = viewPortType ?? throw new ArgumentNullException(nameof(viewPortType));
             Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
             Name = view.Name;
+            InitialViewPortType = ViewPortType;
             Exists = false;
         }
 
@@ -60,6 +62,8 @@ namespace RevitCreateViewSheet.Models {
 
         public IEntitySaver Saver { get; }
 
+        public ElementType InitialViewPortType { get; }
+
         public ElementType ViewPortType { get; set; }
 
 
@@ -75,8 +79,22 @@ namespace RevitCreateViewSheet.Models {
             if(Exists && _viewport is null) {
                 throw new InvalidOperationException();
             }
-            viewport = Exists ? _viewport : null;
-            return Exists;
+            viewport = _viewport;
+            return viewport is not null;
+        }
+
+        /// <summary>
+        /// Назначает ссылку на новый видовой экран в модели ревит, если данный видовой экран еще не существовал
+        /// </summary>
+        /// <param name="viewport">Видовой экран в модели ревит, представляющий текущий ViewPortModel</param>
+        /// <returns>True, если ссылка назначена, иначе False</returns>
+        /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
+        public bool TrySetNewViewSheet(Viewport viewport) {
+            if(Exists) {
+                return false;
+            }
+            _viewport = viewport ?? throw new ArgumentNullException(nameof(viewport));
+            return true;
         }
 
         public bool Equals(ViewPortModel other) {

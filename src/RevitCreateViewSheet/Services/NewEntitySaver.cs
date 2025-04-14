@@ -17,22 +17,22 @@ namespace RevitCreateViewSheet.Services {
             if(string.IsNullOrWhiteSpace(sheetModel.SheetNumber)) {
                 throw new InvalidOperationException($"У листа не задан номер");
             }
-            _revitRepository.CreateViewSheet(sheetModel);
+            _revitRepository.CreateSheet(sheetModel);
         }
 
-        public void Save(ViewPortModel viewModel) {
-            if(!viewModel.Sheet.TryGetViewSheet(out var viewSheet)) {
+        public void Save(ViewPortModel viewPortModel) {
+            if(!viewPortModel.Sheet.TryGetViewSheet(out _)) {
                 throw new InvalidOperationException($"Нельзя разместить видовой экран на еще не созданный лист");
             }
-            if(viewModel.Location is null) {
+            if(viewPortModel.Location is null) {
                 throw new InvalidOperationException(
-                    $"Перед сохранением нового видового экрана необходимо назначить {nameof(viewModel.Location)}");
+                    $"Перед сохранением нового видового экрана необходимо назначить {nameof(viewPortModel.Location)}");
             }
-            if(viewModel.ViewPortType is null) {
+            if(viewPortModel.ViewPortType is null) {
                 throw new InvalidOperationException(
-                    $"Перед сохранением нового видового экрана необходимо назначить {nameof(viewModel.ViewPortType)}");
+                    $"Перед сохранением нового видового экрана необходимо назначить {nameof(viewPortModel.ViewPortType)}");
             }
-            _revitRepository.CreateViewPort(viewSheet.Id, viewModel.View.Id, viewModel.ViewPortType.Id, viewModel.Location);
+            _revitRepository.CreateViewPort(viewPortModel);
         }
 
         public void Save(ScheduleModel scheduleModel) {

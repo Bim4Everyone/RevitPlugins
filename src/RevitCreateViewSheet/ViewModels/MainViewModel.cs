@@ -283,7 +283,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void AcceptView() {
             using(var progressDialogService = _progressFactory.CreateDialog()) {
-                progressDialogService.StepValue = 1;
+                progressDialogService.StepValue = 50;
                 progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("TODO");
                 progressDialogService.MaxValue = _entitiesTracker.GetTrackedEntitiesCount();
                 var progress = progressDialogService.CreateProgress();

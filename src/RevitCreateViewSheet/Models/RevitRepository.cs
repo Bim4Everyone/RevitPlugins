@@ -183,11 +183,9 @@ namespace RevitCreateViewSheet.Models {
                     ? schedulesArr : [],
                 annotations.TryGetValue(sheet.Id, out AnnotationSymbol[] annotationsArr)
                     ? annotationsArr : [],
-                _entitySaverProvider.GetExistsEntitySaver()) {
-
-                TitleBlockSymbol = titleblocks.TryGetValue(sheet.SheetNumber, out FamilySymbol titleBlock)
-                    ? titleBlock : default
-            })
+                _entitySaverProvider.GetExistsEntitySaver(),
+                titleblocks.TryGetValue(sheet.SheetNumber, out FamilySymbol titleBlock)
+                    ? titleBlock : default))
                 .ToArray();
         }
 
@@ -225,36 +223,49 @@ namespace RevitCreateViewSheet.Models {
             return scheduleInstance;
         }
 
-        internal Viewport CreateViewPort(ElementId viewSheetId, ElementId viewId, ElementId viewportTypeId, XYZ point) {
-            var viewport = Viewport.Create(Document, viewSheetId, viewId, point);
-            if(viewport is null) {
-                throw new InvalidOperationException($"Не удалось создать видовой экран");
+        internal Viewport CreateViewPort(ViewPortModel viewPortModel) {
+            if(!viewPortModel.Sheet.TryGetViewSheet(out var sheet)) {
+                throw new InvalidOperationException("Нельзя создать видовой экран на еще не созданном листе");
             }
-            var view = Document.GetElement(viewId) as View;
-            view.CropBoxActive = true;
-            view.CropBoxVisible = true;
-            return UpdateViewPort(viewport, viewportTypeId);
+            var viewport = Viewport.Create(Document, sheet.Id, viewPortModel.View.Id, viewPortModel.Location);
+            viewPortModel.View.CropBoxActive = true;
+            viewPortModel.View.CropBoxVisible = true;
+            viewPortModel.TrySetNewViewSheet(viewport);
+            return UpdateViewPort(viewPortModel);
         }
 
-        internal Viewport UpdateViewPort(Viewport viewport, ElementId viewportTypeId) {
-            viewport.SetParamValue(BuiltInParameter.ELEM_TYPE_PARAM, viewportTypeId);
+        internal Viewport UpdateViewPort(ViewPortModel viewPortModel) {
+            if(!viewPortModel.TryGetViewport(out var viewport)) {
+                throw new InvalidOperationException("Нельзя обновить еще не созданный видовой экран");
+            }
+            if(viewPortModel.ViewPortType?.Id.IsNotNull() ?? false
+                && viewPortModel.InitialViewPortType?.Id != viewPortModel.ViewPortType?.Id) {
+                viewport.SetParamValue(BuiltInParameter.ELEM_TYPE_PARAM, viewPortModel.ViewPortType.Id);
+            }
             return viewport;
         }
 
-        internal ViewSheet CreateViewSheet(SheetModel sheetModel) {
+        internal ViewSheet CreateSheet(SheetModel sheetModel) {
             var sheet = ViewSheet.Create(Document, sheetModel.TitleBlockSymbol.Id);
             if(sheet is null) {
                 throw new InvalidOperationException("Не удалось создать лист");
             }
-            return UpdateViewSheet(sheet, sheetModel, false);
+            sheetModel.TrySetNewViewSheet(sheet);
+            return UpdateViewSheet(sheetModel, false);
         }
 
-        internal ViewSheet UpdateViewSheet(ViewSheet sheet, SheetModel sheetModel) {
-            return UpdateViewSheet(sheet, sheetModel, true);
+        internal ViewSheet UpdateViewSheet(SheetModel sheetModel) {
+            return UpdateViewSheet(sheetModel, true);
         }
 
-        private ViewSheet UpdateViewSheet(ViewSheet sheet, SheetModel sheetModel, bool updateTitleBlock) {
-            if(updateTitleBlock && sheetModel.TitleBlockSymbol is not null) {
+        private ViewSheet UpdateViewSheet(SheetModel sheetModel, bool updateTitleBlock) {
+            if(!sheetModel.TryGetViewSheet(out var sheet)) {
+                throw new InvalidOperationException("Нельзя обновить еще не созданный лист");
+            }
+            if(updateTitleBlock
+                && sheetModel.TitleBlockSymbol is not null
+                && sheetModel.InitialTitleBlockSymbol?.Id != sheetModel.TitleBlockSymbol?.Id) {
+
                 var titleId = sheet.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_TitleBlocks))
                     .FirstOrDefault();
                 var symbol = Document.GetElement(sheetModel.TitleBlockSymbol.Id) as FamilySymbol;
@@ -264,10 +275,18 @@ namespace RevitCreateViewSheet.Models {
                     Document.Create.NewFamilyInstance(sheet.Origin, symbol, sheet);
                 }
             }
-            sheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, sheetModel.SheetCustomNumber);
-            sheet.SetParamValue(SharedParamsConfig.Instance.AlbumBlueprints, sheetModel.AlbumBlueprint);
-            sheet.SetParamValue(BuiltInParameter.SHEET_NAME, sheetModel.Name);
-            sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, sheetModel.SheetNumber);
+            if(sheetModel.InitialSheetCustomNumber != sheetModel.SheetCustomNumber) {
+                sheet.SetParamValue(SharedParamsConfig.Instance.StampSheetNumber, sheetModel.SheetCustomNumber);
+            }
+            if(sheetModel.InitialAlbumBlueprint != sheetModel.AlbumBlueprint) {
+                sheet.SetParamValue(SharedParamsConfig.Instance.AlbumBlueprints, sheetModel.AlbumBlueprint);
+            }
+            if(sheetModel.InitialName != sheetModel.Name) {
+                sheet.SetParamValue(BuiltInParameter.SHEET_NAME, sheetModel.Name);
+            }
+            if(sheetModel.InitialSheetNumber != sheetModel.SheetNumber) {
+                sheet.SetParamValue(BuiltInParameter.SHEET_NUMBER, sheetModel.SheetNumber);
+            }
             return sheet;
         }
 

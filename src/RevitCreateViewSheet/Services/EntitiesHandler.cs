@@ -54,7 +54,8 @@ namespace RevitCreateViewSheet.Services {
                     try {
                         viewPort.Saver.Save(viewPort);
                     } catch(InvalidOperationException) {
-                        sb.AppendLine($"Не удалось сохранить видовой экран {viewPort.Name} на листе с номером {viewPort.Sheet.SheetNumber}");
+                        sb.AppendLine($"Не удалось сохранить видовой экран {viewPort.Name} " +
+                            $"на листе с номером {viewPort.Sheet.SheetNumber}");
                     }
                     progress?.Report(++i);
                 }
@@ -63,7 +64,8 @@ namespace RevitCreateViewSheet.Services {
                     try {
                         schedule.Saver.Save(schedule);
                     } catch(InvalidOperationException) {
-                        sb.AppendLine($"Не удалось сохранить спецификацию {schedule.Name} на листе с номером {schedule.Sheet.SheetNumber}");
+                        sb.AppendLine($"Не удалось сохранить спецификацию {schedule.Name} " +
+                            $"на листе с номером {schedule.Sheet.SheetNumber}");
                     }
                     progress?.Report(++i);
                 }
@@ -72,7 +74,8 @@ namespace RevitCreateViewSheet.Services {
                     try {
                         annotation.Saver.Save(annotation);
                     } catch(InvalidOperationException) {
-                        sb.AppendLine($"Не удалось сохранить аннотацию {annotation.SymbolName} на листе с номером {annotation.Sheet.SheetNumber}");
+                        sb.AppendLine($"Не удалось сохранить аннотацию {annotation.SymbolName} " +
+                            $"на листе с номером {annotation.Sheet.SheetNumber}");
                     }
                     progress?.Report(++i);
                 }

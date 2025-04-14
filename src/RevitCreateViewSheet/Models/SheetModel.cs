@@ -22,13 +22,15 @@ namespace RevitCreateViewSheet.Models {
         /// <param name="schedules">Спецификации на листе</param>
         /// <param name="annotations">Аннотации на листе</param>
         /// <param name="entitySaver">Сервис для сохранения листа в модели Revit</param>
+        /// <param name="titleBlockSymbol">Типоразмер основной надписи листа, если она есть</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public SheetModel(
             ViewSheet viewSheet,
             ICollection<Viewport> viewports,
             ICollection<ScheduleSheetInstance> schedules,
             ICollection<AnnotationSymbol> annotations,
-            ExistsEntitySaver entitySaver) {
+            ExistsEntitySaver entitySaver,
+            FamilySymbol titleBlockSymbol = default) {
 
             _viewSheet = viewSheet ?? throw new ArgumentNullException(nameof(viewSheet));
             Saver = entitySaver ?? throw new ArgumentNullException(nameof(entitySaver));
@@ -39,6 +41,7 @@ namespace RevitCreateViewSheet.Models {
                 ?? throw new ArgumentNullException(nameof(schedules));
             Annotations = annotations?.Select(a => new AnnotationModel(this, a, entitySaver)).ToList()
                 ?? throw new ArgumentNullException(nameof(annotations));
+            TitleBlockSymbol = titleBlockSymbol;
 
             AlbumBlueprint = viewSheet.GetParamValueOrDefault(
                 SharedParamsConfig.Instance.AlbumBlueprints, string.Empty);
@@ -48,6 +51,11 @@ namespace RevitCreateViewSheet.Models {
                 SharedParamsConfig.Instance.StampSheetNumber, string.Empty);
             Name = viewSheet.GetParamValueOrDefault(
                 BuiltInParameter.SHEET_NAME, string.Empty);
+            InitialAlbumBlueprint = AlbumBlueprint;
+            InitialSheetNumber = SheetNumber;
+            InitialSheetCustomNumber = SheetCustomNumber;
+            InitialName = Name;
+            InitialTitleBlockSymbol = TitleBlockSymbol;
             Exists = true;
         }
 
@@ -66,6 +74,10 @@ namespace RevitCreateViewSheet.Models {
             AlbumBlueprint = string.Empty;
             SheetNumber = string.Empty;
             Name = string.Empty;
+            InitialAlbumBlueprint = AlbumBlueprint;
+            InitialSheetNumber = SheetNumber;
+            InitialSheetCustomNumber = SheetCustomNumber;
+            InitialName = Name;
             Exists = false;
         }
 
@@ -74,19 +86,29 @@ namespace RevitCreateViewSheet.Models {
 
         public IEntitySaver Saver { get; }
 
+        public string InitialAlbumBlueprint { get; }
+
         public string AlbumBlueprint { get; set; }
+
+        public string InitialSheetNumber { get; }
 
         /// <summary>
         /// Системный номер листа
         /// </summary>
         public string SheetNumber { get; set; }
 
+        public string InitialSheetCustomNumber { get; }
+
         /// <summary>
         /// Ш.Номер листа
         /// </summary>
         public string SheetCustomNumber { get; set; }
 
+        public string InitialName { get; }
+
         public string Name { get; set; }
+
+        public FamilySymbol InitialTitleBlockSymbol { get; }
 
         public FamilySymbol TitleBlockSymbol { get; set; }
 
@@ -117,7 +139,7 @@ namespace RevitCreateViewSheet.Models {
         /// Назначает ссылку на новый лист в модели ревит, если данный лист еще не существовал
         /// </summary>
         /// <param name="viewSheet">Лист в модели ревит, представляющий текущий SheetModel</param>
-        /// <returns>True, если SheetModel - новый лист, иначе False</returns>
+        /// <returns>True, если ссылка назначена, иначе False</returns>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public bool TrySetNewViewSheet(ViewSheet viewSheet) {
             if(Exists) {
