@@ -39,7 +39,7 @@ namespace RevitCreateViewSheet.Models {
                 .ToArray();
         }
 
-        public ICollection<FamilySymbol> GetTitleBlocks() {
+        public ICollection<FamilySymbol> GetTitleBlockSymbols() {
             var titleBlocks = new FilteredElementCollector(Document)
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .OfClass(typeof(FamilySymbol))
@@ -63,7 +63,7 @@ namespace RevitCreateViewSheet.Models {
             } else {
                 try {
                     using(var transaction = Document.StartTransaction("temp")) {
-                        var titleBlockId = GetTitleBlocks().First().Id;
+                        var titleBlockId = GetTitleBlockSymbols().First().Id;
                         ViewSheet viewSheet = ViewSheet.Create(Document, titleBlockId);
                         var view = new FilteredElementCollector(Document)
                             .OfClass(typeof(ViewPlan))
@@ -163,15 +163,30 @@ namespace RevitCreateViewSheet.Models {
 
         internal ICollection<SheetModel> GetSheetModels() {
             ICollection<ViewSheet> viewSheets = GetViewSheets();
-            ICollection<Viewport> viewports = GetViewPorts();
-            ICollection<ScheduleSheetInstance> schedules = GetSchedules();
-            ICollection<AnnotationSymbol> annotations = GetAnnotations();
+            var viewports = GetViewPorts()
+                .GroupBy(v => v.SheetId)
+                .ToDictionary(g => g.Key, g => g.ToArray());
+            var schedules = GetSchedules()
+                .GroupBy(s => s.OwnerViewId)
+                .ToDictionary(g => g.Key, g => g.ToArray());
+            var annotations = GetAnnotations()
+                .GroupBy(a => a.OwnerViewId)
+                .ToDictionary(g => g.Key, g => g.ToArray());
+            var titleblocks = GetTitleBlockInstances()
+                .GroupBy(a => a.GetParamValueOrDefault(BuiltInParameter.SHEET_NUMBER, string.Empty))
+                .ToDictionary(g => g.Key, g => g.FirstOrDefault()?.Symbol);
+
             return viewSheets.Select(sheet => new SheetModel(sheet,
-                viewports.Where(v => v.SheetId == sheet.Id).ToArray(),
-                schedules.Where(s => s.OwnerViewId == sheet.Id).ToArray(),
-                annotations.Where(a => a.OwnerViewId == sheet.Id).ToArray(),
+                viewports.TryGetValue(sheet.Id, out Viewport[] viewportsArr)
+                    ? viewportsArr : [],
+                schedules.TryGetValue(sheet.Id, out ScheduleSheetInstance[] schedulesArr)
+                    ? schedulesArr : [],
+                annotations.TryGetValue(sheet.Id, out AnnotationSymbol[] annotationsArr)
+                    ? annotationsArr : [],
                 _entitySaverProvider.GetExistsEntitySaver()) {
-                TitleBlockSymbol = GetTitleBlockSymbol(sheet)
+
+                TitleBlockSymbol = titleblocks.TryGetValue(sheet.SheetNumber, out FamilySymbol titleBlock)
+                    ? titleBlock : default
             })
                 .ToArray();
         }
@@ -276,20 +291,15 @@ namespace RevitCreateViewSheet.Models {
         }
 
         /// <summary>
-        /// Возвращает типоразмер основной надписи листа, если она есть. Если ее нет, то будет возвращен null.
+        /// Возвращает экземпляры основных надписей из документа
         /// </summary>
-        /// <param name="viewSheet">Лист в модели Revit</param>
-        /// <returns>Типоразмер основной надписи на листе или null</returns>
-        private FamilySymbol GetTitleBlockSymbol(ViewSheet viewSheet) {
-            var titles = new FilteredElementCollector(Document)
+        private ICollection<FamilyInstance> GetTitleBlockInstances() {
+            return new FilteredElementCollector(Document)
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(FamilyInstance))
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .OfType<FamilyInstance>()
                 .ToArray();
-            return titles
-                .FirstOrDefault(t => t.GetParamValue<string>(BuiltInParameter.SHEET_NUMBER) == viewSheet.SheetNumber)
-                ?.Symbol;
         }
     }
 }

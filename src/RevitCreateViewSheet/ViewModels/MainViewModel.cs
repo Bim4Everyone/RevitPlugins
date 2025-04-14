@@ -80,7 +80,7 @@ namespace RevitCreateViewSheet.ViewModels {
             var comparer = new LogicalStringComparer();
             _sheets = [];
             AllAlbumsBlueprints = [.. _revitRepository.GetAlbumsBlueprints().OrderBy(item => item, comparer)];
-            AllTitleBlocks = [.. _revitRepository.GetTitleBlocks()
+            AllTitleBlocks = [.. _revitRepository.GetTitleBlockSymbols()
                 .Select(item => new TitleBlockViewModel(item))
                 .OrderBy(item => item.Name, comparer)];
             AllViewPortTypes = [.. _revitRepository.GetViewPortTypes()
