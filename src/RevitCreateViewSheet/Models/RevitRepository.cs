@@ -134,7 +134,10 @@ namespace RevitCreateViewSheet.Models {
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(ViewSchedule))
                 .OfType<ViewSchedule>()
-                .Where(s => !s.IsInternalKeynoteSchedule && !s.IsTitleblockRevisionSchedule)
+                .Where(s => !s.IsInternalKeynoteSchedule
+                    && !s.IsTitleblockRevisionSchedule
+                    && !s.IsTemplate
+                    && !s.Definition.IsKeySchedule)
                 .ToArray();
         }
 
