@@ -261,7 +261,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private void RemoveSheets(ICollection<SheetViewModel> sheets) {
             if(sheets.Any(s => s.SheetModel.TryGetExistId(out var sheetId)
                 && _revitRepository.Document.ActiveView.Id == sheetId)) {
-                ShowOkWarning($"Нельзя удалить активный лист {_revitRepository.Document.ActiveView.Name}");
+                ShowOkWarning($"Нельзя удалить активный лист '{_revitRepository.Document.ActiveView.Name}'");
                 return;
             }
             if(ShowYesNoWarning($"Вы действительно хотите удалить листы ({sheets.Count} шт.)?")) {
