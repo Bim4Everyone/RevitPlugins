@@ -11,9 +11,9 @@
         x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
 
     <system:String
-        x:Key="MainWindow.ButtonOk">OK</system:String>
+        x:Key="AllWindow.ButtonOk">OK</system:String>
     <system:String
-        x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+        x:Key="AllWindow.ButtonCancel">Cancel</system:String>
 
     <system:String
         x:Key="TODO">TODO</system:String>

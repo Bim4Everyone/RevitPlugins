@@ -1,5 +1,5 @@
 namespace RevitCreateViewSheet.Models {
-    internal enum RevitViewType {
+    public enum RevitViewType {
         /// <summary>
         /// Любой
         /// </summary>

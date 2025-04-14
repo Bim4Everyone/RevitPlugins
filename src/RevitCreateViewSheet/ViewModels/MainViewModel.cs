@@ -333,19 +333,25 @@ namespace RevitCreateViewSheet.ViewModels {
 
             if(_sheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetNumber))
                 is SheetViewModel sheetInvalidNumber) {
-                ErrorText = $"У листа '{sheetInvalidNumber.Name}' недопустимый системный номер.";
+                ErrorText = string.Format(
+                    _localizationService.GetLocalizedString("Errors.Validation.SheetInvalidNumber"),
+                    sheetInvalidNumber.Name, sheetInvalidNumber.SheetNumber);
                 return false;
             }
 
             if(_sheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.AlbumBlueprint ?? string.Empty))
                 is SheetViewModel sheetInvalidAlbum) {
-                ErrorText = $"У листа '{sheetInvalidAlbum.Name}' недопустимый альбом.";
+                ErrorText = string.Format(
+                    _localizationService.GetLocalizedString("Errors.Validation.SheetInvalidAlbum"),
+                    sheetInvalidAlbum.Name, sheetInvalidAlbum.AlbumBlueprint);
                 return false;
             }
 
             if(_sheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.SheetCustomNumber ?? string.Empty))
                 is SheetViewModel sheetInvalidSheetCustomNumber) {
-                ErrorText = $"У листа '{sheetInvalidSheetCustomNumber.Name}' недопустимый Ш.Номер листа.";
+                ErrorText = string.Format(
+                    _localizationService.GetLocalizedString("Errors.Validation.SheetInvalidCustomNumber"),
+                    sheetInvalidSheetCustomNumber.Name, sheetInvalidSheetCustomNumber.SheetCustomNumber);
                 return false;
             }
 
@@ -444,10 +450,9 @@ namespace RevitCreateViewSheet.ViewModels {
         /// Показывает предупреждение с OK кнопкой
         /// </summary>
         private void ShowOkWarning(string msg) {
-            // TODO localization
             _messageBoxService.Show(
                 msg,
-                "Предупреждение",
+                _localizationService.GetLocalizedString("Warnings.Title"),
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Warning);
         }
@@ -456,10 +461,9 @@ namespace RevitCreateViewSheet.ViewModels {
         /// Показывает предупреждение с Yes/No кнопками
         /// </summary>
         private bool ShowYesNoWarning(string msg) {
-            // TODO localization
             return _messageBoxService.Show(
                 msg,
-                "Предупреждение",
+                _localizationService.GetLocalizedString("Warnings.Title"),
                 System.Windows.MessageBoxButton.YesNo,
                 System.Windows.MessageBoxImage.Warning) == System.Windows.MessageBoxResult.Yes;
         }

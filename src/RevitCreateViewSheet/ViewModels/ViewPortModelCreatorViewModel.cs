@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 
@@ -34,7 +33,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly ObservableCollection<ViewViewModel> _viewsForSelection;
         private string _errorText;
         private ViewPortTypeViewModel _selectedViewPortType;
-        private ViewTypeViewModel _selectedViewType;
+        private RevitViewType? _selectedViewType;
         private ViewViewModel _selectedView;
 
         public ViewPortModelCreatorViewModel(
@@ -54,25 +53,19 @@ namespace RevitCreateViewSheet.ViewModels {
             ViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
-            ViewTypes = InitializeViewTypes();
-            SelectedViewType = ViewTypes.First();
+            SelectedViewType = RevitViewType.Any;
             SelectedView = Views.FirstOrDefault();
             SelectedViewPortType = ViewPortTypes.FirstOrDefault();
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);
         }
 
-        public ViewTypeViewModel SelectedViewType {
+        public RevitViewType? SelectedViewType {
             get => _selectedViewType;
             set {
                 RaiseAndSetIfChanged(ref _selectedViewType, value);
-                UpdateViewsForSelection(value?.ViewType ?? RevitViewType.Any);
+                UpdateViewsForSelection(value ?? RevitViewType.Any);
             }
         }
-
-        /// <summary>
-        /// Типы видов для выбора: план этажа, план потолка, разрез и т.д.
-        /// </summary>
-        public IReadOnlyCollection<ViewTypeViewModel> ViewTypes { get; }
 
         /// <summary>
         /// Виды, соответствующие выбранному пользователем типу видов. Это итоговая коллекция, которую видит пользователь
@@ -113,8 +106,6 @@ namespace RevitCreateViewSheet.ViewModels {
                 .Union(sheetModel.ViewPorts)
                 .Select(v => new ViewViewModel(v.View))
                 .ToHashSet();
-            Debug.Print(_allViews.Count.ToString());
-            Debug.Print(_allViews.Select(v => v.View.Id).Distinct().Count().ToString());
             var enabledViews = _allViews
                 .Where(v => !disabledViews.Contains(v))
                 .OrderBy(v => v.Name, new LogicalStringComparer());
@@ -122,7 +113,7 @@ namespace RevitCreateViewSheet.ViewModels {
             foreach(var view in enabledViews) {
                 _enabledViews.Add(view);
             }
-            UpdateViewsForSelection(SelectedViewType?.ViewType ?? RevitViewType.Any);
+            UpdateViewsForSelection(SelectedViewType ?? RevitViewType.Any);
         }
 
         public string ErrorText {
@@ -131,36 +122,23 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private bool CanAcceptView() {
-            if(SelectedViewType is null) {
-                ErrorText = "Выберите тип вида TODO";
-                return false;
-            }
-
             if(Views.Count == 0) {
-                ErrorText = "Нет доступных видов заданного типа TODO";
+                ErrorText = _localizationService.GetLocalizedString("Errors.Validation.ViewsNotFound");
                 return false;
             }
 
             if(SelectedView is null) {
-                ErrorText = "Выберите вид TODO";
+                ErrorText = _localizationService.GetLocalizedString("Errors.Validation.ViewNotSet");
                 return false;
             }
 
             if(SelectedViewPortType is null) {
-                ErrorText = "Выберите тип видового экрана TODO";
+                ErrorText = _localizationService.GetLocalizedString("Errors.Validation.ViewPortTypeNotSet");
                 return false;
             }
 
             ErrorText = null;
             return true;
-        }
-
-        private IReadOnlyCollection<ViewTypeViewModel> InitializeViewTypes() {
-            // TODO переделать получение имени на ковертер в xaml
-            return [.. Enum.GetValues(typeof(RevitViewType))
-                .Cast<RevitViewType>()
-                .Select(v => new ViewTypeViewModel(v,
-                    _localizationService.GetLocalizedString($"{nameof(RevitViewType)}.{v}")))];
         }
 
         private void UpdateViewsForSelection(RevitViewType revitViewType) {

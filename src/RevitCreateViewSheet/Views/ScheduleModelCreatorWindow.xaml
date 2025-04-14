@@ -31,7 +31,7 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource TODO}" />
+            Title="{me:LocalizationSource CreateScheduleWindow.Title}" />
 
         <StackPanel
             Grid.Row="1"
@@ -39,7 +39,7 @@
             <ui:TextBlock
                 Margin="10"
                 TextAlignment="Center"
-                Text="{me:LocalizationSource TODO}">
+                Text="{me:LocalizationSource CreateScheduleWindow.SelectedScheduleTitle}">
             </ui:TextBlock>
             <ComboBox
                 MinWidth="400"
@@ -51,7 +51,6 @@
                 DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                ToolTip="{me:LocalizationSource TODO}"
                 ItemsSource="{Binding ViewSchedules}"
                 SelectedItem="{Binding SelectedViewSchedule}" />
         </StackPanel>
@@ -71,7 +70,7 @@
                 Width="80"
                 Margin="10"
                 Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Content="{me:LocalizationSource AllWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 IsDefault="True"
                 Command="{Binding AcceptViewCommand}" />
@@ -79,7 +78,7 @@
             <ui:Button
                 Width="80"
                 Margin="10"
-                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                Content="{me:LocalizationSource AllWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
