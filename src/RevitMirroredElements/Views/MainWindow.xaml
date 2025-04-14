@@ -59,9 +59,9 @@
                     <Button
                 Width="80"
                 Grid.Column="1"
+                HorizontalAlignment="Right"
                 Content="{me:LocalizationSource MainWindow.ButtonSelect}"
                 ToolTip="{me:LocalizationSource MainWindow.ButtonSelectTooltip}"
-                HorizontalAlignment="Right"
                 Command="{Binding SelectElementsCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
                 </Grid>
@@ -84,9 +84,9 @@
                     <Button
                 Width="80"
                 Grid.Column="1"
-                Content="{me:LocalizationSource MainWindow.ButtonSelect}"
-                ToolTip="{me:LocalizationSource MainWindow.ButtonSelectCategoriesTooltip}"       
                 HorizontalAlignment="Right"
+                Content="{me:LocalizationSource MainWindow.ButtonSelect}"
+                ToolTip="{me:LocalizationSource MainWindow.ButtonSelectCategoriesTooltip}"  
                 Command="{Binding SelectCategoriesCommand}"/>
                 </Grid>
 
@@ -111,19 +111,19 @@
             </StackPanel>
 
             <TextBlock
-        Text="{me:LocalizationSource MainWindow.VisibilityHeader}"
         FontWeight="Bold"
-        Margin="0,20,0,5" />
+        Margin="0,20,0,5"
+        Text="{me:LocalizationSource MainWindow.VisibilityHeader}"/>
 
             <StackPanel Orientation="Horizontal">
                 <CheckBox
             Margin="0,10,10,0"
             IsChecked="{Binding EnableFilter}" />
                 <TextBlock
-            Text="{me:LocalizationSource MainWindow.FilterDescription}"
             VerticalAlignment="Center"
             TextWrapping="Wrap"
-            Width="250" />
+            Width="250" 
+            Text="{me:LocalizationSource MainWindow.FilterDescription}"/>
             </StackPanel>
 
             <StackPanel Margin="0,10,0,15">
@@ -140,9 +140,8 @@
 
         </StackPanel>
 
-        <StackPanel Grid.Row="1" HorizontalAlignment="Right">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock
             Margin="0,0,5,5"
             TextWrapping="Wrap"
             Foreground="Orange"
@@ -154,18 +153,17 @@
             Margin="10"
             Width="80"
             Appearance="Info"
-            Content="{me:LocalizationSource MainWindow.ButtonOk}"
             IsDefault="True"
             Click="ButtonOk_Click"
+            Content="{me:LocalizationSource MainWindow.ButtonOk}"
             Command="{Binding AcceptViewCommand}" />
 
-                <Button
+            <Button
             Margin="10"
             Width="80"
-            Content="{me:LocalizationSource MainWindow.ButtonCancel}"
             IsCancel="True"
-            Click="ButtonCancel_Click" />
-            </StackPanel>
+            Click="ButtonCancel_Click" 
+            Content="{me:LocalizationSource MainWindow.ButtonCancel}"/>
         </StackPanel>
 
     </Grid>

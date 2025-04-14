@@ -46,12 +46,12 @@
          Title="{me:LocalizationSource CategoryWindow.Title}"/>
 
         <TextBlock
-            Text="{me:LocalizationSource CategoryWindow.EnterToSearch}"
             IsHitTestVisible="False"
             Margin="15,40,10,5"
             Grid.Row="0"
             Foreground="Gray"
             VerticalAlignment="Center"
+            Text="{me:LocalizationSource CategoryWindow.EnterToSearch}"
             Visibility="{Binding HasSearchText, Converter={StaticResource BoolToVisibilityConverter}}" />
         <TextBox
             Margin="10,40,10,5"
@@ -84,9 +84,9 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTextColumn 
-                    Header="{me:LocalizationSource CategoryWindow.Category}"
                     Width="*"
                     IsReadOnly="True"
+                    Header="{me:LocalizationSource CategoryWindow.Category}"
                     Binding="{Binding Name}" />
             </DataGrid.Columns>
         </DataGrid>
@@ -96,8 +96,8 @@
             Orientation="Vertical"
             HorizontalAlignment="Center">
             <CheckBox
-                Content="{me:LocalizationSource CategoryWindow.SelectAll}"
                 Margin="0,0,0,0"
+                Content="{me:LocalizationSource CategoryWindow.SelectAll}"
                 IsChecked="{Binding AllCategoriesSelected, Mode=TwoWay}" />
             <StackPanel
                 Orientation="Horizontal"
@@ -106,16 +106,16 @@
                     Margin="10"
                     Width="80"
                     Appearance="Info"
-                    Content="{me:LocalizationSource MainWindow.ButtonOk}"
                     IsDefault="True"
-                    Click="ButtonOk_Click" />
+                    Click="ButtonOk_Click" 
+                    Content="{me:LocalizationSource MainWindow.ButtonOk}"/>
 
                 <Button
                     Margin="10"
                     Width="80"
-                    Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                     IsCancel="True"
-                    Click="ButtonCancel_Click" />
+                    Click="ButtonCancel_Click" 
+                    Content="{me:LocalizationSource MainWindow.ButtonCancel}"/>
             </StackPanel>
         </StackPanel>
     </Grid>
