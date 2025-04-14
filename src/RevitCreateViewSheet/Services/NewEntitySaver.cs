@@ -9,7 +9,6 @@ namespace RevitCreateViewSheet.Services {
         private readonly RevitRepository _revitRepository;
         private readonly ILocalizationService _localizationService;
 
-        // TODO локализация
         public NewEntitySaver(RevitRepository revitRepository, ILocalizationService localizationService) {
             _revitRepository = revitRepository
                 ?? throw new ArgumentNullException(nameof(revitRepository));
