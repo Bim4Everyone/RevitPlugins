@@ -58,7 +58,7 @@
             Grid.Row="0"
             VerticalAlignment="Center"
             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-        
+
 
         <DataGrid
             Grid.Row="1"
