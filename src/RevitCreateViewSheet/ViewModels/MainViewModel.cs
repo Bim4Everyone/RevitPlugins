@@ -217,7 +217,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 var sheetViewModel = new SheetViewModel(sheetModel, _entitiesTracker, _sheetItemsFactory) {
                     AlbumBlueprint = albumBlueprint,
                     SheetCustomNumber = lastIndex.ToString(),
-                    Name = $"{_localizationService.GetLocalizedString("TODO")} {lastIndex}"
+                    Name = $"{_localizationService.GetLocalizedString("NewSheetTitle")} {lastIndex}"
                 };
                 _sheets.Add(sheetViewModel);
             }
@@ -225,32 +225,38 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private bool CanAddSheets() {
             if(string.IsNullOrWhiteSpace(AddSheetsAlbumBlueprint)) {
-                AddSheetsErrorText = "Выберите альбом.";
+                AddSheetsErrorText =
+                    _localizationService.GetLocalizedString("Errors.Validation.AlbumBlueprintNotSet");
                 return false;
             }
 
             if(!NamingUtils.IsValidName(AddSheetsAlbumBlueprint)) {
-                AddSheetsErrorText = $"Некорректное название альбома '{AddSheetsAlbumBlueprint}'";
+                AddSheetsErrorText = string.Format(
+                    _localizationService.GetLocalizedString("Errors.Validation.InvalidAlbumBlueprintName"),
+                    AddSheetsAlbumBlueprint);
                 return false;
             }
 
             if(AddSheetsTitleBlock is null) {
-                AddSheetsErrorText = "Выберите штамп.";
+                AddSheetsErrorText = _localizationService.GetLocalizedString("Errors.Validation.TitleBlockNotSet");
                 return false;
             }
 
             if(!int.TryParse(AddSheetsCount, out _)) {
-                AddSheetsErrorText = "Количество листов должно быть целым числом.";
+                AddSheetsErrorText =
+                    _localizationService.GetLocalizedString("Errors.Validation.AddSheetsCountNotNumber");
                 return false;
             }
 
             if(int.TryParse(AddSheetsCount, out int number) && number > _maxSheetsCountToAdd) {
-                AddSheetsErrorText = string.Format("Количество листов не должно быть больше {0}.", _maxSheetsCountToAdd);
+                AddSheetsErrorText = string.Format(
+                    _localizationService.GetLocalizedString("Errors.Validation.AddSheetsMaxCount"),
+                    _maxSheetsCountToAdd);
                 return false;
             }
 
             if(int.Parse(AddSheetsCount) <= 0) {
-                AddSheetsErrorText = "Количество листов должно быть положительным числом.";
+                AddSheetsErrorText = _localizationService.GetLocalizedString("Errors.Validation.AddSheetsMinCount");
                 return false;
             }
 
@@ -261,10 +267,13 @@ namespace RevitCreateViewSheet.ViewModels {
         private void RemoveSheets(ICollection<SheetViewModel> sheets) {
             if(sheets.Any(s => s.SheetModel.TryGetExistId(out var sheetId)
                 && _revitRepository.Document.ActiveView.Id == sheetId)) {
-                ShowOkWarning($"Нельзя удалить активный лист '{_revitRepository.Document.ActiveView.Name}'");
+                ShowOkWarning(string.Format(
+                    _localizationService.GetLocalizedString("Errors.CannotDeleteActiveViewSheet"),
+                    _revitRepository.Document.ActiveView.Name));
                 return;
             }
-            if(ShowYesNoWarning($"Вы действительно хотите удалить листы ({sheets.Count} шт.)?")) {
+            if(ShowYesNoWarning(
+                string.Format(_localizationService.GetLocalizedString("Warnings.SureDeleteSheets"), sheets.Count))) {
                 foreach(SheetViewModel sheet in sheets.ToArray()) {
                     _entitiesTracker.AddToRemovedEntities(sheet.SheetModel);
                     _sheets.Remove(sheet);
@@ -284,7 +293,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private void AcceptView() {
             using(var progressDialogService = _progressFactory.CreateDialog()) {
                 progressDialogService.StepValue = 50;
-                progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("TODO");
+                progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("ProgressBarTitle");
                 progressDialogService.MaxValue = _entitiesTracker.GetTrackedEntitiesCount();
                 var progress = progressDialogService.CreateProgress();
                 var ct = progressDialogService.CreateCancellationToken();
@@ -299,24 +308,26 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private bool CanAcceptView() {
             if(_sheets.Any(item => string.IsNullOrWhiteSpace(item.Name))) {
-                ErrorText = "У всех листов должно быть заполнено наименование.";
+                ErrorText = _localizationService.GetLocalizedString("Errors.Validation.AnySheetNameEmpty");
                 return false;
             }
 
             if(_sheets.FirstOrDefault(s => !NamingUtils.IsValidName(s.Name)) is SheetViewModel sheet2) {
-                ErrorText = $"У листа '{sheet2.Name}' недопустимое название.";
+                ErrorText = string.Format(
+                    _localizationService.GetLocalizedString("Errors.Validation.AnySheetInvalidName"), sheet2.Name);
                 return false;
             }
 
             var group = _sheets.GroupBy(item => item.SheetNumber)
                 .FirstOrDefault(g => g.Count() > 1);
             if(group is not null) {
-                ErrorText = $"У листов повторяется номер {group.Key}.";
+                ErrorText = string.Format(
+                    _localizationService.GetLocalizedString("Errors.Validation.DuplicatedSheetNumber"), group.Key);
                 return false;
             }
 
             if(_sheets.Any(s => string.IsNullOrWhiteSpace(s.SheetNumber))) {
-                ErrorText = $"У всех листов должен быть заполнен системный номер";
+                ErrorText = _localizationService.GetLocalizedString("Errors.Validation.AnySheetNumberEmpty");
                 return false;
             }
 

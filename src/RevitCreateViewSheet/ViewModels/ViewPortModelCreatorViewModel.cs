@@ -156,6 +156,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         private IReadOnlyCollection<ViewTypeViewModel> InitializeViewTypes() {
+            // TODO переделать получение имени на ковертер в xaml
             return [.. Enum.GetValues(typeof(RevitViewType))
                 .Cast<RevitViewType>()
                 .Select(v => new ViewTypeViewModel(v,

@@ -11,16 +11,23 @@ using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
 using dosymep.Revit.Comparators;
+using dosymep.SimpleServices;
 
 using RevitCreateViewSheet.Services;
 
 namespace RevitCreateViewSheet.Models {
     internal class RevitRepository {
         private readonly EntitySaverProvider _entitySaverProvider;
+        private readonly ILocalizationService _localizationService;
 
-        public RevitRepository(UIApplication uiApplication, EntitySaverProvider entitySaverProvider) {
+        public RevitRepository(
+            UIApplication uiApplication,
+            EntitySaverProvider entitySaverProvider,
+            ILocalizationService localizationService) {
+
             UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
             _entitySaverProvider = entitySaverProvider ?? throw new ArgumentNullException(nameof(entitySaverProvider));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             InitializeParameters(Application, Document);
         }
 
@@ -46,7 +53,8 @@ namespace RevitCreateViewSheet.Models {
                 .OfType<FamilySymbol>()
                 .ToArray();
             if(titleBlocks.Length == 0) {
-                throw new InvalidOperationException("В проект не загружено ни одно семейство основной надписи.");
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Errors.TitleBlocksNotFound"));
             }
             return titleBlocks;
         }
@@ -55,8 +63,7 @@ namespace RevitCreateViewSheet.Models {
             Viewport viewport = new FilteredElementCollector(Document)
                 .OfClass(typeof(Viewport))
                 .FirstElement() as Viewport;
-            string errorMsg = "Не удалось получить список типов видовых экранов. " +
-                "Создайте видовой экран на каком-либо листе вручную и перезапустите плагин.";
+            string errorMsg = _localizationService.GetLocalizedString("Errors.ViewPortTypesNotFound");
             ICollection<ElementId> viewportTypeIds;
             if(viewport is not null) {
                 viewportTypeIds = viewport.GetValidTypes();
@@ -103,7 +110,8 @@ namespace RevitCreateViewSheet.Models {
             }
             var instance = Document.Create.NewFamilyInstance(point, familySymbol, view2D);
             if(instance is null) {
-                throw new InvalidOperationException("Не удалось создать аннотацию");
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Errors.CannotCreateAnnotation"));
             }
             return instance;
         }
@@ -221,16 +229,22 @@ namespace RevitCreateViewSheet.Models {
         internal ScheduleSheetInstance CreateSchedule(ElementId viewSheetId, ElementId scheduleViewId, XYZ point) {
             var scheduleInstance = ScheduleSheetInstance.Create(Document, viewSheetId, scheduleViewId, point);
             if(scheduleInstance is null) {
-                throw new InvalidOperationException("Не удалось создать спецификацию");
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Errors.CannotCreateSchedule"));
             }
             return scheduleInstance;
         }
 
         internal Viewport CreateViewPort(ViewPortModel viewPortModel) {
             if(!viewPortModel.Sheet.TryGetViewSheet(out var sheet)) {
-                throw new InvalidOperationException("Нельзя создать видовой экран на еще не созданном листе");
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Errors.CannotCreateViewPortOnNotCreatedSheet"));
             }
             var viewport = Viewport.Create(Document, sheet.Id, viewPortModel.View.Id, viewPortModel.Location);
+            if(viewport is null) {
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Errors.CannotCreateViewPort"));
+            }
             viewPortModel.View.CropBoxActive = true;
             viewPortModel.View.CropBoxVisible = true;
             viewPortModel.TrySetNewViewSheet(viewport);
@@ -239,7 +253,8 @@ namespace RevitCreateViewSheet.Models {
 
         internal Viewport UpdateViewPort(ViewPortModel viewPortModel) {
             if(!viewPortModel.TryGetViewport(out var viewport)) {
-                throw new InvalidOperationException("Нельзя обновить еще не созданный видовой экран");
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Errors.CannotUpdateNotCreatetViewPort"));
             }
             if(viewPortModel.ViewPortType?.Id.IsNotNull() ?? false
                 && viewPortModel.InitialViewPortType?.Id != viewPortModel.ViewPortType?.Id) {
@@ -251,7 +266,8 @@ namespace RevitCreateViewSheet.Models {
         internal ViewSheet CreateSheet(SheetModel sheetModel) {
             var sheet = ViewSheet.Create(Document, sheetModel.TitleBlockSymbol.Id);
             if(sheet is null) {
-                throw new InvalidOperationException("Не удалось создать лист");
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Errors.CannotCreateSheet"));
             }
             sheetModel.TrySetNewViewSheet(sheet);
             return UpdateViewSheet(sheetModel, false);
@@ -263,7 +279,8 @@ namespace RevitCreateViewSheet.Models {
 
         private ViewSheet UpdateViewSheet(SheetModel sheetModel, bool updateTitleBlock) {
             if(!sheetModel.TryGetViewSheet(out var sheet)) {
-                throw new InvalidOperationException("Нельзя обновить еще не созданный лист");
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Errors.CannotUpdateNotCreatetSheet"));
             }
             if(updateTitleBlock
                 && sheetModel.TitleBlockSymbol is not null

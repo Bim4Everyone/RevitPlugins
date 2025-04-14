@@ -1,13 +1,20 @@
 using System;
 
+using dosymep.SimpleServices;
+
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.Services {
     internal class ExistsEntitySaver : IEntitySaver {
         private readonly RevitRepository _revitRepository;
+        private readonly ILocalizationService _localizationService;
+
         // TOTO localization
-        public ExistsEntitySaver(RevitRepository revitRepository) {
-            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        public ExistsEntitySaver(RevitRepository revitRepository, ILocalizationService localizationService) {
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _localizationService = localizationService
+                ?? throw new ArgumentNullException(nameof(localizationService));
         }
 
 
@@ -24,8 +31,9 @@ namespace RevitCreateViewSheet.Services {
             }
             if(viewPortModel.ViewPortType is null) {
                 throw new InvalidOperationException(
-                    $"Перед сохранением измененного видового экрана необходимо назначить " +
-                    $"{nameof(viewPortModel.ViewPortType)}");
+                    string.Format(
+                        _localizationService.GetLocalizedString("Errors.ViewPortModel.PropertyNotSet",
+                        nameof(viewPortModel.ViewPortType))));
             }
             _revitRepository.UpdateViewPort(viewPortModel);
         }

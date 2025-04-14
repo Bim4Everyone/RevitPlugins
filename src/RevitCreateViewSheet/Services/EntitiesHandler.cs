@@ -28,14 +28,15 @@ namespace RevitCreateViewSheet.Services {
             IProgress<int> progress = null,
             CancellationToken ct = default) {
 
-            string title = _localizationService.GetLocalizedString("TODO");
+            string title = _localizationService.GetLocalizedString("UpdateSheetsTransaction");
             StringBuilder sb = new();
             using(var transaction = _revitRepository.Document.StartTransaction(title)) {
                 int i = 0;
                 foreach(var id in _entitiesTracker.GetRemovedEntities()) {
                     ct.ThrowIfCancellationRequested();
                     if(!_revitRepository.DeleteElement(id)) {
-                        sb.AppendLine($"Не удалось удалить элемент с id={id.GetIdValue()}");
+                        sb.AppendLine(string.Format(
+                            _localizationService.GetLocalizedString("Errors.CannotDeleteElement"), id.GetIdValue()));
                     }
                     progress?.Report(++i);
                 }
@@ -45,7 +46,8 @@ namespace RevitCreateViewSheet.Services {
                         sheet.Saver.Save(sheet);
                         sheet.SetContentLocations();
                     } catch(InvalidOperationException) {
-                        sb.AppendLine($"Не удалось сохранить лист с номером {sheet.SheetNumber}");
+                        sb.AppendLine(string.Format(
+                            _localizationService.GetLocalizedString("Errors.CannotSaveSheet"), sheet.SheetNumber));
                     }
                     progress?.Report(++i);
                 }
@@ -54,8 +56,8 @@ namespace RevitCreateViewSheet.Services {
                     try {
                         viewPort.Saver.Save(viewPort);
                     } catch(InvalidOperationException) {
-                        sb.AppendLine($"Не удалось сохранить видовой экран {viewPort.Name} " +
-                            $"на листе с номером {viewPort.Sheet.SheetNumber}");
+                        sb.AppendLine(string.Format(
+                            _localizationService.GetLocalizedString("Errors.CannotSaveViewPort"), viewPort.Name, viewPort.Sheet.SheetNumber));
                     }
                     progress?.Report(++i);
                 }
@@ -64,8 +66,9 @@ namespace RevitCreateViewSheet.Services {
                     try {
                         schedule.Saver.Save(schedule);
                     } catch(InvalidOperationException) {
-                        sb.AppendLine($"Не удалось сохранить спецификацию {schedule.Name} " +
-                            $"на листе с номером {schedule.Sheet.SheetNumber}");
+                        sb.AppendLine(string.Format(
+                            _localizationService.GetLocalizedString("Errors.CannotSaveSchedule"),
+                            schedule.Name, schedule.Sheet.SheetNumber));
                     }
                     progress?.Report(++i);
                 }
@@ -74,8 +77,9 @@ namespace RevitCreateViewSheet.Services {
                     try {
                         annotation.Saver.Save(annotation);
                     } catch(InvalidOperationException) {
-                        sb.AppendLine($"Не удалось сохранить аннотацию {annotation.SymbolName} " +
-                            $"на листе с номером {annotation.Sheet.SheetNumber}");
+                        sb.AppendLine(string.Format(
+                            _localizationService.GetLocalizedString("Errors.CannotSaveAnnotation"),
+                            annotation.SymbolName, annotation.Sheet.SheetNumber));
                     }
                     progress?.Report(++i);
                 }

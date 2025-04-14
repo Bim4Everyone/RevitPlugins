@@ -4,19 +4,92 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String
-        x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String
-        x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
-
-    <system:String
         x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 
     <system:String
-        x:Key="TODO">TODO</system:String>
+        x:Key="Errors.ViewPortTypesNotFound">Не удалось получить список типов видовых экранов. Создайте видовой экран на каком-либо листе вручную и перезапустите плагин.</system:String>
+    <system:String
+        x:Key="Errors.TitleBlocksNotFound">В проект не загружено ни одно семейство основной надписи.</system:String>
+    <system:String
+        x:Key="Errors.AnnotationsNotFound">В проекте отсутствуют семейства аннотаций.</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateAnnotation">Не удалось создать аннотацию.</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateSchedule">Не удалось создать спецификацию.</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateSheet">"Не удалось создать лист".</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateViewPort">"Не удалось создать видовой экран".</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateViewPortOnNotCreatedSheet">Нельзя создать видовой экран на еще не созданном листе.</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateScheduleOnNotCreatedSheet">Нельзя создать спецификацию на еще не созданном листе.</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateAnnotationOnNotCreatedSheet">Нельзя создать аннотацию на еще не созданном листе.</system:String>
+    <system:String
+        x:Key="Errors.CannotUpdateNotCreatetViewPort">Нельзя обновить еще не созданный видовой экран.</system:String>
+    <system:String
+        x:Key="Errors.CannotUpdateNotCreatetSheet">Нельзя обновить еще не созданный лист.</system:String>
+    <system:String
+        x:Key="Errors.CannotDeleteElement">Не удалось удалить элемент с id {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotDeleteActiveViewSheet">Нельзя удалить активный лист '{0}'</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveSheet">Не удалось сохранить лист с номером {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveViewPort">Не удалось сохранить видовой экран {0} на листе с номером {1}</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveSchedule">Не удалось сохранить спецификацию {0} на листе с номером {1}</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveAnnotation">Не удалось сохранить аннотацию {0} на листе с номером {1}</system:String>
+    <system:String
+        x:Key="Errors.ViewPortModel.PropertyNotSet">Перед сохранением видового экрана необходимо назначить {0}</system:String>
+    <system:String
+        x:Key="Errors.SheetModel.TitleBlockNotSet">У нового листа не задана основная надпись</system:String>
+    <system:String
+        x:Key="Errors.SheetModel.SheetNumberNotSet">У нового листа не задан номер</system:String>
+    <system:String
+        x:Key="Errors.ScheduleModel.PropertyNotSet">Перед сохранением спецификации необходимо назначить {0}</system:String>
+    <system:String
+        x:Key="Errors.AnnotationModel.PropertyNotSet">Перед сохранением аннотации необходимо назначить {0}</system:String>
+
+    
+    <system:String
+        x:Key="Errors.Validation.AnnotationNotSet">Выберите типоразмер аннотации</system:String>
+    <system:String
+        x:Key="Errors.Validation.AlbumBlueprintNotSet">Выберите альбом</system:String>
+    <system:String
+        x:Key="Errors.Validation.InvalidAlbumBlueprintName">Некорректное название альбома '{0}'</system:String>
+    <system:String
+        x:Key="Errors.Validation.TitleBlockNotSet">Выберите штамп</system:String>
+    <system:String
+        x:Key="Errors.Validation.AddSheetsCountNotNumber">Количество листов должно быть целым числом</system:String>
+    <system:String
+        x:Key="Errors.Validation.AddSheetsMaxCount">Количество листов не должно быть больше {0}</system:String>
+    <system:String
+        x:Key="Errors.Validation.AddSheetsMinCount">Количество листов должно быть положительным числом</system:String>
+    <system:String
+        x:Key="Errors.Validation.AnySheetNameEmpty">У всех листов должно быть заполнено наименование</system:String>
+    <system:String
+        x:Key="Errors.Validation.AnySheetInvalidName">У листа '{0}' недопустимое название</system:String>
+    <system:String
+        x:Key="Errors.Validation.DuplicatedSheetNumber">"У листов повторяется номер {0}</system:String>
+    <system:String
+        x:Key="Errors.Validation.AnySheetNumberEmpty">"У всех листов должен быть заполнен системный номер</system:String>
+    
+    <system:String
+        x:Key="Warnings.SureDeleteSheets">Вы действительно хотите удалить листы ({0} шт.)?</system:String>
+    
+    <system:String
+        x:Key="ProgressBarTitle">Пожалуйста подождите [{0}/{1}] ...</system:String>
+
+    <system:String
+        x:Key="NewSheetTitle">Новый лист</system:String>
+
+    <system:String
+        x:Key="UpdateSheetsTransaction">Обновление листов</system:String>
 
     <system:String
         x:Key="EntityState.Exist">Сущ.</system:String>
