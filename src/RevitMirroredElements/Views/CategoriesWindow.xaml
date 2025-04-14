@@ -10,13 +10,19 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitMirroredElements.ViewModels"
+
     mc:Ignorable="d"
     Title="{me:LocalizationSource CategoryWindow.Title}"
+
     Height="450"
-    Width="300"
-    MinHeight="450"  
-    MinWidth="300"
-    ResizeMode="CanResizeWithGrip">
+    Width="450"
+
+    MinHeight="450"
+    MinWidth="450"
+
+    ResizeMode="CanResizeWithGrip"
+    d:DataContext="{d:DesignInstance vms:CategoriesViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
         <conv:BoolToVisibilityConverter
@@ -33,17 +39,14 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
-            <RowDefinition
-                Height="*" />
-            <RowDefinition
-                Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <ui:TitleBar
-         Grid.Row="0"
-         Title="{me:LocalizationSource CategoryWindow.Title}"/>
+            Grid.Row="0"
+            Title="{me:LocalizationSource CategoryWindow.Title}" />
 
         <TextBlock
             IsHitTestVisible="False"
@@ -52,7 +55,9 @@
             Foreground="Gray"
             VerticalAlignment="Center"
             Text="{me:LocalizationSource CategoryWindow.EnterToSearch}"
-            Visibility="{Binding HasSearchText, Converter={StaticResource BoolToVisibilityConverter}}" />
+            Visibility="{Binding HasSearchText, 
+                Converter={StaticResource BoolToVisibilityConverter}}" />
+
         <TextBox
             Margin="10,40,10,5"
             Grid.Row="0"
@@ -70,6 +75,7 @@
             BorderBrush="Black"
             BorderThickness="1"
             ItemsSource="{Binding FilteredCategories, UpdateSourceTrigger=PropertyChanged}">
+            
             <DataGrid.Columns>
                 <DataGridTemplateColumn
                     Width="60"
@@ -83,7 +89,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn 
+                <DataGridTextColumn
                     Width="*"
                     IsReadOnly="True"
                     Header="{me:LocalizationSource CategoryWindow.Category}"
@@ -93,30 +99,28 @@
 
         <StackPanel
             Grid.Row="2"
-            Orientation="Vertical"
-            HorizontalAlignment="Center">
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            
             <CheckBox
-                Margin="0,0,0,0"
+                VerticalAlignment="Center"
                 Content="{me:LocalizationSource CategoryWindow.SelectAll}"
                 IsChecked="{Binding AllCategoriesSelected, Mode=TwoWay}" />
-            <StackPanel
-                Orientation="Horizontal"
-                HorizontalAlignment="Right">
-                <ui:Button
-                    Margin="10"
-                    Width="80"
-                    Appearance="Info"
-                    IsDefault="True"
-                    Click="ButtonOk_Click" 
-                    Content="{me:LocalizationSource MainWindow.ButtonOk}"/>
+            
+            <ui:Button
+                 Margin="10"
+                 Width="80"
+                 Appearance="Info"
+                 IsDefault="True"
+                 Click="ButtonOk_Click"
+                 Content="{me:LocalizationSource MainWindow.ButtonOk}" />
 
-                <Button
-                    Margin="10"
-                    Width="80"
-                    IsCancel="True"
-                    Click="ButtonCancel_Click" 
-                    Content="{me:LocalizationSource MainWindow.ButtonCancel}"/>
-            </StackPanel>
+            <ui:Button
+                Margin="10"
+                Width="80"
+                IsCancel="True"
+                Click="ButtonCancel_Click"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}" />
         </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>

@@ -12,12 +12,16 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+   
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
+    
     Height="450"
     Width="700"
-    MinHeight="450"  
+    
+    MinHeight="450"
     MinWidth="700"
+   
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
@@ -32,63 +36,74 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
         <ui:TitleBar
-        Grid.Row="0"
-        Title="{me:LocalizationSource MainWindow.Title}"/>
+            Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <StackPanel Margin="10" VerticalAlignment="Center">
-            <Grid Margin="0,5,0,0">
+        <StackPanel
+            Grid.Row="1"
+            Margin="10"
+            VerticalAlignment="Center">
+            
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <RadioButton
-                Grid.Column="0"
-                VerticalAlignment="Center"
-                GroupName="GroupType"
-                Content="{Binding SelectedElementsText}"
-                ToolTip="{me:LocalizationSource MainWindow.CheckMirrorSelectedElements}"
-                IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedElements}" />
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    GroupName="GroupType"
+                    Content="{Binding SelectedElementsText}"
+                    ToolTip="{me:LocalizationSource MainWindow.CheckMirrorSelectedElements}"
+                    IsChecked="{Binding SelectedGroupType, 
+                        Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedElements}" />
 
-                <Button
-                Width="80"
-                Grid.Column="1"
-                HorizontalAlignment="Right"
-                Content="{me:LocalizationSource MainWindow.ButtonSelect}"
-                ToolTip="{me:LocalizationSource MainWindow.ButtonSelectTooltip}"
-                Command="{Binding SelectElementsCommand}"
-                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+                <ui:Button
+                    Grid.Column="1"
+                    Width="80"
+                    HorizontalAlignment="Right"
+                    Content="{me:LocalizationSource MainWindow.ButtonSelect}"
+                    ToolTip="{me:LocalizationSource MainWindow.ButtonSelectTooltip}"
+                    Command="{Binding SelectElementsCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
             </Grid>
 
-            <Grid Margin="0,5,0,0">
+            <Grid Margin="0 5 0 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <RadioButton
-                        Grid.Column="0"
-                        VerticalAlignment="Center"
-                        GroupName="GroupType"
-                        Content="{Binding SelectedCategoriesText}"
-                        ToolTip="{Binding SelectedCategoriesNameText}"
-                        IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedCategories}" />
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    GroupName="GroupType"
+                    Content="{Binding SelectedCategoriesText}"
+                    ToolTip="{Binding SelectedCategoriesNameText}"
+                    IsChecked="{Binding SelectedGroupType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=SelectedCategories}" />
 
 
-                <Button
-                Width="80"
-                Grid.Column="1"
-                HorizontalAlignment="Right"
-                Content="{me:LocalizationSource MainWindow.ButtonSelect}"
-                ToolTip="{me:LocalizationSource MainWindow.ButtonSelectCategoriesTooltip}"  
-                Command="{Binding SelectCategoriesCommand}"/>
+                <ui:Button
+                    Width="80"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Content="{me:LocalizationSource MainWindow.ButtonSelect}"
+                    ToolTip="{me:LocalizationSource MainWindow.ButtonSelectCategoriesTooltip}"
+                    Command="{Binding SelectCategoriesCommand}" />
             </Grid>
 
-            <StackPanel Orientation="Horizontal" Margin="20,10,0,0">
+            <StackPanel 
+                Orientation="Vertical" 
+                Margin="20,5,0,0">
+                
                 <RadioButton
                     GroupName="ElementScope"
                     Margin="0,0,0,5"
@@ -106,59 +121,59 @@
             </StackPanel>
 
             <TextBlock
-        FontWeight="Bold"
-        Margin="0,20,0,5"
-        Text="{me:LocalizationSource MainWindow.VisibilityHeader}"/>
+                FontWeight="Bold"
+                Margin="0,20,0,5"
+                Text="{me:LocalizationSource MainWindow.VisibilityHeader}" />
 
-            <StackPanel Orientation="Horizontal">
-                <CheckBox
-            Margin="0,10,10,0"
-            IsChecked="{Binding EnableFilter}" />
-                <TextBlock
-            VerticalAlignment="Center"
-            TextWrapping="Wrap"
-            Width="250" 
-            Text="{me:LocalizationSource MainWindow.FilterDescription}"/>
-            </StackPanel>
+            <CheckBox
+                VerticalAlignment="Center"
+                IsChecked="{Binding EnableFilter}" 
+                Content="{me:LocalizationSource MainWindow.FilterDescription}"/>
 
-            <StackPanel Margin="0,10,0,15">
+            <StackPanel Margin="0,10,0,0">
                 <TextBlock TextWrapping="Wrap">
                     <Run Text="{me:LocalizationSource MainWindow.PluginDescription}" />
                     <Run Text=" " />
-                    <Run Text="{Binding ElementMirroringParamName}"/>
+                    <Run Text="{Binding ElementMirroringParamName}" />
                 </TextBlock>
 
-                <TextBlock 
-                TextWrapping="Wrap"
-                Text="{me:LocalizationSource MainWindow.PluginDescriptionState}" />
+                <TextBlock
+                    TextWrapping="Wrap"
+                    Text="{me:LocalizationSource MainWindow.PluginDescriptionState}" />
             </StackPanel>
 
         </StackPanel>
+        
+        <ContentControl Grid.Row="2"/>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel 
+            Grid.Row="3" 
+            Orientation="Horizontal" 
+            HorizontalAlignment="Right">
+            
             <TextBlock
-            Margin="0,0,5,5"
-            TextWrapping="Wrap"
-            Foreground="Orange"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Text="{Binding ErrorText}" />
+                Margin="0,0,5,5"
+                TextWrapping="Wrap"
+                Foreground="Orange"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
 
             <ui:Button
-            Margin="10"
-            Width="80"
-            Appearance="Info"
-            IsDefault="True"
-            Click="ButtonOk_Click"
-            Content="{me:LocalizationSource MainWindow.ButtonOk}"
-            Command="{Binding AcceptViewCommand}" />
+                Margin="10"
+                Width="80"
+                Appearance="Info"
+                IsDefault="True"
+                Click="ButtonOk_Click"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Command="{Binding AcceptViewCommand}" />
 
-            <Button
-            Margin="10"
-            Width="80"
-            IsCancel="True"
-            Click="ButtonCancel_Click" 
-            Content="{me:LocalizationSource MainWindow.ButtonCancel}"/>
+            <ui:Button
+                Margin="10"
+                Width="80"
+                IsCancel="True"
+                Click="ButtonCancel_Click"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}" />
         </StackPanel>
 
     </Grid>
