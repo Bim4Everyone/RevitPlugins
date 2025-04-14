@@ -415,7 +415,8 @@
                     <GroupBox.Header>
                         <DockPanel>
                             <ui:TextBlock
-                                Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}" />
+                                Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}" 
+                                Margin="0 0 5 0"/>
                             <ui:TextBlock
                                 Text="{Binding SelectedSheet.Name}" />
                         </DockPanel>
@@ -545,12 +546,12 @@
                                         <ui:DataGrid.Columns>
                                             <DataGridTextColumn
                                                 Header="{StaticResource ScheduleNameHeader}"
-                                                Width="350"
+                                                Width="320"
                                                 IsReadOnly="True"
                                                 Binding="{Binding Name}" />
                                             <DataGridTextColumn
                                                 Header="{StaticResource SchedulesCountHeader}"
-                                                Width="50"
+                                                Width="80"
                                                 IsReadOnly="True"
                                                 Binding="{Binding CountOnSheets}" />
                                             <DataGridTemplateColumn
