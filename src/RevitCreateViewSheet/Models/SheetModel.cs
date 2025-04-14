@@ -165,7 +165,7 @@ namespace RevitCreateViewSheet.Models {
 
         public void SetContentLocations() {
             var origin = new XYZ();
-            var annotationsOrigin = origin + new XYZ(0, 3, 0);
+            var annotationsOrigin = origin + new XYZ(0, 7, 0);
             XYZ annotationsIncrementer = new(0.5, 0, 0);
             foreach(var annotation in Annotations) {
                 if(!annotation.Exists) {
@@ -173,16 +173,16 @@ namespace RevitCreateViewSheet.Models {
                     annotationsOrigin += annotationsIncrementer;
                 }
             }
-            var schedulesOrigin = origin + new XYZ(0, 2, 0);
-            XYZ schedulesIncrementer = new(0.75, 0, 0);
+            var schedulesOrigin = origin + new XYZ(0, 6, 0);
+            XYZ schedulesIncrementer = new(5, 0, 0);
             foreach(var schedule in Schedules) {
                 if(!schedule.Exists) {
                     schedule.Location = schedulesOrigin;
                     schedulesOrigin += schedulesIncrementer;
                 }
             }
-            var viewsOrigin = origin + new XYZ(0, 1, 0);
-            XYZ viewsIncrementer = new(1, 0, 0);
+            var viewsOrigin = origin + new XYZ(0, 5, 0);
+            XYZ viewsIncrementer = new(5, 0, 0);
             foreach(var viewPort in ViewPorts) {
                 if(!viewPort.Exists) {
                     viewPort.Location = viewsOrigin;
