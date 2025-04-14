@@ -1,77 +1,105 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:RevitCorrectNamingCheck.Views.Selectors">
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:RevitCorrectNamingCheck.Views.Selectors"
+    xmlns:models="clr-namespace:RevitCorrectNamingCheck.Models">
 
-    <DataTemplate x:Key="CorrectTemplate">
-        <Border CornerRadius="6"
-                Padding="4,2"
-                Margin="2"
-                SnapsToDevicePixels="True">
-            <TextBlock MinWidth="150"
-                       Text="{Binding Name}"
-                       ToolTip="{DynamicResource WorksetNameStatus.WorksetCorrect}" />
+    <DataTemplate
+        x:Key="CorrectTemplate"
+        DataType="{x:Type models:LinkedFile}">
+        <Border
+            CornerRadius="6"
+            Padding="4,2"
+            Margin="2"
+            SnapsToDevicePixels="True">
+
+            <TextBlock
+                MinWidth="150"
+                Text="{Binding Name}"
+                ToolTip="{DynamicResource WorksetNameStatus.WorksetCorrect}" />
         </Border>
 
     </DataTemplate>
 
-    <DataTemplate x:Key="PartialCorrectTemplate">
-        <Border Background="Khaki"
-                CornerRadius="6"
-                Padding="4,2"
-                Margin="2"
-                SnapsToDevicePixels="True">
-            <TextBlock MinWidth="150"
-                       Background="Khaki"
-                       Text="{Binding Name}"
-                       ToolTip="{DynamicResource WorksetNameStatus.PartialCorrect}" />
+    <DataTemplate
+        x:Key="PartialCorrectTemplate"
+        DataType="{x:Type models:LinkedFile}">
+        <Border
+            Background="Khaki"
+            CornerRadius="6"
+            Padding="4,2"
+            Margin="2"
+            SnapsToDevicePixels="True">
+
+            <TextBlock
+                MinWidth="150"
+                Background="Khaki"
+                Text="{Binding Name}"
+                ToolTip="{DynamicResource WorksetNameStatus.PartialCorrect}" />
         </Border>
     </DataTemplate>
 
-    <DataTemplate x:Key="IncorrectTemplate">
-        <Border Background="MistyRose"
-                CornerRadius="6"
-                Padding="4,2"
-                Margin="2"
-                SnapsToDevicePixels="True">
-            <TextBlock MinWidth="150"
-                       Background="MistyRose"
-                       Text="{Binding Name}"
-                       ToolTip="{DynamicResource WorksetNameStatus.Incorrect}" />
+    <DataTemplate
+        x:Key="IncorrectTemplate"
+        DataType="{x:Type models:LinkedFile}">
+        <Border
+            Background="MistyRose"
+            CornerRadius="6"
+            Padding="4,2"
+            Margin="2"
+            SnapsToDevicePixels="True">
+
+            <TextBlock
+                MinWidth="150"
+                Background="MistyRose"
+                Text="{Binding Name}"
+                ToolTip="{DynamicResource WorksetNameStatus.Incorrect}" />
         </Border>
     </DataTemplate>
 
-    <DataTemplate x:Key="NoMatchTemplate">
-        <Border Background="MistyRose"
-                CornerRadius="6"
-                Padding="4,2"
-                Margin="2"
-                SnapsToDevicePixels="True">
-            <TextBlock MinWidth="150"
-                       Background="MistyRose"
-                       Text="{Binding Name}"
-                       ToolTip="{DynamicResource WorksetNameStatus.NoMatch}" />
+    <DataTemplate
+        x:Key="NoMatchTemplate"
+        DataType="{x:Type models:LinkedFile}">
+        <Border
+            Background="MistyRose"
+            CornerRadius="6"
+            Padding="4,2"
+            Margin="2"
+            SnapsToDevicePixels="True">
+
+            <TextBlock
+                MinWidth="150"
+                Background="MistyRose"
+                Text="{Binding Name}"
+                ToolTip="{DynamicResource WorksetNameStatus.NoMatch}" />
         </Border>
     </DataTemplate>
 
-    <DataTemplate x:Key="DisabledTemplate">
-        <Border Background="LightGray"
-                CornerRadius="6"
-                Padding="4,2"
-                Margin="2"
-                SnapsToDevicePixels="True">
-            <TextBlock Background="LightGray"
-                       Foreground="Gray"
-                       MinWidth="150"
-                       FontStyle="Italic"
-                       Text="{Binding Name}" />
+    <DataTemplate
+        x:Key="DisabledTemplate"
+        DataType="{x:Type models:LinkedFile}">
+        <Border
+            Background="LightGray"
+            CornerRadius="6"
+            Padding="4,2"
+            Margin="2"
+            SnapsToDevicePixels="True">
+
+            <TextBlock
+                Background="LightGray"
+                Foreground="Gray"
+                MinWidth="150"
+                FontStyle="Italic"
+                Text="{Binding Name}" />
         </Border>
 
     </DataTemplate>
 
-    <local:WorksetTemplateSelector x:Key="WorksetSelector"
-                                   CorrectTemplate="{StaticResource CorrectTemplate}"
-                                   PartialCorrectTemplate="{StaticResource PartialCorrectTemplate}"
-                                   IncorrectTemplate="{StaticResource IncorrectTemplate}"
-                                   NoMatchTemplate="{StaticResource NoMatchTemplate}"
-                                   DisabledTemplate="{StaticResource DisabledTemplate}" />
+    <local:WorksetTemplateSelector
+        x:Key="WorksetSelector"
+        CorrectTemplate="{StaticResource CorrectTemplate}"
+        PartialCorrectTemplate="{StaticResource PartialCorrectTemplate}"
+        IncorrectTemplate="{StaticResource IncorrectTemplate}"
+        NoMatchTemplate="{StaticResource NoMatchTemplate}"
+        DisabledTemplate="{StaticResource DisabledTemplate}" />
 </ResourceDictionary>

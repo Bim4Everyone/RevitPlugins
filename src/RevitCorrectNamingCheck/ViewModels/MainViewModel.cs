@@ -21,7 +21,6 @@ internal class MainViewModel : BaseViewModel {
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
 
