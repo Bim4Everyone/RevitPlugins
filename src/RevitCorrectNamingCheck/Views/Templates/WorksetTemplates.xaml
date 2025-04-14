@@ -3,85 +3,75 @@
                     xmlns:local="clr-namespace:RevitCorrectNamingCheck.Views.Selectors">
 
     <DataTemplate x:Key="CorrectTemplate">
-        <Border 
-        CornerRadius="6"
-        Padding="4,2"
-        Margin="2"
-        SnapsToDevicePixels="True">
-            <TextBlock 
-                Text="{Binding Name}"
-                MinWidth="150"
-                ToolTip="{DynamicResource WorksetNameStatus.WorksetCorrect}"/>
+        <Border CornerRadius="6"
+                Padding="4,2"
+                Margin="2"
+                SnapsToDevicePixels="True">
+            <TextBlock MinWidth="150"
+                       Text="{Binding Name}"
+                       ToolTip="{DynamicResource WorksetNameStatus.WorksetCorrect}" />
         </Border>
-        
+
     </DataTemplate>
 
     <DataTemplate x:Key="PartialCorrectTemplate">
-        <Border 
-        Background="Khaki"
-        CornerRadius="6"
-        Padding="4,2"
-        Margin="2"
-        SnapsToDevicePixels="True">
-            <TextBlock
-                Text="{Binding Name}"
-                MinWidth="150"
-                Background="Khaki"
-                ToolTip="{DynamicResource WorksetNameStatus.PartialCorrect}"/>
+        <Border Background="Khaki"
+                CornerRadius="6"
+                Padding="4,2"
+                Margin="2"
+                SnapsToDevicePixels="True">
+            <TextBlock MinWidth="150"
+                       Background="Khaki"
+                       Text="{Binding Name}"
+                       ToolTip="{DynamicResource WorksetNameStatus.PartialCorrect}" />
         </Border>
     </DataTemplate>
 
     <DataTemplate x:Key="IncorrectTemplate">
-        <Border 
-        Background="MistyRose"
-        CornerRadius="6"
-        Padding="4,2"
-        Margin="2"
-        SnapsToDevicePixels="True">
-            <TextBlock 
-                Text="{Binding Name}"
-                MinWidth="150"
-                Background="MistyRose"
-                ToolTip="{DynamicResource WorksetNameStatus.Incorrect}"/>
+        <Border Background="MistyRose"
+                CornerRadius="6"
+                Padding="4,2"
+                Margin="2"
+                SnapsToDevicePixels="True">
+            <TextBlock MinWidth="150"
+                       Background="MistyRose"
+                       Text="{Binding Name}"
+                       ToolTip="{DynamicResource WorksetNameStatus.Incorrect}" />
         </Border>
     </DataTemplate>
 
     <DataTemplate x:Key="NoMatchTemplate">
-        <Border 
-        Background="MistyRose"
-        CornerRadius="6"
-        Padding="4,2"
-        Margin="2"
-        SnapsToDevicePixels="True">
-            <TextBlock 
-                 Text="{Binding Name}"
-                 MinWidth="150"
-                 Background="MistyRose"
-                 ToolTip="{DynamicResource WorksetNameStatus.NoMatch}"/>
+        <Border Background="MistyRose"
+                CornerRadius="6"
+                Padding="4,2"
+                Margin="2"
+                SnapsToDevicePixels="True">
+            <TextBlock MinWidth="150"
+                       Background="MistyRose"
+                       Text="{Binding Name}"
+                       ToolTip="{DynamicResource WorksetNameStatus.NoMatch}" />
         </Border>
     </DataTemplate>
 
     <DataTemplate x:Key="DisabledTemplate">
-        <Border 
-        Background="LightGray"
-        CornerRadius="6"
-        Padding="4,2"
-        Margin="2"
-        SnapsToDevicePixels="True">
-            <TextBlock 
-                Text="{Binding Name}" 
-                Background="LightGray"
-                Foreground="Gray"
-                MinWidth="150"
-                FontStyle="Italic" />
+        <Border Background="LightGray"
+                CornerRadius="6"
+                Padding="4,2"
+                Margin="2"
+                SnapsToDevicePixels="True">
+            <TextBlock Background="LightGray"
+                       Foreground="Gray"
+                       MinWidth="150"
+                       FontStyle="Italic"
+                       Text="{Binding Name}" />
         </Border>
-        
+
     </DataTemplate>
 
     <local:WorksetTemplateSelector x:Key="WorksetSelector"
-                               CorrectTemplate="{StaticResource CorrectTemplate}"
-                               PartialCorrectTemplate ="{StaticResource PartialCorrectTemplate}"
-                               IncorrectTemplate="{StaticResource IncorrectTemplate}"
-                               NoMatchTemplate ="{StaticResource NoMatchTemplate}"
-                               DisabledTemplate="{StaticResource DisabledTemplate}"/>
+                                   CorrectTemplate="{StaticResource CorrectTemplate}"
+                                   PartialCorrectTemplate="{StaticResource PartialCorrectTemplate}"
+                                   IncorrectTemplate="{StaticResource IncorrectTemplate}"
+                                   NoMatchTemplate="{StaticResource NoMatchTemplate}"
+                                   DisabledTemplate="{StaticResource DisabledTemplate}" />
 </ResourceDictionary>
