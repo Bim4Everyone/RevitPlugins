@@ -23,6 +23,33 @@
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Style
+                TargetType="ui:DataGrid"
+                x:Key="SheetItemsDataGrid"
+                BasedOn="{StaticResource CustomResizableDataGridStyle}">
+                <Setter
+                    Property="SelectionMode"
+                    Value="Single" />
+                <Setter
+                    Property="AutoGenerateColumns"
+                    Value="False" />
+                <Setter
+                    Property="VirtualizingPanel.VirtualizationMode"
+                    Value="Recycling" />
+                <Setter
+                    Property="VirtualizingPanel.IsVirtualizing"
+                    Value="True" />
+                <Setter
+                    Property="VerticalScrollBarVisibility"
+                    Value="Auto" />
+                <Setter
+                    Property="HorizontalScrollBarVisibility"
+                    Value="Auto" />
+                <Setter
+                    Property="CanUserReorderColumns"
+                    Value="False" />
+            </Style>
+
             <ui:TextBlock
                 x:Key="ViewPortNameHeader"
                 Text="{me:LocalizationSource MainWindow.AllSheets.Name}" />
@@ -104,22 +131,13 @@
                         <DockPanel
                             LastChildFill="True">
                             <ui:Button
-                                Height="Auto"
-                                Width="Auto"
                                 HorizontalAlignment="Left"
                                 DockPanel.Dock="Bottom"
                                 ToolTip="{StaticResource AddViewPortButtonTooltip}"
                                 Content="{ui:SymbolIcon Add24}"
                                 Command="{Binding AddViewPortCommand}" />
                             <ui:DataGrid
-                                SelectionMode="Single"
-                                AutoGenerateColumns="False"
-                                VirtualizingPanel.VirtualizationMode="Recycling"
-                                VirtualizingPanel.IsVirtualizing="True"
-                                VerticalScrollBarVisibility="Auto"
-                                HorizontalScrollBarVisibility="Auto"
-                                CanUserReorderColumns="False"
-                                Style="{StaticResource CustomResizableDataGridStyle}"
+                                Style="{StaticResource SheetItemsDataGrid}"
                                 ItemsSource="{Binding ViewPorts}"
                                 SelectedItem="{Binding SelectedViewPort}">
                                 <ui:DataGrid.Columns>
@@ -192,37 +210,27 @@
                         <DockPanel
                             LastChildFill="True">
                             <ui:Button
-                                Height="Auto"
-                                Width="Auto"
                                 HorizontalAlignment="Left"
                                 DockPanel.Dock="Bottom"
                                 ToolTip="{StaticResource AddScheduleButtonTooltip}"
                                 Content="{ui:SymbolIcon Add24}"
                                 Command="{Binding AddScheduleCommand}" />
                             <ui:DataGrid
-                                DockPanel.Dock="Top"
-                                SelectionMode="Single"
-                                AutoGenerateColumns="False"
-                                VirtualizingPanel.VirtualizationMode="Recycling"
-                                VirtualizingPanel.IsVirtualizing="True"
-                                VerticalScrollBarVisibility="Auto"
-                                HorizontalScrollBarVisibility="Auto"
-                                CanUserReorderColumns="False"
-                                Style="{StaticResource CustomResizableDataGridStyle}"
+                                Style="{StaticResource SheetItemsDataGrid}"
                                 ItemsSource="{Binding Schedules}"
                                 SelectedItem="{Binding SelectedSchedule}">
                                 <ui:DataGrid.Columns>
                                     <DataGridTextColumn
                                         MinWidth="50"
-                                        Header="{StaticResource ScheduleNameHeader}"
                                         Width="320"
                                         IsReadOnly="True"
+                                        Header="{StaticResource ScheduleNameHeader}"
                                         Binding="{Binding Name}" />
                                     <DataGridTextColumn
-                                        Header="{StaticResource SchedulesCountHeader}"
                                         MinWidth="50"
                                         Width="80"
                                         IsReadOnly="True"
+                                        Header="{StaticResource SchedulesCountHeader}"
                                         Binding="{Binding CountOnSheets}" />
                                     <DataGridTemplateColumn
                                         Width="Auto"
@@ -268,38 +276,27 @@
                         <DockPanel
                             LastChildFill="True">
                             <ui:Button
-                                Height="Auto"
-                                Width="Auto"
                                 HorizontalAlignment="Left"
                                 DockPanel.Dock="Bottom"
                                 ToolTip="{StaticResource AddAnnotationButtonTooltip}"
                                 Content="{ui:SymbolIcon Add24}"
                                 Command="{Binding AddAnnotationCommand}" />
                             <ui:DataGrid
-                                DockPanel.Dock="Top"
-                                SelectionMode="Single"
-                                AutoGenerateColumns="False"
-                                EnableColumnVirtualization="False"
-                                VirtualizingPanel.VirtualizationMode="Recycling"
-                                VirtualizingPanel.IsVirtualizing="True"
-                                VerticalScrollBarVisibility="Auto"
-                                HorizontalScrollBarVisibility="Auto"
-                                CanUserReorderColumns="False"
-                                Style="{StaticResource CustomResizableDataGridStyle}"
+                                Style="{StaticResource SheetItemsDataGrid}"
                                 ItemsSource="{Binding Annotations}"
                                 SelectedItem="{Binding SelectedAnnotation}">
                                 <ui:DataGrid.Columns>
                                     <DataGridTextColumn
                                         MinWidth="50"
-                                        Header="{StaticResource AnnotationFamilyHeader}"
                                         Width="200"
                                         IsReadOnly="True"
+                                        Header="{StaticResource AnnotationFamilyHeader}"
                                         Binding="{Binding FamilyName}" />
                                     <DataGridTextColumn
                                         MinWidth="50"
-                                        Header="{StaticResource AnnotationTypeHeader}"
                                         Width="200"
                                         IsReadOnly="True"
+                                        Header="{StaticResource AnnotationTypeHeader}"
                                         Binding="{Binding SymbolName}" />
                                     <DataGridTemplateColumn
                                         Width="Auto"

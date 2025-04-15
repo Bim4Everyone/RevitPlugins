@@ -206,9 +206,9 @@
                         Grid.Row="1"
                         Width="80"
                         Height="40"
-                        Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
                         HorizontalAlignment="Left"
                         Appearance="Info"
+                        Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
                         Command="{Binding AddSheetsCommand}" />
 
                     <ui:Button
@@ -254,9 +254,9 @@
                 </Grid>
 
                 <GroupBox
-                    Header="{me:LocalizationSource MainWindow.AllSheets.Sheets}"
                     Grid.Row="2"
-                    Grid.Column="0">
+                    Grid.Column="0"
+                    Header="{me:LocalizationSource MainWindow.AllSheets.Sheets}">
                     <ui:DataGrid
                         SelectionMode="Extended"
                         AutoGenerateColumns="False"
@@ -264,19 +264,19 @@
                         VirtualizingPanel.IsVirtualizing="True"
                         VerticalScrollBarVisibility="Auto"
                         HorizontalScrollBarVisibility="Auto"
+                        CanUserReorderColumns="False"
                         res:DataGridSyncEditToSelectedItemProperty.SyncEditToSelectedItem="True"
                         res:CustomSortBehavior.AllowCustomSort="True"
-                        CanUserReorderColumns="False"
                         res:DataGridSelectedItemsProperty.SelectedItems="{Binding SelectedSheets}"
                         Style="{StaticResource CustomResizableDataGridStyle}"
                         ItemsSource="{Binding VisibleSheets.View}"
                         SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
                         <ui:DataGrid.Columns>
                             <DataGridTemplateColumn
+                                Width="Auto"
                                 MinWidth="50"
                                 SortMemberPath="AlbumBlueprint"
-                                Header="{StaticResource AlbumHeader}"
-                                Width="Auto">
+                                Header="{StaticResource AlbumHeader}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ui:TextBox
@@ -285,11 +285,11 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn
+                                Width="Auto"
                                 MinWidth="50"
                                 SortMemberPath="SheetCustomNumber"
-                                Header="{StaticResource CustomNumberHeader}"
                                 res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}"
-                                Width="Auto">
+                                Header="{StaticResource CustomNumberHeader}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ui:TextBox
@@ -298,19 +298,19 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn
+                                Width="Auto"
                                 MinWidth="50"
+                                IsReadOnly="True"
                                 SortMemberPath="SheetNumber"
                                 Binding="{Binding SheetNumber}"
                                 Header="{StaticResource NumberHeader}"
-                                IsReadOnly="True"
-                                res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}"
-                                Width="Auto">
+                                res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}">
                             </DataGridTextColumn>
                             <DataGridTemplateColumn
+                                Width="250"
                                 MinWidth="50"
                                 SortMemberPath="Name"
-                                Header="{StaticResource SheetNameHeader}"
-                                Width="250">
+                                Header="{StaticResource SheetNameHeader}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ui:TextBox
@@ -319,19 +319,19 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn
+                                Width="350"
                                 MinWidth="100"
                                 SortMemberPath="TitleBlock.Name"
-                                Header="{StaticResource TitleBlockHeader}"
-                                Width="350">
+                                Header="{StaticResource TitleBlockHeader}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox
                                             Grid.Row="1"
                                             Grid.Column="1"
-                                            IsTextSearchCaseSensitive="False"
                                             Height="40"
                                             MinHeight="40"
                                             DisplayMemberPath="Name"
+                                            IsTextSearchCaseSensitive="False"
                                             ScrollViewer.VerticalScrollBarVisibility="Visible"
                                             ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                             SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
@@ -397,16 +397,16 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="{me:LocalizationSource AllWindow.ButtonOk}"
-                Click="ButtonOk_Click"
                 Appearance="Info"
+                Click="ButtonOk_Click"
+                Content="{me:LocalizationSource AllWindow.ButtonOk}"
                 Command="{Binding AcceptViewCommand}" />
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="{me:LocalizationSource AllWindow.ButtonCancel}"
                 IsCancel="True"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"
+                Content="{me:LocalizationSource AllWindow.ButtonCancel}" />
         </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>
