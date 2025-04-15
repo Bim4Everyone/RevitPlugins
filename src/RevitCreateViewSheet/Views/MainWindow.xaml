@@ -253,11 +253,17 @@
                     </DockPanel>
                 </Grid>
 
-                <GroupBox
+                <DockPanel
+                    LastChildFill="True"
                     Grid.Row="2"
-                    Grid.Column="0"
-                    Header="{me:LocalizationSource MainWindow.AllSheets.Sheets}">
+                    Grid.Column="0">
+                    <Label
+                        DockPanel.Dock="Top"
+                        FontSize="16"
+                        Target="{Binding ElementName=_sheets}"
+                        Content="{me:LocalizationSource MainWindow.AllSheets.Sheets}" />
                     <ui:DataGrid
+                        x:Name="_sheets"
                         SelectionMode="Extended"
                         AutoGenerateColumns="False"
                         VirtualizingPanel.VirtualizationMode="Recycling"
@@ -367,7 +373,7 @@
                             </DataGridTemplateColumn>
                         </ui:DataGrid.Columns>
                     </ui:DataGrid>
-                </GroupBox>
+                </DockPanel>
 
                 <GridSplitter
                     Grid.Row="2"
@@ -376,10 +382,26 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Stretch" />
 
-                <local:SelectedSheetView
+                <DockPanel
                     Grid.Row="2"
                     Grid.Column="2"
-                    DataContext="{Binding SelectedSheet}" />
+                    LastChildFill="True">
+                    <Label
+                        DockPanel.Dock="Top"
+                        Target="{Binding ElementName=_sheetItems}"
+                        FontSize="16">
+                        <DockPanel>
+                            <ui:TextBlock
+                                Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}"
+                                Margin="0 0 5 0" />
+                            <ui:TextBlock
+                                Text="{Binding SelectedSheet.Name}" />
+                        </DockPanel>
+                    </Label>
+                    <local:SelectedSheetView
+                        x:Name="_sheetItems"
+                        DataContext="{Binding SelectedSheet}" />
+                </DockPanel>
             </Grid>
         </DockPanel>
 

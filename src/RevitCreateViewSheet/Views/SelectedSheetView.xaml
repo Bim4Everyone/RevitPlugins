@@ -96,13 +96,6 @@
         HorizontalScrollBarVisibility="Auto">
         <StackPanel
             Orientation="Vertical">
-            <DockPanel>
-                <ui:TextBlock
-                    Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}"
-                    Margin="0 0 5 0" />
-                <ui:TextBlock
-                    Text="{Binding Name}" />
-            </DockPanel>
             <local:SheetItemsEditControl
                 Header="{me:LocalizationSource MainWindow.AllSheets.ViewPorts}"
                 ButtonToolTip="{me:LocalizationSource MainWindow.AllSheets.AddViewPortTooltip}"
