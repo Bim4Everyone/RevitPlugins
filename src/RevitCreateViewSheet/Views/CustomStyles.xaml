@@ -18,6 +18,11 @@
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Resources/Typography.xaml" />
     </ResourceDictionary.MergedDictionaries>
+    <!--
+    У стандартного стиля DefaultUiDataGridStyle с включенным CanUserResizeColumns не работает изменение ширины столбцов. 
+    Скорее всего проблема в ColumnHeaderGripperStyle в сеттере для Template
+    https://github.com/lepoco/wpfui/blob/776d9c79391a3d5d4505561dd38d5463148c55b3/src/Wpf.Ui/Controls/DataGrid/DataGrid.xaml#L496
+    -->
     <Style
         x:Key="CustomResizableDataGridStyle"
         TargetType="ui:DataGrid"

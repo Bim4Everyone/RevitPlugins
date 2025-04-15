@@ -118,16 +118,19 @@
                                 VirtualizingPanel.IsVirtualizing="True"
                                 VerticalScrollBarVisibility="Auto"
                                 HorizontalScrollBarVisibility="Auto"
+                                CanUserReorderColumns="False"
                                 Style="{StaticResource CustomResizableDataGridStyle}"
                                 ItemsSource="{Binding ViewPorts}"
                                 SelectedItem="{Binding SelectedViewPort}">
                                 <ui:DataGrid.Columns>
                                     <DataGridTextColumn
+                                        MinWidth="50"
                                         Header="{StaticResource ViewPortNameHeader}"
                                         Width="200"
                                         IsReadOnly="True"
                                         Binding="{Binding ViewName}" />
                                     <DataGridTemplateColumn
+                                        MinWidth="100"
                                         Header="{StaticResource ViewPortTypeHeader}"
                                         SortMemberPath="ViewPortType.Name"
                                         Width="200">
@@ -148,6 +151,7 @@
                                     <DataGridTemplateColumn
                                         SortMemberPath="IsPlacedStatus"
                                         Width="Auto"
+                                        CanUserResize="False"
                                         Header="{StaticResource ViewPortStatusHeader}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -158,7 +162,8 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn
+                                        CanUserResize="False">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ui:Button
@@ -202,22 +207,26 @@
                                 VirtualizingPanel.IsVirtualizing="True"
                                 VerticalScrollBarVisibility="Auto"
                                 HorizontalScrollBarVisibility="Auto"
+                                CanUserReorderColumns="False"
                                 Style="{StaticResource CustomResizableDataGridStyle}"
                                 ItemsSource="{Binding Schedules}"
                                 SelectedItem="{Binding SelectedSchedule}">
                                 <ui:DataGrid.Columns>
                                     <DataGridTextColumn
+                                        MinWidth="50"
                                         Header="{StaticResource ScheduleNameHeader}"
                                         Width="320"
                                         IsReadOnly="True"
                                         Binding="{Binding Name}" />
                                     <DataGridTextColumn
                                         Header="{StaticResource SchedulesCountHeader}"
+                                        MinWidth="50"
                                         Width="80"
                                         IsReadOnly="True"
                                         Binding="{Binding CountOnSheets}" />
                                     <DataGridTemplateColumn
                                         Width="Auto"
+                                        CanUserResize="False"
                                         SortMemberPath="IsPlacedStatus"
                                         Header="{StaticResource ScheduleStatusHeader}">
                                         <DataGridTemplateColumn.CellTemplate>
@@ -229,7 +238,8 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn
+                                        CanUserResize="False">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ui:Button
@@ -274,22 +284,26 @@
                                 VirtualizingPanel.IsVirtualizing="True"
                                 VerticalScrollBarVisibility="Auto"
                                 HorizontalScrollBarVisibility="Auto"
+                                CanUserReorderColumns="False"
                                 Style="{StaticResource CustomResizableDataGridStyle}"
                                 ItemsSource="{Binding Annotations}"
                                 SelectedItem="{Binding SelectedAnnotation}">
                                 <ui:DataGrid.Columns>
                                     <DataGridTextColumn
+                                        MinWidth="50"
                                         Header="{StaticResource AnnotationFamilyHeader}"
                                         Width="200"
                                         IsReadOnly="True"
                                         Binding="{Binding FamilyName}" />
                                     <DataGridTextColumn
+                                        MinWidth="50"
                                         Header="{StaticResource AnnotationTypeHeader}"
                                         Width="200"
                                         IsReadOnly="True"
                                         Binding="{Binding SymbolName}" />
                                     <DataGridTemplateColumn
                                         Width="Auto"
+                                        CanUserResize="False"
                                         SortMemberPath="IsPlacedStatus"
                                         Header="{StaticResource AnnotationStatusHeader}">
                                         <DataGridTemplateColumn.CellTemplate>
@@ -301,7 +315,8 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn
+                                        CanUserResize="False">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ui:Button
