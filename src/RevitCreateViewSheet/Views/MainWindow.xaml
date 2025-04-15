@@ -22,29 +22,35 @@
     d:Height="600"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
-        <res:SheetViewModelComparer
-            x:Key="SheetViewModelComparer" />
-        <ui:TextBlock
-            x:Key="AlbumHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.Album}" />
-        <ui:TextBlock
-            x:Key="CustomNumberHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.CustomNumber}" />
-        <ui:TextBlock
-            x:Key="NumberHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.Number}" />
-        <ui:TextBlock
-            x:Key="SheetNameHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.Name}" />
-        <ui:TextBlock
-            x:Key="TitleBlockHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.TitleBlock}" />
-        <ui:TextBlock
-            x:Key="SheetStatusHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
-        <ui:TextBlock
-            x:Key="DeleteSheetTooltip"
-            Text="{me:LocalizationSource MainWindow.AllSheets.DeleteSheetsButtonTooltip}" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <res:SheetViewModelComparer
+                x:Key="SheetViewModelComparer" />
+            <ui:TextBlock
+                x:Key="AlbumHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Album}" />
+            <ui:TextBlock
+                x:Key="CustomNumberHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.CustomNumber}" />
+            <ui:TextBlock
+                x:Key="NumberHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Number}" />
+            <ui:TextBlock
+                x:Key="SheetNameHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Name}" />
+            <ui:TextBlock
+                x:Key="TitleBlockHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.TitleBlock}" />
+            <ui:TextBlock
+                x:Key="SheetStatusHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
+            <ui:TextBlock
+                x:Key="DeleteSheetTooltip"
+                Text="{me:LocalizationSource MainWindow.AllSheets.DeleteSheetsButtonTooltip}" />
+        </ResourceDictionary>
     </Window.Resources>
     <b:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
@@ -258,10 +264,10 @@
                         VirtualizingPanel.IsVirtualizing="True"
                         VerticalScrollBarVisibility="Auto"
                         HorizontalScrollBarVisibility="Auto"
-                        CanUserResizeColumns="True"
                         res:DataGridSyncEditToSelectedItemProperty.SyncEditToSelectedItem="True"
                         res:CustomSortBehavior.AllowCustomSort="True"
                         res:DataGridSelectedItemsProperty.SelectedItems="{Binding SelectedSheets}"
+                        Style="{StaticResource CustomResizableDataGridStyle}"
                         ItemsSource="{Binding VisibleSheets.View}"
                         SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
                         <ui:DataGrid.Columns>

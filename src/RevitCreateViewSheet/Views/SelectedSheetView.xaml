@@ -10,59 +10,67 @@
     xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
     xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
     mc:Ignorable="d"
     x:Name="_this"
     d:DesignHeight="450"
     d:DesignWidth="800"
     d:DataContext="{d:DesignInstance vms:SheetViewModel, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
-        <ui:TextBlock
-            x:Key="ViewPortNameHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.Name}" />
-        <ui:TextBlock
-            x:Key="ViewPortStatusHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
-        <ui:TextBlock
-            x:Key="ViewPortTypeHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.ViewPortType}" />
-        <ui:TextBlock
-            x:Key="AddViewPortButtonTooltip"
-            Text="{me:LocalizationSource MainWindow.AllSheets.AddViewPortTooltip}" />
-        <ui:TextBlock
-            x:Key="DeleteViewPortButtonTooltip"
-            Text="{me:LocalizationSource MainWindow.AllSheets.DeleteViewPortTooltip}" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <ui:TextBlock
-            x:Key="SchedulesCountHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.SchedulesCount}" />
-        <ui:TextBlock
-            x:Key="ScheduleNameHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.Name}" />
-        <ui:TextBlock
-            x:Key="ScheduleStatusHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
-        <ui:TextBlock
-            x:Key="AddScheduleButtonTooltip"
-            Text="{me:LocalizationSource MainWindow.AllSheets.AddScheduleTooltip}" />
-        <ui:TextBlock
-            x:Key="DeleteScheduleButtonTooltip"
-            Text="{me:LocalizationSource MainWindow.AllSheets.DeleteScheduleTooltip}" />
+            <ui:TextBlock
+                x:Key="ViewPortNameHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Name}" />
+            <ui:TextBlock
+                x:Key="ViewPortStatusHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
+            <ui:TextBlock
+                x:Key="ViewPortTypeHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.ViewPortType}" />
+            <ui:TextBlock
+                x:Key="AddViewPortButtonTooltip"
+                Text="{me:LocalizationSource MainWindow.AllSheets.AddViewPortTooltip}" />
+            <ui:TextBlock
+                x:Key="DeleteViewPortButtonTooltip"
+                Text="{me:LocalizationSource MainWindow.AllSheets.DeleteViewPortTooltip}" />
 
-        <ui:TextBlock
-            x:Key="AnnotationFamilyHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.AnnotationFamily}" />
-        <ui:TextBlock
-            x:Key="AnnotationStatusHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
-        <ui:TextBlock
-            x:Key="AnnotationTypeHeader"
-            Text="{me:LocalizationSource MainWindow.AllSheets.AnnotationType}" />
-        <ui:TextBlock
-            x:Key="AddAnnotationButtonTooltip"
-            Text="{me:LocalizationSource MainWindow.AllSheets.AddAnnotationTooltip}" />
-        <ui:TextBlock
-            x:Key="DeleteAnnotationButtonTooltip"
-            Text="{me:LocalizationSource MainWindow.AllSheets.DeleteAnnotationTooltip}" />
+            <ui:TextBlock
+                x:Key="SchedulesCountHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.SchedulesCount}" />
+            <ui:TextBlock
+                x:Key="ScheduleNameHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Name}" />
+            <ui:TextBlock
+                x:Key="ScheduleStatusHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
+            <ui:TextBlock
+                x:Key="AddScheduleButtonTooltip"
+                Text="{me:LocalizationSource MainWindow.AllSheets.AddScheduleTooltip}" />
+            <ui:TextBlock
+                x:Key="DeleteScheduleButtonTooltip"
+                Text="{me:LocalizationSource MainWindow.AllSheets.DeleteScheduleTooltip}" />
+
+            <ui:TextBlock
+                x:Key="AnnotationFamilyHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.AnnotationFamily}" />
+            <ui:TextBlock
+                x:Key="AnnotationStatusHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
+            <ui:TextBlock
+                x:Key="AnnotationTypeHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.AnnotationType}" />
+            <ui:TextBlock
+                x:Key="AddAnnotationButtonTooltip"
+                Text="{me:LocalizationSource MainWindow.AllSheets.AddAnnotationTooltip}" />
+            <ui:TextBlock
+                x:Key="DeleteAnnotationButtonTooltip"
+                Text="{me:LocalizationSource MainWindow.AllSheets.DeleteAnnotationTooltip}" />
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <GroupBox>
@@ -110,7 +118,7 @@
                                 VirtualizingPanel.IsVirtualizing="True"
                                 VerticalScrollBarVisibility="Auto"
                                 HorizontalScrollBarVisibility="Auto"
-                                CanUserResizeColumns="True"
+                                Style="{StaticResource CustomResizableDataGridStyle}"
                                 ItemsSource="{Binding ViewPorts}"
                                 SelectedItem="{Binding SelectedViewPort}">
                                 <ui:DataGrid.Columns>
@@ -194,7 +202,7 @@
                                 VirtualizingPanel.IsVirtualizing="True"
                                 VerticalScrollBarVisibility="Auto"
                                 HorizontalScrollBarVisibility="Auto"
-                                CanUserResizeColumns="True"
+                                Style="{StaticResource CustomResizableDataGridStyle}"
                                 ItemsSource="{Binding Schedules}"
                                 SelectedItem="{Binding SelectedSchedule}">
                                 <ui:DataGrid.Columns>
@@ -261,11 +269,12 @@
                                 DockPanel.Dock="Top"
                                 SelectionMode="Single"
                                 AutoGenerateColumns="False"
+                                EnableColumnVirtualization="False"
                                 VirtualizingPanel.VirtualizationMode="Recycling"
                                 VirtualizingPanel.IsVirtualizing="True"
                                 VerticalScrollBarVisibility="Auto"
                                 HorizontalScrollBarVisibility="Auto"
-                                CanUserResizeColumns="True"
+                                Style="{StaticResource CustomResizableDataGridStyle}"
                                 ItemsSource="{Binding Annotations}"
                                 SelectedItem="{Binding SelectedAnnotation}">
                                 <ui:DataGrid.Columns>

@@ -4,4 +4,7 @@
         <UseWpfUi>true</UseWpfUi>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <Resource Include="Views\CustomStyles.xaml" />
+    </ItemGroup>
 </Project>
