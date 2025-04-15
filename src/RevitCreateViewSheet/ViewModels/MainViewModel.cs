@@ -363,11 +363,12 @@ namespace RevitCreateViewSheet.ViewModels {
         private void SheetsFilterHandler(object sender, FilterEventArgs e) {
             if(e.Item is SheetViewModel sheetViewModel) {
                 if(!string.IsNullOrWhiteSpace(SheetsFilter)) {
-                    if(!sheetViewModel.AlbumBlueprint.Contains(SheetsFilter)
-                        && !sheetViewModel.SheetNumber.Contains(SheetsFilter)
-                        && !sheetViewModel.SheetCustomNumber.Contains(SheetsFilter)
-                        && !sheetViewModel.Name.Contains(SheetsFilter)
-                        && (!sheetViewModel.TitleBlock?.Name.Contains(SheetsFilter) ?? false)) {
+                    var str = SheetsFilter.ToLower();
+                    if(!sheetViewModel.AlbumBlueprint.ToLower().Contains(str)
+                        && !sheetViewModel.SheetNumber.ToLower().Contains(str)
+                        && !sheetViewModel.SheetCustomNumber.ToLower().Contains(str)
+                        && !sheetViewModel.Name.ToLower().Contains(str)
+                        && (!sheetViewModel.TitleBlock?.Name.ToLower().Contains(str) ?? false)) {
 
                         e.Accepted = false;
                         return;
