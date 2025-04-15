@@ -45,8 +45,9 @@
                 MinWidth="450"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
-                SelectedValue="{Binding Path=SelectedViewType}"
-                ItemsSource="{me:EnumToItemsSource EnumType=models:RevitViewType}">
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding SelectedViewType}"
+                ItemsSource="{Binding ViewTypes}">
             </ComboBox>
             <ui:TextBlock
                 Margin="10"

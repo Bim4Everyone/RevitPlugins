@@ -33,7 +33,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly ObservableCollection<ViewViewModel> _viewsForSelection;
         private string _errorText;
         private ViewPortTypeViewModel _selectedViewPortType;
-        private RevitViewType? _selectedViewType;
+        private ViewTypeViewModel _selectedViewType;
         private ViewViewModel _selectedView;
 
         public ViewPortModelCreatorViewModel(
@@ -53,19 +53,25 @@ namespace RevitCreateViewSheet.ViewModels {
             ViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
                 .OrderBy(a => a.Name, new LogicalStringComparer())];
-            SelectedViewType = RevitViewType.Any;
+            ViewTypes = InitializeViewTypes();
+            SelectedViewType = ViewTypes.First();
             SelectedView = Views.FirstOrDefault();
             SelectedViewPortType = ViewPortTypes.FirstOrDefault();
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);
         }
 
-        public RevitViewType? SelectedViewType {
+        public ViewTypeViewModel SelectedViewType {
             get => _selectedViewType;
             set {
                 RaiseAndSetIfChanged(ref _selectedViewType, value);
-                UpdateViewsForSelection(value ?? RevitViewType.Any);
+                UpdateViewsForSelection(value?.ViewType ?? RevitViewType.Any);
             }
         }
+
+        /// <summary>
+        /// Типы видов для выбора: план этажа, план потолка, разрез и т.д.
+        /// </summary>
+        public IReadOnlyCollection<ViewTypeViewModel> ViewTypes { get; }
 
         /// <summary>
         /// Виды, соответствующие выбранному пользователем типу видов. Это итоговая коллекция, которую видит пользователь
@@ -113,7 +119,7 @@ namespace RevitCreateViewSheet.ViewModels {
             foreach(var view in enabledViews) {
                 _enabledViews.Add(view);
             }
-            UpdateViewsForSelection(SelectedViewType ?? RevitViewType.Any);
+            UpdateViewsForSelection(SelectedViewType?.ViewType ?? RevitViewType.Any);
         }
 
         public string ErrorText {
@@ -139,6 +145,13 @@ namespace RevitCreateViewSheet.ViewModels {
 
             ErrorText = null;
             return true;
+        }
+
+        private IReadOnlyCollection<ViewTypeViewModel> InitializeViewTypes() {
+            return [.. Enum.GetValues(typeof(RevitViewType))
+                .Cast<RevitViewType>()
+                .Select(v => new ViewTypeViewModel(v,
+                    _localizationService.GetLocalizedString($"{nameof(RevitViewType)}.{v}")))];
         }
 
         private void UpdateViewsForSelection(RevitViewType revitViewType) {
