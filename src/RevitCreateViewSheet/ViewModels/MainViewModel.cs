@@ -368,7 +368,8 @@ namespace RevitCreateViewSheet.ViewModels {
                         && !sheetViewModel.SheetNumber.ToLower().Contains(str)
                         && !sheetViewModel.SheetCustomNumber.ToLower().Contains(str)
                         && !sheetViewModel.Name.ToLower().Contains(str)
-                        && (!sheetViewModel.TitleBlock?.Name.ToLower().Contains(str) ?? false)) {
+                        && (!sheetViewModel.TitleBlock?.Name.ToLower().Contains(str) ?? false)
+                        && !sheetViewModel.IsPlacedStatus.ToLower().Contains(str)) {
 
                         e.Accepted = false;
                         return;
