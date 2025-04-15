@@ -73,7 +73,8 @@
                 Command="{Binding LoadViewCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
-    <Grid>
+    <Grid
+        Margin="10 10 10 0">
         <Grid.Resources>
             <Style
                 TargetType="ui:TextBlock"
@@ -113,8 +114,7 @@
             Title="{me:LocalizationSource MainWindow.Title}" />
         <DockPanel
             Grid.Row="1">
-            <Grid
-                Margin="5 5 5 0">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition
                         Height="Auto" />
@@ -137,271 +137,324 @@
                         MinWidth="100" />
                 </Grid.ColumnDefinitions>
 
-                <Grid
+                <Border
                     Grid.Row="0"
                     Grid.ColumnSpan="3"
-                    Margin="0 0 0 10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition
-                            Width="250" />
-                        <ColumnDefinition
-                            Width="250" />
-                        <ColumnDefinition
-                            Width="80" />
-                        <ColumnDefinition
-                            Width="Auto" />
-                        <ColumnDefinition
-                            Width="Auto" />
-                        <ColumnDefinition
-                            Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+                    Margin="0 0 0 10"
+                    Padding="10"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    SnapsToDevicePixels="True"
+                    OverridesDefaultStyle="True"
+                    Background="{DynamicResource CardBackground}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+                    FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
+                    CornerRadius="{DynamicResource ControlCornerRadius}">
 
-                    <ui:TextBlock
-                        Grid.Row="0"
-                        Text="{me:LocalizationSource MainWindow.AddSheets.Album}"></ui:TextBlock>
-                    <ComboBox
-                        Grid.Row="1"
-                        IsTextSearchCaseSensitive="False"
-                        Height="40"
-                        MinHeight="40"
-                        IsEditable="True"
-                        ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
-                        Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="250" />
+                            <ColumnDefinition
+                                Width="250" />
+                            <ColumnDefinition
+                                Width="80" />
+                            <ColumnDefinition
+                                Width="Auto" />
+                            <ColumnDefinition
+                                Width="Auto" />
+                            <ColumnDefinition
+                                Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
 
-                    <ui:TextBlock
-                        Grid.Column="1"
-                        Text="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}">
-                    </ui:TextBlock>
-                    <ComboBox
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        IsTextSearchCaseSensitive="False"
-                        Height="40"
-                        MinHeight="40"
-                        IsEditable="True"
-                        DisplayMemberPath="Name"
-                        ScrollViewer.VerticalScrollBarVisibility="Visible"
-                        ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
-                        SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
+                        <ui:TextBlock
+                            Grid.Row="0"
+                            Margin="0 0 0 5"
+                            Text="{me:LocalizationSource MainWindow.AddSheets.Album}"></ui:TextBlock>
+                        <ComboBox
+                            Grid.Row="1"
+                            IsTextSearchCaseSensitive="False"
+                            Height="40"
+                            MinHeight="40"
+                            IsEditable="True"
+                            ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <ui:TextBlock
-                        Grid.Column="2"
-                        Grid.ColumnSpan="2"
-                        Text="{me:LocalizationSource MainWindow.AddSheets.Count}">
-                    </ui:TextBlock>
-                    <ui:TextBox
-                        Grid.Column="2"
-                        Grid.Row="1"
-                        Height="40"
-                        Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
+                        <ui:TextBlock
+                            Margin="20 0 20 5"
+                            Grid.Column="1"
+                            Text="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}">
+                        </ui:TextBlock>
+                        <ComboBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="20 0"
+                            IsTextSearchCaseSensitive="False"
+                            Height="40"
+                            MinHeight="40"
+                            IsEditable="True"
+                            DisplayMemberPath="Name"
+                            ScrollViewer.VerticalScrollBarVisibility="Visible"
+                            ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <ui:Button
-                        Grid.Column="3"
-                        Grid.Row="1"
-                        Width="80"
-                        Height="40"
-                        HorizontalAlignment="Left"
-                        Appearance="Info"
-                        Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
-                        Command="{Binding AddSheetsCommand}" />
+                        <ui:TextBlock
+                            Grid.Column="2"
+                            Grid.ColumnSpan="2"
+                            Margin="0 0 0 5"
+                            Text="{me:LocalizationSource MainWindow.AddSheets.Count}">
+                        </ui:TextBlock>
+                        <ui:TextBox
+                            Grid.Column="2"
+                            Grid.Row="1"
+                            Height="40"
+                            Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <ui:Button
-                        Grid.Column="5"
-                        Grid.Row="1"
-                        Height="40"
-                        Appearance="Info"
-                        ToolTip="{me:LocalizationSource MainWindow.AddSheets.SaveSheetsButtonTooltip}"
-                        Content="{ui:SymbolIcon ArrowUpload24}"
-                        Command="{Binding SaveSheetsCommand}" />
+                        <ui:Button
+                            Grid.Column="3"
+                            Grid.Row="1"
+                            Margin="20 0"
+                            Width="80"
+                            Height="40"
+                            HorizontalAlignment="Left"
+                            Appearance="Info"
+                            Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
+                            Command="{Binding AddSheetsCommand}" />
 
-                    <ui:Button
-                        Grid.Column="4"
-                        Grid.Row="1"
-                        Width="40"
-                        Height="40"
-                        HorizontalAlignment="Left"
-                        Appearance="Info"
-                        ToolTip="{me:LocalizationSource MainWindow.AddSheets.LoadSheetsButtonTooltip}"
-                        Content="{ui:SymbolIcon ArrowDownload24}"
-                        Command="{Binding LoadSheetsCommand}" />
+                        <ui:Button
+                            Grid.Column="4"
+                            Grid.Row="1"
+                            Width="40"
+                            Height="40"
+                            HorizontalAlignment="Left"
+                            Appearance="Info"
+                            ToolTip="{me:LocalizationSource MainWindow.AddSheets.LoadSheetsButtonTooltip}"
+                            Content="{ui:SymbolIcon ArrowDownload24}"
+                            Command="{Binding LoadSheetsCommand}" />
 
-                    <ui:TextBlock
-                        Grid.Row="2"
-                        Grid.ColumnSpan="4"
-                        Foreground="Orange"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource HideableTextBlock}"
-                        Text="{Binding AddSheetsErrorText}">
-                    </ui:TextBlock>
+                        <ui:Button
+                            Grid.Column="5"
+                            Grid.Row="1"
+                            Margin="20 0 0 0"
+                            Height="40"
+                            Width="40"
+                            Appearance="Info"
+                            ToolTip="{me:LocalizationSource MainWindow.AddSheets.SaveSheetsButtonTooltip}"
+                            Content="{ui:SymbolIcon ArrowUpload24}"
+                            Command="{Binding SaveSheetsCommand}" />
 
-                    <DockPanel
-                        Grid.Row="3"
-                        Margin="0 10 0 0"
-                        Grid.ColumnSpan="4">
-                        <StackPanel>
-                            <ui:TextBlock
-                                Text="{me:LocalizationSource MainWindow.AllSheets.Filter}" />
-                            <ui:TextBox
-                                Text="{Binding SheetsFilter, UpdateSourceTrigger=PropertyChanged}" />
-                        </StackPanel>
-                    </DockPanel>
-                </Grid>
+                        <ui:TextBlock
+                            Grid.Row="2"
+                            Grid.ColumnSpan="6"
+                            Margin="0 5"
+                            Foreground="Orange"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource HideableTextBlock}"
+                            Text="{Binding AddSheetsErrorText}">
+                        </ui:TextBlock>
 
-                <DockPanel
-                    LastChildFill="True"
+                        <DockPanel
+                            Grid.Row="3"
+                            Margin="0 10 0 0"
+                            Grid.ColumnSpan="6">
+                            <StackPanel>
+                                <ui:TextBlock
+                                    Margin="0 0 0 5"
+                                    Text="{me:LocalizationSource MainWindow.AllSheets.Filter}" />
+                                <ui:TextBox
+                                    Text="{Binding SheetsFilter, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </DockPanel>
+                    </Grid>
+                </Border>
+
+                <Border
                     Grid.Row="2"
-                    Grid.Column="0">
-                    <Label
-                        DockPanel.Dock="Top"
-                        FontSize="16"
-                        Target="{Binding ElementName=_sheets}"
-                        Content="{me:LocalizationSource MainWindow.AllSheets.Sheets}" />
-                    <ui:DataGrid
-                        x:Name="_sheets"
-                        SelectionMode="Extended"
-                        AutoGenerateColumns="False"
-                        VirtualizingPanel.VirtualizationMode="Recycling"
-                        VirtualizingPanel.IsVirtualizing="True"
-                        VerticalScrollBarVisibility="Auto"
-                        HorizontalScrollBarVisibility="Auto"
-                        CanUserReorderColumns="False"
-                        res:DataGridSyncEditToSelectedItemProperty.SyncEditToSelectedItem="True"
-                        res:CustomSortBehavior.AllowCustomSort="True"
-                        res:DataGridSelectedItemsProperty.SelectedItems="{Binding SelectedSheets}"
-                        Style="{StaticResource CustomResizableDataGridStyle}"
-                        ItemsSource="{Binding VisibleSheets.View}"
-                        SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
-                        <ui:DataGrid.Columns>
-                            <DataGridTemplateColumn
-                                Width="Auto"
-                                MinWidth="50"
-                                SortMemberPath="AlbumBlueprint"
-                                Header="{StaticResource AlbumHeader}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox
-                                            Text="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn
-                                Width="Auto"
-                                MinWidth="50"
-                                SortMemberPath="SheetCustomNumber"
-                                res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}"
-                                Header="{StaticResource CustomNumberHeader}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox
-                                            Text="{Binding SheetCustomNumber, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn
-                                Width="Auto"
-                                MinWidth="50"
-                                IsReadOnly="True"
-                                SortMemberPath="SheetNumber"
-                                Binding="{Binding SheetNumber}"
-                                Header="{StaticResource NumberHeader}"
-                                res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}">
-                            </DataGridTextColumn>
-                            <DataGridTemplateColumn
-                                Width="250"
-                                MinWidth="50"
-                                SortMemberPath="Name"
-                                Header="{StaticResource SheetNameHeader}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox
-                                            Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn
-                                Width="350"
-                                MinWidth="100"
-                                SortMemberPath="TitleBlock.Name"
-                                Header="{StaticResource TitleBlockHeader}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ComboBox
-                                            Grid.Row="1"
-                                            Grid.Column="1"
-                                            Height="40"
-                                            MinHeight="40"
-                                            DisplayMemberPath="Name"
-                                            IsTextSearchCaseSensitive="False"
-                                            ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                            ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                            SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn
-                                CanUserResize="False"
-                                SortMemberPath="IsPlaced"
-                                Width="Auto"
-                                Header="{StaticResource SheetStatusHeader}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBlock
-                                            HorizontalAlignment="Center"
-                                            Text="{Binding IsPlacedStatus}">
-                                        </ui:TextBlock>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn
-                                CanUserResize="False">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:Button
-                                            Appearance="Danger"
-                                            ToolTip="{StaticResource DeleteSheetTooltip}"
-                                            Command="{Binding Path=DataContext.RemoveSheetsCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                            CommandParameter="{Binding Path=DataContext.SelectedSheets, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                            Content="{ui:SymbolIcon Delete24}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </ui:DataGrid.Columns>
-                    </ui:DataGrid>
-                </DockPanel>
+                    Grid.Column="0"
+                    Padding="10"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    SnapsToDevicePixels="True"
+                    OverridesDefaultStyle="True"
+                    Background="{DynamicResource CardBackground}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+                    FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
+                    CornerRadius="{DynamicResource ControlCornerRadius}">
+                    <DockPanel
+                        LastChildFill="True">
+                        <Label
+                            DockPanel.Dock="Top"
+                            FontSize="16"
+                            Target="{Binding ElementName=_sheets}"
+                            Content="{me:LocalizationSource MainWindow.AllSheets.Sheets}" />
+                        <ui:DataGrid
+                            x:Name="_sheets"
+                            SelectionMode="Extended"
+                            AutoGenerateColumns="False"
+                            VirtualizingPanel.VirtualizationMode="Recycling"
+                            VirtualizingPanel.IsVirtualizing="True"
+                            VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Auto"
+                            CanUserReorderColumns="False"
+                            res:DataGridSyncEditToSelectedItemProperty.SyncEditToSelectedItem="True"
+                            res:CustomSortBehavior.AllowCustomSort="True"
+                            res:DataGridSelectedItemsProperty.SelectedItems="{Binding SelectedSheets}"
+                            Style="{StaticResource CustomResizableDataGridStyle}"
+                            ItemsSource="{Binding VisibleSheets.View}"
+                            SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
+                            <ui:DataGrid.Columns>
+                                <DataGridTemplateColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    SortMemberPath="AlbumBlueprint"
+                                    Header="{StaticResource AlbumHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBox
+                                                Margin="10"
+                                                Text="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    SortMemberPath="SheetCustomNumber"
+                                    res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}"
+                                    Header="{StaticResource CustomNumberHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBox
+                                                Margin="10 0"
+                                                Text="{Binding SheetCustomNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    IsReadOnly="True"
+                                    SortMemberPath="SheetNumber"
+                                    Binding="{Binding SheetNumber}"
+                                    Header="{StaticResource NumberHeader}"
+                                    res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}">
+                                </DataGridTextColumn>
+                                <DataGridTemplateColumn
+                                    Width="250"
+                                    MinWidth="50"
+                                    SortMemberPath="Name"
+                                    Header="{StaticResource SheetNameHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBox
+                                                Margin="10 0"
+                                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    Width="350"
+                                    MinWidth="100"
+                                    SortMemberPath="TitleBlock.Name"
+                                    Header="{StaticResource TitleBlockHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                Margin="10 0 0 0"
+                                                Height="40"
+                                                MinHeight="40"
+                                                DisplayMemberPath="Name"
+                                                IsTextSearchCaseSensitive="False"
+                                                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                                ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    CanUserResize="False"
+                                    SortMemberPath="IsPlaced"
+                                    Width="Auto"
+                                    Header="{StaticResource SheetStatusHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBlock
+                                                HorizontalAlignment="Center"
+                                                Text="{Binding IsPlacedStatus}">
+                                            </ui:TextBlock>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    CanUserResize="False">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:Button
+                                                Appearance="Danger"
+                                                ToolTip="{StaticResource DeleteSheetTooltip}"
+                                                Command="{Binding Path=DataContext.RemoveSheetsCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                CommandParameter="{Binding Path=DataContext.SelectedSheets, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                Content="{ui:SymbolIcon Delete24}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </ui:DataGrid.Columns>
+                        </ui:DataGrid>
+                    </DockPanel>
+                </Border>
 
                 <GridSplitter
                     Grid.Row="2"
                     Grid.Column="1"
-                    Width="2"
+                    Width="10"
+                    Background="{DynamicResource CardBackground}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Stretch" />
 
-                <DockPanel
+                <Border
                     Grid.Row="2"
                     Grid.Column="2"
-                    LastChildFill="True">
-                    <Label
-                        DockPanel.Dock="Top"
-                        Target="{Binding ElementName=_sheetItems}"
-                        FontSize="16">
-                        <DockPanel>
-                            <ui:TextBlock
-                                Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}"
-                                Margin="0 0 5 0" />
-                            <ui:TextBlock
-                                Text="{Binding SelectedSheet.Name}" />
-                        </DockPanel>
-                    </Label>
-                    <local:SelectedSheetView
-                        x:Name="_sheetItems"
-                        DataContext="{Binding SelectedSheet}" />
-                </DockPanel>
+                    Padding="10"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    SnapsToDevicePixels="True"
+                    OverridesDefaultStyle="True"
+                    Background="{DynamicResource CardBackground}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+                    FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
+                    CornerRadius="{DynamicResource ControlCornerRadius}">
+                    <DockPanel
+                        LastChildFill="True">
+                        <Label
+                            DockPanel.Dock="Top"
+                            Target="{Binding ElementName=_sheetItems}"
+                            FontSize="16">
+                            <DockPanel>
+                                <ui:TextBlock
+                                    Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}"
+                                    Margin="0 0 5 0" />
+                                <ui:TextBlock
+                                    Text="{Binding SelectedSheet.Name}" />
+                            </DockPanel>
+                        </Label>
+                        <local:SelectedSheetView
+                            x:Name="_sheetItems"
+                            DataContext="{Binding SelectedSheet}" />
+                    </DockPanel>
+                </Border>
             </Grid>
         </DockPanel>
 
@@ -424,7 +477,7 @@
                 Content="{me:LocalizationSource AllWindow.ButtonOk}"
                 Command="{Binding AcceptViewCommand}" />
             <ui:Button
-                Margin="10"
+                Margin="10 10 0 10"
                 Width="80"
                 IsCancel="True"
                 Click="ButtonCancel_Click"
