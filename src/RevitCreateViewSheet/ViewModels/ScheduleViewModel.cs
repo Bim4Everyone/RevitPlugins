@@ -1,23 +1,27 @@
 using System;
 using System.Collections.Generic;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
     internal class ScheduleViewModel : BaseViewModel, IEquatable<ScheduleViewModel> {
+        private readonly ILocalizationService _localizationService;
         private int _countOnSheets;
 
-        public ScheduleViewModel(ScheduleModel scheduleModel) {
+        public ScheduleViewModel(ScheduleModel scheduleModel, ILocalizationService localizationService) {
             ScheduleModel = scheduleModel ?? throw new ArgumentNullException(nameof(scheduleModel));
-            IsPlaced = scheduleModel.Exists;
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            IsPlacedStatus = localizationService.GetLocalizedString(
+                scheduleModel.Exists ? "EntityState.Exist" : "EntityState.New");
         }
 
 
         public string Name => ScheduleModel.Name;
 
-        public bool IsPlaced { get; }
+        public string IsPlacedStatus { get; }
 
         public ScheduleModel ScheduleModel { get; }
 

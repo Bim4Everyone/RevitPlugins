@@ -37,6 +37,9 @@ namespace RevitCreateViewSheet {
                 kernel.UseWpfUIThemeUpdater();
 
                 kernel.BindMainWindow<MainViewModel, MainWindow>();
+                kernel.Bind<SelectedSheetView>()
+                    .ToSelf()
+                    .InSingletonScope();
 
                 kernel.UseXtraSaveFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");
                 kernel.UseXtraOpenFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -14,6 +15,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly SheetModel _sheetModel;
         private readonly EntitiesTracker _entitiesTracker;
         private readonly SheetItemsFactory _sheetItemsFactory;
+        private readonly ILocalizationService _localizationService;
         private readonly ObservableCollection<ViewPortViewModel> _viewPorts;
         private readonly ObservableCollection<ScheduleViewModel> _schedules;
         private readonly ObservableCollection<AnnotationViewModel> _annotations;
@@ -29,11 +31,13 @@ namespace RevitCreateViewSheet.ViewModels {
         public SheetViewModel(
             SheetModel sheetModel,
             EntitiesTracker entitiesTracker,
-            SheetItemsFactory sheetItemsFactory) {
+            SheetItemsFactory sheetItemsFactory,
+            ILocalizationService localizationService) {
 
             _sheetModel = sheetModel ?? throw new ArgumentNullException(nameof(sheetModel));
             _entitiesTracker = entitiesTracker ?? throw new ArgumentNullException(nameof(entitiesTracker));
             _sheetItemsFactory = sheetItemsFactory ?? throw new ArgumentNullException(nameof(sheetItemsFactory));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _albumBlueprint = _sheetModel.AlbumBlueprint;
             _name = _sheetModel.Name;
             _sheetNumber = _sheetModel.SheetNumber;
@@ -41,11 +45,12 @@ namespace RevitCreateViewSheet.ViewModels {
             if(_sheetModel.TitleBlockSymbol is not null) {
                 _titleBlock = new TitleBlockViewModel(_sheetModel.TitleBlockSymbol);
             }
-            IsPlaced = sheetModel.Exists;
+            IsPlacedStatus = localizationService.GetLocalizedString(
+                sheetModel.Exists ? "EntityState.Exist" : "EntityState.New");
 
-            _viewPorts = [.. _sheetModel.ViewPorts.Select(v => new ViewPortViewModel(v))];
-            _schedules = [.. _sheetModel.Schedules.Select(s => new ScheduleViewModel(s))];
-            _annotations = [.. _sheetModel.Annotations.Select(a => new AnnotationViewModel(a))];
+            _viewPorts = [.. _sheetModel.ViewPorts.Select(v => new ViewPortViewModel(v, localizationService))];
+            _schedules = [.. _sheetModel.Schedules.Select(s => new ScheduleViewModel(s, localizationService))];
+            _annotations = [.. _sheetModel.Annotations.Select(a => new AnnotationViewModel(a, localizationService))];
             InitializeTrackedEntities();
 
             ViewPorts = new ReadOnlyObservableCollection<ViewPortViewModel>(_viewPorts);
@@ -61,7 +66,7 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
 
-        public bool IsPlaced { get; }
+        public string IsPlacedStatus { get; }
 
         public SheetModel SheetModel => _sheetModel;
 
@@ -149,7 +154,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void AddViewPort() {
             try {
-                var viewPort = new ViewPortViewModel(_sheetItemsFactory.CreateViewPort(_sheetModel));
+                var viewPort = new ViewPortViewModel(
+                    _sheetItemsFactory.CreateViewPort(_sheetModel), _localizationService);
                 _viewPorts.Add(viewPort);
                 _sheetModel.ViewPorts.Add(viewPort.ViewPortModel);
                 _entitiesTracker.AddAliveViewPort(viewPort.ViewPortModel);
@@ -160,7 +166,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void AddSchedule() {
             try {
-                var schedule = new ScheduleViewModel(_sheetItemsFactory.CreateSchedule(_sheetModel));
+                var schedule = new ScheduleViewModel(
+                    _sheetItemsFactory.CreateSchedule(_sheetModel), _localizationService);
                 _schedules.Add(schedule);
                 _sheetModel.Schedules.Add(schedule.ScheduleModel);
                 _entitiesTracker.AddAliveSchedule(schedule.ScheduleModel);
@@ -171,7 +178,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void AddAnnotation() {
             try {
-                var annotation = new AnnotationViewModel(_sheetItemsFactory.CreateAnnotation(_sheetModel));
+                var annotation = new AnnotationViewModel(
+                    _sheetItemsFactory.CreateAnnotation(_sheetModel), _localizationService);
                 _annotations.Add(annotation);
                 _sheetModel.Annotations.Add(annotation.AnnotationModel);
                 _entitiesTracker.AddAliveAnnotation(annotation.AnnotationModel);

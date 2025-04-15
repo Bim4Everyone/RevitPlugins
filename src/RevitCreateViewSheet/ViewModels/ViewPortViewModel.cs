@@ -1,24 +1,28 @@
 using System;
 using System.Collections.Generic;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
     internal class ViewPortViewModel : BaseViewModel, IEquatable<ViewPortViewModel> {
+        private readonly ILocalizationService _localizationService;
         private ViewPortTypeViewModel _viewPortType;
 
-        public ViewPortViewModel(ViewPortModel viewPortModel) {
+        public ViewPortViewModel(ViewPortModel viewPortModel, ILocalizationService localizationService) {
             ViewPortModel = viewPortModel ?? throw new ArgumentNullException(nameof(viewPortModel));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _viewPortType = new ViewPortTypeViewModel(ViewPortModel.ViewPortType);
-            IsPlaced = ViewPortModel.Exists;
+            IsPlacedStatus = localizationService.GetLocalizedString(
+                viewPortModel.Exists ? "EntityState.Exist" : "EntityState.New");
         }
 
 
         public string ViewName => ViewPortModel.Name;
 
-        public bool IsPlaced { get; }
+        public string IsPlacedStatus { get; }
 
         public ViewPortModel ViewPortModel { get; }
 

@@ -2,8 +2,6 @@ using System.Windows;
 
 using dosymep.SimpleServices;
 
-using RevitCreateViewSheet.Resources;
-
 namespace RevitCreateViewSheet.Views;
 
 public partial class MainWindow {
@@ -20,7 +18,6 @@ public partial class MainWindow {
               localizationService,
               uiThemeService,
               themeUpdaterService) {
-        Resources.Add(nameof(BoolToLocalizedStringConverter), new BoolToLocalizedStringConverter(localizationService));
         InitializeComponent();
     }
 

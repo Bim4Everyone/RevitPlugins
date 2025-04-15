@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitCreateViewSheet.Models;
 
 namespace RevitCreateViewSheet.ViewModels {
     internal class AnnotationViewModel : BaseViewModel, IEquatable<AnnotationViewModel> {
-        public AnnotationViewModel(AnnotationModel annotationModel) {
+        private readonly ILocalizationService _localizationService;
+
+        public AnnotationViewModel(AnnotationModel annotationModel, ILocalizationService localizationService) {
             AnnotationModel = annotationModel ?? throw new ArgumentNullException(nameof(annotationModel));
-            IsPlaced = annotationModel.Exists;
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            IsPlacedStatus = localizationService.GetLocalizedString(
+                annotationModel.Exists ? "EntityState.Exist" : "EntityState.New");
         }
 
 
@@ -17,7 +22,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public string SymbolName => AnnotationModel.SymbolName;
 
-        public bool IsPlaced { get; }
+        public string IsPlacedStatus { get; }
 
         public AnnotationModel AnnotationModel { get; }
 

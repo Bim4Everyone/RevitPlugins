@@ -180,7 +180,7 @@ namespace RevitCreateViewSheet.ViewModels {
 
         private void LoadView() {
             var sheets = _revitRepository.GetSheetModels()
-                .Select(s => new SheetViewModel(s, _entitiesTracker, _sheetItemsFactory))
+                .Select(s => new SheetViewModel(s, _entitiesTracker, _sheetItemsFactory, _localizationService))
                 .OrderBy(s => s.AlbumBlueprint + s.SheetNumber, new LogicalStringComparer())
                 .ToArray();
             for(int i = 0; i < sheets.Length; i++) {
@@ -214,7 +214,8 @@ namespace RevitCreateViewSheet.ViewModels {
             foreach(int index in Enumerable.Range(0, int.Parse(AddSheetsCount))) {
                 ++lastIndex;
                 var sheetModel = new SheetModel(titleBlock.TitleBlockSymbol, _entitySaverProvider.GetNewEntitySaver());
-                var sheetViewModel = new SheetViewModel(sheetModel, _entitiesTracker, _sheetItemsFactory) {
+                var sheetViewModel = new SheetViewModel(
+                    sheetModel, _entitiesTracker, _sheetItemsFactory, _localizationService) {
                     AlbumBlueprint = albumBlueprint,
                     SheetCustomNumber = lastIndex.ToString(),
                     Name = $"{_localizationService.GetLocalizedString("NewSheetTitle")} {lastIndex}"
@@ -390,7 +391,8 @@ namespace RevitCreateViewSheet.ViewModels {
                     .Select(s => new SheetViewModel(
                         s.CreateSheetModel(titleBlocks, _entitySaverProvider.GetNewEntitySaver()),
                         _entitiesTracker,
-                        _sheetItemsFactory))
+                        _sheetItemsFactory,
+                        _localizationService))
                     ?? [];
                 foreach(var sheetViewModel in newSheetViewModels) {
                     _sheets.Add(sheetViewModel);
