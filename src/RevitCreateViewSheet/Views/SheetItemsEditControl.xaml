@@ -1,0 +1,60 @@
+﻿<UserControl
+    x:Class="RevitCreateViewSheet.Views.SheetItemsEditControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    mc:Ignorable="d"
+    x:Name="_this"
+    d:Background="White"
+    d:DesignHeight="300"
+    d:DesignWidth="600">
+    <ui:CardExpander
+        IsExpanded="True">
+
+        <ui:CardExpander.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <ui:TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    FontSize="16"
+                    FontTypography="Body"
+                    Text="{Binding Header, ElementName=_this}" />
+
+                <ui:Button
+                    Appearance="Info"
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="1"
+                    Margin="0,0,16,0"
+                    ToolTip="{Binding ButtonToolTip, ElementName=_this}"
+                    Content="{Binding ButtonContent, ElementName=_this}"
+                    Command="{Binding ButtonCommand, ElementName=_this}">
+                </ui:Button>
+            </Grid>
+        </ui:CardExpander.Header>
+
+        <ContentControl
+            VerticalAlignment="Center"
+            IsEnabled="True"
+            Content="{Binding EditControl, ElementName=_this}" />
+    </ui:CardExpander>
+</UserControl>

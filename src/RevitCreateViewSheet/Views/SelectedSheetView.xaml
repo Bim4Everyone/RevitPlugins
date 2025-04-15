@@ -10,6 +10,7 @@
     xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
     xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
     xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
     mc:Ignorable="d"
     x:Name="_this"
@@ -60,9 +61,6 @@
                 x:Key="ViewPortTypeHeader"
                 Text="{me:LocalizationSource MainWindow.AllSheets.ViewPortType}" />
             <ui:TextBlock
-                x:Key="AddViewPortButtonTooltip"
-                Text="{me:LocalizationSource MainWindow.AllSheets.AddViewPortTooltip}" />
-            <ui:TextBlock
                 x:Key="DeleteViewPortButtonTooltip"
                 Text="{me:LocalizationSource MainWindow.AllSheets.DeleteViewPortTooltip}" />
 
@@ -75,9 +73,6 @@
             <ui:TextBlock
                 x:Key="ScheduleStatusHeader"
                 Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
-            <ui:TextBlock
-                x:Key="AddScheduleButtonTooltip"
-                Text="{me:LocalizationSource MainWindow.AllSheets.AddScheduleTooltip}" />
             <ui:TextBlock
                 x:Key="DeleteScheduleButtonTooltip"
                 Text="{me:LocalizationSource MainWindow.AllSheets.DeleteScheduleTooltip}" />
@@ -92,245 +87,193 @@
                 x:Key="AnnotationTypeHeader"
                 Text="{me:LocalizationSource MainWindow.AllSheets.AnnotationType}" />
             <ui:TextBlock
-                x:Key="AddAnnotationButtonTooltip"
-                Text="{me:LocalizationSource MainWindow.AllSheets.AddAnnotationTooltip}" />
-            <ui:TextBlock
                 x:Key="DeleteAnnotationButtonTooltip"
                 Text="{me:LocalizationSource MainWindow.AllSheets.DeleteAnnotationTooltip}" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
-        <GroupBox>
-            <GroupBox.Header>
-                <DockPanel>
-                    <ui:TextBlock
-                        Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}"
-                        Margin="0 0 5 0" />
-                    <ui:TextBlock
-                        Text="{Binding Name}" />
-                </DockPanel>
-            </GroupBox.Header>
-            <ScrollViewer
-                VerticalScrollBarVisibility="Auto"
-                HorizontalScrollBarVisibility="Auto">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            MinHeight="150" />
-                        <RowDefinition
-                            Height="Auto" />
-                        <RowDefinition
-                            MinHeight="150" />
-                        <RowDefinition
-                            Height="Auto" />
-                        <RowDefinition
-                            MinHeight="150" />
-                    </Grid.RowDefinitions>
-                    <GroupBox
-                        Header="{me:LocalizationSource MainWindow.AllSheets.ViewPorts}">
-                        <DockPanel
-                            LastChildFill="True">
-                            <ui:Button
-                                HorizontalAlignment="Left"
-                                DockPanel.Dock="Bottom"
-                                ToolTip="{StaticResource AddViewPortButtonTooltip}"
-                                Content="{ui:SymbolIcon Add24}"
-                                Command="{Binding AddViewPortCommand}" />
-                            <ui:DataGrid
-                                Style="{StaticResource SheetItemsDataGrid}"
-                                ItemsSource="{Binding ViewPorts}"
-                                SelectedItem="{Binding SelectedViewPort}">
-                                <ui:DataGrid.Columns>
-                                    <DataGridTextColumn
-                                        MinWidth="50"
-                                        Header="{StaticResource ViewPortNameHeader}"
-                                        Width="200"
-                                        IsReadOnly="True"
-                                        Binding="{Binding ViewName}" />
-                                    <DataGridTemplateColumn
-                                        MinWidth="100"
-                                        Header="{StaticResource ViewPortTypeHeader}"
-                                        SortMemberPath="ViewPortType.Name"
-                                        Width="200">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ComboBox
-                                                    Grid.Row="1"
-                                                    Grid.Column="1"
-                                                    IsTextSearchCaseSensitive="False"
-                                                    Height="40"
-                                                    MinHeight="40"
-                                                    DisplayMemberPath="Name"
-                                                    ItemsSource="{Binding Path=DataContext.AllViewPortTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                                    SelectedItem="{Binding ViewPortType, UpdateSourceTrigger=PropertyChanged}" />
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn
-                                        SortMemberPath="IsPlacedStatus"
-                                        Width="Auto"
-                                        CanUserResize="False"
-                                        Header="{StaticResource ViewPortStatusHeader}">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ui:TextBlock
-                                                    HorizontalAlignment="Center"
-                                                    Text="{Binding IsPlacedStatus}">
-                                                </ui:TextBlock>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn
-                                        CanUserResize="False">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ui:Button
-                                                    Appearance="Danger"
-                                                    ToolTip="{StaticResource DeleteViewPortButtonTooltip}"
-                                                    Command="{Binding Path=DataContext.RemoveViewPortCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                                    CommandParameter="{Binding}"
-                                                    Content="{ui:SymbolIcon Delete24}" />
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </ui:DataGrid.Columns>
-                            </ui:DataGrid>
-                        </DockPanel>
-                    </GroupBox>
+    <ScrollViewer
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Auto">
+        <StackPanel
+            Orientation="Vertical">
+            <DockPanel>
+                <ui:TextBlock
+                    Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}"
+                    Margin="0 0 5 0" />
+                <ui:TextBlock
+                    Text="{Binding Name}" />
+            </DockPanel>
+            <local:SheetItemsEditControl
+                Header="{me:LocalizationSource MainWindow.AllSheets.ViewPorts}"
+                ButtonToolTip="{me:LocalizationSource MainWindow.AllSheets.AddViewPortTooltip}"
+                ButtonContent="{ui:SymbolIcon Add24}"
+                ButtonCommand="{Binding AddViewPortCommand}">
+                <ui:DataGrid
+                    Style="{StaticResource SheetItemsDataGrid}"
+                    ItemsSource="{Binding ViewPorts}"
+                    SelectedItem="{Binding SelectedViewPort}">
+                    <ui:DataGrid.Columns>
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Header="{StaticResource ViewPortNameHeader}"
+                            Width="200"
+                            IsReadOnly="True"
+                            Binding="{Binding ViewName}" />
+                        <DataGridTemplateColumn
+                            MinWidth="100"
+                            Header="{StaticResource ViewPortTypeHeader}"
+                            SortMemberPath="ViewPortType.Name"
+                            Width="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        IsTextSearchCaseSensitive="False"
+                                        Height="40"
+                                        MinHeight="40"
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Path=DataContext.AllViewPortTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                        SelectedItem="{Binding ViewPortType, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            SortMemberPath="IsPlacedStatus"
+                            Width="Auto"
+                            CanUserResize="False"
+                            Header="{StaticResource ViewPortStatusHeader}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBlock
+                                        HorizontalAlignment="Center"
+                                        Text="{Binding IsPlacedStatus}">
+                                    </ui:TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Appearance="Danger"
+                                        ToolTip="{StaticResource DeleteViewPortButtonTooltip}"
+                                        Command="{Binding Path=DataContext.RemoveViewPortCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="{ui:SymbolIcon Delete24}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </local:SheetItemsEditControl>
 
-                    <GridSplitter
-                        Grid.Row="1"
-                        Height="2"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center" />
+            <local:SheetItemsEditControl
+                Header="{me:LocalizationSource MainWindow.AllSheets.Schedules}"
+                ButtonToolTip="{me:LocalizationSource MainWindow.AllSheets.AddScheduleTooltip}"
+                ButtonContent="{ui:SymbolIcon Add24}"
+                ButtonCommand="{Binding AddScheduleCommand}">
+                <ui:DataGrid
+                    Style="{StaticResource SheetItemsDataGrid}"
+                    ItemsSource="{Binding Schedules}"
+                    SelectedItem="{Binding SelectedSchedule}">
+                    <ui:DataGrid.Columns>
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="320"
+                            IsReadOnly="True"
+                            Header="{StaticResource ScheduleNameHeader}"
+                            Binding="{Binding Name}" />
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="80"
+                            IsReadOnly="True"
+                            Header="{StaticResource SchedulesCountHeader}"
+                            Binding="{Binding CountOnSheets}" />
+                        <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserResize="False"
+                            SortMemberPath="IsPlacedStatus"
+                            Header="{StaticResource ScheduleStatusHeader}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBlock
+                                        HorizontalAlignment="Center"
+                                        Text="{Binding IsPlacedStatus}">
+                                    </ui:TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Appearance="Danger"
+                                        ToolTip="{StaticResource DeleteScheduleButtonTooltip}"
+                                        Command="{Binding Path=DataContext.RemoveScheduleCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="{ui:SymbolIcon Delete24}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </local:SheetItemsEditControl>
 
-                    <GroupBox
-                        Grid.Row="2"
-                        Header="{me:LocalizationSource MainWindow.AllSheets.Schedules}">
-                        <DockPanel
-                            LastChildFill="True">
-                            <ui:Button
-                                HorizontalAlignment="Left"
-                                DockPanel.Dock="Bottom"
-                                ToolTip="{StaticResource AddScheduleButtonTooltip}"
-                                Content="{ui:SymbolIcon Add24}"
-                                Command="{Binding AddScheduleCommand}" />
-                            <ui:DataGrid
-                                Style="{StaticResource SheetItemsDataGrid}"
-                                ItemsSource="{Binding Schedules}"
-                                SelectedItem="{Binding SelectedSchedule}">
-                                <ui:DataGrid.Columns>
-                                    <DataGridTextColumn
-                                        MinWidth="50"
-                                        Width="320"
-                                        IsReadOnly="True"
-                                        Header="{StaticResource ScheduleNameHeader}"
-                                        Binding="{Binding Name}" />
-                                    <DataGridTextColumn
-                                        MinWidth="50"
-                                        Width="80"
-                                        IsReadOnly="True"
-                                        Header="{StaticResource SchedulesCountHeader}"
-                                        Binding="{Binding CountOnSheets}" />
-                                    <DataGridTemplateColumn
-                                        Width="Auto"
-                                        CanUserResize="False"
-                                        SortMemberPath="IsPlacedStatus"
-                                        Header="{StaticResource ScheduleStatusHeader}">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ui:TextBlock
-                                                    HorizontalAlignment="Center"
-                                                    Text="{Binding IsPlacedStatus}">
-                                                </ui:TextBlock>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn
-                                        CanUserResize="False">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ui:Button
-                                                    Appearance="Danger"
-                                                    ToolTip="{StaticResource DeleteScheduleButtonTooltip}"
-                                                    Command="{Binding Path=DataContext.RemoveScheduleCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                                    CommandParameter="{Binding}"
-                                                    Content="{ui:SymbolIcon Delete24}" />
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </ui:DataGrid.Columns>
-                            </ui:DataGrid>
-                        </DockPanel>
-                    </GroupBox>
-
-                    <GridSplitter
-                        Grid.Row="3"
-                        Height="2"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center" />
-
-                    <GroupBox
-                        Grid.Row="4"
-                        Header="{me:LocalizationSource MainWindow.AllSheets.Annotations}">
-                        <DockPanel
-                            LastChildFill="True">
-                            <ui:Button
-                                HorizontalAlignment="Left"
-                                DockPanel.Dock="Bottom"
-                                ToolTip="{StaticResource AddAnnotationButtonTooltip}"
-                                Content="{ui:SymbolIcon Add24}"
-                                Command="{Binding AddAnnotationCommand}" />
-                            <ui:DataGrid
-                                Style="{StaticResource SheetItemsDataGrid}"
-                                ItemsSource="{Binding Annotations}"
-                                SelectedItem="{Binding SelectedAnnotation}">
-                                <ui:DataGrid.Columns>
-                                    <DataGridTextColumn
-                                        MinWidth="50"
-                                        Width="200"
-                                        IsReadOnly="True"
-                                        Header="{StaticResource AnnotationFamilyHeader}"
-                                        Binding="{Binding FamilyName}" />
-                                    <DataGridTextColumn
-                                        MinWidth="50"
-                                        Width="200"
-                                        IsReadOnly="True"
-                                        Header="{StaticResource AnnotationTypeHeader}"
-                                        Binding="{Binding SymbolName}" />
-                                    <DataGridTemplateColumn
-                                        Width="Auto"
-                                        CanUserResize="False"
-                                        SortMemberPath="IsPlacedStatus"
-                                        Header="{StaticResource AnnotationStatusHeader}">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ui:TextBlock
-                                                    HorizontalAlignment="Center"
-                                                    Text="{Binding IsPlacedStatus}">
-                                                </ui:TextBlock>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn
-                                        CanUserResize="False">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ui:Button
-                                                    Appearance="Danger"
-                                                    ToolTip="{StaticResource DeleteAnnotationButtonTooltip}"
-                                                    Command="{Binding Path=DataContext.RemoveAnnotationCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                                    CommandParameter="{Binding}"
-                                                    Content="{ui:SymbolIcon Delete24}" />
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </ui:DataGrid.Columns>
-                            </ui:DataGrid>
-                        </DockPanel>
-                    </GroupBox>
-                </Grid>
-            </ScrollViewer>
-        </GroupBox>
-    </Grid>
+            <local:SheetItemsEditControl
+                Header="{me:LocalizationSource MainWindow.AllSheets.Annotations}"
+                ButtonToolTip="{me:LocalizationSource MainWindow.AllSheets.AddAnnotationTooltip}"
+                ButtonContent="{ui:SymbolIcon Add24}"
+                ButtonCommand="{Binding AddAnnotationCommand}">
+                <ui:DataGrid
+                    Style="{StaticResource SheetItemsDataGrid}"
+                    ItemsSource="{Binding Annotations}"
+                    SelectedItem="{Binding SelectedAnnotation}">
+                    <ui:DataGrid.Columns>
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="200"
+                            IsReadOnly="True"
+                            Header="{StaticResource AnnotationFamilyHeader}"
+                            Binding="{Binding FamilyName}" />
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="200"
+                            IsReadOnly="True"
+                            Header="{StaticResource AnnotationTypeHeader}"
+                            Binding="{Binding SymbolName}" />
+                        <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserResize="False"
+                            SortMemberPath="IsPlacedStatus"
+                            Header="{StaticResource AnnotationStatusHeader}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:TextBlock
+                                        HorizontalAlignment="Center"
+                                        Text="{Binding IsPlacedStatus}">
+                                    </ui:TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Appearance="Danger"
+                                        ToolTip="{StaticResource DeleteAnnotationButtonTooltip}"
+                                        Command="{Binding Path=DataContext.RemoveAnnotationCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="{ui:SymbolIcon Delete24}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </local:SheetItemsEditControl>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>
