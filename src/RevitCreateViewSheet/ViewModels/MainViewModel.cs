@@ -23,7 +23,7 @@ namespace RevitCreateViewSheet.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private const int _maxSheetsCountToAdd = 1000;
 
-        private readonly ObservableCollection<SheetViewModel> _sheets;
+        private readonly ObservableCollection<SheetViewModel> _sheets = [];
         private readonly RevitRepository _revitRepository;
         private readonly EntitiesHandler _sheetsHandler;
         private readonly EntitiesTracker _entitiesTracker;
@@ -35,15 +35,20 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly ISaveFileDialogService _saveFileService;
         private readonly IProgressDialogFactory _progressFactory;
         private readonly SheetItemsFactory _sheetItemsFactory;
+        private readonly LogicalStringComparer _comparer = new();
         private TitleBlockViewModel _addSheetsTitleBlock;
         private string _errorText;
-        private string _createErrorText;
-        private string _countCreateView;
+        private string _addSheetsErrorText;
+        private string _addSheetsCount = "1";
         private string _albumBlueprints;
         private string _sheetsFilter;
+        private bool _numberByMask = true;
+        private string _numerationErrorText;
+        private string _numerationStartNumber = "1";
+        private string _numerationSelectedColumn;
         private SheetViewModel _selectedSheet;
         private CollectionViewSource _visibleSheets;
-        private ObservableCollection<SheetViewModel> _selectedSheets;
+        private ObservableCollection<SheetViewModel> _selectedSheets = [];
 
         public MainViewModel(
             RevitRepository revitRepository,
@@ -69,25 +74,27 @@ namespace RevitCreateViewSheet.ViewModels {
             _saveFileService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
             _progressFactory = progressDialogFactory ?? throw new ArgumentNullException(nameof(progressDialogFactory));
             _sheetItemsFactory = sheetItemsFactory ?? throw new ArgumentNullException(nameof(sheetItemsFactory));
-            _selectedSheets = [];
             LoadViewCommand = RelayCommand.Create(LoadView);
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             RemoveSheetsCommand = RelayCommand.Create<ICollection<SheetViewModel>>(RemoveSheets, CanRemoveSheet);
             AddSheetsCommand = RelayCommand.Create(AddSheets, CanAddSheets);
             LoadSheetsCommand = RelayCommand.Create(LoadSheets);
             SaveSheetsCommand = RelayCommand.Create(SaveSheets, CanSaveSheets);
+            NumberSheetsCommand = RelayCommand.Create<ICollection<SheetViewModel>>(NumberSheets, CanNumberSheets);
 
-            var comparer = new LogicalStringComparer();
-            _sheets = [];
-            AllAlbumsBlueprints = [.. _revitRepository.GetAlbumsBlueprints().OrderBy(item => item, comparer)];
+            AllAlbumsBlueprints = [.. _revitRepository.GetAlbumsBlueprints().OrderBy(item => item, _comparer)];
             AllTitleBlocks = [.. _revitRepository.GetTitleBlockSymbols()
                 .Select(item => new TitleBlockViewModel(item))
-                .OrderBy(item => item.Name, comparer)];
+                .OrderBy(item => item.Name, _comparer)];
             AllViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
-                .OrderBy(item => item.Name, comparer)];
+                .OrderBy(item => item.Name, _comparer)];
 
-            AddSheetsCount = "1";
+            NumerationColumns = [
+                _localizationService.GetLocalizedString("MainWindow.AllSheets.CustomNumber"),
+                _localizationService.GetLocalizedString("MainWindow.AllSheets.Number")];
+            NumerationSelectedColumn = NumerationColumns.First();
+
             AddSheetsAlbumBlueprint = AllAlbumsBlueprints.FirstOrDefault();
             AddSheetsTitleBlock = AllTitleBlocks.FirstOrDefault();
         }
@@ -112,6 +119,8 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public ICommand SaveSheetsCommand { get; }
 
+        public ICommand NumberSheetsCommand { get; }
+
         public string SheetsFilter {
             get => _sheetsFilter;
             set {
@@ -126,13 +135,13 @@ namespace RevitCreateViewSheet.ViewModels {
         }
 
         public string AddSheetsErrorText {
-            get => _createErrorText;
-            set => RaiseAndSetIfChanged(ref _createErrorText, value);
+            get => _addSheetsErrorText;
+            set => RaiseAndSetIfChanged(ref _addSheetsErrorText, value);
         }
 
         public string AddSheetsCount {
-            get => _countCreateView;
-            set => RaiseAndSetIfChanged(ref _countCreateView, value);
+            get => _addSheetsCount;
+            set => RaiseAndSetIfChanged(ref _addSheetsCount, value);
         }
 
         public string AddSheetsAlbumBlueprint {
@@ -160,6 +169,41 @@ namespace RevitCreateViewSheet.ViewModels {
             }
         }
 
+        /// <summary>
+        /// Включает назначение системного номера листа в формате Альбом-Ш.Номер листа
+        /// </summary>
+        public bool NumberByMask {
+            get => _numberByMask;
+            set {
+                if(value && ShowYesNoWarning(_localizationService.GetLocalizedString(
+                    "MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning"))) {
+                    NumerationSelectedColumn = NumerationColumns.First();
+                    UpdateSheetsNumberByMask(value);
+                    RaiseAndSetIfChanged(ref _numberByMask, value);
+                } else if(!value) {
+                    UpdateSheetsNumberByMask(value);
+                    RaiseAndSetIfChanged(ref _numberByMask, value);
+                }
+            }
+        }
+
+        public string NumerationStartNumber {
+            get => _numerationStartNumber;
+            set => RaiseAndSetIfChanged(ref _numerationStartNumber, value);
+        }
+
+        public string NumerationErrorText {
+            get => _numerationErrorText;
+            set => RaiseAndSetIfChanged(ref _numerationErrorText, value);
+        }
+
+        public string NumerationSelectedColumn {
+            get => _numerationSelectedColumn;
+            set => RaiseAndSetIfChanged(ref _numerationSelectedColumn, value);
+        }
+
+        public IReadOnlyCollection<string> NumerationColumns { get; }
+
         public ObservableCollection<SheetViewModel> SelectedSheets {
             get => _selectedSheets;
             set => RaiseAndSetIfChanged(ref _selectedSheets, value);
@@ -181,7 +225,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private void LoadView() {
             var sheets = _revitRepository.GetSheetModels()
                 .Select(s => new SheetViewModel(s, _entitiesTracker, _sheetItemsFactory, _localizationService))
-                .OrderBy(s => s.AlbumBlueprint + s.SheetNumber, new LogicalStringComparer())
+                .OrderBy(s => s.AlbumBlueprint + s.SheetNumber, _comparer)
                 .ToArray();
             for(int i = 0; i < sheets.Length; i++) {
                 _sheets.Add(sheets[i]);
@@ -447,6 +491,44 @@ namespace RevitCreateViewSheet.ViewModels {
             }
         }
 
+        private void NumberSheets(ICollection<SheetViewModel> sheets) {
+            var start = int.Parse(NumerationStartNumber);
+            if(NumerationSelectedColumn == _localizationService.GetLocalizedString("MainWindow.AllSheets.Number")) {
+                foreach(var sheet in sheets) {
+                    sheet.SheetNumber = start.ToString();
+                    start++;
+                }
+            } else {
+                foreach(var sheet in sheets) {
+                    sheet.SheetCustomNumber = start.ToString();
+                    start++;
+                }
+            }
+        }
+
+        private bool CanNumberSheets(ICollection<SheetViewModel> sheets) {
+            if(sheets is null || sheets.Count == 0) {
+                NumerationErrorText = _localizationService.GetLocalizedString(
+                        "MainWindow.AllSheets.Numeration.Errors.SelectedSheetsNotSet");
+                return false;
+            }
+
+            if(string.IsNullOrWhiteSpace(NumerationStartNumber)) {
+                NumerationErrorText = _localizationService.GetLocalizedString(
+                        "MainWindow.AllSheets.Numeration.Errors.StartNumberNotSet");
+                return false;
+            }
+
+            if(!int.TryParse(NumerationStartNumber, out int number) || number < 0) {
+                NumerationErrorText = _localizationService.GetLocalizedString(
+                        "MainWindow.AllSheets.Numeration.Errors.StartNumberInvalid");
+                return false;
+            }
+
+            NumerationErrorText = null;
+            return true;
+        }
+
         /// <summary>
         /// Показывает предупреждение с OK кнопкой
         /// </summary>
@@ -467,6 +549,12 @@ namespace RevitCreateViewSheet.ViewModels {
                 _localizationService.GetLocalizedString("Warnings.Title"),
                 System.Windows.MessageBoxButton.YesNo,
                 System.Windows.MessageBoxImage.Warning) == System.Windows.MessageBoxResult.Yes;
+        }
+
+        private void UpdateSheetsNumberByMask(bool sheetNumberByMask) {
+            foreach(var sheet in _sheets) {
+                sheet.SheetNumberByMask = sheetNumberByMask;
+            }
         }
     }
 }

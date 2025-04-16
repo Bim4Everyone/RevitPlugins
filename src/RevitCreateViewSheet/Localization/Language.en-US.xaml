@@ -22,7 +22,11 @@
     <system:String
         x:Key="MainWindow.AddSheets.LoadSheetsButtonTooltip">Load sheets from config file</system:String>
     <system:String
-        x:Key="MainWindow.AllSheets.Filter">Sheets filter</system:String>
+        x:Key="MainWindow.AllSheets.Creation">Sheets creation</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration">Numeration</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Filter">Filter</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Sheets">Sheets</system:String>
     <system:String

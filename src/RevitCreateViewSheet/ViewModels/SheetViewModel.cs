@@ -23,6 +23,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private string _albumBlueprint;
         private string _sheetNumber;
         private string _sheetCustomNumber;
+        private bool _sheetNumberByMask = true;
         private TitleBlockViewModel _titleBlock;
         private ViewPortViewModel _selectedViewPort;
         private ScheduleViewModel _selectedSchedule;
@@ -70,6 +71,19 @@ namespace RevitCreateViewSheet.ViewModels {
 
         public SheetModel SheetModel => _sheetModel;
 
+        /// <summary>
+        /// Включает/выключает назначение системного номера в формате Альбом-Ш.Номер листа
+        /// </summary>
+        public bool SheetNumberByMask {
+            get => _sheetNumberByMask;
+            set {
+                _sheetNumberByMask = value;
+                if(value) {
+                    SheetNumber = GetSheetNumber(AlbumBlueprint, SheetCustomNumber);
+                }
+            }
+        }
+
         public string Name {
             get => _name;
             set {
@@ -83,7 +97,9 @@ namespace RevitCreateViewSheet.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _albumBlueprint, value);
                 _sheetModel.AlbumBlueprint = value;
-                SheetNumber = GetSheetNumber(value, SheetCustomNumber);
+                if(SheetNumberByMask) {
+                    SheetNumber = GetSheetNumber(value, SheetCustomNumber);
+                }
             }
         }
 
@@ -106,7 +122,9 @@ namespace RevitCreateViewSheet.ViewModels {
             set {
                 RaiseAndSetIfChanged(ref _sheetCustomNumber, value);
                 _sheetModel.SheetCustomNumber = value;
-                SheetNumber = GetSheetNumber(AlbumBlueprint, value);
+                if(SheetNumberByMask) {
+                    SheetNumber = GetSheetNumber(AlbumBlueprint, value);
+                }
             }
         }
 

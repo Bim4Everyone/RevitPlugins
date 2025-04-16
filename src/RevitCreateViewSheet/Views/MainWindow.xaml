@@ -12,11 +12,12 @@
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
     xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="550"
     Width="900"
-    MinHeight="450"
+    MinHeight="600"
     MinWidth="800"
     d:Width="1500"
     d:Height="600"
@@ -27,6 +28,8 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:InverseBooleanConverter
+                x:Key="InverseBooleanConverter" />
             <res:SheetViewModelComparer
                 x:Key="SheetViewModelComparer" />
             <ui:TextBlock
@@ -85,7 +88,7 @@
                         Value="">
                         <Setter
                             Property="Visibility"
-                            Value="Collapsed" />
+                            Value="Hidden" />
                     </Trigger>
                     <Trigger
                         Property="Text"
@@ -123,8 +126,6 @@
                     <RowDefinition />
                     <RowDefinition
                         Height="Auto" />
-                    <RowDefinition
-                        Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
@@ -137,143 +138,217 @@
                         MinWidth="100" />
                 </Grid.ColumnDefinitions>
 
-                <Border
+                <Grid
                     Grid.Row="0"
+                    Grid.Column="0"
                     Grid.ColumnSpan="3"
-                    Margin="0 0 0 10"
-                    Padding="10"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Stretch"
-                    SnapsToDevicePixels="True"
-                    OverridesDefaultStyle="True"
-                    Background="{DynamicResource CardBackground}"
-                    BorderBrush="{DynamicResource CardBorderBrush}"
-                    BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
-                    FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
-                    CornerRadius="{DynamicResource ControlCornerRadius}">
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="250" />
-                            <ColumnDefinition
-                                Width="250" />
-                            <ColumnDefinition
-                                Width="80" />
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition
-                                Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-
-                        <ui:TextBlock
-                            Grid.Row="0"
-                            Margin="0 0 0 5"
-                            Text="{me:LocalizationSource MainWindow.AddSheets.Album}"></ui:TextBlock>
-                        <ComboBox
-                            Grid.Row="1"
-                            IsTextSearchCaseSensitive="False"
-                            Height="40"
-                            MinHeight="40"
-                            IsEditable="True"
-                            ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
-                            Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <ui:TextBlock
-                            Margin="20 0 20 5"
-                            Grid.Column="1"
-                            Text="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}">
-                        </ui:TextBlock>
-                        <ComboBox
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Margin="20 0"
-                            IsTextSearchCaseSensitive="False"
-                            Height="40"
-                            MinHeight="40"
-                            IsEditable="True"
-                            DisplayMemberPath="Name"
-                            ScrollViewer.VerticalScrollBarVisibility="Visible"
-                            ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
-                            SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <ui:TextBlock
-                            Grid.Column="2"
-                            Grid.ColumnSpan="2"
-                            Margin="0 0 0 5"
-                            Text="{me:LocalizationSource MainWindow.AddSheets.Count}">
-                        </ui:TextBlock>
-                        <ui:TextBox
-                            Grid.Column="2"
-                            Grid.Row="1"
-                            Height="40"
-                            Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <ui:Button
-                            Grid.Column="3"
-                            Grid.Row="1"
-                            Margin="20 0"
-                            Width="80"
-                            Height="40"
-                            HorizontalAlignment="Left"
-                            Appearance="Info"
-                            Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
-                            Command="{Binding AddSheetsCommand}" />
-
-                        <ui:Button
-                            Grid.Column="4"
-                            Grid.Row="1"
-                            Width="40"
-                            Height="40"
-                            HorizontalAlignment="Left"
-                            Appearance="Info"
-                            ToolTip="{me:LocalizationSource MainWindow.AddSheets.LoadSheetsButtonTooltip}"
-                            Content="{ui:SymbolIcon ArrowDownload24}"
-                            Command="{Binding LoadSheetsCommand}" />
-
-                        <ui:Button
-                            Grid.Column="5"
-                            Grid.Row="1"
-                            Margin="20 0 0 0"
-                            Height="40"
-                            Width="40"
-                            Appearance="Info"
-                            ToolTip="{me:LocalizationSource MainWindow.AddSheets.SaveSheetsButtonTooltip}"
-                            Content="{ui:SymbolIcon ArrowUpload24}"
-                            Command="{Binding SaveSheetsCommand}" />
-
-                        <ui:TextBlock
-                            Grid.Row="2"
-                            Grid.ColumnSpan="6"
-                            Margin="0 5"
-                            Foreground="Orange"
-                            VerticalAlignment="Center"
-                            Style="{StaticResource HideableTextBlock}"
-                            Text="{Binding AddSheetsErrorText}">
-                        </ui:TextBlock>
+                    Margin="0 0 0 10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Grid.Column="0"
+                        Margin="0 0 5 0"
+                        Padding="10"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        SnapsToDevicePixels="True"
+                        OverridesDefaultStyle="True"
+                        Background="{DynamicResource CardBackground}"
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+                        FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
+                        CornerRadius="{DynamicResource ControlCornerRadius}">
 
                         <DockPanel
-                            Grid.Row="3"
-                            Margin="0 10 0 0"
-                            Grid.ColumnSpan="6">
-                            <StackPanel>
-                                <ui:TextBlock
-                                    Margin="0 0 0 5"
-                                    Text="{me:LocalizationSource MainWindow.AllSheets.Filter}" />
-                                <ui:TextBox
-                                    Text="{Binding SheetsFilter, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
+                            LastChildFill="True">
+                            <Label
+                                Target="{Binding ElementName=_sheetsCreation}"
+                                FontSize="16"
+                                DockPanel.Dock="Top"
+                                Content="{me:LocalizationSource MainWindow.AllSheets.Creation}" />
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Auto"
+                                VerticalScrollBarVisibility="Disabled">
+                                <Grid
+                                    x:Name="_sheetsCreation">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="250" />
+                                        <ColumnDefinition
+                                            Width="250" />
+                                        <ColumnDefinition
+                                            Width="80" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+
+                                    <ui:TextBlock
+                                        Grid.Row="0"
+                                        Margin="0 0 0 5"
+                                        Text="{me:LocalizationSource MainWindow.AddSheets.Album}"></ui:TextBlock>
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        IsTextSearchCaseSensitive="False"
+                                        Height="40"
+                                        MinHeight="40"
+                                        IsEditable="True"
+                                        ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
+                                        Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <ui:TextBlock
+                                        Margin="20 0 20 5"
+                                        Grid.Column="1"
+                                        Text="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}">
+                                    </ui:TextBlock>
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="20 0"
+                                        IsTextSearchCaseSensitive="False"
+                                        Height="40"
+                                        MinHeight="40"
+                                        IsEditable="True"
+                                        DisplayMemberPath="Name"
+                                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                        ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
+                                        SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <ui:TextBlock
+                                        Grid.Column="2"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0 0 0 5"
+                                        Text="{me:LocalizationSource MainWindow.AddSheets.Count}">
+                                    </ui:TextBlock>
+                                    <ui:TextBox
+                                        Grid.Column="2"
+                                        Grid.Row="1"
+                                        Height="40"
+                                        Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <ui:Button
+                                        Grid.Column="3"
+                                        Grid.Row="1"
+                                        Margin="20 0"
+                                        Width="80"
+                                        Height="40"
+                                        HorizontalAlignment="Left"
+                                        Appearance="Info"
+                                        Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
+                                        Command="{Binding AddSheetsCommand}" />
+
+                                    <ui:Button
+                                        Grid.Column="4"
+                                        Grid.Row="1"
+                                        Width="40"
+                                        Height="40"
+                                        HorizontalAlignment="Left"
+                                        Appearance="Info"
+                                        ToolTip="{me:LocalizationSource MainWindow.AddSheets.LoadSheetsButtonTooltip}"
+                                        Content="{ui:SymbolIcon ArrowDownload24}"
+                                        Command="{Binding LoadSheetsCommand}" />
+
+                                    <ui:Button
+                                        Grid.Column="5"
+                                        Grid.Row="1"
+                                        Margin="20 0 0 0"
+                                        Height="40"
+                                        Width="40"
+                                        Appearance="Info"
+                                        ToolTip="{me:LocalizationSource MainWindow.AddSheets.SaveSheetsButtonTooltip}"
+                                        Content="{ui:SymbolIcon ArrowUpload24}"
+                                        Command="{Binding SaveSheetsCommand}" />
+
+                                    <ui:TextBlock
+                                        Grid.Row="2"
+                                        Grid.ColumnSpan="6"
+                                        Margin="0 10"
+                                        Foreground="Orange"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource HideableTextBlock}"
+                                        Text="{Binding AddSheetsErrorText}">
+                                    </ui:TextBlock>
+                                </Grid>
+                            </ScrollViewer>
                         </DockPanel>
-                    </Grid>
-                </Border>
+                    </Border>
+
+                    <Border
+                        Grid.Column="1"
+                        Margin="5 0 0 0"
+                        Padding="10"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        SnapsToDevicePixels="True"
+                        OverridesDefaultStyle="True"
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                        ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                        Background="{DynamicResource CardBackground}"
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+                        FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
+                        CornerRadius="{DynamicResource ControlCornerRadius}">
+
+                        <DockPanel>
+                            <Label
+                                Target="{Binding ElementName=_sheetsNumeration}"
+                                FontSize="16"
+                                DockPanel.Dock="Top"
+                                Content="{me:LocalizationSource MainWindow.AllSheets.Numeration}" />
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Auto"
+                                VerticalScrollBarVisibility="Disabled">
+                                <DockPanel
+                                    VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    x:Name="_sheetsNumeration">
+                                    <Label
+                                        Target="{Binding ElementName=_numerationStartNumber}"
+                                        Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.StartNumber}" />
+                                    <ui:TextBox
+                                        x:Name="_numerationStartNumber"
+                                        Text="{Binding NumerationStartNumber}" />
+                                    <Label
+                                        Target="{Binding ElementName=_numerationNumberByMask}"
+                                        Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask}" />
+                                    <ui:ToggleSwitch
+                                        x:Name="_numerationNumberByMask"
+                                        IsChecked="{Binding NumberByMask}" />
+                                    <Label
+                                        Target="{Binding ElementName=_numerationColumn}"
+                                        Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.Column}" />
+                                    <ComboBox
+                                        Margin="10 0 0 0"
+                                        Height="40"
+                                        MinHeight="40"
+                                        x:Name="_numerationColumn"
+                                        IsEnabled="{Binding NumberByMask, Converter={StaticResource InverseBooleanConverter}}"
+                                        ItemsSource="{Binding NumerationColumns}"
+                                        SelectedItem="{Binding NumerationSelectedColumn}" />
+                                    <ui:Button
+                                        Appearance="Info"
+                                        Content="Пронумеровать TODO"
+                                        Command="{Binding NumberSheetsCommand}"
+                                        CommandParameter="{Binding SelectedSheets}" />
+                                </DockPanel>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+                </Grid>
 
                 <Border
                     Grid.Row="2"
@@ -295,6 +370,14 @@
                             FontSize="16"
                             Target="{Binding ElementName=_sheets}"
                             Content="{me:LocalizationSource MainWindow.AllSheets.Sheets}" />
+                        <StackPanel
+                            DockPanel.Dock="Top">
+                            <ui:TextBlock
+                                Margin="0 0 0 5"
+                                Text="{me:LocalizationSource MainWindow.AllSheets.Filter}" />
+                            <ui:TextBox
+                                Text="{Binding SheetsFilter, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
                         <ui:DataGrid
                             x:Name="_sheets"
                             SelectionMode="Extended"
@@ -459,9 +542,8 @@
         </DockPanel>
 
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="2"
             Grid.Column="0"
-            Grid.ColumnSpan="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
