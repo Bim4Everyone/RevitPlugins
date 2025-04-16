@@ -191,31 +191,35 @@
                                             Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="*" />
                                     </Grid.RowDefinitions>
 
-                                    <ui:TextBlock
+                                    <Label
                                         Grid.Row="0"
-                                        Margin="0 0 0 5"
-                                        Text="{me:LocalizationSource MainWindow.AddSheets.Album}"></ui:TextBlock>
+                                        Target="{Binding ElementName=_sheetsCreationAlbum}"
+                                        Content="{me:LocalizationSource MainWindow.AddSheets.Album}" />
                                     <ComboBox
                                         Grid.Row="1"
                                         IsTextSearchCaseSensitive="False"
                                         Height="40"
                                         MinHeight="40"
                                         IsEditable="True"
+                                        x:Name="_sheetsCreationAlbum"
                                         ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
                                         Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
 
-                                    <ui:TextBlock
-                                        Margin="20 0 20 5"
+                                    <Label
+                                        Margin="20 0 20 0"
                                         Grid.Column="1"
-                                        Text="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}">
-                                    </ui:TextBlock>
+                                        Target="{Binding ElementName=_sheetsCreationTitleBlock}"
+                                        Content="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}" />
                                     <ComboBox
+                                        x:Name="_sheetsCreationTitleBlock"
                                         Grid.Row="1"
                                         Grid.Column="1"
                                         Margin="20 0"
@@ -228,16 +232,16 @@
                                         ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
                                         SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
 
-                                    <ui:TextBlock
+                                    <Label
                                         Grid.Column="2"
                                         Grid.ColumnSpan="2"
-                                        Margin="0 0 0 5"
-                                        Text="{me:LocalizationSource MainWindow.AddSheets.Count}">
-                                    </ui:TextBlock>
+                                        Target="{Binding ElementName=_sheetsCreationCount}"
+                                        Content="{me:LocalizationSource MainWindow.AddSheets.Count}" />
                                     <ui:TextBox
                                         Grid.Column="2"
                                         Grid.Row="1"
                                         Height="40"
+                                        x:Name="_sheetsCreationCount"
                                         Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
 
                                     <ui:Button
@@ -273,15 +277,20 @@
                                         Content="{ui:SymbolIcon ArrowUpload24}"
                                         Command="{Binding SaveSheetsCommand}" />
 
-                                    <ui:TextBlock
+                                    <DockPanel
+                                        Margin="0 10"
                                         Grid.Row="2"
                                         Grid.ColumnSpan="6"
-                                        Margin="0 10"
-                                        Foreground="Orange"
-                                        VerticalAlignment="Center"
-                                        Style="{StaticResource HideableTextBlock}"
-                                        Text="{Binding AddSheetsErrorText}">
-                                    </ui:TextBlock>
+                                        VerticalAlignment="Bottom">
+
+                                        <ui:TextBlock
+                                            DockPanel.Dock="Bottom"
+                                            Foreground="Orange"
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource HideableTextBlock}"
+                                            Text="{Binding AddSheetsErrorText}">
+                                        </ui:TextBlock>
+                                    </DockPanel>
                                 </Grid>
                             </ScrollViewer>
                         </DockPanel>
@@ -312,39 +321,93 @@
                             <ScrollViewer
                                 HorizontalScrollBarVisibility="Auto"
                                 VerticalScrollBarVisibility="Disabled">
-                                <DockPanel
+                                <Grid
                                     VerticalAlignment="Stretch"
                                     HorizontalAlignment="Stretch"
                                     x:Name="_sheetsNumeration">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="150" />
+                                        <ColumnDefinition
+                                            Width="250" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                    </Grid.RowDefinitions>
                                     <Label
+                                        Grid.Row="0"
+                                        Grid.Column="0"
                                         Target="{Binding ElementName=_numerationStartNumber}"
                                         Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.StartNumber}" />
                                     <ui:TextBox
+                                        Grid.Row="1"
+                                        Grid.Column="0"
                                         x:Name="_numerationStartNumber"
-                                        Text="{Binding NumerationStartNumber}" />
+                                        Text="{Binding NumerationStartNumber, UpdateSourceTrigger=PropertyChanged}" />
+
                                     <Label
-                                        Target="{Binding ElementName=_numerationNumberByMask}"
-                                        Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask}" />
-                                    <ui:ToggleSwitch
-                                        x:Name="_numerationNumberByMask"
-                                        IsChecked="{Binding NumberByMask}" />
-                                    <Label
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Margin="20 0"
                                         Target="{Binding ElementName=_numerationColumn}"
                                         Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.Column}" />
                                     <ComboBox
-                                        Margin="10 0 0 0"
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="20 0"
                                         Height="40"
                                         MinHeight="40"
                                         x:Name="_numerationColumn"
                                         IsEnabled="{Binding NumberByMask, Converter={StaticResource InverseBooleanConverter}}"
                                         ItemsSource="{Binding NumerationColumns}"
                                         SelectedItem="{Binding NumerationSelectedColumn}" />
+
                                     <ui:Button
+                                        Grid.Row="1"
+                                        Grid.Column="2"
                                         Appearance="Info"
-                                        Content="Пронумеровать TODO"
+                                        Height="40"
+                                        Width="40"
+                                        ToolTip="{me:LocalizationSource MainWindow.AllSheets.Numeration.ButtonTooltip}"
+                                        Content="{ui:SymbolIcon TextNumberListLtr24}"
                                         Command="{Binding NumberSheetsCommand}"
                                         CommandParameter="{Binding SelectedSheets}" />
-                                </DockPanel>
+
+                                    <DockPanel
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        Grid.ColumnSpan="4"
+                                        Margin="0 20">
+                                        <ui:ToggleSwitch
+                                            Margin="0 0 10 0"
+                                            x:Name="_numerationNumberByMask"
+                                            ToolTip="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip}"
+                                            IsChecked="{Binding NumberByMask}" />
+                                        <Label
+                                            Target="{Binding ElementName=_numerationNumberByMask}"
+                                            Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask}" />
+                                    </DockPanel>
+
+                                    <ui:TextBlock
+                                        Grid.ColumnSpan="4"
+                                        Grid.Row="3"
+                                        Margin="0 10"
+                                        Foreground="Orange"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding NumerationErrorText}"
+                                        Style="{StaticResource HideableTextBlock}" />
+                                </Grid>
                             </ScrollViewer>
                         </DockPanel>
                     </Border>
@@ -421,15 +484,20 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn
+                                <DataGridTemplateColumn
                                     Width="Auto"
                                     MinWidth="50"
-                                    IsReadOnly="True"
                                     SortMemberPath="SheetNumber"
-                                    Binding="{Binding SheetNumber}"
                                     Header="{StaticResource NumberHeader}"
                                     res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}">
-                                </DataGridTextColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBox
+                                                IsEnabled="{Binding Path=DataContext.NumberByMask, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Converter={StaticResource InverseBooleanConverter}}"
+                                                Text="{Binding SheetNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTemplateColumn
                                     Width="250"
                                     MinWidth="50"

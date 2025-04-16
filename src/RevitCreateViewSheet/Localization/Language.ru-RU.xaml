@@ -30,7 +30,9 @@
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.Column">Столбец для нумерации</system:String>
     <system:String
-        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Системный номер в формате {Альбом}-{Ш.Номер листа}</system:String>
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Системный номер по маске</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip">Системный номер в формате {Альбом}-{Ш.Номер листа}</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning">Вы уверены, что хотите сделать системный номер в формате {Альбом}-{Ш.Номер листа}?&#x0a;Номера существующих листов могут измениться.</system:String>
     <system:String
@@ -39,6 +41,8 @@
         x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberInvalid">Стартовый номер должен быть целым неотрицательным числом</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.Errors.SelectedSheetsNotSet">Выберите листы</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.ButtonTooltip">Пронумеровать выбранные листы</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Filter">Фильтр</system:String>
     <system:String
