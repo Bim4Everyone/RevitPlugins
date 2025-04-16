@@ -12,11 +12,11 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="300"
-    Width="500"
+    Width="600"
     MinHeight="300"
-    MinWidth="500"
+    MinWidth="600"
     MaxHeight="300"
-    MaxWidth="500"
+    MaxWidth="600"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:AnnotationModelCreatorViewModel, IsDesignTimeCreatable=False}">
     <Grid>
@@ -42,7 +42,9 @@
                 Text="{me:LocalizationSource CreateAnnotationWindow.SelectedAnnotationTitle}">
             </ui:TextBlock>
             <ComboBox
-                MinWidth="400"
+                Width="450"
+                MinWidth="450"
+                MaxWidth="450"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"

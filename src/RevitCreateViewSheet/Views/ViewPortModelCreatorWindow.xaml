@@ -42,7 +42,9 @@
                 Text="{me:LocalizationSource CreateViewPortWindow.SelectedViewTypeTitle}">
             </ui:TextBlock>
             <ComboBox
+                Width="450"
                 MinWidth="450"
+                MaxWidth="450"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 DisplayMemberPath="Name"
@@ -55,7 +57,9 @@
                 Text="{me:LocalizationSource CreateViewPortWindow.SelectedViewTitle}">
             </ui:TextBlock>
             <ComboBox
+                Width="450"
                 MinWidth="450"
+                MaxWidth="450"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"
@@ -72,7 +76,9 @@
                 Text="{me:LocalizationSource CreateViewPortWindow.SelectedViewPortTypeTitle}">
             </ui:TextBlock>
             <ComboBox
+                Width="450"
                 MinWidth="450"
+                MaxWidth="450"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"
