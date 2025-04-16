@@ -142,10 +142,7 @@ namespace RevitCreateViewSheet.Models {
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(ViewSchedule))
                 .OfType<ViewSchedule>()
-                .Where(s => !s.IsInternalKeynoteSchedule
-                    && !s.IsTitleblockRevisionSchedule
-                    && !s.IsTemplate
-                    && !s.Definition.IsKeySchedule)
+                .Where(CanPlaceScheduleOnSheet)
                 .ToArray();
         }
 
@@ -214,7 +211,7 @@ namespace RevitCreateViewSheet.Models {
                 .WhereElementIsNotElementType()
                 .OfClass(typeof(ScheduleSheetInstance))
                 .OfType<ScheduleSheetInstance>()
-                .Where(s => !s.IsTitleblockRevisionSchedule)
+                .Where(s => CanPlaceScheduleOnSheet(Document.GetElement(s.ScheduleId) as ViewSchedule))
                 .ToArray();
         }
 
@@ -339,6 +336,14 @@ namespace RevitCreateViewSheet.Models {
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .OfType<FamilyInstance>()
                 .ToArray();
+        }
+
+        private bool CanPlaceScheduleOnSheet(ViewSchedule schedule) {
+            return schedule is not null
+                && !schedule.IsInternalKeynoteSchedule
+                && !schedule.IsTitleblockRevisionSchedule
+                && !schedule.IsTemplate
+                && !schedule.Definition.IsKeySchedule;
         }
     }
 }

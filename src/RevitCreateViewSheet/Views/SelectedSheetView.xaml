@@ -152,7 +152,7 @@
                                     <ui:Button
                                         Appearance="Danger"
                                         ToolTip="{StaticResource DeleteViewPortButtonTooltip}"
-                                        Command="{Binding Path=DataContext.RemoveViewPortCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                        Command="{Binding Path=DataContext.RemoveViewPortCommand, ElementName=_this}"
                                         CommandParameter="{Binding}"
                                         Content="{ui:SymbolIcon Delete24}" />
                                 </DataTemplate>
@@ -179,8 +179,8 @@
                             Header="{StaticResource ScheduleNameHeader}"
                             Binding="{Binding Name}" />
                         <DataGridTextColumn
-                            MinWidth="50"
-                            Width="80"
+                            Width="Auto"
+                            CanUserResize="False"
                             IsReadOnly="True"
                             Header="{StaticResource SchedulesCountHeader}"
                             Binding="{Binding CountOnSheets}" />
@@ -205,7 +205,7 @@
                                     <ui:Button
                                         Appearance="Danger"
                                         ToolTip="{StaticResource DeleteScheduleButtonTooltip}"
-                                        Command="{Binding Path=DataContext.RemoveScheduleCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                        Command="{Binding Path=DataContext.RemoveScheduleCommand, ElementName=_this}"
                                         CommandParameter="{Binding}"
                                         Content="{ui:SymbolIcon Delete24}" />
                                 </DataTemplate>
@@ -258,7 +258,7 @@
                                     <ui:Button
                                         Appearance="Danger"
                                         ToolTip="{StaticResource DeleteAnnotationButtonTooltip}"
-                                        Command="{Binding Path=DataContext.RemoveAnnotationCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                        Command="{Binding Path=DataContext.RemoveAnnotationCommand, ElementName=_this}"
                                         CommandParameter="{Binding}"
                                         Content="{ui:SymbolIcon Delete24}" />
                                 </DataTemplate>

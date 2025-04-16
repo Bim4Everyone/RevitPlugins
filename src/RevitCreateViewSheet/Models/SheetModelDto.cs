@@ -14,7 +14,7 @@ namespace RevitCreateViewSheet.Models {
             AlbumBlueprint = sheetModel.AlbumBlueprint;
             SheetCustomNumber = sheetModel.SheetCustomNumber;
             Name = sheetModel.Name;
-            TitleBlockSymbolName = sheetModel.TitleBlockSymbol.Name;
+            TitleBlockSymbolName = sheetModel.TitleBlockSymbol?.Name;
         }
 
         [JsonConstructor]

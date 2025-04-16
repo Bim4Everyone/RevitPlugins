@@ -364,16 +364,13 @@ namespace RevitCreateViewSheet.ViewModels {
             if(e.Item is SheetViewModel sheetViewModel) {
                 if(!string.IsNullOrWhiteSpace(SheetsFilter)) {
                     var str = SheetsFilter.ToLower();
-                    if(!sheetViewModel.AlbumBlueprint.ToLower().Contains(str)
-                        && !sheetViewModel.SheetNumber.ToLower().Contains(str)
-                        && !sheetViewModel.SheetCustomNumber.ToLower().Contains(str)
-                        && !sheetViewModel.Name.ToLower().Contains(str)
-                        && (!sheetViewModel.TitleBlock?.Name.ToLower().Contains(str) ?? false)
-                        && !sheetViewModel.IsPlacedStatus.ToLower().Contains(str)) {
-
-                        e.Accepted = false;
-                        return;
-                    }
+                    e.Accepted = sheetViewModel.AlbumBlueprint.ToLower().Contains(str)
+                        || sheetViewModel.SheetNumber.ToLower().Contains(str)
+                        || sheetViewModel.SheetCustomNumber.ToLower().Contains(str)
+                        || sheetViewModel.Name.ToLower().Contains(str)
+                        || (sheetViewModel.TitleBlock?.Name.ToLower().Contains(str) ?? false)
+                        || sheetViewModel.IsPlacedStatus.ToLower().Contains(str);
+                    return;
                 }
             }
         }
