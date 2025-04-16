@@ -42,6 +42,7 @@ namespace RevitCreateViewSheet.Models {
             return GetViewSheets()
                 .Select(item => item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints, string.Empty))
                 .Distinct()
+                .Where(s => !string.IsNullOrWhiteSpace(s))
                 .OrderBy(item => item, new LogicalStringComparer())
                 .ToArray();
         }
@@ -242,8 +243,6 @@ namespace RevitCreateViewSheet.Models {
                 throw new InvalidOperationException(
                     _localizationService.GetLocalizedString("Errors.CannotCreateViewPort"));
             }
-            viewPortModel.View.CropBoxActive = true;
-            viewPortModel.View.CropBoxVisible = true;
             viewPortModel.TrySetNewViewSheet(viewport);
             return UpdateViewPort(viewPortModel);
         }
