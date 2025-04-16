@@ -26,6 +26,27 @@
     <system:String
         x:Key="MainWindow.AllSheets.Numeration">Numeration</system:String>
     <system:String
+        x:Key="MainWindow.AllSheets.Numeration.StartNumber">Start number</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Column">Column to number</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Number by mask</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip">Automatically update number by mask {Album}-{Custom number}</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning"
+        xml:space="preserve">Are you sure you want to make a number 
+        in the format {Album}-{Custom number}?
+        Existing sheet numbers may change.</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberNotSet">Set start number</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberInvalid">Start number must be non negative integer</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Errors.SelectedSheetsNotSet">Select sheets</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.ButtonTooltip">Number selected sheets</system:String>
+    <system:String
         x:Key="MainWindow.AllSheets.Filter">Filter</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Sheets">Sheets</system:String>

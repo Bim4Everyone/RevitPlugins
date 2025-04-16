@@ -34,7 +34,10 @@
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip">Системный номер в формате {Альбом}-{Ш.Номер листа}</system:String>
     <system:String
-        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning">Вы уверены, что хотите сделать системный номер в формате {Альбом}-{Ш.Номер листа}?&#x0a;Номера существующих листов могут измениться.</system:String>
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning" xml:space="preserve">
+        Вы уверены, что хотите сделать системный номер 
+        в формате {Альбом}-{Ш.Номер листа}?
+        Номера существующих листов могут измениться.</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberNotSet">Задайте стартовый номер</system:String>
     <system:String
