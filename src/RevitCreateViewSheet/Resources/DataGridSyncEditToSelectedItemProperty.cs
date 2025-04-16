@@ -50,6 +50,14 @@ namespace RevitCreateViewSheet.Resources {
                             }
                         }
                     }
+                    var sortedSelectedItems = dataGrid.SelectedItems
+                        .Cast<object>()
+                        .OrderBy(item => dataGrid.Items.IndexOf(item))
+                        .ToArray();
+                    dataGrid.SelectedItems.Clear();
+                    for(int i = 0; i < sortedSelectedItems.Length; i++) {
+                        dataGrid.SelectedItems.Add(sortedSelectedItems[i]);
+                    }
                 }, System.Windows.Threading.DispatcherPriority.Input);
             }
         }
