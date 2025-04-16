@@ -6,6 +6,7 @@ namespace RevitCreatingFiltersByValues.Models {
     public class ExportContext : IExportContext {
         private readonly Document _document;
         public List<Element> ExportedElements { get; } = new List<Element>();
+        private Document _currentLinkDocument;
 
         public ExportContext(Document document) {
             _document = document;
@@ -19,8 +20,7 @@ namespace RevitCreatingFiltersByValues.Models {
         }
 
         public RenderNodeAction OnElementBegin(ElementId elementId) {
-            // Получаем элемент по его ID
-            Element element = _document.GetElement(elementId);
+            Element element = _currentLinkDocument?.GetElement(elementId) ?? _document.GetElement(elementId);
             if(element != null) {
                 ExportedElements.Add(element);
             }
@@ -41,19 +41,20 @@ namespace RevitCreatingFiltersByValues.Models {
         }
 
         public RenderNodeAction OnLinkBegin(LinkNode node) {
+            _currentLinkDocument = node.GetDocument();
             return RenderNodeAction.Proceed;
         }
 
-        public void OnLinkEnd(LinkNode node) { }
+        public void OnLinkEnd(LinkNode node) {
+            _currentLinkDocument = null;
+        }
 
         public RenderNodeAction OnFaceBegin(FaceNode node) {
             return RenderNodeAction.Proceed;
         }
 
         public void OnFaceEnd(FaceNode node) { }
-
         public void OnRPC(RPCNode node) { }
-
         public void OnLight(LightNode node) { }
     }
 }

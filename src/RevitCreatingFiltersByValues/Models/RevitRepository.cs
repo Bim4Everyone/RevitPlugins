@@ -1,12 +1,8 @@
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
@@ -78,7 +74,7 @@ namespace RevitCreatingFiltersByValues.Models {
             List<Element> elementsInView;
             try {
                 FilterElemsByExportService filterElemsByExportService = new FilterElemsByExportService(Document);
-                elementsInView = filterElemsByExportService.GetElemetns();
+                elementsInView = filterElemsByExportService.GetElements();
             } catch(Exception) {
                 elementsInView = new FilteredElementCollector(Document, Document.ActiveView.Id)
                                         .WhereElementIsNotElementType()
@@ -105,11 +101,8 @@ namespace RevitCreatingFiltersByValues.Models {
                     }
                 }
             }
-
-
             return patterns;
         }
-
 
 
         /// <summary>
@@ -129,14 +122,12 @@ namespace RevitCreatingFiltersByValues.Models {
         }
 
 
-
         /// <summary>
         /// Получает категории, представленные на виде + элементы в словаре по ним
         /// </summary>
         public ObservableCollection<CategoryElements> GetCategoriesInView(bool checkFlag) {
 
             ObservableCollection<CategoryElements> categoryElements = new ObservableCollection<CategoryElements>();
-
             foreach(Element elem in GetElementsInView()) {
                 if(elem.Category is null) { continue; }
 
@@ -157,14 +148,11 @@ namespace RevitCreatingFiltersByValues.Models {
                         break;
                     }
                 }
-
                 if(flag is false) {
                     categoryElements.Add(new CategoryElements(catOfElem, elemCategoryId, checkFlag, new List<Element>() { elem }));
                 }
             }
-
             return categoryElements;
         }
-
     }
 }
