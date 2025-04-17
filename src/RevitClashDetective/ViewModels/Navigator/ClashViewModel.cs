@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -16,13 +17,17 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
             _revitRepository = revitRepository;
 
+            ClashName = clash.Name;
+
             FirstCategory = clash.MainElement.Category;
-            FirstName = clash.MainElement.Name;
+            FirstTypeName = clash.MainElement.Name;
+            FirstFamilyName = GetFamilyName(clash.MainElement);
             FirstDocumentName = clash.MainElement.DocumentName;
             FirstLevel = clash.MainElement.Level;
 
             SecondCategory = clash.OtherElement.Category;
-            SecondName = clash.OtherElement.Name;
+            SecondTypeName = clash.OtherElement.Name;
+            SecondFamilyName = GetFamilyName(clash.OtherElement);
             SecondLevel = clash.OtherElement.Level;
             SecondDocumentName = clash.OtherElement.DocumentName;
 
@@ -39,7 +44,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _clashStatus, value);
         }
 
-        public string FirstName { get; }
+        public string ClashName { get; }
+
+        public string FirstTypeName { get; }
+
+        public string FirstFamilyName { get; }
 
         public string FirstDocumentName { get; }
 
@@ -47,7 +56,9 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public string FirstCategory { get; }
 
-        public string SecondName { get; }
+        public string SecondTypeName { get; }
+
+        public string SecondFamilyName { get; }
 
         public string SecondLevel { get; }
 
@@ -91,11 +102,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
             hashCode = hashCode * -1521134295 + ClashStatus.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<ElementId>.Default.GetHashCode(Clash.MainElement.Id);
             hashCode = hashCode * -1521134295 + EqualityComparer<ElementId>.Default.GetHashCode(Clash.OtherElement.Id);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstTypeName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstDocumentName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstLevel);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FirstCategory);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SecondName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SecondTypeName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SecondLevel);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SecondDocumentName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(SecondCategory);
@@ -106,11 +117,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
             return other != null
                 && Clash.MainElement.Id == other.Clash.MainElement.Id
                 && Clash.OtherElement.Id == other.Clash.OtherElement.Id
-                && FirstName == other.FirstName
+                && FirstTypeName == other.FirstTypeName
                 && FirstDocumentName == other.FirstDocumentName
                 && FirstLevel == other.FirstLevel
                 && FirstCategory == other.FirstCategory
-                && SecondName == other.SecondName
+                && SecondTypeName == other.SecondTypeName
                 && SecondLevel == other.SecondLevel
                 && SecondDocumentName == other.SecondDocumentName
                 && SecondCategory == other.SecondCategory;
@@ -130,6 +141,12 @@ namespace RevitClashDetective.ViewModels.Navigator {
             return (
                 Math.Round(clashData.ClashVolume / minVolume * 100, 2),
                 Math.Round(_revitRepository.ConvertToM3(clashData.ClashVolume), 6));
+        }
+
+        private string GetFamilyName(ElementModel elementModel) {
+            var doc = elementModel.GetDocInfo(_revitRepository.DocInfos)?.Doc;
+            var element = doc?.GetElement(elementModel.Id);
+            return element?.HasElementType() ?? false ? element.GetElementType().FamilyName : string.Empty;
         }
     }
 }

@@ -112,7 +112,10 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-
+                
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Название"
+                                FieldName="ClashName"/>
                 <dxg:GridColumn Header="Статус">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
@@ -124,7 +127,6 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Уровень 1"
                                 FieldName="FirstLevel" />
@@ -133,7 +135,10 @@
                                 FieldName="FirstCategory" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Имя типа 1"
-                                FieldName="FirstName" />
+                                FieldName="FirstTypeName" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Имя семейства 1"
+                                FieldName="FirstFamilyName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Имя файла 1"
                                 FieldName="FirstDocumentName" />
@@ -145,7 +150,10 @@
                                 FieldName="SecondCategory" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Имя типа 2"
-                                FieldName="SecondName" />
+                                FieldName="SecondTypeName" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Имя семейства 2"
+                                FieldName="SecondFamilyName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Имя файла 2"
                                 FieldName="SecondDocumentName" />

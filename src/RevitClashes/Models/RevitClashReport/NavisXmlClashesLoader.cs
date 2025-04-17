@@ -142,11 +142,16 @@ namespace RevitClashDetective.Models.RevitClashReport {
         }
 
         private ClashModel GetClashModel(XElement clashResult) {
+            var name = clashResult.Attribute("name")?.Value ?? string.Empty;
+            var status = GetClashStatus(clashResult.Attribute("status")?.Value);
             var elements = clashResult.Descendants("clashobject")
                 .Take(2)
                 .Select(c => GetElementModel(c))
                 .ToArray();
-            var clash = new ClashModel();
+            var clash = new ClashModel() {
+                Name = name,
+                ClashStatus = status
+            };
             if(elements.Length == 2) {
                 clash.MainElement = elements[0];
                 clash.OtherElement = elements[1];
@@ -185,6 +190,21 @@ namespace RevitClashDetective.Models.RevitClashReport {
             return _revitRepository.DocInfos.Any(d => d.Name.Equals(
                 RevitRepository.GetDocumentName(file),
                 StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        private ClashStatus GetClashStatus(string status) {
+            switch(status?.ToLower()) {
+                case "new":
+                case "active":
+                    return ClashStatus.Active;
+                case "reviewed":
+                case "approved":
+                    return ClashStatus.Analized;
+                case "resolved":
+                    return ClashStatus.Solved;
+                default:
+                    return ClashStatus.Active;
+            }
         }
     }
 }
