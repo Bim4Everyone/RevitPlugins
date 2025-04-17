@@ -23,34 +23,6 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <Style
-                TargetType="ui:DataGrid"
-                x:Key="SheetItemsDataGrid"
-                BasedOn="{StaticResource CustomResizableDataGridStyle}">
-                <Setter
-                    Property="SelectionMode"
-                    Value="Single" />
-                <Setter
-                    Property="AutoGenerateColumns"
-                    Value="False" />
-                <Setter
-                    Property="VirtualizingPanel.VirtualizationMode"
-                    Value="Recycling" />
-                <Setter
-                    Property="VirtualizingPanel.IsVirtualizing"
-                    Value="True" />
-                <Setter
-                    Property="VerticalScrollBarVisibility"
-                    Value="Auto" />
-                <Setter
-                    Property="HorizontalScrollBarVisibility"
-                    Value="Auto" />
-                <Setter
-                    Property="CanUserReorderColumns"
-                    Value="False" />
-            </Style>
-
             <ui:TextBlock
                 x:Key="ViewPortNameHeader"
                 Text="{me:LocalizationSource MainWindow.AllSheets.Name}" />
@@ -102,7 +74,7 @@
                 ButtonContent="{ui:SymbolIcon Add24}"
                 ButtonCommand="{Binding AddViewPortCommand}">
                 <ui:DataGrid
-                    Style="{StaticResource SheetItemsDataGrid}"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
                     ItemsSource="{Binding ViewPorts}"
                     SelectedItem="{Binding SelectedViewPort}">
                     <ui:DataGrid.Columns>
@@ -151,6 +123,7 @@
                                 <DataTemplate>
                                     <ui:Button
                                         Appearance="Danger"
+                                        Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{StaticResource DeleteViewPortButtonTooltip}"
                                         Command="{Binding Path=DataContext.RemoveViewPortCommand, ElementName=_this}"
                                         CommandParameter="{Binding}"
@@ -168,7 +141,7 @@
                 ButtonContent="{ui:SymbolIcon Add24}"
                 ButtonCommand="{Binding AddScheduleCommand}">
                 <ui:DataGrid
-                    Style="{StaticResource SheetItemsDataGrid}"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
                     ItemsSource="{Binding Schedules}"
                     SelectedItem="{Binding SelectedSchedule}">
                     <ui:DataGrid.Columns>
@@ -204,6 +177,7 @@
                                 <DataTemplate>
                                     <ui:Button
                                         Appearance="Danger"
+                                        Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{StaticResource DeleteScheduleButtonTooltip}"
                                         Command="{Binding Path=DataContext.RemoveScheduleCommand, ElementName=_this}"
                                         CommandParameter="{Binding}"
@@ -221,7 +195,7 @@
                 ButtonContent="{ui:SymbolIcon Add24}"
                 ButtonCommand="{Binding AddAnnotationCommand}">
                 <ui:DataGrid
-                    Style="{StaticResource SheetItemsDataGrid}"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
                     ItemsSource="{Binding Annotations}"
                     SelectedItem="{Binding SelectedAnnotation}">
                     <ui:DataGrid.Columns>
@@ -257,6 +231,7 @@
                                 <DataTemplate>
                                     <ui:Button
                                         Appearance="Danger"
+                                        Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{StaticResource DeleteAnnotationButtonTooltip}"
                                         Command="{Binding Path=DataContext.RemoveAnnotationCommand, ElementName=_this}"
                                         CommandParameter="{Binding}"

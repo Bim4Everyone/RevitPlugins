@@ -16,6 +16,8 @@
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewHeaderRowIndicator.xaml" />
         <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
+        <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Resources/Typography.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <!--
@@ -28,11 +30,40 @@
         TargetType="ui:DataGrid"
         BasedOn="{StaticResource DefaultUiDataGridStyle}">
         <Setter
-            Property="CanUserResizeColumns"
-            Value="True" />
-        <Setter
             Property="ColumnHeaderStyle"
             Value="{DynamicResource CustomDataGridColumnHeaderStyle}" />
+        <Setter
+            Property="RowStyle"
+            Value="{DynamicResource CustomDataGridRowStyle}" />
+        <Setter
+            Property="AutoGenerateColumns"
+            Value="False" />
+        <Setter
+            Property="VirtualizingPanel.VirtualizationMode"
+            Value="Recycling" />
+        <Setter
+            Property="VirtualizingPanel.IsVirtualizing"
+            Value="True" />
+        <Setter
+            Property="VerticalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="HorizontalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="CanUserReorderColumns"
+            Value="False" />
+        <Setter
+            Property="CanUserResizeColumns"
+            Value="True" />
+    </Style>
+    <Style
+        x:Key="CustomDataGridRowStyle"
+        TargetType="{x:Type DataGridRow}"
+        BasedOn="{StaticResource DefaultDataGridRowStyle}">
+        <Setter
+            Property="Margin"
+            Value="0 5" />
     </Style>
     <Style
         x:Key="CustomColumnHeaderGripperStyle"
@@ -245,5 +276,157 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style
+        TargetType="{x:Type Label}"
+        x:Key="CustomBigLabel">
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="FontSize"
+            Value="16" />
+        <Setter
+            Property="Margin"
+            Value="0 0 0 10" />
+        <Setter
+            Property="Focusable"
+            Value="False" />
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource LabelForeground}" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+    </Style>
+    <Style
+        TargetType="{x:Type Label}"
+        x:Key="CustomLabel">
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="Margin"
+            Value="0 0 0 7" />
+        <Setter
+            Property="Focusable"
+            Value="False" />
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource LabelForeground}" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+    </Style>
+
+    <Style
+        TargetType="ui:Button"
+        x:Key="CustomSymbolButton"
+        BasedOn="{StaticResource DefaultUiButtonStyle}">
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="Width"
+            Value="40" />
+        <Setter
+            Property="Height"
+            Value="40" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="HorizontalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="Appearance"
+            Value="Info" />
+    </Style>
+
+    <Style
+        TargetType="Border"
+        x:Key="CustomBorder">
+        <Setter
+            Property="Padding"
+            Value="20" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+        <Setter
+            Property="OverridesDefaultStyle"
+            Value="True" />
+        <Setter
+            Property="ScrollViewer.HorizontalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="ScrollViewer.VerticalScrollBarVisibility"
+            Value="Disabled" />
+        <Setter
+            Property="Background"
+            Value="{DynamicResource CardBackground}" />
+        <Setter
+            Property="BorderBrush"
+            Value="{DynamicResource CardBorderBrush}" />
+        <Setter
+            Property="BorderThickness"
+            Value="{DynamicResource CardControlBorderThemeThickness}" />
+        <Setter
+            Property="FocusVisualStyle"
+            Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter
+            Property="CornerRadius"
+            Value="{DynamicResource ControlCornerRadius}" />
+    </Style>
+
+    <Style
+        TargetType="ui:TextBlock"
+        x:Key="CustomErrorText">
+        <Setter
+            Property="Foreground"
+            Value="Orange" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="Background"
+            Value="Transparent" />
+        <Setter
+            Property="Focusable"
+            Value="False" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+        <Setter
+            Property="OverridesDefaultStyle"
+            Value="True" />
+        <Style.Triggers>
+            <Trigger
+                Property="Text"
+                Value="">
+                <Setter
+                    Property="Visibility"
+                    Value="Hidden" />
+            </Trigger>
+            <Trigger
+                Property="Text"
+                Value="{x:Null}">
+                <Setter
+                    Property="Visibility"
+                    Value="Collapsed" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

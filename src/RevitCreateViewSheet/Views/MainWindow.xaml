@@ -79,26 +79,7 @@
     <Grid
         Margin="10 10 10 0">
         <Grid.Resources>
-            <Style
-                TargetType="ui:TextBlock"
-                x:Key="HideableTextBlock">
-                <Style.Triggers>
-                    <Trigger
-                        Property="Text"
-                        Value="">
-                        <Setter
-                            Property="Visibility"
-                            Value="Hidden" />
-                    </Trigger>
-                    <Trigger
-                        Property="Text"
-                        Value="{x:Null}">
-                        <Setter
-                            Property="Visibility"
-                            Value="Collapsed" />
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
+
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -153,23 +134,13 @@
                     <Border
                         Grid.Column="0"
                         Margin="0 0 5 0"
-                        Padding="10"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"
-                        SnapsToDevicePixels="True"
-                        OverridesDefaultStyle="True"
-                        Background="{DynamicResource CardBackground}"
-                        BorderBrush="{DynamicResource CardBorderBrush}"
-                        BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
-                        FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
-                        CornerRadius="{DynamicResource ControlCornerRadius}">
-
+                        Style="{StaticResource CustomBorder}">
                         <DockPanel
                             LastChildFill="True">
                             <Label
-                                Target="{Binding ElementName=_sheetsCreation}"
-                                FontSize="16"
                                 DockPanel.Dock="Top"
+                                Style="{StaticResource CustomBigLabel}"
+                                Target="{Binding ElementName=_sheetsCreation}"
                                 Content="{me:LocalizationSource MainWindow.AllSheets.Creation}" />
                             <ScrollViewer
                                 HorizontalScrollBarVisibility="Auto"
@@ -201,6 +172,7 @@
 
                                     <Label
                                         Grid.Row="0"
+                                        Style="{StaticResource CustomLabel}"
                                         Target="{Binding ElementName=_sheetsCreationAlbum}"
                                         Content="{me:LocalizationSource MainWindow.AddSheets.Album}" />
                                     <ComboBox
@@ -213,11 +185,14 @@
                                         ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
                                         Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
 
-                                    <Label
-                                        Margin="20 0 20 0"
-                                        Grid.Column="1"
-                                        Target="{Binding ElementName=_sheetsCreationTitleBlock}"
-                                        Content="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}" />
+                                    <DockPanel
+                                        Margin="20 0"
+                                        Grid.Column="1">
+                                        <Label
+                                            Style="{StaticResource CustomLabel}"
+                                            Target="{Binding ElementName=_sheetsCreationTitleBlock}"
+                                            Content="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}" />
+                                    </DockPanel>
                                     <ComboBox
                                         x:Name="_sheetsCreationTitleBlock"
                                         Grid.Row="1"
@@ -235,6 +210,7 @@
                                     <Label
                                         Grid.Column="2"
                                         Grid.ColumnSpan="2"
+                                        Style="{StaticResource CustomLabel}"
                                         Target="{Binding ElementName=_sheetsCreationCount}"
                                         Content="{me:LocalizationSource MainWindow.AddSheets.Count}" />
                                     <ui:TextBox
@@ -258,10 +234,7 @@
                                     <ui:Button
                                         Grid.Column="4"
                                         Grid.Row="1"
-                                        Width="40"
-                                        Height="40"
-                                        HorizontalAlignment="Left"
-                                        Appearance="Info"
+                                        Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{me:LocalizationSource MainWindow.AddSheets.LoadSheetsButtonTooltip}"
                                         Content="{ui:SymbolIcon ArrowDownload24}"
                                         Command="{Binding LoadSheetsCommand}" />
@@ -270,9 +243,7 @@
                                         Grid.Column="5"
                                         Grid.Row="1"
                                         Margin="20 0 0 0"
-                                        Height="40"
-                                        Width="40"
-                                        Appearance="Info"
+                                        Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{me:LocalizationSource MainWindow.AddSheets.SaveSheetsButtonTooltip}"
                                         Content="{ui:SymbolIcon ArrowUpload24}"
                                         Command="{Binding SaveSheetsCommand}" />
@@ -285,9 +256,7 @@
 
                                         <ui:TextBlock
                                             DockPanel.Dock="Bottom"
-                                            Foreground="Orange"
-                                            VerticalAlignment="Center"
-                                            Style="{StaticResource HideableTextBlock}"
+                                            Style="{StaticResource CustomErrorText}"
                                             Text="{Binding AddSheetsErrorText}">
                                         </ui:TextBlock>
                                     </DockPanel>
@@ -299,24 +268,13 @@
                     <Border
                         Grid.Column="1"
                         Margin="5 0 0 0"
-                        Padding="10"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"
-                        SnapsToDevicePixels="True"
-                        OverridesDefaultStyle="True"
-                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                        ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                        Background="{DynamicResource CardBackground}"
-                        BorderBrush="{DynamicResource CardBorderBrush}"
-                        BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
-                        FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
-                        CornerRadius="{DynamicResource ControlCornerRadius}">
+                        Style="{StaticResource CustomBorder}">
 
                         <DockPanel>
                             <Label
-                                Target="{Binding ElementName=_sheetsNumeration}"
-                                FontSize="16"
                                 DockPanel.Dock="Top"
+                                Style="{StaticResource CustomBigLabel}"
+                                Target="{Binding ElementName=_sheetsNumeration}"
                                 Content="{me:LocalizationSource MainWindow.AllSheets.Numeration}" />
                             <ScrollViewer
                                 HorizontalScrollBarVisibility="Auto"
@@ -348,6 +306,7 @@
                                     <Label
                                         Grid.Row="0"
                                         Grid.Column="0"
+                                        Style="{StaticResource CustomLabel}"
                                         Target="{Binding ElementName=_numerationStartNumber}"
                                         Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.StartNumber}" />
                                     <ui:TextBox
@@ -356,12 +315,15 @@
                                         x:Name="_numerationStartNumber"
                                         Text="{Binding NumerationStartNumber, UpdateSourceTrigger=PropertyChanged}" />
 
-                                    <Label
-                                        Grid.Row="0"
-                                        Grid.Column="1"
+                                    <DockPanel
                                         Margin="20 0"
-                                        Target="{Binding ElementName=_numerationColumn}"
-                                        Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.Column}" />
+                                        Grid.Row="0"
+                                        Grid.Column="1">
+                                        <Label
+                                            Style="{StaticResource CustomLabel}"
+                                            Target="{Binding ElementName=_numerationColumn}"
+                                            Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.Column}" />
+                                    </DockPanel>
                                     <ComboBox
                                         Grid.Row="1"
                                         Grid.Column="1"
@@ -376,9 +338,7 @@
                                     <ui:Button
                                         Grid.Row="1"
                                         Grid.Column="2"
-                                        Appearance="Info"
-                                        Height="40"
-                                        Width="40"
+                                        Style="{StaticResource CustomSymbolButton}"
                                         ToolTip="{me:LocalizationSource MainWindow.AllSheets.Numeration.ButtonTooltip}"
                                         Content="{ui:SymbolIcon TextNumberListLtr24}"
                                         Command="{Binding NumberSheetsCommand}"
@@ -388,13 +348,15 @@
                                         Grid.Row="2"
                                         Grid.Column="0"
                                         Grid.ColumnSpan="4"
-                                        Margin="0 20">
+                                        Margin="0 20 0 0"
+                                        VerticalAlignment="Center"
+                                        ToolTip="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip}">
                                         <ui:ToggleSwitch
                                             Margin="0 0 10 0"
                                             x:Name="_numerationNumberByMask"
-                                            ToolTip="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip}"
                                             IsChecked="{Binding NumberByMask}" />
                                         <Label
+                                            Style="{StaticResource CustomLabel}"
                                             Target="{Binding ElementName=_numerationNumberByMask}"
                                             Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask}" />
                                     </DockPanel>
@@ -402,11 +364,8 @@
                                     <ui:TextBlock
                                         Grid.ColumnSpan="4"
                                         Grid.Row="3"
-                                        Margin="0 10"
-                                        Foreground="Orange"
-                                        VerticalAlignment="Center"
-                                        Text="{Binding NumerationErrorText}"
-                                        Style="{StaticResource HideableTextBlock}" />
+                                        Style="{StaticResource CustomErrorText}"
+                                        Text="{Binding NumerationErrorText}" />
                                 </Grid>
                             </ScrollViewer>
                         </DockPanel>
@@ -416,44 +375,32 @@
                 <Border
                     Grid.Row="2"
                     Grid.Column="0"
-                    Padding="10"
-                    VerticalAlignment="Stretch"
-                    HorizontalAlignment="Stretch"
-                    SnapsToDevicePixels="True"
-                    OverridesDefaultStyle="True"
-                    Background="{DynamicResource CardBackground}"
-                    BorderBrush="{DynamicResource CardBorderBrush}"
-                    BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
-                    FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
-                    CornerRadius="{DynamicResource ControlCornerRadius}">
+                    Style="{StaticResource CustomBorder}">
                     <DockPanel
                         LastChildFill="True">
                         <Label
                             DockPanel.Dock="Top"
-                            FontSize="16"
+                            Style="{StaticResource CustomBigLabel}"
                             Target="{Binding ElementName=_sheets}"
                             Content="{me:LocalizationSource MainWindow.AllSheets.Sheets}" />
                         <StackPanel
-                            DockPanel.Dock="Top">
-                            <ui:TextBlock
-                                Margin="0 0 0 5"
-                                Text="{me:LocalizationSource MainWindow.AllSheets.Filter}" />
+                            DockPanel.Dock="Top"
+                            Margin="0 0 0 14">
+                            <Label
+                                Style="{StaticResource CustomLabel}"
+                                Target="{Binding ElementName=_sheetsFilter}"
+                                Content="{me:LocalizationSource MainWindow.AllSheets.Filter}" />
                             <ui:TextBox
+                                x:Name="_sheetsFilter"
                                 Text="{Binding SheetsFilter, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                         <ui:DataGrid
                             x:Name="_sheets"
                             SelectionMode="Extended"
-                            AutoGenerateColumns="False"
-                            VirtualizingPanel.VirtualizationMode="Recycling"
-                            VirtualizingPanel.IsVirtualizing="True"
-                            VerticalScrollBarVisibility="Auto"
-                            HorizontalScrollBarVisibility="Auto"
-                            CanUserReorderColumns="False"
+                            Style="{StaticResource CustomResizableDataGridStyle}"
                             res:DataGridSyncEditToSelectedItemProperty.SyncEditToSelectedItem="True"
                             res:CustomSortBehavior.AllowCustomSort="True"
                             res:DataGridSelectedItemsProperty.SelectedItems="{Binding SelectedSheets}"
-                            Style="{StaticResource CustomResizableDataGridStyle}"
                             ItemsSource="{Binding VisibleSheets.View}"
                             SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
                             <ui:DataGrid.Columns>
@@ -465,7 +412,7 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <ui:TextBox
-                                                Margin="10"
+                                                Margin="10 0"
                                                 Text="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -552,6 +499,7 @@
                                         <DataTemplate>
                                             <ui:Button
                                                 Appearance="Danger"
+                                                Style="{StaticResource CustomSymbolButton}"
                                                 ToolTip="{StaticResource DeleteSheetTooltip}"
                                                 Command="{Binding Path=DataContext.RemoveSheetsCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                                 CommandParameter="{Binding Path=DataContext.SelectedSheets, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
@@ -577,22 +525,13 @@
                 <Border
                     Grid.Row="2"
                     Grid.Column="2"
-                    Padding="10"
-                    VerticalAlignment="Stretch"
-                    HorizontalAlignment="Stretch"
-                    SnapsToDevicePixels="True"
-                    OverridesDefaultStyle="True"
-                    Background="{DynamicResource CardBackground}"
-                    BorderBrush="{DynamicResource CardBorderBrush}"
-                    BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
-                    FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
-                    CornerRadius="{DynamicResource ControlCornerRadius}">
+                    Style="{StaticResource CustomBorder}">
                     <DockPanel
                         LastChildFill="True">
                         <Label
                             DockPanel.Dock="Top"
-                            Target="{Binding ElementName=_sheetItems}"
-                            FontSize="16">
+                            Style="{StaticResource CustomBigLabel}"
+                            Target="{Binding ElementName=_sheetItems}">
                             <DockPanel>
                                 <ui:TextBlock
                                     Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}"
@@ -616,8 +555,7 @@
             HorizontalAlignment="Right">
             <ui:TextBlock
                 Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
+                Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorText}" />
             <ui:Button
                 Margin="10"

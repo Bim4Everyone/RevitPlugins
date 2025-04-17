@@ -32,12 +32,14 @@
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Number by mask</system:String>
     <system:String
-        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip">Automatically update number by mask {Album}-{Custom number}</system:String>
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip"
+        xml:space="preserve">Automatically update number by mask 
+{Album}-{Custom number}</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning"
         xml:space="preserve">Are you sure you want to make a number 
-        in the format {Album}-{Custom number}?
-        Existing sheet numbers may change.</system:String>
+in the format {Album}-{Custom number}?
+Existing sheet numbers may change.</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberNotSet">Set start number</system:String>
     <system:String

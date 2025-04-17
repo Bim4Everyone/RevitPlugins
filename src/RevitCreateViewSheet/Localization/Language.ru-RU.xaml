@@ -32,12 +32,14 @@
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Системный номер по маске</system:String>
     <system:String
-        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip">Системный номер в формате {Альбом}-{Ш.Номер листа}</system:String>
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip"
+        xml:space="preserve">Системный номер в формате
+{Альбом}-{Ш.Номер листа}</system:String>
     <system:String
-        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning" xml:space="preserve">
-        Вы уверены, что хотите сделать системный номер 
-        в формате {Альбом}-{Ш.Номер листа}?
-        Номера существующих листов могут измениться.</system:String>
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning"
+        xml:space="preserve">Вы уверены, что хотите сделать системный номер
+в формате {Альбом}-{Ш.Номер листа}?
+Номера существующих листов могут измениться.</system:String>
     <system:String
         x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberNotSet">Задайте стартовый номер</system:String>
     <system:String
@@ -108,7 +110,6 @@
         x:Key="CreateViewPortWindow.SelectedViewTitle">Вид</system:String>
     <system:String
         x:Key="CreateViewPortWindow.SelectedViewPortTypeTitle">Типоразмер видового экрана</system:String>
-    
 
     <system:String
         x:Key="Errors.ViewPortTypesNotFound">Не удалось получить список типов видовых экранов. Создайте видовой экран на каком-либо листе вручную и перезапустите плагин.</system:String>
@@ -157,7 +158,6 @@
     <system:String
         x:Key="Errors.AnnotationModel.PropertyNotSet">Перед сохранением аннотации необходимо назначить {0}</system:String>
 
-    
     <system:String
         x:Key="Errors.Validation.AnnotationNotSet">Выберите типоразмер аннотации</system:String>
     <system:String
@@ -198,12 +198,12 @@
         x:Key="Errors.Validation.ViewNotSet">Выберите вид</system:String>
     <system:String
         x:Key="Errors.Validation.ViewPortTypeNotSet">Выберите тип видового экрана</system:String>
-    
+
     <system:String
         x:Key="Warnings.SureDeleteSheets">Вы действительно хотите удалить листы ({0} шт.)?</system:String>
     <system:String
         x:Key="Warnings.Title">Предупреждение</system:String>
-    
+
     <system:String
         x:Key="ProgressBarTitle">Пожалуйста подождите [{0}/{1}] ...</system:String>
 

@@ -19,6 +19,14 @@
     MaxWidth="600"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:ViewPortModelCreatorViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
@@ -36,30 +44,32 @@
         <StackPanel
             Grid.Row="1"
             VerticalAlignment="Center">
-            <ui:TextBlock
-                Margin="10"
-                TextAlignment="Center"
-                Text="{me:LocalizationSource CreateViewPortWindow.SelectedViewTypeTitle}">
-            </ui:TextBlock>
+            <Label
+                HorizontalAlignment="Center"
+                Style="{StaticResource CustomLabel}"
+                Content="{me:LocalizationSource CreateViewPortWindow.SelectedViewTypeTitle}">
+            </Label>
             <ComboBox
                 Width="450"
                 MinWidth="450"
                 MaxWidth="450"
+                Margin="0 0 0 7"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding SelectedViewType}"
                 ItemsSource="{Binding ViewTypes}">
             </ComboBox>
-            <ui:TextBlock
-                Margin="10"
-                TextAlignment="Center"
-                Text="{me:LocalizationSource CreateViewPortWindow.SelectedViewTitle}">
-            </ui:TextBlock>
+            <Label
+                HorizontalAlignment="Center"
+                Style="{StaticResource CustomLabel}"
+                Content="{me:LocalizationSource CreateViewPortWindow.SelectedViewTitle}">
+            </Label>
             <ComboBox
                 Width="450"
                 MinWidth="450"
                 MaxWidth="450"
+                Margin="0 0 0 7"
                 IsEditable="True"
                 IsTextSearchEnabled="True"
                 IsTextSearchCaseSensitive="False"
@@ -70,11 +80,11 @@
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
                 ItemsSource="{Binding Views}"
                 SelectedItem="{Binding SelectedView}" />
-            <ui:TextBlock
-                Margin="10"
-                TextAlignment="Center"
-                Text="{me:LocalizationSource CreateViewPortWindow.SelectedViewPortTypeTitle}">
-            </ui:TextBlock>
+            <Label
+                HorizontalAlignment="Center"
+                Style="{StaticResource CustomLabel}"
+                Content="{me:LocalizationSource CreateViewPortWindow.SelectedViewPortTypeTitle}">
+            </Label>
             <ComboBox
                 Width="450"
                 MinWidth="450"

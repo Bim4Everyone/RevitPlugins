@@ -19,6 +19,14 @@
     MaxWidth="600"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:AnnotationModelCreatorViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
@@ -36,11 +44,11 @@
         <StackPanel
             Grid.Row="1"
             VerticalAlignment="Center">
-            <ui:TextBlock
-                Margin="10"
-                TextAlignment="Center"
-                Text="{me:LocalizationSource CreateAnnotationWindow.SelectedAnnotationTitle}">
-            </ui:TextBlock>
+            <Label
+                HorizontalAlignment="Center"
+                Style="{StaticResource CustomLabel}"
+                Content="{me:LocalizationSource CreateAnnotationWindow.SelectedAnnotationTitle}">
+            </Label>
             <ComboBox
                 Width="450"
                 MinWidth="450"

@@ -13,14 +13,20 @@
     d:Background="White"
     d:DesignHeight="300"
     d:DesignWidth="600">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <ui:CardExpander
         IsExpanded="True">
 
         <ui:CardExpander.Header>
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition
-                        Height="Auto" />
                     <RowDefinition
                         Height="Auto" />
                 </Grid.RowDefinitions>
@@ -33,22 +39,22 @@
                 </Grid.ColumnDefinitions>
 
                 <ui:TextBlock
-                    Grid.Row="0"
                     Grid.Column="0"
                     FontSize="16"
                     FontTypography="Body"
+                    VerticalAlignment="Center"
                     Text="{Binding Header, ElementName=_this}" />
 
-                <ui:Button
-                    Appearance="Info"
-                    Grid.Row="0"
-                    Grid.RowSpan="2"
-                    Grid.Column="1"
-                    Margin="0,0,16,0"
-                    ToolTip="{Binding ButtonToolTip, ElementName=_this}"
-                    Content="{Binding ButtonContent, ElementName=_this}"
-                    Command="{Binding ButtonCommand, ElementName=_this}">
-                </ui:Button>
+                <DockPanel
+                    Margin="0 0 10 0"
+                    Grid.Column="1">
+                    <ui:Button
+                        Style="{StaticResource CustomSymbolButton}"
+                        ToolTip="{Binding ButtonToolTip, ElementName=_this}"
+                        Content="{Binding ButtonContent, ElementName=_this}"
+                        Command="{Binding ButtonCommand, ElementName=_this}">
+                    </ui:Button>
+                </DockPanel>
             </Grid>
         </ui:CardExpander.Header>
 
