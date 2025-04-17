@@ -43,6 +43,7 @@ namespace RevitClashDetective.Models.Clashes {
         }
 
 
+        public string Name { get; set; }
         public ClashStatus ClashStatus { get; set; }
         public ElementModel MainElement { get; set; }
         public ElementModel OtherElement { get; set; }
