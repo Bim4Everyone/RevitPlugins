@@ -94,10 +94,8 @@
                                     <ComboBox
                                         Grid.Row="1"
                                         Grid.Column="1"
-                                        IsTextSearchCaseSensitive="False"
-                                        Height="40"
-                                        MinHeight="40"
                                         DisplayMemberPath="Name"
+                                        Style="{StaticResource CustomComboBox}"
                                         ItemsSource="{Binding Path=DataContext.AllViewPortTypes, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                         SelectedItem="{Binding ViewPortType, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>

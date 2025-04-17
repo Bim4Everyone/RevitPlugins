@@ -70,14 +70,9 @@
                 MinWidth="450"
                 MaxWidth="450"
                 Margin="0 0 0 7"
-                IsEditable="True"
-                IsTextSearchEnabled="True"
-                IsTextSearchCaseSensitive="False"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
                 DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
-                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                Style="{StaticResource CustomEditableComboBox}"
                 ItemsSource="{Binding Views}"
                 SelectedItem="{Binding SelectedView}" />
             <Label

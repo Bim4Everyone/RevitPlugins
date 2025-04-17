@@ -53,14 +53,9 @@
                 Width="450"
                 MinWidth="450"
                 MaxWidth="450"
-                IsEditable="True"
-                IsTextSearchEnabled="True"
-                IsTextSearchCaseSensitive="False"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
                 DisplayMemberPath="RichName"
                 TextSearch.TextPath="RichName"
-                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                Style="{StaticResource CustomEditableComboBox}"
                 ItemsSource="{Binding AnnotationSymbolTypes}"
                 SelectedItem="{Binding SelectedAnnotationSymbolType}" />
         </StackPanel>

@@ -53,14 +53,9 @@
                 Width="450"
                 MinWidth="450"
                 MaxWidth="450"
-                IsEditable="True"
-                IsTextSearchEnabled="True"
-                IsTextSearchCaseSensitive="False"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
                 DisplayMemberPath="Name"
                 TextSearch.TextPath="Name"
-                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                Style="{StaticResource CustomEditableComboBox}"
                 ItemsSource="{Binding ViewSchedules}"
                 SelectedItem="{Binding SelectedViewSchedule}" />
         </StackPanel>

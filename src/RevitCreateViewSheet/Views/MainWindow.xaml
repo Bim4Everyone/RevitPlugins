@@ -177,11 +177,8 @@
                                         Content="{me:LocalizationSource MainWindow.AddSheets.Album}" />
                                     <ComboBox
                                         Grid.Row="1"
-                                        IsTextSearchCaseSensitive="False"
-                                        Height="40"
-                                        MinHeight="40"
-                                        IsEditable="True"
                                         x:Name="_sheetsCreationAlbum"
+                                        Style="{StaticResource CustomEditableComboBox}"
                                         ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
                                         Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -198,12 +195,8 @@
                                         Grid.Row="1"
                                         Grid.Column="1"
                                         Margin="20 0"
-                                        IsTextSearchCaseSensitive="False"
-                                        Height="40"
-                                        MinHeight="40"
-                                        IsEditable="True"
                                         DisplayMemberPath="Name"
-                                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                        Style="{StaticResource CustomComboBox}"
                                         ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
                                         SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -224,10 +217,7 @@
                                         Grid.Column="3"
                                         Grid.Row="1"
                                         Margin="20 0"
-                                        Width="80"
-                                        Height="40"
-                                        HorizontalAlignment="Left"
-                                        Appearance="Info"
+                                        Style="{StaticResource CustomContentButton}"
                                         Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
                                         Command="{Binding AddSheetsCommand}" />
 
@@ -328,9 +318,8 @@
                                         Grid.Row="1"
                                         Grid.Column="1"
                                         Margin="20 0"
-                                        Height="40"
-                                        MinHeight="40"
                                         x:Name="_numerationColumn"
+                                        Style="{StaticResource CustomComboBox}"
                                         IsEnabled="{Binding NumberByMask, Converter={StaticResource InverseBooleanConverter}}"
                                         ItemsSource="{Binding NumerationColumns}"
                                         SelectedItem="{Binding NumerationSelectedColumn}" />
@@ -469,11 +458,8 @@
                                                 Grid.Row="1"
                                                 Grid.Column="1"
                                                 Margin="10 0 0 0"
-                                                Height="40"
-                                                MinHeight="40"
                                                 DisplayMemberPath="Name"
-                                                IsTextSearchCaseSensitive="False"
-                                                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                                Style="{StaticResource CustomComboBox}"
                                                 ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                                 SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
@@ -559,16 +545,15 @@
                 Text="{Binding ErrorText}" />
             <ui:Button
                 Margin="10"
-                Width="80"
-                Appearance="Info"
                 Click="ButtonOk_Click"
+                Style="{StaticResource CustomContentButton}"
                 Content="{me:LocalizationSource AllWindow.ButtonOk}"
                 Command="{Binding AcceptViewCommand}" />
             <ui:Button
                 Margin="10 10 0 10"
-                Width="80"
                 IsCancel="True"
                 Click="ButtonCancel_Click"
+                Style="{StaticResource CustomContentButton}"
                 Content="{me:LocalizationSource AllWindow.ButtonCancel}" />
         </StackPanel>
     </Grid>
