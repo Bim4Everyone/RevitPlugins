@@ -4,10 +4,20 @@
 
     <!-- Пример перевода на русский язык (google translate) -->
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
+    <system:String x:Key="MainWindow.Title">RSN.ini менеджер</system:String>
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.UpdateSuccess">RSN.ini обновлен</system:String>
+    <system:String x:Key="MainWindow.UpdateSuccessTitle">Выполнено</system:String>
+    <system:String x:Key="MainWindow.ConfigNotFound">Конфигуратор не найден,{x0}необходимо создать новый{x1}в редакторе</system:String>
+    <system:String x:Key="MainWindow.ConfigNotFoundTitle">Ошибка</system:String>
+    <system:String x:Key="MainWindow.Empty">Имя сервера не может быть пустым.</system:String>
+    <system:String x:Key="MainWindow.AlreadyExists">Сервер уже добавлен.</system:String>
+    <system:String x:Key="RsnConfigService.EmptyServerList">Список серверов пуст или не задан.</system:String>
+    <system:String x:Key="RsnConfigService.RevitIniNotFound">Файл Revit.ini не найден.</system:String>
+    <system:String x:Key="RsnConfigService.ProjectPathMissing">Не удалось получить ProjectPath из Revit.ini.</system:String>
+
 </ResourceDictionary>

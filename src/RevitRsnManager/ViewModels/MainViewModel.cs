@@ -1,9 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit.FileInfo;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitRsnManager.Interfaces;
 using RevitRsnManager.Models;
 
 namespace RevitRsnManager.ViewModels;
@@ -15,10 +27,13 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IRsnConfigService _rsnConfigService;
 
     private string _errorText;
-    private string _saveProperty;
-    
+    private string _selectedServer;
+    private string _newServerName;
+    private ObservableCollection<string> _servers;
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
@@ -28,27 +43,39 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService, 
+        IRsnConfigService rsnConfigService) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _rsnConfigService = rsnConfigService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        AutoConfigureCommand = RelayCommand.Create(AutoConfigure);
+        MoveUpCommand = new RelayCommand(MoveUp, server => CanMove(server, -1));
+        MoveDownCommand = new RelayCommand(MoveDown, server => CanMove(server, 1));
+        AddServerCommand = new RelayCommand(_ => AddServer(), _ => !string.IsNullOrWhiteSpace(NewServerName));
+        RemoveServerCommand = new RelayCommand(RemoveServer, server => server is string && Servers.Contains((string) server));
     }
 
     /// <summary>
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
-    public ICommand AcceptViewCommand { get; }
 
+    public ICommand AddServerCommand { get; }
+    public ICommand RemoveServerCommand { get; }
+    public ICommand AcceptViewCommand { get; }
+    public ICommand MoveUpCommand { get; }
+    public ICommand MoveDownCommand { get; }
+    public ICommand AutoConfigureCommand { get; }
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
     /// </summary>
@@ -56,20 +83,135 @@ internal class MainViewModel : BaseViewModel {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
-
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
+    public string NewServerName {
+        get => _newServerName;
+        set => RaiseAndSetIfChanged(ref _newServerName, value);
     }
+
+    public ObservableCollection<string> Servers {
+        get => _servers;
+        set => RaiseAndSetIfChanged(ref _servers, value);
+    }
+
+    public string SelectedServer {
+        get => _selectedServer;
+        set => RaiseAndSetIfChanged(ref _selectedServer, value);
+    }
+
+    private void AutoConfigure() {
+        string modelsPath = _rsnConfigService.GetProjectPathFromRevitIni();
+        DateTime now = DateTime.Now;
+
+        List<FileInfo> allFiles = Directory.GetFiles(modelsPath, "*.rvt", SearchOption.TopDirectoryOnly)
+                                           .Select(path => new FileInfo(path))
+                                           .ToList();
+
+        List<FileInfo> recentFiles = allFiles
+            .Where(file => (now - file.LastWriteTime).TotalDays <= 5)
+            .OrderByDescending(file => file.LastWriteTime)
+            .ToList();
+
+        List<string> serversFromRecentFiles = recentFiles
+            .Select(GetServerIfValid)
+            .Where(server => !string.IsNullOrWhiteSpace(server))
+            .Distinct()
+            .ToList();
+
+        List<string> existingServers = Servers.Except(serversFromRecentFiles).ToList();
+        Servers = new ObservableCollection<string>(serversFromRecentFiles.Concat(existingServers));
+    }
+
+    private string GetServerIfValid(FileInfo file) {
+        try {
+            var info = new RevitFileInfo(file.FullName);
+
+            if(info.BasicFileInfo.AppInfo.Format != ModuleEnvironment.RevitVersion) {
+                return null;
+            }
+
+            string centralPath = info.BasicFileInfo.CentralPath;
+
+            if(!centralPath.StartsWith("RSN://", StringComparison.OrdinalIgnoreCase)) {
+                return null;
+            }
+
+            return ExtractServerFromCentralPath(centralPath);
+        } catch {
+            return null;
+        }
+    }
+
+    private string ExtractServerFromCentralPath(string centralPath) {
+        if(centralPath.StartsWith("RSN://", StringComparison.OrdinalIgnoreCase)) {
+            centralPath = centralPath.Substring("RSN://".Length);
+            string[] parts = centralPath.Split('/');
+            return parts.Length > 0 ? parts[0] : null;
+        }
+
+        return null;
+    }
+
+    private void AddServer() {
+        string trimmed = NewServerName?.Trim();
+       
+        if(string.IsNullOrWhiteSpace(trimmed)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.Empty");
+            return;
+        }
+
+        if(Servers.Contains(trimmed)) {
+            ErrorText = string.Format(
+                _localizationService.GetLocalizedString("MainWindow.AlreadyExists"),
+                trimmed);
+            return;
+        }
+
+        Servers.Add(trimmed);
+        SelectedServer = trimmed;
+        NewServerName = string.Empty;
+        ErrorText = null; 
+    }
+
+    private void RemoveServer(object serverObj) {
+        if(serverObj is string server && Servers.Contains(server)) {
+            Servers.Remove(server);
+            if(SelectedServer == server) {
+                SelectedServer = null;
+            }
+        }
+    }
+
+    private void Move(object serverObj, int delta) {
+        if(serverObj is not string server)
+            return;
+
+        int index = Servers.IndexOf(server);
+        int newIndex = index + delta;
+
+        if(index >= 0 && newIndex >= 0 && newIndex < Servers.Count) {
+            Servers.Move(index, newIndex);
+        }
+    }
+
+    private bool CanMove(object serverObj, int delta) {
+        if(serverObj is not string server)
+            return false;
+
+        int index = Servers.IndexOf(server);
+        return index >= 0 && index + delta >= 0 && index + delta < Servers.Count;
+    }
+
+    private void MoveUp(object serverObj) => Move(serverObj, -1);
+
+    private void MoveDown(object serverObj) => Move(serverObj, 1);
 
     /// <summary>
     /// Метод загрузки главного окна.
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
+        var servers = _rsnConfigService.LoadServersFromIni();
+        Servers = new ObservableCollection<string>(servers);
         LoadConfig();
     }
 
@@ -80,7 +222,16 @@ internal class MainViewModel : BaseViewModel {
     /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
     /// </remarks>
     private void AcceptView() {
+        _rsnConfigService.SaveServersToIni(Servers.ToList());
+        var updateSuccess = _localizationService.GetLocalizedString("MainWindow.UpdateSuccess");
+        var updateSuccessTitle = _localizationService.GetLocalizedString("MainWindow.UpdateSuccessTitle");
         SaveConfig();
+        MessageBox.Show(
+               updateSuccess,
+               updateSuccessTitle,
+               MessageBoxButton.OK,
+               MessageBoxImage.Information
+           );
     }
 
     /// <summary>
@@ -92,11 +243,6 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
-        }
-
         ErrorText = null;
         return true;
     }
@@ -106,8 +252,9 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        if(setting?.Servers?.Any() == true) {
+            Servers = new ObservableCollection<string>(setting.Servers);
+        }
     }
 
     /// <summary>
@@ -117,7 +264,7 @@ internal class MainViewModel : BaseViewModel {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.SaveProperty = SaveProperty;
+        setting.Servers = Servers.ToList();
         _pluginConfig.SaveProjectConfig();
     }
 }

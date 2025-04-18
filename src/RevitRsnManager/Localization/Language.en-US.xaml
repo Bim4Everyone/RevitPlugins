@@ -10,4 +10,14 @@
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="MainWindow.UpdateSuccess">RSN.ini updated</system:String>
+    <system:String x:Key="MainWindow.UpdateSuccessTitle">Done</system:String>
+    <system:String x:Key="MainWindow.ConfigNotFound">Configurator not found,{x0}please create a new one{x1}in the editor</system:String>
+    <system:String x:Key="MainWindow.ConfigNotFoundTitle">Error</system:String>
+    <system:String x:Key="MainWindow.Empty">Server name cannot be empty.</system:String>
+    <system:String x:Key="MainWindow.AlreadyExists">Server is already added.</system:String>
+    <system:String x:Key="RsnConfigService.EmptyServerList">Server list is empty or not specified.</system:String>
+    <system:String x:Key="RsnConfigService.RevitIniNotFound">Revit.ini file not found.</system:String>
+    <system:String x:Key="RsnConfigService.ProjectPathMissing">Failed to get ProjectPath from Revit.ini.</system:String>
+
 </ResourceDictionary>
