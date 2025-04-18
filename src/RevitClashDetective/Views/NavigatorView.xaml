@@ -122,7 +122,7 @@
                             <dxe:ComboBoxEdit ApplyItemTemplateToSelectedItem="True"
                                               IsTextEditable="False"
                                               EditMode="InplaceActive"
-                                              EditValue="{Binding Row.ClashStatus}"
+                                              EditValue="{Binding Row.ClashStatus, UpdateSourceTrigger=PropertyChanged}"
                                               ItemsSource="{dxe:EnumItemsSource EnumType={x:Type m:ClashStatus}}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
