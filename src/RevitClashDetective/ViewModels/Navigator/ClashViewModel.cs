@@ -12,6 +12,7 @@ using RevitClashDetective.Models.Clashes;
 namespace RevitClashDetective.ViewModels.Navigator {
     internal class ClashViewModel : BaseViewModel, IEquatable<ClashViewModel> {
         private ClashStatus _clashStatus;
+        private string _clashName;
         private readonly RevitRepository _revitRepository;
 
         public ClashViewModel(RevitRepository revitRepository, ClashModel clash) {
@@ -21,13 +22,13 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
             FirstCategory = clash.MainElement.Category;
             FirstTypeName = clash.MainElement.Name;
-            FirstFamilyName = GetFamilyName(clash.MainElement);
+            FirstFamilyName = clash.MainElement.FamilyName;
             FirstDocumentName = clash.MainElement.DocumentName;
             FirstLevel = clash.MainElement.Level;
 
             SecondCategory = clash.OtherElement.Category;
             SecondTypeName = clash.OtherElement.Name;
-            SecondFamilyName = GetFamilyName(clash.OtherElement);
+            SecondFamilyName = clash.OtherElement.FamilyName;
             SecondLevel = clash.OtherElement.Level;
             SecondDocumentName = clash.OtherElement.DocumentName;
 
@@ -44,7 +45,10 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _clashStatus, value);
         }
 
-        public string ClashName { get; }
+        public string ClashName {
+            get => _clashName;
+            set => RaiseAndSetIfChanged(ref _clashName, value);
+        }
 
         public string FirstTypeName { get; }
 
@@ -90,6 +94,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         public ClashModel GetClashModel() {
             Clash.ClashStatus = ClashStatus;
+            Clash.Name = ClashName;
             return Clash;
         }
 

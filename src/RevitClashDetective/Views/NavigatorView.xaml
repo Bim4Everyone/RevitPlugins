@@ -113,8 +113,7 @@
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
                 
-                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="Название"
+                <dxg:GridColumn Header="Название"
                                 FieldName="ClashName"/>
                 <dxg:GridColumn Header="Статус">
                     <dxg:GridColumn.CellTemplate>
