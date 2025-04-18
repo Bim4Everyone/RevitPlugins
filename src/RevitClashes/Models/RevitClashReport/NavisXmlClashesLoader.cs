@@ -165,7 +165,15 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 t => t.Element("value").Value);
             string file = tags.TryGetValue("элемент файл источника", out string fileName) ? fileName : null;
             ElementId id = tags.TryGetValue("объект id", out string idStr) ? GetId(idStr) : ElementId.InvalidElementId;
-            return GetElementModel(file, id);
+            var elementModel = GetElementModel(file, id);
+            return elementModel.Id.IsNotNull() ? elementModel :
+                new ElementModel() {
+                    Id = id,
+                    DocumentName = file,
+                    Name = tags.TryGetValue("объект имя", out string name) ? name : string.Empty,
+                    FamilyName = tags.TryGetValue("объект семейство", out string famName) ? famName : string.Empty,
+                    Level = clashObject.Element("layer")?.Value ?? string.Empty
+                };
         }
 
         private ElementModel GetElementModel(string fileName, ElementId id) {
