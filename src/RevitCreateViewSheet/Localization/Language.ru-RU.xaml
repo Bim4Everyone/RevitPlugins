@@ -1,0 +1,245 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="AllWindow.ButtonOk">ОК</system:String>
+    <system:String
+        x:Key="AllWindow.ButtonCancel">Отмена</system:String>
+    <system:String
+        x:Key="MainWindow.Title">Менеджер листов</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.Album">Альбом</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.TitleBlock">Штамп</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.Count">Кол-во листов</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.CreateButton">Создать</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.SaveSheetsButtonTooltip">Сохранить конфигурацию листов в файл</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.LoadSheetsButtonTooltip">Загрузить листы из конфигурационного файла</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Creation">Генерация листов</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration">Нумерация</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.StartNumber">Стартовый номер</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Column">Столбец для нумерации</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Системный номер по маске</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip"
+        xml:space="preserve">Системный номер в формате
+{Альбом}-{Ш.Номер листа}</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning"
+        xml:space="preserve">Вы уверены, что хотите сделать системный номер
+в формате {Альбом}-{Ш.Номер листа}?
+Номера существующих листов могут измениться.</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberNotSet">Задайте стартовый номер</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberInvalid">Стартовый номер должен быть целым неотрицательным числом</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Errors.SelectedSheetsNotSet">Выберите листы</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.ButtonTooltip">Пронумеровать выбранные листы</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Filter">Фильтр</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Sheets">Листы</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.SheetContent">Элементы на листе:</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.ViewPorts">Видовые экраны</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Schedules">Спецификации</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Annotations">Аннотации</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Album">Альбом</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.CustomNumber">Ш.Номер листа</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Number">Номер листа</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Name">Название</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.TitleBlock">Основная надпись</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.DeleteSheetsButtonTooltip">Удаляет все выбранные листы</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Status">Статус</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.ViewPortType">Тип видового экрана</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.SchedulesCount">Кол-во</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AnnotationFamily">Семейство</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AddViewPortTooltip">Добавляет видовой экран на лист</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AddScheduleTooltip">Добавляет спецификацию на лист</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AddAnnotationTooltip">Добавляет аннотацию на лист</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.DeleteViewPortTooltip">Удаляет видовой экран с листа</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.DeleteScheduleTooltip">Удаляет спецификацию с листа</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.DeleteAnnotationTooltip">Удаляет аннотацию с листа</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AnnotationType">Тип</system:String>
+    <system:String
+        x:Key="CreateAnnotationWindow.Title">Добавление аннотации</system:String>
+    <system:String
+        x:Key="CreateAnnotationWindow.SelectedAnnotationTitle">Типоразмер аннотации</system:String>
+    <system:String
+        x:Key="CreateScheduleWindow.Title">Добавление спецификации</system:String>
+    <system:String
+        x:Key="CreateScheduleWindow.SelectedScheduleTitle">Спецификация</system:String>
+    <system:String
+        x:Key="CreateViewPortWindow.Title">Добавление видового экрана</system:String>
+    <system:String
+        x:Key="CreateViewPortWindow.SelectedViewTypeTitle">Тип вида</system:String>
+    <system:String
+        x:Key="CreateViewPortWindow.SelectedViewTitle">Вид</system:String>
+    <system:String
+        x:Key="CreateViewPortWindow.SelectedViewPortTypeTitle">Типоразмер видового экрана</system:String>
+
+    <system:String
+        x:Key="Errors.ViewPortTypesNotFound">Не удалось получить список типов видовых экранов. Создайте видовой экран на каком-либо листе вручную и перезапустите плагин.</system:String>
+    <system:String
+        x:Key="Errors.TitleBlocksNotFound">В проект не загружено ни одно семейство основной надписи</system:String>
+    <system:String
+        x:Key="Errors.AnnotationsNotFound">В проекте отсутствуют семейства аннотаций</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateAnnotation">Не удалось создать аннотацию</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateSchedule">Не удалось создать спецификацию</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateSheet">Не удалось создать лист</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateViewPort">Не удалось создать видовой экран</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateViewPortOnNotCreatedSheet">Нельзя создать видовой экран на еще не созданном листе.</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateScheduleOnNotCreatedSheet">Нельзя создать спецификацию на еще не созданном листе.</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateAnnotationOnNotCreatedSheet">Нельзя создать аннотацию на еще не созданном листе.</system:String>
+    <system:String
+        x:Key="Errors.CannotUpdateNotCreatetViewPort">Нельзя обновить еще не созданный видовой экран.</system:String>
+    <system:String
+        x:Key="Errors.CannotUpdateNotCreatetSheet">Нельзя обновить еще не созданный лист.</system:String>
+    <system:String
+        x:Key="Errors.CannotDeleteElement">Не удалось удалить элемент с id {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotDeleteActiveViewSheet">Нельзя удалить активный лист '{0}'</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveSheet">Не удалось сохранить лист с номером {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveViewPort">Не удалось сохранить видовой экран {0} на листе с номером {1}</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveSchedule">Не удалось сохранить спецификацию {0} на листе с номером {1}</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveAnnotation">Не удалось сохранить аннотацию {0} на листе с номером {1}</system:String>
+    <system:String
+        x:Key="Errors.ViewPortModel.PropertyNotSet">Перед сохранением видового экрана необходимо назначить {0}</system:String>
+    <system:String
+        x:Key="Errors.SheetModel.TitleBlockNotSet">У нового листа не задана основная надпись</system:String>
+    <system:String
+        x:Key="Errors.SheetModel.SheetNumberNotSet">У нового листа не задан номер</system:String>
+    <system:String
+        x:Key="Errors.ScheduleModel.PropertyNotSet">Перед сохранением спецификации необходимо назначить {0}</system:String>
+    <system:String
+        x:Key="Errors.AnnotationModel.PropertyNotSet">Перед сохранением аннотации необходимо назначить {0}</system:String>
+
+    <system:String
+        x:Key="Errors.Validation.AnnotationNotSet">Выберите типоразмер аннотации</system:String>
+    <system:String
+        x:Key="Errors.Validation.AlbumBlueprintNotSet">Выберите альбом</system:String>
+    <system:String
+        x:Key="Errors.Validation.InvalidAlbumBlueprintName">Некорректное название альбома '{0}'</system:String>
+    <system:String
+        x:Key="Errors.Validation.TitleBlockNotSet">Выберите штамп</system:String>
+    <system:String
+        x:Key="Errors.Validation.AddSheetsCountNotNumber">Количество листов должно быть целым числом</system:String>
+    <system:String
+        x:Key="Errors.Validation.AddSheetsMaxCount">Количество листов не должно быть больше {0}</system:String>
+    <system:String
+        x:Key="Errors.Validation.AddSheetsMinCount">Количество листов должно быть положительным числом</system:String>
+    <system:String
+        x:Key="Errors.Validation.AnySheetNameEmpty">У всех листов должно быть заполнено наименование</system:String>
+    <system:String
+        x:Key="Errors.Validation.AnySheetInvalidName">У листа '{0}' недопустимое название</system:String>
+    <system:String
+        x:Key="Errors.Validation.DuplicatedSheetNumber">У листов повторяется номер {0}</system:String>
+    <system:String
+        x:Key="Errors.Validation.AnySheetNumberEmpty">У всех листов должен быть заполнен системный номер</system:String>
+    <system:String
+        x:Key="Errors.Validation.SheetInvalidNumber">У листа '{0}' недопустимый системный номер '{1}'</system:String>
+    <system:String
+        x:Key="Errors.Validation.SheetInvalidAlbum">У листа '{0}' недопустимый альбом '{1}'</system:String>
+    <system:String
+        x:Key="Errors.Validation.SheetInvalidCustomNumber">У листа '{0}' недопустимый Ш.Номер листа '{1}'</system:String>
+    <system:String
+        x:Key="Errors.Validation.SchedulesNotFound">Нет доступных спецификаций</system:String>
+    <system:String
+        x:Key="Errors.Validation.ScheduleNotSet">Выберите спецификацию</system:String>
+    <system:String
+        x:Key="Errors.Validation.ViewTypeNotSet">Выберите тип вида</system:String>
+    <system:String
+        x:Key="Errors.Validation.ViewsNotFound">Нет доступных видов заданного типа</system:String>
+    <system:String
+        x:Key="Errors.Validation.ViewNotSet">Выберите вид</system:String>
+    <system:String
+        x:Key="Errors.Validation.ViewPortTypeNotSet">Выберите тип видового экрана</system:String>
+
+    <system:String
+        x:Key="Warnings.SureDeleteSheets">Вы действительно хотите удалить листы ({0} шт.)?</system:String>
+    <system:String
+        x:Key="Warnings.Title">Предупреждение</system:String>
+
+    <system:String
+        x:Key="ProgressBarTitle">Пожалуйста подождите [{0}/{1}] ...</system:String>
+
+    <system:String
+        x:Key="NewSheetTitle">Новый лист</system:String>
+
+    <system:String
+        x:Key="UpdateSheetsTransaction">Обновление листов</system:String>
+
+    <system:String
+        x:Key="EntityState.Exist">Сущ.</system:String>
+    <system:String
+        x:Key="EntityState.New">Нов.</system:String>
+
+    <system:String
+        x:Key="RevitViewType.Any">Любой</system:String>
+    <system:String
+        x:Key="RevitViewType.FloorPlan">План этажа</system:String>
+    <system:String
+        x:Key="RevitViewType.CeilingPlan">План потолка</system:String>
+    <system:String
+        x:Key="RevitViewType.EngineeringPlan">План несущих конструкций</system:String>
+    <system:String
+        x:Key="RevitViewType.AreaPlan">План зонирования</system:String>
+    <system:String
+        x:Key="RevitViewType.Section">Разрез</system:String>
+    <system:String
+        x:Key="RevitViewType.Elevation">Фасад</system:String>
+    <system:String
+        x:Key="RevitViewType.Detail">Вид узла</system:String>
+    <system:String
+        x:Key="RevitViewType.ThreeD">3D</system:String>
+    <system:String
+        x:Key="RevitViewType.Rendering">Визуализация</system:String>
+    <system:String
+        x:Key="RevitViewType.DraftingView">Чертежный вид</system:String>
+    <system:String
+        x:Key="RevitViewType.Legend">Легенда</system:String>
+</ResourceDictionary>

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -18,7 +19,7 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _saveProperty;
-    
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
@@ -29,7 +30,7 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
-        
+
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
@@ -38,11 +39,13 @@ internal class MainViewModel : BaseViewModel {
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
+    public ObservableCollection<TestClass> Views { get; } = new ObservableCollection<TestClass>([new TestClass() { Name = "test1" }, new TestClass() { Name = "test2" }, new TestClass() { Name = "test3" }]);
+
     /// <summary>
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
@@ -120,4 +123,8 @@ internal class MainViewModel : BaseViewModel {
         setting.SaveProperty = SaveProperty;
         _pluginConfig.SaveProjectConfig();
     }
+}
+
+public class TestClass {
+    public string Name { get; set; }
 }

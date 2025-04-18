@@ -1,0 +1,560 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitCreateViewSheet.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitCreateViewSheet.ViewModels"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:res="clr-namespace:RevitCreateViewSheet.Resources"
+    xmlns:local="clr-namespace:RevitCreateViewSheet.Views"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    Height="550"
+    Width="900"
+    MinHeight="600"
+    MinWidth="800"
+    d:Width="1500"
+    d:Height="600"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:InverseBooleanConverter
+                x:Key="InverseBooleanConverter" />
+            <res:SheetViewModelComparer
+                x:Key="SheetViewModelComparer" />
+            <ui:TextBlock
+                x:Key="AlbumHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Album}" />
+            <ui:TextBlock
+                x:Key="CustomNumberHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.CustomNumber}" />
+            <ui:TextBlock
+                x:Key="NumberHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Number}" />
+            <ui:TextBlock
+                x:Key="SheetNameHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Name}" />
+            <ui:TextBlock
+                x:Key="TitleBlockHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.TitleBlock}" />
+            <ui:TextBlock
+                x:Key="SheetStatusHeader"
+                Text="{me:LocalizationSource MainWindow.AllSheets.Status}" />
+            <ui:TextBlock
+                x:Key="DeleteSheetTooltip"
+                Text="{me:LocalizationSource MainWindow.AllSheets.DeleteSheetsButtonTooltip}" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <b:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+    </b:Interaction.Behaviors>
+    <b:Interaction.Triggers>
+        <b:EventTrigger
+            EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+    <Grid
+        Margin="10 10 10 0">
+        <Grid.Resources>
+
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}" />
+        <DockPanel
+            Grid.Row="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition
+                        Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="2*"
+                        MinWidth="100" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                    <ColumnDefinition
+                        Width="1*"
+                        MinWidth="100" />
+                </Grid.ColumnDefinitions>
+
+                <Grid
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Margin="0 0 0 10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Grid.Column="0"
+                        Margin="0 0 5 0"
+                        Style="{StaticResource CustomBorder}">
+                        <DockPanel
+                            LastChildFill="True">
+                            <Label
+                                DockPanel.Dock="Top"
+                                Style="{StaticResource CustomBigLabel}"
+                                Target="{Binding ElementName=_sheetsCreation}"
+                                Content="{me:LocalizationSource MainWindow.AllSheets.Creation}" />
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Auto"
+                                VerticalScrollBarVisibility="Disabled">
+                                <Grid
+                                    x:Name="_sheetsCreation">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="250" />
+                                        <ColumnDefinition
+                                            Width="250" />
+                                        <ColumnDefinition
+                                            Width="80" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <Label
+                                        Grid.Row="0"
+                                        Style="{StaticResource CustomLabel}"
+                                        Target="{Binding ElementName=_sheetsCreationAlbum}"
+                                        Content="{me:LocalizationSource MainWindow.AddSheets.Album}" />
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        x:Name="_sheetsCreationAlbum"
+                                        Style="{StaticResource CustomEditableComboBox}"
+                                        ItemsSource="{Binding AllAlbumsBlueprints, UpdateSourceTrigger=PropertyChanged}"
+                                        Text="{Binding AddSheetsAlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <DockPanel
+                                        Margin="20 0"
+                                        Grid.Column="1">
+                                        <Label
+                                            Style="{StaticResource CustomLabel}"
+                                            Target="{Binding ElementName=_sheetsCreationTitleBlock}"
+                                            Content="{me:LocalizationSource MainWindow.AddSheets.TitleBlock}" />
+                                    </DockPanel>
+                                    <ComboBox
+                                        x:Name="_sheetsCreationTitleBlock"
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="20 0"
+                                        DisplayMemberPath="Name"
+                                        Style="{StaticResource CustomComboBox}"
+                                        ItemsSource="{Binding AllTitleBlocks, UpdateSourceTrigger=PropertyChanged}"
+                                        SelectedItem="{Binding AddSheetsTitleBlock, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <Label
+                                        Grid.Column="2"
+                                        Grid.ColumnSpan="2"
+                                        Style="{StaticResource CustomLabel}"
+                                        Target="{Binding ElementName=_sheetsCreationCount}"
+                                        Content="{me:LocalizationSource MainWindow.AddSheets.Count}" />
+                                    <ui:TextBox
+                                        Grid.Column="2"
+                                        Grid.Row="1"
+                                        Height="40"
+                                        x:Name="_sheetsCreationCount"
+                                        Text="{Binding AddSheetsCount, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <ui:Button
+                                        Grid.Column="3"
+                                        Grid.Row="1"
+                                        Margin="20 0"
+                                        Style="{StaticResource CustomContentButton}"
+                                        Content="{me:LocalizationSource MainWindow.AddSheets.CreateButton}"
+                                        Command="{Binding AddSheetsCommand}" />
+
+                                    <ui:Button
+                                        Grid.Column="4"
+                                        Grid.Row="1"
+                                        Style="{StaticResource CustomSymbolButton}"
+                                        ToolTip="{me:LocalizationSource MainWindow.AddSheets.LoadSheetsButtonTooltip}"
+                                        Content="{ui:SymbolIcon ArrowDownload24}"
+                                        Command="{Binding LoadSheetsCommand}" />
+
+                                    <ui:Button
+                                        Grid.Column="5"
+                                        Grid.Row="1"
+                                        Margin="20 0 0 0"
+                                        Style="{StaticResource CustomSymbolButton}"
+                                        ToolTip="{me:LocalizationSource MainWindow.AddSheets.SaveSheetsButtonTooltip}"
+                                        Content="{ui:SymbolIcon ArrowUpload24}"
+                                        Command="{Binding SaveSheetsCommand}" />
+
+                                    <DockPanel
+                                        Margin="0 10"
+                                        Grid.Row="2"
+                                        Grid.ColumnSpan="6"
+                                        VerticalAlignment="Bottom">
+
+                                        <ui:TextBlock
+                                            DockPanel.Dock="Bottom"
+                                            Style="{StaticResource CustomErrorText}"
+                                            Text="{Binding AddSheetsErrorText}">
+                                        </ui:TextBlock>
+                                    </DockPanel>
+                                </Grid>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+
+                    <Border
+                        Grid.Column="1"
+                        Margin="5 0 0 0"
+                        Style="{StaticResource CustomBorder}">
+
+                        <DockPanel>
+                            <Label
+                                DockPanel.Dock="Top"
+                                Style="{StaticResource CustomBigLabel}"
+                                Target="{Binding ElementName=_sheetsNumeration}"
+                                Content="{me:LocalizationSource MainWindow.AllSheets.Numeration}" />
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Auto"
+                                VerticalScrollBarVisibility="Disabled">
+                                <Grid
+                                    VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    x:Name="_sheetsNumeration">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="150" />
+                                        <ColumnDefinition
+                                            Width="250" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Label
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Style="{StaticResource CustomLabel}"
+                                        Target="{Binding ElementName=_numerationStartNumber}"
+                                        Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.StartNumber}" />
+                                    <ui:TextBox
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        x:Name="_numerationStartNumber"
+                                        Text="{Binding NumerationStartNumber, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <DockPanel
+                                        Margin="20 0"
+                                        Grid.Row="0"
+                                        Grid.Column="1">
+                                        <Label
+                                            Style="{StaticResource CustomLabel}"
+                                            Target="{Binding ElementName=_numerationColumn}"
+                                            Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.Column}" />
+                                    </DockPanel>
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="20 0"
+                                        x:Name="_numerationColumn"
+                                        Style="{StaticResource CustomComboBox}"
+                                        IsEnabled="{Binding NumberByMask, Converter={StaticResource InverseBooleanConverter}}"
+                                        ItemsSource="{Binding NumerationColumns}"
+                                        SelectedItem="{Binding NumerationSelectedColumn}" />
+
+                                    <ui:Button
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        Style="{StaticResource CustomSymbolButton}"
+                                        ToolTip="{me:LocalizationSource MainWindow.AllSheets.Numeration.ButtonTooltip}"
+                                        Content="{ui:SymbolIcon TextNumberListLtr24}"
+                                        Command="{Binding NumberSheetsCommand}"
+                                        CommandParameter="{Binding SelectedSheets}" />
+
+                                    <DockPanel
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        Grid.ColumnSpan="4"
+                                        Margin="0 20 0 0"
+                                        VerticalAlignment="Center"
+                                        ToolTip="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip}">
+                                        <ui:ToggleSwitch
+                                            Margin="0 0 10 0"
+                                            x:Name="_numerationNumberByMask"
+                                            IsChecked="{Binding NumberByMask}" />
+                                        <Label
+                                            Style="{StaticResource CustomLabel}"
+                                            Target="{Binding ElementName=_numerationNumberByMask}"
+                                            Content="{me:LocalizationSource MainWindow.AllSheets.Numeration.SyncSystemNumberByMask}" />
+                                    </DockPanel>
+
+                                    <ui:TextBlock
+                                        Grid.ColumnSpan="4"
+                                        Grid.Row="3"
+                                        Style="{StaticResource CustomErrorText}"
+                                        Text="{Binding NumerationErrorText}" />
+                                </Grid>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+
+                <Border
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Style="{StaticResource CustomBorder}">
+                    <DockPanel
+                        LastChildFill="True">
+                        <Label
+                            DockPanel.Dock="Top"
+                            Style="{StaticResource CustomBigLabel}"
+                            Target="{Binding ElementName=_sheets}"
+                            Content="{me:LocalizationSource MainWindow.AllSheets.Sheets}" />
+                        <StackPanel
+                            DockPanel.Dock="Top"
+                            Margin="0 0 0 14">
+                            <Label
+                                Style="{StaticResource CustomLabel}"
+                                Target="{Binding ElementName=_sheetsFilter}"
+                                Content="{me:LocalizationSource MainWindow.AllSheets.Filter}" />
+                            <ui:TextBox
+                                x:Name="_sheetsFilter"
+                                Text="{Binding SheetsFilter, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                        <ui:DataGrid
+                            x:Name="_sheets"
+                            SelectionMode="Extended"
+                            Style="{StaticResource CustomResizableDataGridStyle}"
+                            res:DataGridSyncEditToSelectedItemProperty.SyncEditToSelectedItem="True"
+                            res:CustomSortBehavior.AllowCustomSort="True"
+                            res:DataGridSelectedItemsProperty.SelectedItems="{Binding SelectedSheets}"
+                            ItemsSource="{Binding VisibleSheets.View}"
+                            SelectedItem="{Binding SelectedSheet, UpdateSourceTrigger=PropertyChanged}">
+                            <ui:DataGrid.Columns>
+                                <DataGridTemplateColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    SortMemberPath="AlbumBlueprint"
+                                    Header="{StaticResource AlbumHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBox
+                                                Margin="10 0"
+                                                Text="{Binding AlbumBlueprint, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    SortMemberPath="SheetCustomNumber"
+                                    res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}"
+                                    Header="{StaticResource CustomNumberHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBox
+                                                Margin="10 0"
+                                                Text="{Binding SheetCustomNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    Width="Auto"
+                                    MinWidth="50"
+                                    SortMemberPath="SheetNumber"
+                                    Header="{StaticResource NumberHeader}"
+                                    res:CustomSortBehavior.CustomSorter="{StaticResource SheetViewModelComparer}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBox
+                                                IsEnabled="{Binding Path=DataContext.NumberByMask, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Converter={StaticResource InverseBooleanConverter}}"
+                                                Text="{Binding SheetNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    Width="250"
+                                    MinWidth="50"
+                                    SortMemberPath="Name"
+                                    Header="{StaticResource SheetNameHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBox
+                                                Margin="10 0"
+                                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    Width="350"
+                                    MinWidth="100"
+                                    SortMemberPath="TitleBlock.Name"
+                                    Header="{StaticResource TitleBlockHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                Margin="10 0 0 0"
+                                                DisplayMemberPath="Name"
+                                                Style="{StaticResource CustomComboBox}"
+                                                ItemsSource="{Binding Path=DataContext.AllTitleBlocks, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                SelectedItem="{Binding TitleBlock, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    CanUserResize="False"
+                                    SortMemberPath="IsPlaced"
+                                    Width="Auto"
+                                    Header="{StaticResource SheetStatusHeader}">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:TextBlock
+                                                HorizontalAlignment="Center"
+                                                Text="{Binding IsPlacedStatus}">
+                                            </ui:TextBlock>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn
+                                    CanUserResize="False">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:Button
+                                                Appearance="Danger"
+                                                Style="{StaticResource CustomSymbolButton}"
+                                                ToolTip="{StaticResource DeleteSheetTooltip}"
+                                                Command="{Binding Path=DataContext.RemoveSheetsCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                CommandParameter="{Binding Path=DataContext.SelectedSheets, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                                Content="{ui:SymbolIcon Delete24}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </ui:DataGrid.Columns>
+                        </ui:DataGrid>
+                    </DockPanel>
+                </Border>
+
+                <GridSplitter
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Width="10"
+                    Background="{DynamicResource CardBackground}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Stretch" />
+
+                <Border
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Style="{StaticResource CustomBorder}">
+                    <DockPanel
+                        LastChildFill="True">
+                        <Label
+                            DockPanel.Dock="Top"
+                            Style="{StaticResource CustomBigLabel}"
+                            Target="{Binding ElementName=_sheetItems}">
+                            <DockPanel>
+                                <ui:TextBlock
+                                    Text="{me:LocalizationSource MainWindow.AllSheets.SheetContent}"
+                                    Margin="0 0 5 0" />
+                                <ui:TextBlock
+                                    Text="{Binding SelectedSheet.Name}" />
+                            </DockPanel>
+                        </Label>
+                        <local:SelectedSheetView
+                            x:Name="_sheetItems"
+                            DataContext="{Binding SelectedSheet}" />
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </DockPanel>
+
+        <StackPanel
+            Grid.Row="2"
+            Grid.Column="0"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <ui:TextBlock
+                Margin="10"
+                Style="{StaticResource CustomErrorText}"
+                Text="{Binding ErrorText}" />
+            <ui:Button
+                Margin="10"
+                Click="ButtonOk_Click"
+                Style="{StaticResource CustomContentButton}"
+                Content="{me:LocalizationSource AllWindow.ButtonOk}"
+                Command="{Binding AcceptViewCommand}" />
+            <ui:Button
+                Margin="10 10 0 10"
+                IsCancel="True"
+                Click="ButtonCancel_Click"
+                Style="{StaticResource CustomContentButton}"
+                Content="{me:LocalizationSource AllWindow.ButtonCancel}" />
+        </StackPanel>
+    </Grid>
+</core:WpfUIPlatformWindow>
