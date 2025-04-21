@@ -38,7 +38,7 @@ namespace RevitClashDetective.Models.ClashDetection {
                 var oldClashe = oldClashes.FirstOrDefault(item => item.Equals(newClash));
                 if(oldClashe != null) {
                     newClash.ClashStatus = oldClashe.ClashStatus;
-                    newClash.Name = oldClashe.Name;
+                    newClash.Name = string.IsNullOrWhiteSpace(oldClashe.Name) ? newClash.Name : oldClashe.Name;
                 }
                 yield return newClash;
             }
