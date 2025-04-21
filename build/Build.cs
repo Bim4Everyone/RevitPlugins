@@ -1,18 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-using dosymep.Nuke.RevitVersions;
-
 using Nuke.Common;
-using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
-using Nuke.Common.ProjectModel;
-using Nuke.Common.Tools.GitVersion;
-using Nuke.Components;
 
 using Serilog;
 
@@ -26,7 +18,6 @@ partial class Build : NukeBuild {
 
     public BuildParams Params { get; set; }
 
-    [Solution] public readonly Solution Solution;
     [GitRepository] public readonly GitRepository GitRepository;
 
     protected override void OnBuildInitialized() {
