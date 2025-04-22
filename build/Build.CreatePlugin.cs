@@ -28,11 +28,10 @@ partial class Build {
 
             CopyDirectory(Params.TemplateProjectDirectory, Params.PluginDirectory,
                 new Dictionary<string, string>() { { "${{ gen.bundle_name }}", BundleName ?? "Название плагина" } });
-
-            DotNet(arguments: $"sln add {Params.PluginFile} --in-root");
-
             AbsolutePath templatePluginType = Params.TemplateDirectory / Params.PluginType;
             CopyDirectory(templatePluginType, Params.PluginDirectory, new Dictionary<string, string>());
+
+            DotNet(arguments: $"sln add {Params.PluginFile} --in-root");
         });
 
     private bool ProjectExistInSolution(string projectName) {
