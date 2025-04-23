@@ -14,6 +14,7 @@ using dosymep.Revit.FileInfo;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+using dosymep.WpfUI.Core.SimpleServices;
 
 using RevitRsnManager.Interfaces;
 using RevitRsnManager.Models;
@@ -26,6 +27,7 @@ namespace RevitRsnManager.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly WpfUIMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
     private readonly IRsnConfigService _rsnConfigService;
 
@@ -43,6 +45,7 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
+        WpfUIMessageBoxService messageBoxService,
         ILocalizationService localizationService, 
         IRsnConfigService rsnConfigService) {
         
@@ -50,32 +53,28 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _rsnConfigService = rsnConfigService;
+        _messageBoxService = messageBoxService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         AutoConfigureCommand = RelayCommand.Create(AutoConfigure);
-        MoveUpCommand = new RelayCommand(MoveUp, server => CanMove(server, -1));
-        MoveDownCommand = new RelayCommand(MoveDown, server => CanMove(server, 1));
-        AddServerCommand = new RelayCommand(_ => AddServer(), _ => !string.IsNullOrWhiteSpace(NewServerName));
-        RemoveServerCommand = new RelayCommand(RemoveServer, server => server is string && Servers.Contains((string) server));
+        RemoveServerCommand = RelayCommand.Create<string>(server => Servers.Remove(server));
+        AddServerCommand = RelayCommand.Create(AddServer, () => !string.IsNullOrWhiteSpace(NewServerName));
+        MoveUpCommand = RelayCommand.Create<object>(MoveUp, server => CanMove(server, -1));
+        MoveDownCommand = RelayCommand.Create<object>(MoveDown, server => CanMove(server, 1));
     }
 
     /// <summary>
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
-
     public ICommand AddServerCommand { get; }
     public ICommand RemoveServerCommand { get; }
     public ICommand AcceptViewCommand { get; }
     public ICommand MoveUpCommand { get; }
     public ICommand MoveDownCommand { get; }
     public ICommand AutoConfigureCommand { get; }
+
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
     /// </summary>
@@ -83,6 +82,7 @@ internal class MainViewModel : BaseViewModel {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
+
     public string NewServerName {
         get => _newServerName;
         set => RaiseAndSetIfChanged(ref _newServerName, value);
@@ -135,20 +135,10 @@ internal class MainViewModel : BaseViewModel {
                 return null;
             }
 
-            return ExtractServerFromCentralPath(centralPath);
+            return new Uri(centralPath).Host;
         } catch {
             return null;
         }
-    }
-
-    private string ExtractServerFromCentralPath(string centralPath) {
-        if(centralPath.StartsWith("RSN://", StringComparison.OrdinalIgnoreCase)) {
-            centralPath = centralPath.Substring("RSN://".Length);
-            string[] parts = centralPath.Split('/');
-            return parts.Length > 0 ? parts[0] : null;
-        }
-
-        return null;
     }
 
     private void AddServer() {
@@ -172,14 +162,6 @@ internal class MainViewModel : BaseViewModel {
         ErrorText = null; 
     }
 
-    private void RemoveServer(object serverObj) {
-        if(serverObj is string server && Servers.Contains(server)) {
-            Servers.Remove(server);
-            if(SelectedServer == server) {
-                SelectedServer = null;
-            }
-        }
-    }
 
     private void Move(object serverObj, int delta) {
         if(serverObj is not string server)
@@ -226,7 +208,7 @@ internal class MainViewModel : BaseViewModel {
         var updateSuccess = _localizationService.GetLocalizedString("MainWindow.UpdateSuccess");
         var updateSuccessTitle = _localizationService.GetLocalizedString("MainWindow.UpdateSuccessTitle");
         SaveConfig();
-        MessageBox.Show(
+        _messageBoxService.Show(
                updateSuccess,
                updateSuccessTitle,
                MessageBoxButton.OK,
@@ -244,6 +226,11 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private bool CanAcceptView() {
         ErrorText = null;
+        if(Servers == null || Servers.Count == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorEmptyServerList");
+            return false;
+        }
+
         return true;
     }
 

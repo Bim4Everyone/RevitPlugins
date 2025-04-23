@@ -35,7 +35,7 @@ public class RevitRsnEditCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitRsnEditCommand() {
-        PluginName = "RevitRsnManager";
+        PluginName = "Менеджер файла RSN.ini";
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class RevitRsnEditCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
-
+        
         // Настройка локализации,
         // получение имени сборки откуда брать текст
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;

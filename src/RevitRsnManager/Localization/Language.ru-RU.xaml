@@ -19,5 +19,8 @@
     <system:String x:Key="RsnConfigService.EmptyServerList">Список серверов пуст или не задан.</system:String>
     <system:String x:Key="RsnConfigService.RevitIniNotFound">Файл Revit.ini не найден.</system:String>
     <system:String x:Key="RsnConfigService.ProjectPathMissing">Не удалось получить ProjectPath из Revit.ini.</system:String>
+    <system:String x:Key="MainWindow.ErrorEmptyServerList">Добавьте хотя бы один сервер.</system:String>
+    <system:String x:Key="MainWindow.AutoConfigure">Автонастройка</system:String>
+    <system:String x:Key="MainWindow.AddServer">Добавить</system:String>
 
 </ResourceDictionary>

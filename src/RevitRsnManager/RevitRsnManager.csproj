@@ -1,9 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <LangVersion>12</LangVersion>
+	<PropertyGroup>
 		<UseWpfUI>true</UseWpfUI>
-    </PropertyGroup>
-    <ItemGroup>
-      <Folder Include="Utils\" />
-    </ItemGroup>
+		<LangVersion>12</LangVersion>
+	</PropertyGroup>
 </Project>

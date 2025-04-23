@@ -26,6 +26,17 @@
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
+    <Window.Resources>
+        <Style TargetType="ListBox">
+            <Setter 
+                Property="Background"
+                Value="{ui:ThemeResource TextFillColorDisabledBrush}" />
+            <Setter
+                Property="BorderThickness"
+               Value="0" />
+        </Style>
+    </Window.Resources>
+
     <b:Interaction.Triggers>
         <b:EventTrigger
             EventName="Loaded">
@@ -46,11 +57,11 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <Button 
+        <ui:Button 
             Grid.Row="1"
             Margin="0,10,10,10"
             HorizontalAlignment="Right"
-            Content="Автонастройка"
+            Content="{me:LocalizationSource MainWindow.AutoConfigure}"
             Command="{Binding AutoConfigureCommand}" />
 
         <StackPanel 
@@ -62,10 +73,19 @@
                 Width="200"
                 Margin="10,0,10,0"
                 Text="{Binding NewServerName, UpdateSourceTrigger=PropertyChanged}" />
-            
-            <Button 
-                Content="Добавить"
-                Command="{Binding AddServerCommand}" />
+
+            <ui:Button Command="{Binding AddServerCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock 
+                        Text="{me:LocalizationSource MainWindow.AddServer}"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center" />
+                    <ui:SymbolIcon 
+                        Symbol="Add12"
+                        Width="16"
+                        Height="16" />
+                </StackPanel>
+            </ui:Button>
         </StackPanel>
 
         <ListBox 
@@ -78,11 +98,10 @@
 
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
-                    
+
                     <EventSetter 
                         Event="PreviewMouseMove"
                         Handler="ListBoxItem_PreviewMouseMove" />
-                    
                 </Style>
             </ListBox.ItemContainerStyle>
 
@@ -90,36 +109,53 @@
                 <DataTemplate>
                     <Border 
                         BorderThickness="1,1,1,1"
-                        BorderBrush="Black"
+                        BorderBrush="{ui:ThemeResource TextFillColorPrimaryBrush}"
                         Padding="5"
                         Margin="10,5,0,5"
                         CornerRadius="5">
-                        
-                        <DockPanel>
-                            <StackPanel 
-                                Orientation="Vertical"
-                                DockPanel.Dock="Left"
-                                Margin="0,0,5,0">
-                                
-                                <Button 
-                                    Content="↑"
-                                    Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                                <Button 
-                                    Content="↓"
-                                    Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                            </StackPanel>
 
+                        <DockPanel>
                             <TextBlock 
                                 Text="{Binding}"
                                 VerticalAlignment="Center"
+                                DockPanel.Dock="Left"
                                 Margin="10,0"
-                                DockPanel.Dock="Left" />
+                                Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}" />
 
-                            <Button 
-                                Content="X"
+                            <StackPanel 
+                                Orientation="Horizontal"
                                 DockPanel.Dock="Right"
-                                Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                HorizontalAlignment="Right"
+                                Margin="0,0,5,0">
+                                <ui:Button 
+                                    Margin="0,0,5,0"
+                                    Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}">
+                                    <ui:SymbolIcon 
+                                        Symbol="ArrowUp12"
+                                        Width="16"
+                                        Height="16" />
+                                </ui:Button>
+                                <ui:Button 
+                                    Margin="0,0,5,0"
+                                    Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}">
+                                    <ui:SymbolIcon
+                                        Symbol="ArrowDown12"
+                                        Width="16"
+                                        Height="16" />
+                                </ui:Button>
+                                <ui:Button 
+                                    Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}">
+                                    <ui:SymbolIcon 
+                                        Symbol="Delete12"
+                                        Width="16"
+                                        Height="16" />
+                                </ui:Button>
+                            </StackPanel>
                         </DockPanel>
+
                     </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -139,8 +175,8 @@
             <ui:Button 
                 Width="80"
                 Margin="10"
-                Content="{DynamicResource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
+                Content="{DynamicResource MainWindow.ButtonOk}"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button 

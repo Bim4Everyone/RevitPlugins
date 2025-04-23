@@ -13,6 +13,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
+using dosymep.WpfUI.Core.SimpleServices;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -36,7 +37,7 @@ public class RevitRsnLoadCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitRsnLoadCommand() {
-        PluginName = "RevitRsnManager";
+        PluginName = "Менеджер файла RSN.ini";
     }
 
     /// <summary>
@@ -67,6 +68,8 @@ public class RevitRsnLoadCommand : BasePluginCommand {
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
+        kernel.UseWpfUIMessageBox();
+
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
 
@@ -83,8 +86,10 @@ public class RevitRsnLoadCommand : BasePluginCommand {
         var pluginConfig = kernel.Get<PluginConfig>();
         var revitRepository = kernel.Get<RevitRepository>();
         var rsnConfigService = kernel.Get<RsnConfigService>();
+        var msg = kernel.Get<WpfUIMessageBoxService>();
         var localizationService = kernel.Get<ILocalizationService>();
-
+        
+        
         var config = pluginConfig.GetSettings(revitRepository.Document);
         
         if(config != null && config.Servers?.Any() == true) {
@@ -92,7 +97,7 @@ public class RevitRsnLoadCommand : BasePluginCommand {
             var updateSuccessTitle = localizationService.GetLocalizedString("MainWindow.UpdateSuccessTitle");
 
             rsnConfigService.SaveServersToIni(config.Servers);
-            MessageBox.Show(
+            msg.Show(
                updateSuccess,
                updateSuccessTitle,
                MessageBoxButton.OK,
@@ -102,7 +107,7 @@ public class RevitRsnLoadCommand : BasePluginCommand {
             var configNotFound = localizationService.GetLocalizedString("MainWindow.ConfigNotFound");
             var configNotFoundTitle = localizationService.GetLocalizedString("MainWindow.ConfigNotFoundTitle");
 
-            MessageBox.Show(
+            msg.Show(
                 configNotFound,
                 configNotFoundTitle,
                 MessageBoxButton.OK,
