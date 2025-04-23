@@ -222,6 +222,10 @@
               "Rv2025"
             ]
           }
+        },
+        "Solution": {
+          "type": "string",
+          "description": "Path to a solution file that is automatically loaded"
         }
       }
     },

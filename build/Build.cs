@@ -5,6 +5,7 @@ using System.Linq;
 using Nuke.Common;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
+using Nuke.Common.ProjectModel;
 
 using Serilog;
 
@@ -18,11 +19,14 @@ partial class Build : NukeBuild {
 
     public BuildParams Params { get; set; }
 
+    [Solution] public readonly Solution Solution;
     [GitRepository] public readonly GitRepository GitRepository;
 
     protected override void OnBuildInitialized() {
         Params = new BuildParams(this);
         base.OnBuildInitialized();
+
+        Log.Information("Build Solution: {Solution}", Solution);
 
         Log.Information("Build plugin: {PluginName}", Params.PluginName);
         Log.Information("Plugin directory: {PluginDirectory}", Params.PluginDirectory);
