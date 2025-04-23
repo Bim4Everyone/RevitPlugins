@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using pyRevitLabs.Json;
 
 using RevitClashDetective.Models.Extensions;
@@ -33,6 +35,7 @@ namespace RevitClashDetective.Models.Clashes {
 
             Id = element.Id;
             Name = element.Name;
+            FamilyName = element.GetElementType().FamilyName;
             Category = element.Category?.Name;
             Level = RevitRepository.GetLevelName(element);
             DocumentName = RevitRepository.GetDocumentName(element.Document);
@@ -41,7 +44,14 @@ namespace RevitClashDetective.Models.Clashes {
 
 
         public ElementId Id { get; set; }
+        /// <summary>
+        /// Имя типоразмера
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Имя семейства
+        /// </summary>
+        public string FamilyName { get; set; }
         public string Category { get; set; }
         public string Level { get; set; }
         public string DocumentName { get; set; }
