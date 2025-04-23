@@ -668,7 +668,7 @@ namespace RevitOpeningPlacement.Models {
                     return MepConduitCategories.Contains(elCategory);
                 default:
                     throw new NotImplementedException(nameof(mepCategory));
-            };
+            }
         }
 
         /// <summary>
