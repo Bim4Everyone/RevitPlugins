@@ -9,176 +9,6 @@
     <BuildType Name="Release" />
     <Platform Name="x64" />
   </Configurations>
-  <Folder Name="/dosymep/">
-    <File Path="src/dosymep/AppDomainExtensions.cs" />
-    <File Path="src/dosymep/AsyncRelayCommand.cs" />
-    <File Path="src/dosymep/AsyncRelayCommand.T.cs" />
-    <File Path="src/dosymep/BasePluginCommand.cs" />
-    <File Path="src/dosymep/BaseViewModel.cs" />
-    <File Path="src/dosymep/BoolToStringConverter.cs" />
-    <File Path="src/dosymep/BoolToVisibilityConverter.cs" />
-    <File Path="src/dosymep/ConfigSerializer.cs" />
-    <File Path="src/dosymep/ConvertibleExtention.cs" />
-    <File Path="src/dosymep/DisableCollapseGroupRowCommand.cs" />
-    <File Path="src/dosymep/ElementIdConverter.cs" />
-    <File Path="src/dosymep/EnumConverter.cs" />
-    <File Path="src/dosymep/EnumToItemsSource.cs" />
-    <File Path="src/dosymep/GroupRowChildrenValuesConverter.cs" />
-    <File Path="src/dosymep/GroupRowExtensions.cs" />
-    <File Path="src/dosymep/GroupRowValueConverter.cs" />
-    <File Path="src/dosymep/IAsyncCommand.cs" />
-    <File Path="src/dosymep/IAsyncCommand.T.cs" />
-    <File Path="src/dosymep/ICommand.cs" />
-    <File Path="src/dosymep/IndexConverter.cs" />
-    <File Path="src/dosymep/InverseBooleanConverter.cs" />
-    <File Path="src/dosymep/NullToStringConverter.cs" />
-    <File Path="src/dosymep/ObservableObject.cs" />
-    <File Path="src/dosymep/PlatformWindow.cs" />
-    <File Path="src/dosymep/RelayCommand.cs" />
-    <File Path="src/dosymep/RelayCommand.T.cs" />
-    <File Path="src/dosymep/RevitViewTypeConverter.cs" />
-    <File Path="src/dosymep/ThemedPlatformWindow.cs" />
-  </Folder>
-  <Folder Name="/ProjectProps/">
-    <File Path="src/_ProjectProps/DevExpress.props" />
-    <File Path="src/_ProjectProps/RevitClashes.props" />
-    <File Path="src/_ProjectProps/WpfUI.props" />
-  </Folder>
-  <Folder Name="/RevitClashes/" />
-  <Folder Name="/RevitClashes/Models/">
-    <File Path="src/RevitClashes/Models/ChecksConfig.cs" />
-    <File Path="src/RevitClashes/Models/Collector.cs" />
-    <File Path="src/RevitClashes/Models/ConfigLoader.cs" />
-    <File Path="src/RevitClashes/Models/ConfigSaver.cs" />
-    <File Path="src/RevitClashes/Models/DocInfo.cs" />
-    <File Path="src/RevitClashes/Models/NameResolver.cs" />
-    <File Path="src/RevitClashes/Models/ProjectConfigBuilder.cs" />
-    <File Path="src/RevitClashes/Models/RevitParamConverter.cs" />
-    <File Path="src/RevitClashes/Models/RevitRepository.cs" />
-    <File Path="src/RevitClashes/Models/View3DBuilder.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/ClashDetection/">
-    <File Path="src/RevitClashes/Models/ClashDetection/ClashDetector.cs" />
-    <File Path="src/RevitClashes/Models/ClashDetection/FilterProvider.cs" />
-    <File Path="src/RevitClashes/Models/ClashDetection/ProvidersClashDetector.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/Clashes/">
-    <File Path="src/RevitClashes/Models/Clashes/ClashData.cs" />
-    <File Path="src/RevitClashes/Models/Clashes/ClashesConfig.cs" />
-    <File Path="src/RevitClashes/Models/Clashes/ClashModel.cs" />
-    <File Path="src/RevitClashes/Models/Clashes/ElementModel.cs" />
-    <File Path="src/RevitClashes/Models/Clashes/TransformModel.cs" />
-    <File Path="src/RevitClashes/Models/Clashes/XYZModel.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/Evaluators/">
-    <File Path="src/RevitClashes/Models/Evaluators/RuleEvaluators.cs" />
-    <File Path="src/RevitClashes/Models/Evaluators/SetEvaluatorUtils.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/Extensions/">
-    <File Path="src/RevitClashes/Models/Extensions/BoundingBoxExtensions.cs" />
-    <File Path="src/RevitClashes/Models/Extensions/ElementExtensions.cs" />
-    <File Path="src/RevitClashes/Models/Extensions/SolidExtension.cs" />
-    <File Path="src/RevitClashes/Models/Extensions/TransformExtension.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/FilterableValueProviders/">
-    <File Path="src/RevitClashes/Models/FilterableValueProviders/ParameterInitializer.cs" />
-    <File Path="src/RevitClashes/Models/FilterableValueProviders/ParameterValueProvider.cs" />
-    <File Path="src/RevitClashes/Models/FilterableValueProviders/WorksetValueProvider.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/FilterCreators/" />
-  <Folder Name="/RevitClashes/Models/FilterCreators/RevitFilterCreators/">
-    <File Path="src/RevitClashes/Models/FilterCreators/RevitFilterCreators/RevitLogicalAndFilterCreator.cs" />
-    <File Path="src/RevitClashes/Models/FilterCreators/RevitFilterCreators/RevitLogicalOrFilterCreator.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/FilterGenerators/">
-    <File Path="src/RevitClashes/Models/FilterGenerators/RevitFilter.cs" />
-    <File Path="src/RevitClashes/Models/FilterGenerators/RevitFilterGenerator.cs" />
-    <File Path="src/RevitClashes/Models/FilterGenerators/RevitRule.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/FilterModel/">
-    <File Path="src/RevitClashes/Models/FilterModel/Criterion.cs" />
-    <File Path="src/RevitClashes/Models/FilterModel/Filter.cs" />
-    <File Path="src/RevitClashes/Models/FilterModel/FiltersConfig.cs" />
-    <File Path="src/RevitClashes/Models/FilterModel/RevitClashConfigSerializer.cs" />
-    <File Path="src/RevitClashes/Models/FilterModel/RevitClashesSerializationBinder.cs" />
-    <File Path="src/RevitClashes/Models/FilterModel/Rule.cs" />
-    <File Path="src/RevitClashes/Models/FilterModel/Set.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/GraphicView/">
-    <File Path="src/RevitClashes/Models/GraphicView/ParameterFilterProvider.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/Handlers/">
-    <File Path="RevitClashes/Models/Handlers/RevitEventHandler.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/Interfaces/">
-    <File Path="src/RevitClashes/Models/Interfaces/ICriterion.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IFilter.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IFilterableValueProvider.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IFilterGenerator.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/INamedEntity.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IProvider.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IRevitLogicalFilterCreator.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IRevitRuleCreator.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IRule.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IView3DBuilder.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IView3DProvider.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IView3DSetting.cs" />
-    <File Path="src/RevitClashes/Models/Interfaces/IVisiter.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/RevitClashReport/">
-    <File Path="src/RevitClashes/Models/RevitClashReport/BaseClashesLoader.cs" />
-    <File Path="src/RevitClashes/Models/RevitClashReport/NavisHtmlClashesLoader.cs" />
-    <File Path="src/RevitClashes/Models/RevitClashReport/NavisXmlClashesLoader.cs" />
-    <File Path="src/RevitClashes/Models/RevitClashReport/PluginClashesLoader.cs" />
-    <File Path="src/RevitClashes/Models/RevitClashReport/ReportLoader.cs" />
-    <File Path="src/RevitClashes/Models/RevitClashReport/ReportModel.cs" />
-    <File Path="src/RevitClashes/Models/RevitClashReport/RevitClashesLoader.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/RevitViewSettings/">
-    <File Path="src/RevitClashes/Models/RevitViewSettings/DetailLevelSetting.cs" />
-    <File Path="src/RevitClashes/Models/RevitViewSettings/DisplayStyleSetting.cs" />
-    <File Path="src/RevitClashes/Models/RevitViewSettings/FilterSetting.cs" />
-    <File Path="src/RevitClashes/Models/RevitViewSettings/HiddenCategoriesSetting.cs" />
-    <File Path="src/RevitClashes/Models/RevitViewSettings/ParamSetting.cs" />
-    <File Path="src/RevitClashes/Models/RevitViewSettings/TransparencySetting.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/Utils/">
-    <File Path="src/RevitClashes/Models/Utils/DoubleValueParser.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/Value/">
-    <File Path="src/RevitClashes/Models/Value/DoubleParamValue.cs" />
-    <File Path="src/RevitClashes/Models/Value/ElementIdParamValue.cs" />
-    <File Path="src/RevitClashes/Models/Value/IntParamValue.cs" />
-    <File Path="src/RevitClashes/Models/Value/ParamValue.cs" />
-    <File Path="src/RevitClashes/Models/Value/StringParamValue.cs" />
-  </Folder>
-  <Folder Name="/RevitClashes/Models/Visiter/">
-    <File Path="src/RevitClashes/Models/Visiter/BeginsWithVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/ContainsVisiter.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/EndsWithVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/EqualsVisiter.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/GreaterOrEqualVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/GreaterVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/HasNoValueVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/HasValueVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/LessOrEqualVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/LessVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/NotBeginsWithVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/NotContainsVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/NotEndsWithVisister.cs" />
-    <File Path="src/RevitClashes/Models/Visiter/NotEqualsVisister.cs" />
-  </Folder>
-  <Folder Name="/RevitVersions/">
-    <File Path="src/_RevitVersions/Autodesk.Revit.Sdk.Refs.2016.props" />
-    <File Path="src/_RevitVersions/Autodesk.Revit.Sdk.Refs.2017.props" />
-    <File Path="src/_RevitVersions/Autodesk.Revit.Sdk.Refs.2018.props" />
-    <File Path="src/_RevitVersions/Autodesk.Revit.Sdk.Refs.2019.props" />
-    <File Path="src/_RevitVersions/Autodesk.Revit.Sdk.Refs.2020.props" />
-    <File Path="src/_RevitVersions/Autodesk.Revit.Sdk.Refs.2021.props" />
-    <File Path="src/_RevitVersions/Autodesk.Revit.Sdk.Refs.2022.props" />
-    <File Path="src/_RevitVersions/Autodesk.Revit.Sdk.Refs.2023.props" />
-    <File Path="src/_RevitVersions/Autodesk.Revit.Sdk.Refs.2024.props" />
-  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".gitattributes" />
@@ -191,13 +21,19 @@
     <File Path="src/Directory.Build.props" />
     <File Path="src/Directory.Build.targets" />
   </Folder>
+  <Folder Name="/Solution Items/Project Props/">
+    <File Path="src/_ProjectProps/DevExpress.props" />
+    <File Path="src/_ProjectProps/RevitClashes.props" />
+    <File Path="src/_ProjectProps/WpfUI.props" />
+  </Folder>
   <Project Path="build/_build.csproj">
+    <Build Project="false" />
+    <Platform Project="x64" />
     <BuildType Solution="D2020|*" Project="Debug" />
     <BuildType Solution="D2021|*" Project="Debug" />
     <BuildType Solution="D2022|*" Project="Debug" />
     <BuildType Solution="D2023|*" Project="Debug" />
     <BuildType Solution="D2024|*" Project="Debug" />
-    <Build Project="false" />
   </Project>
   <Project Path="src/RevitApartmentPlans/RevitApartmentPlans.csproj">
     <Platform Project="x64" />
