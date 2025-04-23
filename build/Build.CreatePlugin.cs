@@ -35,7 +35,7 @@ partial class Build {
         });
 
     private bool ProjectExistInSolution(string projectName) {
-        return DotNet(arguments: "sln list")
+        return DotNet(arguments: "sln list", logOutput: false)
             .Any(line => line.Text.EndsWith($"{projectName}.csproj"));
     }
 }
