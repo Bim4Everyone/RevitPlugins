@@ -45,6 +45,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             MepCategories = new ObservableCollection<MepCategoryViewModel>(
                 openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, item)));
             ConfigName = openingConfig.Name;
+            RoundUnitedTaskSize = openingConfig.UnitedTasksSizeRounding > 0;
+            SelectedSizeRoundForUnitedTask = openingConfig.UnitedTasksSizeRounding;
+            RoundUnitedTaskElevation = openingConfig.UnitedTasksElevationRounding > 0;
+            SelectedElevationRoundingForUnitedTask = openingConfig.UnitedTasksElevationRounding;
+            ShowPlacingErrors = openingConfig.ShowPlacingErrors;
 
             InitializeTimer();
 
@@ -55,6 +60,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             CheckMepFilterCommand = RelayCommand.Create(CheckMepFilter, CanSaveConfig);
             CheckWallFilterCommand = RelayCommand.Create(CheckWallFilter, CanSaveConfig);
             CheckFloorFilterCommand = RelayCommand.Create(CheckFloorFilter, CanSaveConfig);
+            OpenUnionTaskSettingsCommand = RelayCommand.Create(OpenUnionTaskSettings);
 
             SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
                 ?? MepCategories.First();
@@ -86,6 +92,57 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             set => RaiseAndSetIfChanged(ref _showPlacingErrors, value);
         }
 
+        private bool _roundUnitedTaskSize;
+
+        /// <summary>
+        /// Включает/выключает округление размеров объединенных заданий на отверстия
+        /// </summary>
+        public bool RoundUnitedTaskSize {
+            get => _roundUnitedTaskSize;
+            set {
+                RaiseAndSetIfChanged(ref _roundUnitedTaskSize, value);
+                SelectedSizeRoundForUnitedTask = value ? EnabledRoundings.First() : 0;
+            }
+        }
+
+        private bool _roundUnitedTaskElevation;
+
+        /// <summary>
+        /// Включает/выключает округление отметки объединенных заданий на отверстия
+        /// </summary>
+        public bool RoundUnitedTaskElevation {
+            get => _roundUnitedTaskElevation;
+            set {
+                RaiseAndSetIfChanged(ref _roundUnitedTaskElevation, value);
+                SelectedElevationRoundingForUnitedTask = value ? EnabledRoundings.First() : 0;
+            }
+        }
+
+        private int _selectedElevationRoundingForUnitedTask;
+
+        /// <summary>
+        /// Округление высотной отметки в мм объединенных заданий на отверстия
+        /// </summary>
+        public int SelectedElevationRoundingForUnitedTask {
+            get => _selectedElevationRoundingForUnitedTask;
+            set => RaiseAndSetIfChanged(ref _selectedElevationRoundingForUnitedTask, value);
+        }
+
+        private int _selectedSizeRoundForUnitedTask;
+
+        /// <summary>
+        /// Округление размеров в мм объединенных заданий на отверстия
+        /// </summary>
+        public int SelectedSizeRoundForUnitedTask {
+            get => _selectedSizeRoundForUnitedTask;
+            set => RaiseAndSetIfChanged(ref _selectedSizeRoundForUnitedTask, value);
+        }
+
+        /// <summary>
+        /// Доступные для выбора значения округления в мм
+        /// </summary>
+        public IReadOnlyCollection<int> EnabledRoundings { get; } = new int[] { 1, 5, 10, 25, 50 };
+
         public string ErrorText {
             get => _errorText;
             set => RaiseAndSetIfChanged(ref _errorText, value);
@@ -104,6 +161,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         public ICommand CheckFloorFilterCommand { get; }
 
         public ICommand OpenConfigFolderCommand { get; }
+        public ICommand OpenUnionTaskSettingsCommand { get; }
 
 
         private void InitializeTimer() {
@@ -166,6 +224,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
             config.ShowPlacingErrors = ShowPlacingErrors;
             config.Name = ConfigName.Trim();
+            config.UnitedTasksSizeRounding = SelectedSizeRoundForUnitedTask;
+            config.UnitedTasksElevationRounding = SelectedElevationRoundingForUnitedTask;
             return config;
         }
 
@@ -196,6 +256,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
                     ?? MepCategories.First();
                 ConfigName = config.Name;
+                RoundUnitedTaskSize = config.UnitedTasksSizeRounding > 0;
+                SelectedSizeRoundForUnitedTask = config.UnitedTasksSizeRounding;
+                RoundUnitedTaskElevation = config.UnitedTasksElevationRounding > 0;
+                SelectedElevationRoundingForUnitedTask = config.UnitedTasksElevationRounding;
                 UpdateOpeningConfigPath(config.ProjectConfigPath);
             }
             MessageText = "Файл настроек успешно загружен.";
@@ -241,6 +305,11 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             var path = GetOpeningConfig().ProjectConfigPath;
             var dir = Path.GetDirectoryName(path);
             _configFileService.OpenFolder(dir, path);
+        }
+
+        private void OpenUnionTaskSettings() {
+            var window = new UnionTaskSettingsView() { DataContext = this };
+            window.ShowDialog();
         }
     }
 }
