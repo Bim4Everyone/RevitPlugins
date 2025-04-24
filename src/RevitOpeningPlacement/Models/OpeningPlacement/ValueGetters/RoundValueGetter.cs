@@ -29,26 +29,34 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
 
         /// <summary>
         /// Округляет полученное значение длины (в футах) до ближайшего сверху целого заданного количества миллиметров и возвращает округленную длину в футах.
-        /// Если значение округления 0 или меньше, будет произведено округление по умолчанию до 1 мм.
+        /// Если значение округления 0 или меньше, округление произведено не будет.
         /// </summary>
         /// <param name="ftValue">Размер в футах, который нужно округлить до заданного количества миллиметров</param>
         /// <param name="mmRound">Значение округления в миллиметрах</param>
         /// <returns>Размер в футах, округленный до заданного количества миллиметров</returns>
         protected double RoundToCeilingFeetToMillimeters(double ftValue, int mmRound) {
-            var ftRound = mmRound > 0 ? GetFeetRound(mmRound) : GetFeetRound(1);
-            return Math.Ceiling(Math.Round(ftValue / ftRound, _digitsRound, MidpointRounding.AwayFromZero)) * ftRound;
+            if(mmRound > 0) {
+                var ftRound = GetFeetRound(mmRound);
+                return Math.Ceiling(Math.Round(ftValue / ftRound, _digitsRound, MidpointRounding.AwayFromZero)) * ftRound;
+            } else {
+                return ftValue;
+            }
         }
 
         /// <summary>
         /// Округляет полученное значение длины (в футах) до ближайшего снизу целого заданного количества миллиметров и возвращает округленную длину в футах.
-        /// Если значение округления 0 или меньше, будет произведено округление по умолчанию до 1 мм.
+        /// Если значение округления 0 или меньше, округление произведено не будет.
         /// </summary>
         /// <param name="ftValue">Размер в футах, который нужно округлить до заданного количества миллиметров</param>
         /// <param name="mmRound">Значение округления в миллиметрах</param>
         /// <returns>Размер в футах, округленный до заданного количества миллиметров</returns>
         protected double RoundToFloorFeetToMillimeters(double ftValue, int mmRound = 1) {
-            var ftRound = mmRound > 0 ? GetFeetRound(mmRound) : GetFeetRound(1);
-            return Math.Floor(Math.Round(ftValue / ftRound, _digitsRound, MidpointRounding.AwayFromZero)) * ftRound;
+            if(mmRound > 0) {
+                var ftRound = GetFeetRound(mmRound);
+                return Math.Floor(Math.Round(ftValue / ftRound, _digitsRound, MidpointRounding.AwayFromZero)) * ftRound;
+            } else {
+                return ftValue;
+            }
         }
 
 

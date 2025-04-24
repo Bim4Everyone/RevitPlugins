@@ -21,11 +21,12 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         /// <summary>
         /// Округление высотной отметки отверстия в мм
         /// </summary>
-        private const int _heightRound = 10;
+        private readonly int _heightRound;
 
-        public FittingWallPointFinder(FittingClash<Wall> clash, IAngleFinder angleFinder, IValueGetter<DoubleParamValue> sizeGetter = null) {
+        public FittingWallPointFinder(FittingClash<Wall> clash, IAngleFinder angleFinder, int heightRound, IValueGetter<DoubleParamValue> sizeGetter = null) {
             _clash = clash;
             _angleFinder = angleFinder;
+            _heightRound = heightRound;
             _sizeGetter = sizeGetter;
         }
 

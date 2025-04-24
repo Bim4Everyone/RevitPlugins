@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using RevitOpeningPlacement.Models.Interfaces;
@@ -15,18 +15,21 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
     internal class SingleRectangleOpeningTaskInWallParameterGetter : IParametersGetter {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
         private readonly IPointFinder _pointFinder;
+        private readonly int _rounding;
 
         /// <summary>
         /// Конструктор класса, предоставляющего параметры для чистового прямоугольного отверстия из параметров входящего задания на прямоугольное отверстие в стене
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
-        public SingleRectangleOpeningTaskInWallParameterGetter(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder) {
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
+        public SingleRectangleOpeningTaskInWallParameterGetter(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder, int rounding) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
             if(pointFinder is null) { throw new ArgumentNullException(nameof(pointFinder)); }
 
             _openingMepTaskIncoming = incomingTask;
             _pointFinder = pointFinder;
+            _rounding = rounding;
         }
 
 
@@ -34,10 +37,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
             // габариты отверстия
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArHeight,
-                new RectangleOpeningInWallHeightValueGetter(_openingMepTaskIncoming, _pointFinder)).GetParamValue();
+                new RectangleOpeningInWallHeightValueGetter(_openingMepTaskIncoming, _pointFinder, _rounding)).GetParamValue();
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArWidth,
-                new RectangleOpeningInWallWidthValueGetter(_openingMepTaskIncoming)).GetParamValue();
+                new RectangleOpeningInWallWidthValueGetter(_openingMepTaskIncoming, _rounding)).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
             var isEomValueGetter = new IsEomValueGetter(_openingMepTaskIncoming);

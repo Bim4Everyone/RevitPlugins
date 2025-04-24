@@ -13,15 +13,18 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
     /// </summary>
     internal class SingleOpeningArTaskInFloorParameterGetter : IParametersGetter {
         private readonly IOpeningTaskIncoming _incomingTask;
+        private readonly int _rounding;
 
 
         /// <summary>
         /// Конструктор класса, предоставляющего значения параметров для КР отверстия, размещаемого по одному заданию на отверстие
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public SingleOpeningArTaskInFloorParameterGetter(IOpeningTaskIncoming incomingTask) {
+        public SingleOpeningArTaskInFloorParameterGetter(IOpeningTaskIncoming incomingTask, int rounding) {
             _incomingTask = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
+            _rounding = rounding;
         }
 
 
@@ -29,10 +32,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
             // габариты отверстия
             yield return new DoubleParameterGetter(
                 RealOpeningKrPlacer.RealOpeningKrInFloorHeight,
-                new RectangleOpeningInFloorHeightValueGetter(_incomingTask)).GetParamValue();
+                new RectangleOpeningInFloorHeightValueGetter(_incomingTask, _rounding)).GetParamValue();
             yield return new DoubleParameterGetter(
                 RealOpeningKrPlacer.RealOpeningKrInFloorWidth,
-                new RectangleOpeningInFloorWidthValueGetter(_incomingTask)).GetParamValue();
+                new RectangleOpeningInFloorWidthValueGetter(_incomingTask, _rounding)).GetParamValue();
 
             // текстовые данные отверстия
             yield return new StringParameterGetter(

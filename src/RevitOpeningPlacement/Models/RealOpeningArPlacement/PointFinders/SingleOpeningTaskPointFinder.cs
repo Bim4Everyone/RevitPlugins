@@ -12,16 +12,17 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.PointFinders {
     /// </summary>
     internal class SingleOpeningTaskPointFinder : RoundValueGetter, IPointFinder {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
+        private readonly int _rounding;
 
         /// <summary>
         /// Конструктор класса, предоставляющего точку вставки для чистового отверстия по заданию на отверстие
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
+        /// <param name="rounding">Округление высотной отметки в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public SingleOpeningTaskPointFinder(OpeningMepTaskIncoming incomingTask) {
-            if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
-
-            _openingMepTaskIncoming = incomingTask;
+        public SingleOpeningTaskPointFinder(OpeningMepTaskIncoming incomingTask, int rounding) {
+            _openingMepTaskIncoming = incomingTask ?? throw new ArgumentNullException(nameof(incomingTask));
+            _rounding = rounding;
         }
 
 
@@ -30,7 +31,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.PointFinders {
                 case OpeningType.WallRound:
                 case OpeningType.WallRectangle:
                     var point = _openingMepTaskIncoming.Location;
-                    return new XYZ(point.X, point.Y, RoundToFloorFeetToMillimeters(point.Z));
+                    return new XYZ(point.X, point.Y, RoundToFloorFeetToMillimeters(point.Z, _rounding));
                 default:
                     return _openingMepTaskIncoming.Location;
             }

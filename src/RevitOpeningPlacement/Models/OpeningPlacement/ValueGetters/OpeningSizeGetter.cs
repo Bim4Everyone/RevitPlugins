@@ -1,4 +1,4 @@
-﻿
+
 using System.Linq;
 
 using RevitClashDetective.Models.Value;

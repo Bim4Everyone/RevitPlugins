@@ -17,6 +17,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
     internal class ManyOpeningTasksPointFinderProvider {
         private readonly Element _host;
         private readonly ICollection<OpeningMepTaskIncoming> _incomingTasks;
+        private readonly int _rounding;
 
 
         /// <summary>
@@ -24,9 +25,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         /// </summary>
         /// <param name="host">Хост для чистового отверстия</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
+        /// <param name="rounding">Округление высотной отметки</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         /// <exception cref="ArgumentException">Исключение, если в коллекции меньше 1 элемента</exception>
-        public ManyOpeningTasksPointFinderProvider(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks) {
+        public ManyOpeningTasksPointFinderProvider(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks, int rounding) {
             if(host is null) { throw new ArgumentNullException(nameof(host)); }
             if(!((host is Wall) || (host is Floor))) { throw new ArgumentException(nameof(host)); }
             if(incomingTasks is null) { throw new ArgumentNullException(nameof(incomingTasks)); }
@@ -34,6 +36,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
 
             _host = host;
             _incomingTasks = incomingTasks;
+            _rounding = rounding;
         }
 
         public IPointFinder GetPointFinder() {
@@ -53,7 +56,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         }
 
         private IPointFinder GetWallPointFinder(BoundingBoxXYZ unitedBBox) {
-            return new BoundingBoxBottomPointFinder(unitedBBox);
+            return new BoundingBoxBottomPointFinder(unitedBBox, _rounding);
         }
 
         private BoundingBoxXYZ GetUnitedBBox(ICollection<OpeningMepTaskIncoming> incomingTasks) {

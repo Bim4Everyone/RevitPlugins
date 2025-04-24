@@ -22,14 +22,15 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 Type = revitRepository.GetOpeningTaskType(OpeningType.WallRectangle),
             };
             if(clash.Element1.IsPerpendicular(clash.Element2)) {
-                var pointFinder = new WallPointFinder(clash, new HeightValueGetter(clash.Element1, categoryOption));
+                var pointFinder = new WallPointFinder(clash, categoryOption.ElevationRounding, new HeightValueGetter(clash.Element1, categoryOption));
                 placer.PointFinder = pointFinder;
                 placer.ParameterGetter = new PerpendicularRectangleCurveWallParamGetter(clash, categoryOption, pointFinder, levelFinder);
             } else {
-                var pointFinder = new WallPointFinder(clash, new InclinedSizeInitializer(clash, categoryOption).GetRectangleMepHeightGetter());
+                var pointFinder = new WallPointFinder(clash, categoryOption.ElevationRounding, new InclinedSizeInitializer(clash, categoryOption).GetRectangleMepHeightGetter());
                 placer.ParameterGetter = new InclinedRectangleCurveWallParameterGetter(clash, categoryOption, pointFinder, levelFinder);
                 placer.PointFinder = pointFinder;
-            };
+            }
+            ;
 
             return placer;
         }
