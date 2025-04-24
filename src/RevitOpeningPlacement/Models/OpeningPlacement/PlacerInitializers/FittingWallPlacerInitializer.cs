@@ -20,7 +20,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             var clash = new FittingClash<Wall>(revitRepository, clashModel);
             var angleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform);
             var solidProvider = new FittingClashSolidProvider<Wall>(clash, angleFinder);
-            var heightGetter = new WallOpeningSizeInitializer(solidProvider.GetSolid(), categoryOptions).GetHeight();
+            var heightGetter = new WallOpeningSizeInitializer(solidProvider.GetSolid(), 0, categoryOptions).GetHeight();
             var roundings = categoryOptions.Select(c => c.ElevationRounding).ToArray();
             int rounding = roundings.Length > 0 ? roundings.Min() : 0;
             var pointFinder = new FittingWallPointFinder(clash, angleFinder, rounding, heightGetter);

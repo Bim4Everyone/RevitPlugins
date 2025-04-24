@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
 using RevitOpeningPlacement.OpeningModels;
@@ -50,15 +51,16 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <summary>
         /// Возвращает генератор задания на отверстие, 
         /// </summary>
+        /// <param name="config">Настройки расстановки заданий на отверстия</param>
         /// <exception cref="InvalidOperationException">Исключение, если не удалось выполнить операцию</exception>
         /// <exception cref="ArgumentOutOfRangeException">В группе находится менее 2-х заданий на отверстия</exception>
-        public OpeningPlacer GetOpeningPlacer(RevitRepository revitRepository) {
+        public OpeningPlacer GetOpeningPlacer(RevitRepository revitRepository, OpeningConfig config) {
             try {
                 OpeningPlacer placer;
                 if(_elements.Any(task => (task.OpeningType == OpeningType.FloorRound) || (task.OpeningType == OpeningType.FloorRectangle))) {
-                    placer = new FloorOpeningGroupPlacerInitializer().GetPlacer(revitRepository, this);
+                    placer = new FloorOpeningGroupPlacerInitializer().GetPlacer(revitRepository, config, this);
                 } else {
-                    placer = new WallOpeningGroupPlacerInitializer().GetPlacer(revitRepository, this);
+                    placer = new WallOpeningGroupPlacerInitializer().GetPlacer(revitRepository, config, this);
                 }
                 return placer;
 

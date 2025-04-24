@@ -16,10 +16,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         /// <summary>
         /// Округление высотной отметки отверстия в мм
         /// </summary>
-        private const int _heightRound = 10;
+        private readonly int _heightRound;
 
-        public WallOpeningsGroupPointFinder(OpeningsGroup group) {
+        /// <summary>
+        /// Конструирует провайдер точки вставки для объединенного задания на отверстие
+        /// </summary>
+        /// <param name="group">Объединенное задание на отверстие</param>
+        /// <param name="heightRounding">Округление отметки в мм</param>
+        public WallOpeningsGroupPointFinder(OpeningsGroup group, int heightRounding) {
             _group = group ?? throw new System.ArgumentNullException(nameof(group));
+            _heightRound = heightRounding;
         }
 
         public XYZ GetPoint() {
@@ -29,8 +35,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
                 .ToList()
                 .CreateUnitedBoundingBox();
             var center = bb.Min + (bb.Max - bb.Min) / 2;
-            var zRoundCoordinate = _group.IsCylinder ? RoundFeetToMillimeters(center.Z, _heightRound) : RoundFeetToMillimeters(bb.Min.Z, _heightRound);
-            return _group.GetTransform().OfPoint(new XYZ(center.X, bb.Min.Y, zRoundCoordinate));
+            var zCoordinate = _group.IsCylinder ? center.Z : bb.Min.Z;
+            var transformedPoint = _group.GetTransform().OfPoint(new XYZ(center.X, bb.Min.Y, zCoordinate));
+            return new XYZ(transformedPoint.X, transformedPoint.Y, RoundFeetToMillimeters(transformedPoint.Z, _heightRound));
         }
     }
 }

@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
 
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в группе отверстий меньше 2</exception>
-        public OpeningPlacer GetPlacer(RevitRepository revitRepository, OpeningsGroup openingsGroup) {
+        public OpeningPlacer GetPlacer(RevitRepository revitRepository, Configs.OpeningConfig config, OpeningsGroup openingsGroup) {
             if(openingsGroup is null) {
                 throw new ArgumentNullException(nameof(openingsGroup));
             }
@@ -28,7 +28,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
             if(openingsGroup.Elements.Count < 2) {
                 throw new ArgumentOutOfRangeException(nameof(openingsGroup.Elements.Count));
             }
-            var pointFinder = new WallOpeningsGroupPointFinder(openingsGroup);
+            var pointFinder = new WallOpeningsGroupPointFinder(openingsGroup, config.UnitedTasksElevationRounding);
             var levelFinder = new OpeningsGroupLevelFinder(openingsGroup);
             return new OpeningPlacer(revitRepository) {
                 Type = openingsGroup.IsCylinder
@@ -38,7 +38,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 PointFinder = pointFinder,
                 LevelFinder = levelFinder,
                 AngleFinder = new WallOpeningsGroupAngleFinder(openingsGroup),
-                ParameterGetter = new WallSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, levelFinder, openingsGroup)
+                ParameterGetter = new WallSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, levelFinder, openingsGroup, config)
             };
         }
     }

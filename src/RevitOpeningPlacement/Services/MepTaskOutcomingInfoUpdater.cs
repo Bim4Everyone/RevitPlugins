@@ -122,6 +122,7 @@ namespace RevitOpeningPlacement.Services {
                     outcomingTask.Status = OpeningTaskOutcomingStatus.NotActual;
                     return;
                 }
+                // TODO статус для заданий в разных конструкциях
                 if(OpeningTaskIsIntersecting(outcomingTask)) {
                     FindAndSetHost(outcomingTask);
                     outcomingTask.Status = OpeningTaskOutcomingStatus.Intersects;

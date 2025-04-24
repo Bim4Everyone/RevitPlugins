@@ -254,6 +254,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
                 var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
                 SetOpeningTaskHost(hostId);
+                // TODO логика по назначению статуса для заданий в разных конструкциях
 
                 if((intersectingStructureElements.Count == 0) && (intersectingOpenings.Count == 0)) {
                     Status = OpeningTaskIncomingStatus.NoIntersection;
