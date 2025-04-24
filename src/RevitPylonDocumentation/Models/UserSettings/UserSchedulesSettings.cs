@@ -157,8 +157,8 @@ namespace RevitPylonDocumentation.Models.UserSettings {
             set => RaiseAndSetIfChanged(ref _materialScheduleNameTemp, value);
         }
 
-        public string SytemPartsScheduleName { get; set; }
-        public string SytemPartsScheduleNameTemp {
+        public string SystemPartsScheduleName { get; set; }
+        public string SystemPartsScheduleNameTemp {
             get => _systemPartsScheduleNameTemp;
             set => RaiseAndSetIfChanged(ref _systemPartsScheduleNameTemp, value);
         }
@@ -263,7 +263,7 @@ namespace RevitPylonDocumentation.Models.UserSettings {
 
             RebarScheduleName = RebarScheduleNameTemp;
             MaterialScheduleName = MaterialScheduleNameTemp;
-            SytemPartsScheduleName = SytemPartsScheduleNameTemp;
+            SystemPartsScheduleName = SystemPartsScheduleNameTemp;
             IfcPartsScheduleName = IfcPartsScheduleNameTemp;
             SkeletonScheduleName = SkeletonScheduleNameTemp;
             SkeletonByElemsScheduleName = SkeletonByElemsScheduleNameTemp;

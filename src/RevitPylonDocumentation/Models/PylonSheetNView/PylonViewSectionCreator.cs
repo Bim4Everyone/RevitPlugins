@@ -256,7 +256,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
             XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
-            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0);
+            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0.2);
 
             BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
             sectionBox.Transform = t;

@@ -9,12 +9,15 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models {
     public class RebarFinder {
+        private readonly ParamValueService _paramValueService;
         private readonly string _formNumberParamName = "обр_ФОП_Форма_номер";
 
-        internal RebarFinder(MainViewModel mvm, PylonSheetInfo pylonSheetInfo) {
+        internal RebarFinder(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+            _paramValueService = new ParamValueService(repository);
             ViewModel = mvm;
             SheetInfo = pylonSheetInfo;
         }
+
 
         internal MainViewModel ViewModel { get; set; }
         internal PylonSheetInfo SheetInfo { get; set; }
@@ -55,7 +58,7 @@ namespace RevitPylonDocumentation.Models {
                     continue;
                 }
                 // Фильтрация по номеру формы - отсев вертикальных стержней армирования
-                var formNumber = rebar.GetParamValue<int>(_formNumberParamName);
+                var formNumber = _paramValueService.GetParamValueAnywhere(rebar, _formNumberParamName);
                 if(formNumber >= formNumberMin && formNumber <= formNumberMax) {
                     simpleRebars.Add(rebar);
                 }
@@ -78,7 +81,7 @@ namespace RevitPylonDocumentation.Models {
                     continue;
                 }
                 // Фильтрация по номеру формы - отсев вертикальных стержней армирования
-                var formNumber = rebar.GetParamValue<int>(_formNumberParamName);
+                var formNumber = _paramValueService.GetParamValueAnywhere(rebar, _formNumberParamName);
                 bool includeInNeededRange = formNumber >= formNumberMin && formNumber <= formNumberMax;
                 bool includeInExceptionRange = formNumber >= formNumberMinException && formNumber <= formNumberMaxException;
 
@@ -104,7 +107,7 @@ namespace RevitPylonDocumentation.Models {
                     continue;
                 }
                 // Фильтрация по номеру формы - отсев вертикальных стержней армирования
-                var formNumber = rebar.GetParamValue<int>(_formNumberParamName);
+                var formNumber = _paramValueService.GetParamValueAnywhere(rebar, _formNumberParamName);
                 if(formNumber == neededFormNumber) {
                     simpleRebars.Add(rebar);
                 }

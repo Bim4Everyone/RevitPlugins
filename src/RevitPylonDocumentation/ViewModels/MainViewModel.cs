@@ -566,7 +566,7 @@ namespace RevitPylonDocumentation.ViewModels {
                     sch.Name.Equals(SchedulesSettings.MaterialScheduleName)) as ViewSchedule;
             ReferenceSystemPartsSchedule =
                 _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-                    sch.Name.Equals(SchedulesSettings.SytemPartsScheduleName)) as ViewSchedule;
+                    sch.Name.Equals(SchedulesSettings.SystemPartsScheduleName)) as ViewSchedule;
             ReferenceIfcPartsSchedule =
                 _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                     sch.Name.Equals(SchedulesSettings.IfcPartsScheduleName)) as ViewSchedule;

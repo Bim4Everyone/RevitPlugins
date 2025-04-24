@@ -38,7 +38,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             ViewOfPylon = pylonView;
 
             _paramValueService = new ParamValueService(repository);
-            _rebarFinder = new RebarFinder(ViewModel, SheetInfo);
+            _rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
 
             _transverseViewBarMarksService = new TransverseViewBarMarksService(ViewOfPylon, Repository);
             _transverseRebarViewBarMarksService = new TransverseRebarViewBarMarksService(ViewOfPylon, Repository);
@@ -59,16 +59,21 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         }
 
         private void CreateTransverseViewBarMarks(View view) {
-            var simpleClamps = _rebarFinder.GetSimpleRebars(view, _formNumberForClampsMin, _formNumberForClampsMax);
             var simpleRebars = _rebarFinder.GetSimpleRebars(view, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax,
                                                             _formNumberForCBarMin, _formNumberForCBarMax);
-            var simpleCBars = _rebarFinder.GetSimpleRebars(view, _formNumberForCBarMin);
-
-            _transverseViewBarMarksService.CreateLeftTopMark(simpleClamps, simpleRebars);
-            _transverseViewBarMarksService.CreateRightTopMark(simpleClamps, simpleRebars);
+            if(simpleRebars is null) { return; }
             _transverseViewBarMarksService.CreateLeftBottomMark(simpleRebars);
 
-            _transverseViewBarMarksService.CreateLeftMark(simpleCBars, simpleRebars);
+            var simpleClamps = _rebarFinder.GetSimpleRebars(view, _formNumberForClampsMin, _formNumberForClampsMax);
+            if(simpleClamps != null) {
+                _transverseViewBarMarksService.CreateLeftTopMark(simpleClamps, simpleRebars);
+                _transverseViewBarMarksService.CreateRightTopMark(simpleClamps, simpleRebars);
+            }
+
+            var simpleCBars = _rebarFinder.GetSimpleRebars(view, _formNumberForCBarMin);
+            if(simpleCBars != null) {
+                _transverseViewBarMarksService.CreateLeftMark(simpleCBars, simpleRebars);
+            }
         }
 
 

@@ -34,7 +34,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             var dimensionBaseService = new DimensionBaseService(view, _paramValueService);
 
             try {
-                var rebarFinder = new RebarFinder(ViewModel, SheetInfo);
+                var rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
                 var rebar = rebarFinder.GetSkeletonRebar(view);
                 if(rebar is null) {
                     return;
@@ -88,7 +88,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             var dimensionBaseService = new DimensionBaseService(view, _paramValueService);
 
             try {
-                var rebarFinder = new RebarFinder(ViewModel, SheetInfo);
+                var rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
                 var rebar = rebarFinder.GetSkeletonRebar(view);
                 if(rebar is null) {
                     return;
@@ -115,7 +115,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             var dimensionBaseService = new DimensionBaseService(view, _paramValueService);
 
             try {
-                var rebarFinder = new RebarFinder(ViewModel, SheetInfo);
+                var rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
                 var rebar = rebarFinder.GetSkeletonRebar(view);
                 if(rebar is null) {
                     return;
@@ -138,7 +138,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             var dimensionBaseService = new DimensionBaseService(view, _paramValueService);
 
             try {
-                var rebarFinder = new RebarFinder(ViewModel, SheetInfo);
+                var rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
                 var rebar = rebarFinder.GetSkeletonRebar(view);
                 if(rebar is null) {
                     return;
@@ -189,7 +189,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             var dimensionBaseService = new DimensionBaseService(view, _paramValueService);
 
             try {
-                var rebarFinder = new RebarFinder(ViewModel, SheetInfo);
+                var rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
                 var rebar = rebarFinder.GetSkeletonRebar(view);
                 if(rebar is null) {
                     return;
@@ -221,7 +221,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             var dimensionBaseService = new DimensionBaseService(view, _paramValueService);
 
             try {
-                var rebarFinder = new RebarFinder(ViewModel, SheetInfo);
+                var rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
                 var rebar = rebarFinder.GetSkeletonRebar(view);
                 if(rebar is null) {
                     return;
@@ -256,7 +256,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             var dimensionBaseService = new DimensionBaseService(view, _paramValueService);
 
             try {
-                var rebarFinder = new RebarFinder(ViewModel, SheetInfo);
+                var rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
                 var rebar = rebarFinder.GetSkeletonRebar(view);
                 if(rebar is null) {
                     return;

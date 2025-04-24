@@ -2845,7 +2845,7 @@
                                             Style="{StaticResource TextBoxWithTooltipStyle}"
                                             HorizontalAlignment="Left"
                                             Margin="10 0 10 10"
-                                            Text="{Binding Path=SchedulesSettings.SytemPartsScheduleNameTemp,
+                                            Text="{Binding Path=SchedulesSettings.SystemPartsScheduleNameTemp,
                                             UpdateSourceTrigger=PropertyChanged}"
                                             Width="460"
                                             Height="25"

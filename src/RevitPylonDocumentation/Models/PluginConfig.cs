@@ -183,8 +183,8 @@ namespace RevitPylonDocumentation.Models {
 
             schedulesSettings.MaterialScheduleName = settings.MaterialScheduleName;
             schedulesSettings.MaterialScheduleNameTemp = settings.MaterialScheduleName;
-            schedulesSettings.SytemPartsScheduleName = settings.SystemPartsScheduleName;
-            schedulesSettings.SytemPartsScheduleNameTemp = settings.SystemPartsScheduleName;
+            schedulesSettings.SystemPartsScheduleName = settings.SystemPartsScheduleName;
+            schedulesSettings.SystemPartsScheduleNameTemp = settings.SystemPartsScheduleName;
             schedulesSettings.IfcPartsScheduleName = settings.IfcPartsScheduleName;
             schedulesSettings.IfcPartsScheduleNameTemp = settings.IfcPartsScheduleName;
 
@@ -320,7 +320,7 @@ namespace RevitPylonDocumentation.Models {
             settings.SkeletonByElemsScheduleName = schedulesSettings.SkeletonByElemsScheduleName;
 
             settings.MaterialScheduleName = schedulesSettings.MaterialScheduleName;
-            settings.SystemPartsScheduleName = schedulesSettings.SytemPartsScheduleName;
+            settings.SystemPartsScheduleName = schedulesSettings.SystemPartsScheduleName;
             settings.IfcPartsScheduleName = schedulesSettings.IfcPartsScheduleName;
 
             settings.RebarScheduleDisp1 = schedulesSettings.RebarScheduleDisp1;
