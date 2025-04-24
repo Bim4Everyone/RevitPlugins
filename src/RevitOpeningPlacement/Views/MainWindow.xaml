@@ -71,7 +71,7 @@
                                 DockPanel.Dock="Bottom"
                                 HorizontalAlignment="Stretch"
                                 Content="Настройки объединения"
-                                ToolTip="Настройки объединения используются&#x0a;при ручном объединении заданий на отверстия,&#x0a;а также при автообъединении заданий на отверстия в многослойных конструкциях."
+                                ToolTip="Настройки объединения используются&#x0a;при ручном объединении заданий на отверстия,&#x0a;а также при автообъединении заданий на отверстия, в том числе в многослойных конструкциях."
                                 Command="{Binding OpenUnionTaskSettingsCommand}"/>
                         <local:CategoryView x:Name="_categoryView"
                                         DataContext="{Binding ElementName=_this, Path=DataContext}" />
