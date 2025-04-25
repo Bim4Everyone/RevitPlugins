@@ -227,11 +227,11 @@ namespace RevitOpeningPlacement.OpeningModels {
         }
 
         /// <summary>
-        /// Проверяет, имеет ли текущее задание на отверстие и другое общую грань.
-        /// Использовать для определения заданий на отверстия в многослойных конструкциях, которые надо объединить.
+        /// Проверяет, пересекается ли текущее задание на отверстие с другим.
+        /// Использовать для определения заданий на отверстия, которые надо объединить.
         /// </summary>
         /// <param name="otherOpening">Другое задание на отверстие из активного файла для проверки</param>
-        public bool HasCommonFace(OpeningMepTaskOutcoming otherOpening) {
+        public bool Intersect(OpeningMepTaskOutcoming otherOpening) {
             if(IsRemoved || otherOpening.IsRemoved) {
                 return false;
             }
@@ -243,14 +243,22 @@ namespace RevitOpeningPlacement.OpeningModels {
             if((otherSolid is null) || (otherSolid.Volume <= _volumeTolerance)) {
                 return false;
             }
+            try {
+                var intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation(
+                    thisSolid, otherSolid, BooleanOperationsType.Union);
+                if(intersectSolid != null && SolidUtils.SplitVolumes(intersectSolid).Count == 1) {
+                    return true;
+                }
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
 
-            ICollection<PlanarFace> thisPlanarFaces = GetPlanarFaces(thisSolid);
-            ICollection<PlanarFace> othersPlanarFaces = GetPlanarFaces(otherSolid);
+                ICollection<PlanarFace> thisPlanarFaces = GetPlanarFaces(thisSolid);
+                ICollection<PlanarFace> othersPlanarFaces = GetPlanarFaces(otherSolid);
 
-            foreach(PlanarFace thisFace in thisPlanarFaces) {
-                foreach(PlanarFace otherFace in othersPlanarFaces) {
-                    if(FacesOverlap(thisFace, otherFace)) {
-                        return true;
+                foreach(PlanarFace thisFace in thisPlanarFaces) {
+                    foreach(PlanarFace otherFace in othersPlanarFaces) {
+                        if(FacesOverlap(thisFace, otherFace)) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -271,6 +279,11 @@ namespace RevitOpeningPlacement.OpeningModels {
                         }
                     }
                 }
+                //var projection = first.Project(second.Origin);
+                //if(projection is null || Math.Abs(projection.Distance) < 0.00005 && first.IsInside(projection.UVPoint)) {
+                //    // вторая поверхность полностью внутри первой или наоборот
+                //    return true;
+                //}
             }
             return false;
         }

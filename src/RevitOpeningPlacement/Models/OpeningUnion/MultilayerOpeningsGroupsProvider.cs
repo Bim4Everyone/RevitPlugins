@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -115,7 +115,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         private ICollection<OpeningMepTaskOutcoming> GetTouchingOpenings(OpeningMepTaskOutcoming baseOpening, ICollection<OpeningMepTaskOutcoming> otherOpenings) {
             HashSet<OpeningMepTaskOutcoming> touchingOpenings = new HashSet<OpeningMepTaskOutcoming>();
             foreach(OpeningMepTaskOutcoming otherOpening in otherOpenings) {
-                if(baseOpening.HasCommonFace(otherOpening)) {
+                if(baseOpening.Intersect(otherOpening)) {
                     touchingOpenings.Add(otherOpening);
                 }
             }
