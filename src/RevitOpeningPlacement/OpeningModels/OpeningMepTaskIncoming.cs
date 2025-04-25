@@ -255,7 +255,11 @@ namespace RevitOpeningPlacement.OpeningModels {
                 var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
                 SetOpeningTaskHost(hostId);
                 if(intersectingStructureElements
-                    .Select(id => _revitRepository.Doc.GetElement(id).Category.GetBuiltInCategory())
+                    .Select(id => _revitRepository.Doc.GetElement(id))
+                    .Union(intersectingOpenings
+                        .Select(id => (_revitRepository.Doc.GetElement(id) as FamilyInstance)?.Host)
+                        .Where(e => e != null))
+                    .Select(el => el.Category.GetBuiltInCategory())
                     .Distinct()
                     .Count() > 1) {
                     Status = OpeningTaskIncomingStatus.DifferentConstructions;
