@@ -1,6 +1,6 @@
 {
   "$schema": "./build.schema.json",
-  "Solution": "RevitPlugins.sln",
+  "Solution": "RevitPlugins.slnx",
   "PluginName": "RevitOpeningSlopes",
   "PublishDirectory": "02.AR.extension\\АР.tab\\bin",
   "RevitVersions": [
