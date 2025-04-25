@@ -102,7 +102,7 @@
                 </dxg:GridColumn.CellTemplate>
             </dxg:GridColumn>
 
-            <dxg:GridColumn Header="Наименование" FieldName="Name" Width="Auto" />
+            <dxg:GridColumn Header="Наименование" FieldName="Name" Width="Auto" SortOrder="Ascending" SortIndex="0"/>
 
             <dxg:GridColumn Header="Выбор А" Width="*">
                 <dxg:GridColumn.CellTemplate>
