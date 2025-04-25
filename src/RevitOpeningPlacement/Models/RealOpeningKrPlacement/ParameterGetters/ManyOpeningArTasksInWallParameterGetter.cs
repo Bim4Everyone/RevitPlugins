@@ -17,6 +17,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
         private readonly ICollection<IOpeningTaskIncoming> _incomingTasks;
         private readonly IPointFinder _pointFinder;
         private readonly Wall _wall;
+        private readonly int _rounding;
 
 
         /// <summary>
@@ -24,14 +25,16 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
         /// </summary>
         /// <param name="incomingTasks">Входящие задания</param>
         /// <param name="pointFinder">Провайдер точки вставки отверстия КР</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         /// <exception cref="ArgumentException">Исключение, если количество элементов в коллекции меньше 1</exception>
-        public ManyOpeningArTasksInWallParameterGetter(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder, Wall wall) {
+        public ManyOpeningArTasksInWallParameterGetter(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder, Wall wall, int rounding) {
             _incomingTasks = incomingTasks ?? throw new ArgumentNullException(nameof(incomingTasks));
             if(_incomingTasks.Count < 1) { throw new ArgumentException(nameof(incomingTasks)); }
 
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
             _wall = wall ?? throw new ArgumentNullException(nameof(wall));
+            _rounding = rounding;
         }
 
 
@@ -39,10 +42,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement.ParameterGetters {
             // габариты отверстия
             yield return new DoubleParameterGetter(
                 RealOpeningKrPlacer.RealOpeningKrInWallHeight,
-                new RectangleOpeningInWallHeightValueGetter(_incomingTasks, _pointFinder)).GetParamValue();
+                new RectangleOpeningInWallHeightValueGetter(_incomingTasks, _pointFinder, _rounding)).GetParamValue();
             yield return new DoubleParameterGetter(
                 RealOpeningKrPlacer.RealOpeningKrInWallWidth,
-                new RectangleOpeningInWallWidthValueGetter(_incomingTasks, _wall)).GetParamValue();
+                new RectangleOpeningInWallWidthValueGetter(_incomingTasks, _wall, _rounding)).GetParamValue();
 
             // текстовые данные отверстия
             yield return new StringParameterGetter(

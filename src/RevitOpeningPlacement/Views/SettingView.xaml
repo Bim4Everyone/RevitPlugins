@@ -84,15 +84,33 @@
                             </dxdo:LayoutControlItem>
                         </dxdo:LayoutGroup>
                         <dxdo:LayoutGroup>
-                            <dxdo:LayoutControlItem ItemWidth="2*">
-                                <lc:GroupBox Header="Округление размеров, мм"
-                                             ToolTip="Например, если через стену проходит труба диаметром 110 и выставлен Зазор=50 и Округление=50 мм,&#x0a;то будет создано отверстие диаметром 200 мм,&#x0a;так как диаметр отверстия с учетом зазоров 50 мм станет 110+2*50=210 мм, после чего будет округлен по правилам математики кратно 50 мм, то есть до 200 мм.">
-                                    <dxe:ComboBoxEdit ItemsSource="{Binding Roundings}"
-                                                      SelectedItem="{Binding SelectedRounding}"
-                                                      IsTextEditable="False"
-                                                      Height="20"
-                                                      VerticalAlignment="Top" />
-                                </lc:GroupBox>
+                            <dxdo:LayoutControlItem ItemWidth="2*"
+                                                    MinHeight="150">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <lc:GroupBox Header="Округление размеров, мм"
+                                                 Grid.Row="0"
+                                                 DockPanel.Dock="Top"
+                                                 ToolTip="Например, если через стену проходит труба диаметром 110 и выставлен Зазор=50 и Округление=50 мм,&#x0a;то будет создано отверстие диаметром 200 мм,&#x0a;так как диаметр отверстия с учетом зазоров 50 мм станет 110+2*50=210 мм, после чего будет округлен по правилам математики кратно 50 мм, то есть до 200 мм.">
+                                        <dxe:ComboBoxEdit ItemsSource="{Binding Roundings}"
+                                                          SelectedItem="{Binding SelectedRounding}"
+                                                          IsTextEditable="False"
+                                                          Height="20"
+                                                          VerticalAlignment="Top" />
+                                    </lc:GroupBox>
+                                    <lc:GroupBox Header="Округление отметок, мм"
+                                                 Grid.Row="1"
+                                                 ToolTip="Округление будет произведено относительно начала проекта.">
+                                        <dxe:ComboBoxEdit ItemsSource="{Binding Roundings}"
+                                                          SelectedItem="{Binding SelectedElevationRounding}"
+                                                          IsTextEditable="False"
+                                                          Height="20"
+                                                          VerticalAlignment="Top" />
+                                    </lc:GroupBox>
+                                </Grid>
                             </dxdo:LayoutControlItem>
                         </dxdo:LayoutGroup>
                     </dxdo:LayoutGroup>

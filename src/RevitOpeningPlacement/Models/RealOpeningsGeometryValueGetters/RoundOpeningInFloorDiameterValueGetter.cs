@@ -14,8 +14,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// Конструктор класса, предоставляющего значение диаметра чистового отверстия АР/КР в перекрытии в единицах Revit
         /// </summary>
         /// <param name="openingTaskIncoming">Входящее задание на отверстие</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public RoundOpeningInFloorDiameterValueGetter(IOpeningTaskIncoming openingTaskIncoming) {
+        public RoundOpeningInFloorDiameterValueGetter(IOpeningTaskIncoming openingTaskIncoming, int rounding)
+            : base(rounding, rounding, rounding) {
             _openingTaskIncoming = openingTaskIncoming ?? throw new System.ArgumentNullException(nameof(openingTaskIncoming));
         }
 

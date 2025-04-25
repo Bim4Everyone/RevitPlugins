@@ -13,24 +13,59 @@
                            x:Name="_this"
                            mc:Ignorable="d"
                            Title="Настройки расстановки отверстий КР"
-                           MinHeight="140"
+                           MinHeight="240"
                            MinWidth="350"
-                           MaxHeight="140"
+                           MaxHeight="240"
                            MaxWidth="350"
                            ResizeMode="NoResize"
                            d:DataContext="{d:DesignInstance vms:OpeningRealsKrConfigViewModel, IsDesignTimeCreatable=False}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="45"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="45" />
         </Grid.RowDefinitions>
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <RadioButton GroupName="PlacementType"
-                         Content="Размещать отверстия по заданиям из АР"
-                         IsChecked="{Binding PlaceByAr}" />
-            <RadioButton GroupName="PlacementType"
-                         Content="Размещать отверстия по заданиям из ВИС"
-                         IsChecked="{Binding PlaceByMep}" />
+            <StackPanel>
+                <RadioButton
+                    GroupName="PlacementType"
+                    Content="Размещать отверстия по заданиям из АР"
+                    IsChecked="{Binding PlaceByAr}" />
+                <RadioButton
+                    Margin="0 5 0 0"
+                    GroupName="PlacementType"
+                    Content="Размещать отверстия по заданиям из ВИС"
+                    IsChecked="{Binding PlaceByMep}" />
+
+                <DockPanel
+                    Margin="0 5"
+                    HorizontalAlignment="Stretch">
+                    <dxe:CheckEdit
+                        Content="Округлять габариты"
+                        IsChecked="{Binding RoundSize, UpdateSourceTrigger=PropertyChanged}" />
+                    <dxe:ComboBoxEdit
+                        Width="70"
+                        IsTextEditable="False"
+                        HorizontalAlignment="Right"
+                        ToolTip="Значение округления, мм"
+                        IsEnabled="{Binding RoundSize}"
+                        ItemsSource="{Binding EnabledRoundings}"
+                        SelectedItem="{Binding SelectedRoundSize, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    HorizontalAlignment="Stretch">
+                    <dxe:CheckEdit
+                        Content="Округлять отметку"
+                        IsChecked="{Binding RoundElevation, UpdateSourceTrigger=PropertyChanged}" />
+                    <dxe:ComboBoxEdit
+                        Width="70"
+                        IsTextEditable="False"
+                        HorizontalAlignment="Right"
+                        ToolTip="Значение округления, мм"
+                        IsEnabled="{Binding RoundElevation}"
+                        ItemsSource="{Binding EnabledRoundings}"
+                        SelectedItem="{Binding SelectedRoundElevation, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </StackPanel>
         </StackPanel>
         <DockPanel Grid.Row="2" Margin="10 " HorizontalAlignment="Right" VerticalAlignment="Bottom">
             <dx:SimpleButton Content="OK"

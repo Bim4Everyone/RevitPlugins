@@ -1,4 +1,3 @@
-
 using System;
 
 using Autodesk.Revit.DB;
@@ -12,15 +11,14 @@ using RevitClashDetective.Models.FilterModel;
 
 namespace RevitOpeningPlacement.Models.Configs {
     /// <summary>
-    /// Настройки расстановки чистовых отверстий в файле КР
+    /// Настройки расстановки чистовых отверстий в файле АР
     /// </summary>
-    internal class OpeningRealsKrConfig : ProjectConfig {
+    internal class OpeningRealsArConfig : ProjectConfig {
         public string RevitVersion { get; set; }
         [JsonIgnore]
         public override string ProjectConfigPath { get; set; }
         [JsonIgnore]
         public override IConfigSerializer Serializer { get; set; }
-        public OpeningRealKrPlacementType PlacementType { get; set; } = OpeningRealKrPlacementType.PlaceByAr;
 
         /// <summary>
         /// Округление габаритов отверстия в мм
@@ -32,15 +30,15 @@ namespace RevitOpeningPlacement.Models.Configs {
         /// </summary>
         public int ElevationRounding { get; set; } = 1;
 
-        public static OpeningRealsKrConfig GetOpeningConfig(Document document) {
+        public static OpeningRealsArConfig GetOpeningConfig(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
             return new ProjectConfigBuilder()
                 .SetSerializer(new RevitClashConfigSerializer(new OpeningSerializationBinder(), document))
                 .SetPluginName(nameof(RevitOpeningPlacement))
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
-                .SetProjectConfigName(nameof(OpeningRealsKrConfig) + ".json")
-                .Build<OpeningRealsKrConfig>();
+                .SetProjectConfigName(nameof(OpeningRealsArConfig) + ".json")
+                .Build<OpeningRealsArConfig>();
         }
     }
 }

@@ -1,13 +1,13 @@
 using System.Windows;
 
 namespace RevitOpeningPlacement.Views {
-    public partial class OpeningRealsKrSettingsView {
-        public OpeningRealsKrSettingsView() {
+    public partial class UnionTaskSettingsView {
+        public UnionTaskSettingsView() {
             InitializeComponent();
         }
 
         public override string PluginName => nameof(RevitOpeningPlacement);
-        public override string ProjectConfigName => nameof(OpeningRealsKrSettingsView);
+        public override string ProjectConfigName => nameof(UnionTaskSettingsView);
 
         private void ButtonOk_Click(object sender, RoutedEventArgs e) {
             DialogResult = true;

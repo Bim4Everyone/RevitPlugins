@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using RevitOpeningPlacement.Models.Interfaces;
@@ -14,16 +14,19 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
     /// </summary>
     internal class SingleRectangleOpeningTaskInFloorParameterGetter : IParametersGetter {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
+        private readonly int _rounding;
 
 
         /// <summary>
         /// Конструктор класса, предоставляющего параметры для чистового прямоугольного отверстия из параметров входящего задания на прямоугольное отверстие в перекрытии
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        public SingleRectangleOpeningTaskInFloorParameterGetter(OpeningMepTaskIncoming incomingTask) {
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
+        public SingleRectangleOpeningTaskInFloorParameterGetter(OpeningMepTaskIncoming incomingTask, int rounding) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
 
             _openingMepTaskIncoming = incomingTask;
+            _rounding = rounding;
         }
 
 
@@ -31,10 +34,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
             // габариты отверстия
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArHeight,
-                new RectangleOpeningInFloorHeightValueGetter(_openingMepTaskIncoming)).GetParamValue();
+                new RectangleOpeningInFloorHeightValueGetter(_openingMepTaskIncoming, _rounding)).GetParamValue();
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArWidth,
-                new RectangleOpeningInFloorWidthValueGetter(_openingMepTaskIncoming)).GetParamValue();
+                new RectangleOpeningInFloorWidthValueGetter(_openingMepTaskIncoming, _rounding)).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
             var isEomValueGetter = new IsEomValueGetter(_openingMepTaskIncoming);

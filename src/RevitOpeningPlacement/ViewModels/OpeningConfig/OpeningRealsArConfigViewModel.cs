@@ -10,40 +10,23 @@ using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
-    internal class OpeningRealsKrConfigViewModel : BaseViewModel {
+    internal class OpeningRealsArConfigViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
 
-        public OpeningRealsKrConfigViewModel(RevitRepository revitRepository, OpeningRealsKrConfig openingRealsKrConfig) {
+        public OpeningRealsArConfigViewModel(RevitRepository revitRepository, OpeningRealsArConfig openingRealsArConfig) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-            if(openingRealsKrConfig is null) {
-                throw new ArgumentNullException(nameof(openingRealsKrConfig));
+            if(openingRealsArConfig is null) {
+                throw new ArgumentNullException(nameof(openingRealsArConfig));
             }
 
-            PlaceByMep = openingRealsKrConfig.PlacementType == OpeningRealKrPlacementType.PlaceByMep;
-            PlaceByAr = !PlaceByMep;
-            RoundElevation = openingRealsKrConfig.ElevationRounding > 0;
-            SelectedRoundElevation = openingRealsKrConfig.ElevationRounding;
-            RoundSize = openingRealsKrConfig.Rounding > 0;
-            SelectedRoundSize = openingRealsKrConfig.Rounding;
+            RoundElevation = openingRealsArConfig.ElevationRounding > 0;
+            SelectedRoundElevation = openingRealsArConfig.ElevationRounding;
+            RoundSize = openingRealsArConfig.Rounding > 0;
+            SelectedRoundSize = openingRealsArConfig.Rounding;
 
             SaveConfigCommand = RelayCommand.Create(SaveConfig);
         }
 
-
-        private bool _placeByMep;
-
-        public bool PlaceByMep {
-            get => _placeByMep;
-            set => RaiseAndSetIfChanged(ref _placeByMep, value);
-        }
-
-
-        private bool _placeByAr;
-
-        public bool PlaceByAr {
-            get => _placeByAr;
-            set => RaiseAndSetIfChanged(ref _placeByAr, value);
-        }
 
         private bool _roundSize;
 
@@ -104,11 +87,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         }
 
 
-        private OpeningRealsKrConfig GetOpeningConfig() {
-            var config = OpeningRealsKrConfig.GetOpeningConfig(_revitRepository.Doc);
-            config.PlacementType = PlaceByAr
-                ? OpeningRealKrPlacementType.PlaceByAr
-                : OpeningRealKrPlacementType.PlaceByMep;
+        private OpeningRealsArConfig GetOpeningConfig() {
+            var config = OpeningRealsArConfig.GetOpeningConfig(_revitRepository.Doc);
             config.Rounding = SelectedRoundSize;
             config.ElevationRounding = SelectedRoundElevation;
             return config;

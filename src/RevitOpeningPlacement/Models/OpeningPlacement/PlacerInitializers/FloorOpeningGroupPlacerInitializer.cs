@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
 
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в группе отверстий меньше 2</exception>
-        public OpeningPlacer GetPlacer(RevitRepository revitRepository, OpeningsGroup openingsGroup) {
+        public OpeningPlacer GetPlacer(RevitRepository revitRepository, Configs.OpeningConfig config, OpeningsGroup openingsGroup) {
             if(openingsGroup is null) {
                 throw new ArgumentNullException(nameof(openingsGroup));
             }
@@ -40,7 +40,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 LevelFinder = levelFinder,
                 AngleFinder = new FloorOpeningsGroupAngleFinder(openingsGroup),
 
-                ParameterGetter = new FloorSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, levelFinder, openingsGroup)
+                ParameterGetter = new FloorSolidParameterGetter(new OpeningGroupSolidProvider(openingsGroup), pointFinder, levelFinder, openingsGroup, config)
             };
         }
     }
