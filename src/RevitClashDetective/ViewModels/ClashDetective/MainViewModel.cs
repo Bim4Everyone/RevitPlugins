@@ -71,7 +71,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         }
 
         private void InitializeChecks() {
-            Checks = new ObservableCollection<CheckViewModel>(InitializeChecks(_checksConfig));
+            Checks = new ObservableCollection<CheckViewModel>(InitializeChecks(_checksConfig).OrderBy(c => c.Name));
         }
 
         private IEnumerable<CheckViewModel> InitializeChecks(ChecksConfig config) {
@@ -155,7 +155,7 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
 
             var newChecks = InitializeChecks(config).ToList();
             var nameResolver = new NameResolver<CheckViewModel>(Checks, newChecks);
-            Checks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection());
+            Checks = new ObservableCollection<CheckViewModel>(nameResolver.GetCollection().OrderBy(c => c.Name));
             MessageText = "Файл проверок успешно загружен";
             Wait(() => { MessageText = null; });
         }
