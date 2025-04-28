@@ -148,6 +148,7 @@ namespace RevitFinishingWalls.Models {
                 try {
                     //if(!(item is RevitLinkInstance)) {
                     // нельзя соединить элементы из связей
+                    // TODO
                     JoinGeometryUtils.JoinGeometry(Document, wall, item);
                     //}
                 } catch(Autodesk.Revit.Exceptions.ArgumentException) {
