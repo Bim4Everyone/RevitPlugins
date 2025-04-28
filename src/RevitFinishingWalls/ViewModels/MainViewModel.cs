@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -18,6 +17,7 @@ namespace RevitFinishingWalls.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly RichErrorMessageService _errorMessageService;
         private readonly IRoomFinisher _roomFinisher;
         private readonly IProgressDialogFactory _progressDialogFactory;
 
@@ -34,6 +34,7 @@ namespace RevitFinishingWalls.ViewModels {
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
+            RichErrorMessageService errorMessageService,
             IRoomFinisher roomFinisher,
             IProgressDialogFactory progressDialogFactory
             ) {
@@ -41,6 +42,8 @@ namespace RevitFinishingWalls.ViewModels {
                 ?? throw new ArgumentNullException(nameof(pluginConfig));
             _revitRepository = revitRepository
                 ?? throw new ArgumentNullException(nameof(revitRepository));
+            _errorMessageService = errorMessageService
+                ?? throw new ArgumentNullException(nameof(errorMessageService));
             _roomFinisher = roomFinisher
                 ?? throw new ArgumentNullException(nameof(roomFinisher));
             _progressDialogFactory = progressDialogFactory
@@ -139,8 +142,7 @@ namespace RevitFinishingWalls.ViewModels {
                 errors = _roomFinisher.CreateWallsFinishing(rooms, settings, progress, ct);
             }
             if(errors.Count > 0) {
-                var errorMsgService = ServicesProvider.GetPlatformService<RichErrorMessageService>();
-                errorMsgService.ShowErrorWindow(errors);
+                _errorMessageService.ShowErrorWindow(errors);
             }
         }
 

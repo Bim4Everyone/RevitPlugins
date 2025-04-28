@@ -1,15 +1,15 @@
-using System.Windows;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
-
-using RevitClashDetective.Models.Handlers;
 
 using RevitFinishingWalls.Models;
 using RevitFinishingWalls.Services;
@@ -42,13 +42,17 @@ namespace RevitFinishingWalls {
                 kernel.Bind<ErrorWindow>().ToSelf().InTransientScope();
                 kernel.Bind<RichErrorMessageService>().ToSelf().InTransientScope();
 
-                kernel.UseXtraMessageBox<ErrorWindowViewModel>();
+                kernel.UseWpfUIMessageBox<ErrorWindowViewModel>();
 
-                kernel.UseXtraProgressDialog<MainViewModel>();
-                kernel.Bind<MainViewModel>().ToSelf();
-                kernel.Bind<MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+                kernel.UseWpfUIThemeUpdater();
+
+                kernel.UseWpfUIProgressDialog<MainViewModel>();
+                kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+                kernel.UseWpfLocalization(
+                    $"/{assemblyName};component/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
 
                 Notification(kernel.Get<MainWindow>());
             }

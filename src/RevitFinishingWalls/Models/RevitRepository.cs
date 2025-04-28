@@ -9,12 +9,11 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
-
-using RevitClashDetective.Models.Extensions;
-using RevitClashDetective.Models.Handlers;
+using dosymep.Revit.Geometry;
 
 using RevitFinishingWalls.Exceptions;
 using RevitFinishingWalls.Models.Enums;
+using RevitFinishingWalls.Services;
 using RevitFinishingWalls.Services.Selection;
 
 namespace RevitFinishingWalls.Models {
@@ -147,10 +146,10 @@ namespace RevitFinishingWalls.Models {
             notJoinedElements = new List<ElementId>();
             foreach(Element item in wallCreationData.ElementsForJoin) {
                 try {
-                    if(!(item is RevitLinkInstance)) {
-                        // нельзя соединить элементы из связей
-                        JoinGeometryUtils.JoinGeometry(Document, wall, item);
-                    }
+                    //if(!(item is RevitLinkInstance)) {
+                    // нельзя соединить элементы из связей
+                    JoinGeometryUtils.JoinGeometry(Document, wall, item);
+                    //}
                 } catch(Autodesk.Revit.Exceptions.ArgumentException) {
                     notJoinedElements.Add(item.Id);
                 }
@@ -404,7 +403,8 @@ namespace RevitFinishingWalls.Models {
             return dependentElements
                 .Select(el => Document.GetElement(el).GetBoundingBox())
                 .Where(box => box != null)
-                .GetCommonBoundingBox();
+                .ToList()
+                .CreateCommonBoundingBox();
         }
 
         private void ZoomAndCenter(BoundingBoxXYZ bbox) {
