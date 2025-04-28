@@ -33,7 +33,7 @@
                 Source="{Binding Rooms}">
                 <CollectionViewSource.GroupDescriptions>
                     <PropertyGroupDescription
-                        PropertyName="LavelName" />
+                        PropertyName="LevelName" />
                 </CollectionViewSource.GroupDescriptions>
             </CollectionViewSource>
             <CollectionViewSource
