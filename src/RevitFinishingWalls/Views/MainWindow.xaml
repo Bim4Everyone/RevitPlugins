@@ -86,13 +86,22 @@
                 x:Key="InputLabel">
                 <Setter
                     Property="Margin"
-                    Value="0 0 5 0" />
+                    Value="0 5" />
                 <Setter
                     Property="Width"
                     Value="210" />
                 <Setter
                     Property="VerticalAlignment"
                     Value="Center" />
+                <Setter
+                    Property="Focusable"
+                    Value="False" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource LabelForeground}" />
+                <Setter
+                    Property="SnapsToDevicePixels"
+                    Value="True" />
             </Style>
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
