@@ -23,4 +23,7 @@
     <system:String x:Key="MainWindow.AutoConfigure">Автонастройка</system:String>
     <system:String x:Key="MainWindow.AddServer">Добавить</system:String>
 
+    <system:String x:Key="MainWindow.ConfirmTitle">Подтверждение удаления</system:String>
+    <system:String x:Key="MainWindow.ConfirmDeleteServer">Вы уверены, что хотите удалить выбранный сервер?</system:String>
+
 </ResourceDictionary>

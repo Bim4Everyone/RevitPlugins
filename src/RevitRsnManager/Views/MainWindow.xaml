@@ -1,41 +1,22 @@
-﻿<core:WpfUIPlatformWindow
-    x:Class="RevitRsnManager.Views.MainWindow"
-
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:vms="clr-namespace:RevitRsnManager.ViewModels"
-    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    
-    mc:Ignorable="d"
-    WindowStartupLocation="CenterOwner"
-
-    Title="{me:LocalizationSource MainWindow.Title}"
-
-    Width="500"
-    Height="450"
-    
-    MinWidth="500"
-    MinHeight="450"
-
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-
-    <Window.Resources>
-        <Style TargetType="ListBox">
-            <Setter 
-                Property="Background"
-                Value="{ui:ThemeResource TextFillColorDisabledBrush}" />
-            <Setter
-                Property="BorderThickness"
-               Value="0" />
-        </Style>
-    </Window.Resources>
+﻿<core:WpfUIPlatformWindow x:Class="RevitRsnManager.Views.MainWindow"
+                          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                          xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                          xmlns:base="clr-namespace:dosymep.WPF.Views"
+                          xmlns:vms="clr-namespace:RevitRsnManager.ViewModels"
+                          xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+                          xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                          xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+                          mc:Ignorable="d"
+                          WindowStartupLocation="CenterOwner"
+                          Title="{me:LocalizationSource MainWindow.Title}"
+                          Width="500"
+                          Height="450"
+                          MinWidth="500"
+                          MinHeight="450"
+                          d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <b:Interaction.Triggers>
         <b:EventTrigger
@@ -62,7 +43,12 @@
             Margin="0,10,10,10"
             HorizontalAlignment="Right"
             Content="{me:LocalizationSource MainWindow.AutoConfigure}"
-            Command="{Binding AutoConfigureCommand}" />
+            Command="{Binding AutoConfigureCommand}">
+
+            <ui:Button.ToolTip>
+                <TextBlock Text="{me:LocalizationSource MainWindow.AutoConfigure}" />
+            </ui:Button.ToolTip>
+        </ui:Button>
 
         <StackPanel 
             Grid.Row="1"
@@ -75,6 +61,10 @@
                 Text="{Binding NewServerName, UpdateSourceTrigger=PropertyChanged}" />
 
             <ui:Button Command="{Binding AddServerCommand}">
+                <ui:Button.ToolTip>
+                    <TextBlock Text="{me:LocalizationSource MainWindow.AddServer}" />
+                </ui:Button.ToolTip>
+                
                 <StackPanel Orientation="Horizontal">
                     <TextBlock 
                         Text="{me:LocalizationSource MainWindow.AddServer}"
@@ -87,46 +77,43 @@
                 </StackPanel>
             </ui:Button>
         </StackPanel>
-
-        <ListBox 
-            Grid.Row="2"
-            AllowDrop="True"
-            Drop="ListBox_Drop"
-            PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
-            ItemsSource="{Binding Servers}"
-            SelectedItem="{Binding SelectedServer}">
+        <Border Grid.Row="2"
+                Background="{DynamicResource CardBackground}"
+                CornerRadius="8"
+                Padding="5"
+                Margin="10,0,10,0">
+            <ListBox Grid.Row="2"
+                 AllowDrop="True"
+                 Drop="ListBox_Drop"
+                 PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
+                 ItemsSource="{Binding Servers}"
+                 SelectedItem="{Binding SelectedServer}">
 
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment"
+                            Value="Stretch" />
 
-                    <EventSetter 
-                        Event="PreviewMouseMove"
-                        Handler="ListBoxItem_PreviewMouseMove" />
-                </Style>
+                    <EventSetter Event="PreviewMouseMove"
+                                 Handler="ListBoxItem_PreviewMouseMove" />
+                </Style>       
             </ListBox.ItemContainerStyle>
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border 
-                        BorderThickness="1,1,1,1"
-                        BorderBrush="{ui:ThemeResource TextFillColorPrimaryBrush}"
-                        Padding="5"
-                        Margin="10,5,0,5"
-                        CornerRadius="5">
+                    <Border BorderThickness="1"
+                            BorderBrush="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                            Padding="5"
+                            Margin="10,5,10,5"
+                            CornerRadius="5">
 
-                        <DockPanel>
-                            <TextBlock 
-                                Text="{Binding}"
-                                VerticalAlignment="Center"
-                                DockPanel.Dock="Left"
-                                Margin="10,0"
-                                Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}" />
-
+                        <DockPanel LastChildFill="True">
                             <StackPanel 
                                 Orientation="Horizontal"
                                 DockPanel.Dock="Right"
                                 HorizontalAlignment="Right"
-                                Margin="0,0,5,0">
+                                Margin="10,5,15,5">
+
                                 <ui:Button 
                                     Margin="0,0,5,0"
                                     Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -136,31 +123,37 @@
                                         Width="16"
                                         Height="16" />
                                 </ui:Button>
+
                                 <ui:Button 
                                     Margin="0,0,5,0"
                                     Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                     CommandParameter="{Binding}">
-                                    <ui:SymbolIcon
+                                    <ui:SymbolIcon 
                                         Symbol="ArrowDown12"
                                         Width="16"
                                         Height="16" />
                                 </ui:Button>
-                                <ui:Button 
-                                    Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    CommandParameter="{Binding}">
-                                    <ui:SymbolIcon 
-                                        Symbol="Delete12"
-                                        Width="16"
-                                        Height="16" />
+
+                                <ui:Button Appearance="Danger"
+                                           Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                           CommandParameter="{Binding}">
+                                    <ui:SymbolIcon Symbol="Delete12"
+                                                   Width="16"
+                                                   Height="16" />
                                 </ui:Button>
                             </StackPanel>
+
+                            <TextBlock Text="{Binding}"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0"
+                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}" />
                         </DockPanel>
 
                     </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
+        </Border>
         <StackPanel 
             Grid.Row="3"
             Orientation="Horizontal"
@@ -176,6 +169,7 @@
                 Width="80"
                 Margin="10"
                 Click="ButtonOk_Click"
+                Appearance="Info"
                 Content="{DynamicResource MainWindow.ButtonOk}"
                 Command="{Binding AcceptViewCommand}" />
 

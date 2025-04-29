@@ -58,7 +58,7 @@ internal class MainViewModel : BaseViewModel {
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
         AutoConfigureCommand = RelayCommand.Create(AutoConfigure);
-        RemoveServerCommand = RelayCommand.Create<string>(server => Servers.Remove(server));
+        RemoveServerCommand = RelayCommand.Create<string>(RemoveServer);
         AddServerCommand = RelayCommand.Create(AddServer, () => !string.IsNullOrWhiteSpace(NewServerName));
         MoveUpCommand = RelayCommand.Create<object>(MoveUp, server => CanMove(server, -1));
         MoveDownCommand = RelayCommand.Create<object>(MoveDown, server => CanMove(server, 1));
@@ -138,6 +138,23 @@ internal class MainViewModel : BaseViewModel {
             return new Uri(centralPath).Host;
         } catch {
             return null;
+        }
+    }
+
+    private void RemoveServer(string server) {
+        if(string.IsNullOrWhiteSpace(server)) {
+            return;
+        }
+
+        string title = _localizationService.GetLocalizedString("MainWindow.ConfirmTitle");
+        string message = _localizationService.GetLocalizedString("MainWindow.ConfirmDeleteServer");
+
+        if(_messageBoxService.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+            Servers.Remove(server);
+
+            if(SelectedServer == server) {
+                SelectedServer = null;
+            }
         }
     }
 
