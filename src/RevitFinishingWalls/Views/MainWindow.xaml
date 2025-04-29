@@ -21,6 +21,7 @@
     MinWidth="630"
     MaxHeight="350"
     MaxWidth="630"
+    Title="{me:LocalizationSource MainWindow.Title}"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     ResizeMode="NoResize">
     <core:WpfUIPlatformWindow.Resources>
@@ -33,8 +34,8 @@
                 <ResourceDictionary
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <converters:EnumConverter
-                x:Key="EnumConverter" />
+            <!--<converters:EnumConverter
+                x:Key="EnumConverter" />-->
             <Style
                 TargetType="ui:TextBox"
                 BasedOn="{StaticResource DefaultUiTextBoxStyle}">
@@ -128,39 +129,39 @@
         </Grid.RowDefinitions>
 
         <ui:TitleBar
-            Title="Отделка стен" />
+            Title="{me:LocalizationSource MainWindow.Title}" />
 
         <StackPanel
             Grid.Row="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            ToolTip="Отделочные стены создаются только для помещений из активного документа. У создаваемых отделочных стен будет отключена галочка 'Граница помещения'. Базовый уровень отделочных стен будет соответствовать уровню помещения. Также созданные стены будут соединены с элементами из активного файла, которые образуют границу помещения: стены, колонны, несущие колонны.&#10;&#10;Важно: соединение с элементами из связанных файлов осуществлено не будет!">
+            ToolTip="{me:LocalizationSource MainWindow.Tooltip.Main}">
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
                 <Label
-                    Content="Создавать стены:"
+                    Content="{me:LocalizationSource MainWindow.Label.RoomGetterMode}"
                     Target="{Binding ElementName=InputRoomGetterMode}"
                     Style="{StaticResource InputLabel}" />
                 <ComboBox
                     x:Name="InputRoomGetterMode"
                     IsEditable="False"
-                    ToolTip="Способ выбора помещений для создания отделочных стен."
-                    ItemsSource="{Binding RoomGetterModes}"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.RoomGetterMode}"
+                    ItemsSource="{me:EnumToItemsSource EnumType=enums:RoomGetterMode}"
                     SelectedItem="{Binding SelectedRoomGetterMode}"
                     Style="{StaticResource ComboBoxInput}">
-                    <ComboBox.ItemTemplate>
+                    <!--<ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
                                 Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:RoomGetterMode}}" />
                         </DataTemplate>
-                    </ComboBox.ItemTemplate>
+                    </ComboBox.ItemTemplate>-->
                 </ComboBox>
             </DockPanel>
 
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
                 <Label
-                    Content="Тип отделочных стен:"
+                    Content="{me:LocalizationSource MainWindow.Label.InputWallTypes}"
                     Target="{Binding ElementName=InputWallTypes}"
                     Style="{StaticResource InputLabel}" />
                 <ComboBox
@@ -170,7 +171,7 @@
                     IsEditable="True"
                     DisplayMemberPath="Name"
                     MaxDropDownHeight="250"
-                    ToolTip="Типоразмер отделочных стен, которые будут создаваться."
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallTypes}"
                     ItemsSource="{Binding WallTypes}"
                     SelectedItem="{Binding SelectedWallType}"
                     Style="{StaticResource ComboBoxInput}">
@@ -179,62 +180,62 @@
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
                 <Label
-                    Content="Отметка верха от уровня:"
+                    Content="{me:LocalizationSource MainWindow.Label.InputWallElevationMode}"
                     Target="{Binding ElementName=InputWallElevationMode}"
                     Style="{StaticResource InputLabel}" />
                 <ComboBox
                     x:Name="InputWallElevationMode"
                     IsEditable="False"
-                    ToolTip="Способ задания отметки верха отделочной стены."
-                    ItemsSource="{Binding WallElevationModes}"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallElevationMode}"
+                    ItemsSource="{me:EnumToItemsSource EnumType=enums:WallElevationMode}"
                     SelectedItem="{Binding SelectedWallElevationMode}"
                     Style="{StaticResource ComboBoxInput}">
-                    <ComboBox.ItemTemplate>
+                    <!--<ComboBox.ItemTemplate> TODO
                         <DataTemplate>
                             <TextBlock
                                 Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:WallElevationMode}}" />
                         </DataTemplate>
-                    </ComboBox.ItemTemplate>
+                    </ComboBox.ItemTemplate>-->
                 </ComboBox>
                 <ui:TextBox
-                    ToolTip="Стена будет создана таким способом, чтобы ее верх был на указанной отметке относительно базового уровня стены. Базовый уровень стены будет браться из уровня помещения."
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallElevation}"
                     Text="{Binding WallElevationByUser, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                     IsEnabled="{Binding IsWallHeightByUserEnabled}" />
                 <Label
-                    Content="мм"
                     Width="Auto"
+                    Content="{me:LocalizationSource MainWindow.Label.Mm}"
                     Style="{StaticResource InputLabel}" />
             </DockPanel>
 
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
                 <Label
-                    Content="Смещение снизу от уровня:"
+                    Content="{me:LocalizationSource MainWindow.Label.InputWallBaseOffset}"
                     Target="{Binding ElementName=InputWallBaseOffset}"
                     Style="{StaticResource InputLabel}" />
                 <ui:TextBox
                     x:Name="InputWallBaseOffset"
-                    ToolTip="Смещение снизу в мм от базового уровня стены. Базовый уровень стены будет браться из уровня помещения."
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.WallBaseOffset}"
                     Text="{Binding WallBaseOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
                 <Label
-                    Content="мм"
                     Width="Auto"
+                    Content="{me:LocalizationSource MainWindow.Label.Mm}"
                     Style="{StaticResource InputLabel}" />
             </DockPanel>
 
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
                 <Label
-                    Content="Смещение внутрь помещения:"
+                    Content="{me:LocalizationSource MainWindow.Label.InputWallSideOffset}"
                     Target="{Binding ElementName=InputWallSideOffset}"
                     Style="{StaticResource InputLabel}" />
                 <ui:TextBox
                     x:Name="InputWallSideOffset"
-                    ToolTip="Смещение в мм внутрь помещения, которое будет между границей помещения и гранью отделочной стены."
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallSideOffset}"
                     Text="{Binding WallSideOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
                 <Label
-                    Content="мм"
                     Width="Auto"
+                    Content="{me:LocalizationSource MainWindow.Label.Mm}"
                     Style="{StaticResource InputLabel}" />
             </DockPanel>
         </StackPanel>
@@ -251,18 +252,18 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="ОК"
                 IsDefault="True"
-                Click="ButtonOk_Click"
                 Appearance="Info"
+                Click="ButtonOk_Click"
+                Content="{me:LocalizationSource AllWindow.ButtonOk}"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="Отмена"
                 IsCancel="True"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"
+                Content="{me:LocalizationSource AllWindow.ButtonCancel}" />
         </DockPanel>
     </Grid>
 </core:WpfUIPlatformWindow>

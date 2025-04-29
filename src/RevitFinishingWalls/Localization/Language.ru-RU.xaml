@@ -9,6 +9,37 @@
         x:Key="AllWindow.ButtonCancel">Отмена</system:String>
 
     <system:String
+        x:Key="MainWindow.Title">Отделка стен</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.Main"
+        xml:space="preserve">Отделочные стены создаются только для помещений из активного документа. У создаваемых отделочных стен будет отключена галочка 'Граница помещения'. Базовый уровень отделочных стен будет соответствовать уровню помещения. Также созданные стены будут соединены с элементами из активного файла, которые образуют границу помещения: стены, колонны, несущие колонны.
+
+Важно: соединение с элементами из связанных файлов осуществлено не будет!</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.RoomGetterMode">Способ выбора помещений для создания отделочных стен.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallTypes">Типоразмер отделочных стен, которые будут создаваться.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallElevationMode">Способ задания отметки верха отделочной стены.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallElevation">Стена будет создана таким способом, чтобы ее верх был на указанной отметке относительно базового уровня стены. Базовый уровень стены будет браться из уровня помещения.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.WallBaseOffset">Смещение снизу в мм от базового уровня стены. Базовый уровень стены будет браться из уровня помещения.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallSideOffset">Смещение в мм внутрь помещения, которое будет между границей помещения и гранью отделочной стены.</system:String>
+    <system:String
+        x:Key="MainWindow.Label.RoomGetterMode">Создавать стены:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallTypes">Тип отделочных стен:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallElevationMode">Отметка верха от уровня:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Mm">мм</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallBaseOffset">Смещение снизу от уровня:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallSideOffset">Смещение внутрь помещения:</system:String>
+    <system:String
         x:Key="MainWindow.Validation.WallType">Задайте тип отделочных стен</system:String>
     <system:String
         x:Key="MainWindow.Validation.MinBaseOffset">Слишком большое смещение вниз</system:String>
