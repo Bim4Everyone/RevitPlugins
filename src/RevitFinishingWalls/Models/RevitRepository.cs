@@ -10,6 +10,7 @@ using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
+using dosymep.SimpleServices;
 
 using RevitFinishingWalls.Exceptions;
 using RevitFinishingWalls.Models.Enums;
@@ -22,20 +23,27 @@ namespace RevitFinishingWalls.Models {
         private readonly View3D _defaultView3D;
         private readonly Dictionary<ElementId, double> _wallTypesWidthById;
         private readonly RevitEventHandler _revitEventHandler;
-        /// <summary>
-        /// Минимально допустимая длина линии в ревите. 1/32 дюйма
-        /// </summary>
-        private const double _minLineLength = 0.002604;
+        private readonly ILocalizationService _localizationService;
 
-        public RevitRepository(UIApplication uiApplication, RevitEventHandler revitEventHandler) {
+        /// <summary>
+        /// Минимально допустимая длина линии в ревите
+        /// </summary>
+        private readonly double _minLineLength;
+
+        public RevitRepository(UIApplication uiApplication,
+            RevitEventHandler revitEventHandler,
+            ILocalizationService localizationService) {
+
             UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
             _revitEventHandler = revitEventHandler ?? throw new ArgumentNullException(nameof(revitEventHandler));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _spatialElementBoundaryOptions = new SpatialElementBoundaryOptions() {
                 SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Finish,
                 StoreFreeBoundaryFaces = false
             };
             _defaultView3D = GetDefaultView3D();
             _wallTypesWidthById = new Dictionary<ElementId, double>();
+            _minLineLength = uiApplication.Application.ShortCurveTolerance;
         }
 
         public UIApplication UIApplication { get; }
@@ -72,7 +80,8 @@ namespace RevitFinishingWalls.Models {
             IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
                 ObjectType.Element,
                 filter,
-                "Выберите помещения");
+                _localizationService.GetLocalizedString("RevitUI.FilterPrompt"));
+
 
             List<Room> rooms = new List<Room>();
             foreach(var reference in references) {
@@ -134,9 +143,11 @@ namespace RevitFinishingWalls.Models {
                     false,
                     false);
             } catch(Autodesk.Revit.Exceptions.ArgumentOutOfRangeException) {
-                throw new CannotCreateWallException($"Нельзя создать стену по заданной линии");
+                throw new CannotCreateWallException(
+                    _localizationService.GetLocalizedString("Exceptions.InvalidLine"));
             } catch(Autodesk.Revit.Exceptions.ArgumentException) {
-                throw new CannotCreateWallException($"Нельзя создать стену с заданной высотой");
+                throw new CannotCreateWallException(
+                    _localizationService.GetLocalizedString("Exceptions.InvalidHeight"));
             }
             //параметр "Location Line" или "Линия привязки"
             wall.SetParamValue(BuiltInParameter.WALL_KEY_REF_PARAM, (int) WallLocationLine.FinishFaceInterior);
@@ -146,11 +157,10 @@ namespace RevitFinishingWalls.Models {
             notJoinedElements = new List<ElementId>();
             foreach(Element item in wallCreationData.ElementsForJoin) {
                 try {
-                    //if(!(item is RevitLinkInstance)) {
-                    // нельзя соединить элементы из связей
-                    // TODO
-                    JoinGeometryUtils.JoinGeometry(Document, wall, item);
-                    //}
+                    if(item is not RevitLinkInstance) {
+                        // нельзя соединить элементы из связей
+                        JoinGeometryUtils.JoinGeometry(Document, wall, item);
+                    }
                 } catch(Autodesk.Revit.Exceptions.ArgumentException) {
                     notJoinedElements.Add(item.Id);
                 }
@@ -184,7 +194,7 @@ namespace RevitFinishingWalls.Models {
             ElementId finishingWallTypeId,
             double sideOffset = 0) {
 
-            const string error = "Не удалось построить оси отделочных стен в помещении";
+            string error = _localizationService.GetLocalizedString("Errors.CannotCreateWallLines");
             double finishingWallTypeHalfWidth = GetWallTypeWidth(finishingWallTypeId) / 2;
             List<CurveSegmentElement> curveSegmentsElements = new List<CurveSegmentElement>();
 
@@ -341,10 +351,10 @@ namespace RevitFinishingWalls.Models {
                 ActiveUIDocument.Selection.SetElementIds(dependentElements.ToArray());
             } catch(AccessViolationException) {
                 throw new InvalidOperationException(
-                    "Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.");
+                    _localizationService.GetLocalizedString("Exceptions.ClosedDocument"));
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
                 throw new InvalidOperationException(
-                    "Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.");
+                    _localizationService.GetLocalizedString("Exceptions.InactiveDocument"));
             }
         }
 
@@ -376,11 +386,11 @@ namespace RevitFinishingWalls.Models {
             }
             if(originLoop.Count <= offsetCurves.Count) {
                 throw new InvalidOperationException(
-                    "Нельзя замапить список линий, " +
-                    "количество элементов в котором меньше либо равно количеству линий в исходной петле");
+                    _localizationService.GetLocalizedString("Exceptions.MapingLinesInvalidCount"));
             }
             if(offset > 0) {
-                throw new InvalidOperationException("Можно замапить только список уменьшенных линий");
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Exceptions.MapingLinesInvalidSize"));
             }
 
             List<BoundarySegment> result = new List<BoundarySegment>();
@@ -396,7 +406,8 @@ namespace RevitFinishingWalls.Models {
             if(result.Count == offsetCurves.Count) {
                 return result;
             } else {
-                throw new InvalidOperationException("Не удалось замапить список линий");
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Exceptions.CannotMapLines"));
             }
         }
 
@@ -460,7 +471,8 @@ namespace RevitFinishingWalls.Models {
             }
             if(view == null) {
                 //создаем наш 3D вид по умолчанию
-                using(Transaction t = Document.StartTransaction("Создание 3D-вида")) {
+                using(Transaction t = Document.StartTransaction(
+                    _localizationService.GetLocalizedString("Transactions.Create3dView"))) {
                     var type = new FilteredElementCollector(Document)
                         .OfClass(typeof(ViewFamilyType))
                         .Cast<ViewFamilyType>()
@@ -480,7 +492,8 @@ namespace RevitFinishingWalls.Models {
         /// </summary>
         /// <param name="view3D">3D вид, использующийся в алгоритме <see cref="GetElementByRay"/></param>
         private void ResetDefaultView3D(View3D view3D) {
-            using(Transaction t = Document.StartTransaction("Сброс настроек 3D вида")) {
+            using(Transaction t = Document.StartTransaction(
+                _localizationService.GetLocalizedString("Transactions.Clear3dViewSettings"))) {
                 view3D.IsSectionBoxActive = false;
                 view3D.ViewTemplateId = ElementId.InvalidElementId;
                 view3D.Discipline = ViewDiscipline.Coordination;

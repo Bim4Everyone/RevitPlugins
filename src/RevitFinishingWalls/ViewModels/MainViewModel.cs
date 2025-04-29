@@ -20,6 +20,7 @@ namespace RevitFinishingWalls.ViewModels {
         private readonly RichErrorMessageService _errorMessageService;
         private readonly IRoomFinisher _roomFinisher;
         private readonly IProgressDialogFactory _progressDialogFactory;
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>Максимальная допустимая отметка верха отделочной стены в мм</summary>
         private const int _wallTopMaxElevationMM = 50000;
@@ -36,7 +37,8 @@ namespace RevitFinishingWalls.ViewModels {
             RevitRepository revitRepository,
             RichErrorMessageService errorMessageService,
             IRoomFinisher roomFinisher,
-            IProgressDialogFactory progressDialogFactory
+            IProgressDialogFactory progressDialogFactory,
+            ILocalizationService localizationService
             ) {
             _pluginConfig = pluginConfig
                 ?? throw new ArgumentNullException(nameof(pluginConfig));
@@ -48,7 +50,8 @@ namespace RevitFinishingWalls.ViewModels {
                 ?? throw new ArgumentNullException(nameof(roomFinisher));
             _progressDialogFactory = progressDialogFactory
                 ?? throw new ArgumentNullException(nameof(progressDialogFactory));
-
+            _localizationService = localizationService
+                ?? throw new ArgumentNullException(nameof(localizationService));
             RoomGetterModes = new ObservableCollection<RoomGetterMode>(
                 Enum.GetValues(typeof(RoomGetterMode)).Cast<RoomGetterMode>());
             WallElevationModes = new ObservableCollection<WallElevationMode>(
@@ -133,7 +136,7 @@ namespace RevitFinishingWalls.ViewModels {
             using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
                 var rooms = _revitRepository.GetRooms(settings.RoomGetterMode);
                 progressDialogService.StepValue = 5;
-                progressDialogService.DisplayTitleFormat = "Обработка квартир... [{0}]\\[{1}]";
+                progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("ProgressBar.Title");
                 var progress = progressDialogService.CreateProgress();
                 progressDialogService.MaxValue = rooms.Count;
                 var ct = progressDialogService.CreateCancellationToken();
@@ -148,48 +151,50 @@ namespace RevitFinishingWalls.ViewModels {
 
         private bool CanAcceptView() {
             if(SelectedWallType is null) {
-                ErrorText = "Задайте тип отделочных стен";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.WallType");
                 return false;
             }
             if(double.TryParse(WallBaseOffset, out double baseOffset)) {
                 if(baseOffset < _wallBaseMinOffsetMM) {
-                    ErrorText = "Слишком большое смещение вниз";
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MinBaseOffset");
                     return false;
                 } else if(baseOffset > _wallBaseMaxOffsetMM) {
-                    ErrorText = "Слишком большое смещение вверх";
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MaxBaseOffset");
                     return false;
                 }
             } else {
-                ErrorText = "Смещение должно быть числом";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.BaseOffsetNotNumber");
                 return false;
             }
             if(SelectedWallElevationMode == WallElevationMode.ManualHeight) {
                 if(double.TryParse(WallElevationByUser, out double height)) {
                     if(height <= 0) {
-                        ErrorText = "Отметка верха должна быть больше 0";
+                        ErrorText = string.Format(
+                            _localizationService.GetLocalizedString("MainWindow.Validation.MinWallElevation"), 0);
                         return false;
                     } else if(height > _wallTopMaxElevationMM) {
-                        ErrorText = "Слишком большая отметка верха стены";
+                        ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MaxWallElevation");
                         return false;
                     } else if(height <= baseOffset) {
-                        ErrorText = "Отметка верха должна быть больше смещения";
+                        ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.ElevationBelowOffset");
                         return false;
                     }
                 } else {
-                    ErrorText = "Отметка верха должна быть числом";
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.ElevationNotNumber");
                     return false;
                 }
             }
             if(double.TryParse(WallSideOffset, out double sideOffset)) {
                 if(sideOffset < 0) {
-                    ErrorText = "Смещение внутрь не должно быть меньше 0";
+                    ErrorText = string.Format(
+                        _localizationService.GetLocalizedString("MainWindow.Validation.MinSideOffset"), 0);
                     return false;
                 } else if(sideOffset > _wallSideMaxOffsetMM) {
-                    ErrorText = "Слишком большое смещение внутрь";
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MaxSideOffset");
                     return false;
                 }
             } else {
-                ErrorText = "Смещение внутрь должно быть числом";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.SideOffsetNotNumber");
                 return false;
             }
 

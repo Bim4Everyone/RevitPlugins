@@ -1,12 +1,16 @@
-using System.ComponentModel;
-
 namespace RevitFinishingWalls.Models.Enums {
     internal enum RoomGetterMode {
-        [Description("По уже выбранным помещениям")]
+        /// <summary>
+        /// Помещения, выбранные перед запуском плагина
+        /// </summary>
         AlreadySelectedRooms,
-        [Description("По помещениям на активном виде")]
+        /// <summary>
+        /// Помещения на активном виде
+        /// </summary>
         RoomsOnActiveView,
-        [Description("По выбранным вручную помещениям")]
+        /// <summary>
+        /// Помещения, выбранные вручную
+        /// </summary>
         ManuallySelectedRooms
     }
 }

@@ -1,0 +1,90 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="AllWindow.ButtonOk">ОК</system:String>
+    <system:String
+        x:Key="AllWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String
+        x:Key="MainWindow.Validation.WallType">Задайте тип отделочных стен</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MinBaseOffset">Слишком большое смещение вниз</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MaxBaseOffset">Слишком большое смещение вверх</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.BaseOffsetNotNumber">Смещение должно быть числом</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MinWallElevation">Отметка верха должна быть больше {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MaxWallElevation">Слишком большая отметка верха стены</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ElevationBelowOffset">Отметка верха должна быть больше смещения</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ElevationNotNumber">Отметка верха должна быть числом</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MinSideOffset">Смещение внутрь не должно быть меньше {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MaxSideOffset">Слишком большое смещение внутрь</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SideOffsetNotNumber">Смещение внутрь должно быть числом</system:String>
+
+    <system:String
+        x:Key="RoomGetterMode.AlreadySelectedRooms">По уже выбранным помещениям</system:String>
+    <system:String
+        x:Key="RoomGetterMode.RoomsOnActiveView">По помещениям на активном виде</system:String>
+    <system:String
+        x:Key="RoomGetterMode.ManuallySelectedRooms">По выбранным вручную помещениям</system:String>
+
+    <system:String
+        x:Key="WallElevationMode.ManualHeight">Задать вручную</system:String>
+    <system:String
+        x:Key="WallElevationMode.HeightByRoom">По помещениям</system:String>
+
+    <system:String
+        x:Key="Exceptions.InvalidLine">Нельзя создать стену по заданной линии</system:String>
+    <system:String
+        x:Key="Exceptions.InvalidHeight">Нельзя создать стену с заданной высотой</system:String>
+    <system:String
+        x:Key="Exceptions.ClosedDocument">Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент</system:String>
+    <system:String
+        x:Key="Exceptions.InactiveDocument">Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент</system:String>
+    <system:String
+        x:Key="Exceptions.MapingLinesInvalidCount">Нельзя замапить список линий, количество элементов в котором меньше либо равно количеству линий в исходной петле</system:String>
+    <system:String
+        x:Key="Exceptions.MapingLinesInvalidSize">Можно замапить только список уменьшенных линий</system:String>
+    <system:String
+        x:Key="Exceptions.CannotMapLines">Не удалось замапить список линий</system:String>
+
+    <system:String
+        x:Key="Errors.CannotCreateWallLines">Не удалось построить оси отделочных стен в помещении</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.Title">Ошибки создания отделки стен</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorTitles.RoomBoundaries">Ошибки обработки контура помещения</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorTitles.WallCreation">Ошибки создания стен</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorTitles.WallJoining">Ошибки соединения стен</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorMsg.WallJoining">Не удалось присоединить отделочную стену</system:String>
+
+    <system:String
+        x:Key="MessageBox.Errors.Header">Ошибка</system:String>
+
+    <system:String
+        x:Key="ProgressBar.Title">Обработка квартир... [{0}]\[{1}]</system:String>
+
+    <system:String
+        x:Key="RevitUI.FilterPrompt">Выберите помещения</system:String>
+
+    <system:String
+        x:Key="Transactions.Create3dView">Создание 3D-вида</system:String>
+    <system:String
+        x:Key="Transactions.Clear3dViewSettings">Сброс настроек 3D вида</system:String>
+    <system:String
+        x:Key="Transactions.CreateFinishingWalls">Создание отделочных стен</system:String>
+</ResourceDictionary>
