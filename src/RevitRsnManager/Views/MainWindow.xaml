@@ -77,17 +77,19 @@
                 </StackPanel>
             </ui:Button>
         </StackPanel>
-        <Border Grid.Row="2"
-                Background="{DynamicResource CardBackground}"
-                CornerRadius="8"
-                Padding="5"
-                Margin="10,0,10,0">
-            <ListBox Grid.Row="2"
-                 AllowDrop="True"
-                 Drop="ListBox_Drop"
-                 PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
-                 ItemsSource="{Binding Servers}"
-                 SelectedItem="{Binding SelectedServer}">
+        <Border 
+            Grid.Row="2"
+            CornerRadius="8"
+            Padding="5"
+            Margin="10,0,10,0"
+            Background="{DynamicResource CardBackground}">
+            <ListBox
+                Grid.Row="2"
+                AllowDrop="True"
+                Drop="ListBox_Drop"
+                PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
+                ItemsSource="{Binding Servers}"
+                SelectedItem="{Binding SelectedServer}">
 
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
@@ -101,11 +103,12 @@
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderThickness="1"
-                            BorderBrush="{ui:ThemeResource TextFillColorPrimaryBrush}"
-                            Padding="5"
-                            Margin="10,5,10,5"
-                            CornerRadius="5">
+                    <Border 
+                        BorderThickness="1"
+                        BorderBrush="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                        Padding="5"
+                        Margin="10,5,10,5"
+                        CornerRadius="5">
 
                         <DockPanel LastChildFill="True">
                             <StackPanel 
@@ -134,19 +137,22 @@
                                         Height="16" />
                                 </ui:Button>
 
-                                <ui:Button Appearance="Danger"
-                                           Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                           CommandParameter="{Binding}">
-                                    <ui:SymbolIcon Symbol="Delete12"
-                                                   Width="16"
-                                                   Height="16" />
+                                <ui:Button 
+                                    Appearance="Danger"
+                                    Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}">
+                                    <ui:SymbolIcon 
+                                        Symbol="Delete12"
+                                        Width="16"
+                                        Height="16" />
                                 </ui:Button>
                             </StackPanel>
 
-                            <TextBlock Text="{Binding}"
-                                       VerticalAlignment="Center"
-                                       Margin="10,0"
-                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}" />
+                            <TextBlock 
+                                Text="{Binding}"
+                                VerticalAlignment="Center"
+                                Margin="10,0"
+                                Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}" />
                         </DockPanel>
 
                     </Border>
