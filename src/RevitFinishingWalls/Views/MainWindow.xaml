@@ -17,10 +17,10 @@
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    MinHeight="275"
-    MinWidth="600"
-    MaxHeight="275"
-    MaxWidth="600"
+    MinHeight="350"
+    MinWidth="630"
+    MaxHeight="350"
+    MaxWidth="630"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     ResizeMode="NoResize">
     <core:WpfUIPlatformWindow.Resources>
@@ -39,14 +39,20 @@
                 TargetType="ui:TextBox"
                 BasedOn="{StaticResource DefaultUiTextBoxStyle}">
                 <Setter
-                    Property="Width"
-                    Value="50" />
+                    Property="MinWidth"
+                    Value="60" />
+                <Setter
+                    Property="MaxWidth"
+                    Value="60" />
                 <Setter
                     Property="VerticalAlignment"
                     Value="Center" />
                 <Setter
                     Property="HorizontalAlignment"
                     Value="Center" />
+                <Setter
+                    Property="ClearButtonEnabled"
+                    Value="False" />
             </Style>
             <Style
                 TargetType="ComboBox"
@@ -58,6 +64,9 @@
                 <Setter
                     Property="Margin"
                     Value="0 0 5 0" />
+                <Setter
+                    Property="ScrollViewer.VerticalScrollBarVisibility"
+                    Value="Visible" />
             </Style>
             <Style
                 TargetType="DockPanel"
@@ -73,17 +82,14 @@
                     Value="Center" />
             </Style>
             <Style
-                TargetType="TextBlock"
-                x:Key="InputDescription">
+                TargetType="Label"
+                x:Key="InputLabel">
                 <Setter
                     Property="Margin"
-                    Value="5 0" />
+                    Value="0 0 5 0" />
                 <Setter
                     Property="Width"
-                    Value="200" />
-                <Setter
-                    Property="TextAlignment"
-                    Value="Justify" />
+                    Value="210" />
                 <Setter
                     Property="VerticalAlignment"
                     Value="Center" />
@@ -118,22 +124,21 @@
         <StackPanel
             Grid.Row="1"
             HorizontalAlignment="Center"
-            VerticalAlignment="Center">
-            <StackPanel.ToolTip>
-                <TextBlock
-                    Text="Отделочные стены создаются только для помещений из активного документа.&#10;У создаваемых отделочных стен будет отключена галочка 'Граница помещения'.&#10;Также созданные стены будут соединены с элементами из активного файла,&#10;которые образуют границу помещения: стены, колонны, несущие колонны.&#10;Важно: соединение с элементами из связанных файлов осуществлено не будет!"
-                    FontSize="14" />
-            </StackPanel.ToolTip>
+            VerticalAlignment="Center"
+            ToolTip="Отделочные стены создаются только для помещений из активного документа. У создаваемых отделочных стен будет отключена галочка 'Граница помещения'. Базовый уровень отделочных стен будет соответствовать уровню помещения. Также созданные стены будут соединены с элементами из активного файла, которые образуют границу помещения: стены, колонны, несущие колонны.&#10;&#10;Важно: соединение с элементами из связанных файлов осуществлено не будет!">
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
-                <ui:TextBlock
-                    Text="Создавать стены:"
-                    Style="{StaticResource InputDescription}" />
+                <Label
+                    Content="Создавать стены:"
+                    Target="{Binding ElementName=InputRoomGetterMode}"
+                    Style="{StaticResource InputLabel}" />
                 <ComboBox
+                    x:Name="InputRoomGetterMode"
+                    IsEditable="False"
+                    ToolTip="Способ выбора помещений для создания отделочных стен."
                     ItemsSource="{Binding RoomGetterModes}"
                     SelectedItem="{Binding SelectedRoomGetterMode}"
-                    Style="{StaticResource ComboBoxInput}"
-                    IsEditable="False">
+                    Style="{StaticResource ComboBoxInput}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -145,15 +150,18 @@
 
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
-                <TextBlock
-                    Text="Тип отделочных стен:"
-                    Style="{StaticResource InputDescription}" />
+                <Label
+                    Content="Тип отделочных стен:"
+                    Target="{Binding ElementName=InputWallTypes}"
+                    Style="{StaticResource InputLabel}" />
                 <ComboBox
+                    x:Name="InputWallTypes"
                     IsTextSearchCaseSensitive="False"
                     IsTextSearchEnabled="True"
                     IsEditable="True"
                     DisplayMemberPath="Name"
                     MaxDropDownHeight="250"
+                    ToolTip="Типоразмер отделочных стен, которые будут создаваться."
                     ItemsSource="{Binding WallTypes}"
                     SelectedItem="{Binding SelectedWallType}"
                     Style="{StaticResource ComboBoxInput}">
@@ -161,11 +169,14 @@
             </DockPanel>
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
-                <TextBlock
-                    Text="Отметка верха от уровня:"
-                    Style="{StaticResource InputDescription}" />
+                <Label
+                    Content="Отметка верха от уровня:"
+                    Target="{Binding ElementName=InputWallElevationMode}"
+                    Style="{StaticResource InputLabel}" />
                 <ComboBox
+                    x:Name="InputWallElevationMode"
                     IsEditable="False"
+                    ToolTip="Способ задания отметки верха отделочной стены."
                     ItemsSource="{Binding WallElevationModes}"
                     SelectedItem="{Binding SelectedWallElevationMode}"
                     Style="{StaticResource ComboBoxInput}">
@@ -177,44 +188,50 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 <ui:TextBox
+                    ToolTip="Стена будет создана таким способом, чтобы ее верх был на указанной отметке относительно базового уровня стены. Базовый уровень стены будет браться из уровня помещения."
                     Text="{Binding WallElevationByUser, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                     IsEnabled="{Binding IsWallHeightByUserEnabled}" />
-                <TextBlock
-                    Text="мм"
+                <Label
+                    Content="мм"
                     Width="Auto"
-                    Style="{StaticResource InputDescription}" />
+                    Style="{StaticResource InputLabel}" />
             </DockPanel>
 
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
-                <TextBlock
-                    Text="Смещение снизу от уровня:"
-                    Style="{StaticResource InputDescription}" />
+                <Label
+                    Content="Смещение снизу от уровня:"
+                    Target="{Binding ElementName=InputWallBaseOffset}"
+                    Style="{StaticResource InputLabel}" />
                 <ui:TextBox
+                    x:Name="InputWallBaseOffset"
+                    ToolTip="Смещение снизу в мм от базового уровня стены. Базовый уровень стены будет браться из уровня помещения."
                     Text="{Binding WallBaseOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
-                <TextBlock
-                    Text="мм"
+                <Label
+                    Content="мм"
                     Width="Auto"
-                    Style="{StaticResource InputDescription}" />
+                    Style="{StaticResource InputLabel}" />
             </DockPanel>
 
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
-                <TextBlock
-                    Text="Смещение внутрь помещения:"
-                    Style="{StaticResource InputDescription}" />
+                <Label
+                    Content="Смещение внутрь помещения:"
+                    Target="{Binding ElementName=InputWallSideOffset}"
+                    Style="{StaticResource InputLabel}" />
                 <ui:TextBox
+                    x:Name="InputWallSideOffset"
+                    ToolTip="Смещение в мм внутрь помещения, которое будет между границей помещения и гранью отделочной стены."
                     Text="{Binding WallSideOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
-                <TextBlock
-                    Text="мм"
+                <Label
+                    Content="мм"
                     Width="Auto"
-                    Style="{StaticResource InputDescription}" />
+                    Style="{StaticResource InputLabel}" />
             </DockPanel>
         </StackPanel>
 
         <DockPanel
             Grid.Row="2"
-            Height="45"
             HorizontalAlignment="Right">
             <TextBlock
                 Margin="10"
