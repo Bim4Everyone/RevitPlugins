@@ -19,6 +19,7 @@
     MinHeight="400"
     MinWidth="400"
     WindowStartupLocation="CenterScreen"
+    Title="{me:LocalizationSource ErrorsWindow.Title}"
     d:DataContext="{d:DesignInstance vms:ErrorWindowViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
@@ -63,7 +64,7 @@
                                         <DockPanel
                                             HorizontalAlignment="Right">
                                             <TextBlock
-                                                Text="Кол-во:"
+                                                Text="{me:LocalizationSource ErrorsWindow.GroupItemsCount}"
                                                 Margin="0 0 5 0" />
                                             <TextBlock
                                                 Text="{Binding Path=ItemCount}" />
@@ -194,7 +195,7 @@
         <ui:TitleBar
             Grid.Row="0"
             Grid.ColumnSpan="3"
-            Title="{Binding Title}" />
+            Title="{me:LocalizationSource ErrorsWindow.Title}" />
 
         <Border
             Grid.Column="0"
@@ -203,8 +204,8 @@
             <DockPanel
                 Style="{StaticResource DockContainerStyle}">
                 <Label
-                    Content="Помещения"
                     DockPanel.Dock="Top"
+                    Content="{me:LocalizationSource ErrorsWindow.Label.Rooms}"
                     Style="{StaticResource HeaderLabel}"
                     Target="{Binding ElementName=roomsGrid}" />
                 <ui:DataGrid
@@ -238,10 +239,10 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         <DataGridTextColumn
-                            Header="Уровень"
+                            Header="{me:LocalizationSource ErrorsWindow.Columns.Level}"
                             Binding="{Binding LevelName}" />
                         <DataGridTextColumn
-                            Header="Имя"
+                            Header="{me:LocalizationSource ErrorsWindow.Columns.Name}"
                             Binding="{Binding Name}" />
                     </ui:DataGrid.Columns>
                 </ui:DataGrid>
@@ -270,9 +271,10 @@
                     Target="{Binding ElementName=errorsGrid}">
                     <Label.Content>
                         <DockPanel>
-                            <TextBlock
-                                Text="Ошибки в помещении: " />
-                            <TextBlock
+                            <ui:TextBlock
+                                Text="{me:LocalizationSource ErrorsWindow.Label.ErrorsInRoom}"
+                                Margin="0 0 5 0" />
+                            <ui:TextBlock
                                 Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectedRoom.Name}" />
                         </DockPanel>
                     </Label.Content>
@@ -291,7 +293,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ui:Button
-                                        Content="Выбрать"
+                                        Content="{me:LocalizationSource ErrorsWindow.Buttons.Select}"
                                         Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
                                         CommandParameter="{Binding}" />
                                 </DataTemplate>
@@ -299,11 +301,11 @@
                         </DataGridTemplateColumn>
                         <DataGridTextColumn
                             Width="200"
-                            Header="Заголовок"
+                            Header="{me:LocalizationSource ErrorsWindow.Columns.Header}"
                             Binding="{Binding Title}" />
                         <DataGridTextColumn
                             Width="Auto"
-                            Header="Описание"
+                            Header="{me:LocalizationSource ErrorsWindow.Columns.Description}"
                             Binding="{Binding Message}">
                         </DataGridTextColumn>
                     </ui:DataGrid.Columns>

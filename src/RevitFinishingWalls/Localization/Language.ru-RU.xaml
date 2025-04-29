@@ -95,6 +95,22 @@
     <system:String
         x:Key="ErrorsWindow.Title">Ошибки создания отделки стен</system:String>
     <system:String
+        x:Key="ErrorsWindow.Label.Rooms">Помещения</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Label.ErrorsInRoom">Ошибки в помещении:</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Level">Уровень</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Name">Имя</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Header">Заголовок</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Description">Описание</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Buttons.Select">Выбрать</system:String>
+    <system:String
+        x:Key="ErrorsWindow.GroupItemsCount">Кол-во:</system:String>
+    <system:String
         x:Key="ErrorsWindow.ErrorTitles.RoomBoundaries">Ошибки обработки контура помещения</system:String>
     <system:String
         x:Key="ErrorsWindow.ErrorTitles.WallCreation">Ошибки создания стен</system:String>
