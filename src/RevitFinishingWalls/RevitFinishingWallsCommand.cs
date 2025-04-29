@@ -5,6 +5,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
@@ -34,20 +35,31 @@ namespace RevitFinishingWalls {
                     .ToSelf()
                     .InSingletonScope();
 
-                kernel.Bind<IWallCreationDataProvider>().To<WallCreationDataProvider>().InSingletonScope();
-                kernel.Bind<IRoomFinisher>().To<RoomFinisher>().InSingletonScope();
-                kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
-                kernel.Bind<ErrorWindowViewModel>().ToSelf().InTransientScope();
-                kernel.Bind<ErrorWindow>().ToSelf().InTransientScope();
-                kernel.Bind<RichErrorMessageService>().ToSelf().InTransientScope();
+                kernel.Bind<IWallCreationDataProvider>()
+                    .To<WallCreationDataProvider>()
+                    .InSingletonScope();
+                kernel.Bind<IRoomFinisher>()
+                    .To<RoomFinisher>()
+                    .InSingletonScope();
 
-                kernel.UseWpfUIMessageBox<ErrorWindowViewModel>();
+                kernel.Bind<PluginConfig>()
+                    .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
                 kernel.UseWpfUIThemeUpdater();
 
-                kernel.UseWpfUIProgressDialog<MainViewModel>();
                 kernel.BindMainWindow<MainViewModel, MainWindow>();
+                kernel.UseWpfUIProgressDialog<MainViewModel>();
+
+                kernel.Bind<RichErrorMessageService>()
+                    .ToSelf()
+                    .InTransientScope();
+                kernel.Bind<ErrorWindowViewModel>()
+                    .ToSelf()
+                    .InTransientScope();
+                kernel.Bind<ErrorWindow>()
+                    .ToSelf()
+                    .InTransientScope();
+                kernel.UseWpfUIMessageBox<ErrorWindowViewModel>();
 
                 string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
                 kernel.UseWpfLocalization(
