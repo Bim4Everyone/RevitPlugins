@@ -34,8 +34,6 @@
                 <ResourceDictionary
                     Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <!--<converters:EnumConverter
-                x:Key="EnumConverter" />-->
             <Style
                 TargetType="ui:TextBox"
                 BasedOn="{StaticResource DefaultUiTextBoxStyle}">
@@ -146,15 +144,9 @@
                     x:Name="InputRoomGetterMode"
                     IsEditable="False"
                     ToolTip="{me:LocalizationSource MainWindow.Tooltip.RoomGetterMode}"
-                    ItemsSource="{me:EnumToItemsSource EnumType=enums:RoomGetterMode}"
+                    ItemsSource="{Binding RoomGetterModes}"
                     SelectedItem="{Binding SelectedRoomGetterMode}"
                     Style="{StaticResource ComboBoxInput}">
-                    <!--<ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock
-                                Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:RoomGetterMode}}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>-->
                 </ComboBox>
             </DockPanel>
 
@@ -187,15 +179,9 @@
                     x:Name="InputWallElevationMode"
                     IsEditable="False"
                     ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallElevationMode}"
-                    ItemsSource="{me:EnumToItemsSource EnumType=enums:WallElevationMode}"
+                    ItemsSource="{Binding WallElevationModes}"
                     SelectedItem="{Binding SelectedWallElevationMode}"
                     Style="{StaticResource ComboBoxInput}">
-                    <!--<ComboBox.ItemTemplate> TODO
-                        <DataTemplate>
-                            <TextBlock
-                                Text="{Binding Converter={StaticResource EnumConverter}, ConverterParameter={x:Type enums:WallElevationMode}}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>-->
                 </ComboBox>
                 <ui:TextBox
                     ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallElevation}"

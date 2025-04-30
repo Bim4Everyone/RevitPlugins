@@ -52,12 +52,15 @@ namespace RevitFinishingWalls.ViewModels {
                 ?? throw new ArgumentNullException(nameof(progressDialogFactory));
             _localizationService = localizationService
                 ?? throw new ArgumentNullException(nameof(localizationService));
-            RoomGetterModes = new ObservableCollection<RoomGetterMode>(
-                Enum.GetValues(typeof(RoomGetterMode)).Cast<RoomGetterMode>());
-            WallElevationModes = new ObservableCollection<WallElevationMode>(
-                Enum.GetValues(typeof(WallElevationMode)).Cast<WallElevationMode>());
-            WallTypes = new ObservableCollection<WallTypeViewModel>(
-                _revitRepository.GetWallTypes().Select(wt => new WallTypeViewModel(wt)).OrderBy(wt => wt.Name));
+            RoomGetterModes = [.. Enum.GetValues(typeof(RoomGetterMode))
+                .Cast<RoomGetterMode>()
+                .Select(r => new RoomGetterModeViewModel(_localizationService, r))];
+            WallElevationModes = [.. Enum.GetValues(typeof(WallElevationMode))
+                .Cast<WallElevationMode>()
+                .Select(w => new WallElevationModeViewModel(_localizationService, w))];
+            WallTypes = [.. _revitRepository.GetWallTypes()
+                .Select(wt => new WallTypeViewModel(wt))
+                .OrderBy(wt => wt.Name)];
 
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             LoadConfigCommand = RelayCommand.Create(LoadConfig);
@@ -77,10 +80,10 @@ namespace RevitFinishingWalls.ViewModels {
         }
 
 
-        public ObservableCollection<RoomGetterMode> RoomGetterModes { get; }
+        public ObservableCollection<RoomGetterModeViewModel> RoomGetterModes { get; }
 
-        private RoomGetterMode _selectedRoomGetterMode;
-        public RoomGetterMode SelectedRoomGetterMode {
+        private RoomGetterModeViewModel _selectedRoomGetterMode;
+        public RoomGetterModeViewModel SelectedRoomGetterMode {
             get => _selectedRoomGetterMode;
             set => RaiseAndSetIfChanged(ref _selectedRoomGetterMode, value);
         }
@@ -102,13 +105,14 @@ namespace RevitFinishingWalls.ViewModels {
         }
 
 
-        public bool IsWallHeightByUserEnabled => SelectedWallElevationMode == WallElevationMode.ManualHeight;
+        public bool IsWallHeightByUserEnabled =>
+            SelectedWallElevationMode?.ElevationMode == WallElevationMode.ManualHeight;
 
 
-        public ObservableCollection<WallElevationMode> WallElevationModes { get; }
+        public ObservableCollection<WallElevationModeViewModel> WallElevationModes { get; }
 
-        private WallElevationMode _selectedWallHeightMode;
-        public WallElevationMode SelectedWallElevationMode {
+        private WallElevationModeViewModel _selectedWallHeightMode;
+        public WallElevationModeViewModel SelectedWallElevationMode {
             get => _selectedWallHeightMode;
             set {
                 RaiseAndSetIfChanged(ref _selectedWallHeightMode, value);
@@ -154,6 +158,14 @@ namespace RevitFinishingWalls.ViewModels {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.WallType");
                 return false;
             }
+            if(SelectedRoomGetterMode is null) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.RoomGetterMode");
+                return false;
+            }
+            if(SelectedWallElevationMode is null) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.WallElevationMode");
+                return false;
+            }
             if(double.TryParse(WallBaseOffset, out double baseOffset)) {
                 if(baseOffset < _wallBaseMinOffsetMM) {
                     ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MinBaseOffset");
@@ -166,7 +178,7 @@ namespace RevitFinishingWalls.ViewModels {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.BaseOffsetNotNumber");
                 return false;
             }
-            if(SelectedWallElevationMode == WallElevationMode.ManualHeight) {
+            if(SelectedWallElevationMode?.ElevationMode == WallElevationMode.ManualHeight) {
                 if(double.TryParse(WallElevationByUser, out double height)) {
                     if(height <= 0) {
                         ErrorText = string.Format(
@@ -205,8 +217,10 @@ namespace RevitFinishingWalls.ViewModels {
         private void LoadConfig() {
             RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
-            SelectedRoomGetterMode = settings.RoomGetterMode;
-            SelectedWallElevationMode = settings.WallElevationMode;
+            SelectedRoomGetterMode = new RoomGetterModeViewModel(
+                _localizationService, settings.RoomGetterMode);
+            SelectedWallElevationMode = new WallElevationModeViewModel(
+                _localizationService, settings.WallElevationMode);
             WallElevationByUser = settings.WallElevationMm.ToString();
             WallBaseOffset = settings.WallBaseOffsetMm.ToString();
             WallSideOffset = settings.WallSideOffsetMm.ToString();
@@ -218,8 +232,8 @@ namespace RevitFinishingWalls.ViewModels {
         private void SaveConfig() {
             RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
-            settings.RoomGetterMode = SelectedRoomGetterMode;
-            settings.WallElevationMode = SelectedWallElevationMode;
+            settings.RoomGetterMode = SelectedRoomGetterMode.RoomGetterMode;
+            settings.WallElevationMode = SelectedWallElevationMode.ElevationMode;
             settings.WallBaseOffsetMm = double.TryParse(WallBaseOffset, out double baseOffset) ? baseOffset : 0;
             settings.WallSideOffsetMm = double.TryParse(WallSideOffset, out double sideOffset) ? sideOffset : 0;
             settings.WallElevationMm = double.TryParse(WallElevationByUser, out double height) ? height : 0;

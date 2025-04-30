@@ -42,6 +42,10 @@
     <system:String
         x:Key="MainWindow.Validation.WallType">Задайте тип отделочных стен</system:String>
     <system:String
+        x:Key="MainWindow.Validation.RoomGetterMode">Задайте выбор помещений</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.WallElevationMode">Задайте отметку верха отделочных стен</system:String>
+    <system:String
         x:Key="MainWindow.Validation.MinBaseOffset">Слишком большое смещение вниз</system:String>
     <system:String
         x:Key="MainWindow.Validation.MaxBaseOffset">Слишком большое смещение вверх</system:String>
