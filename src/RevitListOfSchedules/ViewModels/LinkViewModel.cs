@@ -46,8 +46,8 @@ namespace RevitListOfSchedules.ViewModels {
             Status = GetStatus();
         }
 
-        private bool CanReloadLinkType() {
-            if(_isChecked) {
+        public bool CanReloadLinkType() {
+            if(_isChecked && _linkElement.RevitLink.GetLinkedFileStatus() != LinkedFileStatus.InClosedWorkset) {
                 return true;
             }
             return false;

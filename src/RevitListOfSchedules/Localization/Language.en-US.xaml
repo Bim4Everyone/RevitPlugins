@@ -32,7 +32,9 @@
     <system:String
         x:Key="RevitRepository.ViewName">List_Of_Schedules_{0}</system:String>    
     <system:String
-        x:Key="MainViewModel.ErrorText">Select sheets to create a list of schedules</system:String>
+        x:Key="MainViewModel.ErrorText">Select sheets to create a list of schedules</system:String>    
+    <system:String
+        x:Key="MainViewModel.ErrorLinkText">Links are in closed working sets</system:String>
     <system:String
         x:Key="MainViewModel.TransactionName">Create schedules</system:String>
     <system:String
