@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -28,7 +28,7 @@ namespace RevitClashDetective.Models.Extensions {
         }
 
         public static IEnumerable<Solid> GetSolids(this GeometryInstance geometryInstance) {
-            return geometryInstance.GetInstanceGeometry().SelectMany(item => item.GetSolids()).Where(item => item.Volume > 0);
+            return geometryInstance.GetInstanceGeometry().SelectMany(item => item.GetSolids()).Where(solid => GetVolume(solid) > 0);
         }
 
         public static Solid GetSolid(this Element element) {
@@ -38,7 +38,7 @@ namespace RevitClashDetective.Models.Extensions {
         }
 
         public static Solid UniteSolids(List<Solid> solids) {
-            return GetUnitedSolids(solids).OrderByDescending(s => s.Volume).FirstOrDefault();
+            return GetUnitedSolids(solids).OrderByDescending(s => GetVolume(s)).FirstOrDefault();
         }
 
         public static IEnumerable<Solid> GetUnitedSolids(this IEnumerable<Solid> solids) {
@@ -57,6 +57,14 @@ namespace RevitClashDetective.Models.Extensions {
                 unions.Add(union);
             }
             return unions;
+        }
+
+        private static double GetVolume(Solid solid) {
+            try {
+                return solid?.Volume ?? 0;
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                return 0;
+            }
         }
     }
 }
