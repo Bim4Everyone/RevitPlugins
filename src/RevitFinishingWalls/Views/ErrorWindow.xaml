@@ -45,6 +45,18 @@
                         PropertyName="Title" />
                 </CollectionViewSource.GroupDescriptions>
             </CollectionViewSource>
+            <ui:TextBlock
+                x:Key="LevelNameHeader"
+                Text="{me:LocalizationSource ErrorsWindow.Columns.Level}" />
+            <ui:TextBlock
+                x:Key="NameHeader"
+                Text="{me:LocalizationSource ErrorsWindow.Columns.Name}" />
+            <ui:TextBlock
+                x:Key="ErrorTitleHeader"
+                Text="{me:LocalizationSource ErrorsWindow.Columns.Header}" />
+            <ui:TextBlock
+                x:Key="ErrorDescriptionHeader"
+                Text="{me:LocalizationSource ErrorsWindow.Columns.Description}" />
             <Style
                 x:Key="GroupHeaderStyle"
                 TargetType="{x:Type GroupItem}">
@@ -63,8 +75,13 @@
                                             Text="{Binding Path=Name}" />
                                         <DockPanel
                                             HorizontalAlignment="Right">
-                                            <TextBlock
-                                                Text="{me:LocalizationSource ErrorsWindow.GroupItemsCount}"
+                                            <DockPanel.Resources>
+                                                <ui:TextBlock
+                                                    x:Key="GroupItemsCountCaption"
+                                                    Text="{me:LocalizationSource ErrorsWindow.GroupItemsCount}" />
+                                            </DockPanel.Resources>
+                                            <ContentControl
+                                                Content="{StaticResource GroupItemsCountCaption}"
                                                 Margin="0 0 5 0" />
                                             <TextBlock
                                                 Text="{Binding Path=ItemCount}" />
@@ -239,10 +256,10 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         <DataGridTextColumn
-                            Header="{me:LocalizationSource ErrorsWindow.Columns.Level}"
+                            Header="{StaticResource LevelNameHeader}"
                             Binding="{Binding LevelName}" />
                         <DataGridTextColumn
-                            Header="{me:LocalizationSource ErrorsWindow.Columns.Name}"
+                            Header="{StaticResource NameHeader}"
                             Binding="{Binding Name}" />
                     </ui:DataGrid.Columns>
                 </ui:DataGrid>
@@ -293,7 +310,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ui:Button
-                                        Content="{me:LocalizationSource ErrorsWindow.Buttons.Select}"
+                                        Content="{ui:SymbolIcon Symbol=Search24}"
                                         Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
                                         CommandParameter="{Binding}" />
                                 </DataTemplate>
@@ -301,11 +318,11 @@
                         </DataGridTemplateColumn>
                         <DataGridTextColumn
                             Width="200"
-                            Header="{me:LocalizationSource ErrorsWindow.Columns.Header}"
+                            Header="{StaticResource ErrorTitleHeader}"
                             Binding="{Binding Title}" />
                         <DataGridTextColumn
                             Width="Auto"
-                            Header="{me:LocalizationSource ErrorsWindow.Columns.Description}"
+                            Header="{StaticResource ErrorDescriptionHeader}"
                             Binding="{Binding Message}">
                         </DataGridTextColumn>
                     </ui:DataGrid.Columns>
