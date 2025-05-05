@@ -1,182 +1,333 @@
-﻿<base:ThemedPlatformWindow x:Class="RevitFinishingWalls.Views.ErrorWindow"
-                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                           xmlns:base="clr-namespace:dosymep.WPF.Views"
-                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                           xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
-                           xmlns:local="clr-namespace:RevitFinishingWalls.Views"
-                           xmlns:vms="clr-namespace:RevitFinishingWalls.ViewModels"
-                           xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-                           xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-                           xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
-                           xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-                           mc:Ignorable="d"
-                           Title="{Binding Title}"
-                           Height="500"
-                           Width="900"
-                           MinHeight="400"
-                           MinWidth="400"
-                           WindowStartupLocation="CenterScreen"
-                           d:DataContext="{d:DesignInstance vms:ErrorWindowViewModel, IsDesignTimeCreatable=False}"
-                           Loaded="ThemedPlatformWindow_Loaded">
-    <dxmvvm:Interaction.Behaviors>
-        <common:AttachServiceBehavior AttachableService="{Binding MessageBoxService}" />
-    </dxmvvm:Interaction.Behaviors>
-    <Window.Resources>
-        <Style TargetType="Grid"
-               x:Key="MainGrid">
-            <Setter Property="Margin"
-                    Value="5" />
-        </Style>
-        <Style TargetType="dxdo:LayoutGroup">
-            <Setter Property="AllowSplitters"
-                    Value="True" />
-            <Setter Property="Orientation"
-                    Value="Horizontal" />
-        </Style>
-        <Style TargetType="dxdo:LayoutPanel">
-            <Setter Property="ShowPinButton"
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitFinishingWalls.Views.ErrorWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
+    xmlns:local="clr-namespace:RevitFinishingWalls.Views"
+    xmlns:vms="clr-namespace:RevitFinishingWalls.ViewModels"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    mc:Ignorable="d"
+    Height="500"
+    Width="900"
+    MinHeight="400"
+    MinWidth="400"
+    WindowStartupLocation="CenterScreen"
+    Title="{me:LocalizationSource ErrorsWindow.Title}"
+    d:DataContext="{d:DesignInstance vms:ErrorWindowViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <CollectionViewSource
+                x:Key="groupedRooms"
+                Source="{Binding Rooms}">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription
+                        PropertyName="LevelName" />
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+            <CollectionViewSource
+                x:Key="groupedErrors"
+                Source="{Binding SelectedRoomErrors}">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription
+                        PropertyName="Title" />
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+            <ui:TextBlock
+                x:Key="LevelNameHeader"
+                Text="{me:LocalizationSource ErrorsWindow.Columns.Level}" />
+            <ui:TextBlock
+                x:Key="NameHeader"
+                Text="{me:LocalizationSource ErrorsWindow.Columns.Name}" />
+            <ui:TextBlock
+                x:Key="ErrorTitleHeader"
+                Text="{me:LocalizationSource ErrorsWindow.Columns.Header}" />
+            <ui:TextBlock
+                x:Key="ErrorDescriptionHeader"
+                Text="{me:LocalizationSource ErrorsWindow.Columns.Description}" />
+            <Style
+                x:Key="GroupHeaderStyle"
+                TargetType="{x:Type GroupItem}">
+                <Setter
+                    Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate
+                            TargetType="{x:Type GroupItem}">
+                            <ui:CardExpander
+                                IsExpanded="True">
+                                <ui:CardExpander.Header>
+                                    <DockPanel
+                                        Margin="0 0 14 0"
+                                        HorizontalAlignment="Stretch">
+                                        <TextBlock
+                                            Text="{Binding Path=Name}" />
+                                        <DockPanel
+                                            HorizontalAlignment="Right">
+                                            <DockPanel.Resources>
+                                                <ui:TextBlock
+                                                    x:Key="GroupItemsCountCaption"
+                                                    Text="{me:LocalizationSource ErrorsWindow.GroupItemsCount}" />
+                                            </DockPanel.Resources>
+                                            <ContentControl
+                                                Content="{StaticResource GroupItemsCountCaption}"
+                                                Margin="0 0 5 0" />
+                                            <TextBlock
+                                                Text="{Binding Path=ItemCount}" />
+                                        </DockPanel>
+                                    </DockPanel>
+                                </ui:CardExpander.Header>
+                                <ui:CardExpander.Content>
+                                    <ItemsPresenter />
+                                </ui:CardExpander.Content>
+                            </ui:CardExpander>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style
+                x:Key="DataGridStyle"
+                TargetType="ui:DataGrid"
+                BasedOn="{StaticResource DefaultUiDataGridStyle}">
+                <Setter
+                    Property="AutoGenerateColumns"
                     Value="False" />
-            <Setter Property="ShowCloseButton"
-                    Value="False" />
-        </Style>
-        <Style TargetType="dxg:GridControl">
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
+                <Setter
+                    Property="ScrollViewer.HorizontalScrollBarVisibility"
                     Value="Auto" />
-            <Setter Property="SelectionMode"
-                    Value="Row" />
-            <Setter Property="AutoExpandAllGroups"
-                    Value="True" />
-        </Style>
-        <Style TargetType="dxg:TableView">
-            <Setter Property="ShowDataNavigator"
+                <Setter
+                    Property="ScrollViewer.VerticalScrollBarVisibility"
+                    Value="Auto" />
+                <Setter
+                    Property="CanUserResizeColumns"
                     Value="False" />
-            <Setter Property="ShowSearchPanelMode"
-                    Value="Never" />
-            <Setter Property="NavigationStyle"
-                    Value="Cell" />
-            <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping"
-                    Value="True" />
-            <Setter Property="VirtualizingPanel.VirtualizationMode"
-                    Value="Recycling" />
-            <Setter Property="VirtualizingPanel.IsVirtualizing"
-                    Value="True" />
-            <Setter Property="AllowEditing"
+                <Setter
+                    Property="CanUserReorderColumns"
                     Value="False" />
-            <Setter Property="ShowGroupPanel"
-                    Value="False" />
-            <Setter Property="AllowGrouping"
-                    Value="False" />
-        </Style>
-        <Style TargetType="dxg:GridColumn">
-            <Setter Property="SortMode"
-                    Value="Custom" />
-            <Setter Property="AllowResizing"
+            </Style>
+            <Style
+                TargetType="DockPanel"
+                x:Key="DockContainerStyle">
+                <Setter
+                    Property="LastChildFill"
                     Value="True" />
-            <Setter Property="ReadOnly"
+            </Style>
+            <Style
+                TargetType="Label"
+                x:Key="HeaderLabel">
+                <Setter
+                    Property="FontSize"
+                    Value="14" />
+                <Setter
+                    Property="FontWeight"
+                    Value="SemiBold" />
+                <Setter
+                    Property="Padding"
+                    Value="0,0,0,4" />
+                <Setter
+                    Property="Focusable"
+                    Value="False" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource LabelForeground}" />
+                <Setter
+                    Property="SnapsToDevicePixels"
                     Value="True" />
-            <Setter Property="MinWidth"
-                    Value="50" />
-        </Style>
-    </Window.Resources>
-
-    <Grid Style="{StaticResource MainGrid}">
+            </Style>
+            <Style
+                TargetType="Border"
+                x:Key="BorderStyle">
+                <Setter
+                    Property="Padding"
+                    Value="20" />
+                <Setter
+                    Property="VerticalAlignment"
+                    Value="Stretch" />
+                <Setter
+                    Property="HorizontalAlignment"
+                    Value="Stretch" />
+                <Setter
+                    Property="SnapsToDevicePixels"
+                    Value="True" />
+                <Setter
+                    Property="OverridesDefaultStyle"
+                    Value="True" />
+                <Setter
+                    Property="ScrollViewer.HorizontalScrollBarVisibility"
+                    Value="Auto" />
+                <Setter
+                    Property="ScrollViewer.VerticalScrollBarVisibility"
+                    Value="Disabled" />
+                <Setter
+                    Property="Background"
+                    Value="{DynamicResource CardBackground}" />
+                <Setter
+                    Property="BorderBrush"
+                    Value="{DynamicResource CardBorderBrush}" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="{DynamicResource CardControlBorderThemeThickness}" />
+                <Setter
+                    Property="FocusVisualStyle"
+                    Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="{DynamicResource ControlCornerRadius}" />
+            </Style>
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
+    <b:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+    </b:Interaction.Behaviors>
+    <Grid
+        Margin="10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition />
+            <ColumnDefinition
+                MinWidth="200" />
+            <ColumnDefinition
+                Width="Auto" />
+            <ColumnDefinition
+                MinWidth="200" />
         </Grid.ColumnDefinitions>
 
-        <dxdo:DockLayoutManager x:Name="Manager">
-            <dxdo:LayoutGroup x:Name="layoutRoot">
-                <dxdo:LayoutPanel Caption="Помещения">
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
 
-                    <dxg:GridControl x:Name="_dgRooms"
-                                     ItemsSource="{Binding Rooms}"
-                                     SelectedItem="{Binding SelectedRoom}">
-                        <dxg:GridControl.View>
-                            <dxg:TableView x:Name="viewRooms"></dxg:TableView>
-                        </dxg:GridControl.View>
-                        <dxg:GridControl.GroupSummary>
-                            <dxg:GridSummaryItem SummaryType="Count" />
-                        </dxg:GridControl.GroupSummary>
-                        <dxg:GridControl.Columns>
-                            <dxg:GridColumn Width="100"
-                                            AllowResizing="False">
-                                <dxg:GridColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <dx:SimpleButton Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
-                                                         CommandParameter="{Binding Row}"
-                                                         Glyph="{dx:DXImage 'SvgImages/HybridDemoIcons/Editors/HybridDemo_Search Button.svg'}"
-                                                         GlyphHeight="16">
-                                            <dx:SimpleButton.Content>
-                                                <DockPanel>
-                                                    <TextBlock Text="{Binding RowData.Row.RoomId}" />
-                                                </DockPanel>
-                                            </dx:SimpleButton.Content>
-                                        </dx:SimpleButton>
-                                    </DataTemplate>
-                                </dxg:GridColumn.CellTemplate>
-                            </dxg:GridColumn>
-                            <dxg:GridColumn Width="1*"
-                                            Header="Уровень"
-                                            FieldName="LevelName">
-                            </dxg:GridColumn>
-                            <dxg:GridColumn Width="1*"
-                                            Header="Номер"
-                                            FieldName="RoomNumber">
-                            </dxg:GridColumn>
-                            <dxg:GridColumn Width="4*"
-                                            Header="Имя"
-                                            FieldName="Name">
-                            </dxg:GridColumn>
-                        </dxg:GridControl.Columns>
-                    </dxg:GridControl>
+        <ui:TitleBar
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            Title="{me:LocalizationSource ErrorsWindow.Title}" />
 
-                </dxdo:LayoutPanel>
+        <Border
+            Grid.Column="0"
+            Grid.Row="1"
+            Style="{StaticResource BorderStyle}">
+            <DockPanel
+                Style="{StaticResource DockContainerStyle}">
+                <Label
+                    DockPanel.Dock="Top"
+                    Content="{me:LocalizationSource ErrorsWindow.Label.Rooms}"
+                    Style="{StaticResource HeaderLabel}"
+                    Target="{Binding ElementName=roomsGrid}" />
+                <ui:DataGrid
+                    x:Name="roomsGrid"
+                    Style="{StaticResource DataGridStyle}"
+                    ItemsSource="{Binding Source={StaticResource groupedRooms}}"
+                    SelectedItem="{Binding SelectedRoom}">
+                    <ui:DataGrid.GroupStyle>
+                        <GroupStyle
+                            ContainerStyle="{StaticResource GroupHeaderStyle}" />
+                    </ui:DataGrid.GroupStyle>
+                    <ui:DataGrid.Columns>
+                        <DataGridTemplateColumn
+                            Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
+                                        CommandParameter="{Binding}">
+                                        <ui:Button.Content>
+                                            <DockPanel>
+                                                <ui:SymbolIcon
+                                                    Symbol="Search24"
+                                                    Margin="0 0 5 0" />
+                                                <TextBlock
+                                                    Text="{Binding RoomId}" />
+                                            </DockPanel>
+                                        </ui:Button.Content>
+                                    </ui:Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            Header="{StaticResource LevelNameHeader}"
+                            Binding="{Binding LevelName}" />
+                        <DataGridTextColumn
+                            Header="{StaticResource NameHeader}"
+                            Binding="{Binding Name}" />
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
+        </Border>
 
-                <dxdo:LayoutPanel>
-                    <dxdo:LayoutPanel.CaptionTemplate>
-                        <DataTemplate>
-                            <DockPanel>
-                                <TextBlock Text="Ошибки в помещении: " />
-                                <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectedRoom.Name}" />
-                            </DockPanel>
-                        </DataTemplate>
-                    </dxdo:LayoutPanel.CaptionTemplate>
-                    <dxg:GridControl x:Name="_dgErrors"
-                                     Grid.Column="1"
-                                     ItemsSource="{Binding SelectedRoomErrors}">
-                        <dxg:GridControl.GroupSummary>
-                            <dxg:GridSummaryItem SummaryType="Count" />
-                        </dxg:GridControl.GroupSummary>
-                        <dxg:GridControl.View>
-                            <dxg:TableView x:Name="viewErrors"></dxg:TableView>
-                        </dxg:GridControl.View>
-                        <dxg:GridControl.Columns>
-                            <dxg:GridColumn Width="70"
-                                            AllowResizing="False">
-                                <dxg:GridColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <dx:SimpleButton Content="Выбрать"
-                                                         Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
-                                                         CommandParameter="{Binding Row}" />
-                                    </DataTemplate>
-                                </dxg:GridColumn.CellTemplate>
-                            </dxg:GridColumn>
-                            <dxg:GridColumn Width="1*"
-                                            Header="Заголовок"
-                                            FieldName="Title" />
-                            <dxg:GridColumn Width="1*"
-                                            Header="Описание"
-                                            FieldName="Message">
-                            </dxg:GridColumn>
-                        </dxg:GridControl.Columns>
-                    </dxg:GridControl>
+        <GridSplitter
+            Grid.Row="1"
+            Grid.Column="1"
+            Width="10"
+            Background="{DynamicResource CardBackground}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch" />
 
-                </dxdo:LayoutPanel>
-            </dxdo:LayoutGroup>
-        </dxdo:DockLayoutManager>
-
+        <Border
+            Grid.Column="2"
+            Grid.Row="1"
+            Style="{StaticResource BorderStyle}">
+            <DockPanel
+                Style="{StaticResource DockContainerStyle}">
+                <Label
+                    DockPanel.Dock="Top"
+                    Style="{StaticResource HeaderLabel}"
+                    Target="{Binding ElementName=errorsGrid}">
+                    <Label.Content>
+                        <DockPanel>
+                            <ui:TextBlock
+                                Text="{me:LocalizationSource ErrorsWindow.Label.ErrorsInRoom}"
+                                Margin="0 0 5 0" />
+                            <ui:TextBlock
+                                Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectedRoom.Name}" />
+                        </DockPanel>
+                    </Label.Content>
+                </Label>
+                <ui:DataGrid
+                    x:Name="errorsGrid"
+                    Style="{StaticResource DataGridStyle}"
+                    ItemsSource="{Binding Source={StaticResource groupedErrors}}">
+                    <ui:DataGrid.GroupStyle>
+                        <GroupStyle
+                            ContainerStyle="{StaticResource GroupHeaderStyle}" />
+                    </ui:DataGrid.GroupStyle>
+                    <ui:DataGrid.Columns>
+                        <DataGridTemplateColumn
+                            Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Content="{ui:SymbolIcon Symbol=Search24}"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectErrorCommand}"
+                                        CommandParameter="{Binding}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            Width="200"
+                            Header="{StaticResource ErrorTitleHeader}"
+                            Binding="{Binding Title}" />
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Header="{StaticResource ErrorDescriptionHeader}"
+                            Binding="{Binding Message}">
+                        </DataGridTextColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
+        </Border>
     </Grid>
-</base:ThemedPlatformWindow>
+</core:WpfUIPlatformWindow>

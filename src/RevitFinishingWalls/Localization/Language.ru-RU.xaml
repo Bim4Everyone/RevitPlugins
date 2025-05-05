@@ -1,0 +1,141 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="AllWindow.ButtonOk">ОК</system:String>
+    <system:String
+        x:Key="AllWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Отделка стен</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.Main"
+        xml:space="preserve">Отделочные стены создаются только для помещений из активного документа. У создаваемых отделочных стен будет отключена галочка 'Граница помещения'. Базовый уровень отделочных стен будет соответствовать уровню помещения. Также созданные стены будут соединены с элементами из активного файла, которые образуют границу помещения: стены, колонны, несущие колонны.
+
+Важно: соединение с элементами из связанных файлов осуществлено не будет!</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.RoomGetterMode">Способ выбора помещений для создания отделочных стен.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallTypes">Типоразмер отделочных стен, которые будут создаваться.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallElevationMode">Способ задания отметки верха отделочной стены.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallElevation">Стена будет создана таким способом, чтобы ее верх был на указанной отметке относительно базового уровня стены. Базовый уровень стены будет браться из уровня помещения.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.WallBaseOffset">Смещение снизу в мм от базового уровня стены. Базовый уровень стены будет браться из уровня помещения.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallSideOffset">Смещение в мм внутрь помещения, которое будет между границей помещения и гранью отделочной стены.</system:String>
+    <system:String
+        x:Key="MainWindow.Label.RoomGetterMode">Создавать стены:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallTypes">Тип отделочных стен:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallElevationMode">Отметка верха от уровня:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Mm">мм</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallBaseOffset">Смещение снизу от уровня:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallSideOffset">Смещение внутрь помещения:</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.WallType">Задайте тип отделочных стен</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.RoomGetterMode">Задайте выбор помещений</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.WallElevationMode">Задайте отметку верха отделочных стен</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MinBaseOffset">Слишком большое смещение вниз</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MaxBaseOffset">Слишком большое смещение вверх</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.BaseOffsetNotNumber">Смещение должно быть числом</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MinWallElevation">Отметка верха должна быть больше {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MaxWallElevation">Слишком большая отметка верха стены</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ElevationBelowOffset">Отметка верха должна быть больше смещения</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ElevationNotNumber">Отметка верха должна быть числом</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MinSideOffset">Смещение внутрь не должно быть меньше {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MaxSideOffset">Слишком большое смещение внутрь</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SideOffsetNotNumber">Смещение внутрь должно быть числом</system:String>
+
+    <system:String
+        x:Key="RoomGetterMode.AlreadySelectedRooms">По уже выбранным помещениям</system:String>
+    <system:String
+        x:Key="RoomGetterMode.RoomsOnActiveView">По помещениям на активном виде</system:String>
+    <system:String
+        x:Key="RoomGetterMode.ManuallySelectedRooms">По выбранным вручную помещениям</system:String>
+
+    <system:String
+        x:Key="WallElevationMode.ManualHeight">Задать вручную</system:String>
+    <system:String
+        x:Key="WallElevationMode.HeightByRoom">По помещениям</system:String>
+
+    <system:String
+        x:Key="Exceptions.InvalidLine">Нельзя создать стену по заданной линии</system:String>
+    <system:String
+        x:Key="Exceptions.InvalidHeight">Нельзя создать стену с заданной высотой</system:String>
+    <system:String
+        x:Key="Exceptions.ClosedDocument">Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент</system:String>
+    <system:String
+        x:Key="Exceptions.InactiveDocument">Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент</system:String>
+    <system:String
+        x:Key="Exceptions.MapingLinesInvalidCount">Нельзя замапить список линий, количество элементов в котором меньше либо равно количеству линий в исходной петле</system:String>
+    <system:String
+        x:Key="Exceptions.MapingLinesInvalidSize">Можно замапить только список уменьшенных линий</system:String>
+    <system:String
+        x:Key="Exceptions.CannotMapLines">Не удалось замапить список линий</system:String>
+
+    <system:String
+        x:Key="Errors.CannotCreateWallLines">Не удалось построить оси отделочных стен в помещении</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.Title">Ошибки создания отделки стен</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Label.Rooms">Помещения</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Label.ErrorsInRoom">Ошибки в помещении:</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Level">Уровень</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Name">Имя</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Header">Заголовок</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Description">Описание</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Buttons.Select">Выбрать</system:String>
+    <system:String
+        x:Key="ErrorsWindow.GroupItemsCount">Кол-во:</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorTitles.RoomBoundaries">Ошибки обработки контура помещения</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorTitles.WallCreation">Ошибки создания стен</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorTitles.WallJoining">Ошибки соединения стен</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorMsg.WallJoining">Не удалось присоединить отделочную стену</system:String>
+
+    <system:String
+        x:Key="MessageBox.Errors.Header">Ошибка</system:String>
+
+    <system:String
+        x:Key="ProgressBar.Title">Обработка квартир... [{0}]\[{1}]</system:String>
+
+    <system:String
+        x:Key="RevitUI.FilterPrompt">Выберите помещения</system:String>
+
+    <system:String
+        x:Key="Transactions.Create3dView">Создание 3D-вида</system:String>
+    <system:String
+        x:Key="Transactions.Clear3dViewSettings">Сброс настроек 3D вида</system:String>
+    <system:String
+        x:Key="Transactions.CreateFinishingWalls">Создание отделочных стен</system:String>
+</ResourceDictionary>
