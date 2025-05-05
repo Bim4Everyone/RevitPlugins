@@ -120,9 +120,6 @@ namespace RevitClashDetective.Models.RevitClashReport {
             }
 
             var xmlDoc = XDocument.Load(FilePath);
-            if(!IsCorrectFileName(xmlDoc)) {
-                throw new ArgumentException("Попытка загрузки файла отчета, созданного в другом проекте.");
-            }
 
             return xmlDoc.Descendants("clashtest")
                 .Select(ct => new ReportModel((string) ct.Attribute("name"), GetClashModels(ct)));
@@ -186,22 +183,6 @@ namespace RevitClashDetective.Models.RevitClashReport {
             } else {
                 return new ElementModel() { Id = ElementId.InvalidElementId };
             }
-        }
-
-        private bool IsCorrectFileName(XDocument xDoc) {
-            if(xDoc is null) {
-                return false;
-            }
-            const string rvtEnd = ".rvt";
-            var fileName = xDoc.Descendants("smarttag")
-                .FirstOrDefault(tag => tag.Element("value")?.Value?.EndsWith(rvtEnd) ?? false)?.Element("value").Value
-                ?? string.Empty;
-            var title = fileName.Length > rvtEnd.Length
-                ? fileName.Substring(0, fileName.Length - rvtEnd.Length)
-                : fileName;
-            return _revitRepository.DocInfos.Any(d => d.Name.Equals(
-                RevitRepository.GetDocumentName(title),
-                StringComparison.CurrentCultureIgnoreCase));
         }
 
         private ClashStatus GetClashStatus(string status) {
