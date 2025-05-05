@@ -193,10 +193,12 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 return false;
             }
             const string rvtEnd = ".rvt";
-            var file = xDoc.Descendants("smarttag")
+            var fileName = xDoc.Descendants("smarttag")
                 .FirstOrDefault(tag => tag.Element("value")?.Value?.EndsWith(rvtEnd) ?? false)?.Element("value").Value
                 ?? string.Empty;
-            var title = file.Substring(0, file.Length - rvtEnd.Length);
+            var title = fileName.Length > rvtEnd.Length
+                ? fileName.Substring(0, fileName.Length - rvtEnd.Length)
+                : fileName;
             return _revitRepository.DocInfos.Any(d => d.Name.Equals(
                 RevitRepository.GetDocumentName(title),
                 StringComparison.CurrentCultureIgnoreCase));
