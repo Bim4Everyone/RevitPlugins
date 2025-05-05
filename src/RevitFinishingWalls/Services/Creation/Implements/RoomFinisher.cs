@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitFinishingWalls.Exceptions;
 using RevitFinishingWalls.Models;
@@ -17,16 +18,19 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
     internal class RoomFinisher : IRoomFinisher {
         private readonly RevitRepository _revitRepository;
         private readonly IWallCreationDataProvider _wallCreationDataProvider;
+        private readonly ILocalizationService _localizationService;
 
         public RoomFinisher(
             RevitRepository revitRepository,
-            IWallCreationDataProvider wallCreationDataProvider
+            IWallCreationDataProvider wallCreationDataProvider,
+            ILocalizationService localizationService
             ) {
 
             _revitRepository = revitRepository
                 ?? throw new ArgumentNullException(nameof(revitRepository));
             _wallCreationDataProvider = wallCreationDataProvider
                 ?? throw new ArgumentNullException(nameof(wallCreationDataProvider));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         }
 
 
@@ -40,7 +44,8 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
             if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
             List<RoomErrorsViewModel> errors = new List<RoomErrorsViewModel>();
 
-            using(var transaction = _revitRepository.Document.StartTransaction("Создание отделочных стен")) {
+            using(var transaction = _revitRepository.Document.StartTransaction(
+                _localizationService.GetLocalizedString("Transactions.CreateFinishingWalls"))) {
                 FailureHandlingOptions failOpt = transaction.GetFailureHandlingOptions();
                 failOpt.SetFailuresPreprocessor(new WallAndRoomSeparationLineOverlapHandler());
                 transaction.SetFailureHandlingOptions(failOpt);
@@ -54,7 +59,10 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                         datas = _wallCreationDataProvider.GetWallCreationData(room, settings);
                     } catch(CannotCreateWallException ex) {
                         roomErrors.Errors.Add(
-                            new ErrorViewModel("Ошибки обработки контура помещения", ex.Message, room.Id));
+                            new ErrorViewModel(
+                                _localizationService.GetLocalizedString("ErrorsWindow.ErrorTitles.RoomBoundaries"),
+                                ex.Message,
+                                room.Id));
                         errors.Add(roomErrors);
                         continue;
                     }
@@ -66,12 +74,15 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                             if(notJoinedElements.Count > 0) {
                                 roomErrors.Errors.Add(
                                     new ErrorViewModel(
-                                        "Ошибки соединения стен",
-                                        "Не удалось присоединить отделочную стену",
+                                        _localizationService.GetLocalizedString("ErrorsWindow.ErrorTitles.WallJoining"),
+                                        _localizationService.GetLocalizedString("ErrorsWindow.ErrorMsg.WallJoining"),
                                         new HashSet<ElementId>(notJoinedElements.Union(new ElementId[] { wall.Id }))));
                             }
                         } catch(CannotCreateWallException e) {
-                            roomErrors.Errors.Add(new ErrorViewModel("Ошибки создания стен", e.Message, room.Id));
+                            roomErrors.Errors.Add(new ErrorViewModel(
+                                _localizationService.GetLocalizedString("ErrorsWindow.ErrorTitles.WallCreation"),
+                                e.Message,
+                                room.Id));
                         }
                     }
                     if(roomErrors.Errors.Count > 0) {

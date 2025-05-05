@@ -1,6 +1,6 @@
 {
   "$schema": "./build.schema.json",
-  "Solution": "RevitPlugins.sln",
+  "Solution": "RevitPlugins.slnx",
   "PluginName": "RevitExamplePlugin",
   "PublishDirectory": "99.Example.extension\\Example.tab\\bin",
   "RevitVersions": [

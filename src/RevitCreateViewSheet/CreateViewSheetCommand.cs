@@ -1,20 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
+using System.Globalization;
+using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep;
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
-using dosymep.Bim4Everyone.Templates;
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
+using dosymep.Xpf.Core.Ninject;
 
+using Ninject;
+
+using RevitCreateViewSheet.Models;
+using RevitCreateViewSheet.Services;
 using RevitCreateViewSheet.ViewModels;
 using RevitCreateViewSheet.Views;
 
@@ -26,19 +27,86 @@ namespace RevitCreateViewSheet {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            var application = uiApplication.Application;
+            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+                kernel.Bind<RevitRepository>()
+                    .ToSelf()
+                    .InSingletonScope();
 
-            var uiDocument = uiApplication.ActiveUIDocument;
-            var document = uiDocument.Document;
+                AddEntitiesServices(kernel);
 
-            var projectParameters = ProjectParameters.Create(application);
-            projectParameters.SetupRevitParams(document, SharedParamsConfig.Instance.AlbumBlueprints, SharedParamsConfig.Instance.StampSheetNumber);
+                kernel.UseWpfUIThemeUpdater();
 
-            var window = new CreateViewSheetWindow() {
-                DataContext = new AppViewModel(uiApplication)
-            };
-            
-            Notification(window);
+                kernel.BindMainWindow<MainViewModel, MainWindow>();
+                kernel.Bind<SelectedSheetView>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+                kernel.UseXtraSaveFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");
+                kernel.UseXtraOpenFileDialog<MainViewModel>(filter: "JSON (*.json)|*.json");
+                kernel.UseWpfUIMessageBox<MainViewModel>();
+
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+                kernel.UseWpfLocalization(
+                    $"/{assemblyName};component/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
+                kernel.UseWpfUIProgressDialog<MainViewModel>();
+
+                Notification(kernel.Get<MainWindow>());
+            }
+        }
+
+        private void AddEntitiesServices(IKernel kernel) {
+            kernel.Bind<EntitiesHandler>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<NewEntitySaver>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<ExistsEntitySaver>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<EntitySaverProvider>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<EntitiesTracker>()
+                .ToSelf()
+                .InSingletonScope();
+
+            AddEntitiesCreationViews(kernel);
+        }
+
+        private void AddEntitiesCreationViews(IKernel kernel) {
+            kernel.Bind<SheetItemsFactory>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<AnnotationModelCreatorViewModel>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<AnnotationModelCreatorWindow>()
+                .ToSelf()
+                .InTransientScope()
+                .WithPropertyValue(
+                    nameof(Window.DataContext),
+                    c => c.Kernel.Get<AnnotationModelCreatorViewModel>());
+            kernel.Bind<ScheduleModelCreatorViewModel>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<ScheduleModelCreatorWindow>()
+                .ToSelf()
+                .InTransientScope()
+                .WithPropertyValue(
+                    nameof(Window.DataContext),
+                    c => c.Kernel.Get<ScheduleModelCreatorViewModel>());
+            kernel.Bind<ViewPortModelCreatorViewModel>()
+                .ToSelf()
+                .InSingletonScope();
+            kernel.Bind<ViewPortModelCreatorWindow>()
+                .ToSelf()
+                .InTransientScope()
+                .WithPropertyValue(
+                    nameof(Window.DataContext),
+                    c => c.Kernel.Get<ViewPortModelCreatorViewModel>());
         }
     }
 }

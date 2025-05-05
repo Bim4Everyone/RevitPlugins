@@ -24,6 +24,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         private readonly Element _mepElement;
         private readonly Element _structureElement;
         private readonly OpeningsGroup _openingsGroup;
+        private readonly OpeningConfig _openingConfig;
         private readonly bool _createdByOpeningGroup = false;
 
 
@@ -31,12 +32,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             ISolidProvider solidProvider,
             IPointFinder pointFinder,
             ILevelFinder levelFinder,
-            OpeningsGroup openingsGroup
+            OpeningsGroup openingsGroup,
+            OpeningConfig openingConfig
             ) {
             _solidProvider = solidProvider ?? throw new System.ArgumentNullException(nameof(solidProvider));
             _pointFinder = pointFinder ?? throw new System.ArgumentNullException(nameof(pointFinder));
             _levelFinder = levelFinder ?? throw new System.ArgumentNullException(nameof(levelFinder));
             _openingsGroup = openingsGroup ?? throw new System.ArgumentNullException(nameof(openingsGroup));
+            _openingConfig = openingConfig ?? throw new System.ArgumentNullException(nameof(openingConfig));
             _createdByOpeningGroup = true;
         }
 
@@ -59,7 +62,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
 
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            var sizeInit = new WallOpeningSizeInitializer(_solidProvider.GetSolid(), _mepCategories);
+            var sizeInit = _createdByOpeningGroup
+                ? new WallOpeningSizeInitializer(_solidProvider.GetSolid(), _openingConfig.UnitedTasksSizeRounding)
+                : new WallOpeningSizeInitializer(_solidProvider.GetSolid(), 0, _mepCategories);
             //габариты отверстия
             bool isRound = _createdByOpeningGroup && _openingsGroup.IsCylinder;
             if(isRound) {

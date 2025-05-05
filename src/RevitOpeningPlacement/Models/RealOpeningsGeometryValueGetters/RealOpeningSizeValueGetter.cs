@@ -17,20 +17,24 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// <summary>
         /// Значение округления высоты в мм
         /// </summary>
-        private protected const int _heightRound = 10;
+        private protected readonly int _heightRound;
 
         /// <summary>
         /// Значение округления ширины в мм
         /// </summary>
-        private protected const int _widthRound = 10;
+        private protected readonly int _widthRound;
 
         /// <summary>
         /// Значение округления диаметра в мм
         /// </summary>
-        private protected const int _diameterRound = 10;
+        private protected readonly int _diameterRound;
 
 
-        protected RealOpeningSizeValueGetter() { }
+        protected RealOpeningSizeValueGetter(int heightRounding, int widthRounding, int diameterRounding) {
+            _heightRound = heightRounding;
+            _widthRound = widthRounding;
+            _diameterRound = diameterRounding;
+        }
 
 
         private protected BoundingBoxXYZ GetUnitedBox(ICollection<IOpeningTaskIncoming> incomingTasks) {

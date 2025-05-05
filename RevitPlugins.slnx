@@ -1,0 +1,193 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="D2020" />
+    <BuildType Name="D2021" />
+    <BuildType Name="D2022" />
+    <BuildType Name="D2023" />
+    <BuildType Name="D2024" />
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="CODE_STYLE_GUIDE.md" />
+    <File Path="CONTRIBUTING.md" />
+    <File Path="CREDITS.md" />
+    <File Path="LICENSE.md" />
+    <File Path="README.md" />
+    <File Path="src/Directory.Build.props" />
+    <File Path="src/Directory.Build.targets" />
+  </Folder>
+  <Folder Name="/Solution Items/Project Props/">
+    <File Path="src/_ProjectProps/DevExpress.props" />
+    <File Path="src/_ProjectProps/RevitClashes.props" />
+    <File Path="src/_ProjectProps/WpfUI.props" />
+  </Folder>
+  <Project Path="build/_build.csproj">
+    <Build Project="false" />
+    <Platform Project="x64" />
+    <BuildType Solution="D2020|*" Project="Debug" />
+    <BuildType Solution="D2021|*" Project="Debug" />
+    <BuildType Solution="D2022|*" Project="Debug" />
+    <BuildType Solution="D2023|*" Project="Debug" />
+    <BuildType Solution="D2024|*" Project="Debug" />
+    <BuildType Solution="Debug|*" Project="Debug" />
+    <BuildType Solution="Release|*" Project="Release" />
+  </Project>
+  <Project Path="src/RevitApartmentPlans/RevitApartmentPlans.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitArchitecturalDocumentation/RevitArchitecturalDocumentation.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitAxonometryViews/RevitAxonometryViews.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitBatchPrint/RevitBatchPrint.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitCheckingLevels/RevitCheckingLevels.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitClashDetective/RevitClashDetective.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitCopingZones/RevitCopingZones.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitCopyInteriorSpecs/RevitCopyInteriorSpecs.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitCopyStandarts/RevitCopyStandarts.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitCopyViews/RevitCopyViews.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitCorrectNamingCheck/RevitCorrectNamingCheck.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitCreateViewSheet/RevitCreateViewSheet.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitCreatingFiltersByValues/RevitCreatingFiltersByValues.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitDeclarations/RevitDeclarations.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitDeleteUnused/RevitDeleteUnused.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitEditingZones/RevitEditingZones.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitExamplePlugin/RevitExamplePlugin.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitFamilyExplorer/RevitFamilyExplorer.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitFamilyParameterAdder/RevitFamilyParameterAdder.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitFinishingWalls/RevitFinishingWalls.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitGenLookupTables/RevitGenLookupTables.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitIsolateByParameter/RevitIsolateByParameter.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitKrChecker/RevitKrChecker.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitLintelPlacement/RevitLintelPlacement.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitListOfSchedules/RevitListOfSchedules.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitMarkingElements/RevitMarkingElements.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitMarkPlacement/RevitMarkPlacement.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitMechanicalSpecification/RevitMechanicalSpecification.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitMepTotals/RevitMepTotals.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitMirroredElements/RevitMirroredElements.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitOpeningPlacement/RevitOpeningPlacement.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitOpeningSlopes/RevitOpeningSlopes.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitOverridingGraphicsInViews/RevitOverridingGraphicsInViews.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitPlatformSettings/RevitPlatformSettings.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitPlugins/RevitPlugins.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitPylonDocumentation/RevitPylonDocumentation.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitRefreshLinks/RevitRefreshLinks.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitReinforcementCoefficient/RevitReinforcementCoefficient.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitRemoveRoomTags/RevitRemoveRoomTags.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitRoomExtrusion/RevitRoomExtrusion.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitRooms/RevitRooms.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitRoomTagPlacement/RevitRoomTagPlacement.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitScheduleImport/RevitScheduleImport.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitSectionsConstructor/RevitSectionsConstructor.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitServerFolders/RevitServerFolders.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitSetLevelSection/RevitSetLevelSection.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitShakeSpecs/RevitShakeSpecs.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitSuperfilter/RevitSuperfilter.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitValueModifier/RevitValueModifier.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitVolumeOfWork/RevitVolumeOfWork.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitWindowGapPlacement/RevitWindowGapPlacement.csproj">
+    <Platform Project="x64" />
+  </Project>
+</Solution>

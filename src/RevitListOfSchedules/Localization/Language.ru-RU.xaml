@@ -32,7 +32,9 @@
     <system:String
         x:Key="RevitRepository.ViewName">Ведомость_Cпецификаций_{0}</system:String>    
     <system:String
-        x:Key="MainViewModel.ErrorText">Выберите листы для создания ведомости спецификаций</system:String>
+        x:Key="MainViewModel.ErrorText">Выберите листы для создания ведомости спецификаций</system:String>   
+    <system:String
+        x:Key="MainViewModel.ErrorLinkText">Связи находятся в закрытых рабочих наборах</system:String>
     <system:String
         x:Key="MainViewModel.TransactionName">Создание спецификаций</system:String>
     <system:String

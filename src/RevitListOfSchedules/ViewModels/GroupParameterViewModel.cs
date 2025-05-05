@@ -33,6 +33,5 @@ namespace RevitListOfSchedules.ViewModels {
             }
             return string.Empty;
         }
-
     }
 }

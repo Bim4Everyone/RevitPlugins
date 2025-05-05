@@ -22,8 +22,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// Конструктор класса, предоставляющего значение ширины чистового прямоугольного отверстия АР/КР в стене в единицах Revit
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public RectangleOpeningInWallWidthValueGetter(IOpeningTaskIncoming incomingTask) {
+        public RectangleOpeningInWallWidthValueGetter(IOpeningTaskIncoming incomingTask, int rounding)
+            : base(rounding, rounding, rounding) {
             if(incomingTask == null) { throw new ArgumentNullException(nameof(incomingTask)); }
             _incomingTasks = new IOpeningTaskIncoming[] { incomingTask };
         }
@@ -33,9 +35,11 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <param name="wall">Стена-основа для чистового отверстия АР/КР</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в коллекции меньше 1</exception>
-        public RectangleOpeningInWallWidthValueGetter(ICollection<IOpeningTaskIncoming> incomingTasks, Wall wall) {
+        public RectangleOpeningInWallWidthValueGetter(ICollection<IOpeningTaskIncoming> incomingTasks, Wall wall, int rounding)
+            : base(rounding, rounding, rounding) {
             if(incomingTasks is null) { throw new ArgumentNullException(nameof(incomingTasks)); }
             if(incomingTasks.Count < 1) { throw new ArgumentOutOfRangeException(nameof(incomingTasks)); }
             _wall = wall ?? throw new ArgumentNullException(nameof(wall));

@@ -46,6 +46,11 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Задание на отверстие - объединенное
         /// </summary>
         [Description("Объединенное")]
-        United
+        United,
+        /// <summary>
+        /// Задание на отверстие находится в разных конструкциях
+        /// </summary>
+        [Description("В разных конструкциях")]
+        DifferentConstructions
     }
 }

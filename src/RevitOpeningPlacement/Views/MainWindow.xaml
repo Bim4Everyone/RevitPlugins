@@ -66,8 +66,16 @@
         <dxdo:DockLayoutManager Grid.Row="1">
             <dxdo:LayoutGroup LastChildFill="True">
                 <dxdo:LayoutControlItem ItemWidth="310">
-                    <local:CategoryView x:Name="_categoryView"
+                    <DockPanel LastChildFill="True">
+                        <Button Margin="0 10 0 0"
+                                DockPanel.Dock="Bottom"
+                                HorizontalAlignment="Stretch"
+                                Content="Настройки объединения"
+                                ToolTip="Настройки объединения используются&#x0a;при ручном объединении заданий на отверстия,&#x0a;а также при автообъединении заданий на отверстия, в том числе в многослойных конструкциях."
+                                Command="{Binding OpenUnionTaskSettingsCommand}"/>
+                        <local:CategoryView x:Name="_categoryView"
                                         DataContext="{Binding ElementName=_this, Path=DataContext}" />
+                    </DockPanel>
                 </dxdo:LayoutControlItem>
                 <dxdo:LayoutControlItem Margin="-13">
                     <local:SettingView DataContext="{Binding SelectedMepCategoryViewModel}" />

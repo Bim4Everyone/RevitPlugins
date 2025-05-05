@@ -162,6 +162,17 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <StackPanel
+            Grid.Row="2"
+            Grid.Column="0"            
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorLinkText, UpdateSourceTrigger=PropertyChanged}" />            
+        </StackPanel>
         <DataGrid
             x:Name="SecondDataGrid"
             Grid.Row="1"
@@ -224,7 +235,7 @@
         </DataGrid>
         <StackPanel
             Grid.Row="2"
-            Grid.ColumnSpan="3"
+            Grid.Column="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock

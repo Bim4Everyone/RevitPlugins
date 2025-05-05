@@ -25,6 +25,7 @@ namespace RevitListOfSchedules.ViewModels {
         private readonly FamilyLoadOptions _familyLoadOptions;
         private readonly ParamFactory _paramFactory;
         private string _errorText;
+        private string _errorLinkText;
         private ObservableCollection<LinkViewModel> _links;
         private ObservableCollection<LinkViewModel> _selectedLinks;
         private ObservableCollection<SheetViewModel> _sheets;
@@ -59,6 +60,11 @@ namespace RevitListOfSchedules.ViewModels {
         public string ErrorText {
             get => _errorText;
             set => RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
+        public string ErrorLinkText {
+            get => _errorLinkText;
+            set => RaiseAndSetIfChanged(ref _errorLinkText, value);
         }
 
         public ObservableCollection<LinkViewModel> Links {
@@ -123,8 +129,9 @@ namespace RevitListOfSchedules.ViewModels {
                     link.IsChecked = true;
                 }
             }
-            string selectedGroupParameterId = setting?.GroupParameter ?? string.Empty;
-            SelectedGroupParameter = GroupParameters.FirstOrDefault(param => param.Id == selectedGroupParameterId);
+
+            string selectedGroupParameterId = setting?.GroupParameter ?? GroupParameters.First().Id;
+            SelectedGroupParameter = GroupParameters.First(param => param.Id == selectedGroupParameterId);
         }
 
         // Метод подписанный на событие изменения выделенных связанных файлов
@@ -161,7 +168,8 @@ namespace RevitListOfSchedules.ViewModels {
         // Загружаем с основного документа все линки через _revitRepository
         private IEnumerable<LinkViewModel> GetLinks() {
             return _revitRepository.GetLinkTypeElements()
-                .Select(item => new LinkViewModel(item));
+                .Select(item => new LinkViewModel(item))
+                .OrderBy(item => item.Name);
         }
 
         // Добавляем листы из основного документа
@@ -214,7 +222,7 @@ namespace RevitListOfSchedules.ViewModels {
 
         // Метод обновления листов в зависимости от параметра
         private void UpdateGroupParameter() {
-            foreach(var sheetViewModel in _sheets) {
+            foreach(var sheetViewModel in Sheets) {
                 sheetViewModel.GroupParameter = SelectedGroupParameter.Parameter;
             }
             SortSheets(_sheets);
@@ -260,11 +268,16 @@ namespace RevitListOfSchedules.ViewModels {
 
         private bool CanReloadLinks() {
             if(SelectedLinks != null) {
-                if(SelectedLinks.Count != 0) {
-                    return true;
+                if(SelectedLinks.Count == 0) {
+                    return false;
+                }
+                if(SelectedLinks.Any(link => link.CanReloadLinkType() == false)) {
+                    ErrorLinkText = _localizationService.GetLocalizedString("MainViewModel.ErrorLinkText");
+                    return false;
                 }
             }
-            return false;
+            ErrorLinkText = string.Empty;
+            return true;
         }
 
         // Основной метод

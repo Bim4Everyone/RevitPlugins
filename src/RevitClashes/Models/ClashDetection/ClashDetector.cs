@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using RevitClashDetective.Models.Clashes;
@@ -24,6 +24,9 @@ namespace RevitClashDetective.Models.ClashDetection {
                     clashes.AddRange(providerClashDetector.GetClashes());
                 }
             }
+            for(int i = 0; i < clashes.Count; i++) {
+                clashes[i].Name = $"Конфликт{i + 1}";
+            }
 
             return clashes;
         }
@@ -35,6 +38,7 @@ namespace RevitClashDetective.Models.ClashDetection {
                 var oldClashe = oldClashes.FirstOrDefault(item => item.Equals(newClash));
                 if(oldClashe != null) {
                     newClash.ClashStatus = oldClashe.ClashStatus;
+                    newClash.Name = string.IsNullOrWhiteSpace(oldClashe.Name) ? newClash.Name : oldClashe.Name;
                 }
                 yield return newClash;
             }

@@ -61,11 +61,11 @@
                
                 <dxg:GridColumn ReadOnly="True" Header="Уровень 1" FieldName="FirstLevel"/>
                 <dxg:GridColumn ReadOnly="True" Header="Категория 1" FieldName="FirstCategory" />
-                <dxg:GridColumn ReadOnly="True" Header="Имя типа 1" FieldName="FirstName" />
+                <dxg:GridColumn ReadOnly="True" Header="Имя типа 1" FieldName="FirstTypeName" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя файла 1" FieldName="FirstDocumentName" />
                 <dxg:GridColumn ReadOnly="True" Header="Уровень 2" FieldName="SecondLevel" />
                 <dxg:GridColumn ReadOnly="True" Header="Категория 2" FieldName="SecondCategory" />
-                <dxg:GridColumn ReadOnly="True" Header="Имя типа 2" FieldName="SecondName" />
+                <dxg:GridColumn ReadOnly="True" Header="Имя типа 2" FieldName="SecondTypeName" />
                 <dxg:GridColumn ReadOnly="True" Header="Имя файла 2" FieldName="SecondDocumentName" />
             </dxg:GridControl.Columns>
         </dxg:GridControl>

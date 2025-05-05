@@ -1,11 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
@@ -67,33 +64,25 @@ namespace RevitCreatingFiltersByValues.Models {
         public FillPatternElement SolidFillPattern => FillPatternElement.GetFillPatternElementByName(Document, FillPatternTarget.Drafting, "<Сплошная заливка>");
 
 
+        /// <summary>
+        /// Получает все элементы, видимые на виде
+        /// Пытается выполнить получение при помощи экспорта элементов на виде, в этом случае можно получить в т.ч. элементы из связей
+        /// В случае сбоя, получение элементов происходит только из текущего файла Revit стандартным FilteredElementCollector
+        /// </summary>
+        /// <returns></returns>
         public List<Element> GetElementsInView() {
-            
-            // Сначала получаем элементы на виде из текущего проекта
-            List<Element> elementsInView = new FilteredElementCollector(Document, Document.ActiveView.Id)
-                .WhereElementIsNotElementType()
-                .ToElements()
-                .ToList();
-
-            // Получаем экземпляры связей, видимые на виде
-            List<RevitLinkInstance> links = new FilteredElementCollector(Document, Document.ActiveView.Id)
-                .OfClass(typeof(RevitLinkInstance))
-                .OfType<RevitLinkInstance>()
-                .ToList();
-
-            // Получаем и добавляем элементы из связей, видимые на виде
+            List<Element> elementsInView;
             try {
-                foreach(RevitLinkInstance link in links) {
-                    elementsInView.AddRange(new FilteredElementCollector(link.GetLinkDocument(), Document.ActiveView.Id)
-                        .WhereElementIsNotElementType()
-                        .ToElements()
-                        .ToList());
-                }
-            } catch(Exception) {}
-
+                FilterElemsByExportService filterElemsByExportService = new FilterElemsByExportService(Document);
+                elementsInView = filterElemsByExportService.GetElements();
+            } catch(Exception) {
+                elementsInView = new FilteredElementCollector(Document, Document.ActiveView.Id)
+                                        .WhereElementIsNotElementType()
+                                        .ToElements()
+                                        .ToList();
+            }
             return elementsInView;
         }
-
 
 
 
@@ -112,11 +101,8 @@ namespace RevitCreatingFiltersByValues.Models {
                     }
                 }
             }
-
-
             return patterns;
         }
-
 
 
         /// <summary>
@@ -136,14 +122,12 @@ namespace RevitCreatingFiltersByValues.Models {
         }
 
 
-
         /// <summary>
         /// Получает категории, представленные на виде + элементы в словаре по ним
         /// </summary>
         public ObservableCollection<CategoryElements> GetCategoriesInView(bool checkFlag) {
 
             ObservableCollection<CategoryElements> categoryElements = new ObservableCollection<CategoryElements>();
-
             foreach(Element elem in GetElementsInView()) {
                 if(elem.Category is null) { continue; }
 
@@ -164,14 +148,11 @@ namespace RevitCreatingFiltersByValues.Models {
                         break;
                     }
                 }
-
                 if(flag is false) {
                     categoryElements.Add(new CategoryElements(catOfElem, elemCategoryId, checkFlag, new List<Element>() { elem }));
                 }
             }
-
             return categoryElements;
         }
-
     }
 }

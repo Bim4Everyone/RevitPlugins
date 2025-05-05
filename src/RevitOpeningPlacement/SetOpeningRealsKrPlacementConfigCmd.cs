@@ -21,8 +21,8 @@ namespace RevitOpeningPlacement {
     /// Команда для задания настроек расстановки чистовых отверстий в файле КР
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    internal class SetOpeningRealsPlacementConfigCmd : BasePluginCommand {
-        public SetOpeningRealsPlacementConfigCmd() {
+    internal class SetOpeningRealsKrPlacementConfigCmd : BasePluginCommand {
+        public SetOpeningRealsKrPlacementConfigCmd() {
             PluginName = "Настройки расстановки отверстий КР";
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
 using RevitOpeningPlacement.OpeningModels;
@@ -50,15 +51,16 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <summary>
         /// Возвращает генератор задания на отверстие, 
         /// </summary>
+        /// <param name="config">Настройки расстановки заданий на отверстия</param>
         /// <exception cref="InvalidOperationException">Исключение, если не удалось выполнить операцию</exception>
         /// <exception cref="ArgumentOutOfRangeException">В группе находится менее 2-х заданий на отверстия</exception>
-        public OpeningPlacer GetOpeningPlacer(RevitRepository revitRepository) {
+        public OpeningPlacer GetOpeningPlacer(RevitRepository revitRepository, OpeningConfig config) {
             try {
                 OpeningPlacer placer;
                 if(_elements.Any(task => (task.OpeningType == OpeningType.FloorRound) || (task.OpeningType == OpeningType.FloorRectangle))) {
-                    placer = new FloorOpeningGroupPlacerInitializer().GetPlacer(revitRepository, this);
+                    placer = new FloorOpeningGroupPlacerInitializer().GetPlacer(revitRepository, config, this);
                 } else {
-                    placer = new WallOpeningGroupPlacerInitializer().GetPlacer(revitRepository, this);
+                    placer = new WallOpeningGroupPlacerInitializer().GetPlacer(revitRepository, config, this);
                 }
                 return placer;
 
@@ -135,7 +137,7 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <param name="otherOpeningTask">Проверяемое задание на отверстие</param>
         /// <returns>True, если группа пустая или если среди отверстий в группе есть хотя бы одно, которое имеет общую грань с проверяемым, иначе False</returns>
         private bool IsTouchingOpening(OpeningMepTaskOutcoming otherOpeningTask) {
-            return (_elements.Count == 0) || _elements.Any(existingOpening => existingOpening.HasCommonFace(otherOpeningTask));
+            return (_elements.Count == 0) || _elements.Any(existingOpening => existingOpening.Intersect(otherOpeningTask));
         }
 
         /// <summary>
@@ -144,13 +146,21 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
         /// <param name="otherOpeningTask">Проверяемое задание на отверстие</param>
         /// <returns>True, если задания на отверстия в группе расположены на той же прямой, что и проверяемое, иначе False</returns>
         private bool OpeningsLocatedOnTheSameLine(OpeningMepTaskOutcoming otherOpeningTask) {
-            if(_elements.Count < 2) { return true; }
-            XYZ firstToOtherDirection = GetDirectionBetween(_elements.First(), otherOpeningTask);
-            XYZ lastToOtherDirection = GetDirectionBetween(_elements.Last(), otherOpeningTask);
-            double angle = firstToOtherDirection.AngleTo(lastToOtherDirection);
-            bool angleIsZero = Math.Round(angle, 9) == 0;
-            bool angleIsPi = Math.Round(angle - Math.PI, 9) == 0;
-            return angleIsZero || angleIsPi;
+            if(_elements.Count == 0) { return true; }
+            if(_elements.Count == 1) {
+                var firstNormal = _elements.First().GetFamilyInstance().FacingOrientation;
+                var firstLocation = _elements.First().Location;
+                var secondLocation = otherOpeningTask.Location;
+                var direction = (secondLocation - firstLocation).Normalize();
+                return firstNormal.IsAlmostEqualTo(direction) || firstNormal.IsAlmostEqualTo(direction.Negate());
+            } else {
+                XYZ firstToOtherDirection = GetDirectionBetween(_elements.First(), otherOpeningTask);
+                XYZ lastToOtherDirection = GetDirectionBetween(_elements.Last(), otherOpeningTask);
+                double angle = firstToOtherDirection.AngleTo(lastToOtherDirection);
+                bool angleIsZero = Math.Round(angle, 9) == 0;
+                bool angleIsPi = Math.Round(angle - Math.PI, 9) == 0;
+                return angleIsZero || angleIsPi;
+            }
         }
 
         /// <summary>
