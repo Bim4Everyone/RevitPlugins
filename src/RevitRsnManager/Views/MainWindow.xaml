@@ -117,36 +117,46 @@
                                 HorizontalAlignment="Right"
                                 Margin="10,5,15,5">
 
-                                <ui:Button 
-                                    Margin="0,0,5,0"
-                                    Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    CommandParameter="{Binding}">
-                                    <ui:SymbolIcon 
-                                        Symbol="ArrowUp12"
-                                        Width="16"
-                                        Height="16" />
-                                </ui:Button>
+                                    <ui:Button 
+                                        Margin="0,0,5,0"
+                                        Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}">
+                                        <ui:Button.ToolTip>
+                                            <TextBlock Text="{me:LocalizationSource MainWindow.MoveUp}" />
+                                        </ui:Button.ToolTip>
+                                        <ui:SymbolIcon 
+                                            Symbol="ArrowUp12"
+                                            Width="16"
+                                            Height="16" />
+                                    </ui:Button>
 
-                                <ui:Button 
-                                    Margin="0,0,5,0"
-                                    Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    CommandParameter="{Binding}">
-                                    <ui:SymbolIcon 
-                                        Symbol="ArrowDown12"
-                                        Width="16"
-                                        Height="16" />
-                                </ui:Button>
+                                    <ui:Button 
+                                        Margin="0,0,5,0"
+                                        Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}">
+                                        <ui:Button.ToolTip>
+                                            <TextBlock Text="{me:LocalizationSource MainWindow.MoveDown}" />
+                                        </ui:Button.ToolTip>
+                                        <ui:SymbolIcon 
+                                            Symbol="ArrowDown12"
+                                            Width="16"
+                                            Height="16" />
+                                    </ui:Button>
 
-                                <ui:Button 
-                                    Appearance="Danger"
-                                    Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    CommandParameter="{Binding}">
-                                    <ui:SymbolIcon 
-                                        Symbol="Delete12"
-                                        Width="16"
-                                        Height="16" />
-                                </ui:Button>
-                            </StackPanel>
+                                    <ui:Button 
+                                        Appearance="Danger"
+                                        Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}">
+                                        <ui:Button.ToolTip>
+                                            <TextBlock Text="{me:LocalizationSource MainWindow.Remove}" />
+                                        </ui:Button.ToolTip>
+                                        <ui:SymbolIcon 
+                                            Symbol="Delete12"
+                                            Width="16"
+                                            Height="16" />
+                                    </ui:Button>
+
+                                </StackPanel>
 
                             <TextBlock 
                                 Text="{Binding}"
