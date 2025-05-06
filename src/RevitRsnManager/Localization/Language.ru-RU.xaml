@@ -18,12 +18,17 @@
     <system:String x:Key="RsnConfigService.RevitIniNotFound">Файл Revit.ini не найден.</system:String>
     <system:String x:Key="RsnConfigService.ProjectPathMissing">Не удалось получить ProjectPath из Revit.ini.</system:String>
     <system:String x:Key="MainWindow.ErrorEmptyServerList">Добавьте хотя бы один сервер.</system:String>
-    <system:String x:Key="MainWindow.AutoConfigure">Автонастройка</system:String>
-    <system:String x:Key="MainWindow.AddServer">Добавить</system:String>
-    <system:String x:Key="MainWindow.MoveUp">Переместить выше</system:String>
-    <system:String x:Key="MainWindow.MoveDown">Переместить ниже</system:String>
-    <system:String x:Key="MainWindow.Remove">Удалить сервер</system:String>
+	<system:String x:Key="MainWindow.AutoConfigure">Автонастройка</system:String>
+	<system:String x:Key="MainWindow.AddServer">Добавить</system:String>
+    <system:String x:Key="MainWindow.ToolTipAutoConfigure">Автонастройка конфигурации Revit сервером на основе последних открыт проектов</system:String>
+    <system:String x:Key="MainWindow.ToolTipAddServer">Добавить сервер</system:String>
+    <system:String x:Key="MainWindow.ToolTipMoveUp">Переместить сервер выше</system:String>
+    <system:String x:Key="MainWindow.ToolTipMoveDown">Переместить сервер ниже</system:String>
+    <system:String x:Key="MainWindow.ToolTipRemove">Удалить сервер</system:String>
     <system:String x:Key="MainWindow.ConfirmTitle">Подтверждение удаления</system:String>
     <system:String x:Key="MainWindow.ConfirmDeleteServer">Вы уверены, что хотите удалить выбранный сервер?</system:String>
+	<system:String x:Key="MainWindow.PlaceholderServerName">Введите название сервера</system:String>
+	<system:String x:Key="MainWindow.ToolTipConfirmConfig">Завершить настройку конфигурации</system:String>
+	<system:String x:Key="MainWindow.ToolTipCancelConfig">Отменить настройку конфигурации</system:String>
 
 </ResourceDictionary>
