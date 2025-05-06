@@ -144,10 +144,10 @@ namespace RevitFinishingWalls.Models {
                     false);
             } catch(Autodesk.Revit.Exceptions.ArgumentOutOfRangeException) {
                 throw new CannotCreateWallException(
-                    _localizationService.GetLocalizedString("Exceptions.InvalidLine"));
+                    _localizationService.GetLocalizedString("Exceptions.InvalidHeight"));
             } catch(Autodesk.Revit.Exceptions.ArgumentException) {
                 throw new CannotCreateWallException(
-                    _localizationService.GetLocalizedString("Exceptions.InvalidHeight"));
+                    _localizationService.GetLocalizedString("Exceptions.InvalidLine"));
             }
             //параметр "Location Line" или "Линия привязки"
             wall.SetParamValue(BuiltInParameter.WALL_KEY_REF_PARAM, (int) WallLocationLine.FinishFaceInterior);
