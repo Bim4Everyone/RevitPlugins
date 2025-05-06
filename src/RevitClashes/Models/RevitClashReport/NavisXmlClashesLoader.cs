@@ -161,6 +161,10 @@ namespace RevitClashDetective.Models.RevitClashReport {
                 t => t.Element("name").Value.ToLower(),
                 t => t.Element("value").Value);
             string file = tags.TryGetValue("элемент файл источника", out string fileName) ? fileName : null;
+            const string rvtEnd = ".rvt";
+            if(file.EndsWith(rvtEnd)) {
+                file = file.Substring(0, file.Length - rvtEnd.Length);
+            }
             ElementId id = tags.TryGetValue("объект id", out string idStr) ? GetId(idStr) : ElementId.InvalidElementId;
             var elementModel = GetElementModel(file, id);
             return elementModel.Id.IsNotNull() ? elementModel :
