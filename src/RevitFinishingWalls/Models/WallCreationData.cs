@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 
 namespace RevitFinishingWalls.Models {
     /// <summary>
@@ -23,7 +24,7 @@ namespace RevitFinishingWalls.Models {
         /// </summary>
         public Curve Curve { get; set; }
 
-        public ElementId LevelId { get; set; }
+        public ElementId LevelId => Room?.LevelId;
 
         public ElementId WallTypeId { get; set; }
 
@@ -33,7 +34,7 @@ namespace RevitFinishingWalls.Models {
         public double Height { get; set; }
 
         /// <summary>
-        /// Смещение снизу в единицах Revit
+        /// Смещение снизу от <see cref="LevelId"/> в единицах Revit
         /// </summary>
         public double BaseOffset { get; set; }
 
@@ -41,6 +42,11 @@ namespace RevitFinishingWalls.Models {
         /// Коллекция элементов, с которыми нужно соединить созданную стену
         /// </summary>
         public ICollection<Element> ElementsForJoin { get; }
+
+        /// <summary>
+        /// Помещение, в котором будет создана отделочная стена
+        /// </summary>
+        public Room Room { get; set; }
 
 
         /// <summary>

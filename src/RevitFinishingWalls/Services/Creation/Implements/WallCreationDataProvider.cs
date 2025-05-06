@@ -51,7 +51,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                         } else {
                             lastWallCreationData = new WallCreationData(_revitRepository.Document) {
                                 Curve = curveSegmentElement.Curve,
-                                LevelId = room.LevelId,
+                                Room = room,
                                 Height = wallHeight,
                                 WallTypeId = settings.WallTypeId,
                                 BaseOffset = wallBaseOffset
