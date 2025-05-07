@@ -12,7 +12,6 @@ using dosymep.Revit;
 using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
-using RevitFinishingWalls.Exceptions;
 using RevitFinishingWalls.Models.Enums;
 using RevitFinishingWalls.Services;
 using RevitFinishingWalls.Services.Selection;
@@ -124,38 +123,14 @@ namespace RevitFinishingWalls.Models {
         }
 
         /// <summary>
-        /// Создает стену с линией привязки "Чистовая поверхность: Наружная", с отключенными границами помещения
+        /// Присоединяет к заданной стене заданные элементы.
         /// </summary>
-        /// <param name="wallCreationData"></param>
-        /// <param name="notJoinedElements"></param>
-        /// <returns></returns>
-        /// <exception cref="CannotCreateWallException"></exception>
-        public Wall CreateWall(WallCreationData wallCreationData, out ICollection<ElementId> notJoinedElements) {
-            Wall wall;
-            try {
-                wall = Wall.Create(
-                    wallCreationData.Document,
-                    wallCreationData.Curve,
-                    wallCreationData.WallTypeId,
-                    wallCreationData.LevelId,
-                    wallCreationData.Height,
-                    wallCreationData.BaseOffset,
-                    false,
-                    false);
-            } catch(Autodesk.Revit.Exceptions.ArgumentOutOfRangeException) {
-                throw new CannotCreateWallException(
-                    _localizationService.GetLocalizedString("Exceptions.InvalidHeight"));
-            } catch(Autodesk.Revit.Exceptions.ArgumentException) {
-                throw new CannotCreateWallException(
-                    _localizationService.GetLocalizedString("Exceptions.InvalidLine"));
-            }
-            //параметр "Location Line" или "Линия привязки"
-            wall.SetParamValue(BuiltInParameter.WALL_KEY_REF_PARAM, (int) WallLocationLine.FinishFaceInterior);
-            //параметр "Room Bounding" или "Граница помещения"
-            wall.SetParamValue(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING, 0);
-
-            notJoinedElements = new List<ElementId>();
-            foreach(Element item in wallCreationData.ElementsForJoin) {
+        /// <param name="wall">Стена для соединения.</param>
+        /// <param name="elementsToJoin">Элементы для соединения со стеной.</param>
+        /// <returns>Коллекция Id элементов, которые не были соединены со стеной.</returns>
+        public ICollection<ElementId> JoinElementsToWall(Wall wall, ICollection<Element> elementsToJoin) {
+            var notJoinedElements = new List<ElementId>();
+            foreach(Element item in elementsToJoin) {
                 try {
                     if(item is not RevitLinkInstance) {
                         // нельзя соединить элементы из связей
@@ -165,7 +140,23 @@ namespace RevitFinishingWalls.Models {
                     notJoinedElements.Add(item.Id);
                 }
             }
-            return wall;
+            return notJoinedElements;
+        }
+
+        /// <summary>
+        /// Назначает привязку линию привязки стены по внутренней грани
+        /// </summary>
+        public void SetWallAxis(Wall wall) {
+            //параметр "Location Line" или "Линия привязки"
+            wall.SetParamValue(BuiltInParameter.WALL_KEY_REF_PARAM, (int) WallLocationLine.FinishFaceInterior);
+        }
+
+        /// <summary>
+        /// Выключает границы помещения у стены
+        /// </summary>
+        public void SetWallRoomBounding(Wall wall) {
+            //параметр "Room Bounding" или "Граница помещения"
+            wall.SetParamValue(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING, 0);
         }
 
         /// <summary>
