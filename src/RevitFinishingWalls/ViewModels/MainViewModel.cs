@@ -19,6 +19,7 @@ namespace RevitFinishingWalls.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly RichErrorMessageService _errorMessageService;
         private readonly IRoomFinisher _roomFinisher;
+        private readonly IWallCreatorFactory _wallCreatorFactory;
         private readonly IProgressDialogFactory _progressDialogFactory;
         private readonly ILocalizationService _localizationService;
 
@@ -37,6 +38,7 @@ namespace RevitFinishingWalls.ViewModels {
             RevitRepository revitRepository,
             RichErrorMessageService errorMessageService,
             IRoomFinisher roomFinisher,
+            IWallCreatorFactory wallCreatorFactory,
             IProgressDialogFactory progressDialogFactory,
             ILocalizationService localizationService
             ) {
@@ -48,6 +50,8 @@ namespace RevitFinishingWalls.ViewModels {
                 ?? throw new ArgumentNullException(nameof(errorMessageService));
             _roomFinisher = roomFinisher
                 ?? throw new ArgumentNullException(nameof(roomFinisher));
+            _wallCreatorFactory = wallCreatorFactory
+                ?? throw new ArgumentNullException(nameof(wallCreatorFactory));
             _progressDialogFactory = progressDialogFactory
                 ?? throw new ArgumentNullException(nameof(progressDialogFactory));
             _localizationService = localizationService
@@ -146,7 +150,12 @@ namespace RevitFinishingWalls.ViewModels {
                 var ct = progressDialogService.CreateCancellationToken();
                 progressDialogService.Show();
 
-                errors = _roomFinisher.CreateWallsFinishing(rooms, settings, progress, ct);
+                errors = _roomFinisher.CreateWallsFinishing(
+                    rooms,
+                    settings,
+                    _wallCreatorFactory.Create(settings),
+                    progress,
+                    ct);
             }
             if(errors.Count > 0) {
                 _errorMessageService.ShowErrorWindow(errors);

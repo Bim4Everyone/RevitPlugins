@@ -41,6 +41,19 @@ namespace RevitFinishingWalls {
                 kernel.Bind<IRoomFinisher>()
                     .To<RoomFinisher>()
                     .InSingletonScope();
+                kernel.Bind<IWallCreatorFactory>()
+                    .To<WallCreatorFactory>()
+                    .InSingletonScope();
+                kernel.Bind<UnconnectedTopWallCreator>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<TopConnectedToLevelWallCreator>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<TopConnectedToRoomTopWallCreator>()
+                    .ToSelf()
+                    .InSingletonScope();
+
 
                 kernel.Bind<PluginConfig>()
                     .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
