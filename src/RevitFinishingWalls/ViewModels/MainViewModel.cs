@@ -65,6 +65,9 @@ namespace RevitFinishingWalls.ViewModels {
             WallTypes = [.. _revitRepository.GetWallTypes()
                 .Select(wt => new WallTypeViewModel(wt))
                 .OrderBy(wt => wt.Name)];
+            WallHeightStyles = [.. Enum.GetValues(typeof(WallHeightStyle))
+                .Cast<WallHeightStyle>()
+                .Select(w => new WallHeightStyleViewModel(_localizationService, w))];
 
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             LoadConfigCommand = RelayCommand.Create(LoadConfig);
@@ -122,6 +125,14 @@ namespace RevitFinishingWalls.ViewModels {
                 RaiseAndSetIfChanged(ref _selectedWallHeightMode, value);
                 OnPropertyChanged(nameof(IsWallHeightByUserEnabled));
             }
+        }
+
+        public ObservableCollection<WallHeightStyleViewModel> WallHeightStyles { get; }
+
+        private WallHeightStyleViewModel _selectedWallHeightStyle;
+        public WallHeightStyleViewModel SelectedWallHeightStyle {
+            get => _selectedWallHeightStyle;
+            set => RaiseAndSetIfChanged(ref _selectedWallHeightStyle, value);
         }
 
 
@@ -230,6 +241,8 @@ namespace RevitFinishingWalls.ViewModels {
                 _localizationService, settings.RoomGetterMode);
             SelectedWallElevationMode = new WallElevationModeViewModel(
                 _localizationService, settings.WallElevationMode);
+            SelectedWallHeightStyle = new WallHeightStyleViewModel(
+                _localizationService, settings.WallHeightStyle);
             WallElevationByUser = settings.WallElevationMm.ToString();
             WallBaseOffset = settings.WallBaseOffsetMm.ToString();
             WallSideOffset = settings.WallSideOffsetMm.ToString();
@@ -243,6 +256,7 @@ namespace RevitFinishingWalls.ViewModels {
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
             settings.RoomGetterMode = SelectedRoomGetterMode.RoomGetterMode;
             settings.WallElevationMode = SelectedWallElevationMode.ElevationMode;
+            settings.WallHeightStyle = SelectedWallHeightStyle.WallHeightStyle;
             settings.WallBaseOffsetMm = double.TryParse(WallBaseOffset, out double baseOffset) ? baseOffset : 0;
             settings.WallSideOffsetMm = double.TryParse(WallSideOffset, out double sideOffset) ? sideOffset : 0;
             settings.WallElevationMm = double.TryParse(WallElevationByUser, out double height) ? height : 0;

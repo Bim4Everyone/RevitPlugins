@@ -28,6 +28,8 @@
     <system:String
         x:Key="MainWindow.Tooltip.InputWallSideOffset">Смещение в мм внутрь помещения, которое будет между границей помещения и гранью отделочной стены.</system:String>
     <system:String
+        x:Key="MainWindow.Tooltip.InputWallHeightStyle">Вариант привязки верха стены.</system:String>
+    <system:String
         x:Key="MainWindow.Label.RoomGetterMode">Создавать стены:</system:String>
     <system:String
         x:Key="MainWindow.Label.InputWallTypes">Тип отделочных стен:</system:String>

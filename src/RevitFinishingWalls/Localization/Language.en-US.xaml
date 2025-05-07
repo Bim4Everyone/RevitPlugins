@@ -30,6 +30,8 @@ Important: Connection to elements from linked files will not be performed!
     <system:String
         x:Key="MainWindow.Tooltip.InputWallSideOffset">Offset in mm inward from the room boundary to the face of the finishing wall.</system:String>
     <system:String
+        x:Key="MainWindow.Tooltip.InputWallHeightStyle">Option for constraint of the top of the wall.</system:String>
+    <system:String
         x:Key="MainWindow.Label.RoomGetterMode">Create walls:</system:String>
     <system:String
         x:Key="MainWindow.Label.InputWallTypes">Finishing wall type:</system:String>

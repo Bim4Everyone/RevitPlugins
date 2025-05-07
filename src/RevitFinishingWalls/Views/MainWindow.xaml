@@ -17,9 +17,9 @@
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    MinHeight="350"
+    MinHeight="390"
     MinWidth="630"
-    MaxHeight="350"
+    MaxHeight="390"
     MaxWidth="630"
     Title="{me:LocalizationSource MainWindow.Title}"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
@@ -191,6 +191,21 @@
                     Width="Auto"
                     Content="{me:LocalizationSource MainWindow.Label.Mm}"
                     Style="{StaticResource InputLabel}" />
+            </DockPanel>
+            <DockPanel
+                Style="{StaticResource DockPanelInput}">
+                <Label
+                    Content="{me:LocalizationSource MainWindow.Label.InputWallHeightStyle}"
+                    Target="{Binding ElementName=InputWallHeightStyle}"
+                    Style="{StaticResource InputLabel}" />
+                <ComboBox
+                    x:Name="InputWallHeightStyle"
+                    IsEditable="False"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallHeightStyle}"
+                    ItemsSource="{Binding WallHeightStyles}"
+                    SelectedItem="{Binding SelectedWallHeightStyle}"
+                    Style="{StaticResource ComboBoxInput}">
+                </ComboBox>
             </DockPanel>
 
             <DockPanel
