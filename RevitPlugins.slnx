@@ -21,19 +21,21 @@
     <File Path="src/Directory.Build.props" />
     <File Path="src/Directory.Build.targets" />
   </Folder>
-  <Folder Name="/Solution Items/Project Props/" Id="7255d6b0-54b6-07cf-2d45-f0d30a70bd76">
+  <Folder Name="/Solution Items/Project Props/">
     <File Path="src/_ProjectProps/DevExpress.props" />
     <File Path="src/_ProjectProps/RevitClashes.props" />
     <File Path="src/_ProjectProps/WpfUI.props" />
   </Folder>
   <Project Path="build/_build.csproj">
+    <Build Project="false" />
+    <Platform Project="x64" />
     <BuildType Solution="D2020|*" Project="Debug" />
     <BuildType Solution="D2021|*" Project="Debug" />
     <BuildType Solution="D2022|*" Project="Debug" />
     <BuildType Solution="D2023|*" Project="Debug" />
     <BuildType Solution="D2024|*" Project="Debug" />
-    <Platform Project="x64" />
-    <Build Project="false" />
+    <BuildType Solution="Debug|*" Project="Debug" />
+    <BuildType Solution="Release|*" Project="Release" />
   </Project>
   <Project Path="src/RevitApartmentPlans/RevitApartmentPlans.csproj">
     <Platform Project="x64" />
@@ -159,9 +161,6 @@
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitRoomTagPlacement/RevitRoomTagPlacement.csproj">
-    <Platform Project="x64" />
-  </Project>
-  <Project Path="src/RevitRsnManager/RevitRsnManager.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitScheduleImport/RevitScheduleImport.csproj">
