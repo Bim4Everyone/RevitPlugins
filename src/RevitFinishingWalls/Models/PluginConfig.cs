@@ -51,6 +51,11 @@ namespace RevitFinishingWalls.Models {
         public WallElevationMode WallElevationMode { get; set; } = WallElevationMode.HeightByRoom;
 
         /// <summary>
+        /// Зависимость сверху
+        /// </summary>
+        public WallHeightStyle WallHeightStyle { get; set; } = WallHeightStyle.Unconnected;
+
+        /// <summary>
         /// Отступ низа стены от уровня в мм
         /// </summary>
         public double WallBaseOffsetMm { get; set; } = 0;

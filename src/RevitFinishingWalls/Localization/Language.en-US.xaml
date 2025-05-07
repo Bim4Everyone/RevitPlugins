@@ -30,6 +30,8 @@ Important: Connection to elements from linked files will not be performed!
     <system:String
         x:Key="MainWindow.Tooltip.InputWallSideOffset">Offset in mm inward from the room boundary to the face of the finishing wall.</system:String>
     <system:String
+        x:Key="MainWindow.Tooltip.InputWallHeightStyle">Option for constraint of the top of the wall.</system:String>
+    <system:String
         x:Key="MainWindow.Label.RoomGetterMode">Create walls:</system:String>
     <system:String
         x:Key="MainWindow.Label.InputWallTypes">Finishing wall type:</system:String>
@@ -41,6 +43,8 @@ Important: Connection to elements from linked files will not be performed!
         x:Key="MainWindow.Label.InputWallBaseOffset">Bottom offset from level:</system:String>
     <system:String
         x:Key="MainWindow.Label.InputWallSideOffset">Offset inward:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallHeightStyle">Top constraint</system:String>
     <system:String
         x:Key="MainWindow.Validation.WallType">Specify the finishing wall type</system:String>
     <system:String
@@ -79,6 +83,11 @@ Important: Connection to elements from linked files will not be performed!
         x:Key="WallElevationMode.ManualHeight">Set manually</system:String>
     <system:String
         x:Key="WallElevationMode.HeightByRoom">By room</system:String>
+
+    <system:String
+        x:Key="WallHeightStyle.Unconnected">Unconnected</system:String>
+    <system:String
+        x:Key="WallHeightStyle.UpToLevel">Up to level</system:String>
 
     <system:String
         x:Key="Exceptions.InvalidLine">Cannot create wall from the given line</system:String>

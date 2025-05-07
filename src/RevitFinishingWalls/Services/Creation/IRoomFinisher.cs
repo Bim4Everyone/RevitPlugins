@@ -17,12 +17,14 @@ namespace RevitFinishingWalls.Services.Creation {
         /// </summary>
         /// <param name="rooms">Помещения для отделки</param>
         /// <param name="settings">Настройки отделки стен</param>
+        /// <param name="wallCreator">Способ построения отделочной стены</param>
         /// <param name="progress">Уведомитель процесса</param>
         /// <param name="ct">Токен отмены</param>
         /// <returns>Ошибки в построении отделочных стен в помещениях</returns>
         ICollection<RoomErrorsViewModel> CreateWallsFinishing(
             ICollection<Room> rooms,
             RevitSettings settings,
+            IWallCreator wallCreator,
             IProgress<int> progress = null,
             CancellationToken ct = default);
     }
