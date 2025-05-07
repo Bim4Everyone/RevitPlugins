@@ -32,7 +32,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                     false);
                 wall.WallType = wallCreationData.Document.GetElement(wallCreationData.WallTypeId) as WallType;
                 wall.SetParamValue(BuiltInParameter.WALL_BASE_OFFSET, wallCreationData.BaseOffset);
-                wall.SetParamValue(BuiltInParameter.WALL_HEIGHT_TYPE, wallCreationData.Room.UpperLimit.LevelId);
+                wall.SetParamValue(BuiltInParameter.WALL_HEIGHT_TYPE, wallCreationData.Room.UpperLimit.Id);
                 wall.SetParamValue(BuiltInParameter.WALL_TOP_OFFSET, wallCreationData.Room.LimitOffset);
 
             } catch(Autodesk.Revit.Exceptions.ArgumentOutOfRangeException) {
