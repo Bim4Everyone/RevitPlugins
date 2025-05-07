@@ -1,4 +1,4 @@
-﻿<core:WpfUIPlatformWindow 
+﻿<core:WpfUIPlatformWindow
 	x:Class="RevitRsnManager.Views.MainWindow"
 	
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -25,44 +25,42 @@
     MinHeight="450"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <b:Interaction.Triggers>
-        <b:EventTrigger
+	<b:Interaction.Triggers>
+		<b:EventTrigger
             EventName="Loaded">
-            <b:InvokeCommandAction
+			<b:InvokeCommandAction
                 Command="{Binding LoadViewCommand}" />
-        </b:EventTrigger>
-    </b:Interaction.Triggers>
+		</b:EventTrigger>
+	</b:Interaction.Triggers>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition
+				Height="Auto" />
+			<RowDefinition
+				Height="Auto" />
+			<RowDefinition
+				Height="Auto" />
+			<RowDefinition
+				Height="*" />
+			<RowDefinition
+				Height="Auto" />
+		</Grid.RowDefinitions>
 
-        <ui:TitleBar 
+		<ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:Button 
+		<ui:Button
             Grid.Row="1"
             Margin="0,10,10,10"
             HorizontalAlignment="Right"
-            Content="{me:LocalizationSource MainWindow.AutoConfigure}"
-            Command="{Binding AutoConfigureCommand}">
+            Command="{Binding AutoConfigureCommand}"
+			Content="{DynamicResource MainWindow.AutoConfigure}"
+			ToolTip="{DynamicResource MainWindow.ToolTipAutoConfigure}">
+		</ui:Button>
 
-            <ui:Button.ToolTip>
-                <TextBlock 
-					Text="{me:LocalizationSource MainWindow.ToolTipAutoConfigure}"
-					TextWrapping="Wrap"
-                    MaxWidth="250"
-                    Padding="5" />
-            </ui:Button.ToolTip>
-        </ui:Button>
-
-        <StackPanel 
+		<StackPanel
             Grid.Row="1"
             Orientation="Horizontal"
             Margin="0,10,0,10">
@@ -70,35 +68,34 @@
 			<ui:TextBox
                 Width="200"
                 Margin="10,0,10,0"
-                Text="{Binding NewServerName, UpdateSourceTrigger=PropertyChanged}" 
+                Text="{Binding NewServerName, UpdateSourceTrigger=PropertyChanged}"
 				PlaceholderText="{me:LocalizationSource MainWindow.PlaceholderServerName}"/>
 
-            <ui:Button Command="{Binding AddServerCommand}">
-                <ui:Button.ToolTip>
-                    <TextBlock 
-						Text="{me:LocalizationSource MainWindow.ToolTipAddServer}"
-						TextWrapping="Wrap"
-						MaxWidth="250"
-                        Padding="5" />
-                </ui:Button.ToolTip>
-                
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock 
-                        Text="{me:LocalizationSource MainWindow.AddServer}"
+			<ui:Button
+				Command="{Binding AddServerCommand}"
+				ToolTip="{DynamicResource MainWindow.ToolTipAddServer}">
+				<StackPanel
+					Orientation="Horizontal">
+					<TextBlock
                         Margin="0,0,5,0"
-                        VerticalAlignment="Center" />
-                    <ui:SymbolIcon 
+                        VerticalAlignment="Center"
+						Text="{me:LocalizationSource MainWindow.AddServer}"/>
+					<ui:SymbolIcon
                         Symbol="Add12"
                         Width="16"
                         Height="16" />
-                </StackPanel>
-            </ui:Button>
-        </StackPanel>
+				</StackPanel>
+			</ui:Button>
+		</StackPanel>
 
-		<Grid Grid.Row="2" Margin="10,0,10,10">
+		<Grid
+			Grid.Row="2"
+			Margin="10,0,10,10">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="*" />
+				<ColumnDefinition
+					Width="*" />
+				<ColumnDefinition
+					Width="*" />
 			</Grid.ColumnDefinitions>
 
 			<ui:Button
@@ -107,18 +104,18 @@
 				Margin="0,0,5,0"
 				HorizontalAlignment="Stretch"
 				Command="{Binding MoveUpCommand}"
-				CommandParameter="{Binding SelectedServer}">
-				<ui:Button.ToolTip>
-					<TextBlock Text="{DynamicResource MainWindow.ToolTipMoveUp}" />
-				</ui:Button.ToolTip>
-				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-					<ui:SymbolIcon 
-						Symbol="ArrowUp12" 
-						Width="16" 
+				CommandParameter="{Binding SelectedServer}"
+				ToolTip="{DynamicResource MainWindow.ToolTipMoveUp}">
+				<StackPanel
+					Orientation="Horizontal"
+					HorizontalAlignment="Center">
+					<ui:SymbolIcon
+						Symbol="ArrowUp12"
+						Width="16"
 						Height="16" />
-					<TextBlock 
-						Text="{DynamicResource MainWindow.MoveUp}" 
-						Margin="5,0,0,0" />
+					<TextBlock
+						Margin="5,0,0,0"
+						Text="{me:LocalizationSource MainWindow.MoveUp}"/>
 				</StackPanel>
 			</ui:Button>
 
@@ -128,32 +125,30 @@
 				Margin="5,0,0,0"
 				HorizontalAlignment="Stretch"
 				Command="{Binding MoveDownCommand}"
-				CommandParameter="{Binding SelectedServer}">
-				<ui:Button.ToolTip>
-					<TextBlock Text="{DynamicResource MainWindow.ToolTipMoveDown}" />
-				</ui:Button.ToolTip>
-				<StackPanel 
-					Orientation="Horizontal" 
+				CommandParameter="{Binding SelectedServer}"
+				ToolTip="{DynamicResource MainWindow.ToolTipMoveDown}">
+				<StackPanel
+					Orientation="Horizontal"
 					HorizontalAlignment="Center">
-					<ui:SymbolIcon 
-						Symbol="ArrowDown12" 
-						Width="16" 
+					<ui:SymbolIcon
+						Symbol="ArrowDown12"
+						Width="16"
 						Height="16" />
-					<TextBlock 
-						Text="{DynamicResource MainWindow.MoveDown}" 
-						Margin="5,0,0,0" />
+					<TextBlock
+						Margin="5,0,0,0"
+						Text="{me:LocalizationSource MainWindow.MoveDown}"/>
 				</StackPanel>
 			</ui:Button>
 		</Grid>
 
 
-		<Border 
+		<Border
             Grid.Row="3"
             CornerRadius="8"
             Padding="5"
             Margin="10,0,10,0"
             Background="{DynamicResource CardBackground}">
-            <ListBox
+			<ListBox
                 Grid.Row="2"
                 AllowDrop="True"
                 Drop="ListBox_Drop"
@@ -161,91 +156,87 @@
                 ItemsSource="{Binding Servers}"
                 SelectedItem="{Binding SelectedServer}">
 
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="HorizontalContentAlignment"
-                            Value="Stretch" />
+				<ListBox.ItemContainerStyle>
+					<Style
+						TargetType="ListBoxItem">
+						<Setter
+							Property="HorizontalContentAlignment"
+							Value="Stretch" />
+						<EventSetter
+							Event="PreviewMouseMove"
+							Handler="ListBoxItem_PreviewMouseMove" />
+					</Style>
+				</ListBox.ItemContainerStyle>
 
-                    <EventSetter Event="PreviewMouseMove"
-                                 Handler="ListBoxItem_PreviewMouseMove" />
-                </Style>       
-            </ListBox.ItemContainerStyle>
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<Border
+							BorderThickness="1"
+							Padding="5"
+							Margin="10,5,10,5"
+							CornerRadius="5"
+							BorderBrush="{ui:ThemeResource TextFillColorPrimaryBrush}">
 
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Border 
-                        BorderThickness="1"
-                        BorderBrush="{ui:ThemeResource TextFillColorPrimaryBrush}"
-                        Padding="5"
-                        Margin="10,5,10,5"
-                        CornerRadius="5">
+							<DockPanel
+								LastChildFill="True">
+								<StackPanel
+									Margin="20,5,15,5"
+									Orientation="Horizontal"
+									DockPanel.Dock="Right"
+									HorizontalAlignment="Right">
 
-                        <DockPanel LastChildFill="True">
-                            <StackPanel 
-                                Orientation="Horizontal"
-                                DockPanel.Dock="Right"
-                                HorizontalAlignment="Right"
-                                Margin="20,5,15,5">
-								
-                                    <ui:Button 
+									<ui:Button
                                         Appearance="Danger"
-                                        Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding}">
-                                        <ui:Button.ToolTip>
-                                            <TextBlock Text="{DynamicResource MainWindow.ToolTipRemove}" />
-                                        </ui:Button.ToolTip>
-                                        <ui:SymbolIcon 
+                                        CommandParameter="{Binding}"
+										ToolTip="{DynamicResource MainWindow.ToolTipRemove}"
+										Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}">
+										<ui:SymbolIcon
                                             Symbol="Delete12"
                                             Width="16"
                                             Height="16" />
-                                    </ui:Button>
+									</ui:Button>
 
-                                </StackPanel>
+								</StackPanel>
 
-                            <TextBlock 
-                                Text="{Binding}"
-                                VerticalAlignment="Center"
-                                Margin="10,0"
-                                Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}" />
-                        </DockPanel> 
-
-                    </Border>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        </Border>
-        <StackPanel 
+								<TextBlock
+									VerticalAlignment="Center"
+									Margin="10,0"
+									Text="{Binding}"
+									Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}" />
+							</DockPanel>
+						</Border>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		</Border>
+		<StackPanel
             Grid.Row="4"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
-            <ui:TextBlock 
+			<ui:TextBlock
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
-            <ui:Button 
+			<ui:Button
                 Width="80"
                 Margin="10"
-                Click="ButtonOk_Click"
                 Appearance="Info"
-                Content="{DynamicResource MainWindow.ButtonOk}"
-                Command="{Binding AcceptViewCommand}">
-			    <ui:Button.ToolTip>
-				    <TextBlock Text="{DynamicResource MainWindow.ToolTipConfirmConfig}" />
-			    </ui:Button.ToolTip>
+				Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}"
+				Content="{DynamicResource MainWindow.ButtonOk}"
+				ToolTip="{DynamicResource MainWindow.ToolTipConfirmConfig}">
 			</ui:Button>
-            <ui:Button 
+			<ui:Button
                 Width="80"
                 Margin="10"
-                Content="{DynamicResource MainWindow.ButtonCancel}"
                 IsCancel="True"
-                Click="ButtonCancel_Click" >
-			    <ui:Button.ToolTip>
-				    <TextBlock Text="{DynamicResource MainWindow.ToolTipCancelConfig}" />
-			    </ui:Button.ToolTip>
+                Click="ButtonCancel_Click"
+				Content="{DynamicResource MainWindow.ButtonCancel}"
+				ToolTip="{DynamicResource MainWindow.ToolTipCancelConfig}">
 			</ui:Button>
-        </StackPanel>
-    </Grid>
+		</StackPanel>
+	</Grid>
 </core:WpfUIPlatformWindow>

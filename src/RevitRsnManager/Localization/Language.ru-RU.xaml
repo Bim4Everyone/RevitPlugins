@@ -20,7 +20,7 @@
     <system:String x:Key="MainWindow.ErrorEmptyServerList">Добавьте хотя бы один сервер.</system:String>
 	<system:String x:Key="MainWindow.AutoConfigure">Автонастройка</system:String>
 	<system:String x:Key="MainWindow.AddServer">Добавить</system:String>
-    <system:String x:Key="MainWindow.ToolTipAutoConfigure">Автонастройка конфигурации Revit сервером на основе последних открыт проектов</system:String>
+    <system:String x:Key="MainWindow.ToolTipAutoConfigure">Автонастройка конфигурации Revit серверов на основе последних открытых проектов</system:String>
     <system:String x:Key="MainWindow.ToolTipAddServer">Добавить сервер</system:String>
     <system:String x:Key="MainWindow.ToolTipMoveUp">Переместить сервер выше</system:String>
     <system:String x:Key="MainWindow.ToolTipMoveDown">Переместить сервер ниже</system:String>
