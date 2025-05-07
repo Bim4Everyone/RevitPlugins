@@ -42,6 +42,8 @@ Important: Connection to elements from linked files will not be performed!
     <system:String
         x:Key="MainWindow.Label.InputWallSideOffset">Offset inward:</system:String>
     <system:String
+        x:Key="MainWindow.Label.InputWallHeightStyle">Top constraint</system:String>
+    <system:String
         x:Key="MainWindow.Validation.WallType">Specify the finishing wall type</system:String>
     <system:String
         x:Key="MainWindow.Validation.RoomGetterMode">Specify room selection method</system:String>
@@ -79,6 +81,11 @@ Important: Connection to elements from linked files will not be performed!
         x:Key="WallElevationMode.ManualHeight">Set manually</system:String>
     <system:String
         x:Key="WallElevationMode.HeightByRoom">By room</system:String>
+
+    <system:String
+        x:Key="WallHeightStyle.Unconnected">Unconnected</system:String>
+    <system:String
+        x:Key="WallHeightStyle.UpToLevel">Up to level</system:String>
 
     <system:String
         x:Key="Exceptions.InvalidLine">Cannot create wall from the given line</system:String>

@@ -40,6 +40,8 @@
     <system:String
         x:Key="MainWindow.Label.InputWallSideOffset">Смещение внутрь помещения:</system:String>
     <system:String
+        x:Key="MainWindow.Label.InputWallHeightStyle">Зависимость сверху</system:String>
+    <system:String
         x:Key="MainWindow.Validation.WallType">Задайте тип отделочных стен</system:String>
     <system:String
         x:Key="MainWindow.Validation.RoomGetterMode">Задайте выбор помещений</system:String>
@@ -77,6 +79,11 @@
         x:Key="WallElevationMode.ManualHeight">Задать вручную</system:String>
     <system:String
         x:Key="WallElevationMode.HeightByRoom">По помещениям</system:String>
+
+    <system:String
+        x:Key="WallHeightStyle.Unconnected">Неприсоединенная</system:String>
+    <system:String
+        x:Key="WallHeightStyle.UpToLevel">До уровня</system:String>
 
     <system:String
         x:Key="Exceptions.InvalidLine">Нельзя создать стену по заданной линии</system:String>
