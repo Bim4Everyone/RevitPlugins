@@ -22,7 +22,9 @@ Important: Connection to elements from linked files will not be performed!
     <system:String
         x:Key="MainWindow.Tooltip.InputWallTypes">Type of finishing walls to be created.</system:String>
     <system:String
-        x:Key="MainWindow.Tooltip.InputWallElevationMode">Method for specifying the top elevation of the finishing wall.</system:String>
+        x:Key="MainWindow.Tooltip.InputWallTopElevationMode">Method for specifying the top elevation of the finishing wall.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallBaseElevationMode">Method for specifying the base elevation of the finishing wall.</system:String>
     <system:String
         x:Key="MainWindow.Tooltip.InputWallElevation">The wall will be created so that its top is at the specified elevation relative to its base level. The base level will be taken from the room level.</system:String>
     <system:String
@@ -36,7 +38,9 @@ Important: Connection to elements from linked files will not be performed!
     <system:String
         x:Key="MainWindow.Label.InputWallTypes">Finishing wall type:</system:String>
     <system:String
-        x:Key="MainWindow.Label.InputWallElevationMode">Top elevation from level:</system:String>
+        x:Key="MainWindow.Label.InputWallTopElevationMode">Top elevation from level:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallBaseElevationMode">Base elevation from level:</system:String>
     <system:String
         x:Key="MainWindow.Label.Mm">mm</system:String>
     <system:String
@@ -50,7 +54,9 @@ Important: Connection to elements from linked files will not be performed!
     <system:String
         x:Key="MainWindow.Validation.RoomGetterMode">Specify room selection method</system:String>
     <system:String
-        x:Key="MainWindow.Validation.WallElevationMode">Specify top elevation for finishing walls</system:String>
+        x:Key="MainWindow.Validation.WallTopElevationMode">Specify top elevation for finishing walls</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.WallBaseElevationMode">Specify base elevation for finishing walls</system:String>
     <system:String
         x:Key="MainWindow.Validation.MinBaseOffset">Offset downward is too large</system:String>
     <system:String

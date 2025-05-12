@@ -53,7 +53,9 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                                 Curve = curveSegmentElement.Curve,
                                 TopElevation = wallTopElevation,
                                 WallTypeId = settings.WallTypeId,
-                                BaseOffset = wallBaseOffset
+                                BaseOffset = settings.WallBaseElevationMode == WallElevationMode.ManualHeight
+                                    ? wallBaseOffset
+                                    : room.BaseOffset
                             };
                             lastWallCreationData.AddRangeElementsForJoin(curveSegmentElement.Elements);
                             wallCreationData.Add(lastWallCreationData);
@@ -102,7 +104,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
             if(room is null) { throw new ArgumentNullException(nameof(room)); }
             if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
 
-            if(settings.WallElevationMode == WallElevationMode.ManualHeight) {
+            if(settings.WallTopElevationMode == WallElevationMode.ManualHeight) {
                 return _revitRepository.ConvertMmToFeet(settings.WallElevationMm);
             } else {
                 return _revitRepository.GetRoomTopElevation(room);

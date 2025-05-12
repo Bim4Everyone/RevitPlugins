@@ -48,7 +48,12 @@ namespace RevitFinishingWalls.Models {
         /// <summary>
         /// Режим задания верхней отметки стен от уровня
         /// </summary>
-        public WallElevationMode WallElevationMode { get; set; } = WallElevationMode.HeightByRoom;
+        public WallElevationMode WallTopElevationMode { get; set; } = WallElevationMode.HeightByRoom;
+
+        /// <summary>
+        /// Режим задания нижней отметки стен от уровня
+        /// </summary>
+        public WallElevationMode WallBaseElevationMode { get; set; } = WallElevationMode.ManualHeight;
 
         /// <summary>
         /// Зависимость сверху

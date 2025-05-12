@@ -16,11 +16,11 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
 
         public IWallCreator Create(RevitSettings settings) {
             if(settings.WallHeightStyle == Models.Enums.WallHeightStyle.UpToLevel
-                && settings.WallElevationMode == Models.Enums.WallElevationMode.HeightByRoom) {
+                && settings.WallTopElevationMode == Models.Enums.WallElevationMode.HeightByRoom) {
                 return _resolutionRoot.Get<TopConnectedToRoomTopWallCreator>();
 
             } else if(settings.WallHeightStyle == Models.Enums.WallHeightStyle.UpToLevel
-                && settings.WallElevationMode == Models.Enums.WallElevationMode.ManualHeight) {
+                && settings.WallTopElevationMode == Models.Enums.WallElevationMode.ManualHeight) {
                 return _resolutionRoot.Get<TopConnectedToLevelWallCreator>();
 
             } else {

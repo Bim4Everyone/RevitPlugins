@@ -172,19 +172,19 @@
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
                 <Label
-                    Content="{me:LocalizationSource MainWindow.Label.InputWallElevationMode}"
-                    Target="{Binding ElementName=InputWallElevationMode}"
+                    Content="{me:LocalizationSource MainWindow.Label.InputWallTopElevationMode}"
+                    Target="{Binding ElementName=InputWallTopElevationMode}"
                     Style="{StaticResource InputLabel}" />
                 <ComboBox
-                    x:Name="InputWallElevationMode"
+                    x:Name="InputWallTopElevationMode"
                     IsEditable="False"
-                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallElevationMode}"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallTopElevationMode}"
                     ItemsSource="{Binding WallElevationModes}"
-                    SelectedItem="{Binding SelectedWallElevationMode}"
+                    SelectedItem="{Binding SelectedWallTopElevationMode}"
                     Style="{StaticResource ComboBoxInput}">
                 </ComboBox>
                 <ui:TextBox
-                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallElevation}"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallTopElevationMode}"
                     Text="{Binding WallElevationByUser, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                     IsEnabled="{Binding IsWallHeightByUserEnabled}" />
                 <Label
@@ -214,10 +214,19 @@
                     Content="{me:LocalizationSource MainWindow.Label.InputWallBaseOffset}"
                     Target="{Binding ElementName=InputWallBaseOffset}"
                     Style="{StaticResource InputLabel}" />
+                <ComboBox
+                    x:Name="InputWallBaseElevationMode"
+                    IsEditable="False"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallBaseElevationMode}"
+                    ItemsSource="{Binding WallElevationModes}"
+                    SelectedItem="{Binding SelectedWallBaseElevationMode}"
+                    Style="{StaticResource ComboBoxInput}">
+                </ComboBox>
                 <ui:TextBox
                     x:Name="InputWallBaseOffset"
                     ToolTip="{me:LocalizationSource MainWindow.Tooltip.WallBaseOffset}"
-                    Text="{Binding WallBaseOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
+                    Text="{Binding WallBaseOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                    IsEnabled="{Binding IsWallBaseOffsetByUserEnabled}"/>
                 <Label
                     Width="Auto"
                     Content="{me:LocalizationSource MainWindow.Label.Mm}"

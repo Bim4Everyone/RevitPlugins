@@ -20,7 +20,9 @@
     <system:String
         x:Key="MainWindow.Tooltip.InputWallTypes">Типоразмер отделочных стен, которые будут создаваться.</system:String>
     <system:String
-        x:Key="MainWindow.Tooltip.InputWallElevationMode">Способ задания отметки верха отделочной стены.</system:String>
+        x:Key="MainWindow.Tooltip.InputWallTopElevationMode">Способ задания отметки верха отделочной стены.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallBasepElevationMode">Способ задания отметки низа отделочной стены.</system:String>
     <system:String
         x:Key="MainWindow.Tooltip.InputWallElevation">Стена будет создана таким способом, чтобы ее верх был на указанной отметке относительно базового уровня стены. Базовый уровень стены будет браться из уровня помещения.</system:String>
     <system:String
@@ -34,7 +36,9 @@
     <system:String
         x:Key="MainWindow.Label.InputWallTypes">Тип отделочных стен:</system:String>
     <system:String
-        x:Key="MainWindow.Label.InputWallElevationMode">Отметка верха от уровня:</system:String>
+        x:Key="MainWindow.Label.InputWallTopElevationMode">Отметка верха от уровня:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallBaseElevationMode">Отметка низа от уровня:</system:String>
     <system:String
         x:Key="MainWindow.Label.Mm">мм</system:String>
     <system:String
@@ -48,7 +52,9 @@
     <system:String
         x:Key="MainWindow.Validation.RoomGetterMode">Задайте выбор помещений</system:String>
     <system:String
-        x:Key="MainWindow.Validation.WallElevationMode">Задайте отметку верха отделочных стен</system:String>
+        x:Key="MainWindow.Validation.WallTopElevationMode">Задайте отметку верха отделочных стен</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.WallBaseElevationMode">Задайте отметку низа отделочных стен</system:String>
     <system:String
         x:Key="MainWindow.Validation.MinBaseOffset">Слишком большое смещение вниз</system:String>
     <system:String
