@@ -21,7 +21,7 @@
     <File Path="src/Directory.Build.props" />
     <File Path="src/Directory.Build.targets" />
   </Folder>
-  <Folder Name="/Solution Items/Project Props/" >
+  <Folder Name="/Solution Items/Project Props/">
     <File Path="src/_ProjectProps/DevExpress.props" />
     <File Path="src/_ProjectProps/RevitClashes.props" />
     <File Path="src/_ProjectProps/WpfUI.props" />
