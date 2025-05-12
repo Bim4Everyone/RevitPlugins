@@ -184,7 +184,7 @@
                     Style="{StaticResource ComboBoxInput}">
                 </ComboBox>
                 <ui:TextBox
-                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallTopElevationMode}"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallElevation}"
                     Text="{Binding WallElevationByUser, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                     IsEnabled="{Binding IsWallHeightByUserEnabled}" />
                 <Label

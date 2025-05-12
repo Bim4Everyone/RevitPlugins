@@ -22,7 +22,7 @@
     <system:String
         x:Key="MainWindow.Tooltip.InputWallTopElevationMode">Способ задания отметки верха отделочной стены.</system:String>
     <system:String
-        x:Key="MainWindow.Tooltip.InputWallBasepElevationMode">Способ задания отметки низа отделочной стены.</system:String>
+        x:Key="MainWindow.Tooltip.InputWallBaseElevationMode">Способ задания отметки низа отделочной стены.</system:String>
     <system:String
         x:Key="MainWindow.Tooltip.InputWallElevation">Стена будет создана таким способом, чтобы ее верх был на указанной отметке относительно базового уровня стены. Базовый уровень стены будет браться из уровня помещения.</system:String>
     <system:String
