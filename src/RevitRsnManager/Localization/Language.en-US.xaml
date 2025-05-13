@@ -10,7 +10,7 @@
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String x:Key="MainWindow.UpdateSuccess">RSN.ini updated</system:String>
     <system:String x:Key="MainWindow.UpdateSuccessTitle">Done</system:String>
-    <system:String x:Key="MainWindow.ConfigNotFound">Configurator not found,{x0}please create a new one{x1}in the editor</system:String>
+    <system:String x:Key="MainWindow.ConfigNotFound">The configuration file was not found, you need to create it in the editor.</system:String>
     <system:String x:Key="MainWindow.ConfigNotFoundTitle">Error</system:String>
     <system:String x:Key="MainWindow.Empty">Server name cannot be empty.</system:String>
     <system:String x:Key="MainWindow.AlreadyExists">Server is already added.</system:String>
