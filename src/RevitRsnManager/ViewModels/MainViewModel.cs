@@ -60,8 +60,8 @@ internal class MainViewModel : BaseViewModel {
         AutoConfigureCommand = RelayCommand.Create(AutoConfigure);
         RemoveServerCommand = RelayCommand.Create<string>(RemoveServer);
         AddServerCommand = RelayCommand.Create(AddServer, () => !string.IsNullOrWhiteSpace(NewServerName));
-        MoveUpCommand = RelayCommand.Create<string>(MoveUp, server => CanMove(server, -1));
-        MoveDownCommand = RelayCommand.Create<string>(MoveDown, server => CanMove(server, 1));
+        MoveUpCommand = RelayCommand.Create<string>(MoveServerUp, server => CanMove(server, -1));
+        MoveDownCommand = RelayCommand.Create<string>(MoveServerDown, server => CanMove(server, 1));
     }
 
     /// <summary>
@@ -160,11 +160,13 @@ internal class MainViewModel : BaseViewModel {
 
     private void AddServer() {
         string trimmed = NewServerName?.Trim();
-        Servers.Add(trimmed);
+        if(!Servers.Contains(trimmed)) {
+            Servers.Add(trimmed);
+        }
         SelectedServer = trimmed;
     }
 
-    private void Move(string server, int delta) {
+    private void MoveServer(string server, int delta) {
         int index = Servers.IndexOf(server);
         int newIndex = index + delta;
 
@@ -182,9 +184,9 @@ internal class MainViewModel : BaseViewModel {
         return index >= 0 && index + delta >= 0 && index + delta < Servers.Count;
     }
 
-    private void MoveUp(string server) => Move(server, -1);
+    private void MoveServerUp(string server) => MoveServer(server, -1);
 
-    private void MoveDown(string server) => Move(server, 1);
+    private void MoveServerDown(string server) => MoveServer(server, 1);
 
     /// <summary>
     /// Метод загрузки главного окна.
