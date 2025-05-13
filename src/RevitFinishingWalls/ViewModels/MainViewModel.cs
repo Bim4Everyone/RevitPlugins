@@ -19,6 +19,7 @@ namespace RevitFinishingWalls.ViewModels {
         private readonly RevitRepository _revitRepository;
         private readonly RichErrorMessageService _errorMessageService;
         private readonly IRoomFinisher _roomFinisher;
+        private readonly IWallCreatorFactory _wallCreatorFactory;
         private readonly IProgressDialogFactory _progressDialogFactory;
         private readonly ILocalizationService _localizationService;
 
@@ -37,6 +38,7 @@ namespace RevitFinishingWalls.ViewModels {
             RevitRepository revitRepository,
             RichErrorMessageService errorMessageService,
             IRoomFinisher roomFinisher,
+            IWallCreatorFactory wallCreatorFactory,
             IProgressDialogFactory progressDialogFactory,
             ILocalizationService localizationService
             ) {
@@ -48,6 +50,8 @@ namespace RevitFinishingWalls.ViewModels {
                 ?? throw new ArgumentNullException(nameof(errorMessageService));
             _roomFinisher = roomFinisher
                 ?? throw new ArgumentNullException(nameof(roomFinisher));
+            _wallCreatorFactory = wallCreatorFactory
+                ?? throw new ArgumentNullException(nameof(wallCreatorFactory));
             _progressDialogFactory = progressDialogFactory
                 ?? throw new ArgumentNullException(nameof(progressDialogFactory));
             _localizationService = localizationService
@@ -61,6 +65,9 @@ namespace RevitFinishingWalls.ViewModels {
             WallTypes = [.. _revitRepository.GetWallTypes()
                 .Select(wt => new WallTypeViewModel(wt))
                 .OrderBy(wt => wt.Name)];
+            WallHeightStyles = [.. Enum.GetValues(typeof(WallHeightStyle))
+                .Cast<WallHeightStyle>()
+                .Select(w => new WallHeightStyleViewModel(_localizationService, w))];
 
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             LoadConfigCommand = RelayCommand.Create(LoadConfig);
@@ -106,18 +113,39 @@ namespace RevitFinishingWalls.ViewModels {
 
 
         public bool IsWallHeightByUserEnabled =>
-            SelectedWallElevationMode?.ElevationMode == WallElevationMode.ManualHeight;
+            SelectedWallTopElevationMode?.ElevationMode == WallElevationMode.ManualHeight;
 
 
         public ObservableCollection<WallElevationModeViewModel> WallElevationModes { get; }
 
-        private WallElevationModeViewModel _selectedWallHeightMode;
-        public WallElevationModeViewModel SelectedWallElevationMode {
-            get => _selectedWallHeightMode;
+        private WallElevationModeViewModel _selectedWallTopHeightMode;
+        public WallElevationModeViewModel SelectedWallTopElevationMode {
+            get => _selectedWallTopHeightMode;
             set {
-                RaiseAndSetIfChanged(ref _selectedWallHeightMode, value);
+                RaiseAndSetIfChanged(ref _selectedWallTopHeightMode, value);
                 OnPropertyChanged(nameof(IsWallHeightByUserEnabled));
             }
+        }
+
+        public bool IsWallBaseOffsetByUserEnabled =>
+            SelectedWallBaseElevationMode?.ElevationMode == WallElevationMode.ManualHeight;
+
+
+        private WallElevationModeViewModel _selectedWallBaseHeightMode;
+        public WallElevationModeViewModel SelectedWallBaseElevationMode {
+            get => _selectedWallBaseHeightMode;
+            set {
+                RaiseAndSetIfChanged(ref _selectedWallBaseHeightMode, value);
+                OnPropertyChanged(nameof(IsWallBaseOffsetByUserEnabled));
+            }
+        }
+
+        public ObservableCollection<WallHeightStyleViewModel> WallHeightStyles { get; }
+
+        private WallHeightStyleViewModel _selectedWallHeightStyle;
+        public WallHeightStyleViewModel SelectedWallHeightStyle {
+            get => _selectedWallHeightStyle;
+            set => RaiseAndSetIfChanged(ref _selectedWallHeightStyle, value);
         }
 
 
@@ -146,7 +174,12 @@ namespace RevitFinishingWalls.ViewModels {
                 var ct = progressDialogService.CreateCancellationToken();
                 progressDialogService.Show();
 
-                errors = _roomFinisher.CreateWallsFinishing(rooms, settings, progress, ct);
+                errors = _roomFinisher.CreateWallsFinishing(
+                    rooms,
+                    settings,
+                    _wallCreatorFactory.Create(settings),
+                    progress,
+                    ct);
             }
             if(errors.Count > 0) {
                 _errorMessageService.ShowErrorWindow(errors);
@@ -162,23 +195,29 @@ namespace RevitFinishingWalls.ViewModels {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.RoomGetterMode");
                 return false;
             }
-            if(SelectedWallElevationMode is null) {
-                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.WallElevationMode");
+            if(SelectedWallTopElevationMode is null) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.WallTopElevationMode");
                 return false;
             }
-            if(double.TryParse(WallBaseOffset, out double baseOffset)) {
-                if(baseOffset < _wallBaseMinOffsetMM) {
-                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MinBaseOffset");
-                    return false;
-                } else if(baseOffset > _wallBaseMaxOffsetMM) {
-                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MaxBaseOffset");
+            if(SelectedWallBaseElevationMode is null) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.WallBaseElevationMode");
+                return false;
+            }
+            if(SelectedWallBaseElevationMode?.ElevationMode == WallElevationMode.ManualHeight) {
+                if(double.TryParse(WallBaseOffset, out double baseOffset)) {
+                    if(baseOffset < _wallBaseMinOffsetMM) {
+                        ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MinBaseOffset");
+                        return false;
+                    } else if(baseOffset > _wallBaseMaxOffsetMM) {
+                        ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MaxBaseOffset");
+                        return false;
+                    }
+                } else {
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.BaseOffsetNotNumber");
                     return false;
                 }
-            } else {
-                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.BaseOffsetNotNumber");
-                return false;
             }
-            if(SelectedWallElevationMode?.ElevationMode == WallElevationMode.ManualHeight) {
+            if(SelectedWallTopElevationMode?.ElevationMode == WallElevationMode.ManualHeight) {
                 if(double.TryParse(WallElevationByUser, out double height)) {
                     if(height <= 0) {
                         ErrorText = string.Format(
@@ -187,7 +226,9 @@ namespace RevitFinishingWalls.ViewModels {
                     } else if(height > _wallTopMaxElevationMM) {
                         ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MaxWallElevation");
                         return false;
-                    } else if(height <= baseOffset) {
+                    } else if(IsWallBaseOffsetByUserEnabled
+                        && double.TryParse(WallBaseOffset, out double baseOffset)
+                        && height <= baseOffset) {
                         ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.ElevationBelowOffset");
                         return false;
                     }
@@ -219,8 +260,12 @@ namespace RevitFinishingWalls.ViewModels {
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
             SelectedRoomGetterMode = new RoomGetterModeViewModel(
                 _localizationService, settings.RoomGetterMode);
-            SelectedWallElevationMode = new WallElevationModeViewModel(
-                _localizationService, settings.WallElevationMode);
+            SelectedWallTopElevationMode = new WallElevationModeViewModel(
+                _localizationService, settings.WallTopElevationMode);
+            SelectedWallBaseElevationMode = new WallElevationModeViewModel(
+                _localizationService, settings.WallBaseElevationMode);
+            SelectedWallHeightStyle = new WallHeightStyleViewModel(
+                _localizationService, settings.WallHeightStyle);
             WallElevationByUser = settings.WallElevationMm.ToString();
             WallBaseOffset = settings.WallBaseOffsetMm.ToString();
             WallSideOffset = settings.WallSideOffsetMm.ToString();
@@ -233,7 +278,9 @@ namespace RevitFinishingWalls.ViewModels {
             RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
             settings.RoomGetterMode = SelectedRoomGetterMode.RoomGetterMode;
-            settings.WallElevationMode = SelectedWallElevationMode.ElevationMode;
+            settings.WallTopElevationMode = SelectedWallTopElevationMode.ElevationMode;
+            settings.WallBaseElevationMode = SelectedWallBaseElevationMode.ElevationMode;
+            settings.WallHeightStyle = SelectedWallHeightStyle.WallHeightStyle;
             settings.WallBaseOffsetMm = double.TryParse(WallBaseOffset, out double baseOffset) ? baseOffset : 0;
             settings.WallSideOffsetMm = double.TryParse(WallSideOffset, out double sideOffset) ? sideOffset : 0;
             settings.WallElevationMm = double.TryParse(WallElevationByUser, out double height) ? height : 0;
