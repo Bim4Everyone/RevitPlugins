@@ -21,7 +21,7 @@
     <File Path="src/Directory.Build.props" />
     <File Path="src/Directory.Build.targets" />
   </Folder>
-  <Folder Name="/Solution Items/Project Props/ ">
+  <Folder Name="/Solution Items/Project Props/">
     <File Path="src/_ProjectProps/DevExpress.props" />
     <File Path="src/_ProjectProps/RevitClashes.props" />
     <File Path="src/_ProjectProps/WpfUI.props" />
@@ -34,7 +34,7 @@
     <BuildType Solution="D2022|*" Project="Debug" />
     <BuildType Solution="D2023|*" Project="Debug" />
     <BuildType Solution="D2024|*" Project="Debug" />
-	<BuildType Solution="Debug|*" Project="Debug" />
+    <BuildType Solution="Debug|*" Project="Debug" />
     <BuildType Solution="Release|*" Project="Release" />
   </Project>
   <Project Path="src/RevitApartmentPlans/RevitApartmentPlans.csproj">
