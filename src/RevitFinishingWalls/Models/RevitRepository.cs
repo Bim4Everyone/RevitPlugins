@@ -288,7 +288,7 @@ namespace RevitFinishingWalls.Models {
                 return roomHeight + room.GetParamValue<double>(BuiltInParameter.ROOM_LOWER_OFFSET);
             } else {
                 var levelId = room.GetParamValue<ElementId>(BuiltInParameter.ROOM_UPPER_LEVEL);
-                var upperLevel = Document.GetElement(levelId) as Level;
+                var upperLevel = (Level) Document.GetElement(levelId);
                 return room.GetParamValue<double>(BuiltInParameter.ROOM_UPPER_OFFSET) + upperLevel.Elevation;
             }
         }
@@ -428,8 +428,7 @@ namespace RevitFinishingWalls.Models {
             if(_wallTypesWidthById.TryGetValue(wallTypeId, out var width)) {
                 return width;
             } else {
-                var wallType = Document.GetElement(wallTypeId) as WallType;
-                if(wallType != null) {
+                if(Document.GetElement(wallTypeId) is WallType wallType) {
                     double wallTypeWidth = wallType.Width;
                     _wallTypesWidthById.Add(wallTypeId, wallTypeWidth);
                     return _wallTypesWidthById[wallTypeId];

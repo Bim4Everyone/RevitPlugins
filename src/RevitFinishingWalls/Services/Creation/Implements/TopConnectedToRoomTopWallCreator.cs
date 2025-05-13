@@ -30,7 +30,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                     wallCreationData.Curve,
                     wallCreationData.Room.LevelId,
                     false);
-                wall.WallType = wallCreationData.Document.GetElement(wallCreationData.WallTypeId) as WallType;
+                wall.WallType = (WallType) wallCreationData.Document.GetElement(wallCreationData.WallTypeId);
                 wall.SetParamValue(BuiltInParameter.WALL_BASE_OFFSET, wallCreationData.BaseOffset);
                 wall.SetParamValue(BuiltInParameter.WALL_HEIGHT_TYPE, wallCreationData.Room.UpperLimit.Id);
                 wall.SetParamValue(BuiltInParameter.WALL_TOP_OFFSET, wallCreationData.Room.LimitOffset);

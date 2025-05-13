@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 using Autodesk.Revit.DB;
@@ -78,7 +77,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                                     new ErrorViewModel(
                                         _localizationService.GetLocalizedString("ErrorsWindow.ErrorTitles.WallJoining"),
                                         _localizationService.GetLocalizedString("ErrorsWindow.ErrorMsg.WallJoining"),
-                                        [.. notJoinedElements.Union([wall.Id])]));
+                                        [.. notJoinedElements, wall.Id]));
                             }
                         } catch(CannotCreateWallException e) {
                             roomErrors.Errors.Add(new ErrorViewModel(
