@@ -26,6 +26,11 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     public override IConfigSerializer Serializer { get; set; }
 
     /// <summary>
+    /// Список серверов, указанный пользователем.
+    /// </summary>
+    public List<string> Servers { get; set; }
+
+    /// <summary>
     /// Метод создания конфигурации плагина.
     /// </summary>
     /// <returns>
@@ -60,9 +65,4 @@ internal class RevitSettings : ProjectSettings {
     /// Наименование проекта. Системное свойство. (Не трогать)
     /// </summary>
     public override string ProjectName { get; set; }
-
-    /// <summary>
-    /// Список серверов, указанный пользователем.
-    /// </summary>
-    public List<string> Servers { get; set; }
 }

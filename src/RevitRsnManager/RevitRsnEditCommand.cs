@@ -12,6 +12,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
+using dosymep.WpfUI.Core.SimpleServices;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -65,6 +66,8 @@ public class RevitRsnEditCommand : BasePluginCommand {
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
+
+        kernel.UseWpfUIMessageBox();
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();

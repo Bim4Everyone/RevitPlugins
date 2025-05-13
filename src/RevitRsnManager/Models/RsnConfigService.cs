@@ -33,7 +33,7 @@ namespace RevitRsnManager.Models
 
             foreach(string line in File.ReadLines(_revitServerIni)) {
                 string trimmed = line.Trim();
-                if(!string.IsNullOrWhiteSpace(trimmed) && !trimmed.StartsWith("[") && !trimmed.Contains("=")) {
+                if(!string.IsNullOrWhiteSpace(trimmed)) {
                     servers.Add(trimmed);
                 }
             }

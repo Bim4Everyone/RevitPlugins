@@ -83,20 +83,22 @@ public class RevitRsnLoadCommand : BasePluginCommand {
             $"/{assemblyName};component/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        TrySaveServersToIni(kernel);
+    }
+
+    private void TrySaveServersToIni(IKernel kernel) {
         var pluginConfig = kernel.Get<PluginConfig>();
-        var revitRepository = kernel.Get<RevitRepository>();
-        var rsnConfigService = kernel.Get<RsnConfigService>();
-        var msg = kernel.Get<WpfUIMessageBoxService>();
+        var msg = kernel.Get<IMessageBoxService>();
+        var rsnConfigService = kernel.Get<IRsnConfigService>();
         var localizationService = kernel.Get<ILocalizationService>();
-        
-        
-        var config = pluginConfig.GetSettings(revitRepository.Document);
-        
-        if(config != null && config.Servers?.Any() == true) {
+
+        var servers = pluginConfig.Servers;
+
+        if(servers?.Count() > 0) {
             var updateSuccess = localizationService.GetLocalizedString("MainWindow.UpdateSuccess");
             var updateSuccessTitle = localizationService.GetLocalizedString("MainWindow.UpdateSuccessTitle");
 
-            rsnConfigService.SaveServersToIni(config.Servers);
+            rsnConfigService.SaveServersToIni(servers);
             msg.Show(
                updateSuccess,
                updateSuccessTitle,

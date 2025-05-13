@@ -27,7 +27,7 @@ namespace RevitRsnManager.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
-    private readonly WpfUIMessageBoxService _messageBoxService;
+    private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
     private readonly IRsnConfigService _rsnConfigService;
 
@@ -45,7 +45,7 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        WpfUIMessageBoxService messageBoxService,
+        IMessageBoxService messageBoxService,
         ILocalizationService localizationService, 
         IRsnConfigService rsnConfigService) {
         
@@ -60,8 +60,8 @@ internal class MainViewModel : BaseViewModel {
         AutoConfigureCommand = RelayCommand.Create(AutoConfigure);
         RemoveServerCommand = RelayCommand.Create<string>(RemoveServer);
         AddServerCommand = RelayCommand.Create(AddServer, () => !string.IsNullOrWhiteSpace(NewServerName));
-        MoveUpCommand = RelayCommand.Create<object>(MoveUp, server => CanMove(server, -1));
-        MoveDownCommand = RelayCommand.Create<object>(MoveDown, server => CanMove(server, 1));
+        MoveUpCommand = RelayCommand.Create<string>(MoveUp, server => CanMove(server, -1));
+        MoveDownCommand = RelayCommand.Create<string>(MoveDown, server => CanMove(server, 1));
     }
 
     /// <summary>
@@ -160,30 +160,11 @@ internal class MainViewModel : BaseViewModel {
 
     private void AddServer() {
         string trimmed = NewServerName?.Trim();
-       
-        if(string.IsNullOrWhiteSpace(trimmed)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.Empty");
-            return;
-        }
-
-        if(Servers.Contains(trimmed)) {
-            ErrorText = string.Format(
-                _localizationService.GetLocalizedString("MainWindow.AlreadyExists"),
-                trimmed);
-            return;
-        }
-
         Servers.Add(trimmed);
         SelectedServer = trimmed;
-        NewServerName = string.Empty;
-        ErrorText = null; 
     }
 
-
-    private void Move(object serverObj, int delta) {
-        if(serverObj is not string server)
-            return;
-
+    private void Move(string server, int delta) {
         int index = Servers.IndexOf(server);
         int newIndex = index + delta;
 
@@ -192,17 +173,18 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-    private bool CanMove(object serverObj, int delta) {
-        if(serverObj is not string server)
+    private bool CanMove(string server, int delta) {
+        if(Servers == null || string.IsNullOrWhiteSpace(server)) {
             return false;
+        }
 
         int index = Servers.IndexOf(server);
         return index >= 0 && index + delta >= 0 && index + delta < Servers.Count;
     }
 
-    private void MoveUp(object serverObj) => Move(serverObj, -1);
+    private void MoveUp(string server) => Move(server, -1);
 
-    private void MoveDown(object serverObj) => Move(serverObj, 1);
+    private void MoveDown(string server) => Move(server, 1);
 
     /// <summary>
     /// Метод загрузки главного окна.
@@ -248,6 +230,15 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
+        string trimmed = NewServerName?.Trim();
+
+        if(Servers.Contains(trimmed)) {
+            ErrorText = string.Format(
+                _localizationService.GetLocalizedString("MainWindow.AlreadyExists"),
+                trimmed);
+            return false;
+        }
+
         return true;
     }
 
@@ -255,9 +246,9 @@ internal class MainViewModel : BaseViewModel {
     /// Загрузка настроек плагина.
     /// </summary>
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-        if(setting?.Servers?.Any() == true) {
-            Servers = new ObservableCollection<string>(setting.Servers);
+        var servers = _pluginConfig.Servers;
+        if(servers?.Count > 0) {
+            Servers = new ObservableCollection<string>(servers);
         }
     }
 
@@ -265,10 +256,7 @@ internal class MainViewModel : BaseViewModel {
     /// Сохранение настроек плагина.
     /// </summary>
     private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-        setting.Servers = Servers.ToList();
+        _pluginConfig.Servers = Servers.ToList();
         _pluginConfig.SaveProjectConfig();
     }
 }
