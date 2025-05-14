@@ -21,9 +21,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers {
                 Type = revitRepository.GetOpeningTaskType(OpeningType.FloorRectangle),
                 PointFinder = pointFinder,
                 LevelFinder = levelFinder,
-                AngleFinder = new ZeroAngleFinder(),
+                AngleFinder = new FittingFloorAngleFinder(clash.Element1),
                 ParameterGetter = new FloorSolidParameterGetter(
-                    new FittingClashSolidProvider<CeilingAndFloor>(clash, new ZeroAngleFinder()),
+                    new FittingClashSolidProvider<CeilingAndFloor>(clash, new FittingFloorAngleFinder(clash.Element1)),
                     pointFinder,
                     levelFinder,
                     clash.Element1,
