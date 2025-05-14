@@ -22,7 +22,7 @@
     <system:String x:Key="MainWindow.ToolTipRemove">Remove server</system:String>
     <system:String x:Key="MainWindow.ConfirmTitle">Delete Confirmation</system:String>
     <system:String x:Key="MainWindow.ConfirmDeleteServer">Are you sure you want to delete the selected server?</system:String>
-	<system:String x:Key="MainWindow.PlaceholderServerName">Enter the server name</system:String>
+    <system:String x:Key="MainWindow.PlaceholderServerName">Enter the server name</system:String>
 	<system:String x:Key="MainWindow.ToolTipConfirmConfig">Finish configuration setup</system:String>
 	<system:String x:Key="MainWindow.ToolTipCancelConfig">Cancel configuration setup</system:String>
     <system:String x:Key="RsnConfigService.EmptyServerList">Server list is empty or not specified.</system:String>
