@@ -8,7 +8,6 @@
     xmlns:local="clr-namespace:RevitPluginTemplate.Views"
     xmlns:vms="clr-namespace:RevitPluginTemplate.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:conv="clr-namespace:RevitPluginTemplate.Converters"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
@@ -24,10 +23,6 @@
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <Window.Resources>
-        <conv:EnumToBoolConverter x:Key="EnumToBoolConverter" />
-    </Window.Resources>
-
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
@@ -36,8 +31,6 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -62,7 +55,7 @@
                 Width="80"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
-                Click="ButtonOk_OnClick"
+                Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
 			<ui:Button
