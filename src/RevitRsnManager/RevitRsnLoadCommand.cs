@@ -94,7 +94,7 @@ public class RevitRsnLoadCommand : BasePluginCommand {
 
         var servers = pluginConfig.Servers;
 
-        if(servers?.Count() > 0) {
+        if(servers?.Count > 0) {
             var updateSuccess = localizationService.GetLocalizedString("MainWindow.UpdateSuccess");
             var updateSuccessTitle = localizationService.GetLocalizedString("MainWindow.UpdateSuccessTitle");
 
