@@ -19,7 +19,8 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.AngleFinders {
 
         public Rotates GetAngle() {
             var horizConnector = _fitting.GetConnectors()?
-                .FirstOrDefault(c => c.CoordinateSystem.BasisZ.IsAlmostEqualTo(XYZ.BasisZ));
+                .FirstOrDefault(c => c.CoordinateSystem.BasisZ.IsAlmostEqualTo(XYZ.BasisZ)
+                    || c.CoordinateSystem.BasisZ.Negate().IsAlmostEqualTo(XYZ.BasisZ));
             if(horizConnector != null) {
                 return new Rotates(0, 0, XYZ.BasisX.AngleOnPlaneTo(horizConnector.CoordinateSystem.BasisX, XYZ.BasisZ));
             } else {
