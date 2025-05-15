@@ -238,7 +238,7 @@ namespace RevitOpeningPlacement.OpeningModels {
                 .Select(str => str.Split(':')
                     .Select(item => item.Trim())
                     .Where(value => !string.IsNullOrWhiteSpace(value)))
-                .Where(arr => arr.Count() > 2)
+                .Where(arr => arr.Count() >= 2)
                 .Select(arr => new {
                     FileName = arr.First(),
 #if REVIT_2024_OR_GREATER
