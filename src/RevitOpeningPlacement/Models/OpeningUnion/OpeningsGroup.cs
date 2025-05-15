@@ -38,19 +38,10 @@ namespace RevitOpeningPlacement.Models.OpeningUnion {
 
 
         /// <summary>
-        /// Возвращает трансформацию группы заданий на отверстия по самому большому заданию на отверстие.
-        /// Если среди заданий на отверстия есть такие, которые были созданы для линейных элементов ВИС, 
-        /// то трансформация будет браться по самому большому заданию для линейного элемента ВИС.
-        /// 
-        /// Отдельная логика для заданий по линейным элементам нужна для лучшего определения трансформации 
-        /// объединенного задания на отверстие, если объединяются задания в плитах. 
-        /// Например, если объединяется задание на отверстие под соединительную деталь воздуховодов и под воздуховод,
-        /// то трансформация должна быть как у задания под воздуховод.
+        /// Возвращает трансформацию группы заданий на отверстия по самому большому элементу
         /// </summary>
         public Transform GetTransform() {
-            var tasksForLinearElements = _elements.Where(task => task.IsForLinearMepCategory());
-            var tasks = tasksForLinearElements.Any() ? tasksForLinearElements : _elements;
-            return tasks
+            return _elements
                 .OrderByDescending(o => o.GetSolid()?.Volume ?? 0)
                 .FirstOrDefault()
                 ?.GetFamilyInstance()

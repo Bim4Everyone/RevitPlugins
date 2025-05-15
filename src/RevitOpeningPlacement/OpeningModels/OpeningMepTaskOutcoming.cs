@@ -8,7 +8,6 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
-using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models;
@@ -225,52 +224,6 @@ namespace RevitOpeningPlacement.OpeningModels {
                 Min = minExtended,
                 Max = maxExtended
             };
-        }
-
-        /// <summary>
-        /// Возвращает коллекцию элементов, по которым было создано задание на отверстие.
-        /// Информация об элементах записывается в параметр ФОП_Описание.
-        /// <seealso cref="Models.OpeningPlacement.ValueGetters.DescriptionValueGetter">Формат записи</seealso>
-        /// </summary>
-        /// <returns>Коллекция элементов, по которым было создано текущее задание на отверстие.</returns>
-        public ICollection<ElementModel> GetDependentElements() {
-            return Description.Split(';')
-                .Select(str => str.Split(':')
-                    .Select(item => item.Trim())
-                    .Where(value => !string.IsNullOrWhiteSpace(value)))
-                .Where(arr => arr.Count() >= 2)
-                .Select(arr => new {
-                    FileName = arr.First(),
-#if REVIT_2024_OR_GREATER
-                    Id = long.TryParse(arr.Last(), out long id) ? id : -1
-#else
-                    Id = int.TryParse(arr.Last(), out int id) ? id : -1
-#endif
-                })
-                .Where(el => el.Id > 0)
-                .Select(el => new ElementModel() {
-                    DocumentName = RevitClashDetective.Models.RevitRepository.GetDocumentName(el.FileName),
-                    Id = new ElementId(el.Id)
-                })
-                .ToArray();
-        }
-
-        /// <summary>
-        /// Проверяет, создавалось ли задание на отверстие в том числе и для линейного элемента ВИС 
-        /// (трубы, воздуховоды, кабельные лотки, короба).
-        /// </summary>
-        /// <returns>True, если задание на отверстие создавалось в том числе для линейного элемента, иначе False</returns>
-        public bool IsForLinearMepCategory() {
-            var doc = _familyInstance.Document;
-            var docTitle = RevitClashDetective.Models.RevitRepository.GetDocumentName(doc);
-            return GetDependentElements()
-                .Where(el => el.DocumentName.Equals(docTitle, StringComparison.CurrentCultureIgnoreCase))
-                .Select(el => doc.GetElement(el.Id))
-                .Any(el => el != null && el.InAnyCategory(
-                    RevitRepository.MepPipeLinearCategory,
-                    RevitRepository.MepDuctLinearCategory,
-                    RevitRepository.MepConduitLinearCategory,
-                    RevitRepository.MepCableTrayLinearCategory));
         }
 
         /// <summary>
