@@ -17,6 +17,7 @@ namespace RevitClashDetective.Models.Clashes {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())
                 .SetPluginName(nameof(RevitClashDetective))
+                .SetProfilePath(RevitRepository.LocalProfilePath)
                 .SetRelativePath(revitObjectName)
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(configName + ".json")
