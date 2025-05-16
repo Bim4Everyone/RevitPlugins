@@ -16,6 +16,8 @@ namespace RevitClashDetective.Models {
 
         private string _revitVersion;
 
+        private string _profilePath;
+
         public ProjectConfigBuilder SetPluginName(string pluginName) {
             _pluginName = pluginName;
             return this;
@@ -38,6 +40,11 @@ namespace RevitClashDetective.Models {
 
         public ProjectConfigBuilder SetRevitVersion(string revitVersion) {
             _revitVersion = revitVersion;
+            return this;
+        }
+
+        public ProjectConfigBuilder SetProfilePath(string profilePath) {
+            _profilePath = profilePath;
             return this;
         }
 
@@ -76,11 +83,11 @@ namespace RevitClashDetective.Models {
             return new T() { Serializer = _serializer, ProjectConfigPath = projectConfigPath };
         }
 
-        private static string GetConfigPath(string pluginName, string projectConfigName, string revitVersion) {
-            string _profilePath = RevitRepository.ProfilePath;
+        private string GetConfigPath(string pluginName, string projectConfigName, string revitVersion) {
+            string profilePath = string.IsNullOrWhiteSpace(_profilePath) ? RevitRepository.ProfilePath : _profilePath;
             return string.IsNullOrEmpty(revitVersion)
-                ? Path.Combine(_profilePath, pluginName, projectConfigName)
-                : Path.Combine(_profilePath, revitVersion, pluginName, projectConfigName);
+                ? Path.Combine(profilePath, pluginName, projectConfigName)
+                : Path.Combine(profilePath, revitVersion, pluginName, projectConfigName);
         }
     }
 }

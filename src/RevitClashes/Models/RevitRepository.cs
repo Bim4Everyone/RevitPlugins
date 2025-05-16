@@ -78,9 +78,15 @@ namespace RevitClashDetective.Models {
             get {
                 var path = @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
                 if(!Directory.Exists(path)) {
-                    path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep");
+                    path = LocalProfilePath;
                 }
                 return path;
+            }
+        }
+
+        public static string LocalProfilePath {
+            get {
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep");
             }
         }
 
@@ -607,19 +613,19 @@ namespace RevitClashDetective.Models {
                         $"{FiltersNamePrefix}не_элементы_категории_коллизии_{username}"));
             } else {
                 if(firstEl != null) {
-                filters.Add(
-                    _parameterFilterProvider.GetHighlightFilter(
-                        _document,
-                        firstEl,
-                        $"{FiltersNamePrefix}не_первый_элемент_{username}"));
+                    filters.Add(
+                        _parameterFilterProvider.GetHighlightFilter(
+                            _document,
+                            firstEl,
+                            $"{FiltersNamePrefix}не_первый_элемент_{username}"));
                 }
                 if(secondEl != null) {
-                filters.Add(
-                    _parameterFilterProvider.GetHighlightFilter(
-                        _document,
-                        secondEl,
-                        $"{FiltersNamePrefix}не_второй_элемент_{username}"));
-            }
+                    filters.Add(
+                        _parameterFilterProvider.GetHighlightFilter(
+                            _document,
+                            secondEl,
+                            $"{FiltersNamePrefix}не_второй_элемент_{username}"));
+                }
             }
             return filters;
         }
