@@ -58,7 +58,7 @@ namespace RevitDeclarations.Models {
         [JsonProperty("area_non_summer")]
         public double AreaNonSummer => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaNonSumParam, _accuracyForArea);
         [JsonProperty("room_size")]
-        public int RoomsAmount => _firstRoom.GetIntParamValue(_settings.RoomsAmountParam);
+        public double RoomsAmount => _firstRoom.GetIntAndCurrencyParamValue(_settings.RoomsAmountParam);
         [JsonProperty("building_number")]
         public string BuildingNumber => _firstRoom.GetTextParamValue(_settings.BuildingNumberParam);
         [JsonProperty("construction_works")]
