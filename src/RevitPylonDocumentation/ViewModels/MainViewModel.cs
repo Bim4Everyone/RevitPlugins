@@ -31,8 +31,11 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _selectedProjectSection = string.Empty;
         private ViewFamilyType _selectedViewFamilyType;
         private View _selectedGeneralViewTemplate;
+        private View _selectedGeneralRebarViewTemplate;
         private View _selectedTransverseViewTemplate;
+        private View _selectedTransverseRebarViewTemplate;
         private View _selectedLegend;
+        private View _selectedRebarNode;
         private FamilySymbol _selectedTitleBlock;
         private List<PylonSheetInfo> _selectedHostsInfo = new List<PylonSheetInfo>();
 
@@ -76,6 +79,7 @@ namespace RevitPylonDocumentation.ViewModels {
 
             SelectAllFuncInGUICommand = RelayCommand.Create(SelectAllFuncInGUI);
             UnselectAllFuncInGUICommand = RelayCommand.Create(UnselectAllFuncInGUI);
+            InvertAllFuncInGUICommand = RelayCommand.Create(InvertAllFuncInGUI);
         }
 
 
@@ -93,6 +97,7 @@ namespace RevitPylonDocumentation.ViewModels {
         public ICommand UnselectAllHostsInfoInGUICommand { get; }
         public ICommand SelectAllFuncInGUICommand { get; }
         public ICommand UnselectAllFuncInGUICommand { get; }
+        public ICommand InvertAllFuncInGUICommand { get; }
 
         /// <summary>
         /// Настройки выбора пользователя (с какими компонентами должен работать плагин) с предыдущего сеанса
@@ -176,6 +181,17 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         /// <summary>
+        /// Выбранная пользователем легенда
+        /// </summary>
+        public View SelectedRebarNode {
+            get => _selectedRebarNode;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedRebarNode, value);
+                ProjectSettings.RebarNodeNameTemp = value?.Name;
+            }
+        }
+
+        /// <summary>
         /// Типоразмеры видов, имеющиеся в проекте
         /// </summary>
         public List<ViewFamilyType> ViewFamilyTypes { get; set; } = new List<ViewFamilyType>();
@@ -208,6 +224,17 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         /// <summary>
+        /// Выбранный пользователем шаблон вида основных видов армирования
+        /// </summary>
+        public View SelectedGeneralRebarViewTemplate {
+            get => _selectedGeneralRebarViewTemplate;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedGeneralRebarViewTemplate, value);
+                ViewSectionSettings.GeneralRebarViewTemplateNameTemp = value?.Name;
+            }
+        }
+
+        /// <summary>
         /// Выбранный пользователем шаблон вида поперечных видов
         /// </summary>
         public View SelectedTransverseViewTemplate {
@@ -215,6 +242,17 @@ namespace RevitPylonDocumentation.ViewModels {
             set {
                 this.RaiseAndSetIfChanged(ref _selectedTransverseViewTemplate, value);
                 ViewSectionSettings.TransverseViewTemplateNameTemp = value?.Name;
+            }
+        }
+
+        /// <summary>
+        /// Выбранный пользователем шаблон вида поперечных видов армирования
+        /// </summary>
+        public View SelectedTransverseRebarViewTemplate {
+            get => _selectedTransverseRebarViewTemplate;
+            set {
+                this.RaiseAndSetIfChanged(ref _selectedTransverseRebarViewTemplate, value);
+                ViewSectionSettings.TransverseRebarViewTemplateNameTemp = value?.Name;
             }
         }
 
@@ -249,6 +287,16 @@ namespace RevitPylonDocumentation.ViewModels {
         /// Эталонная ведомость деталей для IFC арматуры
         /// </summary>
         public ViewSchedule ReferenceIfcPartsSchedule { get; set; }
+
+        /// <summary>
+        /// Эталонная спецификация арматуры
+        /// </summary>
+        public ViewSchedule ReferenceSkeletonSchedule { get; set; }
+
+        /// <summary>
+        /// Эталонная спецификация арматуры
+        /// </summary>
+        public ViewSchedule ReferenceSkeletonByElemsSchedule { get; set; }
 
         /// <summary>
         /// Фильтр списка марок пилонов
@@ -389,12 +437,18 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithTransverseViewFirst = false;
             SelectionSettings.NeedWorkWithTransverseViewSecond = false;
             SelectionSettings.NeedWorkWithTransverseViewThird = false;
-
             SelectionSettings.NeedWorkWithRebarSchedule = false;
             SelectionSettings.NeedWorkWithMaterialSchedule = false;
             SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
             SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
             SelectionSettings.NeedWorkWithLegend = false;
+            SelectionSettings.NeedWorkWithGeneralRebarView = false;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
+            SelectionSettings.NeedWorkWithTransverseRebarViewFirst = false;
+            SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
+            SelectionSettings.NeedWorkWithSkeletonSchedule = false;
+            SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
+            SelectionSettings.NeedWorkWithRebarNode = false;
 
             MainWindow mainWindow = new MainWindow();
             mainWindow.DataContext = this;
@@ -420,9 +474,12 @@ namespace RevitPylonDocumentation.ViewModels {
             FindReferenceSchedules();
 
             FindGeneralViewTemplate();
+            FindGeneralRebarViewTemplate();
             FindTransverseViewTemplate();
+            FindTransverseRebarViewTemplate();
             FindViewFamilyType();
             FindLegend();
+            FindRebarNode();
             FindTitleBlock();
 
             _settingsEdited = false;
@@ -444,13 +501,28 @@ namespace RevitPylonDocumentation.ViewModels {
                 return;
             }
 
+            if(SelectedGeneralRebarViewTemplate is null) {
+                ErrorText = "Не выбран шаблон основных видов армирования";
+                return;
+            }
+
             if(SelectedTransverseViewTemplate is null) {
                 ErrorText = "Не выбран шаблон поперечных видов";
                 return;
             }
 
+            if(SelectedTransverseRebarViewTemplate is null) {
+                ErrorText = "Не выбран шаблон поперечных видов армирования";
+                return;
+            }
+
             if(SelectedLegend is null) {
                 ErrorText = "Не выбрана легенда примечаний";
+                return;
+            }
+
+            if(SelectedRebarNode is null) {
+                ErrorText = "Не выбран узел армирования";
                 return;
             }
 
@@ -494,10 +566,17 @@ namespace RevitPylonDocumentation.ViewModels {
                     sch.Name.Equals(SchedulesSettings.MaterialScheduleName)) as ViewSchedule;
             ReferenceSystemPartsSchedule =
                 _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
-                    sch.Name.Equals(SchedulesSettings.SytemPartsScheduleName)) as ViewSchedule;
+                    sch.Name.Equals(SchedulesSettings.SystemPartsScheduleName)) as ViewSchedule;
             ReferenceIfcPartsSchedule =
                 _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
                     sch.Name.Equals(SchedulesSettings.IfcPartsScheduleName)) as ViewSchedule;
+
+            ReferenceSkeletonSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.SkeletonScheduleName)) as ViewSchedule;
+            ReferenceSkeletonByElemsSchedule =
+                _revitRepository.AllScheduleViews.FirstOrDefault(sch =>
+                    sch.Name.Equals(SchedulesSettings.SkeletonByElemsScheduleName)) as ViewSchedule;
         }
 
         /// <summary>
@@ -511,12 +590,32 @@ namespace RevitPylonDocumentation.ViewModels {
         }
 
         /// <summary>
+        /// Получает шаблон для основных видов армирования по имени
+        /// </summary>
+        public void FindGeneralRebarViewTemplate() {
+            if(ViewSectionSettings.GeneralRebarViewTemplateName != string.Empty) {
+                SelectedGeneralRebarViewTemplate = ViewTemplatesInPj
+                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.GeneralRebarViewTemplateName));
+            }
+        }
+
+        /// <summary>
         /// Получает шаблон для поперечных видов по имени
         /// </summary>
         public void FindTransverseViewTemplate() {
             if(ViewSectionSettings.TransverseViewTemplateName != string.Empty) {
                 SelectedTransverseViewTemplate = ViewTemplatesInPj
                     .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseViewTemplateName));
+            }
+        }
+
+        /// <summary>
+        /// Получает шаблон для поперечных видов армирования по имени
+        /// </summary>
+        public void FindTransverseRebarViewTemplate() {
+            if(ViewSectionSettings.TransverseRebarViewTemplateName != string.Empty) {
+                SelectedTransverseRebarViewTemplate = ViewTemplatesInPj
+                    .FirstOrDefault(view => view.Name.Equals(ViewSectionSettings.TransverseRebarViewTemplateName));
             }
         }
 
@@ -537,6 +636,16 @@ namespace RevitPylonDocumentation.ViewModels {
             if(ProjectSettings.LegendName != string.Empty) {
                 SelectedLegend = Legends
                     .FirstOrDefault(view => view.Name.Contains(ProjectSettings.LegendName));
+            }
+        }
+
+        /// <summary>
+        /// Получает легенду узла армирования по имени
+        /// </summary>
+        public void FindRebarNode() {
+            if(ProjectSettings.RebarNodeName != string.Empty) {
+                SelectedRebarNode = Legends
+                    .FirstOrDefault(view => view.Name.Contains(ProjectSettings.RebarNodeName));
             }
         }
 
@@ -672,6 +781,13 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithSystemPartsSchedule = true;
             SelectionSettings.NeedWorkWithIfcPartsSchedule = true;
             SelectionSettings.NeedWorkWithLegend = true;
+            SelectionSettings.NeedWorkWithGeneralRebarView = true;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = true;
+            SelectionSettings.NeedWorkWithTransverseRebarViewFirst = true;
+            SelectionSettings.NeedWorkWithTransverseRebarViewSecond = true;
+            SelectionSettings.NeedWorkWithSkeletonSchedule = true;
+            SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = true;
+            SelectionSettings.NeedWorkWithRebarNode = true;
         }
 
 
@@ -690,6 +806,38 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithSystemPartsSchedule = false;
             SelectionSettings.NeedWorkWithIfcPartsSchedule = false;
             SelectionSettings.NeedWorkWithLegend = false;
+            SelectionSettings.NeedWorkWithGeneralRebarView = false;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = false;
+            SelectionSettings.NeedWorkWithTransverseRebarViewFirst = false;
+            SelectionSettings.NeedWorkWithTransverseRebarViewSecond = false;
+            SelectionSettings.NeedWorkWithSkeletonSchedule = false;
+            SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
+            SelectionSettings.NeedWorkWithRebarNode = false;
+        }
+
+
+        /// <summary>
+        /// Инвертирует галки выбора у всех, доступных для создания, видимых в GUI.
+        /// Отрабатывает при нажатии на кнопку "Инвертировать" возле списка тумблеров в GUI
+        /// </summary>
+        private void InvertAllFuncInGUI() {
+            SelectionSettings.NeedWorkWithGeneralView = !SelectionSettings.NeedWorkWithGeneralView;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularView = !SelectionSettings.NeedWorkWithGeneralPerpendicularView;
+            SelectionSettings.NeedWorkWithTransverseViewFirst = !SelectionSettings.NeedWorkWithTransverseViewFirst;
+            SelectionSettings.NeedWorkWithTransverseViewSecond = !SelectionSettings.NeedWorkWithTransverseViewSecond;
+            SelectionSettings.NeedWorkWithTransverseViewThird = !SelectionSettings.NeedWorkWithTransverseViewThird;
+            SelectionSettings.NeedWorkWithRebarSchedule = !SelectionSettings.NeedWorkWithRebarSchedule;
+            SelectionSettings.NeedWorkWithMaterialSchedule = !SelectionSettings.NeedWorkWithMaterialSchedule;
+            SelectionSettings.NeedWorkWithSystemPartsSchedule = !SelectionSettings.NeedWorkWithSystemPartsSchedule;
+            SelectionSettings.NeedWorkWithIfcPartsSchedule = !SelectionSettings.NeedWorkWithIfcPartsSchedule;
+            SelectionSettings.NeedWorkWithLegend = !SelectionSettings.NeedWorkWithLegend;
+            SelectionSettings.NeedWorkWithGeneralRebarView = !SelectionSettings.NeedWorkWithGeneralRebarView;
+            SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView = !SelectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
+            SelectionSettings.NeedWorkWithTransverseRebarViewFirst = !SelectionSettings.NeedWorkWithTransverseRebarViewFirst;
+            SelectionSettings.NeedWorkWithTransverseRebarViewSecond = !SelectionSettings.NeedWorkWithTransverseRebarViewSecond;
+            SelectionSettings.NeedWorkWithSkeletonSchedule = !SelectionSettings.NeedWorkWithSkeletonSchedule;
+            SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = !SelectionSettings.NeedWorkWithSkeletonByElemsSchedule;
+            SelectionSettings.NeedWorkWithRebarNode = !SelectionSettings.NeedWorkWithRebarNode;
         }
     }
 }

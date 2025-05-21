@@ -10,6 +10,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             SheetInfo = pylonSheetInfo;
 
             ViewSectionCreator = new PylonViewSectionCreator(mvm, repository, pylonSheetInfo);
+            ViewDimensionCreator = new PylonViewDimensionCreator(mvm, repository, pylonSheetInfo);
+            ViewMarkCreator = new PylonViewMarkCreator(mvm, repository, pylonSheetInfo, this);
             ViewScheduleCreator = new PylonViewScheduleCreator(mvm, repository, pylonSheetInfo);
 
             ViewSectionPlacer = new PylonViewSectionPlacer(mvm, repository, pylonSheetInfo);
@@ -42,6 +44,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
 
         public PylonViewSectionCreator ViewSectionCreator { get; set; }
+        public PylonViewDimensionCreator ViewDimensionCreator { get; set; }
+        public PylonViewMarkCreator ViewMarkCreator { get; set; }
         public PylonViewScheduleCreator ViewScheduleCreator { get; set; }
         public PylonViewSectionPlacer ViewSectionPlacer { get; set; }
         public PylonViewSchedulePlacer ViewSchedulePlacer { get; set; }

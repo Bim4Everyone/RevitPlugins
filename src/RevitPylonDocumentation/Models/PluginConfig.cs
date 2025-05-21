@@ -41,6 +41,13 @@ namespace RevitPylonDocumentation.Models {
             selectionSettings.NeedWorkWithSystemPartsSchedule = settings.NeedWorkWithSystemPartsSchedule;
             selectionSettings.NeedWorkWithIfcPartsSchedule = settings.NeedWorkWithIfcPartsSchedule;
             selectionSettings.NeedWorkWithLegend = settings.NeedWorkWithLegend;
+            selectionSettings.NeedWorkWithGeneralRebarView = settings.NeedWorkWithGeneralRebarView;
+            selectionSettings.NeedWorkWithGeneralPerpendicularRebarView = settings.NeedWorkWithGeneralPerpendicularRebarView;
+            selectionSettings.NeedWorkWithTransverseRebarViewFirst = settings.NeedWorkWithTransverseRebarViewFirst;
+            selectionSettings.NeedWorkWithTransverseRebarViewSecond = settings.NeedWorkWithTransverseRebarViewSecond;
+            selectionSettings.NeedWorkWithSkeletonSchedule = settings.NeedWorkWithSkeletonSchedule;
+            selectionSettings.NeedWorkWithSkeletonByElemsSchedule = settings.NeedWorkWithSkeletonByElemsSchedule;
+            selectionSettings.NeedWorkWithRebarNode = settings.NeedWorkWithRebarNode;
 
             projectSettings.ProjectSection = settings.ProjectSection;
             projectSettings.ProjectSectionTemp = settings.ProjectSection;
@@ -76,7 +83,6 @@ namespace RevitPylonDocumentation.Models {
             projectSettings.LegendXOffset = settings.LegendXOffset;
             projectSettings.LegendXOffsetTemp = settings.LegendXOffset;
             projectSettings.LegendYOffset = settings.LegendYOffset;
-            projectSettings.LegendYOffsetTemp = settings.LegendYOffset;
 
             viewSectionSettings.GeneralViewPrefix = settings.GeneralViewPrefix;
             viewSectionSettings.GeneralViewPrefixTemp = settings.GeneralViewPrefix;
@@ -88,7 +94,16 @@ namespace RevitPylonDocumentation.Models {
             viewSectionSettings.GeneralViewPerpendicularSuffixTemp = settings.GeneralViewPerpendicularSuffix;
             viewSectionSettings.GeneralViewTemplateName = settings.GeneralViewTemplateName;
             viewSectionSettings.GeneralViewTemplateNameTemp = settings.GeneralViewTemplateName;
+            viewSectionSettings.GeneralRebarViewTemplateName = settings.GeneralRebarViewTemplateName;
+            viewSectionSettings.GeneralRebarViewTemplateNameTemp = settings.GeneralRebarViewTemplateName;
 
+            projectSettings.RebarNodeYOffsetTemp = settings.RebarNodeYOffset;
+            projectSettings.RebarNodeName = settings.RebarNodeName;
+            projectSettings.RebarNodeNameTemp = settings.RebarNodeName;
+            projectSettings.RebarNodeXOffset = settings.RebarNodeXOffset;
+            projectSettings.RebarNodeXOffsetTemp = settings.RebarNodeXOffset;
+            projectSettings.RebarNodeYOffset = settings.RebarNodeYOffset;
+            projectSettings.RebarNodeYOffsetTemp = settings.RebarNodeYOffset;
 
 
             viewSectionSettings.GeneralViewXOffset = settings.GeneralViewXOffset;
@@ -118,6 +133,8 @@ namespace RevitPylonDocumentation.Models {
             viewSectionSettings.TransverseViewThirdElevationTemp = settings.TransverseViewThirdElevation;
             viewSectionSettings.TransverseViewTemplateName = settings.TransverseViewTemplateName;
             viewSectionSettings.TransverseViewTemplateNameTemp = settings.TransverseViewTemplateName;
+            viewSectionSettings.TransverseRebarViewTemplateName = settings.TransverseRebarViewTemplateName;
+            viewSectionSettings.TransverseRebarViewTemplateNameTemp = settings.TransverseRebarViewTemplateName;
 
             viewSectionSettings.TransverseViewXOffset = settings.TransverseViewXOffset;
             viewSectionSettings.TransverseViewXOffsetTemp = settings.TransverseViewXOffset;
@@ -131,6 +148,15 @@ namespace RevitPylonDocumentation.Models {
             schedulesSettings.RebarSchedulePrefixTemp = settings.RebarSchedulePrefix;
             schedulesSettings.RebarScheduleSuffix = settings.RebarScheduleSuffix;
             schedulesSettings.RebarScheduleSuffixTemp = settings.RebarScheduleSuffix;
+
+            schedulesSettings.SkeletonSchedulePrefix = settings.SkeletonSchedulePrefix;
+            schedulesSettings.SkeletonSchedulePrefixTemp = settings.SkeletonSchedulePrefix;
+            schedulesSettings.SkeletonScheduleSuffix = settings.SkeletonScheduleSuffix;
+            schedulesSettings.SkeletonScheduleSuffixTemp = settings.SkeletonScheduleSuffix;
+            schedulesSettings.SkeletonByElemsSchedulePrefix = settings.SkeletonByElemsSchedulePrefix;
+            schedulesSettings.SkeletonByElemsSchedulePrefixTemp = settings.SkeletonByElemsSchedulePrefix;
+            schedulesSettings.SkeletonByElemsScheduleSuffix = settings.SkeletonByElemsScheduleSuffix;
+            schedulesSettings.SkeletonByElemsScheduleSuffixTemp = settings.SkeletonByElemsScheduleSuffix;
 
             schedulesSettings.MaterialSchedulePrefix = settings.MaterialSchedulePrefix;
             schedulesSettings.MaterialSchedulePrefixTemp = settings.MaterialSchedulePrefix;
@@ -149,15 +175,27 @@ namespace RevitPylonDocumentation.Models {
 
             schedulesSettings.RebarScheduleName = settings.RebarScheduleName;
             schedulesSettings.RebarScheduleNameTemp = settings.RebarScheduleName;
+
+            schedulesSettings.SkeletonScheduleName = settings.SkeletonScheduleName;
+            schedulesSettings.SkeletonScheduleNameTemp = settings.SkeletonScheduleName;
+            schedulesSettings.SkeletonByElemsScheduleName = settings.SkeletonByElemsScheduleName;
+            schedulesSettings.SkeletonByElemsScheduleNameTemp = settings.SkeletonByElemsScheduleName;
+
             schedulesSettings.MaterialScheduleName = settings.MaterialScheduleName;
             schedulesSettings.MaterialScheduleNameTemp = settings.MaterialScheduleName;
-            schedulesSettings.SytemPartsScheduleName = settings.SystemPartsScheduleName;
-            schedulesSettings.SytemPartsScheduleNameTemp = settings.SystemPartsScheduleName;
+            schedulesSettings.SystemPartsScheduleName = settings.SystemPartsScheduleName;
+            schedulesSettings.SystemPartsScheduleNameTemp = settings.SystemPartsScheduleName;
             schedulesSettings.IfcPartsScheduleName = settings.IfcPartsScheduleName;
             schedulesSettings.IfcPartsScheduleNameTemp = settings.IfcPartsScheduleName;
 
             schedulesSettings.RebarScheduleDisp1 = settings.RebarScheduleDisp1;
             schedulesSettings.RebarScheduleDisp1Temp = settings.RebarScheduleDisp1;
+
+            schedulesSettings.SkeletonScheduleDisp1 = settings.SkeletonScheduleDisp1;
+            schedulesSettings.SkeletonScheduleDisp1Temp = settings.SkeletonScheduleDisp1;
+            schedulesSettings.SkeletonByElemsScheduleDisp1 = settings.SkeletonByElemsScheduleDisp1;
+            schedulesSettings.SkeletonByElemsScheduleDisp1Temp = settings.SkeletonByElemsScheduleDisp1;
+
             schedulesSettings.MaterialScheduleDisp1 = settings.MaterialScheduleDisp1;
             schedulesSettings.MaterialScheduleDisp1Temp = settings.MaterialScheduleDisp1;
             schedulesSettings.SystemPartsScheduleDisp1 = settings.SystemPartsScheduleDisp1;
@@ -166,6 +204,12 @@ namespace RevitPylonDocumentation.Models {
             schedulesSettings.IfcPartsScheduleDisp1Temp = settings.IfcPartsScheduleDisp1;
             schedulesSettings.RebarScheduleDisp2 = settings.RebarScheduleDisp2;
             schedulesSettings.RebarScheduleDisp2Temp = settings.RebarScheduleDisp2;
+
+            schedulesSettings.SkeletonScheduleDisp2 = settings.SkeletonScheduleDisp2;
+            schedulesSettings.SkeletonScheduleDisp2Temp = settings.SkeletonScheduleDisp2;
+            schedulesSettings.SkeletonByElemsScheduleDisp2 = settings.SkeletonByElemsScheduleDisp2;
+            schedulesSettings.SkeletonByElemsScheduleDisp2Temp = settings.SkeletonByElemsScheduleDisp2;
+
             schedulesSettings.MaterialScheduleDisp2 = settings.MaterialScheduleDisp2;
             schedulesSettings.MaterialScheduleDisp2Temp = settings.MaterialScheduleDisp2;
             schedulesSettings.SystemPartsScheduleDisp2 = settings.SystemPartsScheduleDisp2;
@@ -193,6 +237,13 @@ namespace RevitPylonDocumentation.Models {
             settings.NeedWorkWithSystemPartsSchedule = selectionSettings.NeedWorkWithSystemPartsSchedule;
             settings.NeedWorkWithIfcPartsSchedule = selectionSettings.NeedWorkWithIfcPartsSchedule;
             settings.NeedWorkWithLegend = selectionSettings.NeedWorkWithLegend;
+            settings.NeedWorkWithGeneralRebarView = selectionSettings.NeedWorkWithGeneralRebarView;
+            settings.NeedWorkWithGeneralPerpendicularRebarView = selectionSettings.NeedWorkWithGeneralPerpendicularRebarView;
+            settings.NeedWorkWithTransverseRebarViewFirst = selectionSettings.NeedWorkWithTransverseRebarViewFirst;
+            settings.NeedWorkWithTransverseRebarViewSecond = selectionSettings.NeedWorkWithTransverseRebarViewSecond;
+            settings.NeedWorkWithSkeletonSchedule = selectionSettings.NeedWorkWithSkeletonSchedule;
+            settings.NeedWorkWithSkeletonByElemsSchedule = selectionSettings.NeedWorkWithSkeletonByElemsSchedule;
+            settings.NeedWorkWithRebarNode = selectionSettings.NeedWorkWithRebarNode;
 
             settings.ProjectSection = projectSettings.ProjectSection;
             settings.Mark = projectSettings.Mark;
@@ -220,6 +271,7 @@ namespace RevitPylonDocumentation.Models {
             settings.GeneralViewPerpendicularPrefix = viewSectionSettings.GeneralViewPerpendicularPrefix;
             settings.GeneralViewPerpendicularSuffix = viewSectionSettings.GeneralViewPerpendicularSuffix;
             settings.GeneralViewTemplateName = viewSectionSettings.GeneralViewTemplateName;
+            settings.GeneralRebarViewTemplateName = viewSectionSettings.GeneralRebarViewTemplateName;
             settings.GeneralViewXOffset = viewSectionSettings.GeneralViewXOffset;
             settings.GeneralViewYTopOffset = viewSectionSettings.GeneralViewYTopOffset;
             settings.GeneralViewYBottomOffset = viewSectionSettings.GeneralViewYBottomOffset;
@@ -234,6 +286,11 @@ namespace RevitPylonDocumentation.Models {
             settings.TransverseViewThirdSuffix = viewSectionSettings.TransverseViewThirdSuffix;
             settings.TransverseViewThirdElevation = viewSectionSettings.TransverseViewThirdElevation;
             settings.TransverseViewTemplateName = viewSectionSettings.TransverseViewTemplateName;
+            settings.TransverseRebarViewTemplateName = viewSectionSettings.TransverseRebarViewTemplateName;
+
+            settings.RebarNodeName = projectSettings.RebarNodeName;
+            settings.RebarNodeXOffset = projectSettings.RebarNodeXOffset;
+            settings.RebarNodeYOffset = projectSettings.RebarNodeYOffset;
 
             settings.TransverseViewXOffset = viewSectionSettings.TransverseViewXOffset;
             settings.TransverseViewYOffset = viewSectionSettings.TransverseViewYOffset;
@@ -242,6 +299,11 @@ namespace RevitPylonDocumentation.Models {
 
             settings.RebarSchedulePrefix = schedulesSettings.RebarSchedulePrefix;
             settings.RebarScheduleSuffix = schedulesSettings.RebarScheduleSuffix;
+
+            settings.SkeletonSchedulePrefix = schedulesSettings.SkeletonSchedulePrefix;
+            settings.SkeletonScheduleSuffix = schedulesSettings.SkeletonScheduleSuffix;
+            settings.SkeletonByElemsSchedulePrefix = schedulesSettings.SkeletonByElemsSchedulePrefix;
+            settings.SkeletonByElemsScheduleSuffix = schedulesSettings.SkeletonByElemsScheduleSuffix;
 
             settings.MaterialSchedulePrefix = schedulesSettings.MaterialSchedulePrefix;
             settings.MaterialScheduleSuffix = schedulesSettings.MaterialScheduleSuffix;
@@ -253,15 +315,27 @@ namespace RevitPylonDocumentation.Models {
             settings.IfcPartsScheduleSuffix = schedulesSettings.IfcPartsScheduleSuffix;
 
             settings.RebarScheduleName = schedulesSettings.RebarScheduleName;
+
+            settings.SkeletonScheduleName = schedulesSettings.SkeletonScheduleName;
+            settings.SkeletonByElemsScheduleName = schedulesSettings.SkeletonByElemsScheduleName;
+
             settings.MaterialScheduleName = schedulesSettings.MaterialScheduleName;
-            settings.SystemPartsScheduleName = schedulesSettings.SytemPartsScheduleName;
+            settings.SystemPartsScheduleName = schedulesSettings.SystemPartsScheduleName;
             settings.IfcPartsScheduleName = schedulesSettings.IfcPartsScheduleName;
 
             settings.RebarScheduleDisp1 = schedulesSettings.RebarScheduleDisp1;
+
+            settings.SkeletonScheduleDisp1 = schedulesSettings.SkeletonScheduleDisp1;
+            settings.SkeletonByElemsScheduleDisp1 = schedulesSettings.SkeletonByElemsScheduleDisp1;
+
             settings.MaterialScheduleDisp1 = schedulesSettings.MaterialScheduleDisp1;
             settings.SystemPartsScheduleDisp1 = schedulesSettings.SystemPartsScheduleDisp1;
             settings.IfcPartsScheduleDisp1 = schedulesSettings.IfcPartsScheduleDisp1;
             settings.RebarScheduleDisp2 = schedulesSettings.RebarScheduleDisp2;
+
+            settings.SkeletonScheduleDisp2 = schedulesSettings.SkeletonScheduleDisp2;
+            settings.SkeletonByElemsScheduleDisp2 = schedulesSettings.SkeletonByElemsScheduleDisp2;
+
             settings.MaterialScheduleDisp2 = schedulesSettings.MaterialScheduleDisp2;
             settings.SystemPartsScheduleDisp2 = schedulesSettings.SystemPartsScheduleDisp2;
             settings.IfcPartsScheduleDisp2 = schedulesSettings.IfcPartsScheduleDisp2;
@@ -283,6 +357,13 @@ namespace RevitPylonDocumentation.Models {
         public bool NeedWorkWithSystemPartsSchedule { get; set; }
         public bool NeedWorkWithIfcPartsSchedule { get; set; }
         public bool NeedWorkWithLegend { get; set; }
+        public bool NeedWorkWithGeneralRebarView { get; set; }
+        public bool NeedWorkWithGeneralPerpendicularRebarView { get; set; }
+        public bool NeedWorkWithTransverseRebarViewFirst { get; set; }
+        public bool NeedWorkWithTransverseRebarViewSecond { get; set; }
+        public bool NeedWorkWithSkeletonSchedule { get; set; }
+        public bool NeedWorkWithSkeletonByElemsSchedule { get; set; }
+        public bool NeedWorkWithRebarNode { get; set; }
 
 
         public string ProjectSection { get; set; }
@@ -306,6 +387,7 @@ namespace RevitPylonDocumentation.Models {
         public string GeneralViewPerpendicularPrefix { get; set; }
         public string GeneralViewPerpendicularSuffix { get; set; }
         public string GeneralViewTemplateName { get; set; }
+        public string GeneralRebarViewTemplateName { get; set; }
         public string GeneralViewXOffset { get; set; }
         public string GeneralViewYTopOffset { get; set; }
         public string GeneralViewYBottomOffset { get; set; }
@@ -319,11 +401,23 @@ namespace RevitPylonDocumentation.Models {
         public string TransverseViewThirdSuffix { get; set; }
         public string TransverseViewThirdElevation { get; set; }
         public string TransverseViewTemplateName { get; set; }
+        public string TransverseRebarViewTemplateName { get; set; }
+        public string TransverseRebarViewSecondTemplateName { get; set; }
         public string TransverseViewXOffset { get; set; }
         public string TransverseViewYOffset { get; set; }
         public string ViewFamilyTypeName { get; set; }
         public string RebarSchedulePrefix { get; set; }
         public string RebarScheduleSuffix { get; set; }
+
+        public string SkeletonSchedulePrefix { get; set; }
+        public string SkeletonScheduleSuffix { get; set; }
+        public string SkeletonByElemsSchedulePrefix { get; set; }
+        public string SkeletonByElemsScheduleSuffix { get; set; }
+
+        public string RebarNodeName { get; set; }
+        public string RebarNodeXOffset { get; set; }
+        public string RebarNodeYOffset { get; set; }
+
         public string MaterialSchedulePrefix { get; set; }
         public string MaterialScheduleSuffix { get; set; }
         public string SystemPartsSchedulePrefix { get; set; }
@@ -331,14 +425,26 @@ namespace RevitPylonDocumentation.Models {
         public string IfcPartsSchedulePrefix { get; set; }
         public string IfcPartsScheduleSuffix { get; set; }
         public string RebarScheduleName { get; set; }
+
+        public string SkeletonScheduleName { get; set; }
+        public string SkeletonByElemsScheduleName { get; set; }
+
         public string MaterialScheduleName { get; set; }
         public string SystemPartsScheduleName { get; set; }
         public string IfcPartsScheduleName { get; set; }
         public string RebarScheduleDisp1 { get; set; }
+
+        public string SkeletonScheduleDisp1 { get; set; }
+        public string SkeletonByElemsScheduleDisp1 { get; set; }
+
         public string MaterialScheduleDisp1 { get; set; }
         public string SystemPartsScheduleDisp1 { get; set; }
         public string IfcPartsScheduleDisp1 { get; set; }
         public string RebarScheduleDisp2 { get; set; }
+
+        public string SkeletonScheduleDisp2 { get; set; }
+        public string SkeletonByElemsScheduleDisp2 { get; set; }
+
         public string MaterialScheduleDisp2 { get; set; }
         public string SystemPartsScheduleDisp2 { get; set; }
         public string IfcPartsScheduleDisp2 { get; set; }
