@@ -38,19 +38,19 @@
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
-		
-		<StackPanel
-	        Grid.Row="1"
-	        Orientation="Horizontal"
-	        HorizontalAlignment="Right">
 
-			<ui:TextBlock
+        <StackPanel
+            Grid.Row="1"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <ui:TextBlock
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
-			<ui:Button
+            <ui:Button
                 Margin="10"
                 Width="80"
                 Appearance="Info"
@@ -58,12 +58,12 @@
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
-			<ui:Button
+            <ui:Button
                 Margin="10"
                 Width="80"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
-		</StackPanel>
+        </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>
