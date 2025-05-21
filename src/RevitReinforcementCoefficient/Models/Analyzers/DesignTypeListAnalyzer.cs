@@ -23,6 +23,10 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
         private readonly string _paramForRebarShell = "обр_ФОП_Форма_номер";
         private readonly int _paramValueForRebarShell = 10000;
 
+        // Если у опалубки марка бетона == 0, то их не считаем
+        private readonly string _paramForFormClass = "обр_ФОП_Марка бетона B";
+        private readonly double _paramValueForFormClass = 0;
+
         private List<Element> _elementsForAnalize;
         private readonly List<string> _paramsForAll;
 
@@ -69,6 +73,20 @@ namespace RevitReinforcementCoefficient.Models.Analyzers {
 
                     // Если значение параметра указывает, что это оболочка, то пропускаем, этот элемент не участвует в расчетах
                     if(_paramUtils.GetParamValueAnywhere<int>(element, _paramForRebarShell) == _paramValueForRebarShell) {
+                        continue;
+                    }
+                } else {
+                    // Если это опалубка, то необходимо проверить армируется ли она, если нет, то работать с ней не нужно
+                    // В соотвтетствии с ТЗ показателем того, что элемент несущий и будет армироваться является
+                    // значение марки бетона отличное от 0
+
+                    // Проверяем наличие параметра марки бетона у опалубки
+                    if(!_paramUtils.HasParamAnywhere(element, _paramForFormClass)) {
+                        continue;
+                    }
+
+                    // Если значение параметра указывает, что элемент не армируется, то этот элемент не участвует в расчетах
+                    if(_paramUtils.GetParamValueAnywhere<double>(element, _paramForFormClass) == _paramValueForFormClass) {
                         continue;
                     }
                 }
