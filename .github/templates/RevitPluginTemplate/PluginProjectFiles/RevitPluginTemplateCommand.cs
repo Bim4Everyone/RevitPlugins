@@ -56,13 +56,11 @@ public class RevitPluginTemplateCommand : BasePluginCommand {
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
         // Настройка запуска окна
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -70,8 +68,8 @@ public class RevitPluginTemplateCommand : BasePluginCommand {
 
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
-        kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         // Вызывает стандартное уведомление
