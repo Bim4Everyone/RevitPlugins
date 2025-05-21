@@ -1,0 +1,245 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="AllWindow.ButtonOk">OK</system:String>
+    <system:String
+        x:Key="AllWindow.ButtonCancel">Cancel</system:String>
+    <system:String
+        x:Key="MainWindow.Title">Sheets manager</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.Album">Album</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.TitleBlock">Title block</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.Count">Count</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.CreateButton">Create</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.SaveSheetsButtonTooltip">Save sheets to config file</system:String>
+    <system:String
+        x:Key="MainWindow.AddSheets.LoadSheetsButtonTooltip">Load sheets from config file</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Creation">Sheets creation</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration">Numeration</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.StartNumber">Start number</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Column">Column to number</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask">Number by mask</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.ToolTip"
+        xml:space="preserve">Automatically update number by mask 
+{Album}-{Custom number}</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.SyncSystemNumberByMask.Warning"
+        xml:space="preserve">Are you sure you want to make a number 
+in the format {Album}-{Custom number}?
+Existing sheet numbers may change.</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberNotSet">Set start number</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Errors.StartNumberInvalid">Start number must be non negative integer</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.Errors.SelectedSheetsNotSet">Select sheets</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Numeration.ButtonTooltip">Number selected sheets</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Filter">Filter</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Sheets">Sheets</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.SheetContent">Elements on the sheet:</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.ViewPorts">Viewports</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Schedules">Schedules</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Annotations">Annotations</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Album">Album</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.CustomNumber">Custom number</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Number">Number</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Name">Name</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.TitleBlock">Title block</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.DeleteSheetsButtonTooltip">Delete all selected sheets</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.Status">Status</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.ViewPortType">Viewport type</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.SchedulesCount">Count</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AnnotationFamily">Family</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AddViewPortTooltip">Add viewport to the sheet</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AddScheduleTooltip">Add schedule to the sheet</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AddAnnotationTooltip">Add annotation to the sheet</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.DeleteViewPortTooltip">Delete viewport from the sheet</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.DeleteScheduleTooltip">Delete schedule from the sheet</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.DeleteAnnotationTooltip">Delete annotation from the sheet</system:String>
+    <system:String
+        x:Key="MainWindow.AllSheets.AnnotationType">Type</system:String>
+    <system:String
+        x:Key="CreateAnnotationWindow.Title">Add annotation</system:String>
+    <system:String
+        x:Key="CreateAnnotationWindow.SelectedAnnotationTitle">Annotation symbol</system:String>
+    <system:String
+        x:Key="CreateScheduleWindow.Title">Add schedule</system:String>
+    <system:String
+        x:Key="CreateScheduleWindow.SelectedScheduleTitle">Schedule</system:String>
+    <system:String
+        x:Key="CreateViewPortWindow.Title">Add viewport</system:String>
+    <system:String
+        x:Key="CreateViewPortWindow.SelectedViewTypeTitle">View type</system:String>
+    <system:String
+        x:Key="CreateViewPortWindow.SelectedViewTitle">View</system:String>
+    <system:String
+        x:Key="CreateViewPortWindow.SelectedViewPortTypeTitle">Viewport type</system:String>
+
+    <system:String
+        x:Key="Errors.ViewPortTypesNotFound">Failed to get list of viewport types. Create a viewport on some sheet manually and restart the plugin.</system:String>
+    <system:String
+        x:Key="Errors.TitleBlocksNotFound">Document doesn't contain title block families</system:String>
+    <system:String
+        x:Key="Errors.AnnotationsNotFound">Document doesn't contain annotation families</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateAnnotation">Cannot create annotation</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateSchedule">Cannot create schedule</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateSheet">Cannot create sheet</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateViewPort">Cannot create viewport</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateViewPortOnNotCreatedSheet">You cannot create a viewport on a sheet that has not yet been created.</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateScheduleOnNotCreatedSheet">Cannot create a specification on a sheet that has not yet been created.</system:String>
+    <system:String
+        x:Key="Errors.CannotCreateAnnotationOnNotCreatedSheet">Cannot create an annotation on a sheet that has not yet been created.</system:String>
+    <system:String
+        x:Key="Errors.CannotUpdateNotCreatetViewPort">Cannot update haven't created viewport yet.</system:String>
+    <system:String
+        x:Key="Errors.CannotUpdateNotCreatetSheet">Cannot update haven't created sheet yet.</system:String>
+    <system:String
+        x:Key="Errors.CannotDeleteElement">Cannot delete element with id {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotDeleteActiveViewSheet">Cannot delete active view sheet '{0}'</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveSheet">Cannot save sheet with number {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveViewPort">Cannot save viewport {0} on the sheet number {1}</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveSchedule">Cannot save schedule {0} on the sheet number {1}</system:String>
+    <system:String
+        x:Key="Errors.CannotSaveAnnotation">Cannot save annotation {0} on the sheet number {1}</system:String>
+    <system:String
+        x:Key="Errors.ViewPortModel.PropertyNotSet">Before saving viewport you need to specity {0}</system:String>
+    <system:String
+        x:Key="Errors.SheetModel.TitleBlockNotSet">New sheet doesn't have title block</system:String>
+    <system:String
+        x:Key="Errors.SheetModel.SheetNumberNotSet">New sheet doesn't have number</system:String>
+    <system:String
+        x:Key="Errors.ScheduleModel.PropertyNotSet">Before saving schedule you need to specify {0}</system:String>
+    <system:String
+        x:Key="Errors.AnnotationModel.PropertyNotSet">Before saving annotation you need to specify {0}</system:String>
+
+    <system:String
+        x:Key="Errors.Validation.AnnotationNotSet">Select annotation type</system:String>
+    <system:String
+        x:Key="Errors.Validation.AlbumBlueprintNotSet">Select album</system:String>
+    <system:String
+        x:Key="Errors.Validation.InvalidAlbumBlueprintName">Invalid album '{0}'</system:String>
+    <system:String
+        x:Key="Errors.Validation.TitleBlockNotSet">Select title block</system:String>
+    <system:String
+        x:Key="Errors.Validation.AddSheetsCountNotNumber">Sheets count must be an integer</system:String>
+    <system:String
+        x:Key="Errors.Validation.AddSheetsMaxCount">Sheets count must be lower than {0}</system:String>
+    <system:String
+        x:Key="Errors.Validation.AddSheetsMinCount">Sheets count must be a positive number</system:String>
+    <system:String
+        x:Key="Errors.Validation.AnySheetNameEmpty">All sheets must have name</system:String>
+    <system:String
+        x:Key="Errors.Validation.AnySheetInvalidName">Sheet '{0}' has invalid name</system:String>
+    <system:String
+        x:Key="Errors.Validation.DuplicatedSheetNumber">There is duplicated number {0}</system:String>
+    <system:String
+        x:Key="Errors.Validation.AnySheetNumberEmpty">All sheets must have number</system:String>
+    <system:String
+        x:Key="Errors.Validation.SheetInvalidNumber">Sheet '{0}' has invalid number '{1}'</system:String>
+    <system:String
+        x:Key="Errors.Validation.SheetInvalidAlbum">Sheet '{0}' has album '{1}'</system:String>
+    <system:String
+        x:Key="Errors.Validation.SheetInvalidCustomNumber">Sheet '{0}' has invalid custom number '{1}'</system:String>
+    <system:String
+        x:Key="Errors.Validation.SchedulesNotFound">There are no enabled schedules</system:String>
+    <system:String
+        x:Key="Errors.Validation.ScheduleNotSet">Select schedule</system:String>
+    <system:String
+        x:Key="Errors.Validation.ViewTypeNotSet">Select view type</system:String>
+    <system:String
+        x:Key="Errors.Validation.ViewsNotFound">There are no enabled views of selected type</system:String>
+    <system:String
+        x:Key="Errors.Validation.ViewNotSet">Select view</system:String>
+    <system:String
+        x:Key="Errors.Validation.ViewPortTypeNotSet">Select viewport type</system:String>
+
+    <system:String
+        x:Key="Warnings.SureDeleteSheets">Are you sure you want to delete sheets ({0} items)?</system:String>
+    <system:String
+        x:Key="Warnings.Title">Warning</system:String>
+
+    <system:String
+        x:Key="ProgressBarTitle">Please, wait [{0}/{1}] ...</system:String>
+
+    <system:String
+        x:Key="NewSheetTitle">New sheet</system:String>
+
+    <system:String
+        x:Key="UpdateSheetsTransaction">Update sheets</system:String>
+
+    <system:String
+        x:Key="EntityState.Exist">Exist</system:String>
+    <system:String
+        x:Key="EntityState.New">New</system:String>
+
+    <system:String
+        x:Key="RevitViewType.Any">Any</system:String>
+    <system:String
+        x:Key="RevitViewType.FloorPlan">Floor plan</system:String>
+    <system:String
+        x:Key="RevitViewType.CeilingPlan">Ceiling plan</system:String>
+    <system:String
+        x:Key="RevitViewType.EngineeringPlan">Engineering plan</system:String>
+    <system:String
+        x:Key="RevitViewType.AreaPlan">Area plan</system:String>
+    <system:String
+        x:Key="RevitViewType.Section">Section</system:String>
+    <system:String
+        x:Key="RevitViewType.Elevation">Elevation</system:String>
+    <system:String
+        x:Key="RevitViewType.Detail">Detail</system:String>
+    <system:String
+        x:Key="RevitViewType.ThreeD">ThreeD</system:String>
+    <system:String
+        x:Key="RevitViewType.Rendering">Rendering</system:String>
+    <system:String
+        x:Key="RevitViewType.DraftingView">Drafting view</system:String>
+    <system:String
+        x:Key="RevitViewType.Legend">Legend</system:String>
+</ResourceDictionary>

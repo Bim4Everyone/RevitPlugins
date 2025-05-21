@@ -1,3 +1,5 @@
+using System.Linq;
+
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -38,15 +40,15 @@ namespace RevitClashDetective {
                 var revitRepository = kernel.Get<RevitRepository>();
 
                 var pluginClashPath = @"";
-                var pluginClashes = ReportLoader.GetClashes(revitRepository, pluginClashPath);
+                var pluginClashes = ReportLoader.GetReports(revitRepository, pluginClashPath);
 
                 var revitFilePath = @"";
-                var revitClashes = ReportLoader.GetClashes(revitRepository, revitFilePath);
+                var revitClashes = ReportLoader.GetReports(revitRepository, revitFilePath);
 
                 var navisFilePath = @"";
-                var navisClashes = ReportLoader.GetClashes(revitRepository, navisFilePath);
+                var navisClashes = ReportLoader.GetReports(revitRepository, navisFilePath);
 
-                var mainViewModlel = new ClashReportDiffViewModel(revitRepository, revitClashes, pluginClashes);
+                var mainViewModlel = new ClashReportDiffViewModel(revitRepository, revitClashes.First().Clashes, pluginClashes.First().Clashes);
 
                 var window = new ClashReportDiffView() { DataContext = mainViewModlel };
                 window.Show();

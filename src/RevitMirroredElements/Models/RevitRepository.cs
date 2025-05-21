@@ -10,15 +10,17 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 
 namespace RevitMirroredElements.Models {
     internal class RevitRepository {
 
-        public const string MirrorFilterName = "Проверка зеркальности";
+        private readonly ILocalizationService _localizationService;
 
-        public RevitRepository(UIApplication uiApplication) {
+        public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
             UIApplication = uiApplication;
+            _localizationService = localizationService;
         }
 
         public UIApplication UIApplication { get; }
@@ -88,12 +90,15 @@ namespace RevitMirroredElements.Models {
 
         private ParameterFilterElement GetOrCreateMirrorFilter(List<FamilyInstance> elements) {
             var userName = Application.Username;
-            string filterNameWithUser = $"{MirrorFilterName}_{userName}";
+            var mirrorFilterName = _localizationService.GetLocalizedString("RevitRepository.MirrorFilterName");
+            string filterNameWithUser = $"{mirrorFilterName}_{userName}";
 
             var existingFilter = FindFilterByName(filterNameWithUser);
             var sharedParam = SharedParamsConfig.Instance.ElementMirroring.GetRevitParamElement(Document);
             if(sharedParam.Id.IsNull()) {
-                throw new InvalidOperationException($"Параметр '{SharedParamsConfig.Instance.ElementMirroring.Name}' не найден.");
+                var paramText = _localizationService.GetLocalizedString("RevitRepository.Param");
+                var notFoundText = _localizationService.GetLocalizedString("RevitRepository.NotFound");
+                throw new InvalidOperationException($"{paramText} '{SharedParamsConfig.Instance.ElementMirroring.Name}' {notFoundText}");
             }
 
             var rule = new FilterDoubleRule(new ParameterValueProvider(sharedParam.Id), new FilterNumericEquals(), 1, 1e-6);
@@ -209,21 +214,14 @@ namespace RevitMirroredElements.Models {
                 SharedParamsConfig.Instance.ElementMirroring);
         }
 
-        public Transaction StartTransaction(string transactionName) {
-            return Document.StartTransaction(transactionName);
-        }
-
         public void FilterOnTemporaryView(List<FamilyInstance> elements) {
-            using(var transaction = StartTransaction("Настройка временного вида для зеркальности")) {
-                var activeView = Document.ActiveView;
-                EnableTemporaryViewMode(activeView);
+            var activeView = Document.ActiveView;
+            EnableTemporaryViewMode(activeView);
 
-                var mirrorCheckFilter = GetOrCreateMirrorFilter(elements);
-                var overrideSettings = CreateMirrorCheckGraphicOverrides();
+            var mirrorCheckFilter = GetOrCreateMirrorFilter(elements);
+            var overrideSettings = CreateMirrorCheckGraphicOverrides();
 
-                ApplyFilterToView(activeView, mirrorCheckFilter, overrideSettings);
-                transaction.Commit();
-            }
+            ApplyFilterToView(activeView, mirrorCheckFilter, overrideSettings);
         }
 
         public void SelectElementsOnMainView(List<FamilyInstance> elements) {

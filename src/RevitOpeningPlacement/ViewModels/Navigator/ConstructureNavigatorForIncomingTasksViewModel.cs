@@ -317,9 +317,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
                     ct.ThrowIfCancellationRequested();
                     progress.Report(i);
                     updateStatus.Invoke(openingReal);
-                    if(openingReal.Status != OpeningModels.Enums.OpeningRealStatus.Correct) {
-                        openingsRealViewModels.Add(new OpeningRealKrViewModel(openingReal));
-                    }
+                    openingsRealViewModels.Add(new OpeningRealKrViewModel(openingReal));
                     i++;
                 }
             }

@@ -29,9 +29,9 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
             if(room is null) { throw new ArgumentNullException(nameof(room)); }
             if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
 
-            List<WallCreationData> wallCreationData = new List<WallCreationData>();
+            List<WallCreationData> wallCreationData = [];
             WallCreationData lastWallCreationData = null;
-            double wallHeight = CalculateFinishingWallHeight(room, settings);
+            double wallTopElevation = GetWallTopElevation(room, settings);
             double wallBaseOffset = _revitRepository.ConvertMmToFeet(settings.WallBaseOffsetMm);
             double wallSideOffset = _revitRepository.ConvertMmToFeet(settings.WallSideOffsetMm);
 
@@ -49,12 +49,13 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                                 = _revitRepository.CombineCurves(lastWallCreationData.Curve, curveSegmentElement.Curve);
                             lastWallCreationData.AddRangeElementsForJoin(curveSegmentElement.Elements);
                         } else {
-                            lastWallCreationData = new WallCreationData(_revitRepository.Document) {
+                            lastWallCreationData = new WallCreationData(_revitRepository.Document, room) {
                                 Curve = curveSegmentElement.Curve,
-                                LevelId = room.LevelId,
-                                Height = wallHeight,
+                                TopElevation = wallTopElevation,
                                 WallTypeId = settings.WallTypeId,
-                                BaseOffset = wallBaseOffset
+                                BaseOffset = settings.WallBaseElevationMode == WallElevationMode.ManualHeight
+                                    ? wallBaseOffset
+                                    : room.BaseOffset
                             };
                             lastWallCreationData.AddRangeElementsForJoin(curveSegmentElement.Elements);
                             wallCreationData.Add(lastWallCreationData);
@@ -94,21 +95,19 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
         }
 
         /// <summary>
-        /// Вычисляет высоту стены, чтобы ее верхняя отметка от уровня была в соответствии с настройками
+        /// Находит отметку верха стены от уровня в единицах Revit в соответствии с настройками
         /// </summary>
         /// <param name="room">Помещение</param>
         /// <param name="settings">Настройки расстановки отделочных стен</param>
         /// <exception cref="ArgumentNullException"></exception>
-        private double CalculateFinishingWallHeight(Room room, RevitSettings settings) {
+        private double GetWallTopElevation(Room room, RevitSettings settings) {
             if(room is null) { throw new ArgumentNullException(nameof(room)); }
             if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
 
-            if(settings.WallElevationMode == WallElevationMode.ManualHeight) {
-                return _revitRepository.ConvertMmToFeet(settings.WallElevationMm - settings.WallBaseOffsetMm);
+            if(settings.WallTopElevationMode == WallElevationMode.ManualHeight) {
+                return _revitRepository.ConvertMmToFeet(settings.WallElevationMm);
             } else {
-                double roomTopElevation = _revitRepository.GetRoomTopElevation(room);
-                double roomBaseOffset = _revitRepository.ConvertMmToFeet(settings.WallBaseOffsetMm);
-                return roomTopElevation - roomBaseOffset;
+                return _revitRepository.GetRoomTopElevation(room);
             }
         }
     }

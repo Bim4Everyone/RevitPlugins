@@ -43,6 +43,7 @@ namespace RevitClashDetective.Models.Clashes {
         }
 
 
+        public string Name { get; set; }
         public ClashStatus ClashStatus { get; set; }
         public ElementModel MainElement { get; set; }
         public ElementModel OtherElement { get; set; }
@@ -53,13 +54,19 @@ namespace RevitClashDetective.Models.Clashes {
             return this;
         }
 
+        /// <summary>
+        /// Проверяет, что хотя бы 1 элемент коллизии находится в одном из заданных файлов
+        /// </summary>
+        /// <param name="documentNames">Коллекция названий файлов для проверки</param>
+        /// <returns>True, если хотя бы 1 элемент коллизии находится в одном из заданных файлов, иначе False</returns>
         public bool IsValid(ICollection<string> documentNames) {
-            var clashDocuments = new[] { MainElement.DocumentName, OtherElement.DocumentName };
-            var clashElements = new[] {_revitRepository.GetElement(MainElement.DocumentName, MainElement.Id),
-                                       _revitRepository.GetElement(OtherElement.DocumentName, OtherElement.Id)};
-
-            return clashDocuments.All(item => documentNames.Any(d => d.Contains(item))) && clashElements.Any(item => item != null)
-                   && clashElements.All(item => item?.GetTypeId().IsNotNull() == true);
+            var clashElements = new[] { MainElement, OtherElement };
+            return clashElements.Where(el => el != null)
+                .Where(e => documentNames.Any(d => d.Contains(e?.DocumentName)))
+                .Select(e => _revitRepository.GetElement(e.DocumentName, e.Id))
+                .Where(e => e != null)
+                .Where(e => e.GetTypeId().IsNotNull())
+                .Count() > 0;
         }
 
         public override bool Equals(object obj) {

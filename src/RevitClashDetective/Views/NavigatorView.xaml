@@ -47,22 +47,27 @@
         <DockPanel LastChildFill="True">
 
             <dx:SimpleButton DockPanel.Dock="Left"
-                             ToolTip="Загрузить"
+                             ToolTip="Загрузить проверки"
                              Command="{Binding LoadCommand}"
                              Glyph="{dx:DXImage 'Office2013/Actions/Download_32x32.png'}" />
             <dx:SimpleButton DockPanel.Dock="Left"
                              Margin="5 0 0 0"
-                             ToolTip="Сохранить"
+                             ToolTip="Сохранить все проверки"
+                             Command="{Binding SaveAllReportsCommand}"
+                             Glyph="{dx:DXImage 'Office2013/Save/SaveAll_32x32.png'}" />
+            <dx:SimpleButton DockPanel.Dock="Left"
+                             Margin="5 0 0 0"
+                             ToolTip="Сохранить активную проверку"
                              Command="{Binding SelectedReport.SaveCommand }"
                              Glyph="{dx:DXImage 'DevAV/Actions/Save_32x32.png'}" />
             <dx:SimpleButton DockPanel.Dock="Left"
                              Margin="5 0 0 0"
-                             ToolTip="Сохранить как"
+                             ToolTip="Сохранить как активную проверку"
                              Command="{Binding SelectedReport.SaveAsCommand}"
                              Glyph="{dx:DXImage 'DevAV/Actions/SaveAs_32x32.png'}" />
             <dx:SimpleButton DockPanel.Dock="Left"
                              Margin="5 0 0 0"
-                             ToolTip="Удалить"
+                             ToolTip="Удалить активную проверку"
                              Command="{Binding DeleteCommand}"
                              Glyph="{dx:DXImage 'Office2013/Reports/DeleteGroupHeader_32x32.png'}" />
             <dxe:ComboBoxEdit IsTextEditable="False"
@@ -107,19 +112,20 @@
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-
+                
+                <dxg:GridColumn Header="Название"
+                                FieldName="ClashName"/>
                 <dxg:GridColumn Header="Статус">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <dxe:ComboBoxEdit ApplyItemTemplateToSelectedItem="True"
                                               IsTextEditable="False"
                                               EditMode="InplaceActive"
-                                              EditValue="{Binding Row.ClashStatus}"
+                                              EditValue="{Binding Row.ClashStatus, UpdateSourceTrigger=PropertyChanged}"
                                               ItemsSource="{dxe:EnumItemsSource EnumType={x:Type m:ClashStatus}}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
-
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Уровень 1"
                                 FieldName="FirstLevel" />
@@ -128,7 +134,10 @@
                                 FieldName="FirstCategory" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Имя типа 1"
-                                FieldName="FirstName" />
+                                FieldName="FirstTypeName" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Имя семейства 1"
+                                FieldName="FirstFamilyName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Имя файла 1"
                                 FieldName="FirstDocumentName" />
@@ -140,7 +149,10 @@
                                 FieldName="SecondCategory" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Имя типа 2"
-                                FieldName="SecondName" />
+                                FieldName="SecondTypeName" />
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="Имя семейства 2"
+                                FieldName="SecondFamilyName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
                                 Header="Имя файла 2"
                                 FieldName="SecondDocumentName" />

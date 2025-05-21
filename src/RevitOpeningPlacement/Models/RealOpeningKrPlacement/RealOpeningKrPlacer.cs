@@ -247,12 +247,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         private void PlaceByOneTask(Element host, IOpeningTaskIncoming openingTask) {
             try {
                 var symbol = GetFamilySymbol(host, openingTask.OpeningType);
-                var pointFinder = GetPointFinder(openingTask);
+                var pointFinder = GetPointFinder(openingTask, _config.ElevationRounding);
                 var point = pointFinder.GetPoint();
 
                 var instance = _revitRepository.CreateInstance(point, symbol, host) ?? throw new OpeningNotPlacedException("Не удалось создать экземпляр семейства");
 
-                var parameterGetter = GetParameterGetter(openingTask, pointFinder);
+                var parameterGetter = GetParameterGetter(openingTask, pointFinder, _config.Rounding);
                 SetParamValues(instance, parameterGetter);
 
                 var angleFinder = GetAngleFinder(openingTask);
@@ -283,12 +283,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         private void PlaceUnitedByManyTasks(Element host, ICollection<IOpeningTaskIncoming> incomingTasks) {
             try {
                 var symbol = GetFamilySymbol(host);
-                var pointFinder = GetPointFinder(host, incomingTasks);
+                var pointFinder = GetPointFinder(host, incomingTasks, _config.ElevationRounding);
                 var point = pointFinder.GetPoint();
 
                 var instance = _revitRepository.CreateInstance(point, symbol, host);
 
-                var parameterGetter = GetParameterGetter(host, incomingTasks, pointFinder);
+                var parameterGetter = GetParameterGetter(host, incomingTasks, pointFinder, _config.Rounding);
                 SetParamValues(instance, parameterGetter);
 
                 _revitRepository.SetSelection(instance.Id);
@@ -331,8 +331,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// <summary>
         /// Возвращает интерфейс, предоставляющий значения параметров для размещаемого отверстия КР
         /// </summary>
-        private IParametersGetter GetParameterGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder) {
-            var provider = new SingleOpeningArTaskParameterGettersProvider(incomingTask, pointFinder);
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
+        private IParametersGetter GetParameterGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder, int rounding) {
+            var provider = new SingleOpeningArTaskParameterGettersProvider(incomingTask, pointFinder, rounding);
             return provider.GetParametersGetter();
         }
 
@@ -341,8 +342,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// </summary>
         /// <param name="host">Основа для отверстия КР</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        private IParametersGetter GetParameterGetter(Element host, ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder) {
-            var provider = new ManyOpeningArTasksParameterGettersProvider(host, incomingTasks, pointFinder);
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
+        private IParametersGetter GetParameterGetter(Element host, ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder, int rounding) {
+            var provider = new ManyOpeningArTasksParameterGettersProvider(host, incomingTasks, pointFinder, rounding);
             return provider.GetParametersGetter();
         }
 
@@ -350,8 +352,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// Возвращает интерфейс, предоставляющий точку вставки отверстия КР
         /// </summary>
         /// <param name="openingTask">Входящее задание на отверстие</param>
-        private IPointFinder GetPointFinder(IOpeningTaskIncoming openingTask) {
-            return new SingleOpeningArTaskPointFinder(openingTask);
+        /// <param name="rounding">Округление отметки отверстия в мм</param>
+        private IPointFinder GetPointFinder(IOpeningTaskIncoming openingTask, int rounding) {
+            return new SingleOpeningArTaskPointFinder(openingTask, rounding);
         }
 
         /// <summary>
@@ -359,8 +362,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement {
         /// </summary>
         /// <param name="host">Основа для отверстия КР</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        private IPointFinder GetPointFinder(Element host, ICollection<IOpeningTaskIncoming> incomingTasks) {
-            var provider = new ManyOpeningArTasksPointFinderProvider(host, incomingTasks);
+        /// <param name="rounding">Округление отметки отверстия в мм</param>
+        private IPointFinder GetPointFinder(Element host, ICollection<IOpeningTaskIncoming> incomingTasks, int rounding) {
+            var provider = new ManyOpeningArTasksPointFinderProvider(host, incomingTasks, rounding);
             return provider.GetPointFinder();
         }
 

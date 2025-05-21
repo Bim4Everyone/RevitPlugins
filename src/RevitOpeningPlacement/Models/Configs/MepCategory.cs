@@ -13,6 +13,7 @@ namespace RevitOpeningPlacement.Models.Configs {
     /// </summary>
     internal class MepCategory : IEquatable<MepCategory> {
         public const int DefaultRoundingMm = 50;
+        public const int DefaultElevationRoundingMm = 10;
         public const int DefaultMinSizeMm = 0;
         public const int DefaultMaxSizeMm = 10000;
         public const int DefaultOffsetMm = 50;
@@ -101,9 +102,14 @@ namespace RevitOpeningPlacement.Models.Configs {
             };
 
         /// <summary>
-        /// Значение округления габаритов итогового размещенного задания на отверстие в месте пересечения элемента данной категории и конструктивного элемента
+        /// Значение округления габаритов в мм итогового размещенного задания на отверстие в месте пересечения элемента данной категории и конструктивного элемента
         /// </summary>
         public int Rounding { get; set; } = DefaultRoundingMm;
+
+        /// <summary>
+        /// Значение округления отметки низа в мм размещенного задания на отверстие в месте пересечения элемента данной категории и конструктивного элемента
+        /// </summary>
+        public int ElevationRounding { get; set; } = DefaultElevationRoundingMm;
 
         /// <summary>
         /// Правила фильтрации элементов данной категории

@@ -1,0 +1,158 @@
+﻿<base:PlatformWindow
+    x:Class="RevitMarkingElements.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitMarkingElements.Views"
+    xmlns:vms="clr-namespace:RevitMarkingElements.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    mc:Ignorable="d"
+    x:Name="mainWindow"
+    WindowStartupLocation="CenterOwner"
+    Title="{DynamicResource MainWindow.Title}"
+    Height="300"
+    Width="400"
+    MinHeight="300"
+    MinWidth="400"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel
+            Orientation="Vertical"
+            Margin="10"
+            Grid.Row="0">
+            <RadioButton
+                Margin="0,0,0,5"
+                GroupName="NumberingMode"
+                Content="{DynamicResource MainWindow.ArrayNumberingLabel}"
+                IsChecked="{Binding IsArrayNumberingSelected}" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <RadioButton
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    GroupName="NumberingMode"
+                    Content="{Binding LineNumberingContent}"
+                    IsChecked="{Binding IsLineNumberingSelected}" />
+
+                <Button
+                    Width="110"
+                    Grid.Column="1"
+                    Padding="10"
+                    HorizontalAlignment="Right"
+                    Content="{DynamicResource MainWindow.SelectLinesButton}"
+                    Command="{Binding SelectLinesCommand}"
+                    CommandParameter="{Binding ElementName=mainWindow}"
+                    IsEnabled="{Binding IsLineNumberingSelected}">
+                    <Button.ToolTip>
+                        <ToolTip >
+                            <StackPanel>
+                                <TextBlock
+                                    Text="{DynamicResource MainWindow.MainInstruction}"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Text="{DynamicResource MainWindow.ContentAbout}"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Text="{DynamicResource MainWindow.MainContent}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+
+            </Grid>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0,10,0,0">
+                <TextBlock
+                    Margin="0,0,0,0"
+                    Text="{DynamicResource MainWindow.StartNumbericFrom}" />
+                <TextBox
+                    Margin="10,0,0,0"
+                    Width="100"
+                    Text="{Binding StartNumber}"
+                    IsEnabled="{Binding RenumberAll}" />
+            </StackPanel>
+
+        </StackPanel>
+
+        <StackPanel
+            Orientation="Vertical"
+            Margin="10,0,10,0"
+            Grid.Row="1">
+            <TextBlock
+                Text="{DynamicResource MainWindow.CategoriesElements}"
+                Margin="0,0,0,5" />
+            <ComboBox
+                ItemsSource="{Binding Categories}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding SelectedCategory}"
+                Margin="0,0,0,10" />
+
+            <CheckBox
+                Content="{DynamicResource MainWindow.NumberUnmarkedElements}"
+                IsChecked="{Binding IncludeUnselected}"
+                Margin="0,0,0,10"
+                IsEnabled="{Binding IsLineNumberingSelected}" />
+
+            <CheckBox
+                Content="{DynamicResource MainWindow.RenumberMarkedElements}"
+                IsChecked="{Binding RenumberAll}"
+                Margin="0,0,0,10" />
+        </StackPanel>
+
+        <TextBlock
+            Margin="10"
+            Foreground="Orange"
+            VerticalAlignment="Center"
+            Grid.Row="2"
+            Text="{Binding ErrorText}" />
+
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            <Button
+                Margin="10"
+                Width="80"
+                Content="ОК"
+                IsDefault="True"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
+            <Button
+                Margin="10"
+                Width="80"
+                Content="Отмена"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</base:PlatformWindow>

@@ -39,9 +39,6 @@ namespace RevitAxonometryViews {
             // Которые он обрабатывает самостоятельно
             // Например Kernel.Get<MainViewModel>() требует на вход RevitRepository. Kernel самостоятельно ищет его по биндингам и подает в конструктор
             using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<UIApplication>()
-                    .ToConstant(uiApplication)
-                    .InSingletonScope();
                 kernel.Bind<RevitRepository>().ToSelf()
                     .InSingletonScope();
                 kernel.Bind<MainViewModel>().ToSelf()

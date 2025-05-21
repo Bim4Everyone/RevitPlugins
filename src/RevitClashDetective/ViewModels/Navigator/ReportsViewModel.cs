@@ -38,6 +38,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             LoadCommand = RelayCommand.Create(Load);
             DeleteCommand = RelayCommand.Create(Delete, CanDelete);
             SelectClashCommand = RelayCommand.Create<ClashViewModel>(SelectClash, CanSelectClash);
+            SaveAllReportsCommand = RelayCommand.Create(SaveAllReports, CanSaveAllReports);
         }
 
 
@@ -45,6 +46,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public ICommand OpenClashDetectorCommand { get; }
         public ICommand LoadCommand { get; }
         public ICommand DeleteCommand { get; }
+        public ICommand SaveAllReportsCommand { get; }
 
         public ObservableCollection<ReportViewModel> Reports {
             get => _reports;
@@ -70,7 +72,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
 
         private void InitializeFiles(string selectedFile) {
-            var profilePath = RevitRepository.ProfilePath;
+            var profilePath = RevitRepository.LocalProfilePath;
             Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName()))
                 .Select(path => new ReportViewModel(_revitRepository, Path.GetFileNameWithoutExtension(path)))
                 .Where(item => item.Name.Equals(selectedFile, StringComparison.CurrentCultureIgnoreCase)));
@@ -78,7 +80,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
         private void InitializeFiles() {
-            var profilePath = RevitRepository.ProfilePath;
+            var profilePath = RevitRepository.LocalProfilePath;
             var path = Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName());
             if(Directory.Exists(path)) {
                 Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(path)
@@ -97,7 +99,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void Load() {
             var openWindow = GetPlatformService<IOpenFileDialogService>();
-            openWindow.Filter = "AutodeskClashReport (*.html)|*.html|PluginClashReport (*.json)|*.json";
+            openWindow.Filter = "NavisClashReport (*.xml)|*.xml|PluginClashReport (*.json)|*.json";
 
             if(!openWindow.ShowDialog(_revitRepository.GetFileDialogPath())) {
                 throw new OperationCanceledException();
@@ -110,12 +112,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void InitializeClashes(string path) {
             var name = Path.GetFileNameWithoutExtension(path);
-            var clashes = ReportLoader.GetClashes(_revitRepository, path)
-                                      ?.ToList();
-            var report = new ReportViewModel(_revitRepository, name, clashes);
+            var reports = ReportLoader.GetReports(_revitRepository, path)
+                .Select(r => new ReportViewModel(_revitRepository, r.Name, r.Clashes?.ToList()));
 
-            Reports = new ObservableCollection<ReportViewModel>(new NameResolver<ReportViewModel>(Reports, new[] { report }).GetCollection());
-            SelectedReport = report;
+            Reports = new ObservableCollection<ReportViewModel>(new NameResolver<ReportViewModel>(Reports, reports).GetCollection());
+            SelectedReport = reports.First();
         }
 
         private void Delete() {
@@ -144,6 +145,16 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 && p.Clash != null
                 && p.Clash.MainElement != null
                 && p.Clash.OtherElement != null;
+        }
+
+        private void SaveAllReports() {
+            foreach(var report in Reports) {
+                report.SaveCommand.Execute(default);
+            }
+        }
+
+        private bool CanSaveAllReports() {
+            return Reports.Count > 0;
         }
     }
 }

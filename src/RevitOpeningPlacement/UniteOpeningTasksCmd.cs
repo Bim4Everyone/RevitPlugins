@@ -13,6 +13,7 @@ using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.OpeningModels;
 
 namespace RevitOpeningPlacement {
@@ -48,8 +49,9 @@ namespace RevitOpeningPlacement {
 
                 var revitRepository = kernel.Get<RevitRepository>();
                 ICollection<OpeningMepTaskOutcoming> openingTasks = revitRepository.PickManyOpeningMepTasksOutcoming();
+                var config = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
 
-                var placedOpeningTask = revitRepository.UniteOpenings(openingTasks);
+                var placedOpeningTask = revitRepository.UniteOpenings(openingTasks, config);
                 uiApplication.ActiveUIDocument.Selection.SetElementIds(new ElementId[] { placedOpeningTask.Id });
             }
         }

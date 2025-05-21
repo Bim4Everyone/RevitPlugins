@@ -122,6 +122,11 @@ namespace RevitOpeningPlacement.Services {
                     outcomingTask.Status = OpeningTaskOutcomingStatus.NotActual;
                     return;
                 }
+                if(OpeningTaskInDifferentConstructions(outcomingTask)) {
+                    FindAndSetHost(outcomingTask);
+                    outcomingTask.Status = OpeningTaskOutcomingStatus.DifferentConstructions;
+                    return;
+                }
                 if(OpeningTaskIsIntersecting(outcomingTask)) {
                     FindAndSetHost(outcomingTask);
                     outcomingTask.Status = OpeningTaskOutcomingStatus.Intersects;
@@ -253,6 +258,37 @@ namespace RevitOpeningPlacement.Services {
                 .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningTaskSolid.GetOutline()))
                 .WherePasses(new ElementIntersectsSolidFilter(thisOpeningTaskSolid))
                 .ToElementIds();
+        }
+
+        /// <summary>
+        /// Проверяет, находится ли данное задание на отверстие в разных конструкциях
+        /// </summary>
+        /// <param name="mepTaskOutcoming">Исходящее задание на отверстие из активного файла</param>
+        /// <returns><True - задание на отверстие в разных констркуциях, False - другие случаи/returns>
+        private bool OpeningTaskInDifferentConstructions(OpeningMepTaskOutcoming mepTaskOutcoming) {
+            if(_hostConstructionsCache.Link != null && _hostConstructionsCache.HostCandidates != null) {
+                return _hostConstructionsCache.HostCandidates
+                    .Select(hostId => _hostConstructionsCache.Link.Document
+                        .GetElement(hostId)
+                        .Category
+                        .GetBuiltInCategory())
+                    .Distinct()
+                    .Count() > 1;
+            } else {
+                foreach(var link in _constructureLinks) {
+                    var hostConstructions = GetHostConstructionsForThisOpeningTask(
+                        mepTaskOutcoming,
+                        link,
+                        out _);
+                    if(hostConstructions.Count > 0) {
+                        return hostConstructions
+                            .Select(hostId => link.Document.GetElement(hostId).Category.GetBuiltInCategory())
+                            .Distinct()
+                            .Count() > 1;
+                    }
+                }
+                return false;
+            }
         }
 
         /// <summary>

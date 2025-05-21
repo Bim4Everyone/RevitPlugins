@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using RevitOpeningPlacement.Models.Interfaces;
@@ -14,16 +14,19 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
     /// </summary>
     internal class SingleRoundOpeningTaskInFloorParameterGetter : IParametersGetter {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
+        private readonly int _rounding;
 
 
         /// <summary>
         /// Класс, предоставляющий параметры для чистового круглого отверстия из параметров входящего задания на круглое отверстие в перекрытии
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        public SingleRoundOpeningTaskInFloorParameterGetter(OpeningMepTaskIncoming incomingTask) {
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
+        public SingleRoundOpeningTaskInFloorParameterGetter(OpeningMepTaskIncoming incomingTask, int rounding) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
 
             _openingMepTaskIncoming = incomingTask;
+            _rounding = rounding;
         }
 
 
@@ -31,7 +34,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
             // габариты отверстия
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArDiameter,
-                new RoundOpeningInFloorDiameterValueGetter(_openingMepTaskIncoming)).GetParamValue();
+                new RoundOpeningInFloorDiameterValueGetter(_openingMepTaskIncoming, _rounding)).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
             var isEomValueGetter = new IsEomValueGetter(_openingMepTaskIncoming);

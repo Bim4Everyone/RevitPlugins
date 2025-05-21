@@ -23,6 +23,16 @@ namespace RevitOpeningPlacement.Models.Configs {
         public MepCategoryCollection Categories { get; set; } = new MepCategoryCollection();
 
         /// <summary>
+        /// Округление размеров объединенных заданий на отверстия в мм
+        /// </summary>
+        public int UnitedTasksSizeRounding { get; set; } = 10;
+
+        /// <summary>
+        /// Округление отметки объединенных заданий на отверстия в мм
+        /// </summary>
+        public int UnitedTasksElevationRounding { get; set; } = 10;
+
+        /// <summary>
         /// Флаг для вывода ошибок расстановки заданий на отверстия пользователю
         /// </summary>
         public bool ShowPlacingErrors { get; set; } = false;

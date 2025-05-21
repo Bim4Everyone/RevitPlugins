@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,6 +32,7 @@ namespace RevitRooms.Models {
 #if REVIT_2021_OR_LESS
             _projectParameters.SetupRevitParams(_uiApplication.ActiveUIDocument.Document,
                 ProjectParamsConfig.Instance.IsRoomNumberFix,
+                ProjectParamsConfig.Instance.IsRoomLevelFix,
                 ProjectParamsConfig.Instance.NumberingOrder,
                 SharedParamsConfig.Instance.RoomArea,
                 SharedParamsConfig.Instance.RoomsCount,
@@ -64,6 +65,7 @@ namespace RevitRooms.Models {
 #else
             _projectParameters.SetupRevitParams(_uiApplication.ActiveUIDocument.Document,
                 ProjectParamsConfig.Instance.IsRoomNumberFix,
+                ProjectParamsConfig.Instance.IsRoomLevelFix,
                 ProjectParamsConfig.Instance.NumberingOrder,
                 SharedParamsConfig.Instance.RoomArea,
                 SharedParamsConfig.Instance.RoomsCount,
@@ -124,7 +126,9 @@ namespace RevitRooms.Models {
             yield return SchedulesConfig.Instance.RoomsCheckDeviationAreas;
             yield return SchedulesConfig.Instance.RoomsCheckTypes;
             yield return SchedulesConfig.Instance.RoomsCheckGroupTypes;
+            yield return SchedulesConfig.Instance.RoomsCheckFixedAreas;
             yield return SchedulesConfig.Instance.RoomsMultiLevel;
+            yield return SchedulesConfig.Instance.RoomsSummer;
         }
 
         public CheckProjectParams ReplaceKeySchedules(IEnumerable<KeyScheduleRule> keyScheduleRules) {

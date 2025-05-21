@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.slnx",
+  "PluginName": "RevitRefreshLinks",
+  "PublishDirectory": "01.BIM.extension\\BIM.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/16013/broken-link",
+  "BundleName": "Обновить связанные файлы",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "01.BIM.extension\\BIM.tab\\Связи.panel\\Связи rvt.pulldown"
+}

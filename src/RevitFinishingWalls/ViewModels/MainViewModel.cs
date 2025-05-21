@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -18,8 +17,11 @@ namespace RevitFinishingWalls.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly RichErrorMessageService _errorMessageService;
         private readonly IRoomFinisher _roomFinisher;
+        private readonly IWallCreatorFactory _wallCreatorFactory;
         private readonly IProgressDialogFactory _progressDialogFactory;
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>Максимальная допустимая отметка верха отделочной стены в мм</summary>
         private const int _wallTopMaxElevationMM = 50000;
@@ -34,24 +36,38 @@ namespace RevitFinishingWalls.ViewModels {
         public MainViewModel(
             PluginConfig pluginConfig,
             RevitRepository revitRepository,
+            RichErrorMessageService errorMessageService,
             IRoomFinisher roomFinisher,
-            IProgressDialogFactory progressDialogFactory
+            IWallCreatorFactory wallCreatorFactory,
+            IProgressDialogFactory progressDialogFactory,
+            ILocalizationService localizationService
             ) {
             _pluginConfig = pluginConfig
                 ?? throw new ArgumentNullException(nameof(pluginConfig));
             _revitRepository = revitRepository
                 ?? throw new ArgumentNullException(nameof(revitRepository));
+            _errorMessageService = errorMessageService
+                ?? throw new ArgumentNullException(nameof(errorMessageService));
             _roomFinisher = roomFinisher
                 ?? throw new ArgumentNullException(nameof(roomFinisher));
+            _wallCreatorFactory = wallCreatorFactory
+                ?? throw new ArgumentNullException(nameof(wallCreatorFactory));
             _progressDialogFactory = progressDialogFactory
                 ?? throw new ArgumentNullException(nameof(progressDialogFactory));
-
-            RoomGetterModes = new ObservableCollection<RoomGetterMode>(
-                Enum.GetValues(typeof(RoomGetterMode)).Cast<RoomGetterMode>());
-            WallElevationModes = new ObservableCollection<WallElevationMode>(
-                Enum.GetValues(typeof(WallElevationMode)).Cast<WallElevationMode>());
-            WallTypes = new ObservableCollection<WallTypeViewModel>(
-                _revitRepository.GetWallTypes().Select(wt => new WallTypeViewModel(wt)).OrderBy(wt => wt.Name));
+            _localizationService = localizationService
+                ?? throw new ArgumentNullException(nameof(localizationService));
+            RoomGetterModes = [.. Enum.GetValues(typeof(RoomGetterMode))
+                .Cast<RoomGetterMode>()
+                .Select(r => new RoomGetterModeViewModel(_localizationService, r))];
+            WallElevationModes = [.. Enum.GetValues(typeof(WallElevationMode))
+                .Cast<WallElevationMode>()
+                .Select(w => new WallElevationModeViewModel(_localizationService, w))];
+            WallTypes = [.. _revitRepository.GetWallTypes()
+                .Select(wt => new WallTypeViewModel(wt))
+                .OrderBy(wt => wt.Name)];
+            WallHeightStyles = [.. Enum.GetValues(typeof(WallHeightStyle))
+                .Cast<WallHeightStyle>()
+                .Select(w => new WallHeightStyleViewModel(_localizationService, w))];
 
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
             LoadConfigCommand = RelayCommand.Create(LoadConfig);
@@ -71,10 +87,10 @@ namespace RevitFinishingWalls.ViewModels {
         }
 
 
-        public ObservableCollection<RoomGetterMode> RoomGetterModes { get; }
+        public ObservableCollection<RoomGetterModeViewModel> RoomGetterModes { get; }
 
-        private RoomGetterMode _selectedRoomGetterMode;
-        public RoomGetterMode SelectedRoomGetterMode {
+        private RoomGetterModeViewModel _selectedRoomGetterMode;
+        public RoomGetterModeViewModel SelectedRoomGetterMode {
             get => _selectedRoomGetterMode;
             set => RaiseAndSetIfChanged(ref _selectedRoomGetterMode, value);
         }
@@ -96,18 +112,40 @@ namespace RevitFinishingWalls.ViewModels {
         }
 
 
-        public bool IsWallHeightByUserEnabled => SelectedWallElevationMode == WallElevationMode.ManualHeight;
+        public bool IsWallHeightByUserEnabled =>
+            SelectedWallTopElevationMode?.ElevationMode == WallElevationMode.ManualHeight;
 
 
-        public ObservableCollection<WallElevationMode> WallElevationModes { get; }
+        public ObservableCollection<WallElevationModeViewModel> WallElevationModes { get; }
 
-        private WallElevationMode _selectedWallHeightMode;
-        public WallElevationMode SelectedWallElevationMode {
-            get => _selectedWallHeightMode;
+        private WallElevationModeViewModel _selectedWallTopHeightMode;
+        public WallElevationModeViewModel SelectedWallTopElevationMode {
+            get => _selectedWallTopHeightMode;
             set {
-                RaiseAndSetIfChanged(ref _selectedWallHeightMode, value);
+                RaiseAndSetIfChanged(ref _selectedWallTopHeightMode, value);
                 OnPropertyChanged(nameof(IsWallHeightByUserEnabled));
             }
+        }
+
+        public bool IsWallBaseOffsetByUserEnabled =>
+            SelectedWallBaseElevationMode?.ElevationMode == WallElevationMode.ManualHeight;
+
+
+        private WallElevationModeViewModel _selectedWallBaseHeightMode;
+        public WallElevationModeViewModel SelectedWallBaseElevationMode {
+            get => _selectedWallBaseHeightMode;
+            set {
+                RaiseAndSetIfChanged(ref _selectedWallBaseHeightMode, value);
+                OnPropertyChanged(nameof(IsWallBaseOffsetByUserEnabled));
+            }
+        }
+
+        public ObservableCollection<WallHeightStyleViewModel> WallHeightStyles { get; }
+
+        private WallHeightStyleViewModel _selectedWallHeightStyle;
+        public WallHeightStyleViewModel SelectedWallHeightStyle {
+            get => _selectedWallHeightStyle;
+            set => RaiseAndSetIfChanged(ref _selectedWallHeightStyle, value);
         }
 
 
@@ -130,64 +168,86 @@ namespace RevitFinishingWalls.ViewModels {
             using(var progressDialogService = _progressDialogFactory.CreateDialog()) {
                 var rooms = _revitRepository.GetRooms(settings.RoomGetterMode);
                 progressDialogService.StepValue = 5;
-                progressDialogService.DisplayTitleFormat = "Обработка квартир... [{0}]\\[{1}]";
+                progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("ProgressBar.Title");
                 var progress = progressDialogService.CreateProgress();
                 progressDialogService.MaxValue = rooms.Count;
                 var ct = progressDialogService.CreateCancellationToken();
                 progressDialogService.Show();
 
-                errors = _roomFinisher.CreateWallsFinishing(rooms, settings, progress, ct);
+                errors = _roomFinisher.CreateWallsFinishing(
+                    rooms,
+                    settings,
+                    _wallCreatorFactory.Create(settings),
+                    progress,
+                    ct);
             }
             if(errors.Count > 0) {
-                var errorMsgService = ServicesProvider.GetPlatformService<RichErrorMessageService>();
-                errorMsgService.ShowErrorWindow(errors);
+                _errorMessageService.ShowErrorWindow(errors);
             }
         }
 
         private bool CanAcceptView() {
             if(SelectedWallType is null) {
-                ErrorText = "Задайте тип отделочных стен";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.WallType");
                 return false;
             }
-            if(double.TryParse(WallBaseOffset, out double baseOffset)) {
-                if(baseOffset < _wallBaseMinOffsetMM) {
-                    ErrorText = "Слишком большое смещение вниз";
-                    return false;
-                } else if(baseOffset > _wallBaseMaxOffsetMM) {
-                    ErrorText = "Слишком большое смещение вверх";
-                    return false;
-                }
-            } else {
-                ErrorText = "Смещение должно быть числом";
+            if(SelectedRoomGetterMode is null) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.RoomGetterMode");
                 return false;
             }
-            if(SelectedWallElevationMode == WallElevationMode.ManualHeight) {
-                if(double.TryParse(WallElevationByUser, out double height)) {
-                    if(height <= 0) {
-                        ErrorText = "Отметка верха должна быть больше 0";
+            if(SelectedWallTopElevationMode is null) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.WallTopElevationMode");
+                return false;
+            }
+            if(SelectedWallBaseElevationMode is null) {
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.WallBaseElevationMode");
+                return false;
+            }
+            if(SelectedWallBaseElevationMode?.ElevationMode == WallElevationMode.ManualHeight) {
+                if(double.TryParse(WallBaseOffset, out double baseOffset)) {
+                    if(baseOffset < _wallBaseMinOffsetMM) {
+                        ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MinBaseOffset");
                         return false;
-                    } else if(height > _wallTopMaxElevationMM) {
-                        ErrorText = "Слишком большая отметка верха стены";
-                        return false;
-                    } else if(height <= baseOffset) {
-                        ErrorText = "Отметка верха должна быть больше смещения";
+                    } else if(baseOffset > _wallBaseMaxOffsetMM) {
+                        ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MaxBaseOffset");
                         return false;
                     }
                 } else {
-                    ErrorText = "Отметка верха должна быть числом";
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.BaseOffsetNotNumber");
+                    return false;
+                }
+            }
+            if(SelectedWallTopElevationMode?.ElevationMode == WallElevationMode.ManualHeight) {
+                if(double.TryParse(WallElevationByUser, out double height)) {
+                    if(height <= 0) {
+                        ErrorText = string.Format(
+                            _localizationService.GetLocalizedString("MainWindow.Validation.MinWallElevation"), 0);
+                        return false;
+                    } else if(height > _wallTopMaxElevationMM) {
+                        ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MaxWallElevation");
+                        return false;
+                    } else if(IsWallBaseOffsetByUserEnabled
+                        && double.TryParse(WallBaseOffset, out double baseOffset)
+                        && height <= baseOffset) {
+                        ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.ElevationBelowOffset");
+                        return false;
+                    }
+                } else {
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.ElevationNotNumber");
                     return false;
                 }
             }
             if(double.TryParse(WallSideOffset, out double sideOffset)) {
                 if(sideOffset < 0) {
-                    ErrorText = "Смещение внутрь не должно быть меньше 0";
+                    ErrorText = string.Format(
+                        _localizationService.GetLocalizedString("MainWindow.Validation.MinSideOffset"), 0);
                     return false;
                 } else if(sideOffset > _wallSideMaxOffsetMM) {
-                    ErrorText = "Слишком большое смещение внутрь";
+                    ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.MaxSideOffset");
                     return false;
                 }
             } else {
-                ErrorText = "Смещение внутрь должно быть числом";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.Validation.SideOffsetNotNumber");
                 return false;
             }
 
@@ -198,8 +258,14 @@ namespace RevitFinishingWalls.ViewModels {
         private void LoadConfig() {
             RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
-            SelectedRoomGetterMode = settings.RoomGetterMode;
-            SelectedWallElevationMode = settings.WallElevationMode;
+            SelectedRoomGetterMode = new RoomGetterModeViewModel(
+                _localizationService, settings.RoomGetterMode);
+            SelectedWallTopElevationMode = new WallElevationModeViewModel(
+                _localizationService, settings.WallTopElevationMode);
+            SelectedWallBaseElevationMode = new WallElevationModeViewModel(
+                _localizationService, settings.WallBaseElevationMode);
+            SelectedWallHeightStyle = new WallHeightStyleViewModel(
+                _localizationService, settings.WallHeightStyle);
             WallElevationByUser = settings.WallElevationMm.ToString();
             WallBaseOffset = settings.WallBaseOffsetMm.ToString();
             WallSideOffset = settings.WallSideOffsetMm.ToString();
@@ -211,8 +277,10 @@ namespace RevitFinishingWalls.ViewModels {
         private void SaveConfig() {
             RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document)
                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
-            settings.RoomGetterMode = SelectedRoomGetterMode;
-            settings.WallElevationMode = SelectedWallElevationMode;
+            settings.RoomGetterMode = SelectedRoomGetterMode.RoomGetterMode;
+            settings.WallTopElevationMode = SelectedWallTopElevationMode.ElevationMode;
+            settings.WallBaseElevationMode = SelectedWallBaseElevationMode.ElevationMode;
+            settings.WallHeightStyle = SelectedWallHeightStyle.WallHeightStyle;
             settings.WallBaseOffsetMm = double.TryParse(WallBaseOffset, out double baseOffset) ? baseOffset : 0;
             settings.WallSideOffsetMm = double.TryParse(WallSideOffset, out double sideOffset) ? sideOffset : 0;
             settings.WallElevationMm = double.TryParse(WallElevationByUser, out double height) ? height : 0;

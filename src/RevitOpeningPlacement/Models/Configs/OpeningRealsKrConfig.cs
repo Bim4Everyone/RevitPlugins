@@ -22,6 +22,16 @@ namespace RevitOpeningPlacement.Models.Configs {
         public override IConfigSerializer Serializer { get; set; }
         public OpeningRealKrPlacementType PlacementType { get; set; } = OpeningRealKrPlacementType.PlaceByAr;
 
+        /// <summary>
+        /// Округление габаритов отверстия в мм
+        /// </summary>
+        public int Rounding { get; set; } = 10;
+
+        /// <summary>
+        /// Округление отметки низа отверстия в мм
+        /// </summary>
+        public int ElevationRounding { get; set; } = 1;
+
         public static OpeningRealsKrConfig GetOpeningConfig(Document document) {
             if(document is null) { throw new ArgumentNullException(nameof(document)); }
 

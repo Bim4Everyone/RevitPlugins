@@ -1,0 +1,158 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="AllWindow.ButtonOk">OK</system:String>
+    <system:String
+        x:Key="AllWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Wall Finishing</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.Main"
+        xml:space="preserve">
+Finishing walls are created only for rooms from the active document. The "Room Bounding" checkbox will be disabled for the created finishing walls. The base level of the finishing walls will match the level of the room. Created walls will also be joined with elements from the active file that form the room boundaries: walls, columns, structural columns.
+
+Important: Connection to elements from linked files will not be performed!
+    </system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.RoomGetterMode">Method for selecting rooms to create finishing walls.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallTypes">Type of finishing walls to be created.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallTopElevationMode">Method for specifying the top elevation of the finishing wall.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallBaseElevationMode">Method for specifying the base elevation of the finishing wall.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallElevation">The wall will be created so that its top is at the specified elevation relative to its base level. The base level will be taken from the room level.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.WallBaseOffset">Bottom offset in mm from the base level of the wall. The base level will be taken from the room level.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallSideOffset">Offset in mm inward from the room boundary to the face of the finishing wall.</system:String>
+    <system:String
+        x:Key="MainWindow.Tooltip.InputWallHeightStyle">Option for constraint of the top of the wall.</system:String>
+    <system:String
+        x:Key="MainWindow.Label.RoomGetterMode">Create walls:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallTypes">Finishing wall type:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallTopElevationMode">Top elevation from level:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallBaseElevationMode">Base elevation from level:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.Mm">mm</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallBaseOffset">Bottom offset from level:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallSideOffset">Offset inward:</system:String>
+    <system:String
+        x:Key="MainWindow.Label.InputWallHeightStyle">Top constraint</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.WallType">Specify the finishing wall type</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.RoomGetterMode">Specify room selection method</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.WallTopElevationMode">Specify top elevation for finishing walls</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.WallBaseElevationMode">Specify base elevation for finishing walls</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MinBaseOffset">Offset downward is too large</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MaxBaseOffset">Offset upward is too large</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.BaseOffsetNotNumber">Offset must be a number</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MinWallElevation">Top elevation must be greater than {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MaxWallElevation">Top elevation is too large</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ElevationBelowOffset">Top elevation must be greater than the offset</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.ElevationNotNumber">Top elevation must be a number</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MinSideOffset">Inward offset must not be less than {0}</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.MaxSideOffset">Inward offset is too large</system:String>
+    <system:String
+        x:Key="MainWindow.Validation.SideOffsetNotNumber">Inward offset must be a number</system:String>
+
+    <system:String
+        x:Key="RoomGetterMode.AlreadySelectedRooms">From already selected rooms</system:String>
+    <system:String
+        x:Key="RoomGetterMode.RoomsOnActiveView">From rooms in active view</system:String>
+    <system:String
+        x:Key="RoomGetterMode.ManuallySelectedRooms">From manually selected rooms</system:String>
+
+    <system:String
+        x:Key="WallElevationMode.ManualHeight">Set manually</system:String>
+    <system:String
+        x:Key="WallElevationMode.HeightByRoom">By room</system:String>
+
+    <system:String
+        x:Key="WallHeightStyle.Unconnected">Unconnected</system:String>
+    <system:String
+        x:Key="WallHeightStyle.UpToLevel">Up to level</system:String>
+
+    <system:String
+        x:Key="Exceptions.InvalidLine">Cannot create wall from the given line</system:String>
+    <system:String
+        x:Key="Exceptions.InvalidHeight">Cannot create wall with the given height</system:String>
+    <system:String
+        x:Key="Exceptions.ClosedDocument">Plugin window was opened in a different Revit document which has been closed, cannot show the element</system:String>
+    <system:String
+        x:Key="Exceptions.InactiveDocument">Plugin window was opened in a different Revit document which is not active now, cannot show the element</system:String>
+    <system:String
+        x:Key="Exceptions.MapingLinesInvalidCount">Cannot map the list of lines because it contains fewer or equal elements than the original loop</system:String>
+    <system:String
+        x:Key="Exceptions.MapingLinesInvalidSize">Only a reduced list of lines can be mapped</system:String>
+    <system:String
+        x:Key="Exceptions.CannotMapLines">Failed to map the list of lines</system:String>
+
+    <system:String
+        x:Key="Errors.CannotCreateWallLines">Failed to build axes of finishing walls in the room</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.Title">Wall Finishing Errors</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Label.Rooms">Rooms</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Label.ErrorsInRoom">Errors in room:</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Level">Level</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Name">Name</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Header">Header</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Columns.Description">Description</system:String>
+    <system:String
+        x:Key="ErrorsWindow.Buttons.Select">Select</system:String>
+    <system:String
+        x:Key="ErrorsWindow.GroupItemsCount">Count:</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorTitles.RoomBoundaries">Room Boundary Processing Errors</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorTitles.WallCreation">Wall Creation Errors</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorTitles.WallJoining">Wall Joining Errors</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ErrorMsg.WallJoining">Failed to join finishing wall</system:String>
+
+    <system:String
+        x:Key="MessageBox.Errors.Header">Error</system:String>
+
+    <system:String
+        x:Key="ProgressBar.Title">Processing apartments... [{0}]\[{1}]</system:String>
+
+    <system:String
+        x:Key="RevitUI.FilterPrompt">Select rooms</system:String>
+
+    <system:String
+        x:Key="Transactions.Create3dView">Creating 3D View</system:String>
+    <system:String
+        x:Key="Transactions.Clear3dViewSettings">Reset 3D View Settings</system:String>
+    <system:String
+        x:Key="Transactions.CreateFinishingWalls">Creating Finishing Walls</system:String>
+</ResourceDictionary>

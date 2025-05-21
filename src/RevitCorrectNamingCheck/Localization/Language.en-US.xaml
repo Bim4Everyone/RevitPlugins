@@ -1,0 +1,27 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на английский американский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Check WS connection</system:String>
+    <system:String x:Key="MainWindow.LinkedFile">Linked File</system:String>
+    <system:String x:Key="MainWindow.WorksetType">Type Workset</system:String>
+    <system:String x:Key="MainWindow.Instance">Instance Workset</system:String>
+
+
+    <system:String x:Key="WorksetNameStatus.WorksetCorrect">The bond is distributed by WS correctly</system:String>
+    <system:String x:Key="WorksetNameStatus.PartialCorrect">"The link was added to the working set without the label 'Link'"</system:String>
+    <system:String x:Key="WorksetNameStatus.Incorrect">There are several labels for different sections in the name of the working set. It is impossible to determine the correspondence unambiguously</system:String>
+    <system:String x:Key="WorksetNameStatus.NoMatch">The working set of the unsuitable section is selected</system:String>
+
+    <system:String x:Key="FileNameStatus.NotFoundTags">No section tags found</system:String>
+    <system:String x:Key="FileNameStatus.MultipleTags">More than one section tag found. Unable to determine the linked section unambiguously</system:String>
+
+    <system:String x:Key="GeneralSettings.ErrorNoLinkedFiles">No links uploaded to the file.</system:String>
+    <system:String x:Key="GeneralSettings.ErrorMessage">Error</system:String>
+
+    <system:String x:Key="MainWindow.Undefined">Undefined</system:String>
+    <system:String x:Key="MainWindow.ButtonRefresh">Refresh</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+</ResourceDictionary>

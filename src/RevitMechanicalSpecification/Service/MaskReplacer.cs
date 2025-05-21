@@ -55,11 +55,11 @@ namespace RevitMechanicalSpecification.Service {
         public string ReplaceMask(Element element, string maskName, string toParamName) {
             Element elemType = element.GetElementType();
 
-            if(!elemType.IsExistsParam(maskName)) {
+            if(!elemType.IsExistsParam(maskName) && !element.IsExistsParam(maskName)) {
                 return string.Empty;
             }
 
-            string mask = elemType.GetSharedParamValueOrDefault<string>(maskName, "ЗАПОЛНИТЕ МАСКУ");
+            string mask = element.GetSharedParamValueOrDefault<string>(maskName) ?? elemType.GetSharedParamValueOrDefault<string>(maskName, "ЗАПОЛНИТЕ МАСКУ");
 
             string width = GetStringValue(element, elemType, _adskWidth);
             string height = GetStringValue(element, elemType, _adskHeight);

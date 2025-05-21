@@ -15,16 +15,19 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
     /// </summary>
     internal class ManyOpeningTasksInFloorParameterGetter : IParametersGetter {
         private readonly ICollection<OpeningMepTaskIncoming> _incomingTasks;
+        private readonly int _rounding;
 
 
         /// <summary>
         /// Конструктор класса, предоставляющего параметров габариты чистового отверстия, размещаемого в перекрытии по нескольким заданиям на отверстия
         /// </summary>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         /// <exception cref="ArgumentException">Исключение, если в коллекции меньше одного элемента</exception>
-        public ManyOpeningTasksInFloorParameterGetter(ICollection<OpeningMepTaskIncoming> incomingTasks) {
+        public ManyOpeningTasksInFloorParameterGetter(ICollection<OpeningMepTaskIncoming> incomingTasks, int rounding) {
             _incomingTasks = incomingTasks ?? throw new ArgumentNullException(nameof(incomingTasks));
+            _rounding = rounding;
             if(_incomingTasks.Count < 1) { throw new ArgumentException(nameof(incomingTasks)); }
         }
 
@@ -33,10 +36,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
             // габариты отверстия
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArHeight,
-                new RectangleOpeningInFloorHeightValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray())).GetParamValue();
+                new RectangleOpeningInFloorHeightValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray(), _rounding)).GetParamValue();
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArWidth,
-                new RectangleOpeningInFloorWidthValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray())).GetParamValue();
+                new RectangleOpeningInFloorWidthValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray(), _rounding)).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
             var isEomValueGetter = new IsEomValueGetter(_incomingTasks);

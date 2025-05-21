@@ -1,4 +1,4 @@
-<base:PlatformWindow
+<core:WpfUIPlatformWindow
     x:Class="RevitPlugins.Views.MainWindow"
 
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -9,11 +9,14 @@
 
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:vms="clr-namespace:RevitPlugins.ViewModels"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    Title="{DynamicResource MainWindow.Title}"
+    Title="{me:LocalizationSource MainWindow.Title}"
 
     Width="800"
     Height="450"
@@ -33,43 +36,47 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="*" />
-            <RowDefinition
-                Height="45" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <TextBox
+        <ui:TitleBar
             Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}"/>
+        
+        <ui:TextBox
+            Grid.Row="1"
             Width="200"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
             Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
-            <TextBlock
+            <ui:TextBlock
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
-            <Button
-                Width="80"
+            <ui:Button
                 Margin="10"
-                Content="{DynamicResource MainWindow.ButtonOk}"
+                Width="80"
+                Appearance="Info"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
-            <Button
-                Width="80"
+            <ui:Button
                 Margin="10"
-                Content="{DynamicResource MainWindow.ButtonCancel}"
+                Width="80"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:PlatformWindow>
+</core:WpfUIPlatformWindow>

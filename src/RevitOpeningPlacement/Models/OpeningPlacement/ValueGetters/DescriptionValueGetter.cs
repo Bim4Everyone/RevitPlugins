@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -32,12 +32,16 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters {
             if(_createdByOpeningGroup) {
                 return new StringParamValue(_openingsGroup.GetDescription());
             } else {
+                var firstElementFile = _element1.Document.Title;
                 var firstElementName = _element1.Name;
                 var firstElementId = _element1.Id.GetIdValue();
+                var secondElementFile = _element2.Document.Title;
                 var secondElementName = _element2.Name;
                 var secondElementId = _element2.Id.GetIdValue();
 
-                var description = firstElementName + ": " + firstElementId + "; " + secondElementName + ": " + secondElementId;
+                var description =
+                    $"{firstElementFile}: {firstElementName}: {firstElementId}; " +
+                    $"{secondElementFile}: {secondElementName}: {secondElementId}";
                 return new StringParamValue(description);
             }
         }

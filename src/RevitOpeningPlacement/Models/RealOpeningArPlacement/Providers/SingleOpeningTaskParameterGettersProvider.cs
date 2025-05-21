@@ -11,6 +11,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
     internal class SingleOpeningTaskParameterGettersProvider {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
         private readonly IPointFinder _pointFinder;
+        private readonly int _rounding;
 
 
         /// <summary>
@@ -18,13 +19,15 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public SingleOpeningTaskParameterGettersProvider(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder) {
+        public SingleOpeningTaskParameterGettersProvider(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder, int rounding) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
             if(pointFinder is null) { throw new ArgumentNullException(nameof(pointFinder)); }
 
             _openingMepTaskIncoming = incomingTask;
             _pointFinder = pointFinder;
+            _rounding = rounding;
         }
 
 
@@ -32,13 +35,13 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers {
         public IParametersGetter GetParametersGetter() {
             switch(_openingMepTaskIncoming.OpeningType) {
                 case OpeningType.WallRectangle:
-                    return new SingleRectangleOpeningTaskInWallParameterGetter(_openingMepTaskIncoming, _pointFinder);
+                    return new SingleRectangleOpeningTaskInWallParameterGetter(_openingMepTaskIncoming, _pointFinder, _rounding);
                 case OpeningType.FloorRectangle:
-                    return new SingleRectangleOpeningTaskInFloorParameterGetter(_openingMepTaskIncoming);
+                    return new SingleRectangleOpeningTaskInFloorParameterGetter(_openingMepTaskIncoming, _rounding);
                 case OpeningType.WallRound:
-                    return new SingleRoundOpeningTaskInWallParameterGetter(_openingMepTaskIncoming, _pointFinder);
+                    return new SingleRoundOpeningTaskInWallParameterGetter(_openingMepTaskIncoming, _pointFinder, _rounding);
                 case OpeningType.FloorRound:
-                    return new SingleRoundOpeningTaskInFloorParameterGetter(_openingMepTaskIncoming);
+                    return new SingleRoundOpeningTaskInFloorParameterGetter(_openingMepTaskIncoming, _rounding);
                 default:
                     throw new ArgumentException(nameof(_openingMepTaskIncoming.OpeningType));
             }

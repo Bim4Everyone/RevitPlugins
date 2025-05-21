@@ -111,7 +111,7 @@ namespace RevitOpeningPlacement {
                                                    .ToList();
                 uiApplication.Application.FailuresProcessing += FailureProcessor;
                 try {
-                    var unplacedClashes = InitializePlacing(revitRepository, placers)
+                    var unplacedClashes = InitializePlacing(revitRepository, placers, openingConfig)
                         .Concat(placementConfigurator.GetUnplacedClashes());
                     if(openingConfig.ShowPlacingErrors) {
                         InitializeReport(revitRepository, unplacedClashes);
@@ -134,7 +134,7 @@ namespace RevitOpeningPlacement {
             return false;
         }
 
-        private IList<UnplacedClashModel> InitializePlacing(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
+        private IList<UnplacedClashModel> InitializePlacing(RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers, OpeningConfig config) {
             if(placers.Count() == 0) {
                 return new List<UnplacedClashModel>();
             }
@@ -146,11 +146,11 @@ namespace RevitOpeningPlacement {
                 var ct = pb.CreateCancellationToken();
                 pb.Show();
 
-                return PlaceOpenings(progress, ct, revitRepository, placers);
+                return PlaceOpenings(progress, ct, revitRepository, placers, config);
             }
         }
 
-        private IList<UnplacedClashModel> PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers) {
+        private IList<UnplacedClashModel> PlaceOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, IEnumerable<OpeningPlacer> placers, OpeningConfig config) {
             var placedOpeningTasks = revitRepository.GetPlacedOutcomingTasks();
             HashSet<FamilyInstance> placedFamInstances = new HashSet<FamilyInstance>();
             List<UnplacedClashModel> unplacedClashes = new List<UnplacedClashModel>();
@@ -186,12 +186,12 @@ namespace RevitOpeningPlacement {
             if(placedOpeningTasks.Count > 0) {
                 var newOpeningsNotDeleted = InitializeRemoving(revitRepository, newOpenings, placedOpeningTasks);
                 if(newOpeningsNotDeleted.Count > 1) {
-                    InitializeUnion(revitRepository, newOpeningsNotDeleted);
+                    InitializeUnion(revitRepository, newOpeningsNotDeleted, config);
                 }
             } else {
                 // инициализация удаления дубликатов только что созданных заданий на отверстия здесь не запускается,
                 // потому что дубликаты будут объединены в одно задание
-                InitializeUnion(revitRepository, newOpenings);
+                InitializeUnion(revitRepository, newOpenings, config);
             }
             return unplacedClashes;
         }
@@ -250,7 +250,8 @@ namespace RevitOpeningPlacement {
 
         private void InitializeUnion(
             RevitRepository revitRepository,
-            ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion
+            ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion,
+            OpeningConfig config
             ) {
             using(var pb = GetPlatformService<IProgressDialogService>()) {
                 pb.StepValue = _progressBarStepValue;
@@ -260,11 +261,11 @@ namespace RevitOpeningPlacement {
                 var ctUnite = pb.CreateCancellationToken();
                 pb.Show();
 
-                UniteTouchingOpenings(progressUnite, ctUnite, revitRepository, newOpeningsForUnion);
+                UniteTouchingOpenings(progressUnite, ctUnite, revitRepository, newOpeningsForUnion, config);
             }
         }
 
-        private void UniteTouchingOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion) {
+        private void UniteTouchingOpenings(IProgress<int> progress, CancellationToken ct, RevitRepository revitRepository, ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion, OpeningConfig config) {
             ICollection<OpeningsGroup> groups = new MultilayerOpeningsGroupsProvider(revitRepository).GetOpeningsGroups(newOpeningsForUnion);
             using(var t = revitRepository.GetTransaction("Объединение многослойных заданий")) {
 
@@ -273,7 +274,7 @@ namespace RevitOpeningPlacement {
                     ct.ThrowIfCancellationRequested();
                     progress.Report(count);
                     try {
-                        OpeningPlacer placer = group.GetOpeningPlacer(revitRepository);
+                        OpeningPlacer placer = group.GetOpeningPlacer(revitRepository, config);
                         FamilyInstance unitedOpening = placer.Place();
 
                         if(unitedOpening != null) {
@@ -313,7 +314,8 @@ namespace RevitOpeningPlacement {
                     foreach(var id in ids) {
                         _duplicatedInstancesToRemoveIds.Add(id);
                     }
-                };
+                }
+                ;
             }
         }
 
