@@ -71,7 +71,7 @@ public class RevitPluginTemplateCommand : BasePluginCommand {
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
         kernel.UseWpfLocalization(
-            $"/{assemblyName};component/localization/language.xaml",
+            $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         // Вызывает стандартное уведомление
