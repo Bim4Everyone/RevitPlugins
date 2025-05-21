@@ -62,8 +62,5 @@ namespace RevitDeclarations.Models {
         protected abstract void FillTableHeader();
         protected abstract void FillMainTable();
         protected abstract void FillAdditionalInfo();
-
-
     }
-
 }
