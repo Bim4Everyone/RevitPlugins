@@ -6,5 +6,5 @@ using Nuke.Common.Tooling;
 internal sealed class PluginType : Enumeration {
     public static readonly PluginType Default = new() {Value = nameof(Default)};
     public static readonly PluginType DevExpress = new() {Value = nameof(DevExpress)};
-    public static readonly PluginType WpfUi = new() {Value = nameof(WpfUi) };
+    public static readonly PluginType WpfUI = new() {Value = nameof(WpfUI) };
 }

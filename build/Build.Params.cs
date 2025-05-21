@@ -46,7 +46,7 @@ partial class Build {
     /// Plugin type name.
     /// </summary>
     [Parameter("Plugin type name.")]
-    public PluginType PluginType { get; set; } = PluginType.WpfUi;
+    public PluginType PluginType { get; set; } = PluginType.WpfUI;
 
     /// <summary>
     /// Output directory.
