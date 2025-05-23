@@ -90,8 +90,8 @@ namespace RevitDeclarations.Models {
 
             List<Curve> connectedContour = new List<Curve>();
             if(directionOfLeftContour.CrossProduct(directionOfRightContour).IsAlmostEqualTo(XYZ.Zero)) {
-                Curve curve = Line.CreateBound(endOfTheLeftContour.GetEndPoint(1), startOfTheRightContour.GetEndPoint(1));
-                connectedContour.AddRange(leftContour.Take(leftContour.Count - 2));
+                Curve curve = Line.CreateBound(endOfTheLeftContour.GetEndPoint(0), startOfTheRightContour.GetEndPoint(1));
+                connectedContour.AddRange(leftContour.Take(leftContour.Count - 1));
                 connectedContour.Add(curve);
                 connectedContour.AddRange(rightContour.Skip(1));
             } else {
