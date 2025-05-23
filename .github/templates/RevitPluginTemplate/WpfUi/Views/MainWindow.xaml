@@ -39,6 +39,13 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
+        <ui:TextBox
+            Grid.Row="1"
+            Width="200"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+
         <StackPanel
             Grid.Row="1"
             Orientation="Horizontal"
