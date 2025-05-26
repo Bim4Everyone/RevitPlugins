@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,7 +46,7 @@ partial class Build {
     /// Plugin type name.
     /// </summary>
     [Parameter("Plugin type name.")]
-    public PluginType PluginType { get; set; } = PluginType.Default;
+    public PluginType PluginType { get; set; } = PluginType.WpfUI;
 
     /// <summary>
     /// Output directory.
