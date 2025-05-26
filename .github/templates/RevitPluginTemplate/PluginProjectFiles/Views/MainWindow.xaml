@@ -45,7 +45,7 @@
             Width="200"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
-            Text="{me:LocalizationSource "MainWindow.Hello}" />
+            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
 
         <StackPanel
             Grid.Row="1"
