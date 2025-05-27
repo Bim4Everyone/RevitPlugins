@@ -1,10 +1,19 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
+using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitFinishing.Models;
+using RevitFinishing.Models.Finishing;
+using RevitFinishing.Views;
 
 namespace RevitFinishing.ViewModels;
 
@@ -16,8 +25,12 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
+    private readonly List<Phase> _phases;
+    private Phase _selectedPhase;
+
+    private ObservableCollection<RoomGroupViewModel> _rooms;
+
     private string _errorText;
-    private string _saveProperty;
     
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -34,8 +47,18 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
-        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        ProjectSettingsLoader settings = new ProjectSettingsLoader(_revitRepository.Application,
+                                                           _revitRepository.Document);
+        settings.CopyKeySchedule();
+        settings.CopyParameters();
+
+        _phases = _revitRepository.GetPhases();
+        SelectedPhase = _phases[_phases.Count - 1];
+
+        CalculateFinishingCommand = RelayCommand.Create(CalculateFinishing, CanCalculateFinishing);
+        CheckAllCommand = RelayCommand.Create(CheckAll);
+        UnCheckAllCommand = RelayCommand.Create(UnCheckAll);
+        InvertAllCommand = RelayCommand.Create(InvertAll);
     }
 
     /// <summary>
@@ -49,20 +72,30 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
-    /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
-    /// </summary>
+    public ICommand CalculateFinishingCommand { get; }
+    public ICommand CheckAllCommand { get; }
+    public ICommand UnCheckAllCommand { get; }
+    public ICommand InvertAllCommand { get; }
+
+    public List<Phase> Phases => _phases;
+
+    public Phase SelectedPhase {
+        get => _selectedPhase;
+        set {
+            RaiseAndSetIfChanged(ref _selectedPhase, value);
+            _rooms = _revitRepository.GetRoomsOnPhase(_selectedPhase);
+            OnPropertyChanged("Rooms");
+        }
+    }
+
+    public ObservableCollection<RoomGroupViewModel> Rooms {
+        get => _rooms;
+        set => RaiseAndSetIfChanged(ref _rooms, value);
+    }
+
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
-
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
     }
 
     /// <summary>
@@ -73,51 +106,143 @@ internal class MainViewModel : BaseViewModel {
         LoadConfig();
     }
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
-    private void AcceptView() {
+    private void CalculateFinishing() {
+        IEnumerable<Element> selectedRooms = Rooms
+            .Where(x => x.IsChecked)
+            .SelectMany(x => x.Rooms);
+
+        FinishingInProject allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
+        FinishingChecker checker = new FinishingChecker(SelectedPhase);
+        ErrorsViewModel mainErrors = new ErrorsViewModel();
+
+
+        mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
+            Description = "На выбранной стадии не найдены экземпляры отделки",
+            ErrorElements = new ObservableCollection<ErrorElement>(
+                checker.CheckPhaseContainsFinishing(allFinishing))
+        });
+        mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
+            Description = "Экземпляры отделки являются границами помещений",
+            ErrorElements = new ObservableCollection<ErrorElement>(
+                checker.CheckFinishingByRoomBounding(allFinishing))
+        });
+        string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
+        mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
+            Description = "У помещений не заполнен ключевой параметр отделки",
+            ErrorElements = new ObservableCollection<ErrorElement>(
+                checker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam))
+        });
+        if(mainErrors.ErrorLists.Any()) {
+            var window = new ErrorsWindow(mainErrors);
+            window.Show();
+            return;
+        }
+
+        FinishingCalculator calculator = new FinishingCalculator(selectedRooms, allFinishing);
+        ErrorsViewModel otherErrors = new ErrorsViewModel();
+        ErrorsViewModel warnings = new ErrorsViewModel();
+
+        otherErrors.AddElements(new ErrorsListViewModel("Ошибка") {
+            Description = "Элементы отделки относятся к помещениям с разными типами отделки",
+            ErrorElements = new ObservableCollection<ErrorElement>(
+                checker.CheckFinishingByRoom(calculator.FinishingElements))
+        });
+        if(otherErrors.ErrorLists.Any()) {
+            var window = new ErrorsWindow(otherErrors);
+            window.Show();
+            return;
+        }
+
+        string numberParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER);
+        warnings.AddElements(new ErrorsListViewModel("Предупреждение") {
+            Description = $"У помещений не заполнен параметр \"{numberParamName}\"",
+            ErrorElements = new ObservableCollection<ErrorElement>(
+                checker.CheckRoomsByParameter(selectedRooms, numberParamName))
+        });
+        string nameParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME);
+        warnings.AddElements(new ErrorsListViewModel("Предупреждение") {
+            Description = $"У помещений не заполнен параметр \"{nameParamName}\"",
+            ErrorElements = new ObservableCollection<ErrorElement>(
+                checker.CheckRoomsByParameter(selectedRooms, nameParamName))
+        });
+        if(warnings.ErrorLists.Any()) {
+            var window = new ErrorsWindow(warnings);
+            window.Show();
+        }
+
+        using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры отделки")) {
+            foreach(var element in calculator.FinishingElements) {
+                element.UpdateFinishingParameters();
+                element.UpdateCategoryParameters();
+            }
+            t.Commit();
+        }
+
         SaveConfig();
     }
 
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
-    private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+    private bool CanCalculateFinishing() {
+        if(!Rooms.Any()) {
+            ErrorText = "Помещения отсутствуют на выбранной стадии";
+            return false;
+        }
+        if(!Rooms.Any(x => x.IsChecked)) {
+            ErrorText = "Помещения не выбраны";
             return false;
         }
 
-        ErrorText = null;
+        ErrorText = "";
         return true;
     }
+
+    private void CheckAll() {
+        _revitRepository.SetAll(Rooms, true);
+    }
+
+    private void UnCheckAll() {
+        _revitRepository.SetAll(Rooms, false);
+    }
+
+    private void InvertAll() {
+        _revitRepository.InvertAll(Rooms);
+    }
+
 
     /// <summary>
     /// Загрузка настроек плагина.
     /// </summary>
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        if(settings is null) {
+            settings = _pluginConfig.AddSettings(_revitRepository.Document);
+        }
+
+        settings.Phase = SelectedPhase.Name;
+        settings.RoomNames = Rooms
+            .Where(x => x.IsChecked)
+            .Select(x => x.Name)
+            .ToList();
+
+        _pluginConfig.SaveProjectConfig();
     }
 
     /// <summary>
     /// Сохранение настроек плагина.
     /// </summary>
     private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
+        var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        setting.SaveProperty = SaveProperty;
+        if(settings is null) {
+            settings = _pluginConfig.AddSettings(_revitRepository.Document);
+        }
+
+        settings.Phase = SelectedPhase.Name;
+        settings.RoomNames = Rooms
+            .Where(x => x.IsChecked)
+            .Select(x => x.Name)
+            .ToList();
+
         _pluginConfig.SaveProjectConfig();
     }
 }
