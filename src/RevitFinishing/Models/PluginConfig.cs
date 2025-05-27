@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -63,4 +65,7 @@ internal class RevitSettings : ProjectSettings {
     /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
     /// </summary>
     public string SaveProperty { get; set; }
+
+    public string Phase { get; set; }
+    public List<string> RoomNames { get; set; }
 }
