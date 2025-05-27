@@ -1,6 +1,9 @@
 using System.Windows;
+using System.Windows.Forms;
 
 using dosymep.SimpleServices;
+
+using RevitFinishing.ViewModels;
 
 namespace RevitFinishing.Views;
 
@@ -56,6 +59,10 @@ public partial class MainWindow {
     }
 
     private void ChangeSelected(bool state) {
-        if(state) { }
+        var listBox = (ListBox) FindName("RoomGroups");
+        var groups = listBox.SelectedItems;
+        foreach(RoomGroupViewModel group in groups) {
+            group.IsChecked = state;
+        }
     }
 }
