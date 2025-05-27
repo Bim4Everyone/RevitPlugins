@@ -15,11 +15,11 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="500"
-    Width="700"
+    Height="600"
+    Width="500"
     
-    MinHeight="500"
-    MinWidth="700"
+    MinHeight="600"
+    MinWidth="500"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -32,23 +32,72 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <DockPanel
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            Margin="10">
+            <ui:TextBlock
+                DockPanel.Dock="Left"
+                Width="80"
+                Text="{me:LocalizationSource MainWindow.Phases}"/>
+            <ComboBox
+                Height="25"
+                ItemsSource="{Binding Phases}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding SelectedPhase}"/>
+        </DockPanel>
+
+        <ui:TextBlock
+            Grid.Row="2"
+            Margin="10"
+            Text="{me:LocalizationSource MainWindow.RoomNames}"/>
+
+        <ListBox
+            x:Name="RoomGroups"
+            Grid.Row="3"
+            Margin="10, 5"
+            SelectionMode="Extended"
+            ItemsSource="{Binding Rooms}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding Name}"
+                              Checked="CheckBox_Checked"
+                              Unchecked="CheckBox_Unchecked"
+                              IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <UniformGrid 
+            Columns="3"
+            Grid.Row="4"
+            Margin="10,5">
+            <ui:Button 
+                Content="{me:LocalizationSource MainWindow.CheckAll}"
+                Margin="0,0,5,0"
+                Command="{Binding CheckAllCommand}"/>
+            <ui:Button 
+                Content="{me:LocalizationSource MainWindow.UnCheckAll}"
+                Margin="5,0,5,0"
+                Command="{Binding UnCheckAllCommand}"/>
+            <ui:Button 
+                Content="{me:LocalizationSource MainWindow.InvertAll}"
+                Margin="5,0,0,0"
+                Command="{Binding InvertAllCommand}"/>
+        </UniformGrid>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="5"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 

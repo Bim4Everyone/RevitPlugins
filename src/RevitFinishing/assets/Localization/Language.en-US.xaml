@@ -8,6 +8,14 @@
     <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
 
+    <system:String x:Key="MainWindow.Phases">Phases</system:String>
+    <system:String x:Key="MainWindow.RoomNames">Room names</system:String>
+
+
+    <system:String x:Key="MainWindow.CheckAll">Select all</system:String>
+    <system:String x:Key="MainWindow.UnCheckAll">Unselect all</system:String>
+    <system:String x:Key="MainWindow.InvertAll">Invert</system:String>
+
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>
