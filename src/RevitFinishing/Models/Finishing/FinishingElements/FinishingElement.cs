@@ -77,10 +77,24 @@ namespace RevitFinishing.Models.Finishing
                                         GetRoomsParameters(paramConfig.FloorFinishingType1));
             _revitElement.SetParamValue(paramConfig.FloorFinishingType2,
                                         GetRoomsParameters(paramConfig.FloorFinishingType2));
+            _revitElement.SetParamValue(paramConfig.FloorFinishingType3,
+                                        GetRoomsParameters(paramConfig.FloorFinishingType3));
+            _revitElement.SetParamValue(paramConfig.FloorFinishingType4,
+                                        GetRoomsParameters(paramConfig.FloorFinishingType4));
+            _revitElement.SetParamValue(paramConfig.FloorFinishingType5,
+                                        GetRoomsParameters(paramConfig.FloorFinishingType5));
+
             _revitElement.SetParamValue(paramConfig.CeilingFinishingType1,
                                         GetRoomsParameters(paramConfig.CeilingFinishingType1));
             _revitElement.SetParamValue(paramConfig.CeilingFinishingType2,
-                                        GetRoomsParameters(paramConfig.CeilingFinishingType2));
+                                        GetRoomsParameters(paramConfig.CeilingFinishingType1));
+            _revitElement.SetParamValue(paramConfig.CeilingFinishingType3,
+                                        GetRoomsParameters(paramConfig.CeilingFinishingType3));
+            _revitElement.SetParamValue(paramConfig.CeilingFinishingType4,
+                                        GetRoomsParameters(paramConfig.CeilingFinishingType4));
+            _revitElement.SetParamValue(paramConfig.CeilingFinishingType5,
+                                        GetRoomsParameters(paramConfig.CeilingFinishingType5));
+
             _revitElement.SetParamValue(paramConfig.WallFinishingType1,
                                         GetRoomsParameters(paramConfig.WallFinishingType1));
             _revitElement.SetParamValue(paramConfig.WallFinishingType2,
@@ -101,10 +115,17 @@ namespace RevitFinishing.Models.Finishing
                                         GetRoomsParameters(paramConfig.WallFinishingType9));
             _revitElement.SetParamValue(paramConfig.WallFinishingType10,
                                         GetRoomsParameters(paramConfig.WallFinishingType10));
+
             _revitElement.SetParamValue(paramConfig.BaseboardFinishingType1,
                                         GetRoomsParameters(paramConfig.BaseboardFinishingType1));
             _revitElement.SetParamValue(paramConfig.BaseboardFinishingType2,
                                         GetRoomsParameters(paramConfig.BaseboardFinishingType2));
+            _revitElement.SetParamValue(paramConfig.BaseboardFinishingType3,
+                                        GetRoomsParameters(paramConfig.BaseboardFinishingType3));
+            _revitElement.SetParamValue(paramConfig.BaseboardFinishingType4,
+                                        GetRoomsParameters(paramConfig.BaseboardFinishingType4));
+            _revitElement.SetParamValue(paramConfig.BaseboardFinishingType5,
+                                        GetRoomsParameters(paramConfig.BaseboardFinishingType5));
 
             _revitElement.SetParamValue(paramConfig.FinishingRoomName,
                                         GetRoomsParameters(BuiltInParameter.ROOM_NAME));
