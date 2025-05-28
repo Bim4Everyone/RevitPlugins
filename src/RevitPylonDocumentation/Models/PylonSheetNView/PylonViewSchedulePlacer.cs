@@ -6,6 +6,26 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView {
     public class PylonViewSchedulePlacer {
+        // Смещение по горизонтали в футах, для размещаемых компонентов листа требуемое, чтобы они попали на лист
+        private readonly double _titleBlockFrameRightOffset = UnitUtilsHelper.ConvertToInternalValue(2.883);
+
+        // Смещение по вертикали в футах, для размещаемых компонентов листа требуемое, чтобы они попали на лист
+        private readonly double _titleBlockFrameTopOffset = UnitUtilsHelper.ConvertToInternalValue(9.7536);
+
+        // Смещения по вертикали в футах, для размещаемых спецификаций
+        // требуемое, для их корректного взаимного размещения на листе (в случае наличия маленькой шапки спецификации)
+        private readonly double _scheduleTopOffsetSmall = UnitUtilsHelper.ConvertToInternalValue(2.117);
+        // требуемое, для их корректного взаимного размещения на листе (в случае наличия большой шапки спецификации)
+        private readonly double _scheduleTopOffsetBig = UnitUtilsHelper.ConvertToInternalValue(4);//0.01;
+
+        // Стандартная позиция спецификаций по вертикали в футах, в случае, если размещение пошло не корректно и
+        // референсные объекты для размещения на листе не найдены
+        private readonly double _defaultSchedulePositionY = UnitUtilsHelper.ConvertToInternalValue(-30.48);
+
+        // Смещение по горизонтали в футах, для размещаемых ведомостей деталей, для корректного размещения на листе
+        private readonly double _schedulePartsRightOffset = -UnitUtilsHelper.ConvertToInternalValue(2.9);
+
+
         internal PylonViewSchedulePlacer(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
             ViewModel = mvm;
             Repository = repository;
@@ -22,7 +42,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             if(SheetInfo.SkeletonSchedule.ViewElement == null) {
                 return false;
             } else {
-                // Заполнеяем данные для задания
+                // Заполняем данные для задания
                 SheetInfo.SkeletonSchedule.ViewportName =
                     ViewModel.SchedulesSettings.SkeletonSchedulePrefix
                         + SheetInfo.PylonKeyName
@@ -36,8 +56,8 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Рассчитываем и задаем корректную точку вставки спецификации арматуры пилона
             XYZ newCenter = new XYZ(
-                (-SheetInfo.SkeletonSchedule.ViewportHalfWidth * 2) - 0.0095,
-                SheetInfo.TitleBlockHeight - 0.032,
+                (-SheetInfo.SkeletonSchedule.ViewportHalfWidth * 2) - _titleBlockFrameRightOffset,
+                SheetInfo.TitleBlockHeight - _titleBlockFrameTopOffset,
                 0);
             (SheetInfo.SkeletonSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
 
@@ -51,7 +71,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             if(SheetInfo.RebarSchedule.ViewElement == null) {
                 return false;
             } else {
-                // Заполнеяем данные для задания
+                // Заполняем данные для задания
                 SheetInfo.RebarSchedule.ViewportName =
                     ViewModel.SchedulesSettings.RebarSchedulePrefix
                         + SheetInfo.PylonKeyName
@@ -65,14 +85,15 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
             XYZ newCenter = new XYZ(
-                (-SheetInfo.RebarSchedule.ViewportHalfWidth * 2) - 0.0095,
-                SheetInfo.TitleBlockHeight - 0.032,
+                (-SheetInfo.RebarSchedule.ViewportHalfWidth * 2) - _titleBlockFrameRightOffset,
+                SheetInfo.TitleBlockHeight - _titleBlockFrameTopOffset,
                 0);
 
             if(SheetInfo.SkeletonSchedule.ViewportElement != null) {
                 newCenter = new XYZ(
-                    (-SheetInfo.RebarSchedule.ViewportHalfWidth * 2) - 0.0095,
-                    SheetInfo.SkeletonSchedule.ViewportCenter.Y - (SheetInfo.SkeletonSchedule.ViewportHalfHeight * 2) + 0.0069,
+                    (-SheetInfo.RebarSchedule.ViewportHalfWidth * 2) - _titleBlockFrameRightOffset,
+                    SheetInfo.SkeletonSchedule.ViewportCenter.Y - (SheetInfo.SkeletonSchedule.ViewportHalfHeight * 2) 
+                    + _scheduleTopOffsetSmall,
                     0);
             }
             (SheetInfo.RebarSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -87,7 +108,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             if(SheetInfo.MaterialSchedule.ViewElement == null) {
                 return false;
             } else {
-                // Заполнеяем данные для задания
+                // Заполняем данные для задания
                 SheetInfo.MaterialSchedule.ViewportName =
                     ViewModel.SchedulesSettings.MaterialSchedulePrefix
                         + SheetInfo.PylonKeyName
@@ -101,14 +122,15 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
             XYZ newCenter = new XYZ(
-                    (-SheetInfo.MaterialSchedule.ViewportHalfWidth * 2) - 0.0095,
-                    -0.1,
+                    (-SheetInfo.MaterialSchedule.ViewportHalfWidth * 2) - _titleBlockFrameRightOffset,
+                    _defaultSchedulePositionY,
                     0);
 
             if(SheetInfo.RebarSchedule.ViewportElement != null) {
                 newCenter = new XYZ(
-                    (-SheetInfo.MaterialSchedule.ViewportHalfWidth * 2) - 0.0095,
-                    SheetInfo.RebarSchedule.ViewportCenter.Y - (SheetInfo.RebarSchedule.ViewportHalfHeight * 2) + 0.0069,
+                    (-SheetInfo.MaterialSchedule.ViewportHalfWidth * 2) - _titleBlockFrameRightOffset,
+                    SheetInfo.RebarSchedule.ViewportCenter.Y - (SheetInfo.RebarSchedule.ViewportHalfHeight * 2) 
+                    + _scheduleTopOffsetSmall,
                     0);
             }
             (SheetInfo.MaterialSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -122,7 +144,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             if(SheetInfo.SkeletonByElemsSchedule.ViewElement == null) {
                 return false;
             } else {
-                // Заполнеяем данные для задания
+                // Заполняем данные для задания
                 SheetInfo.SkeletonByElemsSchedule.ViewportName =
                     ViewModel.SchedulesSettings.SkeletonByElemsSchedulePrefix
                         + SheetInfo.PylonKeyName
@@ -136,14 +158,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Рассчитываем и задаем корректную точку вставки спецификации материалов пилона
             XYZ newCenter = new XYZ(
-                    (-SheetInfo.SkeletonByElemsSchedule.ViewportHalfWidth * 2) - 0.0095,
-                    -0.1,
+                    (-SheetInfo.SkeletonByElemsSchedule.ViewportHalfWidth * 2) - _titleBlockFrameRightOffset,
+                    _defaultSchedulePositionY,
                     0);
 
             if(SheetInfo.MaterialSchedule.ViewportElement != null) {
                 newCenter = new XYZ(
-                    (-SheetInfo.SkeletonByElemsSchedule.ViewportHalfWidth * 2) - 0.0095,
-                    SheetInfo.MaterialSchedule.ViewportCenter.Y - (SheetInfo.MaterialSchedule.ViewportHalfHeight * 2) - 0.01,
+                    (-SheetInfo.SkeletonByElemsSchedule.ViewportHalfWidth * 2) - _titleBlockFrameRightOffset,
+                    SheetInfo.MaterialSchedule.ViewportCenter.Y - (SheetInfo.MaterialSchedule.ViewportHalfHeight * 2) - _scheduleTopOffsetBig,
                     0);
             }
             (SheetInfo.SkeletonByElemsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -158,7 +180,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             if(SheetInfo.SystemPartsSchedule.ViewElement == null) {
                 return false;
             } else {
-                // Заполнеяем данные для задания
+                // Заполняем данные для задания
                 SheetInfo.SystemPartsSchedule.ViewportName =
                     ViewModel.SchedulesSettings.SystemPartsSchedulePrefix
                         + SheetInfo.PylonKeyName
@@ -172,14 +194,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
             XYZ newCenter = new XYZ(
-                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - (SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2),
+                    _schedulePartsRightOffset - (SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2),
                     (SheetInfo.TitleBlockHeight / 2) + (SheetInfo.SystemPartsSchedule.ViewportHalfHeight * 2),
                     0);
 
             if(SheetInfo.SkeletonByElemsSchedule.ViewportElement != null) {
                 newCenter = new XYZ(
-                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - (SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2),
-                    SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y - (SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2) - 0.01,
+                    _schedulePartsRightOffset - (SheetInfo.SystemPartsSchedule.ViewportHalfWidth * 2),
+                    SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y - (SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2) - _scheduleTopOffsetBig,
                     0);
             }
             (SheetInfo.SystemPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;
@@ -193,7 +215,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             if(SheetInfo.IfcPartsSchedule.ViewElement == null) {
                 return false;
             } else {
-                // Заполнеяем данные для задания
+                // Заполняем данные для задания
                 SheetInfo.IfcPartsSchedule.ViewportName =
                     ViewModel.SchedulesSettings.IfcPartsSchedulePrefix
                         + SheetInfo.PylonKeyName
@@ -207,14 +229,14 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
             // Рассчитываем и задаем корректную точку вставки спецификации системных деталей пилона
             XYZ newCenter = new XYZ(
-                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - (SheetInfo.IfcPartsSchedule.ViewportHalfWidth * 2),
+                    _schedulePartsRightOffset - (SheetInfo.IfcPartsSchedule.ViewportHalfWidth * 2),
                     (SheetInfo.TitleBlockHeight / 2) + (SheetInfo.IfcPartsSchedule.ViewportHalfHeight * 2),
                     0);
 
             if(SheetInfo.SkeletonByElemsSchedule.ViewportElement != null) {
                 newCenter = new XYZ(
-                    -UnitUtilsHelper.ConvertToInternalValue(2.9) - (SheetInfo.IfcPartsSchedule.ViewportHalfWidth * 2),
-                    SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y - (SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2) - 0.01,
+                    _schedulePartsRightOffset - (SheetInfo.IfcPartsSchedule.ViewportHalfWidth * 2),
+                    SheetInfo.SkeletonByElemsSchedule.ViewportCenter.Y - (SheetInfo.SkeletonByElemsSchedule.ViewportHalfHeight * 2) - _scheduleTopOffsetBig,
                     0);
             }
             (SheetInfo.IfcPartsSchedule.ViewportElement as ScheduleSheetInstance).Point = newCenter;

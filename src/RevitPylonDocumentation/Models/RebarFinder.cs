@@ -33,7 +33,7 @@ namespace RevitPylonDocumentation.Models {
                 if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != SheetInfo.ProjectSection) {
                     continue;
                 }
-                // Фильтарция по имени семейства
+                // Фильтрация по имени семейства
                 FamilySymbol rebarType = view.Document.GetElement(rebar.GetTypeId()) as FamilySymbol;
                 if(rebarType is null) {
                     continue;

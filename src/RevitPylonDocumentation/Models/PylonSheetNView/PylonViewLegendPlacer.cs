@@ -76,10 +76,19 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             }
 
             // Проверяем можем ли разместить на листе легенду
-            if(!Viewport.CanAddViewToSheet(Repository.Document, SheetInfo.PylonViewSheet.Id, ViewModel.SelectedRebarNode.Id)) { return false; }
+            if(!Viewport.CanAddViewToSheet(
+                Repository.Document, 
+                SheetInfo.PylonViewSheet.Id, 
+                ViewModel.SelectedRebarNode.Id)) { 
+                return false; 
+            }
 
             // Размещаем легенду на листе
-            Viewport viewPort = Viewport.Create(Repository.Document, SheetInfo.PylonViewSheet.Id, ViewModel.SelectedRebarNode.Id, SheetInfo.RebarNodeView.ViewportCenter);
+            Viewport viewPort = Viewport.Create(
+                Repository.Document, 
+                SheetInfo.PylonViewSheet.Id, 
+                ViewModel.SelectedRebarNode.Id, 
+                SheetInfo.RebarNodeView.ViewportCenter);
             SheetInfo.RebarNodeView.ViewportElement = viewPort;
 
             // Задание правильного типа видового экрана

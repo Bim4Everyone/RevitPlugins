@@ -267,7 +267,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             IList<ScheduleFilter> viewScheduleFilters = scheduleDefinition.GetFilters();
 
             // Идем в обратном порядке, т.к. удаление фильтра происходит по НОМЕРУ фильтра в общем списке в спеке
-            // Поэтому, если идти прямо, то номера сдивгаются
+            // Поэтому, если идти прямо, то номера сдвигаются
             for(int i = viewScheduleFilters.Count - 1; i >= 0; i--) {
                 ScheduleFilter currentFilter = viewScheduleFilters[i];
 
