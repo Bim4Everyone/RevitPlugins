@@ -14,7 +14,7 @@
    
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    
+
     Height="600"
     Width="500"
     
@@ -40,6 +40,7 @@
         </Grid.RowDefinitions>
 
         <ui:TitleBar
+            VerticalAlignment="Center"
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
@@ -49,9 +50,10 @@
             <ui:TextBlock
                 DockPanel.Dock="Left"
                 Width="80"
+                VerticalAlignment="Center"
                 Text="{me:LocalizationSource MainWindow.Phases}"/>
             <ComboBox
-                Height="25"
+                Height="Auto"
                 ItemsSource="{Binding Phases}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding SelectedPhase}"/>
@@ -70,10 +72,11 @@
             ItemsSource="{Binding Rooms}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <CheckBox Content="{Binding Name}"
-                              Checked="CheckBox_Checked"
-                              Unchecked="CheckBox_Unchecked"
-                              IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                    <CheckBox
+                        Content="{Binding Name}"
+                        Checked="CheckBox_Checked"
+                        Unchecked="CheckBox_Unchecked"
+                        IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

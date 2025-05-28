@@ -5,11 +5,9 @@
     <!-- Пример перевода на русский язык (google translate) -->
 
     <system:String x:Key="MainWindow.Title">Рассчитать отделку</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
     
-    <system:String x:Key="MainWindow.Phases">Стадии</system:String>
-    <system:String x:Key="MainWindow.RoomNames">Имена помещений</system:String>
+    <system:String x:Key="MainWindow.Phases">Стадии:</system:String>
+    <system:String x:Key="MainWindow.RoomNames">Имена помещений:</system:String>
 
     <system:String x:Key="MainWindow.CheckAll">Выбрать все</system:String>
     <system:String x:Key="MainWindow.UnCheckAll">Снять выбор</system:String>

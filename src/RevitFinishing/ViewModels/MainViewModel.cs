@@ -38,17 +38,16 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="pluginConfig">Настройки плагина.</param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
-    public MainViewModel(
-        PluginConfig pluginConfig,
-        RevitRepository revitRepository,
-        ILocalizationService localizationService) {
-        
+    public MainViewModel(PluginConfig pluginConfig,
+                         RevitRepository revitRepository,
+                         ILocalizationService localizationService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
         ProjectSettingsLoader settings = new ProjectSettingsLoader(_revitRepository.Application,
                                                            _revitRepository.Document);
+
         settings.CopyKeySchedule();
         settings.CopyParameters();
 
@@ -59,18 +58,9 @@ internal class MainViewModel : BaseViewModel {
         CheckAllCommand = RelayCommand.Create(CheckAll);
         UnCheckAllCommand = RelayCommand.Create(UnCheckAll);
         InvertAllCommand = RelayCommand.Create(InvertAll);
-    }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
-    public ICommand LoadViewCommand { get; }
-    
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
-    public ICommand AcceptViewCommand { get; }
+        LoadConfig();
+    }
 
     public ICommand CalculateFinishingCommand { get; }
     public ICommand CheckAllCommand { get; }
@@ -96,14 +86,6 @@ internal class MainViewModel : BaseViewModel {
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
-
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
-    private void LoadView() {
-        LoadConfig();
     }
 
     private void CalculateFinishing() {
@@ -207,10 +189,6 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository.InvertAll(Rooms);
     }
 
-
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
     private void LoadConfig() {
         var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
@@ -227,9 +205,6 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig.SaveProjectConfig();
     }
 
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
     private void SaveConfig() {
         var settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
