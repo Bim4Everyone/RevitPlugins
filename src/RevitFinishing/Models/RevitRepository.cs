@@ -75,8 +75,10 @@ internal class RevitRepository {
 #endif
         ElementParameterFilter parameterFilter = new ElementParameterFilter(rule);
 
+        ElementMulticategoryFilter categoryFilter = new ElementMulticategoryFilter(finishingCategory.Category);
+
         return new FilteredElementCollector(Document)
-            .OfCategory(finishingCategory.Category)
+            .WherePasses(categoryFilter)
             .WhereElementIsNotElementType()
             .WherePasses(parameterFilter)
             .WherePasses(phaseFilter)
