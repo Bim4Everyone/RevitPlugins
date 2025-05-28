@@ -116,7 +116,7 @@
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
+                Command="{Binding CalculateFinishingCommand}" />
 
             <ui:Button
                 Margin="10"
