@@ -21,7 +21,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
         /// Размещает легенду примечаний на листе над штампом
         /// </summary>
         internal bool PlaceNoteLegend() {
-            // Проверям вдруг легенда не выбрана
+            // Проверяем вдруг легенда не выбрана
             if(ViewModel.SelectedLegend is null) {
                 return false;
             } else {
@@ -50,6 +50,56 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
                 }
 
                 if(type.Name == SheetInfo.LegendView.ViewportTypeName) {
+                    viewPort.ChangeTypeId(type.Id);
+                    break;
+                }
+            }
+            return true;
+        }
+
+
+        /// <summary>
+        /// Размещает легенду узла армирования на листе
+        /// </summary>
+        internal bool PlaceRebarNodeLegend() {
+            // Проверяем вдруг легенда не выбрана
+            if(ViewModel.SelectedRebarNode is null) {
+                return false;
+            } else {
+                // Заполняем данные для задания
+                SheetInfo.RebarNodeView.ViewportTypeName = "Без названия";
+
+                double coordinateX = UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ProjectSettings.RebarNodeXOffset));
+                double coordinateY = UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ProjectSettings.RebarNodeYOffset));
+
+                SheetInfo.RebarNodeView.ViewportCenter = new XYZ(coordinateX, coordinateY, 0);
+            }
+
+            // Проверяем можем ли разместить на листе легенду
+            if(!Viewport.CanAddViewToSheet(
+                Repository.Document, 
+                SheetInfo.PylonViewSheet.Id, 
+                ViewModel.SelectedRebarNode.Id)) { 
+                return false; 
+            }
+
+            // Размещаем легенду на листе
+            Viewport viewPort = Viewport.Create(
+                Repository.Document, 
+                SheetInfo.PylonViewSheet.Id, 
+                ViewModel.SelectedRebarNode.Id, 
+                SheetInfo.RebarNodeView.ViewportCenter);
+            SheetInfo.RebarNodeView.ViewportElement = viewPort;
+
+            // Задание правильного типа видового экрана
+            ICollection<ElementId> typesOfViewPort = viewPort.GetValidTypes();
+            foreach(ElementId typeId in typesOfViewPort) {
+                ElementType type = Repository.Document.GetElement(typeId) as ElementType;
+                if(type == null) {
+                    continue;
+                }
+
+                if(type.Name == SheetInfo.RebarNodeView.ViewportTypeName) {
                     viewPort.ChangeTypeId(type.Id);
                     break;
                 }
