@@ -20,37 +20,38 @@ namespace RevitFinishing.Models.Finishing
     internal abstract class FinishingElement {
         private protected readonly Element _revitElement;
         private protected readonly FinishingCalculator _calculator;
+        private protected readonly ParamCalculationService _paramService;
+        private protected readonly SharedParamsConfig _paramConfig = SharedParamsConfig.Instance;
 
-        public FinishingElement(Element element, FinishingCalculator calculator) {
+        public FinishingElement(Element element, 
+                                FinishingCalculator calculator, 
+                                ParamCalculationService paramService) {
             _revitElement = element;
             _calculator = calculator;
+            _paramService = paramService;
         }
 
         public Element RevitElement => _revitElement;
         public List<RoomElement> Rooms { get; set; }
 
-        private string GetRoomsParameters(RevitParam parameter) {
-            IEnumerable<string> values = Rooms
-                .Select(x => x.RevitRoom.GetParamValue<string>(parameter))
-                .Distinct();
-
-            return string.Join("; ", values);
+        private protected void UpdateFromSharedParam(SharedParam param) {
+            _revitElement.SetParamValue(param, _paramService.GetRoomsParameters(Rooms, param));
         }
 
-        private string GetRoomsParameters(BuiltInParameter bltnParam) {
-            IEnumerable<string> values = Rooms
-                .Select(x => x.RevitRoom.GetParamValue<string>(bltnParam))
-                .Distinct();
-
-            return string.Join("; ", values);
+        private protected void UpdateFromBltnParam(IEnumerable<RoomElement> rooms, SharedParam param, BuiltInParameter bltnParam) {
+            _revitElement.SetParamValue(param, _paramService.GetRoomsParameters(rooms, bltnParam));
         }
 
-        private string GetRoomsKeyParameters(RevitParam parameter) {
-            IEnumerable<string> values = Rooms
-                .Select(x => x.RevitRoom.GetParam(parameter).AsValueString())
-                .Distinct();
+        private protected void UpdateFromKeyParam(IEnumerable<RoomElement> rooms, SharedParam param, ProjectParam keyParam) {
+            _revitElement.SetParamValue(param, _paramService.GetRoomsKeyParameters(rooms, keyParam));
+        }
 
-            return string.Join("; ", values);
+        private protected void UpdateFromInstParam(SharedParam param, BuiltInParameter bltnParam) {
+            _revitElement.SetParamValue(param, _revitElement.GetParamValue<double>(bltnParam));
+        }
+
+        private protected void UpdateOrderParam(SharedParam param, int value) {
+            _revitElement.SetParamValue(param, value);
         }
 
         /// <summary>
@@ -71,78 +72,44 @@ namespace RevitFinishing.Models.Finishing
         public void UpdateFinishingParameters() {
             FinishingType finishingType = _calculator.RoomsByFinishingType[Rooms.First().RoomFinishingType];
 
-            SharedParamsConfig paramConfig = SharedParamsConfig.Instance;
+            UpdateFromSharedParam(_paramConfig.FloorFinishingType1);
+            UpdateFromSharedParam(_paramConfig.FloorFinishingType2);
+            UpdateFromSharedParam(_paramConfig.FloorFinishingType3);
+            UpdateFromSharedParam(_paramConfig.FloorFinishingType4);
+            UpdateFromSharedParam(_paramConfig.FloorFinishingType5);
 
-            _revitElement.SetParamValue(paramConfig.FloorFinishingType1,
-                                        GetRoomsParameters(paramConfig.FloorFinishingType1));
-            _revitElement.SetParamValue(paramConfig.FloorFinishingType2,
-                                        GetRoomsParameters(paramConfig.FloorFinishingType2));
-            _revitElement.SetParamValue(paramConfig.FloorFinishingType3,
-                                        GetRoomsParameters(paramConfig.FloorFinishingType3));
-            _revitElement.SetParamValue(paramConfig.FloorFinishingType4,
-                                        GetRoomsParameters(paramConfig.FloorFinishingType4));
-            _revitElement.SetParamValue(paramConfig.FloorFinishingType5,
-                                        GetRoomsParameters(paramConfig.FloorFinishingType5));
+            UpdateFromSharedParam(_paramConfig.CeilingFinishingType1);
+            UpdateFromSharedParam(_paramConfig.CeilingFinishingType2);
+            UpdateFromSharedParam(_paramConfig.CeilingFinishingType3);
+            UpdateFromSharedParam(_paramConfig.CeilingFinishingType4);
+            UpdateFromSharedParam(_paramConfig.CeilingFinishingType5);
 
-            _revitElement.SetParamValue(paramConfig.CeilingFinishingType1,
-                                        GetRoomsParameters(paramConfig.CeilingFinishingType1));
-            _revitElement.SetParamValue(paramConfig.CeilingFinishingType2,
-                                        GetRoomsParameters(paramConfig.CeilingFinishingType1));
-            _revitElement.SetParamValue(paramConfig.CeilingFinishingType3,
-                                        GetRoomsParameters(paramConfig.CeilingFinishingType3));
-            _revitElement.SetParamValue(paramConfig.CeilingFinishingType4,
-                                        GetRoomsParameters(paramConfig.CeilingFinishingType4));
-            _revitElement.SetParamValue(paramConfig.CeilingFinishingType5,
-                                        GetRoomsParameters(paramConfig.CeilingFinishingType5));
+            UpdateFromSharedParam(_paramConfig.WallFinishingType1);
+            UpdateFromSharedParam(_paramConfig.WallFinishingType2);
+            UpdateFromSharedParam(_paramConfig.WallFinishingType3);
+            UpdateFromSharedParam(_paramConfig.WallFinishingType4);
+            UpdateFromSharedParam(_paramConfig.WallFinishingType5);
+            UpdateFromSharedParam(_paramConfig.WallFinishingType6);
+            UpdateFromSharedParam(_paramConfig.WallFinishingType7);
+            UpdateFromSharedParam(_paramConfig.WallFinishingType8);
+            UpdateFromSharedParam(_paramConfig.WallFinishingType9);
+            UpdateFromSharedParam(_paramConfig.WallFinishingType10);
 
-            _revitElement.SetParamValue(paramConfig.WallFinishingType1,
-                                        GetRoomsParameters(paramConfig.WallFinishingType1));
-            _revitElement.SetParamValue(paramConfig.WallFinishingType2,
-                                        GetRoomsParameters(paramConfig.WallFinishingType2));
-            _revitElement.SetParamValue(paramConfig.WallFinishingType3,
-                                        GetRoomsParameters(paramConfig.WallFinishingType3));
-            _revitElement.SetParamValue(paramConfig.WallFinishingType4,
-                                        GetRoomsParameters(paramConfig.WallFinishingType4));
-            _revitElement.SetParamValue(paramConfig.WallFinishingType5,
-                                        GetRoomsParameters(paramConfig.WallFinishingType5));
-            _revitElement.SetParamValue(paramConfig.WallFinishingType6,
-                                        GetRoomsParameters(paramConfig.WallFinishingType6));
-            _revitElement.SetParamValue(paramConfig.WallFinishingType7,
-                                        GetRoomsParameters(paramConfig.WallFinishingType7));
-            _revitElement.SetParamValue(paramConfig.WallFinishingType8,
-                                        GetRoomsParameters(paramConfig.WallFinishingType8));
-            _revitElement.SetParamValue(paramConfig.WallFinishingType9,
-                                        GetRoomsParameters(paramConfig.WallFinishingType9));
-            _revitElement.SetParamValue(paramConfig.WallFinishingType10,
-                                        GetRoomsParameters(paramConfig.WallFinishingType10));
+            UpdateFromSharedParam(_paramConfig.BaseboardFinishingType1);
+            UpdateFromSharedParam(_paramConfig.BaseboardFinishingType2);
+            UpdateFromSharedParam(_paramConfig.BaseboardFinishingType3);
+            UpdateFromSharedParam(_paramConfig.BaseboardFinishingType4);
+            UpdateFromSharedParam(_paramConfig.BaseboardFinishingType5);
 
-            _revitElement.SetParamValue(paramConfig.BaseboardFinishingType1,
-                                        GetRoomsParameters(paramConfig.BaseboardFinishingType1));
-            _revitElement.SetParamValue(paramConfig.BaseboardFinishingType2,
-                                        GetRoomsParameters(paramConfig.BaseboardFinishingType2));
-            _revitElement.SetParamValue(paramConfig.BaseboardFinishingType3,
-                                        GetRoomsParameters(paramConfig.BaseboardFinishingType3));
-            _revitElement.SetParamValue(paramConfig.BaseboardFinishingType4,
-                                        GetRoomsParameters(paramConfig.BaseboardFinishingType4));
-            _revitElement.SetParamValue(paramConfig.BaseboardFinishingType5,
-                                        GetRoomsParameters(paramConfig.BaseboardFinishingType5));
+            UpdateFromBltnParam(Rooms, _paramConfig.FinishingRoomName, BuiltInParameter.ROOM_NAME);
+            UpdateFromBltnParam(Rooms, _paramConfig.FinishingRoomNumber, BuiltInParameter.ROOM_NUMBER);
+            UpdateFromBltnParam(finishingType.Rooms, _paramConfig.FinishingRoomNames, BuiltInParameter.ROOM_NAME);
+            UpdateFromBltnParam(finishingType.Rooms, _paramConfig.FinishingRoomNumbers, BuiltInParameter.ROOM_NUMBER);
 
-            _revitElement.SetParamValue(paramConfig.FinishingRoomName,
-                                        GetRoomsParameters(BuiltInParameter.ROOM_NAME));
-            _revitElement.SetParamValue(paramConfig.FinishingRoomNumber,
-                                        GetRoomsParameters(BuiltInParameter.ROOM_NUMBER));
-            _revitElement.SetParamValue(paramConfig.FinishingRoomNames,
-                                        finishingType.GetRoomsParameters(BuiltInParameter.ROOM_NAME));
-            _revitElement.SetParamValue(paramConfig.FinishingRoomNumbers,
-                                        finishingType.GetRoomsParameters(BuiltInParameter.ROOM_NUMBER));
+            UpdateFromKeyParam(Rooms, _paramConfig.FinishingType, ProjectParamsConfig.Instance.RoomFinishingType);
 
-            _revitElement.SetParamValue(paramConfig.FinishingType,
-                                        GetRoomsKeyParameters(ProjectParamsConfig.Instance.RoomFinishingType));
-
-            _revitElement.SetParamValue(paramConfig.SizeArea,
-                                        _revitElement.GetParamValue<double>(BuiltInParameter.HOST_AREA_COMPUTED));
-            _revitElement.SetParamValue(paramConfig.SizeVolume,
-                                        _revitElement.GetParamValue<double>(BuiltInParameter.HOST_VOLUME_COMPUTED));
+            UpdateFromInstParam(_paramConfig.SizeArea, BuiltInParameter.HOST_AREA_COMPUTED);
+            UpdateFromInstParam(_paramConfig.SizeVolume, BuiltInParameter.HOST_VOLUME_COMPUTED);
         }
 
         public abstract void UpdateCategoryParameters();

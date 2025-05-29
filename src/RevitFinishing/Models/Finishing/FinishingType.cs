@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Revit;
-
 namespace RevitFinishing.Models.Finishing
 {
     /// <summary>
@@ -37,6 +34,9 @@ namespace RevitFinishing.Models.Finishing
             _baseboardTypesByOrder = CalculateFinishingOrder(baseboards);
         }
 
+        public IEnumerable<RoomElement> Rooms => _rooms;
+
+
         public int GetWallOrder(string typeName) {
             return _wallTypesByOrder.IndexOf(typeName) + 1;
         }
@@ -51,14 +51,6 @@ namespace RevitFinishing.Models.Finishing
 
         public int GetBaseboardOrder(string typeName) {
             return _baseboardTypesByOrder.IndexOf(typeName) + 1;
-        }
-
-        public string GetRoomsParameters(BuiltInParameter bltnParam) {
-            IEnumerable<string> values = _rooms
-                .Select(x => x.RevitRoom.GetParamValue<string>(bltnParam))
-                .Distinct();
-
-            return string.Join("; ", values);
         }
 
         private List<string> CalculateFinishingOrder(IEnumerable<Element> finishingElements) {
