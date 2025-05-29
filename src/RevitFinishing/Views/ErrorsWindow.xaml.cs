@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using dosymep.SimpleServices;
+
 using RevitFinishing.ViewModels;
 
 namespace RevitFinishing.Views
@@ -21,10 +23,20 @@ namespace RevitFinishing.Views
     /// </summary>
     public partial class ErrorsWindow
     {
-        internal ErrorsWindow(ErrorsViewModel errorsViewModel)
-        {
-            DataContext = errorsViewModel;
+        public ErrorsWindow(
+            ILoggerService loggerService,
+            ISerializationService serializationService,
+            ILanguageService languageService, ILocalizationService localizationService,
+            IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) 
+            : base(loggerService,
+                   serializationService,
+                   languageService, localizationService,
+                   uiThemeService, themeUpdaterService) {
             InitializeComponent();
         }
+
+        public override string PluginName => nameof(RevitFinishing);
+
+        public override string ProjectConfigName => nameof(ErrorsWindow);
     }
 }

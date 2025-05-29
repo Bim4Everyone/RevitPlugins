@@ -11,6 +11,8 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Ninject;
+
 using RevitFinishing.Models;
 using RevitFinishing.Models.Finishing;
 using RevitFinishing.Views;
@@ -31,6 +33,8 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<RoomGroupViewModel> _rooms;
 
     private string _errorText;
+
+    private readonly IKernel _kernel;
     
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -40,10 +44,12 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(PluginConfig pluginConfig,
                          RevitRepository revitRepository,
-                         ILocalizationService localizationService) {        
+                         ILocalizationService localizationService, IKernel kernel) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+
+        _kernel = kernel;
 
         ProjectSettingsLoader settings = new ProjectSettingsLoader(_revitRepository.Application,
                                                            _revitRepository.Document);
@@ -115,7 +121,8 @@ internal class MainViewModel : BaseViewModel {
                 checker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam))
         });
         if(mainErrors.ErrorLists.Any()) {
-            var window = new ErrorsWindow(mainErrors);
+            var window = _kernel.Get<ErrorsWindow>();
+            window.DataContext = mainErrors;
             window.Show();
             return;
         }
@@ -130,8 +137,8 @@ internal class MainViewModel : BaseViewModel {
                 checker.CheckFinishingByRoom(calculator.FinishingElements))
         });
         if(otherErrors.ErrorLists.Any()) {
-            var window = new ErrorsWindow(otherErrors);
-            window.Show();
+            var window = _kernel.Get<ErrorsWindow>();
+            window.DataContext = mainErrors;
             return;
         }
 
@@ -148,7 +155,8 @@ internal class MainViewModel : BaseViewModel {
                 checker.CheckRoomsByParameter(selectedRooms, nameParamName))
         });
         if(warnings.ErrorLists.Any()) {
-            var window = new ErrorsWindow(warnings);
+            var window = _kernel.Get<ErrorsWindow>();
+            window.DataContext = warnings;
             window.Show();
         }
 

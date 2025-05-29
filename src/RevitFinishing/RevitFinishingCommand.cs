@@ -63,6 +63,7 @@ public class RevitFinishingCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
