@@ -13,9 +13,13 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
      
     mc:Ignorable="d"
-    Title="ErrorsWindow" Height="450" Width="800">
+    Title="ErrorsWindow" Height="450" Width="800"
+    
+    d:DataContext="{d:DesignInstance vms:ErrorsViewModel, IsDesignTimeCreatable=False}">
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -24,12 +28,19 @@
             <ColumnDefinition Width="0.65*"/>
         </Grid.ColumnDefinitions>
 
-        <ListView
+        <ui:TitleBar
+            VerticalAlignment="Center"
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            Title="{me:LocalizationSource MainWindow.Title}" />
+
+        <ui:ListView
+            Grid.Row="1"
             Grid.Column="0"
             Margin="10"
             ItemsSource="{Binding ErrorLists}"
             SelectedItem="{Binding SelectedList}">
-            <ListView.View>
+            <ui:ListView.View>
                 <GridView>
                     <GridViewColumn
                         Header="Тип"
@@ -47,15 +58,16 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                 </GridView>
-            </ListView.View>
-        </ListView>
+            </ui:ListView.View>
+        </ui:ListView>
 
-        <ListView
+        <ui:ListView
+            Grid.Row="1"
             Grid.Column="1"
             Margin="10"
             DataContext="{Binding SelectedList}"
             ItemsSource="{Binding ErrorElements}">
-            <ListView.View>
+            <ui:ListView.View>
                 <GridView>
                     <GridViewColumn
                         Header="ID"
@@ -78,7 +90,7 @@
                         Width="150"
                         DisplayMemberBinding="{Binding PhaseName}"/>
                 </GridView>
-            </ListView.View>
-        </ListView>
+            </ui:ListView.View>
+        </ui:ListView>
     </Grid>
 </core:WpfUIPlatformWindow>
