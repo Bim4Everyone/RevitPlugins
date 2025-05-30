@@ -327,7 +327,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             foreach(ElementId id in PylonViewSheet.GetAllViewports()) {
                 Viewport viewportLegend = Repository.Document.GetElement(id) as Viewport;
                 if(viewportLegend is null) { continue; }
-                
+
                 View viewLegend = Repository.Document.GetElement(viewportLegend.ViewId) as View;
                 if(viewLegend is null) { continue; }
 
@@ -350,7 +350,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             foreach(ElementId id in PylonViewSheet.GetAllViewports()) {
                 Viewport viewportLegend = Repository.Document.GetElement(id) as Viewport;
                 if(viewportLegend is null) { continue; }
-                
+
                 View viewLegend = Repository.Document.GetElement(viewportLegend.ViewId) as View;
                 if(viewLegend is null) { continue; }
 
@@ -370,7 +370,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             foreach(ElementId id in PylonViewSheet.GetDependentElements(new ElementClassFilter(typeof(ScheduleSheetInstance)))) {
                 ScheduleSheetInstance viewport = Repository.Document.GetElement(id) as ScheduleSheetInstance;
                 if(viewport is null) { continue; }
-                
+
                 ViewSchedule viewSchedule = Repository.Document.GetElement(viewport.ScheduleId) as ViewSchedule;
                 if(viewSchedule is null) { continue; }
 

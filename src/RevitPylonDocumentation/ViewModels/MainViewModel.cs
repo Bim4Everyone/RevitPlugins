@@ -10,13 +10,13 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models;
 using RevitPylonDocumentation.Models.PylonSheetNView;
 using RevitPylonDocumentation.Models.UserSettings;
-using RevitPylonDocumentation.Views;
 
 using Transaction = Autodesk.Revit.DB.Transaction;
 using View = Autodesk.Revit.DB.View;
@@ -25,6 +25,7 @@ namespace RevitPylonDocumentation.ViewModels {
     internal class MainViewModel : BaseViewModel {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly ILocalizationService _localizationService;
 
         private string _errorText;
         private bool _pylonSelectedManually = false;
@@ -44,9 +45,13 @@ namespace RevitPylonDocumentation.ViewModels {
         private string _hostsInfoFilter;
         private ICollectionView _hostsInfoView;
 
-        public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+        public MainViewModel(
+            PluginConfig pluginConfig,
+            RevitRepository revitRepository,
+            ILocalizationService localizationService) {
             _pluginConfig = pluginConfig;
             _revitRepository = revitRepository;
+            _localizationService = localizationService;
 
             SelectionSettings = new UserSelectionSettings();
             ProjectSettings = new UserProjectSettings(this, _revitRepository);
@@ -450,9 +455,9 @@ namespace RevitPylonDocumentation.ViewModels {
             SelectionSettings.NeedWorkWithSkeletonByElemsSchedule = false;
             SelectionSettings.NeedWorkWithRebarNode = false;
 
-            MainWindow mainWindow = new MainWindow();
-            mainWindow.DataContext = this;
-            mainWindow.ShowDialog();
+            //MainWindow mainWindow = new MainWindow();
+            //mainWindow.DataContext = this;
+            //mainWindow.ShowDialog();
         }
 
 

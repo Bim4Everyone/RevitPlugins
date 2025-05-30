@@ -92,7 +92,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             if(SheetInfo.SkeletonSchedule.ViewportElement != null) {
                 newCenter = new XYZ(
                     (-SheetInfo.RebarSchedule.ViewportHalfWidth * 2) - _titleBlockFrameRightOffset,
-                    SheetInfo.SkeletonSchedule.ViewportCenter.Y - (SheetInfo.SkeletonSchedule.ViewportHalfHeight * 2) 
+                    SheetInfo.SkeletonSchedule.ViewportCenter.Y - (SheetInfo.SkeletonSchedule.ViewportHalfHeight * 2)
                     + _scheduleTopOffsetSmall,
                     0);
             }
@@ -129,7 +129,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
             if(SheetInfo.RebarSchedule.ViewportElement != null) {
                 newCenter = new XYZ(
                     (-SheetInfo.MaterialSchedule.ViewportHalfWidth * 2) - _titleBlockFrameRightOffset,
-                    SheetInfo.RebarSchedule.ViewportCenter.Y - (SheetInfo.RebarSchedule.ViewportHalfHeight * 2) 
+                    SheetInfo.RebarSchedule.ViewportCenter.Y - (SheetInfo.RebarSchedule.ViewportHalfHeight * 2)
                     + _scheduleTopOffsetSmall,
                     0);
             }

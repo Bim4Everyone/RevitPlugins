@@ -14,7 +14,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView {
 
         // Смещение по горизонтали в дюймах, для размещаемых компонентов листа требуемое, чтобы они попали на лист
         private readonly double _titleBlockFrameLeftOffset = UnitUtilsHelper.ConvertToInternalValue(20);
-        
+
         // Смещение по вертикали в дюймах, для размещаемых компонентов листа требуемое, чтобы они попали на лист
         private readonly double _titleBlockFrameTopOffset = UnitUtilsHelper.ConvertToInternalValue(15);
 
