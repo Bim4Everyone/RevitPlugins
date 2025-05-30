@@ -72,7 +72,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
 
         private void InitializeFiles(string selectedFile) {
-            var profilePath = RevitRepository.ProfilePath;
+            var profilePath = RevitRepository.LocalProfilePath;
             Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName()))
                 .Select(path => new ReportViewModel(_revitRepository, Path.GetFileNameWithoutExtension(path)))
                 .Where(item => item.Name.Equals(selectedFile, StringComparison.CurrentCultureIgnoreCase)));
@@ -80,7 +80,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
         private void InitializeFiles() {
-            var profilePath = RevitRepository.ProfilePath;
+            var profilePath = RevitRepository.LocalProfilePath;
             var path = Path.Combine(profilePath, ModuleEnvironment.RevitVersion, nameof(RevitClashDetective), _revitRepository.GetObjectName());
             if(Directory.Exists(path)) {
                 Reports = new ObservableCollection<ReportViewModel>(Directory.GetFiles(path)

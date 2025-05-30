@@ -139,9 +139,8 @@ namespace RevitMechanicalSpecification.Service {
                 return;
             }
             InternalDefinition definition = param.GetDefinition();
-            if(definition.GetGroupTypeId() != group) {
-                definition.SetGroupTypeId(group);
-            }
+
+            definition.ReInsertToGroup(document, group);
         }
 
         // Временная проверка пока мы не переходим на редактируемые экземпляры групп. Если ФОП_ВИС_Число и ФОП_ВИС_Число ДЕ в проекте вместе - отменяем работу 
@@ -173,12 +172,15 @@ namespace RevitMechanicalSpecification.Service {
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
             projectParameters.SetupRevitParams(document, _revitParams);
 
-            foreach(RevitParam revitParam in _paramsToDataGroup) {
-                SortParameterToGroup(document, revitParam.Name, GroupTypeId.Data);
-            }
+            using(var t = _document.StartTransaction("Смена групп параметров")) {
+                foreach(RevitParam revitParam in _paramsToDataGroup) {
+                    SortParameterToGroup(document, revitParam.Name, GroupTypeId.Data);
+                }
 
-            foreach(RevitParam revitParam in _paramsToConstraints) {
-                SortParameterToGroup(document, revitParam.Name, GroupTypeId.Constraints);
+                foreach(RevitParam revitParam in _paramsToConstraints) {
+                    SortParameterToGroup(document, revitParam.Name, GroupTypeId.Constraints);
+                }
+                t.Commit();
             }
 
             CheckParamterValues();

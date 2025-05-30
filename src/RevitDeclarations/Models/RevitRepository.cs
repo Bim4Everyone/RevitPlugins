@@ -154,5 +154,19 @@ namespace RevitDeclarations.Models {
                 .Where(x => x.StorageType == storageType)
                 .ToList();
         }
+
+        public IReadOnlyCollection<Parameter> GetRoomsParamsByDataType(RevitDocumentViewModel document,
+                                                                       ForgeTypeId dataType) {
+            Room room = document?.Room;
+
+            if(room == null) {
+                return new List<Parameter>();
+            }
+
+            return room
+                .GetOrderedParameters()
+                .Where(x => x.Definition.GetDataType() == dataType)
+                .ToList();
+        }
     }
 }

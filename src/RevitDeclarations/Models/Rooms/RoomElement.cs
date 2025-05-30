@@ -77,8 +77,12 @@ namespace RevitDeclarations.Models
             return ParamConverter.ConvertLength(value, accuracy);
         }
 
-        public int GetIntParamValue(Parameter parameter) {
-            return RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
+        public double GetIntAndCurrencyParamValue(Parameter parameter) {
+            if(parameter.StorageType == StorageType.Double) {
+                return RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
+            } else {
+                return RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
+            }
         }
 
         public IReadOnlyList<ElementId> GetBoundaries() {

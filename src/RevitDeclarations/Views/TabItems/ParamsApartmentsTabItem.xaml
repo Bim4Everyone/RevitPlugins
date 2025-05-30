@@ -544,7 +544,7 @@
                 Grid.Column="2"
                 Grid.Row="8"
                 Margin="10, 0"
-                ItemsSource="{Binding IntParameters}"
+                ItemsSource="{Binding IntAndCurrencyParameters}"
                 DisplayMemberPath="Definition.Name"
                 SelectedItem="{Binding SelectedRoomsAmountParam}"/>
 

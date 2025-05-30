@@ -17,9 +17,9 @@
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    MinHeight="350"
+    MinHeight="390"
     MinWidth="630"
-    MaxHeight="350"
+    MaxHeight="390"
     MaxWidth="630"
     Title="{me:LocalizationSource MainWindow.Title}"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
@@ -172,15 +172,15 @@
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
                 <Label
-                    Content="{me:LocalizationSource MainWindow.Label.InputWallElevationMode}"
-                    Target="{Binding ElementName=InputWallElevationMode}"
+                    Content="{me:LocalizationSource MainWindow.Label.InputWallTopElevationMode}"
+                    Target="{Binding ElementName=InputWallTopElevationMode}"
                     Style="{StaticResource InputLabel}" />
                 <ComboBox
-                    x:Name="InputWallElevationMode"
+                    x:Name="InputWallTopElevationMode"
                     IsEditable="False"
-                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallElevationMode}"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallTopElevationMode}"
                     ItemsSource="{Binding WallElevationModes}"
-                    SelectedItem="{Binding SelectedWallElevationMode}"
+                    SelectedItem="{Binding SelectedWallTopElevationMode}"
                     Style="{StaticResource ComboBoxInput}">
                 </ComboBox>
                 <ui:TextBox
@@ -192,6 +192,21 @@
                     Content="{me:LocalizationSource MainWindow.Label.Mm}"
                     Style="{StaticResource InputLabel}" />
             </DockPanel>
+            <DockPanel
+                Style="{StaticResource DockPanelInput}">
+                <Label
+                    Content="{me:LocalizationSource MainWindow.Label.InputWallHeightStyle}"
+                    Target="{Binding ElementName=InputWallHeightStyle}"
+                    Style="{StaticResource InputLabel}" />
+                <ComboBox
+                    x:Name="InputWallHeightStyle"
+                    IsEditable="False"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallHeightStyle}"
+                    ItemsSource="{Binding WallHeightStyles}"
+                    SelectedItem="{Binding SelectedWallHeightStyle}"
+                    Style="{StaticResource ComboBoxInput}">
+                </ComboBox>
+            </DockPanel>
 
             <DockPanel
                 Style="{StaticResource DockPanelInput}">
@@ -199,10 +214,19 @@
                     Content="{me:LocalizationSource MainWindow.Label.InputWallBaseOffset}"
                     Target="{Binding ElementName=InputWallBaseOffset}"
                     Style="{StaticResource InputLabel}" />
+                <ComboBox
+                    x:Name="InputWallBaseElevationMode"
+                    IsEditable="False"
+                    ToolTip="{me:LocalizationSource MainWindow.Tooltip.InputWallBaseElevationMode}"
+                    ItemsSource="{Binding WallElevationModes}"
+                    SelectedItem="{Binding SelectedWallBaseElevationMode}"
+                    Style="{StaticResource ComboBoxInput}">
+                </ComboBox>
                 <ui:TextBox
                     x:Name="InputWallBaseOffset"
                     ToolTip="{me:LocalizationSource MainWindow.Tooltip.WallBaseOffset}"
-                    Text="{Binding WallBaseOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
+                    Text="{Binding WallBaseOffset, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                    IsEnabled="{Binding IsWallBaseOffsetByUserEnabled}"/>
                 <Label
                     Width="Auto"
                     Content="{me:LocalizationSource MainWindow.Label.Mm}"

@@ -1,0 +1,32 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на русский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">RSN.ini менеджер</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.UpdateSuccess">RSN.ini обновлен</system:String>
+    <system:String x:Key="MainWindow.UpdateSuccessTitle">Выполнено</system:String>
+    <system:String x:Key="MainWindow.ConfigNotFound">Конфигурационный файл не найден, необходимо создать его</system:String>
+    <system:String x:Key="MainWindow.ConfigNotFoundTitle">Ошибка</system:String>
+    <system:String x:Key="MainWindow.AlreadyExists">Сервер уже добавлен.</system:String>
+    <system:String x:Key="MainWindow.ErrorEmptyServerList">Добавьте хотя бы один сервер.</system:String>
+    <system:String x:Key="MainWindow.AutoConfigure">Автонастройка</system:String>
+    <system:String x:Key="MainWindow.AddServer">Добавить</system:String>
+    <system:String x:Key="MainWindow.ToolTipAutoConfigure">Автонастройка конфигурации Revit серверов на основе последних открытых проектов</system:String>
+    <system:String x:Key="MainWindow.ToolTipAddServer">Добавить сервер</system:String>
+    <system:String x:Key="MainWindow.ToolTipMoveUp">Переместить сервер выше</system:String>
+    <system:String x:Key="MainWindow.ToolTipMoveDown">Переместить сервер ниже</system:String>
+    <system:String x:Key="MainWindow.ToolTipRemove">Удалить сервер</system:String>
+    <system:String x:Key="MainWindow.ConfirmTitle">Подтверждение удаления</system:String>
+    <system:String x:Key="MainWindow.ConfirmDeleteServer">Вы уверены, что хотите удалить выбранный сервер?</system:String>
+    <system:String x:Key="MainWindow.PlaceholderServerName">Введите название сервера</system:String>
+    <system:String x:Key="MainWindow.ToolTipConfirmConfig">Завершить настройку конфигурации</system:String>
+    <system:String x:Key="MainWindow.ToolTipCancelConfig">Отменить настройку конфигурации</system:String>
+    <system:String x:Key="RsnConfigService.EmptyServerList">Список серверов пуст или не задан.</system:String>
+    <system:String x:Key="RsnConfigService.RevitIniNotFound">Файл Revit.ini не найден.</system:String>
+    <system:String x:Key="RsnConfigService.ProjectPathMissing">Не удалось получить ProjectPath из Revit.ini.</system:String>
+
+</ResourceDictionary>

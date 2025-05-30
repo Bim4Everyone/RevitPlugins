@@ -164,6 +164,9 @@
   <Project Path="src/RevitRoomTagPlacement/RevitRoomTagPlacement.csproj">
     <Platform Project="x64" />
   </Project>
+    <Project Path="src/RevitRsnManager/RevitRsnManager.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitScheduleImport/RevitScheduleImport.csproj">
     <Platform Project="x64" />
   </Project>

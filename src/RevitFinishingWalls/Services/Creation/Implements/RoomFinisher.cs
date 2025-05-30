@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 using Autodesk.Revit.DB;
@@ -37,11 +36,14 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
         public ICollection<RoomErrorsViewModel> CreateWallsFinishing(
             ICollection<Room> rooms,
             RevitSettings settings,
+            IWallCreator wallCreator,
             IProgress<int> progress = null,
             CancellationToken ct = default) {
 
             if(rooms is null) { throw new ArgumentNullException(nameof(rooms)); }
             if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
+            if(wallCreator is null) { throw new ArgumentNullException(nameof(wallCreator)); }
+
             List<RoomErrorsViewModel> errors = new List<RoomErrorsViewModel>();
 
             using(var transaction = _revitRepository.Document.StartTransaction(
@@ -68,15 +70,14 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                     }
                     for(int i = 0; i < datas.Count; i++) {
                         try {
-                            var wall = _revitRepository.CreateWall(
-                                datas[i],
-                                out ICollection<ElementId> notJoinedElements);
+                            var wall = wallCreator.Create(datas[i]);
+                            var notJoinedElements = _revitRepository.JoinElementsToWall(wall, datas[i].ElementsForJoin);
                             if(notJoinedElements.Count > 0) {
                                 roomErrors.Errors.Add(
                                     new ErrorViewModel(
                                         _localizationService.GetLocalizedString("ErrorsWindow.ErrorTitles.WallJoining"),
                                         _localizationService.GetLocalizedString("ErrorsWindow.ErrorMsg.WallJoining"),
-                                        new HashSet<ElementId>(notJoinedElements.Union(new ElementId[] { wall.Id }))));
+                                        [.. notJoinedElements, wall.Id]));
                             }
                         } catch(CannotCreateWallException e) {
                             roomErrors.Errors.Add(new ErrorViewModel(
