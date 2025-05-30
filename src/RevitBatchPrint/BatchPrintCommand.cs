@@ -1,40 +1,76 @@
-﻿#region Namespaces
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows.Interop;
+﻿using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep;
 using dosymep.Bim4Everyone;
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
+using Ninject;
+
+using RevitBatchPrint.Models;
+using RevitBatchPrint.Services;
 using RevitBatchPrint.ViewModels;
 using RevitBatchPrint.Views;
 
-#endregion
+namespace RevitBatchPrint;
 
-namespace RevitBatchPrint {
-    [Transaction(TransactionMode.Manual)]
-    public class BatchPrintCommand : BasePluginCommand {
-        public BatchPrintCommand() {
-            PluginName = "Пакетная печать";
-        }
-        
-        protected override void Execute(UIApplication uiApplication) {
-            var window = new BatchPrintWindow() { DataContext = new PrintAbumsViewModel(uiApplication) };
-            if(window.ShowDialog() == true) {
-                GetPlatformService<INotificationService>()
-                    .CreateNotification(PluginName, "Выполнение скрипта завершено успешно.", "C#")
-                    .ShowAsync();
-            } else {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                    .ShowAsync();
-            }
-        }
+[Transaction(TransactionMode.Manual)]
+public class BatchPrintCommand : BasePluginCommand {
+    public BatchPrintCommand() {
+        PluginName = "Пакетная печать";
+    }
+
+    protected override void Execute(UIApplication uiApplication) {
+        using IKernel kernel = uiApplication.CreatePlatformServices();
+
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<PrintManager>()
+            .ToConstant(uiApplication.ActiveUIDocument.Document.PrintManager)
+            .InSingletonScope();
+
+        // Настройка конфигурации плагина
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
+        // Настройка запуска окна
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        kernel.Bind<IPrinterService>()
+            .To<PrinterService>()
+            .OnActivation(c => c.Load());
+
+        kernel.Bind<RevitPrint>()
+            .ToSelf()
+            .InTransientScope();
+
+        kernel.Bind<RevitExportToPdf>()
+            .ToSelf()
+            .InTransientScope();
+
+        // Вызывает стандартное уведомление
+        Notification(kernel.Get<MainWindow>());
     }
 }
