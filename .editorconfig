@@ -37,24 +37,24 @@ file_header_template = unset
 # this. and Me. preferences
 # Make "this." bright or not
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0003-ide0009
-dotnet_style_qualification_for_event = false
-dotnet_style_qualification_for_field = false
-dotnet_style_qualification_for_method = false
-dotnet_style_qualification_for_property = false
+dotnet_style_qualification_for_event = false:silent
+dotnet_style_qualification_for_field = false:silent
+dotnet_style_qualification_for_method = false:silent
+dotnet_style_qualification_for_property = false:silent
 
 # Language keywords vs BCL types preferences
 # Make by default "int" or "Int32" etc.
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0049
-dotnet_style_predefined_type_for_locals_parameters_members = true
-dotnet_style_predefined_type_for_member_access = true
+dotnet_style_predefined_type_for_locals_parameters_members = true:none
+dotnet_style_predefined_type_for_member_access = true:silent
 
 # Parentheses preferences
 # Make parentheses bright or not in complex operations
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0047-ide0048
-dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity
-dotnet_style_parentheses_in_other_binary_operators = always_for_clarity
-dotnet_style_parentheses_in_other_operators = never_if_unnecessary
-dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity
+dotnet_style_parentheses_in_arithmetic_binary_operators = never_if_unnecessary:silent
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:silent
+dotnet_style_parentheses_in_other_operators = never_if_unnecessary:silent
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:silent
 
 # Modifier preferences
 # Underscore all members with missed accessibility modifiers like warning
@@ -63,37 +63,39 @@ dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
 
 # Expression-level preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0029-ide0030-ide0270
-dotnet_style_coalesce_expression = true
+dotnet_style_coalesce_expression = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0028?pivots=dotnet-8-0
-dotnet_style_collection_initializer = true
+dotnet_style_collection_initializer = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0033
-dotnet_style_explicit_tuple_names = true
+dotnet_style_explicit_tuple_names = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0130
-dotnet_style_namespace_match_folder = true
+dotnet_style_namespace_match_folder = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0031
-dotnet_style_null_propagation = true
+dotnet_style_null_propagation = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0017
-dotnet_style_object_initializer = true
+dotnet_style_object_initializer = true:suggestion
 # https://learn.microsoft.com/en-us/visualstudio/ide/reference/code-styles-refactoring-options?view=vs-2022
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0032
-dotnet_style_prefer_auto_properties = true
+dotnet_style_prefer_auto_properties = true:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0054-ide0074
-dotnet_style_prefer_compound_assignment = true
+dotnet_style_prefer_compound_assignment = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0045
-dotnet_style_prefer_conditional_expression_over_assignment = true
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0046
-dotnet_style_prefer_conditional_expression_over_return = true
+dotnet_style_prefer_conditional_expression_over_return = true:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0037
-dotnet_style_prefer_inferred_anonymous_type_member_names = true
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0037
-dotnet_style_prefer_inferred_tuple_names = true
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0041
-dotnet_style_prefer_is_null_check_over_reference_equality_method = true
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0075
-dotnet_style_prefer_simplified_boolean_expressions = true
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0071
-dotnet_style_prefer_simplified_interpolation = true
+dotnet_style_prefer_simplified_interpolation = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0300
+dotnet_style_prefer_collection_expression = when_types_loosely_match:suggestion
 
 # Field preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0044
@@ -111,101 +113,135 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 # Experimental not documented properties
 # https://github.com/dotnet/roslyn/issues/60539
 # https://github.com/dotnet/roslyn/issues/65770
-# dotnet_style_allow_multiple_blank_lines_experimental = true
-# dotnet_style_allow_statement_immediately_after_block_experimental = true
+dotnet_style_allow_multiple_blank_lines_experimental = true:silent
+dotnet_style_allow_statement_immediately_after_block_experimental = true:silent
 
 #### C# Coding Conventions ####
 
 # var preferences
 # Prefer explicit type over var
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0007-ide0008
-csharp_style_var_elsewhere = false
-csharp_style_var_for_built_in_types = false
-csharp_style_var_when_type_is_apparent = true
+csharp_style_var_elsewhere = true:suggestion
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
 
 # Expression-bodied members
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0027
-csharp_style_expression_bodied_accessors = true
+csharp_style_expression_bodied_accessors = true:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0021
-csharp_style_expression_bodied_constructors = false
+csharp_style_expression_bodied_constructors = false:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0026
-csharp_style_expression_bodied_indexers = false
+csharp_style_expression_bodied_indexers = false:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0053
-csharp_style_expression_bodied_lambdas = true
+csharp_style_expression_bodied_lambdas = true:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0061
-csharp_style_expression_bodied_local_functions = true
+csharp_style_expression_bodied_local_functions = true:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0022
-csharp_style_expression_bodied_methods = false
+csharp_style_expression_bodied_methods = false:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0023-ide0024
-csharp_style_expression_bodied_operators = false
+csharp_style_expression_bodied_operators = false:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0025
-csharp_style_expression_bodied_properties = true
+csharp_style_expression_bodied_properties = true:silent
+
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0350
+csharp_style_prefer_implicitly_typed_lambda_expression = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0180
+csharp_style_prefer_tuple_swap = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0340
+csharp_style_prefer_unbound_generic_type_in_nameof = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0230
+csharp_style_prefer_utf8_string_literals = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0250
+csharp_style_prefer_readonly_struct = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0251
+csharp_style_prefer_readonly_struct_member = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0170
+csharp_style_prefer_extended_property_pattern = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0039
+csharp_style_prefer_local_over_anonymous_function = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0150
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0160-ide0161
+csharp_style_namespace_declarations = file_scoped:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0290
+csharp_style_prefer_primary_constructors = false:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0210
+csharp_style_prefer_top_level_statements = true:silent
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0200
+csharp_style_prefer_method_group_conversion = true:silent
 
 # Pattern matching preferences. Applicable not in all C# versions
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0019
-csharp_style_pattern_matching_over_as_with_null_check = true
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0020-ide0038
-csharp_style_pattern_matching_over_is_with_cast_check = true
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0083
-csharp_style_prefer_not_pattern = true
+csharp_style_prefer_not_pattern = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0078-ide0260
-csharp_style_prefer_pattern_matching = true
+csharp_style_prefer_pattern_matching = true:silent
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0066
-csharp_style_prefer_switch_expression = true
+csharp_style_prefer_switch_expression = true:suggestion
 
 # Null-checking preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide1005
-csharp_style_conditional_delegate_call = true
+csharp_style_conditional_delegate_call = true:suggestion
 
 # Modifier preferences
 # csharp_prefer_static_local_function is applicable in C# 8.0+ 
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0062
-csharp_prefer_static_local_function = true
+csharp_prefer_static_local_function = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0036
 csharp_preferred_modifier_order = public,private,protected,internal,file,new,static,abstract,virtual,sealed,readonly,override,extern,unsafe,volatile,async,required:warning
 
 # Code-block preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0011
-csharp_prefer_braces = true
+csharp_prefer_braces = true:silent
 # csharp_prefer_simple_using_statement is applicable in C# 8.0+
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0063
-csharp_prefer_simple_using_statement = false
+csharp_prefer_simple_using_statement = true:suggestion
+
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0320
+csharp_prefer_static_anonymous_function = true:suggestion
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0330
+csharp_prefer_system_threading_lock = true:suggestion
 
 # Expression-level preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0034
-csharp_prefer_simple_default_expression = true
+csharp_prefer_simple_default_expression = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0042
-csharp_style_deconstructed_variable_declaration = true
+csharp_style_deconstructed_variable_declaration = true:suggestion
 # csharp_style_implicit_object_creation_when_type_is_apparent is applicable in C# 9.0+
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0090
-csharp_style_implicit_object_creation_when_type_is_apparent = true
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0018
-csharp_style_inlined_variable_declaration = true
+csharp_style_inlined_variable_declaration = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0039
 csharp_style_pattern_local_over_anonymous_function = true
 # csharp_style_prefer_index_operator is applicable in C# 8.0+
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0056
-csharp_style_prefer_index_operator = true
+csharp_style_prefer_index_operator = true:suggestion
 # csharp_style_prefer_range_operator is applicable in C# 8.0+
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0057
-csharp_style_prefer_range_operator = true
+csharp_style_prefer_range_operator = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0016
-csharp_style_throw_expression = true
+csharp_style_throw_expression = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0059?pivots=lang-csharp-vb
-csharp_style_unused_value_assignment_preference = discard_variable
+csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0058
-csharp_style_unused_value_expression_statement_preference = discard_variable
+csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 
 # 'using' directive preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0065
-csharp_using_directive_placement = outside_namespace
+csharp_using_directive_placement = outside_namespace:silent
 
 # New line preferences. Not documented experimental properties
 # https://github.com/dotnet/roslyn/issues/60539
 # https://github.com/dotnet/roslyn/issues/65770
-# csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = true
-# csharp_style_allow_blank_lines_between_consecutive_braces_experimental = true
-# csharp_style_allow_embedded_statements_on_same_line_experimental = true
+csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = true:silent
+csharp_style_allow_blank_lines_between_consecutive_braces_experimental = true:silent
+csharp_style_allow_embedded_statements_on_same_line_experimental = true:silent
+csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true:silent
+csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true:silent
 
 #### C# Formatting Rules ####
 
@@ -302,3 +338,50 @@ dotnet_naming_rule.members_should_be_pascal_case.style = pascal_case_style
 dotnet_naming_symbols.all_members.applicable_kinds = *
 
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+# ReSharper properties
+resharper_csharp_keep_blank_lines_in_code = 1
+resharper_csharp_keep_blank_lines_in_declarations = 1
+resharper_csharp_keep_existing_enum_arrangement = false
+resharper_csharp_max_enum_members_on_line = 1
+resharper_csharp_wrap_after_declaration_lpar = true
+resharper_csharp_wrap_after_invocation_lpar = true
+resharper_csharp_wrap_arguments_style = chop_if_long
+resharper_csharp_wrap_before_binary_opsign = true
+resharper_csharp_wrap_before_first_type_parameter_constraint = true
+resharper_csharp_wrap_parameters_style = chop_if_long
+resharper_force_chop_compound_if_expression = true
+resharper_force_chop_compound_while_expression = true
+resharper_keep_existing_declaration_block_arrangement = false
+resharper_keep_existing_embedded_block_arrangement = false
+resharper_keep_existing_expr_member_arrangement = false
+resharper_keep_existing_list_patterns_arrangement = false
+resharper_keep_existing_primary_constructor_declaration_parens_arrangement = false
+resharper_keep_existing_switch_expression_arrangement = false
+resharper_max_initializer_elements_on_line = 1
+resharper_place_accessorholder_attribute_on_same_line = false
+resharper_place_accessor_attribute_on_same_line = false
+resharper_place_constructor_initializer_on_same_line = false
+resharper_place_field_attribute_on_same_line = false
+resharper_place_simple_embedded_statement_on_same_line = false
+resharper_place_simple_property_pattern_on_single_line = false
+resharper_prefer_separate_deconstructed_variables_declaration = true
+resharper_space_after_operator_keyword = false
+resharper_space_before_trailing_comment_text = true
+resharper_space_within_single_line_array_initializer_braces = true
+resharper_static_members_qualify_with = current_type
+resharper_treat_case_statement_with_break_as_simple = false
+resharper_wrap_array_initializer_style = chop_if_long
+resharper_wrap_before_primary_constructor_declaration_lpar = false
+resharper_wrap_before_primary_constructor_declaration_rpar = false
+resharper_wrap_chained_binary_expressions = chop_if_long
+resharper_wrap_chained_binary_patterns = chop_if_long
+resharper_wrap_chained_method_calls = chop_if_long
+resharper_wrap_enum_declaration = chop_if_long
+resharper_wrap_list_pattern = chop_if_long
+resharper_wrap_property_pattern = chop_always
+
+# ReSharper inspection severities
+resharper_suggest_var_or_type_built_in_types_highlighting = hint
+resharper_suggest_var_or_type_elsewhere_highlighting = hint
+resharper_suggest_var_or_type_simple_types_highlighting = hint
