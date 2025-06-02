@@ -51,6 +51,11 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Задание на отверстие находится в разных конструкциях
         /// </summary>
         [Description("В разных конструкциях")]
-        DifferentConstructions
+        DifferentConstructions,
+        /// <summary>
+        /// Задание на отверстие находится в недопустимых конструкциях
+        /// </summary>
+        [Description("Недопустимые конструкции")]
+        UnacceptableConstructions
     }
 }
