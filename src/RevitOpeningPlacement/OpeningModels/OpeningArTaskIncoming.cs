@@ -172,14 +172,13 @@ namespace RevitOpeningPlacement.OpeningModels {
                 var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
 
                 Host = FindHost(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
-                if(intersectingStructureElements
-                    .Select(id => _revitRepository.Doc.GetElement(id))
-                    .Union(intersectingOpenings
-                        .Select(id => (_revitRepository.Doc.GetElement(id) as FamilyInstance)?.Host)
-                        .Where(e => e != null))
-                    .Select(el => el.Category.GetBuiltInCategory())
-                    .Distinct()
-                    .Count() > 1) {
+                if(GetIntersectingStructureElementsIds(thisOpeningSolid,
+                    RevitRepository.UnacceptableStructureCategories.ToArray())
+                    .Count() > 0) {
+                    Status = OpeningTaskIncomingStatus.UnacceptableConstructions;
+                    return;
+                }
+                if(GetHostCategories(intersectingStructureElements, intersectingOpenings).Count > 1) {
                     Status = OpeningTaskIncomingStatus.DifferentConstructions;
                     return;
                 }
@@ -201,6 +200,26 @@ namespace RevitOpeningPlacement.OpeningModels {
             }
         }
 
+
+        /// <summary>
+        /// Находит категории конструкций, в которых расположено текущее входящее задание на отверстие из связи
+        /// </summary>
+        /// <param name="intersectingStructureElements">Элементы конструкций из активного файла, 
+        /// которые пересекаются с входящим заданием на отверстие</param>
+        /// <param name="intersectingOpenings">Чистовые отверстия из активного файла,
+        /// которые пересекаются с входящим заданием на отверстие</param>
+        private ICollection<BuiltInCategory> GetHostCategories(
+            ICollection<ElementId> intersectingStructureElements,
+            ICollection<ElementId> intersectingOpenings) {
+            return intersectingStructureElements
+                .Select(id => _revitRepository.Doc.GetElement(id))
+                .Union(intersectingOpenings
+                    .Select(id => (_revitRepository.Doc.GetElement(id) as FamilyInstance)?.Host)
+                    .Where(e => e != null))
+                .Select(el => el.Category.GetBuiltInCategory())
+                .Distinct()
+                .ToArray();
+        }
 
         /// <summary>
         /// Возвращает Id элемента конструкции, который наиболее похож на хост для задания на отверстие.
@@ -277,6 +296,24 @@ namespace RevitOpeningPlacement.OpeningModels {
                     .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
                     .ToElementIds();
             }
+        }
+
+        /// <summary>
+        /// Возвращает коллекцию элементов конструкций заданных категорий из активного документа, 
+        /// с которыми пересекается текущее задание на отверстие из связи
+        /// </summary>
+        /// <param name="thisOpeningSolid">
+        /// Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
+        /// <param name="constructureCategories">
+        /// Коллекция категорий конструкций из активного документа ревита</param>
+        private ICollection<ElementId> GetIntersectingStructureElementsIds(
+            Solid thisOpeningSolid,
+            ICollection<BuiltInCategory> constructureCategories) {
+            return new FilteredElementCollector(_revitRepository.Doc)
+                .WherePasses(new ElementMulticategoryFilter(constructureCategories))
+                .WherePasses(new BoundingBoxIntersectsFilter(thisOpeningSolid.GetOutline()))
+                .WherePasses(new ElementIntersectsSolidFilter(thisOpeningSolid))
+                .ToElementIds();
         }
 
         /// <summary>
