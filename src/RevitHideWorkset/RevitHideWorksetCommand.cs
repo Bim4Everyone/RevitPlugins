@@ -1,6 +1,6 @@
+using System;
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -9,8 +9,8 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -32,7 +32,7 @@ public class RevitHideWorksetCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitHideWorksetCommand() {
-        PluginName = "RevitHideWorkset";
+        PluginName = "Скрытие РН связей";
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class RevitHideWorksetCommand : BasePluginCommand {
     /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        using var kernel = uiApplication.CreatePlatformServices();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
@@ -56,13 +56,13 @@ public class RevitHideWorksetCommand : BasePluginCommand {
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
+        kernel.UseWpfUIMessageBox();
+
         // Настройка запуска окна
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -70,11 +70,33 @@ public class RevitHideWorksetCommand : BasePluginCommand {
 
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
-        kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        ValidateLinkedFiles(kernel);
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
+    }
+
+    private void ValidateLinkedFiles(IKernel kernel) {
+        var revitRepository = kernel.Get<RevitRepository>();
+        var localizationService = kernel.Get<ILocalizationService>();
+        var msg = kernel.Get<IMessageBoxService>();
+
+        var linkedFiles = revitRepository.GetLinkedFiles();
+
+        if(linkedFiles.Count == 0) {
+            string title = localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
+            string message = localizationService.GetLocalizedString("GeneralSettings.ErrorNoLinkedFiles");
+
+            msg.Show(
+                message,
+                title
+            );
+
+            throw new OperationCanceledException();
+        }
     }
 }

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -12,42 +15,55 @@ namespace RevitHideWorkset.ViewModels;
 /// Основная ViewModel главного окна плагина.
 /// </summary>
 internal class MainViewModel : BaseViewModel {
-    private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
+    private bool _hasChanges;
+
     private string _errorText;
-    private string _saveProperty;
-    
+    private string _searchName;
+
+    private List<LinkedFileElement> _linkedFiles;
+    private List<LinkedFileElement> _filteredLinkedFiles;
+    private List<WorksetElement> _selectedWorksets;
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
-    /// <param name="pluginConfig">Настройки плагина.</param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(
-        PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
-        
-        _pluginConfig = pluginConfig;
+
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
+
+        LinkedFiles = _revitRepository.GetLinkedFiles();
+        ApplyFilter();
+
+        SelectedWorksets = [];
+
+        HideSelectedCommand = RelayCommand.Create(HideSelectedWorksets, CanHideSelected);
+        ToggleVisibilityCommand = RelayCommand.Create<WorksetElement>(ToggleWorksetVisibility);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        _localizationService = localizationService;
     }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
-    public ICommand LoadViewCommand { get; }
-    
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
+
+    public ICommand ToggleVisibilityCommand { get; }
+
+    public ICommand HideSelectedCommand { get; }
+
+    public bool HasChanges {
+        get => _hasChanges;
+        set => RaiseAndSetIfChanged(ref _hasChanges, value);
+    }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -57,20 +73,73 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
+    public string SearchName {
+        get => _searchName;
+        set {
+            RaiseAndSetIfChanged(ref _searchName, value);
+            ApplyFilter();
+        }
     }
 
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
-    private void LoadView() {
-        LoadConfig();
+    public List<LinkedFileElement> LinkedFiles {
+        get => _linkedFiles;
+        set => RaiseAndSetIfChanged(ref _linkedFiles, value);
+    }
+
+    public List<LinkedFileElement> FilteredLinkedFiles {
+        get => _filteredLinkedFiles;
+        set => RaiseAndSetIfChanged(ref _filteredLinkedFiles, value);
+    }
+
+    public List<WorksetElement> SelectedWorksets {
+        get => _selectedWorksets;
+        set => RaiseAndSetIfChanged(ref _selectedWorksets, value);
+    }
+
+    private bool CanHideSelected() {
+        return SelectedWorksets.Count > 0;
+    }
+
+    private void ApplyFilter() {
+        if(string.IsNullOrWhiteSpace(SearchName)) {
+            FilteredLinkedFiles = LinkedFiles
+                .Select(file => new LinkedFileElement {
+                    LinkedFile = file.LinkedFile,
+                    Worksets = file.Worksets.ToList()
+                })
+                .ToList();
+        } else {
+            string search = SearchName.Trim();
+
+            FilteredLinkedFiles = LinkedFiles
+                .Select(file => new LinkedFileElement {
+                    LinkedFile = file.LinkedFile,
+                    Worksets = file.Worksets
+                        .Where(ws => ws.Name != null &&
+                                     ws.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0)
+                        .ToList()
+                })
+                .Where(file => file.Worksets.Count > 0)
+                .ToList();
+        }
+    }
+
+    private void ToggleWorksetVisibility(WorksetElement workset) {
+        workset.IsOpen = !workset.IsOpen;
+        workset.IsChanged = !workset.IsChanged;
+
+        HasChanges = LinkedFiles.SelectMany(x => x.Worksets).Count(w => w.IsChanged) > 0;
+    }
+
+    private void HideSelectedWorksets() {
+        foreach(var workset in SelectedWorksets) {
+            if(workset.IsOpen) {
+                workset.IsOpen = false;
+                workset.IsChanged = !workset.IsChanged;
+            }
+        }
+
+        HasChanges = LinkedFiles.SelectMany(x => x.Worksets).Count(w => w.IsChanged) > 0;
     }
 
     /// <summary>
@@ -80,7 +149,7 @@ internal class MainViewModel : BaseViewModel {
     /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
     /// </remarks>
     private void AcceptView() {
-        SaveConfig();
+        _revitRepository.ToggleWorksetVisibility(LinkedFiles);
     }
 
     /// <summary>
@@ -92,32 +161,14 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+        if(!HasChanges) {
+            string message = _localizationService.GetLocalizedString("MainWindow.NoChanges");
+
+            ErrorText = message;
             return false;
         }
 
         ErrorText = null;
         return true;
-    }
-
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
-    private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
-    }
-
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
-    private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-        setting.SaveProperty = SaveProperty;
-        _pluginConfig.SaveProjectConfig();
     }
 }
