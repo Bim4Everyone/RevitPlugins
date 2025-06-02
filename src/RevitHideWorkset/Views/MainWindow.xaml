@@ -64,7 +64,7 @@
             Margin="0,10,0,10">
 
             <ui:TextBox
-                Width="200"
+                Width="300"
                 Margin="10,0,10,0"
                 Text="{Binding SearchName, UpdateSourceTrigger=PropertyChanged}"
                 PlaceholderText="{me:LocalizationSource MainWindow.SearchPlaceholder}" />
