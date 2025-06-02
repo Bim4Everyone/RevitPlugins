@@ -162,6 +162,15 @@ namespace RevitOpeningPlacement.Models {
         };
 
         /// <summary>
+        /// Категории конструкций, недопустимые для расстановки заданий на отверстия
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> UnacceptableStructureCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_StructuralColumns,
+                BuiltInCategory.OST_StructuralFraming
+            });
+
+        /// <summary>
         /// Используемые в плагине категории для стен: Стены
         /// </summary>
         public static BuiltInCategory WallCategory { get; } = BuiltInCategory.OST_Walls;
