@@ -402,7 +402,6 @@ namespace RevitPylonDocumentation.Models {
         public string TransverseViewThirdElevation { get; set; }
         public string TransverseViewTemplateName { get; set; }
         public string TransverseRebarViewTemplateName { get; set; }
-        public string TransverseRebarViewSecondTemplateName { get; set; }
         public string TransverseViewXOffset { get; set; }
         public string TransverseViewYOffset { get; set; }
         public string ViewFamilyTypeName { get; set; }
