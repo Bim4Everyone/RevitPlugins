@@ -17,13 +17,14 @@ namespace RevitHideWorkset.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxService;
 
     private bool _hasChanges;
 
     private string _errorText;
     private string _searchName;
 
-    private List<LinkedFileElement> _linkedFiles;
+    private List<LinkedFileElement> _allLinkedFiles;
     private List<LinkedFileElement> _filteredLinkedFiles;
     private List<WorksetElement> _selectedWorksets;
 
@@ -33,21 +34,22 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     public MainViewModel(
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
-
+        ILocalizationService localizationService, 
+        IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
 
+        AllLinkedFiles = _revitRepository.GetLinkedFiles();
 
-        LinkedFiles = _revitRepository.GetLinkedFiles();
         ApplyFilter();
 
         SelectedWorksets = [];
 
+        ApplyFilterCommand = RelayCommand.Create(ApplyFilter);
         HideSelectedCommand = RelayCommand.Create(HideSelectedWorksets, CanHideSelected);
         ToggleVisibilityCommand = RelayCommand.Create<WorksetElement>(ToggleWorksetVisibility);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-        _localizationService = localizationService;
     }
 
     /// <summary>
@@ -59,6 +61,8 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ToggleVisibilityCommand { get; }
 
     public ICommand HideSelectedCommand { get; }
+
+    public ICommand ApplyFilterCommand { get; }
 
     public bool HasChanges {
         get => _hasChanges;
@@ -75,15 +79,12 @@ internal class MainViewModel : BaseViewModel {
 
     public string SearchName {
         get => _searchName;
-        set {
-            RaiseAndSetIfChanged(ref _searchName, value);
-            ApplyFilter();
-        }
+        set => RaiseAndSetIfChanged(ref _searchName, value);
     }
 
-    public List<LinkedFileElement> LinkedFiles {
-        get => _linkedFiles;
-        set => RaiseAndSetIfChanged(ref _linkedFiles, value);
+    public List<LinkedFileElement> AllLinkedFiles {
+        get => _allLinkedFiles;
+        set => RaiseAndSetIfChanged(ref _allLinkedFiles, value);
     }
 
     public List<LinkedFileElement> FilteredLinkedFiles {
@@ -101,34 +102,28 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void ApplyFilter() {
-        if(string.IsNullOrWhiteSpace(SearchName)) {
-            FilteredLinkedFiles = LinkedFiles
-                .Select(file => new LinkedFileElement {
-                    LinkedFile = file.LinkedFile,
-                    Worksets = file.Worksets.ToList()
-                })
-                .ToList();
-        } else {
-            string search = SearchName.Trim();
+        string search = SearchName?.Trim();
 
-            FilteredLinkedFiles = LinkedFiles
-                .Select(file => new LinkedFileElement {
-                    LinkedFile = file.LinkedFile,
-                    Worksets = file.Worksets
-                        .Where(ws => ws.Name != null &&
-                                     ws.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0)
-                        .ToList()
-                })
-                .Where(file => file.Worksets.Count > 0)
-                .ToList();
+        foreach(var file in AllLinkedFiles) {
+            file.FiltredWorksets = string.IsNullOrWhiteSpace(search)
+                ? file.AllWorksets.ToList()
+                : file.AllWorksets
+                    .Where(ws => ws.Name != null &&
+                                 ws.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .ToList();
         }
+
+        FilteredLinkedFiles = AllLinkedFiles
+            .Where(file => file.FiltredWorksets.Count > 0)
+            .ToList();
     }
+
 
     private void ToggleWorksetVisibility(WorksetElement workset) {
         workset.IsOpen = !workset.IsOpen;
         workset.IsChanged = !workset.IsChanged;
 
-        HasChanges = LinkedFiles.SelectMany(x => x.Worksets).Count(w => w.IsChanged) > 0;
+        HasChanges = AllLinkedFiles.SelectMany(x => x.AllWorksets).Count(w => w.IsChanged) > 0;
     }
 
     private void HideSelectedWorksets() {
@@ -139,7 +134,7 @@ internal class MainViewModel : BaseViewModel {
             }
         }
 
-        HasChanges = LinkedFiles.SelectMany(x => x.Worksets).Count(w => w.IsChanged) > 0;
+        HasChanges = AllLinkedFiles.SelectMany(x => x.AllWorksets).Count(w => w.IsChanged) > 0;
     }
 
     /// <summary>
@@ -149,9 +144,16 @@ internal class MainViewModel : BaseViewModel {
     /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
     /// </remarks>
     private void AcceptView() {
-        _revitRepository.ToggleWorksetVisibility(LinkedFiles);
-    }
+        var failedFiles = _revitRepository.ToggleWorksetVisibility(AllLinkedFiles);
 
+        if(failedFiles.Count > 0) {
+            string title = _localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
+            string body = _localizationService.GetLocalizedString("GeneralSettings.ErrorConnection");
+
+            string failedList = string.Join(Environment.NewLine, failedFiles);
+            _messageBoxService.Show(title, $"{body}:{Environment.NewLine}{failedList}");
+        }
+    }
     /// <summary>
     /// Метод проверки возможности выполнения команды применения настроек.
     /// </summary>

@@ -17,22 +17,12 @@ namespace RevitHideWorkset.Models;
 /// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
 /// </remarks>
 internal class RevitRepository {
-    private readonly IMessageBoxService _messageBoxService;
-    private readonly ILocalizationService _localizationService;
-
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
     /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(
-        UIApplication uiApplication,
-        IMessageBoxService messageBoxService,
-        ILocalizationService localizationService) {
-
+    public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication;
-        _messageBoxService = messageBoxService;
-        _localizationService = localizationService;
-
     }
 
     /// <summary>
@@ -78,14 +68,17 @@ internal class RevitRepository {
 
             result.Add(new LinkedFileElement {
                 LinkedFile = linkInstance,
-                Worksets = worksets
+                AllWorksets = worksets
             });
         }
 
         return result;
     }
 
-    public void ToggleWorksetVisibility(List<LinkedFileElement> linkedFiles) {
+
+    public List<string> ToggleWorksetVisibility(List<LinkedFileElement> linkedFiles) {
+        var failedFiles = new List<string>();
+
         foreach(var linkedFile in linkedFiles) {
             var linkInstance = linkedFile.LinkedFile;
             var linkType = Document.GetElement(linkInstance.GetTypeId()) as RevitLinkType;
@@ -96,7 +89,7 @@ internal class RevitRepository {
             var allLinkWorksets = WorksharingUtils.GetUserWorksetInfo(modelPath);
 
             var worksetsToOpen = allLinkWorksets
-                .Where(linkWs => linkedFile.Worksets.Any(w => w.Name == linkWs.Name && w.IsOpen))
+                .Where(linkWs => linkedFile.AllWorksets.Count(w => w.Name == linkWs.Name && w.IsOpen) > 0)
                 .Select(ws => ws.Id)
                 .ToList();
 
@@ -105,12 +98,10 @@ internal class RevitRepository {
 
             try {
                 _ = linkType.LoadFrom(modelPath, config);
-            } catch(Exception ex) {
-                string title = _localizationService.GetLocalizedString("GeneralSettings.ErrorMessage");
-                string message = _localizationService.GetLocalizedString("GeneralSettings.ErrorConnection");
-
-                _messageBoxService.Show(title, $"{message} {linkInstance.Name} {ex.Message}");
+            } catch(Exception) {
+                failedFiles.Add(linkInstance.Name);
             }
         }
+        return failedFiles;
     }
 }

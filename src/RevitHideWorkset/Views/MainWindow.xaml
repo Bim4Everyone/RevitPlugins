@@ -67,7 +67,16 @@
                 Width="300"
                 Margin="10,0,10,0"
                 Text="{Binding SearchName, UpdateSourceTrigger=PropertyChanged}"
-                PlaceholderText="{me:LocalizationSource MainWindow.SearchPlaceholder}" />
+                PlaceholderText="{me:LocalizationSource MainWindow.SearchPlaceholder}">
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger
+                        EventName="TextChanged">
+                        <i:InvokeCommandAction
+                            Command="{Binding ApplyFilterCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ui:TextBox>
 
             <ui:Button
                 ToolTip="{DynamicResource MainWindow.ToolTipHideWorksets}"
@@ -121,11 +130,13 @@
                                 <ListBox
                                     BorderThickness="0"
                                     SelectionMode="Extended"
-                                    ItemsSource="{Binding Worksets}">
+                                    ItemsSource="{Binding FiltredWorksets}">
 
                                     <i:Interaction.Behaviors>
                                         <behaviors:SelectedItemsBehavior
-                                            SelectedItems="{Binding DataContext.SelectedWorksets, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" />
+                                            SelectedItems="{Binding DataContext.SelectedWorksets, 
+                                                            RelativeSource={RelativeSource AncestorType=Window},
+                                                            Mode=TwoWay}" />
                                     </i:Interaction.Behaviors>
 
                                     <ListBox.ItemTemplate>
