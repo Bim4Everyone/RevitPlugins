@@ -30,7 +30,7 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Не имеет основания в виде пересекающего его элемента, для которого и было создано задание;
         /// либо задание на отверстие на пересекает ни один элемент конструкции, например, из-за сдвинутой стены
         /// </summary>
-        [Description("Не актуальное задание")]
+        [Description("Неактуальное задание")]
         NotActual,
         /// <summary>
         /// Произошла ошибка обработки геометрии в процессе определения статуса
@@ -51,6 +51,11 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Задание на отверстие находится в разных конструкциях
         /// </summary>
         [Description("В разных конструкциях")]
-        DifferentConstructions
+        DifferentConstructions,
+        /// <summary>
+        /// Задание на отверстие находится в недопустимых конструкциях
+        /// </summary>
+        [Description("Недопустимые конструкции")]
+        UnacceptableConstructions
     }
 }

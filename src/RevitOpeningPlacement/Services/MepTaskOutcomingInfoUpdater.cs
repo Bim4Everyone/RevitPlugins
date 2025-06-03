@@ -122,6 +122,11 @@ namespace RevitOpeningPlacement.Services {
                     outcomingTask.Status = OpeningTaskOutcomingStatus.NotActual;
                     return;
                 }
+                if(OpeningTaskInUnacceptableConstructions(outcomingTask)) {
+                    FindAndSetHost(outcomingTask);
+                    outcomingTask.Status = OpeningTaskOutcomingStatus.UnacceptableConstructions;
+                    return;
+                }
                 if(OpeningTaskInDifferentConstructions(outcomingTask)) {
                     FindAndSetHost(outcomingTask);
                     outcomingTask.Status = OpeningTaskOutcomingStatus.DifferentConstructions;
@@ -148,6 +153,25 @@ namespace RevitOpeningPlacement.Services {
             } finally {
                 ClearCache();
             }
+        }
+
+        /// <summary>
+        /// Проверяет, пересекается ли исходящее задание на отверстие с недопустимыми конструкциями из связей
+        /// </summary>
+        /// <param name="opening">Исходящее задание на отверстие</param>
+        /// <returns>True, если задание на отверстие пересекается с</returns>
+        private bool OpeningTaskInUnacceptableConstructions(OpeningMepTaskOutcoming opening) {
+            foreach(var link in _constructureLinks) {
+                bool intersects = GetIntersectingLinkConstructions(
+                    opening,
+                    link,
+                    RevitRepository.UnacceptableStructureCategories.ToArray())
+                    .Any();
+                if(intersects) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -586,6 +610,27 @@ namespace RevitOpeningPlacement.Services {
             }
             Solid solidInLinkCoordinates = GetOpeningSolid(mepTaskOutcoming, constructureLink);
             return new FilteredElementCollector(constructureLink.Document, ids)
+                .WherePasses(new BoundingBoxIntersectsFilter(solidInLinkCoordinates.GetOutline()))
+                .WherePasses(new ElementIntersectsSolidFilter(solidInLinkCoordinates))
+                .ToElementIds();
+        }
+
+        /// <summary>
+        /// Находит элементы конструкций заданных категорий из связи, с которыми пересекается задание на отверстие
+        /// </summary>
+        /// <param name="mepTaskOutcoming">Задание на отверстие из активного файла</param>
+        /// <param name="constructureLink">Связанный файл с конструкциями</param>
+        /// <param name="constructureCategories">Категории конструкций для поиска</param>
+        /// <returns>Коллекция Id элементов конструкций заданных категорий из связи, 
+        /// с которыми пересекается задание на отверстие</returns>
+        private ICollection<ElementId> GetIntersectingLinkConstructions(
+            OpeningMepTaskOutcoming mepTaskOutcoming,
+            IConstructureLinkElementsProvider constructureLink,
+            ICollection<BuiltInCategory> constructureCategories) {
+
+            Solid solidInLinkCoordinates = GetOpeningSolid(mepTaskOutcoming, constructureLink);
+            return new FilteredElementCollector(constructureLink.Document)
+                .WherePasses(new ElementMulticategoryFilter(constructureCategories))
                 .WherePasses(new BoundingBoxIntersectsFilter(solidInLinkCoordinates.GetOutline()))
                 .WherePasses(new ElementIntersectsSolidFilter(solidInLinkCoordinates))
                 .ToElementIds();

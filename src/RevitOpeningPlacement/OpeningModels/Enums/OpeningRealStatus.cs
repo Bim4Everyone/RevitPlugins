@@ -18,7 +18,7 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// <summary>
         /// Размещенное чистовое отверстие не полностью закрывает задание или элементы ВИС
         /// </summary>
-        [Description("Не актуальное отверстие")]
+        [Description("Неактуальное отверстие")]
         NotActual,
         /// <summary>
         /// Размещенное чистовое отверстие корректно
