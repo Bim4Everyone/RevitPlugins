@@ -38,7 +38,7 @@ namespace RevitPylonDocumentation.Models {
                 if(rebarType is null) {
                     continue;
                 }
-                if(rebarType.FamilyName.Equals("IFC_Пилон_Верт.Арм.")) {
+                if(rebarType.FamilyName.Equals("IFC_Пилон_Верт.Арм.") || rebarType.FamilyName.Contains("IFC_Каркас_Пилон")) {
                     return rebar as FamilyInstance;
                 }
             }
