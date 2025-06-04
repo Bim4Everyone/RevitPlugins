@@ -13,50 +13,49 @@ using Ninject.Syntax;
 using RevitKrChecker.Models;
 using RevitKrChecker.Views;
 
-namespace RevitKrChecker.ViewModels {
-    internal class MainVM : BaseViewModel {
-        private readonly PluginConfig _pluginConfig;
-        private readonly RevitRepository _revitRepository;
-        private readonly ReportVM _reportVM;
-        private readonly IResolutionRoot _resolutionRoot;
+namespace RevitKrChecker.ViewModels;
+internal class MainVM : BaseViewModel {
+    private readonly PluginConfig _pluginConfig;
+    private readonly RevitRepository _revitRepository;
+    private readonly ReportVM _reportVM;
+    private readonly IResolutionRoot _resolutionRoot;
 
-        public MainVM(
-            PluginConfig pluginConfig,
-            RevitRepository revitRepository,
-            ReportVM reportVM,
-            IResolutionRoot resolutionRoot) {
+    public MainVM(
+        PluginConfig pluginConfig,
+        RevitRepository revitRepository,
+        ReportVM reportVM,
+        IResolutionRoot resolutionRoot) {
 
-            _pluginConfig = pluginConfig;
-            _revitRepository = revitRepository;
-            _reportVM = reportVM;
-            _resolutionRoot = resolutionRoot;
+        _pluginConfig = pluginConfig;
+        _revitRepository = revitRepository;
+        _reportVM = reportVM;
+        _resolutionRoot = resolutionRoot;
 
-            CheckElemsFromViewCommand = RelayCommand.Create(CheckElemsFromView);
-            CheckElemsFromPjCommand = RelayCommand.Create(CheckElemsFromPj);
-        }
+        CheckElemsFromViewCommand = RelayCommand.Create(CheckElemsFromView);
+        CheckElemsFromPjCommand = RelayCommand.Create(CheckElemsFromPj);
+    }
 
 
-        public ICommand CheckElemsFromViewCommand { get; }
-        public ICommand CheckElemsFromPjCommand { get; }
+    public ICommand CheckElemsFromViewCommand { get; }
+    public ICommand CheckElemsFromPjCommand { get; }
 
-        private void CheckElemsFromView() {
-            List<Element> elements = _revitRepository.GetViewElements();
-            ShowReport(elements);
-        }
+    private void CheckElemsFromView() {
+        var elements = _revitRepository.GetViewElements();
+        ShowReport(elements);
+    }
 
-        private void CheckElemsFromPj() {
-            List<Element> elements = _revitRepository.GetPjElements();
-            ShowReport(elements);
-        }
+    private void CheckElemsFromPj() {
+        var elements = _revitRepository.GetPjElements();
+        ShowReport(elements);
+    }
 
-        private void ShowReport(List<Element> elements) {
-            _reportVM.CheckElements(elements);
+    private void ShowReport(List<Element> elements) {
+        _reportVM.CheckElements(elements);
 
-            ReportWindow reportWindow = _resolutionRoot.Get<ReportWindow>(
-                new PropertyValue(
-                    nameof(ReportWindow.DataContext),
-                    _reportVM));
-            reportWindow.Show();
-        }
+        var reportWindow = _resolutionRoot.Get<ReportWindow>(
+            new PropertyValue(
+                nameof(ReportWindow.DataContext),
+                _reportVM));
+        reportWindow.Show();
     }
 }
