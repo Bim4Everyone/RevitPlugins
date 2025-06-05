@@ -10,6 +10,8 @@
 
     <system:String x:Key="MainWindow.Phases">Phases</system:String>
     <system:String x:Key="MainWindow.RoomNames">Room names</system:String>
+    <system:String x:Key="MainWindow.RoomDepartments">Room Departments:</system:String>
+    <system:String x:Key="MainWindow.RoomLevels">Room Levels:</system:String>
 
 
     <system:String x:Key="MainWindow.CheckAll">Select all</system:String>

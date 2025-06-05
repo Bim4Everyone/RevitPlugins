@@ -8,6 +8,8 @@
     
     <system:String x:Key="MainWindow.Phases">Стадии:</system:String>
     <system:String x:Key="MainWindow.RoomNames">Имена помещений:</system:String>
+    <system:String x:Key="MainWindow.RoomDepartments">Назначения помещений:</system:String>
+    <system:String x:Key="MainWindow.RoomLevels">Уровни:</system:String>
 
     <system:String x:Key="MainWindow.CheckAll">Выбрать все</system:String>
     <system:String x:Key="MainWindow.UnCheckAll">Снять выбор</system:String>

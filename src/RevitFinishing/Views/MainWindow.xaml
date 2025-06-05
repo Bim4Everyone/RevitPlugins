@@ -16,10 +16,10 @@
     Title="{me:LocalizationSource MainWindow.Title}"
 
     Height="600"
-    Width="500"
+    Width="900"
     
     MinHeight="600"
-    MinWidth="500"
+    MinWidth="900"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -35,17 +35,25 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
 
         <ui:TitleBar
             VerticalAlignment="Center"
             Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
         <DockPanel
             Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Margin="10">
             <ui:TextBlock
                 DockPanel.Dock="Left"
@@ -61,46 +69,74 @@
 
         <ui:TextBlock
             Grid.Row="2"
+            Grid.Column="0"
             Margin="10"
             Text="{me:LocalizationSource MainWindow.RoomNames}"/>
 
+        <ui:TextBlock
+            Grid.Row="2"
+            Grid.Column="1"
+            Margin="10"
+            Text="{me:LocalizationSource MainWindow.RoomDepartments}"/>
+
+        <ui:TextBlock
+            Grid.Row="2"
+            Grid.Column="2"
+            Margin="10"
+            Text="{me:LocalizationSource MainWindow.RoomLevels}"/>
+
         <ListBox
-            x:Name="RoomGroups"
+            x:Name="RoomNames"
             Grid.Row="3"
+            Grid.Column="0"
             Margin="10, 5"
             SelectionMode="Extended"
-            ItemsSource="{Binding Rooms}">
+            ItemsSource="{Binding RoomNames}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <CheckBox
                         Content="{Binding Name}"
-                        Checked="CheckBox_Checked"
-                        Unchecked="CheckBox_Unchecked"
                         IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <UniformGrid 
-            Columns="3"
-            Grid.Row="4"
-            Margin="10,5">
-            <ui:Button 
-                Content="{me:LocalizationSource MainWindow.CheckAll}"
-                Margin="0,0,5,0"
-                Command="{Binding CheckAllCommand}"/>
-            <ui:Button 
-                Content="{me:LocalizationSource MainWindow.UnCheckAll}"
-                Margin="5,0,5,0"
-                Command="{Binding UnCheckAllCommand}"/>
-            <ui:Button 
-                Content="{me:LocalizationSource MainWindow.InvertAll}"
-                Margin="5,0,0,0"
-                Command="{Binding InvertAllCommand}"/>
-        </UniformGrid>
+        <ListBox
+            x:Name="RoomDepartments"
+            Grid.Row="3"
+            Grid.Column="1"
+            Margin="10, 5"
+            SelectionMode="Extended"
+            ItemsSource="{Binding RoomDepartments}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox
+                        Content="{Binding Name}"
+                        IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <ListBox
+            x:Name="RoomLevels"
+            Grid.Row="3"
+            Grid.Column="2"
+            Margin="10, 5"
+            SelectionMode="Extended"
+            ItemsSource="{Binding RoomLevels}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox
+                        Content="{Binding Name}"
+                        IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <StackPanel
-            Grid.Row="5"
+            Grid.Row="4"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
