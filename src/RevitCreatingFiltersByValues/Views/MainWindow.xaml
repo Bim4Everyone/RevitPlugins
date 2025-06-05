@@ -8,7 +8,7 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitCreatingFiltersByValues.Views"
     xmlns:vms="clr-namespace:RevitCreatingFiltersByValues.ViewModels"
-	  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -458,7 +458,7 @@
                VerticalAlignment="Center">
             <Label.ToolTip>
                 <TextBlock 
-                        Text="Перечень возможных значений выбранного параметра среди элементов выбранных категорий. Выберите одно или несколько значений, и тогда плагин перекрасит элементы с выбранными значениями. Если стоит галка &quot;Переопределять цвет&quot;, то плагин создаст фильтр на каждое из выбраннох значений. Если этот список пуст, значит не выбран параметр для фильтрации (см. выше) или элементы выбранных категорий не имеют значений в выбранном параметре для фильтрации." 
+                        Text="Перечень возможных значений выбранного параметра среди элементов выбранных категорий. Выберите одно или несколько значений, и тогда плагин перекрасит элементы с выбранными значениями. Если стоит галка &quot;Переопределять цвет&quot;, то плагин создаст фильтр на каждое из выбранных значений. Если этот список пуст, значит не выбран параметр для фильтрации (см. выше) или элементы выбранных категорий не имеют значений в выбранном параметре для фильтрации." 
                         TextWrapping="Wrap"
                         Width="300"
                         TextAlignment="Justify"
