@@ -45,22 +45,33 @@ internal class RevitRepository {
             .ToList();
     }
 
-    public ObservableCollection<RoomGroupViewModel> GetRoomsOnPhase(Phase phase) {
+    public IEnumerable<string> GetParamStringValues(Phase phase, BuiltInParameter param) {
         ParameterValueProvider valueProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
         FilterNumericEquals ruleEvaluator = new FilterNumericEquals();
         FilterElementIdRule filterRule = new FilterElementIdRule(valueProvider, ruleEvaluator, phase.Id);
         ElementParameterFilter parameterFilter = new ElementParameterFilter(filterRule);
 
-        var rooms = new FilteredElementCollector(Document)
+        return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)
             .WherePasses(parameterFilter)
             .OfType<Room>()
-            .GroupBy(x => x.GetParamValueOrDefault(BuiltInParameter.ROOM_NAME, "<Без имени>"))
-            .Select(x => new RoomGroupViewModel(x.Key.ToString(), x))
-            .OrderBy(x => x.Name)
-            .ToList();
+            .Select(x => x.GetParamValueOrDefault<string>(param))
+            .Distinct();
+    }
 
-        return new ObservableCollection<RoomGroupViewModel>(rooms);
+    public IEnumerable<Element> GetRoomLevels(Phase phase) {
+        ParameterValueProvider valueProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
+        FilterNumericEquals ruleEvaluator = new FilterNumericEquals();
+        FilterElementIdRule filterRule = new FilterElementIdRule(valueProvider, ruleEvaluator, phase.Id);
+        ElementParameterFilter parameterFilter = new ElementParameterFilter(filterRule);
+
+        return new FilteredElementCollector(Document)
+            .OfCategory(BuiltInCategory.OST_Rooms)
+            .WherePasses(parameterFilter)
+            .OfType<Room>()
+            .Select(x => x.UpperLimit)
+            .GroupBy(x => new { x.Id, x.Name })
+            .Select(g => g.First());
     }
 
     public IReadOnlyCollection<Element> GetFinishingElementsOnPhase(FinishingCategory finishingCategory, Phase phase) {
@@ -86,15 +97,42 @@ internal class RevitRepository {
             .ToList();
     }
 
-    public void SetAll(IList<RoomGroupViewModel> allLevels, bool value) {
-        foreach(var level in allLevels) {
-            level.IsChecked = value;
-        }
-    }
+    public List<Room> GetRoomsByFilters(IEnumerable<RoomNameVM> roomNames,
+                                        IEnumerable<RoomDepartmentVM> roomDepartments,
+                                        IEnumerable<RoomLevelVM> roomLevels) {
+        List<ElementFilter> orFilters = new List<ElementFilter>();
 
-    public void InvertAll(IList<RoomGroupViewModel> allLevels) {
-        foreach(var level in allLevels) {
-            level.IsChecked = !level.IsChecked;
+        if(roomNames.Any()) {
+            List <ElementFilter> nameParamFilters = new List<ElementFilter>();
+            foreach(var roomName in roomNames) {
+                nameParamFilters.Add(roomName.GetStringFilter());
+            }
+            orFilters.Add(new LogicalOrFilter(nameParamFilters));
         }
+
+        if(roomDepartments.Any()) {
+            List<ElementFilter> departmentParamFilters = new List<ElementFilter>();
+            foreach(var roomDepartment in roomDepartments) {
+                departmentParamFilters.Add(roomDepartment.GetStringFilter());
+            }
+            orFilters.Add(new LogicalOrFilter(departmentParamFilters));
+        }
+
+        if(roomLevels.Any()) {
+            List<ElementFilter> levelParamFilters = new List<ElementFilter>();
+            foreach(var roomLevel in roomLevels) {
+                levelParamFilters.Add(roomLevel.GetElementIdFilter());
+            }
+            orFilters.Add(new LogicalOrFilter(levelParamFilters));
+        }
+
+        LogicalAndFilter finalFilter = new LogicalAndFilter(orFilters);
+
+
+        return new FilteredElementCollector(Document)
+            .OfCategory(BuiltInCategory.OST_Rooms)
+            .WherePasses(finalFilter)
+            .OfType<Room>()
+            .ToList();
     }
 }

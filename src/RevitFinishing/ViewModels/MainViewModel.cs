@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
@@ -30,7 +32,9 @@ internal class MainViewModel : BaseViewModel {
     private readonly List<Phase> _phases;
     private Phase _selectedPhase;
 
-    private ObservableCollection<RoomGroupViewModel> _rooms;
+    private ObservableCollection<RoomNameVM> _roomNames;
+    private ObservableCollection<RoomDepartmentVM> _roomDepartments;
+    private ObservableCollection<RoomLevelVM> _roomLevels;
 
     private string _errorText;
 
@@ -51,8 +55,8 @@ internal class MainViewModel : BaseViewModel {
 
         _kernel = kernel;
 
-        ProjectSettingsLoader settings = new ProjectSettingsLoader(_revitRepository.Application,
-                                                           _revitRepository.Document);
+        ProjectSettingsLoader settings = 
+            new ProjectSettingsLoader(_revitRepository.Application, _revitRepository.Document);
 
         settings.CopyKeySchedule();
         settings.CopyParameters();
@@ -61,17 +65,11 @@ internal class MainViewModel : BaseViewModel {
         SelectedPhase = _phases[_phases.Count - 1];
 
         CalculateFinishingCommand = RelayCommand.Create(CalculateFinishing, CanCalculateFinishing);
-        CheckAllCommand = RelayCommand.Create(CheckAll);
-        UnCheckAllCommand = RelayCommand.Create(UnCheckAll);
-        InvertAllCommand = RelayCommand.Create(InvertAll);
 
         LoadConfig();
     }
 
     public ICommand CalculateFinishingCommand { get; }
-    public ICommand CheckAllCommand { get; }
-    public ICommand UnCheckAllCommand { get; }
-    public ICommand InvertAllCommand { get; }
 
     public List<Phase> Phases => _phases;
 
@@ -79,14 +77,34 @@ internal class MainViewModel : BaseViewModel {
         get => _selectedPhase;
         set {
             RaiseAndSetIfChanged(ref _selectedPhase, value);
-            _rooms = _revitRepository.GetRoomsOnPhase(_selectedPhase);
-            OnPropertyChanged("Rooms");
+
+            RoomNames = [.. _revitRepository
+                .GetParamStringValues(_selectedPhase, BuiltInParameter.ROOM_NAME)
+                .Select(x => new RoomNameVM(x, BuiltInParameter.ROOM_NAME))];
+
+            RoomDepartments = [.. _revitRepository
+                .GetParamStringValues(_selectedPhase, BuiltInParameter.ROOM_DEPARTMENT)
+                .Select(x => new RoomDepartmentVM(x, BuiltInParameter.ROOM_DEPARTMENT))];
+
+            RoomLevels = [.. _revitRepository
+                .GetRoomLevels(_selectedPhase)
+                .Select(x => new RoomLevelVM(x, x.Name, BuiltInParameter.ROOM_UPPER_LEVEL))];
         }
     }
 
-    public ObservableCollection<RoomGroupViewModel> Rooms {
-        get => _rooms;
-        set => RaiseAndSetIfChanged(ref _rooms, value);
+    public ObservableCollection<RoomNameVM> RoomNames {
+        get => _roomNames;
+        set => RaiseAndSetIfChanged(ref _roomNames, value);
+    }
+
+    public ObservableCollection<RoomDepartmentVM> RoomDepartments {
+        get => _roomDepartments;
+        set => RaiseAndSetIfChanged(ref _roomDepartments, value);
+    }
+
+    public ObservableCollection<RoomLevelVM> RoomLevels {
+        get => _roomLevels;
+        set => RaiseAndSetIfChanged(ref _roomLevels, value);
     }
 
     public string ErrorText {
@@ -95,9 +113,10 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void CalculateFinishing() {
-        IEnumerable<Element> selectedRooms = Rooms
-            .Where(x => x.IsChecked)
-            .SelectMany(x => x.Rooms);
+        var selectedRooms = _revitRepository.GetRoomsByFilters(
+            RoomNames.Where(x => x.IsChecked), 
+            RoomDepartments.Where(x => x.IsChecked), 
+            RoomLevels.Where(x => x.IsChecked));
 
         FinishingInProject allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
         FinishingChecker checker = new FinishingChecker(SelectedPhase);
@@ -172,29 +191,19 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanCalculateFinishing() {
-        if(!Rooms.Any()) {
+        if(!RoomNames.Any()) {
             ErrorText = "Помещения отсутствуют на выбранной стадии";
             return false;
         }
-        if(!Rooms.Any(x => x.IsChecked)) {
+        if(!RoomNames.Any(x => x.IsChecked) 
+            && !RoomDepartments.Any(x => x.IsChecked)
+            && !RoomLevels.Any(x => x.IsChecked)) {
             ErrorText = "Помещения не выбраны";
             return false;
         }
 
         ErrorText = "";
         return true;
-    }
-
-    private void CheckAll() {
-        _revitRepository.SetAll(Rooms, true);
-    }
-
-    private void UnCheckAll() {
-        _revitRepository.SetAll(Rooms, false);
-    }
-
-    private void InvertAll() {
-        _revitRepository.InvertAll(Rooms);
     }
 
     private void LoadConfig() {
@@ -205,7 +214,7 @@ internal class MainViewModel : BaseViewModel {
         }
 
         settings.Phase = SelectedPhase.Name;
-        settings.RoomNames = Rooms
+        settings.RoomNames = RoomNames
             .Where(x => x.IsChecked)
             .Select(x => x.Name)
             .ToList();
@@ -221,7 +230,7 @@ internal class MainViewModel : BaseViewModel {
         }
 
         settings.Phase = SelectedPhase.Name;
-        settings.RoomNames = Rooms
+        settings.RoomNames = RoomNames
             .Where(x => x.IsChecked)
             .Select(x => x.Name)
             .ToList();
