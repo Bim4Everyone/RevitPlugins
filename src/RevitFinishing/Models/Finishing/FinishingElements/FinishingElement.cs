@@ -19,6 +19,8 @@ namespace RevitFinishing.Models.Finishing
     /// </summary>
     internal abstract class FinishingElement {
         private protected readonly Element _revitElement;
+        private protected readonly Element _revitElementType;
+        private protected readonly FamilySymbol _familySymbol;
         private protected readonly FinishingCalculator _calculator;
         private protected readonly ParamCalculationService _paramService;
         private protected readonly SharedParamsConfig _paramConfig = SharedParamsConfig.Instance;
@@ -27,6 +29,10 @@ namespace RevitFinishing.Models.Finishing
                                 FinishingCalculator calculator, 
                                 ParamCalculationService paramService) {
             _revitElement = element;
+            _revitElementType = _revitElement.Document.GetElement(_revitElement.GetTypeId());
+            if(_revitElementType is FamilySymbol) {
+                _familySymbol = _revitElementType as FamilySymbol;
+            }
             _calculator = calculator;
             _paramService = paramService;
         }
@@ -56,18 +62,12 @@ namespace RevitFinishing.Models.Finishing
         // Перенос значения из системного параметра экземпляра отделки в общий параметр отделки
         // У отделки могут отсутствовать системеный параметры, поэтому выполняется проверка.
         private protected void UpdateFromInstParam(SharedParam param, BuiltInParameter bltnParam) {
-            Element elementType = _revitElement.Document.GetElement(_revitElement.GetTypeId());
-
             // Проверка является ли семейство загружаемым или моделью в контексте
-            if(elementType is FamilySymbol) {
-                FamilySymbol familySymbol = elementType as FamilySymbol;
-
+            if(_familySymbol != null) {
                 // Параметр заполняется только для моделей в контексте.
                 // Для загружаемых семейств предполагается, что параметр рассчитан уже внутри семейства.
-                if(familySymbol.Family.IsInPlace) {
-                    if(_revitElement.IsExistsParam(bltnParam)) {
-                        _revitElement.SetParamValue(param, _revitElement.GetParamValue<double>(bltnParam));
-                    }
+                if(_familySymbol.Family.IsInPlace && _revitElement.IsExistsParam(bltnParam)) {
+                    _revitElement.SetParamValue(param, _revitElement.GetParamValue<double>(bltnParam));
                 }
             } else {
                 _revitElement.SetParamValue(param, _revitElement.GetParamValue<double>(bltnParam));
