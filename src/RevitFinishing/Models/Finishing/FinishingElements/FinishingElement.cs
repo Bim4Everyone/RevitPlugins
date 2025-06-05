@@ -34,20 +34,44 @@ namespace RevitFinishing.Models.Finishing
         public Element RevitElement => _revitElement;
         public List<RoomElement> Rooms { get; set; }
 
+        // Перенос значения из общего параметра помещения в аналогичный параметр отделки
         private protected void UpdateFromSharedParam(SharedParam param) {
             _revitElement.SetParamValue(param, _paramService.GetRoomsParameters(Rooms, param));
         }
 
-        private protected void UpdateFromBltnParam(IEnumerable<RoomElement> rooms, SharedParam param, BuiltInParameter bltnParam) {
+        // Перенос значения из системного параметра помещения в общий параметр отделки
+        private protected void UpdateFromBltnParam(IEnumerable<RoomElement> rooms, 
+                                                   SharedParam param, 
+                                                   BuiltInParameter bltnParam) {
             _revitElement.SetParamValue(param, _paramService.GetRoomsParameters(rooms, bltnParam));
         }
 
-        private protected void UpdateFromKeyParam(IEnumerable<RoomElement> rooms, SharedParam param, ProjectParam keyParam) {
+        // Перенос значения из ключевого параметра помещения в общий параметр отделки
+        private protected void UpdateFromKeyParam(IEnumerable<RoomElement> rooms, 
+                                                  SharedParam param, 
+                                                  ProjectParam keyParam) {
             _revitElement.SetParamValue(param, _paramService.GetRoomsKeyParameters(rooms, keyParam));
         }
 
+        // Перенос значения из системного параметра экземпляра отделки в общий параметр отделки
+        // У отделки могут отсутствовать системеный параметры, поэтому выполняется проверка.
         private protected void UpdateFromInstParam(SharedParam param, BuiltInParameter bltnParam) {
-            _revitElement.SetParamValue(param, _revitElement.GetParamValue<double>(bltnParam));
+            Element elementType = _revitElement.Document.GetElement(_revitElement.GetTypeId());
+
+            // Проверка является ли семейство загружаемым или моделью в контексте
+            if(elementType is FamilySymbol) {
+                FamilySymbol familySymbol = elementType as FamilySymbol;
+
+                // Параметр заполняется только для моделей в контексте.
+                // Для загружаемых семейств предполагается, что параметр рассчитан уже внутри семейства.
+                if(familySymbol.Family.IsInPlace) {
+                    if(_revitElement.IsExistsParam(bltnParam)) {
+                        _revitElement.SetParamValue(param, _revitElement.GetParamValue<double>(bltnParam));
+                    }
+                }
+            } else {
+                _revitElement.SetParamValue(param, _revitElement.GetParamValue<double>(bltnParam));
+            }
         }
 
         private protected void UpdateOrderParam(SharedParam param, int value) {
@@ -101,13 +125,16 @@ namespace RevitFinishing.Models.Finishing
             UpdateFromSharedParam(_paramConfig.BaseboardFinishingType4);
             UpdateFromSharedParam(_paramConfig.BaseboardFinishingType5);
 
+            // Тип отделки
+            UpdateFromKeyParam(Rooms, _paramConfig.FinishingType, ProjectParamsConfig.Instance.RoomFinishingType);
+
+            // Имена и номера помещений
             UpdateFromBltnParam(Rooms, _paramConfig.FinishingRoomName, BuiltInParameter.ROOM_NAME);
             UpdateFromBltnParam(Rooms, _paramConfig.FinishingRoomNumber, BuiltInParameter.ROOM_NUMBER);
             UpdateFromBltnParam(finishingType.Rooms, _paramConfig.FinishingRoomNames, BuiltInParameter.ROOM_NAME);
             UpdateFromBltnParam(finishingType.Rooms, _paramConfig.FinishingRoomNumbers, BuiltInParameter.ROOM_NUMBER);
 
-            UpdateFromKeyParam(Rooms, _paramConfig.FinishingType, ProjectParamsConfig.Instance.RoomFinishingType);
-
+            // Габариты отделки 
             UpdateFromInstParam(_paramConfig.SizeArea, BuiltInParameter.HOST_AREA_COMPUTED);
             UpdateFromInstParam(_paramConfig.SizeVolume, BuiltInParameter.HOST_VOLUME_COMPUTED);
         }
