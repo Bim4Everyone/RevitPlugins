@@ -188,8 +188,7 @@
           "description": "Plugin type name",
           "enum": [
             "Default",
-            "DevExpress",
-            "WpfUI"
+            "DevExpress"
           ]
         },
         "PublishDirectory": {
