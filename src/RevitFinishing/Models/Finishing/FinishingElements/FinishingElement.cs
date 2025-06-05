@@ -93,6 +93,9 @@ namespace RevitFinishing.Models.Finishing
             return false;
         }
 
+        /// <summary>
+        /// Заполнение параметров отделки, универсальных для всех семейств отделки.
+        /// </summary>
         public void UpdateFinishingParameters() {
             FinishingType finishingType = _calculator.RoomsByFinishingType[Rooms.First().RoomFinishingType];
 
@@ -139,6 +142,9 @@ namespace RevitFinishing.Models.Finishing
             UpdateFromInstParam(_paramConfig.SizeVolume, BuiltInParameter.HOST_VOLUME_COMPUTED);
         }
 
+        /// <summary>
+        /// Заполнение параметров отделки, уникальных для определенного типа отделки.
+        /// </summary>
         public abstract void UpdateCategoryParameters();
     }
 }
