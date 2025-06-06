@@ -1,7 +1,6 @@
-namespace RevitKrChecker.Models {
-    public enum ParamLevel {
-        Instance,
-        Type,
-        Material
-    }
+namespace RevitKrChecker.Models;
+public enum ParamLevel {
+    Instance,
+    Type,
+    Material
 }

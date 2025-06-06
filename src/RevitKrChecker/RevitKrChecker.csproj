@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-    </PropertyGroup>
+	<PropertyGroup>
+		<LangVersion>12</LangVersion>
+	</PropertyGroup>
 </Project>
