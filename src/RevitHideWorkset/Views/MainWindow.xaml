@@ -1,5 +1,6 @@
 ﻿<core:WpfUIPlatformWindow
     x:Class="RevitHideWorkset.Views.MainWindow"
+    x:Name="mainWindow"
     
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -10,7 +11,6 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:vms="clr-namespace:RevitHideWorkset.ViewModels"
     xmlns:behaviors="clr-namespace:RevitHideWorkset.Behaviors"
-    xmlns:сonvert="clr-namespace:RevitHideWorkset.Converters"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     
@@ -30,8 +30,12 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
-        <сonvert:WorksetIconConverter
-            x:Key="WorksetIconConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../ViewTemplates/LinkedFileTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
     <b:Interaction.Triggers>
@@ -106,74 +110,15 @@
             CornerRadius="8"
             Margin="10,0,10,0"
             Background="{DynamicResource CardBackground}">
-
             <ScrollViewer
                 CanContentScroll="True"
                 VerticalScrollBarVisibility="Auto"
                 HorizontalScrollBarVisibility="Disabled">
-
                 <ItemsControl
-                    ItemsSource="{Binding FilteredLinkedFiles}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Expander
-                                IsExpanded="True"
-                                Margin="0,5">
-                                
-                                <Expander.Header>
-                                    <TextBlock
-                                        FontWeight="Bold"
-                                        Text="{Binding LinkedFile.Name}" />
-                                    
-                                </Expander.Header>
-
-                                <ListBox
-                                    BorderThickness="0"
-                                    SelectionMode="Extended"
-                                    ItemsSource="{Binding FiltredWorksets}">
-
-                                    <i:Interaction.Behaviors>
-                                        <behaviors:SelectedItemsBehavior
-                                            SelectedItems="{Binding DataContext.SelectedWorksets, 
-                                                            RelativeSource={RelativeSource AncestorType=Window},
-                                                            Mode=TwoWay}" />
-                                    </i:Interaction.Behaviors>
-
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition
-                                                        Width="*" />
-                                                    <ColumnDefinition
-                                                        Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-
-                                                <TextBlock
-                                                    Grid.Column="0"
-                                                    VerticalAlignment="Center"
-                                                    Text="{Binding Name}" />
-
-                                                <ui:Button
-                                                    Grid.Column="1"
-                                                    HorizontalAlignment="Right"
-                                                    ToolTip="{DynamicResource MainWindow.ToolTipHideWorkset}"
-                                                    Command="{Binding DataContext.ToggleVisibilityCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding}">
-
-                                                    <ui:SymbolIcon
-                                                        Symbol="{Binding IsOpen, Converter={StaticResource WorksetIconConverter}}" />
-                                                    
-                                                </ui:Button>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                            </Expander>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    ItemsSource="{Binding FilteredLinkedFiles}"
+                    ItemTemplate="{StaticResource LinkedFileTemplate}" />
             </ScrollViewer>
+            
         </Border>
 
         <StackPanel

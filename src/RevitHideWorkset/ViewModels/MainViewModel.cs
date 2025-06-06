@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -105,7 +106,7 @@ internal class MainViewModel : BaseViewModel {
         string search = SearchName?.Trim();
 
         foreach(var file in AllLinkedFiles) {
-            file.FiltredWorksets = string.IsNullOrWhiteSpace(search)
+            file.FilteredWorksets = string.IsNullOrWhiteSpace(search)
                 ? file.AllWorksets.ToList()
                 : file.AllWorksets
                     .Where(ws => ws.Name != null &&
@@ -114,7 +115,7 @@ internal class MainViewModel : BaseViewModel {
         }
 
         FilteredLinkedFiles = AllLinkedFiles
-            .Where(file => file.FiltredWorksets.Count > 0)
+            .Where(file => file.FilteredWorksets.Count > 0)
             .ToList();
     }
 
@@ -154,6 +155,7 @@ internal class MainViewModel : BaseViewModel {
             _messageBoxService.Show(title, $"{body}:{Environment.NewLine}{failedList}");
         }
     }
+
     /// <summary>
     /// Метод проверки возможности выполнения команды применения настроек.
     /// </summary>

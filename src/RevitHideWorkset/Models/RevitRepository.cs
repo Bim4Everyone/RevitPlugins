@@ -81,8 +81,13 @@ internal class RevitRepository {
 
         foreach(var linkedFile in linkedFiles) {
             var linkInstance = linkedFile.LinkedFile;
-            var linkType = Document.GetElement(linkInstance.GetTypeId()) as RevitLinkType;
 
+            var linkType = Document.GetElement(linkInstance.GetTypeId()) as RevitLinkType;
+            if(linkType == null) {
+                failedFiles.Add(linkInstance.Name);
+                continue;
+            }
+                
             var externalRef = linkType.GetExternalFileReference();
             var modelPath = externalRef.GetAbsolutePath();
 
