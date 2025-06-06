@@ -1,7 +1,6 @@
-namespace RevitValueModifier.Models {
-    internal enum RevitParamType {
-        SystemParameter,
-        SharedParameter,
-        ProjectParameter
-    }
+namespace RevitValueModifier.Models;
+internal enum RevitParamType {
+    SystemParameter,
+    SharedParameter,
+    ProjectParameter
 }
