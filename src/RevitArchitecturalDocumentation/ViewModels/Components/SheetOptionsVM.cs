@@ -8,61 +8,60 @@ using dosymep.WPF.ViewModels;
 using RevitArchitecturalDocumentation.Models;
 using RevitArchitecturalDocumentation.Models.Options;
 
-namespace RevitArchitecturalDocumentation.ViewModels.Components {
-    internal class SheetOptionsVM : BaseViewModel {
-        private readonly PluginConfig _pluginConfig;
-        private readonly RevitRepository _revitRepository;
-        private readonly SheetOptions _sheetOptions;
+namespace RevitArchitecturalDocumentation.ViewModels.Components;
+internal class SheetOptionsVM : BaseViewModel {
+    private readonly PluginConfig _pluginConfig;
+    private readonly RevitRepository _revitRepository;
+    private readonly SheetOptions _sheetOptions;
 
-        private bool _workWithSheets;
-        private List<FamilySymbol> _titleBlocksInProject;
-        private FamilySymbol _selectedTitleBlock;
-        private string _sheetNamePrefix;
+    private bool _workWithSheets;
+    private List<FamilySymbol> _titleBlocksInProject;
+    private FamilySymbol _selectedTitleBlock;
+    private string _sheetNamePrefix;
 
-        public SheetOptionsVM(PluginConfig pluginConfig, RevitRepository revitRepository, SheetOptions sheetOptions) {
-            _pluginConfig = pluginConfig;
-            _revitRepository = revitRepository;
-            _sheetOptions = sheetOptions;
+    public SheetOptionsVM(PluginConfig pluginConfig, RevitRepository revitRepository, SheetOptions sheetOptions) {
+        _pluginConfig = pluginConfig;
+        _revitRepository = revitRepository;
+        _sheetOptions = sheetOptions;
 
-            WorkWithSheets = _sheetOptions.WorkWithSheets;
-            SheetNamePrefix = _sheetOptions.SheetNamePrefix;
-            TitleBlocksInProject = _revitRepository.TitleBlocksInProject;
-            SelectedTitleBlock = TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(_sheetOptions.SelectedTitleBlockName));
-        }
-
-
-        public bool WorkWithSheets {
-            get => _workWithSheets;
-            set => RaiseAndSetIfChanged(ref _workWithSheets, value);
-        }
-
-        public List<FamilySymbol> TitleBlocksInProject {
-            get => _titleBlocksInProject;
-            set => RaiseAndSetIfChanged(ref _titleBlocksInProject, value);
-        }
-
-        public FamilySymbol SelectedTitleBlock {
-            get => _selectedTitleBlock;
-            set => RaiseAndSetIfChanged(ref _selectedTitleBlock, value);
-        }
-
-        public string SheetNamePrefix {
-            get => _sheetNamePrefix;
-            set => RaiseAndSetIfChanged(ref _sheetNamePrefix, value);
-        }
+        WorkWithSheets = _sheetOptions.WorkWithSheets;
+        SheetNamePrefix = _sheetOptions.SheetNamePrefix;
+        TitleBlocksInProject = _revitRepository.TitleBlocksInProject;
+        SelectedTitleBlock = TitleBlocksInProject?.FirstOrDefault(a => a.Name.Equals(_sheetOptions.SelectedTitleBlockName));
+    }
 
 
-        public SheetOptions GetSheetOption() {
+    public bool WorkWithSheets {
+        get => _workWithSheets;
+        set => RaiseAndSetIfChanged(ref _workWithSheets, value);
+    }
 
-            SheetOptions sheetOptions = new SheetOptions(_pluginConfig, _revitRepository) {
-                WorkWithSheets = WorkWithSheets,
-                SelectedTitleBlock = SelectedTitleBlock,
-                SelectedTitleBlockName = SelectedTitleBlock.Name,
-                SheetNamePrefix = SheetNamePrefix
-            };
-            sheetOptions.SaveConfig();
+    public List<FamilySymbol> TitleBlocksInProject {
+        get => _titleBlocksInProject;
+        set => RaiseAndSetIfChanged(ref _titleBlocksInProject, value);
+    }
 
-            return sheetOptions;
-        }
+    public FamilySymbol SelectedTitleBlock {
+        get => _selectedTitleBlock;
+        set => RaiseAndSetIfChanged(ref _selectedTitleBlock, value);
+    }
+
+    public string SheetNamePrefix {
+        get => _sheetNamePrefix;
+        set => RaiseAndSetIfChanged(ref _sheetNamePrefix, value);
+    }
+
+
+    public SheetOptions GetSheetOption() {
+
+        var sheetOptions = new SheetOptions(_pluginConfig, _revitRepository) {
+            WorkWithSheets = WorkWithSheets,
+            SelectedTitleBlock = SelectedTitleBlock,
+            SelectedTitleBlockName = SelectedTitleBlock.Name,
+            SheetNamePrefix = SheetNamePrefix
+        };
+        sheetOptions.SaveConfig();
+
+        return sheetOptions;
     }
 }
