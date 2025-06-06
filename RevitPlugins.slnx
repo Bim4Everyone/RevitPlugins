@@ -100,6 +100,9 @@
   <Project Path="src/RevitGenLookupTables/RevitGenLookupTables.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitHideWorkset/RevitHideWorkset.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitIsolateByParameter/RevitIsolateByParameter.csproj">
     <Platform Project="x64" />
   </Project>

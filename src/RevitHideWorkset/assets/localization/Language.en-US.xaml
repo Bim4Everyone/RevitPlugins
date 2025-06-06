@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на английский американский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Hide WS link</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="MainWindow.ToolTipHideWorksets">Hide all selected worksets</system:String>
+    <system:String x:Key="MainWindow.ToolTipHideWorkset">Hide workset</system:String>
+    <system:String x:Key="MainWindow.HideWorkset">Hide</system:String>
+    <system:String x:Key="MainWindow.Finish">Apply changes to worksets</system:String>
+    <system:String x:Key="MainWindow.Cancel">Cancel changes to worksets</system:String>
+    <system:String x:Key="MainWindow.SearchPlaceholder">Enter the name of the workset</system:String>
+    <system:String x:Key="MainWindow.NoChanges">You haven't made any changes</system:String>
+    
+    <system:String x:Key="GeneralSettings.ErrorConnection">Couldn't restart connection</system:String>
+    <system:String x:Key="GeneralSettings.ErrorNoLinkedFiles">No links file uploaded to the file.</system:String>
+    <system:String x:Key="GeneralSettings.ErrorMessage">Error</system:String>
+</ResourceDictionary>
