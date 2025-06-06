@@ -5,13 +5,15 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:behaviors="clr-namespace:RevitHideWorkset.Behaviors"
     xmlns:сonvert="clr-namespace:RevitHideWorkset.Converters"
-    xmlns:local="clr-namespace:RevitHideWorkset.Converters">
+    xmlns:local="clr-namespace:RevitHideWorkset.Converters"
+    xmlns:models="clr-namespace:RevitHideWorkset.Models">
 
     <сonvert:WorksetIconConverter
         x:Key="WorksetIconConverter" />
 
     <DataTemplate
-        x:Key="LinkedFileTemplate">
+        x:Key="LinkedFileTemplate"
+        DataType="{x:Type models:LinkedFileElement}">
         <Expander
             IsExpanded="True"
             Margin="0,5">
