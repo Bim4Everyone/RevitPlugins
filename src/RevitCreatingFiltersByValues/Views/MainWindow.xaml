@@ -8,7 +8,6 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitCreatingFiltersByValues.Views"
     xmlns:vms="clr-namespace:RevitCreatingFiltersByValues.ViewModels"
-	xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
