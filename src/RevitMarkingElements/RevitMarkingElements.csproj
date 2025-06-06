@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <UseDevExpress>false</UseDevExpress>
+	<UseWpfUI>true</UseWpfUI>
+	<LangVersion>12</LangVersion>
     </PropertyGroup>
 </Project>
