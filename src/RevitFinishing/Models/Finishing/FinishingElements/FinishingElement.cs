@@ -19,10 +19,14 @@ namespace RevitFinishing.Models.Finishing
     /// </summary>
     internal abstract class FinishingElement {
         private protected readonly Element _revitElement;
-        private protected readonly Element _revitElementType;
-        private protected readonly FamilySymbol _familySymbol;
         private protected readonly FinishingCalculator _calculator;
         private protected readonly ParamCalculationService _paramService;
+
+        private protected readonly bool _isInPlace;
+        private protected readonly bool _isCustomFamily;
+        private protected readonly FamilySymbol _familySymbol;
+        private protected readonly Element _revitElementType;
+
         private protected readonly SharedParamsConfig _paramConfig = SharedParamsConfig.Instance;
 
         public FinishingElement(Element element, 
@@ -32,12 +36,16 @@ namespace RevitFinishing.Models.Finishing
             _revitElementType = _revitElement.Document.GetElement(_revitElement.GetTypeId());
             if(_revitElementType is FamilySymbol) {
                 _familySymbol = _revitElementType as FamilySymbol;
+                _isCustomFamily = _familySymbol != null;
+                _isInPlace = _familySymbol.Family.IsInPlace;
             }
             _calculator = calculator;
             _paramService = paramService;
         }
 
         public Element RevitElement => _revitElement;
+        public bool IsCustomFamily => _isCustomFamily;
+        public bool IsInPlace => _isInPlace;
         public List<RoomElement> Rooms { get; set; }
 
         // Перенос значения из общего параметра помещения в аналогичный параметр отделки
@@ -63,10 +71,10 @@ namespace RevitFinishing.Models.Finishing
         // У отделки могут отсутствовать системеный параметры, поэтому выполняется проверка.
         private protected void UpdateFromInstParam(SharedParam param, BuiltInParameter bltnParam) {
             // Проверка является ли семейство загружаемым или моделью в контексте
-            if(_familySymbol != null) {
+            if(_isCustomFamily) {
                 // Параметр заполняется только для моделей в контексте.
                 // Для загружаемых семейств предполагается, что параметр рассчитан уже внутри семейства.
-                if(_familySymbol.Family.IsInPlace && _revitElement.IsExistsParam(bltnParam)) {
+                if(_isInPlace && _revitElement.IsExistsParam(bltnParam)) {
                     _revitElement.SetParamValue(param, _revitElement.GetParamValue<double>(bltnParam));
                 }
             } else {

@@ -179,12 +179,28 @@ internal class MainViewModel : BaseViewModel {
             window.Show();
         }
 
+        List<FinishingElement> finishingElements = calculator.FinishingElements;
         using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры отделки")) {
-            foreach(var element in calculator.FinishingElements) {
+            foreach(var element in finishingElements) {
                 element.UpdateFinishingParameters();
                 element.UpdateCategoryParameters();
             }
             t.Commit();
+        }
+
+        ErrorsViewModel calculationWarnings = new ErrorsViewModel();
+        calculationWarnings.AddElements(new ErrorsListViewModel("Предупреждение") {
+            Description = $"Пользовательские семейства",
+            ErrorElements = new ObservableCollection<ErrorElement>(finishingElements
+                .Where(x => x.IsCustomFamily)
+                .Select(x => new ErrorElement(x.RevitElement, SelectedPhase.Name)))
+        });
+
+
+        if(calculationWarnings.ErrorLists.Any()) {
+            var window = _kernel.Get<ErrorsWindow>();
+            window.DataContext = calculationWarnings;
+            window.Show();
         }
 
         SaveConfig();
