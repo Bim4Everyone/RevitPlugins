@@ -18,8 +18,11 @@
     WindowStartupLocation="CenterOwner"
     Title="Расчет коэффициента армирования"
     
-    Height="400" Width="1030"
-    MinHeight="300" MinWidth="1030"
+    Height="600" 
+    Width="1130"
+    
+    MinHeight="400" 
+    MinWidth="1130"
     
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -46,7 +49,12 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!--
+        <ui:TitleBar
+            Grid.Row="0" Grid.ColumnSpan="2" 
+            Margin="-20 0 0 0"
+            Title="{me:LocalizationSource MainWindow.Title}"
+            FontSize="16"/>
+
         <Grid 
             Grid.Row="1"
             Grid.Column="0">
@@ -60,17 +68,17 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Label 
+            <ui:TextBlock 
                 Grid.Row="0"
                 Grid.Column="0"
-                Margin="5"
+                Margin="10 5"
                 VerticalAlignment="Center"
-                Content="Выберите комплект документации:"/>
+                Text="Выберите комплект документации:"/>
 
             <ComboBox
                 Grid.Row="0"
                 Grid.Column="1"
-                Margin="5"
+                Margin="7"
                 Width="200"
                 VerticalContentAlignment="Center"
                 ItemsSource="{Binding Path=DockPackages}"
@@ -89,17 +97,17 @@
                 </i:Interaction.Triggers>
             </ComboBox>
 
-            <Label 
+            <ui:TextBlock 
                 Grid.Row="1"
                 Grid.Column="0"
-                Margin="5"
+                Margin="10 5"
                 VerticalAlignment="Center"
-                Content="Выберите секцию:"/>
+                Text="Выберите секцию:"/>
 
             <ComboBox
                 Grid.Row="1"
                 Grid.Column="1"
-                Margin="5"
+                Margin="7"
                 Width="200"
                 VerticalContentAlignment="Center"
                 ItemsSource="{Binding Path=ElemSections}"
@@ -118,9 +126,9 @@
                 </i:Interaction.Triggers>
             </ComboBox>
         </Grid>
-        -->
+        
 
-        <!--
+        
         <StackPanel
             Grid.Row="1"
             Grid.Column="0"
@@ -131,21 +139,18 @@
 
             <ui:Button
                 Margin="10"
-                Width="120"
-                Height="22"
-                Padding="3"
+                Width="140"
                 Content="Выбрать все"
                 Command="{Binding Path=SelectAllVisibleCommand}" />
 
             <ui:Button
                 Margin="10"
-                Width="120"
-                Height="22"
-                Padding="3"
+                Width="140"
                 Content="Отменить выбор"
                 Command="{Binding Path=UnselectAllVisibleCommand}" />
         </StackPanel>
 
+        
         <ui:ListView
             Grid.Row="2" 
             Grid.Column="0"
@@ -177,7 +182,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Комплект" Width="90">
+                    <GridViewColumn Header="Комплект" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock Text="{Binding Path=DocPackage, 
@@ -186,7 +191,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Секция" Width="90">
+                    <GridViewColumn Header="Секция" Width="110">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock Text="{Binding Path=ElemSection, 
@@ -195,7 +200,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Выше нуля?" Width="80">
+                    <GridViewColumn Header="Выше нуля?" Width="90">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock Text="{Binding Path=AboveZero,
@@ -205,15 +210,15 @@
                     </GridViewColumn>
 
                     <GridViewColumn Header="Кол-во опалубки" 
-                                    Width="110" DisplayMemberBinding="{Binding Formworks.Count}"/>
+                                    Width="130" DisplayMemberBinding="{Binding Formworks.Count}"/>
                     <GridViewColumn Header="Кол-во арм-я" 
-                                    Width="100" DisplayMemberBinding="{Binding Rebars.Count}"/>
+                                    Width="110" DisplayMemberBinding="{Binding Rebars.Count}"/>
                     <GridViewColumn Header="Объем бетона" 
-                                    Width="100" DisplayMemberBinding="{Binding FormworkVolume}"/>
+                                    Width="110" DisplayMemberBinding="{Binding FormworkVolume}"/>
                     <GridViewColumn Header="Масса арм-я" 
-                                    Width="100" DisplayMemberBinding="{Binding RebarMass}"/>
+                                    Width="110" DisplayMemberBinding="{Binding RebarMass}"/>
                     <GridViewColumn Header="Коэффициент арм-я" 
-                                    Width="120" DisplayMemberBinding="{Binding RebarCoef}"/>
+                                    Width="140" DisplayMemberBinding="{Binding RebarCoef}"/>
                 </GridView>
             </ui:ListView.View>
 
@@ -222,6 +227,10 @@
                     <Setter 
                         Property="IsSelected" 
                         Value="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                    <Setter
+                        Property="Margin"
+                        Value="4 2" />
 
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
@@ -241,13 +250,14 @@
             </ui:ListView.ItemContainerStyle>
         </ui:ListView>
 
+        
         <CheckBox 
             Grid.Row="3"
             Grid.Column="0"
             Margin="10"
             VerticalAlignment="Center"
             IsChecked="{Binding Path=СalcСoefficientOnAverage}"
-            Content="Считать коэффициент армирования усредненно"/>
+            Content="Считать коэффициент армирования усреднённо"/>
 
         <StackPanel
             Grid.Row="3"
@@ -258,20 +268,17 @@
 
             <ui:Button
                 Margin="10"
-                Width="120"
-                Padding="3"
+                Width="150"
                 Content="Выделить опалубку"
                 Command="{Binding Path=ShowFormworkElementsCommand}" />
 
             <ui:Button
                 Margin="10"
-                Width="120"
-                Padding="3"
+                Width="150"
                 Content="Выделить арматуру"
                 Command="{Binding Path=ShowRebarElementsCommand}" />
         </StackPanel>
         
-        -->
         
         <StackPanel
             Grid.Row="4"
