@@ -41,7 +41,7 @@ internal class RevitRepository {
                     }
                 }
             } else {
-                if (solids.Count(solid => IsLineIntersectingSolid(lineElement, solid)) > 0) {
+                if(solids.Count(solid => IsLineIntersectingSolid(lineElement, solid)) > 0) {
                     intersectingElements.Add(element);
                     continue;
                 }

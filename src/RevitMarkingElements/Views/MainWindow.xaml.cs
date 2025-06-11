@@ -14,8 +14,7 @@ public partial class MainWindow {
     : base(loggerService,
         serializationService,
         languageService, localizationService,
-        uiThemeService, themeUpdaterService)
-    {
+        uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 

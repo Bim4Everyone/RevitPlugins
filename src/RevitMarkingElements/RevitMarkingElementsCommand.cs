@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -27,28 +26,27 @@ public class RevitMarkingElementsCommand : BasePluginCommand {
         PluginName = "Маркировка элементов";
     }
 
-    protected override void Execute(UIApplication uiApplication)
-    {
+    protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        using var kernel = uiApplication.CreatePlatformServices();
 
         var document = uiApplication.ActiveUIDocument.Document;
         var activeView = document.ActiveView;
 
         // Настройка доступа к Revit
-        kernel.Bind<RevitRepository>()
+        _ = kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
 
         // Настройка конфигурации плагина
-        kernel.Bind<PluginConfig>()
+        _ = kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         // Используем сервис обновления тем для WinUI
-        kernel.UseWpfUIThemeUpdater();
+        _ = kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
-        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        _ = kernel.BindMainWindow<MainViewModel, MainWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -56,7 +54,7 @@ public class RevitMarkingElementsCommand : BasePluginCommand {
 
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
-        kernel.UseWpfLocalization(
+        _ = kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
