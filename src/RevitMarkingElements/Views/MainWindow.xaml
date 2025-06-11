@@ -82,10 +82,9 @@
                     IsChecked="{Binding IsLineNumberingSelected}" />
 
                 <ui:Button
-                    Width="110"
+                    Width="140"
                     Grid.Column="1"
                     Padding="10"
-                    Margin="10"
                     HorizontalAlignment="Right"
                     Content="{DynamicResource MainWindow.SelectLinesButton}"
                     Command="{Binding SelectLinesCommand}"
