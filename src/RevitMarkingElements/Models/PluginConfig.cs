@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
