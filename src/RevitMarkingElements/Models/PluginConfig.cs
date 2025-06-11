@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
@@ -8,13 +11,28 @@ using pyRevitLabs.Json;
 
 namespace RevitMarkingElements.Models;
 internal class PluginConfig : ProjectConfig<RevitSettings> {
-    [JsonIgnore] public override string ProjectConfigPath { get; set; }
+    /// <summary>
+    /// Системное свойство конфигурации. (Не трогать)
+    /// </summary>
+    [JsonIgnore]
+    public override string ProjectConfigPath { get; set; }
 
-    [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
+    /// <summary>
+    /// Системное свойство конфигурации. (Не трогать)
+    /// </summary>
+    [JsonIgnore]
+    public override IConfigSerializer Serializer { get; set; }
 
-    public static PluginConfig GetPluginConfig() {
+    /// <summary>
+    /// Метод создания конфигурации плагина.
+    /// </summary>
+    /// <returns>
+	/// <param name="configSerializer">Сериализатор конфигурации.</param>
+    /// Возвращает прочитанную конфигурацию плагина, либо созданный конфиг по умолчанию.
+    /// </returns>
+    public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
-            .SetSerializer(new ConfigSerializer())
+            .SetSerializer(configSerializer)
             .SetPluginName(nameof(RevitMarkingElements))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
             .SetProjectConfigName(nameof(PluginConfig) + ".json")
@@ -22,7 +40,23 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     }
 }
 
+/// <summary>
+/// Настройки проекта.
+/// В настройках проекта обычно хранится выбор пользователя в основном окне плагина.
+/// </summary>
+/// <remarks>
+/// Проектом по умолчанию является текст до первого нижнего подчеркивания.
+/// <see cref="ProjectConfig" />
+/// https://github.com/dosymep/dosymep.Revit/blob/master/src/dosymep.Bim4Everyone/ProjectConfigs/ProjectConfig.cs#L102
+/// Если плагин работает без открытых проектов,
+/// то требуется данный класс удалять из проекта,
+/// как сделано в плагине RevitServerFolders
+/// https://github.com/Bim4Everyone/RevitPlugins/blob/master/src/RevitServerFolders/Models/PluginConfig.cs#L8
+/// </remarks>
 internal class RevitSettings : ProjectSettings {
+    /// <summary>
+    /// Наименование проекта. Системное свойство. (Не трогать)
+    /// </summary>
     public override string ProjectName { get; set; }
     public ElementId SelectedCategory { get; set; }
 }

@@ -21,15 +21,19 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
-    private string _errorText;
-    private string _lineNumberingContent;
-    private List<Category> _categories;
-    private Category _selectedCategory;
     private bool _includeUnselected;
     private bool _renumberAll;
     private bool _isArrayNumberingSelected;
     private bool _isLineNumberingSelected;
+
     private int _startNumber;
+
+    private string _errorText;
+    private string _lineNumberingContent;
+
+    private List<Category> _categories;
+    private Category _selectedCategory;
+
     private List<CurveElement> Lines { get; set; }
     private List<Element> SelectedElements { get; set; }
 
@@ -164,6 +168,7 @@ internal class MainViewModel : BaseViewModel {
             .ToList();
 
         int nextAvailableNumber = 1;
+
         foreach(int mark in usedMarks) {
             if(mark == nextAvailableNumber) {
                 nextAvailableNumber++;
@@ -247,7 +252,7 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        if(!IsArrayNumberingSelected && !_includeUnselected && (Lines == null || !Lines.Any())) {
+        if(!IsArrayNumberingSelected && !_includeUnselected && (Lines == null || Lines.Count == 0)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoElements");
             return false;
         }
@@ -258,8 +263,12 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
-        SelectedCategory = Categories.FirstOrDefault(item => item.Id == setting.SelectedCategory);
+
+        SelectedCategory = setting != null
+            ? Categories.FirstOrDefault(item => item.Id == setting.SelectedCategory)
+            : Categories.FirstOrDefault();
     }
+
 
     private void SaveConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
@@ -268,5 +277,4 @@ internal class MainViewModel : BaseViewModel {
         setting.SelectedCategory = SelectedCategory.Id;
         _pluginConfig.SaveProjectConfig();
     }
-
 }

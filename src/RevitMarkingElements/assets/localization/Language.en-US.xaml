@@ -8,13 +8,9 @@
     <system:String x:Key="MainWindow.ErrorNoElements">It is necessary to select the numbering lines.</system:String>
     <system:String x:Key="MainWindow.NumberUnmarkedElements">Number unmarked elements</system:String>
     <system:String x:Key="MainWindow.RenumberMarkedElements">Renumber already numbered elements</system:String>
-    <system:String x:Key="MainWindow.LinesType">Select curves or straight lines</system:String>
-    <system:String x:Key="MainWindow.SelectLines">Select lines for determining the numbering order</system:String>
     <system:String x:Key="MainWindow.MainInstruction">You need to select lines to determine the numbering order.</system:String>
     <system:String x:Key="MainWindow.ContentAbout">The beginning of the line determines the start of numbering.</system:String>
     <system:String x:Key="MainWindow.MainContent">If there are no lines, they need to be drawn on the view.</system:String>
-    <system:String x:Key="MainWindow.ResultMessage">Selected elements</system:String>
-    <system:String x:Key="MainWindow.ResultTitle">Selection Result</system:String>
     <system:String x:Key="MainWindow.ArrayNumberingLabel">Number array</system:String>
     <system:String x:Key="MainWindow.LineNumberingLabel">Number by lines</system:String>
     <system:String x:Key="MainWindow.SelectLinesButton">Select lines</system:String>
@@ -23,6 +19,9 @@
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String x:Key="MainWindow.FinishLineSelection">"Press Esc to complete line selection"</system:String>
     <system:String x:Key="MainWindow.StartNumbericFrom">Start numbering with a number.</system:String>
+    <system:String x:Key="MainWindow.Finish">Apply marking elements</system:String>
+    <system:String x:Key="MainWindow.Cancel">Cancel marking elements</system:String>
+
     <system:String x:Key="GeneralSettings.ErrorNoSelectedElements">There are no selected items in the view, or the selected items do not belong to supported categories.</system:String>
     <system:String x:Key="GeneralSettings.ErrorMessage">Error</system:String>
 </ResourceDictionary>

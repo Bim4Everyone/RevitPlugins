@@ -8,10 +8,11 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -26,28 +27,42 @@ public class RevitMarkingElementsCommand : BasePluginCommand {
         PluginName = "Маркировка элементов";
     }
 
-    protected override void Execute(UIApplication uiApplication) {
-        using var kernel = uiApplication.CreatePlatformServices();
+    protected override void Execute(UIApplication uiApplication)
+    {
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
+
         var document = uiApplication.ActiveUIDocument.Document;
         var activeView = document.ActiveView;
 
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
 
-        _ = kernel.Bind<RevitRepository>().ToSelf().InSingletonScope();
-        _ = kernel.Bind<PluginConfig>().ToMethod(c => PluginConfig.GetPluginConfig());
-        _ = kernel.Bind<MainViewModel>().ToSelf();
-        _ = kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
+        // Настройка конфигурации плагина
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
+        // Настройка запуска окна
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-        _ = kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         var revitRepository = kernel.Get<RevitRepository>();
         var localizationService = kernel.Get<ILocalizationService>();
+
         ValidateSelectedElements(revitRepository, localizationService);
         Notification(kernel.Get<MainWindow>());
     }
