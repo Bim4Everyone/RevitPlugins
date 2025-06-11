@@ -9,6 +9,8 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using RevitFinishing.ViewModels;
+
 namespace RevitFinishing.Models.Finishing
 {
     internal class FinishingChecker {
@@ -20,43 +22,43 @@ namespace RevitFinishing.Models.Finishing
             _phaseName = phase.Name;
         }
 
-        public List<ErrorElement> CheckPhaseContainsFinishing(FinishingInProject finishings) {
+        public List<NoticeElementViewModel> CheckPhaseContainsFinishing(FinishingInProject finishings) {
             if(!finishings.AllFinishing.Any()) {
-                return new List<ErrorElement>() {
-                    new ErrorElement(_phase, _phaseName)
+                return new List<NoticeElementViewModel>() {
+                    new NoticeElementViewModel(_phase, _phaseName)
                 };
             }
 
-            return new List<ErrorElement>();
+            return new List<NoticeElementViewModel>();
         }
 
-        public List<ErrorElement> CheckFinishingByRoomBounding(FinishingInProject finishings) {
+        public List<NoticeElementViewModel> CheckFinishingByRoomBounding(FinishingInProject finishings) {
             return finishings
                 .AllFinishing
                 .Where(x => x.GetParamValueOrDefault(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING, 0) == 1)
-                .Select(x => new ErrorElement(x, _phaseName))
+                .Select(x => new NoticeElementViewModel(x, _phaseName))
                 .ToList();
         }
 
-        public List<ErrorElement> CheckRoomsByKeyParameter(IEnumerable<Element> rooms, string paramName) {
+        public List<NoticeElementViewModel> CheckRoomsByKeyParameter(IEnumerable<Element> rooms, string paramName) {
             return rooms
                 .Where(x => x.GetParam(paramName).AsElementId() == ElementId.InvalidElementId)
-                .Select(x => new ErrorElement(x, _phaseName))
+                .Select(x => new NoticeElementViewModel(x, _phaseName))
                 .ToList();
         }
 
-        public List<ErrorElement> CheckRoomsByParameter(IEnumerable<Element> rooms, string paramName) {
+        public List<NoticeElementViewModel> CheckRoomsByParameter(IEnumerable<Element> rooms, string paramName) {
             return rooms
                 .Where(x => string.IsNullOrEmpty(x.GetParamValue<string>(paramName)))
-                .Select(x => new ErrorElement(x, _phaseName))
+                .Select(x => new NoticeElementViewModel(x, _phaseName))
                 .ToList();
         }
 
-        public List<ErrorElement> CheckFinishingByRoom(IEnumerable<FinishingElement> finishings) {
+        public List<NoticeElementViewModel> CheckFinishingByRoom(IEnumerable<FinishingElement> finishings) {
             return finishings
                 .Where(x => !x.CheckFinishingTypes())
                 .Select(x => x.RevitElement)
-                .Select(x => new ErrorElement(x, _phaseName))
+                .Select(x => new NoticeElementViewModel(x, _phaseName))
                 .ToList();
         }
     }

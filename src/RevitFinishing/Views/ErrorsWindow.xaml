@@ -20,6 +20,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -29,16 +30,24 @@
         </Grid.ColumnDefinitions>
 
         <ui:TitleBar
-            VerticalAlignment="Center"
             Grid.Row="0"
+            Grid.Column="0"
             Grid.ColumnSpan="2"
+            VerticalAlignment="Center"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:ListView
+        <ui:TextBlock
             Grid.Row="1"
             Grid.Column="0"
+            Grid.ColumnSpan="2"
             Margin="10"
-            ItemsSource="{Binding ErrorLists}"
+            Text="{Binding NoticeInfo}"/>
+
+        <ui:ListView
+            Grid.Row="2"
+            Grid.Column="0"
+            Margin="10"
+            ItemsSource="{Binding NoticeLists}"
             SelectedItem="{Binding SelectedList}">
             <ui:ListView.View>
                 <GridView>
@@ -62,7 +71,7 @@
         </ui:ListView>
 
         <ui:ListView
-            Grid.Row="1"
+            Grid.Row="2"
             Grid.Column="1"
             Margin="10"
             DataContext="{Binding SelectedList}"

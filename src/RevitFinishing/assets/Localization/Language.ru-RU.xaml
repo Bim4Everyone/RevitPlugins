@@ -15,6 +15,23 @@
     <system:String x:Key="MainWindow.UnCheckAll">Снять выбор</system:String>
     <system:String x:Key="MainWindow.InvertAll">Инвертировать</system:String>
 
+    <system:String x:Key="MainWindow.ErrorNoSelectiom">Помещения не выбраны</system:String>
+    <system:String x:Key="MainWindow.ErrorNoRooms">Помещения отсутствуют на выбранной стадии</system:String>
+
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="MainWindow.TransactionName">Заполнить параметры отделки</system:String>
+
+    <system:String x:Key="ErrorsWindow.ListErrorType">Ошибка</system:String> 
+    <system:String x:Key="ErrorsWindow.ListWarningType">Предупреждение</system:String> 
+
+    <system:String x:Key="ErrorsWindow.ErrorsDescription">
+        Расчет отделки не выполнен!
+        Обнаружены следующие ошибки, которые необходимо исправить:
+    </system:String>
+    <system:String x:Key="ErrorsWindow.WarningsDescription">
+        Расчет отделки завершен!
+        При этом были обнаружены следующие предупреждения, которые могли повлиять на корректность расчета:
+    </system:String>
 </ResourceDictionary>

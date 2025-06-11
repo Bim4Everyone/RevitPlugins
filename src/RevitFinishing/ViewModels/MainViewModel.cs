@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
-using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using Ninject;
-
 using RevitFinishing.Models;
 using RevitFinishing.Models.Finishing;
+using RevitFinishing.Services;
+using RevitFinishing.ViewModels.Errors;
 using RevitFinishing.Views;
 
 namespace RevitFinishing.ViewModels;
@@ -28,6 +28,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly ErrorWindowService _errorWindowService;
 
     private readonly List<Phase> _phases;
     private Phase _selectedPhase;
@@ -38,8 +39,6 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
 
-    private readonly IKernel _kernel;
-    
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
@@ -48,12 +47,12 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(PluginConfig pluginConfig,
                          RevitRepository revitRepository,
-                         ILocalizationService localizationService, IKernel kernel) {        
+                         ILocalizationService localizationService,
+                         ErrorWindowService errorWindowService) {        
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-
-        _kernel = kernel;
+        _errorWindowService = errorWindowService;
 
         ProjectSettingsLoader settings = 
             new ProjectSettingsLoader(_revitRepository.Application, _revitRepository.Document);
@@ -113,70 +112,24 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void CalculateFinishing() {
-        var selectedRooms = _revitRepository.GetRoomsByFilters(
+        List<Room> selectedRooms = _revitRepository.GetRoomsByFilters(
             RoomNames.Where(x => x.IsChecked), 
             RoomDepartments.Where(x => x.IsChecked), 
             RoomLevels.Where(x => x.IsChecked));
 
         FinishingInProject allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
-        FinishingChecker checker = new FinishingChecker(SelectedPhase);
-        ErrorsViewModel mainErrors = new ErrorsViewModel();
+        ProjectChecker projectChecker = new ProjectChecker(SelectedPhase, _localizationService);
 
-
-        mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
-            Description = "На выбранной стадии не найдены экземпляры отделки",
-            ErrorElements = new ObservableCollection<ErrorElement>(
-                checker.CheckPhaseContainsFinishing(allFinishing))
-        });
-        mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
-            Description = "Экземпляры отделки являются границами помещений",
-            ErrorElements = new ObservableCollection<ErrorElement>(
-                checker.CheckFinishingByRoomBounding(allFinishing))
-        });
-        string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
-        mainErrors.AddElements(new ErrorsListViewModel("Ошибка") {
-            Description = "У помещений не заполнен ключевой параметр отделки",
-            ErrorElements = new ObservableCollection<ErrorElement>(
-                checker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam))
-        });
-        if(mainErrors.ErrorLists.Any()) {
-            var window = _kernel.Get<ErrorsWindow>();
-            window.DataContext = mainErrors;
-            window.Show();
+        ErrorsViewModel mainErrors = projectChecker.CheckMainErrors(allFinishing, selectedRooms);
+        if(_errorWindowService.ShowNoticeWindow(mainErrors)) {
             return;
         }
 
         FinishingCalculator calculator = new FinishingCalculator(selectedRooms, allFinishing);
-        ErrorsViewModel otherErrors = new ErrorsViewModel();
-        ErrorsViewModel warnings = new ErrorsViewModel();
 
-        otherErrors.AddElements(new ErrorsListViewModel("Ошибка") {
-            Description = "Элементы отделки относятся к помещениям с разными типами отделки",
-            ErrorElements = new ObservableCollection<ErrorElement>(
-                checker.CheckFinishingByRoom(calculator.FinishingElements))
-        });
-        if(otherErrors.ErrorLists.Any()) {
-            var window = _kernel.Get<ErrorsWindow>();
-            window.DataContext = mainErrors;
+        ErrorsViewModel finishingErrors = projectChecker.CheckFinishingErrors(calculator);
+        if(_errorWindowService.ShowNoticeWindow(finishingErrors)) {
             return;
-        }
-
-        string numberParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER);
-        warnings.AddElements(new ErrorsListViewModel("Предупреждение") {
-            Description = $"У помещений не заполнен параметр \"{numberParamName}\"",
-            ErrorElements = new ObservableCollection<ErrorElement>(
-                checker.CheckRoomsByParameter(selectedRooms, numberParamName))
-        });
-        string nameParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME);
-        warnings.AddElements(new ErrorsListViewModel("Предупреждение") {
-            Description = $"У помещений не заполнен параметр \"{nameParamName}\"",
-            ErrorElements = new ObservableCollection<ErrorElement>(
-                checker.CheckRoomsByParameter(selectedRooms, nameParamName))
-        });
-        if(warnings.ErrorLists.Any()) {
-            var window = _kernel.Get<ErrorsWindow>();
-            window.DataContext = warnings;
-            window.Show();
         }
 
         List<FinishingElement> finishingElements = calculator.FinishingElements;
@@ -188,33 +141,21 @@ internal class MainViewModel : BaseViewModel {
             t.Commit();
         }
 
-        ErrorsViewModel calculationWarnings = new ErrorsViewModel();
-        calculationWarnings.AddElements(new ErrorsListViewModel("Предупреждение") {
-            Description = $"Пользовательские семейства",
-            ErrorElements = new ObservableCollection<ErrorElement>(finishingElements
-                .Where(x => x.IsCustomFamily)
-                .Select(x => new ErrorElement(x.RevitElement, SelectedPhase.Name)))
-        });
-
-
-        if(calculationWarnings.ErrorLists.Any()) {
-            var window = _kernel.Get<ErrorsWindow>();
-            window.DataContext = calculationWarnings;
-            window.Show();
-        }
+        WarningsViewModel parameterErrors = projectChecker.CheckWarnings(selectedRooms, finishingElements);
+        _errorWindowService.ShowNoticeWindow(parameterErrors);
 
         SaveConfig();
     }
 
     private bool CanCalculateFinishing() {
         if(!RoomNames.Any()) {
-            ErrorText = "Помещения отсутствуют на выбранной стадии";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoRooms");
             return false;
         }
         if(!RoomNames.Any(x => x.IsChecked) 
             && !RoomDepartments.Any(x => x.IsChecked)
             && !RoomLevels.Any(x => x.IsChecked)) {
-            ErrorText = "Помещения не выбраны";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoSelectiom");
             return false;
         }
 

@@ -17,6 +17,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitFinishing.Models;
+using RevitFinishing.Services;
 using RevitFinishing.ViewModels;
 using RevitFinishing.Views;
 
@@ -51,6 +52,10 @@ public class RevitFinishingCommand : BasePluginCommand {
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<ErrorWindowService>()
             .ToSelf()
             .InSingletonScope();
 
