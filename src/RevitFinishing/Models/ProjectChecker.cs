@@ -24,8 +24,9 @@ namespace RevitFinishing.Models
 
         public ProjectChecker(Phase phase, ILocalizationService localizationService) {
             _phase = phase;
-            _finishingChecker = new FinishingChecker(phase);
             _localizationService = localizationService;
+
+            _finishingChecker = new FinishingChecker(phase, _localizationService);
         }
 
         public ErrorsViewModel CheckMainErrors(FinishingInProject allFinishing, 
@@ -33,16 +34,16 @@ namespace RevitFinishing.Models
             ErrorsViewModel mainErrors = new ErrorsViewModel(_localizationService);
 
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
-                Description = "На выбранной стадии не найдены экземпляры отделки",
+                Description = _localizationService.GetLocalizedString("ErrorsWindow.NoFinishing"),
                 ErrorElements = [.. _finishingChecker.CheckPhaseContainsFinishing(allFinishing)]
             });
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
-                Description = "Экземпляры отделки являются границами помещений",
+                Description = _localizationService.GetLocalizedString("ErrorsWindow.NoBoundaries"),
                 ErrorElements = [.. _finishingChecker.CheckFinishingByRoomBounding(allFinishing)]
             });
             string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
-                Description = "У помещений не заполнен ключевой параметр отделки",
+                Description = _localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam"),
                 ErrorElements = [.. _finishingChecker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam)]
             });
 
@@ -53,7 +54,7 @@ namespace RevitFinishing.Models
             ErrorsViewModel finishingErrors = new ErrorsViewModel(_localizationService);
 
             finishingErrors.AddElements(new ErrorsListViewModel(_localizationService) {
-                Description = "Элементы отделки относятся к помещениям с разными типами отделки",
+                Description = _localizationService.GetLocalizedString("ErrorsWindow.DifPhases"),
                 ErrorElements = [.. _finishingChecker.CheckFinishingByRoom(calculator.FinishingElements)]
             });
 
@@ -66,19 +67,21 @@ namespace RevitFinishing.Models
 
             string numberParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER);
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
-                Description = $"У помещений не заполнен параметр \"{numberParamName}\"",
+                Description = 
+                    $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{numberParamName}\"",
                 ErrorElements = [.. _finishingChecker.CheckRoomsByParameter(selectedRooms, numberParamName)]
             });
             string nameParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME);
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
-                Description = $"У помещений не заполнен параметр \"{nameParamName}\"",
+                Description = 
+                    $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{nameParamName}\"",
                 ErrorElements = [.. _finishingChecker.CheckRoomsByParameter(selectedRooms, nameParamName)]
             });
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
-                Description = $"Пользовательские семейства",
+                Description = _localizationService.GetLocalizedString("ErrorsWindow.CustomFamilies"),
                 ErrorElements = [.. finishingElements
                     .Where(x => x.IsCustomFamily)
-                    .Select(x => new NoticeElementViewModel(x.RevitElement, _phase.Name))]
+                    .Select(x => new NoticeElementViewModel(x.RevitElement, _phase.Name, _localizationService))]
             });
 
             return parameterErrors;

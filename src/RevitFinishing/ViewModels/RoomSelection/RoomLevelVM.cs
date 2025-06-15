@@ -1,10 +1,13 @@
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 namespace RevitFinishing.ViewModels
 {
     internal class RoomLevelVM : SelectionElementVM {
         private readonly Element _level;
-        public RoomLevelVM(Element level, string name, BuiltInParameter bltnParam) : base(name, bltnParam) {
+        public RoomLevelVM(Element level, string name, BuiltInParameter bltnParam, ILocalizationService localizationService) 
+            : base(name, bltnParam, localizationService) {
             _level = level;
         }
 

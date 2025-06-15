@@ -79,15 +79,15 @@ internal class MainViewModel : BaseViewModel {
 
             RoomNames = [.. _revitRepository
                 .GetParamStringValues(_selectedPhase, BuiltInParameter.ROOM_NAME)
-                .Select(x => new RoomNameVM(x, BuiltInParameter.ROOM_NAME))];
+                .Select(x => new RoomNameVM(x, BuiltInParameter.ROOM_NAME, _localizationService))];
 
             RoomDepartments = [.. _revitRepository
                 .GetParamStringValues(_selectedPhase, BuiltInParameter.ROOM_DEPARTMENT)
-                .Select(x => new RoomDepartmentVM(x, BuiltInParameter.ROOM_DEPARTMENT))];
+                .Select(x => new RoomDepartmentVM(x, BuiltInParameter.ROOM_DEPARTMENT, _localizationService))];
 
             RoomLevels = [.. _revitRepository
                 .GetRoomLevels(_selectedPhase)
-                .Select(x => new RoomLevelVM(x, x.Name, BuiltInParameter.ROOM_UPPER_LEVEL))];
+                .Select(x => new RoomLevelVM(x, x.Name, BuiltInParameter.ROOM_UPPER_LEVEL, _localizationService))];
         }
     }
 
@@ -133,7 +133,8 @@ internal class MainViewModel : BaseViewModel {
         }
 
         List<FinishingElement> finishingElements = calculator.FinishingElements;
-        using(Transaction t = _revitRepository.Document.StartTransaction("Заполнить параметры отделки")) {
+        using(Transaction t = _revitRepository.Document
+            .StartTransaction(_localizationService.GetLocalizedString("MainWindow.TransactionName"))) {
             foreach(var element in finishingElements) {
                 element.UpdateFinishingParameters();
                 element.UpdateCategoryParameters();

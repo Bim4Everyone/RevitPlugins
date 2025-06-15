@@ -1,5 +1,6 @@
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 namespace RevitFinishing.ViewModels
@@ -9,10 +10,13 @@ namespace RevitFinishing.ViewModels
         private readonly BuiltInParameter _bltnParam;
         private readonly bool _isEmpty;
         private bool _isChecked;
+        private readonly ILocalizationService _localizationService;
 
-        public SelectionElementVM(string name, BuiltInParameter bltnParam) {
+        public SelectionElementVM(string name, BuiltInParameter bltnParam, ILocalizationService localizationService) {
+            _localizationService = localizationService;
+
             if(string.IsNullOrEmpty(name)) {
-                _name = "<Без имени>";
+                _name = _localizationService.GetLocalizedString("ErrorsWindow.WithoutLevel");
                 _isEmpty = true;
             } else {
                 _name = name;
