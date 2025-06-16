@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -8,11 +7,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -29,11 +25,11 @@ namespace RevitSleeves;
 /// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
 /// </remarks>
 [Transaction(TransactionMode.Manual)]
-public class RevitSleevesCommand : BasePluginCommand {
+public class SleevesSettingsCommand : BasePluginCommand {
     /// <summary>
     /// Инициализирует команду плагина.
     /// </summary>
-    public RevitSleevesCommand() {
+    public SleevesSettingsCommand() {
         PluginName = "RevitSleeves";
     }
 
