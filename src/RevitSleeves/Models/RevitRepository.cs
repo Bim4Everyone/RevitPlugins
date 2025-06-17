@@ -1,41 +1,35 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
+
 namespace RevitSleeves.Models;
 
-/// <summary>
-/// Класс доступа к документу и приложению Revit.
-/// </summary>
-/// <remarks>
-/// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
-/// </remarks>
 internal class RevitRepository {
-    /// <summary>
-    /// Создает экземпляр репозитория.
-    /// </summary>
-    /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(UIApplication uiApplication) {
-        UIApplication = uiApplication;
+    private readonly RevitClashDetective.Models.RevitRepository _clashRepository;
+
+    public RevitRepository(UIApplication uiApplication, RevitClashDetective.Models.RevitRepository clashRepository) {
+        UIApplication = uiApplication ?? throw new System.ArgumentNullException(nameof(uiApplication));
+        _clashRepository = clashRepository ?? throw new System.ArgumentNullException(nameof(clashRepository));
     }
 
-    /// <summary>
-    /// Класс доступа к интерфейсу Revit.
-    /// </summary>
     public UIApplication UIApplication { get; }
-    
-    /// <summary>
-    /// Класс доступа к интерфейсу документа Revit.
-    /// </summary>
+
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    
-    /// <summary>
-    /// Класс доступа к приложению Revit.
-    /// </summary>
+
     public Application Application => UIApplication.Application;
-    
-    /// <summary>
-    /// Класс доступа к документу Revit.
-    /// </summary>
+
     public Document Document => ActiveUIDocument.Document;
+
+
+    public IList<ParameterValueProvider> GetParameters(Document doc, Category category) {
+        return _clashRepository.GetParameters(doc, [category]);
+    }
+
+    public RevitClashDetective.Models.RevitRepository GetClashRevitRepository() {
+        return _clashRepository;
+    }
 }

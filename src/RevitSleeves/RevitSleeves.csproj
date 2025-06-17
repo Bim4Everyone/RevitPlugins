@@ -1,7 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <UseWpfUI>true</UseWpfUI>
         <UseRevitClashes>true</UseRevitClashes>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <Folder Include="Services\Navigator\" />
+      <Folder Include="Services\Settings\" />
+      <Folder Include="Services\Placing\" />
+      <Folder Include="ViewModels\Navigator\" />
+      <Folder Include="ViewModels\Placing\" />
+      <Folder Include="Views\Navigator\" />
+      <Folder Include="Views\Placing\" />
+    </ItemGroup>
 </Project>
