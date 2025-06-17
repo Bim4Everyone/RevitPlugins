@@ -23,17 +23,17 @@ internal class RevitRepository {
     /// Класс доступа к интерфейсу Revit.
     /// </summary>
     public UIApplication UIApplication { get; }
-    
+
     /// <summary>
     /// Класс доступа к интерфейсу документа Revit.
     /// </summary>
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    
+
     /// <summary>
     /// Класс доступа к приложению Revit.
     /// </summary>
     public Application Application => UIApplication.Application;
-    
+
     /// <summary>
     /// Класс доступа к документу Revit.
     /// </summary>

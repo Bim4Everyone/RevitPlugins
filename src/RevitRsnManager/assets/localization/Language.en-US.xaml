@@ -9,7 +9,7 @@
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String x:Key="MainWindow.UpdateSuccess">RSN.ini updated</system:String>
     <system:String x:Key="MainWindow.UpdateSuccessTitle">Done</system:String>
-    <system:String x:Key="MainWindow.ConfigNotFound">The configuration file was not found, you need to create it</system:String>
+    <system:String x:Key="MainWindow.ConfigNotFound">The configuration file was not found.|You need to create it</system:String>
     <system:String x:Key="MainWindow.ConfigNotFoundTitle">Error</system:String>
     <system:String x:Key="MainWindow.AlreadyExists">Server is already added.</system:String>
     <system:String x:Key="MainWindow.ErrorEmptyServerList">Please add at least one server.</system:String>
