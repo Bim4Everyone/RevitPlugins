@@ -55,7 +55,7 @@ public class RevitMarkingElementsCommand : BasePluginCommand {
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
         _ = kernel.UseWpfLocalization(
-            $"/{assemblyName};component/assets/Localization/Language.xaml",
+            $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         var revitRepository = kernel.Get<RevitRepository>();
