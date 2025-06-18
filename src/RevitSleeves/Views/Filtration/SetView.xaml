@@ -73,7 +73,7 @@
                             BorderThickness="0"
                             Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveSetCommand}"
                             CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}"
-                            Content="{ui:SymbolIcon Symbol=Delete16}" />
+                            Content="{ui:SymbolIcon Delete16}" />
                         <ui:Button
                             DockPanel.Dock="Right"
                             Margin="3"
@@ -124,14 +124,13 @@
 
                 <ui:Button
                     DockPanel.Dock="Right"
-                    Width="16"
                     Margin="3"
                     Background="Transparent"
                     BorderBrush="Transparent"
                     BorderThickness="0"
                     Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBox}, Mode=FindAncestor}, Path=DataContext.RemoveRuleCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}"
-                    Content="{ui:SymbolIcon Symbol=Delete16}" />
+                    Content="{ui:SymbolIcon Delete16}" />
 
                 <ComboBox
                     DockPanel.Dock="Left"
