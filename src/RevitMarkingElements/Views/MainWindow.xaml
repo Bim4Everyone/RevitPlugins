@@ -74,6 +74,38 @@
                         Margin="5"
                         Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
 
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="Auto" />
+                                <ColumnDefinition />
+                                <ColumnDefinition
+                                    Width="4*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                Grid.Column="0"
+                                Margin="0,0,10,0"
+                                VerticalAlignment="Center"
+                                Text="{DynamicResource MainWindow.CategoriesElements}" />
+
+                            <ComboBox
+                                Grid.Column="1"
+                                Grid.ColumnSpan="2"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding Categories}"
+                                SelectedItem="{Binding SelectedCategory}"
+                                Background="{DynamicResource SolidBackgroundFillColorTertiaryBrush}" />
+
+                        </Grid>
+                    </Border>
+
+                    <Border
+                        CornerRadius="8"
+                        Padding="10"
+                        Margin="5"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+
                         <StackPanel>
                             <RadioButton
                                 Margin="0,0,0,5"
@@ -137,22 +169,26 @@
                         Margin="5"
                         Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
 
-                        <StackPanel
-                            Orientation="Horizontal">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="Auto" />
+                                <ColumnDefinition
+                                    Width="*" />
+                            </Grid.ColumnDefinitions>
 
                             <TextBlock
-                                Margin="0,0,0,0"
+                                Grid.Column="0"
+                                Margin="0,0,10,0"
                                 VerticalAlignment="Center"
-                                Text="{DynamicResource MainWindow.StartNumbericFrom}" />
+                                Text="{DynamicResource MainWindow.StartNumbericFrom}"/>
 
                             <ui:TextBox
-                                Margin="10,0,0,0"
-                                Width="100"
+                                Grid.Column="1"
                                 Text="{Binding StartNumber}"
                                 IsEnabled="{Binding RenumberAll}"
                                 Background="{DynamicResource SolidBackgroundFillColorTertiaryBrush}" />
-
-                        </StackPanel>
+                        </Grid>
                     </Border>
                 </StackPanel>
 
@@ -160,38 +196,6 @@
                     Margin="10,0,10,0"
                     Grid.Row="2"
                     Orientation="Vertical">
-
-                    <Border
-                        CornerRadius="8"
-                        Padding="10"
-                        Margin="5"
-                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition
-                                    Width="Auto" />
-                                <ColumnDefinition />
-                                <ColumnDefinition
-                                    Width="4*" />
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock
-                                Grid.Column="0"
-                                Margin="0,0,10,0"
-                                VerticalAlignment="Center"
-                                Text="{DynamicResource MainWindow.CategoriesElements}" />
-
-                            <ComboBox
-                                Grid.Column="1"
-                                Grid.ColumnSpan="2"
-                                DisplayMemberPath="Name"
-                                ItemsSource="{Binding Categories}"
-                                SelectedItem="{Binding SelectedCategory}"
-                                Background="{DynamicResource SolidBackgroundFillColorTertiaryBrush}"/>
-                            
-                        </Grid>
-                    </Border>
 
                     <Border
                         CornerRadius="8"
