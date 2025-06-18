@@ -14,6 +14,13 @@
         x:Key="TODO">TODO</system:String>
 
     <system:String
+        x:Key="From">от</system:String>
+    <system:String
+        x:Key="To">до</system:String>
+    <system:String
+        x:Key="Mm">мм</system:String>
+
+    <system:String
         x:Key="Filtering.AddRule">Добавить правило</system:String>
     <system:String
         x:Key="Filtering.AddSet">Добавить набор</system:String>
@@ -60,6 +67,11 @@
         x:Key="RuleEvaluators.FilterHasValue">Имеет значение</system:String>
     <system:String
         x:Key="RuleEvaluators.FilterNotEquals">Не равно</system:String>
+
+    <system:String
+        x:Key="FromSleeveAxisToMepAxis">Максимальное расстояние между осью гильзы и осью трубы</system:String>
+    <system:String
+        x:Key="FromSleeveEndToTopFloorFace">Расстояние от верхней грани перекрытия до верхнего торца гильзы</system:String>
 
     <system:String
         x:Key="MainWindow.ButtonOk">ОК</system:String>

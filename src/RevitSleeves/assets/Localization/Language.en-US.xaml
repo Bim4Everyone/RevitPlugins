@@ -63,6 +63,11 @@
         x:Key="RuleEvaluators.FilterNotEquals">Not equals</system:String>
 
     <system:String
+        x:Key="FromSleeveAxisToMepAxis">Maximum distance between the axis of the sleeve and the axis of the pipe</system:String>
+    <system:String
+        x:Key="FromSleeveEndToTopFloorFace">Distance from the upper face of the floor to the upper end of the sleeve</system:String>
+
+    <system:String
         x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String
         x:Key="MainWindow.ButtonCancel">Cancel</system:String>

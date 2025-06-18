@@ -15,7 +15,8 @@ internal class OffsetViewModel : BaseViewModel {
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _offset = offset ?? throw new ArgumentNullException(nameof(offset));
 
-        Name = _localizationService.GetLocalizedString("TODO");
+        Name = _localizationService.GetLocalizedString($"{nameof(OffsetType)}.{offset.OffsetType}");
+        Value = _offset.Value;
     }
 
     public string Name { get; }

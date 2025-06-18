@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
@@ -26,19 +28,33 @@ internal class MepCategoryViewModel : BaseViewModel {
     }
 
 
+    public string Name { get; private set; }
+
     public SetViewModel MepFilterViewModel { get; private set; }
+
+    public ObservableCollection<DiameterRangeViewModel> DiameterRanges { get; } = [];
+
+    public ObservableCollection<OffsetViewModel> Offsets { get; } = [];
 
 
     private void InitializeCategory(RevitRepository revitRepository,
         ILocalizationService localizationService,
         MepCategorySettings mepCategorySettings) {
 
+        var category = revitRepository.GetCategory(mepCategorySettings.Category);
         MepFilterViewModel = new SetViewModel(
             revitRepository,
             localizationService,
             new CategoryInfoViewModel(
                 revitRepository,
                 localizationService,
-                revitRepository.GetCategory(mepCategorySettings.Category)));
+                category));
+        Name = category.Name;
+        foreach(var diamRange in mepCategorySettings.DiameterRanges) {
+            DiameterRanges.Add(new DiameterRangeViewModel(localizationService, diamRange));
+        }
+        foreach(var offset in mepCategorySettings.Offsets) {
+            Offsets.Add(new OffsetViewModel(localizationService, offset));
+        }
     }
 }
