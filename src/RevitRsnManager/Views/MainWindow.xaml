@@ -18,9 +18,9 @@
     WindowStartupLocation="CenterOwner"
     
     Width="500"
-    Height="450"
+    Height="750"
     MinWidth="500"
-    MinHeight="450"
+    MinHeight="750"
     
     Title="{me:LocalizationSource MainWindow.Title}"
     
@@ -180,9 +180,9 @@
                     <DataTemplate>
                         <Border
                             BorderThickness="1"
-                            Padding="5"
-                            CornerRadius="5"
-                            Margin="10,5,10,5"
+                            Padding="2"
+                            CornerRadius="3"
+                            Margin="5,2,5,2"
                             BorderBrush="{ui:ThemeResource TextFillColorPrimaryBrush}">
 
                             <DockPanel 
@@ -210,6 +210,7 @@
 
                                 <TextBlock
                                     Margin="10,0"
+                                    FontSize="12"
                                     VerticalAlignment="Center"
                                     Text="{Binding}"
                                     Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}" />

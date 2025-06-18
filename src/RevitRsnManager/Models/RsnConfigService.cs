@@ -3,63 +3,60 @@ using System.Collections.Generic;
 using System.IO;
 
 using dosymep.Bim4Everyone;
-using dosymep.Revit.FileInfo;
 
 using RevitRsnManager.Interfaces;
 using RevitRsnManager.Models.Utils;
 
-namespace RevitRsnManager.Models
-{
-    public class RsnConfigService : IRsnConfigService {
-        private readonly string _version;
-        private readonly string _revitServerIni;
+namespace RevitRsnManager.Models;
 
-        public RsnConfigService() {
-            _version = ModuleEnvironment.RevitVersion;
+public class RsnConfigService : IRsnConfigService {
+    private readonly string _version;
+    private readonly string _revitServerIni;
 
-            string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            _revitServerIni = Path.Combine(programData, "Autodesk", $"Revit Server {_version}", "Config", "RSN.ini");
-        }
+    public RsnConfigService() {
+        _version = ModuleEnvironment.RevitVersion;
 
-        public List<string> LoadServersFromIni() {
-            var servers = new List<string>();
+        string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+        _revitServerIni = Path.Combine(programData, "Autodesk", $"Revit Server {_version}", "Config", "RSN.ini");
+    }
 
-            if(!File.Exists(_revitServerIni)) {
-                Directory.CreateDirectory(Path.GetDirectoryName(_revitServerIni));
+    public List<string> LoadServersFromIni() {
+        var servers = new List<string>();
 
-                File.WriteAllText(_revitServerIni, string.Empty);
-                return servers;
-            }
+        if(!File.Exists(_revitServerIni)) {
+            _ = Directory.CreateDirectory(Path.GetDirectoryName(_revitServerIni));
 
-            foreach(string line in File.ReadLines(_revitServerIni)) {
-                string trimmed = line.Trim();
-                if(!string.IsNullOrWhiteSpace(trimmed)) {
-                    servers.Add(trimmed);
-                }
-            }
-
+            File.WriteAllText(_revitServerIni, string.Empty);
             return servers;
         }
 
-        public void SaveServersToIni(List<string> servers) {
-            using(var writer = new StreamWriter(_revitServerIni, false)) {
-                foreach(string server in servers) {
-                    string trimmed = server?.Trim();
-                    if(!string.IsNullOrWhiteSpace(trimmed)) {
-                        writer.WriteLine(trimmed);
-                    }
-                }
+        foreach(string line in File.ReadLines(_revitServerIni)) {
+            string trimmed = line.Trim();
+            if(!string.IsNullOrWhiteSpace(trimmed)) {
+                servers.Add(trimmed);
             }
         }
 
-        public string GetProjectPathFromRevitIni() {
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string iniPath = Path.Combine(appData, "Autodesk", "Revit", $"Autodesk Revit {_version}", "Revit.ini");
+        return servers;
+    }
 
-            var ini = new IniConfigurationService(iniPath);
-            string rawPath = ini.Read("Directories", "ProjectPath");
-
-            return Environment.ExpandEnvironmentVariables(rawPath);
+    public void SaveServersToIni(List<string> servers) {
+        using var writer = new StreamWriter(_revitServerIni, false);
+        foreach(string server in servers) {
+            string trimmed = server?.Trim();
+            if(!string.IsNullOrWhiteSpace(trimmed)) {
+                writer.WriteLine(trimmed);
+            }
         }
+    }
+
+    public string GetProjectPathFromRevitIni() {
+        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        string iniPath = Path.Combine(appData, "Autodesk", "Revit", $"Autodesk Revit {_version}", "Revit.ini");
+
+        var ini = new IniConfigurationService(iniPath);
+        string rawPath = ini.Read("Directories", "ProjectPath");
+
+        return Environment.ExpandEnvironmentVariables(rawPath);
     }
 }

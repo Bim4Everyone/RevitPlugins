@@ -34,7 +34,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string PluginName => nameof(RevitRsnManager);
-    
+
     /// <summary>
     /// Наименование файла конфигурации.
     /// </summary>
@@ -42,7 +42,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string ProjectConfigName => nameof(MainWindow);
-    
+
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
     }
@@ -57,15 +57,13 @@ public partial class MainWindow {
 
     private void ListBoxItem_PreviewMouseMove(object sender, MouseEventArgs e) {
         if(e.LeftButton == MouseButtonState.Pressed) {
-            Point currentPosition = e.GetPosition(null);
-            Vector diff = _dragStartPoint - currentPosition;
+            var currentPosition = e.GetPosition(null);
+            var diff = _dragStartPoint - currentPosition;
 
             if(Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
                Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance) {
-
-                ListBoxItem item = sender as ListBoxItem;
-                if(item != null) {
-                    DragDrop.DoDragDrop(item, item.DataContext, DragDropEffects.Move);
+                if(sender is ListBoxItem item) {
+                    _ = DragDrop.DoDragDrop(item, item.DataContext, DragDropEffects.Move);
                 }
             }
         }
@@ -73,13 +71,11 @@ public partial class MainWindow {
 
     private void ListBox_Drop(object sender, DragEventArgs e) {
         if(e.Data.GetDataPresent(typeof(string))) {
-            var droppedData = e.Data.GetData(typeof(string)) as string;
-            var target = ((FrameworkElement) e.OriginalSource).DataContext as string;
-
             if(DataContext is RevitRsnManager.ViewModels.MainViewModel vm) {
                 var servers = vm.Servers;
-                if(servers == null || droppedData == null || target == null || droppedData == target)
+                if(servers == null || e.Data.GetData(typeof(string)) is not string droppedData || ((FrameworkElement) e.OriginalSource).DataContext is not string target || droppedData == target) {
                     return;
+                }
 
                 int oldIndex = servers.IndexOf(droppedData);
                 int newIndex = servers.IndexOf(target);

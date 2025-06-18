@@ -1,5 +1,5 @@
+using System;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -10,10 +10,8 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.WpfUI.Core.SimpleServices;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -50,28 +48,28 @@ public class RevitRsnLoadCommand : BasePluginCommand {
     /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        using var kernel = uiApplication.CreatePlatformServices();
 
         // Настройка доступа к Revit
-        kernel.Bind<RevitRepository>()
+        _ = kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
 
         // Настройка конфигурации плагина
-        kernel.Bind<PluginConfig>()
+        _ = kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.Bind<IRsnConfigService>()
+        _ = kernel.Bind<IRsnConfigService>()
             .To<RsnConfigService>()
             .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
-        kernel.UseWpfUIThemeUpdater();
+        _ = kernel.UseWpfUIThemeUpdater();
 
-        kernel.UseWpfUIMessageBox();
+        _ = kernel.UseWpfUIMessageBox();
 
         // Настройка запуска окна
-        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        _ = kernel.BindMainWindow<MainViewModel, MainWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -79,8 +77,8 @@ public class RevitRsnLoadCommand : BasePluginCommand {
 
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
-        kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+        _ = kernel.UseXtraLocalization(
+            $"/{assemblyName};component/assets/localization//Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         TrySaveServersToIni(kernel);
@@ -95,22 +93,25 @@ public class RevitRsnLoadCommand : BasePluginCommand {
         var servers = pluginConfig.Servers;
 
         if(servers?.Count > 0) {
-            var updateSuccess = localizationService.GetLocalizedString("MainWindow.UpdateSuccess");
-            var updateSuccessTitle = localizationService.GetLocalizedString("MainWindow.UpdateSuccessTitle");
+            string updateSuccess = localizationService.GetLocalizedString("MainWindow.UpdateSuccess");
+            string updateSuccessTitle = localizationService.GetLocalizedString("MainWindow.UpdateSuccessTitle");
 
             rsnConfigService.SaveServersToIni(servers);
-            msg.Show(
+            _ = msg.Show(
                updateSuccess,
                updateSuccessTitle,
                MessageBoxButton.OK,
                MessageBoxImage.Information
            );
         } else {
-            var configNotFound = localizationService.GetLocalizedString("MainWindow.ConfigNotFound");
-            var configNotFoundTitle = localizationService.GetLocalizedString("MainWindow.ConfigNotFoundTitle");
+            string configNotFound = localizationService.GetLocalizedString("MainWindow.ConfigNotFound");
+            string configNotFoundTitle = localizationService.GetLocalizedString("MainWindow.ConfigNotFoundTitle");
 
-            msg.Show(
-                configNotFound,
+            string[] lines = configNotFound.Split('|');
+            string finalMessage = string.Join(Environment.NewLine, lines);
+
+            _ = msg.Show(
+                finalMessage,
                 configNotFoundTitle,
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning

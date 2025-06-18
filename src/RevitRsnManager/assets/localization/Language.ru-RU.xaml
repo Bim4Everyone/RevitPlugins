@@ -9,7 +9,7 @@
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String x:Key="MainWindow.UpdateSuccess">RSN.ini обновлен</system:String>
     <system:String x:Key="MainWindow.UpdateSuccessTitle">Выполнено</system:String>
-    <system:String x:Key="MainWindow.ConfigNotFound">Конфигурационный файл не найден, необходимо создать его</system:String>
+    <system:String x:Key="MainWindow.ConfigNotFound">Конфигурационный файл не найден.|Необходимо создать его</system:String>
     <system:String x:Key="MainWindow.ConfigNotFoundTitle">Ошибка</system:String>
     <system:String x:Key="MainWindow.AlreadyExists">Сервер уже добавлен.</system:String>
     <system:String x:Key="MainWindow.ErrorEmptyServerList">Добавьте хотя бы один сервер.</system:String>

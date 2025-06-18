@@ -1,20 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit.FileInfo;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
-using dosymep.WpfUI.Core.SimpleServices;
 
 using RevitRsnManager.Interfaces;
 using RevitRsnManager.Models;
@@ -46,9 +41,9 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         IMessageBoxService messageBoxService,
-        ILocalizationService localizationService, 
+        ILocalizationService localizationService,
         IRsnConfigService rsnConfigService) {
-        
+
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
@@ -100,24 +95,24 @@ internal class MainViewModel : BaseViewModel {
 
     private void AutoConfigure() {
         string modelsPath = _rsnConfigService.GetProjectPathFromRevitIni();
-        DateTime now = DateTime.Now;
+        var now = DateTime.Now;
 
-        List<FileInfo> allFiles = Directory.GetFiles(modelsPath, "*.rvt", SearchOption.TopDirectoryOnly)
+        var allFiles = Directory.GetFiles(modelsPath, "*.rvt", SearchOption.TopDirectoryOnly)
                                            .Select(path => new FileInfo(path))
                                            .ToList();
 
-        List<FileInfo> recentFiles = allFiles
+        var recentFiles = allFiles
             .Where(file => (now - file.LastWriteTime).TotalDays <= 5)
             .OrderByDescending(file => file.LastWriteTime)
             .ToList();
 
-        List<string> serversFromRecentFiles = recentFiles
+        var serversFromRecentFiles = recentFiles
             .Select(GetServerIfValid)
             .Where(server => !string.IsNullOrWhiteSpace(server))
             .Distinct()
             .ToList();
 
-        List<string> existingServers = Servers.Except(serversFromRecentFiles).ToList();
+        var existingServers = Servers.Except(serversFromRecentFiles).ToList();
         Servers = new ObservableCollection<string>(serversFromRecentFiles.Concat(existingServers));
     }
 
@@ -131,11 +126,7 @@ internal class MainViewModel : BaseViewModel {
 
             string centralPath = info.BasicFileInfo.CentralPath;
 
-            if(!centralPath.StartsWith("RSN://", StringComparison.OrdinalIgnoreCase)) {
-                return null;
-            }
-
-            return new Uri(centralPath).Host;
+            return !centralPath.StartsWith("RSN://", StringComparison.OrdinalIgnoreCase) ? null : new Uri(centralPath).Host;
         } catch {
             return null;
         }
@@ -150,7 +141,7 @@ internal class MainViewModel : BaseViewModel {
         string message = _localizationService.GetLocalizedString("MainWindow.ConfirmDeleteServer");
 
         if(_messageBoxService.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
-            Servers.Remove(server);
+            _ = Servers.Remove(server);
 
             if(SelectedServer == server) {
                 SelectedServer = null;
@@ -162,6 +153,7 @@ internal class MainViewModel : BaseViewModel {
         string trimmed = NewServerName?.Trim();
         if(!Servers.Contains(trimmed)) {
             Servers.Add(trimmed);
+            NewServerName = string.Empty;
         }
         SelectedServer = trimmed;
     }
@@ -184,9 +176,13 @@ internal class MainViewModel : BaseViewModel {
         return index >= 0 && index + delta >= 0 && index + delta < Servers.Count;
     }
 
-    private void MoveServerUp(string server) => MoveServer(server, -1);
+    private void MoveServerUp(string server) {
+        MoveServer(server, -1);
+    }
 
-    private void MoveServerDown(string server) => MoveServer(server, 1);
+    private void MoveServerDown(string server) {
+        MoveServer(server, 1);
+    }
 
     /// <summary>
     /// Метод загрузки главного окна.
@@ -206,10 +202,10 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private void AcceptView() {
         _rsnConfigService.SaveServersToIni(Servers.ToList());
-        var updateSuccess = _localizationService.GetLocalizedString("MainWindow.UpdateSuccess");
-        var updateSuccessTitle = _localizationService.GetLocalizedString("MainWindow.UpdateSuccessTitle");
+        string updateSuccess = _localizationService.GetLocalizedString("MainWindow.UpdateSuccess");
+        string updateSuccessTitle = _localizationService.GetLocalizedString("MainWindow.UpdateSuccessTitle");
         SaveConfig();
-        _messageBoxService.Show(
+        _ = _messageBoxService.Show(
                updateSuccess,
                updateSuccessTitle,
                MessageBoxButton.OK,
