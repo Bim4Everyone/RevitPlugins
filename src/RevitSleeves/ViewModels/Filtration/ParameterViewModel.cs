@@ -20,7 +20,7 @@ internal class ParameterViewModel : BaseViewModel, IEquatable<ParameterViewModel
         _localizationService = localizationService
             ?? throw new ArgumentNullException(nameof(localizationService));
         ProviderViewModel = new ProviderViewModel(_localizationService, filterableValueProvider);
-        Name = ProviderViewModel.Name;
+        Name = ProviderViewModel.DisplayValue;
     }
 
     public string Name { get; }

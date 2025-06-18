@@ -12,7 +12,7 @@ internal class SetEvaluatorViewModel : BaseViewModel {
             ?? throw new System.ArgumentNullException(nameof(localizationService));
         SetEvaluator = setEvaluator
             ?? throw new System.ArgumentNullException(nameof(setEvaluator));
-        Name = _localizationService.GetLocalizedString("TODO");
+        Name = _localizationService.GetLocalizedString($"{nameof(SetEvaluators)}.{SetEvaluator.Evaluator}");
     }
 
 

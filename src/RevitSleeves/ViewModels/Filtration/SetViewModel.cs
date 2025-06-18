@@ -37,6 +37,9 @@ internal class SetViewModel : BaseViewModel, ICriterionViewModel {
         AddSetCommand = RelayCommand.Create(AddSet);
         RemoveSetCommand = RelayCommand.Create<SetViewModel>(RemoveSet, CanRemoveSet);
 
+        AddRuleCommandName = _localizationService.GetLocalizedString("Filtering.AddRule");
+        AddSetCommandName = _localizationService.GetLocalizedString("Filtering.AddSet");
+
         if(set == null) {
             Criteria = [];
             SelectedEvaluator = Evaluators.FirstOrDefault();
@@ -69,6 +72,10 @@ internal class SetViewModel : BaseViewModel, ICriterionViewModel {
     }
 
     public IReadOnlyCollection<SetEvaluatorViewModel> Evaluators { get; }
+
+    public string AddRuleCommandName { get; }
+
+    public string AddSetCommandName { get; }
 
 
     public Set GetSet() {

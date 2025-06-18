@@ -13,7 +13,7 @@ internal class RuleEvaluatorViewModel : BaseViewModel, IEquatable<RuleEvaluatorV
     public RuleEvaluatorViewModel(ILocalizationService localizationService, RuleEvaluator ruleEvaluator) {
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         RuleEvaluator = ruleEvaluator ?? throw new ArgumentNullException(nameof(ruleEvaluator));
-        Name = _localizationService.GetLocalizedString("TODO");
+        Name = _localizationService.GetLocalizedString($"{nameof(RuleEvaluators)}.{RuleEvaluator.Evaluator}");
     }
 
 
