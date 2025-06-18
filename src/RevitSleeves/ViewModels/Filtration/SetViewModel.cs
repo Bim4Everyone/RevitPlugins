@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Evaluators;
@@ -30,6 +31,12 @@ internal class SetViewModel : BaseViewModel, ICriterionViewModel {
         CategoryInfo = categoryInfo ?? throw new ArgumentNullException(nameof(categoryInfo));
         Evaluators = new ReadOnlyCollection<SetEvaluatorViewModel>(
             [.. SetEvaluatorUtils.GetEvaluators().Select(i => new SetEvaluatorViewModel(_localizationService, i))]);
+
+        AddRuleCommand = RelayCommand.Create(AddRule);
+        RemoveRuleCommand = RelayCommand.Create<RuleViewModel>(RemoveRule, CanRemoveRule);
+        AddSetCommand = RelayCommand.Create(AddSet);
+        RemoveSetCommand = RelayCommand.Create<SetViewModel>(RemoveSet, CanRemoveSet);
+
         if(set == null) {
             Criteria = [];
             SelectedEvaluator = Evaluators.FirstOrDefault();
@@ -112,5 +119,29 @@ internal class SetViewModel : BaseViewModel, ICriterionViewModel {
         foreach(var criterion in criteria) {
             criterion.SetRevitRepository(_revitRepository.GetClashRevitRepository());
         }
+    }
+
+    private void AddSet() {
+        Criteria.Add(new SetViewModel(_revitRepository, _localizationService, CategoryInfo));
+    }
+
+    private void RemoveSet(SetViewModel model) {
+        Criteria.Remove(model);
+    }
+
+    private bool CanRemoveSet(SetViewModel model) {
+        return model is not null;
+    }
+
+    private void AddRule() {
+        Criteria.Add(new RuleViewModel(_localizationService, CategoryInfo));
+    }
+
+    private bool CanRemoveRule(RuleViewModel model) {
+        return model is not null;
+    }
+
+    private void RemoveRule(RuleViewModel model) {
+        Criteria.Remove(model);
     }
 }

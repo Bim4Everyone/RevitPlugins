@@ -16,6 +16,7 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly ISaveFileDialogService _saveFileDialogService;
     private readonly IOpenFileDialogService _openFileDialogService;
+    private MepCategoryViewModel _activeMepCategorySettings;
     private string _errorText;
     private bool _showPlacingErrors;
 
@@ -26,11 +27,17 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
         ISaveFileDialogService saveFileDialogService,
         IOpenFileDialogService openFileDialogService) {
 
-        _pluginConfig = pluginConfig;
-        _revitRepository = revitRepository;
-        _localizationService = localizationService;
-        _saveFileDialogService = saveFileDialogService;
-        _openFileDialogService = openFileDialogService;
+        _pluginConfig = pluginConfig
+            ?? throw new ArgumentNullException(nameof(pluginConfig));
+        _revitRepository = revitRepository
+            ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localizationService = localizationService
+            ?? throw new ArgumentNullException(nameof(localizationService));
+        _saveFileDialogService = saveFileDialogService
+            ?? throw new ArgumentNullException(nameof(saveFileDialogService));
+        _openFileDialogService = openFileDialogService
+            ?? throw new ArgumentNullException(nameof(openFileDialogService));
+
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
@@ -59,6 +66,11 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _showPlacingErrors, value);
     }
 
+    public MepCategoryViewModel ActiveMepCategorySettings {
+        get => _activeMepCategorySettings;
+        set => RaiseAndSetIfChanged(ref _activeMepCategorySettings, value);
+    }
+
 
     private void LoadView() {
         LoadConfig();
@@ -69,17 +81,20 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
-        if(Math.Round(1.0) > 0) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
-        }
+        //if(Math.Round(1.0) > 0) { TODO
+        //    ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+        //    return false;
+        //}
 
         ErrorText = null;
         return true;
     }
 
     private void LoadConfig() {
-
+        ActiveMepCategorySettings = new MepCategoryViewModel(
+            _revitRepository,
+            _localizationService,
+            _pluginConfig.PipeSettings);
     }
 
     private void SaveConfig() {
