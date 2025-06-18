@@ -5,14 +5,14 @@ using pyRevitLabs.Json;
 using RevitClashDetective.Models.FilterModel;
 
 namespace RevitSleeves.Models.Config;
-internal class StructureSettings {
-    [JsonConstructor]
-    public StructureSettings() { }
+internal abstract class StructureSettings {
+    protected StructureSettings() { }
 
 
-    public BuiltInCategory Category { get; set; }
+    [JsonIgnore]
+    public abstract BuiltInCategory Category { get; }
 
-    public Set FilterSet { get; set; }
+    public Set FilterSet { get; set; } = new Set();
 
     public bool IsEnabled { get; set; }
 }

@@ -32,4 +32,8 @@ internal class RevitRepository {
     public RevitClashDetective.Models.RevitRepository GetClashRevitRepository() {
         return _clashRepository;
     }
+
+    public Category GetCategory(BuiltInCategory category) {
+        return Category.GetCategory(Document, category);
+    }
 }
