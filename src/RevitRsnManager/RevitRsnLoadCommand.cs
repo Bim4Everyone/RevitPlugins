@@ -78,7 +78,7 @@ public class RevitRsnLoadCommand : BasePluginCommand {
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
         _ = kernel.UseXtraLocalization(
-            $"/{assemblyName};component/assets/localization//Language.xaml",
+            $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         TrySaveServersToIni(kernel);
@@ -107,7 +107,7 @@ public class RevitRsnLoadCommand : BasePluginCommand {
             string configNotFound = localizationService.GetLocalizedString("MainWindow.ConfigNotFound");
             string configNotFoundTitle = localizationService.GetLocalizedString("MainWindow.ConfigNotFoundTitle");
 
-            string[] lines = configNotFound.Split('|');
+            var lines = configNotFound.Split('|');
             string finalMessage = string.Join(Environment.NewLine, lines);
 
             _ = msg.Show(
