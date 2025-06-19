@@ -17,6 +17,7 @@ internal class OffsetViewModel : BaseViewModel {
 
         Name = _localizationService.GetLocalizedString($"{nameof(OffsetType)}.{offset.OffsetType}");
         Value = _offset.Value;
+        UnitName = _localizationService.GetLocalizedString("Mm");
     }
 
     public string Name { get; }
@@ -25,4 +26,6 @@ internal class OffsetViewModel : BaseViewModel {
         get => _value;
         set => RaiseAndSetIfChanged(ref _value, value);
     }
+
+    public string UnitName { get; }
 }

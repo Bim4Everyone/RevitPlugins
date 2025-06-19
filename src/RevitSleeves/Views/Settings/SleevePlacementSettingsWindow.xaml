@@ -137,6 +137,24 @@
                                 DockPanel.Dock="Bottom"
                                 x:Name="Offsets"
                                 ItemsSource="{Binding ActiveMepCategorySettings.Offsets}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Style="{StaticResource CustomBorder}">
+                                            <ContentControl
+                                                Width="250"
+                                                Content="{Binding}">
+                                                <ContentControl.ContentTemplate>
+                                                    <DataTemplate
+                                                        DataType="{x:Type vms:OffsetViewModel}">
+                                                        <local:OffsetView
+                                                            DataContext="{Binding}" />
+                                                    </DataTemplate>
+                                                </ContentControl.ContentTemplate>
+                                            </ContentControl>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
                             </ListBox>
                         </DockPanel>
                     </Border>

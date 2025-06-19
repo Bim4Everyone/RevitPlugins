@@ -65,9 +65,9 @@
         x:Key="RuleEvaluators.FilterNotEquals">Не равно</system:String>
 
     <system:String
-        x:Key="FromSleeveAxisToMepAxis">Максимальное расстояние между осью гильзы и осью трубы</system:String>
+        x:Key="OffsetType.FromSleeveAxisToMepAxis">Максимальное расстояние между осью гильзы и осью трубы</system:String>
     <system:String
-        x:Key="FromSleeveEndToTopFloorFace">Расстояние от верхней грани перекрытия до верхнего торца гильзы</system:String>
+        x:Key="OffsetType.FromSleeveEndToTopFloorFace">Расстояние от верхней грани перекрытия до верхнего торца гильзы</system:String>
 
     <system:String
         x:Key="Ok">ОК</system:String>

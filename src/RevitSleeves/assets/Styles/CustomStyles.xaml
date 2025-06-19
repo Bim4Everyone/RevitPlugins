@@ -11,6 +11,8 @@
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBox/TextBox.xaml" />
         <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
+        <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListBox/ListBox.xaml" />
@@ -86,6 +88,32 @@
         <Setter
             Property="ClearButtonEnabled"
             Value="False" />
+    </Style>
+
+    <Style
+        TargetType="{x:Type ui:TextBlock}"
+        x:Key="CustomTextBlockAsLabel">
+        <Setter
+            Property="TextWrapping"
+            Value="Wrap" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Center" />
+        <Setter
+            Property="TextAlignment"
+            Value="Center" />
+        <Setter
+            Property="Focusable"
+            Value="False" />
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource LabelForeground}" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
     </Style>
 
     <Style
