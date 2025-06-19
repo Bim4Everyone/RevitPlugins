@@ -22,8 +22,8 @@ internal class FinishingCalculator {
         _finishingRooms = _revitRooms
             .OfType<Room>()
             .Select(x => new RoomElement(x, _revitFinishings));
-            _finishingElements = SetRoomsForFinishing();
-            _roomsByFinishingType = GroupRoomsByFinishingType();
+        _finishingElements = SetRoomsForFinishing();
+        _roomsByFinishingType = GroupRoomsByFinishingType();
     }
 
     public IList<FinishingElement> FinishingElements => _finishingElements;

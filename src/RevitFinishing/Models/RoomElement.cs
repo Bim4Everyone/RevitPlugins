@@ -44,20 +44,20 @@ internal class RoomElement {
         var roomOutline = new Outline(transformedBB.Min, transformedBB.Max);
         _bbFilter = new BoundingBoxIntersectsFilter(roomOutline);
 
-            _walls = GetElementsBySolidIntersection(finishingElements.Walls.Select(x => x.Id).ToList());
-            _floors = GetElementsBySolidIntersection(finishingElements.Floors.Select(x => x.Id).ToList());
-            _ceilings = GetElementsBySolidIntersection(finishingElements.Ceilings.Select(x => x.Id).ToList());
-            _baseboards = GetElementsBySolidIntersection(finishingElements.Baseboards.Select(x => x.Id).ToList());
+        _walls = GetElementsBySolidIntersection(finishingElements.Walls.Select(x => x.Id).ToList());
+        _floors = GetElementsBySolidIntersection(finishingElements.Floors.Select(x => x.Id).ToList());
+        _ceilings = GetElementsBySolidIntersection(finishingElements.Ceilings.Select(x => x.Id).ToList());
+        _baseboards = GetElementsBySolidIntersection(finishingElements.Baseboards.Select(x => x.Id).ToList());
 
-            _allFinishing = _walls
-                .Concat(_floors)
-                .Concat(_ceilings)
-                .Concat(_baseboards)
+        _allFinishing = _walls
+            .Concat(_floors)
+            .Concat(_ceilings)
+            .Concat(_baseboards)
             .ToList();
     }
 
-    public Room RevitRoom { get; }
-    public string RoomFinishingType { get; }
+    public Room RevitRoom => _revitRoom;
+    public string RoomFinishingType => _roomFinishingType;
 
     public IReadOnlyCollection<Element> AllFinishing => _allFinishing;
     public IReadOnlyCollection<Element> Walls => _walls;
