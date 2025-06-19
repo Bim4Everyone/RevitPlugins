@@ -4,14 +4,17 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String
-        x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String
-        x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
+        x:Key="TODO">TODO</system:String>
 
     <system:String
-        x:Key="TODO">TODO</system:String>
+        x:Key="SleevePlacementSettingsWindow.Title">Sleeves placement settings</system:String>
+
+    <system:String
+        x:Key="From">from</system:String>
+    <system:String
+        x:Key="To">to</system:String>
+    <system:String
+        x:Key="Mm">mm</system:String>
 
     <system:String
         x:Key="Filtering.AddRule">Add rule</system:String>
@@ -22,7 +25,6 @@
         x:Key="SetEvaluators.Or">Or</system:String>
     <system:String
         x:Key="SetEvaluators.And">And</system:String>
-    
     <system:String
         x:Key="RuleEvaluators.FilterStringBeginsWith">Begins with</system:String>
     <system:String
@@ -68,7 +70,7 @@
         x:Key="FromSleeveEndToTopFloorFace">Distance from the upper face of the floor to the upper end of the sleeve</system:String>
 
     <system:String
-        x:Key="MainWindow.ButtonOk">OK</system:String>
+        x:Key="Ok">OK</system:String>
     <system:String
-        x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+        x:Key="Cancel">Cancel</system:String>
 </ResourceDictionary>

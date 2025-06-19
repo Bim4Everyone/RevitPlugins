@@ -4,14 +4,10 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String
-        x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String
-        x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+        x:Key="TODO">TODO</system:String>
 
     <system:String
-        x:Key="TODO">TODO</system:String>
+        x:Key="SleevePlacementSettingsWindow.Title">Настройки расстановки гильз</system:String>
 
     <system:String
         x:Key="From">от</system:String>
@@ -74,7 +70,7 @@
         x:Key="FromSleeveEndToTopFloorFace">Расстояние от верхней грани перекрытия до верхнего торца гильзы</system:String>
 
     <system:String
-        x:Key="MainWindow.ButtonOk">ОК</system:String>
+        x:Key="Ok">ОК</system:String>
     <system:String
-        x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+        x:Key="Cancel">Отмена</system:String>
 </ResourceDictionary>
