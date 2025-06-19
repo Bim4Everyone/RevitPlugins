@@ -13,26 +13,25 @@ namespace RevitFinishing.Models.Finishing
     /// Класс для расчетов отделки помещений в проекте Revit.
     /// </summary>
     internal class FinishingCalculator {
-        private readonly List<Element> _revitRooms;
+        private readonly IEnumerable<Element> _revitRooms;
         private readonly FinishingInProject _revitFinishings;
-        private readonly List<FinishingElement> _finishingElements;
+        private readonly IList<FinishingElement> _finishingElements;
 
-        private readonly List<RoomElement> _finishingRooms;
+        private readonly IEnumerable<RoomElement> _finishingRooms;
         private readonly Dictionary<string, FinishingType> _roomsByFinishingType;
 
         public FinishingCalculator(IEnumerable<Element> rooms, FinishingInProject finishings) {
-            _revitRooms = rooms.ToList();
+            _revitRooms = rooms;
             _revitFinishings = finishings;
 
             _finishingRooms = _revitRooms
                 .OfType<Room>()
-                .Select(x => new RoomElement(x, _revitFinishings))
-                .ToList();
+                .Select(x => new RoomElement(x, _revitFinishings));
             _finishingElements = SetRoomsForFinishing();
             _roomsByFinishingType = GroupRoomsByFinishingType();
         }
 
-        public List<FinishingElement> FinishingElements => _finishingElements;
+        public IList<FinishingElement> FinishingElements => _finishingElements;
         public Dictionary<string, FinishingType> RoomsByFinishingType => _roomsByFinishingType;
 
         /// <summary>
@@ -40,7 +39,7 @@ namespace RevitFinishing.Models.Finishing
         /// к которому этот элемент относится.
         /// </summary>
         /// <returns></returns>
-        private List<FinishingElement> SetRoomsForFinishing() {
+        private IList<FinishingElement> SetRoomsForFinishing() {
             Dictionary<ElementId, FinishingElement> allFinishings = new Dictionary<ElementId, FinishingElement>();
             string wallName = FinishingCategory.Walls.Name;
             string floorName = FinishingCategory.Floors.Name;
@@ -67,7 +66,7 @@ namespace RevitFinishing.Models.Finishing
         private Dictionary<string, FinishingType> GroupRoomsByFinishingType() {
             return _finishingRooms
                 .GroupBy(x => x.RoomFinishingType)
-                .ToDictionary(x => x.Key, x => new FinishingType(x.ToList()));
+                .ToDictionary(x => x.Key, x => new FinishingType(x));
         }
 
         private Dictionary<ElementId, FinishingElement> UpdateDictionary(

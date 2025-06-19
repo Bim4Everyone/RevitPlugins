@@ -37,14 +37,14 @@ internal class RevitRepository {
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
 
-    public List<Phase> GetPhases() {
+    public IList<Phase> GetPhases() {
         return Document
             .Phases
             .OfType<Phase>()
             .ToList();
     }
 
-    public IEnumerable<string> GetParamStringValues(Phase phase, BuiltInParameter param) {
+    public IList<string> GetParamStringValues(Phase phase, BuiltInParameter param) {
         ParameterValueProvider valueProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
         FilterNumericEquals ruleEvaluator = new FilterNumericEquals();
         FilterElementIdRule filterRule = new FilterElementIdRule(valueProvider, ruleEvaluator, phase.Id);
@@ -55,7 +55,8 @@ internal class RevitRepository {
             .WherePasses(parameterFilter)
             .OfType<Room>()
             .Select(x => x.GetParamValueOrDefault<string>(param))
-            .Distinct();
+            .Distinct()
+            .ToList();
     }
 
     public IEnumerable<Element> GetRoomLevels(Phase phase) {
@@ -96,7 +97,7 @@ internal class RevitRepository {
             .ToList();
     }
 
-    public List<Room> GetRoomsByFilters(List<ElementFilter> orFilters) {
+    public IList<Room> GetRoomsByFilters(IList<ElementFilter> orFilters) {
         LogicalAndFilter finalFilter = new LogicalAndFilter(orFilters);
 
         return new FilteredElementCollector(Document)

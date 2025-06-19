@@ -31,7 +31,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ErrorWindowService _errorWindowService;
     private readonly ProjectValidationService _projectValidationService;
 
-    private readonly List<Phase> _phases;
+    private readonly IList<Phase> _phases;
     private Phase _selectedPhase;
 
     private ObservableCollection<RoomNameVM> _roomNames;
@@ -73,7 +73,7 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand CalculateFinishingCommand { get; }
 
-    public List<Phase> Phases => _phases;
+    public IList<Phase> Phases => _phases;
 
     public Phase SelectedPhase {
         get => _selectedPhase;
@@ -119,13 +119,13 @@ internal class MainViewModel : BaseViewModel {
         IEnumerable<RoomDepartmentVM> selectedRoomDepartments = RoomDepartments.Where(x => x.IsChecked);
         IEnumerable<RoomLevelVM> selectedRoomLevels = RoomLevels.Where(x => x.IsChecked);
 
-        List<ElementFilter> orFilters = [];
+        IList<ElementFilter> orFilters = [];
 
         orFilters = GetLogicalFilter(orFilters, selectedRoomNames);
         orFilters = GetLogicalFilter(orFilters, selectedRoomDepartments);
         orFilters = GetLogicalFilter(orFilters, selectedRoomLevels);
 
-        List<Room> selectedRooms = _revitRepository.GetRoomsByFilters(orFilters);
+        IList<Room> selectedRooms = _revitRepository.GetRoomsByFilters(orFilters);
 
         FinishingInProject allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
 
@@ -141,7 +141,7 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        List<FinishingElement> finishingElements = calculator.FinishingElements;
+        IEnumerable<FinishingElement> finishingElements = calculator.FinishingElements;
         using(Transaction t = _revitRepository.Document
             .StartTransaction(_localizationService.GetLocalizedString("MainWindow.TransactionName"))) {
             foreach(var element in finishingElements) {
@@ -174,7 +174,7 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    private List<ElementFilter> GetLogicalFilter(List<ElementFilter> filter,
+    private IList<ElementFilter> GetLogicalFilter(IList<ElementFilter> filter,
                                          IEnumerable<SelectionElementVM> elements) {
         if(elements.Any()) {
             List<ElementFilter> levelParamFilters = new List<ElementFilter>();

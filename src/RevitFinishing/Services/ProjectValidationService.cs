@@ -28,7 +28,7 @@ namespace RevitFinishing.Services
         }
 
         public ErrorsViewModel CheckMainErrors(FinishingInProject allFinishing, 
-                                               List<Room> selectedRooms,
+                                               IEnumerable<Room> selectedRooms,
                                                Phase phase) {
             var mainErrors = new ErrorsViewModel(_localizationService);
 
@@ -60,8 +60,8 @@ namespace RevitFinishing.Services
             return finishingErrors;
         }
 
-        public WarningsViewModel CheckWarnings(List<Room> selectedRooms,
-                                               List<FinishingElement> finishingElements,
+        public WarningsViewModel CheckWarnings(IEnumerable<Room> selectedRooms,
+                                               IEnumerable<FinishingElement> finishingElements,
                                                Phase phase) {
             var parameterErrors = new WarningsViewModel(_localizationService);
 
