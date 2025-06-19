@@ -19,69 +19,69 @@ namespace RevitFinishing.Models
 {
     internal class ProjectChecker {
         private readonly FinishingChecker _finishingChecker;
-        private readonly Phase _phase;
         private readonly ILocalizationService _localizationService;
 
-        public ProjectChecker(Phase phase, ILocalizationService localizationService) {
-            _phase = phase;
+        public ProjectChecker(ILocalizationService localizationService) {
             _localizationService = localizationService;
 
-            _finishingChecker = new FinishingChecker(phase, _localizationService);
+            _finishingChecker = new FinishingChecker(_localizationService);
         }
 
         public ErrorsViewModel CheckMainErrors(FinishingInProject allFinishing, 
-                                               List<Room> selectedRooms) {
+                                               List<Room> selectedRooms,
+                                               Phase phase) {
             ErrorsViewModel mainErrors = new ErrorsViewModel(_localizationService);
 
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.NoFinishing"),
-                ErrorElements = [.. _finishingChecker.CheckPhaseContainsFinishing(allFinishing)]
+                ErrorElements = [.. _finishingChecker.CheckPhaseContainsFinishing(allFinishing, phase)]
             });
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.NoBoundaries"),
-                ErrorElements = [.. _finishingChecker.CheckFinishingByRoomBounding(allFinishing)]
+                ErrorElements = [.. _finishingChecker.CheckFinishingByRoomBounding(allFinishing, phase)]
             });
             string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam"),
-                ErrorElements = [.. _finishingChecker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam)]
+                ErrorElements = [.. _finishingChecker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam, phase)]
             });
 
             return mainErrors;
         }
 
-        public ErrorsViewModel CheckFinishingErrors(FinishingCalculator calculator) {
+        public ErrorsViewModel CheckFinishingErrors(FinishingCalculator calculator, Phase phase) {
             ErrorsViewModel finishingErrors = new ErrorsViewModel(_localizationService);
 
             finishingErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.DifPhases"),
-                ErrorElements = [.. _finishingChecker.CheckFinishingByRoom(calculator.FinishingElements)]
+                ErrorElements = [.. _finishingChecker.CheckFinishingByRoom(calculator.FinishingElements, phase)]
             });
 
             return finishingErrors;
         }
 
         public WarningsViewModel CheckWarnings(List<Room> selectedRooms,
-                                               List<FinishingElement> finishingElements) {
+                                               List<FinishingElement> finishingElements,
+                                               Phase phase) {
             WarningsViewModel parameterErrors = new WarningsViewModel(_localizationService);
 
             string numberParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER);
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
                 Description = 
                     $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{numberParamName}\"",
-                ErrorElements = [.. _finishingChecker.CheckRoomsByParameter(selectedRooms, numberParamName)]
+                ErrorElements = [.. _finishingChecker.CheckRoomsByParameter(selectedRooms, numberParamName, phase)]
             });
             string nameParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME);
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
                 Description = 
                     $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{nameParamName}\"",
-                ErrorElements = [.. _finishingChecker.CheckRoomsByParameter(selectedRooms, nameParamName)]
+                ErrorElements = [.. _finishingChecker.CheckRoomsByParameter(selectedRooms, nameParamName, phase)]
             });
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.CustomFamilies"),
                 ErrorElements = [.. finishingElements
                     .Where(x => x.IsCustomFamily)
-                    .Select(x => new NoticeElementViewModel(x.RevitElement, _phase.Name, _localizationService))]
+                    .Select(x => new NoticeElementViewModel(x.RevitElement, phase.Name, _localizationService))]
             });
 
             return parameterErrors;

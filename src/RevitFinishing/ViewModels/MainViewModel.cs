@@ -29,6 +29,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly ErrorWindowService _errorWindowService;
+    private readonly ProjectChecker _projectChecker;
 
     private readonly List<Phase> _phases;
     private Phase _selectedPhase;
@@ -48,11 +49,13 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(PluginConfig pluginConfig,
                          RevitRepository revitRepository,
                          ILocalizationService localizationService,
+                         ProjectChecker projectChecker,
                          ErrorWindowService errorWindowService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _errorWindowService = errorWindowService;
+        _projectChecker = projectChecker;
 
         ProjectSettingsLoader settings = 
             new ProjectSettingsLoader(_revitRepository.Application, _revitRepository.Document);
@@ -118,16 +121,15 @@ internal class MainViewModel : BaseViewModel {
             RoomLevels.Where(x => x.IsChecked));
 
         FinishingInProject allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
-        ProjectChecker projectChecker = new ProjectChecker(SelectedPhase, _localizationService);
 
-        ErrorsViewModel mainErrors = projectChecker.CheckMainErrors(allFinishing, selectedRooms);
+        ErrorsViewModel mainErrors = _projectChecker.CheckMainErrors(allFinishing, selectedRooms, _selectedPhase);
         if(_errorWindowService.ShowNoticeWindow(mainErrors)) {
             return;
         }
 
         FinishingCalculator calculator = new FinishingCalculator(selectedRooms, allFinishing);
 
-        ErrorsViewModel finishingErrors = projectChecker.CheckFinishingErrors(calculator);
+        ErrorsViewModel finishingErrors = _projectChecker.CheckFinishingErrors(calculator, _selectedPhase);
         if(_errorWindowService.ShowNoticeWindow(finishingErrors)) {
             return;
         }
@@ -142,7 +144,8 @@ internal class MainViewModel : BaseViewModel {
             t.Commit();
         }
 
-        WarningsViewModel parameterErrors = projectChecker.CheckWarnings(selectedRooms, finishingElements);
+        WarningsViewModel parameterErrors = _projectChecker
+            .CheckWarnings(selectedRooms, finishingElements, _selectedPhase);
         _errorWindowService.ShowNoticeWindow(parameterErrors);
 
         SaveConfig();

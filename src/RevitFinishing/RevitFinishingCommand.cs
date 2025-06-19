@@ -59,6 +59,10 @@ public class RevitFinishingCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.Bind<ProjectChecker>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));

@@ -15,53 +15,49 @@ using RevitFinishing.ViewModels;
 namespace RevitFinishing.Models.Finishing
 {
     internal class FinishingChecker {
-        private readonly Phase _phase;
-        private readonly string _phaseName;
         private readonly ILocalizationService _localizationService;
 
-        public FinishingChecker(Phase phase, ILocalizationService localizationService) {
-            _phase = phase;
-            _phaseName = phase.Name;
+        public FinishingChecker(ILocalizationService localizationService) {
             _localizationService = localizationService;
         }
 
-        public List<NoticeElementViewModel> CheckPhaseContainsFinishing(FinishingInProject finishings) {
+        public List<NoticeElementViewModel> CheckPhaseContainsFinishing(FinishingInProject finishings, Phase phase) {
             if(!finishings.AllFinishing.Any()) {
                 return new List<NoticeElementViewModel>() {
-                    new NoticeElementViewModel(_phase, _phaseName, _localizationService)
+                    new NoticeElementViewModel(phase, phase.Name, _localizationService)
                 };
             }
 
             return new List<NoticeElementViewModel>();
         }
 
-        public List<NoticeElementViewModel> CheckFinishingByRoomBounding(FinishingInProject finishings) {
+        public List<NoticeElementViewModel> CheckFinishingByRoomBounding(FinishingInProject finishings, Phase phase) {
             return finishings
                 .AllFinishing
                 .Where(x => x.GetParamValueOrDefault(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING, 0) == 1)
-                .Select(x => new NoticeElementViewModel(x, _phaseName, _localizationService))
+                .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
                 .ToList();
         }
 
-        public List<NoticeElementViewModel> CheckRoomsByKeyParameter(IEnumerable<Element> rooms, string paramName) {
+        public List<NoticeElementViewModel> CheckRoomsByKeyParameter(IEnumerable<Element> rooms, string paramName, Phase phase) {
             return rooms
                 .Where(x => x.GetParam(paramName).AsElementId() == ElementId.InvalidElementId)
-                .Select(x => new NoticeElementViewModel(x, _phaseName, _localizationService))
+                .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
                 .ToList();
         }
 
-        public List<NoticeElementViewModel> CheckRoomsByParameter(IEnumerable<Element> rooms, string paramName) {
+        public List<NoticeElementViewModel> CheckRoomsByParameter(IEnumerable<Element> rooms, string paramName, Phase phase) {
             return rooms
                 .Where(x => string.IsNullOrEmpty(x.GetParamValue<string>(paramName)))
-                .Select(x => new NoticeElementViewModel(x, _phaseName, _localizationService))
+                .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
                 .ToList();
         }
 
-        public List<NoticeElementViewModel> CheckFinishingByRoom(IEnumerable<FinishingElement> finishings) {
+        public List<NoticeElementViewModel> CheckFinishingByRoom(IEnumerable<FinishingElement> finishings, Phase phase) {
             return finishings
                 .Where(x => !x.CheckFinishingTypes())
                 .Select(x => x.RevitElement)
-                .Select(x => new NoticeElementViewModel(x, _phaseName, _localizationService))
+                .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
                 .ToList();
         }
     }
