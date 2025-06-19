@@ -12,11 +12,13 @@ namespace RevitRoughFinishingDesign.Models {
         private readonly RevitRepository _revitRepository;
         private readonly Room _room;
         private readonly Element _wallElement;
+        private string _lineName;
         private XYZ _directionToRoom;
         private Solid _wallSolid;
         private XYZ _wallCentroidPoint;
         private ElementId _wallTypeId;
         private Line _wallLine;
+
 
         /// <summary>
         /// Шаг создания точек для проверки направления
@@ -42,6 +44,25 @@ namespace RevitRoughFinishingDesign.Models {
                 return _wallSolid;
             }
         }
+
+        public string GetLineName() {
+            if(_lineName != null) {
+                return _lineName;
+            } else {
+
+                ElementId typeId = _wallElement.GetTypeId();
+                Element typeElement = _revitRepository.Document.GetElement(typeId);
+                string fileName = typeElement.get_Parameter(BuiltInParameter.ALL_MODEL_TYPE_IMAGE)?.AsValueString();
+
+                if(string.IsNullOrWhiteSpace(fileName))
+                    return string.Empty;
+
+                int dotIndex = fileName.LastIndexOf('.');
+                _lineName = (dotIndex > 0) ? fileName.Substring(0, dotIndex) : fileName;
+                return _lineName;
+            }
+        }
+
 
         public ElementId GetWallTypeId() {
             if(_wallTypeId != null) {

@@ -26,5 +26,6 @@ namespace RevitRoughFinishingDesign.Models {
         public string SaveProperty { get; set; }
         public List<PairModel> PairModels { get; set; }
         public double? LineOffset { get; set; } = null; // Смещение линии для оформления
+        public bool IsAutomated { get; set; } // Автоматический анализ линий по изображениям
     }
 }

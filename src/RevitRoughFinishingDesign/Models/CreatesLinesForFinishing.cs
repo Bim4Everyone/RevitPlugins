@@ -25,12 +25,16 @@ namespace RevitRoughFinishingDesign.Models {
                     wallDesignData,
                     offset);
                 foreach(Line correctLine in correctLines) {
-                    linesForDraw.Add(new DetailLineForFinishing(correctLine) {
-                        LayerNumber = wallDesignData.LayerNumber,
-                        Offset = offset,
-                        DistanceFromBorder = wallDesignData.DistanceFromBorder,
-                        LineStyleId = wallDesignData.LineStyleId
-                    });
+                    if(wallDesignData.LineStyleId != ElementId.InvalidElementId &&
+                        wallDesignData.LineStyleId != null) {
+
+                        linesForDraw.Add(new DetailLineForFinishing(correctLine) {
+                            LayerNumber = wallDesignData.LayerNumber,
+                            Offset = offset,
+                            DistanceFromBorder = wallDesignData.DistanceFromBorder,
+                            LineStyleId = wallDesignData.LineStyleId
+                        });
+                    }
                 }
             }
             linesForDraw = ConnectLines(linesForDraw);
@@ -93,7 +97,9 @@ namespace RevitRoughFinishingDesign.Models {
             IList<DetailLineForFinishing> groupedLines) {
             XYZ currentDirection = currentLine.LineForFinishing.Direction.Normalize();
             XYZ intersectPoint = null;
-            double correctOffset = currentLine.Offset;
+
+            double correctOffset = currentLine.Offset * (currentLine.LayerNumber + 1);
+            //double correctOffset = currentLine.Offset;
             Line currentExtendedLine = ExtendLine(currentLine.LineForFinishing, correctOffset);
             IList<XYZ> intersectionPoints = new List<XYZ>();
             foreach(DetailLineForFinishing line in groupedLines) {

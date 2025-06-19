@@ -3,8 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
-
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -52,7 +50,16 @@ namespace RevitRoughFinishingDesign.ViewModels {
                 OnPropertyChanged(nameof(ErrorText));
             }
         }
-
+        public bool IsEditable => !IsAutomated;
+        private bool _isAutomated;
+        public bool IsAutomated {
+            get => _isAutomated;
+            set {
+                RaiseAndSetIfChanged(ref _isAutomated, value);
+                OnPropertyChanged(nameof(ErrorText));
+                OnPropertyChanged(nameof(IsEditable));
+            }
+        }
         private ObservableCollection<WallTypeViewModel> _wallTypes = new ObservableCollection<WallTypeViewModel>();
         public ObservableCollection<WallTypeViewModel> WallTypes {
             get => _wallTypes;
@@ -106,7 +113,7 @@ namespace RevitRoughFinishingDesign.ViewModels {
         private void AcceptView() {
             SaveConfig();
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-            using(var transaction = _revitRepository.Document.StartTransaction("Тест")) {
+            using(var transaction = _revitRepository.Document.StartTransaction("Оформление черновой отделки")) {
                 _createsLinesForFinishing.DrawLines(setting);
                 transaction.Commit();
             }
@@ -125,6 +132,7 @@ namespace RevitRoughFinishingDesign.ViewModels {
             RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
             LineOffset = setting?.LineOffset.GetValueOrDefault(0).ToString() ?? "0";
             var pairModels = setting?.PairModels ?? new List<PairModel>();
+            IsAutomated = setting?.IsAutomated ?? false;
             WallTypes = new ObservableCollection<WallTypeViewModel>(
                 _revitRepository.GetWallTypesInsideRoomsOnActiveView()
                 .Select(fs => new WallTypeViewModel(fs))
@@ -134,34 +142,33 @@ namespace RevitRoughFinishingDesign.ViewModels {
                 _revitRepository.GetAllLineStyles()
                 .Select(fs => new LineStyleViewModel(fs))
                 .OrderBy(fs => fs.Name));
-
+            LineStyles.Insert(0, LineStyleViewModel.None);
             Items = GetRevitTypesData(WallTypes, LineStyles, pairModels);
 
             OnPropertyChanged(nameof(ErrorText));
         }
 
         private ObservableCollection<PairViewModel> GetRevitTypesData(
-            ICollection<WallTypeViewModel> allWallTypes,
-            ICollection<LineStyleViewModel> allLineStyles,
-            ICollection<PairModel> pairModels) {
+                ICollection<WallTypeViewModel> allWallTypes,
+                ICollection<LineStyleViewModel> allLineStyles,
+                ICollection<PairModel> pairModels) {
+            var noneStyle = allLineStyles.FirstOrDefault(ls => ls.IsNone) ?? LineStyleViewModel.None;
 
             ObservableCollection<PairViewModel> items = new ObservableCollection<PairViewModel>(
-            allWallTypes.Zip(allLineStyles, (wt, ls) => new PairViewModel(wt, ls)));
-            ICollection<ElementId> idCollection = pairModels
-                .Select(p => p.WallTypeId)
-                .ToArray();
+                allWallTypes.Select(wt => new PairViewModel(wt, noneStyle)));
 
             foreach(PairViewModel item in items) {
                 PairModel pairModel = pairModels.FirstOrDefault(pm => pm.WallTypeId == item.WallTypeVM.WallTypeId);
                 if(pairModel != null) {
-                    LineStyleViewModel lineStyle =
-                        allLineStyles.FirstOrDefault(ls => ls.GraphicStyleId == pairModel.LineStyleId);
-                    if(lineStyle != null
-                        && lineStyle.GraphicStyleId != item.LineStyleVM.GraphicStyleId) {
+                    LineStyleViewModel lineStyle = allLineStyles
+                        .FirstOrDefault(ls => ls.GraphicStyleId == pairModel.LineStyleId);
+
+                    if(lineStyle != null && lineStyle.GraphicStyleId != item.LineStyleVM.GraphicStyleId) {
                         item.LineStyleVM = lineStyle;
                     }
                 }
             }
+
             return items;
         }
 
@@ -174,6 +181,7 @@ namespace RevitRoughFinishingDesign.ViewModels {
             setting.PairModels = Items
                 .Select(p => new PairModel(p.WallTypeVM.WallTypeId, p.LineStyleVM.GraphicStyleId))
                 .ToList();
+            setting.IsAutomated = IsAutomated;
             _pluginConfig.SaveProjectConfig();
         }
     }

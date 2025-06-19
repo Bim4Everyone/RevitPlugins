@@ -46,7 +46,8 @@
                             VerticalAlignment="Center"
                             Width="350"
                             Margin="5"
-                            Text="{Binding WallTypeVM}" />
+                            Text="{Binding WallTypeVM}"
+                            IsEnabled="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=Window}}" />
                         <ComboBox
                             VerticalAlignment="Center"
                             Height="25"
@@ -54,7 +55,8 @@
                             Margin="5"
                             VerticalContentAlignment="Center"
                             ItemsSource="{Binding DataContext.LineStyles, ElementName=_this}"
-                            SelectedItem="{Binding LineStyleVM}" />
+                            SelectedItem="{Binding LineStyleVM}"
+                            IsEnabled="{Binding DataContext.IsEditable, RelativeSource={RelativeSource AncestorType=Window}}" />
                     </DockPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -77,6 +79,15 @@
                 HorizontalAlignment="Center"
                 Text="{Binding LineOffset,
         UpdateSourceTrigger=PropertyChanged}" />
+            <CheckBox
+                VerticalAlignment="Center"
+                Margin='100 0 0 0'
+                IsChecked="{Binding IsAutomated, Mode=TwoWay}" />
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="5"
+                Text="Автоматический режим" />
         </StackPanel>
 
         <StackPanel

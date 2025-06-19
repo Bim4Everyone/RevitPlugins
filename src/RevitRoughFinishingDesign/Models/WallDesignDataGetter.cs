@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,12 +24,19 @@ namespace RevitRoughFinishingDesign.Models {
 
             // Сбор всех данных по стенам из всех комнат
             foreach(Room room in rooms) {
-                RevitRoomHandler roomHandler = new RevitRoomHandler(_revitRepository, room, _curveLoopsSimplifier);
-                ICollection<ElementId> wallsIdsInRoom = roomHandler.GetWallsFromRoom();
+                try {
 
-                foreach(ElementId wallId in wallsIdsInRoom) {
-                    WallDesignData wallDesignData = GetWallDesignData(roomHandler, settings, wallId);
-                    wallDesignDatas.Add(wallDesignData);
+                    RevitRoomHandler roomHandler = new RevitRoomHandler(_revitRepository, room, _curveLoopsSimplifier);
+                    ICollection<ElementId> wallsIdsInRoom = roomHandler.GetWallsFromRoom();
+
+                    foreach(ElementId wallId in wallsIdsInRoom) {
+                        WallDesignData wallDesignData = GetWallDesignData(roomHandler, settings, wallId);
+                        if(wallDesignData != null) {
+                            wallDesignDatas.Add(wallDesignData);
+                        }
+                    }
+                } catch(Exception ex) {
+                    string message = ex.Message;
                 }
             }
 
@@ -53,6 +61,7 @@ namespace RevitRoughFinishingDesign.Models {
 
             return resultDesignDatas;
         }
+
         public ElementId GetLineStyleId(RevitSettings settings, ElementId wallTypeId) {
             List<PairModel> pairModels = settings?.PairModels;
             ElementId lineStyle = ElementId.InvalidElementId;
@@ -65,6 +74,15 @@ namespace RevitRoughFinishingDesign.Models {
             return lineStyle;
         }
 
+        public ElementId GetLineStyleIdAutomated(string lineName) {
+            IList<GraphicsStyle> allLineStyles = _revitRepository.GetAllLineStyles();
+            foreach(GraphicsStyle lineStyle in allLineStyles) {
+                if(lineStyle.Name == lineName)
+                    return lineStyle.Id;
+            }
+            return ElementId.InvalidElementId;
+        }
+
         public WallDesignData GetWallDesignData(
             RevitRoomHandler roomHandler,
             RevitSettings settings,
@@ -74,7 +92,12 @@ namespace RevitRoughFinishingDesign.Models {
             IList<RoomBorder> roomBorders = roomHandler.GetRoomBorders();
             Wall wall = _revitRepository.Document.GetElement(wallId) as Wall;
             RevitWallHandler wallHandler = new RevitWallHandler(_revitRepository, roomHandler.RevitRoom, wall);
-            ElementId lineStyleId = GetLineStyleId(settings, wallHandler.GetWallTypeId());
+            ElementId lineStyleId = ElementId.InvalidElementId;
+            if(settings.IsAutomated) {
+                lineStyleId = GetLineStyleIdAutomated(wallHandler.GetLineName());
+            } else {
+                lineStyleId = GetLineStyleId(settings, wallHandler.GetWallTypeId());
+            }
             Curve wallLine = wallHandler.GetWallLineOnActiveView();
             RoomBorder closestBorderOfRoom = _revitRepository.GetClosestCurveFromCurveList(wallLine, roomBorders);
             IList<Line> wallLinesForDraw = wallHandler.GetWallLinesForDraw();
