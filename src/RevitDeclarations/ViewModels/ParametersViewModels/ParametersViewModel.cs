@@ -20,7 +20,7 @@ namespace RevitDeclarations.ViewModels {
 
         private IReadOnlyCollection<Parameter> _textParameters;
         private IReadOnlyCollection<Parameter> _doubleParameters;
-        private IReadOnlyCollection<Parameter> _intParameters;
+        private IReadOnlyCollection<Parameter> _intAndCurrencyParameters;
 
         private Parameter _selectedFilterRoomsParam;
         private string _filterRoomsValue;
@@ -46,12 +46,7 @@ namespace RevitDeclarations.ViewModels {
 
             SelectedDocument = RevitDocuments.FirstOrDefault();
 
-            _textParameters = _revitRepository
-                .GetRoomsParamsByStorageType(SelectedDocument, StorageType.String);
-            _doubleParameters = _revitRepository
-                .GetRoomsParamsByStorageType(SelectedDocument, StorageType.Double);
-            _intParameters = _revitRepository
-                .GetRoomsParamsByStorageType(SelectedDocument, StorageType.Integer);
+            UpdateParameters();
 
             _filterRoomsValues = new ObservableCollection<FilterRoomValueVM>();
 
@@ -70,20 +65,17 @@ namespace RevitDeclarations.ViewModels {
             get => _selectedDocument;
             set {
                 RaiseAndSetIfChanged(ref _selectedDocument, value);
-                _textParameters = _revitRepository
-                    .GetRoomsParamsByStorageType(SelectedDocument, StorageType.String);
-                _doubleParameters = _revitRepository
-                    .GetRoomsParamsByStorageType(SelectedDocument, StorageType.Double);
-                _intParameters = _revitRepository
-                    .GetRoomsParamsByStorageType(SelectedDocument, StorageType.Integer);
+
+                UpdateParameters();
+
                 OnPropertyChanged(nameof(TextParameters));
                 OnPropertyChanged(nameof(DoubleParameters));
-                OnPropertyChanged(nameof(IntParameters));
+                OnPropertyChanged(nameof(IntAndCurrencyParameters));
             }
         }
         public IReadOnlyCollection<Parameter> TextParameters => _textParameters;
         public IReadOnlyCollection<Parameter> DoubleParameters => _doubleParameters;
-        public IReadOnlyCollection<Parameter> IntParameters => _intParameters;
+        public IReadOnlyCollection<Parameter> IntAndCurrencyParameters => _intAndCurrencyParameters;
 
         public Parameter SelectedFilterRoomsParam {
             get => _selectedFilterRoomsParam;
@@ -183,5 +175,16 @@ namespace RevitDeclarations.ViewModels {
         public virtual void SetCompanyParamConfig(object obj) { }
 
         public virtual void SetParametersFromConfig(ProjectSettings configSettings) { }
+
+        private void UpdateParameters() {
+            _textParameters = _revitRepository
+                .GetRoomsParamsByStorageType(SelectedDocument, StorageType.String);
+            _doubleParameters = _revitRepository
+                .GetRoomsParamsByStorageType(SelectedDocument, StorageType.Double);
+            _intAndCurrencyParameters = _revitRepository
+                .GetRoomsParamsByDataType(SelectedDocument, SpecTypeId.Int.Integer)
+                .Concat(_revitRepository.GetRoomsParamsByDataType(SelectedDocument, SpecTypeId.Currency))
+                .ToList();
+        }
     }
 }

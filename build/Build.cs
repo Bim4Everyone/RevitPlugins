@@ -1,18 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-using dosymep.Nuke.RevitVersions;
-
 using Nuke.Common;
-using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
-using Nuke.Common.Tools.GitVersion;
-using Nuke.Components;
 
 using Serilog;
 
@@ -32,6 +25,8 @@ partial class Build : NukeBuild {
     protected override void OnBuildInitialized() {
         Params = new BuildParams(this);
         base.OnBuildInitialized();
+
+        Log.Information("Build Solution: {Solution}", Solution);
 
         Log.Information("Build plugin: {PluginName}", Params.PluginName);
         Log.Information("Plugin directory: {PluginDirectory}", Params.PluginDirectory);

@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.slnx",
+  "PluginName": "RevitCopyInteriorSpecs",
+  "PublishDirectory": "02.AR.extension\\АР.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/NljEX-qLWXg9/separate-by-using-blank-sheets",
+  "BundleName": "Копирование спецификаций АИ",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "02.AR.extension\\АР.tab\\Документация.panel"
+}

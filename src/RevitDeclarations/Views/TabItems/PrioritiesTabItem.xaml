@@ -60,7 +60,7 @@
         <Button
             Grid.Row="2"
             Grid.Column="0"
-            Content="Приоритеты А101"
+            Content="Корпоративные приоритеты"
             Margin="10, 5"
             Height="25"
             Command="{Binding SetDefaultConfigCommand}"/>

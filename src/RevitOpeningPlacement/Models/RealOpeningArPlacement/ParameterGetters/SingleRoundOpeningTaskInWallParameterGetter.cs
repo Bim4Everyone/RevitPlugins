@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using RevitOpeningPlacement.Models.Interfaces;
@@ -15,6 +15,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
     internal class SingleRoundOpeningTaskInWallParameterGetter : IParametersGetter {
         private readonly OpeningMepTaskIncoming _openingMepTaskIncoming;
         private readonly IPointFinder _pointFinder;
+        private readonly int _rounding;
 
 
         /// <summary>
@@ -22,12 +23,14 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
-        public SingleRoundOpeningTaskInWallParameterGetter(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder) {
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
+        public SingleRoundOpeningTaskInWallParameterGetter(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder, int rounding) {
             if(incomingTask is null) { throw new ArgumentNullException(nameof(incomingTask)); }
             if(pointFinder is null) { throw new ArgumentNullException(nameof(pointFinder)); }
 
             _openingMepTaskIncoming = incomingTask;
             _pointFinder = pointFinder;
+            _rounding = rounding;
         }
 
 
@@ -35,7 +38,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
             // габариты отверстия
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArDiameter,
-                new RoundOpeningInWallDiameterValueGetter(_openingMepTaskIncoming, _pointFinder)).GetParamValue();
+                new RoundOpeningInWallDiameterValueGetter(_openingMepTaskIncoming, _pointFinder, _rounding)).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
             var isEomValueGetter = new IsEomValueGetter(_openingMepTaskIncoming);

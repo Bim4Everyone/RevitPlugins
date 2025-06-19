@@ -42,8 +42,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, floorThicknessValueGetter).GetParamValue();
 
             //отметки отверстия
-            var bottomOffsetMmValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, floorThicknessValueGetter);
-            IValueGetter<DoubleParamValue> centerOffsetMmValueGetter = new CenterOffsetValueGetter(_pointFinder);
+            var elevationGetter = new ElevationValueGetter(_pointFinder, _clash.Element1.Document);
+            var bottomOffsetMmValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(elevationGetter, floorThicknessValueGetter);
+            IValueGetter<DoubleParamValue> centerOffsetMmValueGetter = new CenterOffsetValueGetter(elevationGetter);
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, centerOffsetMmValueGetter).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetMmValueGetter).GetParamValue();
             var offsetFeetFromLevelValueGetter = new OffsetFromLevelValueGetter(centerOffsetMmValueGetter, _levelFinder);

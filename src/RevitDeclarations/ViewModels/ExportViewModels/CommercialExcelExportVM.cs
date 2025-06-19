@@ -15,7 +15,7 @@ namespace RevitDeclarations.ViewModels {
         public override void Export(string path, IEnumerable<RoomGroup> roomGroups) {
             List<CommercialRooms> commercialRooms = roomGroups.Cast<CommercialRooms>().ToList();
             CommercialTableInfo tableInfo = new CommercialTableInfo(commercialRooms, _settings);
-            CommercialDataTable table = new CommercialDataTable(tableInfo);
+            CommercialDataTable table = new CommercialDataTable("15.3 Нежилые помещения", tableInfo);
             table.GenerateTable();
 
             ExportTable<ExcelExporter>(path, table);

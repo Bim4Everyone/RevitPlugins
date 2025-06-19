@@ -1,14 +1,12 @@
-# RevitPlugins
+# RevitPlugins (Название плагина)
 Пример Revit плагина.
 
-## Сборка проекта
-
+# Сборка проекта
 ```
 nuke compile --profile RevitPlugins
 ```
 
-## Публикация проекта
-
+# Публикация проекта
 ```
 nuke publish --profile RevitPlugins
 ```

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace RevitDeclarations.Models {
     internal class ApartmentsDataTable : DeclarationDataTable {
-        public ApartmentsDataTable(ApartmentsTableInfo tableInfo) : base(tableInfo) { 
+        public ApartmentsDataTable(string name, ApartmentsTableInfo tableInfo) : base(name,tableInfo) { 
         }
 
         protected override void FillTableHeader() {
@@ -17,7 +17,7 @@ namespace RevitDeclarations.Models {
             _headerTable.Rows[0][6] = "Номер ОКС";
             _headerTable.Rows[0][7] = "Общая площадь с пониж. коэффициентом, м²";
             _headerTable.Rows[0][8] = "Количество комнат";
-            _headerTable.Rows[0][9] = "Жилая площадь, м²";
+            _headerTable.Rows[0][9] = "Общая жилая площадь, м²";
             _headerTable.Rows[0][10] = "Высота потолков, м";
             _headerTable.Rows[0][11] = "ИД Объекта";
             _headerTable.Rows[0][12] = "Номер на площадке";
@@ -46,7 +46,7 @@ namespace RevitDeclarations.Models {
                         int columnIndex = columnNumber + k * ApartmentsTableInfo.SummerRoomCells;
                         _headerTable.Rows[0][columnIndex] = "№ Пом.";
                         _headerTable.Rows[0][columnIndex + 1] = "Наименование на планировке";
-                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name} {k + 1}, без коэф.";
+                        _headerTable.Rows[0][columnIndex + 2] = $"{priority.Name} {k + 1}, площадь без коэф.";
                         _headerTable.Rows[0][columnIndex + 3] = $"{priority.Name} {k + 1}, площадь с коэф.";
                     }
                     columnNumber += priority.MaxRoomAmount * ApartmentsTableInfo.SummerRoomCells;

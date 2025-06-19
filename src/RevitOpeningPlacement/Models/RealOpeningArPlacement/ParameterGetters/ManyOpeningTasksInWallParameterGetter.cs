@@ -19,19 +19,22 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
         private readonly Wall _wall;
         private readonly ICollection<OpeningMepTaskIncoming> _incomingTasks;
         private readonly IPointFinder _pointFinder;
+        private readonly int _rounding;
 
 
         /// <summary>
         /// Конструктор класса, предоставляющего параметры для чистового прямоугольного отверстия в стене для нескольких заданий на отверстия
         /// </summary>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
         /// <exception cref="ArgumentException">Исключение, если в коллекции меньше одного элемента</exception>
-        public ManyOpeningTasksInWallParameterGetter(Wall wall, ICollection<OpeningMepTaskIncoming> incomingTasks, IPointFinder pointFinder) {
+        public ManyOpeningTasksInWallParameterGetter(Wall wall, ICollection<OpeningMepTaskIncoming> incomingTasks, IPointFinder pointFinder, int rounding) {
             _wall = wall ?? throw new ArgumentNullException(nameof(wall));
             _incomingTasks = incomingTasks ?? throw new System.ArgumentNullException(nameof(incomingTasks));
             if(_incomingTasks.Count < 1) { throw new ArgumentException(nameof(incomingTasks)); }
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
+            _rounding = rounding;
         }
 
 
@@ -39,10 +42,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement.ParameterGetters {
             // габариты отверстия
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArHeight,
-                new RectangleOpeningInWallHeightValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray(), _pointFinder)).GetParamValue();
+                new RectangleOpeningInWallHeightValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray(), _pointFinder, _rounding)).GetParamValue();
             yield return new DoubleParameterGetter(
                 RealOpeningArPlacer.RealOpeningArWidth,
-                new RectangleOpeningInWallWidthValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray(), _wall)).GetParamValue();
+                new RectangleOpeningInWallWidthValueGetter(_incomingTasks.Cast<IOpeningTaskIncoming>().ToArray(), _wall, _rounding)).GetParamValue();
 
             // логические флаги для обозначений разделов отверстия
             var isEomValueGetter = new IsEomValueGetter(_incomingTasks);

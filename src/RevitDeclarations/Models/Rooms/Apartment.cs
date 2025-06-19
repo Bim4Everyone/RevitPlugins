@@ -52,20 +52,20 @@ namespace RevitDeclarations.Models {
         [JsonProperty("type")]
         public override string Department => _paramProvider.GetDepartment(_firstRoom, "Квартира");
         [JsonProperty("area_k")]
-        public double AreaCoef => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaCoefParam, _accuracy);
+        public double AreaCoef => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaCoefParam, _accuracyForArea);
         [JsonProperty("area_living")]
-        public double AreaLiving => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaLivingParam, _accuracy);
+        public double AreaLiving => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaLivingParam, _accuracyForArea);
         [JsonProperty("area_non_summer")]
-        public double AreaNonSummer => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaNonSumParam, _accuracy);
+        public double AreaNonSummer => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaNonSumParam, _accuracyForArea);
         [JsonProperty("room_size")]
-        public int RoomsAmount => _firstRoom.GetIntParamValue(_settings.RoomsAmountParam);
+        public double RoomsAmount => _firstRoom.GetIntAndCurrencyParamValue(_settings.RoomsAmountParam);
         [JsonProperty("building_number")]
         public string BuildingNumber => _firstRoom.GetTextParamValue(_settings.BuildingNumberParam);
         [JsonProperty("construction_works")]
         public string ConstrWorksNumber => _firstRoom.GetTextParamValue(_settings.ConstrWorksNumberParam);
 
         [JsonProperty("ceiling_height")]
-        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracy);
+        public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracyForLength);
 
         [JsonIgnore]
         public string UtpTwoBaths => _utpTwoBaths;
@@ -129,7 +129,7 @@ namespace RevitDeclarations.Models {
         // Все помещения в одной квартире должны иметь одинаковые значения.
         public bool CheckEqualityOfRoomAreas() {
             int amountOfAreas = _rooms
-                .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy))
+                .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracyForArea))
                 .Distinct()
                 .Count();
 
@@ -138,7 +138,7 @@ namespace RevitDeclarations.Models {
             }
 
             int amountOfAreasCoef = _rooms
-                .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaCoefParam, _accuracy))
+                .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaCoefParam, _accuracyForArea))
                 .Distinct()
                 .Count();
 
@@ -147,7 +147,7 @@ namespace RevitDeclarations.Models {
             }
 
             int amountOfAreasLiving = _rooms
-                .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaLivingParam, _accuracy))
+                .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaLivingParam, _accuracyForArea))
                 .Distinct()
                 .Count();
 
@@ -156,7 +156,7 @@ namespace RevitDeclarations.Models {
             }
 
             int amountOfAreasNonSum = _rooms
-                .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaNonSumParam, _accuracy))
+                .Select(x => x.GetAreaParamValue(_settings.ApartmentAreaNonSumParam, _accuracyForArea))
                 .Distinct()
                 .Count();
 

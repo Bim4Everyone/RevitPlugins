@@ -6,291 +6,529 @@ using dosymep.Revit;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models.PylonSheetNView {
-    public class PylonViewSectionCreator {
-        internal PylonViewSectionCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
-            ViewModel = mvm;
-            Repository = repository;
-            SheetInfo = pylonSheetInfo;
+namespace RevitPylonDocumentation.Models.PylonSheetNView;
+public class PylonViewSectionCreator {
+    internal PylonViewSectionCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+        ViewModel = mvm;
+        Repository = repository;
+        SheetInfo = pylonSheetInfo;
+    }
+
+    internal MainViewModel ViewModel { get; set; }
+    internal RevitRepository Repository { get; set; }
+    internal PylonSheetInfo SheetInfo { get; set; }
+
+
+    public bool TryCreateGeneralView(ViewFamilyType selectedViewFamilyType) {
+        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+        var elemForWork = SheetInfo.HostElems[0];
+
+        if(elemForWork is null) { return false; }
+
+        double hostLength = 0;
+        double hostWidth = 0;
+        XYZ midlePoint = null;
+        XYZ hostVector = null;
+
+        // Заполняем нужные поля для объекта Transform
+        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
+
+        // Формируем данные для объекта Transform
+        var originPoint = midlePoint;
+        var hostDir = hostVector.Normalize();
+        var upDir = XYZ.BasisZ;
+        var viewDir = hostDir.CrossProduct(upDir);
+
+        // Передаем данные для объекта Transform
+        var t = Transform.Identity;
+        t.Origin = originPoint;
+        t.BasisX = hostDir;
+        t.BasisY = upDir;
+        t.BasisZ = viewDir;
+
+        var bb = elemForWork.get_BoundingBox(null);
+        double minZ = bb.Min.Z;
+        double maxZ = bb.Max.Z;
+
+        double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+        double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+        double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+
+        var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
+        var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostWidth);
+
+        var sectionBox = new BoundingBoxXYZ {
+            Transform = t,
+            Min = sectionBoxMin,
+            Max = sectionBoxMax
+        };
+
+        ViewSection viewSection = null;
+        try {
+            viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
+            if(viewSection != null) {
+                viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewSuffix;
+                if(ViewModel.SelectedGeneralViewTemplate != null) {
+                    viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
+                }
+            }
+        } catch(Exception) {
+            if(viewSection != null) {
+                Repository.Document.Delete(viewSection.Id);
+            }
+            return false;
         }
 
-        internal MainViewModel ViewModel { get; set; }
-        internal RevitRepository Repository { get; set; }
-        internal PylonSheetInfo SheetInfo { get; set; }
+        viewSection.CropBoxVisible = false;
+        SheetInfo.GeneralView.ViewElement = viewSection;
+        return true;
+    }
 
 
-        public bool TryCreateGeneralView(ViewFamilyType selectedViewFamilyType) {
-            // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            int count = 0;
-            Element elemForWork = null;
-            foreach(Element elem in SheetInfo.HostElems) {
-                elemForWork = elem;
-                count++;
-            }
+    public bool TryCreateGeneralRebarView(ViewFamilyType selectedViewFamilyType) {
+        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+        var elemForWork = SheetInfo.HostElems[0];
 
-            if(elemForWork is null) { return false; }
+        if(elemForWork is null) { return false; }
 
-            double hostLength = 0;
-            double hostWidth = 0;
-            XYZ midlePoint = null;
-            XYZ hostVector = null;
+        double hostLength = 0;
+        double hostWidth = 0;
+        XYZ midlePoint = null;
+        XYZ hostVector = null;
 
-            // Заполняем нужные поля для объекта Transform
-            if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
+        // Заполняем нужные поля для объекта Transform
+        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
 
-            // Формируем данные для объекта Transform
-            XYZ originPoint = midlePoint;
-            XYZ hostDir = hostVector.Normalize();
-            XYZ upDir = XYZ.BasisZ;
-            XYZ viewDir = hostDir.CrossProduct(upDir);
+        // Формируем данные для объекта Transform
+        var originPoint = midlePoint;
+        var hostDir = hostVector.Normalize();
+        var upDir = XYZ.BasisZ;
+        var viewDir = hostDir.CrossProduct(upDir);
 
-            // Передаем данные для объекта Transform
-            Transform t = Transform.Identity;
-            t.Origin = originPoint;
-            t.BasisX = hostDir;
-            t.BasisY = upDir;
-            t.BasisZ = viewDir;
+        // Передаем данные для объекта Transform
+        var t = Transform.Identity;
+        t.Origin = originPoint;
+        t.BasisX = hostDir;
+        t.BasisY = upDir;
+        t.BasisZ = viewDir;
 
-            BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
-            double minZ = bb.Min.Z;
-            double maxZ = bb.Max.Z;
+        var bb = elemForWork.get_BoundingBox(null);
+        double minZ = bb.Min.Z;
+        double maxZ = bb.Max.Z;
 
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
-            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
-            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+        double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+        double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+        double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
-            XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
-            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostWidth);
+        var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
+        var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostWidth);
 
-            BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
-            sectionBox.Transform = t;
-            sectionBox.Min = sectionBoxMin;
-            sectionBox.Max = sectionBoxMax;
+        var sectionBox = new BoundingBoxXYZ {
+            Transform = t,
+            Min = sectionBoxMin,
+            Max = sectionBoxMax
+        };
 
-            ViewSection viewSection = null;
-            try {
-                viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
-                if(viewSection != null) {
-                    viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewSuffix;
-                    if(ViewModel.SelectedGeneralViewTemplate != null) {
-                        viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
-                    }
+        ViewSection viewSection = null;
+        try {
+            viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
+            if(viewSection != null) {
+                viewSection.Name =
+                    ViewModel.ViewSectionSettings.GeneralRebarViewPrefix
+                    + SheetInfo.PylonKeyName
+                    + ViewModel.ViewSectionSettings.GeneralRebarViewSuffix;
+                if(ViewModel.SelectedGeneralRebarViewTemplate != null) {
+                    viewSection.ViewTemplateId = ViewModel.SelectedGeneralRebarViewTemplate.Id;
                 }
-            } catch(Exception) {
-                if(viewSection != null) {
-                    Repository.Document.Delete(viewSection.Id);
-                }
-                return false;
             }
-
-            SheetInfo.GeneralView.ViewElement = viewSection;
-            return true;
+        } catch(Exception) {
+            if(viewSection != null) {
+                Repository.Document.Delete(viewSection.Id);
+            }
+            return false;
         }
 
+        viewSection.CropBoxVisible = false;
+        SheetInfo.GeneralRebarView.ViewElement = viewSection;
+        return true;
+    }
 
-        public bool TryCreateGeneralPerpendicularView(ViewFamilyType selectedViewFamilyType) {
-            // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            int count = 0;
-            Element elemForWork = null;
-            foreach(Element elem in SheetInfo.HostElems) {
-                elemForWork = elem;
-                count++;
-            }
 
-            if(elemForWork is null) { return false; }
+    public bool TryCreateGeneralPerpendicularView(ViewFamilyType selectedViewFamilyType) {
+        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+        var elemForWork = SheetInfo.HostElems[0];
 
-            double hostLength = 0;
-            double hostWidth = 0;
-            XYZ midlePoint = null;
-            XYZ hostVector = null;
+        if(elemForWork is null) { return false; }
 
-            // Заполняем нужные для объекта Transform поля
-            if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
+        double hostLength = 0;
+        double hostWidth = 0;
+        XYZ midlePoint = null;
+        XYZ hostVector = null;
 
-            // Формируем данные для объекта Transform
-            XYZ originPoint = midlePoint;
-            XYZ upDir = XYZ.BasisZ;
-            XYZ viewDir = hostVector.Normalize();
-            XYZ rightDir = upDir.CrossProduct(viewDir);
+        // Заполняем нужные для объекта Transform поля
+        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
 
-            // Передаем данные для объекта Transform
-            Transform t = Transform.Identity;
-            t.Origin = originPoint;
-            t.BasisX = rightDir;
-            t.BasisY = upDir;
-            t.BasisZ = viewDir;
+        // Формируем данные для объекта Transform
+        var originPoint = midlePoint;
+        var upDir = XYZ.BasisZ;
+        var viewDir = hostVector.Normalize();
+        var rightDir = upDir.CrossProduct(viewDir);
 
-            BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
-            double minZ = bb.Min.Z;
-            double maxZ = bb.Max.Z;
+        // Передаем данные для объекта Transform
+        var t = Transform.Identity;
+        t.Origin = originPoint;
+        t.BasisX = rightDir;
+        t.BasisY = upDir;
+        t.BasisZ = viewDir;
 
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
-            double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
-            double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+        var bb = elemForWork.get_BoundingBox(null);
+        double minZ = bb.Min.Z;
+        double maxZ = bb.Max.Z;
 
-            XYZ sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.4);
-            XYZ sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostLength * 0.4);
+        double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+        double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+        double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
-            BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
-            sectionBox.Transform = t;
-            sectionBox.Min = sectionBoxMin;
-            sectionBox.Max = sectionBoxMax;
+        var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
+        var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0);
 
-            ViewSection viewSection = null;
-            try {
-                viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
-                if(viewSection != null) {
-                    viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPerpendicularPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewPerpendicularSuffix;
-                    if(ViewModel.SelectedGeneralViewTemplate != null) {
-                        viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
-                    }
+        var sectionBox = new BoundingBoxXYZ {
+            Transform = t,
+            Min = sectionBoxMin,
+            Max = sectionBoxMax
+        };
+
+        ViewSection viewSection = null;
+        try {
+            viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
+            if(viewSection != null) {
+                viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPerpendicularPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewPerpendicularSuffix;
+                if(ViewModel.SelectedGeneralViewTemplate != null) {
+                    viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
                 }
-            } catch(Exception) {
-                if(viewSection != null) {
-                    Repository.Document.Delete(viewSection.Id);
-                }
-                return false;
             }
-            SheetInfo.GeneralViewPerpendicular.ViewElement = viewSection;
-            return true;
+        } catch(Exception) {
+            if(viewSection != null) {
+                Repository.Document.Delete(viewSection.Id);
+            }
+            return false;
         }
 
+        viewSection.CropBoxVisible = false;
+        SheetInfo.GeneralViewPerpendicular.ViewElement = viewSection;
+        return true;
+    }
 
-        public bool TryCreateTransverseView(ViewFamilyType selectedViewFamilyType, int transverseViewNum) {
-            // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-            int count = 0;
-            Element elemForWork = null;
-            foreach(Element elem in SheetInfo.HostElems) {
-                elemForWork = elem;
-                count++;
+
+    public bool TryCreateGeneralRebarPerpendicularView(ViewFamilyType selectedViewFamilyType) {
+        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+        var elemForWork = SheetInfo.HostElems[0];
+
+        if(elemForWork is null) { return false; }
+
+        double hostLength = 0;
+        double hostWidth = 0;
+        XYZ midlePoint = null;
+        XYZ hostVector = null;
+
+        // Заполняем нужные для объекта Transform поля
+        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
+
+        // Формируем данные для объекта Transform
+        var originPoint = midlePoint;
+        var upDir = XYZ.BasisZ;
+        var viewDir = hostVector.Normalize();
+        var rightDir = upDir.CrossProduct(viewDir);
+
+        // Передаем данные для объекта Transform
+        var t = Transform.Identity;
+        t.Origin = originPoint;
+        t.BasisX = rightDir;
+        t.BasisY = upDir;
+        t.BasisZ = viewDir;
+
+        var bb = elemForWork.get_BoundingBox(null);
+        double minZ = bb.Min.Z;
+        double maxZ = bb.Max.Z;
+
+        double coordinateX = hostLength * 0.5
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+        double coordinateYTop = maxZ - originPoint.Z
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+        double coordinateYBottom = minZ - originPoint.Z
+            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+
+        var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
+        var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0.2);
+
+        var sectionBox = new BoundingBoxXYZ {
+            Transform = t,
+            Min = sectionBoxMin,
+            Max = sectionBoxMax
+        };
+
+        ViewSection viewSection = null;
+        try {
+            viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
+            if(viewSection != null) {
+                viewSection.Name =
+                    ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix
+                    + SheetInfo.PylonKeyName
+                    + ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
+                if(ViewModel.SelectedGeneralRebarViewTemplate != null) {
+                    viewSection.ViewTemplateId = ViewModel.SelectedGeneralRebarViewTemplate.Id;
+                }
             }
+        } catch(Exception) {
+            if(viewSection != null) {
+                Repository.Document.Delete(viewSection.Id);
+            }
+            return false;
+        }
 
-            if(elemForWork is null) { return false; }
+        viewSection.CropBoxVisible = false;
+        SheetInfo.GeneralRebarViewPerpendicular.ViewElement = viewSection;
+        return true;
+    }
 
-            double hostLength = 0;
-            double hostWidth = 0;
-            XYZ midlePoint = null;
-            XYZ hostVector = null;
 
-            // Заполняем нужные для объекта Transform поля
-            if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
+    public bool TryCreateTransverseView(ViewFamilyType selectedViewFamilyType, int transverseViewNum) {
+        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+        var elemForWork = SheetInfo.HostElems[0];
 
-            // Формируем данные для объекта Transform
-            XYZ originPoint = midlePoint;
-            XYZ hostDir = hostVector.Normalize();
-            XYZ viewDir = XYZ.BasisZ.Negate();
-            XYZ upDir = viewDir.CrossProduct(hostDir);
+        if(elemForWork is null) { return false; }
 
-            // Передаем данные для объекта Transform
-            Transform t = Transform.Identity;
-            t.Origin = originPoint;
-            t.BasisX = hostDir;
-            t.BasisY = upDir;
-            t.BasisZ = viewDir;
+        double hostLength = 0;
+        double hostWidth = 0;
+        XYZ midlePoint = null;
+        XYZ hostVector = null;
 
-            BoundingBoxXYZ bb = elemForWork.get_BoundingBox(null);
-            double minZ = bb.Min.Z;
-            double maxZ = bb.Max.Z;
+        // Заполняем нужные для объекта Transform поля
+        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
 
-            XYZ sectionBoxMin;
-            XYZ sectionBoxMax;
-            double elevation;
-            double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
-            double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
+        // Формируем данные для объекта Transform
+        var originPoint = midlePoint;
+        var hostDir = hostVector.Normalize();
+        var viewDir = XYZ.BasisZ.Negate();
+        var upDir = viewDir.CrossProduct(hostDir);
 
-            if(transverseViewNum == 1) {
-                // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
-                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewFirstElevation);
+        // Передаем данные для объекта Transform
+        var t = Transform.Identity;
+        t.Origin = originPoint;
+        t.BasisX = hostDir;
+        t.BasisY = upDir;
+        t.BasisZ = viewDir;
 
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
-            } else if(transverseViewNum == 2) {
-                // Располагаем сечение на высоте 1/2 высоты пилона (или по пропорции, указанной пользователем)
-                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewSecondElevation);
+        var bb = elemForWork.get_BoundingBox(null);
+        double minZ = bb.Min.Z;
+        double maxZ = bb.Max.Z;
 
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
-            } else if(transverseViewNum == 3) {
-                // Располагаем сечение на высоте 5/4 высоты пилона (или по пропорции, указанной пользователем)
-                elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewThirdElevation);
+        XYZ sectionBoxMin;
+        XYZ sectionBoxMax;
+        double elevation;
+        double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
+        double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
-                sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
-                sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
+        if(transverseViewNum == 1) {
+            // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
+            elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewFirstElevation);
+
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
+        } else if(transverseViewNum == 2) {
+            // Располагаем сечение на высоте 1/2 высоты пилона (или по пропорции, указанной пользователем)
+            elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewSecondElevation);
+
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
+        } else if(transverseViewNum == 3) {
+            // Располагаем сечение на высоте 5/4 высоты пилона (или по пропорции, указанной пользователем)
+            elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewThirdElevation);
+
+            double coordinateZBottom;
+            if(elevation >= 1) {
+                coordinateZBottom = -(minZ + ((maxZ - minZ) * 0.999) - originPoint.Z);
             } else {
-                return false;
+                coordinateZBottom = -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z);
             }
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, coordinateZBottom);
+        } else {
+            return false;
+        }
 
-            BoundingBoxXYZ sectionBox = new BoundingBoxXYZ();
-            sectionBox.Transform = t;
-            sectionBox.Min = sectionBoxMin;
-            sectionBox.Max = sectionBoxMax;
+        var sectionBox = new BoundingBoxXYZ {
+            Transform = t,
+            Min = sectionBoxMin,
+            Max = sectionBoxMax
+        };
 
-            ViewSection viewSection = null;
-            try {
-                viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
-                if(viewSection != null) {
-                    if(transverseViewNum == 1) {
-                        viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewFirstPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewFirstSuffix;
-                        // Если был выбран шаблон вида, то назначаем
-                        if(ViewModel.SelectedTransverseViewTemplate != null) {
-                            viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
-                        }
-                        SheetInfo.TransverseViewFirst.ViewElement = viewSection;
-
-                    } else if(transverseViewNum == 2) {
-                        viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewSecondPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewSecondSuffix;
-                        if(ViewModel.SelectedTransverseViewTemplate != null) {
-                            viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
-                        }
-                        SheetInfo.TransverseViewSecond.ViewElement = viewSection;
-                    } else if(transverseViewNum == 3) {
-                        viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewThirdPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewThirdSuffix;
-                        if(ViewModel.SelectedTransverseViewTemplate != null) {
-                            viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
-                        }
-                        SheetInfo.TransverseViewThird.ViewElement = viewSection;
+        ViewSection viewSection = null;
+        try {
+            viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
+            if(viewSection != null) {
+                if(transverseViewNum == 1) {
+                    viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewFirstPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewFirstSuffix;
+                    // Если был выбран шаблон вида, то назначаем
+                    if(ViewModel.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
                     }
+                    SheetInfo.TransverseViewFirst.ViewElement = viewSection;
+
+                } else if(transverseViewNum == 2) {
+                    viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewSecondPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewSecondSuffix;
+                    if(ViewModel.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+                    }
+                    SheetInfo.TransverseViewSecond.ViewElement = viewSection;
+                } else if(transverseViewNum == 3) {
+                    viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewThirdPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewThirdSuffix;
+                    if(ViewModel.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
+                    }
+                    SheetInfo.TransverseViewThird.ViewElement = viewSection;
                 }
-            } catch(Exception) {
-                if(viewSection != null) {
-                    Repository.Document.Delete(viewSection.Id);
-                }
-                return false;
             }
-            return true;
+        } catch(Exception) {
+            if(viewSection != null) {
+                Repository.Document.Delete(viewSection.Id);
+            }
+            return false;
         }
 
+        viewSection.CropBoxVisible = false;
+        return true;
+    }
 
-        public bool PrepareInfoForTransform(Element elemForWork, ref XYZ midlePoint, ref XYZ hostVector, ref double hostLength, ref double hostWidth) {
-            if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns) {
-                FamilyInstance column = elemForWork as FamilyInstance;
 
-                LocationPoint locationPoint = column.Location as LocationPoint;
-                midlePoint = locationPoint.Point;
-                double rotation = locationPoint.Rotation + 90 * Math.PI / 180;
-                hostVector = Transform.CreateRotation(XYZ.BasisZ, rotation).OfVector(XYZ.BasisX);
+    public bool TryCreateTransverseRebarView(ViewFamilyType selectedViewFamilyType, int transverseRebarViewNum) {
+        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
+        var elemForWork = SheetInfo.HostElems[0];
 
-                FamilySymbol hostSymbol = column.Symbol;
-                hostLength = hostSymbol.LookupParameter(ViewModel.ProjectSettings.PylonLengthParamName).AsDouble();
-                hostWidth = hostSymbol.LookupParameter(ViewModel.ProjectSettings.PylonWidthParamName).AsDouble();
+        if(elemForWork is null) { return false; }
 
-            } else if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
-                Wall wall = elemForWork as Wall;
-                if(wall is null) { return false; }
-                LocationCurve locationCurve = wall.Location as LocationCurve;
-                Line line = locationCurve.Curve as Line;
+        double hostLength = 0;
+        double hostWidth = 0;
+        XYZ midlePoint = null;
+        XYZ hostVector = null;
 
-                if(line is null) { return false; }
+        // Заполняем нужные для объекта Transform поля
+        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
 
-                XYZ wallLineStart = line.GetEndPoint(0);
-                XYZ wallLineEnd = line.GetEndPoint(1);
-                hostVector = wallLineEnd - wallLineStart;
-                hostLength = hostVector.GetLength();
+        // Формируем данные для объекта Transform
+        var originPoint = midlePoint;
+        var hostDir = hostVector.Normalize();
+        var viewDir = XYZ.BasisZ.Negate();
+        var upDir = viewDir.CrossProduct(hostDir);
 
-                hostWidth = wall.WallType.Width;
-                midlePoint = wallLineStart + 0.5 * hostVector;
-            } else { return false; }
-            return true;
+        // Передаем данные для объекта Transform
+        var t = Transform.Identity;
+        t.Origin = originPoint;
+        t.BasisX = hostDir;
+        t.BasisY = upDir;
+        t.BasisZ = viewDir;
+
+        var bb = elemForWork.get_BoundingBox(null);
+        double minZ = bb.Min.Z;
+        double maxZ = bb.Max.Z;
+
+        XYZ sectionBoxMin;
+        XYZ sectionBoxMax;
+        //double elevation;
+        double coordinateX = hostLength * 0.5
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
+        double coordinateY = hostWidth * 0.5
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
+
+        if(transverseRebarViewNum == 1) {
+            // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
+            double viewFirstElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
+
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * viewFirstElevation - originPoint.Z));
+            // Дальняя секущая плоскость разреза будет немного выше низа опалубки пилона
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + 0.1 - originPoint.Z));
+        } else if(transverseRebarViewNum == 2) {
+            // Располагаем сечение на высоте 1/2 высоты пилона (или по пропорции, указанной пользователем)
+            double viewFirstElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
+            double viewSecondElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevation);
+
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * viewSecondElevation - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + ((maxZ - minZ) * viewFirstElevation + 0.1) - originPoint.Z));
+        } else {
+            return false;
         }
+
+        var sectionBox = new BoundingBoxXYZ {
+            Transform = t,
+            Min = sectionBoxMin,
+            Max = sectionBoxMax
+        };
+
+        ViewSection viewSection = null;
+        try {
+            viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
+            if(viewSection != null) {
+                if(transverseRebarViewNum == 1) {
+                    viewSection.Name =
+                        ViewModel.ViewSectionSettings.TransverseRebarViewFirstPrefix
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.ViewSectionSettings.TransverseRebarViewFirstSuffix;
+                    // Если был выбран шаблон вида, то назначаем
+                    if(ViewModel.SelectedTransverseRebarViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
+                    }
+                    SheetInfo.TransverseRebarViewFirst.ViewElement = viewSection;
+
+                } else if(transverseRebarViewNum == 2) {
+                    viewSection.Name =
+                        ViewModel.ViewSectionSettings.TransverseRebarViewSecondPrefix
+                        + SheetInfo.PylonKeyName
+                        + ViewModel.ViewSectionSettings.TransverseRebarViewSecondSuffix;
+                    if(ViewModel.SelectedTransverseRebarViewTemplate != null) {
+                        viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
+                    }
+                    SheetInfo.TransverseRebarViewSecond.ViewElement = viewSection;
+                }
+            }
+        } catch(Exception) {
+            if(viewSection != null) {
+                Repository.Document.Delete(viewSection.Id);
+            }
+            return false;
+        }
+
+        viewSection.CropBoxVisible = false;
+        return true;
+    }
+
+
+    public bool PrepareInfoForTransform(Element elemForWork, ref XYZ middlePoint, ref XYZ hostVector, ref double hostLength, ref double hostWidth) {
+        if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns) {
+            var column = elemForWork as FamilyInstance;
+
+            var locationPoint = column.Location as LocationPoint;
+            middlePoint = locationPoint.Point;
+            double rotation = locationPoint.Rotation + 90 * Math.PI / 180;
+            hostVector = Transform.CreateRotation(XYZ.BasisZ, rotation).OfVector(XYZ.BasisX);
+
+            var hostSymbol = column.Symbol;
+            hostLength = hostSymbol.LookupParameter(ViewModel.ProjectSettings.PylonLengthParamName).AsDouble();
+            hostWidth = hostSymbol.LookupParameter(ViewModel.ProjectSettings.PylonWidthParamName).AsDouble();
+
+        } else if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
+            if(elemForWork is not Wall wall) { return false; }
+            var locationCurve = wall.Location as LocationCurve;
+
+            if(locationCurve.Curve is not Line line) { return false; }
+
+            var wallLineStart = line.GetEndPoint(0);
+            var wallLineEnd = line.GetEndPoint(1);
+            hostVector = wallLineEnd - wallLineStart;
+            hostLength = hostVector.GetLength();
+
+            hostWidth = wall.WallType.Width;
+            middlePoint = wallLineStart + 0.5 * hostVector;
+        } else { return false; }
+        return true;
     }
 }

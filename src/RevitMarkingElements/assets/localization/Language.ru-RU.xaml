@@ -1,0 +1,27 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Маркировка элементов</system:String>
+    <system:String x:Key="MainWindow.CategoriesElements">Нумеровать категорию:</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Нумерация элементов.</system:String>
+    <system:String x:Key="MainWindow.ErrorNoElements">Необходимо выбрать линии для нумерации.</system:String>
+    <system:String x:Key="MainWindow.NumberUnmarkedElements">Нумеровать элементы, не помеченные линиями</system:String>
+    <system:String x:Key="MainWindow.RenumberMarkedElements">Перенумеровать уже нумерованные</system:String>
+    <system:String x:Key="MainWindow.MainInstruction">Необходимо выбрать линии для определения порядка нумерации.</system:String>
+    <system:String x:Key="MainWindow.ContentAbout">Начало линии определяет начало нумерации.</system:String>
+    <system:String x:Key="MainWindow.MainContent">Если линий нет, то их нужно нарисовать на виде.</system:String>
+    <system:String x:Key="MainWindow.ArrayNumberingLabel">Нумеровать все выделенные элементы</system:String>
+    <system:String x:Key="MainWindow.LineNumberingLabel">Нумеровать по линиям</system:String>
+    <system:String x:Key="MainWindow.SelectLinesButton">Выбрать линии</system:String>
+    <system:String x:Key="MainWindow.SelectNumberingType">Необходимо выбрать тип нумерации</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.FinishLineSelection">Нажмите Esc для завершения выбора линий.</system:String>
+    <system:String x:Key="MainWindow.StartNumbericFrom">Начать нумерацию с числа:</system:String>
+    <system:String x:Key="MainWindow.Finish">Применить маркировку элементов</system:String>
+    <system:String x:Key="MainWindow.Cancel">Отменить маркировку элементов</system:String>
+    
+    <system:String x:Key="GeneralSettings.ErrorNoSelectedElements">Не выбраны элементы на виде или выбранные элементы не принадлежат поддерживаемым категориям.</system:String>
+    <system:String x:Key="GeneralSettings.ErrorMessage">Ошибка</system:String>
+</ResourceDictionary>

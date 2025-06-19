@@ -335,6 +335,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -617,7 +618,30 @@
                 SelectedItem="{Binding SelectedParkingSpaceClass}"/>
 
             <Button
+                Grid.Column="0"
                 Grid.Row="14"
+                Style="{StaticResource RoundButton}">
+                <Button.ToolTip>
+                    <ToolTip
+                        Content="{StaticResource ParkingInfoParamToolTip}"
+                        Style="{StaticResource ParamToolTip}"/>
+                </Button.ToolTip>
+            </Button>
+            <TextBlock
+                Grid.Column="1"
+                Grid.Row="14"
+                Style="{StaticResource ParameterName}"
+                Text="11. Применимость:"/>
+            <ComboBox
+                Grid.Column="2"
+                Grid.Row="14"
+                Margin="10, 0"
+                ItemsSource="{Binding TextParameters}"
+                DisplayMemberPath="Definition.Name"
+                SelectedItem="{Binding SelectedParkingInfo}"/>
+
+            <Button
+                Grid.Row="15"
                 Grid.Column="0"
                 Style="{StaticResource RoundButton}">
                 <Button.ToolTip>
@@ -627,18 +651,18 @@
                 </Button.ToolTip>
             </Button>
             <TextBlock
-                Grid.Row="14"
+                Grid.Row="15"
                 Grid.Column="1"
                 Style="{StaticResource ParameterName}"
-                Text="11. Наименование помещения"/>
+                Text="12. Наименование помещения"/>
 
             <TextBlock
-                Grid.Row="15"
+                Grid.Row="16"
                 Grid.Column="1"
                 Style="{StaticResource ParameterName}"
-                Text="11.2 Для группы из нескольких помещений:"/>
+                Text="12.1 Для группы из нескольких помещений:"/>
             <ComboBox
-                Grid.Row="15"
+                Grid.Row="16"
                 Grid.Column="2"
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
@@ -646,12 +670,12 @@
                 SelectedItem="{Binding SelectedGroupNameParam}"/>
 
             <TextBlock
-                Grid.Row="16"
+                Grid.Row="17"
                 Grid.Column="1"
                 Style="{StaticResource ParameterName}"
-                Text="11.2 Для одного помещения:"/>
+                Text="12.2 Для одного помещения:"/>
             <ComboBox
-                Grid.Row="16"
+                Grid.Row="17"
                 Grid.Column="2"
                 Margin="10, 0"
                 ItemsSource="{Binding TextParameters}"
@@ -660,7 +684,7 @@
 
             <Button
                 Grid.Column="0"
-                Grid.Row="17"
+                Grid.Row="18"
                 Style="{StaticResource RoundButton}">
                 <Button.ToolTip>
                     <ToolTip
@@ -670,12 +694,12 @@
             </Button>
             <TextBlock
                 Grid.Column="1"
-                Grid.Row="17"
+                Grid.Row="18"
                 Style="{StaticResource ParameterName}"
-                Text="12. ИД Объекта:"/>
+                Text="13. ИД Объекта:"/>
             <TextBox
                 Grid.Column="2"
-                Grid.Row="17"
+                Grid.Row="18"
                 Margin="10, 0"
                 Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>

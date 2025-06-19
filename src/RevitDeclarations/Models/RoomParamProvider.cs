@@ -17,7 +17,9 @@ namespace RevitDeclarations.Models {
             string number = room.GetTextParamValue(_settings.RoomNumberParam);
             if(addPrefix) {
                 string group = room.GetTextParamValue(_settings.ApartmentNumberParam);
-                return $"{group}-{number}";
+                if(!string.IsNullOrEmpty(group)) {
+                    return $"{group}-{number}";
+                }
             }
             return number;
         }
@@ -49,7 +51,7 @@ namespace RevitDeclarations.Models {
                 }
             }
 
-            return string.Join("-", resultString);
+            return string.Join(", ", resultString);
         }
 
         public string GetAllLevels(IEnumerable<RoomElement> rooms) {

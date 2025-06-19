@@ -141,7 +141,7 @@ namespace RevitDeclarations.ViewModels {
                 .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.ApartmentAreaCoefParam);
             SelectedApartAreaLivingParam = DoubleParameters
                 .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.ApartmentAreaLivingParam);
-            SelectedRoomsAmountParam = IntParameters
+            SelectedRoomsAmountParam = IntAndCurrencyParameters
                 .FirstOrDefault(x => x.Definition.Name == apartsConfigSettings.RoomsAmountParam);
             ProjectName = apartsConfigSettings.ProjectNameID;
             SelectedApartAreaNonSumParam = DoubleParameters

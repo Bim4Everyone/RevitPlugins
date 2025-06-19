@@ -11,7 +11,8 @@ namespace RevitDeclarations.Models {
         protected readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
 
         protected readonly RoomParamProvider _paramProvider;
-        protected readonly int _accuracy;
+        protected readonly int _accuracyForArea;
+        protected readonly int _accuracyForLength;
 
         protected readonly IEnumerable<RoomElement> _rooms;
 
@@ -22,7 +23,8 @@ namespace RevitDeclarations.Models {
         public RoomGroup(IEnumerable<RoomElement> rooms, DeclarationSettings settings, RoomParamProvider paramProvider) {
             _settings = settings;
             _paramProvider = paramProvider;
-            _accuracy = settings.Accuracy;
+            _accuracyForArea = settings.AccuracyForArea;
+            _accuracyForLength = settings.AccuracyForLength;
 
             _rooms = rooms.ToList();
             _firstRoom = rooms.FirstOrDefault();
@@ -46,7 +48,7 @@ namespace RevitDeclarations.Models {
         public string Building => _firstRoom.GetTextParamValue(_settings.BuildingParam);
 
         [JsonProperty("area")]
-        public virtual double AreaMain => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracy);
+        public virtual double AreaMain => _firstRoom.GetAreaParamValue(_settings.ApartmentAreaParam, _accuracyForArea);
 
         // Проверка актуальности площадей помещений.
         // 1. Сравнивается системная площадь помещения с площадью из квартирографии.

@@ -1,15 +1,16 @@
-using System.Windows;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
-
-using RevitClashDetective.Models.Handlers;
 
 using RevitFinishingWalls.Models;
 using RevitFinishingWalls.Services;
@@ -34,21 +35,49 @@ namespace RevitFinishingWalls {
                     .ToSelf()
                     .InSingletonScope();
 
-                kernel.Bind<IWallCreationDataProvider>().To<WallCreationDataProvider>().InSingletonScope();
-                kernel.Bind<IRoomFinisher>().To<RoomFinisher>().InSingletonScope();
+                kernel.Bind<IWallCreationDataProvider>()
+                    .To<WallCreationDataProvider>()
+                    .InSingletonScope();
+                kernel.Bind<IRoomFinisher>()
+                    .To<RoomFinisher>()
+                    .InSingletonScope();
+                kernel.Bind<IWallCreatorFactory>()
+                    .To<WallCreatorFactory>()
+                    .InSingletonScope();
+                kernel.Bind<UnconnectedTopWallCreator>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<TopConnectedToLevelWallCreator>()
+                    .ToSelf()
+                    .InSingletonScope();
+                kernel.Bind<TopConnectedToRoomTopWallCreator>()
+                    .ToSelf()
+                    .InSingletonScope();
+
+
                 kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
-                kernel.Bind<ErrorWindowViewModel>().ToSelf().InTransientScope();
-                kernel.Bind<ErrorWindow>().ToSelf().InTransientScope();
-                kernel.Bind<RichErrorMessageService>().ToSelf().InTransientScope();
+                    .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-                kernel.UseXtraMessageBox<ErrorWindowViewModel>();
+                kernel.UseWpfUIThemeUpdater();
 
-                kernel.UseXtraProgressDialog<MainViewModel>();
-                kernel.Bind<MainViewModel>().ToSelf();
-                kernel.Bind<MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+                kernel.BindMainWindow<MainViewModel, MainWindow>();
+                kernel.UseWpfUIProgressDialog<MainViewModel>();
+
+                kernel.Bind<RichErrorMessageService>()
+                    .ToSelf()
+                    .InTransientScope();
+                kernel.Bind<ErrorWindowViewModel>()
+                    .ToSelf()
+                    .InTransientScope();
+                kernel.Bind<ErrorWindow>()
+                    .ToSelf()
+                    .InTransientScope();
+                kernel.UseWpfUIMessageBox<ErrorWindowViewModel>();
+
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+                kernel.UseWpfLocalization(
+                    $"/{assemblyName};component/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
 
                 Notification(kernel.Get<MainWindow>());
             }

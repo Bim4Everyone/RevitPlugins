@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using RevitClashDetective.Models.Clashes;
@@ -7,25 +8,29 @@ using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.RevitClashReport {
     internal class ReportLoader {
-        public static IEnumerable<ClashModel> GetClashes(RevitRepository revitRepository, string path) {
+        public static IEnumerable<ReportModel> GetReports(RevitRepository revitRepository, string path) {
             revitRepository.InitializeDocInfos();
 
             var loaders = new List<IClashesLoader>() {
-                new RevitClashesLoader(revitRepository, path),
                 new PluginClashesLoader(path, revitRepository.Doc),
-                new NavisHtmlClashesLoader(revitRepository, path)
+                new NavisXmlClashesLoader(revitRepository, path)
             };
 
             var loader = loaders.FirstOrDefault(item => item.IsValid());
             if(loader == null) {
-                throw new ArgumentException("Íåâåðíûé ôîðìàò ôàéëà.");
+                throw new ArgumentException("ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚ Ñ„Ð°Ð¹Ð»Ð°.");
             }
 
             var docNames = revitRepository.DocInfos.Select(item => RevitRepository.GetDocumentName(item.Doc)).ToList();
 
-            return loader.GetClashes()
-                         .Select(item => item.SetRevitRepository(revitRepository))
-                         .Where(item => item.IsValid(docNames));
+            var reports = loader.GetReports();
+            foreach(var report in reports) {
+                var filteredClashes = report.Clashes
+                    .Select(item => item.SetRevitRepository(revitRepository))
+                    .Where(item => item.IsValid(docNames));
+                report.Clashes = new ReadOnlyCollection<ClashModel>(filteredClashes.ToArray());
+            }
+            return reports;
         }
     }
 }

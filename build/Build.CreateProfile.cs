@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Nuke.Common;
@@ -11,13 +11,13 @@ partial class Build {
         .Executes(() => {
             Dictionary<string, object> result = new();
             result.Add("$schema", "./build.schema.json");
-            result.Add("Solution", "RevitPlugins.sln");
+            result.Add("Solution", "RevitPlugins.slnx");
 
             // Build
             result.Add(nameof(PluginName), PluginName);
             result.Add(nameof(PublishDirectory), PublishDirectory);
             result.Add(nameof(RevitVersions), Params.BuildRevitVersions.Select(item => $"Rv{item}"));
-            
+
             // CreateBundle
             result.Add(nameof(IconUrl), IconUrl.ToString());
             result.Add(nameof(BundleName), BundleName);

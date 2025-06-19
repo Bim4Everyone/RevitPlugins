@@ -1,10 +1,9 @@
 using System;
 
-namespace RevitArchitecturalDocumentation.Models.Exceptions {
-    internal class TaskException : Exception {
-        public TaskException() { }
+namespace RevitArchitecturalDocumentation.Models.Exceptions;
+internal class TaskException : Exception {
+    public TaskException() { }
 
-        public TaskException(string message)
-            : base(message) { }
-    }
+    public TaskException(string message)
+        : base(message) { }
 }

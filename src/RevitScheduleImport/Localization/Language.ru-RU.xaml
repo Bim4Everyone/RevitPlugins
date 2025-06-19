@@ -13,6 +13,9 @@
         x:Key="MainWindow.Title">Импорт Excel</system:String>
     <system:String
         x:Key="MainWindow.ComboBoxTitle">Категория спецификации:</system:String>
+    <system:String
+        x:Key="MainWindow.ComboBoxTooltip">Excel импортируется в шапку "фиктивной спецификации" элементов на заданную категорию. 
+        Необходимо вибирать такую категорию, которая не используется в модели.</system:String>
 
     <system:String
         x:Key="OpenFileDialog.Title">Выберите Excel файл</system:String>

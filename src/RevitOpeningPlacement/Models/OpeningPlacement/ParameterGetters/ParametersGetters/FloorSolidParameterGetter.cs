@@ -16,6 +16,7 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         private readonly IPointFinder _pointFinder;
         private readonly ILevelFinder _levelFinder;
         private readonly OpeningsGroup _openingsGroup;
+        private readonly OpeningConfig _config;
         private readonly MepCategory[] _mepCategories;
         private readonly Element _mepElement;
         private readonly Element _structureElement;
@@ -25,17 +26,20 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
         /// Конструктор для получения параметров задания на отверстие из группы заданий на отверстия
         /// </summary>
         /// <param name="openingsGroup">Группа заданий на отверстия</param>
+        /// <param name="config">Настройки расстановки заданий на отверстия</param>
         /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public FloorSolidParameterGetter(
             ISolidProvider solidProvider,
             IPointFinder pointFinder,
             ILevelFinder levelFinder,
-            OpeningsGroup openingsGroup
+            OpeningsGroup openingsGroup,
+            OpeningConfig config
             ) {
             _solidProvider = solidProvider ?? throw new System.ArgumentNullException(nameof(solidProvider));
             _pointFinder = pointFinder ?? throw new System.ArgumentNullException(nameof(pointFinder));
             _levelFinder = levelFinder ?? throw new System.ArgumentNullException(nameof(levelFinder));
             _openingsGroup = openingsGroup ?? throw new System.ArgumentNullException(nameof(openingsGroup));
+            _config = config ?? throw new System.ArgumentNullException(nameof(config));
             _createdByGroup = true;
         }
 
@@ -64,7 +68,9 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
 
 
         public IEnumerable<ParameterValuePair> GetParamValues() {
-            var sizeInit = new FloorOpeningSizeInitializer(_solidProvider.GetSolid(), _mepCategories);
+            var sizeInit = _createdByGroup
+                ? new FloorOpeningSizeInitializer(_solidProvider.GetSolid(), _config.UnitedTasksSizeRounding)
+                : new FloorOpeningSizeInitializer(_solidProvider.GetSolid(), 0, _mepCategories);
 
             //габариты отверстия
             if(_createdByGroup && _openingsGroup.IsCylinder) {
@@ -82,8 +88,14 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters {
             yield return new DoubleParameterGetter(RevitRepository.OpeningThickness, thicknessValueGetter).GetParamValue();
 
             //отметки отверстия
-            var bottomOffsetValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(_pointFinder, thicknessValueGetter);
-            var centerOffsetMmValueGetter = new CenterOffsetValueGetter(_pointFinder);
+            ElevationValueGetter elevationGetter;
+            if(_createdByGroup) {
+                elevationGetter = new ElevationValueGetter(_pointFinder, _openingsGroup.Elements.First().GetFamilyInstance().Document);
+            } else {
+                elevationGetter = new ElevationValueGetter(_pointFinder, _mepElement.Document);
+            }
+            var bottomOffsetValueGetter = new BottomOffsetOfOpeningInFloorValueGetter(elevationGetter, thicknessValueGetter);
+            var centerOffsetMmValueGetter = new CenterOffsetValueGetter(elevationGetter);
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetBottom, bottomOffsetValueGetter).GetParamValue();
             yield return new DoubleParameterGetter(RevitRepository.OpeningOffsetCenter, centerOffsetMmValueGetter).GetParamValue();
             var offsetFeetFromLevelValueGetter = new OffsetFromLevelValueGetter(centerOffsetMmValueGetter, _levelFinder);

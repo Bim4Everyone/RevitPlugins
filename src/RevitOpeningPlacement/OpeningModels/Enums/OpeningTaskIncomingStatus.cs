@@ -29,6 +29,16 @@ namespace RevitOpeningPlacement.OpeningModels.Enums {
         /// Произошла ошибка обработки геометрии в процессе определения статуса
         /// </summary>
         [Description("Ошибка обработки геометрии")]
-        Invalid
+        Invalid,
+        /// <summary>
+        /// Задание на отверстие находится в разных конструкциях
+        /// </summary>
+        [Description("В разных конструкциях")]
+        DifferentConstructions,
+        /// <summary>
+        /// Задание на отверстие находится в недопустимых конструкциях
+        /// </summary>
+        [Description("Недопустимые конструкции")]
+        UnacceptableConstructions
     }
 }

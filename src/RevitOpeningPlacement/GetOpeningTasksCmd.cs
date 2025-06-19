@@ -218,10 +218,21 @@ namespace RevitOpeningPlacement {
                 .WithPropertyValue(nameof(Window.DataContext),
                     c => c.Kernel.Get<ConstructureNavigatorForIncomingTasksViewModel>())
                 .WithPropertyValue(nameof(Window.Title), PluginName);
+            kernel.Bind<NavigatorMepToKrIncomingView>()
+                .ToSelf()
+                .InSingletonScope()
+                .WithPropertyValue(nameof(Window.DataContext),
+                    c => c.Kernel.Get<ConstructureNavigatorForIncomingTasksViewModel>())
+                .WithPropertyValue(nameof(Window.Title), PluginName);
 
             kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
-            var window = kernel.Get<NavigatorArIncomingView>();
+            Window window;
+            if(navigatorMode == KrNavigatorMode.IncomingAr) {
+                window = kernel.Get<NavigatorArIncomingView>();
+            } else {
+                window = kernel.Get<NavigatorMepToKrIncomingView>();
+            }
             var uiApplication = kernel.Get<UIApplication>();
             var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
             window.Show();

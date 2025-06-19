@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на русский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Скрытие РН связей</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.ToolTipHideWorksets">Скрыть все выбранные рабочие набор</system:String>
+    <system:String x:Key="MainWindow.ToolTipHideWorkset">Скрыть рабочий набор</system:String>
+    <system:String x:Key="MainWindow.HideWorkset">Скрыть</system:String>
+    <system:String x:Key="MainWindow.Finish">Применить изменения к рабочим наборам</system:String>
+    <system:String x:Key="MainWindow.Cancel">Отменить изменения рабочих наборов</system:String>
+    <system:String x:Key="MainWindow.SearchPlaceholder">Введите название рабочего набора</system:String>
+    <system:String x:Key="MainWindow.NoChanges">Вы не внесли изменений</system:String>
+    
+    <system:String x:Key="GeneralSettings.ErrorConnection">Не удалось перезагрузить связь</system:String>
+    <system:String x:Key="GeneralSettings.ErrorNoLinkedFiles">В файл не загружено связей</system:String>
+    <system:String x:Key="GeneralSettings.ErrorMessage">Ошибка</system:String>
+
+</ResourceDictionary>

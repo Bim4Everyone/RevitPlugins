@@ -5,17 +5,17 @@ using Ninject.Syntax;
 using RevitPlatformSettings.Model;
 using RevitPlatformSettings.ViewModels;
 
-namespace RevitPlatformSettings.Factories {
-    internal class ExtensionViewModelFactory : IExtensionViewModelFactory {
-        private readonly IResolutionRoot _resolutionRoot;
+namespace RevitPlatformSettings.Factories;
 
-        public ExtensionViewModelFactory(IResolutionRoot resolutionRoot) {
-            _resolutionRoot = resolutionRoot;
-        }
+internal class ExtensionViewModelFactory : IExtensionViewModelFactory {
+    private readonly IResolutionRoot _resolutionRoot;
 
-        public ExtensionViewModel Create(Extension extension) {
-            return _resolutionRoot.Get<ExtensionViewModel>(
-                new ConstructorArgument(nameof(extension), extension));
-        }
+    public ExtensionViewModelFactory(IResolutionRoot resolutionRoot) {
+        _resolutionRoot = resolutionRoot;
+    }
+
+    public ExtensionViewModel Create(Extension extension) {
+        return _resolutionRoot.Get<ExtensionViewModel>(
+            new ConstructorArgument(nameof(extension), extension));
     }
 }

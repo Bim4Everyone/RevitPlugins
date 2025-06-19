@@ -9,6 +9,7 @@ using dosymep.Revit;
 
 using RevitClashDetective.Models.Extensions;
 
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
@@ -21,10 +22,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
     /// </summary>
     internal class RealOpeningArPlacer {
         private readonly RevitRepository _revitRepository;
+        private readonly OpeningRealsArConfig _config;
 
         public const string RealOpeningArDiameter = "ФОП_РАЗМ_Диаметр";
         public const string RealOpeningArWidth = "ФОП_РАЗМ_Ширина проёма";
         public const string RealOpeningArHeight = "ФОП_РАЗМ_Высота проёма";
+        public const string RealOpeningArThickness = "ФОП_РАЗМ_Глубина проёма";
         public const string RealOpeningIsEom = "ЭОМ";
         public const string RealOpeningIsSs = "СС";
         public const string RealOpeningIsOv = "ОВ";
@@ -43,6 +46,7 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         public RealOpeningArPlacer(RevitRepository revitRepository) {
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _config = OpeningRealsArConfig.GetOpeningConfig(_revitRepository.Doc);
         }
 
 
@@ -186,12 +190,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         private void PlaceByOneTask(Element host, OpeningMepTaskIncoming openingTask) {
             try {
                 var symbol = GetFamilySymbol(host, openingTask);
-                var pointFinder = GetPointFinder(openingTask);
+                var pointFinder = GetPointFinder(openingTask, _config.ElevationRounding);
                 var point = pointFinder.GetPoint();
 
                 var instance = _revitRepository.CreateInstance(point, symbol, host) ?? throw new OpeningNotPlacedException("Не удалось создать экземпляр семейства");
 
-                var parameterGetter = GetParameterGetter(openingTask, pointFinder);
+                var parameterGetter = GetParameterGetter(openingTask, pointFinder, _config.Rounding);
                 SetParamValues(instance, parameterGetter);
 
                 var angleFinder = GetAngleFinder(openingTask);
@@ -220,12 +224,12 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         private void PlaceUnitedByManyTasks(Element host, ICollection<OpeningMepTaskIncoming> openingTasks) {
             try {
                 var symbol = GetFamilySymbol(host);
-                var pointFinder = GetPointFinder(host, openingTasks);
+                var pointFinder = GetPointFinder(host, openingTasks, _config.ElevationRounding);
                 var point = pointFinder.GetPoint();
 
                 var instance = _revitRepository.CreateInstance(point, symbol, host) ?? throw new OpeningNotPlacedException("Не удалось создать экземпляр семейства");
 
-                var parameterGetter = GetParameterGetter(host, openingTasks, pointFinder);
+                var parameterGetter = GetParameterGetter(host, openingTasks, pointFinder, _config.Rounding);
                 SetParamValues(instance, parameterGetter);
 
                 _revitRepository.SetSelection(instance.Id);
@@ -280,8 +284,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
-        private IParametersGetter GetParameterGetter(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder) {
-            var provider = new SingleOpeningTaskParameterGettersProvider(incomingTask, pointFinder);
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
+        private IParametersGetter GetParameterGetter(OpeningMepTaskIncoming incomingTask, IPointFinder pointFinder, int rounding) {
+            var provider = new SingleOpeningTaskParameterGettersProvider(incomingTask, pointFinder, rounding);
             return provider.GetParametersGetter();
         }
 
@@ -291,8 +296,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия</param>
-        private IParametersGetter GetParameterGetter(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks, IPointFinder pointFinder) {
-            return new ManyOpeningTasksParameterGettersProvider(host, incomingTasks, pointFinder).GetParametersGetter();
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
+        private IParametersGetter GetParameterGetter(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks, IPointFinder pointFinder, int rounding) {
+            return new ManyOpeningTasksParameterGettersProvider(host, incomingTasks, pointFinder, rounding).GetParametersGetter();
         }
 
         /// <summary>
@@ -308,8 +314,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// Возвращает интерфейс, предоставляющий точку вставки
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
-        private IPointFinder GetPointFinder(OpeningMepTaskIncoming incomingTask) {
-            var provider = new SingleOpeningTaskPointFinderProvider(incomingTask);
+        /// <param name="rounding">Округление высотной отметки в мм</param>
+        private IPointFinder GetPointFinder(OpeningMepTaskIncoming incomingTask, int rounding) {
+            var provider = new SingleOpeningTaskPointFinderProvider(incomingTask, rounding);
             return provider.GetPointFinder();
         }
 
@@ -319,8 +326,9 @@ namespace RevitOpeningPlacement.Models.RealOpeningArPlacement {
         /// </summary>
         /// <param name="host">Хост чистового отверстия - стена или перекрытие</param>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
-        private IPointFinder GetPointFinder(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks) {
-            var provider = new ManyOpeningTasksPointFinderProvider(host, incomingTasks);
+        /// <param name="rounding">Округление высотной отметки в мм</param>
+        private IPointFinder GetPointFinder(Element host, ICollection<OpeningMepTaskIncoming> incomingTasks, int rounding) {
+            var provider = new ManyOpeningTasksPointFinderProvider(host, incomingTasks, rounding);
             return provider.GetPointFinder();
         }
     }

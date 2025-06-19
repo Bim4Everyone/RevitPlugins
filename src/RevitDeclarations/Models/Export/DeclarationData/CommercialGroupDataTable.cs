@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Windows.Documents;
 
 namespace RevitDeclarations.Models {
     internal class CommercialGroupDataTable : DeclarationDataTable {
-        public CommercialGroupDataTable(CommercialGroupTableInfo tableInfo) : base(tableInfo) {
+        public CommercialGroupDataTable(string name, CommercialGroupTableInfo tableInfo) : base(name, tableInfo) {
         }
 
         protected override void FillTableHeader() {
@@ -15,16 +17,14 @@ namespace RevitDeclarations.Models {
         protected override void FillMainTable() {
             int rowNumber = 0;
 
-            CommercialRooms commercialRooms = _tableInfo.RoomGroups
-                .Cast<CommercialRooms>()
-                .First();
+            foreach(CommercialRooms commercialRooms in _tableInfo.RoomGroups) {
+                foreach(RoomElement room in commercialRooms.Rooms) {
+                    _mainTable.Rows[rowNumber][0] = room.Name ?? "";
+                    _mainTable.Rows[rowNumber][1] = room.Area;
+                    _mainTable.Rows[rowNumber][2] = commercialRooms.DeclarationNumber ?? "";
 
-            foreach(RoomElement room in commercialRooms.Rooms) {
-                _mainTable.Rows[rowNumber][0] = room.Name ?? "";
-                _mainTable.Rows[rowNumber][1] = room.Area;
-                _mainTable.Rows[rowNumber][2] = commercialRooms.DeclarationNumber ?? "";
-
-                rowNumber++;
+                    rowNumber++;
+                }
             }
         }
 

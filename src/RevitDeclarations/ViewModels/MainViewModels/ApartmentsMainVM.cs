@@ -145,8 +145,8 @@ namespace RevitDeclarations.ViewModels {
             List<Apartment> apartments = projects
                 .SelectMany(x => x.RoomGroups)
                 .Cast<Apartment>()
-                .OrderBy(x => x.Section, _stringComparer)
-                .ThenBy(x => x.FullNumber, _stringComparer)
+                .OrderBy(x => x.Section ?? "", _stringComparer)
+                .ThenBy(x => x.FullNumber ?? "", _stringComparer)
                 .ToList();
 
             try {

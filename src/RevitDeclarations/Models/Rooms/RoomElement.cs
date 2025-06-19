@@ -1,8 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
+
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 using pyRevitLabs.Json;
@@ -25,14 +27,14 @@ namespace RevitDeclarations.Models
 
             _name = _revitRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
 
-            _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.Accuracy);
+            _areaRevit = ParamConverter.ConvertArea(_revitRoom.Area, settings.AccuracyForArea);
             RoomAreaCalculator areaCalculator = new RoomAreaCalculator(settings, this);
             _areaCoefRevit = areaCalculator.CalculateAreaCoefRevit();
             _areaLivingRevit = areaCalculator.CalculateAreaLivingRevit();
             _areaNonSummerRevit = areaCalculator.CalculateAreaNonSummerRevit();
 
-            _area = GetAreaParamValue(settings.RoomAreaParam, settings.Accuracy);
-            _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.Accuracy);
+            _area = GetAreaParamValue(settings.RoomAreaParam, settings.AccuracyForArea);
+            _areaCoef = GetAreaParamValue(settings.RoomAreaCoefParam, settings.AccuracyForArea);
         }
 
         [JsonIgnore] 
@@ -75,8 +77,19 @@ namespace RevitDeclarations.Models
             return ParamConverter.ConvertLength(value, accuracy);
         }
 
-        public int GetIntParamValue(Parameter parameter) {
-            return RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
+        public double GetIntAndCurrencyParamValue(Parameter parameter) {
+            if(parameter.StorageType == StorageType.Double) {
+                return RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
+            } else {
+                return RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
+            }
+        }
+
+        public IReadOnlyList<ElementId> GetBoundaries() {
+            return _revitRoom.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
+                .SelectMany(item => item)
+                .Select(item => item.ElementId)
+                .ToList();
         }
     }
 }

@@ -162,6 +162,15 @@ namespace RevitOpeningPlacement.Models {
         };
 
         /// <summary>
+        /// Категории конструкций, недопустимые для расстановки заданий на отверстия
+        /// </summary>
+        public static IReadOnlyCollection<BuiltInCategory> UnacceptableStructureCategories { get; } =
+            new ReadOnlyCollection<BuiltInCategory>(new BuiltInCategory[] {
+                BuiltInCategory.OST_StructuralColumns,
+                BuiltInCategory.OST_StructuralFraming
+            });
+
+        /// <summary>
         /// Используемые в плагине категории для стен: Стены
         /// </summary>
         public static BuiltInCategory WallCategory { get; } = BuiltInCategory.OST_Walls;
@@ -542,9 +551,10 @@ namespace RevitOpeningPlacement.Models {
         /// Объединяет задания на отверстия из активного документа и удаляет старые
         /// </summary>
         /// <param name="openingTasks">Коллекция объединяемых заданий на отверстия</param>
+        /// <param name="config">Настройки расстановки заданий на отверстия</param>
         /// <exception cref="OperationCanceledException">Исключение, если пользователь отменил операцию</exception>
-        public FamilyInstance UniteOpenings(ICollection<OpeningMepTaskOutcoming> openingTasks) {
-            var placer = GetOpeningPlacer(openingTasks);
+        public FamilyInstance UniteOpenings(ICollection<OpeningMepTaskOutcoming> openingTasks, OpeningConfig config) {
+            var placer = GetOpeningPlacer(openingTasks, config);
             FamilyInstance createdOpening = null;
             try {
                 using(var t = GetTransaction("Объединение отверстий")) {
@@ -668,7 +678,7 @@ namespace RevitOpeningPlacement.Models {
                     return MepConduitCategories.Contains(elCategory);
                 default:
                     throw new NotImplementedException(nameof(mepCategory));
-            };
+            }
         }
 
         /// <summary>
@@ -1251,11 +1261,12 @@ namespace RevitOpeningPlacement.Models {
         /// Возвращает класс, размещающий объединенное задание на отверстие
         /// </summary>
         /// <param name="openingTasks">Задания на отверстия из активного документа, которые надо объединить</param>
+        /// <param name="config">Настройки расстановки заданий на отверстия</param>
         /// <exception cref="System.OperationCanceledException">Исключение, операцию отменил пользователь</exception>
-        private OpeningPlacer GetOpeningPlacer(ICollection<OpeningMepTaskOutcoming> openingTasks) {
+        private OpeningPlacer GetOpeningPlacer(ICollection<OpeningMepTaskOutcoming> openingTasks, OpeningConfig config) {
             try {
                 OpeningsGroup group = new OpeningsGroup(openingTasks);
-                return group.GetOpeningPlacer(this);
+                return group.GetOpeningPlacer(this, config);
 
             } catch(ArgumentNullException nullEx) {
                 var dialog = GetMessageBoxService();

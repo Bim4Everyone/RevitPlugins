@@ -2,7 +2,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
@@ -18,9 +17,9 @@ namespace RevitFinishingWalls.Models {
         [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
 
 
-        public static PluginConfig GetPluginConfig() {
+        public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
             return new ProjectConfigBuilder()
-                .SetSerializer(new ConfigSerializer())
+                .SetSerializer(configSerializer)
                 .SetPluginName(nameof(RevitFinishingWalls))
                 .SetRevitVersion(ModuleEnvironment.RevitVersion)
                 .SetProjectConfigName(nameof(PluginConfig) + ".json")
@@ -49,7 +48,17 @@ namespace RevitFinishingWalls.Models {
         /// <summary>
         /// Режим задания верхней отметки стен от уровня
         /// </summary>
-        public WallElevationMode WallElevationMode { get; set; } = WallElevationMode.HeightByRoom;
+        public WallElevationMode WallTopElevationMode { get; set; } = WallElevationMode.HeightByRoom;
+
+        /// <summary>
+        /// Режим задания нижней отметки стен от уровня
+        /// </summary>
+        public WallElevationMode WallBaseElevationMode { get; set; } = WallElevationMode.ManualHeight;
+
+        /// <summary>
+        /// Зависимость сверху
+        /// </summary>
+        public WallHeightStyle WallHeightStyle { get; set; } = WallHeightStyle.Unconnected;
 
         /// <summary>
         /// Отступ низа стены от уровня в мм

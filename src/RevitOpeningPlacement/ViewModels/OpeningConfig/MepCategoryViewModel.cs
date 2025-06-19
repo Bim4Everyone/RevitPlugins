@@ -22,6 +22,8 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
         private bool _isSelected;
         private ObservableCollection<StructureCategoryViewModel> _structureCategories;
         private SetViewModel _setViewModel;
+        private int _selectedRounding;
+        private int _selectedElevationRounding;
 
         public MepCategoryViewModel(RevitRepository revitRepository, MepCategory mepCategory) {
             Name = mepCategory.Name;
@@ -36,6 +38,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             StructureCategories = new ObservableCollection<StructureCategoryViewModel>(
                 mepCategory.Intersections.Select(c => new StructureCategoryViewModel(revitRepository, c)));
             SelectedRounding = mepCategory.Rounding;
+            SelectedElevationRounding = mepCategory.ElevationRounding;
             var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
             SetViewModel = new SetViewModel(revitRepository, categoriesInfoViewModel, mepCategory.Set);
             RenameDisplayParameters();
@@ -51,7 +54,21 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             set => RaiseAndSetIfChanged(ref _isSelected, value);
         }
 
-        public int SelectedRounding { get; set; }
+        /// <summary>
+        /// Округление габаритов задания на отверстие в мм
+        /// </summary>
+        public int SelectedRounding {
+            get => _selectedRounding;
+            set => RaiseAndSetIfChanged(ref _selectedRounding, value);
+        }
+
+        /// <summary>
+        /// Округление отметки задания на отверстие в мм
+        /// </summary>
+        public int SelectedElevationRounding {
+            get => _selectedElevationRounding;
+            set => RaiseAndSetIfChanged(ref _selectedElevationRounding, value);
+        }
 
         public string Name {
             get => _name;
@@ -75,7 +92,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
             set => RaiseAndSetIfChanged(ref _structureCategories, value);
         }
 
-        public List<int> Roundings { get; set; } = new List<int> { 0, 10, 50 };
+        public IReadOnlyCollection<int> Roundings { get; } = new int[] { 1, 5, 10, 25, 50 };
 
         public SetViewModel SetViewModel {
             get => _setViewModel;
@@ -126,6 +143,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig {
                 })
                 .ToList(),
                 Rounding = SelectedRounding,
+                ElevationRounding = SelectedElevationRounding,
                 Set = SetViewModel.GetSet()
             };
         }

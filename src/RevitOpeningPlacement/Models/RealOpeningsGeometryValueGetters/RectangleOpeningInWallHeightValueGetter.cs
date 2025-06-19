@@ -19,8 +19,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="incomingTask">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public RectangleOpeningInWallHeightValueGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder) {
+        public RectangleOpeningInWallHeightValueGetter(IOpeningTaskIncoming incomingTask, IPointFinder pointFinder, int rounding)
+            : base(rounding, rounding, rounding) {
             if(incomingTask == null) { throw new ArgumentNullException(nameof(incomingTask)); }
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
             _incomingTasks = new IOpeningTaskIncoming[] { incomingTask };
@@ -31,11 +33,17 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="incomingTasks">Входящие задания на отверстия</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
         /// <exception cref="ArgumentOutOfRangeException">Исключение, если количество элементов в коллекции меньше 1</exception>
-        public RectangleOpeningInWallHeightValueGetter(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder) {
-            if(incomingTasks is null) { throw new ArgumentNullException(nameof(incomingTasks)); }
-            if(incomingTasks.Count < 1) { throw new ArgumentOutOfRangeException(nameof(incomingTasks)); }
+        public RectangleOpeningInWallHeightValueGetter(ICollection<IOpeningTaskIncoming> incomingTasks, IPointFinder pointFinder, int rounding)
+            : base(rounding, rounding, rounding) {
+            if(incomingTasks is null) {
+                throw new ArgumentNullException(nameof(incomingTasks));
+            }
+            if(incomingTasks.Count < 1) {
+                throw new ArgumentOutOfRangeException(nameof(incomingTasks));
+            }
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
             _incomingTasks = incomingTasks;
         }

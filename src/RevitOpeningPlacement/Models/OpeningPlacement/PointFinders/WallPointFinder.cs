@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Autodesk.Revit.DB;
 
@@ -16,18 +16,20 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement.PointFinders {
         /// <summary>
         /// Округление высотной отметки отверстия в мм
         /// </summary>
-        private const int _heightRound = 10;
+        private readonly int _heightRound;
 
         /// <summary>
         /// Конструктор класса, предоставляющего точку вставки задания на отверстие в стене
         /// </summary>
         /// <param name="clash">Пересечение линейного инженерного элемента со стеной</param>
+        /// <param name="heightRound">Округление высотной отметки задания на отверстие в мм</param>
         /// <param name="rectangleHeightGetter">
         /// Высота прямоугольного отверстия - опциональный параметр для прямоугольных отверстий.
         /// Нужен для корректировки точки вставки, т.к. точка вставки прямоугольного отверстия в стене находится у нижней грани.
         /// </param>
-        public WallPointFinder(MepCurveClash<Wall> clash, IValueGetter<DoubleParamValue> rectangleHeightGetter = null) {
+        public WallPointFinder(MepCurveClash<Wall> clash, int heightRound, IValueGetter<DoubleParamValue> rectangleHeightGetter = null) {
             _clash = clash;
+            _heightRound = heightRound;
             _rectangleHeightGetter = rectangleHeightGetter;
         }
 

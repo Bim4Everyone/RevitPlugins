@@ -18,8 +18,10 @@ namespace RevitOpeningPlacement.Models.RealOpeningsGeometryValueGetters {
         /// </summary>
         /// <param name="openingTaskIncoming">Входящее задание на отверстие</param>
         /// <param name="pointFinder">Провайдер точки вставки чистового отверстия АР/КР</param>
+        /// <param name="rounding">Округление размеров отверстия в мм</param>
         /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-        public RoundOpeningInWallDiameterValueGetter(IOpeningTaskIncoming openingTaskIncoming, IPointFinder pointFinder) {
+        public RoundOpeningInWallDiameterValueGetter(IOpeningTaskIncoming openingTaskIncoming, IPointFinder pointFinder, int rounding)
+            : base(rounding, rounding, rounding) {
             _openingTaskIncoming = openingTaskIncoming ?? throw new ArgumentNullException(nameof(openingTaskIncoming));
             _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
         }

@@ -78,9 +78,15 @@ namespace RevitClashDetective.Models {
             get {
                 var path = @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
                 if(!Directory.Exists(path)) {
-                    path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep");
+                    path = LocalProfilePath;
                 }
                 return path;
+            }
+        }
+
+        public static string LocalProfilePath {
+            get {
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "dosymep");
             }
         }
 
@@ -492,10 +498,11 @@ namespace RevitClashDetective.Models {
 
 
         private ICollection<ElementId> GetElementsToSelect(ClashModel clashModel, View3D view = null) {
-            return GetElementsToSelect(
-                new Element[] {
-                    clashModel.MainElement.GetElement(DocInfos),
-                    clashModel.OtherElement.GetElement(DocInfos) },
+            return GetElementsToSelect(new[] {
+                clashModel.MainElement,
+                clashModel.OtherElement }
+            .Select(e => e.GetElement(DocInfos))
+            .Where(e => e != null),
                 view);
         }
 
@@ -521,10 +528,10 @@ namespace RevitClashDetective.Models {
         private BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<ElementModel> elements) {
             return elements
                 .Select(item => new {
-                    Bb = item.GetElement(DocInfos).get_BoundingBox(null),
-                    Transform = item.GetDocInfo(DocInfos).Transform
+                    Bb = item.GetElement(DocInfos)?.get_BoundingBox(null),
+                    Transform = item.GetDocInfo(DocInfos)?.Transform
                 })
-                .Where(item => item.Bb != null)
+                .Where(item => item.Bb != null && item.Transform != null)
                 .Select(item => item.Bb.GetTransformedBoundingBox(item.Transform))
                 .GetCommonBoundingBox();
         }
@@ -597,7 +604,7 @@ namespace RevitClashDetective.Models {
             };
             var firstEl = clash.MainElement.GetElement(DocInfos);
             var secondEl = clash.OtherElement.GetElement(DocInfos);
-            if(firstEl.Category.GetBuiltInCategory() == secondEl.Category.GetBuiltInCategory()) {
+            if(firstEl?.Category.GetBuiltInCategory() == secondEl?.Category.GetBuiltInCategory()) {
                 filters.Add(
                     _parameterFilterProvider.GetHighlightFilter(
                         _document,
@@ -605,26 +612,30 @@ namespace RevitClashDetective.Models {
                         secondEl,
                         $"{FiltersNamePrefix}не_элементы_категории_коллизии_{username}"));
             } else {
-                filters.Add(
-                    _parameterFilterProvider.GetHighlightFilter(
-                        _document,
-                        firstEl,
-                        $"{FiltersNamePrefix}не_первый_элемент_{username}"));
-                filters.Add(
-                    _parameterFilterProvider.GetHighlightFilter(
-                        _document,
-                        secondEl,
-                        $"{FiltersNamePrefix}не_второй_элемент_{username}"));
+                if(firstEl != null) {
+                    filters.Add(
+                        _parameterFilterProvider.GetHighlightFilter(
+                            _document,
+                            firstEl,
+                            $"{FiltersNamePrefix}не_первый_элемент_{username}"));
+                }
+                if(secondEl != null) {
+                    filters.Add(
+                        _parameterFilterProvider.GetHighlightFilter(
+                            _document,
+                            secondEl,
+                            $"{FiltersNamePrefix}не_второй_элемент_{username}"));
+                }
             }
             return filters;
         }
 
         private ICollection<BuiltInCategory> GetClashCategories(ClashModel clash) {
-            return new HashSet<BuiltInCategory>(
-                new BuiltInCategory[] {
-                    clash.MainElement.GetElement(DocInfos).Category.GetBuiltInCategory(),
-                    clash.OtherElement.GetElement(DocInfos).Category.GetBuiltInCategory()
-                });
+            var elements = new[] { clash.MainElement, clash.OtherElement };
+            return elements.Select(e => e.GetElement(DocInfos))
+                .Where(e => e != null)
+                .Select(e => e.Category.GetBuiltInCategory())
+                .ToHashSet();
         }
 
         private void ClearViewFilters(View3D view) {

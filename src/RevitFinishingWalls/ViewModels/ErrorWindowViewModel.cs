@@ -14,11 +14,15 @@ namespace RevitFinishingWalls.ViewModels {
     internal class ErrorWindowViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
         private readonly IMessageBoxService _messageBoxService;
+        private readonly ILocalizationService _localizationService;
 
-        public ErrorWindowViewModel(RevitRepository revitRepository, IMessageBoxService messageBoxService) {
+        public ErrorWindowViewModel(RevitRepository revitRepository,
+            IMessageBoxService messageBoxService,
+            ILocalizationService localizationService) {
+
             _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
             _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
-
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             Rooms = new ObservableCollection<RoomErrorsViewModel>();
             SelectedRoomErrors = new ObservableCollection<ErrorViewModel>();
 
@@ -28,9 +32,6 @@ namespace RevitFinishingWalls.ViewModels {
         public IMessageBoxService MessageBoxService => _messageBoxService;
 
         public ICommand SelectErrorCommand { get; }
-
-
-        public string Title => "Ошибки создания отделки стен";
 
 
         public ObservableCollection<RoomErrorsViewModel> Rooms { get; }
@@ -72,7 +73,7 @@ namespace RevitFinishingWalls.ViewModels {
             } catch(InvalidOperationException ex) {
                 _messageBoxService.Show(
                     ex.Message,
-                    "BIM",
+                    _localizationService.GetLocalizedString("MessageBox.Errors.Header"),
                     System.Windows.MessageBoxButton.OK,
                     System.Windows.MessageBoxImage.Error);
             }

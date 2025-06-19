@@ -1,0 +1,26 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Пример перевода на русский язык (google translate) -->
+
+    <system:String x:Key="MainWindow.Title">Проверки РН связей</system:String>
+    <system:String x:Key="MainWindow.LinkedFile">Cвязанный файл</system:String>
+    <system:String x:Key="MainWindow.WorksetType">РН типа</system:String>
+    <system:String x:Key="MainWindow.Instance">РН экземпляра</system:String>
+
+    <system:String x:Key="WorksetNameStatus.WorksetCorrect">Связь распределена по РН верно</system:String>
+    <system:String x:Key="WorksetNameStatus.PartialCorrect">Связь добавлена в рабочий набор без метки 'Связь'</system:String>
+    <system:String x:Key="WorksetNameStatus.Incorrect">В имени рабочего набора несколько меток разных разделов. Однозначно определить соответствие невозможно</system:String>
+    <system:String x:Key="WorksetNameStatus.NoMatch">Выбран рабочий набор неподходящего раздела</system:String>
+    
+    <system:String x:Key="FileNameStatus.NotFoundTags">Не найдено меток раздела</system:String>
+    <system:String x:Key="FileNameStatus.MultipleTags">Меток раздела больше одной. Однозначно определить раздел связи невозможно</system:String>
+
+    <system:String x:Key="GeneralSettings.ErrorNoLinkedFiles">В файл не загружено связей.</system:String>
+    <system:String x:Key="GeneralSettings.ErrorMessage">Ошибка</system:String>
+
+    <system:String x:Key="MainWindow.Undefined">Не определено</system:String>
+    <system:String x:Key="MainWindow.ButtonRefresh">Обновить</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+</ResourceDictionary>

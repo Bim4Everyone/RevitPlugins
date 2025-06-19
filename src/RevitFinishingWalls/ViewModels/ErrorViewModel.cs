@@ -11,11 +11,11 @@ namespace RevitFinishingWalls.ViewModels {
     internal class ErrorViewModel : BaseViewModel, IElementsContainer {
         public ErrorViewModel(string title, string message, HashSet<ElementId> dependentElements) {
             if(string.IsNullOrWhiteSpace(title)) {
-                throw new System.ArgumentException($"'{nameof(title)}' cannot be null or whitespace.", nameof(title));
+                throw new System.ArgumentException(nameof(title));
             }
 
             if(string.IsNullOrWhiteSpace(message)) {
-                throw new System.ArgumentException($"'{nameof(message)}' cannot be null or whitespace.", nameof(message));
+                throw new System.ArgumentException(nameof(message));
             }
 
             Title = title;

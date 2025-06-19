@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 
-
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitOverridingGraphicsInViews.Views"
     xmlns:vms="clr-namespace:RevitOverridingGraphicsInViews.ViewModels"
@@ -22,8 +21,6 @@
     WindowStyle="None"
     Background="Transparent"
     
-    
-
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     
     <Window.Resources>

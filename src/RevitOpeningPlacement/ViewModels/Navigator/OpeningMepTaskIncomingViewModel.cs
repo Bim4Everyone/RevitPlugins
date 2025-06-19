@@ -43,7 +43,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
             Height = _openingTask.DisplayHeight;
             Thickness = _openingTask.DisplayThickness;
             FamilyShortName = _openingTask.FamilyShortName;
-            HostName = _openingTask.HostName;
+            Host = _openingTask.Host is null ? new OpeningKrHost() : new OpeningKrHost(_openingTask.Host);
             Status = _openingTask.Status.GetDescription();
             Comment = _openingTask.Comment;
             Username = _openingTask.Username;
@@ -116,11 +116,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         public string FamilyShortName { get; } = string.Empty;
 
         /// <summary>
-        /// Название хоста задания на отверстие
-        /// </summary>
-        public string HostName { get; } = string.Empty;
-
-        /// <summary>
         /// Комментарий экземпляра семейства задания на отверстие
         /// </summary>
         public string Comment { get; } = string.Empty;
@@ -130,6 +125,7 @@ namespace RevitOpeningPlacement.ViewModels.Navigator {
         /// </summary>
         public string Username { get; } = string.Empty;
 
+        public IOpeningKrHost Host { get; }
 
         public override bool Equals(object obj) {
             return (obj != null)
