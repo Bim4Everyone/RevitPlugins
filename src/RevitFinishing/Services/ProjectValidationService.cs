@@ -15,22 +15,22 @@ using RevitFinishing.Models.Finishing;
 using RevitFinishing.ViewModels;
 using RevitFinishing.ViewModels.Errors;
 
-namespace RevitFinishing.Models
+namespace RevitFinishing.Services
 {
-    internal class ProjectChecker {
+    internal class ProjectValidationService {
         private readonly FinishingChecker _finishingChecker;
         private readonly ILocalizationService _localizationService;
 
-        public ProjectChecker(ILocalizationService localizationService) {
+        public ProjectValidationService(ILocalizationService localizationService,
+                                        FinishingChecker finishingChecker) {
             _localizationService = localizationService;
-
-            _finishingChecker = new FinishingChecker(_localizationService);
+            _finishingChecker = finishingChecker;
         }
 
         public ErrorsViewModel CheckMainErrors(FinishingInProject allFinishing, 
                                                List<Room> selectedRooms,
                                                Phase phase) {
-            ErrorsViewModel mainErrors = new ErrorsViewModel(_localizationService);
+            var mainErrors = new ErrorsViewModel(_localizationService);
 
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.NoFinishing"),
@@ -50,7 +50,7 @@ namespace RevitFinishing.Models
         }
 
         public ErrorsViewModel CheckFinishingErrors(FinishingCalculator calculator, Phase phase) {
-            ErrorsViewModel finishingErrors = new ErrorsViewModel(_localizationService);
+            var finishingErrors = new ErrorsViewModel(_localizationService);
 
             finishingErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.DifPhases"),
@@ -63,7 +63,7 @@ namespace RevitFinishing.Models
         public WarningsViewModel CheckWarnings(List<Room> selectedRooms,
                                                List<FinishingElement> finishingElements,
                                                Phase phase) {
-            WarningsViewModel parameterErrors = new WarningsViewModel(_localizationService);
+            var parameterErrors = new WarningsViewModel(_localizationService);
 
             string numberParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER);
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
