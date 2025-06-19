@@ -12,6 +12,10 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBox/TextBox.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListBox/ListBox.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListBox/ListBoxItem.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style
@@ -53,6 +57,35 @@
         <Setter
             Property="CornerRadius"
             Value="{DynamicResource ControlCornerRadius}" />
+    </Style>
+
+    <Style
+        TargetType="{x:Type Label}"
+        x:Key="CustomSmallLabel">
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="Focusable"
+            Value="False" />
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource LabelForeground}" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+    </Style>
+
+    <Style
+        TargetType="{x:Type ui:TextBox}"
+        x:Key="CustomSmallTextBox"
+        BasedOn="{StaticResource DefaultUiTextBoxStyle}">
+        <Setter
+            Property="ClearButtonEnabled"
+            Value="False" />
     </Style>
 
     <Style

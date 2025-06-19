@@ -1,4 +1,4 @@
-<core:WpfUIPlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitSleeves.Views.Settings.SleevePlacementSettingsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -63,22 +63,160 @@
             </Grid.ColumnDefinitions>
 
             <Border
+                Style="{StaticResource CustomBorder}">
+                <DockPanel>
+                    <ui:Button
+                        Content="{ui:SymbolIcon Symbol=ArrowDownload20}" />
+                    <ui:Button
+                        Margin="10 0"
+                        Content="{ui:SymbolIcon Symbol=Save20}" />
+                    <ui:Button
+                        Content="{ui:SymbolIcon Symbol=SaveEdit20}" />
+                </DockPanel>
+            </Border>
+
+            <Border
                 Grid.Row="1"
                 Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="1*" />
+                        <RowDefinition
+                            Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
 
-                <ScrollViewer>
-                    <ContentControl
-                        Content="{Binding ActiveMepCategorySettings.MepFilterViewModel}">
-                        <ContentControl.ContentTemplate>
-                            <DataTemplate
-                                DataType="{x:Type filterViewModel:SetViewModel}">
-                                <filterView:SetView
-                                    DataContext="{Binding}" />
-                            </DataTemplate>
-                        </ContentControl.ContentTemplate>
-                    </ContentControl>
-                </ScrollViewer>
+                    <Border
+                        Style="{StaticResource CustomBorder}">
+                        <DockPanel
+                            LastChildFill="True">
+                            <Label
+                                DockPanel.Dock="Top"
+                                Content="Диапазоны диаметров"
+                                Target="{Binding ElementName=DiameterRanges}" />
+                            <ListBox
+                                DockPanel.Dock="Bottom"
+                                x:Name="DiameterRanges"
+                                ItemsSource="{Binding ActiveMepCategorySettings.DiameterRanges}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Style="{StaticResource CustomBorder}">
+                                            <ContentControl
+                                                Content="{Binding}">
+                                                <ContentControl.ContentTemplate>
+                                                    <DataTemplate
+                                                        DataType="{x:Type vms:DiameterRangeViewModel}">
+                                                        <local:DiameterRangeView
+                                                            DataContext="{Binding}" />
+                                                    </DataTemplate>
+                                                </ContentControl.ContentTemplate>
+                                            </ContentControl>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                    </Border>
+
+                    <Border
+                        Grid.Column="1"
+                        Style="{StaticResource CustomBorder}">
+                        <DockPanel
+                            LastChildFill="True">
+                            <Label
+                                DockPanel.Dock="Top"
+                                Content="Отступы"
+                                Target="{Binding ElementName=Offsets}">
+                            </Label>
+                            <ListBox
+                                DockPanel.Dock="Bottom"
+                                x:Name="Offsets"
+                                ItemsSource="{Binding ActiveMepCategorySettings.Offsets}">
+                            </ListBox>
+                        </DockPanel>
+                    </Border>
+
+                    <Border
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Style="{StaticResource CustomBorder}">
+                        <DockPanel
+                            LastChildFill="True">
+                            <Label
+                                DockPanel.Dock="Top"
+                                Content="{Binding ActiveMepCategorySettings.Name}"
+                                Target="{Binding ElementName=MepFilter}" />
+                            <ScrollViewer
+                                x:Name="MepFilter"
+                                DockPanel.Dock="Bottom">
+                                <ContentControl
+                                    Content="{Binding ActiveMepCategorySettings.MepFilterViewModel}">
+                                    <ContentControl.ContentTemplate>
+                                        <DataTemplate
+                                            DataType="{x:Type filterViewModel:SetViewModel}">
+                                            <filterView:SetView
+                                                DataContext="{Binding}" />
+                                        </DataTemplate>
+                                    </ContentControl.ContentTemplate>
+                                </ContentControl>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+                </Grid>
             </Border>
+
+            <Border
+                Grid.RowSpan="2"
+                Grid.Column="1"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="Auto" />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <Label
+                        Content="Фильтрация конструкций" />
+
+                    <Border
+                        Grid.Row="1"
+                        Style="{StaticResource CustomBorder}">
+                        <ContentControl
+                            Content="{Binding ActiveMepCategorySettings.WallSettings}">
+                            <ContentControl.ContentTemplate>
+                                <DataTemplate
+                                    DataType="{x:Type vms:StructureCategoryViewModel}">
+                                    <local:StructureSettingsView
+                                        DataContext="{Binding}" />
+                                </DataTemplate>
+                            </ContentControl.ContentTemplate>
+                        </ContentControl>
+                    </Border>
+
+                    <Border
+                        Grid.Row="2"
+                        Style="{StaticResource CustomBorder}">
+                        <ContentControl
+                            Content="{Binding ActiveMepCategorySettings.FloorSettings}">
+                            <ContentControl.ContentTemplate>
+                                <DataTemplate
+                                    DataType="{x:Type vms:StructureCategoryViewModel}">
+                                    <local:StructureSettingsView
+                                        DataContext="{Binding}" />
+                                </DataTemplate>
+                            </ContentControl.ContentTemplate>
+                        </ContentControl>
+                    </Border>
+                </Grid>
+            </Border>
+
         </Grid>
 
         <StackPanel

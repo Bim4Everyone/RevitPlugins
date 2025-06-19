@@ -36,6 +36,10 @@ internal class MepCategoryViewModel : BaseViewModel {
 
     public ObservableCollection<OffsetViewModel> Offsets { get; } = [];
 
+    public StructureCategoryViewModel WallSettings { get; private set; }
+
+    public StructureCategoryViewModel FloorSettings { get; private set; }
+
 
     private void InitializeCategory(RevitRepository revitRepository,
         ILocalizationService localizationService,
@@ -56,5 +60,11 @@ internal class MepCategoryViewModel : BaseViewModel {
         foreach(var offset in mepCategorySettings.Offsets) {
             Offsets.Add(new OffsetViewModel(localizationService, offset));
         }
+        WallSettings = new StructureCategoryViewModel(revitRepository,
+            localizationService,
+            mepCategorySettings.WallSettings);
+        FloorSettings = new StructureCategoryViewModel(revitRepository,
+            localizationService,
+            mepCategorySettings.FloorSettings);
     }
 }

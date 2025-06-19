@@ -21,7 +21,8 @@ internal class DiameterRangeViewModel : BaseViewModel {
         Name = $"{_localizationService.GetLocalizedString("From")} " +
             $"{StartMepSize} " +
             $"{_localizationService.GetLocalizedString("To")} " +
-            $"{EndMepSize} {_localizationService.GetLocalizedString("Mm")}";
+            $"{EndMepSize} {_localizationService.GetLocalizedString("Mm")}:";
+        UnitName = _localizationService.GetLocalizedString("Mm");
     }
 
     public double StartMepSize { get; }
@@ -29,6 +30,8 @@ internal class DiameterRangeViewModel : BaseViewModel {
     public double EndMepSize { get; }
 
     public string Name { get; }
+
+    public string UnitName { get; }
 
     public double SleeveDiameter {
         get => _sleeveDiameter;
