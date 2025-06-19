@@ -10,14 +10,15 @@ using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
+using RevitFinishing.Models.Finishing;
 using RevitFinishing.ViewModels;
 
-namespace RevitFinishing.Models.Finishing
+namespace RevitFinishing.Services
 {
-    internal class FinishingChecker {
+    internal class FinishingValidationService {
         private readonly ILocalizationService _localizationService;
 
-        public FinishingChecker(ILocalizationService localizationService) {
+        public FinishingValidationService(ILocalizationService localizationService) {
             _localizationService = localizationService;
         }
 

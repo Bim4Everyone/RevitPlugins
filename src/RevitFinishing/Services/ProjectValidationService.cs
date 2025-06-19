@@ -18,13 +18,13 @@ using RevitFinishing.ViewModels.Errors;
 namespace RevitFinishing.Services
 {
     internal class ProjectValidationService {
-        private readonly FinishingChecker _finishingChecker;
+        private readonly FinishingValidationService _finishingValidationService;
         private readonly ILocalizationService _localizationService;
 
         public ProjectValidationService(ILocalizationService localizationService,
-                                        FinishingChecker finishingChecker) {
+                                        FinishingValidationService finishingValidationService) {
             _localizationService = localizationService;
-            _finishingChecker = finishingChecker;
+            _finishingValidationService = finishingValidationService;
         }
 
         public ErrorsViewModel CheckMainErrors(FinishingInProject allFinishing, 
@@ -34,16 +34,16 @@ namespace RevitFinishing.Services
 
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.NoFinishing"),
-                ErrorElements = [.. _finishingChecker.CheckPhaseContainsFinishing(allFinishing, phase)]
+                ErrorElements = [.. _finishingValidationService.CheckPhaseContainsFinishing(allFinishing, phase)]
             });
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.NoBoundaries"),
-                ErrorElements = [.. _finishingChecker.CheckFinishingByRoomBounding(allFinishing, phase)]
+                ErrorElements = [.. _finishingValidationService.CheckFinishingByRoomBounding(allFinishing, phase)]
             });
             string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
             mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam"),
-                ErrorElements = [.. _finishingChecker.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam, phase)]
+                ErrorElements = [.. _finishingValidationService.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam, phase)]
             });
 
             return mainErrors;
@@ -54,7 +54,7 @@ namespace RevitFinishing.Services
 
             finishingErrors.AddElements(new ErrorsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.DifPhases"),
-                ErrorElements = [.. _finishingChecker.CheckFinishingByRoom(calculator.FinishingElements, phase)]
+                ErrorElements = [.. _finishingValidationService.CheckFinishingByRoom(calculator.FinishingElements, phase)]
             });
 
             return finishingErrors;
@@ -69,13 +69,13 @@ namespace RevitFinishing.Services
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
                 Description = 
                     $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{numberParamName}\"",
-                ErrorElements = [.. _finishingChecker.CheckRoomsByParameter(selectedRooms, numberParamName, phase)]
+                ErrorElements = [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, numberParamName, phase)]
             });
             string nameParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME);
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
                 Description = 
                     $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{nameParamName}\"",
-                ErrorElements = [.. _finishingChecker.CheckRoomsByParameter(selectedRooms, nameParamName, phase)]
+                ErrorElements = [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, nameParamName, phase)]
             });
             parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
                 Description = _localizationService.GetLocalizedString("ErrorsWindow.CustomFamilies"),
