@@ -17,6 +17,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitFinishing.Models;
+using RevitFinishing.Models.Finishing;
 using RevitFinishing.Services;
 using RevitFinishing.ViewModels;
 using RevitFinishing.Views;
@@ -59,7 +60,11 @@ public class RevitFinishingCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<ProjectChecker>()
+        kernel.Bind<ProjectValidationService>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<FinishingChecker>()
             .ToSelf()
             .InSingletonScope();
 
