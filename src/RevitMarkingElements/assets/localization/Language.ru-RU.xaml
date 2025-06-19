@@ -18,7 +18,7 @@
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String x:Key="MainWindow.FinishLineSelection">Нажмите Esc для завершения выбора линий.</system:String>
-    <system:String x:Key="MainWindow.StartNumbericFrom">Начать нумерацию с числа.</system:String>
+    <system:String x:Key="MainWindow.StartNumbericFrom">Начать нумерацию с числа:</system:String>
     <system:String x:Key="MainWindow.Finish">Применить маркировку элементов</system:String>
     <system:String x:Key="MainWindow.Cancel">Отменить маркировку элементов</system:String>
     
