@@ -11,7 +11,6 @@ using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitFinishing.Models.Finishing;
-using RevitFinishing.ViewModels;
 
 namespace RevitFinishing.Models;
 
@@ -97,37 +96,8 @@ internal class RevitRepository {
             .ToList();
     }
 
-    public List<Room> GetRoomsByFilters(IEnumerable<RoomNameVM> roomNames,
-                                        IEnumerable<RoomDepartmentVM> roomDepartments,
-                                        IEnumerable<RoomLevelVM> roomLevels) {
-        List<ElementFilter> orFilters = new List<ElementFilter>();
-
-        if(roomNames.Any()) {
-            List <ElementFilter> nameParamFilters = new List<ElementFilter>();
-            foreach(var roomName in roomNames) {
-                nameParamFilters.Add(roomName.GetStringFilter());
-            }
-            orFilters.Add(new LogicalOrFilter(nameParamFilters));
-        }
-
-        if(roomDepartments.Any()) {
-            List<ElementFilter> departmentParamFilters = new List<ElementFilter>();
-            foreach(var roomDepartment in roomDepartments) {
-                departmentParamFilters.Add(roomDepartment.GetStringFilter());
-            }
-            orFilters.Add(new LogicalOrFilter(departmentParamFilters));
-        }
-
-        if(roomLevels.Any()) {
-            List<ElementFilter> levelParamFilters = new List<ElementFilter>();
-            foreach(var roomLevel in roomLevels) {
-                levelParamFilters.Add(roomLevel.GetElementIdFilter());
-            }
-            orFilters.Add(new LogicalOrFilter(levelParamFilters));
-        }
-
+    public List<Room> GetRoomsByFilters(List<ElementFilter> orFilters) {
         LogicalAndFilter finalFilter = new LogicalAndFilter(orFilters);
-
 
         return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)

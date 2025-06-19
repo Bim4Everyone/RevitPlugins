@@ -115,10 +115,17 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void CalculateFinishing() {
-        List<Room> selectedRooms = _revitRepository.GetRoomsByFilters(
-            RoomNames.Where(x => x.IsChecked), 
-            RoomDepartments.Where(x => x.IsChecked), 
-            RoomLevels.Where(x => x.IsChecked));
+        IEnumerable<RoomNameVM> selectedRoomNames = RoomNames.Where(x => x.IsChecked);
+        IEnumerable<RoomDepartmentVM> selectedRoomDepartments = RoomDepartments.Where(x => x.IsChecked);
+        IEnumerable<RoomLevelVM> selectedRoomLevels = RoomLevels.Where(x => x.IsChecked);
+
+        List<ElementFilter> orFilters = [];
+
+        orFilters = GetLogicalFilter(orFilters, selectedRoomNames);
+        orFilters = GetLogicalFilter(orFilters, selectedRoomDepartments);
+        orFilters = GetLogicalFilter(orFilters, selectedRoomLevels);
+
+        List<Room> selectedRooms = _revitRepository.GetRoomsByFilters(orFilters);
 
         FinishingInProject allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
 
@@ -165,6 +172,18 @@ internal class MainViewModel : BaseViewModel {
 
         ErrorText = "";
         return true;
+    }
+
+    private List<ElementFilter> GetLogicalFilter(List<ElementFilter> filter,
+                                         IEnumerable<SelectionElementVM> elements) {
+        if(elements.Any()) {
+            List<ElementFilter> levelParamFilters = new List<ElementFilter>();
+            foreach(var roomLevel in elements) {
+                levelParamFilters.Add(roomLevel.GetParameterFilter());
+            }
+            filter.Add(new LogicalOrFilter(levelParamFilters));
+        }
+        return filter;
     }
 
     private void LoadConfig() {

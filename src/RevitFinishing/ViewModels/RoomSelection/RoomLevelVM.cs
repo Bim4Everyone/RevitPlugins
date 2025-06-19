@@ -13,7 +13,7 @@ namespace RevitFinishing.ViewModels
 
         public Element Level => _level;
 
-        public ElementParameterFilter GetElementIdFilter() {
+        public override ElementParameterFilter GetParameterFilter() {
             ElementId paramId = new ElementId(BuiltInParameter.ROOM_UPPER_LEVEL);
             ParameterValueProvider valueProvider = new ParameterValueProvider(paramId);
             FilterNumericEquals ruleEvaluator = new FilterNumericEquals();

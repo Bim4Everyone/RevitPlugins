@@ -32,7 +32,7 @@ namespace RevitFinishing.ViewModels
             set => RaiseAndSetIfChanged(ref _isChecked, value);
         }
 
-        public ElementParameterFilter GetStringFilter() {
+        public virtual ElementParameterFilter GetParameterFilter() {
             ElementId paramId = new ElementId(_bltnParam);
             FilterRule filterRule;
 
