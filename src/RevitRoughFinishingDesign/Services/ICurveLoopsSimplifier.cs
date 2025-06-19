@@ -1,16 +1,15 @@
 using Autodesk.Revit.DB;
 
-namespace RevitRoughFinishingDesign.Services {
+namespace RevitRoughFinishingDesign.Services;
+/// <summary>
+/// Сервис, предоставляющий методы по упрощению замкнутых контуров
+/// </summary>
+internal interface ICurveLoopsSimplifier {
     /// <summary>
-    /// Сервис, предоставляющий методы по упрощению замкнутых контуров
+    /// Возвращает упрощенный замкнутый контур, 
+    /// в котором линии, лежащие на одной прямой и являющиеся продолжением друг друга объединены в одну.
     /// </summary>
-    internal interface ICurveLoopsSimplifier {
-        /// <summary>
-        /// Возвращает упрощенный замкнутый контур, 
-        /// в котором линии, лежащие на одной прямой и являющиеся продолжением друг друга объединены в одну.
-        /// </summary>
-        /// <param name="curveLoop">Замкнутый контур</param>
-        /// <returns>Новый контур с объединенными линиями</returns>
-        CurveLoop Simplify(CurveLoop curveLoop);
-    }
+    /// <param name="curveLoop">Замкнутый контур</param>
+    /// <returns>Новый контур с объединенными линиями</returns>
+    CurveLoop Simplify(CurveLoop curveLoop);
 }
