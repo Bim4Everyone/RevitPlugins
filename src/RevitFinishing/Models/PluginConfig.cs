@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
@@ -60,7 +59,7 @@ internal class RevitSettings : ProjectSettings {
     /// Наименование проекта. Системное свойство. (Не трогать)
     /// </summary>
     public override string ProjectName { get; set; }
-    
+
     /// <summary>
     /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
     /// </summary>

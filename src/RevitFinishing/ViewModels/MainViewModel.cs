@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
@@ -16,8 +14,7 @@ using dosymep.WPF.ViewModels;
 using RevitFinishing.Models;
 using RevitFinishing.Models.Finishing;
 using RevitFinishing.Services;
-using RevitFinishing.ViewModels.Errors;
-using RevitFinishing.Views;
+using RevitFinishing.ViewModels.Notices;
 
 namespace RevitFinishing.ViewModels;
 
@@ -57,7 +54,7 @@ internal class MainViewModel : BaseViewModel {
         _errorWindowService = errorWindowService;
         _projectValidationService = projectValidationService;
 
-        ProjectSettingsLoader settings = 
+        var settings =
             new ProjectSettingsLoader(_revitRepository.Application, _revitRepository.Document);
 
         settings.CopyKeySchedule();
@@ -127,14 +124,14 @@ internal class MainViewModel : BaseViewModel {
 
         IList<Room> selectedRooms = _revitRepository.GetRoomsByFilters(orFilters);
 
-        FinishingInProject allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
+        var allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
 
         ErrorsViewModel mainErrors = _projectValidationService.CheckMainErrors(allFinishing, selectedRooms, _selectedPhase);
         if(_errorWindowService.ShowNoticeWindow(mainErrors)) {
             return;
         }
 
-        FinishingCalculator calculator = new FinishingCalculator(selectedRooms, allFinishing);
+        var calculator = new FinishingCalculator(selectedRooms, allFinishing);
 
         ErrorsViewModel finishingErrors = _projectValidationService.CheckFinishingErrors(calculator, _selectedPhase);
         if(_errorWindowService.ShowNoticeWindow(finishingErrors)) {
@@ -144,7 +141,7 @@ internal class MainViewModel : BaseViewModel {
         IEnumerable<FinishingElement> finishingElements = calculator.FinishingElements;
         using(Transaction t = _revitRepository.Document
             .StartTransaction(_localizationService.GetLocalizedString("MainWindow.TransactionName"))) {
-            foreach(var element in finishingElements) {
+            foreach(FinishingElement element in finishingElements) {
                 element.UpdateFinishingParameters();
                 element.UpdateCategoryParameters();
             }
@@ -163,7 +160,7 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoRooms");
             return false;
         }
-        if(!RoomNames.Any(x => x.IsChecked) 
+        if(!RoomNames.Any(x => x.IsChecked)
             && !RoomDepartments.Any(x => x.IsChecked)
             && !RoomLevels.Any(x => x.IsChecked)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoSelectiom");
@@ -177,8 +174,8 @@ internal class MainViewModel : BaseViewModel {
     private IList<ElementFilter> GetLogicalFilter(IList<ElementFilter> filter,
                                          IEnumerable<SelectionElementVM> elements) {
         if(elements.Any()) {
-            List<ElementFilter> levelParamFilters = new List<ElementFilter>();
-            foreach(var roomLevel in elements) {
+            List<ElementFilter> levelParamFilters = [];
+            foreach(SelectionElementVM roomLevel in elements) {
                 levelParamFilters.Add(roomLevel.GetParameterFilter());
             }
             filter.Add(new LogicalOrFilter(levelParamFilters));
@@ -187,11 +184,9 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadConfig() {
-        var settings = _pluginConfig.GetSettings(_revitRepository.Document);
+        RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        if(settings is null) {
-            settings = _pluginConfig.AddSettings(_revitRepository.Document);
-        }
+        settings ??= _pluginConfig.AddSettings(_revitRepository.Document);
 
         settings.Phase = SelectedPhase.Name;
         settings.RoomNames = RoomNames
@@ -203,11 +198,9 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void SaveConfig() {
-        var settings = _pluginConfig.GetSettings(_revitRepository.Document);
+        RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        if(settings is null) {
-            settings = _pluginConfig.AddSettings(_revitRepository.Document);
-        }
+        settings ??= _pluginConfig.AddSettings(_revitRepository.Document);
 
         settings.Phase = SelectedPhase.Name;
         settings.RoomNames = RoomNames

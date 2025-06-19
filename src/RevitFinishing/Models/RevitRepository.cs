@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -24,12 +23,12 @@ internal class RevitRepository {
     public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication;
 
-        _phaseStatuses = new Collection<ElementOnPhaseStatus>() {
+        _phaseStatuses = [
                 ElementOnPhaseStatus.Existing,
                 ElementOnPhaseStatus.Demolished,
                 ElementOnPhaseStatus.New,
                 ElementOnPhaseStatus.Temporary
-            };
+            ];
     }
 
     public UIApplication UIApplication { get; }
@@ -45,10 +44,10 @@ internal class RevitRepository {
     }
 
     public IList<string> GetParamStringValues(Phase phase, BuiltInParameter param) {
-        ParameterValueProvider valueProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
-        FilterNumericEquals ruleEvaluator = new FilterNumericEquals();
-        FilterElementIdRule filterRule = new FilterElementIdRule(valueProvider, ruleEvaluator, phase.Id);
-        ElementParameterFilter parameterFilter = new ElementParameterFilter(filterRule);
+        var valueProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
+        var ruleEvaluator = new FilterNumericEquals();
+        var filterRule = new FilterElementIdRule(valueProvider, ruleEvaluator, phase.Id);
+        var parameterFilter = new ElementParameterFilter(filterRule);
 
         return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)
@@ -60,10 +59,10 @@ internal class RevitRepository {
     }
 
     public IEnumerable<Element> GetRoomLevels(Phase phase) {
-        ParameterValueProvider valueProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
-        FilterNumericEquals ruleEvaluator = new FilterNumericEquals();
-        FilterElementIdRule filterRule = new FilterElementIdRule(valueProvider, ruleEvaluator, phase.Id);
-        ElementParameterFilter parameterFilter = new ElementParameterFilter(filterRule);
+        var valueProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.ROOM_PHASE));
+        var ruleEvaluator = new FilterNumericEquals();
+        var filterRule = new FilterElementIdRule(valueProvider, ruleEvaluator, phase.Id);
+        var parameterFilter = new ElementParameterFilter(filterRule);
 
         return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)
@@ -75,18 +74,18 @@ internal class RevitRepository {
     }
 
     public IReadOnlyCollection<Element> GetFinishingElementsOnPhase(FinishingCategory finishingCategory, Phase phase) {
-        ElementPhaseStatusFilter phaseFilter = new ElementPhaseStatusFilter(phase.Id, _phaseStatuses);
-        ElementId parameterId = new ElementId(BuiltInParameter.ELEM_TYPE_PARAM);
-        ParameterValueProvider valueProvider = new ParameterValueProvider(parameterId);
-        FilterStringContains ruleEvaluator = new FilterStringContains();
+        var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _phaseStatuses);
+        var parameterId = new ElementId(BuiltInParameter.ELEM_TYPE_PARAM);
+        var valueProvider = new ParameterValueProvider(parameterId);
+        var ruleEvaluator = new FilterStringContains();
 #if REVIT_2021_OR_LESS
         FilterStringRule rule = new FilterStringRule(valueProvider, ruleEvaluator, finishingCategory.KeyWord, false);
 #else
-        FilterStringRule rule = new FilterStringRule(valueProvider, ruleEvaluator, finishingCategory.KeyWord);
+        var rule = new FilterStringRule(valueProvider, ruleEvaluator, finishingCategory.KeyWord);
 #endif
-        ElementParameterFilter parameterFilter = new ElementParameterFilter(rule);
+        var parameterFilter = new ElementParameterFilter(rule);
 
-        ElementMulticategoryFilter categoryFilter = new ElementMulticategoryFilter(finishingCategory.Category);
+        var categoryFilter = new ElementMulticategoryFilter(finishingCategory.Category);
 
         return new FilteredElementCollector(Document)
             .WherePasses(categoryFilter)
@@ -98,7 +97,7 @@ internal class RevitRepository {
     }
 
     public IList<Room> GetRoomsByFilters(IList<ElementFilter> orFilters) {
-        LogicalAndFilter finalFilter = new LogicalAndFilter(orFilters);
+        var finalFilter = new LogicalAndFilter(orFilters);
 
         return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)
