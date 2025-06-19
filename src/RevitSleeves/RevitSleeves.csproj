@@ -13,4 +13,7 @@
       <Folder Include="Views\Navigator\" />
       <Folder Include="Views\Placing\" />
     </ItemGroup>
+    <ItemGroup>
+      <Resource Include="assets\Styles\CustomStyles.xaml" />
+    </ItemGroup>
 </Project>

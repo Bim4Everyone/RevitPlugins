@@ -15,11 +15,17 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    Height="500"
-    Width="700"
     MinHeight="500"
-    MinWidth="700"
+    MinWidth="750"
     d:DataContext="{d:DesignInstance vms:SleevePlacementSettingsViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../assets/Styles/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger
@@ -41,20 +47,39 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            Title="{me:LocalizationSource SleevePlacementSettingsWindow.Title}" />
 
-        <ScrollViewer Grid.Row="1">
-            <ContentControl
-                Content="{Binding ActiveMepCategorySettings.MepFilterViewModel}">
-                <ContentControl.ContentTemplate>
-                    <DataTemplate
-                        DataType="{x:Type filterViewModel:SetViewModel}">
-                        <filterView:SetView
-                            DataContext="{Binding}" />
-                    </DataTemplate>
-                </ContentControl.ContentTemplate>
-            </ContentControl>
-        </ScrollViewer>
+        <Grid
+            Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition
+                    Height="Auto" />
+                <RowDefinition
+                    Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Border
+                Grid.Row="1"
+                Style="{StaticResource CustomBorder}">
+
+                <ScrollViewer>
+                    <ContentControl
+                        Content="{Binding ActiveMepCategorySettings.MepFilterViewModel}">
+                        <ContentControl.ContentTemplate>
+                            <DataTemplate
+                                DataType="{x:Type filterViewModel:SetViewModel}">
+                                <filterView:SetView
+                                    DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ContentControl.ContentTemplate>
+                    </ContentControl>
+                </ScrollViewer>
+            </Border>
+        </Grid>
 
         <StackPanel
             Grid.Row="2"
@@ -71,14 +96,16 @@
                 Margin="10"
                 Width="80"
                 Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                d:Appearance="Danger"
+                d:Content="Ok"
+                Content="{me:LocalizationSource Ok}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
                 Margin="10"
                 Width="80"
-                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                Content="{me:LocalizationSource Cancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
