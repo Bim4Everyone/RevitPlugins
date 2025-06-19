@@ -11,6 +11,8 @@ using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using RevitFinishing.Services;
+
 namespace RevitFinishing.Models.Finishing
 {
     /// <summary>

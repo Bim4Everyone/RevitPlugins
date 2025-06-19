@@ -2,6 +2,8 @@ using System;
 
 using Autodesk.Revit.DB;
 
+using RevitFinishing.Services;
+
 namespace RevitFinishing.Models.Finishing
 {
     internal class FinishingFactory {

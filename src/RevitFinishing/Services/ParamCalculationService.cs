@@ -10,8 +10,9 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
-namespace RevitFinishing.Models
-{
+using RevitFinishing.Models;
+
+namespace RevitFinishing.Services {
     internal class ParamCalculationService {
         private string GenerateStrWithUniqueValues(IEnumerable<string> values) {
             return string.Join("; ", values.Distinct());

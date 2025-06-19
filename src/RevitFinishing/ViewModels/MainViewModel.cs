@@ -48,7 +48,7 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(PluginConfig pluginConfig,
                          RevitRepository revitRepository,
                          ILocalizationService localizationService,
-                         ErrorWindowService errorWindowService) {        
+                         ErrorWindowService errorWindowService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
