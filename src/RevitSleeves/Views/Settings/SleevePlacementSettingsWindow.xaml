@@ -15,8 +15,10 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    MinHeight="500"
-    MinWidth="750"
+    MinHeight="600"
+    MinWidth="900"
+    Width="1500"
+    Height="900"
     d:DataContext="{d:DesignInstance vms:SleevePlacementSettingsViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <ResourceDictionary>
@@ -66,12 +68,27 @@
                 Style="{StaticResource CustomBorder}">
                 <DockPanel>
                     <ui:Button
+                        Margin="0 0 10 0"
+                        Command="{Binding LoadSettingsCommand}"
                         Content="{ui:SymbolIcon Symbol=ArrowDownload20}" />
                     <ui:Button
                         Margin="10 0"
+                        Command="{Binding SaveSettingsCommand}"
                         Content="{ui:SymbolIcon Symbol=Save20}" />
                     <ui:Button
+                        Margin="10 0"
+                        Command="{Binding SaveAsSettingsCommand}"
                         Content="{ui:SymbolIcon Symbol=SaveEdit20}" />
+                    <ui:Button
+                        Margin="10 0"
+                        Command="{Binding ShowConfigFolderCommand}"
+                        Content="{ui:SymbolIcon Symbol=FolderOpen20}" />
+                    <Label
+                        Margin="0 0 5 0"
+                        Style="{StaticResource CustomLabel}"
+                        Content="{me:LocalizationSource SleevePlacementSettingsWindow.SettingsName}" />
+                    <TextBox
+                        Text="{Binding Name}" />
                 </DockPanel>
             </Border>
 
@@ -96,13 +113,13 @@
                             LastChildFill="True">
                             <Label
                                 DockPanel.Dock="Top"
-                                Content="Диапазоны диаметров"
+                                Content="{me:LocalizationSource SleevePlacementSettingsWindow.DiameterRanges}"
                                 Target="{Binding ElementName=DiameterRanges}" />
-                            <ListBox
+                            <ui:ListView
                                 DockPanel.Dock="Bottom"
                                 x:Name="DiameterRanges"
                                 ItemsSource="{Binding ActiveMepCategorySettings.DiameterRanges}">
-                                <ListBox.ItemTemplate>
+                                <ui:ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Border
                                             Style="{StaticResource CustomBorder}">
@@ -118,8 +135,8 @@
                                             </ContentControl>
                                         </Border>
                                     </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                </ui:ListView.ItemTemplate>
+                            </ui:ListView>
                         </DockPanel>
                     </Border>
 
@@ -130,19 +147,18 @@
                             LastChildFill="True">
                             <Label
                                 DockPanel.Dock="Top"
-                                Content="Отступы"
+                                Content="{me:LocalizationSource SleevePlacementSettingsWindow.Offsets}"
                                 Target="{Binding ElementName=Offsets}">
                             </Label>
-                            <ListBox
+                            <ui:ListView
                                 DockPanel.Dock="Bottom"
                                 x:Name="Offsets"
                                 ItemsSource="{Binding ActiveMepCategorySettings.Offsets}">
-                                <ListBox.ItemTemplate>
+                                <ui:ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Border
                                             Style="{StaticResource CustomBorder}">
                                             <ContentControl
-                                                Width="250"
                                                 Content="{Binding}">
                                                 <ContentControl.ContentTemplate>
                                                     <DataTemplate
@@ -154,8 +170,8 @@
                                             </ContentControl>
                                         </Border>
                                     </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                </ui:ListView.ItemTemplate>
+                            </ui:ListView>
                         </DockPanel>
                     </Border>
 
@@ -201,7 +217,7 @@
                     </Grid.RowDefinitions>
 
                     <Label
-                        Content="Фильтрация конструкций" />
+                        Content="{me:LocalizationSource SleevePlacementSettingsWindow.StructureFiltration}" />
 
                     <Border
                         Grid.Row="1"
@@ -244,9 +260,33 @@
 
             <ui:TextBlock
                 Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
+                Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorText}" />
+
+            <ui:ToggleSwitch
+                Margin="10"
+                IsChecked="{Binding ShowPlacingErrors}"
+                Content="{me:LocalizationSource SleevePlacementSettingsWindow.ShowPlacingErrors}" />
+
+            <ui:DropDownButton
+                Margin="10"
+                Appearance="Secondary"
+                Content="{me:LocalizationSource SleevePlacementSettingsWindow.CheckFilter}"
+                Style="{StaticResource DefaultUiDropDownButtonStyle}">
+                <ui:DropDownButton.Flyout>
+                    <ContextMenu>
+                        <MenuItem
+                            Header="{Binding ActiveMepCategorySettings.Name}"
+                            Command="{Binding ShowMepFilterCommand}" />
+                        <MenuItem
+                            Header="{Binding ActiveMepCategorySettings.WallSettings.Name}"
+                            Command="{Binding ShowWallsFilterCommand}" />
+                        <MenuItem
+                            Header="{Binding ActiveMepCategorySettings.FloorSettings.Name}"
+                            Command="{Binding ShowFloorFilterCommand}" />
+                    </ContextMenu>
+                </ui:DropDownButton.Flyout>
+            </ui:DropDownButton>
 
             <ui:Button
                 Margin="10"

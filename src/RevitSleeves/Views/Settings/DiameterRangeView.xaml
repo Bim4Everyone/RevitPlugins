@@ -24,7 +24,7 @@
         VerticalAlignment="Center">
         <Label
             DockPanel.Dock="Left"
-            Style="{StaticResource CustomSmallLabel}"
+            Style="{StaticResource CustomLabel}"
             Content="{Binding Name}" />
         <DockPanel
             DockPanel.Dock="Right"
@@ -36,7 +36,7 @@
                 Text="{Binding SleeveDiameter}" />
             <Label
                 Margin="5 0 0 0"
-                Style="{StaticResource CustomSmallLabel}"
+                Style="{StaticResource CustomLabel}"
                 Content="{Binding UnitName}" />
         </DockPanel>
     </DockPanel>

@@ -8,6 +8,18 @@
 
     <system:String
         x:Key="SleevePlacementSettingsWindow.Title">Настройки расстановки гильз</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.CheckFilter">Проверить фильтр</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.ShowPlacingErrors">Выводить ошибки расстановки</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.StructureFiltration">Фильтрация конструкций</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.DiameterRanges">Диапазоны диаметров</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.Offsets">Отступы</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.SettingsName">Название настроек:</system:String>
 
     <system:String
         x:Key="From">от</system:String>

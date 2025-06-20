@@ -23,6 +23,7 @@
     <StackPanel>
         <ui:TextBlock
             Margin="0 0 0 5"
+            MaxWidth="250"
             Style="{StaticResource CustomTextBlockAsLabel}"
             Text="{Binding Name}" />
         <DockPanel
@@ -34,7 +35,7 @@
                 Style="{StaticResource CustomSmallTextBox}" />
             <Label
                 Margin="5 0 0 0"
-                Style="{StaticResource CustomSmallLabel}"
+                Style="{StaticResource CustomLabel}"
                 Content="{Binding UnitName}" />
         </DockPanel>
     </StackPanel>
