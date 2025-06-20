@@ -33,8 +33,8 @@ public class SleevesSettingsCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<PluginConfig>()
-            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+        kernel.Bind<SleevePlacementSettingsConfig>()
+            .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         kernel.UseWpfUIThemeUpdater();
 

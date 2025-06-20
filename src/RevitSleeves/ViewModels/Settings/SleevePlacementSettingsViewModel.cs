@@ -11,7 +11,7 @@ using RevitSleeves.Models.Config;
 namespace RevitSleeves.ViewModels.Settings;
 
 internal class SleevePlacementSettingsViewModel : BaseViewModel {
-    private readonly PluginConfig _pluginConfig;
+    private readonly SleevePlacementSettingsConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly ISaveFileDialogService _saveFileDialogService;
@@ -19,9 +19,10 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
     private MepCategoryViewModel _activeMepCategorySettings;
     private string _errorText;
     private bool _showPlacingErrors;
+    private string _name;
 
     public SleevePlacementSettingsViewModel(
-        PluginConfig pluginConfig,
+        SleevePlacementSettingsConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         ISaveFileDialogService saveFileDialogService,
@@ -46,7 +47,11 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
 
     public ICommand AcceptViewCommand { get; }
 
+    public ICommand SaveSettingsCommand { get; }
+
     public ICommand SaveAsSettingsCommand { get; }
+
+    public ICommand ShowSettingsFolderCommand { get; }
 
     public ICommand LoadSettingsCommand { get; }
 
@@ -71,6 +76,10 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _activeMepCategorySettings, value);
     }
 
+    public string Name {
+        get => _name;
+        set => RaiseAndSetIfChanged(ref _name, value);
+    }
 
     private void LoadView() {
         LoadConfig();
