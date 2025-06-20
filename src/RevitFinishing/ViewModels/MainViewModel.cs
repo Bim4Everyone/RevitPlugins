@@ -79,15 +79,18 @@ internal class MainViewModel : BaseViewModel {
 
             RoomNames = [.. _revitRepository
                 .GetParamStringValues(_selectedPhase, BuiltInParameter.ROOM_NAME)
-                .Select(x => new RoomNameVM(x, BuiltInParameter.ROOM_NAME, _localizationService))];
+                .Select(x => new RoomNameVM(x, BuiltInParameter.ROOM_NAME, _localizationService))
+                .OrderBy(x => x.Name)];
 
             RoomDepartments = [.. _revitRepository
                 .GetParamStringValues(_selectedPhase, BuiltInParameter.ROOM_DEPARTMENT)
-                .Select(x => new RoomDepartmentVM(x, BuiltInParameter.ROOM_DEPARTMENT, _localizationService))];
+                .Select(x => new RoomDepartmentVM(x, BuiltInParameter.ROOM_DEPARTMENT, _localizationService))
+                .OrderBy(x => x.Name)];
 
             RoomLevels = [.. _revitRepository
                 .GetRoomLevels(_selectedPhase)
-                .Select(x => new RoomLevelVM(x, x.Name, BuiltInParameter.ROOM_UPPER_LEVEL, _localizationService))];
+                .Select(x => new RoomLevelVM(x, x.Name, BuiltInParameter.ROOM_UPPER_LEVEL, _localizationService))
+                .OrderBy(x => x.Name)];
         }
     }
 

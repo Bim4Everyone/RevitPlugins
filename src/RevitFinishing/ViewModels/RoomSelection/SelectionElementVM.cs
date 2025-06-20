@@ -15,10 +15,10 @@ internal abstract class SelectionElementVM : BaseViewModel {
         _localizationService = localizationService;
 
         if(string.IsNullOrEmpty(name)) {
-                _name = _localizationService.GetLocalizedString("ErrorsWindow.WithoutLevel");
+            _name = _localizationService.GetLocalizedString("ErrorsWindow.WithoutValue");
             _isEmpty = true;
         } else {
-                _name = name;
+            _name = name;
             _isEmpty = false;
         }
 

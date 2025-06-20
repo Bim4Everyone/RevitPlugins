@@ -11,8 +11,8 @@ internal class NoticeElementViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
     public NoticeElementViewModel(Element element,
-                                    string phaseName,
-                                    ILocalizationService localizationService) {
+                                  string phaseName,
+                                  ILocalizationService localizationService) {
         _element = element;
         _phaseName = phaseName;
         _localizationService = localizationService;
@@ -20,7 +20,7 @@ internal class NoticeElementViewModel : BaseViewModel {
         ElementId levelId = _element.LevelId;
             _levelName = levelId != ElementId.InvalidElementId
             ? _element.Document.GetElement(levelId).Name
-            : _localizationService.GetLocalizedString("ErrorsWindow.WithoutName");
+            : _localizationService.GetLocalizedString("ErrorsWindow.WithoutLevel");
     }
 
     public ElementId ElementId => _element.Id;

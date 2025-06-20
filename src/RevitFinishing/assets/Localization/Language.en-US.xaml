@@ -2,12 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на английский американский язык (google translate) -->
-
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
-
     <system:String x:Key="MainWindow.Phases">Phases</system:String>
     <system:String x:Key="MainWindow.RoomNames">Room names</system:String>
     <system:String x:Key="MainWindow.RoomDepartments">Room Departments:</system:String>
@@ -18,6 +12,36 @@
     <system:String x:Key="MainWindow.UnCheckAll">Unselect all</system:String>
     <system:String x:Key="MainWindow.InvertAll">Invert</system:String>
 
+    <system:String x:Key="MainWindow.ErrorNoSelectiom">Rooms are not selected</system:String>
+    <system:String x:Key="MainWindow.ErrorNoRooms">No rooms at selected phase</system:String>
+s
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.TransactionName">Calculate finishing</system:String>
+    
+    <system:String x:Key="ErrorsWindow.WithoutValue">&lt;No value&gt;</system:String>
+    <system:String x:Key="ErrorsWindow.WithoutLevel">&lt;No level&gt;</system:String>
+
+    <system:String x:Key="ErrorsWindow.ListErrorType">Error</system:String>
+    <system:String x:Key="ErrorsWindow.ListWarningType">Warning</system:String>
+
+    <system:String x:Key="ErrorsWindow.NoFinishing">No finishing elements at selected phase</system:String>
+    <system:String x:Key="ErrorsWindow.NoBoundaries">Finishing elements are room boundaries</system:String>
+    <system:String x:Key="ErrorsWindow.NoKeyParam">Key parameter is empty</system:String>
+    <system:String x:Key="ErrorsWindow.DifPhases">Finishing elements belong to different finishing types</system:String>
+    <system:String x:Key="ErrorsWindow.NoParam">Parameter is empty</system:String>
+    <system:String x:Key="ErrorsWindow.CustomFamilies">
+        Project includes custom an in-place families.
+        You have to check finishing parameters (length, area, volume).
+    </system:String>
+
+    <system:String x:Key="ErrorsWindow.ErrorsDescription">
+        Calculation not completed!
+        Check these errors:
+    </system:String>
+    <system:String x:Key="ErrorsWindow.WarningsDescription">
+        Calculation completed!
+        But you have to check these warnings:
+    </system:String>
 </ResourceDictionary>

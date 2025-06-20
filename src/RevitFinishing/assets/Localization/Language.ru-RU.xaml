@@ -21,8 +21,8 @@
 
     <system:String x:Key="MainWindow.TransactionName">Заполнить параметры отделки</system:String>
 
-    <system:String x:Key="ErrorsWindow.WithoutLevel">Без уровня</system:String>
-    <system:String x:Key="ErrorsWindow.WithoutName">Без имени></system:String>
+    <system:String x:Key="ErrorsWindow.WithoutValue">&lt;Без значения&gt;</system:String>
+    <system:String x:Key="ErrorsWindow.WithoutLevel">&lt;Без уровня&gt;</system:String>
 
     <system:String x:Key="ErrorsWindow.ListErrorType">Ошибка</system:String> 
     <system:String x:Key="ErrorsWindow.ListWarningType">Предупреждение</system:String>
@@ -32,7 +32,10 @@
     <system:String x:Key="ErrorsWindow.NoKeyParam">У помещений не заполнен ключевой параметр отделки</system:String>
     <system:String x:Key="ErrorsWindow.DifPhases">Элементы отделки относятся к помещениям с разными типами отделки</system:String>
     <system:String x:Key="ErrorsWindow.NoParam">У помещений не заполнен параметр</system:String> 
-    <system:String x:Key="ErrorsWindow.CustomFamilies">Пользовательские семейства</system:String> 
+    <system:String x:Key="ErrorsWindow.CustomFamilies">
+        В проекте найдены пользовательские и контекстные семейства отделки.
+        Для них требуется проверить корректность расчетных параметров отделки (длина, площадь, объем). 
+    </system:String> 
 
     <system:String x:Key="ErrorsWindow.ErrorsDescription">
         Расчет отделки не выполнен!
