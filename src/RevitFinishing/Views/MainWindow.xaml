@@ -29,9 +29,16 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -50,89 +57,120 @@
             Grid.ColumnSpan="3"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <DockPanel
+        <Border
             Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="3"
-            Margin="10">
-            <ui:TextBlock
-                DockPanel.Dock="Left"
-                Width="80"
-                VerticalAlignment="Center"
-                Text="{me:LocalizationSource MainWindow.Phases}"/>
-            <ComboBox
-                Height="Auto"
-                ItemsSource="{Binding Phases}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding SelectedPhase}"/>
-        </DockPanel>
+            Margin="10,5"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel>
+                <ui:TextBlock
+                    DockPanel.Dock="Left"
+                    Width="80"
+                    VerticalAlignment="Center"
+                    Text="{me:LocalizationSource MainWindow.Phases}"/>
+                <ComboBox
+                    Height="Auto"
+                    ItemsSource="{Binding Phases}"
+                    DisplayMemberPath="Name"
+                    SelectedItem="{Binding SelectedPhase}"/>
+            </DockPanel>            
+        </Border>
 
-        <ui:TextBlock
+        <Border
             Grid.Row="2"
             Grid.Column="0"
-            Margin="10"
-            Text="{me:LocalizationSource MainWindow.RoomNames}"/>
+            Grid.ColumnSpan="3"
+            Margin="10,5"
+            Style="{StaticResource CustomBorder}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
 
-        <ui:TextBlock
-            Grid.Row="2"
-            Grid.Column="1"
-            Margin="10"
-            Text="{me:LocalizationSource MainWindow.RoomDepartments}"/>
+                <ui:TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="10"
+                    Text="{me:LocalizationSource MainWindow.RoomNames}"/>
 
-        <ui:TextBlock
-            Grid.Row="2"
-            Grid.Column="2"
-            Margin="10"
-            Text="{me:LocalizationSource MainWindow.RoomLevels}"/>
+                <ui:TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Margin="10"
+                    Text="{me:LocalizationSource MainWindow.RoomDepartments}"/>
 
-        <ListBox
-            x:Name="RoomNames"
-            Grid.Row="3"
-            Grid.Column="0"
-            Margin="10, 5"
-            SelectionMode="Extended"
-            ItemsSource="{Binding RoomNames}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox
-                        Content="{Binding Name}"
-                        IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                <ui:TextBlock
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Margin="10"
+                    Text="{me:LocalizationSource MainWindow.RoomLevels}"/>
 
-        <ListBox
-            x:Name="RoomDepartments"
-            Grid.Row="3"
-            Grid.Column="1"
-            Margin="10, 5"
-            SelectionMode="Extended"
-            ItemsSource="{Binding RoomDepartments}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox
-                        Content="{Binding Name}"
-                        IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="10,5"
+                    Style="{StaticResource CustomBorder}">
+                    <ListBox
+                        x:Name="RoomNames"
+                        SelectionMode="Extended"
+                        ItemsSource="{Binding RoomNames}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Content="{Binding Name}"
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
 
-        <ListBox
-            x:Name="RoomLevels"
-            Grid.Row="3"
-            Grid.Column="2"
-            Margin="10, 5"
-            SelectionMode="Extended"
-            ItemsSource="{Binding RoomLevels}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox
-                        Content="{Binding Name}"
-                        IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="10,5"
+                    Style="{StaticResource CustomBorder}">
+                    <ListBox
+                        x:Name="RoomDepartments"
+                        SelectionMode="Extended"
+                        ItemsSource="{Binding RoomDepartments}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Content="{Binding Name}"
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
 
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Margin="10,5"
+                    Style="{StaticResource CustomBorder}">
+                    <ListBox
+                        x:Name="RoomLevels"
+                        SelectionMode="Extended"
+                        ItemsSource="{Binding RoomLevels}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Content="{Binding Name}"
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </Grid>
+        </Border>
+        
         <StackPanel
             Grid.Row="4"
             Grid.Column="0"
