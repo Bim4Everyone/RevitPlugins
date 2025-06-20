@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
@@ -66,5 +67,45 @@ internal class MepCategoryViewModel : BaseViewModel {
         FloorSettings = new StructureCategoryViewModel(revitRepository,
             localizationService,
             mepCategorySettings.FloorSettings);
+    }
+
+    public string GetErrorText() {
+        // TODO
+        //var sizeError = MinSizes.Select(item => item.GetErrorText()).FirstOrDefault(item => !string.IsNullOrEmpty(item));
+        //if(!string.IsNullOrEmpty(sizeError)) {
+        //    return $"У категории \"{Name}\" {sizeError}";
+        //}
+        //var offsetError = Offsets.Select(item => item.GetErrorText()).FirstOrDefault(item => !string.IsNullOrEmpty(item));
+        //if(!string.IsNullOrEmpty(offsetError)) {
+        //    return $"У категории \"{Name}\" {offsetError}";
+        //}
+        //var intersectionOffsetError = GetIntersectionOffsetError();
+        //if(!string.IsNullOrEmpty(intersectionOffsetError)) {
+        //    return $"У категории \"{Name}\" {intersectionOffsetError}";
+        //}
+        //if(IsSelected && StructureCategories.All(item => !item.IsSelected)) {
+        //    return $"Для категории \"{Name}\" выберите категории для пересечения";
+        //}
+        //if(SetViewModel.IsEmpty()) {
+        //    return $"Поля фильтра для ВИС категории \'{Name}\' должны быть заполнены.";
+        //}
+        //var structureEmptyFilter = StructureCategories.FirstOrDefault(item => item.SetViewModel.IsEmpty());
+        //if(structureEmptyFilter != null) {
+        //    return $"Поля фильтра категории \'{structureEmptyFilter.Name}\' для ВИС категории \'{Name}\' должны быть заполнены.";
+        //}
+        //if(!string.IsNullOrEmpty(SetViewModel.GetErrorText())) {
+        //    return SetViewModel.GetErrorText();
+        //}
+        return null;
+    }
+
+    public T GetSettings<T>() where T : MepCategorySettings, new() {
+        return new T() {
+            DiameterRanges = [.. DiameterRanges.Select(item => item.GetDiameterRange())],
+            Offsets = [.. Offsets.Select(item => item.GetOffset())],
+            FloorSettings = FloorSettings.GetStructureSettings<FloorSettings>(),
+            WallSettings = WallSettings.GetStructureSettings<WallSettings>(),
+            MepFilterSet = MepFilterViewModel.GetSet(),
+        };
     }
 }

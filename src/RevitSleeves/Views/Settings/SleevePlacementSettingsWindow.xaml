@@ -10,6 +10,7 @@
     xmlns:filterViewModel="clr-namespace:RevitSleeves.ViewModels.Filtration"
     xmlns:filterView="clr-namespace:RevitSleeves.Views.Filtration"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:b="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
@@ -28,6 +29,15 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+
+    <i:Interaction.Behaviors>
+        <b:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}" />
+        <b:WpfAttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}" />
+        <b:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+    </i:Interaction.Behaviors>
 
     <i:Interaction.Triggers>
         <i:EventTrigger
@@ -118,7 +128,7 @@
                             <ui:ListView
                                 DockPanel.Dock="Bottom"
                                 x:Name="DiameterRanges"
-                                ItemsSource="{Binding ActiveMepCategorySettings.DiameterRanges}">
+                                ItemsSource="{Binding PipeSettings.DiameterRanges}">
                                 <ui:ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Border
@@ -153,7 +163,7 @@
                             <ui:ListView
                                 DockPanel.Dock="Bottom"
                                 x:Name="Offsets"
-                                ItemsSource="{Binding ActiveMepCategorySettings.Offsets}">
+                                ItemsSource="{Binding PipeSettings.Offsets}">
                                 <ui:ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Border
@@ -183,13 +193,13 @@
                             LastChildFill="True">
                             <Label
                                 DockPanel.Dock="Top"
-                                Content="{Binding ActiveMepCategorySettings.Name}"
+                                Content="{Binding PipeSettings.Name}"
                                 Target="{Binding ElementName=MepFilter}" />
                             <ScrollViewer
                                 x:Name="MepFilter"
                                 DockPanel.Dock="Bottom">
                                 <ContentControl
-                                    Content="{Binding ActiveMepCategorySettings.MepFilterViewModel}">
+                                    Content="{Binding PipeSettings.MepFilterViewModel}">
                                     <ContentControl.ContentTemplate>
                                         <DataTemplate
                                             DataType="{x:Type filterViewModel:SetViewModel}">
@@ -223,7 +233,7 @@
                         Grid.Row="1"
                         Style="{StaticResource CustomBorder}">
                         <ContentControl
-                            Content="{Binding ActiveMepCategorySettings.WallSettings}">
+                            Content="{Binding PipeSettings.WallSettings}">
                             <ContentControl.ContentTemplate>
                                 <DataTemplate
                                     DataType="{x:Type vms:StructureCategoryViewModel}">
@@ -238,7 +248,7 @@
                         Grid.Row="2"
                         Style="{StaticResource CustomBorder}">
                         <ContentControl
-                            Content="{Binding ActiveMepCategorySettings.FloorSettings}">
+                            Content="{Binding PipeSettings.FloorSettings}">
                             <ContentControl.ContentTemplate>
                                 <DataTemplate
                                     DataType="{x:Type vms:StructureCategoryViewModel}">
@@ -276,13 +286,16 @@
                 <ui:DropDownButton.Flyout>
                     <ContextMenu>
                         <MenuItem
-                            Header="{Binding ActiveMepCategorySettings.Name}"
+                            Click="ButtonOk_Click"
+                            Header="{Binding PipeSettings.Name}"
                             Command="{Binding ShowMepFilterCommand}" />
                         <MenuItem
-                            Header="{Binding ActiveMepCategorySettings.WallSettings.Name}"
+                            Click="ButtonOk_Click"
+                            Header="{Binding PipeSettings.WallSettings.Name}"
                             Command="{Binding ShowWallsFilterCommand}" />
                         <MenuItem
-                            Header="{Binding ActiveMepCategorySettings.FloorSettings.Name}"
+                            Click="ButtonOk_Click"
+                            Header="{Binding PipeSettings.FloorSettings.Name}"
                             Command="{Binding ShowFloorFilterCommand}" />
                     </ContextMenu>
                 </ui:DropDownButton.Flyout>

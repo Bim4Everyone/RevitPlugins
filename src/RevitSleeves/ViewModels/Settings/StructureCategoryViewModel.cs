@@ -52,4 +52,11 @@ internal class StructureCategoryViewModel : BaseViewModel {
         Name = category.Name;
         IsEnabled = structureSettings.IsEnabled;
     }
+
+    public T GetStructureSettings<T>() where T : StructureSettings, new() {
+        return new T() {
+            FilterSet = StructureFilterViewModel.GetSet(),
+            IsEnabled = IsEnabled
+        };
+    }
 }

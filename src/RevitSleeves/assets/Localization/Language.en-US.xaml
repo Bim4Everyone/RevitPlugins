@@ -22,6 +22,20 @@
         x:Key="SleevePlacementSettingsWindow.SettingsName">Settings name:</system:String>
 
     <system:String
+        x:Key="SleevePlacementSettings.Validation.SetName">Set settings name.</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.NameTooLong">Settings name is too long.</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettings.DefaultFileName">Sleeve placement settings</system:String>
+
+    <system:String
+        x:Key="Error">Error</system:String>
+
+    <system:String
+        x:Key="Errors.CannotLoadPlacementSettings">Cannot load placement settings.</system:String>
+
+    <system:String
         x:Key="From">from</system:String>
     <system:String
         x:Key="To">to</system:String>

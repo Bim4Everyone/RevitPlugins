@@ -37,4 +37,13 @@ internal class DiameterRangeViewModel : BaseViewModel {
         get => _sleeveDiameter;
         set => RaiseAndSetIfChanged(ref _sleeveDiameter, value);
     }
+
+
+    public DiameterRange GetDiameterRange() {
+        return new DiameterRange() {
+            StartMepSize = StartMepSize,
+            EndMepSize = EndMepSize,
+            SleeveDiameter = SleeveDiameter
+        };
+    }
 }

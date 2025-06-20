@@ -15,6 +15,7 @@ using Ninject;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
+using RevitSleeves.Services.Settings;
 using RevitSleeves.ViewModels.Settings;
 using RevitSleeves.Views.Settings;
 
@@ -27,11 +28,21 @@ public class SleevesSettingsCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        using var kernel = uiApplication.CreatePlatformServices();
 
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<IFilterChecker>()
+            .To<FilterChecker>()
+            .InSingletonScope();
+        kernel.Bind<FilterCheckerViewModel>()
+            .ToSelf()
+            .InTransientScope();
+        kernel.Bind<FilterCheckerWindow>()
+            .ToSelf()
+            .InTransientScope();
+
 
         kernel.Bind<SleevePlacementSettingsConfig>()
             .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
@@ -39,8 +50,9 @@ public class SleevesSettingsCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         kernel.BindMainWindow<SleevePlacementSettingsViewModel, SleevePlacementSettingsWindow>();
-        kernel.UseXtraOpenFileDialog<SleevePlacementSettingsViewModel>();
-        kernel.UseXtraSaveFileDialog<SleevePlacementSettingsViewModel>();
+        kernel.UseXtraOpenFileDialog<SleevePlacementSettingsViewModel>(addExtension: true, filter: "*.json");
+        kernel.UseXtraSaveFileDialog<SleevePlacementSettingsViewModel>(addExtension: true, filter: "*.json");
+        kernel.UseWpfUIMessageBox<SleevePlacementSettingsViewModel>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 

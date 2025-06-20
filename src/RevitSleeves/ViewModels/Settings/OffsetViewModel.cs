@@ -28,4 +28,11 @@ internal class OffsetViewModel : BaseViewModel {
     }
 
     public string UnitName { get; }
+
+    public Offset GetOffset() {
+        return new Offset() {
+            Value = _offset.Value,
+            OffsetType = _offset.OffsetType
+        };
+    }
 }
