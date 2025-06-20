@@ -66,7 +66,6 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
         ShowMepFilterCommand = RelayCommand.Create(ShowMepFilter, CanAcceptView);
         ShowWallsFilterCommand = RelayCommand.Create(ShowWallsFilter, CanAcceptView);
         ShowFloorFilterCommand = RelayCommand.Create(ShowFloorsFilter, CanAcceptView);
-
     }
 
 

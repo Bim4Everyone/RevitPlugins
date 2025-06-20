@@ -31,7 +31,7 @@ internal class OffsetViewModel : BaseViewModel {
 
     public Offset GetOffset() {
         return new Offset() {
-            Value = _offset.Value,
+            Value = Value,
             OffsetType = _offset.OffsetType
         };
     }

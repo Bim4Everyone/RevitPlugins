@@ -5,23 +5,23 @@ internal class PipeSettings : MepCategorySettings {
     public PipeSettings() : base() {
         if(Offsets is null || Offsets.Length == 0) {
             Offsets = [
-                new Offset(){
+                new Offset() {
                     OffsetType = OffsetType.FromSleeveAxisToMepAxis,
                     Value = 5
                 },
-                new Offset(){
+                new Offset() {
                     OffsetType = OffsetType.FromSleeveEndToTopFloorFace,
                     Value = 50
                 }];
         }
         if(DiameterRanges is null || DiameterRanges.Length == 0) {
             DiameterRanges = [
-                new DiameterRange(){
+                new DiameterRange() {
                     StartMepSize = 0,
                     EndMepSize = 25,
                     SleeveDiameter = 50
                 },
-                new DiameterRange(){
+                new DiameterRange() {
                     StartMepSize = 26,
                     EndMepSize = 50,
                     SleeveDiameter = 100

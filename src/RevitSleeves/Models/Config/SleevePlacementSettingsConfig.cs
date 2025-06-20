@@ -30,6 +30,7 @@ internal class SleevePlacementSettingsConfig : ProjectConfig {
                 return GetDefaultBuilder(configSerializer)
                     .Build<SleevePlacementSettingsConfig>();
             } catch(JsonException) {
+                // TODO починить сериализацию и десериализацию фильтра
                 return new SleevePlacementSettingsConfig() {
                     ProjectConfigPath = GetDefaultPath(),
                     Serializer = configSerializer

@@ -14,5 +14,5 @@ internal abstract class StructureSettings {
 
     public Set FilterSet { get; set; } = new Set();
 
-    public bool IsEnabled { get; set; }
+    public bool IsEnabled { get; set; } = true;
 }

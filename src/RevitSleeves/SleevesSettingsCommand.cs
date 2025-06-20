@@ -50,8 +50,8 @@ public class SleevesSettingsCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         kernel.BindMainWindow<SleevePlacementSettingsViewModel, SleevePlacementSettingsWindow>();
-        kernel.UseXtraOpenFileDialog<SleevePlacementSettingsViewModel>(addExtension: true, filter: "*.json");
-        kernel.UseXtraSaveFileDialog<SleevePlacementSettingsViewModel>(addExtension: true, filter: "*.json");
+        kernel.UseXtraOpenFileDialog<SleevePlacementSettingsViewModel>(addExtension: true, filter: "|*.json");
+        kernel.UseXtraSaveFileDialog<SleevePlacementSettingsViewModel>(addExtension: true, filter: "|*.json");
         kernel.UseWpfUIMessageBox<SleevePlacementSettingsViewModel>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
