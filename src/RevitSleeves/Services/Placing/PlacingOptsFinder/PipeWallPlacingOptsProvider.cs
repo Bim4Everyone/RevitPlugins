@@ -6,7 +6,7 @@ using Autodesk.Revit.DB.Plumbing;
 using RevitSleeves.Models.Placing;
 
 namespace RevitSleeves.Services.Placing.PlacingOptsFinder;
-internal class PipeWallPlacingOptsProvider : ISleevePlacingOptsProvider<ClashModel<Pipe, Wall>> {
+internal class PipeWallPlacingOptsProvider : IPlacingOptsProvider<ClashModel<Pipe, Wall>> {
 
     public SleevePlacingOpts GetOpts(ClashModel<Pipe, Wall> param) {
         throw new NotImplementedException();
