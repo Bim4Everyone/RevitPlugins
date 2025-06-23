@@ -36,4 +36,11 @@ internal class RevitRepository {
     public Category GetCategory(BuiltInCategory category) {
         return Category.GetCategory(Document, category);
     }
+
+    internal ICollection<ElementId> GetLinkedElementIds<T>(RevitLinkInstance link) {
+        return new FilteredElementCollector(link.Document)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(T))
+            .ToElementIds();
+    }
 }

@@ -1,0 +1,68 @@
+using System.Collections.Generic;
+using System.Linq;
+
+using Autodesk.Revit.DB;
+
+using RevitClashDetective.Models.ClashDetection;
+using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.FilterModel;
+
+using RevitSleeves.Models;
+using RevitSleeves.Models.Config;
+using RevitSleeves.Services.Core;
+
+namespace RevitSleeves.Services.Placing.Intersections;
+internal abstract class SolidCollisionFinder {
+    protected ICollection<ClashModel> FindClashes(
+        RevitRepository repository,
+        IMepElementsProvider mepElementsProvider,
+        IStructureLinksProvider structureLinksProvider,
+        MepCategorySettings mepSettings,
+        StructureSettings structureSettings) {
+
+        var mepProvider = GetMepFilterProvider(repository, mepElementsProvider, mepSettings);
+        var structureProviders = GetStructureFilterProviders(repository, structureLinksProvider, structureSettings);
+        return [.. new ClashDetector(repository.GetClashRevitRepository(), [mepProvider], structureProviders)
+            .FindClashes()];
+    }
+
+    protected FilterProvider GetMepFilterProvider(
+        RevitRepository repository,
+        IMepElementsProvider mepElementsProvider,
+        MepCategorySettings mepSettings) {
+
+        var clashRepo = repository.GetClashRevitRepository();
+
+        var pipeCategory = repository.GetCategory(mepSettings.Category);
+        var pipeFilter = new Filter(clashRepo) {
+            CategoryIds = [pipeCategory.Id],
+            Name = pipeCategory.Name,
+            Set = mepSettings.MepFilterSet
+        };
+        return new FilterProvider(repository.Document,
+            pipeFilter,
+            Transform.Identity,
+            [.. mepElementsProvider.GetMepElementIds(mepSettings.Category)]);
+    }
+
+    protected ICollection<FilterProvider> GetStructureFilterProviders(
+        RevitRepository repository,
+        IStructureLinksProvider structureLinksProvider,
+        StructureSettings structureSettings) {
+
+        var clashRepo = repository.GetClashRevitRepository();
+
+        var structureCategory = repository.GetCategory(structureSettings.Category);
+        var wallsFilter = new Filter(clashRepo) {
+            CategoryIds = [structureCategory.Id],
+            Name = structureCategory.Name,
+            Set = structureSettings.FilterSet
+        };
+        return [.. structureLinksProvider.GetLinks()
+            .Select(link => new FilterProvider(
+                link.GetLinkDocument(),
+                wallsFilter,
+                link.GetTransform(),
+                [.. repository.GetLinkedElementIds<Wall>(link)]))];
+    }
+}

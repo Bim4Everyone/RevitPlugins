@@ -1,31 +1,37 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
+
+using Ninject;
+using Ninject.Syntax;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
 
-namespace RevitSleeves.Services.Placing.Intersections;
-internal class PipeWallIntersectionsFinder : SolidCollisionFinder, IClashFinder<Pipe, Wall> {
+namespace RevitSleeves.Services.Placing;
+internal class SleevePlacingOptsService : ISleevePlacingOptsService {
+    private readonly IResolutionRoot _resolutionRoot;
     private readonly RevitRepository _repository;
     private readonly IMepElementsProvider _mepElementsProvider;
     private readonly IStructureLinksProvider _structureLinksProvider;
     private readonly SleevePlacementSettingsConfig _config;
 
-    public PipeWallIntersectionsFinder(
-        RevitRepository revitRepository,
+    public SleevePlacingOptsService(
+        IResolutionRoot resolutionRoot,
+        RevitRepository repository,
         IMepElementsProvider mepElementsProvider,
         IStructureLinksProvider structureLinksProvider,
         SleevePlacementSettingsConfig config) {
 
-        _repository = revitRepository
-            ?? throw new ArgumentNullException(nameof(revitRepository));
+        _resolutionRoot = resolutionRoot
+            ?? throw new ArgumentNullException(nameof(resolutionRoot));
+        _repository = repository
+            ?? throw new ArgumentNullException(nameof(repository));
         _mepElementsProvider = mepElementsProvider
             ?? throw new ArgumentNullException(nameof(mepElementsProvider));
         _structureLinksProvider = structureLinksProvider
@@ -35,12 +41,11 @@ internal class PipeWallIntersectionsFinder : SolidCollisionFinder, IClashFinder<
     }
 
 
-    public ICollection<ClashModel<Pipe, Wall>> FindClashes(IProgress<int> progress, CancellationToken ct) {
-        return [.. FindClashes(_repository,
-            _mepElementsProvider,
-            _structureLinksProvider,
-            _config.PipeSettings,
-            _config.PipeSettings.WallSettings)
-            .Select(clash => new ClashModel<Pipe, Wall>(_repository, clash))];
+    public ICollection<SleevePlacingOpts> GetOpts(IProgress<int> progress, CancellationToken ct) {
+        var pipeWall = _resolutionRoot.Get<IClashFinder<Pipe, Wall>>().FindClashes(null, default);
+
+        throw new NotImplementedException();
     }
+
+
 }

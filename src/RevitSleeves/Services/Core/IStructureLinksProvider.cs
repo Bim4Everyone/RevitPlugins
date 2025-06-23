@@ -4,5 +4,7 @@ using Autodesk.Revit.DB;
 
 namespace RevitSleeves.Services.Core;
 internal interface IStructureLinksProvider {
-    ICollection<RevitLinkType> GetLinks();
+    ICollection<RevitLinkInstance> GetLinks();
+
+    void SetLinks(ICollection<RevitLinkType> links);
 }
