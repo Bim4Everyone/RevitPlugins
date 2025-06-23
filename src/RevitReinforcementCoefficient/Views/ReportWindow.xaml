@@ -17,95 +17,107 @@
     WindowStartupLocation="CenterScreen"
         
     Title="Отчет об ошибках" 
-    Height="450" Width="800"
-    MinHeight="450" MinWidth="800"
+    Height="450" Width="750"
+    MinHeight="450" MinWidth="750"
         
     d:DataContext="{d:DesignInstance vms:ReportViewModel, IsDesignTimeCreatable=False}">
 
+    <Window.Resources>
+        <Style
+            TargetType="Border">
+            <Setter
+                Property="Background"
+                Value="{ui:ThemeResource LayerOnAcrylicFillColorDefaultBrush}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{ui:ThemeResource TextFillColorDisabledBrush}" />
+            <Setter
+                Property="BorderThickness"
+                Value="1" />
+        </Style>
+    </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Label 
-            Grid.Row="0" 
-            Margin="10 10 10 0"
-            VerticalAlignment="Center"
-            Content="Ниже представлены элементы, работа с которыми привела к ошибкам (они подсчитаны не были):"/>
-        
-        <ListView
-            Grid.Row="1" 
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource ReportWindow.Title}"
+            FontSize="16" />
+
+        <Border
+            Grid.Row="1"
             Margin="10 5"
-            ScrollViewer.VerticalScrollBarVisibility="Visible"
-            ScrollViewer.CanContentScroll="False"
-            ItemsSource="{Binding Path=ReportItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-            SelectionMode="Multiple">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Выбор">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsCheck}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+            CornerRadius="5">
 
-                    <GridViewColumn Header="Наименование" Width="300" DisplayMemberBinding="{Binding Path=ErrorName}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                    <GridViewColumn Header="ID элементов" Width="400" >
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock 
-                                    TextWrapping="Wrap"
-                                    Text="{Binding Path=ElementIdsAsString}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
+                <Label
+                    Grid.Row="0"
+                    Margin="10 10 10 0"
+                    VerticalAlignment="Center"
+                    Content="Ниже представлены элементы, работа с которыми привела к ошибкам (они подсчитаны не были):" />
 
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
-                    <Setter Property="IsSelected" Value="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <ui:DataGrid
+                    Grid.Row="1"
+                    Margin="5"
+                    SelectionMode="Extended"
+                    SelectionUnit="FullRow"
+                    AutoGenerateColumns="False"
+                    CanUserResizeRows="False"
+                    CanUserSortColumns="False"
+                    CanUserReorderColumns="False"
+                    RowStyle="{x:Null}"
+                    GridLinesVisibility="All"
+                    ItemsSource="{Binding 
+                         Path=ReportItems, 
+                         UpdateSourceTrigger=PropertyChanged, 
+                         Mode=TwoWay}">
 
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" 
-                            Value="WhiteSmoke" />
-                            <Setter Property="BorderBrush"
-                            Value="LightGray" />
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="False">
-                            <Setter Property="Background" 
-                            Value="{x:Null}" />
-                            <Setter Property="BorderBrush"
-                            Value="LightGray" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn
+                            Binding="{Binding Path=IsCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Header="Выбор" />
 
+                        <DataGridTextColumn
+                            Binding="{Binding Path=ErrorName}"
+                            Header="Наименование"
+                            IsReadOnly="True" />
 
+                        <DataGridTextColumn
+                            Binding="{Binding Path=ElementIdsAsString}"
+                            Header="ID элементов"
+                            IsReadOnly="True" />
+                    </DataGrid.Columns>
+                </ui:DataGrid>
+            </Grid>
+        </Border>
+
+        
+        
         <StackPanel
-            Grid.Row="3"
-            Height="45"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
-            <Button
+            <ui:Button
                 Margin="10"
-                Width="140"
-                Padding="3"
+                Width="170"
                 Content="Выделить выбранное"
                 Command="{Binding Path=ShowSelectedErrorElementsCommand}" />
 
-            <Button
+            <ui:Button
                 Margin="10"
                 Width="100"
+                Appearance="Info"
                 Content="Закрыть"
                 IsDefault="True"
                 Click="ButtonTestForHide_Click"/>

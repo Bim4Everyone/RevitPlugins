@@ -3,17 +3,54 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на русский язык (google translate) -->
-
     <system:String
         x:Key="MainWindow.Title">Расчет коэффициента армирования</system:String>
     <system:String
-        x:Key="MainWindow.Hello">Привет, Revit!</system:String>
+        x:Key="MainWindow.SelectDocPackage">Выберите комплект документации:</system:String>
     <system:String
-        x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+        x:Key="MainWindow.SelectSection">Выберите секцию:</system:String>
+    <system:String
+        x:Key="MainWindow.СalcСoefficientOnAverageDescription">Есть возможность посчитать и вписать в конструкции среднее значение коэффициента армирования для нескольких типов конструкций. Для этого поставьте галочку:</system:String>
+    <system:String
+        x:Key="MainWindow.СalcСoefficientOnAverageTooltip">Считать коэффициент армирования усреднённо</system:String>
+    
+    <system:String
+        x:Key="MainWindow.DataColumnSelect">Выбор</system:String>
+    <system:String
+        x:Key="MainWindow.DataColumnTypeName">Тип конструкции</system:String>
+    <system:String
+        x:Key="MainWindow.DataColumnDocPackage">Комплект</system:String>
+    <system:String
+        x:Key="MainWindow.DataColumnElemSection">Секция</system:String>
+    <system:String
+        x:Key="MainWindow.DataColumnAboveZero">Выше нуля?</system:String>
+    <system:String
+        x:Key="MainWindow.DataColumnFormworksCount">Кол-во опалубки</system:String>
+    <system:String
+        x:Key="MainWindow.DataColumnRebarsCount">Кол-во арм-я</system:String>
+    <system:String
+        x:Key="MainWindow.DataColumnFormworkVolume">Объем бетона</system:String>
+    <system:String
+        x:Key="MainWindow.DataColumnRebarMass">Масса арм-я</system:String>
+    <system:String
+        x:Key="MainWindow.DataColumnRebarCoef">Коэффициент арм-я</system:String>
 
     <system:String
-        x:Key="MainWindow.ButtonOk">ОК</system:String>
+        x:Key="MainWindow.SelectAll">Выбрать все</system:String>
+    <system:String
+        x:Key="MainWindow.UnselectAll">Отменить выбор</system:String>
+    <system:String
+        x:Key="MainWindow.ShowFormwork">Показать опалубку</system:String>
+    <system:String
+        x:Key="MainWindow.ShowRebar">Показать арматуру</system:String>
+
+    <system:String
+        x:Key="MainWindow.ButtonCalculate">Рассчитать</system:String>
+    <system:String
+        x:Key="MainWindow.ButtonWrite">Записать</system:String>
     <system:String
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String
+        x:Key="ReportWindow.Title">Отчет об ошибках</system:String>
 </ResourceDictionary>
