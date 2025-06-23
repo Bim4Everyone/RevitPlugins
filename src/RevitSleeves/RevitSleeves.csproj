@@ -6,7 +6,6 @@
     </PropertyGroup>
     <ItemGroup>
       <Folder Include="Services\Navigator\" />
-      <Folder Include="Services\Placing\" />
       <Folder Include="ViewModels\Navigator\" />
       <Folder Include="ViewModels\Placing\" />
       <Folder Include="Views\Navigator\" />
