@@ -7,7 +7,7 @@ using RevitSleeves.Models.Placing;
 
 namespace RevitSleeves.Services.Placing.LevelFinder;
 internal class PipeWallLevelFinder : ILevelFinder<ClashModel<Pipe, Wall>> {
-    public ClashModel<Pipe, Wall> GetLevel(ClashModel<Pipe, Wall> param) {
+    public Level GetLevel(ClashModel<Pipe, Wall> param) {
         throw new NotImplementedException();
     }
 }

@@ -1,4 +1,6 @@
+using Autodesk.Revit.DB;
+
 namespace RevitSleeves.Services.Placing;
 internal interface ILevelFinder<T> where T : class {
-    T GetLevel(T param);
+    Level GetLevel(T param);
 }
