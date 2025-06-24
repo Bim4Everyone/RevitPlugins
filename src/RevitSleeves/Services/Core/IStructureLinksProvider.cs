@@ -7,4 +7,6 @@ internal interface IStructureLinksProvider {
     ICollection<RevitLinkInstance> GetLinks();
 
     void SetLinks(ICollection<RevitLinkType> links);
+
+    string[] GetOpeningFamilyNames();
 }

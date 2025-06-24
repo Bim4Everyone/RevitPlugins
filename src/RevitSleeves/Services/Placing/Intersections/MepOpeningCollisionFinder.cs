@@ -13,8 +13,8 @@ using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.Intersections;
 internal abstract class MepOpeningCollisionFinder {
-    private readonly RevitRepository _revitRepository;
-    private readonly IOpeningGeometryProvider _openingGeometryProvider;
+    private protected readonly RevitRepository _revitRepository;
+    private protected readonly IOpeningGeometryProvider _openingGeometryProvider;
 
     protected MepOpeningCollisionFinder(
         RevitRepository revitRepository,

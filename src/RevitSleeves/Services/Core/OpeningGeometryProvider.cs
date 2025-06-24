@@ -6,27 +6,6 @@ using dosymep.Revit;
 
 namespace RevitSleeves.Services.Core;
 internal class OpeningGeometryProvider : IOpeningGeometryProvider {
-    public const string FamilyNameOpeningArRectangleInFloor = "Окн_Отв_Прямоуг_Перекрытие";
-    public const string FamilyNameOpeningArRectangleInWall = "Окн_Отв_Прямоуг_Стена";
-    public const string FamilyNameOpeningArRoundInFloor = "Окн_Отв_Круг_Перекрытие";
-    public const string FamilyNameOpeningArRoundInWall = "Окн_Отв_Круг_Стена";
-
-    public const string ParameterOpeningArDiameter = "ФОП_РАЗМ_Диаметр";
-    public const string ParameterOpeningArWidth = "ФОП_РАЗМ_Ширина проёма";
-    public const string ParameterOpeningArHeight = "ФОП_РАЗМ_Высота проёма";
-    public const string ParameterOpeningArThickness = "ФОП_РАЗМ_Глубина проёма";
-
-    public const string FamilyNameOpeningKrRectangleInFloor = "ОбщМд_Отверстие_Перекрытие_Прямоугольное";
-    public const string FamilyNameOpeningKrRectangleInWall = "ОбщМд_Отверстие_Стена_Прямоугольное";
-    public const string FamilyNameOpeningKrRoundInWall = "ОбщМд_Отверстие_Стена_Круглое";
-
-    public const string ParameterOpeningKrDiameter = "ФОП_РАЗМ_Диаметр";
-    public const string ParameterOpeningKrInWallWidth = "ФОП_РАЗМ_Ширина";
-    public const string ParameterOpeningKrInWallHeight = "ФОП_РАЗМ_Высота";
-    public const string ParameterOpeningKrThickness = "ФОП_РАЗМ_Глубина";
-    public const string ParameterOpeningKrInFloorHeight = "мод_ФОП_Габарит А";
-    public const string ParameterOpeningKrInFloorWidth = "мод_ФОП_Габарит Б";
-
     /// <summary>
     /// Находит солид экземпляра семейства отверстия исходя из координат точки вставки, 
     /// формы семейства и значений параметров.
@@ -36,44 +15,44 @@ internal class OpeningGeometryProvider : IOpeningGeometryProvider {
             throw new ArgumentNullException(nameof(opening));
         }
         return opening.Symbol.FamilyName switch {
-            FamilyNameOpeningArRectangleInWall => GetWallRectangleSolid(
+            NamesProvider.FamilyNameOpeningArRectangleInWall => GetWallRectangleSolid(
                 opening,
-                ParameterOpeningArWidth,
-                ParameterOpeningArHeight,
-                ParameterOpeningArThickness),
+                NamesProvider.ParameterOpeningArWidth,
+                NamesProvider.ParameterOpeningArHeight,
+                NamesProvider.ParameterOpeningArThickness),
 
-            FamilyNameOpeningArRoundInWall => GetWallRoundSolid(
+            NamesProvider.FamilyNameOpeningArRoundInWall => GetWallRoundSolid(
                 opening,
-                ParameterOpeningArDiameter,
-                ParameterOpeningArThickness),
+                NamesProvider.ParameterOpeningArDiameter,
+                NamesProvider.ParameterOpeningArThickness),
 
-            FamilyNameOpeningArRectangleInFloor => GetFloorRectangleSolid(
+            NamesProvider.FamilyNameOpeningArRectangleInFloor => GetFloorRectangleSolid(
                 opening,
-                ParameterOpeningArWidth,
-                ParameterOpeningArHeight,
-                ParameterOpeningArThickness),
+                NamesProvider.ParameterOpeningArWidth,
+                NamesProvider.ParameterOpeningArHeight,
+                NamesProvider.ParameterOpeningArThickness),
 
-            FamilyNameOpeningArRoundInFloor => GetFloorRoundSolid(
+            NamesProvider.FamilyNameOpeningArRoundInFloor => GetFloorRoundSolid(
                 opening,
-                ParameterOpeningArDiameter,
-                ParameterOpeningArThickness),
+                NamesProvider.ParameterOpeningArDiameter,
+                NamesProvider.ParameterOpeningArThickness),
 
-            FamilyNameOpeningKrRectangleInWall => GetWallRectangleSolid(
+            NamesProvider.FamilyNameOpeningKrRectangleInWall => GetWallRectangleSolid(
                 opening,
-                ParameterOpeningKrInWallWidth,
-                ParameterOpeningKrInWallHeight,
-                ParameterOpeningKrThickness),
+                NamesProvider.ParameterOpeningKrInWallWidth,
+                NamesProvider.ParameterOpeningKrInWallHeight,
+                NamesProvider.ParameterOpeningKrThickness),
 
-            FamilyNameOpeningKrRoundInWall => GetWallRoundSolid(
+            NamesProvider.FamilyNameOpeningKrRoundInWall => GetWallRoundSolid(
                 opening,
-                ParameterOpeningKrDiameter,
-                ParameterOpeningKrThickness),
+                NamesProvider.ParameterOpeningKrDiameter,
+                NamesProvider.ParameterOpeningKrThickness),
 
-            FamilyNameOpeningKrRectangleInFloor => GetFloorRectangleSolid(
+            NamesProvider.FamilyNameOpeningKrRectangleInFloor => GetFloorRectangleSolid(
                 opening,
-                ParameterOpeningKrInFloorWidth,
-                ParameterOpeningKrInFloorHeight,
-                ParameterOpeningKrThickness),
+                NamesProvider.ParameterOpeningKrInFloorWidth,
+                NamesProvider.ParameterOpeningKrInFloorHeight,
+                NamesProvider.ParameterOpeningKrThickness),
 
             _ => throw new InvalidOperationException()
         };

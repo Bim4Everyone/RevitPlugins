@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
@@ -35,7 +34,7 @@ internal class PipeWallIntersectionsFinder : MepStructureCollisionFinder, IClash
     }
 
 
-    public ICollection<ClashModel<Pipe, Wall>> FindClashes(IProgress<int> progress, CancellationToken ct) {
+    public ICollection<ClashModel<Pipe, Wall>> FindClashes() {
         return [.. FindClashes(_repository,
             _mepElementsProvider,
             _structureLinksProvider,

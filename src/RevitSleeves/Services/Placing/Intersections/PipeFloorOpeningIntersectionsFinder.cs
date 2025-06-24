@@ -1,23 +1,42 @@
-using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 
 using RevitSleeves.Models;
+using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.Intersections;
 internal class PipeFloorOpeningIntersectionsFinder : MepOpeningCollisionFinder, IClashFinder<Pipe, FamilyInstance> {
+    private readonly IMepElementsProvider _mepElementsProvider;
+    private readonly IStructureLinksProvider _structureLinksProvider;
+    private readonly SleevePlacementSettingsConfig _config;
+
     public PipeFloorOpeningIntersectionsFinder(
         RevitRepository revitRepository,
-        IOpeningGeometryProvider openingGeometryProvider)
+        IOpeningGeometryProvider openingGeometryProvider,
+        IMepElementsProvider mepElementsProvider,
+        IStructureLinksProvider structureLinksProvider,
+        SleevePlacementSettingsConfig config)
         : base(revitRepository, openingGeometryProvider) {
+
+        _mepElementsProvider = mepElementsProvider
+            ?? throw new System.ArgumentNullException(nameof(mepElementsProvider));
+        _structureLinksProvider = structureLinksProvider
+            ?? throw new System.ArgumentNullException(nameof(structureLinksProvider));
+        _config = config
+            ?? throw new System.ArgumentNullException(nameof(config));
     }
 
-    public ICollection<ClashModel<Pipe, FamilyInstance>> FindClashes(IProgress<int> progress, CancellationToken ct) {
-        throw new NotImplementedException();
+    public ICollection<ClashModel<Pipe, FamilyInstance>> FindClashes() {
+        return [.. FindClashes(_mepElementsProvider,
+            _structureLinksProvider,
+            _config.PipeSettings,
+            _config.PipeSettings.FloorSettings,
+            _structureLinksProvider.GetOpeningFamilyNames())
+            .Select(clash => new ClashModel<Pipe, FamilyInstance>(_revitRepository, clash))];
     }
 }
