@@ -95,14 +95,16 @@ internal class MainViewModel : BaseViewModel {
 
     private void AutoConfigure() {
         string modelsPath = _rsnConfigService.GetProjectPathFromRevitIni();
-        var now = DateTime.Now;
 
         var allFiles = Directory.GetFiles(modelsPath, "*.rvt", SearchOption.TopDirectoryOnly)
-                                           .Select(path => new FileInfo(path))
-                                           .ToList();
+                                .Select(path => new FileInfo(path))
+                                .ToList();
 
         var recentFiles = allFiles
-            .Where(file => (now - file.LastWriteTime).TotalDays <= 5)
+            .OrderByDescending(file => file.LastWriteTime)
+            .GroupBy(file => file.LastWriteTime.Date)
+            .Take(5)
+            .SelectMany(group => group)
             .OrderByDescending(file => file.LastWriteTime)
             .ToList();
 
@@ -115,6 +117,7 @@ internal class MainViewModel : BaseViewModel {
         var existingServers = Servers.Except(serversFromRecentFiles).ToList();
         Servers = new ObservableCollection<string>(serversFromRecentFiles.Concat(existingServers));
     }
+
 
     private string GetServerIfValid(FileInfo file) {
         try {
