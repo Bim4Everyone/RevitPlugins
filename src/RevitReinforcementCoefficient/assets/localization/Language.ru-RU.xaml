@@ -53,4 +53,14 @@
     
     <system:String
         x:Key="ReportWindow.Title">Отчет об ошибках</system:String>
+    <system:String
+        x:Key="ReportWindow.ReportExplanation">Ниже представлены элементы, работа с которыми привела к ошибкам (они подсчитаны не были):</system:String>
+    <system:String
+        x:Key="ReportWindow.DataColumnName">Наименование</system:String>
+    <system:String
+        x:Key="ReportWindow.DataColumnElementIDs">ID элементов</system:String>
+    <system:String
+        x:Key="ReportWindow.DataColumnShowSelected">Выделить выбранное</system:String>
+    <system:String
+        x:Key="ReportWindow.ButtonClose">Закрыть</system:String>
 </ResourceDictionary>

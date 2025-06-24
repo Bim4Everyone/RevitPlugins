@@ -19,7 +19,7 @@ public partial class ReportWindow {
         DialogResult = true;
     }
 
-    private void ButtonTestForHide_Click(object sender, RoutedEventArgs e) {
+    private void ButtonForHide_Click(object sender, RoutedEventArgs e) {
         Hide();
     }
 }

@@ -28,80 +28,42 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
-        <Style
-            TargetType="Border"
-            x:Key="CustomBorder">
-            <Setter
-                Property="Padding"
-                Value="7" />
-            <Setter
-                Property="CornerRadius"
-                Value="5" />
-            <Setter
-                Property="VerticalAlignment"
-                Value="Stretch" />
-            <Setter
-                Property="HorizontalAlignment"
-                Value="Stretch" />
-            <Setter
-                Property="SnapsToDevicePixels"
-                Value="True" />
-            <Setter
-                Property="OverridesDefaultStyle"
-                Value="True" />
-            <Setter
-                Property="ScrollViewer.HorizontalScrollBarVisibility"
-                Value="Auto" />
-            <Setter
-                Property="ScrollViewer.VerticalScrollBarVisibility"
-                Value="Disabled" />
-            <Setter
-                Property="Background"
-                Value="{DynamicResource CardBackground}" />
-            <Setter
-                Property="BorderBrush"
-                Value="{DynamicResource CardBorderBrush}" />
-            <Setter
-                Property="BorderThickness"
-                Value="{DynamicResource CardControlBorderThemeThickness}" />
-            <Setter
-                Property="FocusVisualStyle"
-                Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-            <Setter
-                Property="CornerRadius"
-                Value="{DynamicResource ControlCornerRadius}" />
-        </Style>
-
-        <ui:TextBlock
-            x:Key="DataColumnSelectHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnSelect}" />
-        <ui:TextBlock
-            x:Key="DataColumnTypeNameHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnTypeName}" />
-        <ui:TextBlock
-            x:Key="DataColumnDocPackageHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnDocPackage}" />
-        <ui:TextBlock
-            x:Key="DataColumnElemSectionHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnElemSection}" />
-        <ui:TextBlock
-            x:Key="DataColumnAboveZeroHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnAboveZero}" />
-        <ui:TextBlock
-            x:Key="DataColumnFormworksCountHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnFormworksCount}" />
-        <ui:TextBlock
-            x:Key="DataColumnRebarsCountHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnRebarsCount}" />
-        <ui:TextBlock
-            x:Key="DataColumnFormworkVolumeHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnFormworkVolume}" />
-        <ui:TextBlock
-            x:Key="DataColumnRebarMassHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnRebarMass}" />
-        <ui:TextBlock
-            x:Key="DataColumnRebarCoefHeader"
-            Text="{me:LocalizationSource MainWindow.DataColumnRebarCoef}" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <ui:TextBlock
+                x:Key="DataColumnSelectHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnSelect}" />
+            <ui:TextBlock
+                x:Key="DataColumnTypeNameHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnTypeName}" />
+            <ui:TextBlock
+                x:Key="DataColumnDocPackageHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnDocPackage}" />
+            <ui:TextBlock
+                x:Key="DataColumnElemSectionHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnElemSection}" />
+            <ui:TextBlock
+                x:Key="DataColumnAboveZeroHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnAboveZero}" />
+            <ui:TextBlock
+                x:Key="DataColumnFormworksCountHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnFormworksCount}" />
+            <ui:TextBlock
+                x:Key="DataColumnRebarsCountHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnRebarsCount}" />
+            <ui:TextBlock
+                x:Key="DataColumnFormworkVolumeHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnFormworkVolume}" />
+            <ui:TextBlock
+                x:Key="DataColumnRebarMassHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnRebarMass}" />
+            <ui:TextBlock
+                x:Key="DataColumnRebarCoefHeader"
+                Text="{me:LocalizationSource MainWindow.DataColumnRebarCoef}" />
+        </ResourceDictionary>
     </Window.Resources>
 
     <i:Interaction.Triggers>
@@ -159,10 +121,7 @@
                 <ComboBox
                     Grid.Row="0"
                     Grid.Column="1"
-                    Margin="0 2"
-                    MinWidth="250"
-                    HorizontalAlignment="Right"
-                    VerticalContentAlignment="Center"
+                    Style="{StaticResource CustomComboBox}"
                     ItemsSource="{Binding Path=DockPackages}"
                     SelectedItem="{Binding Path=SelectedDockPackage, UpdateSourceTrigger=PropertyChanged}">
                     <ComboBox.ItemTemplate>
@@ -191,10 +150,7 @@
                 <ComboBox
                     Grid.Row="1"
                     Grid.Column="1"
-                    Margin="0 2"
-                    MinWidth="250"
-                    HorizontalAlignment="Right"
-                    VerticalContentAlignment="Center"
+                    Style="{StaticResource CustomComboBox}"
                     ItemsSource="{Binding Path=ElemSections}"
                     SelectedItem="{Binding Path=SelectedElemSection, UpdateSourceTrigger=PropertyChanged}">
                     <ComboBox.ItemTemplate>
@@ -260,14 +216,7 @@
                 </Grid.RowDefinitions>
 
                 <ui:DataGrid
-                    SelectionMode="Extended"
-                    SelectionUnit="FullRow"
-                    AutoGenerateColumns="False"
-                    CanUserResizeRows="False"
-                    CanUserSortColumns="False"
-                    CanUserReorderColumns="False"
-                    RowStyle="{x:Null}"
-                    GridLinesVisibility="All"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
                     ItemsSource="{Binding 
                         Path=DesignTypesList.DesignTypes, 
                         UpdateSourceTrigger=PropertyChanged, 
