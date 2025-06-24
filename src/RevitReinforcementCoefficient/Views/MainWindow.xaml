@@ -29,16 +29,47 @@
 
     <Window.Resources>
         <Style
-            TargetType="Border">
+            TargetType="Border"
+            x:Key="CustomBorder">
+            <Setter
+                Property="Padding"
+                Value="7" />
+            <Setter
+                Property="CornerRadius"
+                Value="5" />
+            <Setter
+                Property="VerticalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="HorizontalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="SnapsToDevicePixels"
+                Value="True" />
+            <Setter
+                Property="OverridesDefaultStyle"
+                Value="True" />
+            <Setter
+                Property="ScrollViewer.HorizontalScrollBarVisibility"
+                Value="Auto" />
+            <Setter
+                Property="ScrollViewer.VerticalScrollBarVisibility"
+                Value="Disabled" />
             <Setter
                 Property="Background"
-                Value="{ui:ThemeResource LayerOnAcrylicFillColorDefaultBrush}" />
+                Value="{DynamicResource CardBackground}" />
             <Setter
                 Property="BorderBrush"
-                Value="{ui:ThemeResource TextFillColorDisabledBrush}" />
+                Value="{DynamicResource CardBorderBrush}" />
             <Setter
                 Property="BorderThickness"
-                Value="1" />
+                Value="{DynamicResource CardControlBorderThemeThickness}" />
+            <Setter
+                Property="FocusVisualStyle"
+                Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+            <Setter
+                Property="CornerRadius"
+                Value="{DynamicResource ControlCornerRadius}" />
         </Style>
 
         <ui:TextBlock
@@ -104,7 +135,7 @@
             Grid.Row="1"
             Grid.Column="0"
             Margin="10 5 5 5"
-            CornerRadius="5">
+            Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition 
@@ -121,14 +152,14 @@
                 <ui:TextBlock
                     Grid.Row="0"
                     Grid.Column="0"
-                    Margin="15 7"
+                    Margin="10 0"
                     VerticalAlignment="Center"
                     Text="{me:LocalizationSource MainWindow.SelectDocPackage}" />
 
                 <ComboBox
                     Grid.Row="0"
                     Grid.Column="1"
-                    Margin="7"
+                    Margin="0 2"
                     MinWidth="250"
                     HorizontalAlignment="Right"
                     VerticalContentAlignment="Center"
@@ -153,14 +184,14 @@
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="0"
-                    Margin="15 7"
+                    Margin="10 0"
                     VerticalAlignment="Center"
                     Text="{me:LocalizationSource MainWindow.SelectSection}" />
 
                 <ComboBox
                     Grid.Row="1"
                     Grid.Column="1"
-                    Margin="7"
+                    Margin="0 2"
                     MinWidth="250"
                     HorizontalAlignment="Right"
                     VerticalContentAlignment="Center"
@@ -188,7 +219,7 @@
             Grid.Row="1"
             Grid.Column="1"
             Margin="5 5 10 5"
-            CornerRadius="5">
+            Style="{StaticResource CustomBorder}">
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -200,7 +231,7 @@
 
                 <ui:TextBlock
                     Grid.Row="0"
-                    Margin="10 5 10 -2"
+                    Margin="7 0"
                     VerticalAlignment="Center"
                     TextAlignment="Justify"
                     Text="{me:LocalizationSource MainWindow.СalcСoefficientOnAverageDescription}"
@@ -208,7 +239,7 @@
 
                 <CheckBox
                     Grid.Row="1"
-                    Margin="0"
+                    Margin="-2 0"
                     VerticalAlignment="Center"
                     IsChecked="{Binding Path=СalcСoefficientOnAverage}"
                     Content="{me:LocalizationSource MainWindow.СalcСoefficientOnAverageTooltip}" />
@@ -220,7 +251,7 @@
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Margin="10 5 10 5"
-            CornerRadius="5">
+            Style="{StaticResource CustomBorder}">
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -229,7 +260,6 @@
                 </Grid.RowDefinitions>
 
                 <ui:DataGrid
-                    Margin="10"
                     SelectionMode="Extended"
                     SelectionUnit="FullRow"
                     AutoGenerateColumns="False"
