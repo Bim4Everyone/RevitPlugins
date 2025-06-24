@@ -8,7 +8,7 @@ using Autodesk.Revit.DB.Plumbing;
 using RevitSleeves.Models.Placing;
 
 namespace RevitSleeves.Services.Placing.Intersections;
-internal class PipeFloorIntersectionsFinder : IClashFinder<Pipe, Floor> {
+internal class PipeFloorIntersectionsFinder : MepStructureCollisionFinder, IClashFinder<Pipe, Floor> {
     public ICollection<ClashModel<Pipe, Floor>> FindClashes(IProgress<int> progress, CancellationToken ct) {
         throw new NotImplementedException();
     }

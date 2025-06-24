@@ -12,7 +12,7 @@ using RevitSleeves.Models.Config;
 using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.Intersections;
-internal abstract class SolidCollisionFinder {
+internal abstract class MepStructureCollisionFinder {
     protected ICollection<ClashModel> FindClashes(
         RevitRepository repository,
         IMepElementsProvider mepElementsProvider,
@@ -26,7 +26,7 @@ internal abstract class SolidCollisionFinder {
             .FindClashes()];
     }
 
-    protected FilterProvider GetMepFilterProvider(
+    private FilterProvider GetMepFilterProvider(
         RevitRepository repository,
         IMepElementsProvider mepElementsProvider,
         MepCategorySettings mepSettings) {
@@ -45,7 +45,7 @@ internal abstract class SolidCollisionFinder {
             [.. mepElementsProvider.GetMepElementIds(mepSettings.Category)]);
     }
 
-    protected ICollection<FilterProvider> GetStructureFilterProviders(
+    private ICollection<FilterProvider> GetStructureFilterProviders(
         RevitRepository repository,
         IStructureLinksProvider structureLinksProvider,
         StructureSettings structureSettings) {
@@ -53,7 +53,7 @@ internal abstract class SolidCollisionFinder {
         var clashRepo = repository.GetClashRevitRepository();
 
         var structureCategory = repository.GetCategory(structureSettings.Category);
-        var wallsFilter = new Filter(clashRepo) {
+        var structureFilter = new Filter(clashRepo) {
             CategoryIds = [structureCategory.Id],
             Name = structureCategory.Name,
             Set = structureSettings.FilterSet
@@ -61,7 +61,7 @@ internal abstract class SolidCollisionFinder {
         return [.. structureLinksProvider.GetLinks()
             .Select(link => new FilterProvider(
                 link.GetLinkDocument(),
-                wallsFilter,
+                structureFilter,
                 link.GetTransform(),
                 [.. repository.GetLinkedElementIds<Wall>(link)]))];
     }

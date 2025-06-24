@@ -12,7 +12,7 @@ using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.Intersections;
-internal class PipeWallIntersectionsFinder : SolidCollisionFinder, IClashFinder<Pipe, Wall> {
+internal class PipeWallIntersectionsFinder : MepStructureCollisionFinder, IClashFinder<Pipe, Wall> {
     private readonly RevitRepository _repository;
     private readonly IMepElementsProvider _mepElementsProvider;
     private readonly IStructureLinksProvider _structureLinksProvider;
