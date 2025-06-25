@@ -3,8 +3,8 @@ namespace RevitSleeves.Services.Core;
 /// Класс для хранения строковых констант
 /// </summary>
 internal static class NamesProvider {
-    public const string SleeveFamilyName = "ТрСд_Авт_Гильза";
-    public const string SleeveSymbolName = SleeveFamilyName;
+    public const string FamilyNameSleeve = "ТрСд_Авт_Гильза";
+    public const string SleeveSymbolName = FamilyNameSleeve;
 
     public const string FamilyNameOpeningArRectangleInFloor = "Окн_Отв_Прямоуг_Перекрытие";
     public const string FamilyNameOpeningArRectangleInWall = "Окн_Отв_Прямоуг_Стена";

@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Reflection;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -14,7 +16,17 @@ using Ninject;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
+using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Core;
 using RevitSleeves.Services.Placing;
+using RevitSleeves.Services.Placing.FamilySymbolFinder;
+using RevitSleeves.Services.Placing.Intersections;
+using RevitSleeves.Services.Placing.LevelFinder;
+using RevitSleeves.Services.Placing.ParamsSetter;
+using RevitSleeves.Services.Placing.ParamsSetterFinder;
+using RevitSleeves.Services.Placing.PlacingOptsProvider;
+using RevitSleeves.Services.Placing.PointFinder;
+using RevitSleeves.Services.Placing.RotationFinder;
 
 namespace RevitSleeves;
 [Transaction(TransactionMode.Manual)]
@@ -33,7 +45,7 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         kernel.Bind<SleevePlacementSettingsConfig>()
             .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        BindCoreServices(kernel);
+        BindServices(kernel);
 
         kernel.UseWpfUIThemeUpdater();
 
@@ -43,7 +55,24 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        var optsService = kernel.Get<ISleevePlacingOptsService>();
+        optsService.GetOpts();
+
         Notification(true);
+    }
+
+    private void BindServices(IKernel kernel) {
+        BindCoreServices(kernel);
+        BindElementsServices(kernel);
+
+        BindFamilySymbolFinders(kernel);
+        BindIntersectionsFinders(kernel);
+        BindLevelFinders(kernel);
+        BindParamsSetters(kernel);
+        BindParamsSetterFinders(kernel);
+        BindPlacingOptsProviders(kernel);
+        BindPointFinders(kernel);
+        BindRotationFinders(kernel);
     }
 
     private void BindCoreServices(IKernel kernel) {
@@ -58,6 +87,141 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<ISleeveMergeService>()
             .To<SleeveMergeService>()
+            .InSingletonScope();
+        kernel.Bind<IPlacingErrorsService>()
+            .To<PlacingErrorsService>()
+            .InSingletonScope();
+        kernel.Bind<IOpeningGeometryProvider>()
+            .To<OpeningGeometryProvider>()
+            .InSingletonScope();
+    }
+
+    private void BindElementsServices(IKernel kernel) {
+        kernel.Bind<IMepElementsProvider>()
+            .To<AllMepElementsProvider>()
+            .InSingletonScope();
+        kernel.Bind<IStructureLinksProvider>()
+            .To<AllLoadedStructureLinksProvider>()
+            .InSingletonScope();
+    }
+
+    private void BindFamilySymbolFinders(IKernel kernel) {
+        kernel.Bind<IFamilySymbolFinder<SleeveMergeModel>>()
+            .To<MergeModelFamilySymbolFinder>()
+            .InSingletonScope();
+        kernel.Bind<IFamilySymbolFinder<ClashModel<Pipe, Floor>>>()
+            .To<PipeFloorFamilySymbolFinder>()
+            .InSingletonScope();
+        kernel.Bind<IFamilySymbolFinder<ClashModel<Pipe, FamilyInstance>>>()
+            .To<PipeOpeningFamilySymbolFinder>()
+            .InSingletonScope();
+        kernel.Bind<IFamilySymbolFinder<ClashModel<Pipe, Wall>>>()
+            .To<PipeWallFamilySymbolFinder>()
+            .InSingletonScope();
+    }
+
+    private void BindIntersectionsFinders(IKernel kernel) {
+        kernel.Bind<IClashFinder<Pipe, Floor>>()
+            .To<PipeFloorIntersectionsFinder>()
+            .InSingletonScope();
+        kernel.Bind<IClashFinder<Pipe, Wall>>()
+            .To<PipeWallIntersectionsFinder>()
+            .InSingletonScope();
+        kernel.Bind<PipeFloorOpeningIntersectionsFinder>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<PipeWallOpeningIntersectionsFinder>()
+            .ToSelf()
+            .InSingletonScope();
+    }
+
+    private void BindLevelFinders(IKernel kernel) {
+        kernel.Bind<ILevelFinder<SleeveMergeModel>>()
+            .To<MergeModelLevelFinder>()
+            .InSingletonScope();
+        kernel.Bind<ILevelFinder<ClashModel<Pipe, Floor>>>()
+            .To<PipeFloorLevelFinder>()
+            .InSingletonScope();
+        kernel.Bind<ILevelFinder<ClashModel<Pipe, Wall>>>()
+            .To<PipeWallLevelFinder>()
+            .InSingletonScope();
+        kernel.Bind<ILevelFinder<ClashModel<Pipe, FamilyInstance>>>()
+            .To<PipeOpeningLevelFinder>()
+            .InSingletonScope();
+    }
+
+    private void BindParamsSetters(IKernel kernel) {
+        kernel.Bind<IParamsSetter<SleeveMergeModel>>()
+            .To<MergeModelParamsSetter>()
+            .InTransientScope();
+        kernel.Bind<IParamsSetter<ClashModel<Pipe, Floor>>>()
+            .To<PipeFloorParamsSetter>()
+            .InTransientScope();
+        kernel.Bind<IParamsSetter<ClashModel<Pipe, Wall>>>()
+            .To<PipeWallParamsSetter>()
+            .InTransientScope();
+        kernel.Bind<IParamsSetter<ClashModel<Pipe, FamilyInstance>>>()
+            .To<PipeOpeningParamsSetter>()
+            .InTransientScope();
+    }
+
+    private void BindParamsSetterFinders(IKernel kernel) {
+        kernel.Bind<IParamsSetterFinder<SleeveMergeModel>>()
+            .To<MergeModelParamsSetterFinder>()
+            .InSingletonScope();
+        kernel.Bind<IParamsSetterFinder<ClashModel<Pipe, Floor>>>()
+            .To<PipeFloorParamsSetterFinder>()
+            .InSingletonScope();
+        kernel.Bind<IParamsSetterFinder<ClashModel<Pipe, Wall>>>()
+            .To<PipeWallParamsSetterFinder>()
+            .InSingletonScope();
+        kernel.Bind<IParamsSetterFinder<ClashModel<Pipe, FamilyInstance>>>()
+            .To<PipeOpeningParamsSetterFinder>()
+            .InSingletonScope();
+    }
+
+    private void BindPlacingOptsProviders(IKernel kernel) {
+        kernel.Bind<IPlacingOptsProvider<SleeveMergeModel>>()
+            .To<MergeModelPlacingOptsProvider>()
+            .InSingletonScope();
+        kernel.Bind<IPlacingOptsProvider<ClashModel<Pipe, Floor>>>()
+            .To<PipeFloorPlacingOptsProvider>()
+            .InSingletonScope();
+        kernel.Bind<IPlacingOptsProvider<ClashModel<Pipe, Wall>>>()
+            .To<PipeWallPlacingOptsProvider>()
+            .InSingletonScope();
+        kernel.Bind<IPlacingOptsProvider<ClashModel<Pipe, FamilyInstance>>>()
+            .To<PipeOpeningPlacingOptsProvider>()
+            .InSingletonScope();
+    }
+
+    private void BindPointFinders(IKernel kernel) {
+        kernel.Bind<IPointFinder<SleeveMergeModel>>()
+            .To<MergeModelPointFinder>()
+            .InSingletonScope();
+        kernel.Bind<IPointFinder<ClashModel<Pipe, Floor>>>()
+            .To<PipeFloorPointFinder>()
+            .InSingletonScope();
+        kernel.Bind<IPointFinder<ClashModel<Pipe, Wall>>>()
+            .To<PipeWallPointFinder>()
+            .InSingletonScope();
+        kernel.Bind<IPointFinder<ClashModel<Pipe, FamilyInstance>>>()
+            .To<PipeOpeningPointFinder>()
+            .InSingletonScope();
+    }
+
+    private void BindRotationFinders(IKernel kernel) {
+        kernel.Bind<IRotationFinder<SleeveMergeModel>>()
+            .To<MergeModelRotationFinder>()
+            .InSingletonScope();
+        kernel.Bind<IRotationFinder<ClashModel<Pipe, Floor>>>()
+            .To<PipeFloorRotationFinder>()
+            .InSingletonScope();
+        kernel.Bind<IRotationFinder<ClashModel<Pipe, Wall>>>()
+            .To<PipeWallRotationFinder>()
+            .InSingletonScope();
+        kernel.Bind<IRotationFinder<ClashModel<Pipe, FamilyInstance>>>()
+            .To<PipeOpeningRotationFinder>()
             .InSingletonScope();
     }
 }

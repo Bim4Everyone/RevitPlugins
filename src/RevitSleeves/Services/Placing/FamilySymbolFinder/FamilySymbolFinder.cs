@@ -18,7 +18,7 @@ internal abstract class FamilySymbolFinder {
 
     protected FamilySymbol GetSleeveFamilySymbol(Document document) {
         return _symbol ??= (FamilySymbol) document.GetElement(
-            GetFamilySymbol(document, NamesProvider.SleeveFamilyName, NamesProvider.SleeveSymbolName));
+            GetFamilySymbol(document, NamesProvider.FamilyNameSleeve, NamesProvider.SleeveSymbolName));
     }
 
     /// <summary>
