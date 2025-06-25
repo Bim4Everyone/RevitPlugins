@@ -13,9 +13,9 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
 
     [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
 
-    public static PluginConfig GetPluginConfig() {
+    public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
-            .SetSerializer(new ConfigSerializer())
+            .SetSerializer(configSerializer)
             .SetPluginName(nameof(RevitCreatingFiltersByValues))
             .SetRevitVersion(ModuleEnvironment.RevitVersion)
             .SetProjectConfigName(nameof(PluginConfig) + ".json")
