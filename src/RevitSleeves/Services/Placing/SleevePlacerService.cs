@@ -16,6 +16,6 @@ internal class SleevePlacerService : ISleevePlacerService {
         IProgress<int> progress,
         CancellationToken ct) {
 
-        throw new NotImplementedException();
+        return Array.Empty<SleeveModel>(); // TODO
     }
 }

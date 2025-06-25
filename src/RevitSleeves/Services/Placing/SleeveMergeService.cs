@@ -16,6 +16,6 @@ internal class SleeveMergeService : ISleeveMergeService {
         IProgress<int> progress,
         CancellationToken ct) {
 
-        throw new NotImplementedException();
+        // TODO
     }
 }

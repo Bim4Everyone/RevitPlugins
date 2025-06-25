@@ -1,8 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+
+using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Core;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
 
@@ -37,10 +41,22 @@ internal class RevitRepository {
         return Category.GetCategory(Document, category);
     }
 
-    internal ICollection<ElementId> GetLinkedElementIds<T>(RevitLinkInstance link) {
+    public ICollection<ElementId> GetLinkedElementIds<T>(RevitLinkInstance link) where T : Element {
         return new FilteredElementCollector(link.Document)
             .WhereElementIsNotElementType()
             .OfClass(typeof(T))
             .ToElementIds();
+    }
+
+    public ICollection<SleeveModel> GetSleeves() {
+        return [.. new FilteredElementCollector(Document)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(FamilyInstance))
+            .OfCategory(BuiltInCategory.OST_PipeFitting)
+            .OfType<FamilyInstance>()
+            .Where(f => f.Symbol.FamilyName.Equals(
+                NamesProvider.FamilyNameSleeve,
+                System.StringComparison.InvariantCultureIgnoreCase))
+            .Select(f => new SleeveModel(f))];
     }
 }

@@ -27,7 +27,11 @@ internal class SleeveMergeModel {
         throw new NotImplementedException();
     }
 
-    public void AddSleeve(SleeveModel sleeve) {
-        throw new NotImplementedException();
+    public bool TryAddSleeve(SleeveModel sleeve) {
+        bool canAdd = CanAddSleeve(sleeve);
+        if(canAdd) {
+            _sleeves.Add(sleeve);
+        }
+        return canAdd;
     }
 }

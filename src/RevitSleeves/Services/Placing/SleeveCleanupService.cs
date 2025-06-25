@@ -17,6 +17,6 @@ internal class SleeveCleanupService : ISleeveCleanupService {
         IProgress<int> progress,
         CancellationToken ct) {
 
-        throw new NotImplementedException();
+        return Array.Empty<SleeveModel>(); // TODO
     }
 }

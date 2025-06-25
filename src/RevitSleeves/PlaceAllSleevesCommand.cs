@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 
@@ -9,6 +10,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -42,6 +45,9 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
         kernel.Bind<SleevePlacementSettingsConfig>()
             .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
@@ -55,10 +61,39 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        var optsService = kernel.Get<ISleevePlacingOptsService>();
-        optsService.GetOpts();
+        Run(kernel);
 
         Notification(true);
+    }
+
+    private void Run(IKernel kernel) {
+        var repo = kernel.Get<RevitRepository>();
+        var oldSleeves = repo.GetSleeves();
+
+        var localizationService = kernel.Get<ILocalizationService>();
+
+        ICollection<SleeveModel> newSleeves;
+        using(var placeTrans = repo.Document.StartTransaction(localizationService.GetLocalizedString("TODO"))) {
+            var opts = kernel.Get<ISleevePlacingOptsService>().GetOpts();
+            newSleeves = kernel.Get<ISleevePlacerService>().PlaceSleeves(opts, null, default);
+            placeTrans.Commit();
+        }
+
+        ICollection<SleeveModel> cleanedSleeves;
+        using(var cleanupTrans = repo.Document.StartTransaction(localizationService.GetLocalizedString("TODO"))) {
+            cleanedSleeves = kernel.Get<ISleeveCleanupService>().CleanupSleeves(oldSleeves, newSleeves, null, default);
+            cleanupTrans.Commit();
+        }
+
+        using(var mergeTrans = repo.Document.StartTransaction(localizationService.GetLocalizedString("TODO"))) {
+            kernel.Get<ISleeveMergeService>().MergeSleeves(cleanedSleeves, null, default);
+            mergeTrans.Commit();
+        }
+
+        var errors = kernel.Get<IPlacingErrorsService>().GetAllErrors();
+        if(errors.Count > 0) {
+            // TODO
+        }
     }
 
     private void BindServices(IKernel kernel) {
