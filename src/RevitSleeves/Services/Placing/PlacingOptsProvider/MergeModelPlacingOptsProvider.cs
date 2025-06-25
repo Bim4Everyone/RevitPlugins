@@ -1,6 +1,11 @@
 using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Placing.FamilySymbolFinder;
+using RevitSleeves.Services.Placing.LevelFinder;
+using RevitSleeves.Services.Placing.ParamsSetterFinder;
+using RevitSleeves.Services.Placing.PointFinder;
+using RevitSleeves.Services.Placing.RotationFinder;
 
-namespace RevitSleeves.Services.Placing.PlacingOptsFinder;
+namespace RevitSleeves.Services.Placing.PlacingOptsProvider;
 internal class MergeModelPlacingOptsProvider : PlacingOptsProvider<SleeveMergeModel> {
     public MergeModelPlacingOptsProvider(
         IFamilySymbolFinder<SleeveMergeModel> symbolFinder,

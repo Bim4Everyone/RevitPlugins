@@ -2,8 +2,13 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 
 using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Placing.FamilySymbolFinder;
+using RevitSleeves.Services.Placing.LevelFinder;
+using RevitSleeves.Services.Placing.ParamsSetterFinder;
+using RevitSleeves.Services.Placing.PointFinder;
+using RevitSleeves.Services.Placing.RotationFinder;
 
-namespace RevitSleeves.Services.Placing.PlacingOptsFinder;
+namespace RevitSleeves.Services.Placing.PlacingOptsProvider;
 internal class PipeWallPlacingOptsProvider : PlacingOptsProvider<ClashModel<Pipe, Wall>> {
     public PipeWallPlacingOptsProvider(
         IFamilySymbolFinder<ClashModel<Pipe, Wall>> symbolFinder,

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-namespace RevitSleeves.Services.Placing;
+namespace RevitSleeves.Services.Core;
 internal interface IMepElementsProvider {
     ICollection<Element> GetMepElements(BuiltInCategory category);
 

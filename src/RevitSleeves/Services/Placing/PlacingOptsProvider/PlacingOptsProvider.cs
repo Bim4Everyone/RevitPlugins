@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 
 using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Placing.FamilySymbolFinder;
+using RevitSleeves.Services.Placing.LevelFinder;
+using RevitSleeves.Services.Placing.ParamsSetterFinder;
+using RevitSleeves.Services.Placing.PointFinder;
+using RevitSleeves.Services.Placing.RotationFinder;
 
-namespace RevitSleeves.Services.Placing.PlacingOptsFinder;
+namespace RevitSleeves.Services.Placing.PlacingOptsProvider;
 internal abstract class PlacingOptsProvider<T> : IPlacingOptsProvider<T> where T : class {
     private readonly IFamilySymbolFinder<T> _symbolFinder;
     private readonly ILevelFinder<T> _levelFinder;
@@ -32,17 +37,21 @@ internal abstract class PlacingOptsProvider<T> : IPlacingOptsProvider<T> where T
     }
 
 
-    public SleevePlacingOpts GetOpts(T param) {
-        return new SleevePlacingOpts() {
-            FamilySymbol = _symbolFinder.GetFamilySymbol(param),
-            Level = _levelFinder.GetLevel(param),
-            Point = _pointFinder.GetPoint(param),
-            Rotation = _rotationFinder.GetRotation(param),
-            ParamsSetter = _paramsSetterFinder.GetParamsSetter(param)
-        };
+    public ICollection<SleevePlacingOpts> GetOpts(ICollection<T> @params) {
+        return [.. @params.Select(GetOpts).Where(opts => opts is not null)];
     }
 
-    public ICollection<SleevePlacingOpts> GetOpts(ICollection<T> @params) {
-        return [.. @params.Select(GetOpts)];
+    private SleevePlacingOpts GetOpts(T param) {
+        try {
+            return new SleevePlacingOpts() {
+                FamilySymbol = _symbolFinder.GetFamilySymbol(param),
+                Level = _levelFinder.GetLevel(param),
+                Point = _pointFinder.GetPoint(param),
+                Rotation = _rotationFinder.GetRotation(param),
+                ParamsSetter = _paramsSetterFinder.GetParamsSetter(param)
+            };
+        } catch(InvalidOperationException) {
+            return null;
+        }
     }
 }

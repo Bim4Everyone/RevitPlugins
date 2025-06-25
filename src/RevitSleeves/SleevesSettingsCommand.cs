@@ -24,7 +24,7 @@ namespace RevitSleeves;
 [Transaction(TransactionMode.Manual)]
 public class SleevesSettingsCommand : BasePluginCommand {
     public SleevesSettingsCommand() {
-        PluginName = "RevitSleeves";
+        PluginName = "Настройки расстановки гильз";
     }
 
     protected override void Execute(UIApplication uiApplication) {

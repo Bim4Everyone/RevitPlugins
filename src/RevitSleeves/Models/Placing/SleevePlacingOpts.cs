@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-using RevitSleeves.Services.Placing;
+using RevitSleeves.Services.Placing.ParamsSetter;
 
 namespace RevitSleeves.Models.Placing;
 internal class SleevePlacingOpts {
