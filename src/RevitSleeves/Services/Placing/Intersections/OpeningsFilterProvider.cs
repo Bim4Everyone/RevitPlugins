@@ -68,9 +68,8 @@ internal class OpeningsFilterProvider : IProvider {
             if(openingIds.Count == 0) {
                 continue;
             }
-            openings.AddRange(new FilteredElementCollector(Doc, openingIds)
-                .ToElements()
-                .OfType<FamilyInstance>()
+            openings.AddRange(openingIds
+                .Select(id => (FamilyInstance) Doc.GetElement(id))
                 .Where(f => structures.Contains(f.Host?.Id)));
         }
         return openings;
