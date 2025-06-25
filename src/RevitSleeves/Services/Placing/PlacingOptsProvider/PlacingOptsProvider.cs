@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Placing.FamilySymbolFinder;
 using RevitSleeves.Services.Placing.LevelFinder;
@@ -41,6 +43,8 @@ internal abstract class PlacingOptsProvider<T> : IPlacingOptsProvider<T> where T
         return [.. @params.Select(GetOpts).Where(opts => opts is not null)];
     }
 
+    protected abstract Element[] GetDependentElements(T param);
+
     private SleevePlacingOpts GetOpts(T param) {
         try {
             return new SleevePlacingOpts() {
@@ -48,7 +52,8 @@ internal abstract class PlacingOptsProvider<T> : IPlacingOptsProvider<T> where T
                 Level = _levelFinder.GetLevel(param),
                 Point = _pointFinder.GetPoint(param),
                 Rotation = _rotationFinder.GetRotation(param),
-                ParamsSetter = _paramsSetterFinder.GetParamsSetter(param)
+                ParamsSetter = _paramsSetterFinder.GetParamsSetter(param),
+                DependentElements = GetDependentElements(param)
             };
         } catch(InvalidOperationException) {
             return null;

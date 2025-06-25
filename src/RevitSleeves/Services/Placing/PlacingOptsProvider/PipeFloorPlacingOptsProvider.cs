@@ -18,4 +18,8 @@ internal class PipeFloorPlacingOptsProvider : PlacingOptsProvider<ClashModel<Pip
         IParamsSetterFinder<ClashModel<Pipe, Floor>> paramsSetterFinder)
         : base(symbolFinder, levelFinder, pointFinder, rotationFinder, paramsSetterFinder) {
     }
+
+    protected override Element[] GetDependentElements(ClashModel<Pipe, Floor> param) {
+        return [param.MepElement, param.StructureElement];
+    }
 }

@@ -18,4 +18,6 @@ internal class SleevePlacingOpts {
     public FamilySymbol FamilySymbol { get; set; }
 
     public IParamsSetter ParamsSetter { get; set; }
+
+    public Element[] DependentElements { get; set; }
 }

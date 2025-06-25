@@ -99,4 +99,11 @@
         x:Key="Ok">OK</system:String>
     <system:String
         x:Key="Cancel">Cancel</system:String>
+
+    <system:String
+        x:Key="Exceptions.CannotCreateSleeve">Cannot create sleeve</system:String>
+    <system:String
+        x:Key="Exceptions.CannotSetSleeveParams">Cannot set sleeve parameters values, sleeve was deleted</system:String>
+    <system:String
+        x:Key="Exceptions.CannotRotateSleeve">Cannot rotate sleeve, sleeve was deleted</system:String>
 </ResourceDictionary>

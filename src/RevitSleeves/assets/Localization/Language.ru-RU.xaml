@@ -20,7 +20,7 @@
         x:Key="SleevePlacementSettingsWindow.Offsets">Отступы</system:String>
     <system:String
         x:Key="SleevePlacementSettingsWindow.SettingsName">Название настроек:</system:String>
-
+    
     <system:String
         x:Key="SleevePlacementSettings.Validation.SetName">Укажите название настроек.</system:String>
     <system:String
@@ -99,4 +99,11 @@
         x:Key="Ok">ОК</system:String>
     <system:String
         x:Key="Cancel">Отмена</system:String>
+
+    <system:String
+        x:Key="Exceptions.CannotCreateSleeve">Не удалось создать гильзу</system:String>
+    <system:String
+        x:Key="Exceptions.CannotSetSleeveParams">Не удалось назначить параметры гильзы, гильза удалена</system:String>
+    <system:String
+        x:Key="Exceptions.CannotRotateSleeve">Не удалось повернуть гильзу, гильза удалена</system:String>
 </ResourceDictionary>

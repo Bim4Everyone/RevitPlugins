@@ -8,10 +8,7 @@ internal class ErrorModel {
     private readonly ICollection<Element> _elements;
 
     public ErrorModel(ICollection<Element> elements, string message) {
-        _elements = elements ?? throw new ArgumentNullException(nameof(elements));
-        if(_elements.Count == 0) {
-            throw new ArgumentOutOfRangeException(nameof(elements));
-        }
+        _elements = elements ?? Array.Empty<Element>();
         if(string.IsNullOrWhiteSpace(message)) {
             throw new ArgumentException(nameof(message));
         }
@@ -19,4 +16,8 @@ internal class ErrorModel {
     }
 
     public string Message { get; set; }
+
+    public ICollection<Element> GetDependentElements() {
+        return _elements;
+    }
 }
