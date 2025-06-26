@@ -41,7 +41,8 @@ internal class PipeFloorIntersectionsFinder : MepOpeningCollisionFinder, IClashF
             .Select(clash => new ClashModel<Pipe, FamilyInstance>(_revitRepository, clash))
             .Select(openingClash => new ClashModel<Pipe, Floor>(
                 _revitRepository, openingClash.MepElement,
-                (Floor)openingClash.StructureElement.Host))];
+                (Floor)openingClash.StructureElement.Host,
+                openingClash.StructureTransform))];
 
         return [.. structureClashes, .. openingClashes];
     }

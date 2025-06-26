@@ -132,6 +132,9 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         kernel.Bind<IOpeningGeometryProvider>()
             .To<OpeningGeometryProvider>()
             .InSingletonScope();
+        kernel.Bind<IGeometryUtils>()
+            .To<GeometryUtils>()
+            .InSingletonScope();
     }
 
     private void BindElementsServices(IKernel kernel) {

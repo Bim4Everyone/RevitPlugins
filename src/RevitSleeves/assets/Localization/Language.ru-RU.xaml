@@ -106,6 +106,8 @@
         x:Key="Exceptions.CannotSetSleeveParams">Не удалось назначить параметры гильзы, гильза удалена</system:String>
     <system:String
         x:Key="Exceptions.CannotRotateSleeve">Не удалось повернуть гильзу, гильза удалена</system:String>
+    <system:String
+        x:Key="Exceptions.FloorIsNotHorizontal">Перекрытие не горизонтально или содержит субэлементы</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Расстановка гильз</system:String>

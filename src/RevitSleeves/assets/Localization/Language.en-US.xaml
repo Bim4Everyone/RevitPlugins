@@ -106,6 +106,8 @@
         x:Key="Exceptions.CannotSetSleeveParams">Cannot set sleeve parameters values, sleeve was deleted</system:String>
     <system:String
         x:Key="Exceptions.CannotRotateSleeve">Cannot rotate sleeve, sleeve was deleted</system:String>
+    <system:String
+        x:Key="Exceptions.FloorIsNotHorizontal">The floor is not horizontal or contains sub-elements</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Sleeve placing</system:String>
