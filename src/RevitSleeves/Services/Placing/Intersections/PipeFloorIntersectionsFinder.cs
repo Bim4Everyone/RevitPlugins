@@ -11,34 +11,38 @@ using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.Intersections;
-internal class PipeFloorIntersectionsFinder : MepStructureCollisionFinder, IClashFinder<Pipe, Floor> {
-    private readonly RevitRepository _repository;
-    private readonly IMepElementsProvider _mepElementsProvider;
-    private readonly IStructureLinksProvider _structureLinksProvider;
+internal class PipeFloorIntersectionsFinder : MepOpeningCollisionFinder, IClashFinder<Pipe, Floor> {
     private readonly SleevePlacementSettingsConfig _config;
 
     public PipeFloorIntersectionsFinder(
         RevitRepository revitRepository,
         IMepElementsProvider mepElementsProvider,
         IStructureLinksProvider structureLinksProvider,
-        SleevePlacementSettingsConfig config) {
+        IOpeningGeometryProvider openingGeometryProvider,
+        SleevePlacementSettingsConfig config)
+        : base(revitRepository, mepElementsProvider, structureLinksProvider, openingGeometryProvider) {
 
-        _repository = revitRepository
-            ?? throw new ArgumentNullException(nameof(revitRepository));
-        _mepElementsProvider = mepElementsProvider
-            ?? throw new ArgumentNullException(nameof(mepElementsProvider));
-        _structureLinksProvider = structureLinksProvider
-            ?? throw new ArgumentNullException(nameof(structureLinksProvider));
-        _config = config
-            ?? throw new ArgumentNullException(nameof(config));
+        _config = config ?? throw new ArgumentNullException(nameof(config));
     }
 
     public ICollection<ClashModel<Pipe, Floor>> FindClashes() {
-        return [.. FindClashes(_repository,
-            _mepElementsProvider,
-            _structureLinksProvider,
-            _config.PipeSettings,
-            _config.PipeSettings.FloorSettings)
-            .Select(clash => new ClashModel<Pipe, Floor>(_repository, clash))];
+        ICollection<ClashModel<Pipe, Floor>> structureClashes = [.. FindStructureClashes(
+            _config.PipeSettings.Category,
+            _config.PipeSettings.MepFilterSet,
+            _config.PipeSettings.FloorSettings.Category,
+            _config.PipeSettings.FloorSettings.FilterSet)
+            .Select(clash => new ClashModel<Pipe, Floor>(_revitRepository, clash))];
+
+        ICollection<ClashModel<Pipe, Floor>> openingClashes = [.. FindOpeningClashes(
+            _config.PipeSettings.Category,
+            _config.PipeSettings.MepFilterSet,
+            _config.PipeSettings.FloorSettings.Category,
+            _config.PipeSettings.FloorSettings.FilterSet)
+            .Select(clash => new ClashModel<Pipe, FamilyInstance>(_revitRepository, clash))
+            .Select(openingClash => new ClashModel<Pipe, Floor>(
+                _revitRepository, openingClash.MepElement,
+                (Floor)openingClash.StructureElement.Host))];
+
+        return [.. structureClashes, .. openingClashes];
     }
 }

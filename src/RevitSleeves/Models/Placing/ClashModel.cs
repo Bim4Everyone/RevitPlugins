@@ -16,6 +16,12 @@ internal class ClashModel<TMep, TStructure> where TMep : Element where TStructur
         StructureElement = (TStructure) _clashModel.OtherElement.GetElement(docInfos);
     }
 
+    public ClashModel(RevitRepository revitRepository, TMep mepElement, TStructure structureElement) {
+        _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+        MepElement = mepElement ?? throw new System.ArgumentNullException(nameof(mepElement));
+        StructureElement = structureElement ?? throw new System.ArgumentNullException(nameof(structureElement));
+    }
+
 
     public TMep MepElement { get; }
 

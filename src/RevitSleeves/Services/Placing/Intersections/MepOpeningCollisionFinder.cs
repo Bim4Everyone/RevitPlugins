@@ -9,72 +9,67 @@ using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitSleeves.Models;
-using RevitSleeves.Models.Config;
 using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.Intersections;
-internal abstract class MepOpeningCollisionFinder {
-    private protected readonly RevitRepository _revitRepository;
-    private protected readonly IOpeningGeometryProvider _openingGeometryProvider;
+internal abstract class MepOpeningCollisionFinder : MepStructureCollisionFinder {
+    protected readonly IOpeningGeometryProvider _openingGeometryProvider;
+
 
     protected MepOpeningCollisionFinder(
         RevitRepository revitRepository,
-        IOpeningGeometryProvider openingGeometryProvider) {
+        IMepElementsProvider mepElementsProvider,
+        IStructureLinksProvider structureLinksProvider,
+        IOpeningGeometryProvider openingGeometryProvider)
+        : base(revitRepository, mepElementsProvider, structureLinksProvider) {
 
-        _revitRepository = revitRepository
-            ?? throw new System.ArgumentNullException(nameof(revitRepository));
         _openingGeometryProvider = openingGeometryProvider
-            ?? throw new System.ArgumentNullException(nameof(openingGeometryProvider));
+            ?? throw new ArgumentNullException(nameof(openingGeometryProvider));
     }
 
 
-    protected ICollection<ClashModel> FindClashes(
-        IMepElementsProvider mepElementsProvider,
-        IStructureLinksProvider structureLinksProvider,
-        MepCategorySettings mepSettings,
-        StructureSettings structureSettings,
-        string[] openingFamilyNames) {
+    /// <summary>
+    /// Находит коллизии между элементами ВИС из активного файла 
+    /// и чистовыми отверстиями из связей в заданных конструкциях
+    /// </summary>
+    /// <param name="mepCategory">Категория элементов ВИС</param>
+    /// <param name="mepFilterSet">Фильтр элементов ВИС</param>
+    /// <param name="structureCategory">Категория элементов конструкций, в которых находятся отверстия</param>
+    /// <param name="structureFilterSet">Фильтр конструкций, в которых находятся отверстия</param>
+    /// <returns>Коллизии между элементами ВИС из активного файла и чистовыми отверстиями из связей</returns>
+    protected ICollection<ClashModel> FindOpeningClashes(
+        BuiltInCategory mepCategory,
+        Set mepFilterSet,
+        BuiltInCategory structureCategory,
+        Set structureFilterSet) {
 
-        var mepProvider = GetMepFilterProvider(mepElementsProvider, mepSettings);
-        var structureLinks = structureLinksProvider.GetLinks();
+        var mepProvider = GetMepFilterProvider(mepCategory, mepFilterSet);
+        var structureLinks = _structureLinksProvider.GetLinks();
         if(structureLinks.Count == 0) {
             return Array.Empty<ClashModel>();
         }
-        var openingProviders = GetOpeningsProviders(structureLinks, structureSettings, openingFamilyNames);
+        var openingProviders = GetOpeningsProviders(
+            structureLinks,
+            structureCategory,
+            structureFilterSet,
+            _structureLinksProvider.GetOpeningFamilyNames());
+
         return [.. new ClashDetector(_revitRepository.GetClashRevitRepository(), [mepProvider], openingProviders)
             .FindClashes()];
     }
 
-    private FilterProvider GetMepFilterProvider(
-        IMepElementsProvider mepElementsProvider,
-        MepCategorySettings mepSettings) {
-
-        var clashRepo = _revitRepository.GetClashRevitRepository();
-
-        var pipeCategory = _revitRepository.GetCategory(mepSettings.Category);
-        var pipeFilter = new Filter(clashRepo) {
-            CategoryIds = [pipeCategory.Id],
-            Name = pipeCategory.Name,
-            Set = mepSettings.MepFilterSet
-        };
-        return new FilterProvider(_revitRepository.Document,
-            pipeFilter,
-            Transform.Identity,
-            [.. mepElementsProvider.GetMepElementIds(mepSettings.Category)]);
-    }
-
-    private ICollection<OpeningsFilterProvider> GetOpeningsProviders(
+    protected ICollection<OpeningsFilterProvider> GetOpeningsProviders(
         ICollection<RevitLinkInstance> structureLinks,
-        StructureSettings structureSettings,
+        BuiltInCategory structureCategory,
+        Set structureFilterSet,
         string[] openingFamilyNames) {
 
         var clashRepo = _revitRepository.GetClashRevitRepository();
 
-        var structureCategory = _revitRepository.GetCategory(structureSettings.Category);
         var structureFilter = new Filter(clashRepo) {
-            CategoryIds = [structureCategory.Id],
-            Name = structureCategory.Name,
-            Set = structureSettings.FilterSet
+            CategoryIds = [new ElementId(structureCategory)],
+            Name = structureCategory.ToString(),
+            Set = structureFilterSet
         };
         return [.. structureLinks.Select(link => new OpeningsFilterProvider(
             link.GetLinkDocument(),

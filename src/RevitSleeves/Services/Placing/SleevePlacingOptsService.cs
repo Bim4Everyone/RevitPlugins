@@ -31,19 +31,12 @@ internal class SleevePlacingOptsService : ISleevePlacingOptsService {
     public ICollection<SleevePlacingOpts> GetOpts() {
         List<SleevePlacingOpts> opts = [];
         if(_config.PipeSettings.WallSettings.IsEnabled) {
-
             var pipeWallClashes = _resolutionRoot.Get<IClashFinder<Pipe, Wall>>().FindClashes();
-            var pipeOpeningWallClashes = _resolutionRoot.Get<PipeWallOpeningIntersectionsFinder>().FindClashes();
-
             opts.AddRange(GetOpts(pipeWallClashes));
-            opts.AddRange(GetOpts(pipeOpeningWallClashes));
         }
         if(_config.PipeSettings.FloorSettings.IsEnabled) {
             var pipeFloorClashes = _resolutionRoot.Get<IClashFinder<Pipe, Floor>>().FindClashes();
-            var pipeOpeningFloorClashes = _resolutionRoot.Get<PipeFloorOpeningIntersectionsFinder>().FindClashes();
-
             opts.AddRange(GetOpts(pipeFloorClashes));
-            opts.AddRange(GetOpts(pipeOpeningFloorClashes));
         }
 
         return opts;

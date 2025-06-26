@@ -150,9 +150,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         kernel.Bind<IFamilySymbolFinder<ClashModel<Pipe, Floor>>>()
             .To<PipeFloorFamilySymbolFinder>()
             .InSingletonScope();
-        kernel.Bind<IFamilySymbolFinder<ClashModel<Pipe, FamilyInstance>>>()
-            .To<PipeOpeningFamilySymbolFinder>()
-            .InSingletonScope();
         kernel.Bind<IFamilySymbolFinder<ClashModel<Pipe, Wall>>>()
             .To<PipeWallFamilySymbolFinder>()
             .InSingletonScope();
@@ -164,12 +161,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<IClashFinder<Pipe, Wall>>()
             .To<PipeWallIntersectionsFinder>()
-            .InSingletonScope();
-        kernel.Bind<PipeFloorOpeningIntersectionsFinder>()
-            .ToSelf()
-            .InSingletonScope();
-        kernel.Bind<PipeWallOpeningIntersectionsFinder>()
-            .ToSelf()
             .InSingletonScope();
     }
 
@@ -183,9 +174,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         kernel.Bind<ILevelFinder<ClashModel<Pipe, Wall>>>()
             .To<PipeWallLevelFinder>()
             .InSingletonScope();
-        kernel.Bind<ILevelFinder<ClashModel<Pipe, FamilyInstance>>>()
-            .To<PipeOpeningLevelFinder>()
-            .InSingletonScope();
     }
 
     private void BindParamsSetters(IKernel kernel) {
@@ -197,9 +185,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .InTransientScope();
         kernel.Bind<IParamsSetter<ClashModel<Pipe, Wall>>>()
             .To<PipeWallParamsSetter>()
-            .InTransientScope();
-        kernel.Bind<IParamsSetter<ClashModel<Pipe, FamilyInstance>>>()
-            .To<PipeOpeningParamsSetter>()
             .InTransientScope();
     }
 
@@ -213,9 +198,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         kernel.Bind<IParamsSetterFinder<ClashModel<Pipe, Wall>>>()
             .To<PipeWallParamsSetterFinder>()
             .InSingletonScope();
-        kernel.Bind<IParamsSetterFinder<ClashModel<Pipe, FamilyInstance>>>()
-            .To<PipeOpeningParamsSetterFinder>()
-            .InSingletonScope();
     }
 
     private void BindPlacingOptsProviders(IKernel kernel) {
@@ -227,9 +209,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<IPlacingOptsProvider<ClashModel<Pipe, Wall>>>()
             .To<PipeWallPlacingOptsProvider>()
-            .InSingletonScope();
-        kernel.Bind<IPlacingOptsProvider<ClashModel<Pipe, FamilyInstance>>>()
-            .To<PipeOpeningPlacingOptsProvider>()
             .InSingletonScope();
     }
 
@@ -243,9 +222,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         kernel.Bind<IPointFinder<ClashModel<Pipe, Wall>>>()
             .To<PipeWallPointFinder>()
             .InSingletonScope();
-        kernel.Bind<IPointFinder<ClashModel<Pipe, FamilyInstance>>>()
-            .To<PipeOpeningPointFinder>()
-            .InSingletonScope();
     }
 
     private void BindRotationFinders(IKernel kernel) {
@@ -257,9 +233,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<IRotationFinder<ClashModel<Pipe, Wall>>>()
             .To<PipeWallRotationFinder>()
-            .InSingletonScope();
-        kernel.Bind<IRotationFinder<ClashModel<Pipe, FamilyInstance>>>()
-            .To<PipeOpeningRotationFinder>()
             .InSingletonScope();
     }
 }

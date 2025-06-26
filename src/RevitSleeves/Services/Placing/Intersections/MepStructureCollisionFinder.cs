@@ -9,64 +9,82 @@ using RevitClashDetective.Models.Clashes;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitSleeves.Models;
-using RevitSleeves.Models.Config;
 using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.Intersections;
 internal abstract class MepStructureCollisionFinder {
-    protected ICollection<ClashModel> FindClashes(
-        RevitRepository repository,
-        IMepElementsProvider mepElementsProvider,
-        IStructureLinksProvider structureLinksProvider,
-        MepCategorySettings mepSettings,
-        StructureSettings structureSettings) {
+    protected readonly RevitRepository _revitRepository;
+    protected readonly IMepElementsProvider _mepElementsProvider;
+    protected readonly IStructureLinksProvider _structureLinksProvider;
 
-        var mepProvider = GetMepFilterProvider(repository, mepElementsProvider, mepSettings);
-        var structureLinks = structureLinksProvider.GetLinks();
+    protected MepStructureCollisionFinder(
+        RevitRepository revitRepository,
+        IMepElementsProvider mepElementsProvider,
+        IStructureLinksProvider structureLinksProvider) {
+
+        _revitRepository = revitRepository
+            ?? throw new ArgumentNullException(nameof(revitRepository));
+        _mepElementsProvider = mepElementsProvider
+            ?? throw new ArgumentNullException(nameof(mepElementsProvider));
+        _structureLinksProvider = structureLinksProvider
+            ?? throw new ArgumentNullException(nameof(structureLinksProvider));
+    }
+
+
+    /// <summary>
+    /// Находит коллизии между элементами ВИС из активного файла и конструкциями из связей
+    /// </summary>
+    /// <param name="mepCategory">Категория элементов ВИС</param>
+    /// <param name="mepFilterSet">Фильтр элементов ВИС</param>
+    /// <param name="structureCategory">Категория элементов конструкций</param>
+    /// <param name="structureFilterSet">Фильтр конструкций</param>
+    /// <returns>Коллизии между элементами ВИС из активного файла и конструкциями из связей</returns>
+    protected ICollection<ClashModel> FindStructureClashes(
+        BuiltInCategory mepCategory,
+        Set mepFilterSet,
+        BuiltInCategory structureCategory,
+        Set structureFilterSet) {
+
+        var mepProvider = GetMepFilterProvider(mepCategory, mepFilterSet);
+        var structureLinks = _structureLinksProvider.GetLinks();
         if(structureLinks.Count == 0) {
             return Array.Empty<ClashModel>();
         }
-        var structureProviders = GetStructureFilterProviders(repository, structureLinks, structureSettings);
-        return [.. new ClashDetector(repository.GetClashRevitRepository(), [mepProvider], structureProviders)
+        var structureProviders = GetStructureFilterProviders(structureLinks, structureCategory, structureFilterSet);
+        return [.. new ClashDetector(_revitRepository.GetClashRevitRepository(), [mepProvider], structureProviders)
             .FindClashes()];
     }
 
-    private FilterProvider GetMepFilterProvider(
-        RevitRepository repository,
-        IMepElementsProvider mepElementsProvider,
-        MepCategorySettings mepSettings) {
+    protected FilterProvider GetMepFilterProvider(BuiltInCategory mepCategory, Set mepFilterSet) {
+        var clashRepo = _revitRepository.GetClashRevitRepository();
 
-        var clashRepo = repository.GetClashRevitRepository();
-
-        var pipeCategory = repository.GetCategory(mepSettings.Category);
         var pipeFilter = new Filter(clashRepo) {
-            CategoryIds = [pipeCategory.Id],
-            Name = pipeCategory.Name,
-            Set = mepSettings.MepFilterSet
+            CategoryIds = [new ElementId(mepCategory)],
+            Name = mepCategory.ToString(),
+            Set = mepFilterSet
         };
-        return new FilterProvider(repository.Document,
+        return new FilterProvider(_revitRepository.Document,
             pipeFilter,
             Transform.Identity,
-            [.. mepElementsProvider.GetMepElementIds(mepSettings.Category)]);
+            [.. _mepElementsProvider.GetMepElementIds(mepCategory)]);
     }
 
-    private ICollection<FilterProvider> GetStructureFilterProviders(
-        RevitRepository repository,
+    protected ICollection<FilterProvider> GetStructureFilterProviders(
         ICollection<RevitLinkInstance> structureLinks,
-        StructureSettings structureSettings) {
+        BuiltInCategory structureCategory,
+        Set structureFilterSet) {
 
-        var clashRepo = repository.GetClashRevitRepository();
+        var clashRepo = _revitRepository.GetClashRevitRepository();
 
-        var structureCategory = repository.GetCategory(structureSettings.Category);
         var structureFilter = new Filter(clashRepo) {
-            CategoryIds = [structureCategory.Id],
-            Name = structureCategory.Name,
-            Set = structureSettings.FilterSet
+            CategoryIds = [new ElementId(structureCategory)],
+            Name = structureCategory.ToString(),
+            Set = structureFilterSet
         };
         return [.. structureLinks.Select(link => new FilterProvider(
             link.GetLinkDocument(),
             structureFilter,
             link.GetTransform(),
-            [.. repository.GetLinkedElementIds<Wall>(link)]))];
+            [.. _revitRepository.GetLinkedElementIds<Wall>(link)]))];
     }
 }
