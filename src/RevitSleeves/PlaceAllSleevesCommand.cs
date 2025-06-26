@@ -73,19 +73,22 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         var localizationService = kernel.Get<ILocalizationService>();
 
         ICollection<SleeveModel> newSleeves;
-        using(var placeTrans = repo.Document.StartTransaction(localizationService.GetLocalizedString("TODO"))) {
+        using(var placeTrans = repo.Document.StartTransaction(
+            localizationService.GetLocalizedString("Transaction.SleevesPlacing"))) {
             var opts = kernel.Get<ISleevePlacingOptsService>().GetOpts();
             newSleeves = kernel.Get<ISleevePlacerService>().PlaceSleeves(opts, null, default);
             placeTrans.Commit();
         }
 
         ICollection<SleeveModel> cleanedSleeves;
-        using(var cleanupTrans = repo.Document.StartTransaction(localizationService.GetLocalizedString("TODO"))) {
+        using(var cleanupTrans = repo.Document.StartTransaction(
+            localizationService.GetLocalizedString("Transaction.SleevesCleanup"))) {
             cleanedSleeves = kernel.Get<ISleeveCleanupService>().CleanupSleeves(oldSleeves, newSleeves, null, default);
             cleanupTrans.Commit();
         }
 
-        using(var mergeTrans = repo.Document.StartTransaction(localizationService.GetLocalizedString("TODO"))) {
+        using(var mergeTrans = repo.Document.StartTransaction(
+            localizationService.GetLocalizedString("Transaction.SleevesMerging"))) {
             kernel.Get<ISleeveMergeService>().MergeSleeves(cleanedSleeves, null, default);
             mergeTrans.Commit();
         }

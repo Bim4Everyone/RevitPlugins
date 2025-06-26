@@ -5,25 +5,30 @@ using Autodesk.Revit.DB;
 using dosymep.SimpleServices;
 
 using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Placing.PointFinder;
 
 namespace RevitSleeves.Services.Placing.ParamsSetter;
-internal class MergeModelParamsSetter : IParamsSetter<SleeveMergeModel> {
+internal class MergeModelParamsSetter : ParamsSetter, IParamsSetter<SleeveMergeModel> {
     private readonly IPlacingErrorsService _errorsService;
     private readonly ILocalizationService _localizationService;
+    private readonly IPointFinder<SleeveMergeModel> _pointFinder;
     private readonly SleeveMergeModel _sleeveModel;
 
     public MergeModelParamsSetter(
         IPlacingErrorsService errorsService,
         ILocalizationService localizationService,
+        IPointFinder<SleeveMergeModel> pointFinder,
         SleeveMergeModel sleeveModel) {
 
         _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        _pointFinder = pointFinder ?? throw new ArgumentNullException(nameof(pointFinder));
         _sleeveModel = sleeveModel ?? throw new ArgumentNullException(nameof(sleeveModel));
     }
 
 
     public void SetParamValues(FamilyInstance sleeve) {
         // TODO
+        SetElevation(sleeve, _pointFinder.GetPoint(_sleeveModel));
     }
 }

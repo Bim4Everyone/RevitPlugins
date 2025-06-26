@@ -106,4 +106,11 @@
         x:Key="Exceptions.CannotSetSleeveParams">Cannot set sleeve parameters values, sleeve was deleted</system:String>
     <system:String
         x:Key="Exceptions.CannotRotateSleeve">Cannot rotate sleeve, sleeve was deleted</system:String>
+
+    <system:String
+        x:Key="Transaction.SleevesPlacing">Sleeve placing</system:String>
+    <system:String
+        x:Key="Transaction.SleevesCleanup">Sleeve cleanup</system:String>
+    <system:String
+        x:Key="Transaction.SleevesMerging">Sleeve merging</system:String>
 </ResourceDictionary>
