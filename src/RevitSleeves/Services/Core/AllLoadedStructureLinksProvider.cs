@@ -24,9 +24,8 @@ internal class AllLoadedStructureLinksProvider : IStructureLinksProvider {
         return [.. new FilteredElementCollector(_revitRepository.Document)
             .OfClass(typeof(RevitLinkInstance))
             .OfType<RevitLinkInstance>()
-            .Where(link => _bimModelPartsService.InAnyBimModelParts(link,
-                BimModelPart.ARPart,
-                BimModelPart.KRPart))];
+            .Where(link => _bimModelPartsService.InAnyBimModelParts(link, BimModelPart.ARPart, BimModelPart.KRPart)
+                && RevitLinkType.IsLoaded(_revitRepository.Document, link.GetTypeId()))];
     }
 
     public string[] GetOpeningFamilyNames() {

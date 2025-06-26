@@ -38,5 +38,8 @@ internal class PipeFloorOpeningIntersectionsFinder : MepOpeningCollisionFinder, 
             _config.PipeSettings.FloorSettings,
             _structureLinksProvider.GetOpeningFamilyNames())
             .Select(clash => new ClashModel<Pipe, FamilyInstance>(_revitRepository, clash))];
+        // TODO сделать возвращаемый тип не ClashModel<Pipe, FamilyInstance>, а ClashModel<Pipe, Floor>,
+        // где Floor - хост отверстия FamilyInstance.
+        // И аналогично в PipeWallOpeningIntersectionsFinder
     }
 }

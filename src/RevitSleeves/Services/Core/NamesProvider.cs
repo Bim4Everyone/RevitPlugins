@@ -26,4 +26,6 @@ internal static class NamesProvider {
     public const string ParameterOpeningKrThickness = "ФОП_РАЗМ_Глубина";
     public const string ParameterOpeningKrInFloorHeight = "мод_ФОП_Габарит А";
     public const string ParameterOpeningKrInFloorWidth = "мод_ФОП_Габарит Б";
+
+    public const string ParameterSleeveIncline = "ADSK_Размер_УголПоворота";
 }

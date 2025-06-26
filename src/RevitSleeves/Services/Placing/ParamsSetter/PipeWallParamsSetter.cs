@@ -3,6 +3,7 @@ using System;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitSleeves.Models.Placing;
@@ -31,5 +32,6 @@ internal class PipeWallParamsSetter : ParamsSetter, IParamsSetter<ClashModel<Pip
     public void SetParamValues(FamilyInstance sleeve) {
         // TODO
         SetElevation(sleeve, _pointFinder.GetPoint(_clash));
+        SetInclineAngle(sleeve, _clash.MepElement.GetParamValue<double>(BuiltInParameter.RBS_PIPE_SLOPE));
     }
 }

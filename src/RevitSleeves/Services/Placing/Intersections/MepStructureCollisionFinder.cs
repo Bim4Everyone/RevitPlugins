@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,7 +22,11 @@ internal abstract class MepStructureCollisionFinder {
         StructureSettings structureSettings) {
 
         var mepProvider = GetMepFilterProvider(repository, mepElementsProvider, mepSettings);
-        var structureProviders = GetStructureFilterProviders(repository, structureLinksProvider, structureSettings);
+        var structureLinks = structureLinksProvider.GetLinks();
+        if(structureLinks.Count == 0) {
+            return Array.Empty<ClashModel>();
+        }
+        var structureProviders = GetStructureFilterProviders(repository, structureLinks, structureSettings);
         return [.. new ClashDetector(repository.GetClashRevitRepository(), [mepProvider], structureProviders)
             .FindClashes()];
     }
@@ -47,7 +52,7 @@ internal abstract class MepStructureCollisionFinder {
 
     private ICollection<FilterProvider> GetStructureFilterProviders(
         RevitRepository repository,
-        IStructureLinksProvider structureLinksProvider,
+        ICollection<RevitLinkInstance> structureLinks,
         StructureSettings structureSettings) {
 
         var clashRepo = repository.GetClashRevitRepository();
@@ -58,11 +63,10 @@ internal abstract class MepStructureCollisionFinder {
             Name = structureCategory.Name,
             Set = structureSettings.FilterSet
         };
-        return [.. structureLinksProvider.GetLinks()
-            .Select(link => new FilterProvider(
-                link.GetLinkDocument(),
-                structureFilter,
-                link.GetTransform(),
-                [.. repository.GetLinkedElementIds<Wall>(link)]))];
+        return [.. structureLinks.Select(link => new FilterProvider(
+            link.GetLinkDocument(),
+            structureFilter,
+            link.GetTransform(),
+            [.. repository.GetLinkedElementIds<Wall>(link)]))];
     }
 }

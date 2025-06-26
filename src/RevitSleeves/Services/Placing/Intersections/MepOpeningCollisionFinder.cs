@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,7 +36,11 @@ internal abstract class MepOpeningCollisionFinder {
         string[] openingFamilyNames) {
 
         var mepProvider = GetMepFilterProvider(mepElementsProvider, mepSettings);
-        var openingProviders = GetOpeningsProviders(structureLinksProvider, structureSettings, openingFamilyNames);
+        var structureLinks = structureLinksProvider.GetLinks();
+        if(structureLinks.Count == 0) {
+            return Array.Empty<ClashModel>();
+        }
+        var openingProviders = GetOpeningsProviders(structureLinks, structureSettings, openingFamilyNames);
         return [.. new ClashDetector(_revitRepository.GetClashRevitRepository(), [mepProvider], openingProviders)
             .FindClashes()];
     }
@@ -59,7 +64,7 @@ internal abstract class MepOpeningCollisionFinder {
     }
 
     private ICollection<OpeningsFilterProvider> GetOpeningsProviders(
-        IStructureLinksProvider structureLinksProvider,
+        ICollection<RevitLinkInstance> structureLinks,
         StructureSettings structureSettings,
         string[] openingFamilyNames) {
 
@@ -71,12 +76,11 @@ internal abstract class MepOpeningCollisionFinder {
             Name = structureCategory.Name,
             Set = structureSettings.FilterSet
         };
-        return [.. structureLinksProvider.GetLinks()
-            .Select(link => new OpeningsFilterProvider(
-                link.GetLinkDocument(),
-                structureFilter,
-                link.GetTransform(),
-                openingFamilyNames,
-                _openingGeometryProvider))];
+        return [.. structureLinks.Select(link => new OpeningsFilterProvider(
+            link.GetLinkDocument(),
+            structureFilter,
+            link.GetTransform(),
+            openingFamilyNames,
+            _openingGeometryProvider))];
     }
 }

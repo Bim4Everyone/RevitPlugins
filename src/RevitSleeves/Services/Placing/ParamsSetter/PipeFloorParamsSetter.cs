@@ -31,5 +31,6 @@ internal class PipeFloorParamsSetter : ParamsSetter, IParamsSetter<ClashModel<Pi
     public void SetParamValues(FamilyInstance sleeve) {
         // TODO
         SetElevation(sleeve, _pointFinder.GetPoint(_clash));
+        SetInclineAngle(sleeve, Math.PI / 2);
     }
 }
