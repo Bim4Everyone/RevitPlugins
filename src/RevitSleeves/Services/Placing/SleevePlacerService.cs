@@ -4,8 +4,6 @@ using System.Threading;
 
 using Autodesk.Revit.DB;
 
-using dosymep.SimpleServices;
-
 using RevitSleeves.Models;
 using RevitSleeves.Models.Placing;
 
@@ -13,16 +11,13 @@ namespace RevitSleeves.Services.Placing;
 internal class SleevePlacerService : ISleevePlacerService {
     private readonly RevitRepository _revitRepository;
     private readonly IPlacingErrorsService _errorsService;
-    private readonly ILocalizationService _localizationService;
 
     public SleevePlacerService(
         RevitRepository revitRepository,
-        IPlacingErrorsService errorsService,
-        ILocalizationService localizationService) {
+        IPlacingErrorsService errorsService) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
-        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
     }
 
 
@@ -37,25 +32,19 @@ internal class SleevePlacerService : ISleevePlacerService {
             try {
                 instance = _revitRepository.CreateInstance(opt.FamilySymbol, opt.Point, opt.Level);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                _errorsService.AddError(new ErrorModel(
-                    opt.DependentElements,
-                    _localizationService.GetLocalizedString("Exceptions.CannotCreateSleeve")));
+                _errorsService.AddError(opt.DependentElements, "Exceptions.CannotCreateSleeve");
                 continue;
             }
             try {
                 _revitRepository.RotateElement(instance, opt.Point, opt.Rotation);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                _errorsService.AddError(new ErrorModel(
-                    opt.DependentElements,
-                    _localizationService.GetLocalizedString("Exceptions.CannotRotateSleeve")));
+                _errorsService.AddError(opt.DependentElements, "Exceptions.CannotRotateSleeve");
                 continue;
             }
             try {
                 opt.ParamsSetter.SetParamValues(instance);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                _errorsService.AddError(new ErrorModel(
-                    opt.DependentElements,
-                    _localizationService.GetLocalizedString("Exceptions.CannotSetSleeveParams")));
+                _errorsService.AddError(opt.DependentElements, "Exceptions.CannotSetSleeveParams");
                 continue;
             }
             sleeves.Add(new SleeveModel(instance));

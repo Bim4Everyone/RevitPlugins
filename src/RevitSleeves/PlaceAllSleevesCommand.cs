@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -30,6 +31,8 @@ using RevitSleeves.Services.Placing.ParamsSetterFinder;
 using RevitSleeves.Services.Placing.PlacingOptsProvider;
 using RevitSleeves.Services.Placing.PointFinder;
 using RevitSleeves.Services.Placing.RotationFinder;
+using RevitSleeves.ViewModels.Placing;
+using RevitSleeves.Views.Placing;
 
 namespace RevitSleeves;
 [Transaction(TransactionMode.Manual)]
@@ -52,6 +55,7 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         BindServices(kernel);
+        BindWindows(kernel);
 
         kernel.UseWpfUIThemeUpdater();
 
@@ -93,9 +97,9 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             mergeTrans.Commit();
         }
 
-        var errors = kernel.Get<IPlacingErrorsService>().GetAllErrors();
-        if(errors.Count > 0) {
-            // TODO
+        if(kernel.Get<SleevePlacementSettingsConfig>().ShowPlacingErrors
+            && kernel.Get<IPlacingErrorsService>().ContainsErrors()) {
+            kernel.Get<PlacingErrorsWindow>().Show();
         }
     }
 
@@ -111,6 +115,16 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         BindPlacingOptsProviders(kernel);
         BindPointFinders(kernel);
         BindRotationFinders(kernel);
+    }
+
+    private void BindWindows(IKernel kernel) {
+        kernel.Bind<PlacingErrorsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<PlacingErrorsWindow>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<PlacingErrorsViewModel>());
     }
 
     private void BindCoreServices(IKernel kernel) {

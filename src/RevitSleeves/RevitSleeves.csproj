@@ -7,9 +7,7 @@
     <ItemGroup>
       <Folder Include="Services\Navigator\" />
       <Folder Include="ViewModels\Navigator\" />
-      <Folder Include="ViewModels\Placing\" />
       <Folder Include="Views\Navigator\" />
-      <Folder Include="Views\Placing\" />
     </ItemGroup>
     <ItemGroup>
       <Resource Include="assets\Styles\CustomStyles.xaml" />

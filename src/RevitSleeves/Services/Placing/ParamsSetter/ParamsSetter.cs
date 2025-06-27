@@ -24,4 +24,12 @@ internal abstract class ParamsSetter {
     protected void SetInclineAngle(FamilyInstance sleeve, double inclineAngle) {
         sleeve.SetSharedParamValue(NamesProvider.ParameterSleeveIncline, inclineAngle);
     }
+
+    protected void SetLength(FamilyInstance sleeve, double length) {
+        sleeve.SetParamValue(NamesProvider.ParameterSleeveLength, length);
+    }
+
+    protected void SetDiameter(FamilyInstance sleeve, double diameter) {
+        sleeve.SetParamValue(NamesProvider.ParameterSleeveDiameter, diameter);
+    }
 }

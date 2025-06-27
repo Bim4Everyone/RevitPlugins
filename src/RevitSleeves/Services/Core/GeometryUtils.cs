@@ -23,10 +23,20 @@ internal class GeometryUtils : IGeometryUtils {
         return floor.FloorType.GetCompoundStructure().GetWidth();
     }
 
-    public bool FloorIsHorizontal(Floor floor) {
+    public bool IsHorizontal(Floor floor) {
         var bbox = floor.GetBoundingBox();
         double bboxHeight = bbox.Max.Z - bbox.Min.Z;
         double floorHeight = GetFloorThickness(floor);
-        return Math.Abs(bboxHeight - floorHeight) >= _revitRepository.Application.ShortCurveTolerance;
+        return Math.Abs(bboxHeight - floorHeight) <= _revitRepository.Application.ShortCurveTolerance;
+    }
+
+    public bool IsVertical(MEPCurve curve) {
+        return ((LocationCurve) curve.Location).Curve is Line line
+            && (line.Direction.IsAlmostEqualTo(XYZ.BasisZ) || line.Direction.IsAlmostEqualTo(XYZ.BasisZ.Negate()));
+    }
+
+    public bool IsHorizontal(MEPCurve curve) {
+        return ((LocationCurve) curve.Location).Curve is Line line
+            && (Math.Abs(line.Direction.Z) < _revitRepository.Application.ShortCurveTolerance);
     }
 }

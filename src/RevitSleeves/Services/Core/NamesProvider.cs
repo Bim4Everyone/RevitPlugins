@@ -28,4 +28,6 @@ internal static class NamesProvider {
     public const string ParameterOpeningKrInFloorWidth = "мод_ФОП_Габарит Б";
 
     public const string ParameterSleeveIncline = "ADSK_Размер_УголПоворота";
+    public const string ParameterSleeveDiameter = "Диаметр";
+    public const string ParameterSleeveLength = "Длина";
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.DB;
 
 using pyRevitLabs.Json;
@@ -14,7 +16,7 @@ internal abstract class MepCategorySettings {
 
     public Set MepFilterSet { get; set; } = new Set();
 
-    public Offset[] Offsets { get; set; } = [];
+    public Dictionary<OffsetType, double> Offsets { get; set; } = [];
 
     public DiameterRange[] DiameterRanges { get; set; } = [];
 

@@ -108,6 +108,10 @@
         x:Key="Exceptions.CannotRotateSleeve">Не удалось повернуть гильзу, гильза удалена</system:String>
     <system:String
         x:Key="Exceptions.FloorIsNotHorizontal">Перекрытие не горизонтально или содержит субэлементы</system:String>
+    <system:String
+        x:Key="Exceptions.MepCurveIsNotVertical">Ось инженерного элемента не вертикальна</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFindPlacingPoint">Не удалось найти точку вставки</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Расстановка гильз</system:String>

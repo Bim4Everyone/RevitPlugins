@@ -98,6 +98,14 @@ internal class RevitRepository {
         }
     }
 
+    public double ConvertFromInternal(double feetValue) {
+        return UnitUtils.ConvertFromInternalUnits(feetValue, UnitTypeId.Millimeters);
+    }
+
+    public double ConvertToInternal(double mmValue) {
+        return UnitUtils.ConvertToInternalUnits(mmValue, UnitTypeId.Millimeters);
+    }
+
     private void RotateElement(Element element, Line axis, double angle) {
         if(Math.Abs(angle) > Application.AngleTolerance) {
             ElementTransformUtils.RotateElement(Document, element.Id, axis, angle);
