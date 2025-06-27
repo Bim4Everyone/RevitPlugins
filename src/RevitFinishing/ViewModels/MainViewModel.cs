@@ -175,7 +175,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private IList<ElementFilter> GetLogicalFilter(IList<ElementFilter> filter,
-                                         IEnumerable<SelectionElementVM> elements) {
+                                                  IEnumerable<SelectionElementVM> elements) {
         if(elements.Any()) {
             List<ElementFilter> levelParamFilters = [];
             foreach(SelectionElementVM roomLevel in elements) {
@@ -191,11 +191,23 @@ internal class MainViewModel : BaseViewModel {
 
         settings ??= _pluginConfig.AddSettings(_revitRepository.Document);
 
-        settings.Phase = SelectedPhase.Name;
-        settings.RoomNames = RoomNames
-            .Where(x => x.IsChecked)
-            .Select(x => x.Name)
-            .ToList();
+        SelectedPhase = Phases.FirstOrDefault(x => x.Name == settings.Phase);
+
+        var rooms = RoomNames.Where(x => settings.RoomNames.Contains(x.Name));
+        var departments = RoomDepartments.Where(x => settings.RoomDepartments.Contains(x.Name));
+        var levels = RoomLevels.Where(x => settings.RoomLevels.Contains(x.Name));
+
+        foreach(var room in rooms) {
+            room.IsChecked = true;
+        }
+
+        foreach(var department in departments) {
+            department.IsChecked = true;
+        }
+
+        foreach(var level in levels) {
+            level.IsChecked = true;
+        }
 
         _pluginConfig.SaveProjectConfig();
     }
@@ -207,6 +219,16 @@ internal class MainViewModel : BaseViewModel {
 
         settings.Phase = SelectedPhase.Name;
         settings.RoomNames = RoomNames
+            .Where(x => x.IsChecked)
+            .Select(x => x.Name)
+            .ToList();
+        
+        settings.RoomDepartments = RoomDepartments
+            .Where(x => x.IsChecked)
+            .Select(x => x.Name)
+            .ToList();
+
+        settings.RoomLevels = RoomLevels
             .Where(x => x.IsChecked)
             .Select(x => x.Name)
             .ToList();

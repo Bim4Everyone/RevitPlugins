@@ -60,11 +60,8 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public override string ProjectName { get; set; }
 
-    /// <summary>
-    /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
-    /// </summary>
-    public string SaveProperty { get; set; }
-
     public string Phase { get; set; }
-    public List<string> RoomNames { get; set; }
+    public IList<string> RoomNames { get; set; } = [];
+    public IList<string> RoomDepartments { get; set; } = [];
+    public IList<string> RoomLevels { get; set; } = [];
 }

@@ -14,7 +14,7 @@
 
     <system:String x:Key="MainWindow.ErrorNoSelectiom">Rooms are not selected</system:String>
     <system:String x:Key="MainWindow.ErrorNoRooms">No rooms at selected phase</system:String>
-s
+
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 
