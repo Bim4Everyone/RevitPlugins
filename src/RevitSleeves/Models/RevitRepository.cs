@@ -44,7 +44,7 @@ internal class RevitRepository {
     }
 
     public ICollection<ElementId> GetLinkedElementIds<T>(RevitLinkInstance link) where T : Element {
-        return new FilteredElementCollector(link.Document)
+        return new FilteredElementCollector(link.GetLinkDocument())
             .WhereElementIsNotElementType()
             .OfClass(typeof(T))
             .ToElementIds();

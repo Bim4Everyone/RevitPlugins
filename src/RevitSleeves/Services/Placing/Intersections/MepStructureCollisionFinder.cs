@@ -39,18 +39,19 @@ internal abstract class MepStructureCollisionFinder {
     /// <param name="structureCategory">Категория элементов конструкций</param>
     /// <param name="structureFilterSet">Фильтр конструкций</param>
     /// <returns>Коллизии между элементами ВИС из активного файла и конструкциями из связей</returns>
-    protected ICollection<ClashModel> FindStructureClashes(
+    protected ICollection<ClashModel> FindStructureClashes<TStructure>(
         BuiltInCategory mepCategory,
         Set mepFilterSet,
         BuiltInCategory structureCategory,
-        Set structureFilterSet) {
+        Set structureFilterSet) where TStructure : Element {
 
         var mepProvider = GetMepFilterProvider(mepCategory, mepFilterSet);
         var structureLinks = _structureLinksProvider.GetLinks();
         if(structureLinks.Count == 0) {
             return Array.Empty<ClashModel>();
         }
-        var structureProviders = GetStructureFilterProviders(structureLinks, structureCategory, structureFilterSet);
+        var structureProviders = GetStructureFilterProviders<TStructure>(
+            structureLinks, structureCategory, structureFilterSet);
         return [.. new ClashDetector(_revitRepository.GetClashRevitRepository(), [mepProvider], structureProviders)
             .FindClashes()];
     }
@@ -69,10 +70,10 @@ internal abstract class MepStructureCollisionFinder {
             [.. _mepElementsProvider.GetMepElementIds(mepCategory)]);
     }
 
-    protected ICollection<FilterProvider> GetStructureFilterProviders(
+    protected ICollection<FilterProvider> GetStructureFilterProviders<T>(
         ICollection<RevitLinkInstance> structureLinks,
         BuiltInCategory structureCategory,
-        Set structureFilterSet) {
+        Set structureFilterSet) where T : Element {
 
         var clashRepo = _revitRepository.GetClashRevitRepository();
 
@@ -85,6 +86,7 @@ internal abstract class MepStructureCollisionFinder {
             link.GetLinkDocument(),
             structureFilter,
             link.GetTransform(),
-            [.. _revitRepository.GetLinkedElementIds<Wall>(link)]))];
+            // дополнительный фильтр по классу, т.к. в плагине обрабатываются только системные семейства
+            [.. _revitRepository.GetLinkedElementIds<T>(link)]))];
     }
 }

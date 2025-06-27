@@ -26,7 +26,7 @@ internal class PipeFloorIntersectionsFinder : MepOpeningCollisionFinder, IClashF
     }
 
     public ICollection<ClashModel<Pipe, Floor>> FindClashes() {
-        ICollection<ClashModel<Pipe, Floor>> structureClashes = [.. FindStructureClashes(
+        ICollection<ClashModel<Pipe, Floor>> structureClashes = [.. FindStructureClashes<Floor>(
             _config.PipeSettings.Category,
             _config.PipeSettings.MepFilterSet,
             _config.PipeSettings.FloorSettings.Category,
