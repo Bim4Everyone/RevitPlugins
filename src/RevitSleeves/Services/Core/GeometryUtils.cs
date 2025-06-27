@@ -40,7 +40,8 @@ internal class GeometryUtils : IGeometryUtils {
         }
 
         return ((LocationCurve) curve.Location).Curve is Line line
-            && (line.Direction.IsAlmostEqualTo(XYZ.BasisZ) || line.Direction.IsAlmostEqualTo(XYZ.BasisZ.Negate()));
+            && (line.Direction.AngleTo(XYZ.BasisZ) < _revitRepository.Application.AngleTolerance
+                || line.Direction.AngleTo(XYZ.BasisZ.Negate()) < _revitRepository.Application.AngleTolerance);
     }
 
     public bool IsHorizontal(MEPCurve curve) {
