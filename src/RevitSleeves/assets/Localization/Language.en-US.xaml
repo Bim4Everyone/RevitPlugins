@@ -111,7 +111,13 @@
     <system:String
         x:Key="Exceptions.MepCurveIsNotVertical">Mep curve is not vertical</system:String>
     <system:String
+        x:Key="Exceptions.MepCurveIsVertical">Mep curve is vertical</system:String>
+    <system:String
         x:Key="Exceptions.CannotFindPlacingPoint">Cannot find placing point</system:String>
+    <system:String
+        x:Key="Exceptions.WallLocationIsNotLine">Wall location is not a line</system:String>
+    <system:String
+        x:Key="Exceptions.MepCurveIsParallelToWall">Mep curve is parallel to wall</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Sleeve placing</system:String>

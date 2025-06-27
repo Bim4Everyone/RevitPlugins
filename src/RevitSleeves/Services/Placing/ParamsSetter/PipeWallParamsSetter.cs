@@ -33,5 +33,6 @@ internal class PipeWallParamsSetter : ParamsSetter, IParamsSetter<ClashModel<Pip
         // TODO
         SetElevation(sleeve, _pointFinder.GetPoint(_clash));
         SetInclineAngle(sleeve, _clash.MepElement.GetParamValue<double>(BuiltInParameter.RBS_PIPE_SLOPE));
+        SetDiameter(sleeve, 1);
     }
 }

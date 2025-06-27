@@ -24,6 +24,10 @@ internal class GeometryUtils : IGeometryUtils {
     }
 
     public bool IsHorizontal(Floor floor) {
+        if(floor is null) {
+            throw new ArgumentNullException(nameof(floor));
+        }
+
         var bbox = floor.GetBoundingBox();
         double bboxHeight = bbox.Max.Z - bbox.Min.Z;
         double floorHeight = GetFloorThickness(floor);
@@ -31,11 +35,19 @@ internal class GeometryUtils : IGeometryUtils {
     }
 
     public bool IsVertical(MEPCurve curve) {
+        if(curve is null) {
+            throw new ArgumentNullException(nameof(curve));
+        }
+
         return ((LocationCurve) curve.Location).Curve is Line line
             && (line.Direction.IsAlmostEqualTo(XYZ.BasisZ) || line.Direction.IsAlmostEqualTo(XYZ.BasisZ.Negate()));
     }
 
     public bool IsHorizontal(MEPCurve curve) {
+        if(curve is null) {
+            throw new ArgumentNullException(nameof(curve));
+        }
+
         return ((LocationCurve) curve.Location).Curve is Line line
             && (Math.Abs(line.Direction.Z) < _revitRepository.Application.ShortCurveTolerance);
     }
