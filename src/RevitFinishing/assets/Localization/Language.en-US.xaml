@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
+    <system:String x:Key="MainWindow.Title">Calculate finishing</system:String>
+    
     <system:String x:Key="MainWindow.Phases">Phases</system:String>
     <system:String x:Key="MainWindow.RoomNames">Room names</system:String>
     <system:String x:Key="MainWindow.RoomDepartments">Room Departments:</system:String>
@@ -19,7 +21,17 @@
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 
     <system:String x:Key="MainWindow.TransactionName">Calculate finishing</system:String>
-    
+
+    <system:String x:Key="ErrorsWindow.Title">Calculate finishing</system:String>
+
+    <system:String x:Key="ErrorsWindow.ErrorTypeColumn">Type</system:String>
+    <system:String x:Key="ErrorsWindow.ErrorDescriptionColumn">Description</system:String>
+    <system:String x:Key="ErrorsWindow.IdColumn">Id</system:String>
+    <system:String x:Key="ErrorsWindow.CategoryColumn">Category</system:String>
+    <system:String x:Key="ErrorsWindow.NameColumn">Name</system:String>
+    <system:String x:Key="ErrorsWindow.LevelColumn">Level</system:String>
+    <system:String x:Key="ErrorsWindow.PhaseColumn">Phase</system:String>
+
     <system:String x:Key="ErrorsWindow.WithoutValue">&lt;No value&gt;</system:String>
     <system:String x:Key="ErrorsWindow.WithoutLevel">&lt;No level&gt;</system:String>
 

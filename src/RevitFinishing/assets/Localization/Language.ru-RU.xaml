@@ -21,6 +21,16 @@
 
     <system:String x:Key="MainWindow.TransactionName">Заполнить параметры отделки</system:String>
 
+    <system:String x:Key="ErrorsWindow.Title">Рассчитать отделку</system:String>
+
+    <system:String x:Key="ErrorsWindow.ErrorTypeColumn">Тип</system:String>
+    <system:String x:Key="ErrorsWindow.ErrorDescriptionColumn">Описание</system:String>
+    <system:String x:Key="ErrorsWindow.IdColumn">Id</system:String>
+    <system:String x:Key="ErrorsWindow.CategoryColumn">Категория</system:String>
+    <system:String x:Key="ErrorsWindow.NameColumn">Имя</system:String>
+    <system:String x:Key="ErrorsWindow.LevelColumn">Уровень</system:String>
+    <system:String x:Key="ErrorsWindow.PhaseColumn">Стадия</system:String>
+    
     <system:String x:Key="ErrorsWindow.WithoutValue">&lt;Без значения&gt;</system:String>
     <system:String x:Key="ErrorsWindow.WithoutLevel">&lt;Без уровня&gt;</system:String>
 
@@ -37,12 +47,8 @@
         Для них требуется проверить корректность расчетных параметров отделки (длина, площадь, объем). 
     </system:String> 
 
-    <system:String x:Key="ErrorsWindow.ErrorsDescription">
-        Расчет отделки не выполнен!
-        Обнаружены следующие ошибки, которые необходимо исправить:
-    </system:String>
-    <system:String x:Key="ErrorsWindow.WarningsDescription">
-        Расчет отделки завершен!
-        При этом были обнаружены следующие предупреждения, которые могли повлиять на корректность расчета:
-    </system:String>
+    <system:String x:Key="ErrorsWindow.ErrorInfoTitle">Расчет отделки не выполнен!</system:String>
+    <system:String x:Key="ErrorsWindow.ErrorInfo">Обнаружены следующие ошибки, которые необходимо исправить:</system:String>
+    <system:String x:Key="ErrorsWindow.WarningInfoTitle">Расчет отделки завершен!</system:String>
+    <system:String x:Key="ErrorsWindow.WarningInfo">При этом были обнаружены следующие предупреждения, которые могли повлиять на корректность расчета:</system:String>
 </ResourceDictionary>

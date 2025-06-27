@@ -4,6 +4,7 @@ namespace RevitFinishing.ViewModels.Notices;
 internal class ErrorsViewModel : NoticeViewModel {
     public ErrorsViewModel(ILocalizationService localizationService)
         : base(localizationService) {
-        NoticeInfo = _localizationService.GetLocalizedString("ErrorsWindow.ErrorsDescription");
+        NoticeInfoTitle = _localizationService.GetLocalizedString("ErrorsWindow.ErrorInfoTitle");
+        NoticeInfo = _localizationService.GetLocalizedString("ErrorsWindow.ErrorInfo");
     }
 }

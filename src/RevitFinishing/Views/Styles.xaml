@@ -41,4 +41,13 @@
             Property="CornerRadius"
             Value="{DynamicResource ControlCornerRadius}" />
     </Style>
+
+    <Style
+        TargetType="Border"
+        x:Key="CustomBorderNoPadding"
+        BasedOn="{StaticResource CustomBorder}">
+        <Setter
+            Property="Padding"
+            Value="0" />
+    </Style>
 </ResourceDictionary>

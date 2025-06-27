@@ -9,13 +9,19 @@ internal class NoticeViewModel : BaseViewModel {
     private protected readonly ILocalizationService _localizationService;
         private readonly ObservableCollection<NoticeListViewModel> _noticeLists = [];
     private NoticeListViewModel _selectedList;
+    private string _noticeInfoTitle;
     private string _noticeInfo;
 
     public NoticeViewModel(ILocalizationService localizationService) {
         _localizationService = localizationService;
     }
 
-        public ObservableCollection<NoticeListViewModel> NoticeLists => _noticeLists;
+    public ObservableCollection<NoticeListViewModel> NoticeLists => _noticeLists;
+
+    public string NoticeInfoTitle {
+        get => _noticeInfoTitle;
+        set => RaiseAndSetIfChanged(ref _noticeInfoTitle, value);
+    }
     public string NoticeInfo {
         get => _noticeInfo;
         set => RaiseAndSetIfChanged(ref _noticeInfo, value);
@@ -30,5 +36,7 @@ internal class NoticeViewModel : BaseViewModel {
         if(noticeList.ErrorElements.Any()) {
                 _noticeLists.Add(noticeList);
         }
+
+        SelectedList = _noticeLists.FirstOrDefault();
     }
 }

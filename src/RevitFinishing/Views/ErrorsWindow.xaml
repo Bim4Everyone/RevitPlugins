@@ -6,16 +6,30 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitFinishing.Views"
-    xmlns:vms="clr-namespace:RevitFinishing.ViewModels"
+    xmlns:vms="clr-namespace:RevitFinishing.ViewModels.Notices"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
      
     mc:Ignorable="d"
-    Title="ErrorsWindow" Height="450" Width="800"
+    Title="{me:LocalizationSource MainWindow.Title}" 
     
-    d:DataContext="{d:DesignInstance vms:ErrorsViewModel, IsDesignTimeCreatable=False}">
+    Height="700" 
+    Width="1200"
+        
+    MinHeight="700"
+    MinWidth="1200"
+    
+    d:DataContext="{d:DesignInstance vms:NoticeElementViewModel, IsDesignTimeCreatable=False}">
+
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -24,82 +38,113 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.35*"/>
-            <ColumnDefinition Width="0.65*"/>
-        </Grid.ColumnDefinitions>
-
         <ui:TitleBar
             Grid.Row="0"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             VerticalAlignment="Center"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            Title="{me:LocalizationSource ErrorsWindow.Title}" />
 
-        <ui:TextBlock
+        <Border
             Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Margin="10"
-            Text="{Binding NoticeInfo}"/>
+            Grid.ColumnSpan="3"
+            Margin="10,5"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel
+                Orientation="Vertical">
+                <ui:TextBlock
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    FontWeight="SemiBold"
+                    Text="{Binding NoticeInfoTitle}"/>
+                <ui:TextBlock
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="{Binding NoticeInfo}"/>
 
-        <ui:ListView
+            </StackPanel>
+        </Border>
+
+        <Border
             Grid.Row="2"
             Grid.Column="0"
-            Margin="10"
-            ItemsSource="{Binding NoticeLists}"
-            SelectedItem="{Binding SelectedList}">
-            <ui:ListView.View>
-                <GridView>
-                    <GridViewColumn
-                        Header="Тип"
-                        Width="120"
-                        DisplayMemberBinding="{Binding Status}"/>
-                    <GridViewColumn
-                        Header="Описание"
-                        Width="210">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock
-                                    TextWrapping="Wrap"
-                                    Text="{Binding Description}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ui:ListView.View>
-        </ui:ListView>
+            Margin="10,5"
+            Style="{StaticResource CustomBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.35*"/>
+                    <ColumnDefinition Width="0.65*"/>
+                </Grid.ColumnDefinitions>
 
-        <ui:ListView
-            Grid.Row="2"
-            Grid.Column="1"
-            Margin="10"
-            DataContext="{Binding SelectedList}"
-            ItemsSource="{Binding ErrorElements}">
-            <ui:ListView.View>
-                <GridView>
-                    <GridViewColumn
-                        Header="ID"
-                        Width="70"
-                        DisplayMemberBinding="{Binding ElementId}"/>
-                    <GridViewColumn
-                        Header="Категория"
-                        Width="90"
-                        DisplayMemberBinding="{Binding CategoryName}"/>
-                    <GridViewColumn
-                        Header="Наименование"
-                        Width="160"
-                        DisplayMemberBinding="{Binding ElementName}"/>
-                    <GridViewColumn
-                        Header="Уровень"
-                        Width="160"
-                        DisplayMemberBinding="{Binding LevelName}"/>
-                    <GridViewColumn
-                        Header="Стадия"
-                        Width="150"
-                        DisplayMemberBinding="{Binding PhaseName}"/>
-                </GridView>
-            </ui:ListView.View>
-        </ui:ListView>
+                <Border
+                    Grid.Column="0"
+                    Margin="0,0,10,0"
+                    Style="{StaticResource CustomBorderNoPadding}">
+                    <ui:ListView
+                        Grid.Column="0"
+                        BorderThickness="0"
+                        ItemsSource="{Binding NoticeLists}"
+                        SelectedItem="{Binding SelectedList}">
+                        <ui:ListView.View>
+                            <GridView>
+                                <GridViewColumn
+                                    Header="{me:LocalizationSource ErrorsWindow.ErrorTypeColumn}"
+                                    Width="140"
+                                    DisplayMemberBinding="{Binding Status}"/>
+                                <GridViewColumn
+                                    Header="{me:LocalizationSource ErrorsWindow.ErrorDescriptionColumn}"
+                                    Width="230">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                TextWrapping="Wrap"
+                                                Text="{Binding Description}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ui:ListView.View>
+                    </ui:ListView>                    
+                </Border>
+                
+                <Border
+                    Grid.Column="1"
+                    Style="{StaticResource CustomBorderNoPadding}">
+                    <ui:ListView
+                        Grid.Column="1"
+                        BorderThickness="0"
+                        DataContext="{Binding SelectedList}"
+                        ItemsSource="{Binding ErrorElements}">
+                        <ui:ListView.View>
+                            <GridView>
+                                <GridViewColumn
+                                    Header="{me:LocalizationSource ErrorsWindow.IdColumn}"
+                                    Width="100"
+                                    DisplayMemberBinding="{Binding ElementId}"/>
+                                <GridViewColumn
+                                    Header="{me:LocalizationSource ErrorsWindow.CategoryColumn}"
+                                    Width="100"
+                                    DisplayMemberBinding="{Binding CategoryName}"/>
+                                <GridViewColumn
+                                    Header="{me:LocalizationSource ErrorsWindow.NameColumn}"
+                                    Width="200"
+                                    DisplayMemberBinding="{Binding ElementName}"/>
+                                <GridViewColumn
+                                    Header="{me:LocalizationSource ErrorsWindow.LevelColumn}"
+                                    Width="180"
+                                    DisplayMemberBinding="{Binding LevelName}"/>
+                                <GridViewColumn
+                                    Header="{me:LocalizationSource ErrorsWindow.PhaseColumn}"
+                                    Width="150"
+                                    DisplayMemberBinding="{Binding PhaseName}"/>
+                            </GridView>
+                        </ui:ListView.View>
+                </ui:ListView>
+                </Border>
+            </Grid>
+        </Border>
     </Grid>
 </core:WpfUIPlatformWindow>
