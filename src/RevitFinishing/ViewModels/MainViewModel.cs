@@ -191,7 +191,7 @@ internal class MainViewModel : BaseViewModel {
 
         settings ??= _pluginConfig.AddSettings(_revitRepository.Document);
 
-        SelectedPhase = Phases.FirstOrDefault(x => x.Name == settings.Phase);
+        SelectedPhase = Phases.FirstOrDefault(x => x.Name == settings.Phase) ?? _phases[_phases.Count - 1];
 
         var rooms = RoomNames.Where(x => settings.RoomNames.Contains(x.Name));
         var departments = RoomDepartments.Where(x => settings.RoomDepartments.Contains(x.Name));
