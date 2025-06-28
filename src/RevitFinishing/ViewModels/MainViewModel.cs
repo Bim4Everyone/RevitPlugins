@@ -54,8 +54,7 @@ internal class MainViewModel : BaseViewModel {
         _errorWindowService = errorWindowService;
         _projectValidationService = projectValidationService;
 
-        var settings =
-            new ProjectSettingsLoader(_revitRepository.Application, _revitRepository.Document);
+        var settings = new ProjectSettingsLoader(_revitRepository.Application, _revitRepository.Document);
 
         settings.CopyKeySchedule();
         settings.CopyParameters();
@@ -129,27 +128,29 @@ internal class MainViewModel : BaseViewModel {
 
         var allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
 
-        ErrorsViewModel mainErrors = _projectValidationService.CheckMainErrors(allFinishing, selectedRooms, _selectedPhase);
+        ErrorsViewModel mainErrors = _projectValidationService
+            .CheckMainErrors(allFinishing, selectedRooms, _selectedPhase);
         if(_errorWindowService.ShowNoticeWindow(mainErrors)) {
             return;
         }
 
         var calculator = new FinishingCalculator(selectedRooms, allFinishing);
 
-        ErrorsViewModel finishingErrors = _projectValidationService.CheckFinishingErrors(calculator, _selectedPhase);
+        ErrorsViewModel finishingErrors = _projectValidationService
+            .CheckFinishingErrors(calculator, _selectedPhase);
         if(_errorWindowService.ShowNoticeWindow(finishingErrors)) {
             return;
         }
 
         IEnumerable<FinishingElement> finishingElements = calculator.FinishingElements;
-        using(Transaction t = _revitRepository.Document
-            .StartTransaction(_localizationService.GetLocalizedString("MainWindow.TransactionName"))) {
-            foreach(FinishingElement element in finishingElements) {
-                element.UpdateFinishingParameters();
-                element.UpdateCategoryParameters();
-            }
-            t.Commit();
+
+        Transaction t = _revitRepository.Document
+            .StartTransaction(_localizationService.GetLocalizedString("MainWindow.TransactionName"));
+        foreach(FinishingElement element in finishingElements) {
+            element.UpdateFinishingParameters();
+            element.UpdateCategoryParameters();
         }
+        t.Commit();
 
         WarningsViewModel parameterErrors = _projectValidationService
             .CheckWarnings(selectedRooms, finishingElements, _selectedPhase);
@@ -218,20 +219,17 @@ internal class MainViewModel : BaseViewModel {
         settings ??= _pluginConfig.AddSettings(_revitRepository.Document);
 
         settings.Phase = SelectedPhase.Name;
-        settings.RoomNames = RoomNames
+        settings.RoomNames = [.. RoomNames
             .Where(x => x.IsChecked)
-            .Select(x => x.Name)
-            .ToList();
+            .Select(x => x.Name)];
         
-        settings.RoomDepartments = RoomDepartments
+        settings.RoomDepartments = [.. RoomDepartments
             .Where(x => x.IsChecked)
-            .Select(x => x.Name)
-            .ToList();
+            .Select(x => x.Name)];
 
-        settings.RoomLevels = RoomLevels
+        settings.RoomLevels = [.. RoomLevels
             .Where(x => x.IsChecked)
-            .Select(x => x.Name)
-            .ToList();
+            .Select(x => x.Name)];
 
         _pluginConfig.SaveProjectConfig();
     }

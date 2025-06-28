@@ -5,7 +5,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 namespace RevitFinishing.ViewModels.Notices;
-internal class NoticeViewModel : BaseViewModel {
+internal abstract class NoticeViewModel : BaseViewModel {
     private protected readonly ILocalizationService _localizationService;
         private readonly ObservableCollection<NoticeListViewModel> _noticeLists = [];
     private NoticeListViewModel _selectedList;

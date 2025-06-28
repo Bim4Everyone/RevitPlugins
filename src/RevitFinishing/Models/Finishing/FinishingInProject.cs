@@ -21,7 +21,7 @@ internal class FinishingInProject {
             .Concat(_baseboards)
             .Concat(_ceilings)
             .Concat(_floors)
-        .ToList();
+            .ToList();
     }
 
     public IReadOnlyCollection<Element> Walls => _walls;

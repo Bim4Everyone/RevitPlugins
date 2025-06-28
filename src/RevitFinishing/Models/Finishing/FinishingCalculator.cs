@@ -64,21 +64,20 @@ internal class FinishingCalculator {
             .ToDictionary(x => x.Key, x => new FinishingType(x));
     }
 
-    private Dictionary<ElementId, FinishingElement> UpdateDictionary(
-                                    Dictionary<ElementId, FinishingElement> allFinishings,
-                                    RoomElement room,
-                                    string finishingName,
-                                    Element finishingRevitElement) {
+    private Dictionary<ElementId, FinishingElement> UpdateDictionary(Dictionary<ElementId, FinishingElement> finishings,
+                                                                     RoomElement room,
+                                                                     string finishingName,
+                                                                     Element finishingRevitElement) {
         ElementId finishingId = finishingRevitElement.Id;
 
-        if(allFinishings.TryGetValue(finishingId, out FinishingElement finishing)) {
+        if(finishings.TryGetValue(finishingId, out FinishingElement finishing)) {
             finishing.Rooms.Add(room);
         } else {
             FinishingElement newFinishing = FinishingFactory.Create(finishingName, finishingRevitElement, this);
             newFinishing.Rooms = [room];
-            allFinishings.Add(finishingId, newFinishing);
+            finishings.Add(finishingId, newFinishing);
         }
 
-        return allFinishings;
+        return finishings;
     }
 }

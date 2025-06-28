@@ -31,8 +31,4 @@ internal class FinishingCategory {
         KeyWord = "(О) Потолок",
         Category = [BuiltInCategory.OST_Ceilings, BuiltInCategory.OST_Walls]
     };
-
-    public bool CheckCategory(Element element, FinishingCategory category) {
-        return element.Name.Contains(category.KeyWord);
-    }
 }

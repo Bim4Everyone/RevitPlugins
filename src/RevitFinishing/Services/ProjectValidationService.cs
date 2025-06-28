@@ -37,7 +37,8 @@ internal class ProjectValidationService {
         string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
         mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
             Description = _localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam"),
-            ErrorElements = [.. _finishingValidationService.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam, phase)]
+            ErrorElements = 
+                [.. _finishingValidationService.CheckRoomsByKeyParameter(selectedRooms, finishingKeyParam, phase)]
         });
 
         return mainErrors;
@@ -48,7 +49,8 @@ internal class ProjectValidationService {
 
         finishingErrors.AddElements(new ErrorsListViewModel(_localizationService) {
             Description = _localizationService.GetLocalizedString("ErrorsWindow.DifPhases"),
-            ErrorElements = [.. _finishingValidationService.CheckFinishingByRoom(calculator.FinishingElements, phase)]
+            ErrorElements = 
+                [.. _finishingValidationService.CheckFinishingByRoom(calculator.FinishingElements, phase)]
         });
 
         return finishingErrors;
@@ -63,13 +65,15 @@ internal class ProjectValidationService {
         parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
             Description =
                 $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{numberParamName}\"",
-            ErrorElements = [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, numberParamName, phase)]
+            ErrorElements = 
+                [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, numberParamName, phase)]
         });
         string nameParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME);
         parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
             Description =
                 $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{nameParamName}\"",
-            ErrorElements = [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, nameParamName, phase)]
+            ErrorElements = 
+                [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, nameParamName, phase)]
         });
         parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
             Description = _localizationService.GetLocalizedString("ErrorsWindow.CustomFamilies"),
