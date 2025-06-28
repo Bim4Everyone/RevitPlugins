@@ -50,4 +50,14 @@
             Property="Padding"
             Value="0" />
     </Style>
+
+    <Style 
+        TargetType="{x:Type GridViewColumnHeader}">
+        <Setter 
+            Property="Background" 
+            Value="{DynamicResource CardBackground}" />
+        <Setter 
+            Property="Foreground" 
+            Value="{DynamicResource TextFillColorPrimaryBrush}" />
+    </Style>
 </ResourceDictionary>
