@@ -50,5 +50,7 @@
     <system:String x:Key="ErrorsWindow.ErrorInfoTitle">Расчет отделки не выполнен!</system:String>
     <system:String x:Key="ErrorsWindow.ErrorInfo">Обнаружены следующие ошибки, которые необходимо исправить:</system:String>
     <system:String x:Key="ErrorsWindow.WarningInfoTitle">Расчет отделки завершен!</system:String>
-    <system:String x:Key="ErrorsWindow.WarningInfo">При этом были обнаружены следующие предупреждения, которые могли повлиять на корректность расчета:</system:String>
+    <system:String x:Key="ErrorsWindow.WarningInfo">
+        При этом были обнаружены следующие предупреждения, которые могли повлиять на корректность расчета:
+    </system:String>
 </ResourceDictionary>
