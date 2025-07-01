@@ -226,9 +226,9 @@ csharp_style_prefer_range_operator = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0016
 csharp_style_throw_expression = true:suggestion
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0059?pivots=lang-csharp-vb
-csharp_style_unused_value_assignment_preference = discard_variable:suggestion
+csharp_style_unused_value_assignment_preference = discard_variable:none
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0058
-csharp_style_unused_value_expression_statement_preference = discard_variable:silent
+csharp_style_unused_value_expression_statement_preference = discard_variable:none
 
 # 'using' directive preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0065
