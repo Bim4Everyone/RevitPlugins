@@ -7,6 +7,9 @@
         x:Key="TODO">TODO</system:String>
 
     <system:String
+        x:Key="RevitUI.PickMepElements">Выберите элемент(ы) ВИС</system:String>
+    
+    <system:String
         x:Key="SleevePlacementSettingsWindow.Title">Настройки расстановки гильз</system:String>
     <system:String
         x:Key="SleevePlacementSettingsWindow.CheckFilter">Проверить фильтр</system:String>
@@ -120,6 +123,8 @@
         x:Key="Exceptions.MepCurveIsParallelToWall">Ось инженерного элемента параллельна стене</system:String>
     <system:String
         x:Key="Exceptions.CannotFindDiameterRange">Не удалось найти диаметр гильзы для трубы</system:String>
+    <system:String
+        x:Key="Exceptions.CannotMergeSleeves">Не удалось объединить гильзы</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Расстановка гильз</system:String>

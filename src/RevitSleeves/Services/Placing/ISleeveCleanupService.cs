@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
+using Autodesk.Revit.DB.Events;
+
 using RevitSleeves.Models.Placing;
 
 namespace RevitSleeves.Services.Placing;
@@ -19,4 +21,9 @@ internal interface ISleeveCleanupService {
         ICollection<SleeveModel> newSleeves,
         IProgress<int> progress,
         CancellationToken ct);
+
+    /// <summary>
+    /// Обработчик событий создания дублирующих гильз
+    /// </summary>
+    void FailureProcessor(object sender, FailuresProcessingEventArgs e);
 }

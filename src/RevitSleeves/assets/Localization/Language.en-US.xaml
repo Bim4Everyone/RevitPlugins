@@ -7,6 +7,9 @@
         x:Key="TODO">TODO</system:String>
 
     <system:String
+        x:Key="RevitUI.PickMepElements">Pick mep element(s)</system:String>
+
+    <system:String
         x:Key="SleevePlacementSettingsWindow.Title">Sleeves placement settings</system:String>
     <system:String
         x:Key="SleevePlacementSettingsWindow.CheckFilter">Check filter</system:String>
@@ -120,6 +123,8 @@
         x:Key="Exceptions.MepCurveIsParallelToWall">Mep curve is parallel to wall</system:String>
     <system:String
         x:Key="Exceptions.CannotFindDiameterRange">Unable to find the diameter of the tube sleeve</system:String>
+    <system:String
+        x:Key="Exceptions.CannotMergeSleeves">Cannot merge sleeves</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Sleeve placing</system:String>

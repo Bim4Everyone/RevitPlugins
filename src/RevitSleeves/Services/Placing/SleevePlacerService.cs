@@ -26,8 +26,11 @@ internal class SleevePlacerService : ISleevePlacerService {
         IProgress<int> progress,
         CancellationToken ct) {
 
+        int i = 0;
         var sleeves = new List<SleeveModel>();
         foreach(var opt in opts) {
+            ct.ThrowIfCancellationRequested();
+            progress?.Report(++i);
             FamilyInstance instance;
             try {
                 instance = _revitRepository.CreateInstance(opt.FamilySymbol, opt.Point, opt.Level);

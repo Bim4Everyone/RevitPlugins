@@ -75,19 +75,27 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         var oldSleeves = repo.GetSleeves();
 
         var localizationService = kernel.Get<ILocalizationService>();
+        var cleanupService = kernel.Get<ISleeveCleanupService>();
 
         ICollection<SleeveModel> newSleeves;
-        using(var placeTrans = repo.Document.StartTransaction(
-            localizationService.GetLocalizedString("Transaction.SleevesPlacing"))) {
+        try {
+            repo.Application.FailuresProcessing += cleanupService.FailureProcessor;
+            using var placeTrans = repo.Document.StartTransaction(
+                localizationService.GetLocalizedString("Transaction.SleevesPlacing"));
             var opts = kernel.Get<ISleevePlacingOptsService>().GetOpts();
             newSleeves = kernel.Get<ISleevePlacerService>().PlaceSleeves(opts, null, default);
-            placeTrans.Commit();
+            var options = placeTrans.GetFailureHandlingOptions()
+                .SetForcedModalHandling(false)
+                .SetDelayedMiniWarnings(true);
+            placeTrans.Commit(options);
+        } finally {
+            repo.Application.FailuresProcessing -= cleanupService.FailureProcessor;
         }
 
         ICollection<SleeveModel> cleanedSleeves;
         using(var cleanupTrans = repo.Document.StartTransaction(
             localizationService.GetLocalizedString("Transaction.SleevesCleanup"))) {
-            cleanedSleeves = kernel.Get<ISleeveCleanupService>().CleanupSleeves(oldSleeves, newSleeves, null, default);
+            cleanedSleeves = cleanupService.CleanupSleeves(oldSleeves, newSleeves, null, default);
             cleanupTrans.Commit();
         }
 
@@ -151,7 +159,7 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .InSingletonScope();
     }
 
-    private void BindElementsServices(IKernel kernel) {
+    protected virtual void BindElementsServices(IKernel kernel) {
         kernel.Bind<IMepElementsProvider>()
             .To<AllMepElementsProvider>()
             .InSingletonScope();

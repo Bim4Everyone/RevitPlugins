@@ -66,6 +66,12 @@ internal class RevitRepository {
         Document.Delete(id);
     }
 
+    public void DeleteElements(ICollection<ElementId> ids) {
+        foreach(var id in ids) {
+            DeleteElement(id);
+        }
+    }
+
     public FamilyInstance CreateInstance(FamilySymbol type, XYZ point, Level level) {
         if(type is null) {
             throw new ArgumentNullException(nameof(type));
