@@ -20,6 +20,7 @@ internal class SleeveModel : IEquatable<SleeveModel> {
         Diameter = _familyInstance.GetParamValue<double>(NamesProvider.ParameterSleeveDiameter);
         Length = _familyInstance.GetParamValue<double>(NamesProvider.ParameterSleeveLength);
         Location = ((LocationPoint) _familyInstance.Location).Point;
+        Id = _familyInstance.Id;
     }
 
 
@@ -36,6 +37,8 @@ internal class SleeveModel : IEquatable<SleeveModel> {
     public double Length { get; }
 
     public XYZ Location { get; }
+
+    public ElementId Id { get; }
 
     public override bool Equals(object obj) {
         return Equals(obj as SleeveModel);
@@ -72,5 +75,17 @@ internal class SleeveModel : IEquatable<SleeveModel> {
         var end = faces[0].Origin;
         _orientation = (end - start).Normalize();
         return _orientation;
+    }
+
+    public bool CanMerge(SleeveModel second) {
+        if(this.Equals(second)) { return false; }
+        double distanceTolerance = _familyInstance.Document.Application.ShortCurveTolerance;
+        if(Math.Abs(this.Diameter - second.Diameter) > distanceTolerance) {
+            return false;
+        }
+        double angleTolerance = _familyInstance.Document.Application.AngleTolerance;
+        var locationDiff = this.Location - second.Location;
+        return locationDiff.GetLength() <= (this.Length / 2 + second.Length / 2 + distanceTolerance * 2)
+            && this.GetOrientation().AngleTo(locationDiff) <= angleTolerance;
     }
 }

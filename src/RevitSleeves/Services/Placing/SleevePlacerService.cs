@@ -50,6 +50,9 @@ internal class SleevePlacerService : ISleevePlacerService {
                 _errorsService.AddError(opt.DependentElements, "Exceptions.CannotSetSleeveParams");
                 continue;
             }
+            _revitRepository.Document.Regenerate(); // решение бага, когда значения параметров,
+                                                    // которые назначались этому экземпляру сразу после создания,
+                                                    // по итогу не назначались
             sleeves.Add(new SleeveModel(instance));
         }
         return sleeves;

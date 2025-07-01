@@ -30,5 +30,12 @@ internal class MergeModelParamsSetter : ParamsSetter, IParamsSetter<SleeveMergeM
     public void SetParamValues(FamilyInstance sleeve) {
         // TODO
         SetElevation(sleeve, _pointFinder.GetPoint(_sleeveModel));
+        var orientation = _sleeveModel.GetOrientation();
+        double angle = Math.Asin(orientation.Z);
+        SetInclineAngle(sleeve, angle);
+        SetDiameter(sleeve, _sleeveModel.GetDiameter());
+        (var start, var end) = _sleeveModel.GetEndPoints();
+        double length = (end - start).GetLength();
+        SetLength(sleeve, length);
     }
 }

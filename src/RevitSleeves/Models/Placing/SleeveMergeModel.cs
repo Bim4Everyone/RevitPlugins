@@ -25,12 +25,31 @@ internal class SleeveMergeModel {
     /// </summary>
     public int Count => _sleeves.Count;
 
+    public double GetDiameter() {
+        return _sleeves[0].Diameter;
+    }
+
+    public XYZ GetOrientation() {
+        return _sleeves[0].GetOrientation();
+    }
+
+    public (XYZ Start, XYZ End) GetEndPoints() {
+        var orientation = GetOrientation();
+        var startPoint = _sleeves[0].Location;
+        var orderedSleeves = _sleeves.OrderBy(s => orientation.DotProduct(s.Location - startPoint)).ToArray();
+        var first = orderedSleeves.First();
+        var last = orderedSleeves.Last();
+        double length = first.Length / 2 + (last.Location - first.Location).GetLength() + last.Length / 2;
+        var start = first.Location - orientation * first.Length / 2;
+        return (start, start + orientation * length);
+    }
+
     public IReadOnlyCollection<SleeveModel> GetSleeves() {
         return new ReadOnlyCollection<SleeveModel>(_sleeves);
     }
 
     public bool CanAddSleeve(SleeveModel sleeve) {
-        return _sleeves.Any(s => CanMerge(s, sleeve));
+        return _sleeves.Any(s => s.CanMerge(sleeve));
     }
 
     public bool TryAddSleeve(SleeveModel sleeve) {
@@ -39,17 +58,5 @@ internal class SleeveMergeModel {
             _sleeves.Add(sleeve);
         }
         return canAdd;
-    }
-
-    private bool CanMerge(SleeveModel first, SleeveModel second) {
-        if(first.Equals(second)) { return false; }
-        double distanceTolerance = Document.Application.ShortCurveTolerance;
-        if(Math.Abs(first.Diameter - second.Diameter) > distanceTolerance) {
-            return false;
-        }
-        double angleTolerance = Document.Application.AngleTolerance;
-        var locationDiff = first.Location - second.Location;
-        return locationDiff.GetLength() <= (first.Length / 2 + second.Length / 2 + distanceTolerance * 2)
-            && first.GetOrientation().AngleTo(locationDiff) <= angleTolerance;
     }
 }

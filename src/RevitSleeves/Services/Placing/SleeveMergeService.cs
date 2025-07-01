@@ -29,27 +29,13 @@ internal class SleeveMergeService : ISleeveMergeService {
         IProgress<int> progress,
         CancellationToken ct) {
 
-        var sleevesToExclude = new List<SleeveModel>();
-        var mergeModels = new List<SleeveMergeModel>();
-
-        int i = 0;
-        foreach(var sleeve in sleeves) {
-            ct.ThrowIfCancellationRequested();
-            progress?.Report(++i);
-            sleevesToExclude.Add(sleeve);
-            var mergeModel = new SleeveMergeModel(sleeve);
-            mergeModels.Add(mergeModel);
-            var sleevesToIterate = sleeves.Except(sleevesToExclude).ToArray();
-            foreach(var sleeveToMerge in sleevesToIterate) {
-                bool added = mergeModel.TryAddSleeve(sleeveToMerge);
-                if(added) {
-                    sleevesToExclude.Add(sleeveToMerge);
-                }
-            }
-        }
+        var mergeModels = FindMergeModels(sleeves);
 
         var opts = _optsProvider.GetOpts([.. mergeModels.Where(m => m.Count > 1)]);
+        int i = 0;
         foreach(var opt in opts) {
+            ct.ThrowIfCancellationRequested();
+            progress?.Report(++i);
             try {
                 var instance = _revitRepository.CreateInstance(opt.FamilySymbol, opt.Point, opt.Level);
                 _revitRepository.RotateElement(instance, opt.Point, opt.Rotation);
@@ -60,5 +46,52 @@ internal class SleeveMergeService : ISleeveMergeService {
             }
             _revitRepository.DeleteElements([.. opt.DependentElements.Select(e => e.Id)]);
         }
+    }
+
+    /// <summary>
+    /// Находит гильзы для объединения, используя граф
+    /// </summary>
+    /// <param name="sleeves">Все исходные гильзы</param>
+    /// <returns>Коллекция объединенных гильз</returns>
+    private ICollection<SleeveMergeModel> FindMergeModels(ICollection<SleeveModel> sleeves) {
+        var allSleeves = sleeves.ToList();
+        var visited = new HashSet<SleeveModel>();
+        var mergeModels = new List<SleeveMergeModel>();
+
+        foreach(var sleeve in allSleeves) {
+            if(visited.Contains(sleeve)) {
+                continue;
+            }
+
+            var mergeCandidates = new List<SleeveModel>();
+            var queue = new Queue<SleeveModel>();
+            queue.Enqueue(sleeve);
+            visited.Add(sleeve);
+
+            while(queue.Count > 0) {
+                var current = queue.Dequeue();
+                mergeCandidates.Add(current);
+
+                foreach(var neighbor in allSleeves) {
+                    if(!visited.Contains(neighbor) && CanMerge(current, neighbor)) {
+                        visited.Add(neighbor);
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+
+            var mergeGroup = new SleeveMergeModel(mergeCandidates.First());
+            foreach(var s in mergeCandidates.Skip(1)) {
+                mergeGroup.TryAddSleeve(s);
+            }
+
+            mergeModels.Add(mergeGroup);
+        }
+
+        return mergeModels;
+    }
+
+    private bool CanMerge(SleeveModel first, SleeveModel second) {
+        return first.CanMerge(second);
     }
 }
