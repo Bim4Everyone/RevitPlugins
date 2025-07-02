@@ -47,7 +47,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -56,29 +55,42 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:AutoSuggestBox
+        <Border
             Grid.Row="1"
             Margin="8"
-            Icon="{ui:SymbolIcon Accessibility20}"
-            Text="{Binding AlbumParamName}"
-            PlaceholderText="{me:LocalizationSource MainWindow.AlbumHintText}"
-            OriginalItemsSource="{Binding AlbumParamNames}" />
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+            <ui:AutoSuggestBox
+                Margin="14,8,14,8"
+                Icon="{ui:SymbolIcon TextAlignJustify24}"
+                Text="{Binding AlbumParamName}"
+                PlaceholderText="{me:LocalizationSource MainWindow.AlbumHintText}"
+                OriginalItemsSource="{Binding AlbumParamNames}" />
+        </Border>
 
-        <ui:AutoSuggestBox
+        <Border
             Grid.Row="2"
-            Margin="8"
-            Text="{Binding SearchText, Delay=250}"
-            PlaceholderText="{me:LocalizationSource MainWindow.SearchHintText}" />
-
-        <TreeView
-            Grid.Row="3"
             Margin="8 0 8 8"
-            ItemTemplate="{StaticResource TreeViewTemplate}"
-            ItemsSource="{Binding FilteredAlbums}"
-            ItemContainerStyle="{StaticResource CustomTreeViewItemStyle}" />
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+
+            <StackPanel>
+                <ui:AutoSuggestBox
+                    Margin="14,8,14,8"
+                    Text="{Binding SearchText, Delay=250}"
+                    PlaceholderText="{me:LocalizationSource MainWindow.SearchHintText}" />
+
+                <TreeView
+                    Margin="14,0,14,8"
+                    ItemTemplate="{StaticResource TreeViewTemplate}"
+                    ItemsSource="{Binding FilteredAlbums}"
+                    ItemContainerStyle="{StaticResource CustomTreeViewItemStyle}" />
+            </StackPanel>
+
+        </Border>
 
         <StackPanel
-            Grid.Row="4"
+            Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
@@ -95,7 +107,7 @@
                 Content="{me:LocalizationSource MainWindow.PrintCommandName}"
                 Click="ButtonOk_Click"
                 Command="{Binding PrintCommand}" />
-            
+
             <ui:Button
                 Margin="10"
                 Width="80"
