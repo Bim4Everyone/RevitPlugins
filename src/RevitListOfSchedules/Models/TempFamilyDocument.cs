@@ -22,7 +22,6 @@ namespace RevitListOfSchedules.Models {
         private readonly string _familyPath;
         private readonly string _tempDirectory = Path.GetTempPath();
         private readonly string _albumName;
-        private readonly FamilySymbol _familySymbol;
 
         public TempFamilyDocument(
             ILocalizationService localizationService,
@@ -44,19 +43,19 @@ namespace RevitListOfSchedules.Models {
                 "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
             CreateDocument();
 
-            _familySymbol = LoadFamilySymbol();
+            FamilySymbol = LoadFamilySymbol();
         }
 
-        public FamilySymbol FamilySymbol => _familySymbol;
+        public FamilySymbol FamilySymbol { get; }
 
         public List<FamilyInstance> GetFamilyInstances(
             Document document, ViewSheet viewSheet, string number, string revisionNumber, ViewDrafting viewDrafting) {
 
             List<FamilyInstance> familyInstanceList = [];
-            var schedules = _revitRepository.GetScheduleInstances(document, viewSheet);
+            IList<ViewSchedule> schedules = _revitRepository.GetScheduleInstances(document, viewSheet);
 
             if(schedules != null) {
-                var instances = PlaceFamilyInstances(viewDrafting, number, revisionNumber, schedules);
+                IList<FamilyInstance> instances = PlaceFamilyInstances(viewDrafting, number, revisionNumber, schedules);
                 familyInstanceList.AddRange(instances);
             }
             return familyInstanceList;
@@ -64,7 +63,7 @@ namespace RevitListOfSchedules.Models {
 
         public FamilyInstance CreateInstance(View view, string name, string number, string revisionNumber) {
             XYZ xyz = XYZ.Zero;
-            FamilyInstance familyInstance = _revitRepository.Document.Create.NewFamilyInstance(xyz, _familySymbol, view);
+            FamilyInstance familyInstance = _revitRepository.Document.Create.NewFamilyInstance(xyz, FamilySymbol, view);
             familyInstance.SetParamValue(ParamFactory.FamilyParamNumber, number);
             familyInstance.SetParamValue(ParamFactory.FamilyParamName, name);
             familyInstance.SetParamValue(ParamFactory.FamilyParamRevision, revisionNumber);
@@ -95,7 +94,7 @@ namespace RevitListOfSchedules.Models {
                 ModifyDefaultText(document, _albumName);
                 t.Commit();
             }
-            SaveAsOptions opt = new SaveAsOptions {
+            var opt = new SaveAsOptions {
                 OverwriteExistingFile = true
             };
             document.SaveAs(_familyPath, opt);
@@ -117,8 +116,8 @@ namespace RevitListOfSchedules.Models {
                 .First();
             Autodesk.Revit.Creation.FamilyItemFactory familyCreator = document.FamilyCreate;
             double diameterArc = UnitUtils.ConvertToInternalUnits(_diameterArc, UnitTypeId.Millimeters);
-            Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero);
-            Arc circle = Arc.Create(plane, diameterArc / 2, 0, 2 * Math.PI);
+            var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero);
+            var circle = Arc.Create(plane, diameterArc / 2, 0, 2 * Math.PI);
             familyCreator.NewDetailCurve(viewPlan, circle);
         }
 
