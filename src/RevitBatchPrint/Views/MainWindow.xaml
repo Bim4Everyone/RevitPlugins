@@ -30,6 +30,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../ViewsTemplates/TreeViewTemplate.xaml" />
+                <ResourceDictionary Source="../ViewsTemplates/TreeViewItemTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -73,7 +74,8 @@
             Grid.Row="3"
             Margin="8 0 8 8"
             ItemTemplate="{StaticResource TreeViewTemplate}"
-            ItemsSource="{Binding FilteredAlbums}" />
+            ItemsSource="{Binding FilteredAlbums}"
+            ItemContainerStyle="{StaticResource CustomTreeViewItemStyle}" />
 
         <StackPanel
             Grid.Row="4"

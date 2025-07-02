@@ -58,6 +58,9 @@ public class BatchPrintCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        kernel.Bind<Document>()
+            .ToMethod(c => c.Kernel.Get<RevitRepository>().Document);
+
         kernel.Bind<IPrinterService>()
             .To<PrinterService>()
             .OnActivation(c => c.Load());

@@ -1,3 +1,5 @@
+using System.Windows.Input;
+
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
@@ -25,6 +27,7 @@ internal sealed class SheetViewModel : BaseViewModel {
 
     public string Name { get; }
     public AlbumViewModel Album { get; }
+    public ICommand CheckCommand => Album.CheckUpdateCommand;
 
     public string ErrorText {
         get => _errorText;
