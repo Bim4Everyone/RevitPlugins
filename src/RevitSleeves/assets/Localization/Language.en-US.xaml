@@ -33,6 +33,9 @@
         x:Key="SleevePlacementSettings.DefaultFileName">Sleeve placement settings</system:String>
 
     <system:String
+        x:Key="Navigator.Title">Navigator</system:String>
+
+    <system:String
         x:Key="Error">Error</system:String>
 
     <system:String
@@ -44,6 +47,10 @@
         x:Key="To">to</system:String>
     <system:String
         x:Key="Mm">mm</system:String>
+    <system:String
+        x:Key="Diameter">Diameter</system:String>
+    <system:String
+        x:Key="Length">Length</system:String>
 
     <system:String
         x:Key="Filtering.AddRule">Add rule</system:String>
@@ -97,6 +104,31 @@
         x:Key="OffsetType.FromSleeveAxisToMepAxis">Maximum distance between the axis of the sleeve and the axis of the pipe</system:String>
     <system:String
         x:Key="OffsetType.FromSleeveEndToTopFloorFace">Distance from the upper face of the floor to the upper end of the sleeve</system:String>
+
+    <system:String
+        x:Key="SleeveStatus.Invalid">Unable to determine status</system:String>
+    <system:String
+        x:Key="SleeveStatus.TooBigDiameter">Diameter too large</system:String>
+    <system:String
+        x:Key="SleeveStatus.TooSmallDiameter">Diameter too small</system:String>
+    <system:String
+        x:Key="SleeveStatus.IntersectSleeve">Intersects with another sleeve</system:String>
+    <system:String
+        x:Key="SleeveStatus.Empty">Empty sleeve</system:String>
+    <system:String
+        x:Key="SleeveStatus.OutsideOfStructure">Sleeve outside the structure</system:String>
+    <system:String
+        x:Key="SleeveStatus.BeyondOpening">Sleeve does not match the opening</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceOutsideOfStructure">Sleeve end far from the structure</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceInsideStructure">Sleeve end inside the structure</system:String>
+    <system:String
+        x:Key="SleeveStatus.IrrelevantSleeve">Irrelevant sleeve</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisNotParallelToMepElement">Sleeve axis not parallel to the VIS element axis</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisDistanceTooBig">Sleeve axis offset from the pipe axis</system:String>
 
     <system:String
         x:Key="Ok">OK</system:String>

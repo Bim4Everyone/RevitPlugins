@@ -1,0 +1,151 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitSleeves.Views.Navigator.NavigatorWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:RevitSleeves.ViewModels.Navigator"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:local="clr-namespace:RevitSleeves.Views.Navigator"
+    mc:Ignorable="d"
+    Height="450"
+    Width="800"
+    WindowStartupLocation="CenterScreen"
+    d:DataContext="{d:DesignInstance vms:NavigatorViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../assets/Styles/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <CollectionViewSource
+                x:Key="groupedSleeves"
+                Source="{Binding Sleeves}">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription
+                        PropertyName="Status" />
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+            <ui:TextBlock
+                x:Key="DiameterHeader"
+                Text="{me:LocalizationSource Diameter}" />
+            <ui:TextBlock
+                x:Key="LengthHeader"
+                Text="{me:LocalizationSource Length}" />
+            <Style
+                x:Key="GroupHeaderStyle"
+                TargetType="{x:Type GroupItem}">
+                <Setter
+                    Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate
+                            TargetType="{x:Type GroupItem}">
+                            <ui:CardExpander
+                                IsExpanded="False">
+                                <ui:CardExpander.Header>
+                                    <DockPanel
+                                        Margin="0 0 14 0"
+                                        HorizontalAlignment="Stretch">
+                                        <TextBlock
+                                            Text="{Binding Path=Name}" />
+                                        <DockPanel
+                                            HorizontalAlignment="Right">
+                                            <DockPanel.Resources>
+                                                <ui:TextBlock
+                                                    x:Key="GroupItemsCountCaption"
+                                                    Text="{me:LocalizationSource ErrorsWindow.GroupItemsCount}" />
+                                            </DockPanel.Resources>
+                                            <ContentControl
+                                                Content="{StaticResource GroupItemsCountCaption}"
+                                                Margin="0 0 5 0" />
+                                            <TextBlock
+                                                Text="{Binding Path=ItemCount}" />
+                                        </DockPanel>
+                                    </DockPanel>
+                                </ui:CardExpander.Header>
+                                <ui:CardExpander.Content>
+                                    <ItemsPresenter />
+                                </ui:CardExpander.Content>
+                            </ui:CardExpander>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
+    <b:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
+    </b:Interaction.Behaviors>
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <DockPanel
+        LastChildFill="True">
+        <ui:TitleBar
+            DockPanel.Dock="Top"
+            Title="{me:LocalizationSource Navigator.Title}" />
+        <Border
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <ui:DataGrid
+                    RowHeight="26"
+                    VerticalContentAlignment="Center"
+                    CellStyle="{StaticResource CustomDataGridCell}"
+                    Style="{StaticResource CustomReadonlyDataGrid}"
+                    ItemsSource="{Binding Source={StaticResource groupedSleeves}}"
+                    SelectedItem="{Binding SelectedSleeve}">
+                    <ui:DataGrid.GroupStyle>
+                        <GroupStyle
+                            ContainerStyle="{StaticResource GroupHeaderStyle}" />
+                    </ui:DataGrid.GroupStyle>
+                    <ui:DataGrid.Columns>
+                        <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Appearance="Info"
+                                        Height="Auto"
+                                        Padding="5 1"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.SelectSleeveCommand}"
+                                        CommandParameter="{Binding}">
+                                        <ui:Button.Content>
+                                            <DockPanel>
+                                                <ui:SymbolIcon
+                                                    Symbol="Search24" />
+                                                <TextBlock
+                                                    Text="{Binding Id}" />
+                                            </DockPanel>
+                                        </ui:Button.Content>
+                                    </ui:Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Header="{StaticResource DiameterHeader}"
+                            Binding="{Binding Diameter}" />
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Header="{StaticResource LengthHeader}"
+                            Binding="{Binding Length}" />
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
+        </Border>
+    </DockPanel>
+</core:WpfUIPlatformWindow>

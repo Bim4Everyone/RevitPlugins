@@ -5,11 +5,6 @@
         <LangVersion>12</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-      <Folder Include="Services\Navigator\" />
-      <Folder Include="ViewModels\Navigator\" />
-      <Folder Include="Views\Navigator\" />
-    </ItemGroup>
-    <ItemGroup>
       <Resource Include="assets\Styles\CustomStyles.xaml" />
     </ItemGroup>
 </Project>

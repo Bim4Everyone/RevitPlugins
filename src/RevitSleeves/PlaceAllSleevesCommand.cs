@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -126,13 +125,7 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
     }
 
     private void BindWindows(IKernel kernel) {
-        kernel.Bind<PlacingErrorsViewModel>()
-            .ToSelf()
-            .InSingletonScope();
-        kernel.Bind<PlacingErrorsWindow>()
-            .ToSelf()
-            .InSingletonScope()
-            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<PlacingErrorsViewModel>());
+        kernel.BindOtherWindow<PlacingErrorsViewModel, PlacingErrorsWindow>();
     }
 
     private void BindCoreServices(IKernel kernel) {

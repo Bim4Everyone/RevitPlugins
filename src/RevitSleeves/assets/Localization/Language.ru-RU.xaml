@@ -8,7 +8,7 @@
 
     <system:String
         x:Key="RevitUI.PickMepElements">Выберите элемент(ы) ВИС</system:String>
-    
+
     <system:String
         x:Key="SleevePlacementSettingsWindow.Title">Настройки расстановки гильз</system:String>
     <system:String
@@ -33,6 +33,9 @@
         x:Key="SleevePlacementSettings.DefaultFileName">Настройки расстановки гильз</system:String>
 
     <system:String
+        x:Key="Navigator.Title">Навигатор</system:String>
+
+    <system:String
         x:Key="Error">Ошибка</system:String>
 
     <system:String
@@ -44,6 +47,10 @@
         x:Key="To">до</system:String>
     <system:String
         x:Key="Mm">мм</system:String>
+    <system:String
+        x:Key="Diameter">Диаметр</system:String>
+    <system:String
+        x:Key="Length">Длина</system:String>
 
     <system:String
         x:Key="Filtering.AddRule">Добавить правило</system:String>
@@ -97,6 +104,31 @@
         x:Key="OffsetType.FromSleeveAxisToMepAxis">Максимальное расстояние между осью гильзы и осью трубы</system:String>
     <system:String
         x:Key="OffsetType.FromSleeveEndToTopFloorFace">Расстояние от верхней грани перекрытия до верхнего торца гильзы</system:String>
+
+    <system:String
+        x:Key="SleeveStatus.Invalid">Не удалось определить статус</system:String>
+    <system:String
+        x:Key="SleeveStatus.TooBigDiameter">Слишком большой диаметр</system:String>
+    <system:String
+        x:Key="SleeveStatus.TooSmallDiameter">Слишком маленький диаметр</system:String>
+    <system:String
+        x:Key="SleeveStatus.IntersectSleeve">Пересекается с другой гильзой</system:String>
+    <system:String
+        x:Key="SleeveStatus.Empty">Пустая гильза</system:String>
+    <system:String
+        x:Key="SleeveStatus.OutsideOfStructure">Гильза вне конструкции</system:String>
+    <system:String
+        x:Key="SleeveStatus.BeyondOpening">Гильза не соответствует отверстию</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceOutsideOfStructure">Торец гильзы далеко от конструкции</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceInsideStructure">Торец гильзы внутри конструкции</system:String>
+    <system:String
+        x:Key="SleeveStatus.IrrelevantSleeve">Неактуальная гильза</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisNotParallelToMepElement">Ось гильзы не параллельна оси элемента ВИС</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisDistanceTooBig">Ось гильзы смещена от оси трубы</system:String>
 
     <system:String
         x:Key="Ok">ОК</system:String>
