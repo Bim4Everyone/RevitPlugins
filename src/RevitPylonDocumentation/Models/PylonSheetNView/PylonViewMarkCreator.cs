@@ -88,7 +88,7 @@ public class PylonViewMarkCreator {
 
 
     private void CreateTransverseRebarViewBarMarks(View view) {
-        var skeletonRebar = _rebarFinder.GetSkeletonRebar(view);
+        var skeletonRebar = _rebarFinder.GetSkeletonParentRebar(view);
         var simpleRebars = _rebarFinder.GetSimpleRebars(view, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax);
 
         // Определяем наличие в каркасе Г-образных стержней

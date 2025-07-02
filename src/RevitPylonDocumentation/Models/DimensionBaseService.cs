@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 namespace RevitPylonDocumentation.Models;
 
@@ -231,8 +232,8 @@ internal class DimensionBaseService {
     }
 
 
-    public ReferenceArray GetDimensionRefs(FamilyInstance elem, char keyRefNamePart,
-                                            List<string> importantRefNameParts, ReferenceArray oldRefArray = null) {
+    public ReferenceArray GetDimensionRefs(FamilyInstance elem, char keyRefNamePart, char refNameParamsSeparator,
+                                        List<string> importantRefNameParts, ReferenceArray oldRefArray = null) {
         var references = new List<Reference>();
         foreach(FamilyInstanceReferenceType referenceType in Enum.GetValues(typeof(FamilyInstanceReferenceType))) {
             references.AddRange(elem.GetReferences(referenceType));
@@ -254,8 +255,29 @@ internal class DimensionBaseService {
                 continue;
             }
 
-            string paramName = referenceName.Split(keyRefNamePart)[0];
-            int paramValue = paramName == string.Empty ? 1 : _paramValueService.GetParamValueAnywhere(elem, paramName);
+            // мод_ФОП_Доборный 1/мод_ФОП_Доборный 1_Массив#1_торец
+            // мод_ФОП_Доборный 1#1_торец
+
+            string paramParts = referenceName.Split(keyRefNamePart)[0];
+            int paramValue = 0;
+
+            string[] test = [paramParts];
+            if(paramParts.Contains(refNameParamsSeparator)) {
+                test = paramParts.Split(refNameParamsSeparator);
+            }
+
+
+            foreach(string paramPart in test) {
+                if(paramPart == string.Empty) {
+                    paramValue = 1;
+                } else {
+                    paramValue = _paramValueService.GetParamValueAnywhere(elem, paramPart);
+                }
+
+                if(paramValue == 0) {
+                    break;
+                }
+            }
 
             if(paramValue == 1) {
                 refArray.Append(reference);
@@ -263,6 +285,7 @@ internal class DimensionBaseService {
         }
         return refArray;
     }
+
 
     public ReferenceArray GetDimensionRefs(List<Grid> grids, XYZ direction, ReferenceArray oldRefArray = null) {
         // Создаем матрицу трансформации

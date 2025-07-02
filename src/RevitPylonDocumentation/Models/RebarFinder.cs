@@ -22,7 +22,7 @@ public class RebarFinder {
     internal MainViewModel ViewModel { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
-    public FamilyInstance GetSkeletonRebar(View view) {
+    public FamilyInstance GetSkeletonParentRebar(View view) {
         var rebars = new FilteredElementCollector(view.Document, view.Id)
             .OfCategory(BuiltInCategory.OST_Rebar)
             .WhereElementIsNotElementType()
@@ -42,6 +42,30 @@ public class RebarFinder {
             }
         }
         return null;
+    }
+
+    public List<FamilyInstance> GetClampsParentRebars(View view) {
+        var rebars = new FilteredElementCollector(view.Document, view.Id)
+            .OfCategory(BuiltInCategory.OST_Rebar)
+            .WhereElementIsNotElementType()
+            .ToElements();
+
+        var parentRebars = new List<FamilyInstance>();
+
+        foreach(var rebar in rebars) {
+            // Фильтрация по комплекту документации
+            if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != SheetInfo.ProjectSection) {
+                continue;
+            }
+            // Фильтрация по имени семейства
+            if(view.Document.GetElement(rebar.GetTypeId()) is not FamilySymbol rebarType) {
+                continue;
+            }
+            if(rebarType.FamilyName.Contains("IFC_Набор_Пилон") && rebarType.FamilyName.Contains("Хомуты")) {
+                parentRebars.Add(rebar as FamilyInstance);
+            }
+        }
+        return parentRebars;
     }
 
     public List<Element> GetSimpleRebars(View view, int formNumberMin, int formNumberMax) {
