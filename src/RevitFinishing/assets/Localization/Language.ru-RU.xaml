@@ -1,0 +1,56 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Рассчитать отделку</system:String>
+    
+    <system:String x:Key="MainWindow.Phases">Стадии:</system:String>
+    <system:String x:Key="MainWindow.RoomNames">Имена помещений:</system:String>
+    <system:String x:Key="MainWindow.RoomDepartments">Назначения помещений:</system:String>
+    <system:String x:Key="MainWindow.RoomLevels">Уровни:</system:String>
+
+    <system:String x:Key="MainWindow.CheckAll">Выбрать все</system:String>
+    <system:String x:Key="MainWindow.UnCheckAll">Снять выбор</system:String>
+    <system:String x:Key="MainWindow.InvertAll">Инвертировать</system:String>
+
+    <system:String x:Key="MainWindow.ErrorNoSelectiom">Помещения не выбраны</system:String>
+    <system:String x:Key="MainWindow.ErrorNoRooms">Помещения отсутствуют на выбранной стадии</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="MainWindow.TransactionName">Заполнить параметры отделки</system:String>
+
+    <system:String x:Key="ErrorsWindow.Title">Рассчитать отделку</system:String>
+
+    <system:String x:Key="ErrorsWindow.ErrorTypeColumn">Тип</system:String>
+    <system:String x:Key="ErrorsWindow.ErrorDescriptionColumn">Описание</system:String>
+    <system:String x:Key="ErrorsWindow.IdColumn">Id</system:String>
+    <system:String x:Key="ErrorsWindow.CategoryColumn">Категория</system:String>
+    <system:String x:Key="ErrorsWindow.NameColumn">Имя</system:String>
+    <system:String x:Key="ErrorsWindow.LevelColumn">Уровень</system:String>
+    <system:String x:Key="ErrorsWindow.PhaseColumn">Стадия</system:String>
+    
+    <system:String x:Key="ErrorsWindow.WithoutValue">&lt;Без значения&gt;</system:String>
+    <system:String x:Key="ErrorsWindow.WithoutLevel">&lt;Без уровня&gt;</system:String>
+
+    <system:String x:Key="ErrorsWindow.ListErrorType">Ошибка</system:String> 
+    <system:String x:Key="ErrorsWindow.ListWarningType">Предупреждение</system:String>
+
+    <system:String x:Key="ErrorsWindow.NoFinishing">На выбранной стадии не найдены экземпляры отделки</system:String>
+    <system:String x:Key="ErrorsWindow.NoBoundaries">Экземпляры отделки являются границами помещений</system:String>
+    <system:String x:Key="ErrorsWindow.NoKeyParam">У помещений не заполнен ключевой параметр отделки</system:String>
+    <system:String x:Key="ErrorsWindow.DifPhases">Элементы отделки относятся к помещениям с разными типами отделки</system:String>
+    <system:String x:Key="ErrorsWindow.NoParam">У помещений не заполнен параметр</system:String> 
+    <system:String x:Key="ErrorsWindow.CustomFamilies">
+        В проекте найдены пользовательские и контекстные семейства отделки.
+        Для них требуется проверить корректность расчетных параметров отделки (длина, площадь, объем). 
+    </system:String> 
+
+    <system:String x:Key="ErrorsWindow.ErrorInfoTitle">Расчет отделки не выполнен!</system:String>
+    <system:String x:Key="ErrorsWindow.ErrorInfo">Обнаружены следующие ошибки, которые необходимо исправить:</system:String>
+    <system:String x:Key="ErrorsWindow.WarningInfoTitle">Расчет отделки завершен!</system:String>
+    <system:String x:Key="ErrorsWindow.WarningInfo">
+        При этом были обнаружены следующие предупреждения, которые могли повлиять на корректность расчета:
+    </system:String>
+</ResourceDictionary>
