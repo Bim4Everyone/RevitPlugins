@@ -30,17 +30,17 @@ namespace RevitListOfSchedules.Models {
         }
 
         private void ConfigureScheduleColumns(ViewSchedule schedule) {
-            var definition = schedule.Definition;
+            ScheduleDefinition definition = schedule.Definition;
 
-            var noteField1 = definition.AddField(
+            ScheduleField noteField1 = definition.AddField(
                 ScheduleFieldType.Instance,
                 _familyInstance.GetParam(ParamFactory.FamilyParamNumber).Id);
 
-            var noteField2 = definition.AddField(
+            ScheduleField noteField2 = definition.AddField(
                 ScheduleFieldType.Instance,
                 _familyInstance.GetParam(ParamFactory.FamilyParamName).Id);
 
-            var noteField3 = definition.AddField(
+            ScheduleField noteField3 = definition.AddField(
                 ScheduleFieldType.Instance,
                 _familyInstance.GetParam(ParamFactory.FamilyParamRevision).Id);
 
@@ -50,8 +50,8 @@ namespace RevitListOfSchedules.Models {
         }
 
         private void ConfigureScheduleHeader(ViewSchedule schedule) {
-            var tableData = schedule.GetTableData();
-            var appearanceSection = tableData.GetSectionData(SectionType.Header);
+            TableData tableData = schedule.GetTableData();
+            TableSectionData appearanceSection = tableData.GetSectionData(SectionType.Header);
 
             appearanceSection.ClearCell(0, 0);
             appearanceSection.SetCellText(0, 0, ParamFactory.ScheduleName);

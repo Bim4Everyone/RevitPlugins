@@ -18,32 +18,29 @@ namespace RevitListOfSchedules.Models {
         public const string ScheduleName = "Ведомость спецификаций и ведомостей";
 
         private readonly SharedParamsConfig _sharedParamsConfig = SharedParamsConfig.Instance;
-        private readonly IList<SharedParam> _sharedParamsRevision;
-        private readonly IList<SharedParam> _sharedParamsRevisionValue;
-        private readonly SharedParam _sharedParamNumber;        
 
-        public ParamFactory() {            
-            _sharedParamsRevision = GetRevisionParams();
-            _sharedParamsRevisionValue = GetRevisionValueParams();
-            _sharedParamNumber = _sharedParamsConfig.StampSheetNumber;
+        public ParamFactory() {
+            SharedParamsRevision = GetRevisionParams();
+            SharedParamsRevisionValue = GetRevisionValueParams();
+            SharedParamNumber = _sharedParamsConfig.StampSheetNumber;
         }
 
-        public IList<SharedParam> SharedParamsRevision => _sharedParamsRevision;
-        public IList<SharedParam> SharedParamsRevisionValue => _sharedParamsRevisionValue;
-        public SharedParam SharedParamNumber => _sharedParamNumber;
+        public IList<SharedParam> SharedParamsRevision { get; }
+        public IList<SharedParam> SharedParamsRevisionValue { get; }
+        public SharedParam SharedParamNumber { get; }
 
 
         public List<RevitParam> GetGroupParameters(RevitRepository revitRepository) {
 
-            ElementId sheetCategoryId = new ElementId(BuiltInCategory.OST_Sheets);
-            ICollection<ElementId> categories = new List<ElementId> { sheetCategoryId };
-            var filterableParameters = ParameterFilterUtilities.GetFilterableParametersInCommon(revitRepository.Document, categories);
+            var sheetCategoryId = new ElementId(BuiltInCategory.OST_Sheets);
+            ICollection<ElementId> categories = [sheetCategoryId];
+            ICollection<ElementId> filterableParameters = ParameterFilterUtilities.GetFilterableParametersInCommon(revitRepository.Document, categories);
 
-            List<RevitParam> listOfParameters = new List<RevitParam>();
+            List<RevitParam> listOfParameters = [];
             List<RevitParam> viewParams = GetRevitParams(filterableParameters.ToList(), revitRepository);
 
             if(viewParams.Count > 0) {
-                List<RevitParam> sortedList = viewParams.OrderBy(param => param.Name).ToList();
+                var sortedList = viewParams.OrderBy(param => param.Name).ToList();
                 listOfParameters.AddRange(sortedList);
                 List<ElementId> browserParamElementIds = GetBrowserParameterElementIds(revitRepository);
                 if(browserParamElementIds.Count > 0) {
@@ -60,12 +57,12 @@ namespace RevitListOfSchedules.Models {
 
 
         private List<ElementId> GetBrowserParameterElementIds(RevitRepository revitRepository) {
-            List<ElementId> listOfElementIds = new List<ElementId>();
-            var projectSheets = revitRepository.GetViewSheets(revitRepository.Document);
+            List<ElementId> listOfElementIds = [];
+            IList<ViewSheet> projectSheets = revitRepository.GetViewSheets(revitRepository.Document);
             if(projectSheets.Count > 0) {
                 var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForSheets(revitRepository.Document);
                 IList<FolderItemInfo> itemsInfo = browserOrganization.GetFolderItems(projectSheets.First().Id);
-                foreach(var item in itemsInfo) {
+                foreach(FolderItemInfo item in itemsInfo) {
                     listOfElementIds.Add(item.ElementId);
                 }
             }
@@ -73,7 +70,7 @@ namespace RevitListOfSchedules.Models {
         }
 
         private List<RevitParam> GetRevitParams(List<ElementId> elementIds, RevitRepository revitRepository) {
-            List<RevitParam> listOfParameters = new List<RevitParam>();
+            List<RevitParam> listOfParameters = [];
             if(elementIds.Count > 0) {
                 foreach(ElementId elementId in elementIds) {
                     if(elementId.IsSystemId()) {
@@ -103,7 +100,7 @@ namespace RevitListOfSchedules.Models {
 
         private IList<SharedParam> GetRevisionParams() {
 
-            return new List<SharedParam>() {
+            return [
                 _sharedParamsConfig.StampSheetRevision1,
                 _sharedParamsConfig.StampSheetRevision2,
                 _sharedParamsConfig.StampSheetRevision3,
@@ -112,12 +109,12 @@ namespace RevitListOfSchedules.Models {
                 _sharedParamsConfig.StampSheetRevision6,
                 _sharedParamsConfig.StampSheetRevision7,
                 _sharedParamsConfig.StampSheetRevision8
-            };
+            ];
         }
 
         private IList<SharedParam> GetRevisionValueParams() {
 
-            return new List<SharedParam>() {
+            return [
                 _sharedParamsConfig.StampSheetRevisionValue1,
                 _sharedParamsConfig.StampSheetRevisionValue2,
                 _sharedParamsConfig.StampSheetRevisionValue3,
@@ -126,7 +123,7 @@ namespace RevitListOfSchedules.Models {
                 _sharedParamsConfig.StampSheetRevisionValue6,
                 _sharedParamsConfig.StampSheetRevisionValue7,
                 _sharedParamsConfig.StampSheetRevisionValue8
-            };
+            ];
         }
     }
 }

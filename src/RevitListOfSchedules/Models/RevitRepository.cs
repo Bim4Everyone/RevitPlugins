@@ -14,20 +14,19 @@ namespace RevitListOfSchedules.Models;
 internal class RevitRepository {
     private readonly ILocalizationService _localizationService;
     private readonly ParamFactory _paramFactory;
-    private readonly IList<SheetElement> _sheetElements;
 
     public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService, ParamFactory paramFactory) {
         UIApplication = uiApplication;
         _localizationService = localizationService;
         _paramFactory = paramFactory;
-        _sheetElements = GetSheetElements(Document);
+        SheetElements = GetSheetElements(Document);
     }
 
     public UIApplication UIApplication { get; }
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
-    public IList<SheetElement> SheetElements => _sheetElements;
+    public IList<SheetElement> SheetElements { get; }
 
     // Метод получения типа "Связанный файл"
     public IList<LinkTypeElement> GetLinkTypeElements() {
@@ -56,7 +55,7 @@ internal class RevitRepository {
     // Метод получения списка SheetElement по Document (основной или связанный)
     public IList<SheetElement> GetSheetElements(Document document) {
         return new Collection<SheetElement>(GetViewSheets(document)
-            .Select(sheet => new SheetElement(sheet, _paramFactory))
+            .Select(sheet => new SheetElement(_paramFactory, sheet))
             .OrderBy(sheet => Convert.ToInt32(sheet.Number))
             .ToList());
     }
@@ -73,16 +72,12 @@ internal class RevitRepository {
     public ViewDrafting GetViewDrafting(string familyName) {
         string nameView = string.Format(
             _localizationService.GetLocalizedString("RevitRepository.ViewName"), familyName);
-        var view = new FilteredElementCollector(Document)
+        ViewDrafting view = new FilteredElementCollector(Document)
             .OfClass(typeof(ViewDrafting))
             .Where(v => v.Name.Equals(nameView, StringComparison.OrdinalIgnoreCase))
             .Cast<ViewDrafting>()
             .FirstOrDefault();
-        if(view != null) {
-            return view;
-        } else {
-            return CreateViewDrafting(nameView);
-        }
+        return view ?? CreateViewDrafting(nameView);
     }
     public IList<ViewSchedule> GetScheduleInstances(Document document, ViewSheet viewSheet) {
         if(document == null || viewSheet == null) {
@@ -92,12 +87,11 @@ internal class RevitRepository {
             .OfClass(typeof(ScheduleSheetInstance))
             .Cast<ScheduleSheetInstance>()
             .Where(schedule => schedule.OwnerViewId == viewSheet.Id)
-            .Where(schedule => schedule.SegmentIndex == 0 || schedule.SegmentIndex == -1)
+            .Where(schedule => schedule.SegmentIndex is 0 or (-1))
             .ToList();
-        if(!scheduleInstances.Any()) {
-            return null;
-        }
-        return scheduleInstances
+        return !scheduleInstances.Any()
+            ? null
+            : (IList<ViewSchedule>) scheduleInstances
             .Select(element => document.GetElement(element.ScheduleId))
             .OfType<ViewSchedule>()
             .ToList();
@@ -116,7 +110,7 @@ internal class RevitRepository {
             .OfType<FamilyInstance>()
             .Select(instance => instance.Id)
             .ToList();
-        foreach(var instance in instances) {
+        foreach(ElementId instance in instances) {
             Document.Delete(instance);
         }
     }
@@ -131,14 +125,14 @@ internal class RevitRepository {
 
     // Метод создания нового чертежного вида
     private ViewDrafting CreateViewDrafting(string nameView) {
-        var viewTypes = new FilteredElementCollector(Document)
+        IEnumerable<ViewFamilyType> viewTypes = new FilteredElementCollector(Document)
             .OfClass(typeof(ViewFamilyType))
             .Cast<ViewFamilyType>();
-        var viewFamilyType = viewTypes
+        ViewFamilyType viewFamilyType = viewTypes
             .Where(vt => vt.ViewFamily == ViewFamily.Drafting)
             .First();
 
-        ViewDrafting view = ViewDrafting.Create(Document, viewFamilyType.Id);
+        var view = ViewDrafting.Create(Document, viewFamilyType.Id);
         view.Name = nameView;
         return view;
     }
