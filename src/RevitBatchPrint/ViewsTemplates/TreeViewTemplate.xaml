@@ -2,11 +2,30 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels"
                     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+                    xmlns:db="clr-namespace:Autodesk.Revit.DB;assembly=RevitAPI">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <ui:SymbolRegular x:Key="SymbolPortrait">Document24</ui:SymbolRegular>
+    <db:PageOrientationType x:Key="PageTypePortrait">Portrait</db:PageOrientationType>
+
+    <ui:SymbolRegular x:Key="SymbolLandscape">DocumentLandscape24</ui:SymbolRegular>
+    <db:PageOrientationType x:Key="PageTypeLandscape">Landscape</db:PageOrientationType>
+
+    <converters:ObjectToObjectConverter x:Key="PageTypeEnumConverter">
+        <converters:ObjectToObjectConverter.CoupleItems>
+            <converters:CoupleItem
+                Target="{StaticResource SymbolPortrait}"
+                Source="{StaticResource PageTypePortrait}" />
+            <converters:CoupleItem
+                Target="{StaticResource SymbolLandscape}"
+                Source="{StaticResource PageTypeLandscape}" />
+        </converters:ObjectToObjectConverter.CoupleItems>
+    </converters:ObjectToObjectConverter>
 
     <Style x:Key="ButtonStackPanel" TargetType="StackPanel">
         <Setter Property="Visibility" Value="Hidden" />
@@ -46,19 +65,25 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-
-
+            
             <CheckBox
                 Grid.Column="0"
-                HorizontalAlignment="Stretch"
                 IsChecked="{Binding IsSelected}">
 
-                <StackPanel Orientation="Horizontal">
+                <StackPanel
+                    Orientation="Horizontal">
+                    
                     <ui:SymbolIcon
                         Margin="0,0,8,0"
-                        Symbol="Document24" />
+                        ToolTip="{Binding PrintSheetSettings.FormatOrientation}"
+                        Symbol="{Binding PrintSheetSettings.FormatOrientation,
+                            Converter={StaticResource PageTypeEnumConverter}}" />
 
-                    <ui:TextBlock Text="{Binding Name}" />
+                    <ui:TextBlock
+                        Margin="0,0,8,0"
+                        FontTypography="BodyStrong"
+                        VerticalAlignment="Center"
+                        Text="{Binding Name}" />
                 </StackPanel>
 
                 <b:Interaction.Triggers>
@@ -68,6 +93,15 @@
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
             </CheckBox>
+            
+            <ui:TextBlock
+                Grid.Column="1"
+                x:Name="FormatName"
+                Margin="0 0 12 0"
+                FontTypography="Body"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Text="{Binding PrintSheetSettings.SheetFormat.Name}" />
 
             <StackPanel
                 Grid.Column="1"
@@ -93,6 +127,7 @@
                 Binding="{Binding Path=IsMouseOver,
                     RelativeSource={RelativeSource AncestorType=TreeViewItem}}">
                 <Setter TargetName="Buttons" Property="Visibility" Value="Visible" />
+                <Setter TargetName="FormatName" Property="Margin" Value="0 0 90 0" />
             </DataTrigger>
         </HierarchicalDataTemplate.Triggers>
 
