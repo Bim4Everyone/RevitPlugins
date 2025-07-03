@@ -5,8 +5,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 
 using dosymep.Revit;
-
-using RevitClashDetective.Models.Extensions;
+using dosymep.Revit.Geometry;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
@@ -22,7 +21,7 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
     private readonly IOpeningGeometryProvider _openingGeometryProvider;
     private readonly BuiltInCategory[] _unacceptableConstructions
         = [BuiltInCategory.OST_StructuralColumns, BuiltInCategory.OST_StructuralFraming];
-    private Transform _structureDocumentTransformCashe;
+    private Transform _structureDocumentTransformCache;
     private Pipe[] _intersectingPipesCache;
     private FamilyInstance[] _intersectingOpeningsCache;
     private Wall[] _intersectingWallsCache;
@@ -64,6 +63,25 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
             if(SleeveBeyondOpening(sleeve)) {
                 return SleeveStatus.BeyondOpening;
             }
+            if(SleeveIntersectsWithManyMepElements(sleeve)) {
+                return SleeveStatus.MultipleMepElements;
+            }
+            if(SleeveIsIrrelevant(sleeve)) {
+                return SleeveStatus.Irrelevant;
+            }
+            if(SleeveDiameterNotFound(sleeve, out var diameterRange){
+                return SleeveStatus.DiameterNotFound;
+            }
+            if(SleeveIsTooBig(sleeve, diameterRange)) {
+                return SleeveStatus.TooBigDiameter;
+            }
+            if(SleeveIsTooSmall(sleeve, diameterRange)) {
+                return SleeveStatus.TooSmallDiameter;
+            }
+            if(SleeveEndFaceFarAwayFromStructure(sleeve)) {
+                return SleeveStatus.EndFaceFarAwayFromStructure;
+            }
+            // TODO
 
         } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             return SleeveStatus.Invalid;
@@ -76,12 +94,12 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         _intersectingWallsCache = null;
         _intersectingFloorsCache = null;
         _intersectingUnacceptableStructuresCache = null;
-        _structureDocumentTransformCashe = null;
+        _structureDocumentTransformCache = null;
     }
 
     private bool SleeveIsEmpty(SleeveModel sleeve) {
         if(_intersectingPipesCache is null) {
-            FindMepElementsIntersections(sleeve);
+            FindIntersectionsWithMepElements(sleeve);
         }
         return _intersectingPipesCache.Length == 0;
     }
@@ -121,7 +139,70 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         return _intersectingFloorsCache.Length > 0 || _intersectingWallsCache.Length > 0;
     }
 
-    private void FindMepElementsIntersections(SleeveModel sleeve) {
+    private bool SleeveIntersectsWithManyMepElements(SleeveModel sleeve) {
+        if(_intersectingPipesCache is null) {
+            FindIntersectionsWithMepElements(sleeve);
+        }
+        return _intersectingPipesCache.Length > 1;
+    }
+
+    private bool SleeveIsIrrelevant(SleeveModel sleeve) {
+        if(_intersectingPipesCache is null) {
+            FindIntersectionsWithMepElements(sleeve);
+        }
+        var pipeSolid = GetSolid(_intersectingPipesCache.FirstOrDefault());
+        var sleeveSolid = GetSolid(sleeve.GetFamilyInstance());
+        if(pipeSolid?.GetVolumeOrDefault() > 0 && sleeveSolid?.GetVolumeOrDefault() > 0) {
+            var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
+                pipeSolid, sleeveSolid, BooleanOperationsType.Intersect);
+            var difference = BooleanOperationsUtils.ExecuteBooleanOperation(
+                pipeSolid, sleeveSolid, BooleanOperationsType.Difference);
+            return !IsCylindricPrism(intersection)
+                || SolidUtils.SplitVolumes(difference).Count != 2;
+        } else {
+            return true;
+        }
+    }
+
+    private bool SleeveDiameterNotFound(SleeveModel sleeve, out DiameterRange range) {
+        range = GetSleeveDiameterRange(sleeve);
+        return range is null;
+    }
+
+    private bool SleeveIsTooBig(SleeveModel sleeve, DiameterRange range) {
+        return _revitRepository.ConvertFromInternal(sleeve.Diameter) > range.SleeveDiameter;
+    }
+
+    private bool SleeveIsTooSmall(SleeveModel sleeve, DiameterRange range) {
+        return _revitRepository.ConvertFromInternal(sleeve.Diameter) < range.SleeveDiameter;
+    }
+
+    private DiameterRange GetSleeveDiameterRange(SleeveModel sleeve) {
+        if(_intersectingPipesCache is null) {
+            FindIntersectionsWithMepElements(sleeve);
+        }
+        var pipe = _intersectingPipesCache.First();
+        double diameter = pipe.GetParamValue<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER);
+        return _config.PipeSettings.DiameterRanges.FirstOrDefault(
+            r => _revitRepository.ConvertToInternal(r.StartMepSize) <= diameter
+            && diameter <= _revitRepository.ConvertToInternal(r.EndMepSize));
+    }
+
+    private bool SleeveEndFaceFarAwayFromStructure(SleeveModel sleeve) {
+        if(_intersectingFloorsCache is null || _intersectingWallsCache is null || _intersectingOpeningsCache is null) {
+            FindIntersectionsWithStructures(sleeve);
+        }
+        // TODO
+        Wall[] walls = [.. _intersectingWallsCache, .. _intersectingOpeningsCache.Where(o => o.Host is Wall).Select(o => (Wall) o.Host)];
+        if(walls.Length > 0) {
+
+        }
+        throw new NotImplementedException();
+    }
+
+
+
+    private void FindIntersectionsWithMepElements(SleeveModel sleeve) {
         var famInst = sleeve.GetFamilyInstance();
         var bbox = famInst.GetBoundingBox();
         _intersectingPipesCache = [.. new FilteredElementCollector(_revitRepository.Document)
@@ -137,13 +218,14 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         var links = _structureLinksProvider.GetLinks();
         string[] openingFamNames = _structureLinksProvider.GetOpeningFamilyNames();
         foreach(var link in links) {
-            _structureDocumentTransformCashe = link.GetTransform();
+            _structureDocumentTransformCache = link.GetTransform();
             var sleeveBBox = sleeve.GetFamilyInstance()
                 .GetBoundingBox()
-                .GetTransformedBoundingBox(_structureDocumentTransformCashe.Inverse);
+                .TransformBoundingBox(_structureDocumentTransformCache.Inverse);
             var sleeveOutline = new Outline(sleeveBBox.Min, sleeveBBox.Max);
             var sleeveSolid = SolidUtils.CreateTransformed(
-                sleeve.GetFamilyInstance().GetSolid(), _structureDocumentTransformCashe.Inverse);
+                GetSolid(sleeve.GetFamilyInstance()),
+                _structureDocumentTransformCache.Inverse);
             var bboxFilter = new BoundingBoxIntersectsFilter(sleeveOutline);
             var solidFilter = new ElementIntersectsSolidFilter(sleeveSolid);
 
@@ -185,9 +267,28 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
     private bool SolidIntersects(Solid solid1, Solid solid2) {
         try {
             return BooleanOperationsUtils.ExecuteBooleanOperation(
-                solid1, solid2, BooleanOperationsType.Intersect)?.Volume > 0;
+                solid1, solid2, BooleanOperationsType.Intersect)?.GetVolumeOrDefault() > 0;
         } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             return false;
         }
+    }
+
+    private Solid GetSolid(Element element) {
+        return element?.GetSolids().OrderByDescending(s => s.GetVolumeOrDefault() ?? 0).FirstOrDefault();
+    }
+
+    private bool IsCylindricPrism(Solid solid) {
+        if(solid is null || solid.GetVolumeOrDefault(0) == 0) {
+            return false;
+        }
+        double areaTolerance = _revitRepository.Application.ShortCurveTolerance
+            * _revitRepository.Application.ShortCurveTolerance;
+        var faces = solid.Faces.OfType<Face>().ToArray();
+        var planarFaces = faces.OfType<PlanarFace>().ToArray();
+        var cylindricFaces = faces.OfType<CylindricalFace>().ToArray();
+        return planarFaces.Length == 2
+            && cylindricFaces.Length == 2
+            && Math.Abs(planarFaces[1].Area - planarFaces[0].Area) <= areaTolerance
+            && Math.Abs(cylindricFaces[1].Area - cylindricFaces[0].Area) <= areaTolerance;
     }
 }

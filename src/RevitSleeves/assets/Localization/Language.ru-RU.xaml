@@ -124,11 +124,13 @@
     <system:String
         x:Key="SleeveStatus.MultipleMepElements">Пересечение с двумя и более элементами ВИС</system:String>
     <system:String
-        x:Key="SleeveStatus.IrrelevantSleeve">Неактуальная гильза</system:String>
+        x:Key="SleeveStatus.Irrelevant">Неактуальная гильза</system:String>
     <system:String
         x:Key="SleeveStatus.TooBigDiameter">Большой диаметр</system:String>
     <system:String
         x:Key="SleeveStatus.TooSmallDiameter">Маленький диаметр</system:String>
+    <system:String
+        x:Key="SleeveStatus.DiameterNotFound">Диаметр не задан в настройках</system:String>
     <system:String
         x:Key="SleeveStatus.EndFaceFarAwayFromStructure">Торец гильзы далеко от конструкции</system:String>
     <system:String

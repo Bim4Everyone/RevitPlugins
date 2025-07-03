@@ -59,12 +59,16 @@ internal class SleeveModel : IEquatable<SleeveModel> {
         return -1618034841 + EqualityComparer<ElementId>.Default.GetHashCode(_familyInstance.Id);
     }
 
+    /// <summary>
+    /// Возвращает вектор, направленный из <seealso cref="GetEndPoints">начальной</seealso> точки тела гильзы 
+    /// в <seealso cref="GetEndPoints">конечную</seealso>
+    /// </summary>
     public XYZ GetOrientation() {
         if(_orientation is not null) {
             return _orientation;
         }
         var faces = _familyInstance.GetSolids()
-            .OrderByDescending(s => s.Volume)
+            .OrderByDescending(s => s.GetVolumeOrDefault() ?? 0)
             .First()
             .Faces
             .OfType<PlanarFace>()
@@ -75,6 +79,15 @@ internal class SleeveModel : IEquatable<SleeveModel> {
         var end = faces[0].Origin;
         _orientation = (end - start).Normalize();
         return _orientation;
+    }
+
+    /// <summary>
+    /// Возвращает начальную и конечную точки тела гильзы
+    /// </summary>
+    public (XYZ Start, XYZ End) GetEndPoints() {
+        var orientation = GetOrientation();
+        var start = Location - orientation * Length / 2;
+        return (start, start + orientation * Length);
     }
 
     public bool CanMerge(SleeveModel second) {

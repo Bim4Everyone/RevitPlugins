@@ -124,11 +124,13 @@
     <system:String
         x:Key="SleeveStatus.MultipleMepElements">Multiple mep elements intersection</system:String>
     <system:String
-        x:Key="SleeveStatus.IrrelevantSleeve">Irrelevant sleeve</system:String>
+        x:Key="SleeveStatus.Irrelevant">Irrelevant sleeve</system:String>
     <system:String
         x:Key="SleeveStatus.TooBigDiameter">Too big diameter</system:String>
     <system:String
         x:Key="SleeveStatus.TooSmallDiameter">Too small diameter</system:String>
+    <system:String
+        x:Key="SleeveStatus.DiameterNotFound">Diameter is not set</system:String>
     <system:String
         x:Key="SleeveStatus.EndFaceFarAwayFromStructure">End face far away from structure</system:String>
     <system:String
