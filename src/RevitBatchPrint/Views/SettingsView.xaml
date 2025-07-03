@@ -1,0 +1,174 @@
+<UserControl
+    x:Class="RevitBatchPrint.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitBatchPrint.Views"
+    xmlns:edits="clr-namespace:RevitBatchPrint.Views.Edits"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels"
+    xmlns:db="clr-namespace:Autodesk.Revit.DB;assembly=RevitAPI"
+
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance vms:PrintOptionsViewModel, IsDesignTimeCreatable=False}">
+    
+    <ScrollViewer
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Disabled">
+
+        <StackPanel
+            Margin="8 8 14 8">
+
+            <edits:CustomGroupEditControl
+                Icon="{ui:SymbolIcon TextAlignJustify24}"
+                Header="{me:LocalizationSource Settings.CommonSettings}"
+                Description="{me:LocalizationSource Settings.CommonSettingsDescription}">
+
+                <StackPanel>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon BuildingGovernment24}"
+                        Header="{me:LocalizationSource Settings.PrinterName}"
+                        Description="{me:LocalizationSource Settings.PrinterNameDescription}">
+
+                        <ComboBox
+                            IsReadOnly="True"
+                            IsEnabled="False"
+                            SelectedValue="{Binding Path=PrinterName, Mode=OneWay}"
+                            ItemsSource="{Binding Path=PrinterNames, Mode=OneWay}" />
+
+                    </edits:CustomEditControl>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon BuildingGovernment24}"
+                        Header="{me:LocalizationSource Settings.FilePath}"
+                        Description="{me:LocalizationSource Settings.FilePathDescription}">
+
+                        <ui:TextBox
+                            Icon="{ui:SymbolIcon DocumentPdf24}"
+                            Text="{Binding Path=FilePath, Mode=OneWay}" />
+
+                    </edits:CustomEditControl>
+                </StackPanel>
+            </edits:CustomGroupEditControl>
+
+            <edits:CustomGroupEditControl
+                Icon="{ui:SymbolIcon Print24}"
+                Header="{me:LocalizationSource Settings.PrintSettings}"
+                Description="{me:LocalizationSource Settings.PrintSettingsDescription}">
+
+                <StackPanel>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon Color24}"
+                        Header="{me:LocalizationSource Settings.ColorDepth}"
+                        Description="{me:LocalizationSource Settings.ColorDepthDescription}">
+
+                        <ComboBox
+                            ItemsSource="{me:EnumToItemsSource db:ColorDepthType}"
+                            SelectedValue="{Binding Path=ColorDepth, Mode=OneWay}" />
+
+                    </edits:CustomEditControl>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon Class24}"
+                        Header="{me:LocalizationSource Settings.RasterQuality}"
+                        Description="{me:LocalizationSource Settings.RasterQualityDescription}">
+
+                        <ComboBox
+                            ItemsSource="{me:EnumToItemsSource db:RasterQualityType}"
+                            SelectedValue="{Binding Path=RasterQuality, Mode=OneWay}" />
+
+                    </edits:CustomEditControl>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon Link24}"
+                        Header="{me:LocalizationSource Settings.ViewLinksInBlue}"
+                        Description="{me:LocalizationSource Settings.ViewLinksInBlueDescription}">
+
+                        <ui:ToggleSwitch
+                            OnContent="{me:LocalizationSource ToggleSwitch.On}"
+                            OffContent="{me:LocalizationSource ToggleSwitch.Off}"
+                            IsChecked="{Binding ViewLinksInBlue, Mode=TwoWay}" />
+
+                    </edits:CustomEditControl>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon VirtualNetwork20}"
+                        Header="{me:LocalizationSource Settings.HideReferencePlane}"
+                        Description="{me:LocalizationSource Settings.HideReferencePlaneDescription}">
+
+                        <ui:ToggleSwitch
+                            OnContent="{me:LocalizationSource ToggleSwitch.On}"
+                            OffContent="{me:LocalizationSource ToggleSwitch.Off}"
+                            IsChecked="{Binding HideReferencePlane, Mode=TwoWay}" />
+
+                    </edits:CustomEditControl>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon Markdown20}"
+                        Header="{me:LocalizationSource Settings.HideUnreferencedViewTags}"
+                        Description="{me:LocalizationSource Settings.HideUnreferencedViewTagsDescription}">
+
+                        <ui:ToggleSwitch
+                            OnContent="{me:LocalizationSource ToggleSwitch.On}"
+                            OffContent="{me:LocalizationSource ToggleSwitch.Off}"
+                            IsChecked="{Binding HideUnreferencedViewTags, Mode=TwoWay}" />
+
+                    </edits:CustomEditControl>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon Line24}"
+                        Header="{me:LocalizationSource Settings.MaskCoincidentLines}"
+                        Description="{me:LocalizationSource Settings.MaskCoincidentLinesDescription}">
+
+                        <ui:ToggleSwitch
+                            OnContent="{me:LocalizationSource ToggleSwitch.On}"
+                            OffContent="{me:LocalizationSource ToggleSwitch.Off}"
+                            IsChecked="{Binding MaskCoincidentLines, Mode=TwoWay}" />
+
+                    </edits:CustomEditControl>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon Line24}"
+                        Header="{me:LocalizationSource Settings.HideScopeBoxes}"
+                        Description="{me:LocalizationSource Settings.HideScopeBoxesDescription}">
+
+                        <ui:ToggleSwitch
+                            OnContent="{me:LocalizationSource ToggleSwitch.On}"
+                            OffContent="{me:LocalizationSource ToggleSwitch.Off}"
+                            IsChecked="{Binding HideScopeBoxes, Mode=TwoWay}" />
+
+                    </edits:CustomEditControl>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon Line24}"
+                        Header="{me:LocalizationSource Settings.HideCropBoundaries}"
+                        Description="{me:LocalizationSource Settings.HideCropBoundariesBoxesDescription}">
+
+                        <ui:ToggleSwitch
+                            OnContent="{me:LocalizationSource ToggleSwitch.On}"
+                            OffContent="{me:LocalizationSource ToggleSwitch.Off}"
+                            IsChecked="{Binding HideCropBoundaries, Mode=TwoWay}" />
+
+                    </edits:CustomEditControl>
+
+                    <edits:CustomEditControl
+                        Icon="{ui:SymbolIcon Line24}"
+                        Header="{me:LocalizationSource Settings.ReplaceHalftoneWithThinLines}"
+                        Description="{me:LocalizationSource Settings.ReplaceHalftoneWithThinLinesDescription}">
+
+                        <ui:ToggleSwitch
+                            OnContent="{me:LocalizationSource ToggleSwitch.On}"
+                            OffContent="{me:LocalizationSource ToggleSwitch.Off}"
+                            IsChecked="{Binding ReplaceHalftoneWithThinLines, Mode=TwoWay}" />
+
+                    </edits:CustomEditControl>
+                </StackPanel>
+            </edits:CustomGroupEditControl>
+        </StackPanel>
+
+    </ScrollViewer>
+</UserControl>

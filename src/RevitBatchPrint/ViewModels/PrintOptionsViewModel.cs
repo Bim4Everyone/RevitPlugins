@@ -172,7 +172,8 @@ internal sealed class PrintOptionsViewModel : BaseViewModel {
             HideReferencePlane = HideReferencePlane,
             HideUnreferencedViewTags = HideUnreferencedViewTags,
             HideScopeBoxes = HideScopeBoxes,
-            HideCropBoundaries = HideCropBoundaries
+            HideCropBoundaries = HideCropBoundaries,
+            ReplaceHalftoneWithThinLines = ReplaceHalftoneWithThinLines
         };
     }
 }
