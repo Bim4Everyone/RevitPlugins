@@ -40,6 +40,10 @@
 
     <system:String
         x:Key="Errors.CannotLoadPlacementSettings">Не удалось загрузить настройки.</system:String>
+    <system:String
+        x:Key="Errors.DuplicatedLinks">Следующие связи дублируются: {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotFindStructureLinks">Не найдено ни одной связи с конструкциями</system:String>
 
     <system:String
         x:Key="From">от</system:String>
@@ -106,29 +110,37 @@
         x:Key="OffsetType.FromSleeveEndToTopFloorFace">Расстояние от верхней грани перекрытия до верхнего торца гильзы</system:String>
 
     <system:String
-        x:Key="SleeveStatus.Invalid">Не удалось определить статус</system:String>
-    <system:String
-        x:Key="SleeveStatus.TooBigDiameter">Слишком большой диаметр</system:String>
-    <system:String
-        x:Key="SleeveStatus.TooSmallDiameter">Слишком маленький диаметр</system:String>
-    <system:String
-        x:Key="SleeveStatus.IntersectSleeve">Пересекается с другой гильзой</system:String>
+        x:Key="SleeveStatus.Invalid">Ошибка обработки геометрии</system:String>
     <system:String
         x:Key="SleeveStatus.Empty">Пустая гильза</system:String>
     <system:String
-        x:Key="SleeveStatus.OutsideOfStructure">Гильза вне конструкции</system:String>
+        x:Key="SleeveStatus.OutsideOfStructure">Вне конструкции</system:String>
     <system:String
-        x:Key="SleeveStatus.BeyondOpening">Гильза не соответствует отверстию</system:String>
+        x:Key="SleeveStatus.UnacceptableConstructions">В недопустимых конструкциях</system:String>
     <system:String
-        x:Key="SleeveStatus.EndFaceOutsideOfStructure">Торец гильзы далеко от конструкции</system:String>
+        x:Key="SleeveStatus.DifferentConstructions">В разных конструкциях</system:String>
     <system:String
-        x:Key="SleeveStatus.EndFaceInsideStructure">Торец гильзы внутри конструкции</system:String>
+        x:Key="SleeveStatus.BeyondOpening">Не соответствует отверстию</system:String>
+    <system:String
+        x:Key="SleeveStatus.MultipleMepElements">Пересечение с двумя и более элементами ВИС</system:String>
     <system:String
         x:Key="SleeveStatus.IrrelevantSleeve">Неактуальная гильза</system:String>
     <system:String
-        x:Key="SleeveStatus.AxisNotParallelToMepElement">Ось гильзы не параллельна оси элемента ВИС</system:String>
+        x:Key="SleeveStatus.TooBigDiameter">Большой диаметр</system:String>
+    <system:String
+        x:Key="SleeveStatus.TooSmallDiameter">Маленький диаметр</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceFarAwayFromStructure">Торец гильзы далеко от конструкции</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceInsideStructure">Торец гильзы внутри конструкции</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisNotParallelToMepElement">Ось гильзы не параллельна оси трубы</system:String>
     <system:String
         x:Key="SleeveStatus.AxisDistanceTooBig">Ось гильзы смещена от оси трубы</system:String>
+    <system:String
+        x:Key="SleeveStatus.IntersectSleeve">Пересекающиеся гильзы</system:String>
+    <system:String
+        x:Key="SleeveStatus.Correct">Актуальная гильза</system:String>
 
     <system:String
         x:Key="Ok">ОК</system:String>

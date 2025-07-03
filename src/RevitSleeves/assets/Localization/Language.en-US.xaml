@@ -40,6 +40,10 @@
 
     <system:String
         x:Key="Errors.CannotLoadPlacementSettings">Cannot load placement settings.</system:String>
+    <system:String
+        x:Key="Errors.DuplicatedLinks">Links are duplicated: {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotFindStructureLinks">Cannot find structure links</system:String>
 
     <system:String
         x:Key="From">from</system:String>
@@ -106,29 +110,37 @@
         x:Key="OffsetType.FromSleeveEndToTopFloorFace">Distance from the upper face of the floor to the upper end of the sleeve</system:String>
 
     <system:String
-        x:Key="SleeveStatus.Invalid">Unable to determine status</system:String>
-    <system:String
-        x:Key="SleeveStatus.TooBigDiameter">Diameter too large</system:String>
-    <system:String
-        x:Key="SleeveStatus.TooSmallDiameter">Diameter too small</system:String>
-    <system:String
-        x:Key="SleeveStatus.IntersectSleeve">Intersects with another sleeve</system:String>
+        x:Key="SleeveStatus.Invalid">Invalid</system:String>
     <system:String
         x:Key="SleeveStatus.Empty">Empty sleeve</system:String>
     <system:String
-        x:Key="SleeveStatus.OutsideOfStructure">Sleeve outside the structure</system:String>
+        x:Key="SleeveStatus.OutsideOfStructure">Outside of structure</system:String>
     <system:String
-        x:Key="SleeveStatus.BeyondOpening">Sleeve does not match the opening</system:String>
+        x:Key="SleeveStatus.UnacceptableConstructions">Unacceptable constructions</system:String>
     <system:String
-        x:Key="SleeveStatus.EndFaceOutsideOfStructure">Sleeve end far from the structure</system:String>
+        x:Key="SleeveStatus.DifferentConstructions">Different constructions</system:String>
     <system:String
-        x:Key="SleeveStatus.EndFaceInsideStructure">Sleeve end inside the structure</system:String>
+        x:Key="SleeveStatus.BeyondOpening">Beyond opening</system:String>
+    <system:String
+        x:Key="SleeveStatus.MultipleMepElements">Multiple mep elements intersection</system:String>
     <system:String
         x:Key="SleeveStatus.IrrelevantSleeve">Irrelevant sleeve</system:String>
     <system:String
-        x:Key="SleeveStatus.AxisNotParallelToMepElement">Sleeve axis not parallel to the VIS element axis</system:String>
+        x:Key="SleeveStatus.TooBigDiameter">Too big diameter</system:String>
     <system:String
-        x:Key="SleeveStatus.AxisDistanceTooBig">Sleeve axis offset from the pipe axis</system:String>
+        x:Key="SleeveStatus.TooSmallDiameter">Too small diameter</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceFarAwayFromStructure">End face far away from structure</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceInsideStructure">End face inside structure</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisNotParallelToMepElement">Axis not parallel to mep element</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisDistanceTooBig">Axis distance too big</system:String>
+    <system:String
+        x:Key="SleeveStatus.IntersectSleeve">Intersecting sleeves</system:String>
+    <system:String
+        x:Key="SleeveStatus.Correct">Correct</system:String>
 
     <system:String
         x:Key="Ok">OK</system:String>
