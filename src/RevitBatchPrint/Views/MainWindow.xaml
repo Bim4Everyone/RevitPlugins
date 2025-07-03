@@ -12,7 +12,9 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:views="clr-namespace:RevitBatchPrint.Views"
 
+    x:Name="_this"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
@@ -26,15 +28,6 @@
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../ViewsTemplates/TreeViewTemplate.xaml" />
-                <ResourceDictionary Source="../ViewsTemplates/TreeViewItemTemplate.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
-
     <b:Interaction.Triggers>
         <b:EventTrigger
             EventName="Loaded">
@@ -44,8 +37,14 @@
     </b:Interaction.Triggers>
 
     <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -53,44 +52,31 @@
 
         <ui:TitleBar
             Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <Border
+        <views:SheetsView
             Grid.Row="1"
-            Margin="8"
-            Background="{DynamicResource CardBackground}"
-            CornerRadius="{DynamicResource ControlCornerRadius}">
-            <ui:AutoSuggestBox
-                Margin="14,8,14,8"
-                Icon="{ui:SymbolIcon TextAlignJustify24}"
-                Text="{Binding AlbumParamName}"
-                PlaceholderText="{me:LocalizationSource MainWindow.AlbumHintText}"
-                OriginalItemsSource="{Binding AlbumParamNames}" />
-        </Border>
+            Grid.Column="0"
+            DataContext="{Binding DataContext, ElementName=_this}" />
 
-        <Border
-            Grid.Row="2"
-            Margin="8 0 8 8"
-            Background="{DynamicResource CardBackground}"
-            CornerRadius="{DynamicResource ControlCornerRadius}">
+        <GridSplitter
+            Grid.Row="1"
+            Grid.Column="1"
+            Width="3"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Center" />
 
-            <StackPanel>
-                <ui:AutoSuggestBox
-                    Margin="14,8,14,8"
-                    Text="{Binding SearchText, Delay=250}"
-                    PlaceholderText="{me:LocalizationSource MainWindow.SearchHintText}" />
-
-                <TreeView
-                    Margin="14,0,14,8"
-                    ItemTemplate="{StaticResource TreeViewTemplate}"
-                    ItemsSource="{Binding FilteredAlbums}"
-                    ItemContainerStyle="{StaticResource CustomTreeViewItemStyle}" />
-            </StackPanel>
-
-        </Border>
+        <views:SettingsView
+            Grid.Row="1"
+            Grid.Column="2"
+            DataContext="{Binding PrintOptions}" />
 
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 

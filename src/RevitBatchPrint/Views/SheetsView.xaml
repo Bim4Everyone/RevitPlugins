@@ -1,0 +1,69 @@
+<UserControl
+    x:Class="RevitBatchPrint.Views.SheetsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitBatchPrint.Views"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:markupExtensions="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels"
+
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewsTemplates/TreeViewTemplate.xaml" />
+                <ResourceDictionary Source="../ViewsTemplates/TreeViewItemTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border
+            Grid.Row="0"
+            Margin="8"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+            <ui:AutoSuggestBox
+                Margin="14,8,14,8"
+                Icon="{ui:SymbolIcon TextAlignJustify24}"
+                Text="{Binding AlbumParamName}"
+                PlaceholderText="{markupExtensions:LocalizationSource MainWindow.AlbumHintText}"
+                OriginalItemsSource="{Binding AlbumParamNames}" />
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Margin="8 0 8 8"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+
+            <StackPanel>
+                <ui:AutoSuggestBox
+                    Margin="14,8,14,8"
+                    Text="{Binding SearchText, Delay=250}"
+                    PlaceholderText="{markupExtensions:LocalizationSource MainWindow.SearchHintText}" />
+
+                <ScrollViewer
+                    Margin="14,0,14,8"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled">
+                    
+                    <TreeView
+                        ItemTemplate="{StaticResource TreeViewTemplate}"
+                        ItemsSource="{Binding FilteredAlbums}"
+                        ItemContainerStyle="{StaticResource CustomTreeViewItemStyle}" />
+                </ScrollViewer>
+            </StackPanel>
+
+        </Border>
+    </Grid>
+</UserControl>

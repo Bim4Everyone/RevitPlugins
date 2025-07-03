@@ -34,8 +34,8 @@
 
             <StackPanel>
                 <ContentControl
-                    Width="300"
                     VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
                     Content="{Binding EditControl, ElementName=_this}" />
             </StackPanel>
 
