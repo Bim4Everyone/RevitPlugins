@@ -18,8 +18,10 @@ public class PylonViewDimensionCreator {
 
     // Отступ текста размера от стандартного положения на размерной линии
     // В данном случае вверх и вбок, чтобы поместился весь текст с префиксом
-    private readonly XYZ _smallTextOffset = new XYZ(0, 0.3, 0.3);
-    private readonly XYZ _bigTextOffset = new XYZ(0, 0.3, 0.6);
+    private readonly XYZ _vertDimSmallTextOffset = new XYZ(0, 0.3, 0.2);
+    private readonly XYZ _vertDimSmallTextOffsetInverted = new XYZ(0, 0.3, -0.2);
+    private readonly XYZ _vertDimBigTextOffset = new XYZ(0, 0.3, 0.6);
+    private readonly XYZ _vertDimBigTextOffsetInverted = new XYZ(0, 0.3, -0.6);
 
     private readonly ParamValueService _paramValueService;
 
@@ -170,12 +172,12 @@ public class PylonViewDimensionCreator {
         // - седьмой сегмент: никак не меняем
         // - восьмой сегмент: никак не меняем
 
-        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", _smallTextOffset));
+        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", _vertDimSmallTextOffset));
         if(test1 == 1) {
             if(test1_count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
                                                               $"{test1_count - 1}х{test1_step}=",
-                                                              _bigTextOffset));
+                                                              _vertDimBigTextOffset));
             }
             dimSegmentOpts.Add(new DimensionSegmentOption(false));
         }
@@ -187,10 +189,10 @@ public class PylonViewDimensionCreator {
             if(test2_count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
                                                               $"{test2_count - 1}х{test2_step}=",
-                                                              _bigTextOffset));
+                                                              _vertDimBigTextOffsetInverted));
             }
         }
-        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", _smallTextOffset));
+        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", _vertDimSmallTextOffsetInverted));
         dimSegmentOpts.Add(new DimensionSegmentOption(false));
 
         return dimSegmentOpts;
