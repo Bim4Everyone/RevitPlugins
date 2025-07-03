@@ -16,6 +16,11 @@ public class PylonViewDimensionCreator {
     private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
     private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
 
+    // Отступ текста размера от стандартного положения на размерной линии
+    // В данном случае вверх и вбок, чтобы поместился весь текст с префиксом
+    private readonly XYZ _smallTextOffset = new XYZ(0, 0.3, 0.3);
+    private readonly XYZ _bigTextOffset = new XYZ(0, 0.3, 0.6);
+
     private readonly ParamValueService _paramValueService;
 
     internal PylonViewDimensionCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
@@ -73,16 +78,12 @@ public class PylonViewDimensionCreator {
             //}
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-
-
-
-
             Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems[0] as FamilyInstance,
                                                                                DimensionOffsetType.Right, -1);
 
             ReferenceArray refArraySide = new ReferenceArray();
             
-            // Собираем опорные плоскости по опалубке
+            // Собираем опорные плоскости по опалубке, например:
             // #_1_горизонт_край_низ
             // #_1_горизонт_край_верх
             foreach(var item in SheetInfo.HostElems) {
@@ -92,80 +93,21 @@ public class PylonViewDimensionCreator {
                 }
             }
 
-            var dimSegmentMods = new List<DimensionSegmentModification>();
-            var textOffset = new XYZ(0, 0.3, 0.6);
-
-            // Собираем опорные плоскости по арматуре
+            // Собираем опорные плоскости по арматуре и заполняем список опций изменений сегментов размера
+            var dimSegmentOpts = new List<DimensionSegmentOption>();
             foreach(FamilyInstance clampsParentRebar in clampsParentRebars) {
-                refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["торец"], refArraySide);
+                refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт"], refArraySide);
 
-
-                int test1 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1");
-
-                double test1_count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1_Количество");
-
-                double test1_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 1_Шаг");
-                test1_step = UnitUtilsHelper.ConvertFromInternalValue(test1_step);
-
-
-
-                int test2 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2");
-
-                double test2_count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2_Количество");
-
-                double test2_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 2_Шаг");
-                test2_step = UnitUtilsHelper.ConvertFromInternalValue(test2_step);
-
-
-
-                double test3_len = clampsParentRebar.GetParamValue<double>("мод_ФОП_Массив_Длина");
-                test3_len = UnitUtilsHelper.ConvertFromInternalValue(test3_len);
-
-                double test3_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Массив_шаг");
-                test3_step = UnitUtilsHelper.ConvertFromInternalValue(test3_step);
-
-
-
-
-                // Комментирование сегментов
-                // В первый никогда
-                // Во второй вписывать если "мод_ФОП_Доборный 1" и "мод_ФОП_Доборный 1_Количество" > 1
-                // Во третий никогда
-                // В четвертый вписывать всегда
-                // В пятый никогда
-                // В шестой вписывать если "мод_ФОП_Доборный 2" и "мод_ФОП_Доборный 2_Количество" > 1
-                // В седьмой никогда
-                // В восьмой никогда
-                
-                dimSegmentMods.Add(new DimensionSegmentModification(false));
-                if(test1 == 1) {
-                    if(test1_count > 1) {
-                        dimSegmentMods.Add(new DimensionSegmentModification(true, 
-                                                                            $"{test1_count - 1}х{test1_step}=", 
-                                                                            textOffset));
-                    }
-                    dimSegmentMods.Add(new DimensionSegmentModification(false));
-                }
-                dimSegmentMods.Add(new DimensionSegmentModification(true, 
-                                                                    $"{test3_step}х{Math.Round(test3_len / test3_step)}=", 
-                                                                    new XYZ()));
-                if(test2 == 1) {
-                    dimSegmentMods.Add(new DimensionSegmentModification(false));
-                    if(test2_count > 1) {
-                        dimSegmentMods.Add(new DimensionSegmentModification(true, 
-                                                                            $"{test2_count - 1}х{test2_step}=", 
-                                                                            textOffset));
-                    }
-                }
-                dimSegmentMods.Add(new DimensionSegmentModification(false));
-                dimSegmentMods.Add(new DimensionSegmentModification(false));
+                // Получаем настройки для изменения сегментов размеров
+                dimSegmentOpts = GetDimensionSegmentOptions(clampsParentRebar, dimSegmentOpts);
             }
 
             Dimension dimensionRebarSide = doc.Create.NewDimension(view, dimensionLineLeft, refArraySide);
 
+            // Применяем опции изменений сегментов размера
             var dimensionSegments = dimensionRebarSide.Segments;
             for(int i = 0; i < dimensionSegments.Size; i++) {
-                var dimSegmentMod = dimSegmentMods[i];
+                var dimSegmentMod = dimSegmentOpts[i];
 
                 if(dimSegmentMod.ModificationNeeded) {
                     var segment = dimensionSegments.get_Item(i);
@@ -175,41 +117,83 @@ public class PylonViewDimensionCreator {
                     segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
                 }
             }
-
-
-
-            //// Комментирование сегментов
-            //// В первый вписывать если "мод_ФОП_Доборный 1" и "мод_ФОП_Доборный 1_Количество" > 1
-            //// Во второй никогда
-            //// В третий вписывать всегда
-            //// В четвертый никогда
-            //// В пятый вписывать если "мод_ФОП_Доборный 2" и "мод_ФОП_Доборный 2_Количество" > 1
-
-            //var prefixes = new List<string>();
-            //var dimensionSegments = dimensionRebarSide.Segments;
-
-            //if(test1 == 1) {
-            //    if(test1_count > 1) {
-            //        prefixes.Add($"{test1_count - 1}х{test1_step}=");
-
-            //        var oldTextPosition = dimensionSegments.get_Item(0).TextPosition;
-            //        dimensionSegments.get_Item(0).TextPosition = oldTextPosition + new XYZ(0, 0.3, 0.6);
-            //    }
-            //    prefixes.Add("");
-            //}
-            //prefixes.Add($"{test3_step}х{Math.Round(test3_len / test3_step)}=");
-            //if(test2 == 1) {
-            //    prefixes.Add("");
-            //    if(test2_count > 1) {
-            //        prefixes.Add($"{test2_count - 1}х{test2_step}=");
-
-            //        var dimensionSegmentsLen = dimensionSegments.Size;
-            //        var oldTextPosition = dimensionSegments.get_Item(dimensionSegmentsLen - 1).TextPosition;
-            //        dimensionSegments.get_Item(dimensionSegmentsLen - 1).TextPosition = oldTextPosition + new XYZ(0, 0.3, 0.6);
-            //    }
-            //}
-
         } catch(Exception) { }
+    }
+
+
+    /// <summary>
+    /// Данный метод настраивает опции по переопределению сегментов размера на основе параметров семейства армирования
+    /// </summary>
+    /// <param name="clampsParentRebar">Экземпляр родительского семейства хомутов</param>
+    /// <param name="dimSegmentOpts">Список опций, в который можно дописать новые</param>
+    /// <returns></returns>
+    private List<DimensionSegmentOption> GetDimensionSegmentOptions(FamilyInstance clampsParentRebar, 
+                                                                    List<DimensionSegmentOption> dimSegmentOpts = null) {
+        // Можно передать список для того, чтобы в него дописать новые опции. Если не передали, сделаем новый
+        dimSegmentOpts ??= [];
+        
+        // Предполагается, что для анализа будет передано родительское семейство хомутов
+        // В этому случае нужно учесть, что данное семейство имеет основной массив хомутов, а также доборные массивы
+        // хомутов с двух сторон
+        // Запрос значений параметров, отвечающих за дополнительный массив хомутов, расположенный перед основным
+        int test1 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1");
+        double test1_count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1_Количество");
+        double test1_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 1_Шаг");
+        test1_step = UnitUtilsHelper.ConvertFromInternalValue(test1_step);
+
+        // Запрос значений параметров, отвечающих за дополнительный массив хомутов, расположенный после основного
+        int test2 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2");
+        double test2_count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2_Количество");
+        double test2_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 2_Шаг");
+        test2_step = UnitUtilsHelper.ConvertFromInternalValue(test2_step);
+
+        // Запрос значений параметров, отвечающих за основной массив хомутов
+        double test3_len = clampsParentRebar.GetParamValue<double>("мод_ФОП_Массив_Длина");
+        test3_len = UnitUtilsHelper.ConvertFromInternalValue(test3_len);
+        double test3_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Массив_шаг");
+        test3_step = UnitUtilsHelper.ConvertFromInternalValue(test3_step);
+
+        // Последовательность сегментов размеров имеет строгий порядок. В связи с ограничениями API нет возможности 
+        // узнать к каким опорным плоскостям привязаны сегменты размеров, но можно получить порядок сегментов как 
+        // в модели. Соответственно ниже составляем последовательность опций, в соответствии с которыми будут 
+        // изменяться сегменты размера. Есть два варианта изменений - указание префикса и изменение положения текста.
+
+        // Пояснение к опциям сегментов размеров:
+        // - первый сегмент: префикс не пишем
+        // - второй сегмент: вписать префикс и изменить положение текста,
+        //      если "мод_ФОП_Доборный 1" == true и "мод_ФОП_Доборный 1_Количество" > 1
+        // - третий сегмент: никак не меняем
+        // - четвертый сегмент: всегда вписывать префикс, но не менять положение текста
+        // - пятый сегмент: никак не меняем
+        // - шестой сегмент: вписать префикс и изменить положение текста,
+        //      если "мод_ФОП_Доборный 2" == true и "мод_ФОП_Доборный 2_Количество" > 1
+        // - седьмой сегмент: никак не меняем
+        // - восьмой сегмент: никак не меняем
+
+        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", _smallTextOffset));
+        if(test1 == 1) {
+            if(test1_count > 1) {
+                dimSegmentOpts.Add(new DimensionSegmentOption(true,
+                                                              $"{test1_count - 1}х{test1_step}=",
+                                                              _bigTextOffset));
+            }
+            dimSegmentOpts.Add(new DimensionSegmentOption(false));
+        }
+        dimSegmentOpts.Add(new DimensionSegmentOption(true,
+                                                      $"{test3_step}х{Math.Round(test3_len / test3_step)}=",
+                                                      new XYZ()));
+        if(test2 == 1) {
+            dimSegmentOpts.Add(new DimensionSegmentOption(false));
+            if(test2_count > 1) {
+                dimSegmentOpts.Add(new DimensionSegmentOption(true,
+                                                              $"{test2_count - 1}х{test2_step}=",
+                                                              _bigTextOffset));
+            }
+        }
+        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", _smallTextOffset));
+        dimSegmentOpts.Add(new DimensionSegmentOption(false));
+
+        return dimSegmentOpts;
     }
 
     public void TryCreateTransverseViewFirstDimensions() {
