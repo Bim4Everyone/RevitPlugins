@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Windows.Media;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
@@ -17,6 +18,7 @@ namespace RevitSleeves.Services.Navigator;
 internal class SleeveStatusFinder : ISleeveStatusFinder {
     private readonly RevitRepository _revitRepository;
     private readonly SleevePlacementSettingsConfig _config;
+    private readonly IGeometryUtils _geometryUtils;
     private readonly IStructureLinksProvider _structureLinksProvider;
     private readonly IOpeningGeometryProvider _openingGeometryProvider;
     private readonly BuiltInCategory[] _unacceptableConstructions
@@ -31,6 +33,7 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
     public SleeveStatusFinder(
         RevitRepository revitRepository,
         SleevePlacementSettingsConfig config,
+        IGeometryUtils geometryUtils,
         IStructureLinksProvider structureLinksProvider,
         IOpeningGeometryProvider openingGeometryProvider) {
 
@@ -38,6 +41,8 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
             ?? throw new ArgumentNullException(nameof(revitRepository));
         _config = config
             ?? throw new ArgumentNullException(nameof(config));
+        _geometryUtils = geometryUtils
+            ?? throw new ArgumentNullException(nameof(geometryUtils));
         _structureLinksProvider = structureLinksProvider
             ?? throw new ArgumentNullException(nameof(structureLinksProvider));
         _openingGeometryProvider = openingGeometryProvider
@@ -189,18 +194,47 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
     }
 
     private bool SleeveEndFaceFarAwayFromStructure(SleeveModel sleeve) {
-        if(_intersectingFloorsCache is null || _intersectingWallsCache is null || _intersectingOpeningsCache is null) {
+        if(_intersectingFloorsCache is null
+            || _intersectingWallsCache is null
+            || _intersectingOpeningsCache is null
+            || _structureDocumentTransformCache is null) {
             FindIntersectionsWithStructures(sleeve);
         }
-        // TODO
-        Wall[] walls = [.. _intersectingWallsCache, .. _intersectingOpeningsCache.Where(o => o.Host is Wall).Select(o => (Wall) o.Host)];
+        Wall[] walls = [.. _intersectingWallsCache,
+            .. _intersectingOpeningsCache.Where(o => o.Host is Wall).Select(o => (Wall) o.Host)];
         if(walls.Length > 0) {
-
+            return SleeveEndFaceFarAwayFromWall(sleeve, walls);
         }
-        throw new NotImplementedException();
+        Floor[] floors = [.. _intersectingFloorsCache,
+            .. _intersectingOpeningsCache.Where(o => o.Host is Floor).Select(o => (Floor) o.Host)];
+        if(floors.Length > 0) {
+            return SleeveEndFaceFarAwayFromFloor(sleeve, floors);
+        }
+        return false;
     }
 
+    private bool SleeveEndFaceFarAwayFromWall(SleeveModel sleeve, Wall[] intersectingWalls) {
+        var wallOrientation = intersectingWalls[0].Orientation;
+        // TODO
+        return false;
+    }
 
+    private bool SleeveEndFaceFarAwayFromFloor(SleeveModel sleeve, Floor[] intersectingFloors) {
+        double floorThickness = intersectingFloors.Sum(_geometryUtils.GetFloorThickness);
+        double sleeveEndToTopOffset = _revitRepository.ConvertToInternal(
+            _config.PipeSettings.Offsets[OffsetType.FromSleeveEndToTopFloorFace]);
+        double sleeveRequiredLength = floorThickness + sleeveEndToTopOffset;
+        double distanceTolerance = _revitRepository.Application.ShortCurveTolerance;
+
+        var sleeveBbox = sleeve.GetFamilyInstance()
+            .GetBoundingBox()
+            .TransformBoundingBox(_structureDocumentTransformCache);
+        var floorsBbox = intersectingFloors.Select(f => f.GetBoundingBox()).ToList().CreateCommonBoundingBox();
+
+        return sleeve.Length > (sleeveRequiredLength + distanceTolerance)
+            || (sleeveBbox.Max.Z - floorsBbox.Max.Z) > (sleeveEndToTopOffset + distanceTolerance)
+            || (floorsBbox.Min.Z - sleeveBbox.Min.Z) > distanceTolerance;
+    }
 
     private void FindIntersectionsWithMepElements(SleeveModel sleeve) {
         var famInst = sleeve.GetFamilyInstance();

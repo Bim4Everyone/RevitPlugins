@@ -49,6 +49,9 @@ internal class ShowNavigatorCommand : BasePluginCommand {
         kernel.Bind<IStructureLinksProvider>()
             .To<AllLoadedStructureLinksProvider>()
             .InSingletonScope();
+        kernel.Bind<IGeometryUtils>()
+            .To<GeometryUtils>()
+            .InSingletonScope();
 
         kernel.BindMainWindow<NavigatorViewModel, NavigatorWindow>();
         kernel.UseWpfUIMessageBox<NavigatorViewModel>();
