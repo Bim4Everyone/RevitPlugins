@@ -75,25 +75,42 @@ public class PylonViewDimensionCreator {
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
 
 
-            foreach(FamilyInstance clampsParentRebar in clampsParentRebars) {
-                Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(clampsParentRebar, 
+
+
+            Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems[0] as FamilyInstance,
                                                                                DimensionOffsetType.Right, -1);
-                ReferenceArray refArrayRebarSide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', 
-                                                                                         ["торец"]);
-                Dimension dimensionRebarSide = doc.Create.NewDimension(view, dimensionLineLeft, refArrayRebarSide);
+
+            ReferenceArray refArraySide = new ReferenceArray();
+            
+            // Собираем опорные плоскости по опалубке
+            // #_1_горизонт_край_низ
+            // #_1_горизонт_край_верх
+            foreach(var item in SheetInfo.HostElems) {
+                if(item is FamilyInstance hostElem) {
+                    refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"], 
+                                                                         refArraySide);
+                }
+            }
+
+            var dimSegmentMods = new List<DimensionSegmentModification>();
+            var textOffset = new XYZ(0, 0.3, 0.6);
+
+            // Собираем опорные плоскости по арматуре
+            foreach(FamilyInstance clampsParentRebar in clampsParentRebars) {
+                refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["торец"], refArraySide);
 
 
                 int test1 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1");
-                
+
                 double test1_count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1_Количество");
-                
+
                 double test1_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 1_Шаг");
                 test1_step = UnitUtilsHelper.ConvertFromInternalValue(test1_step);
 
 
 
                 int test2 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2");
-                
+
                 double test2_count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2_Количество");
 
                 double test2_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 2_Шаг");
@@ -108,41 +125,89 @@ public class PylonViewDimensionCreator {
                 test3_step = UnitUtilsHelper.ConvertFromInternalValue(test3_step);
 
 
+
+
                 // Комментирование сегментов
-                // В первый вписывать если "мод_ФОП_Доборный 1" и "мод_ФОП_Доборный 1_Количество" > 1
-                // Во второй никогда
-                // В третий вписывать всегда
-                // В четвертый никогда
-                // В пятый вписывать если "мод_ФОП_Доборный 2" и "мод_ФОП_Доборный 2_Количество" > 1
-
-                var prefixes = new List<string>();
-                var dimensionSegments = dimensionRebarSide.Segments;
-
+                // В первый никогда
+                // Во второй вписывать если "мод_ФОП_Доборный 1" и "мод_ФОП_Доборный 1_Количество" > 1
+                // Во третий никогда
+                // В четвертый вписывать всегда
+                // В пятый никогда
+                // В шестой вписывать если "мод_ФОП_Доборный 2" и "мод_ФОП_Доборный 2_Количество" > 1
+                // В седьмой никогда
+                // В восьмой никогда
+                
+                dimSegmentMods.Add(new DimensionSegmentModification(false));
                 if(test1 == 1) {
                     if(test1_count > 1) {
-                        prefixes.Add($"{test1_count - 1}х{test1_step}=");
-
-                        var oldTextPosition = dimensionSegments.get_Item(0).TextPosition;
-                        dimensionSegments.get_Item(0).TextPosition = oldTextPosition + new XYZ(0, 0.3, 0.6);
+                        dimSegmentMods.Add(new DimensionSegmentModification(true, 
+                                                                            $"{test1_count - 1}х{test1_step}=", 
+                                                                            textOffset));
                     }
-                    prefixes.Add("");
+                    dimSegmentMods.Add(new DimensionSegmentModification(false));
                 }
-                prefixes.Add($"{test3_step}х{Math.Round(test3_len / test3_step)}=");
+                dimSegmentMods.Add(new DimensionSegmentModification(true, 
+                                                                    $"{test3_step}х{Math.Round(test3_len / test3_step)}=", 
+                                                                    new XYZ()));
                 if(test2 == 1) {
-                    prefixes.Add("");
+                    dimSegmentMods.Add(new DimensionSegmentModification(false));
                     if(test2_count > 1) {
-                        prefixes.Add($"{test2_count - 1}х{test2_step}=");
-
-                        var dimensionSegmentsLen = dimensionSegments.Size;
-                        var oldTextPosition = dimensionSegments.get_Item(dimensionSegmentsLen - 1).TextPosition;
-                        dimensionSegments.get_Item(dimensionSegmentsLen - 1).TextPosition = oldTextPosition + new XYZ(0, 0.3, 0.6);
+                        dimSegmentMods.Add(new DimensionSegmentModification(true, 
+                                                                            $"{test2_count - 1}х{test2_step}=", 
+                                                                            textOffset));
                     }
                 }
+                dimSegmentMods.Add(new DimensionSegmentModification(false));
+                dimSegmentMods.Add(new DimensionSegmentModification(false));
+            }
 
-                for(int i = 0; i < dimensionSegments.Size; i++) {
-                    dimensionSegments.get_Item(i).Prefix = prefixes[i];
+            Dimension dimensionRebarSide = doc.Create.NewDimension(view, dimensionLineLeft, refArraySide);
+
+            var dimensionSegments = dimensionRebarSide.Segments;
+            for(int i = 0; i < dimensionSegments.Size; i++) {
+                var dimSegmentMod = dimSegmentMods[i];
+
+                if(dimSegmentMod.ModificationNeeded) {
+                    var segment = dimensionSegments.get_Item(i);
+                    segment.Prefix = dimSegmentMod.Prefix;
+
+                    var oldTextPosition = segment.TextPosition;
+                    segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
                 }
             }
+
+
+
+            //// Комментирование сегментов
+            //// В первый вписывать если "мод_ФОП_Доборный 1" и "мод_ФОП_Доборный 1_Количество" > 1
+            //// Во второй никогда
+            //// В третий вписывать всегда
+            //// В четвертый никогда
+            //// В пятый вписывать если "мод_ФОП_Доборный 2" и "мод_ФОП_Доборный 2_Количество" > 1
+
+            //var prefixes = new List<string>();
+            //var dimensionSegments = dimensionRebarSide.Segments;
+
+            //if(test1 == 1) {
+            //    if(test1_count > 1) {
+            //        prefixes.Add($"{test1_count - 1}х{test1_step}=");
+
+            //        var oldTextPosition = dimensionSegments.get_Item(0).TextPosition;
+            //        dimensionSegments.get_Item(0).TextPosition = oldTextPosition + new XYZ(0, 0.3, 0.6);
+            //    }
+            //    prefixes.Add("");
+            //}
+            //prefixes.Add($"{test3_step}х{Math.Round(test3_len / test3_step)}=");
+            //if(test2 == 1) {
+            //    prefixes.Add("");
+            //    if(test2_count > 1) {
+            //        prefixes.Add($"{test2_count - 1}х{test2_step}=");
+
+            //        var dimensionSegmentsLen = dimensionSegments.Size;
+            //        var oldTextPosition = dimensionSegments.get_Item(dimensionSegmentsLen - 1).TextPosition;
+            //        dimensionSegments.get_Item(dimensionSegmentsLen - 1).TextPosition = oldTextPosition + new XYZ(0, 0.3, 0.6);
+            //    }
+            //}
 
         } catch(Exception) { }
     }
