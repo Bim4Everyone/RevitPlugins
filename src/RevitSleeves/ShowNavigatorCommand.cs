@@ -15,6 +15,7 @@ using Ninject;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
+using RevitSleeves.Services.Core;
 using RevitSleeves.Services.Navigator;
 using RevitSleeves.ViewModels.Navigator;
 using RevitSleeves.Views.Navigator;
@@ -41,6 +42,12 @@ internal class ShowNavigatorCommand : BasePluginCommand {
 
         kernel.Bind<ISleeveStatusFinder>()
             .To<SleeveStatusFinder>()
+            .InSingletonScope();
+        kernel.Bind<IOpeningGeometryProvider>()
+            .To<OpeningGeometryProvider>()
+            .InSingletonScope();
+        kernel.Bind<IStructureLinksProvider>()
+            .To<AllLoadedStructureLinksProvider>()
             .InSingletonScope();
 
         kernel.BindMainWindow<NavigatorViewModel, NavigatorWindow>();

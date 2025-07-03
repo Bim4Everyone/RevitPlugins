@@ -1,21 +1,193 @@
 using System;
+using System.Linq;
+
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Plumbing;
+
+using dosymep.Revit;
+
+using RevitClashDetective.Models.Extensions;
 
 using RevitSleeves.Models;
+using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Navigator;
 using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Navigator;
 internal class SleeveStatusFinder : ISleeveStatusFinder {
     private readonly RevitRepository _revitRepository;
+    private readonly SleevePlacementSettingsConfig _config;
+    private readonly IStructureLinksProvider _structureLinksProvider;
+    private readonly IOpeningGeometryProvider _openingGeometryProvider;
+    private readonly BuiltInCategory[] _unacceptableConstructions
+        = [BuiltInCategory.OST_StructuralColumns, BuiltInCategory.OST_StructuralFraming];
+    private Transform _structureDocumentTransformCashe;
+    private Pipe[] _intersectingPipesCache;
+    private FamilyInstance[] _intersectingOpeningsCache;
+    private Wall[] _intersectingWallsCache;
+    private Floor[] _intersectingFloorsCache;
+    private Element[] _intersectingUnacceptableStructuresCache;
 
-    public SleeveStatusFinder(RevitRepository revitRepository) {
-        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+    public SleeveStatusFinder(
+        RevitRepository revitRepository,
+        SleevePlacementSettingsConfig config,
+        IStructureLinksProvider structureLinksProvider,
+        IOpeningGeometryProvider openingGeometryProvider) {
+
+        _revitRepository = revitRepository
+            ?? throw new ArgumentNullException(nameof(revitRepository));
+        _config = config
+            ?? throw new ArgumentNullException(nameof(config));
+        _structureLinksProvider = structureLinksProvider
+            ?? throw new ArgumentNullException(nameof(structureLinksProvider));
+        _openingGeometryProvider = openingGeometryProvider
+            ?? throw new ArgumentNullException(nameof(openingGeometryProvider));
     }
 
 
     public SleeveStatus GetStatus(SleeveModel sleeve) {
-        // TODO
-        var rnd = new Random();
-        return (SleeveStatus) rnd.Next(0, 3);
+        ClearCache();
+        try {
+            if(SleeveIsEmpty(sleeve)) {
+                return SleeveStatus.Empty;
+            }
+            if(SleeveIsOutsideOfStructure(sleeve)) {
+                return SleeveStatus.OutsideOfStructure;
+            }
+            if(SleeveIsInUnacceptableStructures(sleeve)) {
+                return SleeveStatus.UnacceptableConstructions;
+            }
+            if(SleeveIsInDifferentStructures(sleeve)) {
+                return SleeveStatus.DifferentConstructions;
+            }
+            if(SleeveBeyondOpening(sleeve)) {
+                return SleeveStatus.BeyondOpening;
+            }
+
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+            return SleeveStatus.Invalid;
+        }
+    }
+
+    private void ClearCache() {
+        _intersectingPipesCache = null;
+        _intersectingOpeningsCache = null;
+        _intersectingWallsCache = null;
+        _intersectingFloorsCache = null;
+        _intersectingUnacceptableStructuresCache = null;
+        _structureDocumentTransformCashe = null;
+    }
+
+    private bool SleeveIsEmpty(SleeveModel sleeve) {
+        if(_intersectingPipesCache is null) {
+            FindMepElementsIntersections(sleeve);
+        }
+        return _intersectingPipesCache.Length == 0;
+    }
+
+    private bool SleeveIsOutsideOfStructure(SleeveModel sleeve) {
+        if(_intersectingFloorsCache is null || _intersectingWallsCache is null || _intersectingOpeningsCache is null) {
+            FindIntersectionsWithStructures(sleeve);
+        }
+        return _intersectingFloorsCache.Length == 0
+            && _intersectingWallsCache.Length == 0
+            && _intersectingOpeningsCache.Length == 0;
+    }
+
+    private bool SleeveIsInUnacceptableStructures(SleeveModel sleeve) {
+        if(_intersectingUnacceptableStructuresCache is null) {
+            FindIntersectionsWithStructures(sleeve);
+        }
+        return _intersectingUnacceptableStructuresCache.Length > 0;
+    }
+
+    private bool SleeveIsInDifferentStructures(SleeveModel sleeve) {
+        if(_intersectingFloorsCache is null || _intersectingWallsCache is null || _intersectingOpeningsCache is null) {
+            FindIntersectionsWithStructures(sleeve);
+        }
+        int walls = _intersectingWallsCache.Length + _intersectingOpeningsCache.Count(o => o.Host is Wall);
+        int floors = _intersectingFloorsCache.Length + _intersectingOpeningsCache.Count(o => o.Host is Floor);
+        return (walls > 0) && (floors > 0);
+    }
+
+    private bool SleeveBeyondOpening(SleeveModel sleeve) {
+        if(_intersectingFloorsCache is null || _intersectingWallsCache is null || _intersectingOpeningsCache is null) {
+            FindIntersectionsWithStructures(sleeve);
+        }
+        if(_intersectingOpeningsCache.Length == 0) {
+            return false;
+        }
+        return _intersectingFloorsCache.Length > 0 || _intersectingWallsCache.Length > 0;
+    }
+
+    private void FindMepElementsIntersections(SleeveModel sleeve) {
+        var famInst = sleeve.GetFamilyInstance();
+        var bbox = famInst.GetBoundingBox();
+        _intersectingPipesCache = [.. new FilteredElementCollector(_revitRepository.Document)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(Pipe))
+            .WherePasses(new BoundingBoxIntersectsFilter(new Outline(bbox.Min, bbox.Max)))
+            .WherePasses(new ElementIntersectsElementFilter(famInst))
+            .ToElements()
+            .OfType<Pipe>()];
+    }
+
+    private void FindIntersectionsWithStructures(SleeveModel sleeve) {
+        var links = _structureLinksProvider.GetLinks();
+        string[] openingFamNames = _structureLinksProvider.GetOpeningFamilyNames();
+        foreach(var link in links) {
+            _structureDocumentTransformCashe = link.GetTransform();
+            var sleeveBBox = sleeve.GetFamilyInstance()
+                .GetBoundingBox()
+                .GetTransformedBoundingBox(_structureDocumentTransformCashe.Inverse);
+            var sleeveOutline = new Outline(sleeveBBox.Min, sleeveBBox.Max);
+            var sleeveSolid = SolidUtils.CreateTransformed(
+                sleeve.GetFamilyInstance().GetSolid(), _structureDocumentTransformCashe.Inverse);
+            var bboxFilter = new BoundingBoxIntersectsFilter(sleeveOutline);
+            var solidFilter = new ElementIntersectsSolidFilter(sleeveSolid);
+
+            _intersectingWallsCache = [.. new FilteredElementCollector(link.Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(Wall))
+                .WherePasses(bboxFilter)
+                .WherePasses(solidFilter)
+                .ToElements()
+                .OfType<Wall>()];
+            _intersectingFloorsCache = [.. new FilteredElementCollector(link.Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(Floor))
+                .WherePasses(bboxFilter)
+                .WherePasses(solidFilter)
+                .ToElements()
+                .OfType<Floor>()];
+            _intersectingOpeningsCache = [.. new FilteredElementCollector(link.Document)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(FamilyInstance))
+                .WherePasses(bboxFilter)
+                .ToElements()
+                .OfType<FamilyInstance>()
+                .Where(f => openingFamNames.Contains(f?.Symbol?.FamilyName))
+                .Where(f => SolidIntersects(_openingGeometryProvider.GetSolid(f), sleeveSolid))];
+            _intersectingUnacceptableStructuresCache = [.. new FilteredElementCollector(link.Document)
+                .WhereElementIsNotElementType()
+                .WherePasses(new ElementMulticategoryFilter(_unacceptableConstructions))
+                .WherePasses(bboxFilter)
+                .WherePasses(solidFilter)
+                .ToElements()];
+
+            if(_intersectingWallsCache.Any() || _intersectingFloorsCache.Any() || _intersectingOpeningsCache.Any()) {
+                return;
+            }
+        }
+    }
+
+    private bool SolidIntersects(Solid solid1, Solid solid2) {
+        try {
+            return BooleanOperationsUtils.ExecuteBooleanOperation(
+                solid1, solid2, BooleanOperationsType.Intersect)?.Volume > 0;
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+            return false;
+        }
     }
 }
