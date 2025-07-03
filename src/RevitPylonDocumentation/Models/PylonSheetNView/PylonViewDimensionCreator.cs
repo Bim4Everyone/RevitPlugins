@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -80,47 +81,86 @@ public class PylonViewDimensionCreator {
             //}
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems[0] as FamilyInstance,
-                                                                               DimensionOffsetType.Right, -1);
+            CreateGeneralViewClampsDimensions(view, clampsParentRebars, dimensionBaseService);
 
-            ReferenceArray refArraySide = new ReferenceArray();
-            
+            CreateGeneralViewPylonDimensions(view, SheetInfo.HostElems, dimensionBaseService);
+
+        } catch(Exception) { }
+    }
+
+    /// <summary>
+    /// Метод по созданию размеров по опалубке пилонов
+    /// </summary>
+    /// <param name="view">Вид, на котором нужно создать размеры</param>
+    /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
+    /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
+    private void CreateGeneralViewPylonDimensions(View view, 
+                                                   List<Element> hostElems,
+                                                   DimensionBaseService dimensionBaseService) {
+        Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance,
+                                                                   DimensionOffsetType.Right, -1.7);
+        foreach(var item in hostElems) {
+            if(item is not FamilyInstance hostElem) { return; }
+
             // Собираем опорные плоскости по опалубке, например:
             // #_1_горизонт_край_низ
             // #_1_горизонт_край_верх
-            foreach(var item in SheetInfo.HostElems) {
-                if(item is FamilyInstance hostElem) {
-                    refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"], 
-                                                                         refArraySide);
-                }
-            }
-
-            // Собираем опорные плоскости по арматуре и заполняем список опций изменений сегментов размера
-            var dimSegmentOpts = new List<DimensionSegmentOption>();
-            foreach(FamilyInstance clampsParentRebar in clampsParentRebars) {
-                refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт"], refArraySide);
-
-                // Получаем настройки для изменения сегментов размеров
-                dimSegmentOpts = GetDimensionSegmentOptions(clampsParentRebar, dimSegmentOpts);
-            }
-
-            Dimension dimensionRebarSide = doc.Create.NewDimension(view, dimensionLineLeft, refArraySide);
-
-            // Применяем опции изменений сегментов размера
-            var dimensionSegments = dimensionRebarSide.Segments;
-            for(int i = 0; i < dimensionSegments.Size; i++) {
-                var dimSegmentMod = dimSegmentOpts[i];
-
-                if(dimSegmentMod.ModificationNeeded) {
-                    var segment = dimensionSegments.get_Item(i);
-                    segment.Prefix = dimSegmentMod.Prefix;
-
-                    var oldTextPosition = segment.TextPosition;
-                    segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
-                }
-            }
-        } catch(Exception) { }
+            ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
+            Dimension dimensionRebarSide = Repository.Document.Create.NewDimension(view, dimensionLineLeft, refArraySide);
+        }
     }
+
+
+    /// <summary>
+    /// Метод по созданию размера по хомутам на основном виде опалубки
+    /// </summary>
+    /// <param name="view">Вид, на котором нужно создать размер</param>
+    /// <param name="clampsParentRebars">Список экземпляров семейств хомутов</param>
+    /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
+    private void CreateGeneralViewClampsDimensions(View view,
+                                                   List<FamilyInstance> clampsParentRebars,
+                                                   DimensionBaseService dimensionBaseService) {
+        Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems[0] as FamilyInstance,
+                                                                   DimensionOffsetType.Right, -1);
+
+        ReferenceArray refArraySide = new ReferenceArray();
+
+        // Собираем опорные плоскости по опалубке, например:
+        // #_1_горизонт_край_низ
+        // #_1_горизонт_край_верх
+        foreach(var item in SheetInfo.HostElems) {
+            if(item is FamilyInstance hostElem) {
+                refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"],
+                                                                     refArraySide);
+            }
+        }
+
+        // Собираем опорные плоскости по арматуре и заполняем список опций изменений сегментов размера
+        var dimSegmentOpts = new List<DimensionSegmentOption>();
+        foreach(FamilyInstance clampsParentRebar in clampsParentRebars) {
+            refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт"], refArraySide);
+
+            // Получаем настройки для изменения сегментов размеров
+            dimSegmentOpts = GetDimensionSegmentOptions(clampsParentRebar, dimSegmentOpts);
+        }
+
+        Dimension dimensionRebarSide = Repository.Document.Create.NewDimension(view, dimensionLineLeft, refArraySide);
+
+        // Применяем опции изменений сегментов размера
+        var dimensionSegments = dimensionRebarSide.Segments;
+        for(int i = 0; i < dimensionSegments.Size; i++) {
+            var dimSegmentMod = dimSegmentOpts[i];
+
+            if(dimSegmentMod.ModificationNeeded) {
+                var segment = dimensionSegments.get_Item(i);
+                segment.Prefix = dimSegmentMod.Prefix;
+
+                var oldTextPosition = segment.TextPosition;
+                segment.TextPosition = oldTextPosition + dimSegmentMod.TextOffset;
+            }
+        }
+    }
+
 
 
     /// <summary>
@@ -138,22 +178,22 @@ public class PylonViewDimensionCreator {
         // В этому случае нужно учесть, что данное семейство имеет основной массив хомутов, а также доборные массивы
         // хомутов с двух сторон
         // Запрос значений параметров, отвечающих за дополнительный массив хомутов, расположенный перед основным
-        int test1 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1");
-        double test1_count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1_Количество");
-        double test1_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 1_Шаг");
-        test1_step = UnitUtilsHelper.ConvertFromInternalValue(test1_step);
+        int additional1 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1");
+        double additional1Count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 1_Количество");
+        double additional1Step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 1_Шаг");
+        additional1Step = UnitUtilsHelper.ConvertFromInternalValue(additional1Step);
 
         // Запрос значений параметров, отвечающих за дополнительный массив хомутов, расположенный после основного
-        int test2 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2");
-        double test2_count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2_Количество");
-        double test2_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 2_Шаг");
-        test2_step = UnitUtilsHelper.ConvertFromInternalValue(test2_step);
+        int additional2 = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2");
+        double additional2Count = clampsParentRebar.GetParamValue<int>("мод_ФОП_Доборный 2_Количество");
+        double additional2Step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Доборный 2_Шаг");
+        additional2Step = UnitUtilsHelper.ConvertFromInternalValue(additional2Step);
 
         // Запрос значений параметров, отвечающих за основной массив хомутов
-        double test3_len = clampsParentRebar.GetParamValue<double>("мод_ФОП_Массив_Длина");
-        test3_len = UnitUtilsHelper.ConvertFromInternalValue(test3_len);
-        double test3_step = clampsParentRebar.GetParamValue<double>("мод_ФОП_Массив_шаг");
-        test3_step = UnitUtilsHelper.ConvertFromInternalValue(test3_step);
+        double generalLen = clampsParentRebar.GetParamValue<double>("мод_ФОП_Массив_Длина");
+        generalLen = UnitUtilsHelper.ConvertFromInternalValue(generalLen);
+        double generalStep = clampsParentRebar.GetParamValue<double>("мод_ФОП_Массив_шаг");
+        generalStep = UnitUtilsHelper.ConvertFromInternalValue(generalStep);
 
         // Последовательность сегментов размеров имеет строгий порядок. В связи с ограничениями API нет возможности 
         // узнать к каким опорным плоскостям привязаны сегменты размеров, но можно получить порядок сегментов как 
@@ -173,22 +213,22 @@ public class PylonViewDimensionCreator {
         // - восьмой сегмент: никак не меняем
 
         dimSegmentOpts.Add(new DimensionSegmentOption(true, "", _vertDimSmallTextOffset));
-        if(test1 == 1) {
-            if(test1_count > 1) {
+        if(additional1 == 1) {
+            if(additional1Count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
-                                                              $"{test1_count - 1}х{test1_step}=",
+                                                              $"{additional1Count - 1}х{additional1Step}=",
                                                               _vertDimBigTextOffset));
             }
             dimSegmentOpts.Add(new DimensionSegmentOption(false));
         }
         dimSegmentOpts.Add(new DimensionSegmentOption(true,
-                                                      $"{test3_step}х{Math.Round(test3_len / test3_step)}=",
+                                                      $"{generalStep}х{Math.Round(generalLen / generalStep)}=",
                                                       new XYZ()));
-        if(test2 == 1) {
+        if(additional2 == 1) {
             dimSegmentOpts.Add(new DimensionSegmentOption(false));
-            if(test2_count > 1) {
+            if(additional2Count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
-                                                              $"{test2_count - 1}х{test2_step}=",
+                                                              $"{additional2Count - 1}х{additional2Step}=",
                                                               _vertDimBigTextOffsetInverted));
             }
         }
