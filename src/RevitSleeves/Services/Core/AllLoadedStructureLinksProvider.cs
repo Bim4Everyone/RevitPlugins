@@ -36,7 +36,7 @@ internal class AllLoadedStructureLinksProvider : IStructureLinksProvider {
         string duplicatedLink = links.GroupBy(l => l.Name).FirstOrDefault(g => g.Count() > 1)?.Key;
         if(!string.IsNullOrEmpty(duplicatedLink)) {
             throw new InvalidOperationException(
-                string.Format(_localizationService.GetLocalizedString("Errors.DuplicatedLinks"), duplicatedLink);
+                string.Format(_localizationService.GetLocalizedString("Errors.DuplicatedLinks"), duplicatedLink));
         }
         if(links.Length == 0) {
             throw new InvalidOperationException(

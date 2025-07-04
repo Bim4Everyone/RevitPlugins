@@ -52,4 +52,36 @@ internal class GeometryUtils : IGeometryUtils {
         return ((LocationCurve) curve.Location).Curve is Line line
             && (Math.Abs(line.Direction.Z) < _revitRepository.Application.ShortCurveTolerance);
     }
+
+    public Solid CreateWallSolid(Wall wall, Transform transform = null) {
+        if(wall is null) {
+            throw new ArgumentNullException(nameof(wall));
+        }
+        var wallBbox = wall.GetBoundingBox();
+        double wallHeight = wallBbox.Max.Z - wallBbox.Min.Z;
+        var loop = GetWallLoop(wall);
+        loop = transform is null ? loop : CurveLoop.CreateViaTransform(loop, transform);
+        return GeometryCreationUtilities.CreateExtrusionGeometry([loop], XYZ.BasisZ, wallHeight);
+    }
+
+    private CurveLoop GetWallLoop(Wall wall) {
+        var line = (Line) ((LocationCurve) wall.Location).Curve;
+        double width = wall.Width;
+        var wallNormal = wall.Orientation;
+        var lineStart = line.GetEndPoint(0);
+        var lineEnd = line.GetEndPoint(1);
+
+        var offsetVector = wallNormal * width / 2;
+        var leftTop = lineStart + offsetVector;
+        var rightTop = lineEnd + offsetVector;
+        var rightBottom = lineEnd - offsetVector;
+        var leftBottom = lineStart - offsetVector;
+
+        return CurveLoop.Create([
+            Line.CreateBound(leftTop, rightTop),
+            Line.CreateBound(rightTop, rightBottom),
+            Line.CreateBound(rightBottom, leftBottom),
+            Line.CreateBound(leftBottom, leftTop)
+        ]);
+    }
 }

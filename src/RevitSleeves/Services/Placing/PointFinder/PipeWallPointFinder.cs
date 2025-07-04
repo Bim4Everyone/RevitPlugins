@@ -4,8 +4,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 
-using dosymep.Revit;
-
 using RevitSleeves.Models;
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
@@ -60,36 +58,8 @@ internal class PipeWallPointFinder : IPointFinder<ClashModel<Pipe, Wall>> {
         }
     }
 
-    private CurveLoop GetWallLoop(Wall wall) {
-        var line = (Line) ((LocationCurve) wall.Location).Curve;
-        double width = wall.Width;
-        var wallNormal = wall.Orientation;
-        var lineStart = line.GetEndPoint(0);
-        var lineEnd = line.GetEndPoint(1);
-
-        var offsetVector = wallNormal * width / 2;
-        var leftTop = lineStart + offsetVector;
-        var rightTop = lineEnd + offsetVector;
-        var rightBottom = lineEnd - offsetVector;
-        var leftBottom = lineStart - offsetVector;
-
-        return CurveLoop.Create([
-            Line.CreateBound(leftTop, rightTop),
-            Line.CreateBound(rightTop, rightBottom),
-            Line.CreateBound(rightBottom, leftBottom),
-            Line.CreateBound(leftBottom, leftTop)
-        ]);
-    }
-
-    private Solid CreateWallSolid(Wall wall, Transform transform) {
-        var wallBbox = wall.GetBoundingBox();
-        double wallHeight = wallBbox.Max.Z - wallBbox.Min.Z;
-        var loop = CurveLoop.CreateViaTransform(GetWallLoop(wall), transform);
-        return GeometryCreationUtilities.CreateExtrusionGeometry([loop], XYZ.BasisZ, wallHeight);
-    }
-
     private (Face FrontFace, Face BackFace) GetFaces(Wall wall, Transform transform) {
-        var wallSolid = CreateWallSolid(wall, transform);
+        var wallSolid = _geometryUtils.CreateWallSolid(wall, transform);
         var faces = wallSolid.Faces.OfType<PlanarFace>().ToArray();
         var frontFace = faces.First(f => f.FaceNormal.IsAlmostEqualTo(wall.Orientation));
         var backFace = faces.First(f => f.FaceNormal.Negate().IsAlmostEqualTo(wall.Orientation));
