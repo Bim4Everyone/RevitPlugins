@@ -173,7 +173,7 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
                 pipeSolid, sleeveSolid, BooleanOperationsType.Intersect);
             var difference = BooleanOperationsUtils.ExecuteBooleanOperation(
                 pipeSolid, sleeveSolid, BooleanOperationsType.Difference);
-            return !IsCylindricPrism(intersection)
+            return !IsCylinder(intersection)
                 || SolidUtils.SplitVolumes(difference).Count != 2;
         } else {
             return true;
@@ -240,7 +240,7 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
                 intersection, wallSolid, BooleanOperationsType.Difference);
         }
         return intersection.GetVolumeOrDefault(0)
-            <= Math.Abs(Math.Tan(angle)) * Math.PI * Math.Pow(sleeve.Diameter, 3) / 4;
+            > Math.Abs(Math.Tan(angle)) * Math.PI * Math.Pow(sleeve.Diameter, 3) / 4;
     }
 
     private bool SleeveEndFaceFarAwayFromFloor(SleeveModel sleeve, Floor[] intersectingFloors) {
@@ -253,7 +253,8 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         var sleeveBbox = sleeve.GetFamilyInstance()
             .GetBoundingBox()
             .TransformBoundingBox(_structureDocumentTransformCache.Inverse);
-        var floorsBbox = intersectingFloors.Select(f => f.GetBoundingBox()).ToList().CreateCommonBoundingBox();
+        var floorBboxes = intersectingFloors.Select(f => f.GetBoundingBox()).ToList();
+        var floorsBbox = new BoundingBoxXYZ() { Max = floorBboxes.GetMaxPoint(), Min = floorBboxes.GetMinPoint() };
 
         return sleeve.Length > (sleeveRequiredLength + distanceTolerance)
             || (sleeveBbox.Max.Z - floorsBbox.Max.Z) > (sleeveEndToTopOffset + distanceTolerance)
@@ -305,7 +306,7 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         var pipeLine = (Line) ((LocationCurve) _intersectingPipesCache.First().Location).Curve;
         var sleeveLocation = sleeve.Location;
         return pipeLine.Project(sleeveLocation).Distance
-            <= _revitRepository.ConvertToInternal(_config.PipeSettings.Offsets[OffsetType.FromSleeveAxisToMepAxis]);
+            > _revitRepository.ConvertToInternal(_config.PipeSettings.Offsets[OffsetType.FromSleeveAxisToMepAxis]);
     }
 
     private bool SleeveIsIntersectsOther(SleeveModel sleeve) {
@@ -394,7 +395,7 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         return element?.GetSolids().OrderByDescending(s => s.GetVolumeOrDefault() ?? 0).FirstOrDefault();
     }
 
-    private bool IsCylindricPrism(Solid solid) {
+    private bool IsCylinder(Solid solid) {
         if(solid is null || solid.GetVolumeOrDefault(0) == 0) {
             return false;
         }
@@ -404,7 +405,8 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         var planarFaces = faces.OfType<PlanarFace>().ToArray();
         var cylindricFaces = faces.OfType<CylindricalFace>().ToArray();
         return planarFaces.Length == 2
-            && cylindricFaces.Length == 2
+            && cylindricFaces.Length >= 2
+            && cylindricFaces.Length % 2 == 0
             && Math.Abs(planarFaces[1].Area - planarFaces[0].Area) <= areaTolerance
             && Math.Abs(cylindricFaces[1].Area - cylindricFaces[0].Area) <= areaTolerance;
     }
