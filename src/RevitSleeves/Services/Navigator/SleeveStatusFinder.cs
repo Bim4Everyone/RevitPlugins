@@ -236,8 +236,14 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         var wallSolids = intersectingWalls.Select(w => _geometryUtils.CreateWallSolid(w)).ToArray();
         var intersection = sleeveSolid;
         foreach(var wallSolid in wallSolids) {
-            intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
-                intersection, wallSolid, BooleanOperationsType.Difference);
+            try {
+                intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
+                    intersection, wallSolid, BooleanOperationsType.Difference);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                // будем считать, что ошибка произошла из-за слегка смещенных граней солидов,
+                // поэтому в этом случае с большой вероятностью грани гильзы находятся близко к граням стены.
+                return false;
+            }
         }
         return intersection.GetVolumeOrDefault(0)
             > Math.Abs(Math.Tan(angle)) * Math.PI * Math.Pow(sleeve.Diameter, 3) / 4;
