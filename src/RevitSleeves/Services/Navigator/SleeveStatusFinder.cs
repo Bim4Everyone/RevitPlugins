@@ -52,6 +52,9 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
     public SleeveStatus GetStatus(SleeveModel sleeve) {
         ClearCache();
         try {
+            if(SleeveIsInvalid(sleeve)) {
+                return SleeveStatus.Invalid;
+            }
             if(SleeveIsEmpty(sleeve)) {
                 return SleeveStatus.Empty;
             }
@@ -111,6 +114,13 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         _intersectingFloorsCache = null;
         _intersectingUnacceptableStructuresCache = null;
         _structureDocumentTransformCache = null;
+    }
+
+    private bool SleeveIsInvalid(SleeveModel sleeve) {
+        return GetSolid(sleeve.GetFamilyInstance())?.GetVolumeOrDefault(0)
+            <= _revitRepository.Application.ShortCurveTolerance
+            * _revitRepository.Application.ShortCurveTolerance
+            * _revitRepository.Application.ShortCurveTolerance;
     }
 
     private bool SleeveIsEmpty(SleeveModel sleeve) {
