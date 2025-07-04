@@ -59,7 +59,7 @@
                     OnContent="{me:LocalizationSource ToggleSwitch.On}"
                     OffContent="{me:LocalizationSource ToggleSwitch.Off}"
                     IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}"
-                    Visibility="{Binding ToogleSwitchVisible, 
+                    Visibility="{Binding ToggleSwitchVisible, 
                         ElementName=_this, Converter={StaticResource ToggleSwitchVisible}}" />
             </Grid>
         </ui:CardExpander.Header>

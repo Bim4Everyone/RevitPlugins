@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitBatchPrint.Views"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:markupExtensions="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels"
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
 
@@ -43,7 +43,7 @@
                 Margin="14,8,14,8"
                 Icon="{ui:SymbolIcon TextAlignJustify24}"
                 Text="{Binding AlbumParamName}"
-                PlaceholderText="{markupExtensions:LocalizationSource MainWindow.AlbumHintText}"
+                PlaceholderText="{me:LocalizationSource MainWindow.AlbumHintText}"
                 OriginalItemsSource="{Binding AlbumParamNames}" />
         </Border>
 
@@ -86,7 +86,7 @@
                 <ui:AutoSuggestBox
                     Margin="14,8,14,8"
                     Text="{Binding SearchText, Delay=250}"
-                    PlaceholderText="{markupExtensions:LocalizationSource MainWindow.SearchHintText}" />
+                    PlaceholderText="{me:LocalizationSource MainWindow.SearchHintText}" />
 
                 <ScrollViewer
                     Margin="14,0,14,8"

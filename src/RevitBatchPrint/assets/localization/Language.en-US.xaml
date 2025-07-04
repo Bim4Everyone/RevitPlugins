@@ -3,9 +3,60 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="MainWindow.Title">Revit batch print</system:String>
-    
+
+    <system:String x:Key="MainWindow.AlbumHintText">Select the grouping parameter</system:String>
+    <system:String x:Key="MainWindow.SearchHintText">Search</system:String>
     <system:String x:Key="MainWindow.EmptyAlbumNameParam">Noname</system:String>
+
+    <system:String x:Key="MainWindow.PrintMode">Print Mode</system:String>
+    <system:String x:Key="MainWindow.ExportMode">Export Mode</system:String>
+
+    <system:String x:Key="MainWindow.PrintCommandName">Print</system:String>
+    <system:String x:Key="MainWindow.ExportCommandName">Export</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="Settings.PrintSettings">Print Settings</system:String>
+    <system:String x:Key="Settings.PrintSettingsDescription">You can select a printer and other options to prepare the document for printing</system:String>
+
+    <system:String x:Key="Settings.ColorDepth">Colors</system:String>
+    <system:String x:Key="Settings.ColorDepthDescription">Color settings</system:String>
+
+    <system:String x:Key="Settings.RasterQuality">Raster quality</system:String>
+    <system:String x:Key="Settings.RasterQualityDescription">Image detail and sharpness settings for printing</system:String>
+
+    <system:String x:Key="Settings.ViewLinksInBlue">View links in blue</system:String>
+    <system:String x:Key="Settings.ViewLinksInBlueDescription">Highlighting connections in blue when printing in color</system:String>
+
+    <system:String x:Key="Settings.HideReferencePlane">Hide ref/work planes</system:String>
+    <system:String x:Key="Settings.HideReferencePlaneDescription">Excludes datum and working planes from printing</system:String>
+
+    <system:String x:Key="Settings.HideUnreferencedViewTags">Hide unreferenced view tags</system:String>
+    <system:String x:Key="Settings.HideUnreferencedViewTagsDescription">Printing only those tags that are visible in the active view</system:String>
+
+    <system:String x:Key="Settings.MaskCoincidentLines">Region edges mask coincident lines</system:String>
+    <system:String x:Key="Settings.MaskCoincidentLinesDescription">Hides lines that coincide with the boundaries of the mask</system:String>
+
+    <system:String x:Key="Settings.HideScopeBoxes">Hide scope boxes</system:String>
+    <system:String x:Key="Settings.HideScopeBoxesDescription">Removes the frames that limit the view's visible area</system:String>
+
+    <system:String x:Key="Settings.HideCropBoundaries">Hide crop boundaries</system:String>
+    <system:String x:Key="Settings.HideCropBoundariesDescription">Hides the display of crop boundaries on the screen</system:String>
+
+    <system:String x:Key="Settings.ReplaceHalftoneWithThinLines">Replace halftone with thinLines</system:String>
+    <system:String x:Key="Settings.ReplaceHalftoneWithThinLinesDescription">Halftones are displayed as thin lines</system:String>
+    
+    <system:String x:Key="ColorDepthType.BlackLine">Black line</system:String>
+    <system:String x:Key="ColorDepthType.GrayScale">Gray scale</system:String>
+    <system:String x:Key="ColorDepthType.Color">Color</system:String>
+    
+    <system:String x:Key="RasterQualityType.Low">Low</system:String>
+    <system:String x:Key="RasterQualityType.Medium">Medium</system:String>
+    <system:String x:Key="RasterQualityType.High">High</system:String>
+    <system:String x:Key="RasterQualityType.Presentation">Presentation</system:String>
+    
+    <system:String x:Key="ToggleSwitch.On">On</system:String>
+    <system:String x:Key="ToggleSwitch.Off">Off</system:String>
+    
 </ResourceDictionary>

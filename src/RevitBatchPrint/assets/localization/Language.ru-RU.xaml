@@ -3,9 +3,59 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="MainWindow.Title">Пакетная печать</system:String>
-    
+
+    <system:String x:Key="MainWindow.AlbumHintText">Выберите параметр группировки</system:String>
+    <system:String x:Key="MainWindow.SearchHintText">Поиск</system:String>
     <system:String x:Key="MainWindow.EmptyAlbumNameParam">Без имени</system:String>
+
+    <system:String x:Key="MainWindow.PrintMode">Режим печати</system:String>
+    <system:String x:Key="MainWindow.ExportMode">Режим экспорта</system:String>
+
+    <system:String x:Key="MainWindow.PrintCommandName">Печать</system:String>
+    <system:String x:Key="MainWindow.ExportCommandName">Экспорт</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="Settings.PrintSettings">Настройки Печати</system:String>
+    <system:String x:Key="Settings.PrintSettingsDescription">Вы можете выбрать принтер, и другие опции для подготовки документа к печати</system:String>
+
+    <system:String x:Key="Settings.ColorDepth">Настройки цвета</system:String>
+    <system:String x:Key="Settings.ColorDepthDescription">Установка цветной печати</system:String>
+
+    <system:String x:Key="Settings.RasterQuality">Качество изображения</system:String>
+    <system:String x:Key="Settings.RasterQualityDescription">Настройка детализации и чёткости изображения при печати</system:String>
+
+    <system:String x:Key="Settings.ViewLinksInBlue">Выделить связи синим</system:String>
+    <system:String x:Key="Settings.ViewLinksInBlueDescription">Подсветка связей синим цветом при цветной печати</system:String>
+
+    <system:String x:Key="Settings.HideReferencePlane">Скрыть опорные/рабочие плоскости</system:String>
+    <system:String x:Key="Settings.HideReferencePlaneDescription">Исключает опорные и рабочие плоскости из печати</system:String>
+
+    <system:String x:Key="Settings.HideUnreferencedViewTags">Печатать только имеющиеся на виде марки</system:String>
+    <system:String x:Key="Settings.HideUnreferencedViewTagsDescription">Печать только тех марок, что видны на активном виде</system:String>
+
+    <system:String x:Key="Settings.MaskCoincidentLines">Кромки области маскируют совпадающие линии</system:String>
+    <system:String x:Key="Settings.MaskCoincidentLinesDescription">Скрывает линии, совпадающие с границами маски</system:String>
+
+    <system:String x:Key="Settings.HideScopeBoxes">Скрыть границы области видимости</system:String>
+    <system:String x:Key="Settings.HideScopeBoxesDescription">Убирает рамки, ограничивающие область видимости вида</system:String>
+
+    <system:String x:Key="Settings.HideCropBoundaries">Скрыть границы обрезки</system:String>
+    <system:String x:Key="Settings.HideCropBoundariesDescription">Скрывает отображение границ обрезки на экране</system:String>
+
+    <system:String x:Key="Settings.ReplaceHalftoneWithThinLines">Заменить полутона тонкими линиями</system:String>
+    <system:String x:Key="Settings.ReplaceHalftoneWithThinLinesDescription">Полутона отображаются тонкими линиями</system:String>
+    
+    <system:String x:Key="ColorDepthType.BlackLine">Черные линии</system:String>
+    <system:String x:Key="ColorDepthType.GrayScale">Оттенки серого</system:String>
+    <system:String x:Key="ColorDepthType.Color">Цветное</system:String>
+    
+    <system:String x:Key="RasterQualityType.Low">Низкое</system:String>
+    <system:String x:Key="RasterQualityType.Medium">Среднее</system:String>
+    <system:String x:Key="RasterQualityType.High">Высокое</system:String>
+    <system:String x:Key="RasterQualityType.Presentation">Презентационное</system:String>
+    
+    <system:String x:Key="ToggleSwitch.On">Включено</system:String>
+    <system:String x:Key="ToggleSwitch.Off">Выключено</system:String>
 </ResourceDictionary>

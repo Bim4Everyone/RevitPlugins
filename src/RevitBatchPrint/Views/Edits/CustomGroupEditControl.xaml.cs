@@ -25,8 +25,8 @@ public partial class CustomGroupEditControl {
     public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
         nameof(IsChecked), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(true));
 
-    public static readonly DependencyProperty ToogleSwitchVisibleProperty = DependencyProperty.Register(
-        nameof(ToogleSwitchVisible), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(false));
+    public static readonly DependencyProperty ToggleSwitchVisibleProperty = DependencyProperty.Register(
+        nameof(ToggleSwitchVisible), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(false));
 
     public CustomGroupEditControl() {
         InitializeComponent();
@@ -57,8 +57,8 @@ public partial class CustomGroupEditControl {
         set => SetValue(IsCheckedProperty, value);
     }
 
-    public bool ToogleSwitchVisible {
-        get => (bool) GetValue(ToogleSwitchVisibleProperty);
-        set => SetValue(ToogleSwitchVisibleProperty, value);
+    public bool ToggleSwitchVisible {
+        get => (bool) GetValue(ToggleSwitchVisibleProperty);
+        set => SetValue(ToggleSwitchVisibleProperty, value);
     }
 }
