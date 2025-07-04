@@ -28,6 +28,7 @@ internal class SleeveCleanupService : ISleeveCleanupService {
         IProgress<int> progress,
         CancellationToken ct) {
 
+        // TODO добавить удаление гильз, которые находятся полностью внутри уже существующих
         var sleevesToDelete = newSleeves.Where(s => _duplicatedSleeves.Contains(s.GetFamilyInstance().Id)).ToArray();
         var cleanedSleeves = newSleeves.Except(sleevesToDelete).ToArray();
         int i = 0;

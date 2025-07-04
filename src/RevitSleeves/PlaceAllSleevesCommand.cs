@@ -30,7 +30,9 @@ using RevitSleeves.Services.Placing.ParamsSetterFinder;
 using RevitSleeves.Services.Placing.PlacingOptsProvider;
 using RevitSleeves.Services.Placing.PointFinder;
 using RevitSleeves.Services.Placing.RotationFinder;
+using RevitSleeves.ViewModels.Filtration;
 using RevitSleeves.ViewModels.Placing;
+using RevitSleeves.Views.Filtration;
 using RevitSleeves.Views.Placing;
 
 namespace RevitSleeves;
@@ -157,8 +159,9 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .To<AllMepElementsProvider>()
             .InSingletonScope();
         kernel.Bind<IStructureLinksProvider>()
-            .To<AllLoadedStructureLinksProvider>()
+            .To<UserSelectedStructureLinks>()
             .InSingletonScope();
+        kernel.BindOtherWindow<StructureLinksSelectorViewModel, StructureLinksSelectorWindow>();
     }
 
     private void BindFamilySymbolFinders(IKernel kernel) {

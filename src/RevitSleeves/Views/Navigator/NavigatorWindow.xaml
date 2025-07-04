@@ -9,7 +9,6 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:local="clr-namespace:RevitSleeves.Views.Navigator"
     mc:Ignorable="d"
@@ -78,12 +77,12 @@
             </Style>
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
-    <b:Interaction.Behaviors>
+    <i:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding MessageBoxService}" />
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding ProgressDialogFactory}" />
-    </b:Interaction.Behaviors>
+    </i:Interaction.Behaviors>
     <i:Interaction.Triggers>
         <i:EventTrigger
             EventName="Loaded">

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace RevitSleeves.Services.Core;
 /// <summary>
 /// Класс для хранения строковых констант
@@ -30,4 +32,13 @@ internal static class NamesProvider {
     public const string ParameterSleeveIncline = "ADSK_Размер_УголПоворота";
     public const string ParameterSleeveDiameter = "Диаметр";
     public const string ParameterSleeveLength = "Длина";
+
+    public static readonly IReadOnlyCollection<string> FamilyNamesAllOpenings = [
+        FamilyNameOpeningArRectangleInFloor,
+        FamilyNameOpeningArRectangleInWall,
+        FamilyNameOpeningArRoundInFloor,
+        FamilyNameOpeningArRoundInWall,
+        FamilyNameOpeningKrRectangleInFloor,
+        FamilyNameOpeningKrRectangleInWall,
+        FamilyNameOpeningKrRoundInWall];
 }

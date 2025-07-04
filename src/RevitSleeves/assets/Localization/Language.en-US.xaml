@@ -25,6 +25,20 @@
         x:Key="SleevePlacementSettingsWindow.SettingsName">Settings name:</system:String>
 
     <system:String
+        x:Key="LinksSelectorWindow.Title">Links selection for calculation</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkWillBeLoaded">Will be loaded</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkWillNotChange">Will not change</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkIsNotLoaded">Loaded</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkIsLoaded">Is not loaded</system:String>
+
+    <system:String
+        x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Select any link</system:String>
+
+    <system:String
         x:Key="SleevePlacementSettings.Validation.SetName">Set settings name.</system:String>
     <system:String
         x:Key="SleevePlacementSettings.Validation.NameTooLong">Settings name is too long.</system:String>

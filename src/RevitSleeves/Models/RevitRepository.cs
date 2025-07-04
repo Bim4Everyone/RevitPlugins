@@ -7,6 +7,9 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
 
@@ -16,10 +19,15 @@ namespace RevitSleeves.Models;
 
 internal class RevitRepository {
     private readonly RevitClashDetective.Models.RevitRepository _clashRepository;
+    private readonly IBimModelPartsService _modelPartsService;
 
-    public RevitRepository(UIApplication uiApplication, RevitClashDetective.Models.RevitRepository clashRepository) {
-        UIApplication = uiApplication ?? throw new System.ArgumentNullException(nameof(uiApplication));
-        _clashRepository = clashRepository ?? throw new System.ArgumentNullException(nameof(clashRepository));
+    public RevitRepository(UIApplication uiApplication,
+        RevitClashDetective.Models.RevitRepository clashRepository,
+        IBimModelPartsService modelPartsService) {
+
+        UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
+        _clashRepository = clashRepository ?? throw new ArgumentNullException(nameof(clashRepository));
+        _modelPartsService = modelPartsService ?? throw new ArgumentNullException(nameof(modelPartsService));
     }
 
     public UIApplication UIApplication { get; }
@@ -48,6 +56,23 @@ internal class RevitRepository {
             .WhereElementIsNotElementType()
             .OfClass(typeof(T))
             .ToElementIds();
+    }
+
+    public ICollection<RevitLinkType> GetStructureLinkTypes() {
+        return [.. new FilteredElementCollector(Document)
+             .WhereElementIsElementType()
+             .OfClass(typeof(RevitLinkType))
+             .ToElements()
+             .OfType<RevitLinkType>()
+             .Where(l => _modelPartsService.InAnyBimModelParts(l, [BimModelPart.ARPart, BimModelPart.KRPart]))];
+    }
+
+    public ICollection<RevitLinkInstance> GetStructureLinkInstances() {
+        return [.. new FilteredElementCollector(Document)
+            .OfClass(typeof(RevitLinkInstance))
+            .OfType<RevitLinkInstance>()
+            .Where(link => _modelPartsService.InAnyBimModelParts(link, BimModelPart.ARPart, BimModelPart.KRPart)
+                && RevitLinkType.IsLoaded(Document, link.GetTypeId()))];
     }
 
     public ICollection<SleeveModel> GetSleeves() {
