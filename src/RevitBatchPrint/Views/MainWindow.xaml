@@ -39,6 +39,11 @@
             x:Key="SettingsVisibleConverter"
             TrueValue="Visible"
             FalseValue="Collapsed" />
+
+        <converters:BoolToVisibilityConverter
+            x:Key="ExportVisibilityConverter"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
     </Window.Resources>
 
     <b:Interaction.Triggers>
@@ -70,7 +75,15 @@
                     <ui:ToggleSwitch
                         Margin="8 0"
                         OnContent="{me:LocalizationSource MainWindow.ExportMode}"
-                        OffContent="{me:LocalizationSource MainWindow.PrintMode}" />
+                        OffContent="{me:LocalizationSource MainWindow.PrintMode}">
+                        <b:Interaction.Triggers>
+                            <b:EventTrigger
+                                EventName="Click">
+                                <b:InvokeCommandAction
+                                    Command="{Binding ChangeModeCommand}" />
+                            </b:EventTrigger>
+                        </b:Interaction.Triggers>
+                    </ui:ToggleSwitch>
 
                     <ui:ToggleSwitch
                         x:Name="_settingsSwitch"
@@ -94,7 +107,7 @@
             DataContext="{Binding PrintOptions}"
             Visibility="{Binding IsChecked, 
                 ElementName=_settingsSwitch,
-                Converter={StaticResource SettingsVisibleConverter}}"/>
+                Converter={StaticResource SettingsVisibleConverter}}" />
 
         <StackPanel
             Grid.Row="2"
@@ -113,7 +126,9 @@
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.PrintCommandName}"
                 Click="ButtonOk_Click"
-                Command="{Binding PrintCommand}" />
+                Command="{Binding PrintCommand}"
+                Visibility="{Binding ShowPrint,
+                    Converter={StaticResource ExportVisibilityConverter}}" />
 
             <ui:Button
                 Margin="10"
@@ -121,7 +136,9 @@
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ExportCommandName}"
                 Click="ButtonOk_Click"
-                Command="{Binding ExportCommand}" />
+                Command="{Binding ExportCommand}"
+                Visibility="{Binding ShowExport,
+                    Converter={StaticResource ExportVisibilityConverter}}" />
 
             <ui:Button
                 Margin="10"

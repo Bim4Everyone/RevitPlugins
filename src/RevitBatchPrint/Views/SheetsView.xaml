@@ -8,6 +8,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:markupExtensions="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
 
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
@@ -18,11 +19,17 @@
                 <ResourceDictionary Source="../ViewsTemplates/TreeViewTemplate.xaml" />
                 <ResourceDictionary Source="../ViewsTemplates/TreeViewItemTemplate.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:BoolToVisibilityConverter
+                x:Key="ExportVisibilityConverter"
+                TrueValue="Visible"
+                FalseValue="Collapsed" />
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -43,6 +50,35 @@
         <Border
             Grid.Row="1"
             Margin="8 0 8 8"
+            Padding="0"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+            <ComboBox
+                Margin="14,8,14,8"
+                ItemsSource="{Binding Path=PrintOptions.PrinterNames, Mode=OneWay}"
+                SelectedValue="{Binding Path=PrintOptions.PrinterName, Mode=OneWay}"
+                Visibility="{Binding ShowPrint,
+                    Converter={StaticResource ExportVisibilityConverter}}" />
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Margin="8 0 8 8"
+            Padding="0"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+            <ui:TextBox
+                Height="36.5"
+                Margin="14,8,14,8"
+                Icon="{ui:SymbolIcon DocumentPdf24}"
+                Text="{Binding Path=PrintOptions.FilePath, Mode=OneWay}"
+                Visibility="{Binding ShowExport,
+                    Converter={StaticResource ExportVisibilityConverter}}" />
+        </Border>
+
+        <Border
+            Grid.Row="2"
+            Margin="8 0 8 8"
             Background="{DynamicResource CardBackground}"
             CornerRadius="{DynamicResource ControlCornerRadius}">
 
@@ -56,7 +92,7 @@
                     Margin="14,0,14,8"
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Disabled">
-                    
+
                     <TreeView
                         ItemTemplate="{StaticResource TreeViewTemplate}"
                         ItemsSource="{Binding FilteredAlbums}"

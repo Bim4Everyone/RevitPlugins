@@ -13,46 +13,13 @@
 
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vms:PrintOptionsViewModel, IsDesignTimeCreatable=False}">
-    
+
     <ScrollViewer
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Disabled">
 
         <StackPanel
             Margin="8 8 14 8">
-
-            <edits:CustomGroupEditControl
-                Icon="{ui:SymbolIcon TextAlignJustify24}"
-                Header="{me:LocalizationSource Settings.CommonSettings}"
-                Description="{me:LocalizationSource Settings.CommonSettingsDescription}">
-
-                <StackPanel>
-
-                    <edits:CustomEditControl
-                        Icon="{ui:SymbolIcon BuildingGovernment24}"
-                        Header="{me:LocalizationSource Settings.PrinterName}"
-                        Description="{me:LocalizationSource Settings.PrinterNameDescription}">
-
-                        <ComboBox
-                            IsReadOnly="True"
-                            IsEnabled="False"
-                            SelectedValue="{Binding Path=PrinterName, Mode=OneWay}"
-                            ItemsSource="{Binding Path=PrinterNames, Mode=OneWay}" />
-
-                    </edits:CustomEditControl>
-
-                    <edits:CustomEditControl
-                        Icon="{ui:SymbolIcon BuildingGovernment24}"
-                        Header="{me:LocalizationSource Settings.FilePath}"
-                        Description="{me:LocalizationSource Settings.FilePathDescription}">
-
-                        <ui:TextBox
-                            Icon="{ui:SymbolIcon DocumentPdf24}"
-                            Text="{Binding Path=FilePath, Mode=OneWay}" />
-
-                    </edits:CustomEditControl>
-                </StackPanel>
-            </edits:CustomGroupEditControl>
 
             <edits:CustomGroupEditControl
                 Icon="{ui:SymbolIcon Print24}"

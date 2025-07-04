@@ -31,6 +31,10 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _searchText;
+    
+    private bool _showPrint;
+    private bool _showExport;
+    
     private string _albumParamName;
     private PrintOptionsViewModel _printOptions;
 
@@ -55,15 +59,19 @@ internal class MainViewModel : BaseViewModel {
         _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
+        ChangeModeCommand = RelayCommand.Create(ChangeMode);
 
         PrintCommand = RelayCommand.Create(Print, CanPrint);
         ExportCommand = RelayCommand.Create(Export, CanExport);
 
         SearchCommand = RelayCommand.Create(ApplySearch);
+
+        ShowPrint = true;
+        ShowExport = false;
     }
 
-
     public ICommand LoadViewCommand { get; }
+    public ICommand ChangeModeCommand { get; }
 
     public ICommand PrintCommand { get; }
     public ICommand ExportCommand { get; }
@@ -81,6 +89,16 @@ internal class MainViewModel : BaseViewModel {
     public string SearchText {
         get => _searchText;
         set => this.RaiseAndSetIfChanged(ref _searchText, value);
+    }
+
+    public bool ShowPrint {
+        get => _showPrint;
+        set => this.RaiseAndSetIfChanged(ref _showPrint, value);
+    }
+
+    public bool ShowExport {
+        get => _showExport;
+        set => this.RaiseAndSetIfChanged(ref _showExport, value);
     }
 
     public string AlbumParamName {
@@ -113,6 +131,11 @@ internal class MainViewModel : BaseViewModel {
 
         LoadConfig();
         CreateAlbumCollection();
+    }
+    
+    private void ChangeMode() {
+        ShowPrint = !ShowPrint;
+        ShowExport = !ShowExport;
     }
 
     private void Print() {
