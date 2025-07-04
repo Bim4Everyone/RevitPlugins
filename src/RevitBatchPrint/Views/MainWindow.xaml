@@ -13,6 +13,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:views="clr-namespace:RevitBatchPrint.Views"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
 
     x:Name="_this"
     mc:Ignorable="d"
@@ -28,6 +29,18 @@
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="SheetVisibleConverter"
+            TrueValue="Collapsed"
+            FalseValue="Visible" />
+
+        <converters:BoolToVisibilityConverter
+            x:Key="SettingsVisibleConverter"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+    </Window.Resources>
+
     <b:Interaction.Triggers>
         <b:EventTrigger
             EventName="Loaded">
@@ -38,12 +51,6 @@
 
     <Grid>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -52,31 +59,45 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            Title="{me:LocalizationSource MainWindow.Title}">
+
+            <ui:TitleBar.TrailingContent>
+                <StackPanel
+                    Margin="0,5"
+                    VerticalAlignment="Top"
+                    Orientation="Horizontal">
+
+                    <ui:ToggleSwitch
+                        Margin="8 0"
+                        OnContent="{me:LocalizationSource MainWindow.ExportMode}"
+                        OffContent="{me:LocalizationSource MainWindow.PrintMode}" />
+
+                    <ui:ToggleSwitch
+                        x:Name="_settingsSwitch"
+                        IsChecked="False"
+                        OnContent="{ui:SymbolIcon Settings24, Filled=True}"
+                        OffContent="{ui:SymbolIcon Settings24, Filled=False}" />
+                </StackPanel>
+            </ui:TitleBar.TrailingContent>
+
+        </ui:TitleBar>
 
         <views:SheetsView
             Grid.Row="1"
-            Grid.Column="0"
-            DataContext="{Binding DataContext, ElementName=_this}" />
-
-        <GridSplitter
-            Grid.Row="1"
-            Grid.Column="1"
-            Width="3"
-            VerticalAlignment="Stretch"
-            HorizontalAlignment="Center" />
+            DataContext="{Binding DataContext, ElementName=_this}"
+            Visibility="{Binding IsChecked, 
+                ElementName=_settingsSwitch,
+                Converter={StaticResource SheetVisibleConverter}}" />
 
         <views:SettingsView
             Grid.Row="1"
-            Grid.Column="2"
-            DataContext="{Binding PrintOptions}" />
+            DataContext="{Binding PrintOptions}"
+            Visibility="{Binding IsChecked, 
+                ElementName=_settingsSwitch,
+                Converter={StaticResource SettingsVisibleConverter}}"/>
 
         <StackPanel
             Grid.Row="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
