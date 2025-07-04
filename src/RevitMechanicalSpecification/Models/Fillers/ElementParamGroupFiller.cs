@@ -110,6 +110,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// </summary>
         private string GetDetailedGroup(SpecificationElement specificationElement) {
             string name = specificationElement.ElementName;
+            string famylyTypeName = string.Empty;
+            // Имя типоразмера имеет значение только для узлов. Обычные элементы могут быть разного типа, но одинакового типоразмера. 
+            if(specificationElement.ElementType.IsExistsParam(Config.IsManiFoldParamName)
+                && specificationElement.ElementType.GetParamValue<int>(Config.IsManiFoldParamName) == 1) {
+                famylyTypeName = specificationElement.Element.GetParam(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString();
+            }
             string mark = !string.IsNullOrEmpty(specificationElement.ElementMark)
                    ? specificationElement.ElementMark
                    : specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameMark);
@@ -117,7 +123,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             string code = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameCode);
             string creator = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameCreator);
 
-            return $"{name}_{mark}_{code}_{creator}";
+            return $"{famylyTypeName}_{name}_{mark}_{code}_{creator}";
         }
     }
 }
