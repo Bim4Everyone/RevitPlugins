@@ -3,6 +3,8 @@ using System.Windows;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 using Ninject.Planning.Targets;
@@ -112,9 +114,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             string name = specificationElement.ElementName;
             string famylyTypeName = string.Empty;
             // Имя типоразмера имеет значение только для узлов. Обычные элементы могут быть разного типа, но с одинаковыми экземплярными параметрами. 
-            if(specificationElement.ElementType.IsExistsParam(Config.IsManiFoldParamName)
-                && specificationElement.ElementType.GetParamValue<int>(Config.IsManiFoldParamName) == 1) {
-                famylyTypeName = specificationElement.Element.GetParam(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString();
+            if(specificationElement.ElementType.GetParamValueOrDefault<int>(Config.IsManiFoldParamName, 0) == 1) {                
+                RevitParam familyTypeParam = SystemParamsConfig.Instance.CreateRevitParam(
+                    Document, 
+                    BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM);
+                famylyTypeName = specificationElement.Element.GetParamValueString(familyTypeParam);
             }
             string mark = !string.IsNullOrEmpty(specificationElement.ElementMark)
                    ? specificationElement.ElementMark
