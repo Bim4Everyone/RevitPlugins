@@ -18,7 +18,7 @@
     <system:String
         x:Key="SleevePlacementSettingsWindow.StructureFiltration">Фильтрация конструкций</system:String>
     <system:String
-        x:Key="SleevePlacementSettingsWindow.DiameterRanges">Диапазоны диаметров</system:String>
+        x:Key="SleevePlacementSettingsWindow.DiameterRanges">Диапазоны диаметров, мм</system:String>
     <system:String
         x:Key="SleevePlacementSettingsWindow.Offsets">Отступы</system:String>
     <system:String

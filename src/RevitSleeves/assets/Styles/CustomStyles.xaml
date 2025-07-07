@@ -269,7 +269,7 @@
     </Style>
     <Style
         TargetType="ui:DataGrid"
-        x:Key="CustomReadonlyDataGrid"
+        x:Key="CustomDataGrid"
         BasedOn="{StaticResource CustomResizableDataGridStyle}">
         <Setter
             Property="RowDetailsVisibilityMode"
@@ -278,11 +278,16 @@
             Property="GridLinesVisibility"
             Value="All" />
         <Setter
-            Property="IsReadOnly"
-            Value="True" />
-        <Setter
             Property="CanUserReorderColumns"
             Value="False" />
+    </Style>
+    <Style
+        TargetType="ui:DataGrid"
+        x:Key="CustomReadonlyDataGrid"
+        BasedOn="{StaticResource CustomDataGrid}">
+        <Setter
+            Property="IsReadOnly"
+            Value="True" />
     </Style>
     <Style
         x:Key="CustomDataGridCell"

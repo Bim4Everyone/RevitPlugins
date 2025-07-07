@@ -21,23 +21,31 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <DockPanel
+        HorizontalAlignment="Stretch"
         VerticalAlignment="Center">
         <Label
-            DockPanel.Dock="Left"
             Style="{StaticResource CustomLabel}"
-            Content="{Binding Name}" />
-        <DockPanel
-            DockPanel.Dock="Right"
-            HorizontalAlignment="Right">
-            <ui:TextBox
-                MinWidth="50"
-                MaxWidth="50"
-                Style="{StaticResource CustomSmallTextBox}"
-                Text="{Binding SleeveDiameter}" />
-            <Label
-                Margin="5 0 0 0"
-                Style="{StaticResource CustomLabel}"
-                Content="{Binding UnitName}" />
-        </DockPanel>
+            Content="{Binding From}" />
+        <ui:TextBox
+            Margin="5 0"
+            Width="50"
+            Text="{Binding StartMepSize}"
+            Style="{StaticResource CustomSmallTextBox}" />
+        <Label
+            Style="{StaticResource CustomLabel}"
+            Content="{Binding To}" />
+        <ui:TextBox
+            Margin="5 0"
+            Width="50"
+            Text="{Binding EndMepSize}"
+            Style="{StaticResource CustomSmallTextBox}" />
+        <ui:TextBox
+            Margin="30 0 5 0"
+            Width="60"
+            Text="{Binding SleeveDiameter}"
+            Style="{StaticResource CustomSmallTextBox}" />
+        <Label
+            Style="{StaticResource CustomLabel}"
+            Content="{Binding UnitName}" />
     </DockPanel>
 </UserControl>

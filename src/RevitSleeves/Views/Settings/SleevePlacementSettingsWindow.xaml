@@ -122,17 +122,34 @@
                         Style="{StaticResource CustomBorder}">
                         <DockPanel
                             LastChildFill="True">
-                            <Label
-                                DockPanel.Dock="Top"
-                                Content="{me:LocalizationSource SleevePlacementSettingsWindow.DiameterRanges}"
-                                Target="{Binding ElementName=DiameterRanges}" />
+                            <DockPanel
+                                VerticalAlignment="Center"
+                                DockPanel.Dock="Top">
+                                <Label
+                                    VerticalContentAlignment="Center"
+                                    Content="{me:LocalizationSource SleevePlacementSettingsWindow.DiameterRanges}"
+                                    Target="{Binding ElementName=DiameterRanges}" />
+                                <ui:Button
+                                    Margin="10 0"
+                                    Appearance="Info"
+                                    Content="{ui:SymbolIcon Symbol=Add24}"
+                                    Command="{Binding PipeSettings.AddDiameterRangeCommand}" />
+                                <ui:Button
+                                    Appearance="Danger"
+                                    Content="{ui:SymbolIcon Symbol=Delete24}"
+                                    Command="{Binding PipeSettings.RemoveDiameterRangeCommand}"
+                                    CommandParameter="{Binding PipeSettings.SelectedDiameterRange}" />
+                            </DockPanel>
                             <ui:ListView
                                 DockPanel.Dock="Bottom"
                                 x:Name="DiameterRanges"
-                                ItemsSource="{Binding PipeSettings.DiameterRanges}">
+                                SelectionMode="Single"
+                                ItemsSource="{Binding PipeSettings.DiameterRanges}"
+                                SelectedItem="{Binding PipeSettings.SelectedDiameterRange}">
                                 <ui:ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Border
+                                            Padding="5"
                                             Style="{StaticResource CustomBorder}">
                                             <ContentControl
                                                 Content="{Binding}">

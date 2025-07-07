@@ -62,7 +62,7 @@
             GridLinesVisibility="All"
             CanUserReorderColumns="False"
             CanUserResizeRows="False"
-            Style="{StaticResource CustomResizableDataGridStyle}"
+            Style="{StaticResource CustomDataGrid}"
             ItemsSource="{Binding Links}">
             <ui:DataGrid.Columns>
                 <DataGridCheckBoxColumn

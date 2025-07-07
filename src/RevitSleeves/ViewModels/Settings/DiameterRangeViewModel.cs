@@ -10,6 +10,8 @@ internal class DiameterRangeViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly DiameterRange _diameterRange;
     private double _sleeveDiameter;
+    private double _startMepSize;
+    private double _endMepSize;
 
     public DiameterRangeViewModel(ILocalizationService localizationService, DiameterRange diameterRange) {
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
@@ -18,20 +20,27 @@ internal class DiameterRangeViewModel : BaseViewModel {
         StartMepSize = _diameterRange.StartMepSize;
         EndMepSize = _diameterRange.EndMepSize;
         SleeveDiameter = _diameterRange.SleeveDiameter;
-        Name = $"{_localizationService.GetLocalizedString("From")} " +
-            $"{StartMepSize} " +
-            $"{_localizationService.GetLocalizedString("To")} " +
-            $"{EndMepSize} {_localizationService.GetLocalizedString("Mm")}:";
+        From = _localizationService.GetLocalizedString("From");
+        To = _localizationService.GetLocalizedString("To");
         UnitName = _localizationService.GetLocalizedString("Mm");
     }
 
-    public double StartMepSize { get; }
 
-    public double EndMepSize { get; }
+    public string From { get; }
 
-    public string Name { get; }
+    public string To { get; }
 
     public string UnitName { get; }
+
+    public double StartMepSize {
+        get => _startMepSize;
+        set => RaiseAndSetIfChanged(ref _startMepSize, value);
+    }
+
+    public double EndMepSize {
+        get => _endMepSize;
+        set => RaiseAndSetIfChanged(ref _endMepSize, value);
+    }
 
     public double SleeveDiameter {
         get => _sleeveDiameter;

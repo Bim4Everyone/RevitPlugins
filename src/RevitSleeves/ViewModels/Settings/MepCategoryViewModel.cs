@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitSleeves.Models;
@@ -13,6 +15,7 @@ internal class MepCategoryViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly MepCategorySettings _mepCategorySettings;
+    private DiameterRangeViewModel _selectedDiameterRange;
 
     public MepCategoryViewModel(RevitRepository revitRepository,
         ILocalizationService localizationService,
@@ -26,8 +29,20 @@ internal class MepCategoryViewModel : BaseViewModel {
             ?? throw new System.ArgumentNullException(nameof(mepCategorySettings));
 
         InitializeCategory(_revitRepository, _localizationService, _mepCategorySettings);
+        AddDiameterRangeCommand = RelayCommand.Create(AddDiameterRange);
+        RemoveDiameterRangeCommand = RelayCommand.Create<DiameterRangeViewModel>(
+            RemoveDiameterRange, CanRemoveDiameterRange);
     }
 
+
+    public ICommand AddDiameterRangeCommand { get; }
+
+    public ICommand RemoveDiameterRangeCommand { get; }
+
+    public DiameterRangeViewModel SelectedDiameterRange {
+        get => _selectedDiameterRange;
+        set => RaiseAndSetIfChanged(ref _selectedDiameterRange, value);
+    }
 
     public string Name { get; private set; }
 
@@ -56,7 +71,7 @@ internal class MepCategoryViewModel : BaseViewModel {
                 category));
         Name = category.Name;
         foreach(var diamRange in mepCategorySettings.DiameterRanges) {
-            DiameterRanges.Add(new DiameterRangeViewModel(localizationService, diamRange));
+            DiameterRanges.Add(new DiameterRangeViewModel(_localizationService, diamRange));
         }
         foreach(var pair in mepCategorySettings.Offsets) {
             Offsets.Add(new OffsetViewModel(localizationService,
@@ -109,5 +124,18 @@ internal class MepCategoryViewModel : BaseViewModel {
             WallSettings = WallSettings.GetStructureSettings<WallSettings>(),
             MepFilterSet = MepFilterViewModel.GetSet(),
         };
+    }
+
+    private void AddDiameterRange() {
+        DiameterRanges.Add(new DiameterRangeViewModel(_localizationService, new DiameterRange()));
+    }
+
+    private void RemoveDiameterRange(DiameterRangeViewModel diameterRange) {
+        DiameterRanges.Remove(diameterRange);
+        SelectedDiameterRange = DiameterRanges.FirstOrDefault();
+    }
+
+    private bool CanRemoveDiameterRange(DiameterRangeViewModel diameterRange) {
+        return diameterRange is not null;
     }
 }
