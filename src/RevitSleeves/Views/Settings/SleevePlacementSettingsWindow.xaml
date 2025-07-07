@@ -98,7 +98,7 @@
                         Style="{StaticResource CustomLabel}"
                         Content="{me:LocalizationSource SleevePlacementSettingsWindow.SettingsName}" />
                     <TextBox
-                        Text="{Binding Name}" />
+                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
             </Border>
 

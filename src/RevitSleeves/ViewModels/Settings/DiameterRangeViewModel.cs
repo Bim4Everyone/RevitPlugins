@@ -55,4 +55,29 @@ internal class DiameterRangeViewModel : BaseViewModel {
             SleeveDiameter = SleeveDiameter
         };
     }
+
+    public string GetErrorText() {
+        if(StartMepSize < 0 || EndMepSize < 0 || SleeveDiameter < 0) {
+            return _localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.DiameterRangesLessThanZero");
+        }
+        if(EndMepSize == 0) {
+            return _localizationService.GetLocalizedString(
+               "SleevePlacementSettings.Validation.EndMepSizeMustBeGreaterThanZero");
+        }
+        if(SleeveDiameter == 0) {
+            return _localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.SleeveDiameterMustBeGreaterThanZero");
+        }
+        if(StartMepSize >= EndMepSize) {
+            return _localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.StartMepSizeGreaterThanEnd");
+        }
+        return string.Empty;
+    }
+
+    public bool Overlap(DiameterRangeViewModel diameterRange) {
+        return (StartMepSize < diameterRange.StartMepSize || StartMepSize < diameterRange.EndMepSize)
+            && (diameterRange.EndMepSize < EndMepSize || diameterRange.StartMepSize < EndMepSize);
+    }
 }

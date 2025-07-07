@@ -29,7 +29,7 @@
         <ui:TextBox
             Margin="5 0"
             Width="50"
-            Text="{Binding StartMepSize}"
+            Text="{Binding StartMepSize, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource CustomSmallTextBox}" />
         <Label
             Style="{StaticResource CustomLabel}"
@@ -37,12 +37,12 @@
         <ui:TextBox
             Margin="5 0"
             Width="50"
-            Text="{Binding EndMepSize}"
+            Text="{Binding EndMepSize, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource CustomSmallTextBox}" />
         <ui:TextBox
             Margin="30 0 5 0"
             Width="60"
-            Text="{Binding SleeveDiameter}"
+            Text="{Binding SleeveDiameter, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource CustomSmallTextBox}" />
         <Label
             Style="{StaticResource CustomLabel}"

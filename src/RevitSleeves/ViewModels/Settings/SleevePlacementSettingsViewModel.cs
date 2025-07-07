@@ -131,8 +131,13 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("SleevePlacementSettings.Validation.NameTooLong");
             return false;
         }
-        ErrorText = PipeSettings.GetErrorText();
-        return string.IsNullOrEmpty(ErrorText);
+        string pipeError = PipeSettings.GetErrorText();
+        if(!string.IsNullOrWhiteSpace(pipeError)) {
+            ErrorText = pipeError;
+            return false;
+        }
+        ErrorText = null;
+        return true;
     }
 
     private void MapConfigToViewModel(SleevePlacementSettingsConfig config) {

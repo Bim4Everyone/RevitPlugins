@@ -31,7 +31,7 @@
             <ui:TextBox
                 MinWidth="50"
                 MaxWidth="50"
-                Text="{Binding Value}"
+                Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
                 Style="{StaticResource CustomSmallTextBox}" />
             <Label
                 Margin="5 0 0 0"

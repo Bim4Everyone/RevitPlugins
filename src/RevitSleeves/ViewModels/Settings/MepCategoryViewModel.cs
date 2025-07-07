@@ -86,33 +86,53 @@ internal class MepCategoryViewModel : BaseViewModel {
     }
 
     public string GetErrorText() {
-        // TODO
-        //var sizeError = MinSizes.Select(item => item.GetErrorText()).FirstOrDefault(item => !string.IsNullOrEmpty(item));
-        //if(!string.IsNullOrEmpty(sizeError)) {
-        //    return $"У категории \"{Name}\" {sizeError}";
-        //}
-        //var offsetError = Offsets.Select(item => item.GetErrorText()).FirstOrDefault(item => !string.IsNullOrEmpty(item));
-        //if(!string.IsNullOrEmpty(offsetError)) {
-        //    return $"У категории \"{Name}\" {offsetError}";
-        //}
-        //var intersectionOffsetError = GetIntersectionOffsetError();
-        //if(!string.IsNullOrEmpty(intersectionOffsetError)) {
-        //    return $"У категории \"{Name}\" {intersectionOffsetError}";
-        //}
-        //if(IsSelected && StructureCategories.All(item => !item.IsSelected)) {
-        //    return $"Для категории \"{Name}\" выберите категории для пересечения";
-        //}
-        //if(SetViewModel.IsEmpty()) {
-        //    return $"Поля фильтра для ВИС категории \'{Name}\' должны быть заполнены.";
-        //}
-        //var structureEmptyFilter = StructureCategories.FirstOrDefault(item => item.SetViewModel.IsEmpty());
-        //if(structureEmptyFilter != null) {
-        //    return $"Поля фильтра категории \'{structureEmptyFilter.Name}\' для ВИС категории \'{Name}\' должны быть заполнены.";
-        //}
-        //if(!string.IsNullOrEmpty(SetViewModel.GetErrorText())) {
-        //    return SetViewModel.GetErrorText();
-        //}
-        return null;
+        if(DiameterRanges.Count == 0) {
+            return _localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.DiameterRangesIsEmpty");
+        }
+        string diameterRangeError = DiameterRanges
+            .Select(r => r.GetErrorText())
+            .FirstOrDefault(s => !string.IsNullOrWhiteSpace(s));
+        if(!string.IsNullOrWhiteSpace(diameterRangeError)) {
+            return diameterRangeError;
+        }
+        if(DiameterRangesOverlap()) {
+            return _localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.DiameterRangesOverlap");
+        }
+        if(Offsets.Any(o => o.Value < 0)) {
+            return _localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.OffsetsLessThanZero");
+        }
+        if(!WallSettings.IsEnabled && !FloorSettings.IsEnabled) {
+            return _localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.StructureCategoriesNotEnabled");
+        }
+        if(MepFilterViewModel.IsEmpty()) {
+            return string.Format(_localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.FilterIsEmpty"), Name);
+        }
+        if(WallSettings.StructureFilterViewModel.IsEmpty()) {
+            return string.Format(_localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.FilterIsEmpty"), WallSettings.Name);
+        }
+        if(FloorSettings.StructureFilterViewModel.IsEmpty()) {
+            return string.Format(_localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.FilterIsEmpty"), FloorSettings.Name);
+        }
+        string mepFilterError = MepFilterViewModel.GetErrorText();
+        if(!string.IsNullOrWhiteSpace(mepFilterError)) {
+            return mepFilterError;
+        }
+        string wallFilterError = WallSettings.StructureFilterViewModel.GetErrorText();
+        if(!string.IsNullOrWhiteSpace(wallFilterError)) {
+            return wallFilterError;
+        }
+        string floorFilterError = FloorSettings.StructureFilterViewModel.GetErrorText();
+        if(!string.IsNullOrWhiteSpace(floorFilterError)) {
+            return floorFilterError;
+        }
+        return string.Empty;
     }
 
     public T GetSettings<T>() where T : MepCategorySettings, new() {
@@ -137,5 +157,16 @@ internal class MepCategoryViewModel : BaseViewModel {
 
     private bool CanRemoveDiameterRange(DiameterRangeViewModel diameterRange) {
         return diameterRange is not null;
+    }
+
+    private bool DiameterRangesOverlap() {
+        for(int i = 0; i < DiameterRanges.Count; i++) {
+            for(int j = i + 1; j < DiameterRanges.Count; j++) {
+                if(DiameterRanges[i].Overlap(DiameterRanges[j])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -48,6 +48,24 @@
         x:Key="SleevePlacementSettings.Validation.SetName">Укажите название настроек.</system:String>
     <system:String
         x:Key="SleevePlacementSettings.Validation.NameTooLong">Слишком длинное название настроек.</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesLessThanZero">Значения диапазонов диаметров должны быть неотрицательными</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.EndMepSizeMustBeGreaterThanZero">Значение размера 'до' должно быть больше 0</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.SleeveDiameterMustBeGreaterThanZero">Значение диаметра должно быть больше 0</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.StartMepSizeGreaterThanEnd">Значение размера 'от' должно быть меньше значения 'до'</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesIsEmpty">Должен быть задан хотя бы 1 диапазон диаметров</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesOverlap">Диапазоны диаметров пересекаются</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.OffsetsLessThanZero">Значения всех отступов должны быть неотрицательными</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.StructureCategoriesNotEnabled">Выберите хотя бы 1 категорию конструкций</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.FilterIsEmpty">Поля фильтрации для категории '{0}' должны быть заполнены</system:String>
 
     <system:String
         x:Key="SleevePlacementSettings.DefaultFileName">Настройки расстановки гильз</system:String>
