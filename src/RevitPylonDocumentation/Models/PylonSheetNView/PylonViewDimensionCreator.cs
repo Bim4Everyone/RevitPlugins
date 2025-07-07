@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
@@ -46,15 +47,15 @@ public class PylonViewDimensionCreator {
 
         try {
             var rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
-            //var skeletonParentRebar = rebarFinder.GetSkeletonParentRebar(view);
-            //if(skeletonParentRebar is null) {
-            //    return;
-            //}
+            var skeletonParentRebar = rebarFinder.GetSkeletonParentRebar(view);
+            if(skeletonParentRebar is null) {
+                return;
+            }
 
             var clampsParentRebars = rebarFinder.GetClampsParentRebars(view);
-            //if(clampsParentRebars is null) { 
-            //    return; 
-            //}
+            if(clampsParentRebars is null) { 
+                return; 
+            }
 
 
             //var grids = new FilteredElementCollector(doc, view.Id)
@@ -83,10 +84,119 @@ public class PylonViewDimensionCreator {
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
             CreateGeneralViewClampsDimensions(view, clampsParentRebars, dimensionBaseService);
 
+
+            CreateGeneralViewTopAdditionalDimensions(view, skeletonParentRebar, dimensionBaseService);
+
+
+
             CreateGeneralViewPylonDimensions(view, SheetInfo.HostElems, dimensionBaseService);
+
+            CreateGeneralViewPylonElevMark(view, SheetInfo.HostElems, dimensionBaseService);
+
 
         } catch(Exception) { }
     }
+
+
+
+
+    private void CreateGeneralViewTopAdditionalDimensions(View view,
+                                               FamilyInstance rebar,
+                                               DimensionBaseService dimensionBaseService) {
+
+        // Определяем наличие в каркасе Г-образных стержней
+        bool firstLRebarParamValue = _paramValueService.GetParamValueAnywhere(rebar, _hasFirstLRebarParamName) == 1;
+        bool secondLRebarParamValue = _paramValueService.GetParamValueAnywhere(rebar, _hasSecondLRebarParamName) == 1;
+
+        bool hasLRebar = firstLRebarParamValue || secondLRebarParamValue;
+        if(hasLRebar) {
+            return;
+        }
+
+        var lastFloor = GetLastFloor();
+        if(lastFloor is null) {
+            return;
+        }
+
+        var viewOptions = new Options {
+            View = view,
+            ComputeReferences = true,
+            IncludeNonVisibleObjects = false
+        };
+        var lastFloorTopFace = GetTopFloorFace(lastFloor, viewOptions);
+
+        Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
+                                                           DimensionOffsetType.Right, -1);
+        // #1_горизонт_выпуск
+        ReferenceArray refArray = dimensionBaseService.GetDimensionRefs(rebar, '#', '/', ["горизонт", "выпуск"]);
+        refArray.Append(lastFloorTopFace.Reference);
+        Dimension dimensionRebarSide = Repository.Document.Create.NewDimension(view, dimensionLineLeft, refArray);
+    }
+
+
+
+    private PlanarFace GetTopFloorFace(Element floor, Options options) => floor.get_Geometry(options)?
+        .OfType<Solid>()
+        .Where(solid => solid?.Volume > 0)
+        .SelectMany(solid => solid.Faces.OfType<PlanarFace>())
+        .FirstOrDefault(face => Math.Abs(face.FaceNormal.Z - 1) < 0.001);
+
+
+
+
+    private Element GetLastFloor() {
+        var lastPylon = SheetInfo.HostElems.Last();
+        var bbox = lastPylon.get_BoundingBox(null);
+
+        // Готовим фильтр для сбор плит в области вокруг верхней точки пилона
+        var outline = new Outline(
+            bbox.Max - new XYZ(10, 10, 5),
+            bbox.Max + new XYZ(10, 10, 5)
+        );
+        var filter = new BoundingBoxIntersectsFilter(outline);
+
+        return new FilteredElementCollector(Repository.Document)
+            .OfCategory(BuiltInCategory.OST_Floors)
+            .WherePasses(filter)
+            .WhereElementIsNotElementType()
+            .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Метод по созданию размеров по опалубке пилонов
+    /// </summary>
+    /// <param name="view">Вид, на котором нужно создать размеры</param>
+    /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
+    /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
+    private void CreateGeneralViewPylonElevMark(View view,
+                                                List<Element> hostElems,
+                                                   DimensionBaseService dimensionBaseService) {
+
+        var location = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance,
+                                                           DimensionOffsetType.Right, -2).Origin;
+
+        foreach(var item in hostElems) {
+            if(item is not FamilyInstance hostElem) { return; }
+
+            // Собираем опорные плоскости по опалубке, например:
+            // #_1_горизонт_край_низ
+            // #_1_горизонт_край_верх
+            ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
+
+            foreach(Reference reference in refArraySide) {
+                SpotDimension spotElevation = Repository.Document.Create.NewSpotElevation(
+                    view,
+                    reference,
+                    location,
+                    location,
+                    location,
+                    location,
+                    false);
+            }
+        }
+    }
+
+
 
     /// <summary>
     /// Метод по созданию размеров по опалубке пилонов
