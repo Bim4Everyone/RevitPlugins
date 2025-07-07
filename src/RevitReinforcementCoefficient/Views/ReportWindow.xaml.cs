@@ -1,8 +1,17 @@
 using System.Windows;
 
+using dosymep.SimpleServices;
+
 namespace RevitReinforcementCoefficient.Views;
 public partial class ReportWindow {
-    public ReportWindow() {
+    public ReportWindow(ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            serializationService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 
@@ -10,7 +19,7 @@ public partial class ReportWindow {
         DialogResult = true;
     }
 
-    private void ButtonTestForHide_Click(object sender, RoutedEventArgs e) {
+    private void ButtonForHide_Click(object sender, RoutedEventArgs e) {
         Hide();
     }
 }
