@@ -124,23 +124,31 @@ public class PylonViewDimensionCreator {
             IncludeNonVisibleObjects = false
         };
         var lastFloorTopFace = GetTopFloorFace(lastFloor, viewOptions);
+        var lastFloorBottomFace = GetBottomFloorFace(lastFloor, viewOptions);
 
         Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
                                                            DimensionOffsetType.Right, -1);
         // #1_горизонт_выпуск
         ReferenceArray refArray = dimensionBaseService.GetDimensionRefs(rebar, '#', '/', ["горизонт", "выпуск"]);
         refArray.Append(lastFloorTopFace.Reference);
+        refArray.Append(lastFloorBottomFace.Reference);
         Dimension dimensionRebarSide = Repository.Document.Create.NewDimension(view, dimensionLineLeft, refArray);
     }
 
 
 
-    private PlanarFace GetTopFloorFace(Element floor, Options options) => floor.get_Geometry(options)?
-        .OfType<Solid>()
-        .Where(solid => solid?.Volume > 0)
-        .SelectMany(solid => solid.Faces.OfType<PlanarFace>())
+    private PlanarFace GetTopFloorFace(Element floor, Options options) => GetFloorFace(floor, options)
         .FirstOrDefault(face => Math.Abs(face.FaceNormal.Z - 1) < 0.001);
 
+    private PlanarFace GetBottomFloorFace(Element floor, Options options) => GetFloorFace(floor, options)
+        .FirstOrDefault(face => Math.Abs(face.FaceNormal.Z + 1) < 0.001);
+
+
+
+    private IEnumerable<PlanarFace> GetFloorFace(Element floor, Options options) => floor.get_Geometry(options)?
+        .OfType<Solid>()
+        .Where(solid => solid?.Volume > 0)
+        .SelectMany(solid => solid.Faces.OfType<PlanarFace>());
 
 
 
