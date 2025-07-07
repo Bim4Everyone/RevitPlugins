@@ -111,7 +111,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private string GetDetailedGroup(SpecificationElement specificationElement) {
             string name = specificationElement.ElementName;
             string famylyTypeName = string.Empty;
-            // Имя типоразмера имеет значение только для узлов. Обычные элементы могут быть разного типа, но одинакового типоразмера. 
+            // Имя типоразмера имеет значение только для узлов. Обычные элементы могут быть разного типа, но с одинаковыми экземплярными параметрами. 
             if(specificationElement.ElementType.IsExistsParam(Config.IsManiFoldParamName)
                 && specificationElement.ElementType.GetParamValue<int>(Config.IsManiFoldParamName) == 1) {
                 famylyTypeName = specificationElement.Element.GetParam(BuiltInParameter.ELEM_FAMILY_AND_TYPE_PARAM).AsValueString();
