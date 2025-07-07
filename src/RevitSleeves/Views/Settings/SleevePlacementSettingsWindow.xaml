@@ -117,6 +117,7 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
+                    <!-- TODO добавить функционал по добавлению и удалению диапазонов диаметров-->
                     <Border
                         Style="{StaticResource CustomBorder}">
                         <DockPanel

@@ -25,6 +25,12 @@
         x:Key="SleevePlacementSettingsWindow.SettingsName">Название настроек:</system:String>
 
     <system:String
+        x:Key="LinksSelectorWindow.NameHeader">Название</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.CurrentStatusHeader">Текущий статус</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.NewStatusHeader">Новый статус</system:String>
+    <system:String
         x:Key="LinksSelectorWindow.Title">Выбор связей для обработки</system:String>
     <system:String
         x:Key="LinksSelectorWindow.LinkWillBeLoaded">Будет загружено</system:String>

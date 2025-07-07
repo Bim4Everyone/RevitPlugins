@@ -280,6 +280,9 @@
         <Setter
             Property="IsReadOnly"
             Value="True" />
+        <Setter
+            Property="CanUserReorderColumns"
+            Value="False" />
     </Style>
     <Style
         x:Key="CustomDataGridCell"

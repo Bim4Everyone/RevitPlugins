@@ -81,9 +81,9 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         ICollection<SleeveModel> newSleeves;
         try {
             repo.Application.FailuresProcessing += cleanupService.FailureProcessor;
+            var opts = kernel.Get<ISleevePlacingOptsService>().GetOpts();
             using var placeTrans = repo.Document.StartTransaction(
                 localizationService.GetLocalizedString("Transaction.SleevesPlacing"));
-            var opts = kernel.Get<ISleevePlacingOptsService>().GetOpts();
             newSleeves = kernel.Get<ISleevePlacerService>().PlaceSleeves(opts, null, default);
             var options = placeTrans.GetFailureHandlingOptions()
                 .SetForcedModalHandling(false)

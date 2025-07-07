@@ -55,7 +55,7 @@ internal class LinkViewModel : BaseViewModel {
     /// </summary>
     public string FutureStatus {
         get => _futureStatus;
-        private set => RaiseAndSetIfChanged(ref _futureStatus, value);
+        set => RaiseAndSetIfChanged(ref _futureStatus, value);
     }
 
     public override bool Equals(object obj) {

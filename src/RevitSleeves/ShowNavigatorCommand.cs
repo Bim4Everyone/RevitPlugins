@@ -17,7 +17,9 @@ using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Services.Core;
 using RevitSleeves.Services.Navigator;
+using RevitSleeves.ViewModels.Filtration;
 using RevitSleeves.ViewModels.Navigator;
+using RevitSleeves.Views.Filtration;
 using RevitSleeves.Views.Navigator;
 
 namespace RevitSleeves;
@@ -47,13 +49,14 @@ internal class ShowNavigatorCommand : BasePluginCommand {
             .To<OpeningGeometryProvider>()
             .InSingletonScope();
         kernel.Bind<IStructureLinksProvider>()
-            .To<AllLoadedStructureLinksProvider>()
+            .To<UserSelectedStructureLinks>()
             .InSingletonScope();
         kernel.Bind<IGeometryUtils>()
             .To<GeometryUtils>()
             .InSingletonScope();
 
         kernel.BindMainWindow<NavigatorViewModel, NavigatorWindow>();
+        kernel.BindOtherWindow<StructureLinksSelectorViewModel, StructureLinksSelectorWindow>();
         kernel.UseWpfUIMessageBox<NavigatorViewModel>();
         kernel.UseWpfUIProgressDialog<NavigatorViewModel>();
 

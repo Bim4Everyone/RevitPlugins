@@ -20,7 +20,9 @@ internal class UserSelectedStructureLinks : IStructureLinksProvider {
     private readonly IResolutionRoot _resolutionRoot;
     private List<ElementId> _linkTypeIds;
 
-    public UserSelectedStructureLinks(RevitRepository revitRepository, ILocalizationService localizationService, IResolutionRoot resolutionRoot) {
+    public UserSelectedStructureLinks(RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        IResolutionRoot resolutionRoot) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
@@ -50,7 +52,7 @@ internal class UserSelectedStructureLinks : IStructureLinksProvider {
         return [.. NamesProvider.FamilyNamesAllOpenings];
     }
 
-    public void SetLinks() {
+    private void SetLinks() {
         var window = _resolutionRoot.Get<StructureLinksSelectorWindow>();
         if(!(window.ShowDialog() ?? false)) {
             throw new OperationCanceledException();

@@ -14,6 +14,8 @@
     mc:Ignorable="d"
     Height="450"
     Width="800"
+    MinWidth="600"
+    MinHeight="400"
     d:DataContext="{d:DesignInstance vms:StructureLinksSelectorViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <ResourceDictionary>
@@ -21,6 +23,15 @@
                 <ResourceDictionary
                     Source="../../assets/Styles/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <ui:TextBlock
+                x:Key="NameHeader"
+                Text="{me:LocalizationSource LinksSelectorWindow.NameHeader}" />
+            <ui:TextBlock
+                x:Key="CurrentStatusHeader"
+                Text="{me:LocalizationSource LinksSelectorWindow.CurrentStatusHeader}" />
+            <ui:TextBlock
+                x:Key="NewStatusHeader"
+                Text="{me:LocalizationSource LinksSelectorWindow.NewStatusHeader}" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -44,6 +55,49 @@
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource LinksSelectorWindow.Title}" />
+
+        <ui:DataGrid
+            Grid.Row="1"
+            RowHeight="35"
+            GridLinesVisibility="All"
+            CanUserReorderColumns="False"
+            CanUserResizeRows="False"
+            Style="{StaticResource CustomResizableDataGridStyle}"
+            ItemsSource="{Binding Links}">
+            <ui:DataGrid.Columns>
+                <DataGridCheckBoxColumn
+                    CanUserResize="False"
+                    Width="Auto"
+                    IsReadOnly="False"
+                    Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
+
+                </DataGridCheckBoxColumn>
+                <DataGridTextColumn
+                    Width="250"
+                    MinWidth="50"
+                    IsReadOnly="True"
+                    Header="{StaticResource NameHeader}"
+                    Binding="{Binding Name}">
+
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="Auto"
+                    MinWidth="50"
+                    IsReadOnly="True"
+                    Header="{StaticResource CurrentStatusHeader}"
+                    Binding="{Binding CurrentStatus}">
+
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="Auto"
+                    MinWidth="50"
+                    IsReadOnly="True"
+                    Header="{StaticResource NewStatusHeader}"
+                    Binding="{Binding FutureStatus}">
+
+                </DataGridTextColumn>
+            </ui:DataGrid.Columns>
+        </ui:DataGrid>
 
         <StackPanel
             Grid.Row="2"
