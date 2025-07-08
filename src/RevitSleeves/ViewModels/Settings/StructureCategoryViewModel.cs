@@ -48,7 +48,8 @@ internal class StructureCategoryViewModel : BaseViewModel {
             new CategoryInfoViewModel(
                 revitRepository,
                 localizationService,
-                category));
+                category),
+            structureSettings.FilterSet);
         Name = category.Name;
         IsEnabled = structureSettings.IsEnabled;
     }

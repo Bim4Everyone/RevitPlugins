@@ -262,7 +262,7 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
     private bool SleeveEndFaceFarAwayFromFloor(SleeveModel sleeve, Floor[] intersectingFloors) {
         double floorThickness = intersectingFloors.Sum(_geometryUtils.GetFloorThickness);
         double sleeveEndToTopOffset = _revitRepository.ConvertToInternal(
-            _config.PipeSettings.Offsets[OffsetType.FromSleeveEndToTopFloorFace]);
+            _config.PipeSettings.Offsets.First(o => o.OffsetType == OffsetType.FromSleeveEndToTopFloorFace).Value);
         double sleeveRequiredLength = floorThickness + sleeveEndToTopOffset;
         double distanceTolerance = _revitRepository.Application.ShortCurveTolerance;
 
@@ -322,7 +322,8 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
         var pipeLine = (Line) ((LocationCurve) _intersectingPipesCache.First().Location).Curve;
         var sleeveLocation = sleeve.Location;
         return pipeLine.Project(sleeveLocation).Distance
-            > _revitRepository.ConvertToInternal(_config.PipeSettings.Offsets[OffsetType.FromSleeveAxisToMepAxis]);
+            > _revitRepository.ConvertToInternal(_config.PipeSettings.Offsets
+            .First(o => o.OffsetType == OffsetType.FromSleeveAxisToMepAxis).Value);
     }
 
     private bool SleeveIsIntersectsOther(SleeveModel sleeve) {

@@ -34,7 +34,6 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
         SleevePlacementSettingsConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        IConfigSerializer configSerializer,
         IMessageBoxService messageBoxService,
         ISaveFileDialogService saveFileDialogService,
         IOpenFileDialogService openFileDialogService,
@@ -46,8 +45,7 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
             ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService
             ?? throw new ArgumentNullException(nameof(localizationService));
-        _configSerializer = configSerializer
-            ?? throw new ArgumentNullException(nameof(configSerializer));
+        _configSerializer = _pluginConfig.Serializer;
         MessageBoxService = messageBoxService
             ?? throw new ArgumentNullException(nameof(messageBoxService));
         SaveFileDialogService = saveFileDialogService

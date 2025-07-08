@@ -68,14 +68,15 @@ internal class MepCategoryViewModel : BaseViewModel {
             new CategoryInfoViewModel(
                 revitRepository,
                 localizationService,
-                category));
+                category),
+            mepCategorySettings.MepFilterSet);
         Name = category.Name;
         foreach(var diamRange in mepCategorySettings.DiameterRanges) {
             DiameterRanges.Add(new DiameterRangeViewModel(_localizationService, diamRange));
         }
         foreach(var pair in mepCategorySettings.Offsets) {
             Offsets.Add(new OffsetViewModel(localizationService,
-                new Offset() { OffsetType = pair.Key, Value = pair.Value }));
+                new Offset() { OffsetType = pair.OffsetType, Value = pair.Value }));
         }
         WallSettings = new StructureCategoryViewModel(revitRepository,
             localizationService,
@@ -138,8 +139,7 @@ internal class MepCategoryViewModel : BaseViewModel {
     public T GetSettings<T>() where T : MepCategorySettings, new() {
         return new T() {
             DiameterRanges = [.. DiameterRanges.Select(item => item.GetDiameterRange())],
-            Offsets = Offsets.Select(item => item.GetOffset())
-                .ToDictionary(offset => offset.OffsetType, offset => offset.Value),
+            Offsets = [.. Offsets.Select(item => item.GetOffset())],
             FloorSettings = FloorSettings.GetStructureSettings<FloorSettings>(),
             WallSettings = WallSettings.GetStructureSettings<WallSettings>(),
             MepFilterSet = MepFilterViewModel.GetSet(),

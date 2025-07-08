@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
@@ -43,7 +44,8 @@ internal class PipeFloorPointFinder : IPointFinder<ClashModel<Pipe, Floor>> {
             double floorThickness = _geometryUtils.GetFloorThickness(param.StructureElement);
             var centerIntersectionPoint = topIntersectionPoint - XYZ.BasisZ * floorThickness / 2;
 
-            double topOffsetMm = _config.PipeSettings.Offsets[OffsetType.FromSleeveEndToTopFloorFace];
+            double topOffsetMm = _config.PipeSettings.Offsets
+                .First(o => o.OffsetType == OffsetType.FromSleeveEndToTopFloorFace).Value;
             return centerIntersectionPoint + XYZ.BasisZ * _revitRepository.ConvertToInternal(topOffsetMm) / 2;
 
         } catch(Autodesk.Revit.Exceptions.ApplicationException) {

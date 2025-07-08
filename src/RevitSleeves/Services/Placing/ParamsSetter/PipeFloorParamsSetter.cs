@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
@@ -35,7 +36,8 @@ internal class PipeFloorParamsSetter : PipeParamsSetter, IParamsSetter<ClashMode
         SetInclineAngle(sleeve, Math.PI / 2);
         double diameter = GetSleeveDiameter(_clash.MepElement);
         SetDiameter(sleeve, diameter);
-        double topOffset = _config.PipeSettings.Offsets[OffsetType.FromSleeveEndToTopFloorFace];
+        double topOffset = _config.PipeSettings.Offsets
+            .First(o => o.OffsetType == OffsetType.FromSleeveEndToTopFloorFace).Value;
         double length = _geometryUtils.GetFloorThickness(_clash.StructureElement)
             + _revitRepository.ConvertToInternal(topOffset);
         SetLength(sleeve, length);

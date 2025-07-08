@@ -5,13 +5,14 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
+
+using RevitClashDetective.Models.FilterModel;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
@@ -45,7 +46,9 @@ public class SleevesSettingsCommand : BasePluginCommand {
 
 
         kernel.Bind<SleevePlacementSettingsConfig>()
-            .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+            .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(
+                new RevitClashConfigSerializer(
+                    new RevitClashesSerializationBinder(), uiApplication.ActiveUIDocument.Document)));
 
         kernel.UseWpfUIThemeUpdater();
 

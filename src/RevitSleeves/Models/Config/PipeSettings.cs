@@ -3,11 +3,11 @@ using Autodesk.Revit.DB;
 namespace RevitSleeves.Models.Config;
 internal class PipeSettings : MepCategorySettings {
     public PipeSettings() : base() {
-        if(Offsets is null || Offsets.Count == 0) {
-            Offsets = new System.Collections.Generic.Dictionary<OffsetType, double>() {
-                { OffsetType.FromSleeveAxisToMepAxis, 5},
-                { OffsetType.FromSleeveEndToTopFloorFace, 50 }
-            };
+        if(Offsets is null || Offsets.Length == 0) {
+            Offsets = [
+                 new Offset(){ OffsetType = OffsetType.FromSleeveAxisToMepAxis, Value = 5},
+                 new Offset(){ OffsetType = OffsetType.FromSleeveEndToTopFloorFace, Value = 50},
+            ];
         }
         if(DiameterRanges is null || DiameterRanges.Length == 0) {
             DiameterRanges = [
