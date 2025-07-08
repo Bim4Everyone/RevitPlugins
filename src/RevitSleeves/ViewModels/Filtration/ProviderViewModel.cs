@@ -29,13 +29,16 @@ internal class ProviderViewModel : BaseViewModel {
         return Provider.StorageType switch {
             StorageType.Integer => int.TryParse(value, out int _)
                 ? string.Empty
-                : _localizationService.GetLocalizedString("TODO"), // $"Значение параметра \"{Name}\" должно быть целым числом."
+                : string.Format(_localizationService.GetLocalizedString(
+                    "SleevePlacementSettings.Validation.ParamValueMustBeInt"), Name),
             StorageType.Double => DoubleValueParser.TryParse(value, Provider.UnitType, out double _)
                 ? string.Empty
-                : _localizationService.GetLocalizedString("TODO"), // $"Значение параметра \"{Name}\" должно быть вещественным числом."
+                : string.Format(_localizationService.GetLocalizedString(
+                    "SleevePlacementSettings.Validation.ParamValueMustBeDouble"), Name),
             StorageType.String => string.Empty,
             StorageType.ElementId => string.Empty,
-            _ => _localizationService.GetLocalizedString("TODO") // $"У параметра {Name} не определен тип данных."
+            _ => string.Format(_localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.ParamHasNoDataType"), Name)
         };
     }
 }

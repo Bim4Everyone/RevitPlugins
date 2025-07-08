@@ -66,6 +66,12 @@
         x:Key="SleevePlacementSettings.Validation.StructureCategoriesNotEnabled">Выберите хотя бы 1 категорию конструкций</system:String>
     <system:String
         x:Key="SleevePlacementSettings.Validation.FilterIsEmpty">Поля фильтрации для категории '{0}' должны быть заполнены</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamValueMustBeInt">Значение параметра '{0}' должно быть целым числом</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamValueMustBeDouble">Значение параметра '{0}' должно быть вещественным числом</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">У параметра {0} не определен тип данных</system:String>
 
     <system:String
         x:Key="SleevePlacementSettings.DefaultFileName">Настройки расстановки гильз</system:String>

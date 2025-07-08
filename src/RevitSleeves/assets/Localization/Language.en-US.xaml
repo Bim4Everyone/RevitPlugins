@@ -48,6 +48,30 @@
         x:Key="SleevePlacementSettings.Validation.SetName">Set settings name.</system:String>
     <system:String
         x:Key="SleevePlacementSettings.Validation.NameTooLong">Settings name is too long.</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesLessThanZero">Diameter range values ​​must be non-negative</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.EndMepSizeMustBeGreaterThanZero">The value of the 'to' dimension must be greater than 0</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.SleeveDiameterMustBeGreaterThanZero">The value of the diameter must be greater than 0</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.StartMepSizeGreaterThanEnd">The value of the 'from' dimension must be less than the 'to' value</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesIsEmpty">At least 1 diameter range must be specified</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesOverlap">The diameter ranges overlap</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.OffsetsLessThanZero">The values ​​of all indents must be non-negative</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.StructureCategoriesNotEnabled">Select at least 1 design category</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.FilterIsEmpty">The filter fields for the '{0}' category must be filled in</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamValueMustBeInt">The value of the '{0}' parameter must be an integer</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamValueMustBeDouble">The value of the '{0}' parameter must be a real number</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">The {0} parameter has no data type defined</system:String>
 
     <system:String
         x:Key="SleevePlacementSettings.DefaultFileName">Sleeve placement settings</system:String>
