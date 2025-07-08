@@ -99,6 +99,10 @@
             Style="{StaticResource CustomBorder}">
             <DockPanel
                 LastChildFill="True">
+                <Label
+                    Style="{StaticResource CustomLabel}"
+                    Content="{Binding SettingsNameHeader}"
+                    DockPanel.Dock="Top" />
                 <ui:DataGrid
                     RowHeight="26"
                     VerticalContentAlignment="Center"

@@ -78,6 +78,8 @@
 
     <system:String
         x:Key="Navigator.Title">Навигатор</system:String>
+    <system:String
+        x:Key="Navigator.SettingsNamePrefix">Статусы назначаются согласно настройкам: '{0}'</system:String>
 
     <system:String
         x:Key="Error">Ошибка</system:String>

@@ -78,6 +78,8 @@
 
     <system:String
         x:Key="Navigator.Title">Navigator</system:String>
+    <system:String
+        x:Key="Navigator.SettingsNamePrefix">Statuses are assigned according to the settings: '{0}'</system:String>
 
     <system:String
         x:Key="Error">Error</system:String>

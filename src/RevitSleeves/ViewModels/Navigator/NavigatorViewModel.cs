@@ -8,12 +8,14 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models.Clashes;
 
 using RevitSleeves.Models;
+using RevitSleeves.Models.Config;
 using RevitSleeves.Services.Navigator;
 
 namespace RevitSleeves.ViewModels.Navigator;
 internal class NavigatorViewModel : BaseViewModel {
     private readonly ISleeveStatusFinder _sleeveStatusFinder;
     private readonly ILocalizationService _localizationService;
+    private readonly SleevePlacementSettingsConfig _config;
     private readonly RevitRepository _revitRepository;
     private SleeveViewModel _selectedSleeve;
 
@@ -22,6 +24,7 @@ internal class NavigatorViewModel : BaseViewModel {
         ISleeveStatusFinder sleeveStatusFinder,
         IMessageBoxService messageBoxService,
         ILocalizationService localizationService,
+        SleevePlacementSettingsConfig config,
         RevitRepository revitRepository) {
 
         ProgressDialogFactory = progressFactory
@@ -32,9 +35,13 @@ internal class NavigatorViewModel : BaseViewModel {
             ?? throw new System.ArgumentNullException(nameof(messageBoxService));
         _localizationService = localizationService
             ?? throw new System.ArgumentNullException(nameof(localizationService));
+        _config = config
+            ?? throw new System.ArgumentNullException(nameof(config));
         _revitRepository = revitRepository
             ?? throw new System.ArgumentNullException(nameof(revitRepository));
 
+        SettingsNameHeader = string.Format(
+            _localizationService.GetLocalizedString("Navigator.SettingsNamePrefix"), _config.Name);
         Sleeves = [];
         LoadViewCommand = RelayCommand.Create(LoadView);
         SelectSleeveCommand = RelayCommand.Create<SleeveViewModel>(SelectSleeve, CanSelectSleeve);
@@ -48,6 +55,8 @@ internal class NavigatorViewModel : BaseViewModel {
     public ICommand SelectSleeveCommand { get; }
 
     public ICommand LoadViewCommand { get; }
+
+    public string SettingsNameHeader { get; }
 
     public ObservableCollection<SleeveViewModel> Sleeves { get; }
 
