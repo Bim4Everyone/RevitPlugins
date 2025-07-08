@@ -6,8 +6,6 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep.SimpleServices;
-
 namespace RevitHideWorkset.Models;
 
 /// <summary>
@@ -82,12 +80,11 @@ internal class RevitRepository {
         foreach(var linkedFile in linkedFiles) {
             var linkInstance = linkedFile.LinkedFile;
 
-            var linkType = Document.GetElement(linkInstance.GetTypeId()) as RevitLinkType;
-            if(linkType == null) {
+            if(Document.GetElement(linkInstance.GetTypeId()) is not RevitLinkType linkType) {
                 failedFiles.Add(linkInstance.Name);
                 continue;
             }
-                
+
             var externalRef = linkType.GetExternalFileReference();
             var modelPath = externalRef.GetAbsolutePath();
 

@@ -11,6 +11,8 @@
     <system:String x:Key="MainWindow.ToolTipHideWorksets">Hide all selected worksets</system:String>
     <system:String x:Key="MainWindow.ToolTipHideWorkset">Hide workset</system:String>
     <system:String x:Key="MainWindow.HideWorkset">Hide</system:String>
+    <system:String x:Key="MainWindow.ToolTipShowWorkset">Show workset</system:String>
+    <system:String x:Key="MainWindow.ShowWorkset">Show</system:String>
     <system:String x:Key="MainWindow.Finish">Apply changes to worksets</system:String>
     <system:String x:Key="MainWindow.Cancel">Cancel changes to worksets</system:String>
     <system:String x:Key="MainWindow.SearchPlaceholder">Enter the name of the workset</system:String>

@@ -11,6 +11,8 @@
     <system:String x:Key="MainWindow.ToolTipHideWorksets">Скрыть все выбранные рабочие набор</system:String>
     <system:String x:Key="MainWindow.ToolTipHideWorkset">Скрыть рабочий набор</system:String>
     <system:String x:Key="MainWindow.HideWorkset">Скрыть</system:String>
+    <system:String x:Key="MainWindow.ToolTipShowWorkset">Показать рабочий набор</system:String>
+    <system:String x:Key="MainWindow.ShowWorkset">Показать</system:String>
     <system:String x:Key="MainWindow.Finish">Применить изменения к рабочим наборам</system:String>
     <system:String x:Key="MainWindow.Cancel">Отменить изменения рабочих наборов</system:String>
     <system:String x:Key="MainWindow.SearchPlaceholder">Введите название рабочего набора</system:String>
