@@ -17,6 +17,7 @@ using RevitClashDetective.Models.FilterModel;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Services.Settings;
+using RevitSleeves.ViewModels.Filtration;
 using RevitSleeves.ViewModels.Settings;
 using RevitSleeves.Views.Settings;
 
@@ -28,6 +29,10 @@ public class SleevesSettingsCommand : BasePluginCommand {
         PluginName = "Настройки расстановки гильз";
     }
 
+    public void ExecuteCommand(UIApplication uiApplication) {
+        Execute(uiApplication);
+    }
+
     protected override void Execute(UIApplication uiApplication) {
         using var kernel = uiApplication.CreatePlatformServices();
 
@@ -37,10 +42,13 @@ public class SleevesSettingsCommand : BasePluginCommand {
         kernel.Bind<IFilterChecker>()
             .To<FilterChecker>()
             .InSingletonScope();
-        kernel.Bind<FilterCheckerViewModel>()
+        kernel.Bind<ActiveDocFilterViewModel>()
             .ToSelf()
             .InTransientScope();
-        kernel.Bind<FilterCheckerWindow>()
+        kernel.Bind<StructureLinksFilterViewModel>()
+            .ToSelf()
+            .InTransientScope();
+        kernel.Bind<FilterWindow>()
             .ToSelf()
             .InTransientScope();
 

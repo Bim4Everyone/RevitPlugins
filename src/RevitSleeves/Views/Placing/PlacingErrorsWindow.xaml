@@ -10,7 +10,6 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vm="clr-namespace:RevitSleeves.ViewModels.Placing"
-    Title="{me:LocalizationSource TODO}"
     Height="450"
     Width="800"
     d:DataContext="{d:DesignInstance vm:PlacingErrorsViewModel, IsDesignTimeCreatable=False}">

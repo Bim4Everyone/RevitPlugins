@@ -74,6 +74,19 @@
         x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">У параметра {0} не определен тип данных</system:String>
 
     <system:String
+        x:Key="FilterWindow.Title">Проверка фильтра</system:String>
+    <system:String
+        x:Key="FilterWindow.Invert">Инвертировать</system:String>
+    <system:String
+        x:Key="FilterWindow.ShowSet">Показать весь набор</system:String>
+    <system:String
+        x:Key="FilterWindow.FileHeader">Файл</system:String>
+    <system:String
+        x:Key="FilterWindow.CategoryHeader">Категория</system:String>
+    <system:String
+        x:Key="FilterWindow.TypeNameHeader">Имя типоразмера</system:String>
+
+    <system:String
         x:Key="SleevePlacementSettings.DefaultFileName">Настройки расстановки гильз</system:String>
 
     <system:String

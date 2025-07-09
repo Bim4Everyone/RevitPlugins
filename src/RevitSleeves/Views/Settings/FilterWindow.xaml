@@ -1,0 +1,120 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitSleeves.Views.Settings.FilterWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:RevitSleeves.Views.Settings"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:b="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitSleeves.ViewModels.Filtration"
+    mc:Ignorable="d"
+    Height="450"
+    Width="800"
+    d:DataContext="{d:DesignInstance vms:FilterViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../assets/Styles/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <ui:TextBlock
+                x:Key="FileHeader"
+                Text="{me:LocalizationSource FilterWindow.FileHeader}" />
+            <ui:TextBlock
+                x:Key="CategoryHeader"
+                Text="{me:LocalizationSource FilterWindow.CategoryHeader}" />
+            <ui:TextBlock
+                x:Key="TypeNameHeader"
+                Text="{me:LocalizationSource FilterWindow.TypeNameHeader}" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <i:Interaction.Behaviors>
+        <b:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+    </i:Interaction.Behaviors>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding ShowSetCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger
+            EventName="Closing">
+            <i:InvokeCommandAction
+                Command="{Binding CloseCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <DockPanel
+        LastChildFill="True">
+        <ui:TitleBar
+            DockPanel.Dock="Top"
+            Title="{me:LocalizationSource FilterWindow.Title}" />
+        <Border
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <DockPanel
+                    DockPanel.Dock="Top">
+                    <ToggleButton
+                        Margin="0 0 10 0"
+                        IsChecked="{Binding Inverted}"
+                        Content="{me:LocalizationSource FilterWindow.Invert}"
+                        Command="{Binding InversionChangedCommand}">
+                    </ToggleButton>
+                    <ui:Button
+                        Content="{me:LocalizationSource FilterWindow.ShowSet}"
+                        Command="{Binding ShowSetCommand}" />
+                </DockPanel>
+                <ui:DataGrid
+                    RowHeight="26"
+                    VerticalContentAlignment="Center"
+                    CellStyle="{StaticResource CustomDataGridCell}"
+                    Style="{StaticResource CustomReadonlyDataGrid}"
+                    ItemsSource="{Binding ActiveSearchSet.Elements}">
+                    <ui:DataGrid.Columns>
+                        <DataGridTemplateColumn
+                            Width="Auto"
+                            CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Appearance="Info"
+                                        Height="Auto"
+                                        Padding="5 1"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.ActiveSearchSet.ShowElementCommand}"
+                                        CommandParameter="{Binding}">
+                                        <ui:Button.Content>
+                                            <DockPanel>
+                                                <ui:SymbolIcon
+                                                    Symbol="Search24" />
+                                                <TextBlock
+                                                    Text="{Binding Id}" />
+                                            </DockPanel>
+                                        </ui:Button.Content>
+                                    </ui:Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Header="{StaticResource FileHeader}"
+                            Binding="{Binding FileName}" />
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Header="{StaticResource CategoryHeader}"
+                            Binding="{Binding CategoryName}" />
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Header="{StaticResource TypeNameHeader}"
+                            Binding="{Binding TypeName}" />
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
+        </Border>
+    </DockPanel>
+</core:WpfUIPlatformWindow>

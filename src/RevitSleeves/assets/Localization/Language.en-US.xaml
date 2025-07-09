@@ -74,6 +74,17 @@
         x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">The {0} parameter has no data type defined</system:String>
 
     <system:String
+        x:Key="FilterWindow.Invert">Invert</system:String>
+    <system:String
+        x:Key="FilterWindow.ShowSet">Show search set</system:String>
+    <system:String
+        x:Key="FilterWindow.FileHeader">File</system:String>
+    <system:String
+        x:Key="FilterWindow.CategoryHeader">Category</system:String>
+    <system:String
+        x:Key="FilterWindow.TypeNameHeader">Family type name</system:String>
+
+    <system:String
         x:Key="SleevePlacementSettings.DefaultFileName">Sleeve placement settings</system:String>
 
     <system:String
