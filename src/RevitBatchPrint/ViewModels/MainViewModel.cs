@@ -169,9 +169,14 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedAlbumParamName");
             return false;
         }
-
-        if(string.IsNullOrEmpty(PrintOptions.PrinterName)) {
+        
+        if(ShowPrint && string.IsNullOrEmpty(PrintOptions.PrinterName)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedPrinter");
+            return false;
+        }
+        
+        if(ShowExport && string.IsNullOrEmpty(PrintOptions.FilePath)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedFilePath");
             return false;
         }
 

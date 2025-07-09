@@ -17,6 +17,11 @@
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.NotSelectedAlbumParamName">Выберите параметр группировки альбома</system:String>
+    <system:String x:Key="MainWindow.NotSelectedPrinter">Выберите принтер для печати</system:String>
+    <system:String x:Key="MainWindow.NotSelectedFilePath">Выберите путь до файла для экспорта</system:String>
+    <system:String x:Key="MainWindow.NotSelectedAlbumSheets">Выберите листы для печати или экспорта</system:String>
 
     <system:String x:Key="Settings.PrintSettings">Настройки Печати</system:String>
     <system:String x:Key="Settings.PrintSettingsDescription">Вы можете выбрать принтер, и другие опции для подготовки документа к печати</system:String>

@@ -17,6 +17,11 @@
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+    <system:String x:Key="MainWindow.NotSelectedAlbumParamName">Please select album param name</system:String>
+    <system:String x:Key="MainWindow.NotSelectedPrinter">Please select printer name</system:String>
+    <system:String x:Key="MainWindow.NotSelectedFilePath">Please select export file path</system:String>
+    <system:String x:Key="MainWindow.NotSelectedAlbumSheets">Please select sheets to print or export</system:String>
 
     <system:String x:Key="Settings.PrintSettings">Print Settings</system:String>
     <system:String x:Key="Settings.PrintSettingsDescription">You can select a printer and other options to prepare the document for printing</system:String>
