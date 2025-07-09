@@ -80,11 +80,24 @@
             CornerRadius="{DynamicResource ControlCornerRadius}"
             Visibility="{Binding ShowExport,
                     Converter={StaticResource ExportVisibilityConverter}}">
-            <ui:TextBox
-                Height="36.5"
-                Margin="14,8,14,8"
-                Icon="{ui:SymbolIcon DocumentPdf24}"
-                Text="{Binding Path=PrintOptions.FilePath, Mode=OneWay}" />
+            
+            <DockPanel
+                LastChildFill="True">
+                <ui:Button
+                    DockPanel.Dock="Right"
+                    Height="36.5"
+                    Margin="14 8"
+                    Icon="{ui:SymbolIcon Folder24}"
+                    ToolTip="{me:LocalizationSource MainWindow.ChooseFileName}"/>
+                
+                <ui:TextBox
+                    DockPanel.Dock="Left"
+                    Height="36.5"
+                    Margin="14,8,0,8"
+                    Icon="{ui:SymbolIcon DocumentPdf24}"
+                    Text="{Binding Path=PrintOptions.FilePath, Mode=OneWay}" />
+            </DockPanel>
+
         </Border>
 
         <Border
