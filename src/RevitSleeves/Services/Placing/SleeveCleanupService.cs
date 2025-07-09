@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Placing;
@@ -28,14 +29,23 @@ internal class SleeveCleanupService : ISleeveCleanupService {
         IProgress<int> progress,
         CancellationToken ct) {
 
-        // TODO добавить удаление гильз, которые находятся полностью внутри уже существующих
-        var sleevesToDelete = newSleeves.Where(s => _duplicatedSleeves.Contains(s.GetFamilyInstance().Id)).ToArray();
-        var cleanedSleeves = newSleeves.Except(sleevesToDelete).ToArray();
+        var duplicatedSleeves = newSleeves.Where(s => _duplicatedSleeves.Contains(s.GetFamilyInstance().Id)).ToArray();
+        var notDuplicatedSleeves = newSleeves.Except(duplicatedSleeves).ToArray();
         int i = 0;
-        foreach(var sleeve in sleevesToDelete) {
+        foreach(var sleeve in duplicatedSleeves) {
             ct.ThrowIfCancellationRequested();
             progress?.Report(++i);
-            _revitRepository.DeleteElement(sleeve.GetFamilyInstance().Id);
+            _revitRepository.DeleteElement(sleeve.Id);
+        }
+        var cleanedSleeves = new List<SleeveModel>();
+        foreach(var sleeve in notDuplicatedSleeves) {
+            ct.ThrowIfCancellationRequested();
+            progress?.Report(++i);
+            if(SleeveIsInsideOneOfOthers(sleeve, oldSleeves)) {
+                _revitRepository.DeleteElement(sleeve.Id);
+            } else {
+                cleanedSleeves.Add(sleeve);
+            }
         }
         return cleanedSleeves;
     }
@@ -55,5 +65,40 @@ internal class SleeveCleanupService : ISleeveCleanupService {
                 }
             }
         }
+    }
+
+    private bool SleeveIsInsideOneOfOthers(SleeveModel newSleeve, ICollection<SleeveModel> oldSleeves) {
+        if(oldSleeves.Count == 0) {
+            return false;
+        }
+        var newSleeveBbox = newSleeve.GetFamilyInstance().GetBoundingBox();
+        var intersectedSleeves = new FilteredElementCollector(
+            _revitRepository.Document, [.. oldSleeves.Select(s => s.Id)])
+            .WherePasses(new BoundingBoxContainsPointFilter(newSleeve.Location))
+            .ToElements();
+        if(intersectedSleeves.Count == 0) {
+            return false;
+        }
+        var newSleeveSolid = GetSolid(newSleeve.GetFamilyInstance());
+        foreach(var intersectedSleeve in intersectedSleeves) {
+            try {
+                var intersectedSleeveSolid = GetSolid(intersectedSleeve);
+                var intersectedSolid = BooleanOperationsUtils.ExecuteBooleanOperation(
+                    intersectedSleeveSolid, newSleeveSolid, BooleanOperationsType.Intersect);
+                double intersectionVolume = intersectedSolid.Volume;
+                double newSleeveVolume = newSleeveSolid.Volume;
+                if(Math.Abs(intersectionVolume - newSleeveVolume)
+                    <= Math.Min(intersectionVolume, newSleeveVolume) * 0.01) {
+                    return true;
+                }
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Solid GetSolid(Element element) {
+        return element.GetSolids().OrderByDescending(s => s.Volume).First();
     }
 }
