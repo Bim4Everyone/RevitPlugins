@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -60,6 +61,38 @@ public class PylonViewMarkCreator {
         try {
             CreateGeneralViewPylonElevMark(view, SheetInfo.HostElems, dimensionBaseService);
         } catch(Exception) { }
+    }
+
+    /// <summary>
+    /// Метод по созданию размеров по опалубке пилонов
+    /// </summary>
+    /// <param name="view">Вид, на котором нужно создать размеры</param>
+    /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
+    /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
+    private void CreateGeneralViewPylonElevMark(View view, List<Element> hostElems, 
+                                                DimensionBaseService dimensionBaseService) {
+        var location = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance,
+                                                           DimensionOffsetType.Right, -2).Origin;
+        foreach(var item in hostElems) {
+            if(item is not FamilyInstance hostElem) { return; }
+
+            // Собираем опорные плоскости по опалубке, например:
+            // #_1_горизонт_край_низ
+            // #_1_горизонт_край_верх
+            ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
+
+            foreach(Reference reference in refArraySide) {
+                SpotDimension spotElevation = Repository.Document.Create.NewSpotElevation(
+                    view,
+                    reference,
+                    location,
+                    location,
+                    location,
+                    location,
+                    false);
+                spotElevation.ChangeTypeId(ViewModel.SelectedSpotDimensionType.Id);
+            }
+        }
     }
 
     public void TryCreateTransverseViewMarks() {
@@ -136,40 +169,5 @@ public class PylonViewMarkCreator {
         _transverseRebarViewPlateMarksService.CreateLeftMark(simplePlates);
 
         _transverseRebarViewPlateMarksService.CreateRightMark(simplePlates);
-    }
-
-
-    /// <summary>
-    /// Метод по созданию размеров по опалубке пилонов
-    /// </summary>
-    /// <param name="view">Вид, на котором нужно создать размеры</param>
-    /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
-    /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
-    private void CreateGeneralViewPylonElevMark(View view,
-                                                List<Element> hostElems,
-                                                   DimensionBaseService dimensionBaseService) {
-
-        var location = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance,
-                                                           DimensionOffsetType.Right, -2).Origin;
-
-        foreach(var item in hostElems) {
-            if(item is not FamilyInstance hostElem) { return; }
-
-            // Собираем опорные плоскости по опалубке, например:
-            // #_1_горизонт_край_низ
-            // #_1_горизонт_край_верх
-            ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
-
-            foreach(Reference reference in refArraySide) {
-                SpotDimension spotElevation = Repository.Document.Create.NewSpotElevation(
-                    view,
-                    reference,
-                    location,
-                    location,
-                    location,
-                    location,
-                    false);
-            }
-        }
     }
 }
