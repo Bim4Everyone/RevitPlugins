@@ -63,11 +63,10 @@ internal class MainViewModel : BaseViewModel {
         _saveFileDialogService = saveFileDialogService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
+        AcceptVewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        
         ChangeModeCommand = RelayCommand.Create(ChangeMode);
         ChooseSaveFileCommand = RelayCommand.Create(ChooseSaveFile);
-
-        PrintCommand = RelayCommand.Create(Print, CanPrint);
-        ExportCommand = RelayCommand.Create(Export, CanExport);
 
         SearchCommand = RelayCommand.Create(ApplySearch);
         ChangeAlbumNameCommand = RelayCommand.Create(ChangeAlbumName);
@@ -77,12 +76,11 @@ internal class MainViewModel : BaseViewModel {
     }
 
     public ICommand LoadViewCommand { get; }
+    public ICommand AcceptVewCommand { get; }
+    
     public ICommand ChangeModeCommand { get; }
     public ICommand ChooseSaveFileCommand { get; }
-
-    public ICommand PrintCommand { get; }
-    public ICommand ExportCommand { get; }
-
+    
     public ICommand SearchCommand { get; set; }
     public ICommand ChangeAlbumNameCommand { get; set; }
 
@@ -160,11 +158,11 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-    private void Print() {
+    private void AcceptView() {
         AcceptView(_revitPrint);
     }
 
-    private bool CanPrint() {
+    private bool CanAcceptView() {
         if(string.IsNullOrEmpty(AlbumParamName)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedAlbumParamName");
             return false;
@@ -189,30 +187,6 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    private void Export() {
-        AcceptView(_revitExport);
-    }
-
-    private bool CanExport() {
-        if(string.IsNullOrEmpty(AlbumParamName)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedAlbumParamName");
-            return false;
-        }
-
-        if(string.IsNullOrEmpty(PrintOptions.FilePath)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedFilePath");
-            return false;
-        }
-
-        if(!MainAlbums.Any(item => item.HasSelectedSheets())) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedAlbumSheets");
-            return false;
-        }
-
-        ErrorText = null;
-        return true;
-    }
-
     private void AcceptView(IRevitPrint revitPrint) {
         SaveConfig();
 
@@ -222,7 +196,7 @@ internal class MainViewModel : BaseViewModel {
             .Select(item => item.CreateSheetElement())
             .ToArray();
 
-        _revitExport.Execute(sheetElements, PrintOptions.CreatePrintOptions());
+        revitPrint.Execute(sheetElements, PrintOptions.CreatePrintOptions());
     }
 
     private void ApplySearch() {

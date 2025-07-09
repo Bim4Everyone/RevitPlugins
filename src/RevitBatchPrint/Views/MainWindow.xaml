@@ -137,7 +137,7 @@
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.PrintCommandName}"
                 Click="ButtonOk_Click"
-                Command="{Binding PrintCommand}"
+                Command="{Binding AcceptVewCommand}"
                 Visibility="{Binding ShowPrint,
                     Converter={StaticResource ExportVisibilityConverter}}" />
 
@@ -147,7 +147,7 @@
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ExportCommandName}"
                 Click="ButtonOk_Click"
-                Command="{Binding ExportCommand}"
+                Command="{Binding AcceptVewCommand}"
                 Visibility="{Binding ShowExport,
                     Converter={StaticResource ExportVisibilityConverter}}" />
 
