@@ -199,16 +199,18 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void ApplySearch() {
-        if(string.IsNullOrEmpty(SearchText)) {
+        foreach(AlbumViewModel albumViewModel in MainAlbums) {
+            albumViewModel.FilterSheets(SearchText);
+        }
+        
+        if(string.IsNullOrWhiteSpace(SearchText)) {
             FilteredAlbums = new ObservableCollection<AlbumViewModel>(MainAlbums);
         } else {
             FilteredAlbums = new ObservableCollection<AlbumViewModel>(
                 MainAlbums
-                    .Where(item => item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) > 1));
-        }
-
-        foreach(AlbumViewModel albumViewModel in FilteredAlbums) {
-            albumViewModel.FilterSheets(SearchText);
+                    .Where(item =>
+                        item.FilteredSheets.Count > 0
+                        || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0));
         }
     }
 

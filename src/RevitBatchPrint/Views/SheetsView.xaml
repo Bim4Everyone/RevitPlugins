@@ -9,6 +9,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels"
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
 
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
@@ -86,8 +87,16 @@
                 <ui:AutoSuggestBox
                     DockPanel.Dock="Top"
                     Margin="14,8,14,8"
-                    Text="{Binding SearchText, Delay=250}"
-                    PlaceholderText="{me:LocalizationSource MainWindow.SearchHintText}" />
+                    Icon="{ui:SymbolIcon Search24}"
+                    Text="{Binding SearchText, Mode=TwoWay}"
+                    PlaceholderText="{me:LocalizationSource MainWindow.SearchHintText}">
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="TextChanged">
+                            <b:InvokeCommandAction
+                                Command="{Binding SearchCommand}" />
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </ui:AutoSuggestBox>
 
                 <TreeView
                     DockPanel.Dock="Bottom"

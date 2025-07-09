@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -56,11 +57,11 @@ internal sealed class AlbumViewModel : BaseViewModel {
     }
 
     public void FilterSheets(string searchText) {
-        if(string.IsNullOrEmpty(searchText)) {
+        if(string.IsNullOrWhiteSpace(searchText)) {
             FilteredSheets = new ObservableCollection<SheetViewModel>(MainSheets);
         } else {
             FilteredSheets = new ObservableCollection<SheetViewModel>(
-                MainSheets.Where(item => item.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > 1));
+                MainSheets.Where(item => item.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0));
         }
     }
 

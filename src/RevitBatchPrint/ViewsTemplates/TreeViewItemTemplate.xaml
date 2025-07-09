@@ -12,6 +12,7 @@
         TargetType="{x:Type TreeViewItem}"
         BasedOn="{StaticResource {x:Type TreeViewItem}}">
 
+        <Setter Property="IsExpanded" Value="True" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
 
