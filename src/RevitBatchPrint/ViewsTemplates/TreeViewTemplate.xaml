@@ -4,11 +4,14 @@
                     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
-                    xmlns:db="clr-namespace:Autodesk.Revit.DB;assembly=RevitAPI">
+                    xmlns:db="clr-namespace:Autodesk.Revit.DB;assembly=RevitAPI"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
+    
+    <converters:BoolToVisibilityConverter x:Key="ExportVisibilityConverter"/>
 
     <ui:SymbolRegular x:Key="SymbolPortrait">Document24</ui:SymbolRegular>
     <db:PageOrientationType x:Key="PageTypePortrait">Portrait</db:PageOrientationType>
@@ -65,14 +68,14 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            
+
             <CheckBox
                 Grid.Column="0"
                 IsChecked="{Binding IsSelected}">
 
                 <StackPanel
                     Orientation="Horizontal">
-                    
+
                     <ui:SymbolIcon
                         Margin="0,0,8,0"
                         ToolTip="{Binding PrintSheetSettings.FormatOrientation}"
@@ -93,7 +96,7 @@
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
             </CheckBox>
-            
+
             <ui:TextBlock
                 Grid.Column="1"
                 x:Name="FormatName"
@@ -113,11 +116,17 @@
 
                 <ui:Button
                     Icon="{ui:SymbolIcon Print24}"
-                    Style="{StaticResource TreeItemButtonStyle}" />
-
+                    Style="{StaticResource TreeItemButtonStyle}"
+                    Visibility="{Binding DataContext.ShowPrint,
+                        RelativeSource={RelativeSource AncestorType=Window},
+                        Converter={StaticResource ExportVisibilityConverter}}"/>
+                
                 <ui:Button
-                    Icon="{ui:SymbolIcon DocumentPdf24}"
-                    Style="{StaticResource TreeItemButtonStyle}" />
+                    Icon="{ui:SymbolIcon Document24}"
+                    Style="{StaticResource TreeItemButtonStyle}"
+                    Visibility="{Binding DataContext.ShowExport,
+                        RelativeSource={RelativeSource AncestorType=Window},
+                        Converter={StaticResource ExportVisibilityConverter}}"/>
             </StackPanel>
         </Grid>
 
@@ -127,7 +136,7 @@
                 Binding="{Binding Path=IsMouseOver,
                     RelativeSource={RelativeSource AncestorType=TreeViewItem}}">
                 <Setter TargetName="Buttons" Property="Visibility" Value="Visible" />
-                <Setter TargetName="FormatName" Property="Margin" Value="0 0 90 0" />
+                <Setter TargetName="FormatName" Property="Margin" Value="0 0 70 0" />
             </DataTrigger>
         </HierarchicalDataTemplate.Triggers>
 

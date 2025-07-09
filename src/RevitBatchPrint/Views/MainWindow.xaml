@@ -73,9 +73,20 @@
                     Orientation="Horizontal">
 
                     <ui:ToggleSwitch
-                        Margin="8 0"
-                        OnContent="{me:LocalizationSource MainWindow.ExportMode}"
-                        OffContent="{me:LocalizationSource MainWindow.PrintMode}">
+                        Margin="8 0">
+
+                        <ui:ToggleSwitch.OnContent>
+                            <ui:SymbolIcon
+                                Symbol="Document24"
+                                ToolTip="{me:LocalizationSource MainWindow.ExportMode}" />
+                        </ui:ToggleSwitch.OnContent>
+
+                        <ui:ToggleSwitch.OffContent>
+                            <ui:SymbolIcon
+                                Symbol="Print24"
+                                ToolTip="{me:LocalizationSource MainWindow.PrintMode}" />
+                        </ui:ToggleSwitch.OffContent>
+
                         <b:Interaction.Triggers>
                             <b:EventTrigger
                                 EventName="Click">
