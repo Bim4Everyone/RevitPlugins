@@ -79,15 +79,9 @@ internal class RevitRepository {
 
         foreach(var linkedFile in linkedFiles) {
             var linkInstance = linkedFile.LinkedFile;
-
-            if(Document.GetElement(linkInstance.GetTypeId()) is not RevitLinkType linkType) {
-                failedFiles.Add(linkInstance.Name);
-                continue;
-            }
-
+            var linkType = (RevitLinkType) Document.GetElement(linkInstance.GetTypeId());
             var externalRef = linkType.GetExternalFileReference();
             var modelPath = externalRef.GetAbsolutePath();
-
             var allLinkWorksets = WorksharingUtils.GetUserWorksetInfo(modelPath);
 
             var worksetsToOpen = allLinkWorksets
