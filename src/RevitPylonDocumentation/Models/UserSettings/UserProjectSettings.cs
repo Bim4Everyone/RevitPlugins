@@ -35,6 +35,8 @@ internal class UserProjectSettings : BaseViewModel {
     private string _pylonLengthParamNameTemp = "ФОП_РАЗМ_Длина";
     private string _pylonWidthParamNameTemp = "ФОП_РАЗМ_Ширина";
 
+    private string _spotDimensionTypeNameTemp = "Стрелка_Проектная_Верх";
+
     public UserProjectSettings(MainViewModel mainViewModel, RevitRepository repository) {
         ViewModel = mainViewModel;
         Repository = repository;
@@ -157,6 +159,12 @@ internal class UserProjectSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _pylonWidthParamNameTemp, value);
     }
 
+    public string SpotDimensionTypeName { get; set; }
+    public string SpotDimensionTypeNameTemp {
+        get => _spotDimensionTypeNameTemp;
+        set => RaiseAndSetIfChanged(ref _spotDimensionTypeNameTemp, value);
+    }
+
     public void ApplyProjectSettings() {
         ProjectSection = ProjectSectionTemp;
         Mark = MarkTemp;
@@ -182,6 +190,8 @@ internal class UserProjectSettings : BaseViewModel {
 
         PylonLengthParamName = PylonLengthParamNameTemp;
         PylonWidthParamName = PylonWidthParamNameTemp;
+
+        SpotDimensionTypeName = SpotDimensionTypeNameTemp;
     }
 
     public void CheckProjectSettings() {

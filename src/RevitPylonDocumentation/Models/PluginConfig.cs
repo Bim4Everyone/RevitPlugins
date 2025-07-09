@@ -82,6 +82,10 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.LegendXOffset = settings.LegendXOffset;
         projectSettings.LegendXOffsetTemp = settings.LegendXOffset;
         projectSettings.LegendYOffset = settings.LegendYOffset;
+        projectSettings.LegendYOffsetTemp = settings.LegendYOffset;
+
+        projectSettings.SpotDimensionTypeName = settings.SpotDimensionTypeName;
+        projectSettings.SpotDimensionTypeNameTemp = settings.SpotDimensionTypeName;
 
         viewSectionSettings.GeneralViewPrefix = settings.GeneralViewPrefix;
         viewSectionSettings.GeneralViewPrefixTemp = settings.GeneralViewPrefix;
@@ -249,6 +253,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.TitleBlockName = projectSettings.TitleBlockName;
         settings.DispatcherGroupingFirst = projectSettings.DispatcherGroupingFirst;
         settings.DispatcherGroupingSecond = projectSettings.DispatcherGroupingSecond;
+        settings.SpotDimensionTypeName = projectSettings.SpotDimensionTypeName;
 
         settings.SheetSize = projectSettings.SheetSize;
         settings.SheetCoefficient = projectSettings.SheetCoefficient;
@@ -370,6 +375,7 @@ internal class PluginSettings : ProjectSettings {
     public string TitleBlockName { get; set; }
     public string DispatcherGroupingFirst { get; set; }
     public string DispatcherGroupingSecond { get; set; }
+    public string SpotDimensionTypeName { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public string SheetPrefix { get; set; }

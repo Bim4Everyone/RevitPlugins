@@ -445,6 +445,42 @@
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Выберите типоразмер высотной отметки:">
+                                        </TextBlock>
+
+                                        <ComboBox
+                                            Style="{StaticResource ComboBoxWithTooltipStyle}"
+                                            Margin="10 0 10 10"
+                                            Width="460"
+                                            Height="25"
+                                            HorizontalAlignment="Left"
+                                            ItemsSource="{Binding Path=SpotDimensionTypes}"
+                                            SelectedItem="{Binding Path=SelectedSpotDimensionType}">
+
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock>
+                                                        <TextBlock.Text>
+                                                            <Binding
+                                                                Path="Name" />
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                            RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
                                     </StackPanel>
                                 </GroupBox>
 

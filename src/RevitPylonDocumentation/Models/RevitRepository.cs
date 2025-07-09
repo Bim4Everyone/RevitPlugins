@@ -71,6 +71,7 @@ internal class RevitRepository {
             .OfType<ViewFamilyType>()
             .Where(a => ViewFamily.Section == a.ViewFamily)
             .ToList();
+    
     /// <summary>
     /// Возвращает список всех легенд, присутствующих в проекте
     /// </summary>
@@ -79,6 +80,7 @@ internal class RevitRepository {
             .OfType<View>()
             .Where(view => view.ViewType == ViewType.Legend)
             .ToList();
+    
     /// <summary>
     /// Возвращает список всех шаблонов сечений в проекте
     /// </summary>
@@ -88,6 +90,14 @@ internal class RevitRepository {
             .OfType<ViewSection>()
             .Where(v => v.IsTemplate == true)
             .OrderBy(a => a.Name)
+            .ToList();
+
+    /// <summary>
+    /// Возвращает список типоразмеров высотных отметок
+    /// </summary>
+    public List<SpotDimensionType> SpotDimensionTypes => new FilteredElementCollector(Document)
+            .OfClass(typeof(SpotDimensionType))
+            .OfType<SpotDimensionType>()
             .ToList();
 
 

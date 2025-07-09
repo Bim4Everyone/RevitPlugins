@@ -29,6 +29,7 @@ internal class MainViewModel : BaseViewModel {
     private bool _pylonSelectedManually = false;
     private string _selectedProjectSection = string.Empty;
     private ViewFamilyType _selectedViewFamilyType;
+    private SpotDimensionType _selectedSpotDimensionType;
     private View _selectedGeneralViewTemplate;
     private View _selectedGeneralRebarViewTemplate;
     private View _selectedTransverseViewTemplate;
@@ -56,6 +57,7 @@ internal class MainViewModel : BaseViewModel {
         TitleBlocks = _revitRepository.TitleBlocksInProject;
         Legends = _revitRepository.LegendsInProject;
         ViewTemplatesInPj = _revitRepository.AllViewTemplates;
+        SpotDimensionTypes = _revitRepository.SpotDimensionTypes;
 
         SetHostsInfoFilters();
 
@@ -203,6 +205,22 @@ internal class MainViewModel : BaseViewModel {
         set {
             RaiseAndSetIfChanged(ref _selectedViewFamilyType, value);
             ViewSectionSettings.ViewFamilyTypeNameTemp = value?.Name;
+        }
+    }
+
+    /// <summary>
+    /// Типоразмеры высотных отметок, имеющиеся в проекте
+    /// </summary>
+    public List<SpotDimensionType> SpotDimensionTypes { get; set; } = [];
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер высотной отметки
+    /// </summary>
+    public SpotDimensionType SelectedSpotDimensionType {
+        get => _selectedSpotDimensionType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedSpotDimensionType, value);
+            ProjectSettings.SpotDimensionTypeNameTemp = value?.Name;
         }
     }
 
@@ -474,6 +492,7 @@ internal class MainViewModel : BaseViewModel {
         FindTransverseViewTemplate();
         FindTransverseRebarViewTemplate();
         FindViewFamilyType();
+        FindSpotDimensionType();
         FindLegend();
         FindRebarNode();
         FindTitleBlock();
@@ -519,6 +538,16 @@ internal class MainViewModel : BaseViewModel {
 
         if(SelectedRebarNode is null) {
             ErrorText = "Не выбран узел армирования";
+            return;
+        }
+
+        if(SelectedViewFamilyType is null) {
+            ErrorText = "Не выбран типоразмер создаваемого вида";
+            return;
+        }
+
+        if(SelectedSpotDimensionType is null) {
+            ErrorText = "Не выбран типоразмер высотной отметки";
             return;
         }
 
@@ -617,6 +646,16 @@ internal class MainViewModel : BaseViewModel {
         if(ViewSectionSettings.ViewFamilyTypeName != string.Empty) {
             SelectedViewFamilyType = ViewFamilyTypes
                 .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер вида для создаваемых видов
+    /// </summary>
+    public void FindSpotDimensionType() {
+        if(ProjectSettings.SpotDimensionTypeName != string.Empty) {
+            SelectedSpotDimensionType = SpotDimensionTypes
+                .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ProjectSettings.SpotDimensionTypeName));
         }
     }
 
