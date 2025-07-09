@@ -43,9 +43,17 @@
             <ui:AutoSuggestBox
                 Margin="14,8,14,8"
                 Icon="{ui:SymbolIcon TextAlignJustify24}"
-                Text="{Binding AlbumParamName}"
+                Text="{Binding AlbumParamName, Mode=TwoWay}"
                 PlaceholderText="{me:LocalizationSource MainWindow.AlbumHintText}"
-                OriginalItemsSource="{Binding AlbumParamNames}" />
+                OriginalItemsSource="{Binding AlbumParamNames}">
+                
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="TextChanged">
+                        <b:InvokeCommandAction
+                            Command="{Binding ChangeAlbumNameCommand}" />
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+            </ui:AutoSuggestBox>
         </Border>
 
         <Border

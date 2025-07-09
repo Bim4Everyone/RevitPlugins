@@ -31,10 +31,10 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _searchText;
-    
+
     private bool _showPrint;
     private bool _showExport;
-    
+
     private string _albumParamName;
     private PrintOptionsViewModel _printOptions;
 
@@ -65,6 +65,7 @@ internal class MainViewModel : BaseViewModel {
         ExportCommand = RelayCommand.Create(Export, CanExport);
 
         SearchCommand = RelayCommand.Create(ApplySearch);
+        ChangeAlbumNameCommand = RelayCommand.Create(ChangeAlbumName);
 
         ShowPrint = true;
         ShowExport = false;
@@ -77,6 +78,7 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ExportCommand { get; }
 
     public ICommand SearchCommand { get; set; }
+    public ICommand ChangeAlbumNameCommand { get; set; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -132,7 +134,7 @@ internal class MainViewModel : BaseViewModel {
         LoadConfig();
         CreateAlbumCollection();
     }
-    
+
     private void ChangeMode() {
         ShowPrint = !ShowPrint;
         ShowExport = !ShowExport;
@@ -202,7 +204,7 @@ internal class MainViewModel : BaseViewModel {
         foreach(AlbumViewModel albumViewModel in MainAlbums) {
             albumViewModel.FilterSheets(SearchText);
         }
-        
+
         if(string.IsNullOrWhiteSpace(SearchText)) {
             FilteredAlbums = new ObservableCollection<AlbumViewModel>(MainAlbums);
         } else {
@@ -212,6 +214,10 @@ internal class MainViewModel : BaseViewModel {
                         item.FilteredSheets.Count > 0
                         || item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0));
         }
+    }
+
+    private void ChangeAlbumName() {
+        CreateAlbumCollection();
     }
 
     private void CreateAlbumCollection() {
@@ -259,8 +265,9 @@ internal class MainViewModel : BaseViewModel {
 
         AlbumParamName = setting?.AlbumParamName;
         AlbumParamName ??= AlbumParamNames
-            .FirstOrDefault(item =>
-                PluginSystemConfig.PrintParamNames.Contains(item));
+                               .FirstOrDefault(item =>
+                                   PluginSystemConfig.PrintParamNames.Contains(item))
+                           ?? AlbumParamNames.FirstOrDefault();
 
         PrintOptions = new PrintOptionsViewModel(setting?.PrintOptions ?? new PrintOptions()) {
             PrinterNames = new ObservableCollection<string>(_printerService.EnumPrinterNames())

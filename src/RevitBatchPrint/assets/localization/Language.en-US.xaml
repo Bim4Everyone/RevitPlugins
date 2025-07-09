@@ -4,7 +4,7 @@
 
     <system:String x:Key="MainWindow.Title">Revit batch print</system:String>
 
-    <system:String x:Key="MainWindow.AlbumHintText">Select the grouping parameter</system:String>
+    <system:String x:Key="MainWindow.AlbumHintText">Choose the grouping parameter name</system:String>
     <system:String x:Key="MainWindow.SearchHintText">Search</system:String>
     <system:String x:Key="MainWindow.EmptyAlbumNameParam">Noname</system:String>
 
