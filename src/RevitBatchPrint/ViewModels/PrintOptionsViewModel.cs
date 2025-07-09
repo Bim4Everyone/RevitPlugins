@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -34,9 +36,13 @@ internal sealed class PrintOptionsViewModel : BaseViewModel {
     private bool _hideCropBoundaries;
     private bool _replaceHalftoneWithThinLines;
 
-    public PrintOptionsViewModel(PrintOptions printOptions) {
+    public PrintOptionsViewModel(IEnumerable<string> printerNames, PrintOptions printOptions) {
+        PrinterNames = new  ObservableCollection<string>(printerNames);
+        
         FilePath = printOptions.FilePath;
-        PrinterName = printOptions.PrinterName;
+        PrinterName = PrinterNames
+                          .FirstOrDefault(item => printOptions.PrinterName.Equals(item))
+                      ?? PrinterNames.FirstOrDefault();
 
         Zoom = printOptions.Zoom;
         ZoomType = printOptions.ZoomType;

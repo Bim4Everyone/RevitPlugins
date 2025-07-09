@@ -61,13 +61,15 @@
             Margin="8 0 8 8"
             Padding="0"
             Background="{DynamicResource CardBackground}"
-            CornerRadius="{DynamicResource ControlCornerRadius}">
+            CornerRadius="{DynamicResource ControlCornerRadius}"
+            Visibility="{Binding ShowPrint,
+                    Converter={StaticResource ExportVisibilityConverter}}">
             <ComboBox
                 Margin="14,8,14,8"
+                IsEnabled="True"
+                IsReadOnly="False"
                 ItemsSource="{Binding Path=PrintOptions.PrinterNames, Mode=OneWay}"
-                SelectedValue="{Binding Path=PrintOptions.PrinterName, Mode=OneWay}"
-                Visibility="{Binding ShowPrint,
-                    Converter={StaticResource ExportVisibilityConverter}}" />
+                SelectedValue="{Binding Path=PrintOptions.PrinterName, Mode=TwoWay}" />
         </Border>
 
         <Border
@@ -75,14 +77,14 @@
             Margin="8 0 8 8"
             Padding="0"
             Background="{DynamicResource CardBackground}"
-            CornerRadius="{DynamicResource ControlCornerRadius}">
+            CornerRadius="{DynamicResource ControlCornerRadius}"
+            Visibility="{Binding ShowExport,
+                    Converter={StaticResource ExportVisibilityConverter}}">
             <ui:TextBox
                 Height="36.5"
                 Margin="14,8,14,8"
                 Icon="{ui:SymbolIcon DocumentPdf24}"
-                Text="{Binding Path=PrintOptions.FilePath, Mode=OneWay}"
-                Visibility="{Binding ShowExport,
-                    Converter={StaticResource ExportVisibilityConverter}}" />
+                Text="{Binding Path=PrintOptions.FilePath, Mode=OneWay}" />
         </Border>
 
         <Border

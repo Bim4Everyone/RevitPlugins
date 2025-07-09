@@ -269,9 +269,7 @@ internal class MainViewModel : BaseViewModel {
                                    PluginSystemConfig.PrintParamNames.Contains(item))
                            ?? AlbumParamNames.FirstOrDefault();
 
-        PrintOptions = new PrintOptionsViewModel(setting?.PrintOptions ?? new PrintOptions()) {
-            PrinterNames = new ObservableCollection<string>(_printerService.EnumPrinterNames())
-        };
+        PrintOptions = new PrintOptionsViewModel(_printerService.EnumPrinterNames(), setting?.PrintOptions ?? new PrintOptions());
     }
 
     /// <summary>
