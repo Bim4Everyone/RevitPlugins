@@ -88,14 +88,15 @@
                     Height="36.5"
                     Margin="14 8"
                     Icon="{ui:SymbolIcon Folder24}"
-                    ToolTip="{me:LocalizationSource MainWindow.ChooseFileName}"/>
+                    ToolTip="{me:LocalizationSource MainWindow.ChooseFileName}"
+                    Command="{Binding ChooseSaveFileCommand}"/>
                 
                 <ui:TextBox
                     DockPanel.Dock="Left"
                     Height="36.5"
                     Margin="14,8,0,8"
                     Icon="{ui:SymbolIcon DocumentPdf24}"
-                    Text="{Binding Path=PrintOptions.FilePath, Mode=OneWay}" />
+                    Text="{Binding Path=PrintOptions.FilePath, Mode=TwoWay}" />
             </DockPanel>
 
         </Border>

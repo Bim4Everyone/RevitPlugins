@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 
@@ -28,6 +29,7 @@ internal class MainViewModel : BaseViewModel {
 
     private readonly IPrinterService _printerService;
     private readonly ILocalizationService _localizationService;
+    private readonly ISaveFileDialogService _saveFileDialogService;
 
     private string _errorText;
     private string _searchText;
@@ -48,7 +50,8 @@ internal class MainViewModel : BaseViewModel {
         RevitPrint revitPrint,
         RevitExportToPdf revitExport,
         IPrinterService printerService,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService,
+        ISaveFileDialogService saveFileDialogService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
 
@@ -57,9 +60,11 @@ internal class MainViewModel : BaseViewModel {
 
         _printerService = printerService;
         _localizationService = localizationService;
+        _saveFileDialogService = saveFileDialogService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         ChangeModeCommand = RelayCommand.Create(ChangeMode);
+        ChooseSaveFileCommand = RelayCommand.Create(ChooseSaveFile);
 
         PrintCommand = RelayCommand.Create(Print, CanPrint);
         ExportCommand = RelayCommand.Create(Export, CanExport);
@@ -73,6 +78,7 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand LoadViewCommand { get; }
     public ICommand ChangeModeCommand { get; }
+    public ICommand ChooseSaveFileCommand { get; }
 
     public ICommand PrintCommand { get; }
     public ICommand ExportCommand { get; }
@@ -138,6 +144,20 @@ internal class MainViewModel : BaseViewModel {
     private void ChangeMode() {
         ShowPrint = !ShowPrint;
         ShowExport = !ShowExport;
+    }
+
+    private void ChooseSaveFile() {
+        string fileName = string.IsNullOrEmpty(PrintOptions.FilePath)
+            ? $"{_revitRepository.Document.Title}.pdf"
+            : Path.GetFileName(PrintOptions.FilePath);
+
+        string folderName = string.IsNullOrEmpty(PrintOptions.FilePath)
+            ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            : Path.GetDirectoryName(PrintOptions.FilePath);
+
+        if(_saveFileDialogService.ShowDialog(folderName, fileName)) {
+            PrintOptions.FilePath = _saveFileDialogService.File.FullName;
+        }
     }
 
     private void Print() {
