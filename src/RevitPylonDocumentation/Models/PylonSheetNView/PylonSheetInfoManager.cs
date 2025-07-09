@@ -234,6 +234,8 @@ internal class PylonSheetInfoManager {
             if(SheetInfo.GeneralView.ViewElement != null) {
                 SheetInfo.GeneralView.ViewDimensionCreator
                     .TryCreateGeneralViewDimensions();
+                SheetInfo.TransverseViewFirst.ViewMarkCreator
+                    .TryCreateGeneralViewMarks();
             }
         }
 
