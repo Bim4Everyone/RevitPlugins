@@ -82,23 +82,20 @@
             Background="{DynamicResource CardBackground}"
             CornerRadius="{DynamicResource ControlCornerRadius}">
 
-            <StackPanel>
+            <DockPanel>
                 <ui:AutoSuggestBox
+                    DockPanel.Dock="Top"
                     Margin="14,8,14,8"
                     Text="{Binding SearchText, Delay=250}"
                     PlaceholderText="{me:LocalizationSource MainWindow.SearchHintText}" />
 
-                <ScrollViewer
+                <TreeView
+                    DockPanel.Dock="Bottom"
                     Margin="14,0,14,8"
-                    VerticalScrollBarVisibility="Auto"
-                    HorizontalScrollBarVisibility="Disabled">
-
-                    <TreeView
-                        ItemTemplate="{StaticResource TreeViewTemplate}"
-                        ItemsSource="{Binding FilteredAlbums}"
-                        ItemContainerStyle="{StaticResource CustomTreeViewItemStyle}" />
-                </ScrollViewer>
-            </StackPanel>
+                    ItemTemplate="{StaticResource TreeViewTemplate}"
+                    ItemsSource="{Binding FilteredAlbums}"
+                    ItemContainerStyle="{StaticResource CustomTreeViewItemStyle}" />
+            </DockPanel>
 
         </Border>
     </Grid>
