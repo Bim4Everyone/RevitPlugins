@@ -20,7 +20,7 @@ namespace RevitBatchPrint.ViewModels;
 /// <summary>
 /// Основная ViewModel главного окна плагина.
 /// </summary>
-internal class MainViewModel : BaseViewModel {
+internal class MainViewModel : BaseViewModel, IPrintContext {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
 
@@ -36,6 +36,7 @@ internal class MainViewModel : BaseViewModel {
 
     private bool _showPrint;
     private bool _showExport;
+    private IRevitPrint _currentPrintExport;
 
     private string _albumParamName;
     private PrintOptionsViewModel _printOptions;
@@ -64,7 +65,7 @@ internal class MainViewModel : BaseViewModel {
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptVewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-        
+
         ChangeModeCommand = RelayCommand.Create(ChangeMode);
         ChooseSaveFileCommand = RelayCommand.Create(ChooseSaveFile);
 
@@ -73,14 +74,15 @@ internal class MainViewModel : BaseViewModel {
 
         ShowPrint = true;
         ShowExport = false;
+        _currentPrintExport = _revitPrint;
     }
 
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptVewCommand { get; }
-    
+
     public ICommand ChangeModeCommand { get; }
     public ICommand ChooseSaveFileCommand { get; }
-    
+
     public ICommand SearchCommand { get; set; }
     public ICommand ChangeAlbumNameCommand { get; set; }
 
@@ -142,6 +144,12 @@ internal class MainViewModel : BaseViewModel {
     private void ChangeMode() {
         ShowPrint = !ShowPrint;
         ShowExport = !ShowExport;
+
+        if(ShowPrint) {
+            _currentPrintExport = _revitPrint;
+        } else if(ShowExport) {
+            _currentPrintExport = _revitExport;
+        }
     }
 
     private void ChooseSaveFile() {
@@ -159,7 +167,25 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AcceptView() {
-        AcceptView(_revitPrint);
+        SaveConfig();
+
+        IEnumerable<SheetViewModel> sheets = MainAlbums
+            .SelectMany(item => item.MainSheets)
+            .Where(item => item.IsSelected);
+
+        ExecutePrintExport(sheets);
+    }
+
+    public void ExecutePrintExport(IEnumerable<SheetViewModel> sheets) {
+        SheetElement[] sheetElements = sheets
+            .Select(item => item.CreateSheetElement())
+            .ToArray();
+
+        _currentPrintExport.Execute(sheetElements, PrintOptions.CreatePrintOptions());
+    }
+
+    public bool CanExecutePrintExport(IEnumerable<SheetViewModel> sheets) {
+        return CanAcceptView();
     }
 
     private bool CanAcceptView() {
@@ -167,12 +193,12 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedAlbumParamName");
             return false;
         }
-        
+
         if(ShowPrint && string.IsNullOrEmpty(PrintOptions.PrinterName)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedPrinter");
             return false;
         }
-        
+
         if(ShowExport && string.IsNullOrEmpty(PrintOptions.FilePath)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedFilePath");
             return false;
@@ -185,18 +211,6 @@ internal class MainViewModel : BaseViewModel {
 
         ErrorText = null;
         return true;
-    }
-
-    private void AcceptView(IRevitPrint revitPrint) {
-        SaveConfig();
-
-        SheetElement[] sheetElements = MainAlbums
-            .SelectMany(item => item.MainSheets)
-            .Where(item => item.IsSelected)
-            .Select(item => item.CreateSheetElement())
-            .ToArray();
-
-        revitPrint.Execute(sheetElements, PrintOptions.CreatePrintOptions());
     }
 
     private void ApplySearch() {
@@ -234,7 +248,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private AlbumViewModel CreateAlbum(string albumName, IEnumerable<ViewSheet> viewSheets) {
-        var viewModel = new AlbumViewModel(albumName, _localizationService);
+        var viewModel = new AlbumViewModel(albumName, this, _localizationService);
 
         SheetViewModel[] sheets = CreateSheetCollection(viewModel, viewSheets);
         viewModel.MainSheets = new ObservableCollection<SheetViewModel>(sheets);
@@ -251,7 +265,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private SheetViewModel CreateSheet(ViewSheet viewSheet, AlbumViewModel album) {
-        return new SheetViewModel(viewSheet, album, _localizationService) {
+        return new SheetViewModel(viewSheet, album, this) {
             PrintSheetSettings = _revitRepository.GetPrintSettings(viewSheet)
         };
     }
@@ -268,7 +282,9 @@ internal class MainViewModel : BaseViewModel {
                                    PluginSystemConfig.PrintParamNames.Contains(item))
                            ?? AlbumParamNames.FirstOrDefault();
 
-        PrintOptions = new PrintOptionsViewModel(_printerService.EnumPrinterNames(), setting?.PrintOptions ?? new PrintOptions());
+        PrintOptions = new PrintOptionsViewModel(
+            _printerService.EnumPrinterNames(),
+            setting?.PrintOptions ?? new PrintOptions());
     }
 
     /// <summary>

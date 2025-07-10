@@ -10,8 +10,8 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    
-    <converters:BoolToVisibilityConverter x:Key="ExportVisibilityConverter"/>
+
+    <converters:BoolToVisibilityConverter x:Key="ExportVisibilityConverter" />
 
     <ui:SymbolRegular x:Key="SymbolPortrait">Document24</ui:SymbolRegular>
     <db:PageOrientationType x:Key="PageTypePortrait">Portrait</db:PageOrientationType>
@@ -117,16 +117,18 @@
                 <ui:Button
                     Icon="{ui:SymbolIcon Print24}"
                     Style="{StaticResource TreeItemButtonStyle}"
+                    Command="{Binding PrintExportCommand}"
                     Visibility="{Binding DataContext.ShowPrint,
                         RelativeSource={RelativeSource AncestorType=Window},
-                        Converter={StaticResource ExportVisibilityConverter}}"/>
-                
+                        Converter={StaticResource ExportVisibilityConverter}}" />
+
                 <ui:Button
                     Icon="{ui:SymbolIcon Document24}"
                     Style="{StaticResource TreeItemButtonStyle}"
+                    Command="{Binding PrintExportCommand}"
                     Visibility="{Binding DataContext.ShowExport,
                         RelativeSource={RelativeSource AncestorType=Window},
-                        Converter={StaticResource ExportVisibilityConverter}}"/>
+                        Converter={StaticResource ExportVisibilityConverter}}" />
             </StackPanel>
         </Grid>
 

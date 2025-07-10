@@ -12,10 +12,12 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitBatchPrint.Models;
+
 namespace RevitBatchPrint.ViewModels;
 
 internal sealed class AlbumViewModel : BaseViewModel {
-    private readonly ILocalizationService _localizationService;
+    private readonly IPrintContext _printContext;
 
     private bool? _isSelected;
     private ObservableCollection<SheetViewModel> _mainSheets;
@@ -23,8 +25,9 @@ internal sealed class AlbumViewModel : BaseViewModel {
 
     public AlbumViewModel(
         string albumName,
+        IPrintContext printContext,
         ILocalizationService localizationService) {
-        _localizationService = localizationService;
+        _printContext = printContext;
 
         IsSelected = false;
 
@@ -34,10 +37,12 @@ internal sealed class AlbumViewModel : BaseViewModel {
 
         CheckCommand = RelayCommand.Create(Check);
         CheckUpdateCommand = RelayCommand.Create(CheckUpdate);
+        PrintExportCommand = RelayCommand.Create(ExecutePrintExport, CanExecutePrintExport);
     }
 
     public ICommand CheckCommand { get; }
     public ICommand CheckUpdateCommand { get; }
+    public ICommand PrintExportCommand { get; }
 
     public string Name { get; }
 
@@ -86,5 +91,13 @@ internal sealed class AlbumViewModel : BaseViewModel {
         } else if(MainSheets.Count == countSelected) {
             IsSelected = true;
         }
+    }
+    
+    private void ExecutePrintExport() {
+        _printContext.ExecutePrintExport(MainSheets);
+    }
+
+    private bool CanExecutePrintExport() {
+        return _printContext.CanExecutePrintExport(MainSheets);
     }
 }
