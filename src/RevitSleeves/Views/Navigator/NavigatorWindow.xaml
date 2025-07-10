@@ -18,9 +18,6 @@
     d:DataContext="{d:DesignInstance vms:NavigatorViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
-            <ui:TextBlock
-                x:Key="GroupItemsCountTextBlock"
-                Text="{me:LocalizationSource GroupItemsCount}" />
             <CollectionViewSource
                 x:Key="groupedSleeves"
                 Source="{Binding Sleeves}">

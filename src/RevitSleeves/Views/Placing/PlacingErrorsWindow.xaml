@@ -15,9 +15,6 @@
     d:DataContext="{d:DesignInstance vm:PlacingErrorsViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <ResourceDictionary>
-            <ui:TextBlock
-                x:Key="GroupItemsCountTextBlock"
-                Text="{me:LocalizationSource GroupItemsCount}" />
             <CollectionViewSource
                 x:Key="groupedErrors"
                 Source="{Binding Errors}">
