@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Placing.FamilySymbolFinder;
 using RevitSleeves.Services.Placing.LevelFinder;
@@ -55,7 +56,7 @@ internal abstract class PlacingOptsProvider<T> : IPlacingOptsProvider<T> where T
                 ParamsSetter = _paramsSetterFinder.GetParamsSetter(param),
                 DependentElements = GetDependentElements(param)
             };
-        } catch(InvalidOperationException) {
+        } catch(CannotCreateSleeveException) {
             return null;
         }
     }

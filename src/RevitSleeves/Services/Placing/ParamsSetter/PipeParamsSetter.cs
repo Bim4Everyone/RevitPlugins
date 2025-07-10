@@ -6,6 +6,7 @@ using Autodesk.Revit.DB.Plumbing;
 
 using dosymep.Revit;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 
@@ -31,11 +32,11 @@ internal abstract class PipeParamsSetter : ParamsSetter {
             double pipeDiameter = _revitRepository.ConvertFromInternal(
                 pipe.GetParamValue<double>(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER));
             return _revitRepository.ConvertToInternal(_config.PipeSettings.DiameterRanges
-                .First(d => d.StartMepSize <= pipeDiameter && pipeDiameter <= d.EndMepSize)
+                .FirstOrDefault(d => d.StartMepSize <= pipeDiameter && pipeDiameter <= d.EndMepSize)
                 .SleeveDiameter);
-        } catch(ArgumentNullException) {
+        } catch(NullReferenceException) {
             _errorsService.AddError([pipe], "Exceptions.CannotFindDiameterRange");
-            throw new InvalidOperationException();
+            throw new CannotCreateSleeveException();
         }
     }
 }

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
+using Autodesk.Revit.DB;
+
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Placing.PlacingOptsProvider;
@@ -36,12 +39,21 @@ internal class SleeveMergeService : ISleeveMergeService {
         foreach(var opt in opts) {
             ct.ThrowIfCancellationRequested();
             progress?.Report(++i);
+            FamilyInstance instance = default;
             try {
-                var instance = _revitRepository.CreateInstance(opt.FamilySymbol, opt.Point, opt.Level);
+                instance = _revitRepository.CreateInstance(opt.FamilySymbol, opt.Point, opt.Level);
                 _revitRepository.RotateElement(instance, opt.Point, opt.Rotation);
                 opt.ParamsSetter.SetParamValues(instance);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 _errorsService.AddError(opt.DependentElements, "Exceptions.CannotMergeSleeves");
+                if(instance is not null) {
+                    _revitRepository.DeleteElement(instance.Id);
+                }
+                continue;
+            } catch(CannotCreateSleeveException) {
+                if(instance is not null) {
+                    _revitRepository.DeleteElement(instance.Id);
+                }
                 continue;
             }
             _revitRepository.DeleteElements([.. opt.DependentElements.Select(e => e.Id)]);

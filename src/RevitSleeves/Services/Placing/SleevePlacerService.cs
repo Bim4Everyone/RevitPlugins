@@ -4,6 +4,7 @@ using System.Threading;
 
 using Autodesk.Revit.DB;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Placing;
 
@@ -31,23 +32,37 @@ internal class SleevePlacerService : ISleevePlacerService {
         foreach(var opt in opts) {
             ct.ThrowIfCancellationRequested();
             progress?.Report(++i);
-            FamilyInstance instance;
+            FamilyInstance instance = default;
             try {
                 instance = _revitRepository.CreateInstance(opt.FamilySymbol, opt.Point, opt.Level);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 _errorsService.AddError(opt.DependentElements, "Exceptions.CannotCreateSleeve");
+                if(instance is not null) {
+                    _revitRepository.DeleteElement(instance.Id);
+                }
                 continue;
             }
             try {
                 _revitRepository.RotateElement(instance, opt.Point, opt.Rotation);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 _errorsService.AddError(opt.DependentElements, "Exceptions.CannotRotateSleeve");
+                if(instance is not null) {
+                    _revitRepository.DeleteElement(instance.Id);
+                }
                 continue;
             }
             try {
                 opt.ParamsSetter.SetParamValues(instance);
             } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 _errorsService.AddError(opt.DependentElements, "Exceptions.CannotSetSleeveParams");
+                if(instance is not null) {
+                    _revitRepository.DeleteElement(instance.Id);
+                }
+                continue;
+            } catch(CannotCreateSleeveException) {
+                if(instance is not null) {
+                    _revitRepository.DeleteElement(instance.Id);
+                }
                 continue;
             }
             _revitRepository.Document.Regenerate(); // решение бага, когда значения параметров,

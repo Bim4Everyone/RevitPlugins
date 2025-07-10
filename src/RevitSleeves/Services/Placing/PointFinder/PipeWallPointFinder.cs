@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
@@ -34,7 +35,7 @@ internal class PipeWallPointFinder : IPointFinder<ClashModel<Pipe, Wall>> {
         var backIntersect = backFace.Intersect(mepCurve, out var backResults);
         if(frontIntersect != SetComparisonResult.Overlap || backIntersect != SetComparisonResult.Overlap) {
             _errorsService.AddError([param.MepElement, param.StructureElement], "Exceptions.CannotFindPlacingPoint");
-            throw new InvalidOperationException();
+            throw new CannotCreateSleeveException();
         }
 
         var frontPoint = frontResults.get_Item(0).XYZPoint;
@@ -46,15 +47,15 @@ internal class PipeWallPointFinder : IPointFinder<ClashModel<Pipe, Wall>> {
     private void Check(ClashModel<Pipe, Wall> param) {
         if(_geometryUtils.IsVertical(param.MepElement)) {
             _errorsService.AddError([param.MepElement, param.StructureElement], "Exceptions.MepCurveIsVertical");
-            throw new InvalidOperationException();
+            throw new CannotCreateSleeveException();
         }
         if(((LocationCurve) param.StructureElement.Location).Curve is not Line wallLine) {
             _errorsService.AddError([param.MepElement, param.StructureElement], "Exceptions.WallLocationIsNotLine");
-            throw new InvalidOperationException();
+            throw new CannotCreateSleeveException();
         }
         if(((Line) ((LocationCurve) param.MepElement.Location).Curve).Direction.IsAlmostEqualTo(wallLine.Direction)) {
             _errorsService.AddError([param.MepElement, param.StructureElement], "Exceptions.MepCurveIsParallelToWall");
-            throw new InvalidOperationException();
+            throw new CannotCreateSleeveException();
         }
     }
 

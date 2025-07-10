@@ -7,6 +7,7 @@ using Autodesk.Revit.DB.Plumbing;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
@@ -50,18 +51,18 @@ internal class PipeFloorPointFinder : IPointFinder<ClashModel<Pipe, Floor>> {
 
         } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             _errorsService.AddError([param.MepElement, param.StructureElement], "Exceptions.CannotFindPlacingPoint");
-            throw new InvalidOperationException();
+            throw new CannotCreateSleeveException();
         }
     }
 
     private void Check(ClashModel<Pipe, Floor> clash) {
         if(!_geometryUtils.IsHorizontal(clash.StructureElement)) {
             _errorsService.AddError([clash.MepElement, clash.StructureElement], "Exceptions.FloorIsNotHorizontal");
-            throw new InvalidOperationException();
+            throw new CannotCreateSleeveException();
         }
         if(!_geometryUtils.IsVertical(clash.MepElement)) {
             _errorsService.AddError([clash.MepElement, clash.StructureElement], "Exceptions.MepCurveIsNotVertical");
-            throw new InvalidOperationException();
+            throw new CannotCreateSleeveException();
         }
     }
 }
