@@ -13,7 +13,7 @@ internal abstract class ParamsSetter {
     /// <param name="point">Точка вставки гильзы</param>
     protected void SetElevation(FamilyInstance sleeve, XYZ point) {
         var level = (Level) sleeve.Document.GetElement(sleeve.LevelId);
-        sleeve.SetParamValue(BuiltInParameter.INSTANCE_ELEVATION_PARAM, point.Z - level.Elevation);
+        sleeve.SetParamValue(BuiltInParameter.INSTANCE_ELEVATION_PARAM, point.Z - level.ProjectElevation);
     }
 
     /// <summary>
