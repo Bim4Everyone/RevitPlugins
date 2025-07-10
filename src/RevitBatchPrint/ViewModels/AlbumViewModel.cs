@@ -68,6 +68,10 @@ internal sealed class AlbumViewModel : BaseViewModel {
             FilteredSheets = new ObservableCollection<SheetViewModel>(
                 MainSheets.Where(item => item.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0));
         }
+
+        // Обновляем выделение после фильтрации,
+        // чтобы выделение стало корректным из-за скрытых элементов
+        CheckUpdate();
     }
 
     public bool HasSelectedSheets() {
@@ -79,20 +83,22 @@ internal sealed class AlbumViewModel : BaseViewModel {
             return;
         }
 
-        foreach(SheetViewModel sheetViewModel in MainSheets) {
+        foreach(SheetViewModel sheetViewModel in FilteredSheets) {
             sheetViewModel.IsSelected = IsSelected.Value;
         }
     }
 
     private void CheckUpdate() {
         int countSelected = MainSheets.Count(item => item.IsSelected);
-        if(MainSheets.Count != countSelected) {
-            IsSelected = null;
+        if(countSelected == 0) {
+            IsSelected = false;
         } else if(MainSheets.Count == countSelected) {
             IsSelected = true;
+        } else if(MainSheets.Count != countSelected) {
+            IsSelected = null;
         }
     }
-    
+
     private void ExecutePrintExport() {
         _printContext.ExecutePrintExport(MainSheets);
     }
