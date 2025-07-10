@@ -36,7 +36,7 @@ internal class UserSelectedStructureLinks : IStructureLinksProvider {
         var links = _revitRepository.GetStructureLinkInstances()
                  .Where(l => _linkTypeIds.Contains(l.GetTypeId()))
                  .ToArray();
-        string duplicatedLink = links.GroupBy(l => l.Name).FirstOrDefault(g => g.Count() > 1)?.Key;
+        string duplicatedLink = links.GroupBy(l => l.GetLinkDocument().Title).FirstOrDefault(g => g.Count() > 1)?.Key;
         if(!string.IsNullOrEmpty(duplicatedLink)) {
             throw new InvalidOperationException(
                 string.Format(_localizationService.GetLocalizedString("Errors.DuplicatedLinks"), duplicatedLink));

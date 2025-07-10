@@ -24,7 +24,7 @@ internal class AllLoadedStructureLinksProvider : IStructureLinksProvider {
 
     public ICollection<RevitLinkInstance> GetLinks() {
         var links = _revitRepository.GetStructureLinkInstances();
-        string duplicatedLink = links.GroupBy(l => l.Name).FirstOrDefault(g => g.Count() > 1)?.Key;
+        string duplicatedLink = links.GroupBy(l => l.GetLinkDocument().Title).FirstOrDefault(g => g.Count() > 1)?.Key;
         if(!string.IsNullOrEmpty(duplicatedLink)) {
             throw new InvalidOperationException(
                 string.Format(_localizationService.GetLocalizedString("Errors.DuplicatedLinks"), duplicatedLink));
