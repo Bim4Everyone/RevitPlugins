@@ -1,5 +1,3 @@
-using System.Windows;
-
 using dosymep.SimpleServices;
 
 namespace RevitSleeves.Views.Placing;
@@ -19,12 +17,4 @@ public partial class PlacingErrorsWindow {
     public override string PluginName => nameof(RevitSleeves);
 
     public override string ProjectConfigName => nameof(PlacingErrorsWindow);
-
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-        DialogResult = true;
-    }
-
-    private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-        DialogResult = false;
-    }
 }

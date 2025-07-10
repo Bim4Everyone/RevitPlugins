@@ -88,6 +88,15 @@
 
     <system:String
         x:Key="SleevePlacementSettings.DefaultFileName">Настройки расстановки гильз</system:String>
+    
+    <system:String
+        x:Key="PlacingErrorsWindow.Title">Ошибки расстановки гильз</system:String>
+    <system:String
+        x:Key="PlacingErrorsWindow.MessageHeader">Заголовок</system:String>
+    <system:String
+        x:Key="PlacingErrorsWindow.DependentElementsHeader">Зависимые элементы</system:String>
+    <system:String
+        x:Key="GroupItemsCount">Кол-во:</system:String>
 
     <system:String
         x:Key="Navigator.Title">Навигатор</system:String>

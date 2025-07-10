@@ -18,10 +18,9 @@
     d:DataContext="{d:DesignInstance vms:NavigatorViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="../../assets/Styles/CustomStyles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
+            <ui:TextBlock
+                x:Key="GroupItemsCountTextBlock"
+                Text="{me:LocalizationSource GroupItemsCount}" />
             <CollectionViewSource
                 x:Key="groupedSleeves"
                 Source="{Binding Sleeves}">
@@ -36,45 +35,10 @@
             <ui:TextBlock
                 x:Key="LengthHeader"
                 Text="{me:LocalizationSource Length}" />
-            <Style
-                x:Key="GroupHeaderStyle"
-                TargetType="{x:Type GroupItem}">
-                <Setter
-                    Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate
-                            TargetType="{x:Type GroupItem}">
-                            <ui:CardExpander
-                                IsExpanded="False">
-                                <ui:CardExpander.Header>
-                                    <DockPanel
-                                        Margin="0 0 14 0"
-                                        HorizontalAlignment="Stretch">
-                                        <TextBlock
-                                            Text="{Binding Path=Name}" />
-                                        <DockPanel
-                                            HorizontalAlignment="Right">
-                                            <DockPanel.Resources>
-                                                <ui:TextBlock
-                                                    x:Key="GroupItemsCountCaption"
-                                                    Text="{me:LocalizationSource ErrorsWindow.GroupItemsCount}" />
-                                            </DockPanel.Resources>
-                                            <ContentControl
-                                                Content="{StaticResource GroupItemsCountCaption}"
-                                                Margin="0 0 5 0" />
-                                            <TextBlock
-                                                Text="{Binding Path=ItemCount}" />
-                                        </DockPanel>
-                                    </DockPanel>
-                                </ui:CardExpander.Header>
-                                <ui:CardExpander.Content>
-                                    <ItemsPresenter />
-                                </ui:CardExpander.Content>
-                            </ui:CardExpander>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../assets/Styles/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformWindow.Resources>
     <i:Interaction.Behaviors>
@@ -108,11 +72,10 @@
                     VerticalContentAlignment="Center"
                     CellStyle="{StaticResource CustomDataGridCell}"
                     Style="{StaticResource CustomReadonlyDataGrid}"
-                    ItemsSource="{Binding Source={StaticResource groupedSleeves}}"
-                    SelectedItem="{Binding SelectedSleeve}">
+                    ItemsSource="{Binding Source={StaticResource groupedSleeves}}">
                     <ui:DataGrid.GroupStyle>
                         <GroupStyle
-                            ContainerStyle="{StaticResource GroupHeaderStyle}" />
+                            ContainerStyle="{StaticResource CustomGroupHeaderStyle}" />
                     </ui:DataGrid.GroupStyle>
                     <ui:DataGrid.Columns>
                         <DataGridTemplateColumn

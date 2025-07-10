@@ -17,7 +17,6 @@ internal class NavigatorViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly SleevePlacementSettingsConfig _config;
     private readonly RevitRepository _revitRepository;
-    private SleeveViewModel _selectedSleeve;
 
     public NavigatorViewModel(
         IProgressDialogFactory progressFactory,
@@ -60,10 +59,6 @@ internal class NavigatorViewModel : BaseViewModel {
 
     public ObservableCollection<SleeveViewModel> Sleeves { get; }
 
-    public SleeveViewModel SelectedSleeve {
-        get => _selectedSleeve;
-        set => RaiseAndSetIfChanged(ref _selectedSleeve, value);
-    }
 
     private void SelectSleeve(SleeveViewModel sleeve) {
         _revitRepository

@@ -74,6 +74,8 @@
         x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">The {0} parameter has no data type defined</system:String>
 
     <system:String
+        x:Key="FilterWindow.Title">Filter checking</system:String>
+    <system:String
         x:Key="FilterWindow.Invert">Invert</system:String>
     <system:String
         x:Key="FilterWindow.ShowSet">Show search set</system:String>
@@ -86,6 +88,15 @@
 
     <system:String
         x:Key="SleevePlacementSettings.DefaultFileName">Sleeve placement settings</system:String>
+
+    <system:String
+        x:Key="PlacingErrorsWindow.Title">Ошибки расстановки гильз</system:String>
+    <system:String
+        x:Key="PlacingErrorsWindow.MessageHeader">Заголовок</system:String>
+    <system:String
+        x:Key="PlacingErrorsWindow.DependentElementsHeader">Зависимые элементы</system:String>
+    <system:String
+        x:Key="GroupItemsCount">Кол-во:</system:String>
 
     <system:String
         x:Key="Navigator.Title">Navigator</system:String>

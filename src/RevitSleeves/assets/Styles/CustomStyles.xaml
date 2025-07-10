@@ -443,4 +443,44 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <Style
+        x:Key="CustomGroupHeaderStyle"
+        TargetType="{x:Type GroupItem}">
+        <!-- Для использования этого стиля необходимо определить TextBlock с Key=GroupItemsCountTextBlock перед подключением словаря CustomStyles к окну-->
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="{x:Type GroupItem}">
+                    <ui:CardExpander
+                        IsExpanded="False">
+                        <ui:CardExpander.Header>
+                            <DockPanel
+                                Margin="0 0 14 0"
+                                HorizontalAlignment="Stretch">
+                                <TextBlock
+                                    Text="{Binding Path=Name}" />
+                                <DockPanel
+                                    HorizontalAlignment="Right">
+                                    <DockPanel.Resources>
+                                        <ui:TextBlock
+                                            x:Key="GroupItemsCountCaption"
+                                            Text="{DynamicResource GroupItemsCountTextBlock.Text}" />
+                                    </DockPanel.Resources>
+                                    <ContentControl
+                                        Content="{DynamicResource GroupItemsCountCaption}"
+                                        Margin="0 0 5 0" />
+                                    <TextBlock
+                                        Text="{Binding Path=ItemCount}" />
+                                </DockPanel>
+                            </DockPanel>
+                        </ui:CardExpander.Header>
+                        <ui:CardExpander.Content>
+                            <ItemsPresenter />
+                        </ui:CardExpander.Content>
+                    </ui:CardExpander>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

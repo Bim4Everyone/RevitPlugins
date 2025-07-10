@@ -1,36 +1,51 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 
-using dosymep.Revit;
-using dosymep.SimpleServices;
+using Autodesk.Revit.DB;
+
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitClashDetective.Models.Clashes;
+
+using RevitSleeves.Models;
 using RevitSleeves.Services.Placing;
 
 namespace RevitSleeves.ViewModels.Placing;
 internal class PlacingErrorsViewModel : BaseViewModel {
-    private readonly ILocalizationService _localizationService;
+    private readonly RevitRepository _revitRepository;
     private readonly IPlacingErrorsService _placingErrorsService;
-    private string _errors;
 
     public PlacingErrorsViewModel(
-        ILocalizationService localizationService,
+        RevitRepository revitRepository,
         IPlacingErrorsService placingErrorsService) {
-
-        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _placingErrorsService = placingErrorsService ?? throw new ArgumentNullException(nameof(placingErrorsService));
 
-        Errors = string.Join("\n\n", _placingErrorsService.GetAllErrors()
-            .Select(m => new {
-                Message = m.Message,
-                Elements = string.Join("\n", m.GetDependentElements()
-                    .Select(e => $"{e.Document.Title}: {e.Id.GetIdValue()}"))
-            })
-            .Select(m => $"{m.Message}:\n{m.Elements}"));
+        Errors = [.. _placingErrorsService.GetAllErrors().Select(e => new ErrorViewModel(e))];
+        ShowDependentElementsCommand = RelayCommand.Create<ErrorViewModel>(
+            ShowDependentElements, CanShowDependentElements);
     }
 
-    public string Errors {
-        get => _errors;
-        set => RaiseAndSetIfChanged(ref _errors, value);
+
+    public ICommand ShowDependentElementsCommand { get; }
+
+    public ObservableCollection<ErrorViewModel> Errors { get; }
+
+
+    private void ShowDependentElements(ErrorViewModel error) {
+        var clashRepo = _revitRepository.GetClashRevitRepository();
+        ElementModel[] elementModels = [.. error.ErrorModel.GetDependentElements().Select(e => new ElementModel(e))];
+        foreach(var elementModel in elementModels) {
+            var transform = elementModel.GetDocInfo(clashRepo.DocInfos)?.Transform ?? Transform.Identity;
+            elementModel.TransformModel = new TransformModel(transform);
+        }
+        clashRepo.SelectAndShowElement(elementModels);
+    }
+
+    private bool CanShowDependentElements(ErrorViewModel error) {
+        return error is not null;
     }
 }
