@@ -185,10 +185,14 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     }
 
     public bool CanExecutePrintExport(IEnumerable<SheetViewModel> sheets) {
-        return CanAcceptView();
+        return CanAcceptView(false);
     }
 
     private bool CanAcceptView() {
+        return CanAcceptView(true);
+    }
+
+    private bool CanAcceptView(bool checkSelected) {
         if(string.IsNullOrEmpty(AlbumParamName)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedAlbumParamName");
             return false;
@@ -204,7 +208,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
             return false;
         }
 
-        if(!MainAlbums.Any(item => item.HasSelectedSheets())) {
+        if(checkSelected && !MainAlbums.Any(item => item.HasSelectedSheets())) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedAlbumSheets");
             return false;
         }
