@@ -27,7 +27,7 @@ internal sealed class AlbumViewModel : BaseViewModel {
         _localizationService = localizationService;
 
         IsSelected = false;
-        
+
         Name = string.IsNullOrEmpty(albumName)
             ? localizationService.GetLocalizedString("MainWindow.EmptyAlbumNameParam")
             : albumName;
@@ -36,8 +36,8 @@ internal sealed class AlbumViewModel : BaseViewModel {
         CheckUpdateCommand = RelayCommand.Create(CheckUpdate);
     }
 
-    public ICommand CheckCommand { get; }  
-    public ICommand CheckUpdateCommand { get; }  
+    public ICommand CheckCommand { get; }
+    public ICommand CheckUpdateCommand { get; }
 
     public string Name { get; }
 
@@ -68,18 +68,23 @@ internal sealed class AlbumViewModel : BaseViewModel {
     public bool HasSelectedSheets() {
         return MainSheets.Any(item => item.IsSelected);
     }
-    
+
     private void Check() {
         if(IsSelected == null) {
             return;
         }
-        
+
         foreach(SheetViewModel sheetViewModel in MainSheets) {
             sheetViewModel.IsSelected = IsSelected.Value;
         }
     }
-    
+
     private void CheckUpdate() {
-        IsSelected = MainSheets.Count(item => item.IsSelected) == MainSheets.Count;
+        int countSelected = MainSheets.Count(item => item.IsSelected);
+        if(MainSheets.Count != countSelected) {
+            IsSelected = null;
+        } else if(MainSheets.Count == countSelected) {
+            IsSelected = true;
+        }
     }
 }
