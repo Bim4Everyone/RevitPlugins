@@ -50,6 +50,7 @@ namespace RevitBatchPrint.Models {
             }
 
             AddFormat(formatName, formatSize, new Rectangle(Point.Empty, formatSize));
+            Load();
         }
 
         public void RemoveFormat(string formatName) {
@@ -59,6 +60,7 @@ namespace RevitBatchPrint.Models {
 
             ThrowWin32Exception(
                 SafeExecute(handle => WinSpool.DeleteForm(handle, formatName)));
+            Load();
         }
 
         private void AddFormat(string formatName, Size formatSize, Rectangle visibleArea) {

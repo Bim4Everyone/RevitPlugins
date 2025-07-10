@@ -30,21 +30,27 @@ internal class PrintOptions {
 
     public void SetupPrintParams(PrintParameters printParameters) {
         printParameters.ZoomType = ZoomType;
-        printParameters.Zoom = Zoom;
+        if(ZoomType == ZoomType.Zoom) {
+            printParameters.Zoom = Zoom;
+        }
 
-        printParameters.MarginType = MarginType;
-
+        printParameters.PaperPlacement = PaperPlacement;
+        if(PaperPlacement == PaperPlacementType.Margins) {
+            printParameters.MarginType = MarginType;
+            if(MarginType == MarginType.UserDefined) {
 #if REVIT_2022_OR_GREATER
-        printParameters.OriginOffsetX = OriginOffsetX;
-        printParameters.OriginOffsetY = OriginOffsetY;
+                printParameters.OriginOffsetX = OriginOffsetX;
+                printParameters.OriginOffsetY = OriginOffsetY;
 #else
-        printParameters.UserDefinedMarginX = UserDefinedMarginX;
-        printParameters.UserDefinedMarginY = UserDefinedMarginY;
+                printParameters.UserDefinedMarginX = UserDefinedMarginX;
+                printParameters.UserDefinedMarginY = UserDefinedMarginY;
 #endif
+            }
+        }
+
         printParameters.HiddenLineViews = HiddenLineViews;
         printParameters.ColorDepth = ColorDepth;
         printParameters.RasterQuality = RasterQuality;
-        printParameters.PaperPlacement = PaperPlacement;
 
         printParameters.MaskCoincidentLines = MaskCoincidentLines;
         printParameters.ViewLinksinBlue = ViewLinksInBlue;
