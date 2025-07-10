@@ -84,6 +84,8 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.LegendYOffset = settings.LegendYOffset;
         projectSettings.LegendYOffsetTemp = settings.LegendYOffset;
 
+        projectSettings.DimensionTypeName = settings.DimensionTypeName;
+        projectSettings.DimensionTypeNameTemp = settings.DimensionTypeName;
         projectSettings.SpotDimensionTypeName = settings.SpotDimensionTypeName;
         projectSettings.SpotDimensionTypeNameTemp = settings.SpotDimensionTypeName;
 
@@ -107,7 +109,6 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.RebarNodeXOffsetTemp = settings.RebarNodeXOffset;
         projectSettings.RebarNodeYOffset = settings.RebarNodeYOffset;
         projectSettings.RebarNodeYOffsetTemp = settings.RebarNodeYOffset;
-
 
         viewSectionSettings.GeneralViewXOffset = settings.GeneralViewXOffset;
         viewSectionSettings.GeneralViewXOffsetTemp = settings.GeneralViewXOffset;
@@ -253,6 +254,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.TitleBlockName = projectSettings.TitleBlockName;
         settings.DispatcherGroupingFirst = projectSettings.DispatcherGroupingFirst;
         settings.DispatcherGroupingSecond = projectSettings.DispatcherGroupingSecond;
+        settings.DimensionTypeName = projectSettings.DimensionTypeName;
         settings.SpotDimensionTypeName = projectSettings.SpotDimensionTypeName;
 
         settings.SheetSize = projectSettings.SheetSize;
@@ -375,6 +377,7 @@ internal class PluginSettings : ProjectSettings {
     public string TitleBlockName { get; set; }
     public string DispatcherGroupingFirst { get; set; }
     public string DispatcherGroupingSecond { get; set; }
+    public string DimensionTypeName { get; set; }
     public string SpotDimensionTypeName { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }

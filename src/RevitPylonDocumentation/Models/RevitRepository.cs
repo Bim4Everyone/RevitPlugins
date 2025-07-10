@@ -95,9 +95,19 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает список типоразмеров высотных отметок
     /// </summary>
+    public List<DimensionType> DimensionTypes => new FilteredElementCollector(Document)
+            .OfClass(typeof(DimensionType))
+            .OfType<DimensionType>()
+            .OrderBy(a => a.Name)
+            .ToList();
+
+    /// <summary>
+    /// Возвращает список типоразмеров высотных отметок
+    /// </summary>
     public List<SpotDimensionType> SpotDimensionTypes => new FilteredElementCollector(Document)
             .OfClass(typeof(SpotDimensionType))
             .OfType<SpotDimensionType>()
+            .OrderBy(a => a.Name)
             .ToList();
 
 
