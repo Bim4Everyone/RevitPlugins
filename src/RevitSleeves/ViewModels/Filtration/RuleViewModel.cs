@@ -100,9 +100,6 @@ internal class RuleViewModel : BaseViewModel, ICriterionViewModel {
 
     public void Initialize() {
         if(_rule != null) {
-            if(!CategoryInfo.Parameters.Any(item => item.ProviderViewModel.Provider.Equals(_rule.Provider))) {
-                throw new InvalidOperationException("TODO какой-то старый костыль №1");
-            }
             SelectedParameter = CategoryInfo.Parameters.First(
                 item => item.ProviderViewModel.Provider.Equals(_rule.Provider));
             SelectedParameterChanged();
@@ -175,9 +172,6 @@ internal class RuleViewModel : BaseViewModel, ICriterionViewModel {
 
     private void InitializeRule() {
         SelectedParameter = new ParameterViewModel(_localizationService, _rule.Provider);
-        if(!CategoryInfo.Parameters.Contains(SelectedParameter)) {
-            throw new InvalidOperationException("TODO какой-то старый костыль №2");
-        }
         SelectedRuleEvaluator = new RuleEvaluatorViewModel(_localizationService, _rule.Evaluator);
         SelectedValue = new ParamValueViewModel(_rule.Value);
         DisplayValue = SelectedValue.ParamValue.DisplayValue;
