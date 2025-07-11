@@ -113,7 +113,7 @@
                     <edits:CustomEditControl
                         Icon="{ui:SymbolIcon Line24}"
                         Header="{me:LocalizationSource Settings.HideCropBoundaries}"
-                        Description="{me:LocalizationSource Settings.HideCropBoundariesBoxesDescription}">
+                        Description="{me:LocalizationSource Settings.HideCropBoundariesDescription}">
 
                         <ui:ToggleSwitch
                             OnContent="{me:LocalizationSource ToggleSwitch.On}"
