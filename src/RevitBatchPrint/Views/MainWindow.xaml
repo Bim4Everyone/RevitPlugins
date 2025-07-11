@@ -30,20 +30,26 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
-        <converters:BoolToVisibilityConverter
-            x:Key="SheetVisibleConverter"
-            TrueValue="Collapsed"
-            FalseValue="Visible" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewsTemplates/ToogleSwitchTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <converters:BoolToVisibilityConverter
-            x:Key="SettingsVisibleConverter"
-            TrueValue="Visible"
-            FalseValue="Collapsed" />
+            <converters:BoolToVisibilityConverter
+                x:Key="SheetVisibleConverter"
+                TrueValue="Collapsed"
+                FalseValue="Visible" />
 
-        <converters:BoolToVisibilityConverter
-            x:Key="ExportVisibilityConverter"
-            TrueValue="Visible"
-            FalseValue="Collapsed" />
+            <converters:BoolToVisibilityConverter
+                x:Key="SettingsVisibleConverter"
+                TrueValue="Visible"
+                FalseValue="Collapsed" />
+
+            <converters:BoolToVisibilityConverter
+                x:Key="ExportVisibilityConverter"
+                TrueValue="Visible"
+                FalseValue="Collapsed" />
+        </ResourceDictionary>
     </Window.Resources>
 
     <b:Interaction.Triggers>
@@ -68,22 +74,25 @@
 
             <ui:TitleBar.TrailingContent>
                 <StackPanel
-                    Margin="0,5"
+                    Margin="8,5"
                     VerticalAlignment="Top"
                     Orientation="Horizontal">
 
                     <ui:ToggleSwitch
-                        Margin="8 0">
+                        Margin="8 0"
+                        Style="{StaticResource CustomToggleSwitchStyle}">
 
                         <ui:ToggleSwitch.OnContent>
                             <ui:SymbolIcon
-                                Symbol="Document24"
+                                FontSize="20"
+                                Symbol="Document48"
                                 ToolTip="{me:LocalizationSource MainWindow.ExportMode}" />
                         </ui:ToggleSwitch.OnContent>
 
                         <ui:ToggleSwitch.OffContent>
                             <ui:SymbolIcon
-                                Symbol="Print24"
+                                FontSize="20"
+                                Symbol="Print48"
                                 ToolTip="{me:LocalizationSource MainWindow.PrintMode}" />
                         </ui:ToggleSwitch.OffContent>
 
@@ -99,8 +108,9 @@
                     <ui:ToggleSwitch
                         x:Name="_settingsSwitch"
                         IsChecked="False"
-                        OnContent="{ui:SymbolIcon Settings24, Filled=True}"
-                        OffContent="{ui:SymbolIcon Settings24, Filled=False}" />
+                        OnContent="{ui:SymbolIcon Settings48, Filled=True, FontSize=20}"
+                        OffContent="{ui:SymbolIcon Settings48, Filled=False, FontSize=20}"
+                        Style="{StaticResource CustomToggleSwitchStyle}" />
                 </StackPanel>
             </ui:TitleBar.TrailingContent>
 
