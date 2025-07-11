@@ -64,7 +64,7 @@ internal class NavigatorViewModel : BaseViewModel {
         _revitRepository
             .GetClashRevitRepository()
             .SelectAndShowElement(
-            [new ElementModel(sleeve.GetSleeve().GetFamilyInstance())], _revitRepository.GetSleeve3dView());
+            [new ElementModel(sleeve.GetSleeve().GetFamilyInstance())], 2, _revitRepository.GetSleeve3dView());
     }
 
     private bool CanSelectSleeve(SleeveViewModel sleeve) {
