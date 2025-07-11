@@ -17,7 +17,7 @@ internal class FinishingCalculator {
         _finishingRooms = rooms 
             .OfType<Room>()
             .Select(x => new RoomElement(x, finishings));
-        _finishingElements = SetRoomsForFinishing();
+        _finishingElements = GetUpdatedFinishingByRooms();
         _roomsByFinishingType = GroupRoomsByFinishingType();
     }
 
@@ -29,7 +29,7 @@ internal class FinishingCalculator {
     /// к которому этот элемент относится.
     /// </summary>
     /// <returns></returns>
-    private IList<FinishingElement> SetRoomsForFinishing() {
+    private IList<FinishingElement> GetUpdatedFinishingByRooms() {
         Dictionary<ElementId, FinishingElement> allFinishings = [];
         string wallName = FinishingCategory.Walls.Name;
         string floorName = FinishingCategory.Floors.Name;
