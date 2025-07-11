@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <UseWpfUI>true</UseWpfUI>
+        <UseRevitClashes>true</UseRevitClashes>
+        <LangVersion>12</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+      <Resource Include="assets\Styles\CustomStyles.xaml" />
+    </ItemGroup>
+</Project>

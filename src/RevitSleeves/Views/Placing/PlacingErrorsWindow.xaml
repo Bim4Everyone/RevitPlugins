@@ -1,0 +1,76 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitSleeves.Views.Placing.PlacingErrorsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:RevitSleeves.Views.Placing"
+    mc:Ignorable="d"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vm="clr-namespace:RevitSleeves.ViewModels.Placing"
+    Height="450"
+    Width="800"
+    d:DataContext="{d:DesignInstance vm:PlacingErrorsViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <CollectionViewSource
+                x:Key="groupedErrors"
+                Source="{Binding Errors}">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription
+                        PropertyName="Message" />
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+            <ui:TextBlock
+                x:Key="DependentElementsHeader"
+                Text="{me:LocalizationSource PlacingErrorsWindow.DependentElementsHeader}" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../assets/Styles/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <DockPanel
+        LastChildFill="True">
+        <ui:TitleBar
+            DockPanel.Dock="Top"
+            Title="{me:LocalizationSource PlacingErrorsWindow.Title}" />
+        <Border
+            Style="{StaticResource CustomBorder}">
+            <ui:DataGrid
+                RowHeight="26"
+                VerticalContentAlignment="Center"
+                CellStyle="{StaticResource CustomDataGridCell}"
+                Style="{StaticResource CustomReadonlyDataGrid}"
+                ItemsSource="{Binding Source={StaticResource groupedErrors}}">
+                <ui:DataGrid.GroupStyle>
+                    <GroupStyle
+                        ContainerStyle="{StaticResource CustomGroupHeaderStyle}" />
+                </ui:DataGrid.GroupStyle>
+                <ui:DataGrid.Columns>
+                    <DataGridTemplateColumn
+                        Width="Auto"
+                        CanUserResize="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:Button
+                                    Appearance="Info"
+                                    Height="Auto"
+                                    Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor},Path=DataContext.ShowDependentElementsCommand}"
+                                    CommandParameter="{Binding}"
+                                    Content="{ui:SymbolIcon Symbol=Search24}">
+                                </ui:Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn
+                        MinWidth="100"
+                        Header="{StaticResource DependentElementsHeader}"
+                        Binding="{Binding ElementsDescription}" />
+                </ui:DataGrid.Columns>
+            </ui:DataGrid>
+        </Border>
+    </DockPanel>
+</core:WpfUIPlatformWindow>
