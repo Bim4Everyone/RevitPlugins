@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -35,7 +34,7 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     public MainViewModel(
         RevitRepository revitRepository,
-        ILocalizationService localizationService, 
+        ILocalizationService localizationService,
         IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
@@ -48,7 +47,8 @@ internal class MainViewModel : BaseViewModel {
         SelectedWorksets = [];
 
         ApplyFilterCommand = RelayCommand.Create(ApplyFilter);
-        HideSelectedCommand = RelayCommand.Create(HideSelectedWorksets, CanHideSelected);
+        HideSelectedCommand = RelayCommand.Create(HideSelectedWorksets, HaveSelected);
+        ShowSelectedCommand = RelayCommand.Create(ShowSelectedWorksets, HaveSelected);
         ToggleVisibilityCommand = RelayCommand.Create<WorksetElement>(ToggleWorksetVisibility);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
@@ -62,6 +62,8 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ToggleVisibilityCommand { get; }
 
     public ICommand HideSelectedCommand { get; }
+
+    public ICommand ShowSelectedCommand { get; }
 
     public ICommand ApplyFilterCommand { get; }
 
@@ -98,7 +100,7 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedWorksets, value);
     }
 
-    private bool CanHideSelected() {
+    private bool HaveSelected() {
         return SelectedWorksets.Count > 0;
     }
 
@@ -131,6 +133,17 @@ internal class MainViewModel : BaseViewModel {
         foreach(var workset in SelectedWorksets) {
             if(workset.IsOpen) {
                 workset.IsOpen = false;
+                workset.IsChanged = !workset.IsChanged;
+            }
+        }
+
+        HasChanges = AllLinkedFiles.SelectMany(x => x.AllWorksets).Count(w => w.IsChanged) > 0;
+    }
+
+    private void ShowSelectedWorksets() {
+        foreach(var workset in SelectedWorksets) {
+            if(!workset.IsOpen) {
+                workset.IsOpen = true;
                 workset.IsChanged = !workset.IsChanged;
             }
         }

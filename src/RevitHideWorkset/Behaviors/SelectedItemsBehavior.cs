@@ -30,9 +30,16 @@ public class SelectedItemsBehavior : Behavior<ListBox> {
             return;
         }
 
-        SelectedItems.Clear();
-        foreach(object item in AssociatedObject.SelectedItems) {
-            SelectedItems.Add(item);
+        foreach(object item in e.RemovedItems) {
+            if(SelectedItems.Contains(item)) {
+                SelectedItems.Remove(item);
+            }
+        }
+
+        foreach(object item in e.AddedItems) {
+            if(!SelectedItems.Contains(item)) {
+                SelectedItems.Add(item);
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ public class RevitHideWorksetCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitHideWorksetCommand() {
-        PluginName = "Скрытие РН связей";
+        PluginName = "Отображение РН связей";
     }
 
     /// <summary>

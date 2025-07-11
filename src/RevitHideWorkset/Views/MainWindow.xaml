@@ -102,6 +102,28 @@
 
                 </StackPanel>
             </ui:Button>
+
+            <ui:Button
+                Margin="10,0,0,0"
+                ToolTip="{DynamicResource MainWindow.ToolTipShowWorksets}"
+                Command="{Binding ShowSelectedCommand}">
+
+                <StackPanel
+                    Orientation="Horizontal">
+
+                    <TextBlock
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        ToolTip="{DynamicResource MainWindow.ToolTipShowWorksets}"
+                        Text="{me:LocalizationSource MainWindow.ShowWorkset}" />
+
+                    <ui:SymbolIcon
+                        Symbol="Eye16"
+                        Width="16"
+                        Height="16" />
+
+                </StackPanel>
+            </ui:Button>
         </StackPanel>
 
         <Border
