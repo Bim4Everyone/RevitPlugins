@@ -1,5 +1,6 @@
 using System.Windows;
 
+using dosymep.SimpleServices;
 
 namespace RevitListOfSchedules.Views;
 
@@ -10,7 +11,15 @@ public partial class MainWindow {
     /// <summary>
     /// Иницализирует главное окно плагина.
     /// </summary>
-    public MainWindow() {
+    public MainWindow(
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            serializationService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
     }
 

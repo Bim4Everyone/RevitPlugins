@@ -1,17 +1,14 @@
 using System.Globalization;
 using System.Reflection;
 
-using System.Windows;
-
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
-using dosymep.WPF.Views;
-using dosymep.Xpf.Core.Ninject;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
@@ -48,7 +45,10 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
     /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        using var kernel = uiApplication.CreatePlatformServices();
+
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
@@ -66,12 +66,7 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         // Настройка запуска окна
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>())
-            .WithPropertyValue(nameof(PlatformWindow.LocalizationService),
-                c => c.Kernel.Get<ILocalizationService>());
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -79,8 +74,8 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
 
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
-        kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         // Вызывает стандартное уведомление
