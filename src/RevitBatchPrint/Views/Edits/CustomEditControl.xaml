@@ -11,34 +11,52 @@
     x:Name="_this"
     mc:Ignorable="d"
     d:DesignHeight="50" d:DesignWidth="300">
-    
-    <StackPanel>
-        <ui:CardControl
-            Icon="{Binding Icon, ElementName=_this}">
 
-            <ui:CardControl.Header>
-                <StackPanel>
-                    <ui:TextBlock
-                        Margin="0"
-                        FontTypography="BodyStrong"
-                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="{Binding Header, ElementName=_this}"
-                        TextWrapping="WrapWithOverflow" />
-                    <ui:TextBlock
-                        Appearance="Secondary"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                        Text="{Binding Description, ElementName=_this}"
-                        TextWrapping="WrapWithOverflow" />
-                </StackPanel>
-            </ui:CardControl.Header>
+    <Border
+        VerticalAlignment="Center"
+        HorizontalAlignment="Stretch"
+        Padding="{DynamicResource CardControlPadding}"
+        Background="{DynamicResource CardBackground}"
+        BorderBrush="{DynamicResource CardBorderBrush}"
+        CornerRadius="{DynamicResource ControlCornerRadius}"
+        BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-            <StackPanel>
-                <ContentControl
-                    Width="300"
-                    VerticalAlignment="Center"
-                    Content="{Binding EditControl, ElementName=_this}" />
+            <ContentControl
+                Grid.Column="0"
+                Focusable="False"
+                Margin="{DynamicResource CardControlIconMargin}"
+                FontSize="{DynamicResource CardControlIconSize}"
+                Foreground="{DynamicResource CardForeground}"
+                VerticalAlignment="Center"
+                Content="{Binding Icon, ElementName=_this}" />
+
+            <StackPanel
+                Grid.Column="1">
+                <ui:TextBlock
+                    Margin="0"
+                    FontTypography="BodyStrong"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="{Binding Header, ElementName=_this}"
+                    TextWrapping="WrapWithOverflow" />
+                <ui:TextBlock
+                    Appearance="Secondary"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="{Binding Description, ElementName=_this}"
+                    TextWrapping="WrapWithOverflow" />
             </StackPanel>
 
-        </ui:CardControl>
-    </StackPanel>
+            <ContentControl
+                Grid.Column="2"
+                Width="300"
+                VerticalAlignment="Center"
+                Margin="{DynamicResource CardControlContentMargin}"
+                Content="{Binding EditControl, ElementName=_this}" />
+        </Grid>
+    </Border>
 </UserControl>
