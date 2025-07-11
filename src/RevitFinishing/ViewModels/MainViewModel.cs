@@ -144,13 +144,14 @@ internal class MainViewModel : BaseViewModel {
 
         IEnumerable<FinishingElement> finishingElements = calculator.FinishingElements;
 
-        Transaction t = _revitRepository.Document
-            .StartTransaction(_localizationService.GetLocalizedString("MainWindow.TransactionName"));
-        foreach(FinishingElement element in finishingElements) {
-            element.UpdateFinishingParameters();
-            element.UpdateCategoryParameters();
+        string transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
+        using(Transaction t = _revitRepository.Document.StartTransaction(transactionName)) {
+            foreach(FinishingElement element in finishingElements) {
+                element.UpdateFinishingParameters();
+                element.UpdateCategoryParameters();
+            }
+            t.Commit();
         }
-        t.Commit();
 
         WarningsViewModel parameterErrors = _projectValidationService
             .CheckWarnings(selectedRooms, finishingElements, _selectedPhase);
