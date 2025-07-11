@@ -30,7 +30,7 @@ internal class ParamCalculationService {
 
     public string GetRoomsKeyParameters(IEnumerable<RoomElement> rooms, RevitParam parameter) {
         IEnumerable<string> values = rooms
-            .Select(x => x.RevitRoom.GetParam(parameter).AsValueString());
+            .Select(x => x.RevitRoom.GetParamValueString(parameter));
 
         return GenerateStrWithUniqueValues(values);
     }
