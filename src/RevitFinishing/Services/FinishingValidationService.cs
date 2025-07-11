@@ -4,6 +4,8 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
@@ -34,20 +36,20 @@ internal class FinishingValidationService {
             .ToList();
     }
 
-    public IList<NoticeElementViewModel> CheckRoomsByKeyParameter(IEnumerable<Element> rooms, 
-                                                                  string paramName, 
+    public IList<NoticeElementViewModel> CheckRoomsByKeyParameter(IEnumerable<Element> rooms,
+                                                                  ProjectParam projectParam, 
                                                                   Phase phase) {
         return rooms
-            .Where(x => x.GetParam(paramName).AsElementId() == ElementId.InvalidElementId)
+            .Where(x => !x.IsExistsParamValue(projectParam))
             .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
             .ToList();
     }
 
-    public IList<NoticeElementViewModel> CheckRoomsByParameter(IEnumerable<Element> rooms, 
-                                                               string paramName, 
+    public IList<NoticeElementViewModel> CheckRoomsByParameter(IEnumerable<Element> rooms,
+                                                               SystemParam systemParam, 
                                                                Phase phase) {
         return rooms
-            .Where(x => string.IsNullOrEmpty(x.GetParamValue<string>(paramName)))
+            .Where(x => !x.IsExistsParamValue(systemParam))
             .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
             .ToList();
     }

@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SystemParams;
 using dosymep.SimpleServices;
 
 using RevitFinishing.Models.Finishing;
@@ -34,7 +35,7 @@ internal class ProjectValidationService {
             Description = _localizationService.GetLocalizedString("ErrorsWindow.NoBoundaries"),
             ErrorElements = [.. _finishingValidationService.CheckFinishingByRoomBounding(allFinishing, phase)]
         });
-        string finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType.Name;
+        var finishingKeyParam = ProjectParamsConfig.Instance.RoomFinishingType;
         mainErrors.AddElements(new ErrorsListViewModel(_localizationService) {
             Description = _localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam"),
             ErrorElements = 
@@ -57,24 +58,27 @@ internal class ProjectValidationService {
     }
 
     public WarningsViewModel CheckWarnings(IEnumerable<Room> selectedRooms,
-                                            IEnumerable<FinishingElement> finishingElements,
-                                            Phase phase) {
+                                           IEnumerable<FinishingElement> finishingElements,
+                                           Phase phase,
+                                           Document document) {
         var parameterErrors = new WarningsViewModel(_localizationService);
 
-        string numberParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER);
+        var numberParam = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.ROOM_NUMBER);
         parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
             Description =
-                $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{numberParamName}\"",
+                $"{_localizationService.GetLocalizedString("ErrorsWindow.NoParam")} \"{numberParam.Name}\"",
             ErrorElements = 
-                [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, numberParamName, phase)]
+                [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, numberParam, phase)]
         });
-        string nameParamName = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME);
+
+        var nameParam = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.ROOM_NUMBER);
         parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
             Description =
-                $"{_localizationService.GetLocalizedString("ErrorsWindow.NoKeyParam")} \"{nameParamName}\"",
+                $"{_localizationService.GetLocalizedString("ErrorsWindow.NoParam")} \"{nameParam.Name}\"",
             ErrorElements = 
-                [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, nameParamName, phase)]
+                [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, nameParam, phase)]
         });
+
         parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
             Description = _localizationService.GetLocalizedString("ErrorsWindow.CustomFamilies"),
             ErrorElements = [.. finishingElements
