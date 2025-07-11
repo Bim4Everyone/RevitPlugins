@@ -17,6 +17,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Interfaces;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
@@ -154,6 +155,9 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<IGeometryUtils>()
             .To<GeometryUtils>()
+            .InSingletonScope();
+        kernel.Bind<IView3DProvider>()
+            .To<SleeveView3dProvider>()
             .InSingletonScope();
     }
 

@@ -10,6 +10,9 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 
+using RevitClashDetective.Models.Interfaces;
+
+using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
 
@@ -20,14 +23,20 @@ namespace RevitSleeves.Models;
 internal class RevitRepository {
     private readonly RevitClashDetective.Models.RevitRepository _clashRepository;
     private readonly IBimModelPartsService _modelPartsService;
+    private readonly IView3DProvider _view3DProvider;
+    private readonly View3D _sleeve3dView;
 
     public RevitRepository(UIApplication uiApplication,
         RevitClashDetective.Models.RevitRepository clashRepository,
-        IBimModelPartsService modelPartsService) {
+        IBimModelPartsService modelPartsService,
+        IView3DProvider view3DProvider) {
 
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
         _clashRepository = clashRepository ?? throw new ArgumentNullException(nameof(clashRepository));
         _modelPartsService = modelPartsService ?? throw new ArgumentNullException(nameof(modelPartsService));
+        _view3DProvider = view3DProvider ?? throw new ArgumentNullException(nameof(view3DProvider));
+        _sleeve3dView = _view3DProvider.GetView(
+            Document, string.Format(NamesProvider.ViewNameSleeve, Application.Username));
     }
 
     public UIApplication UIApplication { get; }
@@ -38,6 +47,10 @@ internal class RevitRepository {
 
     public Document Document => ActiveUIDocument.Document;
 
+
+    public View3D GetSleeve3dView() {
+        return _sleeve3dView;
+    }
 
     public IList<ParameterValueProvider> GetParameters(Document doc, Category category) {
         return _clashRepository.GetParameters(doc, [category]);
@@ -79,7 +92,7 @@ internal class RevitRepository {
         return [.. new FilteredElementCollector(Document)
             .WhereElementIsNotElementType()
             .OfClass(typeof(FamilyInstance))
-            .OfCategory(BuiltInCategory.OST_PipeFitting)
+            .OfCategory(SleevePlacementSettingsConfig.SleeveCategory)
             .OfType<FamilyInstance>()
             .Where(f => f.Symbol.FamilyName.Equals(
                 NamesProvider.FamilyNameSleeve,

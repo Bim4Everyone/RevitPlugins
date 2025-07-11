@@ -33,6 +33,16 @@ internal static class NamesProvider {
     public const string ParameterSleeveDiameter = "Диаметр";
     public const string ParameterSleeveLength = "Длина";
 
+    public const string ViewNameSleeve = "BIM_Гильзы_{0}";
+
+    public const string FilterNameMep = "BIM_Гильзы_ВИС";
+    public const string FilterNameSleeves = "BIM_Гильзы";
+    public const string FilterNameConstructions = "BIM_Гильзы_Конструкции";
+    public const string FilterNameSecondaryCategories = "BIM_Гильзы_Вспомогательные_Категории";
+
+    public const string BIM = "BIM";
+
+
     public static readonly IReadOnlyCollection<string> FamilyNamesAllOpenings = [
         FamilyNameOpeningArRectangleInFloor,
         FamilyNameOpeningArRectangleInWall,

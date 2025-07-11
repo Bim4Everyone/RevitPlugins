@@ -13,9 +13,11 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Interfaces;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
+using RevitSleeves.Services.Core;
 using RevitSleeves.Services.Settings;
 using RevitSleeves.ViewModels.Filtration;
 using RevitSleeves.ViewModels.Settings;
@@ -41,6 +43,9 @@ public class SleevesSettingsCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<IFilterChecker>()
             .To<FilterChecker>()
+            .InSingletonScope();
+        kernel.Bind<IView3DProvider>()
+            .To<SleeveView3dProvider>()
             .InSingletonScope();
         kernel.Bind<ActiveDocFilterViewModel>()
             .ToSelf()

@@ -42,7 +42,7 @@ internal class PlacingErrorsViewModel : BaseViewModel {
             var transform = elementModel.GetDocInfo(clashRepo.DocInfos)?.Transform ?? Transform.Identity;
             elementModel.TransformModel = new TransformModel(transform);
         }
-        clashRepo.SelectAndShowElement(elementModels);
+        clashRepo.SelectAndShowElement(elementModels, _revitRepository.GetSleeve3dView());
     }
 
     private bool CanShowDependentElements(ErrorViewModel error) {

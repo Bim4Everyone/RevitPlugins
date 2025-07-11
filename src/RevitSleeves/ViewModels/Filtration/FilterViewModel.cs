@@ -10,6 +10,7 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models.FilterModel;
 
 using RevitSleeves.Models;
+using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.ViewModels.Filtration;
 internal abstract class FilterViewModel : BaseViewModel {
@@ -78,7 +79,7 @@ internal abstract class FilterViewModel : BaseViewModel {
         } catch(InvalidOperationException ex) {
             MessageBoxService.Show(
                 ex.Message,
-                $"BIM",
+                NamesProvider.BIM,
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Error,
                 System.Windows.MessageBoxResult.OK);

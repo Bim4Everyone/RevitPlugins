@@ -246,4 +246,6 @@
         x:Key="Transaction.SleevesCleanup">Удаление дублирующих гильз</system:String>
     <system:String
         x:Key="Transaction.SleevesMerging">Объединение гильз</system:String>
+    <system:String
+        x:Key="Transaction.CreateFilter">Создание фильтра</system:String>
 </ResourceDictionary>

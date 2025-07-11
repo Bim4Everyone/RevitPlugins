@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
@@ -20,6 +22,9 @@ internal class SleevePlacementSettingsConfig : ProjectConfig {
     public bool ShowPlacingErrors { get; set; }
 
     public string Name { get; set; } = "default";
+
+    [JsonIgnore]
+    public const BuiltInCategory SleeveCategory = BuiltInCategory.OST_PipeFitting;
 
     public static SleevePlacementSettingsConfig GetPluginConfig(IConfigSerializer configSerializer) {
         try {
