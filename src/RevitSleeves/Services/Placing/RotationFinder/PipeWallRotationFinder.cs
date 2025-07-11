@@ -6,7 +6,6 @@ using RevitSleeves.Models.Placing;
 namespace RevitSleeves.Services.Placing.RotationFinder;
 internal class PipeWallRotationFinder : IRotationFinder<ClashModel<Pipe, Wall>> {
     public Rotation GetRotation(ClashModel<Pipe, Wall> param) {
-        // TODO
         var pipeDir = ((Line) ((LocationCurve) param.MepElement.Location).Curve).Direction;
         double angle = XYZ.BasisX.AngleOnPlaneTo(pipeDir, XYZ.BasisZ);
         return new Rotation() { AngleOZ = angle };

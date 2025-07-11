@@ -31,7 +31,6 @@ internal class PipeFloorParamsSetter : PipeParamsSetter, IParamsSetter<ClashMode
 
 
     public void SetParamValues(FamilyInstance sleeve) {
-        // TODO
         SetElevation(sleeve, _pointFinder.GetPoint(_clash));
         SetInclineAngle(sleeve, Math.PI / 2);
         double diameter = GetSleeveDiameter(_clash.MepElement);

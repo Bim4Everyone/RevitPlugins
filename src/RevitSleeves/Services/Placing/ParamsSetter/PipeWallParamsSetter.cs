@@ -28,7 +28,6 @@ internal class PipeWallParamsSetter : PipeParamsSetter, IParamsSetter<ClashModel
 
 
     public void SetParamValues(FamilyInstance sleeve) {
-        // TODO
         SetElevation(sleeve, _pointFinder.GetPoint(_clash));
         SetInclineAngle(sleeve, _clash.MepElement.GetParamValue<double>(BuiltInParameter.RBS_PIPE_SLOPE));
         double diameter = GetSleeveDiameter(_clash.MepElement);
