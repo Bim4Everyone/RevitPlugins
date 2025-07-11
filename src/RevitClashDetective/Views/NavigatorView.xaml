@@ -13,7 +13,7 @@
                            xmlns:base="clr-namespace:dosymep.WPF.Views"
                            xmlns:converters="clr-namespace:dosymep.WPF.Converters"
                            xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-                           xmlns:res="clr-namespace:RevitClashDetective.Resources"
+                           xmlns:c="clr-namespace:RevitClashDetective.Models.Clashes"
                            mc:Ignorable="d"
                            Title="Навигатор"
                            Height="450"
@@ -28,7 +28,14 @@
     </b:Interaction.Triggers>
     <base:ThemedPlatformWindow.Resources>
         <converters:IndexConverter x:Key="IndexConverter" />
-        <res:ClashStatusToImageConverter x:Key="ClashStatusToImageConverter" />
+        <mvvm:ObjectToObjectConverter x:Key="DxClashStatusToImageConverter">
+            <mvvm:MapItem Source="{x:Static c:ClashStatus.Active}"
+                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png" />
+            <mvvm:MapItem Source="{x:Static c:ClashStatus.Analized}"
+                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png" />
+            <mvvm:MapItem Source="{x:Static c:ClashStatus.Solved}"
+                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png" />
+        </mvvm:ObjectToObjectConverter>
         <Style TargetType="dxg:GridColumn"
                x:Key="ReadOnlyColumn">
             <Setter Property="ReadOnly"
@@ -130,7 +137,7 @@
                                         <StackPanel Orientation="Horizontal">
                                             <Image Width="16"
                                                    Height="16"
-                                                   Source="{Binding ., Converter={StaticResource ClashStatusToImageConverter}}"
+                                                   Source="{Binding Path=Id, Converter={StaticResource DxClashStatusToImageConverter}}"
                                                    Margin="0 0 4 0" />
                                             <TextBlock Text="{Binding}" />
                                         </StackPanel>
