@@ -52,16 +52,16 @@ internal abstract class FinishingElement {
     }
 
     // Перенос значения из системного параметра помещения в общий параметр отделки
-    private protected void UpdateFromBltnParam(IEnumerable<RoomElement> rooms,
-                                                SharedParam param,
-                                                BuiltInParameter bltnParam) {
+    private protected void UpdateFromSystemParam(IEnumerable<RoomElement> rooms,
+                                                 SharedParam param,
+                                                 BuiltInParameter bltnParam) {
         _revitElement.SetParamValue(param, _paramService.GetRoomsParameters(rooms, bltnParam));
     }
 
     // Перенос значения из ключевого параметра помещения в общий параметр отделки
     private protected void UpdateFromKeyParam(IEnumerable<RoomElement> rooms,
-                                                SharedParam param,
-                                                ProjectParam keyParam) {
+                                              SharedParam param,
+                                              ProjectParam keyParam) {
         _revitElement.SetParamValue(param, _paramService.GetRoomsKeyParameters(rooms, keyParam));
     }
 
@@ -136,10 +136,10 @@ internal abstract class FinishingElement {
         UpdateFromKeyParam(Rooms, _paramConfig.FinishingType, ProjectParamsConfig.Instance.RoomFinishingType);
 
         // Имена и номера помещений
-        UpdateFromBltnParam(Rooms, _paramConfig.FinishingRoomName, BuiltInParameter.ROOM_NAME);
-        UpdateFromBltnParam(Rooms, _paramConfig.FinishingRoomNumber, BuiltInParameter.ROOM_NUMBER);
-        UpdateFromBltnParam(finishingType.Rooms, _paramConfig.FinishingRoomNames, BuiltInParameter.ROOM_NAME);
-        UpdateFromBltnParam(finishingType.Rooms, _paramConfig.FinishingRoomNumbers, BuiltInParameter.ROOM_NUMBER);
+        UpdateFromSystemParam(Rooms, _paramConfig.FinishingRoomName, BuiltInParameter.ROOM_NAME);
+        UpdateFromSystemParam(Rooms, _paramConfig.FinishingRoomNumber, BuiltInParameter.ROOM_NUMBER);
+        UpdateFromSystemParam(finishingType.Rooms, _paramConfig.FinishingRoomNames, BuiltInParameter.ROOM_NAME);
+        UpdateFromSystemParam(finishingType.Rooms, _paramConfig.FinishingRoomNumbers, BuiltInParameter.ROOM_NUMBER);
 
         // Габариты отделки 
         UpdateFromInstParam(_paramConfig.SizeArea, BuiltInParameter.HOST_AREA_COMPUTED);
