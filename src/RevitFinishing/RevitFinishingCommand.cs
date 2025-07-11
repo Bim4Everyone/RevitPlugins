@@ -32,7 +32,7 @@ public class RevitFinishingCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitFinishingCommand() {
-        PluginName = "RevitFinishing";
+        PluginName = "Рассчитать отделку";
     }
 
     /// <summary>
