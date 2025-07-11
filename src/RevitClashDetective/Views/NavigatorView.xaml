@@ -13,6 +13,7 @@
                            xmlns:base="clr-namespace:dosymep.WPF.Views"
                            xmlns:converters="clr-namespace:dosymep.WPF.Converters"
                            xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                           xmlns:c="clr-namespace:RevitClashDetective.Models.Clashes"
                            mc:Ignorable="d"
                            Title="Навигатор"
                            Height="450"
@@ -27,6 +28,14 @@
     </b:Interaction.Triggers>
     <base:ThemedPlatformWindow.Resources>
         <converters:IndexConverter x:Key="IndexConverter" />
+        <mvvm:ObjectToObjectConverter x:Key="DxClashStatusToImageConverter">
+            <mvvm:MapItem Source="{x:Static c:ClashStatus.Active}"
+                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png" />
+            <mvvm:MapItem Source="{x:Static c:ClashStatus.Analized}"
+                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png" />
+            <mvvm:MapItem Source="{x:Static c:ClashStatus.Solved}"
+                          Target="pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png" />
+        </mvvm:ObjectToObjectConverter>
         <Style TargetType="dxg:GridColumn"
                x:Key="ReadOnlyColumn">
             <Setter Property="ReadOnly"
@@ -122,7 +131,19 @@
                                               IsTextEditable="False"
                                               EditMode="InplaceActive"
                                               EditValue="{Binding Row.ClashStatus, UpdateSourceTrigger=PropertyChanged}"
-                                              ItemsSource="{dxe:EnumItemsSource EnumType={x:Type m:ClashStatus}}" />
+                                              ItemsSource="{dxe:EnumItemsSource EnumType={x:Type m:ClashStatus}}">
+                                <dxe:ComboBoxEdit.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Width="16"
+                                                   Height="16"
+                                                   Source="{Binding Path=Id, Converter={StaticResource DxClashStatusToImageConverter}}"
+                                                   Margin="0 0 4 0" />
+                                            <TextBlock Text="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </dxe:ComboBoxEdit.ItemTemplate>
+                            </dxe:ComboBoxEdit>
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
