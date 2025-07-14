@@ -42,8 +42,8 @@ internal class PrintOptions {
                 printParameters.OriginOffsetX = OriginOffsetX;
                 printParameters.OriginOffsetY = OriginOffsetY;
 #else
-                printParameters.UserDefinedMarginX = UserDefinedMarginX;
-                printParameters.UserDefinedMarginY = UserDefinedMarginY;
+                printParameters.UserDefinedMarginX = OriginOffsetX;
+                printParameters.UserDefinedMarginY = OriginOffsetY;
 #endif
             }
         }
