@@ -5,7 +5,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-// using DevExpress.Mvvm.DataAnnotations;
+using DevExpress.Mvvm.DataAnnotations;
 
 using dosymep.Revit;
 
@@ -156,15 +156,11 @@ namespace RevitClashDetective.Models.Clashes {
     }
 
     internal enum ClashStatus {
-        // TODO переделать получение иконок
-        //[Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png")]
-        [Display(Name = "Активно")]
+        [Display(Name = "Активно"), Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_High.png")]
         Active,
-        //[Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png")]
-        [Display(Name = "Проанализировано")]
+        [Display(Name = "Проанализировано"), Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Low.png")]
         Analized,
-        //[Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png")]
-        [Display(Name = "Исправлено")]
+        [Display(Name = "Исправлено"), Image("pack://application:,,,/DevExpress.Images.v21.2;component/Images/XAF/State_Priority_Normal.png")]
         Solved
     }
 }
