@@ -41,11 +41,16 @@
             Background="{DynamicResource CardBackground}"
             CornerRadius="{DynamicResource ControlCornerRadius}">
             <ui:AutoSuggestBox
+                x:Name="_albumParamName"
                 Margin="14,8,14,8"
                 Icon="{ui:SymbolIcon TextAlignJustify24}"
                 Text="{Binding AlbumParamName, Mode=TwoWay}"
                 PlaceholderText="{me:LocalizationSource MainWindow.AlbumHintText}"
-                OriginalItemsSource="{Binding AlbumParamNames}">
+                OriginalItemsSource="{Binding AlbumParamNames}"
+                UpdateTextOnSelect="True"
+                Loaded="_albumParamName_OnLoaded"
+                GotFocus="_albumParamName_OnGotFocus"
+                TextChanged="_albumParamName_OnTextChanged">
                 
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="TextChanged">
