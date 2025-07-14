@@ -9,12 +9,6 @@ namespace RevitListOfSchedules.ViewModels {
     internal class SheetViewModel {
         private readonly ILocalizationService _localizationService;
         private readonly SheetElement _sheetElement;
-        private readonly LinkViewModel _linkViewModel;
-        private readonly ViewSheet _viewSheet;
-        private readonly ElementId _elementId;
-        private readonly string _name;
-        private readonly string _number;
-        private readonly string _revisionNumber;
 
         public SheetViewModel(
             ILocalizationService localizationService,
@@ -23,29 +17,28 @@ namespace RevitListOfSchedules.ViewModels {
 
             _localizationService = localizationService;
             _sheetElement = sheetElement;
-            _linkViewModel = linkViewModel;
-            _viewSheet = _sheetElement.Sheet;
-            _elementId = _viewSheet.Id;
-            _name = _sheetElement.Name;
-            _number = _sheetElement.Number;
-            _revisionNumber = _sheetElement.RevisionNumber;
+            LinkViewModel = linkViewModel;
+            ViewSheet = _sheetElement.Sheet;
+            Id = ViewSheet.Id;
+            Name = _sheetElement.Name;
+            Number = _sheetElement.Number;
+            RevisionNumber = _sheetElement.RevisionNumber;
         }
 
-        public LinkViewModel LinkViewModel => _linkViewModel;
-        public ViewSheet ViewSheet => _viewSheet;
+        public LinkViewModel LinkViewModel { get; }
+        public ViewSheet ViewSheet { get; }
         public RevitParam GroupParameter { get; set; }
-        public ElementId Id => _elementId;
-        public string Name => _name;
-        public string Number => _number;
-        public string RevisionNumber => _revisionNumber;
+        public ElementId Id { get; }
+        public string Name { get; }
+        public string Number { get; }
+        public string RevisionNumber { get; }
         public string AlbumName => GetAlbumName();
 
         private string GetAlbumName() {
-            if(GroupParameter != null) {
-                return _sheetElement.Sheet.GetParamValueOrDefault<string>(GroupParameter)
-                    ?? _localizationService.GetLocalizedString("GroupValue.NoValue");
-            }
-            return _localizationService.GetLocalizedString("GroupParameter.NoParameter");
+            return GroupParameter != null
+                ? _sheetElement.Sheet.GetParamValueOrDefault<string>(GroupParameter)
+                    ?? _localizationService.GetLocalizedString("GroupValue.NoValue")
+                : _localizationService.GetLocalizedString("GroupParameter.NoParameter");
         }
     }
 }

@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -8,11 +7,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.WpfUI.Core.SimpleServices;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -49,37 +45,37 @@ public class RevitRsnEditCommand : BasePluginCommand {
     /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        using var kernel = uiApplication.CreatePlatformServices();
 
         // Настройка доступа к Revit
-        kernel.Bind<RevitRepository>()
+        _ = kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
 
         // Настройка конфигурации плагина
-        kernel.Bind<PluginConfig>()
+        _ = kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        kernel.Bind<IRsnConfigService>()
+        _ = kernel.Bind<IRsnConfigService>()
             .To<RsnConfigService>()
             .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
-        kernel.UseWpfUIThemeUpdater();
+        _ = kernel.UseWpfUIThemeUpdater();
 
-        kernel.UseWpfUIMessageBox();
+        _ = kernel.UseWpfUIMessageBox();
 
         // Настройка запуска окна
-        kernel.BindMainWindow<MainViewModel, MainWindow>();
-        
+        _ = kernel.BindMainWindow<MainViewModel, MainWindow>();
+
         // Настройка локализации,
         // получение имени сборки откуда брать текст
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
-        kernel.UseXtraLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+        _ = kernel.UseXtraLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         // Вызывает стандартное уведомление

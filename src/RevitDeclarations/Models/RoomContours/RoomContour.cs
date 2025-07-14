@@ -34,6 +34,9 @@ namespace RevitDeclarations.Models {
         public IReadOnlyList<Curve> ContourCurves => _mainContour;
         public bool NeedToCheck => _needToCheck;
 
+        // Метод создает вместо каждой линии контура прямую линию по начальной и конечной точке.
+        // Это необходимо для замены арок в контуре.
+        // Если имеется арка, то она заменяется на две прямые линии.
         private IList<Curve> GetStraightContour(IList<BoundarySegment> boundaries) {
             Curve prevCurve = boundaries[boundaries.Count - 1].GetCurve();
             List<Curve> contour = new List<Curve>();
@@ -43,9 +46,21 @@ namespace RevitDeclarations.Models {
                 double distance = prevCurve.GetEndPoint(1).DistanceTo(curve.GetEndPoint(1));
 
                 if(distance > _curveTolerance) {
-                    Curve straightCurve = Line.CreateBound(prevCurve.GetEndPoint(1), curve.GetEndPoint(1));
-                    prevCurve = straightCurve;
-                    contour.Add(straightCurve);
+                    if(curve is Arc) {
+                        XYZ midPoint = curve.Evaluate(0.5, true);
+                        Curve straightCurveLeft = Line.CreateBound(prevCurve.GetEndPoint(1), midPoint);
+                        contour.Add(straightCurveLeft);
+
+                        Curve straightCurveRight = Line.CreateBound(midPoint, curve.GetEndPoint(1));
+                        prevCurve = straightCurveRight;
+                        contour.Add(straightCurveRight);
+
+                        _needToCheck = true;
+                    } else {
+                        Curve straightCurve = Line.CreateBound(prevCurve.GetEndPoint(1), curve.GetEndPoint(1));
+                        prevCurve = straightCurve;
+                        contour.Add(straightCurve);
+                    }
                 } else {
                     _needToCheck = true;
                 }
@@ -72,6 +87,7 @@ namespace RevitDeclarations.Models {
             }
         }
 
+        // Метод для объединения линий, которые лежат на одной прямой и идут друг за другом.
         private IList<Curve> ConnectRoomContour(IList<Curve> contour) {
             int contourLength = contour.Count();
 
