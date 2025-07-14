@@ -99,7 +99,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Icon="{ui:SymbolIcon Line24}"
+                        Icon="{ui:SymbolIcon Box24}"
                         Header="{me:LocalizationSource Settings.HideScopeBoxes}"
                         Description="{me:LocalizationSource Settings.HideScopeBoxesDescription}">
 
@@ -111,7 +111,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Icon="{ui:SymbolIcon Line24}"
+                        Icon="{ui:SymbolIcon Crop24}"
                         Header="{me:LocalizationSource Settings.HideCropBoundaries}"
                         Description="{me:LocalizationSource Settings.HideCropBoundariesDescription}">
 
@@ -123,7 +123,7 @@
                     </edits:CustomEditControl>
 
                     <edits:CustomEditControl
-                        Icon="{ui:SymbolIcon Line24}"
+                        Icon="{ui:SymbolIcon CircleHalfFill24}"
                         Header="{me:LocalizationSource Settings.ReplaceHalftoneWithThinLines}"
                         Description="{me:LocalizationSource Settings.ReplaceHalftoneWithThinLinesDescription}">
 

@@ -123,7 +123,7 @@
                         Converter={StaticResource ExportVisibilityConverter}}" />
 
                 <ui:Button
-                    Icon="{ui:SymbolIcon Document24}"
+                    Icon="{ui:SymbolIcon DocumentArrowDown20}"
                     Style="{StaticResource TreeItemButtonStyle}"
                     Command="{Binding PrintExportCommand}"
                     Visibility="{Binding DataContext.ShowExport,

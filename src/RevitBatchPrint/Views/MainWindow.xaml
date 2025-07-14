@@ -83,7 +83,7 @@
                         <ui:ToggleSwitch.OnContent>
                             <ui:SymbolIcon
                                 FontSize="20"
-                                Symbol="Document48"
+                                Symbol="DocumentArrowDown20"
                                 ToolTip="{me:LocalizationSource MainWindow.ExportMode}" />
                         </ui:ToggleSwitch.OnContent>
 
