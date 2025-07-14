@@ -23,6 +23,12 @@ public partial class MainWindow {
         InitializeComponent();
     }
 
+#if REVIT_2022_OR_GREATER
+    public bool SupportExport => true;
+#else
+    public bool SupportExport => false;
+#endif
+
     /// <summary>
     /// Наименование плагина.
     /// </summary>

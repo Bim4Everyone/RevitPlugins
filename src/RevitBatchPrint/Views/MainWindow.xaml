@@ -41,12 +41,7 @@
                 FalseValue="Visible" />
 
             <converters:BoolToVisibilityConverter
-                x:Key="SettingsVisibleConverter"
-                TrueValue="Visible"
-                FalseValue="Collapsed" />
-
-            <converters:BoolToVisibilityConverter
-                x:Key="ExportVisibilityConverter"
+                x:Key="BoolToVisibilityConverter"
                 TrueValue="Visible"
                 FalseValue="Collapsed" />
         </ResourceDictionary>
@@ -80,7 +75,10 @@
 
                     <ui:ToggleSwitch
                         Margin="8 0"
-                        Style="{StaticResource CustomToggleSwitchStyle}">
+                        Style="{StaticResource CustomToggleSwitchStyle}"
+                        Visibility="{Binding SupportExport, 
+                            ElementName=_this,
+                            Converter={StaticResource BoolToVisibilityConverter}}">
 
                         <ui:ToggleSwitch.OnContent>
                             <ui:SymbolIcon
@@ -128,7 +126,7 @@
             DataContext="{Binding PrintOptions}"
             Visibility="{Binding IsChecked, 
                 ElementName=_settingsSwitch,
-                Converter={StaticResource SettingsVisibleConverter}}" />
+                Converter={StaticResource BoolToVisibilityConverter}}" />
 
         <StackPanel
             Grid.Row="2"
@@ -149,7 +147,7 @@
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptVewCommand}"
                 Visibility="{Binding ShowPrint,
-                    Converter={StaticResource ExportVisibilityConverter}}" />
+                    Converter={StaticResource BoolToVisibilityConverter}}" />
 
             <ui:Button
                 Margin="10"
@@ -159,7 +157,7 @@
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptVewCommand}"
                 Visibility="{Binding ShowExport,
-                    Converter={StaticResource ExportVisibilityConverter}}" />
+                    Converter={StaticResource BoolToVisibilityConverter}}" />
 
             <ui:Button
                 Margin="10"
