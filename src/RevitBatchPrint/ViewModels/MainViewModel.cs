@@ -193,17 +193,12 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     }
 
     private bool CanAcceptView(bool checkSelected) {
-        if(string.IsNullOrEmpty(AlbumParamName)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedAlbumParamName");
-            return false;
-        }
-
-        if(ShowPrint && string.IsNullOrEmpty(PrintOptions.PrinterName)) {
+        if(ShowPrint && string.IsNullOrEmpty(PrintOptions?.PrinterName)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedPrinter");
             return false;
         }
 
-        if(ShowExport && string.IsNullOrEmpty(PrintOptions.FilePath)) {
+        if(ShowExport && string.IsNullOrEmpty(PrintOptions?.FilePath)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NotSelectedFilePath");
             return false;
         }
@@ -280,8 +275,10 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        AlbumParamName = setting?.AlbumParamName;
-        AlbumParamName ??= AlbumParamNames
+        AlbumParamName = AlbumParamNames
+                               .FirstOrDefault(item =>
+                                   item.Equals(setting?.AlbumParamName))
+                           ?? AlbumParamNames
                                .FirstOrDefault(item =>
                                    PluginSystemConfig.PrintParamNames.Contains(item))
                            ?? AlbumParamNames.FirstOrDefault();
