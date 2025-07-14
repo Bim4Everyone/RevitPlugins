@@ -3,8 +3,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using RevitFinishing.Models.Finishing.Factories;
-
 namespace RevitFinishing.Models.Finishing;
 internal class FinishingInProject {
     private readonly IReadOnlyCollection<FinishingElement> _allFinishing;
