@@ -32,7 +32,7 @@ internal class DimensionBaseService {
 
 
     public Line GetDimensionLine(FamilyInstance rebar, DimensionOffsetType dimensionOffsetType,
-                          double offsetCoefficient = 1) {
+                          double offsetCoefficient = 1, bool dependsOnCropBox = true) {
         // Задаем дефолтные точки на случай, если не сработает получение
         var pt1 = new XYZ(0, 0, 0);
         var pt2 = new XYZ(0, 100, 0);
@@ -74,29 +74,31 @@ internal class DimensionBaseService {
                     pt1 = bbox.Max + offsetTop;
                 }
 
-                // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
-                // то ставим по рамки подрезки
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
-                    if(pt1.Y > cropBoxMaxGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                if(dependsOnCropBox) {
+                    // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
+                    // то ставим по рамки подрезки
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
+                        if(pt1.Y > cropBoxMaxGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
-                    if(pt1.Y < cropBoxMaxGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
+                        if(pt1.Y < cropBoxMaxGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.X > cropBoxMaxGlobal.X) {
-                        pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.X > cropBoxMaxGlobal.X) {
+                            pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.X < cropBoxMaxGlobal.X) {
-                        pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.X < cropBoxMaxGlobal.X) {
+                            pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                        }
                     }
                 }
 
@@ -115,29 +117,31 @@ internal class DimensionBaseService {
                     pt1 = bbox.Min + offsetBottom;
                 }
 
-                // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
-                // то ставим по рамке подрезки
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
-                    if(pt1.Y < cropBoxMinGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                if(dependsOnCropBox) {
+                    // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
+                    // то ставим по рамке подрезки
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
+                        if(pt1.Y < cropBoxMinGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
-                    if(pt1.Y > cropBoxMinGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
+                        if(pt1.Y > cropBoxMinGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.X < cropBoxMinGlobal.X) {
-                        pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.X < cropBoxMinGlobal.X) {
+                            pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.X > cropBoxMinGlobal.X) {
-                        pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.X > cropBoxMinGlobal.X) {
+                            pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
+                        }
                     }
                 }
 
@@ -156,29 +160,31 @@ internal class DimensionBaseService {
                     pt1 = bbox.Min + offsetLeft;
                 }
 
-                // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
-                // то ставим по рамки подрезки
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
-                    if(pt1.X < cropBoxMinGlobal.X) {
-                        pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
+                if(dependsOnCropBox) {
+                    // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
+                    // то ставим по рамки подрезки
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
+                        if(pt1.X < cropBoxMinGlobal.X) {
+                            pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
-                    if(pt1.X > cropBoxMinGlobal.X) {
-                        pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
+                        if(pt1.X > cropBoxMinGlobal.X) {
+                            pt1 = new XYZ(cropBoxMinGlobal.X, pt1.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.Y > cropBoxMinGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.Y > cropBoxMinGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.Y < cropBoxMinGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.Y < cropBoxMinGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMinGlobal.Y, pt1.Z);
+                        }
                     }
                 }
 
@@ -197,29 +203,31 @@ internal class DimensionBaseService {
                     pt1 = bbox.Max + offsetRight;
                 }
 
-                // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
-                // то ставим по рамки подрезки
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
-                    if(pt1.X > cropBoxMaxGlobal.X) {
-                        pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                if(dependsOnCropBox) {
+                    // Если точка, куда нужно поставить размерную линию находится за рамкой подрезки,
+                    // то ставим по рамки подрезки
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(1.0)) {
+                        if(pt1.X > cropBoxMaxGlobal.X) {
+                            pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
-                    if(pt1.X < cropBoxMaxGlobal.X) {
-                        pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(0.0) && yUpDirectionRounded.Equals(-1.0)) {
+                        if(pt1.X < cropBoxMaxGlobal.X) {
+                            pt1 = new XYZ(cropBoxMaxGlobal.X, pt1.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.Y < cropBoxMaxGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.Y < cropBoxMaxGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                        }
                     }
-                }
 
-                if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
-                    if(pt1.Y > cropBoxMaxGlobal.Y) {
-                        pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                    if(xUpDirectionRounded.Equals(-1.0) && yUpDirectionRounded.Equals(0.0)) {
+                        if(pt1.Y > cropBoxMaxGlobal.Y) {
+                            pt1 = new XYZ(pt1.X, cropBoxMaxGlobal.Y, pt1.Z);
+                        }
                     }
                 }
 

@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
@@ -10,6 +14,7 @@ using dosymep.Revit;
 using RevitPylonDocumentation.ViewModels;
 
 using Grid = Autodesk.Revit.DB.Grid;
+using Line = Autodesk.Revit.DB.Line;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonViewDimensionCreator {
@@ -577,7 +582,6 @@ public class PylonViewDimensionCreator {
             Dimension dimensionFormworkRebarSide = doc.Create.NewDimension(view, dimensionLineRightSecond,
                                                                               refArrayFormworkRebarSide, ViewModel.SelectedDimensionType);
 
-
             if(grids.Count > 0) {
                 // Размер по ТОРЦУ опалубка + оси (положение слева 1)
                 Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Left, 1.2);
@@ -585,7 +589,63 @@ public class PylonViewDimensionCreator {
                                                                        refArrayFormworkSide);
                 Dimension dimensionFormworkGridSide = doc.Create.NewDimension(view, dimensionLineLeft,
                                                                           refArrayFormworkGridSide, ViewModel.SelectedDimensionType);
+
+                // Корректируем концы осей, приближая их на виде к опалубке пилона, чтобы сократить габариты
+                // видового экрана
+                var transverseViewGridOffsets = new OffsetOption() {
+                    LeftOffset = 1.5,
+                    RightOffset = 0.5,
+                    TopOffset = 0.6,
+                    BottomOffset = 1.1
+                };
+                EditGridEnds(view, SheetInfo.HostElems.First() as FamilyInstance, grids, transverseViewGridOffsets, dimensionBaseService);
             }
         } catch(Exception) { }
+    }
+
+
+    private void EditGridEnds(View view, FamilyInstance familyInstance, 
+                              List<Grid> grids, OffsetOption offsetOption, DimensionBaseService dimensionBaseService) {
+        var rightDirection = view.RightDirection;
+
+        foreach(var grid in grids) {
+            var gridLine = grid.Curve as Line;
+            var gridDir = gridLine.Direction;
+
+            if(rightDirection.IsAlmostEqualTo(gridDir)
+                || rightDirection.IsAlmostEqualTo(gridDir.Negate())) {
+
+                var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
+
+                Line offsetLine1 = dimensionBaseService.GetDimensionLine(familyInstance,
+                                                                         DimensionOffsetType.Left,
+                                                                         offsetOption.LeftOffset, false);
+                var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
+
+                Line offsetLine2 = dimensionBaseService.GetDimensionLine(familyInstance,
+                                                                         DimensionOffsetType.Right,
+                                                                         offsetOption.RightOffset, false);
+                var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
+
+                var newLine = Line.CreateBound(pt1, pt2);
+                grid.SetCurveInView(DatumExtentType.ViewSpecific, view, newLine);
+
+            } else {
+                var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
+
+                Line offsetLine1 = dimensionBaseService.GetDimensionLine(familyInstance,
+                                                                         DimensionOffsetType.Bottom,
+                                                                         offsetOption.BottomOffset, false);
+                var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
+
+                Line offsetLine2 = dimensionBaseService.GetDimensionLine(familyInstance,
+                                                                         DimensionOffsetType.Top,
+                                                                         offsetOption.TopOffset, false);
+                var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
+
+                var newLine = Line.CreateBound(pt1, pt2);
+                grid.SetCurveInView(DatumExtentType.ViewSpecific, view, newLine);
+            }
+        }
     }
 }
