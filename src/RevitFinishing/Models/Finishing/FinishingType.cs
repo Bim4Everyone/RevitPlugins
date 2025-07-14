@@ -19,10 +19,14 @@ internal class FinishingType {
     public FinishingType(IEnumerable<RoomElement> rooms) {
         _rooms = rooms;
 
-        IList<Element> walls = _rooms.SelectMany(x => x.Walls).ToList();
-        IList<Element> floors = _rooms.SelectMany(x => x.Floors).ToList();
-        IList<Element> ceilings = _rooms.SelectMany(x => x.Ceilings).ToList();
-        IList<Element> baseboards = _rooms.SelectMany(x => x.Baseboards).ToList();
+        IList<FinishingWall> walls = _rooms
+            .SelectMany(x => x.AllFinishing.OfType<FinishingWall>()).ToList();
+        IList<FinishingFloor> floors = _rooms
+            .SelectMany(x => x.AllFinishing.OfType<FinishingFloor>()).ToList();
+        IList<FinishingCeiling> ceilings = _rooms
+            .SelectMany(x => x.AllFinishing.OfType<FinishingCeiling>()).ToList();
+        IList<FinishingBaseboard> baseboards = _rooms
+            .SelectMany(x => x.AllFinishing.OfType<FinishingBaseboard>()).ToList();
 
         _wallTypesByOrder = CalculateFinishingOrder(walls);
         _floorTypesByOrder = CalculateFinishingOrder(floors);
@@ -49,9 +53,9 @@ internal class FinishingType {
         return _baseboardTypesByOrder.IndexOf(typeName) + 1;
     }
 
-    private List<string> CalculateFinishingOrder(IEnumerable<Element> finishingElements) {
+    private List<string> CalculateFinishingOrder(IEnumerable<FinishingElement> finishingElements) {
         return finishingElements
-            .Select(x => x.Name)
+            .Select(x => x.RevitElement.Name)
             .Distinct()
             .OrderBy(x => x)
             .ToList();

@@ -17,7 +17,6 @@ namespace RevitFinishing.Models.Finishing;
 /// </summary>
 internal abstract class FinishingElement {
     private protected readonly Element _revitElement;
-    private protected readonly FinishingCalculator _calculator;
     private protected readonly ParamCalculationService _paramService;
 
     private protected readonly bool _isInPlace;
@@ -28,7 +27,6 @@ internal abstract class FinishingElement {
     private protected readonly SharedParamsConfig _paramConfig = SharedParamsConfig.Instance;
 
     public FinishingElement(Element element,
-                            FinishingCalculator calculator,
                             ParamCalculationService paramService) {
         _revitElement = element;
         _revitElementType = _revitElement.Document.GetElement(_revitElement.GetTypeId());
@@ -37,7 +35,7 @@ internal abstract class FinishingElement {
             _isCustomFamily = _familySymbol != null;
             _isInPlace = _familySymbol.Family.IsInPlace;
         }
-        _calculator = calculator;
+
         _paramService = paramService;
     }
 
@@ -100,8 +98,8 @@ internal abstract class FinishingElement {
     /// <summary>
     /// Заполнение параметров отделки, универсальных для всех семейств отделки.
     /// </summary>
-    public void UpdateFinishingParameters() {
-        FinishingType finishingType = _calculator.RoomsByFinishingType[Rooms.First().RoomFinishingType];
+    public void UpdateFinishingParameters(FinishingCalculator calculator) {
+        FinishingType finishingType = calculator.RoomsByFinishingType[Rooms.First().RoomFinishingType];
 
         UpdateFromSharedParam(_paramConfig.FloorFinishingType1);
         UpdateFromSharedParam(_paramConfig.FloorFinishingType2);
@@ -149,5 +147,5 @@ internal abstract class FinishingElement {
     /// <summary>
     /// Заполнение параметров отделки, уникальных для определенного типа отделки.
     /// </summary>
-    public abstract void UpdateCategoryParameters();
+    public abstract void UpdateCategoryParameters(FinishingCalculator calculator);
 }

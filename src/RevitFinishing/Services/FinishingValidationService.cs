@@ -31,8 +31,8 @@ internal class FinishingValidationService {
                                                                       Phase phase) {
         return finishings
             .AllFinishing
-            .Where(x => x.GetParamValueOrDefault(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING, 0) == 1)
-            .Select(x => new NoticeElementViewModel(x, phase.Name, _localizationService))
+            .Where(x => x.RevitElement.GetParamValueOrDefault(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING, 0) == 1)
+            .Select(x => new NoticeElementViewModel(x.RevitElement, phase.Name, _localizationService))
             .ToList();
     }
 

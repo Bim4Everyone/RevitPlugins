@@ -73,7 +73,7 @@ internal class RevitRepository {
             .Select(g => g.First());
     }
 
-    public IReadOnlyCollection<Element> GetFinishingElementsOnPhase(FinishingCategory finishingCategory, Phase phase) {
+    public IReadOnlyCollection<FinishingElement> GetFinishingElementsOnPhase(FinishingCategory finishingCategory, Phase phase) {
         var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _phaseStatuses);
         var parameterId = new ElementId(BuiltInParameter.ELEM_TYPE_PARAM);
         var valueProvider = new ParameterValueProvider(parameterId);
@@ -93,6 +93,7 @@ internal class RevitRepository {
             .WherePasses(parameterFilter)
             .WherePasses(phaseFilter)
             .ToElements()
+            .Select(x => FinishingFactory.Create(finishingCategory.Name, x))
             .ToList();
     }
 

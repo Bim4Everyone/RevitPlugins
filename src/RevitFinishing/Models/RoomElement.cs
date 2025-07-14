@@ -21,12 +21,7 @@ internal class RoomElement {
     private readonly Document _document;
     private readonly ElementIntersectsSolidFilter _solidFilter;
     private readonly BoundingBoxIntersectsFilter _bbFilter;
-
-    private readonly IReadOnlyCollection<Element> _walls;
-    private readonly IReadOnlyCollection<Element> _floors;
-    private readonly IReadOnlyCollection<Element> _ceilings;
-    private readonly IReadOnlyCollection<Element> _baseboards;
-    private readonly IReadOnlyCollection<Element> _allFinishing;
+    private readonly IReadOnlyCollection<FinishingElement> _allFinishing;
 
     public RoomElement(Room room, FinishingInProject finishingElements) {
         _revitRoom = room;
@@ -44,34 +39,23 @@ internal class RoomElement {
         var roomOutline = new Outline(transformedBB.Min, transformedBB.Max);
         _bbFilter = new BoundingBoxIntersectsFilter(roomOutline);
 
-        _walls = GetElementsBySolidIntersection(finishingElements.Walls.Select(x => x.Id).ToList());
-        _floors = GetElementsBySolidIntersection(finishingElements.Floors.Select(x => x.Id).ToList());
-        _ceilings = GetElementsBySolidIntersection(finishingElements.Ceilings.Select(x => x.Id).ToList());
-        _baseboards = GetElementsBySolidIntersection(finishingElements.Baseboards.Select(x => x.Id).ToList());
-
-        _allFinishing = _walls
-            .Concat(_floors)
-            .Concat(_ceilings)
-            .Concat(_baseboards)
-            .ToList();
+        _allFinishing = GetElementsBySolidIntersection(finishingElements.AllFinishing.ToList());
     }
 
     public Room RevitRoom => _revitRoom;
     public string RoomFinishingType => _roomFinishingType;
 
-    public IReadOnlyCollection<Element> AllFinishing => _allFinishing;
-    public IReadOnlyCollection<Element> Walls => _walls;
-    public IReadOnlyCollection<Element> Floors => _floors;
-    public IReadOnlyCollection<Element> Ceilings => _ceilings;
-    public IReadOnlyCollection<Element> Baseboards => _baseboards;
+    public IReadOnlyCollection<FinishingElement> AllFinishing => _allFinishing;
 
-    private IReadOnlyCollection<Element> GetElementsBySolidIntersection(ICollection<ElementId> elements) {
-        return !elements.Any()
+    private IReadOnlyCollection<FinishingElement> GetElementsBySolidIntersection(ICollection<FinishingElement> elements) {
+        var filteredElements = !elements.Any()
             ? []
-            : (IReadOnlyCollection<Element>) new FilteredElementCollector(_document, elements)
+            : new FilteredElementCollector(_document, elements.Select(x => x.RevitElement.Id).ToList())
             .WherePasses(_bbFilter)
             .WherePasses(_solidFilter)
-            .ToElements()
+            .ToElementIds()
             .ToList();
+
+        return elements.Where(x => filteredElements.Contains(x.RevitElement.Id)).ToList();
     }
 }

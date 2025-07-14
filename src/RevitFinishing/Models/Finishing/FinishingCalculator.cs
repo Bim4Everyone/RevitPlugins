@@ -32,23 +32,10 @@ internal class FinishingCalculator {
     /// <returns></returns>
     private IList<FinishingElement> GetUpdatedFinishingByRooms() {
         Dictionary<ElementId, FinishingElement> allFinishings = [];
-        string wallName = FinishingCategory.Walls.Name;
-        string floorName = FinishingCategory.Floors.Name;
-        string ceilingName = FinishingCategory.Ceilings.Name;
-        string baseboarName = FinishingCategory.Baseboards.Name;
 
         foreach(RoomElement room in _finishingRooms) {
-            foreach(Element finishingRevitElement in room.Walls) {
-                allFinishings = UpdateDictionary(allFinishings, room, wallName, finishingRevitElement);
-            }
-            foreach(Element finishingRevitElement in room.Baseboards) {
-                allFinishings = UpdateDictionary(allFinishings, room, baseboarName, finishingRevitElement);
-            }
-            foreach(Element finishingRevitElement in room.Floors) {
-                allFinishings = UpdateDictionary(allFinishings, room, floorName, finishingRevitElement);
-            }
-            foreach(Element finishingRevitElement in room.Ceilings) {
-                allFinishings = UpdateDictionary(allFinishings, room, ceilingName, finishingRevitElement);
+            foreach(FinishingElement finishingRevitElement in room.AllFinishing) {
+                allFinishings = UpdateDictionary(allFinishings, room, finishingRevitElement);
             }
         }
         return allFinishings.Values.ToList();
@@ -62,16 +49,14 @@ internal class FinishingCalculator {
 
     private Dictionary<ElementId, FinishingElement> UpdateDictionary(Dictionary<ElementId, FinishingElement> finishings,
                                                                      RoomElement room,
-                                                                     string finishingName,
-                                                                     Element finishingRevitElement) {
-        ElementId finishingId = finishingRevitElement.Id;
+                                                                     FinishingElement finishingRevitElement) {
+        ElementId finishingId = finishingRevitElement.RevitElement.Id;
 
         if(finishings.TryGetValue(finishingId, out FinishingElement finishing)) {
             finishing.Rooms.Add(room);
         } else {
-            FinishingElement newFinishing = FinishingFactory.Create(finishingName, finishingRevitElement, this);
-            newFinishing.Rooms = [room];
-            finishings.Add(finishingId, newFinishing);
+            finishingRevitElement.Rooms = [room];
+            finishings.Add(finishingId, finishingRevitElement);
         }
 
         return finishings;

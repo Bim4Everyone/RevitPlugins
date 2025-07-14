@@ -147,8 +147,8 @@ internal class MainViewModel : BaseViewModel {
         string transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
         using(Transaction t = _revitRepository.Document.StartTransaction(transactionName)) {
             foreach(FinishingElement element in finishingElements) {
-                element.UpdateFinishingParameters();
-                element.UpdateCategoryParameters();
+                element.UpdateFinishingParameters(calculator);
+                element.UpdateCategoryParameters(calculator);
             }
             t.Commit();
         }
