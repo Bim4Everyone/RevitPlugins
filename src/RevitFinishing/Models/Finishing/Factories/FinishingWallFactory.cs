@@ -1,0 +1,13 @@
+using Autodesk.Revit.DB;
+
+using RevitFinishing.Services;
+
+namespace RevitFinishing.Models.Finishing.Factories
+{
+    internal class FinishingWallFactory : FinishingFactory {
+        public override FinishingElement Create(Element element) {
+            var paramService = new ParamCalculationService();
+            return new FinishingWall(element, paramService);
+        }
+    }
+}
