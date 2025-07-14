@@ -82,13 +82,40 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         var localizationService = kernel.Get<ILocalizationService>();
         var cleanupService = kernel.Get<ISleeveCleanupService>();
 
+        var newSleeves = CreateSleeves(kernel);
+
+        var cleanedSleeves = CleanupSleeves(kernel, oldSleeves, newSleeves);
+
+        MergeSleeves(kernel, cleanedSleeves);
+
+        if(kernel.Get<SleevePlacementSettingsConfig>().ShowPlacingErrors
+            && kernel.Get<IPlacingErrorsService>().ContainsErrors()) {
+            kernel.Get<PlacingErrorsWindow>().Show();
+        }
+    }
+
+    private ICollection<SleeveModel> CreateSleeves(IKernel kernel) {
+
+        var repo = kernel.Get<RevitRepository>();
+        var localizationService = kernel.Get<ILocalizationService>();
+        var cleanupService = kernel.Get<ISleeveCleanupService>();
+
         ICollection<SleeveModel> newSleeves;
         try {
             repo.Application.FailuresProcessing += cleanupService.FailureProcessor;
             var opts = kernel.Get<ISleevePlacingOptsService>().GetOpts();
             using var placeTrans = repo.Document.StartTransaction(
                 localizationService.GetLocalizedString("Transaction.SleevesPlacing"));
-            newSleeves = kernel.Get<ISleevePlacerService>().PlaceSleeves(opts, null, default);
+
+            using var dialogCreate = kernel.Get<IProgressDialogService>();
+            dialogCreate.StepValue = 50;
+            dialogCreate.MaxValue = opts.Count;
+            dialogCreate.DisplayTitleFormat = $"{placeTrans} [{{0}}/{{1}}] ...";
+            var progressCreate = dialogCreate.CreateProgress();
+            var ctCreate = dialogCreate.CreateCancellationToken();
+            dialogCreate.Show();
+
+            newSleeves = kernel.Get<ISleevePlacerService>().PlaceSleeves(opts, progressCreate, ctCreate);
             var options = placeTrans.GetFailureHandlingOptions()
                 .SetForcedModalHandling(false)
                 .SetDelayedMiniWarnings(true);
@@ -96,24 +123,52 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         } finally {
             repo.Application.FailuresProcessing -= cleanupService.FailureProcessor;
         }
+        return newSleeves;
+    }
+
+    private ICollection<SleeveModel> CleanupSleeves(IKernel kernel,
+        ICollection<SleeveModel> oldSleeves,
+        ICollection<SleeveModel> newSleeves) {
+
+        var repo = kernel.Get<RevitRepository>();
+        var localizationService = kernel.Get<ILocalizationService>();
+        var cleanupService = kernel.Get<ISleeveCleanupService>();
 
         ICollection<SleeveModel> cleanedSleeves;
-        using(var cleanupTrans = repo.Document.StartTransaction(
-            localizationService.GetLocalizedString("Transaction.SleevesCleanup"))) {
-            cleanedSleeves = cleanupService.CleanupSleeves(oldSleeves, newSleeves, null, default);
-            cleanupTrans.Commit();
-        }
+        using var cleanupTrans = repo.Document.StartTransaction(
+            localizationService.GetLocalizedString("Transaction.SleevesCleanup"));
 
-        using(var mergeTrans = repo.Document.StartTransaction(
-            localizationService.GetLocalizedString("Transaction.SleevesMerging"))) {
-            kernel.Get<ISleeveMergeService>().MergeSleeves(cleanedSleeves, null, default);
-            mergeTrans.Commit();
-        }
+        using var dialogCleanup = kernel.Get<IProgressDialogService>();
+        dialogCleanup.StepValue = 50;
+        dialogCleanup.MaxValue = newSleeves.Count;
+        dialogCleanup.DisplayTitleFormat = $"{cleanupTrans} [{{0}}/{{1}}] ...";
+        var progressCleanup = dialogCleanup.CreateProgress();
+        var ctCleanup = dialogCleanup.CreateCancellationToken();
+        dialogCleanup.Show();
 
-        if(kernel.Get<SleevePlacementSettingsConfig>().ShowPlacingErrors
-            && kernel.Get<IPlacingErrorsService>().ContainsErrors()) {
-            kernel.Get<PlacingErrorsWindow>().Show();
-        }
+        cleanedSleeves = cleanupService.CleanupSleeves(oldSleeves, newSleeves, progressCleanup, ctCleanup);
+        cleanupTrans.Commit();
+        return cleanedSleeves;
+    }
+
+    private void MergeSleeves(IKernel kernel, ICollection<SleeveModel> cleanedSleeves) {
+        var repo = kernel.Get<RevitRepository>();
+        var localizationService = kernel.Get<ILocalizationService>();
+        var cleanupService = kernel.Get<ISleeveCleanupService>();
+
+        using var mergeTrans = repo.Document.StartTransaction(
+            localizationService.GetLocalizedString("Transaction.SleevesMerging"));
+
+        using var dialogMerge = kernel.Get<IProgressDialogService>();
+        dialogMerge.StepValue = 50;
+        dialogMerge.MaxValue = cleanedSleeves.Count;
+        dialogMerge.DisplayTitleFormat = $"{mergeTrans} [{{0}}/{{1}}] ...";
+        var progressMerge = dialogMerge.CreateProgress();
+        var ctMerge = dialogMerge.CreateCancellationToken();
+        dialogMerge.Show();
+
+        kernel.Get<ISleeveMergeService>().MergeSleeves(cleanedSleeves, progressMerge, ctMerge);
+        mergeTrans.Commit();
     }
 
     private void BindServices(IKernel kernel) {
