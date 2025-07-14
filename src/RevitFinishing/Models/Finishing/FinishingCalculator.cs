@@ -10,13 +10,14 @@ namespace RevitFinishing.Models.Finishing;
 /// </summary>
 internal class FinishingCalculator {
     private readonly IList<FinishingElement> _finishingElements;
-    private readonly IEnumerable<RoomElement> _finishingRooms;
+    private readonly IList<RoomElement> _finishingRooms;
     private readonly Dictionary<string, FinishingType> _roomsByFinishingType;
 
     public FinishingCalculator(IEnumerable<Element> rooms, FinishingInProject finishings) {
         _finishingRooms = rooms 
             .OfType<Room>()
-            .Select(x => new RoomElement(x, finishings));
+            .Select(x => new RoomElement(x, finishings))
+            .ToList();
         _finishingElements = GetUpdatedFinishingByRooms();
         _roomsByFinishingType = GroupRoomsByFinishingType();
     }
