@@ -170,8 +170,9 @@ public class PylonViewDimensionCreator {
         if(grids.Count > 0) {
             // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
             Line dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Bottom, 1.5);
-            ReferenceArray refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, new XYZ(0, 1, 0),
-                                                                          refArrayFormworkFront);
+            ReferenceArray refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view, 
+                                                                                             new XYZ(0, 0, 1),
+                                                                                             refArrayFormworkFront);
             Dimension dimensionFormworkGridFront = Repository.Document.Create.NewDimension(view, dimensionLineBottomSecond,
                                                                            refArrayFormworkGridFront, ViewModel.SelectedDimensionType);
         }
@@ -550,8 +551,9 @@ public class PylonViewDimensionCreator {
             if(grids.Count > 0) {
                 // Размер по ФРОНТУ опалубка + оси (положение сверху 1)
                 Line dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Top, 0.5);
-                ReferenceArray refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, new XYZ(0, 1, 0),
-                                                                          refArrayFormworkFront);
+                ReferenceArray refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view, 
+                                                                                                 new XYZ(0, 1, 0),
+                                                                                                 refArrayFormworkFront);
                 Dimension dimensionFormworkGridFront = doc.Create.NewDimension(view, dimensionLineTopSecond,
                                                                            refArrayFormworkGridFront, ViewModel.SelectedDimensionType);
             }
@@ -608,8 +610,9 @@ public class PylonViewDimensionCreator {
             if(grids.Count > 0) {
                 // Размер по ТОРЦУ опалубка + оси (положение слева 1)
                 Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Left, 1.2);
-                ReferenceArray refArrayFormworkGridSide = dimensionBaseService.GetDimensionRefs(grids, new XYZ(1, 0, 0),
-                                                                       refArrayFormworkSide);
+                ReferenceArray refArrayFormworkGridSide = dimensionBaseService.GetDimensionRefs(grids, view, 
+                                                                                                new XYZ(1, 0, 0),
+                                                                                                refArrayFormworkSide);
                 Dimension dimensionFormworkGridSide = doc.Create.NewDimension(view, dimensionLineLeft,
                                                                           refArrayFormworkGridSide, ViewModel.SelectedDimensionType);
 

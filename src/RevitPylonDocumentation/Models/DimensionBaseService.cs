@@ -319,7 +319,7 @@ internal class DimensionBaseService {
     }
 
 
-    public ReferenceArray GetDimensionRefs(List<Grid> grids, XYZ direction, ReferenceArray oldRefArray = null) {
+    public ReferenceArray GetDimensionRefs(List<Grid> grids, View view, XYZ direction, ReferenceArray oldRefArray = null) {
         // Создаем матрицу трансформации
         var transform = Transform.Identity;
         transform.Origin = _viewOrigin;
@@ -342,14 +342,17 @@ internal class DimensionBaseService {
                 var lineDirection = line.Direction.Normalize();
                 var lineDirectionByView = transform.OfVector(lineDirection);
 
-                if(lineDirectionByView.IsAlmostEqualTo(normalizedDirection, 0.01)
+                // Оси могут быть проложены в двух направлениях
+                // В случае, если это вертикальный вид, то нужно привязываться к осям всегда
+                // В случае, если это горизонтальный вид, то нужно привязываться в зависимости от направления вида
+                if(view.UpDirection.IsAlmostEqualTo(XYZ.BasisZ)
+                    || lineDirectionByView.IsAlmostEqualTo(normalizedDirection, 0.01)
                     || lineDirectionByView.IsAlmostEqualTo(normalizedDirection.Negate(), 0.01)) {
-
                     var gridRef = new Reference(grid);
                     if(gridRef != null) {
                         refArray.Append(gridRef);
                     }
-                }
+                } 
             }
         }
         return refArray;
