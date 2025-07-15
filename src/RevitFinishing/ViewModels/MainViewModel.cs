@@ -25,6 +25,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly FinishingInProject _finishingInProject;
     private readonly ErrorWindowService _errorWindowService;
     private readonly ProjectValidationService _projectValidationService;
 
@@ -46,11 +47,13 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(PluginConfig pluginConfig,
                          RevitRepository revitRepository,
                          ILocalizationService localizationService,
+                         FinishingInProject finishingInProject,
                          ProjectValidationService projectValidationService,
                          ErrorWindowService errorWindowService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _finishingInProject = finishingInProject;
         _errorWindowService = errorWindowService;
         _projectValidationService = projectValidationService;
 
@@ -126,15 +129,15 @@ internal class MainViewModel : BaseViewModel {
 
         IList<Room> selectedRooms = _revitRepository.GetRoomsByFilters(orFilters);
 
-        var allFinishing = new FinishingInProject(_revitRepository, SelectedPhase);
+        _finishingInProject.CalculateAllFinishing(_revitRepository, SelectedPhase);
 
         ErrorsViewModel mainErrors = _projectValidationService
-            .CheckMainErrors(allFinishing, selectedRooms, _selectedPhase);
+            .CheckMainErrors(_finishingInProject, selectedRooms, _selectedPhase);
         if(_errorWindowService.ShowNoticeWindow(mainErrors)) {
             return;
         }
 
-        var calculator = new FinishingCalculator(selectedRooms, allFinishing);
+        var calculator = new FinishingCalculator(selectedRooms, _finishingInProject);
 
         ErrorsViewModel finishingErrors = _projectValidationService
             .CheckFinishingErrors(calculator, _selectedPhase);

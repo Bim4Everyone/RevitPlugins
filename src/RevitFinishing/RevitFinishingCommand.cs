@@ -13,6 +13,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitFinishing.Models;
+using RevitFinishing.Models.Finishing;
 using RevitFinishing.Services;
 using RevitFinishing.ViewModels;
 using RevitFinishing.ViewModels.Notices;
@@ -61,6 +62,30 @@ public class RevitFinishingCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Bind<FinishingValidationService>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<ParamCalculationService>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<FinishingFloorFactory>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<FinishingWallFactory>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<FinishingCeilingFactory>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<FinishingBaseboardFactory>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<FinishingInProject>()
             .ToSelf()
             .InSingletonScope();
 
