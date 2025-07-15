@@ -104,13 +104,13 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         try {
             repo.Application.FailuresProcessing += cleanupService.FailureProcessor;
             var opts = kernel.Get<ISleevePlacingOptsService>().GetOpts();
-            using var placeTrans = repo.Document.StartTransaction(
-                localizationService.GetLocalizedString("Transaction.SleevesPlacing"));
+            string msg = localizationService.GetLocalizedString("Transaction.SleevesPlacing");
+            using var placeTrans = repo.Document.StartTransaction(msg);
 
             using var dialogCreate = kernel.Get<IProgressDialogService>();
             dialogCreate.StepValue = 50;
             dialogCreate.MaxValue = opts.Count;
-            dialogCreate.DisplayTitleFormat = $"{placeTrans} [{{0}}/{{1}}] ...";
+            dialogCreate.DisplayTitleFormat = $"{msg} [{{0}}/{{1}}] ...";
             var progressCreate = dialogCreate.CreateProgress();
             var ctCreate = dialogCreate.CreateCancellationToken();
             dialogCreate.Show();
@@ -135,13 +135,13 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         var cleanupService = kernel.Get<ISleeveCleanupService>();
 
         ICollection<SleeveModel> cleanedSleeves;
-        using var cleanupTrans = repo.Document.StartTransaction(
-            localizationService.GetLocalizedString("Transaction.SleevesCleanup"));
+        string msg = localizationService.GetLocalizedString("Transaction.SleevesCleanup");
+        using var cleanupTrans = repo.Document.StartTransaction(msg);
 
         using var dialogCleanup = kernel.Get<IProgressDialogService>();
         dialogCleanup.StepValue = 50;
         dialogCleanup.MaxValue = newSleeves.Count;
-        dialogCleanup.DisplayTitleFormat = $"{cleanupTrans} [{{0}}/{{1}}] ...";
+        dialogCleanup.DisplayTitleFormat = $"{msg} [{{0}}/{{1}}] ...";
         var progressCleanup = dialogCleanup.CreateProgress();
         var ctCleanup = dialogCleanup.CreateCancellationToken();
         dialogCleanup.Show();
@@ -156,13 +156,13 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         var localizationService = kernel.Get<ILocalizationService>();
         var cleanupService = kernel.Get<ISleeveCleanupService>();
 
-        using var mergeTrans = repo.Document.StartTransaction(
-            localizationService.GetLocalizedString("Transaction.SleevesMerging"));
+        string msg = localizationService.GetLocalizedString("Transaction.SleevesMerging");
+        using var mergeTrans = repo.Document.StartTransaction(msg);
 
         using var dialogMerge = kernel.Get<IProgressDialogService>();
         dialogMerge.StepValue = 50;
         dialogMerge.MaxValue = cleanedSleeves.Count;
-        dialogMerge.DisplayTitleFormat = $"{mergeTrans} [{{0}}/{{1}}] ...";
+        dialogMerge.DisplayTitleFormat = $"{msg} [{{0}}/{{1}}] ...";
         var progressMerge = dialogMerge.CreateProgress();
         var ctMerge = dialogMerge.CreateCancellationToken();
         dialogMerge.Show();
