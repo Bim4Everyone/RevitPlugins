@@ -75,7 +75,7 @@ internal class RevitRepository {
 
     public IReadOnlyCollection<FinishingElement> GetFinishingElementsOnPhase(
         FinishingCategory finishingCategory,
-        FinishingFactory factory,
+        IFinishingFactory factory,
         Phase phase) {
         var phaseFilter = new ElementPhaseStatusFilter(phase.Id, _phaseStatuses);
         var parameterId = new ElementId(BuiltInParameter.ELEM_TYPE_PARAM);

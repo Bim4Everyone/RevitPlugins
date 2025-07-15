@@ -4,8 +4,8 @@ using RevitFinishing.Services;
 
 namespace RevitFinishing.Models.Finishing
 {
-    internal class FinishingWallFactory : FinishingFactory {
-        public override FinishingElement Create(Element element) {
+    internal class FinishingWallFactory : IFinishingFactory {
+        public FinishingElement Create(Element element) {
             var paramService = new ParamCalculationService();
             return new FinishingWall(element, paramService);
         }
