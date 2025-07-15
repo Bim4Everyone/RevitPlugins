@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
@@ -20,13 +16,6 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonViewDimensionCreator {
     private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
     private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
-
-    // Отступ текста размера от стандартного положения на размерной линии
-    // В данном случае вверх и вбок, чтобы поместился весь текст с префиксом
-    private readonly XYZ _vertDimSmallTextOffset = new XYZ(0, 0.3, 0.2);
-    private readonly XYZ _vertDimSmallTextOffsetInverted = new XYZ(0, 0.3, -0.2);
-    private readonly XYZ _vertDimBigTextOffset = new XYZ(0, 0.3, 0.6);
-    private readonly XYZ _vertDimBigTextOffsetInverted = new XYZ(0, 0.3, -0.6);
 
     private readonly ParamValueService _paramValueService;
 
@@ -219,7 +208,7 @@ public class PylonViewDimensionCreator {
             refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт"], refArraySide);
 
             // Получаем настройки для изменения сегментов размеров
-            dimSegmentOpts = GetDimensionSegmentOptions(clampsParentRebar, dimSegmentOpts);
+            dimSegmentOpts = GetClampsDimensionSegmentOptions(view, clampsParentRebar, dimSegmentOpts);
         }
 
         Dimension dimensionRebarSide = Repository.Document.Create.NewDimension(view, dimensionLineLeft, refArraySide, ViewModel.SelectedDimensionType);
@@ -247,7 +236,7 @@ public class PylonViewDimensionCreator {
     /// <param name="clampsParentRebar">Экземпляр родительского семейства хомутов</param>
     /// <param name="dimSegmentOpts">Список опций, в который можно дописать новые</param>
     /// <returns></returns>
-    private List<DimensionSegmentOption> GetDimensionSegmentOptions(FamilyInstance clampsParentRebar, 
+    private List<DimensionSegmentOption> GetClampsDimensionSegmentOptions(View view, FamilyInstance clampsParentRebar, 
                                                                     List<DimensionSegmentOption> dimSegmentOpts = null) {
         // Можно передать список для того, чтобы в него дописать новые опции. Если не передали, сделаем новый
         dimSegmentOpts ??= [];
@@ -290,12 +279,46 @@ public class PylonViewDimensionCreator {
         // - седьмой сегмент: никак не меняем
         // - восьмой сегмент: никак не меняем
 
-        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", _vertDimSmallTextOffset));
+
+        // Текст в сегментах размера нужно ставить со смещением от стандартного положения на размерной линии
+        // Чтобы он не перекрывал соседние сегменты
+        double offsetXY = -0.3;
+        double offsetZSmall = 0.2;
+        double offsetZBig = 0.6;
+
+        // Смещение для размерного сегмента с маленьким текстом
+        XYZ vertDimSmallTextOffset;
+        // Смещение для размерного сегмента с маленьким текстом инвертированное (зависит от положения в размерной цепочке)
+        XYZ vertDimSmallTextOffsetInverted;
+        // Смещение для размерного сегмента с большим текстом
+        XYZ vertDimBigTextOffset;
+        // Смещение для размерного сегмента с большим текстом инвертированное (зависит от положения в размерной цепочке)
+        XYZ vertDimBigTextOffsetInverted;
+
+        // Т.к. смещение будет зависеть от направления вида, на котором расположен размер, то берем за основу:
+        var rightDirection = view.RightDirection;
+        // В зависимости от направления вида рассчитываем смещения
+        if(Math.Abs(view.RightDirection.Y) == 1) {
+            vertDimSmallTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, offsetZSmall);
+            vertDimSmallTextOffsetInverted = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, -offsetZSmall);
+
+            vertDimBigTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, offsetZBig);
+            vertDimBigTextOffsetInverted = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, -offsetZBig);
+        } else {
+            vertDimSmallTextOffset = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, offsetZSmall);
+            vertDimSmallTextOffsetInverted = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, -offsetZSmall);
+
+            vertDimBigTextOffset = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, offsetZBig);
+            vertDimBigTextOffsetInverted = new XYZ(rightDirection.X * offsetXY, rightDirection.Y, -offsetZBig);
+        }
+
+        // Формируем опцию смещения сегментов размера для семейства хомутов
+        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", vertDimSmallTextOffset));
         if(additional1 == 1) {
             if(additional1Count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
                                                               $"{additional1Count - 1}х{additional1Step}=",
-                                                              _vertDimBigTextOffset));
+                                                              vertDimBigTextOffset));
             }
             dimSegmentOpts.Add(new DimensionSegmentOption(false));
         }
@@ -307,10 +330,10 @@ public class PylonViewDimensionCreator {
             if(additional2Count > 1) {
                 dimSegmentOpts.Add(new DimensionSegmentOption(true,
                                                               $"{additional2Count - 1}х{additional2Step}=",
-                                                              _vertDimBigTextOffsetInverted));
+                                                              vertDimBigTextOffsetInverted));
             }
         }
-        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", _vertDimSmallTextOffsetInverted));
+        dimSegmentOpts.Add(new DimensionSegmentOption(true, "", vertDimSmallTextOffsetInverted));
         dimSegmentOpts.Add(new DimensionSegmentOption(false));
 
         return dimSegmentOpts;
