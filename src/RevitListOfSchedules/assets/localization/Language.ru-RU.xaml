@@ -6,7 +6,27 @@
     <system:String
         x:Key="MainWindow.ReloadButton">Обновить связь</system:String>
     <system:String
-        x:Key="MainWindow.GroupParametersLabel">Параметр группировки:</system:String>    
+        x:Key="MainWindow.Settings">Настройки</system:String>
+    <system:String
+        x:Key="MainWindow.GroupParameters">Параметр группировки:</system:String>    
+    <system:String
+        x:Key="MainWindow.GroupParametersTooltip">Параметр, используемый в группировке листов</system:String>
+    <system:String
+        x:Key="MainWindow.CreateList">Создать ведомость</system:String>
+    <system:String
+        x:Key="MainWindow.CreateListTooltip">Будет создана новая ведомость, если такой еще нет в проекте</system:String>
+    <system:String
+        x:Key="MainWindow.AddListToSheet">Добавить ведомость на лист</system:String>
+    <system:String
+        x:Key="MainWindow.AddListToSheetTooltip">Созданная ведомость добавится в ведомость спецификаций на 1 лист</system:String>
+    <system:String
+        x:Key="MainWindow.ConsiderRevision">Учитывать изменения листа</system:String>
+    <system:String
+        x:Key="MainWindow.ConsiderRevisionTooltip">Добавить в ведомость информацию об изменениях листа</system:String>
+    <system:String
+        x:Key="MainWindow.OnContent">Включено</system:String>
+    <system:String
+        x:Key="MainWindow.OffContent">Выключено</system:String>
     <system:String
         x:Key="MainWindow.LinkName">Наименование связи</system:String>
     <system:String

@@ -6,7 +6,27 @@
     <system:String
         x:Key="MainWindow.ReloadButton">Reload link</system:String>
     <system:String
-        x:Key="MainWindow.GroupParametersLabel">Grouping parameter:</system:String>
+        x:Key="MainWindow.Settings">Settings</system:String>
+    <system:String
+        x:Key="MainWindow.GroupParameters">Grouping parameter:</system:String>
+    <system:String
+        x:Key="MainWindow.GroupParametersTooltip">Parameter used in sheet grouping</system:String>
+    <system:String
+        x:Key="MainWindow.CreateList">Create list of schedule</system:String>
+    <system:String
+        x:Key="MainWindow.CreateListTooltip">A new list of schedule will be created if there is no such statement in the project yet</system:String>
+    <system:String
+        x:Key="MainWindow.AddListToSheet">Add list of schedules to sheet</system:String>
+    <system:String
+        x:Key="MainWindow.AddListToSheetTooltip">The created list of schedules will be added to the list of schedules on 1 sheet</system:String>
+    <system:String
+        x:Key="MainWindow.ConsiderRevision">Consider sheet's revisions</system:String>
+    <system:String
+        x:Key="MainWindow.ConsiderRevisionTooltip">Add information about sheet's revisions</system:String>
+    <system:String
+        x:Key="MainWindow.OnContent">Enable</system:String>
+    <system:String
+        x:Key="MainWindow.OffContent">Disable</system:String>
     <system:String
         x:Key="MainWindow.LinkName">Link name</system:String>
     <system:String

@@ -9,6 +9,8 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewHeaderRowIndicator.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <!--
     У стандартного стиля DefaultUiDataGridStyle с включенным CanUserResizeColumns не работает изменение ширины столбцов. 
@@ -278,5 +280,128 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    <Style
+        TargetType="Border"
+        x:Key="CustomBorder">
+        <Setter
+            Property="Margin"
+            Value="10" />
+        <Setter
+            Property="Padding"
+            Value="10" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+        <Setter
+            Property="OverridesDefaultStyle"
+            Value="True" />
+        <Setter
+            Property="ScrollViewer.HorizontalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="ScrollViewer.VerticalScrollBarVisibility"
+            Value="Disabled" />
+        <Setter
+            Property="Background"
+            Value="{DynamicResource CardBackground}" />
+        <Setter
+            Property="BorderBrush"
+            Value="{DynamicResource CardBorderBrush}" />
+        <Setter
+            Property="BorderThickness"
+            Value="{DynamicResource CardControlBorderThemeThickness}" />
+        <Setter
+            Property="FocusVisualStyle"
+            Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter
+            Property="CornerRadius"
+            Value="{DynamicResource ControlCornerRadius}" />
+    </Style>
+    <Style
+        TargetType="ui:Button"
+        x:Key="CustomContentButton"
+        BasedOn="{StaticResource DefaultUiButtonStyle}">
+        <Setter
+            Property="Margin"
+            Value="10" />
+        <Setter
+            Property="Width"
+            Value="80" />
+        <Setter
+            Property="Height"
+            Value="40" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="HorizontalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="Appearance"
+            Value="Info" />
+    </Style>
+    <Style
+        TargetType="ui:Button"
+        x:Key="CustomContentBigButton"
+        BasedOn="{StaticResource DefaultUiButtonStyle}">
+        <Setter
+            Property="Margin"
+            Value="10,0,0,10" />
+        <Setter
+            Property="Width"
+            Value="200" />
+        <Setter
+            Property="Height"
+            Value="45" />
+        <Setter
+            Property="FontWeight"
+            Value="Bold" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Top" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Left" />
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="HorizontalContentAlignment"
+            Value="Center" />        
+    </Style>
+    <Style
+        TargetType="ui:TextBlock"
+        x:Key="CustomErrorText">
+        <Setter
+            Property="Margin"
+            Value="10" />
+        <Setter
+            Property="Foreground"
+            Value="Orange" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="Background"
+            Value="Transparent" />
+        <Setter
+            Property="Focusable"
+            Value="False" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+        <Setter
+            Property="OverridesDefaultStyle"
+            Value="True" />        
     </Style>
 </ResourceDictionary>
