@@ -16,15 +16,15 @@ namespace RevitFinishing.Models.Finishing;
 /// Каждый элемент отделки хранит список всех помещений, к которым он относится.
 /// </summary>
 internal abstract class FinishingElement {
-    private protected readonly Element _revitElement;
-    private protected readonly ParamCalculationService _paramService;
+    protected readonly Element _revitElement;
+    protected readonly ParamCalculationService _paramService;
 
-    private protected readonly bool _isInPlace;
-    private protected readonly bool _isCustomFamily;
-    private protected readonly FamilySymbol _familySymbol;
-    private protected readonly Element _revitElementType;
+    protected readonly bool _isInPlace;
+    protected readonly bool _isCustomFamily;
+    protected readonly FamilySymbol _familySymbol;
+    protected readonly Element _revitElementType;
 
-    private protected readonly SharedParamsConfig _paramConfig = SharedParamsConfig.Instance;
+    protected readonly SharedParamsConfig _paramConfig = SharedParamsConfig.Instance;
 
     public FinishingElement(Element element,
                             ParamCalculationService paramService) {
@@ -45,19 +45,19 @@ internal abstract class FinishingElement {
     public List<RoomElement> Rooms { get; set; }
 
     // Перенос значения из общего параметра помещения в аналогичный параметр отделки
-    private protected void UpdateFromSharedParam(SharedParam param) {
+    protected void UpdateFromSharedParam(SharedParam param) {
         _revitElement.SetParamValue(param, _paramService.GetRoomsParameters(Rooms, param));
     }
 
     // Перенос значения из системного параметра помещения в общий параметр отделки
-    private protected void UpdateFromSystemParam(IEnumerable<RoomElement> rooms,
+    protected void UpdateFromSystemParam(IEnumerable<RoomElement> rooms,
                                                  SharedParam param,
                                                  BuiltInParameter bltnParam) {
         _revitElement.SetParamValue(param, _paramService.GetRoomsParameters(rooms, bltnParam));
     }
 
     // Перенос значения из ключевого параметра помещения в общий параметр отделки
-    private protected void UpdateFromKeyParam(IEnumerable<RoomElement> rooms,
+    protected void UpdateFromKeyParam(IEnumerable<RoomElement> rooms,
                                               SharedParam param,
                                               ProjectParam keyParam) {
         _revitElement.SetParamValue(param, _paramService.GetRoomsKeyParameters(rooms, keyParam));
@@ -65,7 +65,7 @@ internal abstract class FinishingElement {
 
     // Перенос значения из системного параметра экземпляра отделки в общий параметр отделки
     // У отделки могут отсутствовать системеный параметры, поэтому выполняется проверка.
-    private protected void UpdateFromInstParam(SharedParam param, BuiltInParameter bltnParam) {
+    protected void UpdateFromInstParam(SharedParam param, BuiltInParameter bltnParam) {
         // Проверка является ли семейство загружаемым или моделью в контексте
         if(_isCustomFamily) {
             // Параметр заполняется только для моделей в контексте.
@@ -78,7 +78,7 @@ internal abstract class FinishingElement {
         }
     }
 
-    private protected void UpdateOrderParam(SharedParam param, int value) {
+    protected void UpdateOrderParam(SharedParam param, int value) {
         _revitElement.SetParamValue(param, value);
     }
 
