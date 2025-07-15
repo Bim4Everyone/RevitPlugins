@@ -42,6 +42,10 @@ internal class DimensionBaseService {
         // Получаем начало локальной системы координат вида в глобальной системе координат
         double xUpDirectionRounded = Math.Round(_viewUpDirection.X);
         double yUpDirectionRounded = Math.Round(_viewUpDirection.Y);
+        double zUpDirectionRounded = Math.Round(_viewUpDirection.Z);
+
+        double xRightDirectionRounded = Math.Round(_viewRightDirection.X);
+        double yRightDirectionRounded = Math.Round(_viewRightDirection.Y);
 
         // Создаем матрицу трансформации
         var transform = Transform.Identity;
@@ -154,10 +158,20 @@ internal class DimensionBaseService {
                 var offsetLeft = leftDirectionNormalized.Multiply(offsetCoefficient);
 
                 // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                if(xUpDirectionRounded == 1 || (yUpDirectionRounded == -1)) {
-                    pt1 = bbox.Max + offsetLeft;
+                if(zUpDirectionRounded == 1) {
+                    // Вертикальное сечение
+                    if(xRightDirectionRounded == -1 || yRightDirectionRounded == -1) {
+                        pt1 = bbox.Max + offsetLeft;
+                    } else {
+                        pt1 = bbox.Min + offsetLeft;
+                    }
                 } else {
-                    pt1 = bbox.Min + offsetLeft;
+                    // Горизонтальное сечение
+                    if(xUpDirectionRounded == 1 || yUpDirectionRounded == -1) {
+                        pt1 = bbox.Max + offsetLeft;
+                    } else {
+                        pt1 = bbox.Min + offsetLeft;
+                    }
                 }
 
                 if(dependsOnCropBox) {
@@ -197,10 +211,20 @@ internal class DimensionBaseService {
                 var offsetRight = rightDirectionNormalized.Multiply(offsetCoefficient);
 
                 // Получаем первую точку размерной линии по BoundingBox каркаса армирования + отступ
-                if(xUpDirectionRounded == 1 || (yUpDirectionRounded == -1)) {
-                    pt1 = bbox.Min + offsetRight;
+                if(zUpDirectionRounded == 1) {
+                    // Вертикальное сечение
+                    if(xRightDirectionRounded == -1 || yRightDirectionRounded == -1) {
+                        pt1 = bbox.Min + offsetRight;
+                    } else {
+                        pt1 = bbox.Max + offsetRight;
+                    }
                 } else {
-                    pt1 = bbox.Max + offsetRight;
+                    // Горизонтальное сечение
+                    if(xUpDirectionRounded == 1 || (yUpDirectionRounded == -1)) {
+                        pt1 = bbox.Min + offsetRight;
+                    } else {
+                        pt1 = bbox.Max + offsetRight;
+                    }
                 }
 
                 if(dependsOnCropBox) {

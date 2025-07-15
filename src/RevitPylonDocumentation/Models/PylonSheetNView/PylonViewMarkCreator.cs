@@ -72,7 +72,7 @@ public class PylonViewMarkCreator {
     private void CreateGeneralViewPylonElevMark(View view, List<Element> hostElems, 
                                                 DimensionBaseService dimensionBaseService) {
         var location = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance,
-                                                           DimensionOffsetType.Right, -2).Origin;
+                                                           DimensionOffsetType.Left, 2).Origin;
         foreach(var item in hostElems) {
             if(item is not FamilyInstance hostElem) { return; }
 

@@ -104,7 +104,7 @@ public class PylonViewDimensionCreator {
         var lastFloorBottomFace = GetBottomFloorFace(lastFloor, viewOptions);
 
         Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
-                                                           DimensionOffsetType.Right, -1);
+                                                           DimensionOffsetType.Left, 1);
         // #1_горизонт_выпуск
         ReferenceArray refArray = dimensionBaseService.GetDimensionRefs(rebar, '#', '/', ["горизонт", "выпуск"]);
         refArray.Append(lastFloorTopFace.Reference);
@@ -154,7 +154,7 @@ public class PylonViewDimensionCreator {
                                                    List<Element> hostElems,
                                                    DimensionBaseService dimensionBaseService) {
         Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance,
-                                                                   DimensionOffsetType.Right, -1.7);
+                                                                   DimensionOffsetType.Left, 1.7);
         foreach(var item in hostElems) {
             if(item is not FamilyInstance hostElem) { return; }
 
@@ -199,7 +199,7 @@ public class PylonViewDimensionCreator {
                                                    List<FamilyInstance> clampsParentRebars,
                                                    DimensionBaseService dimensionBaseService) {
         Line dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems[0] as FamilyInstance,
-                                                                   DimensionOffsetType.Right, -1);
+                                                                   DimensionOffsetType.Left, 1);
 
         ReferenceArray refArraySide = new ReferenceArray();
 
