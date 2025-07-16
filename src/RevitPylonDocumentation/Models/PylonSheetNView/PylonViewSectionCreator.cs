@@ -35,7 +35,7 @@ public class PylonViewSectionCreator {
 
         // Формируем данные для объекта Transform
         var originPoint = midlePoint;
-        var hostDir = hostVector.Normalize();
+        var hostDir = GetHostDirByProjectTransform(hostVector);
         var upDir = XYZ.BasisZ;
         var viewDir = hostDir.CrossProduct(upDir);
 
@@ -530,5 +530,23 @@ public class PylonViewSectionCreator {
             middlePoint = wallLineStart + 0.5 * hostVector;
         } else { return false; }
         return true;
+    }
+
+
+    /// <summary>
+    /// Метод проверяет вектор основы на направленность и редактирует при необходимости
+    /// Виды должны располагаться на плане снизу-вверх и справа-налево
+    /// Некоторые основы локально повернуты не по данным направлениям, поэтому вектор нужно исправить
+    /// </summary>
+    private XYZ GetHostDirByProjectTransform(XYZ hostVector) {
+        var hostDir = hostVector.Normalize();
+
+        // Получаем углы между вектором основы и базисами
+        var angleToX = Math.Round(hostDir.AngleTo(XYZ.BasisX) * (180.0 / Math.PI));
+        var angleToY = Math.Round(hostDir.AngleTo(XYZ.BasisY) * (180.0 / Math.PI));
+
+        // Определяем нужно ли инвертировать вектор в зависимости от его положения в системе координат проекта
+        bool shouldInvert = (angleToX <= 45 || angleToX >= 135) ? (angleToX <= 45) : (angleToY <= 45);
+        return shouldInvert ? hostDir.Negate() : hostDir;
     }
 }
