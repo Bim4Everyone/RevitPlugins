@@ -298,9 +298,10 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
             intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
                 intersection, solid, BooleanOperationsType.Difference);
         }
-        double tolerance = _revitRepository.Application.ShortCurveTolerance
-            * _revitRepository.Application.ShortCurveTolerance
-            * _revitRepository.Application.ShortCurveTolerance;
+        double tolerance = Math.PI
+            * sleeve.Diameter
+            * sleeve.Diameter
+            * _revitRepository.Application.ShortCurveTolerance / 4;
         return intersection.GetVolumeOrDefault(0) <= tolerance;
     }
 
