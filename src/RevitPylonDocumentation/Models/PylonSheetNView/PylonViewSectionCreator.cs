@@ -101,7 +101,7 @@ public class PylonViewSectionCreator {
 
         // Формируем данные для объекта Transform
         var originPoint = midlePoint;
-        var hostDir = hostVector.Normalize();
+        var hostDir = GetHostDirByProjectTransform(hostVector);
         var upDir = XYZ.BasisZ;
         var viewDir = hostDir.CrossProduct(upDir);
 
@@ -171,7 +171,7 @@ public class PylonViewSectionCreator {
         // Формируем данные для объекта Transform
         var originPoint = midlePoint;
         var upDir = XYZ.BasisZ;
-        var viewDir = hostVector.Normalize();
+        var viewDir = GetHostDirByProjectTransform(hostVector).Negate();
         var rightDir = upDir.CrossProduct(viewDir);
 
         // Передаем данные для объекта Transform
@@ -237,7 +237,7 @@ public class PylonViewSectionCreator {
         // Формируем данные для объекта Transform
         var originPoint = midlePoint;
         var upDir = XYZ.BasisZ;
-        var viewDir = hostVector.Normalize();
+        var viewDir = GetHostDirByProjectTransform(hostVector).Negate();
         var rightDir = upDir.CrossProduct(viewDir);
 
         // Передаем данные для объекта Transform
@@ -308,7 +308,7 @@ public class PylonViewSectionCreator {
 
         // Формируем данные для объекта Transform
         var originPoint = midlePoint;
-        var hostDir = hostVector.Normalize();
+        var hostDir = GetHostDirByProjectTransform(hostVector).Negate();
         var viewDir = XYZ.BasisZ.Negate();
         var upDir = viewDir.CrossProduct(hostDir);
 
@@ -417,7 +417,7 @@ public class PylonViewSectionCreator {
 
         // Формируем данные для объекта Transform
         var originPoint = midlePoint;
-        var hostDir = hostVector.Normalize();
+        var hostDir = GetHostDirByProjectTransform(hostVector).Negate();
         var viewDir = XYZ.BasisZ.Negate();
         var upDir = viewDir.CrossProduct(hostDir);
 
