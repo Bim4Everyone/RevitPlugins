@@ -74,8 +74,8 @@ public class PylonViewDimensionCreator {
         bool firstLRebarParamValue = _paramValueService.GetParamValueAnywhere(rebar, _hasFirstLRebarParamName) == 1;
         bool secondLRebarParamValue = _paramValueService.GetParamValueAnywhere(rebar, _hasSecondLRebarParamName) == 1;
 
-        bool hasLRebar = firstLRebarParamValue || secondLRebarParamValue;
-        if(hasLRebar) {
+        bool allRebarAreL = firstLRebarParamValue && secondLRebarParamValue;
+        if(allRebarAreL) {
             return;
         }
 
