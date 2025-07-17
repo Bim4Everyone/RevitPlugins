@@ -175,7 +175,7 @@ internal class SleeveView3dProvider : IView3DProvider {
     }
 
     private ParameterFilterElement GetSleeveFilter(Document doc) {
-        var category = Category.GetCategory(doc, BuiltInCategory.OST_GenericModel);
+        var category = Category.GetCategory(doc, SleevePlacementSettingsConfig.SleeveCategory);
         var nameParameter = ParameterFilterUtilities.GetFilterableParametersInCommon(doc, [category.Id])
             .First(item => item.IsSystemId() && item.AsBuiltInParameter() == BuiltInParameter.ALL_MODEL_FAMILY_NAME);
         string famName = NamesProvider.FamilyNameSleeve;
@@ -187,7 +187,7 @@ internal class SleeveView3dProvider : IView3DProvider {
         return CreateFilter(
             doc,
             NamesProvider.FilterNameSleeves,
-            [BuiltInCategory.OST_GenericModel],
+            [SleevePlacementSettingsConfig.SleeveCategory],
             [filterRule]);
     }
 
