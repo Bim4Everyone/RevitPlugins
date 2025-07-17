@@ -94,6 +94,9 @@
   <Project Path="src/RevitFamilyParameterAdder/RevitFamilyParameterAdder.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitFinishing/RevitFinishing.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitFinishingWalls/RevitFinishingWalls.csproj">
     <Platform Project="x64" />
   </Project>
