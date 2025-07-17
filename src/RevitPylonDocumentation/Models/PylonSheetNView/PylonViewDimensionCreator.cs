@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -383,6 +384,7 @@ public class PylonViewDimensionCreator {
             ReferenceArray refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "верх", "фронт" });
             Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop, ViewModel.SelectedDimensionType);
 
+
             List<Element> plates = rebarFinder.GetSimpleRebars(view, 2001);
             CreateGeneralRebarViewPlateDimensions(view, skeletonParentRebar, plates, DimensionOffsetType.Left, dimensionBaseService);
         } catch(Exception) { }
@@ -397,7 +399,7 @@ public class PylonViewDimensionCreator {
         bool secondLRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonParentRebar, _hasSecondLRebarParamName) == 1;
 
         bool allRebarAreL = firstLRebarParamValue && secondLRebarParamValue;
-
+        bool hasLRebar = firstLRebarParamValue || secondLRebarParamValue;
 
         ReferenceArray refArraySide;
         if(allRebarAreL) {
@@ -473,9 +475,72 @@ public class PylonViewDimensionCreator {
             ReferenceArray refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "верх", "торец" });
             Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop, ViewModel.SelectedDimensionType);
 
+
+
+
+            // Определяем наличие в каркасе Г-образных стержней
+            bool firstLRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonParentRebar, _hasFirstLRebarParamName) == 1;
+            bool secondLRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonParentRebar, _hasSecondLRebarParamName) == 1;
+
+            bool allRebarAreL = firstLRebarParamValue && secondLRebarParamValue;
+            bool hasLRebar = firstLRebarParamValue || secondLRebarParamValue;
+
+            var defaultDimensionOffsetType = DimensionOffsetType.Right;
+            // Будем ставить по дефолту справа
+            // Слева будем ставить только если есть гэшка (но не все) и она справа
+
+            if(hasLRebar && LRebarIsRight(view, rebarFinder)) {
+                defaultDimensionOffsetType = DimensionOffsetType.Left;
+            }
+
+
             List<Element> plates = rebarFinder.GetSimpleRebars(view, 2001);
-            CreateGeneralRebarViewPlateDimensions(view, skeletonParentRebar, plates, DimensionOffsetType.Left, dimensionBaseService);
+            CreateGeneralRebarViewPlateDimensions(view, skeletonParentRebar, plates, defaultDimensionOffsetType, dimensionBaseService);
+
+
+             
+
+
+            if(!allRebarAreL && hasLRebar) {
+                // #1_горизонт_Г-стержень
+                ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["горизонт", "Г-стержень"]);
+                // #_1_горизонт_край_низ
+                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["горизонт", "край", "низ"], refArraySide);
+
+                defaultDimensionOffsetType = defaultDimensionOffsetType == DimensionOffsetType.Left ? DimensionOffsetType.Right : DimensionOffsetType.Left;
+
+                Line dimensionLineLeftFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, defaultDimensionOffsetType, 1.3);
+                Dimension dimensionRebarSideFirst = Repository.Document.Create.NewDimension(view, dimensionLineLeftFirst, refArraySide, ViewModel.SelectedDimensionType);
+            }
+
+
         } catch(Exception) { }
+    }
+
+
+    private bool LRebarIsRight(View view, RebarFinder rebarFinder) {
+        // Гэшка
+        var lRebar = rebarFinder.GetSimpleRebars(view, 1101).FirstOrDefault();
+        // Бутылка
+        var bottleRebar = rebarFinder.GetSimpleRebars(view, 1204).FirstOrDefault();
+
+        if(lRebar is null || bottleRebar is null) {
+            return false;
+        }
+
+        var lRebarLocation = lRebar.Location as LocationPoint;
+        var lRebarPt = lRebarLocation.Point;
+
+        var bottleRebarLocation = bottleRebar.Location as LocationPoint;
+        var bottleRebarPt = bottleRebarLocation.Point;
+
+        var transform = view.CropBox.Transform;
+        var inverseTransform = transform.Inverse;
+        // Получаем координаты точек вставки в координатах вида
+        var lRebarPtTransformed = inverseTransform.OfPoint(lRebarPt);
+        var bottleRebarPtTransformed = inverseTransform.OfPoint(bottleRebarPt);
+
+        return lRebarPtTransformed.X > bottleRebarPtTransformed.X;
     }
 
 
