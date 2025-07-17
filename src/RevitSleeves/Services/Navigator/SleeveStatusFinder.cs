@@ -255,8 +255,9 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
                 return false;
             }
         }
-        return intersection.GetVolumeOrDefault(0)
-            > Math.Abs(Math.Tan(angle)) * Math.PI * Math.Pow(sleeve.Diameter, 3) / 4;
+        double h = Math.Abs(Math.Tan(angle) * sleeve.Diameter) + _revitRepository.Application.ShortCurveTolerance;
+        double tolerance = Math.PI * sleeve.Diameter * sleeve.Diameter * h / 4;
+        return intersection.GetVolumeOrDefault(0) > tolerance;
     }
 
     private bool SleeveEndFaceFarAwayFromFloor(SleeveModel sleeve, Floor[] intersectingFloors) {
@@ -284,25 +285,40 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
             || _structureDocumentTransformCache is null) {
             FindIntersectionsWithStructures(sleeve);
         }
-        // пересечение слегка увеличенного солида гильзы со всеми конструкциями
-        var transform = Transform.CreateTranslation(-sleeve.Location)
-            .Multiply(Transform.Identity.ScaleBasis(1.001))
-            .Multiply(Transform.CreateTranslation(sleeve.Location))
-            .Multiply(_structureDocumentTransformCache.Inverse);
-        var sleeveSolid = SolidUtils.CreateTransformed(GetSolid(sleeve.GetFamilyInstance()), transform);
-        Solid[] solids = [.. _intersectingFloorsCache.Select(GetSolid),
+        // диски, построенные в начале и в конце гильзы
+        (var start, var end) = sleeve.GetEndPoints();
+        var sleeveDir = sleeve.GetOrientation();
+        double radius = sleeve.Diameter / 2;
+        double diskHeight = _revitRepository.Application.ShortCurveTolerance * 2;
+        var diskStart = SolidUtils.CreateTransformed(
+            _geometryUtils.CreateCylinder(start, -sleeveDir, radius, diskHeight),
+            _structureDocumentTransformCache.Inverse);
+        var diskEnd = SolidUtils.CreateTransformed(
+            _geometryUtils.CreateCylinder(end, sleeveDir, radius, diskHeight),
+            _structureDocumentTransformCache.Inverse);
+
+        Solid[] structureSolids = [.. _intersectingFloorsCache.Select(GetSolid),
             .. _intersectingWallsCache.Select(GetSolid),
             .. _intersectingOpeningsCache.Select(_openingGeometryProvider.GetSolid)];
-        var intersection = sleeveSolid;
-        foreach(var solid in solids) {
-            intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
-                intersection, solid, BooleanOperationsType.Difference);
+        var diffStart = diskStart;
+        var diffEnd = diskEnd;
+        foreach(var solid in structureSolids) {
+            try {
+                diffStart = BooleanOperationsUtils.ExecuteBooleanOperation(
+                    diffStart, solid, BooleanOperationsType.Difference);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                // pass
+            }
+            try {
+                diffEnd = BooleanOperationsUtils.ExecuteBooleanOperation(
+                    diffEnd, solid, BooleanOperationsType.Difference);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                // pass
+            }
         }
-        double tolerance = Math.PI
-            * sleeve.Diameter
-            * sleeve.Diameter
-            * _revitRepository.Application.ShortCurveTolerance / 4;
-        return intersection.GetVolumeOrDefault(0) <= tolerance;
+        // остаток разницы солидов дисков и конструкций не должен быть меньше 9/10 объема исходного диска
+        return diffStart.GetVolumeOrDefault(0) <= diskStart.GetVolumeOrDefault(0) * 0.9
+            || diffEnd.GetVolumeOrDefault(0) <= diskEnd.GetVolumeOrDefault(0) * 0.9;
     }
 
     private bool SleeveAxisNotParallelToMep(SleeveModel sleeve) {
@@ -310,10 +326,10 @@ internal class SleeveStatusFinder : ISleeveStatusFinder {
             FindIntersectionsWithMepElements(sleeve);
         }
         var pipeDir = ((Line) ((LocationCurve) _intersectingPipesCache.First().Location).Curve).Direction;
-        var sleeveDir = sleeve.Location;
+        var sleeveDir = sleeve.GetOrientation();
         double angle = pipeDir.AngleTo(sleeveDir);
-        return 0 <= angle && angle <= _revitRepository.Application.AngleTolerance
-            || (Math.PI - _revitRepository.Application.AngleTolerance) <= angle && angle <= Math.PI;
+        return _revitRepository.Application.AngleTolerance <= angle
+            && angle <= (Math.PI - _revitRepository.Application.AngleTolerance);
     }
 
     private bool SleeveAxisDistanceTooBig(SleeveModel sleeve) {

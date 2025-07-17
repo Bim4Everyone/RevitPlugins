@@ -84,4 +84,13 @@ internal class GeometryUtils : IGeometryUtils {
             Line.CreateBound(leftBottom, leftTop)
         ]);
     }
+
+    public Solid CreateCylinder(XYZ bottomPoint, XYZ topDir, double radius, double height) {
+        var plane = Plane.CreateByNormalAndOrigin(topDir, bottomPoint);
+
+        var circle = CurveLoop.Create([
+            Arc.Create(plane, radius, 0, Math.PI),
+            Arc.Create(plane, radius, Math.PI, Math.PI * 2)]);
+        return GeometryCreationUtilities.CreateExtrusionGeometry([circle], topDir, height);
+    }
 }
