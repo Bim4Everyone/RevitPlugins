@@ -11,6 +11,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:local="clr-namespace:RevitSleeves.Views.Navigator"
+    xmlns:cm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     mc:Ignorable="d"
     Height="450"
     Width="800"
@@ -25,6 +26,11 @@
                     <PropertyGroupDescription
                         PropertyName="Status" />
                 </CollectionViewSource.GroupDescriptions>
+                <CollectionViewSource.SortDescriptions>
+                    <cm:SortDescription
+                        PropertyName="StatusValue"
+                        Direction="Ascending" />
+                </CollectionViewSource.SortDescriptions>
             </CollectionViewSource>
             <ui:TextBlock
                 x:Key="DiameterHeader"
@@ -32,6 +38,9 @@
             <ui:TextBlock
                 x:Key="LengthHeader"
                 Text="{me:LocalizationSource Length}" />
+            <ui:TextBlock
+                x:Key="CommentHeader"
+                Text="{me:LocalizationSource Comment}" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../../assets/Styles/CustomStyles.xaml" />
@@ -106,6 +115,10 @@
                             MinWidth="50"
                             Header="{StaticResource LengthHeader}"
                             Binding="{Binding Length}" />
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Header="{StaticResource CommentHeader}"
+                            Binding="{Binding Comment}" />
                     </ui:DataGrid.Columns>
                 </ui:DataGrid>
             </DockPanel>

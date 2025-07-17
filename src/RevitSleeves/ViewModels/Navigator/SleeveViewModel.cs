@@ -27,17 +27,23 @@ internal class SleeveViewModel : BaseViewModel, IEquatable<SleeveViewModel> {
         _sleeve = sleeve ?? throw new ArgumentNullException(nameof(sleeve));
 
         Status = _localizationService.GetLocalizedString($"{nameof(SleeveStatus)}.{_sleeve.Status}");
+        StatusValue = _sleeve.Status;
         Diameter = _revitRepository.ConvertFromInternal(_sleeve.Diameter);
         Length = Math.Round(_revitRepository.ConvertFromInternal(_sleeve.Length), 1);
+        Comment = _sleeve.GetFamilyInstance().GetParamValue<string>(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS);
         Id = _sleeve.Id.GetIdValue();
     }
 
 
     public string Status { get; }
 
+    public SleeveStatus StatusValue { get; }
+
     public double Diameter { get; }
 
     public double Length { get; }
+
+    public string Comment { get; }
 
     public long Id { get; }
 

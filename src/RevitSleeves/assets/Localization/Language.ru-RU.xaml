@@ -120,6 +120,8 @@
         x:Key="Diameter">Диаметр</system:String>
     <system:String
         x:Key="Length">Длина</system:String>
+    <system:String
+        x:Key="Comment">Комментарий</system:String>
 
     <system:String
         x:Key="Filtering.AddRule">Добавить правило</system:String>

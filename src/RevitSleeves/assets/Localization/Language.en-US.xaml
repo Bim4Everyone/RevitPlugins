@@ -120,6 +120,8 @@
         x:Key="Diameter">Diameter</system:String>
     <system:String
         x:Key="Length">Length</system:String>
+    <system:String
+        x:Key="Comment">Comment</system:String>
 
     <system:String
         x:Key="Filtering.AddRule">Add rule</system:String>
