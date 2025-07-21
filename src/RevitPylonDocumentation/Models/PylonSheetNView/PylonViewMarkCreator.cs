@@ -23,12 +23,8 @@ public class PylonViewMarkCreator {
     private readonly int _formNumberForCBarMax = 1202;
     private readonly int _formNumberForCBarMin = 1202;
 
-    private readonly string _hasFirstLRebarParamName = "ст_Г_1_ВКЛ";
-    private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
-    private readonly string _hasDifferentRebarParamName = "ст_РАЗНЫЕ";
-
     private readonly ParamValueService _paramValueService;
-    private readonly RebarFinder _rebarFinder;
+    private readonly RebarFinderService _rebarFinder;
 
     private readonly TransverseRebarViewBarMarksService _transverseRebarViewBarMarksService;
     private readonly TransverseRebarViewPlateMarksService _transverseRebarViewPlateMarksService;
@@ -42,7 +38,7 @@ public class PylonViewMarkCreator {
         ViewOfPylon = pylonView;
 
         _paramValueService = new ParamValueService(repository);
-        _rebarFinder = new RebarFinder(ViewModel, Repository, SheetInfo);
+        _rebarFinder = ViewModel.RebarFinder;
 
         _transverseViewBarMarksService = new TransverseViewBarMarksService(ViewOfPylon, Repository);
         _transverseRebarViewBarMarksService = new TransverseRebarViewBarMarksService(ViewOfPylon, Repository);
@@ -103,18 +99,18 @@ public class PylonViewMarkCreator {
     }
 
     private void CreateTransverseViewBarMarks(View view) {
-        var simpleRebars = _rebarFinder.GetSimpleRebars(view, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax,
+        var simpleRebars = _rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax,
                                                         _formNumberForCBarMin, _formNumberForCBarMax);
         if(simpleRebars is null) { return; }
         _transverseViewBarMarksService.CreateLeftBottomMark(simpleRebars);
 
-        var simpleClamps = _rebarFinder.GetSimpleRebars(view, _formNumberForClampsMin, _formNumberForClampsMax);
+        var simpleClamps = _rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, _formNumberForClampsMin, _formNumberForClampsMax);
         if(simpleClamps != null) {
             _transverseViewBarMarksService.CreateLeftTopMark(simpleClamps, simpleRebars);
             _transverseViewBarMarksService.CreateRightTopMark(simpleClamps, simpleRebars);
         }
 
-        var simpleCBars = _rebarFinder.GetSimpleRebars(view, _formNumberForCBarMin);
+        var simpleCBars = _rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, _formNumberForCBarMin);
         if(simpleCBars != null) {
             _transverseViewBarMarksService.CreateLeftMark(simpleCBars, simpleRebars);
         }
@@ -132,17 +128,13 @@ public class PylonViewMarkCreator {
 
 
     private void CreateTransverseRebarViewBarMarks(View view) {
-        var skeletonRebar = _rebarFinder.GetSkeletonParentRebar(view);
-        var simpleRebars = _rebarFinder.GetSimpleRebars(view, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax);
-
-        // Определяем наличие в каркасе Г-образных стержней
-        bool firstLRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonRebar, _hasFirstLRebarParamName) == 1;
-        bool secondLRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonRebar, _hasSecondLRebarParamName) == 1;
-        bool differentRebarParamValue = _paramValueService.GetParamValueAnywhere(skeletonRebar, _hasDifferentRebarParamName) == 1;
+        var simpleRebars = _rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax);
 
         // Если у нас есть Г-образные стержни или стержни разной длины, то нужно ставить две разные марки
         // Если нет - то допускается поставить одну марку, которая будет характеризовать все стрежни (они же одинаковые)
-        if(firstLRebarParamValue || secondLRebarParamValue || differentRebarParamValue) {
+        if(SheetInfo.RebarInfo.FirstLRebarParamValue 
+            || SheetInfo.RebarInfo.SecondLRebarParamValue 
+            || SheetInfo.RebarInfo.DifferentRebarParamValue) {
             // ЛЕВЫЙ НИЖНИЙ УГОЛ
             _transverseRebarViewBarMarksService.CreateLeftBottomMark(simpleRebars, true);
 
@@ -158,7 +150,7 @@ public class PylonViewMarkCreator {
 
 
     private void CreateTransverseRebarViewPlateMarks(View view) {
-        var simplePlates = _rebarFinder.GetSimpleRebars(view, _formNumberForSkeletonPlatesMin, _formNumberForSkeletonPlatesMax);
+        var simplePlates = _rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, _formNumberForSkeletonPlatesMin, _formNumberForSkeletonPlatesMax);
         if(simplePlates.Count == 0) {
             return;
         }

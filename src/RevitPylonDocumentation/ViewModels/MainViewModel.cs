@@ -63,6 +63,9 @@ internal class MainViewModel : BaseViewModel {
 
         SetHostsInfoFilters();
 
+        ParamValService = new ParamValueService(revitRepository);
+        RebarFinder = new RebarFinderService(this, _revitRepository);
+
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
@@ -121,6 +124,16 @@ internal class MainViewModel : BaseViewModel {
     /// Настройки параметров и правил создания спек с предыдущего сеанса
     /// </summary>
     public UserSchedulesSettings SchedulesSettings { get; set; }
+
+    /// <summary>
+    /// Сервис по получению значений параметров у элементов
+    /// </summary>
+    internal ParamValueService ParamValService { get; set; }
+
+    /// <summary>
+    /// Сервис по поиску арматуры в проекте или на виде
+    /// </summary>
+    internal RebarFinderService RebarFinder { get; set; }
 
 
     /// <summary>
@@ -351,6 +364,7 @@ internal class MainViewModel : BaseViewModel {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
+
 
 
     /// <summary>

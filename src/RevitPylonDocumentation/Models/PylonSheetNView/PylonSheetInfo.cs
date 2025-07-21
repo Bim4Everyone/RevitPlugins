@@ -14,10 +14,11 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView;
 internal class PylonSheetInfo : BaseViewModel {
     private bool _isCheck = false;
 
-    internal PylonSheetInfo(MainViewModel mvm, RevitRepository repository, string pylonKeyName) {
+    internal PylonSheetInfo(MainViewModel mvm, RevitRepository repository, string projectSection, string pylonKeyName) {
         ViewModel = mvm;
         Repository = repository;
         PylonKeyName = pylonKeyName;
+        ProjectSection = projectSection;
 
         Manager = new PylonSheetInfoManager(ViewModel, Repository, this);
 
@@ -40,11 +41,14 @@ internal class PylonSheetInfo : BaseViewModel {
 
         LegendView = new PylonView(ViewModel, Repository, this);
         RebarNodeView = new PylonView(ViewModel, Repository, this);
+
+        RebarInfo = new PylonRebarInfo(mvm, Repository, this);
     }
 
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfoManager Manager { get; set; }
+    internal PylonRebarInfo RebarInfo { get; set; }
 
 
     public bool IsCheck {
