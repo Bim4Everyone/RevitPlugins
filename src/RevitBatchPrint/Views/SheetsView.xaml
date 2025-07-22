@@ -49,7 +49,6 @@
                 OriginalItemsSource="{Binding AlbumParamNames}"
                 UpdateTextOnSelect="True"
                 Loaded="_albumParamName_OnLoaded"
-                GotFocus="_albumParamName_OnGotFocus"
                 TextChanged="_albumParamName_OnTextChanged">
                 
                 <b:Interaction.Triggers>
