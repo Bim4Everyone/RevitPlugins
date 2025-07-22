@@ -11,12 +11,16 @@ internal class TransViewFirstAnnotCreator : ViewAnnotationCreator {
     }
 
     public override void TryCreateViewAnnotations() {
-        var dimensionService = new TransViewDimensionService(ViewModel, Repository, SheetInfo);
-        dimensionService.TryCreateTransverseViewDimensions(ViewOfPylon.ViewElement, false);
-
+        // Пытаемся создать размеры на виде
         try {
-            var creator = new TransverseViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
-            creator.CreateTransverseViewBarMarks();
+            var dimensionService = new TransViewDimensionService(ViewModel, Repository, SheetInfo);
+            dimensionService.TryCreateTransverseViewDimensions(ViewOfPylon.ViewElement, false);
+        } catch(Exception) { }
+
+        // Пытаемся создать марки на виде
+        try {
+            var markService = new TransverseViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            markService.CreateTransverseViewBarMarks();
         } catch(Exception) { }
     }
 }

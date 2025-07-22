@@ -11,9 +11,13 @@ internal class TransViewSecondRebarAnnotCreator : ViewAnnotationCreator {
     }
 
     public override void TryCreateViewAnnotations() {
-        var dimensionService = new TransViewRebarDimensionService(ViewModel, Repository, SheetInfo);
-        dimensionService.TryCreateTransViewRebarDimensions(ViewOfPylon.ViewElement, true);
+        // Пытаемся создать размеры на виде
+        try {
+            var dimensionService = new TransViewRebarDimensionService(ViewModel, Repository, SheetInfo);
+            dimensionService.TryCreateTransViewRebarDimensions(ViewOfPylon.ViewElement, true);
+        } catch(Exception) { } 
 
+        // Пытаемся создать марки на виде
         try {
             var creator = new TransverseViewRebarMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             creator.CreateTransverseRebarViewBarMarks();

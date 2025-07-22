@@ -19,6 +19,7 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
 
         var dimensionService = new GeneralViewPerpRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
 
+        // Пытаемся создать размеры на виде
         try {
             var rebarFinder = ViewModel.RebarFinder;
             var skeletonParentRebar = SheetInfo.RebarInfo.SkeletonParentRebar;
@@ -62,6 +63,11 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
             }
 
             dimensionService.TryCreateGeneralRebarPerpendicularViewAdditionalDimensions();
+        } catch(Exception) { }
+
+        // Пытаемся создать марки на виде
+        try {
+
         } catch(Exception) { }
     }
 }

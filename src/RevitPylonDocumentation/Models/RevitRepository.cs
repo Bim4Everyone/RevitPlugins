@@ -110,6 +110,13 @@ internal class RevitRepository {
             .OrderBy(a => a.Name)
             .ToList();
 
+    /// <summary>
+    /// Возвращает список осей, видимых на виде
+    /// </summary>
+    public List<Grid> GridsInView(View view) => new FilteredElementCollector(Document, view.Id)
+        .OfCategory(BuiltInCategory.OST_Grids)
+        .Cast<Grid>()
+        .ToList();
 
     /// <summary>
     /// Хранит оболочки над листами пилонов - центральное хранилище информации по пилону для работы плагина

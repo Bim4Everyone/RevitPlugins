@@ -29,9 +29,7 @@ internal class GeneralViewDimensionService {
     /// <param name="view">Вид, на котором нужно создать размеры</param>
     /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
     /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
-    internal void CreateGeneralViewPylonDimensions(View view,
-                                                   List<Element> hostElems,
-                                                   DimensionBaseService dimensionBaseService) {
+    internal void CreatePylonDimensions(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
         var dimensionLineLeft = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance,
                                                                    DimensionOffsetType.Left, 1.7);
         foreach(var item in hostElems) {
@@ -41,17 +39,15 @@ internal class GeneralViewDimensionService {
             // #_1_горизонт_край_низ
             // #_1_горизонт_край_верх
             var refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
-            var dimensionRebarSide = Repository.Document.Create.NewDimension(view, dimensionLineLeft, refArraySide, ViewModel.SelectedDimensionType);
+            var dimensionRebarSide = 
+                Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArraySide, 
+                                                        ViewModel.SelectedDimensionType);
         }
     }
 
-
-
-
-    internal void CreateGeneralViewPylonDimensions(View view,
-                                              FamilyInstance skeletonParentRebar,
-                                              List<Grid> grids,
-                                              DimensionBaseService dimensionBaseService) {
+    internal void CreatePylonDimensions(FamilyInstance skeletonParentRebar, List<Grid> grids,
+                                        DimensionBaseService dimensionBaseService) {
+        var view = ViewOfPylon.ViewElement;
         // Размер по ФРОНТУ опалубка (положение снизу 1)
         var dimensionLineBottomFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Bottom, 2);
         var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#', '/',
@@ -62,16 +58,13 @@ internal class GeneralViewDimensionService {
         if(grids.Count > 0) {
             // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
             var dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Bottom, 1.5);
-            var refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view,
-                                                                                             new XYZ(0, 0, 1),
-                                                                                             refArrayFormworkFront);
-            var dimensionFormworkGridFront = Repository.Document.Create.NewDimension(view, dimensionLineBottomSecond,
-                                                                           refArrayFormworkGridFront, ViewModel.SelectedDimensionType);
+            var refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view, new XYZ(0, 0, 1), 
+                                                                                  refArrayFormworkFront);
+            var dimensionFormworkGridFront = 
+                Repository.Document.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkGridFront, 
+                                                        ViewModel.SelectedDimensionType);
         }
     }
-
-
-
 
     /// <summary>
     /// Метод по созданию размера по хомутам на основном виде опалубки
@@ -79,12 +72,10 @@ internal class GeneralViewDimensionService {
     /// <param name="view">Вид, на котором нужно создать размер</param>
     /// <param name="clampsParentRebars">Список экземпляров семейств хомутов</param>
     /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
-    internal void CreateGeneralViewClampsDimensions(View view,
-                                                   List<FamilyInstance> clampsParentRebars,
-                                                   DimensionBaseService dimensionBaseService) {
+    internal void CreateClampsDimensions(List<FamilyInstance> clampsParentRebars, 
+                                         DimensionBaseService dimensionBaseService) {
         var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems[0] as FamilyInstance,
                                                                    DimensionOffsetType.Left, 1);
-
         var refArraySide = new ReferenceArray();
 
         // Собираем опорные плоскости по опалубке, например:
@@ -103,10 +94,12 @@ internal class GeneralViewDimensionService {
             refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт"], refArraySide);
 
             // Получаем настройки для изменения сегментов размеров
-            dimSegmentOpts = GetClampsDimensionSegmentOptions(view, clampsParentRebar, dimSegmentOpts);
+            dimSegmentOpts = GetClampsDimensionSegmentOptions(clampsParentRebar, dimSegmentOpts);
         }
 
-        var dimensionRebarSide = Repository.Document.Create.NewDimension(view, dimensionLineLeft, refArraySide, ViewModel.SelectedDimensionType);
+        var dimensionRebarSide = 
+            Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArraySide, 
+                                                    ViewModel.SelectedDimensionType);
 
         // Применяем опции изменений сегментов размера
         var dimensionSegments = dimensionRebarSide.Segments;
@@ -123,10 +116,7 @@ internal class GeneralViewDimensionService {
         }
     }
 
-
-    internal void CreateGeneralViewTopAdditionalDimensions(View view,
-                                               FamilyInstance rebar,
-                                               DimensionBaseService dimensionBaseService) {
+    internal void CreateTopAdditionalDimensions(FamilyInstance rebar, DimensionBaseService dimensionBaseService) {
         if(SheetInfo.RebarInfo.AllRebarAreL) {
             return;
         }
@@ -137,7 +127,7 @@ internal class GeneralViewDimensionService {
         }
 
         var viewOptions = new Options {
-            View = view,
+            View = ViewOfPylon.ViewElement,
             ComputeReferences = true,
             IncludeNonVisibleObjects = false
         };
@@ -150,7 +140,9 @@ internal class GeneralViewDimensionService {
         var refArray = dimensionBaseService.GetDimensionRefs(rebar, '#', '/', ["горизонт", "выпуск"]);
         refArray.Append(lastFloorTopFace.Reference);
         refArray.Append(lastFloorBottomFace.Reference);
-        var dimensionRebarSide = Repository.Document.Create.NewDimension(view, dimensionLineLeft, refArray, ViewModel.SelectedDimensionType);
+        var dimensionRebarSide = 
+            Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArray, 
+                                                    ViewModel.SelectedDimensionType);
     }
 
 
@@ -192,8 +184,8 @@ internal class GeneralViewDimensionService {
     /// <param name="clampsParentRebar">Экземпляр родительского семейства хомутов</param>
     /// <param name="dimSegmentOpts">Список опций, в который можно дописать новые</param>
     /// <returns></returns>
-    private List<DimensionSegmentOption> GetClampsDimensionSegmentOptions(View view, FamilyInstance clampsParentRebar,
-                                                                    List<DimensionSegmentOption> dimSegmentOpts = null) {
+    private List<DimensionSegmentOption> GetClampsDimensionSegmentOptions(FamilyInstance clampsParentRebar,
+                                                                          List<DimensionSegmentOption> dimSegmentOpts = null) {
         // Можно передать список для того, чтобы в него дописать новые опции. Если не передали, сделаем новый
         dimSegmentOpts ??= [];
 
@@ -252,9 +244,9 @@ internal class GeneralViewDimensionService {
         XYZ vertDimBigTextOffsetInverted;
 
         // Т.к. смещение будет зависеть от направления вида, на котором расположен размер, то берем за основу:
-        var rightDirection = view.RightDirection;
+        var rightDirection = ViewOfPylon.ViewElement.RightDirection;
         // В зависимости от направления вида рассчитываем смещения
-        if(Math.Abs(view.RightDirection.Y) == 1) {
+        if(Math.Abs(ViewOfPylon.ViewElement.RightDirection.Y) == 1) {
             vertDimSmallTextOffset = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, offsetZSmall);
             vertDimSmallTextOffsetInverted = new XYZ(rightDirection.X, rightDirection.Y * offsetXY, -offsetZSmall);
 
