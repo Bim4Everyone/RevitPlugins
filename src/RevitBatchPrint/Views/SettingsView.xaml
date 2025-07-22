@@ -35,7 +35,7 @@
 
                         <ComboBox
                             ItemsSource="{me:EnumToItemsSource db:ColorDepthType}"
-                            SelectedValue="{Binding Path=ColorDepth, Mode=OneWay}" />
+                            SelectedValue="{Binding Path=ColorDepth, Mode=TwoWay}" />
 
                     </edits:CustomEditControl>
 
@@ -46,7 +46,7 @@
 
                         <ComboBox
                             ItemsSource="{me:EnumToItemsSource db:RasterQualityType}"
-                            SelectedValue="{Binding Path=RasterQuality, Mode=OneWay}" />
+                            SelectedValue="{Binding Path=RasterQuality, Mode=TwoWay}" />
 
                     </edits:CustomEditControl>
 
