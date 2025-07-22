@@ -8,5 +8,10 @@ internal class TransViewFirstMarkCreator : ViewMarkCreator {
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
 
-    public override void TryCreateViewMarks() { }
+    public override void TryCreateViewMarks() {
+        try {
+            var creator = new TransverseViewMarksCreator(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            creator.CreateTransverseViewBarMarks();
+        } catch(Exception) { }
+    }
 }

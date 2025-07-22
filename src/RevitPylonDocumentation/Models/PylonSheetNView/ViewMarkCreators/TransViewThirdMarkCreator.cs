@@ -9,5 +9,9 @@ internal class TransViewThirdMarkCreator : ViewMarkCreator {
     }
 
     public override void TryCreateViewMarks() {
+        try {
+            var creator = new TransverseViewMarksCreator(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            creator.CreateTransverseViewBarMarks();
+        } catch(Exception) { }
     }
 }

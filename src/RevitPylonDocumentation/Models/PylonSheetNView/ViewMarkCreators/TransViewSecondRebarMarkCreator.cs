@@ -9,5 +9,10 @@ internal class TransViewSecondRebarMarkCreator : ViewMarkCreator {
     }
 
     public override void TryCreateViewMarks() {
+        try {
+            var creator = new TransverseViewRebarMarksCreator(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            creator.CreateTransverseRebarViewBarMarks();
+            creator.CreateTransverseRebarViewPlateMarks();
+        } catch(Exception) { }
     }
 }
