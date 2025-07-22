@@ -1,16 +1,23 @@
 using Autodesk.Revit.DB;
 
+using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionCreatorFactories;
+using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionCreators;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonView {
-    internal PylonView(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo) {
+
+    internal PylonView(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
+                       IDimensionCreatorFactory dimensionCreatorFactory = null) {
         ViewModel = mvm;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
 
         ViewSectionCreator = new PylonViewSectionCreator(mvm, repository, pylonSheetInfo);
-        ViewDimensionCreator = new PylonViewDimensionCreator(mvm, repository, pylonSheetInfo);
+        //ViewDimensionCreator = new PylonViewDimensionCreator(mvm, repository, pylonSheetInfo, this);
+        //DimensionCreator = new GeneralViewDimensionCreator(mvm, repository, pylonSheetInfo, this);
+        DimensionCreator = dimensionCreatorFactory?.Create(mvm, repository, pylonSheetInfo, this);
+
         ViewMarkCreator = new PylonViewMarkCreator(mvm, repository, pylonSheetInfo, this);
         ViewScheduleCreator = new PylonViewScheduleCreator(mvm, repository, pylonSheetInfo);
 
@@ -44,7 +51,11 @@ public class PylonView {
 
 
     public PylonViewSectionCreator ViewSectionCreator { get; set; }
-    public PylonViewDimensionCreator ViewDimensionCreator { get; set; }
+    public ViewDimensionCreator DimensionCreator { get; set; }
+
+
+
+
     public PylonViewMarkCreator ViewMarkCreator { get; set; }
     public PylonViewScheduleCreator ViewScheduleCreator { get; set; }
     public PylonViewSectionPlacer ViewSectionPlacer { get; set; }

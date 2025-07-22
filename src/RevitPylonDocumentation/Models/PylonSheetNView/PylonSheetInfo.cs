@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
+using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionCreatorFactories;
 using RevitPylonDocumentation.ViewModels;
 
 using Document = Autodesk.Revit.DB.Document;
@@ -22,15 +23,15 @@ internal class PylonSheetInfo : BaseViewModel {
 
         Manager = new PylonSheetInfoManager(ViewModel, Repository, this);
 
-        GeneralView = new PylonView(ViewModel, Repository, this);
-        GeneralRebarView = new PylonView(ViewModel, Repository, this);
-        GeneralViewPerpendicular = new PylonView(ViewModel, Repository, this);
-        GeneralRebarViewPerpendicular = new PylonView(ViewModel, Repository, this);
-        TransverseViewFirst = new PylonView(ViewModel, Repository, this);
-        TransverseViewSecond = new PylonView(ViewModel, Repository, this);
-        TransverseViewThird = new PylonView(ViewModel, Repository, this);
-        TransverseRebarViewFirst = new PylonView(ViewModel, Repository, this);
-        TransverseRebarViewSecond = new PylonView(ViewModel, Repository, this);
+        GeneralView = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.General);
+        GeneralViewPerpendicular = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.GeneralPerp);
+        GeneralRebarView = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.GeneralRebar);
+        GeneralRebarViewPerpendicular = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.GeneralRebarPerp);
+        TransverseViewFirst = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseFirst);
+        TransverseViewSecond = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseSecond);
+        TransverseViewThird = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseThird);
+        TransverseRebarViewFirst = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseRebarFirst);
+        TransverseRebarViewSecond = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseRebarSecond);
 
         RebarSchedule = new PylonView(ViewModel, Repository, this);
         SkeletonSchedule = new PylonView(ViewModel, Repository, this);

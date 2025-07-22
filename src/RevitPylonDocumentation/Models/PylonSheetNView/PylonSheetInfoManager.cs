@@ -232,87 +232,87 @@ internal class PylonSheetInfoManager {
         if(selectionSettings.NeedWorkWithGeneralView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
             if(SheetInfo.GeneralView.ViewElement != null) {
-                SheetInfo.GeneralView.ViewDimensionCreator
-                    .TryCreateGeneralViewDimensions();
-                SheetInfo.TransverseViewFirst.ViewMarkCreator
-                    .TryCreateGeneralViewMarks();
+                SheetInfo.GeneralView.DimensionCreator
+                    .TryCreateViewDimensions();
+                //SheetInfo.TransverseViewFirst.ViewMarkCreator
+                //    .TryCreateGeneralViewMarks();
             }
         }
 
-        // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА
-        if(selectionSettings.NeedWorkWithTransverseViewFirst) {
-            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewFirst.ViewElement != null) {
-                SheetInfo.TransverseViewFirst.ViewDimensionCreator
-                    .TryCreateTransverseViewFirstDimensions();
-                SheetInfo.TransverseViewFirst.ViewMarkCreator
-                    .TryCreateTransverseViewMarks();
-            }
-        }
+        //// СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА
+        //if(selectionSettings.NeedWorkWithTransverseViewFirst) {
+        //    // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+        //    if(SheetInfo.TransverseViewFirst.ViewElement != null) {
+        //        SheetInfo.TransverseViewFirst.ViewDimensionCreator
+        //            .TryCreateTransverseViewFirstDimensions();
+        //        SheetInfo.TransverseViewFirst.ViewMarkCreator
+        //            .TryCreateTransverseViewMarks();
+        //    }
+        //}
 
-        // СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИДА
-        if(selectionSettings.NeedWorkWithTransverseViewSecond) {
-            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewSecond.ViewElement != null) {
-                SheetInfo.TransverseViewSecond.ViewDimensionCreator
-                    .TryCreateTransverseViewSecondDimensions();
-                SheetInfo.TransverseViewSecond.ViewMarkCreator
-                    .TryCreateTransverseViewMarks();
-            }
-        }
+        //// СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИДА
+        //if(selectionSettings.NeedWorkWithTransverseViewSecond) {
+        //    // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+        //    if(SheetInfo.TransverseViewSecond.ViewElement != null) {
+        //        SheetInfo.TransverseViewSecond.ViewDimensionCreator
+        //            .TryCreateTransverseViewSecondDimensions();
+        //        SheetInfo.TransverseViewSecond.ViewMarkCreator
+        //            .TryCreateTransverseViewMarks();
+        //    }
+        //}
 
-        // СОЗДАНИЕ АННОТАЦИЙ ТРЕТЬЕГО ПОПЕРЕЧНОГО ВИДА
-        if(selectionSettings.NeedWorkWithTransverseViewThird) {
-            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewThird.ViewElement != null) {
-                SheetInfo.TransverseViewThird.ViewDimensionCreator
-                    .TryCreateTransverseViewThirdDimensions();
-                SheetInfo.TransverseViewThird.ViewMarkCreator
-                    .TryCreateTransverseViewMarks();
-            }
-        }
+        //// СОЗДАНИЕ АННОТАЦИЙ ТРЕТЬЕГО ПОПЕРЕЧНОГО ВИДА
+        //if(selectionSettings.NeedWorkWithTransverseViewThird) {
+        //    // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+        //    if(SheetInfo.TransverseViewThird.ViewElement != null) {
+        //        SheetInfo.TransverseViewThird.ViewDimensionCreator
+        //            .TryCreateTransverseViewThirdDimensions();
+        //        SheetInfo.TransverseViewThird.ViewMarkCreator
+        //            .TryCreateTransverseViewMarks();
+        //    }
+        //}
 
-        // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО АРМАТУРНОГО ВИДА
-        if(selectionSettings.NeedWorkWithGeneralRebarView) {
-            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralRebarView.ViewElement != null) {
-                SheetInfo.GeneralRebarView.ViewDimensionCreator
-                    .TryCreateGeneralRebarViewDimensions();
-            }
-        }
+        //// СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО АРМАТУРНОГО ВИДА
+        //if(selectionSettings.NeedWorkWithGeneralRebarView) {
+        //    // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+        //    if(SheetInfo.GeneralRebarView.ViewElement != null) {
+        //        SheetInfo.GeneralRebarView.ViewDimensionCreator
+        //            .TryCreateGeneralRebarViewDimensions();
+        //    }
+        //}
 
-        // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ПЕРПЕНДИКУЛЯРНОГО АРМАТУРНОГО ВИДА
-        if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
-            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement != null) {
-                SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
-                    .TryCreateGeneralRebarPerpendicularViewDimensions();
-                SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
-                    .TryCreateGeneralRebarPerpendicularViewAdditionalDimensions();
-            }
-        }
+        //// СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ПЕРПЕНДИКУЛЯРНОГО АРМАТУРНОГО ВИДА
+        //if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
+        //    // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+        //    if(SheetInfo.GeneralRebarViewPerpendicular.ViewElement != null) {
+        //        SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
+        //            .TryCreateGeneralRebarPerpendicularViewDimensions();
+        //        SheetInfo.GeneralRebarViewPerpendicular.ViewDimensionCreator
+        //            .TryCreateGeneralRebarPerpendicularViewAdditionalDimensions();
+        //    }
+        //}
 
-        // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
-            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseRebarViewFirst.ViewElement != null) {
-                SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
-                    .TryCreateTransverseRebarViewFirstDimensions();
-                SheetInfo.TransverseRebarViewFirst.ViewMarkCreator
-                    .TryCreateTransverseRebarViewMarks();
-            }
-        }
+        //// СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
+        //if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
+        //    // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+        //    if(SheetInfo.TransverseRebarViewFirst.ViewElement != null) {
+        //        SheetInfo.TransverseRebarViewFirst.ViewDimensionCreator
+        //            .TryCreateTransverseRebarViewFirstDimensions();
+        //        SheetInfo.TransverseRebarViewFirst.ViewMarkCreator
+        //            .TryCreateTransverseRebarViewMarks();
+        //    }
+        //}
 
-        // СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
-        if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
-            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseRebarViewSecond.ViewElement != null) {
-                SheetInfo.TransverseRebarViewSecond.ViewDimensionCreator
-                    .TryCreateTransverseRebarViewSecondDimensions();
-                SheetInfo.TransverseRebarViewSecond.ViewMarkCreator
-                    .TryCreateTransverseRebarViewMarks();
-            }
-        }
+        //// СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
+        //if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
+        //    // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+        //    if(SheetInfo.TransverseRebarViewSecond.ViewElement != null) {
+        //        SheetInfo.TransverseRebarViewSecond.ViewDimensionCreator
+        //            .TryCreateTransverseRebarViewSecondDimensions();
+        //        SheetInfo.TransverseRebarViewSecond.ViewMarkCreator
+        //            .TryCreateTransverseRebarViewMarks();
+        //    }
+        //}
 
 
 
