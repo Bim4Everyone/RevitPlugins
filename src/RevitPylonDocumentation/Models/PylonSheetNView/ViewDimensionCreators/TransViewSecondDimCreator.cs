@@ -1,8 +1,8 @@
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionCreators;
-internal class TransverseViewThirdDimCreator : ViewDimensionCreator {
-    public TransverseViewThirdDimCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) 
+internal class TransViewSecondDimCreator : ViewDimensionCreator {
+    public TransViewSecondDimCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) 
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
 

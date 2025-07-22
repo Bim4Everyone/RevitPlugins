@@ -25,13 +25,13 @@ internal class PylonSheetInfo : BaseViewModel {
 
         GeneralView = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.General);
         GeneralViewPerpendicular = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.GeneralPerp);
-        GeneralRebarView = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.GeneralRebar);
-        GeneralRebarViewPerpendicular = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.GeneralRebarPerp);
+        GeneralViewRebar = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.GeneralRebar);
+        GeneralViewPerpendicularRebar = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.GeneralRebarPerp);
         TransverseViewFirst = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseFirst);
         TransverseViewSecond = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseSecond);
         TransverseViewThird = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseThird);
-        TransverseRebarViewFirst = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseRebarFirst);
-        TransverseRebarViewSecond = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseRebarSecond);
+        TransverseViewFirstRebar = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseRebarFirst);
+        TransverseViewSecondRebar = new PylonView(ViewModel, Repository, this, DimensionCreatorFactories.TransverseRebarSecond);
 
         RebarSchedule = new PylonView(ViewModel, Repository, this);
         SkeletonSchedule = new PylonView(ViewModel, Repository, this);
@@ -75,14 +75,14 @@ internal class PylonSheetInfo : BaseViewModel {
 
     // Видовые экраны разрезов
     public PylonView GeneralView { get; set; }
-    public PylonView GeneralRebarView { get; set; }
+    public PylonView GeneralViewRebar { get; set; }
     public PylonView GeneralViewPerpendicular { get; set; }
-    public PylonView GeneralRebarViewPerpendicular { get; set; }
+    public PylonView GeneralViewPerpendicularRebar { get; set; }
     public PylonView TransverseViewFirst { get; set; }
     public PylonView TransverseViewSecond { get; set; }
     public PylonView TransverseViewThird { get; set; }
-    public PylonView TransverseRebarViewFirst { get; set; }
-    public PylonView TransverseRebarViewSecond { get; set; }
+    public PylonView TransverseViewFirstRebar { get; set; }
+    public PylonView TransverseViewSecondRebar { get; set; }
 
 
 
@@ -205,10 +205,10 @@ internal class PylonSheetInfo : BaseViewModel {
         SystemPartsSchedule.ViewName = ViewModel.SchedulesSettings.SystemPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SystemPartsScheduleSuffix;
         IfcPartsSchedule.ViewName = ViewModel.SchedulesSettings.IfcPartsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.IfcPartsScheduleSuffix;
 
-        GeneralRebarView.ViewName = ViewModel.ViewSectionSettings.GeneralRebarViewPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralRebarViewSuffix;
-        GeneralRebarViewPerpendicular.ViewName = ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
-        TransverseRebarViewFirst.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewFirstPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewFirstSuffix;
-        TransverseRebarViewSecond.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewSecondPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewSecondSuffix;
+        GeneralViewRebar.ViewName = ViewModel.ViewSectionSettings.GeneralRebarViewPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralRebarViewSuffix;
+        GeneralViewPerpendicularRebar.ViewName = ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularPrefix + PylonKeyName + ViewModel.ViewSectionSettings.GeneralRebarViewPerpendicularSuffix;
+        TransverseViewFirstRebar.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewFirstPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewFirstSuffix;
+        TransverseViewSecondRebar.ViewName = ViewModel.ViewSectionSettings.TransverseRebarViewSecondPrefix + PylonKeyName + ViewModel.ViewSectionSettings.TransverseRebarViewSecondSuffix;
 
         SkeletonSchedule.ViewName = ViewModel.SchedulesSettings.SkeletonSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SkeletonScheduleSuffix;
         SkeletonByElemsSchedule.ViewName = ViewModel.SchedulesSettings.SkeletonByElemsSchedulePrefix + PylonKeyName + ViewModel.SchedulesSettings.SkeletonByElemsScheduleSuffix;
@@ -238,12 +238,12 @@ internal class PylonSheetInfo : BaseViewModel {
             }
 
             // GeneralRebarView
-            if(GeneralRebarView.ViewElement is null && viewSection.Name.Equals(GeneralRebarView.ViewName)) {
-                GeneralRebarView.ViewElement = viewSection;
-                GeneralRebarView.ViewportElement = viewport;
+            if(GeneralViewRebar.ViewElement is null && viewSection.Name.Equals(GeneralViewRebar.ViewName)) {
+                GeneralViewRebar.ViewElement = viewSection;
+                GeneralViewRebar.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(GeneralRebarView, viewport);
+                GetInfoAboutViewport(GeneralViewRebar, viewport);
                 continue;
             }
 
@@ -258,12 +258,12 @@ internal class PylonSheetInfo : BaseViewModel {
             }
 
             // GeneralRebarViewPerpendicular
-            if(GeneralRebarViewPerpendicular.ViewElement is null && viewSection.Name.Equals(GeneralRebarViewPerpendicular.ViewName)) {
-                GeneralRebarViewPerpendicular.ViewElement = viewSection;
-                GeneralRebarViewPerpendicular.ViewportElement = viewport;
+            if(GeneralViewPerpendicularRebar.ViewElement is null && viewSection.Name.Equals(GeneralViewPerpendicularRebar.ViewName)) {
+                GeneralViewPerpendicularRebar.ViewElement = viewSection;
+                GeneralViewPerpendicularRebar.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(GeneralRebarViewPerpendicular, viewport);
+                GetInfoAboutViewport(GeneralViewPerpendicularRebar, viewport);
                 continue;
             }
 
@@ -298,22 +298,22 @@ internal class PylonSheetInfo : BaseViewModel {
             }
 
             // TransverseRebarViewFirst
-            if(TransverseRebarViewFirst.ViewElement is null && viewSection.Name.Equals(TransverseRebarViewFirst.ViewName)) {
-                TransverseRebarViewFirst.ViewElement = viewSection;
-                TransverseRebarViewFirst.ViewportElement = viewport;
+            if(TransverseViewFirstRebar.ViewElement is null && viewSection.Name.Equals(TransverseViewFirstRebar.ViewName)) {
+                TransverseViewFirstRebar.ViewElement = viewSection;
+                TransverseViewFirstRebar.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(TransverseRebarViewFirst, viewport);
+                GetInfoAboutViewport(TransverseViewFirstRebar, viewport);
                 continue;
             }
 
             // TransverseRebarViewSecond
-            if(TransverseRebarViewSecond.ViewElement is null && viewSection.Name.Equals(TransverseRebarViewSecond.ViewName)) {
-                TransverseRebarViewSecond.ViewElement = viewSection;
-                TransverseRebarViewSecond.ViewportElement = viewport;
+            if(TransverseViewSecondRebar.ViewElement is null && viewSection.Name.Equals(TransverseViewSecondRebar.ViewName)) {
+                TransverseViewSecondRebar.ViewElement = viewSection;
+                TransverseViewSecondRebar.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(TransverseRebarViewSecond, viewport);
+                GetInfoAboutViewport(TransverseViewSecondRebar, viewport);
                 continue;
             }
         }

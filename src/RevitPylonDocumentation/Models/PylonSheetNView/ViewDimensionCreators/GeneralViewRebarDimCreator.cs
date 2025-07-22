@@ -11,16 +11,13 @@ using dosymep.Revit;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionCreators;
-internal class GeneralRebarViewPerpDimCreator : ViewDimensionCreator {
-    internal GeneralRebarViewPerpDimCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) 
-        : base(mvm, repository, pylonSheetInfo, pylonView) {
+internal class GeneralViewRebarDimCreator : ViewDimensionCreator {
+    internal GeneralViewRebarDimCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
 
-
     public override void TryCreateViewDimensions() {
-
         var doc = Repository.Document;
-        var view = SheetInfo.GeneralRebarViewPerpendicular.ViewElement;
+        View view = SheetInfo.GeneralViewRebar.ViewElement;
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
 
         try {
@@ -31,43 +28,20 @@ internal class GeneralRebarViewPerpDimCreator : ViewDimensionCreator {
             }
 
             var dimensionLineBottom = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Bottom);
-            var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "низ", "торец" });
+            var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "низ", "фронт" });
             Dimension dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom, ViewModel.SelectedDimensionType);
 
+            var dimensionLineBottomEdges = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Bottom, 1.5);
+            var refArrayBottomEdges = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "низ", "фронт", "край" });
+            Dimension dimensionBottomEdges = doc.Create.NewDimension(view, dimensionLineBottomEdges, refArrayBottomEdges, ViewModel.SelectedDimensionType);
+
             var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top);
-            var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "верх", "торец" });
+            var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "верх", "фронт" });
             Dimension dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop, ViewModel.SelectedDimensionType);
 
 
-
-            var defaultDimensionOffsetType = DimensionOffsetType.Right;
-            // Будем ставить по дефолту справа
-            // Слева будем ставить только если есть гэшка (но не все) и она справа
-
-            if(SheetInfo.RebarInfo.HasLRebar && LRebarIsRight(view, rebarFinder)) {
-                defaultDimensionOffsetType = DimensionOffsetType.Left;
-            }
-
             List<Element> plates = rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, 2001);
-            CreateGeneralRebarViewPlateDimensions(view, skeletonParentRebar, plates, defaultDimensionOffsetType, dimensionBaseService);
-
-
-
-
-
-            if(!SheetInfo.RebarInfo.AllRebarAreL && SheetInfo.RebarInfo.HasLRebar) {
-                // #1_горизонт_Г-стержень
-                var refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["горизонт", "Г-стержень"]);
-                // #_1_горизонт_край_низ
-                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["горизонт", "край", "низ"], refArraySide);
-
-                defaultDimensionOffsetType = defaultDimensionOffsetType == DimensionOffsetType.Left ? DimensionOffsetType.Right : DimensionOffsetType.Left;
-
-                var dimensionLineLeftFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, defaultDimensionOffsetType, 1.3);
-                Dimension dimensionRebarSideFirst = Repository.Document.Create.NewDimension(view, dimensionLineLeftFirst, refArraySide, ViewModel.SelectedDimensionType);
-            }
-
-
+            CreateGeneralRebarViewPlateDimensions(view, skeletonParentRebar, plates, DimensionOffsetType.Left, dimensionBaseService);
         } catch(Exception) { }
     }
 
@@ -123,31 +97,5 @@ internal class GeneralRebarViewPerpDimCreator : ViewDimensionCreator {
 
         Dimension dimensionRebarSideSecond = Repository.Document.Create.NewDimension(view, dimensionLineLeftSecond,
                                                         refArraySide, ViewModel.SelectedDimensionType);
-    }
-
-
-    private bool LRebarIsRight(View view, RebarFinderService rebarFinder) {
-        // Гэшка
-        var lRebar = rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, 1101).FirstOrDefault();
-        // Бутылка
-        var bottleRebar = rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, 1204).FirstOrDefault();
-
-        if(lRebar is null || bottleRebar is null) {
-            return false;
-        }
-
-        var lRebarLocation = lRebar.Location as LocationPoint;
-        var lRebarPt = lRebarLocation.Point;
-
-        var bottleRebarLocation = bottleRebar.Location as LocationPoint;
-        var bottleRebarPt = bottleRebarLocation.Point;
-
-        var transform = view.CropBox.Transform;
-        var inverseTransform = transform.Inverse;
-        // Получаем координаты точек вставки в координатах вида
-        var lRebarPtTransformed = inverseTransform.OfPoint(lRebarPt);
-        var bottleRebarPtTransformed = inverseTransform.OfPoint(bottleRebarPt);
-
-        return lRebarPtTransformed.X > bottleRebarPtTransformed.X;
     }
 }

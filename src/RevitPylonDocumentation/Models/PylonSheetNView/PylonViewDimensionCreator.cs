@@ -73,7 +73,7 @@ public class PylonViewDimensionCreator {
 
     public void TryCreateGeneralRebarPerpendicularViewAdditionalDimensions() {
         var doc = Repository.Document;
-        var view = SheetInfo.GeneralRebarViewPerpendicular.ViewElement;
+        var view = SheetInfo.GeneralViewPerpendicularRebar.ViewElement;
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
 
         try {
@@ -123,7 +123,7 @@ public class PylonViewDimensionCreator {
 
     public void TryCreateTransverseRebarViewFirstDimensions() {
         var doc = Repository.Document;
-        var view = SheetInfo.TransverseRebarViewFirst.ViewElement;
+        var view = SheetInfo.TransverseViewFirstRebar.ViewElement;
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
 
         try {
@@ -155,7 +155,7 @@ public class PylonViewDimensionCreator {
 
     public void TryCreateTransverseRebarViewSecondDimensions() {
         var doc = Repository.Document;
-        var view = SheetInfo.TransverseRebarViewSecond.ViewElement;
+        var view = SheetInfo.TransverseViewSecondRebar.ViewElement;
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
 
         try {

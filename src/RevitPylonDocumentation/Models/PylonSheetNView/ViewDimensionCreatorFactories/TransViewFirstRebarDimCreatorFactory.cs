@@ -3,13 +3,13 @@ using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkCreators;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionCreatorFactories;
-internal class GeneralViewPerpDimCreatorFactory : IAnnotationCreatorFactory {
+internal class TransViewFirstRebarDimCreatorFactory : IAnnotationCreatorFactory {
     public ViewDimensionCreator CreateDimensionCreator(MainViewModel mvm, RevitRepository repository,
                                                        PylonSheetInfo sheetInfo, PylonView view) {
-        return new GeneralViewPerpDimCreator(mvm, repository, sheetInfo, view);
+        return new TransViewFirstRebarDimCreator(mvm, repository, sheetInfo, view);
     }
     public ViewMarkCreator CreateMarkCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo sheetInfo,
-                                             PylonView view) {
-        return new GeneralViewPerpMarkCreator(mvm, repository, sheetInfo, view);
+                                         PylonView view) {
+        return new TransViewFirstRebarMarkCreator(mvm, repository, sheetInfo, view);
     }
 }

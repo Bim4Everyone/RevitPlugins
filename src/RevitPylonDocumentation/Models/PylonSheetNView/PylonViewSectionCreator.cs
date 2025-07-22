@@ -149,7 +149,7 @@ public class PylonViewSectionCreator {
         }
 
         viewSection.CropBoxVisible = false;
-        SheetInfo.GeneralRebarView.ViewElement = viewSection;
+        SheetInfo.GeneralViewRebar.ViewElement = viewSection;
         return true;
     }
 
@@ -287,7 +287,7 @@ public class PylonViewSectionCreator {
         }
 
         viewSection.CropBoxVisible = false;
-        SheetInfo.GeneralRebarViewPerpendicular.ViewElement = viewSection;
+        SheetInfo.GeneralViewPerpendicularRebar.ViewElement = viewSection;
         return true;
     }
 
@@ -477,7 +477,7 @@ public class PylonViewSectionCreator {
                     if(ViewModel.SelectedTransverseRebarViewTemplate != null) {
                         viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
                     }
-                    SheetInfo.TransverseRebarViewFirst.ViewElement = viewSection;
+                    SheetInfo.TransverseViewFirstRebar.ViewElement = viewSection;
 
                 } else if(transverseRebarViewNum == 2) {
                     viewSection.Name =
@@ -487,7 +487,7 @@ public class PylonViewSectionCreator {
                     if(ViewModel.SelectedTransverseRebarViewTemplate != null) {
                         viewSection.ViewTemplateId = ViewModel.SelectedTransverseRebarViewTemplate.Id;
                     }
-                    SheetInfo.TransverseRebarViewSecond.ViewElement = viewSection;
+                    SheetInfo.TransverseViewSecondRebar.ViewElement = viewSection;
                 }
             }
         } catch(Exception) {
