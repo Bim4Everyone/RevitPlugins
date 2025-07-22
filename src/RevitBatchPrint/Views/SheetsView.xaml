@@ -1,0 +1,139 @@
+<UserControl
+    x:Class="RevitBatchPrint.Views.SheetsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitBatchPrint.Views"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitBatchPrint.ViewModels"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewsTemplates/TreeViewTemplate.xaml" />
+                <ResourceDictionary Source="../ViewsTemplates/TreeViewItemTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:BoolToVisibilityConverter
+                x:Key="ExportVisibilityConverter"
+                TrueValue="Visible"
+                FalseValue="Collapsed" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border
+            Grid.Row="0"
+            Margin="8"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+            <ui:AutoSuggestBox
+                x:Name="_albumParamName"
+                Margin="14,8,14,8"
+                Icon="{ui:SymbolIcon TextAlignJustify24}"
+                Text="{Binding AlbumParamName, Mode=TwoWay}"
+                PlaceholderText="{me:LocalizationSource MainWindow.AlbumHintText}"
+                OriginalItemsSource="{Binding AlbumParamNames}"
+                UpdateTextOnSelect="True"
+                Loaded="_albumParamName_OnLoaded"
+                TextChanged="_albumParamName_OnTextChanged">
+                
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="TextChanged">
+                        <b:InvokeCommandAction
+                            Command="{Binding ChangeAlbumNameCommand}" />
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+            </ui:AutoSuggestBox>
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Margin="8 0 8 8"
+            Padding="0"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}"
+            Visibility="{Binding ShowPrint,
+                    Converter={StaticResource ExportVisibilityConverter}}">
+            <ComboBox
+                Margin="14,8,14,8"
+                IsEnabled="True"
+                IsReadOnly="False"
+                ItemsSource="{Binding Path=PrintOptions.PrinterNames, Mode=OneWay}"
+                SelectedValue="{Binding Path=PrintOptions.PrinterName, Mode=TwoWay}" />
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Margin="8 0 8 8"
+            Padding="0"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}"
+            Visibility="{Binding ShowExport,
+                    Converter={StaticResource ExportVisibilityConverter}}">
+            
+            <DockPanel
+                LastChildFill="True">
+                <ui:Button
+                    DockPanel.Dock="Right"
+                    Height="36.5"
+                    Margin="14 8"
+                    Icon="{ui:SymbolIcon Folder24}"
+                    ToolTip="{me:LocalizationSource MainWindow.ChooseFileName}"
+                    Command="{Binding ChooseSaveFileCommand}"/>
+                
+                <ui:TextBox
+                    DockPanel.Dock="Left"
+                    Height="36.5"
+                    Margin="14,8,0,8"
+                    Icon="{ui:SymbolIcon DocumentPdf24}"
+                    Text="{Binding Path=PrintOptions.FilePath, Mode=TwoWay}" />
+            </DockPanel>
+
+        </Border>
+
+        <Border
+            Grid.Row="2"
+            Margin="8 0 8 8"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+
+            <DockPanel>
+                <ui:AutoSuggestBox
+                    DockPanel.Dock="Top"
+                    Margin="14,8,14,8"
+                    Icon="{ui:SymbolIcon Search24}"
+                    Text="{Binding SearchText, Mode=TwoWay}"
+                    PlaceholderText="{me:LocalizationSource MainWindow.SearchHintText}">
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="TextChanged">
+                            <b:InvokeCommandAction
+                                Command="{Binding SearchCommand}" />
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </ui:AutoSuggestBox>
+
+                <TreeView
+                    DockPanel.Dock="Bottom"
+                    Margin="14,0,14,8"
+                    ItemTemplate="{StaticResource TreeViewTemplate}"
+                    ItemsSource="{Binding FilteredAlbums}"
+                    ItemContainerStyle="{StaticResource CustomTreeViewItemStyle}" />
+            </DockPanel>
+
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,62 @@
+using System.Windows.Input;
+
+using Autodesk.Revit.DB;
+
+using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
+
+using RevitBatchPrint.Models;
+
+namespace RevitBatchPrint.ViewModels;
+
+internal sealed class SheetViewModel : BaseViewModel {
+    private readonly ViewSheet _viewSheet;
+    private readonly IPrintContext _printContext;
+
+    private string _errorText;
+    private bool _isSelected;
+    private PrintSheetSettings _printSheetSettings;
+
+    public SheetViewModel(ViewSheet viewSheet, AlbumViewModel album, IPrintContext printContext) {
+        _viewSheet = viewSheet;
+        _printContext = printContext;
+
+        Name = _viewSheet.Name;
+        Album = album;
+        CheckCommand = Album.CheckUpdateCommand;
+        PrintExportCommand = RelayCommand.Create(ExecutePrintExport, CanExecutePrintExport);
+    }
+
+    public string Name { get; }
+    public AlbumViewModel Album { get; }
+    public ICommand CheckCommand { get; }
+    public ICommand PrintExportCommand { get; }
+
+    public string ErrorText {
+        get => _errorText;
+        set => this.RaiseAndSetIfChanged(ref _errorText, value);
+    }
+
+    public bool IsSelected {
+        get => _isSelected;
+        set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+    }
+
+    public PrintSheetSettings PrintSheetSettings {
+        get => _printSheetSettings;
+        set => this.RaiseAndSetIfChanged(ref _printSheetSettings, value);
+    }
+
+    public SheetElement CreateSheetElement() {
+        return new SheetElement() {ViewSheet = _viewSheet, PrintSheetSettings = PrintSheetSettings};
+    }
+    
+    private void ExecutePrintExport() {
+        _printContext.ExecutePrintExport([this]);
+    }
+    
+    private bool CanExecutePrintExport() {
+        return _printContext.CanExecutePrintExport([this]);
+    }
+}
