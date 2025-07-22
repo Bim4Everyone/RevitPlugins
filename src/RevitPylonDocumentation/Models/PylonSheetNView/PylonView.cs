@@ -1,8 +1,7 @@
 using Autodesk.Revit.DB;
 
-using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionCreatorFactories;
-using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionCreators;
-using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkCreators;
+using RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreatorFactories;
+using RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
@@ -17,8 +16,7 @@ public class PylonView {
         ViewSectionCreator = new PylonViewSectionCreator(mvm, repository, pylonSheetInfo);
         ViewScheduleCreator = new PylonViewScheduleCreator(mvm, repository, pylonSheetInfo);
         
-        DimensionCreator = annotationCreatorFactory?.CreateDimensionCreator(mvm, repository, pylonSheetInfo, this);
-        MarkCreator = annotationCreatorFactory?.CreateMarkCreator(mvm, repository, pylonSheetInfo, this);
+        AnnotationCreator = annotationCreatorFactory?.CreateAnnotationCreator(mvm, repository, pylonSheetInfo, this);
 
         ViewSectionPlacer = new PylonViewSectionPlacer(mvm, repository, pylonSheetInfo);
         ViewSchedulePlacer = new PylonViewSchedulePlacer(mvm, repository, pylonSheetInfo);
@@ -44,8 +42,7 @@ public class PylonView {
     public PylonViewSectionCreator ViewSectionCreator { get; set; }
     public PylonViewScheduleCreator ViewScheduleCreator { get; set; }
 
-    public ViewDimensionCreator DimensionCreator { get; set; }
-    public ViewMarkCreator MarkCreator { get; set; }
+    public ViewAnnotationCreator AnnotationCreator { get; set; }
 
     public PylonViewSectionPlacer ViewSectionPlacer { get; set; }
     public PylonViewSchedulePlacer ViewSchedulePlacer { get; set; }
