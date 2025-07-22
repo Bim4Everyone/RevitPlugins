@@ -9,6 +9,5 @@ internal class TransViewFirstRebarMarkCreator : ViewMarkCreator {
     }
 
     public override void TryCreateViewMarks() {
-        throw new NotImplementedException();
     }
 }

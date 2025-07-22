@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
 
@@ -69,6 +67,9 @@ internal class GeneralViewPerpRebarDimCreator : ViewDimensionCreator {
 
 
         } catch(Exception) { }
+
+
+        TryCreateGeneralRebarPerpendicularViewAdditionalDimensions();
     }
 
 
@@ -149,5 +150,58 @@ internal class GeneralViewPerpRebarDimCreator : ViewDimensionCreator {
         var bottleRebarPtTransformed = inverseTransform.OfPoint(bottleRebarPt);
 
         return lRebarPtTransformed.X > bottleRebarPtTransformed.X;
+    }
+
+
+
+
+
+    public void TryCreateGeneralRebarPerpendicularViewAdditionalDimensions() {
+        var doc = Repository.Document;
+        var view = SheetInfo.GeneralViewPerpendicularRebar.ViewElement;
+        var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
+
+        try {
+            var rebarFinder = ViewModel.RebarFinder;
+            var skeletonParentRebar = SheetInfo.RebarInfo.SkeletonParentRebar;
+            if(skeletonParentRebar is null) {
+                return;
+            }
+
+            Line dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top, -1);
+
+            ReferenceArray refArrayTop_1 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "1_торец" });
+            Dimension dimensionTop_1 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop_1, ViewModel.SelectedDimensionType);
+            if(dimensionTop_1.Value == 0) {
+                doc.Delete(dimensionTop_1.Id);
+            }
+
+            ReferenceArray refArrayTop_2 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "2_торец" });
+            Dimension dimensionTop_2 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop_2, ViewModel.SelectedDimensionType);
+            if(dimensionTop_2.Value == 0) {
+                doc.Delete(dimensionTop_2.Id);
+            }
+
+            //// Смещение выноски вправо
+            //var rightDirection = GetViewDirections(view).RightDirection;
+            //// .Multiply(offsetCoefficient)
+
+            //var dimensionPoint_1 = dimensionBottom_1.LeaderEndPosition;
+            //var dimensionPoint_2 = dimensionBottom_2.LeaderEndPosition;
+
+            //dimensionPoint_1 = new XYZ(dimensionPoint_1.X, dimensionPoint_1.Y, 0);
+            //dimensionPoint_2 = new XYZ(dimensionPoint_2.X, dimensionPoint_2.Y, 0);
+
+            //var viewMin = view.CropBox.Min;
+            //viewMin = new XYZ(viewMin.X, viewMin.Y, 0);
+
+            //if(dimensionPoint_1.DistanceTo(viewMin) < dimensionPoint_2.DistanceTo(viewMin)) {
+            //    dimensionBottom_1.LeaderEndPosition = dimensionPoint_1 + rightDirection;
+            //    dimensionBottom_2.LeaderEndPosition = dimensionPoint_2 - rightDirection;
+            //} else {
+            //    dimensionBottom_1.LeaderEndPosition = dimensionPoint_1 - rightDirection;
+            //    dimensionBottom_2.LeaderEndPosition = dimensionPoint_2 + rightDirection;
+            //}
+        } catch(Exception) { }
     }
 }

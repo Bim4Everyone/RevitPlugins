@@ -9,6 +9,5 @@ internal class GeneralViewPerpMarkCreator : ViewMarkCreator {
     }
 
     public override void TryCreateViewMarks() {
-        throw new NotImplementedException();
     }
 }

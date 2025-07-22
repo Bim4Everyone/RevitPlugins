@@ -9,6 +9,5 @@ internal class TransViewThirdMarkCreator : ViewMarkCreator {
     }
 
     public override void TryCreateViewMarks() {
-        throw new NotImplementedException();
     }
 }

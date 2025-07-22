@@ -7,13 +7,13 @@ public abstract class ViewDimensionCreator {
         ViewModel = mvm;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
-        View = pylonView;
+        ViewOfPylon = pylonView;
     }
     
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
-    internal PylonView View { get; set; }
+    internal PylonView ViewOfPylon { get; set; }
 
 
     public abstract void TryCreateViewDimensions();

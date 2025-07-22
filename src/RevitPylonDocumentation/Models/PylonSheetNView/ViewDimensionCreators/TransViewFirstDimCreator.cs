@@ -7,6 +7,7 @@ internal class TransViewFirstDimCreator : ViewDimensionCreator {
     }
 
     public override void TryCreateViewDimensions() {
-
+        var creator = new TransverseViewDimensionsCreator(ViewModel, Repository, SheetInfo);
+        creator.TryCreateTransverseViewDimensions(ViewOfPylon.ViewElement, false);
     }
 }

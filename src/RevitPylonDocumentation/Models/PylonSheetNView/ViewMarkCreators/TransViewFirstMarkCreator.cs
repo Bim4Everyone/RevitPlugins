@@ -8,7 +8,5 @@ internal class TransViewFirstMarkCreator : ViewMarkCreator {
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
 
-    public override void TryCreateViewMarks() {
-        throw new NotImplementedException();
-    }
+    public override void TryCreateViewMarks() { }
 }
