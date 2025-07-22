@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -32,7 +31,7 @@ namespace RevitClashDetective.ViewModels.Navigator {
             SecondLevel = clash.OtherElement.Level;
             SecondDocumentName = clash.OtherElement.DocumentName;
 
-            (IntersectionPercentage, IntersectionVolume) = GetIntersectionData(clash);
+            SetIntersectionData(clash);
 
             ClashStatus = clash.ClashStatus;
             Clash = clash;
@@ -71,14 +70,19 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public string SecondCategory { get; }
 
         /// <summary>
-        /// Процент пересечения относительно объема меньшего элемента коллизии
+        /// Процент пересечения относительно объема первого элемента коллизии
         /// </summary>
-        public double IntersectionPercentage { get; }
+        public double MainElementIntersectionPercentage { get; private set; }
+
+        /// <summary>
+        /// Процент пересечения относительно объема второго элемента коллизии
+        /// </summary>
+        public double SecondElementIntersectionPercentage { get; private set; }
 
         /// <summary>
         /// Объем пересечения в м3
         /// </summary>
-        public double IntersectionVolume { get; }
+        public double IntersectionVolume { get; private set; }
 
         public ClashModel Clash { get; }
 
@@ -133,25 +137,20 @@ namespace RevitClashDetective.ViewModels.Navigator {
         }
 
 
-        private (double Percentage, double Volume) GetIntersectionData(ClashModel clashModel) {
+        private void SetIntersectionData(ClashModel clashModel) {
             if(clashModel is null) {
                 throw new ArgumentNullException(nameof(clashModel));
             }
 
-            ClashData clashData = clashModel
+            var clashData = clashModel
                 .SetRevitRepository(_revitRepository)
                 .GetClashData();
 
-            double minVolume = Math.Min(clashData.MainElementVolume, clashData.OtherElementVolume);
-            return (
-                Math.Round(clashData.ClashVolume / minVolume * 100, 2),
-                Math.Round(_revitRepository.ConvertToM3(clashData.ClashVolume), 6));
-        }
-
-        private string GetFamilyName(ElementModel elementModel) {
-            var doc = elementModel.GetDocInfo(_revitRepository.DocInfos)?.Doc;
-            var element = doc?.GetElement(elementModel.Id);
-            return element?.HasElementType() ?? false ? element.GetElementType().FamilyName : string.Empty;
+            IntersectionVolume = Math.Round(_revitRepository.ConvertToM3(clashData.ClashVolume), 6);
+            MainElementIntersectionPercentage =
+                Math.Round(clashData.ClashVolume / clashData.MainElementVolume * 100, 2);
+            SecondElementIntersectionPercentage =
+                 Math.Round(clashData.ClashVolume / clashData.OtherElementVolume * 100, 2);
         }
     }
 }

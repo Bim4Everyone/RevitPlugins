@@ -178,8 +178,15 @@
                                 Header="Имя файла 2"
                                 FieldName="SecondDocumentName" />
                 <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
-                                Header="% пересечения"
-                                FieldName="IntersectionPercentage">
+                                Header="% пересечения 1"
+                                FieldName="MainElementIntersectionPercentage">
+                    <dxg:GridColumn.EditSettings>
+                        <dxe:TextEditSettings HorizontalContentAlignment="Left" />
+                    </dxg:GridColumn.EditSettings>
+                </dxg:GridColumn>
+                <dxg:GridColumn Style="{StaticResource ReadOnlyColumn}"
+                                Header="% пересечения 2"
+                                FieldName="SecondElementIntersectionPercentage">
                     <dxg:GridColumn.EditSettings>
                         <dxe:TextEditSettings HorizontalContentAlignment="Left" />
                     </dxg:GridColumn.EditSettings>
