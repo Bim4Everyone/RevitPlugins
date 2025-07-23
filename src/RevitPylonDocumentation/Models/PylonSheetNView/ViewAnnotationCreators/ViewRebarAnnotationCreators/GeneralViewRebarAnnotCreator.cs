@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 using RevitPylonDocumentation.ViewModels;

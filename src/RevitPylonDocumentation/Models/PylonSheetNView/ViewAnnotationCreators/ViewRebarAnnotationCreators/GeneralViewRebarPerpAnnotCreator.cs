@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 using RevitPylonDocumentation.ViewModels;
@@ -17,7 +16,7 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
         var view = SheetInfo.GeneralViewPerpendicularRebar.ViewElement;
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
 
-        var dimensionService = new GeneralViewPerpRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+        var dimensionService = new GeneralViewRebarPerpDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
 
         // Пытаемся создать размеры на виде
         try {
@@ -27,42 +26,28 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
                 return;
             }
 
-            var dimensionLineBottom = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Bottom);
-            var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "низ", "торец" });
-            var dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom, ViewModel.SelectedDimensionType);
-
-            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top);
-            var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', new List<string>() { "верх", "торец" });
-            var dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop, ViewModel.SelectedDimensionType);
+            dimensionService.CreateTopEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
+            dimensionService.CreateBottomEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
 
 
-
-            var defaultDimensionOffsetType = DimensionOffsetType.Right;
-            // Будем ставить по дефолту справа
-            // Слева будем ставить только если есть гэшка (но не все) и она справа
-
+            var plateDimensionOffsetType = DimensionOffsetType.Right;
+            // Будем ставить размерную цепочку по дефолту справа
+            // Слева будем ставить только если есть Г-образный стержень (но не все) и он справа
             if(SheetInfo.RebarInfo.HasLRebar && dimensionService.LRebarIsRight(view, rebarFinder)) {
-                defaultDimensionOffsetType = DimensionOffsetType.Left;
+                plateDimensionOffsetType = DimensionOffsetType.Left;
             }
 
             var plates = rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, 2001);
-            dimensionService.CreateGeneralRebarViewPlateDimensions(view, skeletonParentRebar, plates, defaultDimensionOffsetType, dimensionBaseService);
-
+            dimensionService.CreatePlateDimensions(skeletonParentRebar, plates, plateDimensionOffsetType, dimensionBaseService);
 
 
             if(!SheetInfo.RebarInfo.AllRebarAreL && SheetInfo.RebarInfo.HasLRebar) {
-                // #1_горизонт_Г-стержень
-                var refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["горизонт", "Г-стержень"]);
-                // #_1_горизонт_край_низ
-                refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["горизонт", "край", "низ"], refArraySide);
-
-                defaultDimensionOffsetType = defaultDimensionOffsetType == DimensionOffsetType.Left ? DimensionOffsetType.Right : DimensionOffsetType.Left;
-
-                var dimensionLineLeftFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, defaultDimensionOffsetType, 1.3);
-                var dimensionRebarSideFirst = Repository.Document.Create.NewDimension(view, dimensionLineLeftFirst, refArraySide, ViewModel.SelectedDimensionType);
+                var rebarDimensionOffsetType = plateDimensionOffsetType == 
+                    DimensionOffsetType.Left ? DimensionOffsetType.Right : DimensionOffsetType.Left;
+                dimensionService.CreateLRebarDimension(skeletonParentRebar, rebarDimensionOffsetType, dimensionBaseService);
             }
 
-            dimensionService.TryCreateGeneralRebarPerpendicularViewAdditionalDimensions();
+            dimensionService.CreateAdditionalDimensions(skeletonParentRebar, dimensionBaseService);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде
