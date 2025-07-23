@@ -30,6 +30,9 @@ internal class GeneralViewRebarPerpDimensionService {
     internal void TryCreateTopEdgeRebarDimensions(FamilyInstance skeletonParentRebar, 
                                                DimensionBaseService dimensionBaseService) {
         try {
+            // Если хотя бы один из стержней - Г-образный,тогда нет смысле ставить этот размер
+            // Ставится только когда обе бутылки
+            if(!SheetInfo.RebarInfo.HasLRebar) { return; }
             var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top);
             var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "торец"]);
             Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineTop, refArrayTop, 

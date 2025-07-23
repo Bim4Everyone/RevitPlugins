@@ -28,7 +28,7 @@ internal class GeneralViewRebarDimensionService {
     /// Создание размерной цепочки по всем вертикальным стержням арматурного каркаса снизу
     /// </summary>
     internal void TryCreateAllBottomRebarDimensions(FamilyInstance skeletonParentRebar, 
-                                                 DimensionBaseService dimensionBaseService) {
+                                                    DimensionBaseService dimensionBaseService) {
         try {
             var dimensionLineBottom = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
                                                                             DimensionOffsetType.Bottom);
@@ -42,8 +42,10 @@ internal class GeneralViewRebarDimensionService {
     /// Создание размерной цепочки по всем вертикальным стержням арматурного каркаса сверху
     /// </summary>
     internal void TryCreateAllTopRebarDimensions(FamilyInstance skeletonParentRebar,
-                                              DimensionBaseService dimensionBaseService) {
+                                                 DimensionBaseService dimensionBaseService) {
         try {
+            // Если все стержни Г-образные,тогда нет смысле ставить этот размер
+            if(SheetInfo.RebarInfo.AllRebarAreL) { return; }
             var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top);
             var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "фронт"]);
             Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineTop, refArrayTop,
@@ -55,7 +57,7 @@ internal class GeneralViewRebarDimensionService {
     /// Создание размерной цепочки по крайним вертикальным стержням арматурного каркаса снизу
     /// </summary>
     internal void TryCreateEdgeRebarDimensions(FamilyInstance skeletonParentRebar, 
-                                            DimensionBaseService dimensionBaseService) {
+                                               DimensionBaseService dimensionBaseService) {
         try {
             var dimensionLineBottomEdges = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
                                                                      DimensionOffsetType.Bottom, 1.5);

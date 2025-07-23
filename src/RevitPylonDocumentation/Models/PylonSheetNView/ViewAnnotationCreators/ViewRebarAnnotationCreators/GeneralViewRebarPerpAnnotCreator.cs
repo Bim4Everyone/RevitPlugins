@@ -12,9 +12,8 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
 
 
     public override void TryCreateViewAnnotations() {
-        var view = ViewOfPylon.ViewElement;
         var dimensionService = new GeneralViewRebarPerpDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
-        var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
+        var dimensionBaseService = new DimensionBaseService(ViewOfPylon.ViewElement, ViewModel.ParamValService);
 
         // Пытаемся создать размеры на виде
         try {
@@ -23,7 +22,6 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
             if(skeletonParentRebar is null) {
                 return;
             }
-
             // Создаем размеры по вертикальным стержням снизу и сверху (если нужно)
             dimensionService.TryCreateTopEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
             dimensionService.TryCreateBottomEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
@@ -33,7 +31,6 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
             // Создаем размерную цепочку по пластинам
             dimensionService.TryCreatePlateDimensions(skeletonParentRebar, plateDimensionOffsetType, 
                                                       dimensionBaseService);
-
             // Если Г-образный стержень только с одной стороны, то его нужно образмерить
             // В противном случае (оба Г-образные) это произойдет ранее
             if(!SheetInfo.RebarInfo.AllRebarAreL && SheetInfo.RebarInfo.HasLRebar) {
@@ -42,7 +39,6 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
                 dimensionService.TryCreateLRebarDimension(skeletonParentRebar, rebarDimensionOffsetType, 
                                                        dimensionBaseService);
             }
-
             // Создаем размеры по изгибам вертикальных стержней-бутылок
             dimensionService.TryCreateAdditionalDimensions(skeletonParentRebar, dimensionBaseService);
         } catch(Exception) { }
