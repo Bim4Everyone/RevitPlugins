@@ -6,7 +6,8 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
 internal class TransViewFirstAnnotCreator : ViewAnnotationCreator {
-    internal TransViewFirstAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) 
+    internal TransViewFirstAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+                                        PylonView pylonView) 
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
 
@@ -19,8 +20,8 @@ internal class TransViewFirstAnnotCreator : ViewAnnotationCreator {
 
         // Пытаемся создать марки на виде
         try {
-            var markService = new TransverseViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
-            markService.CreateTransverseViewBarMarks();
+            var markService = new TransViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            markService.TryCreateTransverseViewBarMarks();
         } catch(Exception) { }
     }
 }

@@ -2,24 +2,24 @@ using RevitPylonDocumentation.Models.RebarMarksServices;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices;
-internal class TransverseViewRebarMarkService {
+internal class TransViewRebarMarkService {
     private readonly int _formNumberForSkeletonPlatesMax = 2999;
     private readonly int _formNumberForSkeletonPlatesMin = 2001;
 
     private readonly int _formNumberForVerticalRebarMax = 1499;
     private readonly int _formNumberForVerticalRebarMin = 1101;
 
-    private readonly TransverseRebarViewBarMarksService _transverseRebarViewBarMarksService;
-    private readonly TransverseRebarViewPlateMarksService _transverseRebarViewPlateMarksService;
+    private readonly RebarViewBarMarksService _transverseRebarViewBarMarksService;
+    private readonly RebarViewPlateMarksService _transverseRebarViewPlateMarksService;
     
-    internal TransverseViewRebarMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) {
+    internal TransViewRebarMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) {
         ViewModel = mvm;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
 
-        _transverseRebarViewBarMarksService = new TransverseRebarViewBarMarksService(ViewOfPylon, Repository);
-        _transverseRebarViewPlateMarksService = new TransverseRebarViewPlateMarksService(ViewOfPylon, Repository);
+        _transverseRebarViewBarMarksService = new RebarViewBarMarksService(ViewOfPylon, Repository);
+        _transverseRebarViewPlateMarksService = new RebarViewPlateMarksService(ViewOfPylon, Repository);
     }
 
     internal MainViewModel ViewModel { get; set; }

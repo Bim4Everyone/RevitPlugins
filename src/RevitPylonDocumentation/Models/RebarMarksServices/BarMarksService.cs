@@ -5,7 +5,7 @@ using Autodesk.Revit.DB;
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models.RebarMarksServices;
-internal class TransverseViewBarMarksService {
+internal class BarMarksService {
     private readonly PylonView _pylonView;
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
@@ -13,7 +13,7 @@ internal class TransverseViewBarMarksService {
     private readonly FamilySymbol _tagSymbolWithoutSerif;
     private readonly FamilySymbol _tagSkeletonSymbol;
 
-    public TransverseViewBarMarksService(PylonView pylonView, RevitRepository revitRepository) {
+    public BarMarksService(PylonView pylonView, RevitRepository revitRepository) {
         _pylonView = pylonView;
         _viewPointsAnalyzer = new ViewPointsAnalyzer(pylonView);
         _annotationService = new AnnotationService(pylonView);

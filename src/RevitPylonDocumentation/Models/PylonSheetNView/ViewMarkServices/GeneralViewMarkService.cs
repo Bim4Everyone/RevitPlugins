@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -25,28 +26,30 @@ internal class GeneralViewMarkService {
     /// <param name="view">Вид, на котором нужно создать размеры</param>
     /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
     /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
-    internal void CreatePylonElevMark(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
-        var location = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance,
-                                                           DimensionOffsetType.Left, 2).Origin;
-        foreach(var item in hostElems) {
-            if(item is not FamilyInstance hostElem) { return; }
+    internal void TryCreatePylonElevMark(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
+        try {
+            var location = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance, DimensionOffsetType.Left, 2)
+                                           .Origin;
+            foreach(var item in hostElems) {
+                if(item is not FamilyInstance hostElem) { return; }
 
-            // Собираем опорные плоскости по опалубке, например:
-            // #_1_горизонт_край_низ
-            // #_1_горизонт_край_верх
-            ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
+                // Собираем опорные плоскости по опалубке, например:
+                // #_1_горизонт_край_низ
+                // #_1_горизонт_край_верх
+                ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
 
-            foreach(Reference reference in refArraySide) {
-                SpotDimension spotElevation = Repository.Document.Create.NewSpotElevation(
-                    ViewOfPylon.ViewElement,
-                    reference,
-                    location,
-                    location,
-                    location,
-                    location,
-                    false);
-                spotElevation.ChangeTypeId(ViewModel.SelectedSpotDimensionType.Id);
+                foreach(Reference reference in refArraySide) {
+                    SpotDimension spotElevation = Repository.Document.Create.NewSpotElevation(
+                        ViewOfPylon.ViewElement,
+                        reference,
+                        location,
+                        location,
+                        location,
+                        location,
+                        false);
+                    spotElevation.ChangeTypeId(ViewModel.SelectedSpotDimensionType.Id);
+                }
             }
-        }
+        } catch(Exception) { }
     }
 }

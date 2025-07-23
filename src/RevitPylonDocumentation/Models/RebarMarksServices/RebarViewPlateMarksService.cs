@@ -5,12 +5,12 @@ using Autodesk.Revit.DB;
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models.RebarMarksServices;
-internal class TransverseRebarViewPlateMarksService {
+internal class RebarViewPlateMarksService {
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
     private readonly FamilySymbol _tagSymbolWithoutSerif;
 
-    public TransverseRebarViewPlateMarksService(PylonView pylonView, RevitRepository revitRepository) {
+    public RebarViewPlateMarksService(PylonView pylonView, RevitRepository revitRepository) {
         _viewPointsAnalyzer = new ViewPointsAnalyzer(pylonView);
         _annotationService = new AnnotationService(pylonView);
 

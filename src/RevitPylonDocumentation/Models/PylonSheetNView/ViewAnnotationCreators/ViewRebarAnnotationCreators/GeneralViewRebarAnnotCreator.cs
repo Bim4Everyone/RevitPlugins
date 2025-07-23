@@ -5,15 +5,14 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
 internal class GeneralViewRebarAnnotCreator : ViewAnnotationCreator {
-    internal GeneralViewRebarAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) 
+    internal GeneralViewRebarAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+                                          PylonView pylonView) 
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
 
     public override void TryCreateViewAnnotations() {
-        var doc = Repository.Document;
-        var view = SheetInfo.GeneralViewRebar.ViewElement;
+        var view = ViewOfPylon.ViewElement;
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
-
 
         // Пытаемся создать размеры на виде
         try {
@@ -22,16 +21,16 @@ internal class GeneralViewRebarAnnotCreator : ViewAnnotationCreator {
             if(skeletonParentRebar is null) {
                 return;
             }
-            var plates = rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, 2001);
 
             var dimensionService = new GeneralViewRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.CreateAllTopRebarDimensions(skeletonParentRebar, dimensionBaseService);
-            dimensionService.CreateAllBottomRebarDimensions(skeletonParentRebar, dimensionBaseService);
-            dimensionService.CreateEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateAllTopRebarDimensions(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateAllBottomRebarDimensions(skeletonParentRebar, dimensionBaseService);
+            dimensionService.TryCreateEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.CreatePlateDimensions(skeletonParentRebar, plates, DimensionOffsetType.Left, dimensionBaseService);
+            dimensionService.TryCreatePlateDimensions(skeletonParentRebar, DimensionOffsetType.Left, 
+                                                      dimensionBaseService);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде

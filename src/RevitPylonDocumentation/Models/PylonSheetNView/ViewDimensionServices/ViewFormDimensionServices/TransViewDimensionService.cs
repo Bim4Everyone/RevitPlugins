@@ -30,82 +30,82 @@ internal class TransViewDimensionService {
             if(skeletonParentRebar is null) {
                 return;
             }
-
             var grids = new FilteredElementCollector(doc, view.Id)
                 .OfCategory(BuiltInCategory.OST_Grids)
                 .Cast<Grid>()
                 .ToList();
 
-
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
             // Размер по ФРОНТУ опалубка (положение снизу 1)
-            var dimensionLineBottomFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Bottom, 1);
-            var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#', '/',
-                                                                    new List<string>() { "фронт", "край" });
+            var dimensionLineBottomFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                                                                                 DimensionOffsetType.Bottom, 1);
+            var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance, 
+                                                                              '#', '/', ["фронт", "край"]);
             var dimensionFormworkFront = doc.Create.NewDimension(view, dimensionLineBottomFirst,
-                                                                   refArrayFormworkFront, ViewModel.SelectedDimensionType);
-
+                                                                 refArrayFormworkFront, ViewModel.SelectedDimensionType);
             if(grids.Count > 0) {
                 // Размер по ФРОНТУ опалубка + оси (положение сверху 1)
-                var dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top, 0.5);
-                var refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view,
-                                                                                                 new XYZ(0, 1, 0),
-                                                                                                 refArrayFormworkFront);
+                var dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                                                                                   DimensionOffsetType.Top, 0.5);
+                var refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view, XYZ.BasisY,
+                                                                                      refArrayFormworkFront);
                 var dimensionFormworkGridFront = doc.Create.NewDimension(view, dimensionLineTopSecond,
-                                                                           refArrayFormworkGridFront, ViewModel.SelectedDimensionType);
+                                                                         refArrayFormworkGridFront, 
+                                                                         ViewModel.SelectedDimensionType);
             }
-
             if(!(onTopOfRebar && SheetInfo.RebarInfo.AllRebarAreL)) {
                 // Размер по ФРОНТУ опалубка + армирование (положение снизу 2)
-                var dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Bottom, 0.5);
+                var dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                                                                                      DimensionOffsetType.Bottom, 0.5);
                 // Добавляем ссылки на арматурные стержни
-                var refArrayFormworkRebarFrontSecond = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                             new List<string>() { rebarPart, "фронт" },
-                                                                         refArrayFormworkFront);
-                var dimensionFormworkRebarFrontFirst = doc.Create.NewDimension(view, dimensionLineBottomSecond,
-                                                                                  refArrayFormworkRebarFrontSecond, ViewModel.SelectedDimensionType);
+                var refArrayFormworkRebarFrontSecond = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
+                                                                                             '#', '/',
+                                                                                             [rebarPart, "фронт"],
+                                                                                             refArrayFormworkFront);
+                doc.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkRebarFrontSecond, 
+                                        ViewModel.SelectedDimensionType);
             }
-
-
             // Размер по ФРОНТУ опалубка + армирование в случае, если есть Г-стержни (положение снизу 0)
             if(onTopOfRebar && SheetInfo.RebarInfo.HasLRebar) {
-                var dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Bottom, 0);
+                var dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                                                                                   DimensionOffsetType.Bottom, 0);
                 // Добавляем ссылки на арматурные стержни
-                var refArrayFormworkRebarFrontSecond = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                             new List<string>() { "низ", "фронт" },
-                                                                         refArrayFormworkFront);
-                var dimensionFormworkRebarFrontSecond = doc.Create.NewDimension(view, dimensionLineTopSecond,
-                                                                                  refArrayFormworkRebarFrontSecond, ViewModel.SelectedDimensionType);
+                var refArrayFormworkRebarFrontSecond = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
+                                                                                             '#', '/',
+                                                                                             ["низ", "фронт"],
+                                                                                             refArrayFormworkFront);
+                doc.Create.NewDimension(view, dimensionLineTopSecond, refArrayFormworkRebarFrontSecond, 
+                                        ViewModel.SelectedDimensionType);
             }
-
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
             // Размер по ТОРЦУ опалубка (положение справа 1)
-            var dimensionLineRightFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Right, 1);
-            var refArrayFormworkSide = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems[0] as FamilyInstance, '#', '/',
-                                                                   new List<string>() { "торец", "край" });
+            var dimensionLineRightFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                                                                                DimensionOffsetType.Right, 1);
+            var refArrayFormworkSide = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance, 
+                                                                             '#', '/', ["торец", "край"]);
             var dimensionFormworkSide = doc.Create.NewDimension(view, dimensionLineRightFirst,
                                                                   refArrayFormworkSide, ViewModel.SelectedDimensionType);
 
-
             // Размер по ТОРЦУ опалубка + армирование (положение справа 2)
-            var dimensionLineRightSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Right, 0.5);
+            var dimensionLineRightSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                                                                                 DimensionOffsetType.Right, 0.5);
             // Добавляем ссылки на арматурные стержни
             var refArrayFormworkRebarSide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                        new List<string>() { rebarPart, "торец" },
-                                                                    refArrayFormworkSide);
+                                                                                  [rebarPart, "торец"],
+                                                                                  refArrayFormworkSide);
             var dimensionFormworkRebarSide = doc.Create.NewDimension(view, dimensionLineRightSecond,
-                                                                              refArrayFormworkRebarSide, ViewModel.SelectedDimensionType);
-
+                                                                     refArrayFormworkRebarSide, 
+                                                                     ViewModel.SelectedDimensionType);
             if(grids.Count > 0) {
                 // Размер по ТОРЦУ опалубка + оси (положение слева 1)
-                var dimensionLineLeft = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Left, 1.2);
-                var refArrayFormworkGridSide = dimensionBaseService.GetDimensionRefs(grids, view,
-                                                                                                new XYZ(1, 0, 0),
-                                                                                                refArrayFormworkSide);
+                var dimensionLineLeft = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                                                                              DimensionOffsetType.Left, 1.2);
+                var refArrayFormworkGridSide = dimensionBaseService.GetDimensionRefs(grids, view, XYZ.BasisX,
+                                                                                     refArrayFormworkSide);
                 var dimensionFormworkGridSide = doc.Create.NewDimension(view, dimensionLineLeft,
-                                                                          refArrayFormworkGridSide, ViewModel.SelectedDimensionType);
-
+                                                                        refArrayFormworkGridSide, 
+                                                                        ViewModel.SelectedDimensionType);
                 // Корректируем концы осей, приближая их на виде к опалубке пилона, чтобы сократить габариты
                 // видового экрана
                 var transverseViewGridOffsets = new OffsetOption() {
@@ -114,12 +114,11 @@ internal class TransViewDimensionService {
                     TopOffset = 0.6,
                     BottomOffset = 1.1
                 };
-                EditGridEnds(view, SheetInfo.HostElems.First() as FamilyInstance, grids, transverseViewGridOffsets, dimensionBaseService);
+                EditGridEnds(view, SheetInfo.HostElems.First() as FamilyInstance, grids, transverseViewGridOffsets, 
+                             dimensionBaseService);
             }
         } catch(Exception) { }
     }
-
-
 
 
     private void EditGridEnds(View view, FamilyInstance familyInstance,
@@ -136,13 +135,13 @@ internal class TransViewDimensionService {
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
                 var offsetLine1 = dimensionBaseService.GetDimensionLine(familyInstance,
-                                                                         DimensionOffsetType.Left,
-                                                                         offsetOption.LeftOffset, false);
+                                                                        DimensionOffsetType.Left,
+                                                                        offsetOption.LeftOffset, false);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
                 var offsetLine2 = dimensionBaseService.GetDimensionLine(familyInstance,
-                                                                         DimensionOffsetType.Right,
-                                                                         offsetOption.RightOffset, false);
+                                                                        DimensionOffsetType.Right,
+                                                                        offsetOption.RightOffset, false);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
                 var newLine = Line.CreateBound(pt1, pt2);
@@ -152,13 +151,13 @@ internal class TransViewDimensionService {
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
                 var offsetLine1 = dimensionBaseService.GetDimensionLine(familyInstance,
-                                                                         DimensionOffsetType.Bottom,
-                                                                         offsetOption.BottomOffset, false);
+                                                                        DimensionOffsetType.Bottom,
+                                                                        offsetOption.BottomOffset, false);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
                 var offsetLine2 = dimensionBaseService.GetDimensionLine(familyInstance,
-                                                                         DimensionOffsetType.Top,
-                                                                         offsetOption.TopOffset, false);
+                                                                        DimensionOffsetType.Top,
+                                                                        offsetOption.TopOffset, false);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
                 var newLine = Line.CreateBound(pt1, pt2);

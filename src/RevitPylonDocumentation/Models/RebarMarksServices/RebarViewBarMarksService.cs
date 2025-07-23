@@ -7,7 +7,7 @@ using dosymep.Revit;
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models.RebarMarksServices;
-internal class TransverseRebarViewBarMarksService {
+internal class RebarViewBarMarksService {
     private readonly string _commentParamName = "Комментарии";
 
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
@@ -15,7 +15,7 @@ internal class TransverseRebarViewBarMarksService {
     private readonly FamilySymbol _tagSymbolWithoutSerif;
     private readonly FamilySymbol _gostTagSymbol;
 
-    public TransverseRebarViewBarMarksService(PylonView pylonView, RevitRepository revitRepository) {
+    public RebarViewBarMarksService(PylonView pylonView, RevitRepository revitRepository) {
         _viewPointsAnalyzer = new ViewPointsAnalyzer(pylonView);
         _annotationService = new AnnotationService(pylonView);
 

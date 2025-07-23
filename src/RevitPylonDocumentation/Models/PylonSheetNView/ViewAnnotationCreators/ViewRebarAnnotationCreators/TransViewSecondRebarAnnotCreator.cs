@@ -6,7 +6,8 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
 internal class TransViewSecondRebarAnnotCreator : ViewAnnotationCreator {
-    public TransViewSecondRebarAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) 
+    public TransViewSecondRebarAnnotCreator(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+                                            PylonView pylonView) 
         : base(mvm, repository, pylonSheetInfo, pylonView) {
     }
 
@@ -19,7 +20,7 @@ internal class TransViewSecondRebarAnnotCreator : ViewAnnotationCreator {
 
         // Пытаемся создать марки на виде
         try {
-            var creator = new TransverseViewRebarMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            var creator = new TransViewRebarMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             creator.CreateTransverseRebarViewBarMarks();
             creator.CreateTransverseRebarViewPlateMarks();
         } catch(Exception) { }

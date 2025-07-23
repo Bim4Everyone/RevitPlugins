@@ -33,17 +33,17 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
 
             var dimensionService = new GeneralViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.CreatePylonDimensions(skeletonParentRebar, grids, dimensionBaseService);
+            dimensionService.TryCreatePylonDimensions(skeletonParentRebar, grids, dimensionBaseService);
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.CreateClampsDimensions(clampsParentRebars, dimensionBaseService);
-            dimensionService.CreateTopAdditionalDimensions(skeletonParentRebar, dimensionBaseService);
-            dimensionService.CreatePylonDimensions(SheetInfo.HostElems, dimensionBaseService);
+            dimensionService.TryCreatePylonDimensions(SheetInfo.HostElems, dimensionBaseService);
+            dimensionService.TryCreateClampsDimensions(clampsParentRebars, dimensionBaseService);
+            dimensionService.TryCreateTopAdditionalDimensions(skeletonParentRebar, dimensionBaseService);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде
         try {
             var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
-            markService.CreatePylonElevMark(SheetInfo.HostElems, dimensionBaseService);
+            markService.TryCreatePylonElevMark(SheetInfo.HostElems, dimensionBaseService);
         } catch(Exception) { }
     }
 }
