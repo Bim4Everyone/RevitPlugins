@@ -21,8 +21,8 @@ internal class TransViewFirstRebarAnnotCreator : ViewAnnotationCreator {
         // Пытаемся создать марки на виде
         try {
             var markService = new TransViewRebarMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
-            markService.CreateTransverseRebarViewBarMarks();
-            markService.CreateTransverseRebarViewPlateMarks();
+            markService.TryCreateBarMarks();
+            markService.TryCreatePlateMarks();
         } catch(Exception) { }
     }
 }

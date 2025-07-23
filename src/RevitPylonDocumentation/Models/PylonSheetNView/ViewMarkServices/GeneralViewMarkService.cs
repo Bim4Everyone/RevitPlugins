@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -7,7 +8,8 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices;
 internal class GeneralViewMarkService {
-    internal GeneralViewMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, PylonView pylonView) {
+    internal GeneralViewMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
+                                    PylonView pylonView) {
         ViewModel = mvm;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
@@ -28,16 +30,16 @@ internal class GeneralViewMarkService {
     /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
     internal void TryCreatePylonElevMark(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
         try {
-            var location = dimensionBaseService.GetDimensionLine(hostElems[0] as FamilyInstance, DimensionOffsetType.Left, 2)
-                                           .Origin;
+            var location = dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance, 
+                                                                 DimensionOffsetType.Left, 2).Origin;
             foreach(var item in hostElems) {
                 if(item is not FamilyInstance hostElem) { return; }
 
                 // Собираем опорные плоскости по опалубке, например:
                 // #_1_горизонт_край_низ
                 // #_1_горизонт_край_верх
-                ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
-
+                ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', 
+                                                                                    ["горизонт", "край"]);
                 foreach(Reference reference in refArraySide) {
                     SpotDimension spotElevation = Repository.Document.Create.NewSpotElevation(
                         ViewOfPylon.ViewElement,
