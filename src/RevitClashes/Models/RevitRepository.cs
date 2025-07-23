@@ -19,6 +19,7 @@ using RevitClashDetective.Models.Extensions;
 using RevitClashDetective.Models.FilterableValueProviders;
 using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
+using RevitClashDetective.Models.Interfaces;
 
 using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
 
@@ -315,6 +316,38 @@ namespace RevitClashDetective.Models {
                 ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.");
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
                 ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.");
+            }
+        }
+
+        public void SelectAndShowElement(ICollection<ElementModel> elements, IView3DSetting viewSettings) {
+            if(elements is null) {
+                throw new ArgumentNullException(nameof(elements));
+            }
+            if(elements.Count == 0) {
+                throw new ArgumentOutOfRangeException(nameof(elements));
+            }
+            if(viewSettings is null) {
+                throw new ArgumentNullException(nameof(viewSettings));
+            }
+
+            try {
+                _uiDocument.ActiveView = _view;
+                _revitEventHandler.TransactAction = () => {
+                    try {
+                        viewSettings.Apply(_view);
+                    } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                        ShowErrorMessage("Не удалось применить настройки графики");
+                    }
+                };
+                _revitEventHandler.Raise();
+                _uiDocument.Selection.SetElementIds(
+                    GetElementsToSelect(elements.Select(e => e.GetElement(DocInfos)), _view));
+            } catch(AccessViolationException) {
+                ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который был закрыт, " +
+                    "нельзя показать элемент.");
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который сейчас не активен, " +
+                    "нельзя показать элемент.");
             }
         }
 

@@ -1,0 +1,27 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="Ok">OK</system:String>
+    <system:String
+        x:Key="Cancel">Cancel</system:String>
+
+    <system:String
+        x:Key="SettingsWindow.Title">Settings</system:String>
+
+    <system:String
+        x:Key="ElementVisibilitySettings.ColorLabel">Color:</system:String>
+    <system:String
+        x:Key="ElementVisibilitySettings.TransparencyLabel">Transparency:</system:String>
+
+    <system:String
+        x:Key="SettingsWindow.Validation.TransparancyLessThanZero">Transparency cannot be less than 0</system:String>
+    <system:String
+        x:Key="SettingsWindow.Validation.TransparancyGreaterThanHundred">Transparency cannot be more than 100%</system:String>
+    <system:String
+        x:Key="SettingsWindow.MainElementVisibilitySettings">Visibility settings for the first collision element</system:String>
+    <system:String
+        x:Key="SettingsWindow.SecondElementVisibilitySettings">Visibility settings for the second collision element</system:String>
+</ResourceDictionary>
