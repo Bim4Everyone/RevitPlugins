@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows;
 
 using RevitCorrectNamingCheck.Models;
-using System.Diagnostics;
 using System.Windows.Media;
 
 namespace RevitCorrectNamingCheck.Views.Selectors
@@ -29,10 +23,6 @@ namespace RevitCorrectNamingCheck.Views.Selectors
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container) {
             var linkedFile = FindParent<DataGridRow>(container)?.DataContext as LinkedFile;
-
-            if(linkedFile.FileNameStatus == NameStatus.Incorrect) {
-                return DisabledTemplate;
-            }
 
             if(item is WorksetInfo worksetInfo) {
                 return worksetInfo.WorksetNameStatus switch {

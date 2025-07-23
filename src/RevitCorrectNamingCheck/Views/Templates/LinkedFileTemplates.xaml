@@ -25,7 +25,7 @@
                 <Setter
                     TargetName="StatusBorder"
                     Property="Background"
-                    Value="MistyRose" />
+                    Value="LightYellow" />
 
                 <Setter
                     TargetName="StatusBorder"
