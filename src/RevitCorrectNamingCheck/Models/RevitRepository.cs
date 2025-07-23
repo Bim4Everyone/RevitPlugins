@@ -95,7 +95,7 @@ internal class RevitRepository {
             foreach(var instance in instances) {
                 var typeWorkset = new WorksetInfo(linkType.WorksetId, GetWorksetName(linkType));
                 var instanceWorkset = new WorksetInfo(instance.WorksetId, GetWorksetName(instance));
-                var linkedFile = new LinkedFile(linkType.Id, linkType.Name, typeWorkset, instanceWorkset);
+                var linkedFile = new LinkedFile(linkType.Id, linkType.Name, instance.Pinned, typeWorkset, instanceWorkset);
 
                 linkedFileEnricher.Enrich(linkedFile);
                 result.Add(linkedFile);
