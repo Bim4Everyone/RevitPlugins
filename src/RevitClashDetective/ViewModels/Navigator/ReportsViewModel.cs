@@ -141,11 +141,11 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
         private void SelectClash(ClashViewModel clash) {
             IView3DSetting settings;
+            var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
             if(ElementsIsolationEnabled) {
-                settings = new ClashIsolationViewSettings(_revitRepository, clash.Clash,
-                    SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>()));
+                settings = new ClashIsolationViewSettings(_revitRepository, clash.Clash, config);
             } else {
-                settings = new ClashDefaultViewSettings(_revitRepository, clash.Clash);
+                settings = new ClashDefaultViewSettings(_revitRepository, clash.Clash, config);
             }
             _revitRepository.SelectAndShowElement([clash.Clash.MainElement, clash.Clash.OtherElement], settings);
         }

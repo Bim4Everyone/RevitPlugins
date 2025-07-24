@@ -30,7 +30,8 @@ internal class ClashIsolationViewSettings : IView3DSetting {
             10);
         bboxSettings.Apply(view3D);
         IsolateClashElements(view3D, _clashModel);
-        ColorClashElements(view3D, _clashModel);
+        var colorSettings = new ColorClashViewSettings(_revitRepository, _clashModel, _config);
+        colorSettings.Apply(view3D);
     }
 
     private void IsolateClashElements(View3D view, ClashModel clash) {
@@ -48,55 +49,7 @@ internal class ClashIsolationViewSettings : IView3DSetting {
         }
     }
 
-    private void ColorClashElements(View3D view, ClashModel clash) {
-        var firstEl = clash.MainElement.GetElement(_revitRepository.DocInfos);
-        var secondEl = clash.OtherElement.GetElement(_revitRepository.DocInfos);
-        if(firstEl != null && secondEl != null) {
-            string username = _revitRepository.Doc.Application.Username;
-            using(Transaction t = _revitRepository.Doc.StartTransaction("Настройка графики элементов коллизии")) {
-                var firstElFilter = _revitRepository.ParameterFilterProvider.GetSelectFilter(
-                    _revitRepository.Doc,
-                    firstEl,
-                    $"{RevitRepository.FiltersNamePrefix}первый_элемент_{username}");
-                var secondElFilter = _revitRepository.ParameterFilterProvider.GetSelectFilter(
-                    _revitRepository.Doc,
-                    secondEl,
-                    $"{RevitRepository.FiltersNamePrefix}второй_элемент_{username}");
 
-                view.AddFilter(firstElFilter.Id);
-                view.SetFilterOverrides(firstElFilter.Id, GetGraphicSettings(_config.MainElementVisibilitySettings));
-                view.AddFilter(secondElFilter.Id);
-                view.SetFilterOverrides(secondElFilter.Id, GetGraphicSettings(_config.SecondElementVisibilitySettings));
-                t.Commit();
-            }
-        }
-    }
-
-    private OverrideGraphicSettings GetGraphicSettings(ElementVisibilitySettings settings) {
-        var color = new Color(settings.Color.R, settings.Color.G, settings.Color.B);
-        var graphicOverrides = new OverrideGraphicSettings();
-
-        graphicOverrides
-            .SetSurfaceTransparency(settings.Transparency)
-            .SetCutBackgroundPatternColor(color)
-            .SetCutForegroundPatternColor(color)
-            .SetSurfaceBackgroundPatternColor(color)
-            .SetSurfaceForegroundPatternColor(color);
-
-        var solidFillPattern = new FilteredElementCollector(_revitRepository.Doc)
-            .OfClass(typeof(FillPatternElement))
-            .OfType<FillPatternElement>()
-            .FirstOrDefault(item => item.GetFillPattern().IsSolidFill);
-        if(solidFillPattern != null) {
-            graphicOverrides
-                .SetSurfaceBackgroundPatternId(solidFillPattern.Id)
-                .SetSurfaceForegroundPatternId(solidFillPattern.Id)
-                .SetCutBackgroundPatternId(solidFillPattern.Id)
-                .SetCutForegroundPatternId(solidFillPattern.Id);
-        }
-
-        return graphicOverrides;
-    }
 
     private ICollection<ParameterFilterElement> GetIsolationFilters(ClashModel clash, View view) {
         string username = _revitRepository.Doc.Application.Username;
