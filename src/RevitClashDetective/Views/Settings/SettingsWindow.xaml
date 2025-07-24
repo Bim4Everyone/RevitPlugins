@@ -85,6 +85,7 @@
 
         <ui:TitleBar
             Grid.Row="0"
+            ShowMaximize="False"
             Title="{me:LocalizationSource SettingsWindow.Title}" />
 
         <StackPanel

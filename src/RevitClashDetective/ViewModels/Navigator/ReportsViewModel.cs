@@ -12,7 +12,9 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.RevitClashReport;
+using RevitClashDetective.Services.RevitViewSettings;
 
 namespace RevitClashDetective.ViewModels.Navigator {
 
@@ -137,7 +139,13 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private bool CanDelete() => SelectedReport != null;
 
         private void SelectClash(ClashViewModel clash) {
-            _revitRepository.SelectAndShowElement(clash.Clash, ElementsIsolationEnabled);
+            IView3DSetting settings;
+            if(ElementsIsolationEnabled) {
+                settings = new ClashIsolationViewSettings(_revitRepository, clash.Clash);
+            } else {
+                settings = new ClashDefaultViewSettings(_revitRepository, clash.Clash);
+            }
+            _revitRepository.SelectAndShowElement([clash.Clash.MainElement, clash.Clash.OtherElement], settings);
         }
 
         private bool CanSelectClash(ClashViewModel p) {

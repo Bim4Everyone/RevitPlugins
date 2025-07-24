@@ -9,11 +9,13 @@ using RevitClashDetective.Models;
 
 namespace RevitClashDetective.ViewModels.Settings;
 internal class SettingsViewModel : BaseViewModel {
+    private readonly RevitRepository _revitRepository;
     private readonly SettingsConfig _config;
     private readonly ILocalizationService _localizationService;
     private string _errorText;
 
-    public SettingsViewModel(SettingsConfig config, ILocalizationService localizationService) {
+    public SettingsViewModel(RevitRepository revitRepository, SettingsConfig config, ILocalizationService localizationService) {
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _config = config ?? throw new ArgumentNullException(nameof(config));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
 

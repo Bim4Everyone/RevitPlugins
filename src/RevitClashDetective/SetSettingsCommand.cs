@@ -13,6 +13,8 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.Settings;
 using RevitClashDetective.Views.Settings;
 
@@ -28,6 +30,12 @@ internal class SetSettingsCommand : BasePluginCommand {
         using var kernel = uiApplication.CreatePlatformServices();
 
         kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
 

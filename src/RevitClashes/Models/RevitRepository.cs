@@ -37,23 +37,6 @@ namespace RevitClashDetective.Models {
         private readonly ParameterFilterProvider _parameterFilterProvider;
         public const string FiltersNamePrefix = "BIM_коллизии_";
 
-        public RevitRepository(Application application, Document document) {
-            _application = application ?? throw new ArgumentNullException(nameof(application));
-            _uiApplication = new UIApplication(application);
-
-            _document = document ?? throw new ArgumentNullException(nameof(document));
-            _uiDocument = new UIDocument(document);
-
-            _revitEventHandler = new RevitEventHandler();
-            _endings.Add("_" + _application.Username);
-
-            _view = GetClashView();
-            _parameterFilterProvider = new ParameterFilterProvider();
-
-            CommonConfig = RevitClashDetectiveConfig.GetRevitClashDetectiveConfig();
-
-            InitializeDocInfos();
-        }
 
         public RevitRepository(
             UIApplication uiApplication,
@@ -74,6 +57,9 @@ namespace RevitClashDetective.Models {
             CommonConfig = RevitClashDetectiveConfig.GetRevitClashDetectiveConfig();
             InitializeDocInfos();
         }
+
+
+        public ParameterFilterProvider ParameterFilterProvider => _parameterFilterProvider;
 
         public static string ProfilePath {
             get {
@@ -286,39 +272,6 @@ namespace RevitClashDetective.Models {
             SelectAndShowElement(elements.Select(item => item.GetElement(DocInfos)), bbox, additionalSize, view);
         }
 
-        public void SelectAndShowElement(ClashModel clashModel, bool isolateClashElements) {
-            if(clashModel is null || clashModel.OtherElement is null || clashModel.MainElement is null) {
-                throw new ArgumentNullException(nameof(clashModel));
-            }
-
-            try {
-                var view = _view;
-                _uiDocument.ActiveView = view;
-                var bbox = GetCommonBoundingBox(clashModel);
-
-                if(bbox != null) {
-                    _revitEventHandler.TransactAction = () => {
-                        SetSectionBox(bbox, view, 10);
-                        try {
-                            if(isolateClashElements) {
-                                HighlightClashElements(view, clashModel);
-                            } else {
-                                ClearViewFilters(view);
-                            }
-                        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                            ShowErrorMessage("Не удалось выделить элементы коллизии");
-                        }
-                    };
-                    _revitEventHandler.Raise();
-                }
-                _uiDocument.Selection.SetElementIds(GetElementsToSelect(clashModel, view));
-            } catch(AccessViolationException) {
-                ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который был закрыт, нельзя показать элемент.");
-            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который сейчас не активен, нельзя показать элемент.");
-            }
-        }
-
         public void SelectAndShowElement(ICollection<ElementModel> elements, IView3DSetting viewSettings) {
             if(elements is null) {
                 throw new ArgumentNullException(nameof(elements));
@@ -341,7 +294,7 @@ namespace RevitClashDetective.Models {
                 };
                 _revitEventHandler.Raise();
                 _uiDocument.Selection.SetElementIds(
-                    GetElementsToSelect(elements.Select(e => e.GetElement(DocInfos)), _view));
+                    GetElementsToSelect(elements.Select(e => e.GetElement(DocInfos)).Where(e => e != null), _view));
             } catch(AccessViolationException) {
                 ShowErrorMessage("Окно плагина было открыто в другом документе Revit, который был закрыт, " +
                     "нельзя показать элемент.");
@@ -464,8 +417,7 @@ namespace RevitClashDetective.Models {
             }
         }
 
-
-        private ICollection<ElementId> GetLineCategoriesToHide() {
+        public ICollection<ElementId> GetLineCategoriesToHide() {
             return new ElementId[] {
                 new ElementId(BuiltInCategory.OST_MEPSpaceSeparationLines),
                 new ElementId(BuiltInCategory.OST_RoomSeparationLines),
@@ -529,16 +481,6 @@ namespace RevitClashDetective.Models {
             return view;
         }
 
-
-        private ICollection<ElementId> GetElementsToSelect(ClashModel clashModel, View3D view = null) {
-            return GetElementsToSelect(new[] {
-                clashModel.MainElement,
-                clashModel.OtherElement }
-            .Select(e => e.GetElement(DocInfos))
-            .Where(e => e != null),
-                view);
-        }
-
         private ICollection<ElementId> GetElementsToSelect(IEnumerable<Element> elements, View3D view = null) {
             if(elements is null) { throw new ArgumentNullException(nameof(elements)); }
 
@@ -554,11 +496,7 @@ namespace RevitClashDetective.Models {
             }
         }
 
-        private BoundingBoxXYZ GetCommonBoundingBox(ClashModel clashModel) {
-            return GetCommonBoundingBox(new ElementModel[] { clashModel.MainElement, clashModel.OtherElement });
-        }
-
-        private BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<ElementModel> elements) {
+        public BoundingBoxXYZ GetCommonBoundingBox(IEnumerable<ElementModel> elements) {
             return elements
                 .Select(item => new {
                     Bb = item.GetElement(DocInfos)?.get_BoundingBox(null),
@@ -595,7 +533,7 @@ namespace RevitClashDetective.Models {
         /// <param name="bb">Ограничивающий бокс, на основе которого будет строиться область подрезки</param>
         /// <param name="view">3D Вид для задания области подрезки</param>
         /// <param name="additionalSize">Добавочный размер в футах, на который нужно увеличить бокс в каждом направлении: OX, OY, OZ</param>
-        private void SetSectionBox(BoundingBoxXYZ bb, View3D view, double additionalSize) {
+        public void SetSectionBox(BoundingBoxXYZ bb, View3D view, double additionalSize) {
             if(bb == null)
                 return;
             using(Transaction t = _document.StartTransaction("Подрезка")) {
@@ -607,73 +545,6 @@ namespace RevitClashDetective.Models {
                 if(uiView != null) {
                     uiView.ZoomAndCenterRectangle(bb.Min, bb.Max);
                 }
-                t.Commit();
-            }
-        }
-
-        private void HighlightClashElements(View3D view, ClashModel clash) {
-            using(Transaction t = _document.StartTransaction("Выделение элементов коллизии")) {
-                var filtersToHide = GetHighlightFilters(clash, view);
-                view = RemoveFilters(view);
-                foreach(var filter in filtersToHide) {
-                    view.AddFilter(filter.Id);
-                    view.SetFilterVisibility(filter.Id, false);
-                }
-                foreach(var category in GetLineCategoriesToHide()) {
-                    view.SetCategoryHidden(category, true);
-                }
-                t.Commit();
-            }
-        }
-
-        private ICollection<ParameterFilterElement> GetHighlightFilters(ClashModel clash, View view) {
-            string username = _document.Application.Username;
-            var filters = new List<ParameterFilterElement>() {
-                _parameterFilterProvider.GetExceptCategoriesFilter(
-                    _document,
-                    view,
-                    GetClashCategories(clash),
-                    $"{FiltersNamePrefix}не_категории_элементов_коллизии_{username}")
-            };
-            var firstEl = clash.MainElement.GetElement(DocInfos);
-            var secondEl = clash.OtherElement.GetElement(DocInfos);
-            if(firstEl?.Category.GetBuiltInCategory() == secondEl?.Category.GetBuiltInCategory()) {
-                filters.Add(
-                    _parameterFilterProvider.GetHighlightFilter(
-                        _document,
-                        firstEl,
-                        secondEl,
-                        $"{FiltersNamePrefix}не_элементы_категории_коллизии_{username}"));
-            } else {
-                if(firstEl != null) {
-                    filters.Add(
-                        _parameterFilterProvider.GetHighlightFilter(
-                            _document,
-                            firstEl,
-                            $"{FiltersNamePrefix}не_первый_элемент_{username}"));
-                }
-                if(secondEl != null) {
-                    filters.Add(
-                        _parameterFilterProvider.GetHighlightFilter(
-                            _document,
-                            secondEl,
-                            $"{FiltersNamePrefix}не_второй_элемент_{username}"));
-                }
-            }
-            return filters;
-        }
-
-        private ICollection<BuiltInCategory> GetClashCategories(ClashModel clash) {
-            var elements = new[] { clash.MainElement, clash.OtherElement };
-            return elements.Select(e => e.GetElement(DocInfos))
-                .Where(e => e != null)
-                .Select(e => e.Category.GetBuiltInCategory())
-                .ToHashSet();
-        }
-
-        private void ClearViewFilters(View3D view) {
-            using(Transaction t = _document.StartTransaction("Сброс фильтров элементов коллизии")) {
-                RemoveFilters(view);
                 t.Commit();
             }
         }
