@@ -65,4 +65,6 @@
     <system:String x:Key="ToggleSwitch.On">On</system:String>
     <system:String x:Key="ToggleSwitch.Off">Off</system:String>
     
+    <system:String x:Key="ViewSheet.NotFoundTitleBlock">Not found title block on a sheet "{0}".</system:String>
+    
 </ResourceDictionary>

@@ -10,6 +10,8 @@ using Autodesk.Revit.UI;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
+using InvalidOperationException = Autodesk.Revit.Exceptions.InvalidOperationException;
+
 namespace RevitBatchPrint.Models {
     internal class RevitRepository {
         private readonly PrintManager _printManager;
@@ -102,7 +104,8 @@ namespace RevitBatchPrint.Models {
             FamilyInstance familyInstance = GetTitleBlock(viewSheet);
 
             if(familyInstance is null) {
-                throw new ArgumentNullException(nameof(familyInstance));
+                throw new System.InvalidOperationException(
+                    _localizationService.GetLocalizedString("ViewSheet.NotFoundTitleBlock", viewSheet.Name));
             }
 
             double sheetWidth = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_WIDTH);

@@ -64,4 +64,6 @@
     
     <system:String x:Key="ToggleSwitch.On">Включено</system:String>
     <system:String x:Key="ToggleSwitch.Off">Выключено</system:String>
+    
+    <system:String x:Key="ViewSheet.NotFoundTitleBlock">Не была найдена основная надпись на листе "{0}".</system:String>
 </ResourceDictionary>
