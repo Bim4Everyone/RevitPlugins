@@ -32,7 +32,7 @@ internal class GeneralViewRebarPerpDimensionService {
         try {
             // Если хотя бы один из стержней - Г-образный,тогда нет смысле ставить этот размер
             // Ставится только когда обе бутылки
-            if(!SheetInfo.RebarInfo.HasLRebar) { return; }
+            if(SheetInfo.RebarInfo.HasLRebar) { return; }
             var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top);
             var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "торец"]);
             Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineTop, refArrayTop, 
@@ -178,13 +178,13 @@ internal class GeneralViewRebarPerpDimensionService {
             var refArrayTop_1 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["1_торец"]);
             var dimensionTop_1 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop_1,
                                                          ViewModel.SelectedDimensionType);
-            if(dimensionTop_1.Value == 0) {
+            if(dimensionTop_1.ValueString == "0") {
                 doc.Delete(dimensionTop_1.Id);
             }
             var refArrayTop_2 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["2_торец"]);
             var dimensionTop_2 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop_2,
                                                          ViewModel.SelectedDimensionType);
-            if(dimensionTop_2.Value == 0) {
+            if(dimensionTop_2.ValueString == "0") {
                 doc.Delete(dimensionTop_2.Id);
             }
         } catch(Exception) { }
