@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -52,6 +53,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         RevitExportToPdf revitExport,
         IPrinterService printerService,
         ILocalizationService localizationService,
+        IMessageBoxService messageBoxService,
         ISaveFileDialogService saveFileDialogService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -62,19 +64,26 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         _printerService = printerService;
         _localizationService = localizationService;
         _saveFileDialogService = saveFileDialogService;
+        MessageBoxService = messageBoxService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
-        AcceptVewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        AcceptVewCommand = RelayCommand.Create<Window>(AcceptView, CanAcceptView);
 
         ChangeModeCommand = RelayCommand.Create(ChangeMode);
         ChooseSaveFileCommand = RelayCommand.Create(ChooseSaveFile);
 
         SearchCommand = RelayCommand.Create(ApplySearch);
         ChangeAlbumNameCommand = RelayCommand.Create(ChangeAlbumName);
-
+        
+#if REVIT_2021_OR_LESS
         ShowPrint = true;
         ShowExport = false;
         _currentPrintExport = _revitPrint;
+#else
+        ShowPrint = false;
+        ShowExport = true;
+        _currentPrintExport = _revitExport;
+#endif
     }
 
     public ICommand LoadViewCommand { get; }
@@ -85,6 +94,8 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
 
     public ICommand SearchCommand { get; set; }
     public ICommand ChangeAlbumNameCommand { get; set; }
+
+    public IMessageBoxService MessageBoxService { get; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -166,14 +177,28 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         }
     }
 
-    private void AcceptView() {
+    private void AcceptView(Window window) {
         SaveConfig();
 
         IEnumerable<SheetViewModel> sheets = MainAlbums
             .SelectMany(item => item.MainSheets)
-            .Where(item => item.IsSelected);
+            .Where(item => item.IsSelected)
+            .ToArray();
+
+        if(sheets.Any(item => item.ViewsWithoutCrop.Count > 0)) {
+            var messageBoxResult = MessageBoxService.Show(
+                _localizationService.GetLocalizedString("MainWindow.SheetsWithoutCropMessage"),
+                _localizationService.GetLocalizedString("MainWindow.Title"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if(messageBoxResult == MessageBoxResult.No) {
+                throw new OperationCanceledException();
+            }
+        }
 
         ExecutePrintExport(sheets);
+        window.DialogResult = true;
     }
 
     public void ExecutePrintExport(IEnumerable<SheetViewModel> sheets) {
@@ -188,7 +213,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         return CanAcceptView(false);
     }
 
-    private bool CanAcceptView() {
+    private bool CanAcceptView(Window window) {
         return CanAcceptView(true);
     }
 
@@ -233,10 +258,10 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     }
 
     private void CreateAlbumCollection() {
-        AlbumViewModel[] albums = _revitRepository.GetViewSheets()
+        AlbumViewModel[] albums = _revitRepository.GetSheetsInfo()
             .GroupBy(item => string.IsNullOrEmpty(AlbumParamName)
                 ? null
-                : item.GetParamValueOrDefault<string>(AlbumParamName))
+                : item.ViewSheet.GetParamValueOrDefault<string>(AlbumParamName))
             .Select(item => CreateAlbum(item.Key, item))
             .OrderBy(item => item.Name)
             .ToArray();
@@ -246,26 +271,39 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         FilteredAlbums = new ObservableCollection<AlbumViewModel>(albums);
     }
 
-    private AlbumViewModel CreateAlbum(string albumName, IEnumerable<ViewSheet> viewSheets) {
-        var viewModel = new AlbumViewModel(albumName, this, _localizationService);
+    private AlbumViewModel CreateAlbum(
+        string albumName,
+        IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
+        var viewModel = new AlbumViewModel(albumName, this, MessageBoxService, _localizationService);
 
-        SheetViewModel[] sheets = CreateSheetCollection(viewModel, viewSheets);
+        SheetViewModel[] sheets = CreateSheetCollection(viewModel, sheetsInfo);
         viewModel.MainSheets = new ObservableCollection<SheetViewModel>(sheets);
         viewModel.FilteredSheets = new ObservableCollection<SheetViewModel>(sheets);
+
+        viewModel.ViewsWithoutCrop = new ObservableCollection<string>(
+            viewModel.MainSheets
+                .Where(item => item.ViewsWithoutCrop.Count > 0)
+                .Select(item => item.Name)
+                .ToList());
 
         return viewModel;
     }
 
-    private SheetViewModel[] CreateSheetCollection(AlbumViewModel album, IEnumerable<ViewSheet> viewSheets) {
-        return viewSheets
-            .Select(item => CreateSheet(item, album))
+    private SheetViewModel[] CreateSheetCollection(
+        AlbumViewModel album,
+        IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
+        return sheetsInfo
+            .Select(item => CreateSheet(album, item))
             .OrderBy(item => item.Name)
             .ToArray();
     }
 
-    private SheetViewModel CreateSheet(ViewSheet viewSheet, AlbumViewModel album) {
-        return new SheetViewModel(viewSheet, album, this) {
-            PrintSheetSettings = _revitRepository.GetPrintSettings(viewSheet)
+    private SheetViewModel CreateSheet(
+        AlbumViewModel album,
+        (ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports) sheetsInfo) {
+        return new SheetViewModel(sheetsInfo.ViewSheet, album, this, MessageBoxService, _localizationService) {
+            PrintSheetSettings = _revitRepository.GetPrintSettings(sheetsInfo.TitleBlock),
+            ViewsWithoutCrop = new ObservableCollection<string>(sheetsInfo.Viewports?.Select(item => item.Name) ?? [])
         };
     }
 
@@ -276,12 +314,12 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
         AlbumParamName = AlbumParamNames
-                               .FirstOrDefault(item =>
-                                   item.Equals(setting?.AlbumParamName))
-                           ?? AlbumParamNames
-                               .FirstOrDefault(item =>
-                                   PluginSystemConfig.PrintParamNames.Contains(item))
-                           ?? AlbumParamNames.FirstOrDefault();
+                             .FirstOrDefault(item =>
+                                 item.Equals(setting?.AlbumParamName))
+                         ?? AlbumParamNames
+                             .FirstOrDefault(item =>
+                                 PluginSystemConfig.PrintParamNames.Contains(item))
+                         ?? AlbumParamNames.FirstOrDefault();
 
         PrintOptions = new PrintOptionsViewModel(
             _printerService.EnumPrinterNames(),

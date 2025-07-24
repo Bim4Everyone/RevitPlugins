@@ -5,7 +5,8 @@
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
                     xmlns:db="clr-namespace:Autodesk.Revit.DB;assembly=RevitAPI"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
+                    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
@@ -97,15 +98,39 @@
                 </b:Interaction.Triggers>
             </CheckBox>
 
-            <ui:TextBlock
+            <StackPanel
                 Grid.Column="1"
                 x:Name="FormatName"
-                Margin="0 0 12 0"
-                FontTypography="Body"
-                HorizontalAlignment="Right"
+                Orientation="Horizontal"
                 VerticalAlignment="Center"
-                Text="{Binding PrintSheetSettings.SheetFormat.Name}" />
+                HorizontalAlignment="Right"
+                Margin="0 0 12 0">
+                
+                <ui:TextBlock
+                    FontTypography="Body"
+                    VerticalAlignment="Center"
+                    Text="{Binding PrintSheetSettings.SheetFormat.Name}" />
 
+                <ui:SymbolIcon
+                    Symbol="Warning24"
+                    Margin="12 0 0 0"
+                    VerticalAlignment="Center"
+                    ToolTip="{Binding ViewsWithoutCropText, Mode=OneWay}">
+                
+                    <ui:SymbolIcon.Style>
+                        <Style TargetType="ui:SymbolIcon">
+                            <Setter Property="Visibility" Value="Visible" />
+                
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ViewsWithoutCrop.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:SymbolIcon.Style>
+                </ui:SymbolIcon>
+            </StackPanel>
+            
             <StackPanel
                 Grid.Column="1"
                 x:Name="Buttons"
@@ -138,7 +163,7 @@
                 Binding="{Binding Path=IsMouseOver,
                     RelativeSource={RelativeSource AncestorType=TreeViewItem}}">
                 <Setter TargetName="Buttons" Property="Visibility" Value="Visible" />
-                <Setter TargetName="FormatName" Property="Margin" Value="0 0 70 0" />
+                <Setter TargetName="FormatName" Property="Margin" Value="0 0 58 0" />
             </DataTrigger>
         </HierarchicalDataTemplate.Triggers>
 

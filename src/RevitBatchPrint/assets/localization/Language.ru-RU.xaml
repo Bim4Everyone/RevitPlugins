@@ -9,6 +9,7 @@
     <system:String x:Key="MainWindow.EmptyAlbumNameParam">Без имени</system:String>
     <system:String x:Key="MainWindow.ChooseFileName">Выберите файл для сохранения</system:String>
 
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
     <system:String x:Key="MainWindow.PrintMode">Режим печати</system:String>
     <system:String x:Key="MainWindow.ExportMode">Режим экспорта</system:String>
 
@@ -17,7 +18,7 @@
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
-    
+
     <system:String x:Key="MainWindow.NotSelectedAlbumParamName">Выберите параметр группировки альбома</system:String>
     <system:String x:Key="MainWindow.NotSelectedPrinter">Выберите принтер для печати</system:String>
     <system:String x:Key="MainWindow.NotSelectedFilePath">Выберите путь до файла для экспорта</system:String>
@@ -52,16 +53,32 @@
 
     <system:String x:Key="Settings.ReplaceHalftoneWithThinLines">Заменить полутона тонкими линиями</system:String>
     <system:String x:Key="Settings.ReplaceHalftoneWithThinLinesDescription">Полутона отображаются тонкими линиями</system:String>
-    
+
     <system:String x:Key="ColorDepthType.BlackLine">Черные линии</system:String>
     <system:String x:Key="ColorDepthType.GrayScale">Оттенки серого</system:String>
     <system:String x:Key="ColorDepthType.Color">Цветное</system:String>
-    
+
     <system:String x:Key="RasterQualityType.Low">Низкое</system:String>
     <system:String x:Key="RasterQualityType.Medium">Среднее</system:String>
     <system:String x:Key="RasterQualityType.High">Высокое</system:String>
     <system:String x:Key="RasterQualityType.Presentation">Презентационное</system:String>
-    
+
     <system:String x:Key="ToggleSwitch.On">Включено</system:String>
     <system:String x:Key="ToggleSwitch.Off">Выключено</system:String>
+
+    <system:String x:Key="ViewSheet.NotFoundTitleBlock">Не была найдена основная надпись на листе "{0}".</system:String>
+    <system:String x:Key="TreeView.ViewsWithoutCropToolTip">Виды без подрезки:</system:String>
+    <system:String x:Key="TreeView.SheetsWithoutCropToolTip">Листы без подрезки:</system:String>
+
+    <system:String xml:space="preserve" x:Key="MainWindow.ViewsWithoutCropMessage">
+Предупреждение!
+Вы печатаете листы с видами без подрезки.
+Продолжить?
+</system:String>
+
+    <system:String xml:space="preserve" x:Key="MainWindow.SheetsWithoutCropMessage">
+Предупреждение!
+Вы печатаете листы с видами без подрезки.
+Продолжить?
+</system:String>
 </ResourceDictionary>
