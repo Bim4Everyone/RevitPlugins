@@ -251,10 +251,10 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     }
 
     private void CreateAlbumCollection() {
-        AlbumViewModel[] albums = _revitRepository.GetViewSheets()
+        AlbumViewModel[] albums = _revitRepository.GetSheetsInfo()
             .GroupBy(item => string.IsNullOrEmpty(AlbumParamName)
                 ? null
-                : item.GetParamValueOrDefault<string>(AlbumParamName))
+                : item.ViewSheet.GetParamValueOrDefault<string>(AlbumParamName))
             .Select(item => CreateAlbum(item.Key, item))
             .OrderBy(item => item.Name)
             .ToArray();
@@ -264,10 +264,12 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         FilteredAlbums = new ObservableCollection<AlbumViewModel>(albums);
     }
 
-    private AlbumViewModel CreateAlbum(string albumName, IEnumerable<ViewSheet> viewSheets) {
+    private AlbumViewModel CreateAlbum(
+        string albumName, 
+        IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
         var viewModel = new AlbumViewModel(albumName, this, MessageBoxService, _localizationService);
 
-        SheetViewModel[] sheets = CreateSheetCollection(viewModel, viewSheets);
+        SheetViewModel[] sheets = CreateSheetCollection(viewModel, sheetsInfo);
         viewModel.MainSheets = new ObservableCollection<SheetViewModel>(sheets);
         viewModel.FilteredSheets = new ObservableCollection<SheetViewModel>(sheets);
         
@@ -280,19 +282,21 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         return viewModel;
     }
 
-    private SheetViewModel[] CreateSheetCollection(AlbumViewModel album, IEnumerable<ViewSheet> viewSheets) {
-        return viewSheets
-            .Select(item => CreateSheet(item, album))
+    private SheetViewModel[] CreateSheetCollection(
+        AlbumViewModel album, 
+        IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
+        return sheetsInfo
+            .Select(item => CreateSheet(album, item))
             .OrderBy(item => item.Name)
             .ToArray();
     }
 
-    private SheetViewModel CreateSheet(ViewSheet viewSheet, AlbumViewModel album) {
-        return new SheetViewModel(viewSheet, album, this, MessageBoxService, _localizationService) {
-            PrintSheetSettings = _revitRepository.GetPrintSettings(viewSheet),
-            ViewsWithoutCrop = new ObservableCollection<string>(
-                _revitRepository.GetViewsWithoutCrop(viewSheet)
-                    .Select(item => item.Name))
+    private SheetViewModel CreateSheet(
+        AlbumViewModel album,
+        (ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports) sheetsInfo) {
+        return new SheetViewModel(sheetsInfo.ViewSheet, album, this, MessageBoxService, _localizationService) {
+            PrintSheetSettings = _revitRepository.GetPrintSettings(sheetsInfo.TitleBlock),
+            ViewsWithoutCrop = new ObservableCollection<string>(sheetsInfo.Viewports?.Select(item => item.Name) ?? [])
         };
     }
 

@@ -80,35 +80,45 @@ namespace RevitBatchPrint.Models {
                 .Distinct()
                 .ToList();
         }
-        
-        public List<ViewSheet> GetViewSheets() {
-            return new FilteredElementCollector(Document)
-                .OfClass(typeof(ViewSheet))
+
+        public List<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> GetSheetsInfo() {
+            Dictionary<ElementId, Viewport[]> viewPorts = GetViewPorts();
+            Dictionary<ElementId, FamilyInstance> titleBlocks = GetFamilyInstances();
+
+            // используем только основные надписи,
+            // потому что они используются в печати и требуются их размеры
+            IEnumerable<ElementId> sheetsIds = titleBlocks.Keys;
+
+            return sheetsIds
+                .Select(item => Document.GetElement(item))
                 .OfType<ViewSheet>()
                 .Where(item => item.CanBePrinted)
                 .Where(item => item.IsTemplate == false)
                 .Where(item => item.ViewType == ViewType.DrawingSheet)
-                .Where(item => GetTitleBlock(item) != null)
+                .Select(item => (item, 
+                    GetValueOrDefault(item.Id, titleBlocks), 
+                    GetValueOrDefault(item.Id, viewPorts)))
                 .ToList();
         }
 
-        public List<View> GetViewsWithoutCrop(ViewSheet viewSheet) {
-            return viewSheet.GetAllPlacedViews()
-                .Select(item => Document.GetElement(item))
-                .OfType<View>()
-                .Where(item => item.IsExistsParam(BuiltInParameter.VIEWER_CROP_REGION))
-                .Where(item => !item.CropBoxActive)
-                .ToList();
+        private Dictionary<ElementId, Viewport[]> GetViewPorts() {
+            return new FilteredElementCollector(Document)
+                .OfClass(typeof(Viewport))
+                .OfType<Viewport>()
+                .Where(item => item.GetParamValueOrDefault<int?>(BuiltInParameter.VIEWER_CROP_REGION) == 0)
+                .GroupBy(item => item.SheetId)
+                .ToDictionary(item => item.Key, item => item.ToArray());
+        }
+
+        private Dictionary<ElementId, FamilyInstance> GetFamilyInstances() {
+            return new FilteredElementCollector(Document)
+                .OfClass(typeof(FamilyInstance))
+                .OfType<FamilyInstance>()
+                .GroupBy(item => item.OwnerViewId)
+                .ToDictionary(item => item.Key, item => item.FirstOrDefault());
         }
         
-        public PrintSheetSettings GetPrintSettings(ViewSheet viewSheet) {
-            FamilyInstance familyInstance = GetTitleBlock(viewSheet);
-
-            if(familyInstance is null) {
-                throw new System.InvalidOperationException(
-                    _localizationService.GetLocalizedString("ViewSheet.NotFoundTitleBlock", viewSheet.Name));
-            }
-
+        public PrintSheetSettings GetPrintSettings(FamilyInstance familyInstance) {
             double sheetWidth = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_WIDTH);
             double sheetHeight = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_HEIGHT);
 
@@ -126,6 +136,10 @@ namespace RevitBatchPrint.Models {
             };
         }
         
+        private static PageOrientationType GetFormatOrientation(int width, int height) {
+            return width > height ? PageOrientationType.Landscape : PageOrientationType.Portrait;
+        }
+        
         public PaperSize GetPaperSizeByName(string formatName) {
             if(string.IsNullOrEmpty(formatName)) {
                 throw new ArgumentException($"'{nameof(formatName)}' cannot be null or empty.", nameof(formatName));
@@ -134,24 +148,14 @@ namespace RevitBatchPrint.Models {
             return _printManager.PaperSizes.OfType<PaperSize>().FirstOrDefault(item => item.Name.Equals(formatName));
         }
         
-        private FamilyInstance GetTitleBlock(ViewSheet viewSheet) {
-            if(viewSheet is null) {
-                throw new ArgumentNullException(nameof(viewSheet));
-            }
-
-            return (FamilyInstance) new FilteredElementCollector(Document, viewSheet.Id)
-                .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                .FirstOrDefault();
-        }
-        
-        private static PageOrientationType GetFormatOrientation(int width, int height) {
-            return width > height ? PageOrientationType.Landscape : PageOrientationType.Portrait;
-        }
-        
         private static string ReplaceInvalidChars(string filename) {
             return string.IsNullOrEmpty(filename)
                 ? null
                 : string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
+        }
+        
+        private T GetValueOrDefault<T>(ElementId key, Dictionary<ElementId, T> dictionary) {
+            return dictionary.TryGetValue(key, out T value) ? value : default;
         }
     }
 }
