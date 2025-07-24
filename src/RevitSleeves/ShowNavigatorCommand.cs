@@ -13,6 +13,8 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.Models.Interfaces;
 
 using RevitSleeves.Models;
@@ -39,6 +41,12 @@ internal class ShowNavigatorCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
         kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
         kernel.Bind<SleevePlacementSettingsConfig>()
