@@ -70,12 +70,14 @@
     <system:String x:Key="TreeView.SheetsWithoutCropToolTip">Листы без подрезки:</system:String>
 
     <system:String xml:space="preserve" x:Key="MainWindow.ViewsWithoutCropMessage">
-Предупреждение! Вы печатаете листы с видами без подрезки.
+Предупреждение!
+Вы печатаете листы с видами без подрезки.
 Продолжить?
 </system:String>
 
     <system:String xml:space="preserve" x:Key="MainWindow.SheetsWithoutCropMessage">
-Предупреждение! Вы печатаете листы с видами без подрезки.
+Предупреждение!
+Вы печатаете листы с видами без подрезки.
 Продолжить?
 </system:String>
 </ResourceDictionary>

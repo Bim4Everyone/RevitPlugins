@@ -71,13 +71,15 @@
 
     <system:String xml:space="preserve"
                    x:Key="MainWindow.ViewsWithoutCropMessage">
-Warning! You are printing sheets with views without cropping.
+Warning!
+You are printing sheets with views without cropping.
 Continue?
 </system:String>
     
     <system:String xml:space="preserve"
                    x:Key="MainWindow.SheetsWithoutCropMessage">
-Warning! You are printing sheets with views without cropping.
+Warning!
+You are printing sheets with views without cropping.
 Continue?
     </system:String>
 
