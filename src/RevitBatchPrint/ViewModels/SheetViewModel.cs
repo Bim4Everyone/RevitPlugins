@@ -61,8 +61,8 @@ internal sealed class SheetViewModel : BaseViewModel {
         ViewsWithoutCrop.Count == 0
             ? null
             : " - "
-              + string.Join(" - " + Environment.NewLine, ViewsWithoutCrop.Take(5))
-              + (ViewsWithoutCrop.Count > 5 ? ".." : null);
+              + string.Join(Environment.NewLine + " - ", ViewsWithoutCrop.Take(5))
+              + (ViewsWithoutCrop.Count > 5 ? "..." : null);
     
     public SheetElement CreateSheetElement() {
         return new SheetElement() {ViewSheet = _viewSheet, PrintSheetSettings = PrintSheetSettings};
