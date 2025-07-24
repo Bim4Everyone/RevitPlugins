@@ -67,7 +67,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         MessageBoxService = messageBoxService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
-        AcceptVewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        AcceptVewCommand = RelayCommand.Create<Window>(AcceptView, CanAcceptView);
 
         ChangeModeCommand = RelayCommand.Create(ChangeMode);
         ChooseSaveFileCommand = RelayCommand.Create(ChooseSaveFile);
@@ -171,7 +171,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         }
     }
 
-    private void AcceptView() {
+    private void AcceptView(Window window) {
         SaveConfig();
 
         IEnumerable<SheetViewModel> sheets = MainAlbums
@@ -191,6 +191,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         }
 
         ExecutePrintExport(sheets);
+        window.DialogResult = true;
     }
 
     public void ExecutePrintExport(IEnumerable<SheetViewModel> sheets) {
@@ -205,7 +206,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         return CanAcceptView(false);
     }
 
-    private bool CanAcceptView() {
+    private bool CanAcceptView(Window window) {
         return CanAcceptView(true);
     }
 

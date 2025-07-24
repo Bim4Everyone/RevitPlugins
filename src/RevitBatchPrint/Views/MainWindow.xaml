@@ -47,7 +47,7 @@
                 FalseValue="Collapsed" />
         </ResourceDictionary>
     </Window.Resources>
-    
+
     <b:Interaction.Behaviors>
         <behaviors:WpfAttachServiceBehavior
             AttachableService="{Binding MessageBoxService}">
@@ -151,8 +151,8 @@
                 Width="80"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.PrintCommandName}"
-                Click="ButtonOk_Click"
                 Command="{Binding AcceptVewCommand}"
+                CommandParameter="{Binding ElementName=_this}"
                 Visibility="{Binding ShowPrint,
                     Converter={StaticResource BoolToVisibilityConverter}}" />
 
@@ -161,8 +161,8 @@
                 Width="80"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ExportCommandName}"
-                Click="ButtonOk_Click"
                 Command="{Binding AcceptVewCommand}"
+                CommandParameter="{Binding ElementName=_this}"
                 Visibility="{Binding ShowExport,
                     Converter={StaticResource BoolToVisibilityConverter}}" />
 
