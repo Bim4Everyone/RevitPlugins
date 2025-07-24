@@ -22,6 +22,7 @@ internal sealed class AlbumViewModel : BaseViewModel {
     private bool? _isSelected;
     private ObservableCollection<SheetViewModel> _mainSheets;
     private ObservableCollection<SheetViewModel> _filteredSheets;
+    private ObservableCollection<string> _viewsWithoutCrop;
 
     public AlbumViewModel(
         string albumName,
@@ -60,6 +61,18 @@ internal sealed class AlbumViewModel : BaseViewModel {
         get => _filteredSheets;
         set => this.RaiseAndSetIfChanged(ref _filteredSheets, value);
     }
+
+    public ObservableCollection<string> ViewsWithoutCrop {
+        get => _viewsWithoutCrop;
+        set => this.RaiseAndSetIfChanged(ref _viewsWithoutCrop, value);
+    }
+
+    public string ViewsWithoutCropText =>
+        ViewsWithoutCrop.Count == 0
+            ? null
+            : " - "
+              + string.Join(" - " + Environment.NewLine, ViewsWithoutCrop.Take(5))
+              + (ViewsWithoutCrop.Count > 5 ? ".." : null);
 
     public void FilterSheets(string searchText) {
         if(string.IsNullOrWhiteSpace(searchText)) {

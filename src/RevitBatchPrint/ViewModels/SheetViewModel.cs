@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -59,7 +60,9 @@ internal sealed class SheetViewModel : BaseViewModel {
     public string ViewsWithoutCropText =>
         ViewsWithoutCrop.Count == 0
             ? null
-            : " - " + string.Join(" - " + Environment.NewLine, ViewsWithoutCrop);
+            : " - "
+              + string.Join(" - " + Environment.NewLine, ViewsWithoutCrop.Take(5))
+              + (ViewsWithoutCrop.Count > 5 ? ".." : null);
     
     public SheetElement CreateSheetElement() {
         return new SheetElement() {ViewSheet = _viewSheet, PrintSheetSettings = PrintSheetSettings};

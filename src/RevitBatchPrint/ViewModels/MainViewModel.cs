@@ -252,7 +252,13 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         SheetViewModel[] sheets = CreateSheetCollection(viewModel, viewSheets);
         viewModel.MainSheets = new ObservableCollection<SheetViewModel>(sheets);
         viewModel.FilteredSheets = new ObservableCollection<SheetViewModel>(sheets);
-
+        
+        viewModel.ViewsWithoutCrop = new ObservableCollection<string>(
+            viewModel.MainSheets
+                .Where(item => item.ViewsWithoutCrop.Count > 0)
+                .Select(item => item.Name)
+                .ToList());
+        
         return viewModel;
     }
 
