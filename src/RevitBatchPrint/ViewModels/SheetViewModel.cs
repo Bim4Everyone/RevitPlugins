@@ -1,3 +1,5 @@
+using System;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -17,6 +19,7 @@ internal sealed class SheetViewModel : BaseViewModel {
     private string _errorText;
     private bool _isSelected;
     private PrintSheetSettings _printSheetSettings;
+    private ObservableCollection<string> _viewsWithoutCrop;
 
     public SheetViewModel(ViewSheet viewSheet, AlbumViewModel album, IPrintContext printContext) {
         _viewSheet = viewSheet;
@@ -48,6 +51,16 @@ internal sealed class SheetViewModel : BaseViewModel {
         set => this.RaiseAndSetIfChanged(ref _printSheetSettings, value);
     }
 
+    public ObservableCollection<string> ViewsWithoutCrop {
+        get => _viewsWithoutCrop;
+        set => this.RaiseAndSetIfChanged(ref _viewsWithoutCrop, value);
+    }
+
+    public string ViewsWithoutCropText =>
+        ViewsWithoutCrop.Count == 0
+            ? null
+            : " - " + string.Join(" - " + Environment.NewLine, ViewsWithoutCrop);
+    
     public SheetElement CreateSheetElement() {
         return new SheetElement() {ViewSheet = _viewSheet, PrintSheetSettings = PrintSheetSettings};
     }

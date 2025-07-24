@@ -265,7 +265,10 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
 
     private SheetViewModel CreateSheet(ViewSheet viewSheet, AlbumViewModel album) {
         return new SheetViewModel(viewSheet, album, this) {
-            PrintSheetSettings = _revitRepository.GetPrintSettings(viewSheet)
+            PrintSheetSettings = _revitRepository.GetPrintSettings(viewSheet),
+            ViewsWithoutCrop = new ObservableCollection<string>(
+                _revitRepository.GetViewsWithoutCrop(viewSheet)
+                    .Select(item => item.Name))
         };
     }
 

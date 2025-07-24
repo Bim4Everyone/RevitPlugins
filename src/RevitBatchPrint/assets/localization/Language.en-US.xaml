@@ -66,5 +66,6 @@
     <system:String x:Key="ToggleSwitch.Off">Off</system:String>
     
     <system:String x:Key="ViewSheet.NotFoundTitleBlock">Not found title block on a sheet "{0}".</system:String>
+    <system:String x:Key="TreeView.ViewsWithoutCropToolTip">Views without crop:</system:String>
     
 </ResourceDictionary>
