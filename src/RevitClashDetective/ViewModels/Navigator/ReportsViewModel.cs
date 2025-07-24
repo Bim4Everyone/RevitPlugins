@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Input;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -141,7 +142,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private void SelectClash(ClashViewModel clash) {
             IView3DSetting settings;
             if(ElementsIsolationEnabled) {
-                settings = new ClashIsolationViewSettings(_revitRepository, clash.Clash);
+                settings = new ClashIsolationViewSettings(_revitRepository, clash.Clash,
+                    SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>()));
             } else {
                 settings = new ClashDefaultViewSettings(_revitRepository, clash.Clash);
             }
