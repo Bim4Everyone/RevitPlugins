@@ -95,9 +95,10 @@ namespace RevitBatchPrint.Models {
                 .Where(item => item.CanBePrinted)
                 .Where(item => item.IsTemplate == false)
                 .Where(item => item.ViewType == ViewType.DrawingSheet)
-                .Select(item => (item, 
-                    GetValueOrDefault(item.Id, titleBlocks), 
+                .Select(item => (item,
+                    GetValueOrDefault(item.Id, titleBlocks),
                     GetValueOrDefault(item.Id, viewPorts)))
+                .Where(item => item.Item2 is not null)
                 .ToList();
         }
 
