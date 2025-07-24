@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -16,6 +17,7 @@ namespace RevitBatchPrint.ViewModels;
 internal sealed class SheetViewModel : BaseViewModel {
     private readonly ViewSheet _viewSheet;
     private readonly IPrintContext _printContext;
+    private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
 
     private string _errorText;
@@ -27,9 +29,11 @@ internal sealed class SheetViewModel : BaseViewModel {
         ViewSheet viewSheet,
         AlbumViewModel album,
         IPrintContext printContext,
+        IMessageBoxService messageBoxService,
         ILocalizationService localizationService) {
         _viewSheet = viewSheet;
         _printContext = printContext;
+        _messageBoxService = messageBoxService;
         _localizationService = localizationService;
 
         Name = _viewSheet.Name;
@@ -76,6 +80,17 @@ internal sealed class SheetViewModel : BaseViewModel {
     }
     
     private void ExecutePrintExport() {
+        if(ViewsWithoutCrop.Count > 0) {
+            var messageBoxResult = _messageBoxService.Show(
+                _localizationService.GetLocalizedString("MainWindow.ViewsWithoutCropMessage"), 
+                _localizationService.GetLocalizedString("MainWindow.Title"),
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if(messageBoxResult == MessageBoxResult.No) {
+                throw new OperationCanceledException();
+            }
+        }
+        
         _printContext.ExecutePrintExport([this]);
     }
     

@@ -14,6 +14,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:views="clr-namespace:RevitBatchPrint.Views"
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:behaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
 
     x:Name="_this"
     mc:Ignorable="d"
@@ -46,6 +47,12 @@
                 FalseValue="Collapsed" />
         </ResourceDictionary>
     </Window.Resources>
+    
+    <b:Interaction.Behaviors>
+        <behaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}">
+        </behaviors:WpfAttachServiceBehavior>
+    </b:Interaction.Behaviors>
 
     <b:Interaction.Triggers>
         <b:EventTrigger

@@ -68,4 +68,7 @@
     <system:String x:Key="ViewSheet.NotFoundTitleBlock">Не была найдена основная надпись на листе "{0}".</system:String>
     <system:String x:Key="TreeView.ViewsWithoutCropToolTip">Виды без подрезки:</system:String>
     <system:String x:Key="TreeView.SheetsWithoutCropToolTip">Листы без подрезки:</system:String>
+    
+    <system:String x:Key="MainWindow.ViewsWithoutCropMessage">Предупреждение, вы печатаете виды без подрезки. Продолжить?</system:String>
+    <system:String x:Key="MainWindow.SheetsWithoutCropMessage">Предупреждение, вы печатаете листы без подрезки. Продолжить?</system:String>
 </ResourceDictionary>

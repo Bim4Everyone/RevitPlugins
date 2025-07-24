@@ -18,6 +18,7 @@ namespace RevitBatchPrint.ViewModels;
 
 internal sealed class AlbumViewModel : BaseViewModel {
     private readonly IPrintContext _printContext;
+    private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
 
     private bool? _isSelected;
@@ -28,8 +29,10 @@ internal sealed class AlbumViewModel : BaseViewModel {
     public AlbumViewModel(
         string albumName,
         IPrintContext printContext,
+        IMessageBoxService messageBoxService,
         ILocalizationService localizationService) {
         _printContext = printContext;
+        _messageBoxService = messageBoxService;
         _localizationService = localizationService;
 
         IsSelected = false;
@@ -116,6 +119,17 @@ internal sealed class AlbumViewModel : BaseViewModel {
     }
 
     private void ExecutePrintExport() {
+        if(MainSheets.Any(item => item.ViewsWithoutCrop.Count > 0)) {
+            var messageBoxResult = _messageBoxService.Show(
+                _localizationService.GetLocalizedString("MainWindow.SheetsWithoutCropMessage"), 
+                _localizationService.GetLocalizedString("MainWindow.Title"),
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if(messageBoxResult == MessageBoxResult.No) {
+                throw new OperationCanceledException();
+            }
+        }
+        
         _printContext.ExecutePrintExport(MainSheets);
     }
 

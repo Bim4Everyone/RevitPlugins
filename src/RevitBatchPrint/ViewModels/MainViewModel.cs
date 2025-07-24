@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -52,6 +53,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         RevitExportToPdf revitExport,
         IPrinterService printerService,
         ILocalizationService localizationService,
+        IMessageBoxService messageBoxService,
         ISaveFileDialogService saveFileDialogService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
@@ -62,6 +64,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         _printerService = printerService;
         _localizationService = localizationService;
         _saveFileDialogService = saveFileDialogService;
+        MessageBoxService = messageBoxService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptVewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -85,6 +88,8 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
 
     public ICommand SearchCommand { get; set; }
     public ICommand ChangeAlbumNameCommand { get; set; }
+    
+    public IMessageBoxService MessageBoxService { get; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -171,7 +176,19 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
 
         IEnumerable<SheetViewModel> sheets = MainAlbums
             .SelectMany(item => item.MainSheets)
-            .Where(item => item.IsSelected);
+            .Where(item => item.IsSelected)
+            .ToArray();
+
+        if(sheets.Any(item => item.ViewsWithoutCrop.Count > 0)) {
+            var messageBoxResult = MessageBoxService.Show(
+                _localizationService.GetLocalizedString("MainWindow.SheetsWithoutCropMessage"), 
+                _localizationService.GetLocalizedString("MainWindow.Title"),
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if(messageBoxResult == MessageBoxResult.No) {
+                throw new OperationCanceledException();
+            }
+        }
 
         ExecutePrintExport(sheets);
     }
@@ -247,7 +264,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     }
 
     private AlbumViewModel CreateAlbum(string albumName, IEnumerable<ViewSheet> viewSheets) {
-        var viewModel = new AlbumViewModel(albumName, this, _localizationService);
+        var viewModel = new AlbumViewModel(albumName, this, MessageBoxService, _localizationService);
 
         SheetViewModel[] sheets = CreateSheetCollection(viewModel, viewSheets);
         viewModel.MainSheets = new ObservableCollection<SheetViewModel>(sheets);
@@ -270,7 +287,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     }
 
     private SheetViewModel CreateSheet(ViewSheet viewSheet, AlbumViewModel album) {
-        return new SheetViewModel(viewSheet, album, this, _localizationService) {
+        return new SheetViewModel(viewSheet, album, this, MessageBoxService, _localizationService) {
             PrintSheetSettings = _revitRepository.GetPrintSettings(viewSheet),
             ViewsWithoutCrop = new ObservableCollection<string>(
                 _revitRepository.GetViewsWithoutCrop(viewSheet)
