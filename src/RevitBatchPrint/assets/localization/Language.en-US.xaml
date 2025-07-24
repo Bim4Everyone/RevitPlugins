@@ -17,7 +17,7 @@
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
-    
+
     <system:String x:Key="MainWindow.NotSelectedAlbumParamName">Please select album param name</system:String>
     <system:String x:Key="MainWindow.NotSelectedPrinter">Please select printer name</system:String>
     <system:String x:Key="MainWindow.NotSelectedFilePath">Please select export file path</system:String>
@@ -52,24 +52,33 @@
 
     <system:String x:Key="Settings.ReplaceHalftoneWithThinLines">Replace halftone with thinLines</system:String>
     <system:String x:Key="Settings.ReplaceHalftoneWithThinLinesDescription">Halftones are displayed as thin lines</system:String>
-    
+
     <system:String x:Key="ColorDepthType.BlackLine">Black line</system:String>
     <system:String x:Key="ColorDepthType.GrayScale">Gray scale</system:String>
     <system:String x:Key="ColorDepthType.Color">Color</system:String>
-    
+
     <system:String x:Key="RasterQualityType.Low">Low</system:String>
     <system:String x:Key="RasterQualityType.Medium">Medium</system:String>
     <system:String x:Key="RasterQualityType.High">High</system:String>
     <system:String x:Key="RasterQualityType.Presentation">Presentation</system:String>
-    
+
     <system:String x:Key="ToggleSwitch.On">On</system:String>
     <system:String x:Key="ToggleSwitch.Off">Off</system:String>
-    
+
     <system:String x:Key="ViewSheet.NotFoundTitleBlock">Not found title block on a sheet "{0}".</system:String>
     <system:String x:Key="TreeView.ViewsWithoutCropToolTip">Views without crop:</system:String>
     <system:String x:Key="TreeView.SheetsWithoutCropToolTip">Sheets without crop:</system:String>
+
+    <system:String xml:space="preserve"
+                   x:Key="MainWindow.ViewsWithoutCropMessage">
+Warning! You are printing views without cropping.
+Continue?
+</system:String>
     
-    <system:String x:Key="MainWindow.ViewsWithoutCropMessage">Warning! You are printing views without cropping. Continue?</system:String>
-    <system:String x:Key="MainWindow.SheetsWithoutCropMessage">Warning! You are printing sheets without cropping. Continue?</system:String>
-    
+    <system:String xml:space="preserve"
+                   x:Key="MainWindow.SheetsWithoutCropMessage">
+Warning! You are printing sheets without cropping.
+Continue?
+    </system:String>
+
 </ResourceDictionary>
