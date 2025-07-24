@@ -114,11 +114,12 @@ namespace RevitBatchPrint.Models {
         private Dictionary<ElementId, FamilyInstance> GetFamilyInstances() {
             return new FilteredElementCollector(Document)
                 .OfClass(typeof(FamilyInstance))
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .OfType<FamilyInstance>()
                 .GroupBy(item => item.OwnerViewId)
                 .ToDictionary(item => item.Key, item => item.FirstOrDefault());
         }
-        
+
         public PrintSheetSettings GetPrintSettings(FamilyInstance familyInstance) {
             double sheetWidth = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_WIDTH);
             double sheetHeight = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_HEIGHT);
