@@ -69,6 +69,6 @@
     <system:String x:Key="TreeView.ViewsWithoutCropToolTip">Виды без подрезки:</system:String>
     <system:String x:Key="TreeView.SheetsWithoutCropToolTip">Листы без подрезки:</system:String>
     
-    <system:String x:Key="MainWindow.ViewsWithoutCropMessage">Предупреждение, вы печатаете виды без подрезки. Продолжить?</system:String>
-    <system:String x:Key="MainWindow.SheetsWithoutCropMessage">Предупреждение, вы печатаете листы без подрезки. Продолжить?</system:String>
+    <system:String x:Key="MainWindow.ViewsWithoutCropMessage">Предупреждение! Вы печатаете виды без подрезки. Продолжить?</system:String>
+    <system:String x:Key="MainWindow.SheetsWithoutCropMessage">Предупреждение! Вы печатаете листы без подрезки. Продолжить?</system:String>
 </ResourceDictionary>

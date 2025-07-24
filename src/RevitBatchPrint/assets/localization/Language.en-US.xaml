@@ -69,7 +69,7 @@
     <system:String x:Key="TreeView.ViewsWithoutCropToolTip">Views without crop:</system:String>
     <system:String x:Key="TreeView.SheetsWithoutCropToolTip">Sheets without crop:</system:String>
     
-    <system:String x:Key="MainWindow.ViewsWithoutCropMessage">Warning, you print views without a crop. Continue?</system:String>
-    <system:String x:Key="MainWindow.SheetsWithoutCropMessage">Warning, you print sheets without a crop. Continue?</system:String>
+    <system:String x:Key="MainWindow.ViewsWithoutCropMessage">Warning! You are printing views without cropping. Continue?</system:String>
+    <system:String x:Key="MainWindow.SheetsWithoutCropMessage">Warning! You are printing sheets without cropping. Continue?</system:String>
     
 </ResourceDictionary>
