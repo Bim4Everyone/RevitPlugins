@@ -84,7 +84,7 @@ internal sealed class SheetViewModel : BaseViewModel {
             var messageBoxResult = _messageBoxService.Show(
                 _localizationService.GetLocalizedString("MainWindow.ViewsWithoutCropMessage"), 
                 _localizationService.GetLocalizedString("MainWindow.Title"),
-                MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if(messageBoxResult == MessageBoxResult.No) {
                 throw new OperationCanceledException();

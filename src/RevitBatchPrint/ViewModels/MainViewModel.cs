@@ -183,7 +183,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
             var messageBoxResult = MessageBoxService.Show(
                 _localizationService.GetLocalizedString("MainWindow.SheetsWithoutCropMessage"), 
                 _localizationService.GetLocalizedString("MainWindow.Title"),
-                MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if(messageBoxResult == MessageBoxResult.No) {
                 throw new OperationCanceledException();
