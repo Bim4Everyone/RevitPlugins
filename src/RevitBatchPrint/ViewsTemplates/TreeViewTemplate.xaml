@@ -114,16 +114,8 @@
                 <ui:SymbolIcon
                     Symbol="Warning24"
                     Margin="12 0 0 0"
-                    VerticalAlignment="Center">
-                    
-                    <ui:SymbolIcon.ToolTip>
-                        <TextBlock>
-                            <Run Text="{me:LocalizationSource TreeView.ViewsWithoutCropToolTip}" />
-                            <LineBreak />
-                            <Run Text="{Binding ViewsWithoutCropText, Mode=OneWay}" />
-                        </TextBlock>
-                
-                    </ui:SymbolIcon.ToolTip>
+                    VerticalAlignment="Center"
+                    ToolTip="{Binding ViewsWithoutCropText, Mode=OneWay}">
                 
                     <ui:SymbolIcon.Style>
                         <Style TargetType="ui:SymbolIcon">

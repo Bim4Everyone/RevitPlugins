@@ -16,15 +16,21 @@ namespace RevitBatchPrint.ViewModels;
 internal sealed class SheetViewModel : BaseViewModel {
     private readonly ViewSheet _viewSheet;
     private readonly IPrintContext _printContext;
+    private readonly ILocalizationService _localizationService;
 
     private string _errorText;
     private bool _isSelected;
     private PrintSheetSettings _printSheetSettings;
     private ObservableCollection<string> _viewsWithoutCrop;
 
-    public SheetViewModel(ViewSheet viewSheet, AlbumViewModel album, IPrintContext printContext) {
+    public SheetViewModel(
+        ViewSheet viewSheet,
+        AlbumViewModel album,
+        IPrintContext printContext,
+        ILocalizationService localizationService) {
         _viewSheet = viewSheet;
         _printContext = printContext;
+        _localizationService = localizationService;
 
         Name = _viewSheet.Name;
         Album = album;
@@ -60,7 +66,8 @@ internal sealed class SheetViewModel : BaseViewModel {
     public string ViewsWithoutCropText =>
         ViewsWithoutCrop.Count == 0
             ? null
-            : " - "
+            : _localizationService.GetLocalizedString("TreeView.ViewsWithoutCropToolTip")
+              + Environment.NewLine + " - "
               + string.Join(Environment.NewLine + " - ", ViewsWithoutCrop.Take(5))
               + (ViewsWithoutCrop.Count > 5 ? "..." : null);
     
