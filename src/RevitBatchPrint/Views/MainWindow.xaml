@@ -113,6 +113,7 @@
                     <ui:ToggleSwitch
                         x:Name="_settingsSwitch"
                         IsChecked="False"
+                        ToolTip="{me:LocalizationSource MainWindow.Settings}"
                         OnContent="{ui:SymbolIcon Settings48, Filled=True, FontSize=20}"
                         OffContent="{ui:SymbolIcon Settings48, Filled=False, FontSize=20}"
                         Style="{StaticResource CustomToggleSwitchStyle}" />

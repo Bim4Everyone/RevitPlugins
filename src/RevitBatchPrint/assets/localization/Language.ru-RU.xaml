@@ -9,6 +9,7 @@
     <system:String x:Key="MainWindow.EmptyAlbumNameParam">Без имени</system:String>
     <system:String x:Key="MainWindow.ChooseFileName">Выберите файл для сохранения</system:String>
 
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
     <system:String x:Key="MainWindow.PrintMode">Режим печати</system:String>
     <system:String x:Key="MainWindow.ExportMode">Режим экспорта</system:String>
 

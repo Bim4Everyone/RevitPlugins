@@ -9,6 +9,7 @@
     <system:String x:Key="MainWindow.EmptyAlbumNameParam">Noname</system:String>
     <system:String x:Key="MainWindow.ChooseFileName">Choose the path to save the file</system:String>
 
+    <system:String x:Key="MainWindow.Settings">Settings</system:String>
     <system:String x:Key="MainWindow.PrintMode">Print Mode</system:String>
     <system:String x:Key="MainWindow.ExportMode">Export Mode</system:String>
 

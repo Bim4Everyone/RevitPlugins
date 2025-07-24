@@ -74,10 +74,16 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
 
         SearchCommand = RelayCommand.Create(ApplySearch);
         ChangeAlbumNameCommand = RelayCommand.Create(ChangeAlbumName);
-
+        
+#if REVIT_2021_OR_LESS
         ShowPrint = true;
         ShowExport = false;
         _currentPrintExport = _revitPrint;
+#else
+        ShowPrint = false;
+        ShowExport = true;
+        _currentPrintExport = _revitExport;
+#endif
     }
 
     public ICommand LoadViewCommand { get; }
@@ -88,7 +94,7 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
 
     public ICommand SearchCommand { get; set; }
     public ICommand ChangeAlbumNameCommand { get; set; }
-    
+
     public IMessageBoxService MessageBoxService { get; }
 
     /// <summary>
@@ -181,9 +187,10 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
 
         if(sheets.Any(item => item.ViewsWithoutCrop.Count > 0)) {
             var messageBoxResult = MessageBoxService.Show(
-                _localizationService.GetLocalizedString("MainWindow.SheetsWithoutCropMessage"), 
+                _localizationService.GetLocalizedString("MainWindow.SheetsWithoutCropMessage"),
                 _localizationService.GetLocalizedString("MainWindow.Title"),
-                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
             if(messageBoxResult == MessageBoxResult.No) {
                 throw new OperationCanceledException();
@@ -265,25 +272,25 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     }
 
     private AlbumViewModel CreateAlbum(
-        string albumName, 
+        string albumName,
         IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
         var viewModel = new AlbumViewModel(albumName, this, MessageBoxService, _localizationService);
 
         SheetViewModel[] sheets = CreateSheetCollection(viewModel, sheetsInfo);
         viewModel.MainSheets = new ObservableCollection<SheetViewModel>(sheets);
         viewModel.FilteredSheets = new ObservableCollection<SheetViewModel>(sheets);
-        
+
         viewModel.ViewsWithoutCrop = new ObservableCollection<string>(
             viewModel.MainSheets
                 .Where(item => item.ViewsWithoutCrop.Count > 0)
                 .Select(item => item.Name)
                 .ToList());
-        
+
         return viewModel;
     }
 
     private SheetViewModel[] CreateSheetCollection(
-        AlbumViewModel album, 
+        AlbumViewModel album,
         IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
         return sheetsInfo
             .Select(item => CreateSheet(album, item))
@@ -307,12 +314,12 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
         AlbumParamName = AlbumParamNames
-                               .FirstOrDefault(item =>
-                                   item.Equals(setting?.AlbumParamName))
-                           ?? AlbumParamNames
-                               .FirstOrDefault(item =>
-                                   PluginSystemConfig.PrintParamNames.Contains(item))
-                           ?? AlbumParamNames.FirstOrDefault();
+                             .FirstOrDefault(item =>
+                                 item.Equals(setting?.AlbumParamName))
+                         ?? AlbumParamNames
+                             .FirstOrDefault(item =>
+                                 PluginSystemConfig.PrintParamNames.Contains(item))
+                         ?? AlbumParamNames.FirstOrDefault();
 
         PrintOptions = new PrintOptionsViewModel(
             _printerService.EnumPrinterNames(),
