@@ -21,6 +21,26 @@ public class RebarFinderService {
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
 
+    private bool CheckRebarByBaseParams(Element rebar, string projectSection, string pylonKeyName) {
+        // Фильтрация по комплекту документации
+        if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != projectSection) {
+            return false;
+        }
+        // Фильтрация по марке пилона
+        if(rebar.GetParamValue<string>(_baseMarkParamName) != pylonKeyName) {
+            return false;
+        }
+        // Фильтрация по обр_ФОП_Фильтрации 1
+        if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.TypicalPylonFilterParameter) !=
+            ViewModel.ProjectSettings.TypicalPylonFilterValue) {
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Получение родительского элемента сварного арматурного каркаса (верт стержни + пластины)
+    /// </summary>
     public FamilyInstance GetSkeletonParentRebar(string projectSection, string pylonKeyName) {
         var rebars = new FilteredElementCollector(Repository.Document)
             .OfCategory(BuiltInCategory.OST_Rebar)
@@ -28,17 +48,8 @@ public class RebarFinderService {
             .ToElements();
 
         foreach(var rebar in rebars) {
-            // Фильтрация по комплекту документации
-            if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != projectSection) {
-                continue;
-            }
-            // Фильтрация по марке пилона
-            if(rebar.GetParamValue<string>(_baseMarkParamName) != pylonKeyName) {
-                continue;
-            }
-            // Фильтрация по обр_ФОП_Фильтрации 1
-            if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.TypicalPylonFilterParameter) !=
-                ViewModel.ProjectSettings.TypicalPylonFilterValue) {
+            // Фильтрация по базовым параметрам (комплект, марка, фильтрация 1)
+            if(!CheckRebarByBaseParams(rebar, projectSection, pylonKeyName)) {
                 continue;
             }
             // Фильтрация по имени семейства
@@ -52,6 +63,43 @@ public class RebarFinderService {
         return null;
     }
 
+    /// <summary>
+    /// Получение арматурных стержней с параметры по пилону (комплект, марка, фильтрация 1) с нужными номерами форм.
+    /// Номера арматурных форм подаются граничными значениеями диапазонов
+    /// </summary>
+    /// <param name="projectSection">Комплект документации</param>
+    /// <param name="pylonKeyName">Марка пилона</param>
+    /// <param name="formNumberMin">Минимальный номер формы арматурного стержня, который нужно найти</param>
+    /// <param name="formNumberMax">Максимальный номер формы арматурного стержня, который нужно найти</param>
+    /// <param name="formNumberMinException">Минимальный номер формы арматурного стержня, который нужно исключить</param>
+    /// <param name="formNumberMaxException">Максимальный номер формы арматурного стержня, который нужно исключить</param>
+    /// <returns></returns>
+    public List<Element> GetSimpleRebars(string projectSection, string pylonKeyName, 
+                                         int formNumberMin, int formNumberMax,
+                                         int formNumberMinException, int formNumberMaxException) {
+        var rebars = new FilteredElementCollector(Repository.Document)
+            .OfCategory(BuiltInCategory.OST_Rebar)
+            .WhereElementIsNotElementType()
+            .ToElements();
+
+        var simpleRebars = new List<Element>();
+        foreach(var rebar in rebars) {
+            // Фильтрация по базовым параметрам (комплект, марка, фильтрация 1)
+            if(!CheckRebarByBaseParams(rebar, projectSection, pylonKeyName)) {
+                continue;
+            }
+            // Фильтрация по номеру формы
+            // Номер формы должен попадать в диапазон нужных форм и не попадать в диапазон форм для отсева
+            int formNumber = _paramValueService.GetParamValueAnywhere(rebar, _formNumberParamName);
+            bool includeInNeededRange = formNumber >= formNumberMin && formNumber <= formNumberMax;
+            bool includeInExceptionRange = formNumber >= formNumberMinException && formNumber <= formNumberMaxException;
+
+            if(includeInNeededRange && !includeInExceptionRange) {
+                simpleRebars.Add(rebar);
+            }
+        }
+        return simpleRebars;
+    }
 
     //public FamilyInstance GetSkeletonParentRebar(View view) {
     //    var rebars = new FilteredElementCollector(view.Document, view.Id)
@@ -168,4 +216,11 @@ public class RebarFinderService {
         }
         return simpleRebars;
     }
+
+
+
+
+
+
+
 }

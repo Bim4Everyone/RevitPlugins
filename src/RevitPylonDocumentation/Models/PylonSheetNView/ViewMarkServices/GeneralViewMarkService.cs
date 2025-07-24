@@ -8,18 +8,23 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices;
 internal class GeneralViewMarkService {
+    private readonly FamilySymbol _tagSkeletonSymbol;
     internal GeneralViewMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                     PylonView pylonView) {
         ViewModel = mvm;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
+
+        // Находим типоразмер марки несущей арматуры для обозначения марки изделия
+        _tagSkeletonSymbol = Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Изделие_Марка - Полка 30");
     }
 
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
     internal PylonView ViewOfPylon { get; set; }
+
 
 
     /// <summary>
@@ -53,5 +58,34 @@ internal class GeneralViewMarkService {
                 }
             }
         } catch(Exception) { }
+    }
+
+    /// <summary>
+    /// Создает марку арматурного каркаса на основном виде опалубки
+    /// </summary>
+    internal void CreateSkeletonMark(List<Element> simpleRebars) {
+        if(simpleRebars.Count == 0) { return; }
+        var viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
+        var annotationService = new AnnotationService(ViewOfPylon);
+
+        // Получаем референс-элемент
+        Element rightVerticalBar = viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.Right,
+                                                                            false);
+        // Получаем точку в которую нужно поставить аннотацию
+        var pointRight= viewPointsAnalyzer.GetPointByDirection(rightVerticalBar, DirectionType.Right,
+                                                               0, 0, true);
+        // Корректируем положение точки, куда будет установлена марка (текст)
+        pointRight = viewPointsAnalyzer.GetPointByDirection(pointRight, DirectionType.RightBottom, 1.5, 3.5);
+        // Создаем марку арматуры
+        var rightTag = annotationService.CreateRebarTag(pointRight, _tagSkeletonSymbol, rightVerticalBar);
+
+#if REVIT_2022_OR_GREATER
+        rightTag.LeaderEndCondition = LeaderEndCondition.Free;
+        var rightVerticalBarRef = new Reference(rightVerticalBar);
+
+        var tagLeaderEnd = rightTag.GetLeaderEnd(rightVerticalBarRef);
+        tagLeaderEnd = viewPointsAnalyzer.GetPointByDirection(tagLeaderEnd, DirectionType.Bottom, 0, 3);
+        rightTag.SetLeaderEnd(rightVerticalBarRef, tagLeaderEnd);
+#endif
     }
 }

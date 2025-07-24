@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices;
@@ -44,6 +47,7 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
         try {
             var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             markService.TryCreatePylonElevMark(SheetInfo.HostElems, dimensionBaseService);
+            markService.CreateSkeletonMark(SheetInfo.RebarInfo.SimpleVerticalRebars);
         } catch(Exception) { }
     }
 }

@@ -1,6 +1,6 @@
-using Autodesk.Revit.DB;
+using System.Collections.Generic;
 
-using dosymep.Revit;
+using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.ViewModels;
 
@@ -10,6 +10,12 @@ internal class PylonRebarInfo {
     private readonly string _hasSecondLRebarParamName = "ст_Г_2_ВКЛ";
     private readonly string _hasDifferentRebarParamName = "ст_РАЗНЫЕ";
 
+    private readonly int _formNumberForVerticalRebarMax = 1499;
+    private readonly int _formNumberForVerticalRebarMin = 1101;
+
+    private readonly int _formNumberForCBarMax = 1202;
+    private readonly int _formNumberForCBarMin = 1202;
+
     internal PylonRebarInfo(MainViewModel mvm, RevitRepository revitRepository, PylonSheetInfo pylonSheetInfo) {
         ViewModel = mvm;
         SheetInfo = pylonSheetInfo;
@@ -17,6 +23,11 @@ internal class PylonRebarInfo {
 
         SkeletonParentRebar = ViewModel.RebarFinder.GetSkeletonParentRebar(SheetInfo.ProjectSection, SheetInfo.PylonKeyName);
         GetInfo();
+
+        SimpleVerticalRebars = 
+            ViewModel.RebarFinder.GetSimpleRebars(SheetInfo.ProjectSection, SheetInfo.PylonKeyName,
+                                                  _formNumberForVerticalRebarMin, _formNumberForVerticalRebarMax,
+                                                  _formNumberForCBarMin, _formNumberForCBarMax);
     }
 
     internal MainViewModel ViewModel { get; set; }
@@ -24,6 +35,7 @@ internal class PylonRebarInfo {
     internal RevitRepository Repository { get; set; }
 
     internal FamilyInstance SkeletonParentRebar { get; set; }
+    internal List<Element> SimpleVerticalRebars { get; set; }
     internal bool FirstLRebarParamValue { get; set; } = false;
     internal bool SecondLRebarParamValue { get; set; } = false;
     internal bool DifferentRebarParamValue { get; set; } = false;

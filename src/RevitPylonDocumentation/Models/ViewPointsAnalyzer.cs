@@ -184,7 +184,7 @@ public class ViewPointsAnalyzer {
         }
     }
 
-    public XYZ GetPointByDirection(XYZ point, DirectionType directionType, int xOffsetCoef, double yOffsetCoef) {
+    public XYZ GetPointByDirection(XYZ point, DirectionType directionType, double xOffsetCoef, double yOffsetCoef) {
         var offsets = GetOffsetsByDirection(directionType, xOffsetCoef, yOffsetCoef);
         var xOffset = offsets.xOffset;
         var yOffset = offsets.yOffset;
