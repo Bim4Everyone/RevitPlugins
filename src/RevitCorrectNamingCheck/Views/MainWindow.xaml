@@ -16,10 +16,10 @@
     WindowStartupLocation="CenterOwner"
     Title="{me:LocalizationSource MainWindow.Title}"
 
-    Width="600"
+    Width="750"
     Height="400"
-
-    MinWidth="600"
+    
+    MinWidth="750"
     MinHeight="400"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
@@ -42,7 +42,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -50,78 +49,110 @@
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
-
-        <StackPanel
+        <Border
             Grid.Row="1"
-            Orientation="Horizontal"
-            HorizontalAlignment="Left"
-            Margin="10,10">
-            <ui:Button
-                Width="140"
-                Padding="10,5"
-                Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonRefresh}"
-                Command="{Binding LoadViewCommand}" />
-        </StackPanel>
+            CornerRadius="8"
+            Padding="5"
+            Margin="10,0,10,0"
+            Background="{DynamicResource CardBackground}">
+            
+            <DataGrid
+                CanUserDeleteRows="False"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                IsReadOnly="True"
+                Grid.Row="1"
+                Margin="10,0,10,0"
+                HeadersVisibility="Column"
+                GridLinesVisibility="All"
+                ItemsSource="{Binding LinkedFiles}">
 
-        <DataGrid
-            Grid.Row="2"
-            AutoGenerateColumns="False"
-            HeadersVisibility="Column"
-            CanUserAddRows="False"
-            CanUserDeleteRows="False"
-            GridLinesVisibility="All"
-            Margin="10,10,10,10"
-            IsReadOnly="True"
-            ItemsSource="{Binding LinkedFiles}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock
+                                Text="{DynamicResource MainWindow.LinkedFile}" />
 
-            <DataGrid.Columns>
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.Header>
-                        <TextBlock Text="{DynamicResource MainWindow.LinkedFile}" />
-                    </DataGridTemplateColumn.Header>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <StaticResource ResourceKey="LinkedFileTemplate" />
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <StaticResource
+                                ResourceKey="LinkedFileTemplate" />
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.Header>
-                        <TextBlock Text="{DynamicResource MainWindow.WorksetType}" />
-                    </DataGridTemplateColumn.Header>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ContentControl Content="{Binding TypeWorkset}"
-                                            ContentTemplateSelector="{StaticResource WorksetSelector}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock
+                                Text="{DynamicResource MainWindow.WorksetType}" />
 
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.Header>
-                        <TextBlock Text="{DynamicResource MainWindow.Instance}" />
-                    </DataGridTemplateColumn.Header>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ContentControl Content="{Binding InstanceWorkset}"
-                                            ContentTemplateSelector="{StaticResource WorksetSelector}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl
+                                    Content="{Binding TypeWorkset}"
+                                    ContentTemplateSelector="{StaticResource WorksetSelector}" />
 
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock
+                                Text="{DynamicResource MainWindow.Instance}" />
+
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl
+                                    Content="{Binding InstanceWorkset}"
+                                    ContentTemplateSelector="{StaticResource WorksetSelector}" />
+
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn
+                        Width="100">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.Pinned}" />
+                            
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    IsHitTestVisible="False"
+                                    Focusable="False"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    IsChecked="{Binding IsPinned}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
             <ui:Button
+                Width="100"
+                Margin="10"
+                Appearance="Info"
+                Content="{me:LocalizationSource MainWindow.ButtonRefresh}"
+                Command="{Binding LoadViewCommand}" />
+            
+            <ui:Button
+                IsCancel="True"
                 Margin="10"
                 Width="80"
-                IsCancel="True"
                 Click="ButtonCancel_Click"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}" />
+            
         </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>

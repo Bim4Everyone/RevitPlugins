@@ -45,7 +45,7 @@ public class RevitCorrectNamingCheckCommand : BasePluginCommand {
     /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        using var kernel = uiApplication.CreatePlatformServices();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()

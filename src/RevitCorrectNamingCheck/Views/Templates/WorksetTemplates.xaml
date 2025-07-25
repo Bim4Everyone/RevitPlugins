@@ -8,52 +8,60 @@
         x:Key="CorrectTemplate"
         DataType="{x:Type models:LinkedFile}">
         <Border
-            CornerRadius="6"
-            Padding="4,2"
-            Margin="2"
-            SnapsToDevicePixels="True">
+            SnapsToDevicePixels="True"
+            CornerRadius="3"
+            Padding="5,3"
+            Margin="3"
+            Background="Honeydew">
 
             <TextBlock
                 MinWidth="150"
+                Background="Honeydew"
+                Foreground="Black"
                 Text="{Binding Name}"
                 ToolTip="{DynamicResource WorksetNameStatus.WorksetCorrect}" />
+            
         </Border>
 
-    </DataTemplate>
-
-    <DataTemplate
-        x:Key="PartialCorrectTemplate"
-        DataType="{x:Type models:LinkedFile}">
-        <Border
-            Background="Khaki"
-            CornerRadius="6"
-            Padding="4,2"
-            Margin="2"
-            SnapsToDevicePixels="True">
-
-            <TextBlock
-                MinWidth="150"
-                Background="Khaki"
-                Text="{Binding Name}"
-                ToolTip="{DynamicResource WorksetNameStatus.PartialCorrect}" />
-        </Border>
     </DataTemplate>
 
     <DataTemplate
         x:Key="IncorrectTemplate"
         DataType="{x:Type models:LinkedFile}">
         <Border
-            Background="MistyRose"
-            CornerRadius="6"
-            Padding="4,2"
-            Margin="2"
-            SnapsToDevicePixels="True">
+            SnapsToDevicePixels="True"
+            CornerRadius="3"
+            Padding="5,3"
+            Margin="3"
+            Background="MistyRose">
 
             <TextBlock
                 MinWidth="150"
                 Background="MistyRose"
+                Foreground="Black"
                 Text="{Binding Name}"
                 ToolTip="{DynamicResource WorksetNameStatus.Incorrect}" />
+            
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate
+        x:Key="PartialCorrectTemplate"
+        DataType="{x:Type models:LinkedFile}">
+        <Border
+            SnapsToDevicePixels="True"
+            CornerRadius="3"
+            Padding="5,3"
+            Margin="3"
+            Background="LightYellow">
+
+            <TextBlock
+                MinWidth="150"
+                Background="LightYellow"
+                Foreground="Black"
+                Text="{Binding Name}"
+                ToolTip="{DynamicResource WorksetNameStatus.PartialCorrect}" />
+            
         </Border>
     </DataTemplate>
 
@@ -61,45 +69,28 @@
         x:Key="NoMatchTemplate"
         DataType="{x:Type models:LinkedFile}">
         <Border
-            Background="MistyRose"
-            CornerRadius="6"
-            Padding="4,2"
-            Margin="2"
-            SnapsToDevicePixels="True">
+            SnapsToDevicePixels="True"
+            CornerRadius="3"
+            Padding="5,3"
+            Margin="3"
+            Background="LightYellow">
 
             <TextBlock
                 MinWidth="150"
-                Background="MistyRose"
+                Background="LightYellow"
+                Foreground="Black"
                 Text="{Binding Name}"
                 ToolTip="{DynamicResource WorksetNameStatus.NoMatch}" />
+            
         </Border>
     </DataTemplate>
 
-    <DataTemplate
-        x:Key="DisabledTemplate"
-        DataType="{x:Type models:LinkedFile}">
-        <Border
-            Background="LightGray"
-            CornerRadius="6"
-            Padding="4,2"
-            Margin="2"
-            SnapsToDevicePixels="True">
-
-            <TextBlock
-                Background="LightGray"
-                Foreground="Gray"
-                MinWidth="150"
-                FontStyle="Italic"
-                Text="{Binding Name}" />
-        </Border>
-
-    </DataTemplate>
 
     <local:WorksetTemplateSelector
         x:Key="WorksetSelector"
         CorrectTemplate="{StaticResource CorrectTemplate}"
         PartialCorrectTemplate="{StaticResource PartialCorrectTemplate}"
         IncorrectTemplate="{StaticResource IncorrectTemplate}"
-        NoMatchTemplate="{StaticResource NoMatchTemplate}"
-        DisabledTemplate="{StaticResource DisabledTemplate}" />
+        NoMatchTemplate="{StaticResource NoMatchTemplate}"/>
+    
 </ResourceDictionary>

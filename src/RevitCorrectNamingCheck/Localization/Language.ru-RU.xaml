@@ -10,8 +10,8 @@
     <system:String x:Key="MainWindow.Instance">РН экземпляра</system:String>
 
     <system:String x:Key="WorksetNameStatus.WorksetCorrect">Связь распределена по РН верно</system:String>
-    <system:String x:Key="WorksetNameStatus.PartialCorrect">Связь добавлена в рабочий набор без метки 'Связь'</system:String>
-    <system:String x:Key="WorksetNameStatus.Incorrect">В имени рабочего набора несколько меток разных разделов. Однозначно определить соответствие невозможно</system:String>
+    <system:String x:Key="WorksetNameStatus.Incorrect">Связь добавлена в рабочий набор без метки 'Связь'</system:String>
+    <system:String x:Key="WorksetNameStatus.PartialCorrect">В имени рабочего набора несколько меток разных разделов. Однозначно определить соответствие невозможно</system:String>
     <system:String x:Key="WorksetNameStatus.NoMatch">Выбран рабочий набор неподходящего раздела</system:String>
     
     <system:String x:Key="FileNameStatus.NotFoundTags">Не найдено меток раздела</system:String>
@@ -21,6 +21,7 @@
     <system:String x:Key="GeneralSettings.ErrorMessage">Ошибка</system:String>
 
     <system:String x:Key="MainWindow.Undefined">Не определено</system:String>
+    <system:String x:Key="MainWindow.Pinned">Закреплена</system:String>
     <system:String x:Key="MainWindow.ButtonRefresh">Обновить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>

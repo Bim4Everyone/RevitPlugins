@@ -1,20 +1,23 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:models="clr-namespace:RevitCorrectNamingCheck.Models">
+    xmlns:models="clr-namespace:RevitCorrectNamingCheck.Models"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
 
     <DataTemplate
         x:Key="LinkedFileTemplate"
         DataType="{x:Type models:LinkedFile}">
         <Border
+            CornerRadius="3"
+            Padding="5,3"
             x:Name="StatusBorder"
-            Padding="6,2"
-            CornerRadius="6"
             Background="Transparent">
 
             <TextBlock
-                Foreground="Black"
+                x:Name="StatusText"
+                Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
                 Text="{Binding Name}" />
+            
         </Border>
 
         <DataTemplate.Triggers>
@@ -23,9 +26,14 @@
                 Binding="{Binding FileNameStatus}">
 
                 <Setter
+                    TargetName="StatusText"
+                    Property="Foreground"
+                    Value="Black" />
+
+                <Setter
                     TargetName="StatusBorder"
                     Property="Background"
-                    Value="MistyRose" />
+                    Value="LightYellow" />
 
                 <Setter
                     TargetName="StatusBorder"
@@ -36,6 +44,11 @@
             <DataTrigger
                 Value="Incorrect"
                 Binding="{Binding FileNameStatus}">
+
+                <Setter
+                    TargetName="StatusText"
+                    Property="Foreground"
+                    Value="Black" />
 
                 <Setter
                     TargetName="StatusBorder"

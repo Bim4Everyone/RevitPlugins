@@ -11,8 +11,8 @@
 
 
     <system:String x:Key="WorksetNameStatus.WorksetCorrect">The bond is distributed by WS correctly</system:String>
-    <system:String x:Key="WorksetNameStatus.PartialCorrect">"The link was added to the working set without the label 'Link'"</system:String>
-    <system:String x:Key="WorksetNameStatus.Incorrect">There are several labels for different sections in the name of the working set. It is impossible to determine the correspondence unambiguously</system:String>
+    <system:String x:Key="WorksetNameStatus.Incorrect">"The link was added to the working set without the label 'Link'"</system:String>
+    <system:String x:Key="WorksetNameStatus.PartialCorrect">There are several labels for different sections in the name of the working set. It is impossible to determine the correspondence unambiguously</system:String>
     <system:String x:Key="WorksetNameStatus.NoMatch">The working set of the unsuitable section is selected</system:String>
 
     <system:String x:Key="FileNameStatus.NotFoundTags">No section tags found</system:String>
@@ -22,6 +22,7 @@
     <system:String x:Key="GeneralSettings.ErrorMessage">Error</system:String>
 
     <system:String x:Key="MainWindow.Undefined">Undefined</system:String>
+    <system:String x:Key="MainWindow.Pinned">Pinned</system:String>
     <system:String x:Key="MainWindow.ButtonRefresh">Refresh</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>
