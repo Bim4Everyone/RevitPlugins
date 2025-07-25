@@ -50,7 +50,7 @@
                 UpdateTextOnSelect="True"
                 Loaded="_albumParamName_OnLoaded"
                 TextChanged="_albumParamName_OnTextChanged">
-                
+
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="TextChanged">
                         <b:InvokeCommandAction
@@ -84,7 +84,7 @@
             CornerRadius="{DynamicResource ControlCornerRadius}"
             Visibility="{Binding ShowExport,
                     Converter={StaticResource ExportVisibilityConverter}}">
-            
+
             <DockPanel
                 LastChildFill="True">
                 <ui:Button
@@ -93,8 +93,8 @@
                     Margin="14 8"
                     Icon="{ui:SymbolIcon Folder24}"
                     ToolTip="{me:LocalizationSource MainWindow.ChooseFileName}"
-                    Command="{Binding ChooseSaveFileCommand}"/>
-                
+                    Command="{Binding ChooseSaveFileCommand}" />
+
                 <ui:TextBox
                     DockPanel.Dock="Left"
                     Height="36.5"
@@ -128,6 +128,7 @@
 
                 <TreeView
                     DockPanel.Dock="Bottom"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                     Margin="14,0,14,8"
                     ItemTemplate="{StaticResource TreeViewTemplate}"
                     ItemsSource="{Binding FilteredAlbums}"
