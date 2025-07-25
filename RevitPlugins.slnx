@@ -187,6 +187,9 @@
   <Project Path="src/RevitShakeSpecs/RevitShakeSpecs.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitSleeves/RevitSleeves.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitSuperfilter/RevitSuperfilter.csproj">
     <Platform Project="x64" />
   </Project>
