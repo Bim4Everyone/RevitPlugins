@@ -20,6 +20,8 @@
     <ui:SymbolRegular x:Key="SymbolLandscape">DocumentLandscape24</ui:SymbolRegular>
     <db:PageOrientationType x:Key="PageTypeLandscape">Landscape</db:PageOrientationType>
 
+    <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+
     <converters:ObjectToObjectConverter x:Key="PageTypeEnumConverter">
         <converters:ObjectToObjectConverter.CoupleItems>
             <converters:CoupleItem
@@ -66,6 +68,8 @@
         <Grid>
 
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
@@ -73,22 +77,6 @@
             <CheckBox
                 Grid.Column="0"
                 IsChecked="{Binding IsSelected}">
-
-                <StackPanel
-                    Orientation="Horizontal">
-
-                    <ui:SymbolIcon
-                        Margin="0,0,8,0"
-                        ToolTip="{Binding PrintSheetSettings.FormatOrientation}"
-                        Symbol="{Binding PrintSheetSettings.FormatOrientation,
-                            Converter={StaticResource PageTypeEnumConverter}}" />
-
-                    <ui:TextBlock
-                        Margin="0,0,8,0"
-                        FontTypography="BodyStrong"
-                        VerticalAlignment="Center"
-                        Text="{Binding Name}" />
-                </StackPanel>
 
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="Click">
@@ -100,12 +88,43 @@
 
             <StackPanel
                 Grid.Column="1"
+                Orientation="Horizontal">
+
+                <ui:SymbolIcon
+                    Margin="0,0,8,0"
+                    ToolTip="{Binding PrintSheetSettings.FormatOrientation}"
+                    Symbol="{Binding PrintSheetSettings.FormatOrientation,
+                            Converter={StaticResource PageTypeEnumConverter}}"
+                    Visibility="{Binding PrintSheetSettings.FormatOrientation, 
+                            Converter={StaticResource StringToVisibilityConverter}}" />
+
+                <ui:TextBlock
+                    Margin="0,0,8,0"
+                    FontTypography="BodyStrong"
+                    VerticalAlignment="Center"
+                    Text="{Binding SheetNumber}"
+                    Visibility="{Binding SheetNumber, 
+                            Converter={StaticResource StringToVisibilityConverter}}" />
+            </StackPanel>
+
+            <ui:TextBlock
+                Grid.Column="2"
+                Margin="0,0,8,0"
+                FontTypography="BodyStrong"
+                VerticalAlignment="Center"
+                TextWrapping="NoWrap"
+                TextTrimming="CharacterEllipsis"
+                Text="{Binding Name}"
+                ToolTip="{Binding Name}" />
+
+            <StackPanel
+                Grid.Column="3"
                 x:Name="FormatName"
                 Orientation="Horizontal"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Right"
                 Margin="0 0 12 0">
-                
+
                 <ui:TextBlock
                     FontTypography="Body"
                     VerticalAlignment="Center"
@@ -116,11 +135,11 @@
                     Margin="12 0 0 0"
                     VerticalAlignment="Center"
                     ToolTip="{Binding ViewsWithoutCropText, Mode=OneWay}">
-                
+
                     <ui:SymbolIcon.Style>
                         <Style TargetType="ui:SymbolIcon">
                             <Setter Property="Visibility" Value="Visible" />
-                
+
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ViewsWithoutCrop.Count}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -130,9 +149,9 @@
                     </ui:SymbolIcon.Style>
                 </ui:SymbolIcon>
             </StackPanel>
-            
+
             <StackPanel
-                Grid.Column="1"
+                Grid.Column="3"
                 x:Name="Buttons"
                 Margin="0 0 12 0"
                 Orientation="Horizontal"
