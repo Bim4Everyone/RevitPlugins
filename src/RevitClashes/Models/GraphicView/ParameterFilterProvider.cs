@@ -11,9 +11,15 @@ using RevitClashDetective.Models.Visiter;
 namespace RevitClashDetective.Models.GraphicView {
     internal class ParameterFilterProvider {
         private readonly NotEqualsVisister _notEqualsVisister;
+        private readonly EqualsVisiter _equalsVisiter;
+        private readonly GreaterOrEqualVisister _greaterOrEqualVisister;
+        private readonly LessOrEqualVisister _lessOrEqualVisister;
 
         public ParameterFilterProvider() {
             _notEqualsVisister = new NotEqualsVisister();
+            _greaterOrEqualVisister = new GreaterOrEqualVisister();
+            _lessOrEqualVisister = new LessOrEqualVisister();
+            _equalsVisiter = new EqualsVisiter();
         }
 
         /// <summary>
@@ -33,6 +39,25 @@ namespace RevitClashDetective.Models.GraphicView {
 
             var elementFilter = CreateFilter(document, filterName, element.Category.GetBuiltInCategory());
             return SetFilterRules(elementFilter, element);
+        }
+
+        /// <summary>
+        /// Возвращает фильтр по параметрам, в который попадает только заданный элемент
+        /// </summary>
+        /// <param name="document">Документ, в котором нужно получить фильтр</param>
+        /// <param name="element">Элемент, который попадает в фильтр</param>
+        /// <param name="filterName">Название фильтра</param>
+        /// <returns>Заново созданный фильтр по параметрам</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public ParameterFilterElement GetSelectFilter(Document document, Element element, string filterName) {
+            if(document is null) { throw new ArgumentNullException(nameof(document)); }
+            if(element is null) { throw new ArgumentNullException(nameof(element)); }
+            if(string.IsNullOrWhiteSpace(filterName)) { throw new ArgumentException(nameof(filterName)); }
+
+            var elementFilter = CreateFilter(document, filterName, element.Category.GetBuiltInCategory());
+            elementFilter.SetElementFilter(GetSelectElementFilter(element, elementFilter));
+            return elementFilter;
         }
 
         /// <summary>
@@ -257,6 +282,44 @@ namespace RevitClashDetective.Models.GraphicView {
                 }
             }
             return new LogicalOrFilter(filters);
+        }
+
+        /// <summary>
+        /// Возвращает фильтр, в который попадает только заданный элемент
+        /// </summary>
+        /// <param name="element">Элемент для фильтрации</param>
+        /// <param name="checker">Экземпляр класса для проверки возможности установить фильтры на параметры</param>
+        /// <returns>Фильтр вида: Имя типа == "имя типа" И Размер ≥ 9.99 И Размер ≤ 10.01 и т.д.</returns>
+        private ElementFilter GetSelectElementFilter(Element element, ParameterFilterElement checker) {
+            List<ElementFilter> filters = new List<ElementFilter>();
+            //проверяем наличие типа у элемента
+            if(element.HasElementType()) {
+                BuiltInParameter typeName = BuiltInParameter.ALL_MODEL_TYPE_NAME;
+                string elType = element.GetElementType().Name;
+                //выбираем элементы, у которых название типа равно названию типа заданного элемента
+                FilterRule typeNameEqualsRule = _equalsVisiter.Create(new ElementId(typeName), elType);
+                var typeNameEqualsFilter = new ElementParameterFilter(typeNameEqualsRule);
+                if(IsValidFilter(checker, typeNameEqualsFilter)) {
+                    filters.Add(typeNameEqualsFilter);
+                }
+            }
+
+            IEnumerable<Parameter> doubleParameters = GetParameters(element)
+                .Where(p => p.HasValue && p.StorageType == StorageType.Double && p.AsDouble() != 0);
+            foreach(var param in doubleParameters) {
+                // добавляем фильтры для диапазонов: длина больше или равно (Х-d), длина меньше или равно (X+d)
+                double value = param.AsDouble();
+                double delta = value / 1000;
+                FilterRule ruleStart = _greaterOrEqualVisister.Create(param.Id, value - delta);
+                FilterRule ruleEnd = _lessOrEqualVisister.Create(param.Id, value + delta);
+                var paramFilterStart = new ElementParameterFilter(ruleStart);
+                var paramFilterEnd = new ElementParameterFilter(ruleEnd);
+                if(IsValidFilter(checker, paramFilterStart) && IsValidFilter(checker, paramFilterEnd)) {
+                    filters.Add(paramFilterStart);
+                    filters.Add(paramFilterEnd);
+                }
+            }
+            return new LogicalAndFilter(filters);
         }
 
         /// <summary>

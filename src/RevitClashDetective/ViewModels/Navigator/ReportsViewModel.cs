@@ -6,13 +6,16 @@ using System.Windows;
 using System.Windows.Input;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.RevitClashReport;
+using RevitClashDetective.Services.RevitViewSettings;
 
 namespace RevitClashDetective.ViewModels.Navigator {
 
@@ -137,7 +140,14 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private bool CanDelete() => SelectedReport != null;
 
         private void SelectClash(ClashViewModel clash) {
-            _revitRepository.SelectAndShowElement(clash.Clash, ElementsIsolationEnabled);
+            IView3DSetting settings;
+            var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
+            if(ElementsIsolationEnabled) {
+                settings = new ClashIsolationViewSettings(_revitRepository, clash.Clash, config);
+            } else {
+                settings = new ClashDefaultViewSettings(_revitRepository, clash.Clash, config);
+            }
+            _revitRepository.SelectAndShowElement([clash.Clash.MainElement, clash.Clash.OtherElement], settings);
         }
 
         private bool CanSelectClash(ClashViewModel p) {
