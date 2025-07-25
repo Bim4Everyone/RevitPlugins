@@ -37,12 +37,15 @@ internal sealed class SheetViewModel : BaseViewModel {
         _localizationService = localizationService;
 
         Name = _viewSheet.Name;
+        SheetNumber = _viewSheet.SheetNumber;
+        
         Album = album;
         CheckCommand = Album.CheckUpdateCommand;
         PrintExportCommand = RelayCommand.Create(ExecutePrintExport, CanExecutePrintExport);
     }
 
     public string Name { get; }
+    public string SheetNumber { get; }
     public AlbumViewModel Album { get; }
     public ICommand CheckCommand { get; }
     public ICommand PrintExportCommand { get; }

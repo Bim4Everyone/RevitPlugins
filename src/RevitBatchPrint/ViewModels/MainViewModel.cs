@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -292,9 +293,11 @@ internal class MainViewModel : BaseViewModel, IPrintContext {
     private SheetViewModel[] CreateSheetCollection(
         AlbumViewModel album,
         IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
+
+        LogicalStringComparer comparer = new();
         return sheetsInfo
             .Select(item => CreateSheet(album, item))
-            .OrderBy(item => item.Name)
+            .OrderBy(item => item.SheetNumber, comparer)
             .ToArray();
     }
 
