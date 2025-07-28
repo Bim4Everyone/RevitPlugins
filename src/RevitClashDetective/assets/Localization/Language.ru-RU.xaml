@@ -24,4 +24,24 @@
         x:Key="SettingsWindow.MainElementVisibilitySettings">Настройки видимости первого элемента коллизии</system:String>
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Настройки видимости второго элемента коллизии</system:String>
+
+    <system:String
+        x:Key="Transactions.IsolateClashElements">Изоляция элементов коллизии</system:String>
+    <system:String
+        x:Key="Transactions.ClashGraphicSettings">Настройка графики элементов коллизии</system:String>
+    <system:String
+        x:Key="Transactions.ClearFilters">Сброс фильтров элементов коллизии</system:String>
+
+    <system:String
+        x:Key="Filters.FirstElementFilter">BIM_коллизии_первый_элемент_{0}</system:String>
+    <system:String
+        x:Key="Filters.SecondElementFilter">BIM_коллизии_второй_элемент_{0}</system:String>
+    <system:String
+        x:Key="Filters.NotFirstElementFilter">BIM_коллизии_не_первый_элемент_{0}</system:String>
+    <system:String
+        x:Key="Filters.NotSecondElementFilter">BIM_коллизии_не_второй_элемент_{0}</system:String>
+    <system:String
+        x:Key="Filters.NotElementsOfCollisionCategories">BIM_коллизии_не_элементы_категории_коллизии_{0}</system:String>
+    <system:String
+        x:Key="Filters.NotCollisionCategories">BIM_коллизии_не_категории_элементов_коллизии_{0}</system:String>
 </ResourceDictionary>

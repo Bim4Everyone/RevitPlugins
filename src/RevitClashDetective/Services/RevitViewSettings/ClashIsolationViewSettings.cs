@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
@@ -14,11 +15,17 @@ namespace RevitClashDetective.Services.RevitViewSettings;
 
 internal class ClashIsolationViewSettings : IView3DSetting {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
     private readonly ClashModel _clashModel;
     private readonly SettingsConfig _config;
 
-    public ClashIsolationViewSettings(RevitRepository revitRepository, ClashModel clashModel, SettingsConfig config) {
+    public ClashIsolationViewSettings(
+        RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        ClashModel clashModel,
+        SettingsConfig config) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _clashModel = clashModel ?? throw new ArgumentNullException(nameof(clashModel));
         _config = config ?? throw new ArgumentNullException(nameof(config));
     }
@@ -30,12 +37,13 @@ internal class ClashIsolationViewSettings : IView3DSetting {
             10);
         bboxSettings.Apply(view3D);
         IsolateClashElements(view3D, _clashModel);
-        var colorSettings = new ColorClashViewSettings(_revitRepository, _clashModel, _config);
+        var colorSettings = new ColorClashViewSettings(_revitRepository, _localizationService, _clashModel, _config);
         colorSettings.Apply(view3D);
     }
 
     private void IsolateClashElements(View3D view, ClashModel clash) {
-        using(Transaction t = _revitRepository.Doc.StartTransaction("Изоляция элементов коллизии")) {
+        using(Transaction t = _revitRepository.Doc.StartTransaction(
+            _localizationService.GetLocalizedString("Transactions.IsolateClashElements"))) {
             var filtersToHide = GetIsolationFilters(clash, view);
             view = _revitRepository.RemoveFilters(view);
             foreach(var filter in filtersToHide) {
@@ -58,7 +66,8 @@ internal class ClashIsolationViewSettings : IView3DSetting {
                     _revitRepository.Doc,
                     view,
                     GetClashCategories(clash),
-                    $"{RevitRepository.FiltersNamePrefix}не_категории_элементов_коллизии_{username}")
+                    string.Format(_localizationService.GetLocalizedString(
+                        "Filters.NotCollisionCategories"), username))
             };
         var firstEl = clash.MainElement.GetElement(_revitRepository.DocInfos);
         var secondEl = clash.OtherElement.GetElement(_revitRepository.DocInfos);
@@ -68,21 +77,24 @@ internal class ClashIsolationViewSettings : IView3DSetting {
                     _revitRepository.Doc,
                     firstEl,
                     secondEl,
-                    $"{RevitRepository.FiltersNamePrefix}не_элементы_категории_коллизии_{username}"));
+                    string.Format(_localizationService.GetLocalizedString(
+                        "Filters.NotElementsOfCollisionCategories", username))));
         } else {
             if(firstEl != null) {
                 filters.Add(
                     _revitRepository.ParameterFilterProvider.GetHighlightFilter(
                         _revitRepository.Doc,
                         firstEl,
-                        $"{RevitRepository.FiltersNamePrefix}не_первый_элемент_{username}"));
+                        string.Format(_localizationService.GetLocalizedString(
+                            "Filters.NotFirstElementFilter", username))));
             }
             if(secondEl != null) {
                 filters.Add(
                     _revitRepository.ParameterFilterProvider.GetHighlightFilter(
                         _revitRepository.Doc,
                         secondEl,
-                        $"{RevitRepository.FiltersNamePrefix}не_второй_элемент_{username}"));
+                        string.Format(_localizationService.GetLocalizedString(
+                            "Filters.NotSecondElementFilter", username))));
             }
         }
         return filters;

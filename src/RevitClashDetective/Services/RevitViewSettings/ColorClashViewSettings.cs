@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
@@ -12,11 +13,16 @@ using RevitClashDetective.Models.Interfaces;
 namespace RevitClashDetective.Services.RevitViewSettings;
 internal class ColorClashViewSettings : IView3DSetting {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
     private readonly ClashModel _clashModel;
     private readonly SettingsConfig _config;
 
-    public ColorClashViewSettings(RevitRepository revitRepository, ClashModel clashModel, SettingsConfig config) {
+    public ColorClashViewSettings(RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        ClashModel clashModel,
+        SettingsConfig config) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _clashModel = clashModel ?? throw new ArgumentNullException(nameof(clashModel));
         _config = config ?? throw new ArgumentNullException(nameof(config));
     }
@@ -31,15 +37,16 @@ internal class ColorClashViewSettings : IView3DSetting {
         var secondEl = clash.OtherElement.GetElement(_revitRepository.DocInfos);
         if(firstEl != null && secondEl != null) {
             string username = _revitRepository.Doc.Application.Username;
-            using(Transaction t = _revitRepository.Doc.StartTransaction("Настройка графики элементов коллизии")) {
+            using(Transaction t = _revitRepository.Doc.StartTransaction(
+                _localizationService.GetLocalizedString("Transactions.ClashGraphicSettings"))) {
                 var firstElFilter = _revitRepository.ParameterFilterProvider.GetSelectFilter(
                     _revitRepository.Doc,
                     firstEl,
-                    $"{RevitRepository.FiltersNamePrefix}первый_элемент_{username}");
+                    string.Format(_localizationService.GetLocalizedString("Filters.FirstElementFilter", username)));
                 var secondElFilter = _revitRepository.ParameterFilterProvider.GetSelectFilter(
                     _revitRepository.Doc,
                     secondEl,
-                    $"{RevitRepository.FiltersNamePrefix}второй_элемент_{username}");
+                    string.Format(_localizationService.GetLocalizedString("Filters.SecondElementFilter", username)));
 
                 view.AddFilter(firstElFilter.Id);
                 view.SetFilterOverrides(firstElFilter.Id, GetGraphicSettings(_config.MainElementVisibilitySettings));

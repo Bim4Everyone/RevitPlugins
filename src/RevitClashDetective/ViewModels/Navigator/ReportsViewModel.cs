@@ -21,14 +21,18 @@ namespace RevitClashDetective.ViewModels.Navigator {
 
     internal class ReportsViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-
+        private readonly ILocalizationService _localizationService;
         private bool _elementsIsolationEnabled = true;
         private bool _openFromClashDetector;
         private ReportViewModel _selectedFile;
         private ObservableCollection<ReportViewModel> _reports;
 
-        public ReportsViewModel(RevitRepository revitRepository, string selectedFile = null) {
-            _revitRepository = revitRepository;
+        public ReportsViewModel(RevitRepository revitRepository,
+            ILocalizationService localizationService,
+            string selectedFile = null) {
+
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             Reports = new ObservableCollection<ReportViewModel>();
 
             if(selectedFile == null) {
@@ -143,9 +147,9 @@ namespace RevitClashDetective.ViewModels.Navigator {
             IView3DSetting settings;
             var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
             if(ElementsIsolationEnabled) {
-                settings = new ClashIsolationViewSettings(_revitRepository, clash.Clash, config);
+                settings = new ClashIsolationViewSettings(_revitRepository, _localizationService, clash.Clash, config);
             } else {
-                settings = new ClashDefaultViewSettings(_revitRepository, clash.Clash, config);
+                settings = new ClashDefaultViewSettings(_revitRepository, _localizationService, clash.Clash, config);
             }
             _revitRepository.SelectAndShowElement([clash.Clash.MainElement, clash.Clash.OtherElement], settings);
         }

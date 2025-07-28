@@ -24,4 +24,24 @@
         x:Key="SettingsWindow.MainElementVisibilitySettings">Visibility settings for the first collision element</system:String>
     <system:String
         x:Key="SettingsWindow.SecondElementVisibilitySettings">Visibility settings for the second collision element</system:String>
+
+    <system:String
+        x:Key="Transactions.IsolateClashElements">Isolate clash elements</system:String>
+    <system:String
+        x:Key="Transactions.ClashGraphicSettings">Clash elements graphic settings</system:String>
+    <system:String
+        x:Key="Transactions.ClearFilters">Reset clash element filters</system:String>
+
+    <system:String
+        x:Key="Names.FirstElementFilter">BIM_clashes_first_element_{0}</system:String>
+    <system:String
+        x:Key="Names.SecondElementFilter">BIM_clashes_second_element_{0}</system:String>
+    <system:String
+        x:Key="Names.NotFirstElementFilter">BIM_clashes_not_first_element_{0}</system:String>
+    <system:String
+        x:Key="Names.NotSecondElementFilter">BIM_clashes_not_second_element_{0}</system:String>
+    <system:String
+        x:Key="Names.NotElementsOfCollisionCategories">BIM_clashes_not_elements_of_clash_category_{0}</system:String>
+    <system:String
+        x:Key="Names.NotCollisionCategories">BIM_clashes_not_clash_element_categories_{0}</system:String>
 </ResourceDictionary>

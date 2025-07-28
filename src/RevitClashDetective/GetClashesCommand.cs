@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -5,6 +7,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
 
 using Ninject;
 
@@ -18,7 +21,7 @@ namespace RevitClashDetective {
     [Transaction(TransactionMode.Manual)]
     public class GetClashesCommand : BasePluginCommand {
         public GetClashesCommand() {
-            PluginName = "Поиск коллизий";
+            PluginName = "Навигатор";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -40,6 +43,11 @@ namespace RevitClashDetective {
                     .ToSelf()
                     .InSingletonScope()
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<ReportsViewModel>());
+
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+                kernel.UseWpfLocalization(
+                    $"/{assemblyName};component/assets/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
 
                 kernel.Get<NavigatorView>().Show();
             }

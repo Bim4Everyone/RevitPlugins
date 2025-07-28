@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -17,6 +18,7 @@ using RevitClashDetective.Views;
 namespace RevitClashDetective.ViewModels.ClashDetective {
     internal class CheckViewModel : BaseViewModel, INamedEntity {
         private readonly RevitRepository _revitRepository;
+        private readonly ILocalizationService _localizationService;
         private readonly FiltersConfig _filtersConfig;
         private string _name;
         private string _errorText;
@@ -25,9 +27,13 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         private SelectionViewModel _firstSelection;
         private SelectionViewModel _secondSelection;
 
-        public CheckViewModel(RevitRepository revitRepository, FiltersConfig filtersConfig, Check check = null) {
-            _revitRepository = revitRepository;
-            _filtersConfig = filtersConfig;
+        public CheckViewModel(RevitRepository revitRepository,
+            ILocalizationService localizationService,
+            FiltersConfig filtersConfig,
+            Check check = null) {
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _filtersConfig = filtersConfig ?? throw new ArgumentNullException(nameof(filtersConfig));
 
             Name = check?.Name ?? "Без имени";
 
@@ -143,7 +149,12 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         }
 
         private void ShowClashes() {
-            var view = new NavigatorView() { DataContext = new ReportsViewModel(_revitRepository, ReportName) { OpenFromClashDetector = true } };
+            var view = new NavigatorView() {
+                DataContext = new ReportsViewModel(
+                _revitRepository,
+                _localizationService,
+                ReportName) { OpenFromClashDetector = true }
+            };
             view.Show();
         }
 
