@@ -12,8 +12,8 @@ internal class AnnotationService {
     private readonly PylonView _pylonView;
 
     private readonly string _annotationTagTopTextParamName = "Текст верх";
+    private readonly string _annotationTagBottomTextParamName = "Текст низ";
     private readonly string _annotationTagLengthParamName = "Ширина полки";
-    private readonly string _weldingGostText = "ГОСТ 14098-2014-Н1-Рш";
 
 
     public AnnotationService(PylonView pylonView) {
@@ -53,20 +53,9 @@ internal class AnnotationService {
     }
 
 
-    public void CreateGostTag(XYZ bodyPoint, FamilySymbol annotationSymbol, Element element) {
-        var view = _pylonView.ViewElement;
-        var doc = view.Document;
-        // Создаем экземпляр типовой аннотации для указания ГОСТа
-        AnnotationSymbol annotationInstance = doc.Create.NewFamilyInstance(
-            bodyPoint,
-            annotationSymbol,
-            view) as AnnotationSymbol;
-
-        // Устанавливаем значение верхнего текста у выноски
-        annotationInstance.SetParamValue(_annotationTagTopTextParamName, _weldingGostText);
-
-        // Устанавливаем значение длины полки под текстом, чтобы текст влез
-        annotationInstance.SetParamValue(_annotationTagLengthParamName, UnitUtilsHelper.ConvertToInternalValue(40));
+    public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, Element element, 
+                                   string topText = null, string bottomText = null) {
+        var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, topText, bottomText);
 
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
@@ -75,5 +64,37 @@ internal class AnnotationService {
             var loc = element.Location as LocationPoint;
             leader.End = loc.Point; // Точка на элементе
         }
+    }
+
+    public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, XYZ leaderPoint,
+                                   string topText = null, string bottomText = null) {
+        var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, topText, bottomText);
+
+        // Добавляем и устанавливаем точку привязки выноски
+        annotationInstance.addLeader();
+        Leader leader = annotationInstance.GetLeaders().FirstOrDefault();
+        if(leader != null) {
+            leader.End = leaderPoint; // Точка на элементе
+        }
+    }
+
+    private AnnotationSymbol CreateAnnotationSymbol(XYZ bodyPoint, FamilySymbol annotationSymbol,
+                                                    string topText = null, string bottomText = null) {
+        var view = _pylonView.ViewElement;
+        var doc = view.Document;
+        // Создаем экземпляр типовой аннотации для указания ГОСТа
+        var annotationInstance = doc.Create.NewFamilyInstance(bodyPoint, annotationSymbol, view) as AnnotationSymbol;
+
+        // Устанавливаем значение верхнего текста у выноски
+        if(topText != null) {
+            annotationInstance.SetParamValue(_annotationTagTopTextParamName, topText);
+        }
+        // Устанавливаем значение нижнего текста у выноски
+        if(bottomText != null) {
+            annotationInstance.SetParamValue(_annotationTagBottomTextParamName, bottomText);
+        }
+        // Устанавливаем значение длины полки под текстом, чтобы текст влез
+        annotationInstance.SetParamValue(_annotationTagLengthParamName, UnitUtilsHelper.ConvertToInternalValue(40));
+        return annotationInstance;
     }
 }

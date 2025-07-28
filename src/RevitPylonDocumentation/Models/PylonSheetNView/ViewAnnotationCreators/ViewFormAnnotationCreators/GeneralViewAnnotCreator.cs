@@ -46,6 +46,7 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
             markService.TryCreatePylonElevMark(SheetInfo.HostElems, dimensionBaseService);
             markService.CreateSkeletonMark();
             markService.CreateClampMarks();
+            markService.CreateAdditionalMark();
         } catch(Exception) { }
     }
 }

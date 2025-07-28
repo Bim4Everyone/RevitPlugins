@@ -23,6 +23,8 @@ internal class TransViewRebarMarkService {
     private readonly FamilySymbol _tagSymbolWithoutSerif;
     private readonly FamilySymbol _gostTagSymbol;
 
+    private readonly string _weldingGostText = "ГОСТ 14098-2014-Н1-Рш";
+
     internal TransViewRebarMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
                                        PylonView pylonView) {
         ViewModel = mvm;
@@ -125,7 +127,7 @@ internal class TransViewRebarMarkService {
         var pointRightBottom = _viewPointsAnalyzer.GetPointByDirection(rightBottomElement, DirectionType.RightBottom, 
                                                                        2, 0.4, false);
         // Создаем типовую аннотацию для обозначения ГОСТа
-        _annotationService.CreateGostTag(pointRightBottom, _gostTagSymbol, rightBottomElement);
+        _annotationService.CreateUniversalTag(pointRightBottom, _gostTagSymbol, rightBottomElement, _weldingGostText);
     }
 
     private void CreateTopMark(List<Element> simplePlates) {

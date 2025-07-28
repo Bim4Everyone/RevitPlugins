@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using RevitPylonDocumentation.ViewModels;
 
@@ -15,6 +13,7 @@ internal class GeneralViewMarkService {
 
     private readonly FamilySymbol _tagSkeletonSymbol;
     private readonly FamilySymbol _tagSymbolWithoutSerif;
+    private readonly FamilySymbol _gostTagSymbol;
 
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
@@ -35,6 +34,8 @@ internal class GeneralViewMarkService {
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
         _tagSymbolWithoutSerif = Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Шаг - Полка 10");
+        // Находим типоразмер типовой аннотации для метки ГОСТа сварки
+        _gostTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
     }
 
     internal MainViewModel ViewModel { get; set; }
@@ -134,5 +135,19 @@ internal class GeneralViewMarkService {
         // Создаем марку арматуры
         var clampTag = _annotationService.CreateRebarTag(annotPoint, _tagSymbolWithoutSerif, simpleClamp);
         clampTag.LeaderEndCondition = LeaderEndCondition.Free;
+    }
+
+    internal void CreateAdditionalMark() {
+        // Получаем референс-элемент
+        var bottomElement = SheetInfo.HostElems.First();
+
+        // Получаем точку в которую нужно поставить аннотацию
+        var annotPoint = _viewPointsAnalyzer.GetPointByDirection(bottomElement, DirectionType.RightBottom,
+                                                                 5, 1, false);
+        var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(bottomElement, DirectionType.RightBottom,
+                                                                 2.5, 0.5, false);
+        // Создаем типовую аннотацию для обозначения ГОСТа
+        _annotationService.CreateUniversalTag(annotPoint, _gostTagSymbol, leaderPoint, 
+                                              "Арматурные выпуски", "показаны условно");
     }
 }

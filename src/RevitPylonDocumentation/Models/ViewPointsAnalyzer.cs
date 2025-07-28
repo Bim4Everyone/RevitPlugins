@@ -198,7 +198,6 @@ public class ViewPointsAnalyzer {
     /// Метод возвращает точку элемента в системе координат вида
     /// </summary>
     /// <param name="getByBoundingBox">Если да, то точка - центр BoundingBox, нет - точка вставки элемента</param>
-    /// <returns></returns>
     public XYZ GetTransformedPoint(Element element, bool getByBoundingBox) {
         var transform = _viewOfPylon.ViewElement.CropBox.Transform;
         var inverseTransform = transform.Inverse;
