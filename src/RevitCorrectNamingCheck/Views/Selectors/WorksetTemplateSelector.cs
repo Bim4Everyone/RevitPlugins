@@ -1,10 +1,8 @@
 using System.Windows.Controls;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 
 using RevitCorrectNamingCheck.Models;
-using System.Windows.Media;
 
 namespace RevitCorrectNamingCheck.Views.Selectors;
 
@@ -39,4 +37,4 @@ public class WorksetTemplateSelector : DataTemplateSelector {
             return base.SelectTemplate(item, container);
         }
     }
-}
+
