@@ -1,21 +1,20 @@
-namespace RevitMepTotals.Models.Interfaces {
+namespace RevitMepTotals.Models.Interfaces;
+/// <summary>
+/// Данные из Revit документа по воздуховодам для экспорта
+/// </summary>
+internal interface IDuctData : IMepData {
     /// <summary>
-    /// Данные из Revit документа по воздуховодам для экспорта
+    /// Значение параметра "Размер"
     /// </summary>
-    internal interface IDuctData : IMepData {
-        /// <summary>
-        /// Значение параметра "Размер"
-        /// </summary>
-        string Size { get; }
+    string Size { get; }
 
-        /// <summary>
-        /// Длина в мм
-        /// </summary>
-        double Length { get; }
+    /// <summary>
+    /// Длина в мм
+    /// </summary>
+    double Length { get; }
 
-        /// <summary>
-        /// Площадь в м кв.
-        /// </summary>
-        double Area { get; }
-    }
+    /// <summary>
+    /// Площадь в м кв.
+    /// </summary>
+    double Area { get; }
 }

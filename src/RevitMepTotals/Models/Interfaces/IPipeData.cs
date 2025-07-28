@@ -1,16 +1,15 @@
-﻿namespace RevitMepTotals.Models.Interfaces {
+namespace RevitMepTotals.Models.Interfaces;
+/// <summary>
+/// Данные из Revit документа по трубам для экспорта
+/// </summary>
+internal interface IPipeData : IMepData {
     /// <summary>
-    /// Данные из Revit документа по трубам для экспорта
+    /// Значение параметра "Размер"
     /// </summary>
-    internal interface IPipeData : IMepData {
-        /// <summary>
-        /// Значение параметра "Размер"
-        /// </summary>
-        string Size { get; }
+    string Size { get; }
 
-        /// <summary>
-        /// Длина в мм
-        /// </summary>
-        double Length { get; }
-    }
+    /// <summary>
+    /// Длина в мм
+    /// </summary>
+    double Length { get; }
 }

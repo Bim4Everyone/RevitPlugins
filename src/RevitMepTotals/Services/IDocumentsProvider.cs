@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using RevitMepTotals.Models.Interfaces;
 
-namespace RevitMepTotals.Services {
+namespace RevitMepTotals.Services;
+/// <summary>
+/// Сервис, предоставляющий методы по выбору документов моделей Revit
+/// </summary>
+internal interface IDocumentsProvider {
     /// <summary>
-    /// Сервис, предоставляющий методы по выбору документов моделей Revit
+    /// Возвращает коллекцию моделей Revit, выбранных пользователем
     /// </summary>
-    interface IDocumentsProvider {
-        /// <summary>
-        /// Возвращает коллекцию моделей Revit, выбранных пользователем
-        /// </summary>
-        /// <returns></returns>
-        ICollection<IDocument> GetDocuments();
-    }
+    /// <returns></returns>
+    ICollection<IDocument> GetDocuments();
 }

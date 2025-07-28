@@ -1,18 +1,17 @@
-﻿namespace RevitMepTotals.Models.Interfaces {
-    internal interface IPipeInsulationData : IMepData {
-        /// <summary>
-        /// Значение параметра "Размер трубы"
-        /// </summary>
-        string PipeSize { get; }
+namespace RevitMepTotals.Models.Interfaces;
+internal interface IPipeInsulationData : IMepData {
+    /// <summary>
+    /// Значение параметра "Размер трубы"
+    /// </summary>
+    string PipeSize { get; }
 
-        /// <summary>
-        /// Значение параметра "Толщина"
-        /// </summary>
-        double Thickness { get; }
+    /// <summary>
+    /// Значение параметра "Толщина"
+    /// </summary>
+    double Thickness { get; }
 
-        /// <summary>
-        /// Длина в мм
-        /// </summary>
-        double Length { get; }
-    }
+    /// <summary>
+    /// Длина в мм
+    /// </summary>
+    double Length { get; }
 }
