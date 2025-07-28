@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,17 +39,17 @@ internal class RevitRepository {
     /// Класс доступа к интерфейсу Revit.
     /// </summary>
     public UIApplication UIApplication { get; }
-    
+
     /// <summary>
     /// Класс доступа к интерфейсу документа Revit.
     /// </summary>
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    
+
     /// <summary>
     /// Класс доступа к приложению Revit.
     /// </summary>
     public Application Application => UIApplication.Application;
-    
+
     /// <summary>
     /// Класс доступа к документу Revit.
     /// </summary>
@@ -72,7 +71,7 @@ internal class RevitRepository {
     }
 
     private string GetWorksetName(Element element) {
-        var undefinedText = _localizationService.GetLocalizedString("MainWindow.Undefined");
+        string undefinedText = _localizationService.GetLocalizedString("MainWindow.Undefined");
 
         int? worksetId = element.GetParamValueOrDefault<int?>(BuiltInParameter.ELEM_PARTITION_PARAM);
         if(worksetId is null) {
