@@ -19,45 +19,43 @@ using RevitMepTotals.Services.Implements;
 using RevitMepTotals.ViewModels;
 using RevitMepTotals.Views;
 
-namespace RevitMepTotals {
-    /// <summary>
-    /// Команда для выбора моделей Revit и последующей выгрузки информации из них в Excel файл.
-    /// </summary>
-    [Transaction(TransactionMode.Manual)]
-    public class RevitMepTotalsCommand : BasePluginCommand {
-        public RevitMepTotalsCommand() {
-            PluginName = "Выгрузить объемы";
-        }
+namespace RevitMepTotals;
+/// <summary>
+/// Команда для выбора моделей Revit и последующей выгрузки информации из них в Excel файл.
+/// </summary>
+[Transaction(TransactionMode.Manual)]
+public class RevitMepTotalsCommand : BasePluginCommand {
+    public RevitMepTotalsCommand() {
+        PluginName = "Выгрузить объемы";
+    }
 
-        protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
-                kernel.Bind<RevitRepository>()
-                    .ToSelf()
-                    .InSingletonScope();
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
 
-                kernel.Bind<IDocument>().To<RevitDocument>();
-                kernel.Bind<IDocumentsProcessor>().To<DocumentsProcessor>().InSingletonScope();
-                kernel.Bind<IDataExporter>().To<DataExporter>().InSingletonScope();
-                kernel.Bind<ICopyNameProvider>().To<CopyNameProvider>().InSingletonScope();
-                kernel.Bind<IDirectoryProvider>().To<DirectoryProvider>().InSingletonScope();
-                kernel.Bind<IConstantsProvider>().To<ConstantsProvider>().InSingletonScope();
-                kernel.Bind<IErrorMessagesProvider>().To<ErrorMessagesProvider>().InSingletonScope();
-                kernel.UseXtraProgressDialog<MainViewModel>();
-                kernel.UseXtraOpenFileDialog<MainViewModel>(
-                    filter: "Revit projects |*.rvt",
-                    multiSelect: true,
-                    initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-                    );
-                kernel.UseXtraMessageBox<MainViewModel>();
+        kernel.Bind<IDocument>().To<RevitDocument>();
+        kernel.Bind<IDocumentsProcessor>().To<DocumentsProcessor>().InSingletonScope();
+        kernel.Bind<IDataExporter>().To<DataExporter>().InSingletonScope();
+        kernel.Bind<ICopyNameProvider>().To<CopyNameProvider>().InSingletonScope();
+        kernel.Bind<IDirectoryProvider>().To<DirectoryProvider>().InSingletonScope();
+        kernel.Bind<IConstantsProvider>().To<ConstantsProvider>().InSingletonScope();
+        kernel.Bind<IErrorMessagesProvider>().To<ErrorMessagesProvider>().InSingletonScope();
+        kernel.UseXtraProgressDialog<MainViewModel>();
+        kernel.UseXtraOpenFileDialog<MainViewModel>(
+            filter: "Revit projects |*.rvt",
+            multiSelect: true,
+            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            );
+        kernel.UseXtraMessageBox<MainViewModel>();
 
-                kernel.Bind<MainViewModel>().ToSelf();
-                kernel.Bind<MainWindow>().ToSelf()
-                    .WithPropertyValue(nameof(Window.Title), PluginName)
-                    .WithPropertyValue(nameof(Window.DataContext),
-                        c => c.Kernel.Get<MainViewModel>());
+        kernel.Bind<MainViewModel>().ToSelf();
+        kernel.Bind<MainWindow>().ToSelf()
+            .WithPropertyValue(nameof(Window.Title), PluginName)
+            .WithPropertyValue(nameof(Window.DataContext),
+                c => c.Kernel.Get<MainViewModel>());
 
-                Notification(kernel.Get<MainWindow>());
-            }
-        }
+        Notification(kernel.Get<MainWindow>());
     }
 }

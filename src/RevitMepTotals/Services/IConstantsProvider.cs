@@ -1,18 +1,17 @@
 using System.Collections.Generic;
 
-namespace RevitMepTotals.Services {
+namespace RevitMepTotals.Services;
+/// <summary>
+/// Сервис, предоставляющий константы
+/// </summary>
+internal interface IConstantsProvider {
     /// <summary>
-    /// Сервис, предоставляющий константы
+    /// Максимально допустимая длина названия документа
     /// </summary>
-    internal interface IConstantsProvider {
-        /// <summary>
-        /// Максимально допустимая длина названия документа
-        /// </summary>
-        int DocNameMaxLength { get; }
+    int DocNameMaxLength { get; }
 
-        /// <summary>
-        /// Символы, которые нельзя использовать в названиях листов Excel
-        /// </summary>
-        IReadOnlyCollection<char> ProhibitedExcelChars { get; }
-    }
+    /// <summary>
+    /// Символы, которые нельзя использовать в названиях листов Excel
+    /// </summary>
+    IReadOnlyCollection<char> ProhibitedExcelChars { get; }
 }
