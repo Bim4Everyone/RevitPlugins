@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 
-using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
