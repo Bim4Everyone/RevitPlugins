@@ -76,7 +76,8 @@ public class RebarFinderService {
     /// <returns></returns>
     public List<Element> GetSimpleRebars(string projectSection, string pylonKeyName, 
                                          int formNumberMin, int formNumberMax,
-                                         int formNumberMinException, int formNumberMaxException) {
+                                         int formNumberMinException = int.MinValue, 
+                                         int formNumberMaxException = int.MinValue) {
         var rebars = new FilteredElementCollector(Repository.Document)
             .OfCategory(BuiltInCategory.OST_Rebar)
             .WhereElementIsNotElementType()

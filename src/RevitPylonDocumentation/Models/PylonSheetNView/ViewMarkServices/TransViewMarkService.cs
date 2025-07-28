@@ -10,10 +10,10 @@ internal class TransViewMarkService {
     private readonly int _formNumberForClampsMax = 1599;
     private readonly int _formNumberForClampsMin = 1500;
 
-    private readonly int _formNumberForVerticalRebarMax = 1499;
-    private readonly int _formNumberForVerticalRebarMin = 1101;
+    //private readonly int _formNumberForVerticalRebarMax = 1499;
+    //private readonly int _formNumberForVerticalRebarMin = 1101;
 
-    private readonly int _formNumberForCBarMax = 1202;
+    //private readonly int _formNumberForCBarMax = 1202;
     private readonly int _formNumberForCBarMin = 1202;
 
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
@@ -51,15 +51,12 @@ internal class TransViewMarkService {
 
     internal void TryCreateTransverseViewBarMarks() {
         try {
-            var simpleRebars = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, 
-                                                                     _formNumberForVerticalRebarMin, 
-                                                                     _formNumberForVerticalRebarMax,
-                                                                     _formNumberForCBarMin, 
-                                                                     _formNumberForCBarMax);
-            if(simpleRebars is null) { return; }
-            CreateLeftBottomMark(simpleRebars);
+            var simpleRebars = SheetInfo.RebarInfo.SimpleVerticalRebars;
+            if(simpleRebars.Count > 0) {
+                CreateLeftBottomMark(simpleRebars);
+            }
 
-            var simpleClamps = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, 
+            var simpleClamps = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
                                                                      _formNumberForClampsMin, _formNumberForClampsMax);
             if(simpleClamps != null) {
                 CreateLeftTopMark(simpleClamps, simpleRebars);

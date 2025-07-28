@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models;
@@ -190,5 +192,24 @@ public class ViewPointsAnalyzer {
         var yOffset = offsets.yOffset;
 
         return point + xOffset + yOffset;
+    }
+
+    /// <summary>
+    /// Метод возвращает точку элемента в системе координат вида
+    /// </summary>
+    /// <param name="getByBoundingBox">Если да, то точка - центр BoundingBox, нет - точка вставки элемента</param>
+    /// <returns></returns>
+    public XYZ GetTransformedPoint(Element element, bool getByBoundingBox) {
+        var transform = _viewOfPylon.ViewElement.CropBox.Transform;
+        var inverseTransform = transform.Inverse;
+
+        XYZ elementPoint;
+        if(getByBoundingBox) {
+            var boundingBox = element.get_BoundingBox(_viewOfPylon.ViewElement);
+            elementPoint = (boundingBox.Min + boundingBox.Max) / 2;
+        } else {
+            elementPoint = (element.Location as LocationPoint).Point;
+        }
+        return inverseTransform.OfPoint(elementPoint);
     }
 }
