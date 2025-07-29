@@ -42,11 +42,11 @@ internal class ColorClashViewSettings : IView3DSetting {
                 var firstElFilter = _revitRepository.ParameterFilterProvider.GetSelectFilter(
                     _revitRepository.Doc,
                     firstEl,
-                    string.Format(_localizationService.GetLocalizedString("Filters.FirstElementFilter", username)));
+                    _localizationService.GetLocalizedString("Filters.FirstElementFilter", username));
                 var secondElFilter = _revitRepository.ParameterFilterProvider.GetSelectFilter(
                     _revitRepository.Doc,
                     secondEl,
-                    string.Format(_localizationService.GetLocalizedString("Filters.SecondElementFilter", username)));
+                    _localizationService.GetLocalizedString("Filters.SecondElementFilter", username));
 
                 view.AddFilter(firstElFilter.Id);
                 view.SetFilterOverrides(firstElFilter.Id, GetGraphicSettings(_config.MainElementVisibilitySettings));

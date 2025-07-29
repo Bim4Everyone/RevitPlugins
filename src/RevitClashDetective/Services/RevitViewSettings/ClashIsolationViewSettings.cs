@@ -66,8 +66,7 @@ internal class ClashIsolationViewSettings : IView3DSetting {
                     _revitRepository.Doc,
                     view,
                     GetClashCategories(clash),
-                    string.Format(_localizationService.GetLocalizedString(
-                        "Filters.NotCollisionCategories"), username))
+                    _localizationService.GetLocalizedString("Filters.NotCollisionCategories", username))
             };
         var firstEl = clash.MainElement.GetElement(_revitRepository.DocInfos);
         var secondEl = clash.OtherElement.GetElement(_revitRepository.DocInfos);
@@ -77,24 +76,21 @@ internal class ClashIsolationViewSettings : IView3DSetting {
                     _revitRepository.Doc,
                     firstEl,
                     secondEl,
-                    string.Format(_localizationService.GetLocalizedString(
-                        "Filters.NotElementsOfCollisionCategories", username))));
+                    _localizationService.GetLocalizedString("Filters.NotElementsOfCollisionCategories", username)));
         } else {
             if(firstEl != null) {
                 filters.Add(
                     _revitRepository.ParameterFilterProvider.GetHighlightFilter(
                         _revitRepository.Doc,
                         firstEl,
-                        string.Format(_localizationService.GetLocalizedString(
-                            "Filters.NotFirstElementFilter", username))));
+                        _localizationService.GetLocalizedString("Filters.NotFirstElementFilter", username)));
             }
             if(secondEl != null) {
                 filters.Add(
                     _revitRepository.ParameterFilterProvider.GetHighlightFilter(
                         _revitRepository.Doc,
                         secondEl,
-                        string.Format(_localizationService.GetLocalizedString(
-                            "Filters.NotSecondElementFilter", username))));
+                        _localizationService.GetLocalizedString("Filters.NotSecondElementFilter", username)));
             }
         }
         return filters;
