@@ -18,8 +18,8 @@
     d:DesignWidth="600"
     Height="450"
     Width="500"
-    MinHeight="300"
-    MinWidth="300"
+    MinHeight="400"
+    MinWidth="400"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
         <Style
@@ -98,6 +98,7 @@
             <DockPanel
                 LastChildFill="True">
                 <Label
+                    Margin="0 0 0 10"
                     DockPanel.Dock="Top"
                     Content="{me:LocalizationSource MainWindow.SelectedProjects}" />
                 <ui:ListView

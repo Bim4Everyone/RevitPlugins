@@ -85,23 +85,23 @@ internal class MainViewModel : BaseViewModel {
         var docViewModels = OpenFileDialogService.Files
              .Select(file => new RevitDocument(file))
              .Select(doc => new DocumentViewModel(doc));
-        List<string> errors = [];
+        string error = string.Empty;
         foreach(var docViewModel in docViewModels) {
             if(!Documents.Contains(docViewModel)) {
                 Documents.Add(docViewModel);
             } else {
-                errors.Add($"{docViewModel} уже добавлен в список");
+                error = _localizationService.GetLocalizedString("Errors.DocumentAlreadyAdded", docViewModel.Name);
             }
         }
-        if(errors.Count > 0) {
-            ShowMessageBoxError(string.Join("\n", errors));
+        if(!string.IsNullOrWhiteSpace(error)) {
+            ShowMessageBoxError(error);
         }
     }
 
 
     private void RemoveDocument(DocumentViewModel document) {
         if(MessageBoxService.Show(
-            $"Из списка будет удален документ:\n{document.Name}\nПродолжить?",
+            _localizationService.GetLocalizedString("Warnings.DocumentWillBeRemoved", document.Name),
             "BIM",
             MessageBoxButton.OKCancel,
             MessageBoxImage.Warning,
@@ -126,7 +126,7 @@ internal class MainViewModel : BaseViewModel {
             IList<IDocumentData> processedData;
             using(var progressDialogService = ProgressDialogFactory.CreateDialog()) {
                 progressDialogService.StepValue = 1;
-                progressDialogService.DisplayTitleFormat = "Обработка документов... [{0}]\\[{1}]";
+                progressDialogService.DisplayTitleFormat = _localizationService.GetLocalizedString("ProgressTitle");
                 var progress = progressDialogService.CreateProgress();
                 progressDialogService.MaxValue = documents.Count;
                 var ct = progressDialogService.CreateCancellationToken();

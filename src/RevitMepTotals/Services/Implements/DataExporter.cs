@@ -7,20 +7,25 @@ using ClosedXML.Excel;
 
 using dosymep.SimpleServices;
 
+using RevitMepTotals.Models;
 using RevitMepTotals.Models.Interfaces;
 
 namespace RevitMepTotals.Services.Implements;
 internal class DataExporter : IDataExporter {
+    private readonly RevitRepository _repository;
     private readonly ICopyNameProvider _copyNameProvider;
     private readonly IConstantsProvider _constantsProvider;
     private readonly IErrorMessagesProvider _errorMessagesProvider;
     private readonly ILocalizationService _localizationService;
 
     public DataExporter(
+        RevitRepository repository,
         ICopyNameProvider copyNameProvider,
         IConstantsProvider constantsProvider,
         IErrorMessagesProvider errorMessagesProvider,
         ILocalizationService localizationService) {
+        _repository = repository
+            ?? throw new ArgumentNullException(nameof(repository));
         _copyNameProvider = copyNameProvider
             ?? throw new ArgumentNullException(nameof(copyNameProvider));
         _constantsProvider = constantsProvider
@@ -123,15 +128,15 @@ internal class DataExporter : IDataExporter {
     /// <param name="ductData">Данные по воздуховодам</param>
     /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
     private int WriteDuctData(IXLWorksheet worksheet, int startRow, IList<IDuctData> ductData) {
-        worksheet.Cell(startRow, 1).Value = "Воздуховоды";
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.Ducts");
         worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
-        worksheet.Cell(startRow, 1).Value = "Имя системы";
-        worksheet.Cell(startRow, 2).Value = "Тип";
-        worksheet.Cell(startRow, 3).Value = "ФОП_ВИС_Наименование комбинированное";
-        worksheet.Cell(startRow, 4).Value = "Размер";
-        worksheet.Cell(startRow, 5).Value = "Длина, м";
-        worksheet.Cell(startRow, 6).Value = "Площадь, м2";
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.SystemName");
+        worksheet.Cell(startRow, 2).Value = _localizationService.GetLocalizedString("Excel.TypeName");
+        worksheet.Cell(startRow, 3).Value = _repository.CombinedNameParam.Name;
+        worksheet.Cell(startRow, 4).Value = _localizationService.GetLocalizedString("Excel.Size");
+        worksheet.Cell(startRow, 5).Value = _localizationService.GetLocalizedString("Excel.Length");
+        worksheet.Cell(startRow, 6).Value = _localizationService.GetLocalizedString("Excel.Area");
         worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
         int ductsCount = ductData.Count;
@@ -155,14 +160,14 @@ internal class DataExporter : IDataExporter {
     /// <param name="pipeData">Данные по трубам</param>
     /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
     private int WritePipeData(IXLWorksheet worksheet, int startRow, IList<IPipeData> pipeData) {
-        worksheet.Cell(startRow, 1).Value = "Трубы";
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.Pipes");
         worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
-        worksheet.Cell(startRow, 1).Value = "Имя системы";
-        worksheet.Cell(startRow, 2).Value = "Тип";
-        worksheet.Cell(startRow, 3).Value = "ФОП_ВИС_Наименование комбинированное";
-        worksheet.Cell(startRow, 4).Value = "Размер";
-        worksheet.Cell(startRow, 5).Value = "Длина, м";
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.SystemName");
+        worksheet.Cell(startRow, 2).Value = _localizationService.GetLocalizedString("Excel.TypeName");
+        worksheet.Cell(startRow, 3).Value = _repository.CombinedNameParam.Name;
+        worksheet.Cell(startRow, 4).Value = _localizationService.GetLocalizedString("Excel.Size");
+        worksheet.Cell(startRow, 5).Value = _localizationService.GetLocalizedString("Excel.Length");
         worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
         int pipesCount = pipeData.Count;
@@ -189,15 +194,15 @@ internal class DataExporter : IDataExporter {
         int startRow,
         IList<IPipeInsulationData> pipeInsulationData) {
 
-        worksheet.Cell(startRow, 1).Value = "Изоляция трубопроводов";
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.PipeInsulation");
         worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
-        worksheet.Cell(startRow, 1).Value = "Имя системы";
-        worksheet.Cell(startRow, 2).Value = "Тип";
-        worksheet.Cell(startRow, 3).Value = "ФОП_ВИС_Наименование комбинированное";
-        worksheet.Cell(startRow, 4).Value = "Размер трубы";
-        worksheet.Cell(startRow, 5).Value = "Толщина, мм";
-        worksheet.Cell(startRow, 6).Value = "Длина, м";
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.SystemName");
+        worksheet.Cell(startRow, 2).Value = _localizationService.GetLocalizedString("Excel.TypeName");
+        worksheet.Cell(startRow, 3).Value = _repository.CombinedNameParam.Name;
+        worksheet.Cell(startRow, 4).Value = _localizationService.GetLocalizedString("Excel.PipeSize");
+        worksheet.Cell(startRow, 5).Value = _localizationService.GetLocalizedString("Excel.Thickness");
+        worksheet.Cell(startRow, 6).Value = _localizationService.GetLocalizedString("Excel.Length");
         worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
         int count = pipeInsulationData.Count;
@@ -224,9 +229,9 @@ internal class DataExporter : IDataExporter {
         if(exportDirectory is null) { throw new ArgumentNullException(nameof(exportDirectory)); }
 
         string suffix = DateTime.Now.ToString("yyyy-MM-dd");
-        string fileExtension = ".xlsx";
+        const string fileExtension = ".xlsx";
 
-        string docShortName = $"Выгрузка объемов ВИС-{suffix}";
+        string docShortName = _localizationService.GetLocalizedString("Excel.FileNameMask", suffix);
         string docLongName = $"{exportDirectory.FullName}\\{docShortName}{fileExtension}";
 
         if(File.Exists(docLongName)) {
