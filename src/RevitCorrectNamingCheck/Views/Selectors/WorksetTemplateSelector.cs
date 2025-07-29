@@ -1,5 +1,5 @@
-using System.Windows;
 using System.Windows.Controls;
+using System.Windows;
 using System.Windows.Media;
 
 using RevitCorrectNamingCheck.Models;
@@ -24,16 +24,17 @@ public class WorksetTemplateSelector : DataTemplateSelector {
     public override DataTemplate SelectTemplate(object item, DependencyObject container) {
         var linkedFile = FindParent<DataGridRow>(container)?.DataContext as LinkedFile;
 
-        return linkedFile.FileNameStatus == NameStatus.Incorrect
-            ? DisabledTemplate
-            : item is WorksetInfo worksetInfo
-            ? worksetInfo.WorksetNameStatus switch {
-                NameStatus.Correct => CorrectTemplate,
-                NameStatus.PartialCorrect => PartialCorrectTemplate,
-                NameStatus.Incorrect => IncorrectTemplate,
-                NameStatus.None => NoMatchTemplate,
-                _ => base.SelectTemplate(item, container)
+            if(item is WorksetInfo worksetInfo) {
+                return worksetInfo.WorksetNameStatus switch {
+                    NameStatus.Correct => CorrectTemplate,
+                    NameStatus.PartialCorrect => PartialCorrectTemplate,
+                    NameStatus.Incorrect => IncorrectTemplate,
+                    NameStatus.None => NoMatchTemplate,
+                    _ => base.SelectTemplate(item, container)
+                };
             }
-            : base.SelectTemplate(item, container);
+
+            return base.SelectTemplate(item, container);
     }
 }
+
