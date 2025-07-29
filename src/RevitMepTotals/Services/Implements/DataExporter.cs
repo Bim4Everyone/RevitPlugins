@@ -51,7 +51,6 @@ internal class DataExporter : IDataExporter {
             return;
         }
         string path = CreateFileName(exportDirectory);
-        // https://docs.devexpress.com/OfficeFileAPI/15072/spreadsheet-document-api/getting-started?v=21.2
         using var workbook = new XLWorkbook();
         for(int sheetIndex = 0; sheetIndex < data.Count; sheetIndex++) {
             string name = CleanSheetName(data[sheetIndex].Title);
@@ -246,7 +245,7 @@ internal class DataExporter : IDataExporter {
 
     /// <summary>
     /// Корректирует название листа Excel в соответствии с правилами
-    /// https://docs.devexpress.com/OfficeFileAPI/DevExpress.Spreadsheet.Worksheet.Name#remarks
+    /// https://support.microsoft.com/en-us/office/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>

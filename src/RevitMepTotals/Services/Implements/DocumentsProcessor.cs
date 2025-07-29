@@ -108,7 +108,7 @@ internal class DocumentsProcessor : IDocumentsProcessor {
     /// Проверяет документы на конфликты имен и возвращает коллекцию документов из заданной коллекции,
     /// которые НЕ образуют конфликты и из имен документов можно сделать названия листов Excel.
     /// Правила именования листов Excel:
-    /// https://docs.devexpress.com/OfficeFileAPI/DevExpress.Spreadsheet.Worksheet.Name#remarks
+    /// https://support.microsoft.com/en-us/office/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9
     /// </summary>
     /// <param name="data"></param>
     /// <param name="errorMessage">Сообщение об ошибке, или пустая строка, если ошибок нет</param>
