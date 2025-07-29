@@ -1,0 +1,141 @@
+﻿<UserControl
+    x:Class="RevitListOfSchedules.Views.SettingsControl"
+    xmlns:res="clr-namespace:dosymep.WPF.Views"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    mc:Ignorable="d"
+    d:DesignHeight="370"
+    d:DesignWidth="600">    
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <StackPanel
+        FlowDirection="LeftToRight"
+        Background="{DynamicResource ComboBoxDropDownBackground}">
+        <Border
+            Style="{StaticResource CustomBorder}"
+            Height="65">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="350" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0">
+                    <Label
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource MainWindow.GroupParameters}" />
+                    <Label
+                        FontSize="10"
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource MainWindow.GroupParametersTooltip}" />
+                </StackPanel>
+                <ComboBox
+                    Grid.Column="1"
+                    MinWidth="250"
+                    HorizontalAlignment="Left"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding GroupParameters}"
+                    SelectedItem="{Binding SelectedGroupParameter}" />
+            </Grid>
+        </Border>
+        <Border
+            Style="{StaticResource CustomBorder}"
+            Height="65">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="350" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0">
+                    <Label
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource MainWindow.CreateList}" />
+                    <Label
+                        FontSize="10"
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource MainWindow.CreateListTooltip}" />
+                </StackPanel>
+                <ui:ToggleSwitch
+                    IsChecked="False"
+                    OnContent="{me:LocalizationSource MainWindow.OnContent}"
+                    OffContent="{me:LocalizationSource MainWindow.OffContent}"
+                    Grid.Column="1"
+                    HorizontalAlignment="Left" />
+            </Grid>
+        </Border>
+        <Border
+            Style="{StaticResource CustomBorder}"
+            Height="65">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="350" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0">
+                    <Label
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource MainWindow.AddListToSheet}" />
+                    <Label
+                        FontSize="10"
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource MainWindow.AddListToSheetTooltip}" />
+                </StackPanel>
+                <ui:ToggleSwitch
+                    IsChecked="True"
+                    OnContent="{me:LocalizationSource MainWindow.OnContent}"
+                    OffContent="{me:LocalizationSource MainWindow.OffContent}"
+                    Grid.Column="1"
+                    HorizontalAlignment="Left" />
+            </Grid>
+        </Border>
+        <Border
+            Style="{StaticResource CustomBorder}"
+            Height="65">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="350" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0">
+                    <Label
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource MainWindow.ConsiderRevision}" />
+                    <Label
+                        FontSize="10"
+                        VerticalAlignment="Center"
+                        Content="{me:LocalizationSource MainWindow.ConsiderRevisionTooltip}" />
+                </StackPanel>
+                <ui:ToggleSwitch
+                    x:Name="RevisionSwitch"
+                    Grid.Column="1"
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding IsRevisionVisible, UpdateSourceTrigger=PropertyChanged}"
+                    OnContent="{me:LocalizationSource MainWindow.OnContent}"
+                    OffContent="{me:LocalizationSource MainWindow.OffContent}" />
+            </Grid>
+        </Border>
+    </StackPanel>    
+</UserControl>

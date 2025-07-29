@@ -28,11 +28,15 @@
     <system:String
         x:Key="MainWindow.OffContent">Disable</system:String>
     <system:String
+        x:Key="MainWindow.StatusTextLoaded">Loaded</system:String>
+    <system:String
+        x:Key="MainWindow.StatusTextUnloaded">Unloaded</system:String>
+    <system:String
         x:Key="MainWindow.LinkName">Link name</system:String>
     <system:String
         x:Key="MainWindow.LinkFullName">Link full name</system:String>
     <system:String
-        x:Key="MainWindow.Reload">Reload</system:String>    
+        x:Key="MainWindow.LinkStatus">Link status</system:String>    
     <system:String
         x:Key="MainWindow.SheetNumber">Sheet number</system:String>
     <system:String

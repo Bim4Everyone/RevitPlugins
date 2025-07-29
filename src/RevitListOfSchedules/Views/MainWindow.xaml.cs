@@ -46,4 +46,8 @@ public partial class MainWindow {
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
     }
+
+    private void SettingsControl_Loaded(object sender, RoutedEventArgs e) {
+
+    }
 }

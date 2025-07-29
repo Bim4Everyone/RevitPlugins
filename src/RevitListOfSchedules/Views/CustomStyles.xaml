@@ -3,10 +3,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:local="clr-namespace:RevitListOfSchedules.Views"
-    xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui">
+    xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewHeaderRowIndicator.xaml" />
         <ResourceDictionary
@@ -324,6 +327,7 @@
             Property="CornerRadius"
             Value="{DynamicResource ControlCornerRadius}" />
     </Style>
+    
     <Style
         TargetType="ui:Button"
         x:Key="CustomContentButton"
@@ -348,7 +352,7 @@
             Value="Center" />
         <Setter
             Property="Appearance"
-            Value="Info" />
+            Value="Primary" />
     </Style>
     <Style
         TargetType="ui:Button"
@@ -377,7 +381,10 @@
             Value="Center" />
         <Setter
             Property="HorizontalContentAlignment"
-            Value="Center" />        
+            Value="Center" />
+        <Setter
+            Property="Appearance"
+            Value="Primary" />
     </Style>
     <Style
         TargetType="ui:TextBlock"

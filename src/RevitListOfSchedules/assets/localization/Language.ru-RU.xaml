@@ -28,11 +28,15 @@
     <system:String
         x:Key="MainWindow.OffContent">Выключено</system:String>
     <system:String
+        x:Key="MainWindow.StatusTextLoaded">Загружена</system:String>
+    <system:String
+        x:Key="MainWindow.StatusTextUnloaded">Не загружена</system:String>
+    <system:String
         x:Key="MainWindow.LinkName">Наименование связи</system:String>
     <system:String
         x:Key="MainWindow.LinkFullName">Полное наименование связи</system:String>
     <system:String
-        x:Key="MainWindow.Reload">Обновить</system:String>
+        x:Key="MainWindow.LinkStatus">Статус связи</system:String>
     <system:String
         x:Key="MainWindow.SheetNumber">Номер листа</system:String>
     <system:String
