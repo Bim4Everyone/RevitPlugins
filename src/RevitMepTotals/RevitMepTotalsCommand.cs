@@ -1,19 +1,20 @@
 using System;
-using System.Windows;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
 using RevitMepTotals.Models;
-using RevitMepTotals.Models.Interfaces;
 using RevitMepTotals.Services;
 using RevitMepTotals.Services.Implements;
 using RevitMepTotals.ViewModels;
@@ -35,26 +36,39 @@ public class RevitMepTotalsCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        kernel.Bind<IDocument>().To<RevitDocument>();
-        kernel.Bind<IDocumentsProcessor>().To<DocumentsProcessor>().InSingletonScope();
-        kernel.Bind<IDataExporter>().To<DataExporter>().InSingletonScope();
-        kernel.Bind<ICopyNameProvider>().To<CopyNameProvider>().InSingletonScope();
-        kernel.Bind<IDirectoryProvider>().To<DirectoryProvider>().InSingletonScope();
-        kernel.Bind<IConstantsProvider>().To<ConstantsProvider>().InSingletonScope();
-        kernel.Bind<IErrorMessagesProvider>().To<ErrorMessagesProvider>().InSingletonScope();
-        kernel.UseXtraProgressDialog<MainViewModel>();
+        kernel.Bind<IDocumentsProcessor>()
+            .To<DocumentsProcessor>()
+            .InSingletonScope();
+        kernel.Bind<IDataExporter>()
+            .To<DataExporter>()
+            .InSingletonScope();
+        kernel.Bind<ICopyNameProvider>()
+            .To<CopyNameProvider>()
+            .InSingletonScope();
+        kernel.Bind<IConstantsProvider>()
+            .To<ConstantsProvider>()
+            .InSingletonScope();
+        kernel.Bind<IErrorMessagesProvider>()
+            .To<ErrorMessagesProvider>()
+            .InSingletonScope();
+
+        kernel.UseWpfUIThemeUpdater();
+
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.UseWpfUIProgressDialog<MainViewModel>();
         kernel.UseXtraOpenFileDialog<MainViewModel>(
             filter: "Revit projects |*.rvt",
             multiSelect: true,
-            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-            );
-        kernel.UseXtraMessageBox<MainViewModel>();
+            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+        kernel.UseXtraOpenFolderDialog<MainViewModel>(
+            multiSelect: false,
+            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+        kernel.UseWpfUIMessageBox<MainViewModel>();
 
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext),
-                c => c.Kernel.Get<MainViewModel>());
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
         Notification(kernel.Get<MainWindow>());
     }

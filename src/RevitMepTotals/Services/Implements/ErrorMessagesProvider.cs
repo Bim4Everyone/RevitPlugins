@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 
+using dosymep.SimpleServices;
+
 namespace RevitMepTotals.Services.Implements;
 internal class ErrorMessagesProvider : IErrorMessagesProvider {
     private readonly IConstantsProvider _constantsProvider;
+    private readonly ILocalizationService _localizationService;
 
-
-    public ErrorMessagesProvider(IConstantsProvider constantsProvider) {
+    public ErrorMessagesProvider(IConstantsProvider constantsProvider, ILocalizationService localizationService) {
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
     }
 
 

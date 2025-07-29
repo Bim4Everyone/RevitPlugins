@@ -17,37 +17,41 @@ namespace RevitMepTotals.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly IDocumentsProcessor _documentsProcessor;
     private readonly IDataExporter _dataExporter;
-    private readonly IDirectoryProvider _directoryProvider;
+    private readonly ILocalizationService _localizationService;
 
     public MainViewModel(
         IMessageBoxService messageBoxService,
         IDocumentsProcessor documentsProcessor,
         IDataExporter dataExporter,
-        IDirectoryProvider directoryProvider,
         IProgressDialogFactory progressDialogFactory,
-        IOpenFileDialogService openFileDialogService
+        IOpenFileDialogService openFileDialogService,
+        IOpenFolderDialogService openFolderDialogService,
+        ILocalizationService localizationService
         ) {
         MessageBoxService = messageBoxService
-            ?? throw new System.ArgumentNullException(nameof(messageBoxService));
+            ?? throw new ArgumentNullException(nameof(messageBoxService));
         _documentsProcessor = documentsProcessor
-            ?? throw new System.ArgumentNullException(nameof(documentsProcessor));
+            ?? throw new ArgumentNullException(nameof(documentsProcessor));
         _dataExporter = dataExporter
-            ?? throw new System.ArgumentNullException(nameof(dataExporter));
-        _directoryProvider = directoryProvider
-            ?? throw new System.ArgumentNullException(nameof(directoryProvider));
+            ?? throw new ArgumentNullException(nameof(dataExporter));
         ProgressDialogFactory = progressDialogFactory
-            ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
+            ?? throw new ArgumentNullException(nameof(progressDialogFactory));
         OpenFileDialogService = openFileDialogService
-            ?? throw new System.ArgumentNullException(nameof(openFileDialogService));
-
+            ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        OpenFolderDialogService = openFolderDialogService
+            ?? throw new ArgumentNullException(nameof(openFolderDialogService));
+        _localizationService = localizationService
+            ?? throw new ArgumentNullException(nameof(localizationService));
         AddDocumentCommand = RelayCommand.Create(AddDocument);
-        RemoveDocumentCommand = RelayCommand.Create(RemoveDocument, CanRemoveDocument);
+        RemoveDocumentCommand = RelayCommand.Create<DocumentViewModel>(RemoveDocument, CanRemoveDocument);
         ProcessDocumentsCommand = RelayCommand.Create(ProcessDocuments, CanProcessDocuments);
     }
 
     public IProgressDialogFactory ProgressDialogFactory { get; }
 
     public IOpenFileDialogService OpenFileDialogService { get; }
+
+    public IOpenFolderDialogService OpenFolderDialogService { get; }
 
     public IMessageBoxService MessageBoxService { get; }
 
@@ -57,8 +61,7 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand ProcessDocumentsCommand { get; }
 
-    public ObservableCollection<DocumentViewModel> Documents { get; }
-        = [];
+    public ObservableCollection<DocumentViewModel> Documents { get; } = [];
 
 
     private DocumentViewModel _selectedDocument;
@@ -76,7 +79,7 @@ internal class MainViewModel : BaseViewModel {
 
 
     private void AddDocument() {
-        if(!OpenFileDialogService.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments))) {
+        if(!OpenFileDialogService.ShowDialog()) {
             return;
         }
         var docViewModels = OpenFileDialogService.Files
@@ -96,27 +99,29 @@ internal class MainViewModel : BaseViewModel {
     }
 
 
-    private void RemoveDocument() {
+    private void RemoveDocument(DocumentViewModel document) {
         if(MessageBoxService.Show(
-            $"Из списка будет удален документ:\n{SelectedDocument.Name}\nПродолжить?",
+            $"Из списка будет удален документ:\n{document.Name}\nПродолжить?",
             "BIM",
             MessageBoxButton.OKCancel,
             MessageBoxImage.Warning,
             MessageBoxResult.Cancel) == MessageBoxResult.OK) {
 
-            Documents.Remove(SelectedDocument);
+            Documents.Remove(document);
             SelectedDocument = Documents.FirstOrDefault();
         }
     }
 
-    private bool CanRemoveDocument() {
-        return SelectedDocument != null;
+    private bool CanRemoveDocument(DocumentViewModel document) {
+        return document is not null;
     }
 
     private void ProcessDocuments() {
         var documents = Documents.Select(vm => vm.GetDocument()).ToHashSet();
         if(documents.Count > 0) {
-            var directory = _directoryProvider.GetDirectory();
+            var directory = OpenFolderDialogService.ShowDialog()
+                ? OpenFolderDialogService.Folder
+                : throw new OperationCanceledException();
             string errorMsg;
             IList<IDocumentData> processedData;
             using(var progressDialogService = ProgressDialogFactory.CreateDialog()) {
