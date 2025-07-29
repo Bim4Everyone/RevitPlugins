@@ -23,6 +23,7 @@ internal class TransViewDimensionService {
         var doc = Repository.Document;
         string rebarPart = onTopOfRebar ? "верх" : "низ";
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
+        
 
         try {
             var rebarFinder = ViewModel.RebarFinder;
@@ -35,17 +36,21 @@ internal class TransViewDimensionService {
                 .Cast<Grid>()
                 .ToList();
 
+            // Определяем относительно чего нужно строить размерные линии - каркаса или пилона
+            var pylon = SheetInfo.HostElems.First();
+            var dimensionLineHostRef = onTopOfRebar ? skeletonParentRebar : pylon;
+
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
             // Размер по ФРОНТУ опалубка (положение снизу 1)
-            var dimensionLineBottomFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+            var dimensionLineBottomFirst = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, 
                                                                                  DimensionOffsetType.Bottom, 1);
-            var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance, 
+            var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance, 
                                                                               '#', '/', ["фронт", "край"]);
             var dimensionFormworkFront = doc.Create.NewDimension(view, dimensionLineBottomFirst,
                                                                  refArrayFormworkFront, ViewModel.SelectedDimensionType);
             if(grids.Count > 0) {
                 // Размер по ФРОНТУ опалубка + оси (положение сверху 1)
-                var dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                var dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, 
                                                                                    DimensionOffsetType.Top, 0.5);
                 var refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view, XYZ.BasisY,
                                                                                       refArrayFormworkFront);
@@ -55,7 +60,7 @@ internal class TransViewDimensionService {
             }
             if(!(onTopOfRebar && SheetInfo.RebarInfo.AllRebarAreL)) {
                 // Размер по ФРОНТУ опалубка + армирование (положение снизу 2)
-                var dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                var dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, 
                                                                                       DimensionOffsetType.Bottom, 0.5);
                 // Добавляем ссылки на арматурные стержни
                 var refArrayFormworkRebarFrontSecond = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
@@ -67,7 +72,7 @@ internal class TransViewDimensionService {
             }
             // Размер по ФРОНТУ опалубка + армирование в случае, если есть Г-стержни (положение снизу 0)
             if(onTopOfRebar && SheetInfo.RebarInfo.HasLRebar) {
-                var dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
+                var dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, 
                                                                                    DimensionOffsetType.Bottom, 0);
                 // Добавляем ссылки на арматурные стержни
                 var refArrayFormworkRebarFrontSecond = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
@@ -80,16 +85,14 @@ internal class TransViewDimensionService {
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
             // Размер по ТОРЦУ опалубка (положение справа 1)
-            var dimensionLineRightFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                                DimensionOffsetType.Right, 1);
-            var refArrayFormworkSide = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance, 
+            var dimensionLineRightFirst = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Right, 0.8);
+            var refArrayFormworkSide = dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance, 
                                                                              '#', '/', ["торец", "край"]);
             var dimensionFormworkSide = doc.Create.NewDimension(view, dimensionLineRightFirst,
                                                                   refArrayFormworkSide, ViewModel.SelectedDimensionType);
 
             // Размер по ТОРЦУ опалубка + армирование (положение справа 2)
-            var dimensionLineRightSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                                 DimensionOffsetType.Right, 0.5);
+            var dimensionLineRightSecond = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Right, 0.3);
             // Добавляем ссылки на арматурные стержни
             var refArrayFormworkRebarSide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
                                                                                   [rebarPart, "торец"],
@@ -99,8 +102,7 @@ internal class TransViewDimensionService {
                                                                      ViewModel.SelectedDimensionType);
             if(grids.Count > 0) {
                 // Размер по ТОРЦУ опалубка + оси (положение слева 1)
-                var dimensionLineLeft = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                              DimensionOffsetType.Left, 1.2);
+                var dimensionLineLeft = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Left, 1);
                 var refArrayFormworkGridSide = dimensionBaseService.GetDimensionRefs(grids, view, XYZ.BasisX,
                                                                                      refArrayFormworkSide);
                 var dimensionFormworkGridSide = doc.Create.NewDimension(view, dimensionLineLeft,
@@ -114,7 +116,7 @@ internal class TransViewDimensionService {
                     TopOffset = 0.6,
                     BottomOffset = 1.1
                 };
-                EditGridEnds(view, SheetInfo.HostElems.First() as FamilyInstance, grids, transverseViewGridOffsets, 
+                EditGridEnds(view, pylon as FamilyInstance, grids, transverseViewGridOffsets, 
                              dimensionBaseService);
             }
         } catch(Exception) { }

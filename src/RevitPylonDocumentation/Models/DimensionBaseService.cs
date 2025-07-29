@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 namespace RevitPylonDocumentation.Models;
 
@@ -31,7 +30,7 @@ internal class DimensionBaseService {
     }
 
 
-    public Line GetDimensionLine(FamilyInstance rebar, DimensionOffsetType dimensionOffsetType,
+    public Line GetDimensionLine(Element rebar, DimensionOffsetType dimensionOffsetType,
                                  double offsetCoefficient = 1, bool dependsOnCropBox = true) {
         // Задаем дефолтные точки на случай, если не сработает получение
         var pt1 = new XYZ(0, 0, 0);
