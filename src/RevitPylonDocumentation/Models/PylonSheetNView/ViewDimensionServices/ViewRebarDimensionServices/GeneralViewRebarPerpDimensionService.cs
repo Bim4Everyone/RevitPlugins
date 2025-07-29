@@ -121,7 +121,9 @@ internal class GeneralViewRebarPerpDimensionService {
     /// <summary>
     /// Определение с какой стороны относительно вид находится Г-образный стержень
     /// </summary>
-    internal bool LRebarIsRight(View view, RebarFinderService rebarFinder) {
+    internal bool LRebarIsRight() {
+        var view = ViewOfPylon.ViewElement;
+        var rebarFinder = ViewModel.RebarFinder;
         // Г-образный стержень
         var lRebar = rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, 1101).FirstOrDefault();
         // Бутылка
@@ -150,7 +152,7 @@ internal class GeneralViewRebarPerpDimensionService {
     /// Создание размера сбоку между низом арматурного каркаса и Г-образным стержнем
     /// </summary>
     internal void TryCreateLRebarDimension(FamilyInstance skeletonParentRebar, DimensionOffsetType dimensionOffsetType, 
-                                        DimensionBaseService dimensionBaseService) {
+                                           DimensionBaseService dimensionBaseService) {
         try {
             // #1_горизонт_Г-стержень
             var refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
@@ -165,6 +167,41 @@ internal class GeneralViewRebarPerpDimensionService {
                                                                                   dimensionLineLeftFirst, refArraySide,
                                                                                   ViewModel.SelectedDimensionType);
         } catch(Exception) { }
+    }
+
+    /// <summary>
+    /// Создание размера сбоку между низом арматурного каркаса и Г-образным стержнем
+    /// </summary>
+    internal void TryCreateLRebarDimension(FamilyInstance skeletonParentRebar, DimensionBaseService dimensionBaseService) {
+        try {
+            //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
+            // Г-образный стержень
+            var lRebar = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, 1101)
+                            .FirstOrDefault();
+            var dimensionLine = dimensionBaseService.GetDimensionLine(lRebar, DimensionOffsetType.Top, 0.5);
+            //"#1_торец_Г_нутрь"
+            //"#1_торец_Г_край"
+            if(SheetInfo.RebarInfo.AllRebarAreL) {
+                CreateLRebarDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, ["#1_торец_Г"]);
+                CreateLRebarDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, ["#2_торец_Г"]);
+            } else if(SheetInfo.RebarInfo.HasLRebar) {
+                if(LRebarIsRight() && SheetInfo.RebarInfo.SecondLRebarParamValue) {
+                    CreateLRebarDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, ["#2_торец_Г"]);
+                } else {
+                    CreateLRebarDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, ["#1_торец_Г"]);
+                }
+            }
+        } catch(Exception) { }
+    }
+
+    private void CreateLRebarDimension(FamilyInstance skeletonParentRebar, Line dimensionLine,
+                                       DimensionBaseService dimensionBaseService,
+                                       List<string> importantRefNameParts, 
+                                       List<string> unimportantRefNameParts = null) {
+        var refArray = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', importantRefNameParts,
+                                                             unimportantRefNameParts);
+        Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLine, refArray,
+                                                ViewModel.SelectedDimensionType);
     }
 
     /// <summary>

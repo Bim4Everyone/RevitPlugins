@@ -1,5 +1,7 @@
 using System;
 
+using Autodesk.Revit.DB;
+
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 using RevitPylonDocumentation.ViewModels;
 
@@ -37,8 +39,9 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
                 var rebarDimensionOffsetType = plateDimensionOffsetType == 
                     DimensionOffsetType.Left ? DimensionOffsetType.Right : DimensionOffsetType.Left;
                 dimensionService.TryCreateLRebarDimension(skeletonParentRebar, rebarDimensionOffsetType, 
-                                                       dimensionBaseService);
+                                                          dimensionBaseService);
             }
+            dimensionService.TryCreateLRebarDimension(skeletonParentRebar, dimensionBaseService);
             // Создаем размеры по изгибам вертикальных стержней-бутылок
             dimensionService.TryCreateAdditionalDimensions(skeletonParentRebar, dimensionBaseService);
         } catch(Exception) { }
@@ -53,8 +56,7 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
         // Будем ставить размерную цепочку по дефолту справа
         var plateDimensionOffsetType = DimensionOffsetType.Right;
         // Слева будем ставить только если есть Г-образный стержень (но не все) и он справа
-        if(SheetInfo.RebarInfo.HasLRebar && dimensionService.LRebarIsRight(ViewOfPylon.ViewElement, 
-                                                                           ViewModel.RebarFinder)) {
+        if(SheetInfo.RebarInfo.HasLRebar && dimensionService.LRebarIsRight()) {
             plateDimensionOffsetType = DimensionOffsetType.Left;
         }
         return plateDimensionOffsetType;
