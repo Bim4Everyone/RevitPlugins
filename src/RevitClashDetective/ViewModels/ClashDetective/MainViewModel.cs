@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 
 using dosymep.Bim4Everyone;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -20,13 +21,20 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
         private readonly ChecksConfig _checksConfig;
         private readonly FiltersConfig _filtersConfig;
         private readonly RevitRepository _revitRepository;
+        private readonly ILocalizationService _localizationService;
         private bool _canCancel = true;
         private string _messageText;
         private ObservableCollection<CheckViewModel> _checks;
 
-        public MainViewModel(ChecksConfig checksConfig, FiltersConfig filtersConfig, RevitRepository revitRepository) {
-            _filtersConfig = filtersConfig;
-            _revitRepository = revitRepository;
+        public MainViewModel(
+            RevitRepository revitRepository,
+            ILocalizationService localizationService,
+            ChecksConfig checksConfig,
+            FiltersConfig filtersConfig) {
+
+            _filtersConfig = filtersConfig ?? throw new ArgumentNullException(nameof(filtersConfig));
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _checksConfig = checksConfig;
 
             if(_checksConfig != null && _checksConfig.Checks.Count > 0) {
@@ -76,18 +84,18 @@ namespace RevitClashDetective.ViewModels.ClashDetective {
 
         private IEnumerable<CheckViewModel> InitializeChecks(ChecksConfig config) {
             foreach(var check in config.Checks) {
-                yield return new CheckViewModel(_revitRepository, _filtersConfig, check);
+                yield return new CheckViewModel(_revitRepository, _localizationService, _filtersConfig, check);
             }
         }
 
         private void InitializeEmptyCheck() {
             Checks = new ObservableCollection<CheckViewModel>() {
-                new CheckViewModel(_revitRepository, _filtersConfig)
+                new CheckViewModel(_revitRepository, _localizationService, _filtersConfig)
             };
         }
 
         private void AddCheck() {
-            Checks.Add(new CheckViewModel(_revitRepository, _filtersConfig));
+            Checks.Add(new CheckViewModel(_revitRepository, _localizationService, _filtersConfig));
         }
 
         private void RemoveCheck(CheckViewModel p) {

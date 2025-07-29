@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -6,6 +8,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
 
 using Ninject;
 
@@ -59,6 +62,11 @@ namespace RevitClashDetective {
                     .ToSelf()
                     .InSingletonScope()
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
+
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+                kernel.UseWpfLocalization(
+                    $"/{assemblyName};component/assets/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
 
                 Notification(kernel.Get<MainWindow>());
             }

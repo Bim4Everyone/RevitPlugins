@@ -1,6 +1,8 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
@@ -8,6 +10,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
 
 using Ninject;
 
@@ -23,7 +26,7 @@ namespace RevitClashDetective {
     [Transaction(TransactionMode.Manual)]
     public class CreateFiltersCommand : BasePluginCommand {
         public CreateFiltersCommand() {
-            PluginName = "Поиск коллизий";
+            PluginName = "Поисковые наборы";
         }
 
         protected override void Execute(UIApplication uiApplication) {
@@ -55,6 +58,11 @@ namespace RevitClashDetective {
                     .ToSelf()
                     .InSingletonScope()
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<FiltersViewModel>());
+
+                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+                kernel.UseWpfLocalization(
+                    $"/{assemblyName};component/assets/Localization/Language.xaml",
+                    CultureInfo.GetCultureInfo("ru-RU"));
 
                 if(selectedFilter != null) {
                     var viewModel = kernel.Get<FiltersViewModel>();

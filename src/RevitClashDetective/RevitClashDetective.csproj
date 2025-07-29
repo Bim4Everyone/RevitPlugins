@@ -2,5 +2,7 @@
 	<PropertyGroup>
 		<UseDevExpress>true</UseDevExpress>
 		<UseRevitClashes>true</UseRevitClashes>
+		<UseWpfUI>true</UseWpfUI>
+		<LangVersion>12</LangVersion>
 	</PropertyGroup>
 </Project>

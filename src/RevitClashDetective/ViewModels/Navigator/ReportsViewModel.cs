@@ -6,26 +6,33 @@ using System.Windows;
 using System.Windows.Input;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Models.RevitClashReport;
+using RevitClashDetective.Services.RevitViewSettings;
 
 namespace RevitClashDetective.ViewModels.Navigator {
 
     internal class ReportsViewModel : BaseViewModel {
         private readonly RevitRepository _revitRepository;
-
+        private readonly ILocalizationService _localizationService;
         private bool _elementsIsolationEnabled = true;
         private bool _openFromClashDetector;
         private ReportViewModel _selectedFile;
         private ObservableCollection<ReportViewModel> _reports;
 
-        public ReportsViewModel(RevitRepository revitRepository, string selectedFile = null) {
-            _revitRepository = revitRepository;
+        public ReportsViewModel(RevitRepository revitRepository,
+            ILocalizationService localizationService,
+            string selectedFile = null) {
+
+            _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             Reports = new ObservableCollection<ReportViewModel>();
 
             if(selectedFile == null) {
@@ -137,7 +144,14 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private bool CanDelete() => SelectedReport != null;
 
         private void SelectClash(ClashViewModel clash) {
-            _revitRepository.SelectAndShowElement(clash.Clash, ElementsIsolationEnabled);
+            IView3DSetting settings;
+            var config = SettingsConfig.GetSettingsConfig(GetPlatformService<IConfigSerializer>());
+            if(ElementsIsolationEnabled) {
+                settings = new ClashIsolationViewSettings(_revitRepository, _localizationService, clash.Clash, config);
+            } else {
+                settings = new ClashDefaultViewSettings(_revitRepository, _localizationService, clash.Clash, config);
+            }
+            _revitRepository.SelectAndShowElement([clash.Clash.MainElement, clash.Clash.OtherElement], settings);
         }
 
         private bool CanSelectClash(ClashViewModel p) {
