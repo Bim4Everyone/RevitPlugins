@@ -88,7 +88,7 @@ internal class GeneralViewRebarDimensionService {
 
             // #_1_горизонт_край_низ
             refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
-                                                                 ["горизонт", "край", "низ"], refArraySide);
+                                                                 ["горизонт", "край", "низ"], oldRefArray: refArraySide);
 
             var dimensionLineLeftFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
                                                                                dimensionOffsetType, 1.3);

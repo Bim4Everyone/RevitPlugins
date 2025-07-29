@@ -86,14 +86,14 @@ internal class GeneralViewDimensionService {
             foreach(var item in SheetInfo.HostElems) {
                 if(item is FamilyInstance hostElem) {
                     refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"],
-                                                                         refArraySide);
+                                                                         oldRefArray: refArraySide);
                 }
             }
             // Собираем опорные плоскости по арматуре и заполняем список опций изменений сегментов размера
             var dimSegmentOpts = new List<DimensionSegmentOption>();
             foreach(var clampsParentRebar in clampsParentRebars) {
-                refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт"], 
-                                                                     refArraySide);
+                refArraySide = dimensionBaseService.GetDimensionRefs(clampsParentRebar, '#', '/', ["горизонт"],
+                                                                     oldRefArray: refArraySide);
                 // Получаем настройки для изменения сегментов размеров
                 dimSegmentOpts = GetClampsDimensionSegmentOptions(clampsParentRebar, dimSegmentOpts);
             }

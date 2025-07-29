@@ -63,10 +63,9 @@ internal class TransViewDimensionService {
                 var dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, 
                                                                                       DimensionOffsetType.Bottom, 0.5);
                 // Добавляем ссылки на арматурные стержни
-                var refArrayFormworkRebarFrontSecond = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
-                                                                                             '#', '/',
-                                                                                             [rebarPart, "фронт"],
-                                                                                             refArrayFormworkFront);
+                var refArrayFormworkRebarFrontSecond = 
+                    dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', [rebarPart, "фронт"], 
+                                                          oldRefArray: refArrayFormworkFront);
                 doc.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkRebarFrontSecond, 
                                         ViewModel.SelectedDimensionType);
             }
@@ -75,10 +74,9 @@ internal class TransViewDimensionService {
                 var dimensionLineTopSecond = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, 
                                                                                    DimensionOffsetType.Bottom, 0);
                 // Добавляем ссылки на арматурные стержни
-                var refArrayFormworkRebarFrontSecond = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
-                                                                                             '#', '/',
-                                                                                             ["низ", "фронт"],
-                                                                                             refArrayFormworkFront);
+                var refArrayFormworkRebarFrontSecond = 
+                    dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"],
+                                                          oldRefArray: refArrayFormworkFront);
                 doc.Create.NewDimension(view, dimensionLineTopSecond, refArrayFormworkRebarFrontSecond, 
                                         ViewModel.SelectedDimensionType);
             }
@@ -96,7 +94,7 @@ internal class TransViewDimensionService {
             // Добавляем ссылки на арматурные стержни
             var refArrayFormworkRebarSide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
                                                                                   [rebarPart, "торец"],
-                                                                                  refArrayFormworkSide);
+                                                                                  oldRefArray: refArrayFormworkSide);
             var dimensionFormworkRebarSide = doc.Create.NewDimension(view, dimensionLineRightSecond,
                                                                      refArrayFormworkRebarSide, 
                                                                      ViewModel.SelectedDimensionType);

@@ -80,7 +80,7 @@ internal class GeneralViewRebarPerpDimensionService {
             }
             // #_1_горизонт_край_низ
             refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
-                                                                 ["горизонт", "край", "низ"], refArraySide);
+                                                                 ["горизонт", "край", "низ"], oldRefArray: refArraySide);
             var dimensionLineLeftFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
                                                                                dimensionOffsetType, 1.3);
             var dimensionRebarSideFirst = Repository.Document.Create.NewDimension(view, dimensionLineLeftFirst, 
@@ -158,7 +158,7 @@ internal class GeneralViewRebarPerpDimensionService {
             // #_1_горизонт_край_низ
             refArraySide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
                                                                  ["горизонт", "край", "низ"],
-                                                                 refArraySide);
+                                                                 oldRefArray: refArraySide);
             var dimensionLineLeftFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
                                                                                dimensionOffsetType, 1.3);
             var dimensionRebarSideFirst = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement,
@@ -178,13 +178,13 @@ internal class GeneralViewRebarPerpDimensionService {
             // Создаем размеры по изгибам бутылок
             var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top, -2.3);
 
-            var refArrayTop1 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["1_торец"]);
+            var refArrayTop1 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["1_торец"], ["Г"]);
             var dimensionTop1 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop1,
-                                                         ViewModel.SelectedDimensionType);
+                                                        ViewModel.SelectedDimensionType);
 
-            var refArrayTop2 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["2_торец"]);
+            var refArrayTop2 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["2_торец"], ["Г"]);
             var dimensionTop2 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop2,
-                                                         ViewModel.SelectedDimensionType);
+                                                        ViewModel.SelectedDimensionType);
             // Смещаем текст размера для корректного отображения
             var rightDirection = view.RightDirection;
             var rightDirectionInversed = rightDirection.Negate();

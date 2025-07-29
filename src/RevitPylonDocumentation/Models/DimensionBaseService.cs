@@ -264,7 +264,8 @@ internal class DimensionBaseService {
 
 
     public ReferenceArray GetDimensionRefs(FamilyInstance elem, char keyRefNamePart, char refNameParamsSeparator,
-                                        List<string> importantRefNameParts, ReferenceArray oldRefArray = null) {
+                                           List<string> importantRefNameParts, List<string> unimportantRefNameParts = null, 
+                                           ReferenceArray oldRefArray = null) {
         var references = new List<Reference>();
         foreach(FamilyInstanceReferenceType referenceType in Enum.GetValues(typeof(FamilyInstanceReferenceType))) {
             references.AddRange(elem.GetReferences(referenceType));
@@ -280,9 +281,10 @@ internal class DimensionBaseService {
         }
 
         importantRefNameParts.Add(keyRefNamePart.ToString());
+        unimportantRefNameParts = unimportantRefNameParts is null ? [] : unimportantRefNameParts;
         foreach(var reference in references) {
             string referenceName = elem.GetReferenceName(reference);
-            if(!importantRefNameParts.All(referenceName.Contains)) {
+            if(!importantRefNameParts.All(referenceName.Contains) || unimportantRefNameParts.Any(referenceName.Contains)) {
                 continue;
             }
 
