@@ -211,4 +211,13 @@ public class ViewPointsAnalyzer {
         }
         return inverseTransform.OfPoint(elementPoint);
     }
+
+    /// <summary>
+    /// Метод возвращает точку в системе координат вида
+    /// </summary>
+    public XYZ GetTransformedPoint(XYZ point) {
+        var transform = _viewOfPylon.ViewElement.CropBox.Transform;
+        var inverseTransform = transform.Inverse;
+        return inverseTransform.OfPoint(point);
+    }
 }

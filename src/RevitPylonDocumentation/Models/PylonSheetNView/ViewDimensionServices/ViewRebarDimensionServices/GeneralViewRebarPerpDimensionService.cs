@@ -10,18 +10,21 @@ using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 internal class GeneralViewRebarPerpDimensionService {
+    private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     internal GeneralViewRebarPerpDimensionService(MainViewModel mvm, RevitRepository repository, 
                                                   PylonSheetInfo pylonSheetInfo, PylonView pylonView) {
         ViewModel = mvm;
         Repository = repository;
         SheetInfo = pylonSheetInfo;
         ViewOfPylon = pylonView;
+        _viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
     }
 
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
     internal PylonView ViewOfPylon { get; set; }
+
 
 
     /// <summary>
@@ -172,20 +175,46 @@ internal class GeneralViewRebarPerpDimensionService {
         try {
             var doc = Repository.Document;
             var view = ViewOfPylon.ViewElement;
+            // Создаем размеры по изгибам бутылок
+            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top, -2.3);
 
-            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top, -1);
-
-            var refArrayTop_1 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["1_торец"]);
-            var dimensionTop_1 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop_1,
+            var refArrayTop1 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["1_торец"]);
+            var dimensionTop1 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop1,
                                                          ViewModel.SelectedDimensionType);
-            if(dimensionTop_1.ValueString == "0") {
-                doc.Delete(dimensionTop_1.Id);
+
+            var refArrayTop2 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["2_торец"]);
+            var dimensionTop2 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop2,
+                                                         ViewModel.SelectedDimensionType);
+            // Смещаем текст размера для корректного отображения
+            var rightDirection = view.RightDirection;
+            var rightDirectionInversed = rightDirection.Negate();
+            double offsetX = 0.3;
+
+            var offsetLeft = new XYZ(rightDirection.X * offsetX, rightDirection.Y * offsetX, rightDirection.Z);
+            var offsetRight = new XYZ(rightDirectionInversed.X * offsetX, 
+                                      rightDirectionInversed.Y * offsetX, 
+                                      rightDirectionInversed.Z);
+            var textPosition1 = dimensionTop1.TextPosition;
+            var textPosition1Transformed = _viewPointsAnalyzer.GetTransformedPoint(textPosition1);
+
+            var textPosition2 = dimensionTop2.TextPosition;
+            var textPosition2Transformed = _viewPointsAnalyzer.GetTransformedPoint(textPosition2);
+            if(textPosition1Transformed.X > textPosition2Transformed.X) {
+                dimensionTop1.TextPosition += offsetLeft;
+                dimensionTop2.TextPosition += offsetRight;
+            } else {
+                dimensionTop1.TextPosition += offsetRight;
+                dimensionTop2.TextPosition += offsetLeft;
             }
-            var refArrayTop_2 = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["2_торец"]);
-            var dimensionTop_2 = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop_2,
-                                                         ViewModel.SelectedDimensionType);
-            if(dimensionTop_2.ValueString == "0") {
-                doc.Delete(dimensionTop_2.Id);
+
+            // В случае, если размер имеет нулевое значение, то удаляем его
+            if(dimensionTop1.ValueString == "0") {
+                doc.Delete(dimensionTop1.Id);
+                dimensionTop1 = null;
+            }
+            if(dimensionTop2.ValueString == "0") {
+                doc.Delete(dimensionTop2.Id);
+                dimensionTop2 = null;
             }
         } catch(Exception) { }
     }
