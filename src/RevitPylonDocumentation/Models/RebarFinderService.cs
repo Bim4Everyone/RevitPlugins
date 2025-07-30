@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -219,9 +220,13 @@ public class RebarFinderService {
     }
 
 
-
-
-
-
-
+    /// <summary>
+    /// Метод возвращает только те элементы, что видны на виде
+    /// </summary>
+    public List<Element> GetRebarsFromView(List<Element> rebars, View view) {
+        var collector = new FilteredElementCollector(Repository.Document, view.Id)
+            .WhereElementIsViewIndependent()
+            .ToElements();
+        return collector.Intersect(rebars, ViewModel.ComparerOfElements).ToList();
+    }
 }

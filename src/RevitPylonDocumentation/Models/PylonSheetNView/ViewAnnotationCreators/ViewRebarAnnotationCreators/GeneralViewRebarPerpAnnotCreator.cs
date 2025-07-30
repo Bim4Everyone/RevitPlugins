@@ -1,8 +1,7 @@
 using System;
 
-using Autodesk.Revit.DB;
-
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
+using RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices;
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreators;
@@ -48,7 +47,8 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
 
         // Пытаемся создать марки на виде
         try {
-
+            var markService = new GeneralViewRebarPerpMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
+            markService.CreateVerticalBarMarks();
         } catch(Exception) { }
     }
 

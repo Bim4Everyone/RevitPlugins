@@ -65,6 +65,7 @@ internal class MainViewModel : BaseViewModel {
 
         ParamValService = new ParamValueService(revitRepository);
         RebarFinder = new RebarFinderService(this, _revitRepository);
+        ComparerOfElements = new ElementComparer();
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -134,6 +135,11 @@ internal class MainViewModel : BaseViewModel {
     /// Сервис по поиску арматуры в проекте или на виде
     /// </summary>
     internal RebarFinderService RebarFinder { get; set; }
+
+    /// <summary>
+    /// Компаратор для сравнения элементов по Id
+    /// </summary>
+    internal ElementComparer ComparerOfElements { get; }
 
 
     /// <summary>
