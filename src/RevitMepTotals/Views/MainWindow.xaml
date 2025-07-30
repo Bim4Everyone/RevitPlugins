@@ -1,59 +1,115 @@
-<base:ThemedPlatformWindow
+<core:WpfUIPlatformWindow
     x:Class="RevitMepTotals.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
     xmlns:local="clr-namespace:RevitMepTotals.Views"
     xmlns:vms="clr-namespace:RevitMepTotals.ViewModels"
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    x:Name="_this"
-    Title="MainWindow"
     d:DesignHeight="600"
     d:DesignWidth="600"
     Height="450"
     Width="500"
-    MinHeight="300"
-    MinWidth="300"
+    MinHeight="400"
+    MinWidth="400"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
-    <dxmvvm:Interaction.Behaviors>
-        <common:AttachServiceBehavior
-            AttachableService="{Binding ProgressDialogFactory}" />
-        <common:AttachServiceBehavior
-            AttachableService="{Binding OpenFileDialogService}" />
-        <common:AttachServiceBehavior
-            AttachableService="{Binding MessageBoxService}" />
-    </dxmvvm:Interaction.Behaviors>
+    <core:WpfUIPlatformWindow.Resources>
+        <Style
+            TargetType="Border"
+            x:Key="CustomBorder">
+            <Setter
+                Property="Padding"
+                Value="20" />
+            <Setter
+                Property="VerticalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="HorizontalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="SnapsToDevicePixels"
+                Value="True" />
+            <Setter
+                Property="OverridesDefaultStyle"
+                Value="True" />
+            <Setter
+                Property="ScrollViewer.HorizontalScrollBarVisibility"
+                Value="Auto" />
+            <Setter
+                Property="ScrollViewer.VerticalScrollBarVisibility"
+                Value="Disabled" />
+            <Setter
+                Property="Background"
+                Value="{DynamicResource CardBackground}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource CardBorderBrush}" />
+            <Setter
+                Property="BorderThickness"
+                Value="{DynamicResource CardControlBorderThemeThickness}" />
+            <Setter
+                Property="FocusVisualStyle"
+                Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+            <Setter
+                Property="CornerRadius"
+                Value="{DynamicResource ControlCornerRadius}" />
+        </Style>
+    </core:WpfUIPlatformWindow.Resources>
+    <b:Interaction.Behaviors>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFolderDialogService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}">
+        </wpfbehaviors:WpfAttachServiceBehavior>
+    </b:Interaction.Behaviors>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
             <RowDefinition
                 Height="*" />
             <RowDefinition
                 Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxdo:LayoutControlItem>
-            <lc:GroupBox
-                Header="Выбранные проекты">
-                <dxe:ListBoxEdit
-                    ItemsSource="{Binding Documents}"
-                    EditValue="{Binding SelectedDocument, UpdateSourceTrigger=PropertyChanged}">
-                </dxe:ListBoxEdit>
-            </lc:GroupBox>
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}" />
 
-        </dxdo:LayoutControlItem>
+        <Border
+            Grid.Row="1"
+            Margin="10"
+            Style="{StaticResource CustomBorder}">
+            <DockPanel
+                LastChildFill="True">
+                <Label
+                    Margin="0 0 0 10"
+                    DockPanel.Dock="Top"
+                    Content="{me:LocalizationSource MainWindow.SelectedProjects}" />
+                <ui:ListView
+                    ItemsSource="{Binding Documents}"
+                    SelectedItem="{Binding SelectedDocument}">
+                </ui:ListView>
+            </DockPanel>
+        </Border>
 
         <StackPanel
-            Grid.Row="1"
-            Height="45"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
@@ -62,32 +118,33 @@
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
-            <dx:SimpleButton
+            <ui:Button
                 Margin="10"
-                Width="80"
-                Content="Удалить"
+                Appearance="Danger"
+                Content="{ui:SymbolIcon Symbol=Delete24}"
+                CommandParameter="{Binding SelectedDocument}"
                 Command="{Binding RemoveDocumentCommand}" />
 
-            <dx:SimpleButton
+            <ui:Button
                 Margin="10"
-                Width="80"
-                Content="Добавить"
+                Content="{ui:SymbolIcon Symbol=Add24}"
                 Command="{Binding AddDocumentCommand}" />
 
-            <dx:SimpleButton
+            <ui:Button
                 Margin="10"
                 Width="80"
-                Content="ОК"
+                Appearance="Info"
                 IsDefault="True"
                 Click="ButtonOk_Click"
+                Content="{me:LocalizationSource Ok}"
                 Command="{Binding ProcessDocumentsCommand}" />
 
-            <dx:SimpleButton
+            <ui:Button
                 Margin="10"
                 Width="80"
-                Content="Отмена"
                 IsCancel="True"
-                Click="ButtonCancel_Click" />
+                Click="ButtonCancel_Click"
+                Content="{me:LocalizationSource Cancel}" />
         </StackPanel>
     </Grid>
-</base:ThemedPlatformWindow>
+</core:WpfUIPlatformWindow>

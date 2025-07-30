@@ -1,0 +1,100 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="Ok">OK</system:String>
+    <system:String
+        x:Key="Cancel">Cancel</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Export totals</system:String>
+    <system:String
+        x:Key="MainWindow.SelectedProjects">Selected projects</system:String>
+
+    <system:String
+        x:Key="ProgressTitle">Processing documents... [{0}]\[{1}]</system:String>
+
+    <system:String
+        x:Key="DefaultStringParamValue">not available</system:String>
+    <system:String
+        x:Key="Copy">copy</system:String>
+
+    <system:String
+        x:Key="Excel.Ducts">Ducts</system:String>
+    <system:String
+        x:Key="Excel.Pipes">Pipes</system:String>
+    <system:String
+        x:Key="Excel.PipeInsulation">Pipe insulation</system:String>
+    <system:String
+        x:Key="Excel.SystemName">System name</system:String>
+    <system:String
+        x:Key="Excel.TypeName">Type</system:String>
+    <system:String
+        x:Key="Excel.Size">Size</system:String>
+    <system:String
+        x:Key="Excel.PipeSize">Pipe size</system:String>
+    <system:String
+        x:Key="Excel.Length">Length, m</system:String>
+    <system:String
+        x:Key="Excel.Area">Area, m2</system:String>
+    <system:String
+        x:Key="Excel.Thickness">Thickness, mm</system:String>
+
+    <system:String
+        x:Key="Excel.FileNameMask">Export volumes MEP-{0}</system:String>
+
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.FileNamesConflict">
+These documents cannot be exported at the same time,
+because they cause sheet name conflicts in Excel:
+{0}
+An Excel sheet name must be no longer than {1} characters
+and must not contain {2}
+</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.CannotProcessOpenedDocument">
+Cannot process an open document:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.NotSupportedDocumentVersion">
+The document was created in a newer version:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.DocumentHasTooManyErrors">
+The document has too many errors:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.CannotProcessDocument">
+The document cannot be processed:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.DocumentIsRemoved">
+The document has been removed:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.InsufficientResources">
+The computer does not have enough resources
+to open the model.</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.DocumentAlreadyAdded">
+The document has already been added to the list:
+'{0}'</system:String>
+
+    <system:String
+        xml:space="preserve"
+        x:Key="Warnings.DocumentWillBeRemoved">
+The document will be removed from the list:
+{0}
+Continue?</system:String>
+
+</ResourceDictionary>

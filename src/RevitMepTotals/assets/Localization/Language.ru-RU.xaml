@@ -1,0 +1,100 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="Ok">ОК</system:String>
+    <system:String
+        x:Key="Cancel">Отмена</system:String>
+
+    <system:String
+        x:Key="MainWindow.Title">Выгрузить объемы</system:String>
+    <system:String
+        x:Key="MainWindow.SelectedProjects">Выбранные проекты</system:String>
+    
+    <system:String
+        x:Key="ProgressTitle">Обработка документов... [{0}]\[{1}]</system:String>
+
+    <system:String
+        x:Key="DefaultStringParamValue">отсутствует</system:String>
+    <system:String
+        x:Key="Copy">копия</system:String>
+
+    <system:String
+        x:Key="Excel.Ducts">Воздуховоды</system:String>
+    <system:String
+        x:Key="Excel.Pipes">Трубы</system:String>
+    <system:String
+        x:Key="Excel.PipeInsulation">Изоляция трубопроводов</system:String>
+    <system:String
+        x:Key="Excel.SystemName">Имя системы</system:String>
+    <system:String
+        x:Key="Excel.TypeName">Тип</system:String>
+    <system:String
+        x:Key="Excel.Size">Размер</system:String>
+    <system:String
+        x:Key="Excel.PipeSize">Размер трубы</system:String>
+    <system:String
+        x:Key="Excel.Length">Длина, м</system:String>
+    <system:String
+        x:Key="Excel.Area">Площадь, м2</system:String>
+    <system:String
+        x:Key="Excel.Thickness">Толщина, мм</system:String>
+
+    <system:String
+        x:Key="Excel.FileNameMask">Выгрузка объемов ВИС-{0}</system:String>
+
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.FileNamesConflict">
+Эти документы нельзя выгрузить за один раз,
+т.к. они образуют конфликт имен в листах Excel:
+{0}
+Имя листа Excel должно быть не более {1} символов
+и не должно содержать {2}
+</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.CannotProcessOpenedDocument">
+Нельзя обработать открытый документ:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.NotSupportedDocumentVersion">
+Документ создан в более поздней версии:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.DocumentHasTooManyErrors">
+В документе слишком много ошибок:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.CannotProcessDocument">
+Документ нельзя обработать:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.DocumentIsRemoved">
+Документ удален:
+'{0}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.InsufficientResources">
+У компьютера недостаточно ресурсов,
+чтобы открыть модель.</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Errors.DocumentAlreadyAdded">
+Документ уже добавлен в список:
+'{0}'</system:String>
+
+    <system:String
+        xml:space="preserve"
+        x:Key="Warnings.DocumentWillBeRemoved">
+Из списка будет удален документ:
+{0}
+Продолжить?</system:String>
+
+</ResourceDictionary>

@@ -3,26 +3,37 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using DevExpress.Spreadsheet;
+using ClosedXML.Excel;
 
+using dosymep.SimpleServices;
+
+using RevitMepTotals.Models;
 using RevitMepTotals.Models.Interfaces;
 
 namespace RevitMepTotals.Services.Implements;
 internal class DataExporter : IDataExporter {
+    private readonly RevitRepository _repository;
     private readonly ICopyNameProvider _copyNameProvider;
     private readonly IConstantsProvider _constantsProvider;
     private readonly IErrorMessagesProvider _errorMessagesProvider;
+    private readonly ILocalizationService _localizationService;
 
     public DataExporter(
+        RevitRepository repository,
         ICopyNameProvider copyNameProvider,
         IConstantsProvider constantsProvider,
-        IErrorMessagesProvider errorMessagesProvider) {
+        IErrorMessagesProvider errorMessagesProvider,
+        ILocalizationService localizationService) {
+        _repository = repository
+            ?? throw new ArgumentNullException(nameof(repository));
         _copyNameProvider = copyNameProvider
             ?? throw new ArgumentNullException(nameof(copyNameProvider));
         _constantsProvider = constantsProvider
             ?? throw new ArgumentNullException(nameof(constantsProvider));
         _errorMessagesProvider = errorMessagesProvider
             ?? throw new ArgumentNullException(nameof(errorMessagesProvider));
+        _localizationService = localizationService
+            ?? throw new ArgumentNullException(nameof(localizationService));
     }
 
 
@@ -40,38 +51,23 @@ internal class DataExporter : IDataExporter {
             return;
         }
         string path = CreateFileName(exportDirectory);
-        // https://docs.devexpress.com/OfficeFileAPI/15072/spreadsheet-document-api/getting-started?v=21.2
-        using var workbook = new Workbook();
-        workbook.Unit = DevExpress.Office.DocumentUnit.Point;
-        workbook.BeginUpdate();
-        try {
-            for(int sheetIndex = 0; sheetIndex < data.Count; sheetIndex++) {
-                var worksheet = workbook.Worksheets[sheetIndex];
-                worksheet.Name = CleanSheetName(data[sheetIndex].Title); // корректировка заголовка листа
+        using var workbook = new XLWorkbook();
+        for(int sheetIndex = 0; sheetIndex < data.Count; sheetIndex++) {
+            string name = CleanSheetName(data[sheetIndex].Title);
+            var worksheet = workbook.Worksheets.Add(name);
 
-                int rowToWrite = 0;
-                rowToWrite = WriteDuctData(worksheet, rowToWrite, GetOrderedDuctData(data[sheetIndex]));
+            int rowToWrite = 1;
+            rowToWrite = WriteDuctData(worksheet, rowToWrite, GetOrderedDuctData(data[sheetIndex]));
 
-                rowToWrite++;
-                rowToWrite = WritePipeData(worksheet, rowToWrite, GetOrderedPipeData(data[sheetIndex]));
+            rowToWrite++;
+            rowToWrite = WritePipeData(worksheet, rowToWrite, GetOrderedPipeData(data[sheetIndex]));
 
-                rowToWrite++;
-                WritePipeInsulationData(worksheet, rowToWrite, GetOrderedPipeInsulationData(data[sheetIndex]));
+            rowToWrite++;
+            WritePipeInsulationData(worksheet, rowToWrite, GetOrderedPipeInsulationData(data[sheetIndex]));
 
-                worksheet.Columns
-                    .AutoFit(0,
-                        typeof(IPipeInsulationData)
-                        .GetProperties()
-                        .Count()
-                    ); // интерфейс с самым большим количеством свойств
-                workbook.Worksheets.Add(); //добавляем следующий лист
-            }
-            workbook.Worksheets.RemoveAt(workbook.Worksheets.Count - 1); // удаляем последний пустой лист
-        } finally {
-            workbook.EndUpdate();
+            worksheet.Columns().AdjustToContents();
         }
-        workbook.Calculate();
-        workbook.SaveDocument(path, DocumentFormat.OpenXml);
+        workbook.SaveAs(path);
     }
 
     /// <summary>
@@ -94,36 +90,33 @@ internal class DataExporter : IDataExporter {
             ? _errorMessagesProvider
                 .GetFileNamesConflictMessage(docsWithNameConflicts.Select(doc => doc.Title).ToArray())
             : string.Empty;
-        return data.Except(docsWithNameConflicts).ToList();
+        return [.. data.Except(docsWithNameConflicts)];
     }
 
     private IList<IDuctData> GetOrderedDuctData(IDocumentData documentData) {
-        return documentData.Ducts
+        return [.. documentData.Ducts
             .OrderBy(d => d.SystemName)
             .ThenBy(d => d.TypeName)
             .ThenBy(d => d.Name)
-            .ThenBy(d => d.Size)
-            .ToList();
+            .ThenBy(d => d.Size)];
     }
 
     private IList<IPipeData> GetOrderedPipeData(IDocumentData documentData) {
-        return documentData.Pipes
+        return [.. documentData.Pipes
             .OrderBy(d => d.SystemName)
             .ThenBy(d => d.TypeName)
             .ThenBy(d => d.Name)
-            .ThenBy(d => d.Size)
-            .ToList();
+            .ThenBy(d => d.Size)];
     }
 
     private IList<IPipeInsulationData> GetOrderedPipeInsulationData(IDocumentData documentData) {
-        return documentData.PipeInsulations
+        return [.. documentData.PipeInsulations
             .OrderBy(d => d.SystemName)
             .ThenBy(d => d.TypeName)
             .ThenBy(d => d.Name)
             .ThenBy(d => d.PipeSize)
             .ThenBy(d => d.Thickness)
-            .Where(d => d.Length > 0)
-            .ToList();
+            .Where(d => d.Length > 0)];
     }
 
     /// <summary>
@@ -133,27 +126,27 @@ internal class DataExporter : IDataExporter {
     /// <param name="startRow">Индекс первой строчки, с которой нужно начать запись данных</param>
     /// <param name="ductData">Данные по воздуховодам</param>
     /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
-    private int WriteDuctData(Worksheet worksheet, int startRow, IList<IDuctData> ductData) {
-        worksheet.Rows[startRow][0].Value = "Воздуховоды";
-        worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
+    private int WriteDuctData(IXLWorksheet worksheet, int startRow, IList<IDuctData> ductData) {
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.Ducts");
+        worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
-        worksheet.Rows[startRow][0].Value = "Имя системы";
-        worksheet.Rows[startRow][1].Value = "Тип";
-        worksheet.Rows[startRow][2].Value = "ФОП_ВИС_Наименование комбинированное";
-        worksheet.Rows[startRow][3].Value = "Размер";
-        worksheet.Rows[startRow][4].Value = "Длина, м";
-        worksheet.Rows[startRow][5].Value = "Площадь, м2";
-        worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.SystemName");
+        worksheet.Cell(startRow, 2).Value = _localizationService.GetLocalizedString("Excel.TypeName");
+        worksheet.Cell(startRow, 3).Value = _repository.CombinedNameParam.Name;
+        worksheet.Cell(startRow, 4).Value = _localizationService.GetLocalizedString("Excel.Size");
+        worksheet.Cell(startRow, 5).Value = _localizationService.GetLocalizedString("Excel.Length");
+        worksheet.Cell(startRow, 6).Value = _localizationService.GetLocalizedString("Excel.Area");
+        worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
         int ductsCount = ductData.Count;
         int lastRow = startRow + ductsCount - 1;
         for(int row = startRow; row < lastRow + 1; row++) {
-            worksheet.Rows[row][0].Value = ductData[row - startRow].SystemName;
-            worksheet.Rows[row][1].Value = ductData[row - startRow].TypeName;
-            worksheet.Rows[row][2].Value = ductData[row - startRow].Name;
-            worksheet.Rows[row][3].Value = ductData[row - startRow].Size;
-            worksheet.Rows[row][4].Value = ductData[row - startRow].Length / 1000;
-            worksheet.Rows[row][5].Value = ductData[row - startRow].Area;
+            worksheet.Cell(row, 1).Value = ductData[row - startRow].SystemName;
+            worksheet.Cell(row, 2).Value = ductData[row - startRow].TypeName;
+            worksheet.Cell(row, 3).Value = ductData[row - startRow].Name;
+            worksheet.Cell(row, 4).Value = ductData[row - startRow].Size;
+            worksheet.Cell(row, 5).Value = ductData[row - startRow].Length / 1000;
+            worksheet.Cell(row, 6).Value = ductData[row - startRow].Area;
         }
         return lastRow;
     }
@@ -165,25 +158,25 @@ internal class DataExporter : IDataExporter {
     /// <param name="startRow">Индекс первой строчки, с которой нужно начать запись данных</param>
     /// <param name="pipeData">Данные по трубам</param>
     /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
-    private int WritePipeData(Worksheet worksheet, int startRow, IList<IPipeData> pipeData) {
-        worksheet.Rows[startRow][0].Value = "Трубы";
-        worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
+    private int WritePipeData(IXLWorksheet worksheet, int startRow, IList<IPipeData> pipeData) {
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.Pipes");
+        worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
-        worksheet.Rows[startRow][0].Value = "Имя системы";
-        worksheet.Rows[startRow][1].Value = "Тип";
-        worksheet.Rows[startRow][2].Value = "ФОП_ВИС_Наименование комбинированное";
-        worksheet.Rows[startRow][3].Value = "Размер";
-        worksheet.Rows[startRow][4].Value = "Длина, м";
-        worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.SystemName");
+        worksheet.Cell(startRow, 2).Value = _localizationService.GetLocalizedString("Excel.TypeName");
+        worksheet.Cell(startRow, 3).Value = _repository.CombinedNameParam.Name;
+        worksheet.Cell(startRow, 4).Value = _localizationService.GetLocalizedString("Excel.Size");
+        worksheet.Cell(startRow, 5).Value = _localizationService.GetLocalizedString("Excel.Length");
+        worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
         int pipesCount = pipeData.Count;
         int lastRow = startRow + pipesCount - 1;
         for(int row = startRow; row < lastRow + 1; row++) {
-            worksheet.Rows[row][0].Value = pipeData[row - startRow].SystemName;
-            worksheet.Rows[row][1].Value = pipeData[row - startRow].TypeName;
-            worksheet.Rows[row][2].Value = pipeData[row - startRow].Name;
-            worksheet.Rows[row][3].Value = pipeData[row - startRow].Size;
-            worksheet.Rows[row][4].Value = pipeData[row - startRow].Length / 1000;
+            worksheet.Cell(row, 1).Value = pipeData[row - startRow].SystemName;
+            worksheet.Cell(row, 2).Value = pipeData[row - startRow].TypeName;
+            worksheet.Cell(row, 3).Value = pipeData[row - startRow].Name;
+            worksheet.Cell(row, 4).Value = pipeData[row - startRow].Size;
+            worksheet.Cell(row, 5).Value = pipeData[row - startRow].Length / 1000;
         }
         return lastRow;
     }
@@ -196,30 +189,30 @@ internal class DataExporter : IDataExporter {
     /// <param name="pipeInsulationData">Данные по изоляции труб</param>
     /// <returns>Индекс последней строчки, на которую были записаны данные</returns>
     private int WritePipeInsulationData(
-        Worksheet worksheet,
+        IXLWorksheet worksheet,
         int startRow,
         IList<IPipeInsulationData> pipeInsulationData) {
 
-        worksheet.Rows[startRow][0].Value = "Изоляция трубопроводов";
-        worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.PipeInsulation");
+        worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
-        worksheet.Rows[startRow][0].Value = "Имя системы";
-        worksheet.Rows[startRow][1].Value = "Тип";
-        worksheet.Rows[startRow][2].Value = "ФОП_ВИС_Наименование комбинированное";
-        worksheet.Rows[startRow][3].Value = "Размер трубы";
-        worksheet.Rows[startRow][4].Value = "Толщина, мм";
-        worksheet.Rows[startRow][5].Value = "Длина, м";
-        worksheet.Rows[startRow].Font.FontStyle = SpreadsheetFontStyle.Bold;
+        worksheet.Cell(startRow, 1).Value = _localizationService.GetLocalizedString("Excel.SystemName");
+        worksheet.Cell(startRow, 2).Value = _localizationService.GetLocalizedString("Excel.TypeName");
+        worksheet.Cell(startRow, 3).Value = _repository.CombinedNameParam.Name;
+        worksheet.Cell(startRow, 4).Value = _localizationService.GetLocalizedString("Excel.PipeSize");
+        worksheet.Cell(startRow, 5).Value = _localizationService.GetLocalizedString("Excel.Thickness");
+        worksheet.Cell(startRow, 6).Value = _localizationService.GetLocalizedString("Excel.Length");
+        worksheet.Row(startRow).Style.Font.Bold = true;
         startRow++;
         int count = pipeInsulationData.Count;
         int lastRow = startRow + count - 1;
         for(int row = startRow; row < lastRow + 1; row++) {
-            worksheet.Rows[row][0].Value = pipeInsulationData[row - startRow].SystemName;
-            worksheet.Rows[row][1].Value = pipeInsulationData[row - startRow].TypeName;
-            worksheet.Rows[row][2].Value = pipeInsulationData[row - startRow].Name;
-            worksheet.Rows[row][3].Value = pipeInsulationData[row - startRow].PipeSize;
-            worksheet.Rows[row][4].Value = pipeInsulationData[row - startRow].Thickness;
-            worksheet.Rows[row][5].Value = pipeInsulationData[row - startRow].Length / 1000;
+            worksheet.Cell(row, 1).Value = pipeInsulationData[row - startRow].SystemName;
+            worksheet.Cell(row, 2).Value = pipeInsulationData[row - startRow].TypeName;
+            worksheet.Cell(row, 3).Value = pipeInsulationData[row - startRow].Name;
+            worksheet.Cell(row, 4).Value = pipeInsulationData[row - startRow].PipeSize;
+            worksheet.Cell(row, 5).Value = pipeInsulationData[row - startRow].Thickness;
+            worksheet.Cell(row, 6).Value = pipeInsulationData[row - startRow].Length / 1000;
         }
         return lastRow;
     }
@@ -235,16 +228,16 @@ internal class DataExporter : IDataExporter {
         if(exportDirectory is null) { throw new ArgumentNullException(nameof(exportDirectory)); }
 
         string suffix = DateTime.Now.ToString("yyyy-MM-dd");
-        string fileExtension = ".xlsx";
+        const string fileExtension = ".xlsx";
 
-        string docShortName = $"Выгрузка объемов ВИС-{suffix}";
+        string docShortName = _localizationService.GetLocalizedString("Excel.FileNameMask", suffix);
         string docLongName = $"{exportDirectory.FullName}\\{docShortName}{fileExtension}";
 
         if(File.Exists(docLongName)) {
             string[] neighboringFilesNames = exportDirectory
                 .GetFiles()
                 .Select(f => Path.GetFileNameWithoutExtension(f.FullName))
-                .ToArray() ?? Array.Empty<string>();
+                .ToArray() ?? [];
             docShortName = _copyNameProvider.CreateCopyName(docShortName, neighboringFilesNames);
         }
         return $"{exportDirectory.FullName}\\{docShortName}{fileExtension}";
@@ -252,7 +245,7 @@ internal class DataExporter : IDataExporter {
 
     /// <summary>
     /// Корректирует название листа Excel в соответствии с правилами
-    /// https://docs.devexpress.com/OfficeFileAPI/DevExpress.Spreadsheet.Worksheet.Name#remarks
+    /// https://support.microsoft.com/en-us/office/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>

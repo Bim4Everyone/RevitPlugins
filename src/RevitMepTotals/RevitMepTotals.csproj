@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<UseDevExpress>true</UseDevExpress>
+		<UseWpfUI>true</UseWpfUI>
 		<LangVersion>12</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DevExpress.Document.Processor" Version="21.2.3">
+		<PackageReference Include="ClosedXML" Version="0.104.1">
 			<PrivateAssets>all</PrivateAssets>
 			<ExcludeAssets>runtime</ExcludeAssets>
 		</PackageReference>

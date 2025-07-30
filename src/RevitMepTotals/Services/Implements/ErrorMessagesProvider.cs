@@ -1,44 +1,48 @@
 using System;
 using System.Collections.Generic;
 
+using dosymep.SimpleServices;
+
 namespace RevitMepTotals.Services.Implements;
 internal class ErrorMessagesProvider : IErrorMessagesProvider {
     private readonly IConstantsProvider _constantsProvider;
+    private readonly ILocalizationService _localizationService;
 
-
-    public ErrorMessagesProvider(IConstantsProvider constantsProvider) {
+    public ErrorMessagesProvider(IConstantsProvider constantsProvider, ILocalizationService localizationService) {
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
     }
 
 
     public string GetFileNamesConflictMessage(ICollection<string> conflictNames) {
-        return $"{string.Join(Environment.NewLine, conflictNames)}" +
-            $"\nЭти документы нельзя выгрузить за один раз, т.к. они образуют конфликт имен в листах Excel." +
-            $"\nИмя листа Excel должно быть не более {_constantsProvider.DocNameMaxLength} символа" +
-            $"\nи не должно содержать {string.Join(", ", _constantsProvider.ProhibitedExcelChars)} ";
+        return _localizationService.GetLocalizedString(
+            "Errors.FileNamesConflict",
+            string.Join(Environment.NewLine, conflictNames),
+            _constantsProvider.DocNameMaxLength,
+            string.Join(", ", _constantsProvider.ProhibitedExcelChars));
     }
 
     public string GetFileAlreadyOpenedMessage(string path) {
-        return $"Документ \'{path}\' нельзя обработать, т.к. он уже открыт.";
+        return _localizationService.GetLocalizedString("Errors.CannotProcessOpenedDocument", path);
     }
 
     public string GetFileVersionIsInvalidMessage(string path) {
-        return $"Документ \'{path}\' нельзя обработать, т.к. он создан в более поздней версии.";
+        return _localizationService.GetLocalizedString("Errors.NotSupportedDocumentVersion", path);
     }
 
     public string GetFileDataCorruptionMessage(string path) {
-        return $"Документ \'{path}\' нельзя обработать, т.к. в нем слишком много ошибок.";
+        return _localizationService.GetLocalizedString("Errors.DocumentHasTooManyErrors", path);
     }
 
     public string GetFileCannotBeProcessMessage(string path) {
-        return $"Документ \'{path}\' нельзя обработать.";
+        return _localizationService.GetLocalizedString("Errors.CannotProcessDocument", path);
     }
 
     public string GetFileRemovedMessage(string path) {
-        return $"Документ \'{path}\' удален.";
+        return _localizationService.GetLocalizedString("Errors.DocumentIsRemoved", path);
     }
 
     public string GetInsufficientResourcesMessage() {
-        return "У компьютера недостаточно ресурсов, чтобы открыть модель.";
+        return _localizationService.GetLocalizedString("Errors.InsufficientResources");
     }
 }

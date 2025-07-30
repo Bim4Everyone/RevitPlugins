@@ -7,6 +7,7 @@ using System.Threading;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit.FileInfo;
+using dosymep.SimpleServices;
 
 using RevitMepTotals.Models;
 using RevitMepTotals.Models.Interfaces;
@@ -16,17 +17,21 @@ internal class DocumentsProcessor : IDocumentsProcessor {
     private readonly RevitRepository _revitRepository;
     private readonly IConstantsProvider _constantsProvider;
     private readonly IErrorMessagesProvider _errorMessagesProvider;
+    private readonly ILocalizationService _localizationService;
 
     public DocumentsProcessor(
         RevitRepository revitRepository,
         IConstantsProvider constantsProvider,
-        IErrorMessagesProvider errorMessagesProvider) {
+        IErrorMessagesProvider errorMessagesProvider,
+        ILocalizationService localizationService) {
         _revitRepository = revitRepository
             ?? throw new ArgumentNullException(nameof(revitRepository));
         _constantsProvider = constantsProvider
             ?? throw new ArgumentNullException(nameof(constantsProvider));
         _errorMessagesProvider = errorMessagesProvider
             ?? throw new ArgumentNullException(nameof(errorMessagesProvider));
+        _localizationService = localizationService
+            ?? throw new ArgumentNullException(nameof(localizationService));
     }
 
 
@@ -103,7 +108,7 @@ internal class DocumentsProcessor : IDocumentsProcessor {
     /// Проверяет документы на конфликты имен и возвращает коллекцию документов из заданной коллекции,
     /// которые НЕ образуют конфликты и из имен документов можно сделать названия листов Excel.
     /// Правила именования листов Excel:
-    /// https://docs.devexpress.com/OfficeFileAPI/DevExpress.Spreadsheet.Worksheet.Name#remarks
+    /// https://support.microsoft.com/en-us/office/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9
     /// </summary>
     /// <param name="data"></param>
     /// <param name="errorMessage">Сообщение об ошибке, или пустая строка, если ошибок нет</param>
@@ -128,16 +133,17 @@ internal class DocumentsProcessor : IDocumentsProcessor {
         if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
         bool ductsHaveSharedName = _revitRepository.SharedNameForDuctsExists(document);
+        string noValue = _localizationService.GetLocalizedString("DefaultStringParamValue");
 
         return _revitRepository
             .GetDucts(document)
             .GroupBy(duct => new {
-                SystemName = _revitRepository.GetMepCurveElementMepSystemName(duct),
+                SystemName = _revitRepository.GetMepCurveElementMepSystemName(duct, noValue),
                 TypeName = _revitRepository.GetDuctTypeName(duct),
-                Size = GetStandardSizeFormat(_revitRepository.GetDuctSize(duct)),
+                Size = GetStandardSizeFormat(_revitRepository.GetDuctSize(duct, noValue)),
                 Name = ductsHaveSharedName
-                     ? _revitRepository.GetMepCurveElementSharedName(duct)
-                     : RevitRepository.DefaultStringParamValue
+                     ? _revitRepository.GetMepCurveElementSharedName(duct, noValue)
+                     : noValue
             })
             .Select(group =>
             new DuctData(group.Key.SystemName, group.Key.TypeName, group.Key.Size, group.Key.Name) {
@@ -151,16 +157,17 @@ internal class DocumentsProcessor : IDocumentsProcessor {
         if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
         bool pipesHaveSharedName = _revitRepository.SharedNameForPipesExists(document);
+        string noValue = _localizationService.GetLocalizedString("DefaultStringParamValue");
 
         return _revitRepository
             .GetPipes(document)
             .GroupBy(pipe => new {
-                SystemName = _revitRepository.GetMepCurveElementMepSystemName(pipe),
+                SystemName = _revitRepository.GetMepCurveElementMepSystemName(pipe, noValue),
                 TypeName = _revitRepository.GetPipeTypeName(pipe),
-                Size = GetStandardSizeFormat(_revitRepository.GetPipeSize(pipe)),
+                Size = GetStandardSizeFormat(_revitRepository.GetPipeSize(pipe, noValue)),
                 Name = pipesHaveSharedName
-                     ? _revitRepository.GetMepCurveElementSharedName(pipe)
-                     : RevitRepository.DefaultStringParamValue
+                     ? _revitRepository.GetMepCurveElementSharedName(pipe, noValue)
+                     : noValue
             })
             .Select(group =>
             new PipeData(group.Key.SystemName, group.Key.TypeName, group.Key.Size, group.Key.Name) {
@@ -173,17 +180,18 @@ internal class DocumentsProcessor : IDocumentsProcessor {
         if(document is null) { throw new ArgumentNullException(nameof(document)); }
 
         bool pipeInsulationsHaveSharedName = _revitRepository.SharedNameForPipeInsulationsExists(document);
+        string noValue = _localizationService.GetLocalizedString("DefaultStringParamValue");
 
         return _revitRepository
             .GetPipeInsulations(document)
             .GroupBy(pipeInsulation => new {
-                SystemName = _revitRepository.GetMepCurveElementMepSystemName(pipeInsulation),
-                TypeName = _revitRepository.GetPipeInsulationTypeName(pipeInsulation),
-                PipeSize = GetStandardSizeFormat(_revitRepository.GetPipeInsulationSize(pipeInsulation)),
+                SystemName = _revitRepository.GetMepCurveElementMepSystemName(pipeInsulation, noValue),
+                TypeName = _revitRepository.GetPipeInsulationTypeName(pipeInsulation, noValue),
+                PipeSize = GetStandardSizeFormat(_revitRepository.GetPipeInsulationSize(pipeInsulation, noValue)),
                 Thickness = _revitRepository.GetPipeInsulationThickness(pipeInsulation),
                 Name = pipeInsulationsHaveSharedName
-                     ? _revitRepository.GetMepCurveElementSharedName(pipeInsulation)
-                     : RevitRepository.DefaultStringParamValue
+                     ? _revitRepository.GetMepCurveElementSharedName(pipeInsulation, noValue)
+                     : noValue
             })
             .Select(group =>
             new PipeInsulationData(group.Key.SystemName, group.Key.TypeName, group.Key.PipeSize, group.Key.Name) {
