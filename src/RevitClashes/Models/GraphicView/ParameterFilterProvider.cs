@@ -309,7 +309,7 @@ namespace RevitClashDetective.Models.GraphicView {
             foreach(var param in doubleParameters) {
                 // добавляем фильтры для диапазонов: длина больше или равно (Х-d), длина меньше или равно (X+d)
                 double value = param.AsDouble();
-                double delta = value / 1000;
+                double delta = Math.Abs(value / 1000);
                 FilterRule ruleStart = _greaterOrEqualVisister.Create(param.Id, value - delta);
                 FilterRule ruleEnd = _lessOrEqualVisister.Create(param.Id, value + delta);
                 var paramFilterStart = new ElementParameterFilter(ruleStart);

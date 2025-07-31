@@ -49,6 +49,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
             set => RaiseAndSetIfChanged(ref _clashName, value);
         }
 
+        public ClashData ClashData { get; private set; }
+
         public string FirstTypeName { get; }
 
         public string FirstFamilyName { get; }
@@ -142,15 +144,15 @@ namespace RevitClashDetective.ViewModels.Navigator {
                 throw new ArgumentNullException(nameof(clashModel));
             }
 
-            var clashData = clashModel
+            ClashData = clashModel
                 .SetRevitRepository(_revitRepository)
                 .GetClashData();
 
-            IntersectionVolume = Math.Round(_revitRepository.ConvertToM3(clashData.ClashVolume), 6);
+            IntersectionVolume = Math.Round(_revitRepository.ConvertToM3(ClashData.ClashVolume), 6);
             MainElementIntersectionPercentage =
-                Math.Round(clashData.ClashVolume / clashData.MainElementVolume * 100, 2);
+                Math.Round(ClashData.ClashVolume / ClashData.MainElementVolume * 100, 2);
             SecondElementIntersectionPercentage =
-                 Math.Round(clashData.ClashVolume / clashData.OtherElementVolume * 100, 2);
+                 Math.Round(ClashData.ClashVolume / ClashData.OtherElementVolume * 100, 2);
         }
     }
 }

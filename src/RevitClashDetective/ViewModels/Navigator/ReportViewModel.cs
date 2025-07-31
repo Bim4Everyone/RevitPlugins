@@ -21,6 +21,8 @@ namespace RevitClashDetective.ViewModels.Navigator {
         private DispatcherTimer _timer;
         private List<ClashViewModel> _allClashes;
         private List<ClashViewModel> _clashes;
+        private double _firstIntersectionPercentage;
+        private double _secondIntersectionPercentage;
 
         public ReportViewModel(RevitRepository revitRepository, string name) {
             Initialize(revitRepository, name);
@@ -47,6 +49,16 @@ namespace RevitClashDetective.ViewModels.Navigator {
         public List<ClashViewModel> Clashes {
             get => _clashes;
             set => this.RaiseAndSetIfChanged(ref _clashes, value);
+        }
+
+        public double FirstIntersectionPercentage {
+            get => _firstIntersectionPercentage;
+            set => RaiseAndSetIfChanged(ref _firstIntersectionPercentage, value);
+        }
+
+        public double SecondIntersectionPercentage {
+            get => _secondIntersectionPercentage;
+            set => RaiseAndSetIfChanged(ref _secondIntersectionPercentage, value);
         }
 
 
@@ -104,10 +116,20 @@ namespace RevitClashDetective.ViewModels.Navigator {
             var documentNames = _revitRepository.DocInfos.Select(item => item.Doc.Title).ToList();
             Clashes = _allClashes.Where(item => IsValid(documentNames, item))
                                  .ToList();
+            SetIntersectionPercentage(Clashes);
         }
 
         private bool IsValid(List<string> documentNames, ClashViewModel clash) {
             return clash.Clash.IsValid(documentNames);
+        }
+
+        private void SetIntersectionPercentage(ICollection<ClashViewModel> clashes) {
+            double firstTotalVolume = clashes.Select(c => c.ClashData.MainElementVolume).Sum();
+            double secondTotalVolume = clashes.Select(c => c.ClashData.OtherElementVolume).Sum();
+            double collisionTotalVolume = clashes.Select(c => c.ClashData.ClashVolume).Sum();
+
+            FirstIntersectionPercentage = Math.Round(collisionTotalVolume / firstTotalVolume * 100, 2);
+            SecondIntersectionPercentage = Math.Round(collisionTotalVolume / secondTotalVolume * 100, 2);
         }
 
         private void InitializeTimer() {
