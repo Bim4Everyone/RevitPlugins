@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
@@ -21,6 +22,7 @@ using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.Models.Interfaces;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
@@ -128,6 +130,12 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
                 .SetForcedModalHandling(false)
                 .SetDelayedMiniWarnings(true);
             placeTrans.Commit(options);
+        } catch(StructureLinksNotFoundException ex) {
+            kernel.Get<IMessageBoxService>().Show(ex.Message,
+                localizationService.GetLocalizedString("Warning"),
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Warning);
+            throw new OperationCanceledException();
         } finally {
             repo.Application.FailuresProcessing -= cleanupService.FailureProcessor;
         }

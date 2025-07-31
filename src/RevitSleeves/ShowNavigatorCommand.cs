@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Reflection;
 using System.Windows.Interop;
@@ -7,6 +8,7 @@ using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -83,8 +85,24 @@ internal class ShowNavigatorCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        CheckSleevesCount(kernel);
+
         var window = kernel.Get<NavigatorWindow>();
         var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
         kernel.Get<NavigatorWindow>().Show();
+    }
+
+    private void CheckSleevesCount(IKernel kernel) {
+        var repo = kernel.Get<RevitRepository>();
+        var sleeves = repo.GetSleeves();
+        if(sleeves.Count == 0) {
+            var localization = kernel.Get<ILocalizationService>();
+            kernel.Get<IMessageBoxService>().Show(
+                localization.GetLocalizedString("Exceptions.SleevesNotFoundException"),
+                localization.GetLocalizedString("Warning"),
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Warning);
+            throw new OperationCanceledException();
+        }
     }
 }

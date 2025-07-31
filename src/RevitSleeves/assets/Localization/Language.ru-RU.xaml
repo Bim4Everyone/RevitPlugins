@@ -102,6 +102,8 @@
 
     <system:String
         x:Key="Error">Ошибка</system:String>
+    <system:String
+        x:Key="Warning">Предупреждение</system:String>
 
     <system:String
         x:Key="Errors.CannotLoadPlacementSettings">Не удалось загрузить настройки.</system:String>
@@ -238,6 +240,10 @@
         x:Key="Exceptions.CannotFindDiameterRange">Не удалось найти диаметр гильзы для трубы</system:String>
     <system:String
         x:Key="Exceptions.CannotMergeSleeves">Не удалось объединить гильзы</system:String>
+    <system:String
+        x:Key="Exceptions.SleevesNotFoundException">В документе отсутствуют размещенные гильзы</system:String>
+    <system:String
+        x:Key="Exceptions.StructureLinksNotFoundException">Не обнаружено ни одной связи с конструкциями</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Расстановка гильз</system:String>

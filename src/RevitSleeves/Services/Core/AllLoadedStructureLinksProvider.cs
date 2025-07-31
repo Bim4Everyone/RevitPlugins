@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 
+using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 
 namespace RevitSleeves.Services.Core;
@@ -30,7 +31,7 @@ internal class AllLoadedStructureLinksProvider : IStructureLinksProvider {
                 string.Format(_localizationService.GetLocalizedString("Errors.DuplicatedLinks"), duplicatedLink));
         }
         if(links.Count == 0) {
-            throw new InvalidOperationException(
+            throw new StructureLinksNotFoundException(
                 _localizationService.GetLocalizedString("Errors.CannotFindStructureLinks"));
         }
         return links;

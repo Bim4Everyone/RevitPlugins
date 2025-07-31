@@ -102,6 +102,8 @@
 
     <system:String
         x:Key="Error">Error</system:String>
+    <system:String
+        x:Key="Warning">Warning</system:String>
 
     <system:String
         x:Key="Errors.CannotLoadPlacementSettings">Cannot load placement settings.</system:String>
@@ -238,6 +240,10 @@
         x:Key="Exceptions.CannotFindDiameterRange">Unable to find the diameter of the tube sleeve</system:String>
     <system:String
         x:Key="Exceptions.CannotMergeSleeves">Cannot merge sleeves</system:String>
+    <system:String
+        x:Key="Exceptions.SleevesNotFoundException">No sleeves placed in the document</system:String>
+    <system:String
+        x:Key="Exceptions.StructureLinksNotFoundException">No structural links found</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Sleeve placing</system:String>
