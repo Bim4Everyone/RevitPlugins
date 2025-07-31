@@ -31,16 +31,8 @@
         <ScrollViewer
             x:Name="Filter"
             DockPanel.Dock="Bottom">
-            <ContentControl
-                Content="{Binding StructureFilterViewModel}">
-                <ContentControl.ContentTemplate>
-                    <DataTemplate
-                        DataType="{x:Type filterViewModel:SetViewModel}">
-                        <filterView:SetView
-                            DataContext="{Binding}" />
-                    </DataTemplate>
-                </ContentControl.ContentTemplate>
-            </ContentControl>
+            <filterView:SetView
+                DataContext="{Binding StructureFilterViewModel}" />
         </ScrollViewer>
     </DockPanel>
 </UserControl>

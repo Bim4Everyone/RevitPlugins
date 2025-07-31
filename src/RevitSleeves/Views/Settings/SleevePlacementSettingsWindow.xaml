@@ -149,16 +149,8 @@
                                         <Border
                                             Padding="5"
                                             Style="{StaticResource CustomBorder}">
-                                            <ContentControl
-                                                Content="{Binding}">
-                                                <ContentControl.ContentTemplate>
-                                                    <DataTemplate
-                                                        DataType="{x:Type vms:DiameterRangeViewModel}">
-                                                        <local:DiameterRangeView
-                                                            DataContext="{Binding}" />
-                                                    </DataTemplate>
-                                                </ContentControl.ContentTemplate>
-                                            </ContentControl>
+                                            <local:DiameterRangeView
+                                                DataContext="{Binding}" />
                                         </Border>
                                     </DataTemplate>
                                 </ui:ListView.ItemTemplate>
@@ -184,16 +176,8 @@
                                     <DataTemplate>
                                         <Border
                                             Style="{StaticResource CustomBorder}">
-                                            <ContentControl
-                                                Content="{Binding}">
-                                                <ContentControl.ContentTemplate>
-                                                    <DataTemplate
-                                                        DataType="{x:Type vms:OffsetViewModel}">
-                                                        <local:OffsetView
-                                                            DataContext="{Binding}" />
-                                                    </DataTemplate>
-                                                </ContentControl.ContentTemplate>
-                                            </ContentControl>
+                                            <local:OffsetView
+                                                DataContext="{Binding}" />
                                         </Border>
                                     </DataTemplate>
                                 </ui:ListView.ItemTemplate>
@@ -214,16 +198,8 @@
                             <ScrollViewer
                                 x:Name="MepFilter"
                                 DockPanel.Dock="Bottom">
-                                <ContentControl
-                                    Content="{Binding PipeSettings.MepFilterViewModel}">
-                                    <ContentControl.ContentTemplate>
-                                        <DataTemplate
-                                            DataType="{x:Type filterViewModel:SetViewModel}">
-                                            <filterView:SetView
-                                                DataContext="{Binding}" />
-                                        </DataTemplate>
-                                    </ContentControl.ContentTemplate>
-                                </ContentControl>
+                                <filterView:SetView
+                                    DataContext="{Binding PipeSettings.MepFilterViewModel}" />
                             </ScrollViewer>
                         </DockPanel>
                     </Border>
@@ -248,31 +224,15 @@
                     <Border
                         Grid.Row="1"
                         Style="{StaticResource CustomBorder}">
-                        <ContentControl
-                            Content="{Binding PipeSettings.WallSettings}">
-                            <ContentControl.ContentTemplate>
-                                <DataTemplate
-                                    DataType="{x:Type vms:StructureCategoryViewModel}">
-                                    <local:StructureSettingsView
-                                        DataContext="{Binding}" />
-                                </DataTemplate>
-                            </ContentControl.ContentTemplate>
-                        </ContentControl>
+                        <local:StructureSettingsView
+                            DataContext="{Binding PipeSettings.WallSettings}" />
                     </Border>
 
                     <Border
                         Grid.Row="2"
                         Style="{StaticResource CustomBorder}">
-                        <ContentControl
-                            Content="{Binding PipeSettings.FloorSettings}">
-                            <ContentControl.ContentTemplate>
-                                <DataTemplate
-                                    DataType="{x:Type vms:StructureCategoryViewModel}">
-                                    <local:StructureSettingsView
-                                        DataContext="{Binding}" />
-                                </DataTemplate>
-                            </ContentControl.ContentTemplate>
-                        </ContentControl>
+                        <local:StructureSettingsView
+                            DataContext="{Binding PipeSettings.FloorSettings}" />
                     </Border>
                 </Grid>
             </Border>
