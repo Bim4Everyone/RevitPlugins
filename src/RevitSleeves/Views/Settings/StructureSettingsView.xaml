@@ -32,6 +32,8 @@
             x:Name="Filter"
             DockPanel.Dock="Bottom">
             <filterView:SetView
+                IsEnabled="{Binding DataContext.IsEnabled, 
+                RelativeSource={RelativeSource AncestorType=UserControl}}"
                 DataContext="{Binding StructureFilterViewModel}" />
         </ScrollViewer>
     </DockPanel>
