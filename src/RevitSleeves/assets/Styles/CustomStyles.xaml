@@ -314,7 +314,7 @@
         x:Key="CustomBorder">
         <Setter
             Property="Padding"
-            Value="20" />
+            Value="14 8 14 8" />
         <Setter
             Property="VerticalAlignment"
             Value="Stretch" />

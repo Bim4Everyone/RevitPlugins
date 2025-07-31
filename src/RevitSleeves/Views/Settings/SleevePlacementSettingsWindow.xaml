@@ -16,7 +16,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
     MinHeight="600"
-    MinWidth="900"
+    MinWidth="1300"
     Width="1500"
     Height="900"
     d:DataContext="{d:DesignInstance vms:SleevePlacementSettingsViewModel, IsDesignTimeCreatable=False}">
@@ -175,6 +175,7 @@
                                 <ui:ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Border
+                                            Padding="5"
                                             Style="{StaticResource CustomBorder}">
                                             <local:OffsetView
                                                 DataContext="{Binding}" />
