@@ -53,10 +53,9 @@ internal class AnnotationService {
     }
 
 
-    public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, Element element, 
+    public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, Element element, double tagLength,
                                    string topText = null, string bottomText = null) {
-        var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, topText, bottomText);
-
+        var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
         Leader leader = annotationInstance.GetLeaders().FirstOrDefault();
@@ -66,10 +65,9 @@ internal class AnnotationService {
         }
     }
 
-    public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, XYZ leaderPoint,
+    public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, XYZ leaderPoint, double tagLength,
                                    string topText = null, string bottomText = null) {
-        var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, topText, bottomText);
-
+        var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
         Leader leader = annotationInstance.GetLeaders().FirstOrDefault();
@@ -78,8 +76,8 @@ internal class AnnotationService {
         }
     }
 
-    private AnnotationSymbol CreateAnnotationSymbol(XYZ bodyPoint, FamilySymbol annotationSymbol,
-                                                    string topText = null, string bottomText = null) {
+    public AnnotationSymbol CreateAnnotationSymbol(XYZ bodyPoint, FamilySymbol annotationSymbol, double tagLength,
+                                                   string topText = null, string bottomText = null) {
         var view = _pylonView.ViewElement;
         var doc = view.Document;
         // Создаем экземпляр типовой аннотации для указания ГОСТа
@@ -94,7 +92,7 @@ internal class AnnotationService {
             annotationInstance.SetParamValue(_annotationTagBottomTextParamName, bottomText);
         }
         // Устанавливаем значение длины полки под текстом, чтобы текст влез
-        annotationInstance.SetParamValue(_annotationTagLengthParamName, UnitUtilsHelper.ConvertToInternalValue(40));
+        annotationInstance.SetParamValue(_annotationTagLengthParamName, tagLength);
         return annotationInstance;
     }
 }

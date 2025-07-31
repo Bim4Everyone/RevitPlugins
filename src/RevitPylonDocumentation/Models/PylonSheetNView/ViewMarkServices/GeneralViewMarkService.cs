@@ -148,6 +148,7 @@ internal class GeneralViewMarkService {
                                                                  2.5, 0.5, false);
         // Создаем типовую аннотацию для обозначения ГОСТа
         _annotationService.CreateUniversalTag(annotPoint, _gostTagSymbol, leaderPoint, 
+                                              UnitUtilsHelper.ConvertToInternalValue(40),
                                               "Арматурные выпуски", "показаны условно");
     }
 }

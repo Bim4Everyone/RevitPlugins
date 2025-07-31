@@ -48,7 +48,8 @@ internal class GeneralViewRebarPerpAnnotCreator : ViewAnnotationCreator {
         // Пытаемся создать марки на виде
         try {
             var markService = new GeneralViewRebarPerpMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
-            markService.CreateVerticalBarMarks();
+            markService.TryCreateVerticalBarMarks();
+            markService.TryCreateWeldingUnitMarks();
         } catch(Exception) { }
     }
 

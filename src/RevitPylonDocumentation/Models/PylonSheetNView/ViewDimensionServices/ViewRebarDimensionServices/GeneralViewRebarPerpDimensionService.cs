@@ -175,9 +175,10 @@ internal class GeneralViewRebarPerpDimensionService {
     internal void TryCreateLRebarDimension(FamilyInstance skeletonParentRebar, DimensionBaseService dimensionBaseService) {
         try {
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
+            if(!SheetInfo.RebarInfo.HasLRebar) { return; }
             // Г-образный стержень
             var lRebar = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, 1101)
-                            .FirstOrDefault();
+                                              .FirstOrDefault();
             var dimensionLine = dimensionBaseService.GetDimensionLine(lRebar, DimensionOffsetType.Top, 0.5);
             //"#1_торец_Г_нутрь"
             //"#1_торец_Г_край"

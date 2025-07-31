@@ -127,7 +127,8 @@ internal class TransViewRebarMarkService {
         var pointRightBottom = _viewPointsAnalyzer.GetPointByDirection(rightBottomElement, DirectionType.RightBottom, 
                                                                        2, 0.4, false);
         // Создаем типовую аннотацию для обозначения ГОСТа
-        _annotationService.CreateUniversalTag(pointRightBottom, _gostTagSymbol, rightBottomElement, _weldingGostText);
+        _annotationService.CreateUniversalTag(pointRightBottom, _gostTagSymbol, rightBottomElement, 
+                                              UnitUtilsHelper.ConvertToInternalValue(40), _weldingGostText);
     }
 
     private void CreateTopMark(List<Element> simplePlates) {
