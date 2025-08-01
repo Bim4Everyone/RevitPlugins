@@ -19,8 +19,8 @@ namespace RevitBatchPrint.Models {
         private readonly ILocalizationService _localizationService;
 
         public RevitRepository(
-            PrintManager printManager, 
-            UIApplication uiApplication, 
+            PrintManager printManager,
+            UIApplication uiApplication,
             ILocalizationService localizationService) {
             _printManager = printManager;
             _uiApplication = uiApplication;
@@ -28,7 +28,7 @@ namespace RevitBatchPrint.Models {
         }
 
         public Document Document => _uiApplication.ActiveUIDocument.Document;
-        
+
         public void ReloadPrintSettings(string printerName) {
             // После выбора принтера все настройки сбрасываются
             _printManager.SelectNewPrintDriver(printerName);
@@ -43,10 +43,10 @@ namespace RevitBatchPrint.Models {
             _printManager.Apply();
             UpdatePrintFileName(null);
         }
-        
+
         public void UpdatePrintFileName(ViewSheet viewSheet) {
-            string documentFileName = string.IsNullOrEmpty(Document.Title) 
-                ? _localizationService.GetLocalizedString("Print.DefaultFileName") 
+            string documentFileName = string.IsNullOrEmpty(Document.Title)
+                ? _localizationService.GetLocalizedString("Print.DefaultFileName")
                 : Document.Title;
 
             string viewName = ReplaceInvalidChars(viewSheet?.SheetNumber);
@@ -61,7 +61,7 @@ namespace RevitBatchPrint.Models {
                 File.Delete(_printManager.PrintToFileName);
             }
         }
-        
+
         public List<string> GetAlbumParamNames() {
             var categoryId = new ElementId(BuiltInCategory.OST_Sheets);
             return Document.GetParameterBindings()
@@ -121,8 +121,14 @@ namespace RevitBatchPrint.Models {
         }
 
         public PrintSheetSettings GetPrintSettings(FamilyInstance familyInstance) {
-            double sheetWidth = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_WIDTH);
-            double sheetHeight = (double) familyInstance.GetParamValueOrDefault(BuiltInParameter.SHEET_HEIGHT);
+            string widthParamName = _localizationService.GetLocalizedString("Settings.WidthParamName");
+            string heightParamName = _localizationService.GetLocalizedString("Settings.HeightParamName");
+
+            double sheetWidth = familyInstance.GetParamValueOrDefault<double?>(widthParamName)
+                                ?? familyInstance.GetParamValueOrDefault<double>(BuiltInParameter.SHEET_WIDTH);
+
+            double sheetHeight = familyInstance.GetParamValueOrDefault<double?>(heightParamName)
+                                 ?? familyInstance.GetParamValueOrDefault<double>(BuiltInParameter.SHEET_HEIGHT);
 
 #if REVIT_2020_OR_LESS
             sheetWidth = UnitUtils.ConvertFromInternalUnits(sheetWidth, DisplayUnitType.DUT_MILLIMETERS);
@@ -137,11 +143,11 @@ namespace RevitBatchPrint.Models {
                 FormatOrientation = GetFormatOrientation((int) Math.Round(sheetWidth), (int) Math.Round(sheetHeight))
             };
         }
-        
+
         private static PageOrientationType GetFormatOrientation(int width, int height) {
             return width > height ? PageOrientationType.Landscape : PageOrientationType.Portrait;
         }
-        
+
         public PaperSize GetPaperSizeByName(string formatName) {
             if(string.IsNullOrEmpty(formatName)) {
                 throw new ArgumentException($"'{nameof(formatName)}' cannot be null or empty.", nameof(formatName));
@@ -149,13 +155,13 @@ namespace RevitBatchPrint.Models {
 
             return _printManager.PaperSizes.OfType<PaperSize>().FirstOrDefault(item => item.Name.Equals(formatName));
         }
-        
+
         private static string ReplaceInvalidChars(string filename) {
             return string.IsNullOrEmpty(filename)
                 ? null
                 : string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
         }
-        
+
         private T GetValueOrDefault<T>(ElementId key, Dictionary<ElementId, T> dictionary) {
             return dictionary.TryGetValue(key, out T value) ? value : default;
         }

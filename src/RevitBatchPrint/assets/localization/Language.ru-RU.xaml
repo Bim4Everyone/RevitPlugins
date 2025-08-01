@@ -53,6 +53,9 @@
 
     <system:String x:Key="Settings.ReplaceHalftoneWithThinLines">Заменить полутона тонкими линиями</system:String>
     <system:String x:Key="Settings.ReplaceHalftoneWithThinLinesDescription">Полутона отображаются тонкими линиями</system:String>
+    
+    <system:String x:Key="Settings.WidthParamName">Ширина</system:String>
+    <system:String x:Key="Settings.HeightParamName">Высота</system:String>
 
     <system:String x:Key="ColorDepthType.BlackLine">Черные линии</system:String>
     <system:String x:Key="ColorDepthType.GrayScale">Оттенки серого</system:String>
