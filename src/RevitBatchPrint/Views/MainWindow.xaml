@@ -50,8 +50,7 @@
 
     <b:Interaction.Behaviors>
         <behaviors:WpfAttachServiceBehavior
-            AttachableService="{Binding MessageBoxService}">
-        </behaviors:WpfAttachServiceBehavior>
+            AttachableService="{Binding MessageBoxService}" />
     </b:Interaction.Behaviors>
 
     <b:Interaction.Triggers>

@@ -53,6 +53,9 @@
 
     <system:String x:Key="Settings.ReplaceHalftoneWithThinLines">Replace halftone with thinLines</system:String>
     <system:String x:Key="Settings.ReplaceHalftoneWithThinLinesDescription">Halftones are displayed as thin lines</system:String>
+    
+    <system:String x:Key="Settings.WidthParamName">Width</system:String>
+    <system:String x:Key="Settings.HeightParamName">Height</system:String>
 
     <system:String x:Key="ColorDepthType.BlackLine">Black line</system:String>
     <system:String x:Key="ColorDepthType.GrayScale">Gray scale</system:String>
