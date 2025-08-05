@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace RevitCopyStandarts.Commands;
+namespace RevitCopyStandarts.Models.Commands;
 
 internal class CopyFamiliesCommand : CopyStandartsCommand {
     public CopyFamiliesCommand(Document source, Document destination)

@@ -7,7 +7,7 @@ using dosymep.Revit;
 
 using RevitCopyStandarts.ViewModels;
 
-namespace RevitCopyStandarts.Commands;
+namespace RevitCopyStandarts.Models.Commands;
 
 public abstract class CopyStandartsCommand : ICopyStandartsCommand {
     protected readonly Document _source;

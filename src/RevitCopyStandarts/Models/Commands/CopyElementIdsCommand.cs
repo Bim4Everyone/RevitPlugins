@@ -2,7 +2,7 @@
 
 using Autodesk.Revit.DB;
 
-namespace RevitCopyStandarts.Commands;
+namespace RevitCopyStandarts.Models.Commands;
 
 internal class CopyElementIdsCommand : CopyStandartsCommand {
     public CopyElementIdsCommand(Document source, Document target)

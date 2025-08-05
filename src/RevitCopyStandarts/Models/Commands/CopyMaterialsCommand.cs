@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 
-namespace RevitCopyStandarts.Commands;
+namespace RevitCopyStandarts.Models.Commands;
 
 /// <summary>
 ///     Копирует материал Manage -> Materials

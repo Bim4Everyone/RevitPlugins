@@ -12,26 +12,26 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitCopyStandarts.Commands;
 using RevitCopyStandarts.Models;
+using RevitCopyStandarts.Models.Commands;
 
 namespace RevitCopyStandarts.ViewModels;
 
 internal class BimFileViewModel : BaseViewModel {
     private static readonly Dictionary<string, string> _commandsMap = new() {
         { "BrowserOrganization", "Autodesk.Revit.DB.BrowserOrganization" },
-        { "ObjectStyles", "RevitCopyStandarts.Commands.CopyObjectStylesCommand" },
+        { "ObjectStyles", "RevitCopyStandarts.Models.Commands.CopyObjectStylesCommand" },
         { "ProjectInfo", "Autodesk.Revit.DB.ProjectInfo" },
         { "GlobalParameter", "Autodesk.Revit.DB.GlobalParameter" },
         { "PrintSettings", "Autodesk.Revit.DB.PrintSetting" },
         // { "LinePattern", "Autodesk.Revit.DB.LinePattern" },
-        { "WallTypes", "RevitCopyStandarts.Commands.CopyWallTypesCommand" },
-        { "CurtainTypes", "RevitCopyStandarts.Commands.CopyCurtainTypesCommand" },
+        { "WallTypes", "RevitCopyStandarts.Models.Commands.CopyWallTypesCommand" },
+        { "CurtainTypes", "RevitCopyStandarts.Models.Commands.CopyCurtainTypesCommand" },
         { "RoofType", "Autodesk.Revit.DB.RoofType" },
         { "CeilingType", "Autodesk.Revit.DB.CeilingType" },
         { "StairsType", "Autodesk.Revit.DB.Architecture.StairsType" },
         { "RailingType", "Autodesk.Revit.DB.Architecture.RailingType" },
-        { "ColorFillSchemes", "RevitCopyStandarts.Commands.CopyColorFillSchemesCommand" },
+        { "ColorFillSchemes", "RevitCopyStandarts.Models.Commands.CopyColorFillSchemesCommand" },
         { "TopRailType", "Autodesk.Revit.DB.Architecture.TopRailType" },
         { "HandRailType", "Autodesk.Revit.DB.Architecture.HandRailType" },
         { "PipeType", "Autodesk.Revit.DB.Plumbing.PipeType" },
@@ -54,16 +54,16 @@ internal class BimFileViewModel : BaseViewModel {
         { "WallFoundationType", "Autodesk.Revit.DB.WallFoundationType" },
         { "PanelScheduleTemplate", "Autodesk.Revit.DB.Electrical.PanelScheduleTemplate" },
         { "StructuralSettings", "Autodesk.Revit.DB.Structure.StructuralSettings" },
-        { "FloorType", "RevitCopyStandarts.Commands.CopyFloorTypeCommand" },
-        { "FoundationSlab", "RevitCopyStandarts.Commands.CopyFoundationSlabCommand" },
+        { "FloorType", "RevitCopyStandarts.Models.Commands.CopyFloorTypeCommand" },
+        { "FoundationSlab", "RevitCopyStandarts.Models.Commands.CopyFoundationSlabCommand" },
         { "SlabEdgeType", "Autodesk.Revit.DB.SlabEdgeType" },
         { "DuctSystemType", "Autodesk.Revit.DB.Mechanical.MechanicalSystemType" },
         { "GutterType", "Autodesk.Revit.DB.Architecture.GutterType" },
         { "BuildingPadType", "Autodesk.Revit.DB.BuildingPadType" },
-        { "Parameters", "RevitCopyStandarts.Commands.CopyParametersCommand" },
+        { "Parameters", "RevitCopyStandarts.Models.Commands.CopyParametersCommand" },
         { "GlobalParameters", "Autodesk.Revit.DB.GlobalParameter" },
-        { "SharedParameters", "RevitCopyStandarts.Commands.CopySharedParametersCommand" },
-        { "ProjectParameters", "RevitCopyStandarts.Commands.CopyProjectParametersCommand" }
+        { "SharedParameters", "RevitCopyStandarts.Models.Commands.CopySharedParametersCommand" },
+        { "ProjectParameters", "RevitCopyStandarts.Models.Commands.CopyProjectParametersCommand" }
     };
 
     private readonly FileInfo _fileInfo;

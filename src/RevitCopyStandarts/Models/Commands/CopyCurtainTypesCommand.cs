@@ -5,7 +5,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-namespace RevitCopyStandarts.Commands;
+namespace RevitCopyStandarts.Models.Commands;
 
 internal class CopyCurtainTypesCommand : ICopyStandartsCommand {
     private readonly Document _source;

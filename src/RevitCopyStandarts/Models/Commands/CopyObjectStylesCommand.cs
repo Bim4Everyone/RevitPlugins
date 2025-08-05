@@ -5,7 +5,7 @@ using Autodesk.Revit.Exceptions;
 
 using dosymep.Revit;
 
-namespace RevitCopyStandarts.Commands;
+namespace RevitCopyStandarts.Models.Commands;
 
 internal class CopyObjectStylesCommand : ICopyStandartsCommand {
     private readonly Document _source;

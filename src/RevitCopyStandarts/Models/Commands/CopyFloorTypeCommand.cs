@@ -3,7 +3,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-namespace RevitCopyStandarts.Commands;
+namespace RevitCopyStandarts.Models.Commands;
 
 internal class CopyFloorTypeCommand : CopyStandartsCommand {
     public CopyFloorTypeCommand(Document source, Document target)
