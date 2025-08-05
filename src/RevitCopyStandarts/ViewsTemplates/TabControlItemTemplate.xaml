@@ -61,7 +61,8 @@
                                     <ui:Button
                                         Margin="8 0"
                                         Icon="{ui:SymbolIcon DocumentCopy24}"
-                                        Command="{Binding CopyObjectsCommand}" />
+                                        Command="{Binding CopyObjectsCommand}"
+                                        ToolTip="{DynamicResource TabControl.CopyCommandToolTip}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -104,12 +105,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
                     <Grid x:Name="Root">
-                        
+
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        
+
                         <Rectangle
                             Grid.Row="0"
                             x:Name="ActiveRectangle"

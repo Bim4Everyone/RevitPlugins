@@ -4,6 +4,7 @@
     <system:String x:Key="MainWindow.Title">Копирование стандартов</system:String>
     
     <system:String x:Key="TabControl.SearchHintText">Поиск</system:String>
+    <system:String x:Key="TabControl.CopyCommandToolTip">Копирует выбранный файл стандартов в текущий файл</system:String>
     <system:String x:Key="TabControlItem.NameColumn">Имя</system:String>
     <system:String x:Key="TabControlItem.CreationTimeColumn">Дата создания</system:String>
     <system:String x:Key="TabControlItem.ModifiedTimeColumn">Дата изменения</system:String>

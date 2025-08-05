@@ -4,6 +4,7 @@
     <system:String x:Key="MainWindow.Title">Copy standards</system:String>
     
     <system:String x:Key="TabControl.SearchHintText">Search</system:String>
+    <system:String x:Key="TabControl.CopyCommandToolTip">Copies the selected standards file to the current file</system:String>
     <system:String x:Key="TabControlItem.NameColumn">Name</system:String>
     <system:String x:Key="TabControlItem.CreationTimeColumn">Creation time</system:String>
     <system:String x:Key="TabControlItem.ModifiedTimeColumn">Modified time</system:String>
