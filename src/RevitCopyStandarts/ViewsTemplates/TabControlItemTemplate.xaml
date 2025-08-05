@@ -3,7 +3,8 @@
                     xmlns:vms="clr-namespace:RevitCopyStandarts.ViewModels"
                     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
                     xmlns:globalization="clr-namespace:System.Globalization;assembly=mscorlib"
-                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                    xmlns:b="http://schemas.microsoft.com/xaml/behaviors">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Controls/TabControl/TabControl.xaml" />
@@ -22,46 +23,69 @@
     </DataTemplate>
 
     <DataTemplate x:Key="TabControlItemTemplate" DataType="{x:Type vms:BimPartsViewModel}">
-        <ui:DataGrid
-            IsReadOnly="True"
-            CanUserAddRows="False"
-            CanUserDeleteRows="False"
-            CanUserResizeRows="False"
-            CanUserResizeColumns="True"
-            CanUserReorderColumns="False"
-            AutoGenerateColumns="False"
-            ItemsSource="{Binding BimFiles}">
+        <Border
+            Margin="8 0 8 8"
+            Background="{DynamicResource CardBackground}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+            <DockPanel>
 
-            <DataGrid.Columns>
+                <ui:AutoSuggestBox
+                    DockPanel.Dock="Top"
+                    Margin="14,8,14,8"
+                    Icon="{ui:SymbolIcon Search24}"
+                    Text="{Binding SearchText, Mode=TwoWay}"
+                    PlaceholderText="{DynamicResource TabControl.SearchHintText}">
+                    <b:Interaction.Triggers>
+                        <b:EventTrigger EventName="TextChanged">
+                            <b:InvokeCommandAction
+                                Command="{Binding SearchCommand}" />
+                        </b:EventTrigger>
+                    </b:Interaction.Triggers>
+                </ui:AutoSuggestBox>
 
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ui:Button
-                                Margin="8 0"
-                                Icon="{ui:SymbolIcon DocumentCopy24}"
-                                Command="{Binding CopyObjectsCommand}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <ui:DataGrid
+                    IsReadOnly="True"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    CanUserResizeRows="False"
+                    CanUserResizeColumns="True"
+                    CanUserReorderColumns="False"
+                    AutoGenerateColumns="False"
+                    ItemsSource="{Binding FilteredBimFiles}">
 
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Name}"
-                    HeaderTemplate="{StaticResource NameColumn}" />
+                    <DataGrid.Columns>
 
-                <DataGridTextColumn
-                    HeaderTemplate="{StaticResource CreationTimeColumn}"
-                    Binding="{Binding CreationTime, StringFormat=g, 
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:Button
+                                        Margin="8 0"
+                                        Icon="{ui:SymbolIcon DocumentCopy24}"
+                                        Command="{Binding CopyObjectsCommand}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Name}"
+                            HeaderTemplate="{StaticResource NameColumn}" />
+
+                        <DataGridTextColumn
+                            HeaderTemplate="{StaticResource CreationTimeColumn}"
+                            Binding="{Binding CreationTime, StringFormat=g, 
                         ConverterCulture={x:Static globalization:CultureInfo.CurrentUICulture}}" />
 
-                <DataGridTextColumn
-                    HeaderTemplate="{StaticResource ModifiedTimeColumn}"
-                    Binding="{Binding ModifiedTime, StringFormat=g,
+                        <DataGridTextColumn
+                            HeaderTemplate="{StaticResource ModifiedTimeColumn}"
+                            Binding="{Binding ModifiedTime, StringFormat=g,
                         ConverterCulture={x:Static globalization:CultureInfo.CurrentUICulture}}" />
-            </DataGrid.Columns>
+                    </DataGrid.Columns>
 
-        </ui:DataGrid>
+                </ui:DataGrid>
+            </DockPanel>
+
+        </Border>
     </DataTemplate>
 
     <Style x:Key="DefaultTabControlHeaderStyle" TargetType="{x:Type TabItem}">
@@ -91,11 +115,11 @@
                             RadiusX="2"
                             RadiusY="2"
                             Visibility="Hidden" />
-                        
+
                         <Border
                             x:Name="Border"
                             MinHeight="36"
-                            Margin="0"
+                            Margin="8 0 0 0"
                             Padding="6"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"

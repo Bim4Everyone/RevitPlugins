@@ -22,7 +22,7 @@ internal sealed class MainViewModel : BaseViewModel {
     private readonly IStandartsService _standarts;
     private readonly ILocalizationService _localizationService;
     private readonly INotificationService _notificationService;
-    
+
     private ObservableCollection<BimPartsViewModel> _bimParts;
 
     /// <summary>
@@ -71,17 +71,20 @@ internal sealed class MainViewModel : BaseViewModel {
     }
 
     private BimPartsViewModel GetBimPart(string partName, IEnumerable<FileInfo> bimFiles) {
+        BimFileViewModel[] bimFilesVms = bimFiles
+            .Select(item =>
+                new BimFileViewModel(
+                    _standarts.GetFileName(item),
+                    item,
+                    _revitRepository,
+                    _localizationService,
+                    _notificationService,
+                    ProgressDialogFactory))
+            .ToArray();
+
         return new BimPartsViewModel(partName) {
-            BimFiles = [
-                ..bimFiles.Select(item =>
-                    new BimFileViewModel(
-                        _standarts.GetFileName(item),
-                        item,
-                        _revitRepository,
-                        _localizationService,
-                        _notificationService,
-                        ProgressDialogFactory))
-            ]
+            MainBimFiles = [..bimFilesVms],
+            FilteredBimFiles = [..bimFilesVms]
         };
     }
 }
