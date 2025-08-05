@@ -56,11 +56,13 @@ public class CopyStandartsRevitCommand : BasePluginCommand {
         // Настройка локализации,
         // установка дефолтной локализации "ru-RU"
         kernel.UseWpfLocalization(
-            $"/{assemblyName};component/Localization/Language.xaml",
+            $"/{assemblyName};component/assets/localizations/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        kernel.UseWpfUIProgressDialog<MainViewModel>();
 
-        kernel.Bind<StandartsService, IStandartsService>();
+
+        kernel.Bind<IStandartsService>().To<StandartsService>();
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());

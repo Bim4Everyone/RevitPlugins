@@ -1,4 +1,12 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:String x:Key="MainWindow.Title">Copy standarts</system:String>
     
+    <system:String x:Key="TabControlItem.NameColumn">Name</system:String>
+    <system:String x:Key="TabControlItem.CreationTimeColumn">Creation time</system:String>
+    <system:String x:Key="TabControlItem.ModifiedTimeColumn">Modified time</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>

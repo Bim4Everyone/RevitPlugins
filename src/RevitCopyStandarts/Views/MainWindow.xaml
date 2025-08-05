@@ -13,6 +13,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
 
+    x:Name="_this"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
@@ -23,8 +24,18 @@
 
     MinWidth="800"
     MinHeight="450"
+    
+    KeyUp="MainWindow_OnKeyUp"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewsTemplates/TabControlItemTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
     <b:Interaction.Triggers>
         <b:EventTrigger
@@ -38,38 +49,19 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}"/>
+            Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <StackPanel
-            Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
+        <TabControl
+            Grid.Row="1"
+            Margin="14 8"
+            SelectedIndex="0"
+            ItemsSource="{Binding BimParts}"
+            ContentTemplate="{StaticResource TabControlItemTemplate}"
+            ItemContainerStyle="{StaticResource TabControlHeaderStyle}" />
 
-            <ui:TextBlock
-                Margin="10"
-                Foreground="Orange"
-                VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
-
-            <ui:Button
-                Margin="10"
-                Width="80"
-                Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonOk}"
-                Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
-
-            <ui:Button
-                Margin="10"
-                Width="80"
-                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
-                IsCancel="True"
-                Click="ButtonCancel_Click" />
-        </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>
