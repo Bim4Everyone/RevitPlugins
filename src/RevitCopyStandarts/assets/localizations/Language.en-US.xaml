@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-    <system:String x:Key="MainWindow.Title">Copy standarts</system:String>
+    <system:String x:Key="MainWindow.Title">Copy standards</system:String>
     
     <system:String x:Key="TabControlItem.NameColumn">Name</system:String>
     <system:String x:Key="TabControlItem.CreationTimeColumn">Creation time</system:String>
@@ -9,4 +9,13 @@
     
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+    <system:String x:Key="ProgressDialog.Title">Coping standards [{0}\\{1}]...</system:String>
+    
+    <system:String x:Key="Notification.Title">Copy standards</system:String>
+    <system:String x:Key="Notification.Message">Standards copying completed successfully.</system:String>
+    
+    <system:String x:Key="Exceptions.UnknownClassName">Unknown command name \"{0}\".</system:String>
+    <system:String x:Key="Exceptions.NullElementId">Element identifier cannot be empty or null.</system:String>
+    <system:String x:Key="Exceptions.NumElementId">Element identifier must be a number.</system:String>
 </ResourceDictionary>

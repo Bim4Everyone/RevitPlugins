@@ -13,7 +13,7 @@
     <system:String x:Key="ProgressDialog.Title">Копирование стандартов [{0}\\{1}]...</system:String>
     
     <system:String x:Key="Notification.Title">Копирование стандартов</system:String>
-    <system:String x:Key="Notification.Message">Выполнение скрипта завершено успешно.</system:String>
+    <system:String x:Key="Notification.Message">Копирование стандартов завершено успешно.</system:String>
     
     <system:String x:Key="Exceptions.UnknownClassName">Неизвестное наименование команды \"{0}\".</system:String>
     <system:String x:Key="Exceptions.NullElementId">Идентификатор элемента не может быть пустым или null.</system:String>
