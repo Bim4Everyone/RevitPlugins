@@ -48,7 +48,7 @@
     <system:String 
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\Аннотации\Метрическая система, типовая аннотация.rft</system:String>
+        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\Метрическая система, элементы узлов.rft</system:String>
     <system:String
         x:Key="TempFamilyDocument.FamilyName">{0}Ведомость_Спецификаций_{1}{2}</system:String>
     <system:String

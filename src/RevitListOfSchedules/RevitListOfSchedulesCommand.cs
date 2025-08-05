@@ -1,5 +1,7 @@
+using System;
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -7,6 +9,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -77,6 +80,26 @@ public class RevitListOfSchedulesCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        var messageBoxService = kernel.Get<IMessageBoxService>();
+        var localizationService = kernel.Get<ILocalizationService>();
+
+        // Загрузка параметров проекта
+        bool isScheduleChecked = new CheckSchedule(uiApplication)
+            .ReplaceSchedule()
+            .GetIsChecked();
+
+        // Загрузка параметров проекта
+        bool isParamChecked = new CheckProjectParams(uiApplication)
+            .CopyProjectParams()
+            .GetIsChecked();
+
+        if(!isScheduleChecked) {
+            string stringMessegeBody = "Закрой спеку";
+            string stringMessegeTitle = "Сообщение";
+            messageBoxService.Show(stringMessegeBody, stringMessegeTitle, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            throw new OperationCanceledException();
+        }
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());

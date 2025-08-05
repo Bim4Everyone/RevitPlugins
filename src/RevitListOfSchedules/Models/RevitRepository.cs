@@ -72,13 +72,15 @@ internal class RevitRepository {
     public ViewDrafting GetViewDrafting(string familyName) {
         string nameView = string.Format(
             _localizationService.GetLocalizedString("RevitRepository.ViewName"), familyName);
-        ViewDrafting view = new FilteredElementCollector(Document)
+        var view = new FilteredElementCollector(Document)
             .OfClass(typeof(ViewDrafting))
             .Where(v => v.Name.Equals(nameView, StringComparison.OrdinalIgnoreCase))
             .Cast<ViewDrafting>()
             .FirstOrDefault();
         return view ?? CreateViewDrafting(nameView);
     }
+
+    // Метод получения экземпляров спецификация с листа
     public IList<ViewSchedule> GetScheduleInstances(Document document, ViewSheet viewSheet) {
         if(document == null || viewSheet == null) {
             return null;
@@ -97,6 +99,7 @@ internal class RevitRepository {
             .ToList();
     }
 
+    // Метод получения типа семейства
     public FamilySymbol GetFamilySymbol(Family family) {
         ElementFilter filter = new FamilySymbolFilter(family.Id);
         return new FilteredElementCollector(Document)
@@ -105,30 +108,41 @@ internal class RevitRepository {
             .First();
     }
 
+    // Метод удаления экземпляров семейства с вида
     public void DeleteFamilyInstances(View view) {
         var instances = new FilteredElementCollector(Document, view.Id)
             .OfType<FamilyInstance>()
             .Select(instance => instance.Id)
             .ToList();
-        foreach(ElementId instance in instances) {
-            Document.Delete(instance);
+        if(instances.Any()) {
+            Document.Delete(instances);
         }
     }
 
-    public void CreateSchedule(TempFamilyDocument tempDoc, FamilyInstance familyInstance) {
-        FamilySymbol familySymbol = tempDoc.FamilySymbol;
-        var cache = new ViewScheduleCache(Document);
-        if(!cache.IsViewScheduleExist(familySymbol.Name)) {
-            _ = new ScheduleElement(this, familySymbol, familyInstance);
+    // Метод проверки наличия нужной спецификации в проекте и создания при ее отсутствии
+    public void CheckSchedule(string scheduleName) {
+        var schedule = GetSchedule(scheduleName);
+        if(schedule == null) {
+            CreateSchedule(scheduleName);
         }
+    }
+
+    public void CreateSchedule(string scheduleName) {
+        _ = new ScheduleElement(this, scheduleName);
+    }
+
+    // Метод поиска и получения спецификации по имени
+    public ViewSchedule GetSchedule(string scheduleName) {
+        var cache = new ViewScheduleCache(Document);
+        return cache.ExistViewSchedule(scheduleName);
     }
 
     // Метод создания нового чертежного вида
     private ViewDrafting CreateViewDrafting(string nameView) {
-        IEnumerable<ViewFamilyType> viewTypes = new FilteredElementCollector(Document)
+        var viewTypes = new FilteredElementCollector(Document)
             .OfClass(typeof(ViewFamilyType))
             .Cast<ViewFamilyType>();
-        ViewFamilyType viewFamilyType = viewTypes
+        var viewFamilyType = viewTypes
             .Where(vt => vt.ViewFamily == ViewFamily.Drafting)
             .First();
 

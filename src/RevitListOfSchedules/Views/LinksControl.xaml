@@ -40,13 +40,11 @@
             <converters:BoolToObjectConverter
                 x:Key="StatusIconConverter"
                 TrueValue="{StaticResource StatusLoaded}"
-                FalseValue="{StaticResource StatusUnloaded}" />            
-
+                FalseValue="{StaticResource StatusUnloaded}" />
         </ResourceDictionary>
     </UserControl.Resources>
 
     <ui:DataGrid
-        x:Name="FirstDataGrid"
         ItemsSource="{Binding Links}"
         Style="{StaticResource CustomResizableDataGridStyle}">
         <DataGrid.Columns>

@@ -110,8 +110,7 @@
                     </StackPanel>
                 </Expander.Header>
                 <controls:SettingsControl
-                    HorizontalAlignment="Left"
-                    Canvas.Left="-836"
+                    HorizontalAlignment="Left"                    
                     VerticalAlignment="Top" />
             </Expander>
         </Canvas>

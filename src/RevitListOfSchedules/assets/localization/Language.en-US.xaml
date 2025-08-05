@@ -48,7 +48,7 @@
     <system:String 
         x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\English\Annotations\Metric Generic Annotation.rft</system:String>
+        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\English\Metric Detail Item.rft</system:String>
     <system:String
         x:Key="TempFamilyDocument.FamilyName">{0}List_Of_Schedules_{1}{2}</system:String>
     <system:String

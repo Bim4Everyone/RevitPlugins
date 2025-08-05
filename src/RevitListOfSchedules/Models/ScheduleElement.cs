@@ -1,64 +1,40 @@
+using System.Linq;
+
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
+namespace RevitListOfSchedules.Models;
+internal class ScheduleElement {
+    private const string _defaultScheduleName = "КВГ_(Проверка) Без группы";
+    private readonly RevitRepository _revitRepository;
+    private readonly string _scheduleName;
 
-namespace RevitListOfSchedules.Models {
-    internal class ScheduleElement {
-        private const int _firstLastColumnWidthMm = 30;
-        private const int _middleColumnWidthMm = 110;
+    public ScheduleElement(RevitRepository revitRepository, string scheduleName) {
+        _revitRepository = revitRepository;
+        _scheduleName = scheduleName;
+        ConfigureSchedule();
+    }
 
-        private readonly RevitRepository _revitRepository;
-        private readonly FamilySymbol _familySymbol;
-        private readonly FamilyInstance _familyInstance;
+    private void ConfigureSchedule() {
+        var newSchedule = CreateNewSchedule();
+        var defenition = newSchedule.Definition;
+        var filter = defenition.GetFilters().FirstOrDefault();
+        filter?.SetValue(newSchedule.Name);
+        defenition.SetFilter(0, filter);
+        ConfigureScheduleHeader(newSchedule);
+    }
 
-        public ScheduleElement(
-            RevitRepository revitRepository,
-            FamilySymbol familySymbol,
-            FamilyInstance familyInstance) {
-            _revitRepository = revitRepository;
-            _familySymbol = familySymbol;
-            _familyInstance = familyInstance;
-            CreateSchedule();
-        }
+    private ViewSchedule CreateNewSchedule() {
+        var defaultSchedule = _revitRepository.GetSchedule(_defaultScheduleName);
+        var newScheduleId = defaultSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+        var newSchedule = _revitRepository.Document.GetElement(newScheduleId) as ViewSchedule;
+        newSchedule.Name = $"{_defaultScheduleName}_{_scheduleName}";
+        return newSchedule;
+    }
 
-        public void CreateSchedule() {
-            var schedule = ViewSchedule.CreateNoteBlock(_revitRepository.Document, _familySymbol.Family.Id);
-            schedule.Name = _familySymbol.Name;
-
-            ConfigureScheduleColumns(schedule);
-            ConfigureScheduleHeader(schedule);
-        }
-
-        private void ConfigureScheduleColumns(ViewSchedule schedule) {
-            ScheduleDefinition definition = schedule.Definition;
-
-            ScheduleField noteField1 = definition.AddField(
-                ScheduleFieldType.Instance,
-                _familyInstance.GetParam(ParamFactory.FamilyParamNumber).Id);
-
-            ScheduleField noteField2 = definition.AddField(
-                ScheduleFieldType.Instance,
-                _familyInstance.GetParam(ParamFactory.FamilyParamName).Id);
-
-            ScheduleField noteField3 = definition.AddField(
-                ScheduleFieldType.Instance,
-                _familyInstance.GetParam(ParamFactory.FamilyParamRevision).Id);
-
-            noteField1.GridColumnWidth = ConvertToInternalUnits(_firstLastColumnWidthMm);
-            noteField2.GridColumnWidth = ConvertToInternalUnits(_middleColumnWidthMm);
-            noteField3.GridColumnWidth = ConvertToInternalUnits(_firstLastColumnWidthMm);
-        }
-
-        private void ConfigureScheduleHeader(ViewSchedule schedule) {
-            TableData tableData = schedule.GetTableData();
-            TableSectionData appearanceSection = tableData.GetSectionData(SectionType.Header);
-
-            appearanceSection.ClearCell(0, 0);
-            appearanceSection.SetCellText(0, 0, ParamFactory.ScheduleName);
-        }
-
-        private double ConvertToInternalUnits(double millimeters) {
-            return UnitUtils.ConvertToInternalUnits(millimeters, UnitTypeId.Millimeters);
-        }
+    private void ConfigureScheduleHeader(ViewSchedule schedule) {
+        var tableData = schedule.GetTableData();
+        var appearanceSection = tableData.GetSectionData(SectionType.Header);
+        appearanceSection.ClearCell(0, 0);
+        appearanceSection.SetCellText(0, 0, $"{ParamFactory.ScheduleName} {_scheduleName}");
     }
 }

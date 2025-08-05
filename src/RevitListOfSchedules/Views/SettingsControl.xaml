@@ -72,12 +72,12 @@
                         VerticalAlignment="Center"
                         Content="{me:LocalizationSource MainWindow.CreateListTooltip}" />
                 </StackPanel>
-                <ui:ToggleSwitch
-                    IsChecked="False"
-                    OnContent="{me:LocalizationSource MainWindow.OnContent}"
-                    OffContent="{me:LocalizationSource MainWindow.OffContent}"
+                <ui:ToggleSwitch                    
                     Grid.Column="1"
-                    HorizontalAlignment="Left" />
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding IsCreateScheduleChecked, UpdateSourceTrigger=PropertyChanged}"
+                    OnContent="{me:LocalizationSource MainWindow.OnContent}"
+                    OffContent="{me:LocalizationSource MainWindow.OffContent}" />
             </Grid>
         </Border>
         <Border
@@ -100,12 +100,12 @@
                         VerticalAlignment="Center"
                         Content="{me:LocalizationSource MainWindow.AddListToSheetTooltip}" />
                 </StackPanel>
-                <ui:ToggleSwitch
-                    IsChecked="True"
-                    OnContent="{me:LocalizationSource MainWindow.OnContent}"
-                    OffContent="{me:LocalizationSource MainWindow.OffContent}"
+                <ui:ToggleSwitch                    
                     Grid.Column="1"
-                    HorizontalAlignment="Left" />
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding IsScheduleToSheetChecked, UpdateSourceTrigger=PropertyChanged}"
+                    OnContent="{me:LocalizationSource MainWindow.OnContent}"
+                    OffContent="{me:LocalizationSource MainWindow.OffContent}" />
             </Grid>
         </Border>
         <Border
@@ -128,11 +128,10 @@
                         VerticalAlignment="Center"
                         Content="{me:LocalizationSource MainWindow.ConsiderRevisionTooltip}" />
                 </StackPanel>
-                <ui:ToggleSwitch
-                    x:Name="RevisionSwitch"
+                <ui:ToggleSwitch                    
                     Grid.Column="1"
                     HorizontalAlignment="Left"
-                    IsChecked="{Binding IsRevisionVisible, UpdateSourceTrigger=PropertyChanged}"
+                    IsChecked="{Binding IsRevisionVisibleChecked, UpdateSourceTrigger=PropertyChanged}"
                     OnContent="{me:LocalizationSource MainWindow.OnContent}"
                     OffContent="{me:LocalizationSource MainWindow.OffContent}" />
             </Grid>

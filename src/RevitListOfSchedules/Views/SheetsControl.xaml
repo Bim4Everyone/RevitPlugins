@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RevitListOfSchedules.Views"
+             xmlns:proxy="clr-namespace:RevitListOfSchedules.Proxy"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
@@ -17,6 +18,8 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <proxy:BindingProxy x:Key="Proxy" Data="{Binding}" />
 
             <CollectionViewSource
                 x:Key="GroupedAlbums"
@@ -41,14 +44,10 @@
                 x:Key="RevVisibilityConverter"
                 TrueValue="Visible"
                 FalseValue="Collapsed" />
-
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <ui:DataGrid
-        x:Name="SecondDataGrid"
-        Grid.Row="2"
-        Grid.Column="2"
+    <ui:DataGrid        
         ItemsSource="{Binding Source={StaticResource GroupedAlbums}}"
         Style="{StaticResource CustomResizableDataGridStyle}">
         <b:Interaction.Triggers>
@@ -56,7 +55,8 @@
                 EventName="SelectionChanged">
                 <b:InvokeCommandAction
                     Command="{Binding UpdateSelectedSheetsCommand}"
-                    CommandParameter="{Binding SelectedItems, RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                    CommandParameter="{Binding SelectedItems, 
+                        RelativeSource={RelativeSource AncestorType=DataGrid}}" />
             </b:EventTrigger>
         </b:Interaction.Triggers>
         <DataGrid.Columns>
@@ -72,8 +72,10 @@
                 Width="*"
                 Header="{StaticResource SheetRevisionNumber}"
                 Binding="{Binding RevisionNumber}"
-                Visibility="{Binding IsRevisionVisible, Converter={StaticResource RevVisibilityConverter}}" />
-        </DataGrid.Columns>
+                Visibility="{Binding Data.IsRevisionVisibleChecked, 
+                    Source={StaticResource Proxy}, 
+                    Converter={StaticResource RevVisibilityConverter}}" />
+        </DataGrid.Columns>        
         <DataGrid.GroupStyle>
             <GroupStyle>
                 <GroupStyle.ContainerStyle>
