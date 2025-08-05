@@ -1,6 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <UseDevExpress>true</UseDevExpress>
+        <UseWpfUI>true</UseWpfUI>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
+    <ItemGroup>
+      <Page Update="Views\MainWindow.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+    </ItemGroup>
 </Project>

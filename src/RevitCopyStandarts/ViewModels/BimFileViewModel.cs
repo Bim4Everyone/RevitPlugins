@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.ApplicationServices;
@@ -12,6 +13,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitCopyStandarts.Commands;
+using RevitCopyStandarts.Models;
 
 namespace RevitCopyStandarts.ViewModels;
 
@@ -64,19 +66,28 @@ internal class BimFileViewModel : BaseViewModel {
         { "ProjectParameters", "RevitCopyStandarts.Commands.CopyProjectParametersCommand" }
     };
 
-    private readonly Application _application;
-
     private readonly FileInfo _fileInfo;
-    private readonly Document _targetDocument;
+    private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
+    private readonly INotificationService _notificationService;
+    private readonly IProgressDialogFactory _progressDialogFactory;
 
-    public BimFileViewModel(string name, FileInfo fileInfo, Application application, Document targetDocument) {
+    public BimFileViewModel(
+        string name, 
+        FileInfo fileInfo, 
+        RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        INotificationService notificationService,
+        IProgressDialogFactory progressDialogFactory) {
         Name = name;
 
         _fileInfo = fileInfo;
-        _application = application;
-        _targetDocument = targetDocument;
+        _revitRepository = revitRepository;
+        _localizationService = localizationService;
+        _notificationService = notificationService;
+        _progressDialogFactory = progressDialogFactory;
 
-        CopyObjectsCommand = new RelayCommand(CopyObjectsAsync);
+        CopyObjectsCommand = RelayCommand.CreateAsync(CopyObjectsAsync);
     }
 
     public string Name { get; }
@@ -87,27 +98,23 @@ internal class BimFileViewModel : BaseViewModel {
 
     public ICommand CopyObjectsCommand { get; }
 
-    public INotificationService NotificationService => GetPlatformService<INotificationService>();
-
-    public IProgressDialogService ProgressDialogService => GetPlatformService<IProgressDialogService>();
-
-    private async void CopyObjectsAsync(object p) {
-        var sourceDocument = _application.OpenDocumentFile(_fileInfo.FullName);
+    private async Task CopyObjectsAsync() {
+        var sourceDocument = _revitRepository.OpenDocumentFile(_fileInfo.FullName);
         try {
             var commands = new List<ICopyStandartsCommand> {
-                new CopyViewTemplatesCommand(sourceDocument, _targetDocument),
-                new CopyViewSchedulesCommand(sourceDocument, _targetDocument),
-                new CopyMaterialsCommand(sourceDocument, _targetDocument),
-                new CopyViewLegendsCommand(sourceDocument, _targetDocument),
-                new CopyFiltersCommand(sourceDocument, _targetDocument)
+                new CopyViewTemplatesCommand(sourceDocument, _revitRepository.Document),
+                new CopyViewSchedulesCommand(sourceDocument, _revitRepository.Document),
+                new CopyMaterialsCommand(sourceDocument, _revitRepository.Document),
+                new CopyViewLegendsCommand(sourceDocument, _revitRepository.Document),
+                new CopyFiltersCommand(sourceDocument, _revitRepository.Document)
             };
 
             commands.AddRange(GetOptionalStandarts(sourceDocument));
             commands.AddRange(GetIdOptionalStandarts(sourceDocument));
 
-            using(var window = ProgressDialogService) {
+            using(var window = _progressDialogFactory.CreateDialog()) {
                 window.MaxValue = commands.Count;
-                window.DisplayTitleFormat = "Копирование стандартов [{0}\\{1}]...";
+                window.DisplayTitleFormat = _localizationService.GetLocalizedString("ProgressDialog.Title");;
                 window.Show();
 
                 int counter = 1;
@@ -118,9 +125,9 @@ internal class BimFileViewModel : BaseViewModel {
                 }
             }
 
-            _ = await NotificationService.CreateNotification(
-                    "Копирование стандартов",
-                    "Выполнение скрипта завершено успешно.")
+            await _notificationService.CreateNotification(
+                    _localizationService.GetLocalizedString("Notification.Title"),
+                    _localizationService.GetLocalizedString("Notification.Message"))
                 .ShowAsync();
         } finally {
             sourceDocument.Close(false);
@@ -141,16 +148,16 @@ internal class BimFileViewModel : BaseViewModel {
         if(_commandsMap.TryGetValue(className, out string commandName)) {
             var type = Type.GetType(commandName);
             if(type == null) {
-                return new CopyOptionalStandartsCommand(sourceDocument, _targetDocument) {
+                return new CopyOptionalStandartsCommand(sourceDocument, _revitRepository.Document) {
                     Name = className,
                     BuiltInCategoryName = commandName
                 };
             }
 
-            return (ICopyStandartsCommand) Activator.CreateInstance(type, sourceDocument, _targetDocument);
+            return (ICopyStandartsCommand) Activator.CreateInstance(type, sourceDocument, _revitRepository.Document);
         }
 
-        throw new ArgumentException($"Неизвестное наименование команды \"{className}\".");
+        throw new ArgumentException(_localizationService.GetLocalizedString("Exceptions.UnknownClassName", className));
     }
 
     private IEnumerable<ICopyStandartsCommand> GetIdOptionalStandarts(Document sourceDocument) {
@@ -165,13 +172,13 @@ internal class BimFileViewModel : BaseViewModel {
             .Where(item => item != null);
 
         return [
-            new CopyElementIdsCommand(sourceDocument, _targetDocument) { CopyElements = elements.ToList() }
+            new CopyElementIdsCommand(sourceDocument, _revitRepository.Document) { CopyElements = elements.ToList() }
         ];
     }
 
     private Element GetElement(Document sourceDocument, string elementId) {
         if(string.IsNullOrEmpty(elementId)) {
-            throw new ArgumentException("Идентификатор элемента не может быть пустым или null.", nameof(elementId));
+            throw new ArgumentException(_localizationService.GetLocalizedString("Exceptions.NullElementId"), nameof(elementId));
         }
 #if REVIT_2023_OR_LESS
             if(!int.TryParse(elementId, out int result)) {
@@ -181,7 +188,7 @@ internal class BimFileViewModel : BaseViewModel {
             return sourceDocument.GetElement(new ElementId(result));
 #else
         if(!long.TryParse(elementId, out long result)) {
-            throw new ArgumentException("Идентификатор элемента должен быть числом.", nameof(elementId));
+            throw new ArgumentException(_localizationService.GetLocalizedString("Exceptions.NumElementId"), nameof(elementId));
         }
 
         return sourceDocument.GetElement(new ElementId(result));

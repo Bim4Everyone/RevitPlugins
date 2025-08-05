@@ -5,7 +5,9 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-namespace RevitCopyStandarts.Commands;
+using RevitCopyStandarts.Commands;
+
+namespace RevitCopyStandarts.Models.Commands;
 
 /// <summary>
 ///     Данный класс копирует цветовые схемы Architecture -> Room & Area -> Color Schemes

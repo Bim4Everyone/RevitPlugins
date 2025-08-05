@@ -1,13 +1,24 @@
 #region Namespaces
 
+using System.Globalization;
 using System.IO;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
+using Ninject;
+
+using RevitCopyStandarts.Models;
+using RevitCopyStandarts.Services;
 using RevitCopyStandarts.ViewModels;
+using RevitCopyStandarts.Views;
 
 #endregion
 
@@ -20,18 +31,38 @@ public class CopyStandartsRevitCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        var uiDocument = uiApplication.ActiveUIDocument;
-        var application = uiApplication.Application;
-        var document = uiDocument.Document;
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
+        
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
 
-        string mainFolder =
-            @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
+        // Настройка конфигурации плагина
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        mainFolder =
-            Path.Combine(mainFolder, ModuleEnvironment.RevitVersion, nameof(RevitCopyStandarts));
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
 
-        var mainWindow = new MainWindow { DataContext = new BimCategoriesViewModel(mainFolder, document, application) };
+        // Настройка запуска окна
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
 
-        mainWindow.ShowDialog();
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+
+        kernel.Bind<StandartsService, IStandartsService>();
+
+        // Вызывает стандартное уведомление
+        Notification(kernel.Get<MainWindow>());
     }
 }
