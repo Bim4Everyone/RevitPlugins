@@ -104,11 +104,18 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
                     <Grid x:Name="Root">
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
                         <Rectangle
+                            Grid.Row="0"
                             x:Name="ActiveRectangle"
                             Width="25"
                             Height="3"
-                            Margin="0"
+                            Margin="8 0 0 0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top"
                             Fill="{DynamicResource ListViewItemPillFillBrush}"
@@ -117,6 +124,7 @@
                             Visibility="Hidden" />
 
                         <Border
+                            Grid.Row="1"
                             x:Name="Border"
                             MinHeight="36"
                             Margin="8 0 0 0"
@@ -163,7 +171,7 @@
                                     Value="{DynamicResource TabViewItemHeaderBackgroundSelected}" />
                             <Setter TargetName="Border" Property="BorderBrush"
                                     Value="{DynamicResource TabViewSelectedItemBorderBrush}" />
-                            <Setter Property="Foreground" Value="{DynamicResource TabViewItemForegroundSelected}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ListViewItemPillFillBrush}" />
                             <Setter TargetName="ActiveRectangle" Property="Visibility" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
