@@ -12,6 +12,7 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:behaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
 
     x:Name="_this"
     mc:Ignorable="d"
@@ -44,6 +45,11 @@
                 Command="{Binding LoadViewCommand}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
+    
+    <b:Interaction.Behaviors>
+        <behaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}"/>
+    </b:Interaction.Behaviors>
 
     <Grid>
         <Grid.RowDefinitions>

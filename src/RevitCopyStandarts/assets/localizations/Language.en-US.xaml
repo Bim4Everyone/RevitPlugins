@@ -10,7 +10,7 @@
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     
-    <system:String x:Key="ProgressDialog.Title">Coping standards [{0}\\{1}]...</system:String>
+    <system:String x:Key="ProgressDialog.Title">Coping standards [{0}\{1}]...</system:String>
     
     <system:String x:Key="Notification.Title">Copy standards</system:String>
     <system:String x:Key="Notification.Message">Standards copying completed successfully.</system:String>

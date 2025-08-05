@@ -119,8 +119,11 @@ internal class BimFileViewModel : BaseViewModel {
 
                 int counter = 1;
                 var progress = window.CreateProgress();
+                var cancellationToken = window.CreateCancellationToken();
                 foreach(var command in commands) {
                     progress.Report(counter++);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    
                     command.Execute();
                 }
             }

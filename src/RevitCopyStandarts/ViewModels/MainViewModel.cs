@@ -22,9 +22,7 @@ internal sealed class MainViewModel : BaseViewModel {
     private readonly IStandartsService _standarts;
     private readonly ILocalizationService _localizationService;
     private readonly INotificationService _notificationService;
-    private readonly IProgressDialogFactory _progressDialogFactory;
-
-    private string _errorText;
+    
     private ObservableCollection<BimPartsViewModel> _bimParts;
 
     /// <summary>
@@ -42,10 +40,9 @@ internal sealed class MainViewModel : BaseViewModel {
         _standarts = standarts;
         _localizationService = localizationService;
         _notificationService = notificationService;
-        _progressDialogFactory = progressDialogFactory;
+        ProgressDialogFactory = progressDialogFactory;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
-        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
     /// <summary>
@@ -53,19 +50,7 @@ internal sealed class MainViewModel : BaseViewModel {
     /// </summary>
     public ICommand LoadViewCommand { get; }
 
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
-    public ICommand AcceptViewCommand { get; }
-
-    /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
-    /// </summary>
-    public string ErrorText {
-        get => _errorText;
-        set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
+    public IProgressDialogFactory ProgressDialogFactory { get; }
 
     public ObservableCollection<BimPartsViewModel> BimParts {
         get => _bimParts;
@@ -85,29 +70,6 @@ internal sealed class MainViewModel : BaseViewModel {
         BimParts = new ObservableCollection<BimPartsViewModel>(bimParts);
     }
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а также быть основной код плагина.
-    /// </remarks>
-    private void AcceptView() {
-        
-    }
-
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке, как в окне (сверху-вниз)
-    /// </remarks>
-    private bool CanAcceptView() {
-        ErrorText = null;
-        return true;
-    }
-
     private BimPartsViewModel GetBimPart(string partName, IEnumerable<FileInfo> bimFiles) {
         return new BimPartsViewModel(partName) {
             BimFiles = [
@@ -118,7 +80,7 @@ internal sealed class MainViewModel : BaseViewModel {
                         _revitRepository,
                         _localizationService,
                         _notificationService,
-                        _progressDialogFactory))
+                        ProgressDialogFactory))
             ]
         };
     }

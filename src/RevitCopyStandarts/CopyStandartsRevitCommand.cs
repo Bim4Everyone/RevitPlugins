@@ -59,12 +59,12 @@ public class CopyStandartsRevitCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localizations/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        kernel.UseWpfUIProgressDialog<MainViewModel>();
+        kernel.UseWpfUIProgressDialog<MainViewModel>(stepValue: 1);
 
 
         kernel.Bind<IStandartsService>().To<StandartsService>();
 
         // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+        kernel.Get<MainWindow>().ShowDialog();
     }
 }
