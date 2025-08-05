@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitCopyStandarts.ViewModels;
 
@@ -12,17 +13,20 @@ namespace RevitCopyStandarts.Models.Commands;
 public abstract class CopyStandartsCommand : ICopyStandartsCommand {
     protected readonly Document _source;
     protected readonly Document _target;
+    protected readonly ILocalizationService _localizationService;
 
-    protected CopyStandartsCommand(Document source, Document target) {
+    protected CopyStandartsCommand(Document source, Document target, ILocalizationService localizationService) {
         _source = source;
         _target = target;
+        _localizationService = localizationService;
     }
 
     public virtual string Name { get; set; }
 
     public void Execute() {
         using var transactionGroup = new TransactionGroup(_target);
-        transactionGroup.BIMStart($"Копирование \"{Name}\"");
+        transactionGroup.BIMStart(
+            _localizationService.GetLocalizedString("CopyStandartsCommandTransactionGroup", Name));
 
         var copyOptions = new CopyPasteOptions();
         // copyOptions.SetDuplicateTypeNamesHandler(GetDuplicateTypeNamesHandler());
@@ -30,7 +34,9 @@ public abstract class CopyStandartsCommand : ICopyStandartsCommand {
         var elements = GetElements();
         foreach(var element in FilterElements(elements)) {
             using var transaction = new Transaction(_target);
-            transaction.BIMStart($"Копирование \"{Name} - {element.Name}\"");
+            
+            transaction.BIMStart(
+                _localizationService.GetLocalizedString("CopyStandartsCommandTransaction", Name, element.Name));
 
             var newElementId = CopyElement(element, copyOptions);
             if(IsAllowCommit(_target.GetElement(newElementId), element)) {

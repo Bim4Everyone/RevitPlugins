@@ -102,11 +102,11 @@ internal class BimFileViewModel : BaseViewModel {
         var sourceDocument = _revitRepository.OpenDocumentFile(_fileInfo.FullName);
         try {
             var commands = new List<ICopyStandartsCommand> {
-                new CopyViewTemplatesCommand(sourceDocument, _revitRepository.Document),
-                new CopyViewSchedulesCommand(sourceDocument, _revitRepository.Document),
-                new CopyMaterialsCommand(sourceDocument, _revitRepository.Document),
-                new CopyViewLegendsCommand(sourceDocument, _revitRepository.Document),
-                new CopyFiltersCommand(sourceDocument, _revitRepository.Document)
+                new CopyViewTemplatesCommand(sourceDocument, _revitRepository.Document, _localizationService),
+                new CopyViewSchedulesCommand(sourceDocument, _revitRepository.Document, _localizationService),
+                new CopyMaterialsCommand(sourceDocument, _revitRepository.Document, _localizationService),
+                new CopyViewLegendsCommand(sourceDocument, _revitRepository.Document, _localizationService),
+                new CopyFiltersCommand(sourceDocument, _revitRepository.Document, _localizationService)
             };
 
             commands.AddRange(GetOptionalStandarts(sourceDocument));
@@ -151,13 +151,13 @@ internal class BimFileViewModel : BaseViewModel {
         if(_commandsMap.TryGetValue(className, out string commandName)) {
             var type = Type.GetType(commandName);
             if(type == null) {
-                return new CopyOptionalStandartsCommand(sourceDocument, _revitRepository.Document) {
+                return new CopyOptionalStandartsCommand(sourceDocument, _revitRepository.Document, _localizationService) {
                     Name = className,
                     BuiltInCategoryName = commandName
                 };
             }
 
-            return (ICopyStandartsCommand) Activator.CreateInstance(type, sourceDocument, _revitRepository.Document);
+            return (ICopyStandartsCommand) Activator.CreateInstance(type, sourceDocument, _revitRepository.Document, _localizationService);
         }
 
         throw new ArgumentException(_localizationService.GetLocalizedString("Exceptions.UnknownClassName", className));
@@ -175,7 +175,7 @@ internal class BimFileViewModel : BaseViewModel {
             .Where(item => item != null);
 
         return [
-            new CopyElementIdsCommand(sourceDocument, _revitRepository.Document) { CopyElements = elements.ToList() }
+            new CopyElementIdsCommand(sourceDocument, _revitRepository.Document, _localizationService) { CopyElements = elements.ToList() }
         ];
     }
 

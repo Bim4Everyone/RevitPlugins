@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitCopyStandarts.Models.Commands;
 
@@ -13,10 +14,12 @@ namespace RevitCopyStandarts.Models.Commands;
 internal class CopyColorFillSchemesCommand : ICopyStandartsCommand {
     private readonly Document _source;
     private readonly Document _target;
+    private readonly ILocalizationService _localizationService;
 
-    public CopyColorFillSchemesCommand(Document source, Document target) {
+    public CopyColorFillSchemesCommand(Document source, Document target, ILocalizationService localizationService) {
         _source = source;
         _target = target;
+        _localizationService = localizationService;
     }
 
     public void Execute() {
@@ -29,7 +32,7 @@ internal class CopyColorFillSchemesCommand : ICopyStandartsCommand {
             .ToElements();
 
         using var transaction = new Transaction(_target);
-        transaction.BIMStart("Копирование \"Схема цветов\"");
+        transaction.BIMStart(_localizationService.GetLocalizedString("CopyColorFillSchemesCommandTransaction"));
 
         // если не удалять цветовые схемы,
         // то они копируются неверно, появляется дубликат без настроек
@@ -37,7 +40,7 @@ internal class CopyColorFillSchemesCommand : ICopyStandartsCommand {
             targetElements.Intersect(sourceElements, new FillSchemaEqualityComparer())
                 .Select(item => item.Id)
                 .ToArray());
-        
+
         ElementTransformUtils.CopyElements(
             _source,
             sourceElements.Select(item => item.Id).ToArray(),

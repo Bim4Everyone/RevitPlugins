@@ -4,25 +4,29 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.Exceptions;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitCopyStandarts.Models.Commands;
 
 internal class CopyObjectStylesCommand : ICopyStandartsCommand {
     private readonly Document _source;
     private readonly Document _target;
+    private readonly ILocalizationService _localizationService;
 
-    public CopyObjectStylesCommand(Document source, Document target) {
+    public CopyObjectStylesCommand(Document source, Document target, ILocalizationService localizationService) {
         _source = source;
         _target = target;
+        _localizationService = localizationService;
     }
 
     public void Execute() {
         using var transactionGroup = new TransactionGroup(_target);
-        transactionGroup.BIMStart("Копирование \"Стили объектов\"");
+        transactionGroup.BIMStart(
+            _localizationService.GetLocalizedString("CopyObjectStylesCommandTransactionGroup"));
 
         foreach(Category sourceCategory in _source.Settings.Categories) {
             using var transaction = new Transaction(_target);
-            transaction.BIMStart($"Копирование \"Стили объектов - {sourceCategory.Name}\"");
+            transaction.BIMStart(_localizationService.GetLocalizedString("CopyObjectStylesCommandTransaction", sourceCategory.Name));
 
             var targetCategory = GetCategory(sourceCategory, _target.Settings.Categories);
             if(targetCategory == null) {

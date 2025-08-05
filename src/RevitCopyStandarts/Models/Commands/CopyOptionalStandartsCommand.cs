@@ -3,11 +3,13 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 namespace RevitCopyStandarts.Models.Commands;
 
 internal class CopyOptionalStandartsCommand : CopyStandartsCommand {
-    public CopyOptionalStandartsCommand(Document source, Document destination)
-        : base(source, destination) {
+    public CopyOptionalStandartsCommand(Document source, Document destination, ILocalizationService localizationService)
+        : base(source, destination, localizationService) {
     }
 
     public string BuiltInCategoryName { get; set; }

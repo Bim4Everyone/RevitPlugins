@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitCopyStandarts.Models.Commands;
 
@@ -13,24 +14,32 @@ namespace RevitCopyStandarts.Models.Commands;
 internal class CopyViewLegendsCommand : ICopyStandartsCommand {
     private readonly Document _source;
     private readonly Document _target;
+    private readonly ILocalizationService _localizationService;
 
-    public CopyViewLegendsCommand(Document source, Document target) {
+    public CopyViewLegendsCommand(Document source, Document target, ILocalizationService localizationService) {
         _source = source;
         _target = target;
+        _localizationService = localizationService;
     }
 
-    public string Name => "Легенда";
+    public string Name => _localizationService.GetLocalizedString("CopyViewLegendsCommand");
 
     public void Execute() {
         var sourceElements = GetElements(_source).ToList();
         var targetElements = GetElements(_target).ToList();
 
         using var transactionGroup = new TransactionGroup(_target);
-        transactionGroup.BIMStart($"Копирование \"{Name}\"");
+        transactionGroup.BIMStart(
+            _localizationService.GetLocalizedString("CopyStandartsCommandTransactionGroup", Name));
 
         foreach(var sourceElement in sourceElements) {
             using var transaction = new Transaction(_target);
-            transaction.BIMStart($"Копирование \"{Name} - {sourceElement.Name}\"");
+            
+            transaction.BIMStart(
+                _localizationService.GetLocalizedString(
+                    "CopyStandartsCommandTransactionName",
+                    Name,
+                    sourceElement.Name));
 
             var newElement = _target.GetElement(CopyElement(sourceElement));
             var targetElement = targetElements.FirstOrDefault(item => item.Name.Equals(sourceElement.Name));

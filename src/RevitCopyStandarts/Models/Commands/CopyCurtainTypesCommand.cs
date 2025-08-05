@@ -4,16 +4,19 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitCopyStandarts.Models.Commands;
 
 internal class CopyCurtainTypesCommand : ICopyStandartsCommand {
     private readonly Document _source;
     private readonly Document _target;
+    private readonly ILocalizationService _localizationService;
 
-    public CopyCurtainTypesCommand(Document source, Document target) {
+    public CopyCurtainTypesCommand(Document source, Document target, ILocalizationService localizationService) {
         _source = source;
         _target = target;
+        _localizationService = localizationService;
     }
 
     public void Execute() {
@@ -26,7 +29,7 @@ internal class CopyCurtainTypesCommand : ICopyStandartsCommand {
             .ToList();
 
         using var transaction = new Transaction(_target);
-        transaction.BIMStart("Копирование \"Типы витражей\"");
+        transaction.BIMStart(_localizationService.GetLocalizedString("CopyCurtainTypesCommandTransaction"));
 
         ElementTransformUtils.CopyElements(
             _source,

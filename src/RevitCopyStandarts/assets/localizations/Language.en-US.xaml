@@ -20,4 +20,23 @@
     <system:String x:Key="Exceptions.UnknownClassName">Unknown command name \"{0}\".</system:String>
     <system:String x:Key="Exceptions.NullElementId">Element identifier cannot be empty or null.</system:String>
     <system:String x:Key="Exceptions.NumElementId">Element identifier must be a number.</system:String>
+    
+    <system:String x:Key="CopyViewTemplatesCommandName">Template</system:String>
+    <system:String x:Key="CopyViewSchedulesCommandName">Schedule</system:String>
+    <system:String x:Key="CopyMaterialsCommandName">Material</system:String>
+    <system:String x:Key="CopyViewLegendsCommandName">Legend</system:String>
+    <system:String x:Key="CopyFiltersCommandName">Filter</system:String>
+    <system:String x:Key="CopyElementIdsCommandName">Identifiers</system:String>
+    <system:String x:Key="CopyFamiliesCommandName">Family</system:String>
+    <system:String x:Key="CopyFloorTypeCommandName">Floor Types</system:String>
+    <system:String x:Key="CopyFoundationSlabCommandName">Slab Edge Parameters</system:String>
+    <system:String x:Key="CopyWallTypesCommandName">Wall Types</system:String>
+    
+    <system:String x:Key="CopyColorFillSchemesCommandTransaction">Copying "Color Scheme"</system:String>
+    <system:String x:Key="CopyCurtainTypesCommandTransaction">Copying "Curtain Types"</system:String>
+    <system:String x:Key="CopyObjectStylesCommandTransactionGroup">Copying "Object Styles"</system:String>
+    <system:String x:Key="CopyObjectStylesCommandTransaction">Copying "Object Styles - {0}"</system:String>
+    
+    <system:String x:Key="CopyStandartsCommandTransactionGroup">Copying "{0}"</system:String>
+    <system:String x:Key="CopyStandartsCommandTransaction">Copying "{0} - {1}"</system:String>
 </ResourceDictionary>
