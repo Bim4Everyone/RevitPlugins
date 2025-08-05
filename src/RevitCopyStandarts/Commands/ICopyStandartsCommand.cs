@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace RevitCopyStandarts.Commands;
 
-namespace RevitCopyStandarts.Commands {
-    interface ICopyStandartsCommand {
-        void Execute();
-    }
+internal interface ICopyStandartsCommand {
+    void Execute();
 }

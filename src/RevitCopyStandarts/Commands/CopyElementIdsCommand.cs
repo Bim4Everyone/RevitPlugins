@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-namespace RevitCopyStandarts.Commands {
-    internal class CopyElementIdsCommand : CopyStandartsCommand {
-        public CopyElementIdsCommand(Document source, Document target)
-            : base(source, target) {
-        }
+namespace RevitCopyStandarts.Commands;
 
-        public override string Name => "Идентификаторы";
-        public IReadOnlyCollection<Element> CopyElements { get; set; }
+internal class CopyElementIdsCommand : CopyStandartsCommand {
+    public CopyElementIdsCommand(Document source, Document target)
+        : base(source, target) {
+    }
 
-        protected override IEnumerable<Element> GetElements() {
-            return CopyElements;
-        }
+    public override string Name => "Идентификаторы";
+    public IReadOnlyCollection<Element> CopyElements { get; set; }
+
+    protected override IEnumerable<Element> GetElements() {
+        return CopyElements;
     }
 }

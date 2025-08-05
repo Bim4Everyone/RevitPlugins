@@ -6,27 +6,32 @@ using System.Linq;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
-namespace RevitCopyStandarts.ViewModels {
-    internal sealed class BimCategoryViewModel {
-        private readonly Document _mainDocument;
-        private readonly Application _application;
+namespace RevitCopyStandarts.ViewModels;
 
-        public BimCategoryViewModel(string categoryName, IEnumerable<FileInfo> files, Document mainDocument, Application application) {
-            Name = categoryName;
-            
-            _mainDocument = mainDocument;
-            _application = application;
+internal sealed class BimCategoryViewModel {
+    private readonly Document _document;
+    private readonly Application _application;
 
-            BimFiles = new ObservableCollection<BimFileViewModel>(files
-                .Select(item => new BimFileViewModel(GetStandard(item), item, _application, _mainDocument))
+    public BimCategoryViewModel(
+        string categoryName,
+        IEnumerable<FileInfo> files,
+        Document document,
+        Application application) {
+        Name = categoryName;
+
+        _document = document;
+        _application = application;
+
+        BimFiles = new ObservableCollection<BimFileViewModel>(
+            files
+                .Select(item => new BimFileViewModel(GetStandard(item), item, _application, _document))
                 .OrderBy(item => item.Name));
-        }
+    }
 
-        public string Name { get; set; }
-        public ObservableCollection<BimFileViewModel> BimFiles { get; set; }
+    public string Name { get; set; }
+    public ObservableCollection<BimFileViewModel> BimFiles { get; set; }
 
-        public string GetStandard(FileInfo fileInfo) {
-            return string.Join("_", Path.GetFileNameWithoutExtension(fileInfo.Name).Split('_').Skip(1));
-        }
+    public string GetStandard(FileInfo fileInfo) {
+        return string.Join("_", Path.GetFileNameWithoutExtension(fileInfo.Name).Split('_').Skip(1));
     }
 }

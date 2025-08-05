@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -9,24 +8,25 @@ using Autodesk.Revit.DB;
 
 using dosymep.WPF.ViewModels;
 
-namespace RevitCopyStandarts.ViewModels {
-    internal sealed class BimCategoriesViewModel : BaseViewModel {
-        private readonly Document _mainDocument;
-        private readonly Application _application;
+namespace RevitCopyStandarts.ViewModels;
 
-        public BimCategoriesViewModel(string mainFolder, Document mainDocument, Application application) {
-            _mainDocument = mainDocument;
-            _application = application;
-            
-            IEnumerable<BimCategoryViewModel> categories = Directory.EnumerateFiles(mainFolder, "*.rvt", SearchOption.TopDirectoryOnly)
-                .Select(item => new FileInfo(item))
-                .GroupBy(item => item.Name.Split('_')[0])
-                .Select(item => new BimCategoryViewModel(item.Key, item, _mainDocument, _application))
-                .OrderBy(item => item.Name);
+internal sealed class BimCategoriesViewModel : BaseViewModel {
+    private readonly Document _document;
+    private readonly Application _application;
 
-            BimCategories = new ObservableCollection<BimCategoryViewModel>(categories);
-        }
+    public BimCategoriesViewModel(string mainFolder, Document document, Application application) {
+        _document = document;
+        _application = application;
 
-        public ObservableCollection<BimCategoryViewModel> BimCategories { get; set; }
+        IEnumerable<BimCategoryViewModel> categories = Directory
+            .EnumerateFiles(mainFolder, "*.rvt", SearchOption.TopDirectoryOnly)
+            .Select(item => new FileInfo(item))
+            .GroupBy(item => item.Name.Split('_')[0])
+            .Select(item => new BimCategoryViewModel(item.Key, item, _document, _application))
+            .OrderBy(item => item.Name);
+
+        BimCategories = new ObservableCollection<BimCategoryViewModel>(categories);
     }
+
+    public ObservableCollection<BimCategoryViewModel> BimCategories { get; set; }
 }

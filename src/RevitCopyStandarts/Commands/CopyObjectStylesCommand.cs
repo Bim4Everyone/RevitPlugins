@@ -1,96 +1,107 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.Exceptions;
 
-namespace RevitCopyStandarts.Commands {
-    internal class CopyObjectStylesCommand : ICopyStandartsCommand {
-        private readonly Document _source;
-        private readonly Document _target;
+using dosymep.Revit;
 
-        public CopyObjectStylesCommand(Document source, Document target) {
-            _source = source;
-            _target = target;
+namespace RevitCopyStandarts.Commands;
+
+internal class CopyObjectStylesCommand : ICopyStandartsCommand {
+    private readonly Document _source;
+    private readonly Document _target;
+
+    public CopyObjectStylesCommand(Document source, Document target) {
+        _source = source;
+        _target = target;
+    }
+
+    public void Execute() {
+        using var transactionGroup = new TransactionGroup(_target);
+        transactionGroup.BIMStart("Копирование \"Стили объектов\"");
+
+        foreach(Category sourceCategory in _source.Settings.Categories) {
+            using var transaction = new Transaction(_target);
+            transaction.BIMStart($"Копирование \"Стили объектов - {sourceCategory.Name}\"");
+
+            var targetCategory = GetCategory(sourceCategory, _target.Settings.Categories);
+            if(targetCategory == null) {
+                continue;
+            }
+
+            CopyCategory(sourceCategory, targetCategory);
+
+            foreach(Category sourceSubCategory in sourceCategory.SubCategories) {
+                var targetSubCategory = GetCategory(sourceSubCategory, targetCategory.SubCategories)
+                                        ?? CreateSubCategory(targetCategory, sourceSubCategory.Name);
+                CopyCategory(sourceSubCategory, targetSubCategory);
+            }
+
+            transaction.Commit();
         }
 
-        public void Execute() {
-            using(var transactionGroup = new TransactionGroup(_target)) {
-                transactionGroup.Start($"Копирование \"Стили объектов\"");
+        transactionGroup.Assimilate();
+    }
 
-                foreach(Category sourceCategory in _source.Settings.Categories) {
-                    using(var transaction = new Transaction(_target)) {
-                        transaction.Start($"Копирование \"Стили объектов - {sourceCategory.Name}\"");
+    private Category CreateSubCategory(Category parentCategory, string categoryName) {
+        return _target.Settings.Categories.NewSubcategory(parentCategory, categoryName);
+    }
 
-                        Category targetCategory = GetCategory(sourceCategory, _target.Settings.Categories);
-                        if(targetCategory == null) {
-                            continue;
-                        }
+    private Category GetCategory(Category category, CategoryNameMap categories) {
+        try {
+            return categories.get_Item(category.Name);
+        } catch(InvalidOperationException) {
+            return null;
+        }
+    }
 
-                        CopyCategory(sourceCategory, targetCategory);
-
-                        foreach(Category sourceSubCategory in sourceCategory.SubCategories) {
-                            Category targetSubCategory = GetCategory(sourceSubCategory, targetCategory.SubCategories) ?? CreateSubCategory(targetCategory, sourceSubCategory.Name);
-                            CopyCategory(sourceSubCategory, targetSubCategory);
-                        }
-
-                        transaction.Commit();
-                    }
-                }
-
-                transactionGroup.Assimilate();
-            }
+    private void CopyCategory(Category sourceCategory, Category targetCategory) {
+        targetCategory.LineColor = sourceCategory.LineColor;
+        if(sourceCategory.CategoryType != CategoryType.Annotation
+           && sourceCategory.CategoryType != CategoryType.Internal) {
+            targetCategory.Material = sourceCategory.Material;
         }
 
-        private Category CreateSubCategory(Category parentCategory, string categoryName) {
-            return _target.Settings.Categories.NewSubcategory(parentCategory, categoryName);
+        try {
+            int? weight = sourceCategory.GetLineWeight(GraphicsStyleType.Cut);
+            if(weight > 0) {
+                targetCategory.SetLineWeight(weight.Value, GraphicsStyleType.Cut);
+            }
+        } catch(InvalidOperationException) {
         }
 
-        private Category GetCategory(Category category, CategoryNameMap categories) {
-            try {
-                return categories.get_Item(category.Name);
-            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                return null;
+        try {
+            int? weight = sourceCategory.GetLineWeight(GraphicsStyleType.Projection);
+            if(weight > 0) {
+                targetCategory.SetLineWeight(weight.Value, GraphicsStyleType.Projection);
             }
+        } catch(InvalidOperationException) {
         }
 
-        private void CopyCategory(Category sourceCategory, Category targetCategory) {
-            targetCategory.LineColor = sourceCategory.LineColor;
-            if(sourceCategory.CategoryType != CategoryType.Annotation && sourceCategory.CategoryType != CategoryType.Internal) {
-                targetCategory.Material = sourceCategory.Material;
-            }
+        SetLinePattern(
+            _source.GetElement(sourceCategory.GetLinePatternId(GraphicsStyleType.Cut)),
+            targetCategory,
+            GraphicsStyleType.Cut);
+        SetLinePattern(
+            _source.GetElement(sourceCategory.GetLinePatternId(GraphicsStyleType.Projection)),
+            targetCategory,
+            GraphicsStyleType.Projection);
+    }
 
-            try {
-                var weight = sourceCategory.GetLineWeight(GraphicsStyleType.Cut);
-                if(weight.HasValue && weight.Value > 0) {
-                    targetCategory.SetLineWeight(weight.Value, GraphicsStyleType.Cut);
-                }
-            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-            }
-
-            try {
-                var weight = sourceCategory.GetLineWeight(GraphicsStyleType.Projection);
-                if(weight.HasValue && weight.Value > 0) {
-                    targetCategory.SetLineWeight(weight.Value, GraphicsStyleType.Projection);
-                }
-            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-            }
-
-            SetLinePattern(_source.GetElement(sourceCategory.GetLinePatternId(GraphicsStyleType.Cut)), targetCategory, GraphicsStyleType.Cut);
-            SetLinePattern(_source.GetElement(sourceCategory.GetLinePatternId(GraphicsStyleType.Projection)), targetCategory, GraphicsStyleType.Projection);
+    private void SetLinePattern(
+        Element sourceLinePattern,
+        Category targetCategory,
+        GraphicsStyleType graphicsStyleType) {
+        if(sourceLinePattern == null
+           || targetCategory == null) {
+            return;
         }
 
-        private void SetLinePattern(Element sourceLinePattern, Category targetCategory, GraphicsStyleType graphicsStyleType) {
-            if(sourceLinePattern == null || targetCategory == null) {
-                return;
-            }
-
-            var targetLinePattern = new FilteredElementCollector(_target).OfClass(typeof(LinePatternElement)).ToElements().FirstOrDefault(item => item.Name.Equals(sourceLinePattern.Name));
-            if(targetLinePattern != null) {
-                targetCategory.SetLinePatternId(targetLinePattern.Id, graphicsStyleType);
-            }
+        var targetLinePattern = new FilteredElementCollector(_target).OfClass(typeof(LinePatternElement))
+            .ToElements()
+            .FirstOrDefault(item => item.Name.Equals(sourceLinePattern.Name));
+        if(targetLinePattern != null) {
+            targetCategory.SetLinePatternId(targetLinePattern.Id, graphicsStyleType);
         }
     }
 }

@@ -1,52 +1,37 @@
 #region Namespaces
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Windows.Interop;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 
-using dosymep;
 using dosymep.Bim4Everyone;
-using dosymep.SimpleServices;
 
 using RevitCopyStandarts.ViewModels;
 
 #endregion
 
-namespace RevitCopyStandarts {
-    [Transaction(TransactionMode.Manual)]
-    public class CopyStandartsRevitCommand : BasePluginCommand {
-        public CopyStandartsRevitCommand() {
-            PluginName = "Копирование стандартов";
-        }
+namespace RevitCopyStandarts;
 
-        protected override void Execute(UIApplication uiApplication) {
-            UIDocument uiDocument = uiApplication.ActiveUIDocument;
-            Application application = uiApplication.Application;
-            Document document = uiDocument.Document;
+[Transaction(TransactionMode.Manual)]
+public class CopyStandartsRevitCommand : BasePluginCommand {
+    public CopyStandartsRevitCommand() {
+        PluginName = "Копирование стандартов";
+    }
 
-            var mainFolder =
-                @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
+    protected override void Execute(UIApplication uiApplication) {
+        var uiDocument = uiApplication.ActiveUIDocument;
+        var application = uiApplication.Application;
+        var document = uiDocument.Document;
 
-            mainFolder =
-                Path.Combine(mainFolder, ModuleEnvironment.RevitVersion, "RevitCopyStandarts");
-            
-            var mainWindow = new MainWindow() {
-                DataContext = new BimCategoriesViewModel(mainFolder, document, application)
-            };
+        string mainFolder =
+            @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
 
-            mainWindow.ShowDialog();
-        }
+        mainFolder =
+            Path.Combine(mainFolder, ModuleEnvironment.RevitVersion, nameof(RevitCopyStandarts));
+
+        var mainWindow = new MainWindow { DataContext = new BimCategoriesViewModel(mainFolder, document, application) };
+
+        mainWindow.ShowDialog();
     }
 }
