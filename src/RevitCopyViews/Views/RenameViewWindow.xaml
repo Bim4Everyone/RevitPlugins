@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     mc:Ignorable="d"
     ResizeMode="NoResize"
@@ -51,10 +51,11 @@
             <StackPanel IsEnabled="{Binding ElementName=_withPrefix, Path=IsChecked, TargetNullValue=false}">
                 <StackPanel>
                     <dxe:TextEdit EditMode="InplaceActive" IsReadOnly="True" EditValue="Префикс" />
-                    <dxe:CheckEdit  Content="Заменить"
+                    <dxe:CheckEdit Content="Заменить"
                                    EditValue="{Binding ReplacePrefix, UpdateSourceTrigger=PropertyChanged}"
                                    IsEnabled="{Binding IsAllowReplacePrefix, UpdateSourceTrigger=PropertyChanged}" />
-                    <dxe:ComboBoxEdit AutoComplete="True" ItemsSource="{Binding Prefixes, UpdateSourceTrigger=PropertyChanged}"
+                    <dxe:ComboBoxEdit AutoComplete="True"
+                                      ItemsSource="{Binding Prefixes, UpdateSourceTrigger=PropertyChanged}"
                                       EditValue="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
@@ -63,7 +64,8 @@
                     <dxe:CheckEdit Content="Заменить"
                                    EditValue="{Binding ReplaceSuffix, UpdateSourceTrigger=PropertyChanged}"
                                    IsEnabled="{Binding IsAllowReplaceSuffix, UpdateSourceTrigger=PropertyChanged}" />
-                    <dxe:ComboBoxEdit AutoComplete="True" ItemsSource="{Binding Suffixes, UpdateSourceTrigger=PropertyChanged}"
+                    <dxe:ComboBoxEdit AutoComplete="True"
+                                      ItemsSource="{Binding Suffixes, UpdateSourceTrigger=PropertyChanged}"
                                       EditValue="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
             </StackPanel>

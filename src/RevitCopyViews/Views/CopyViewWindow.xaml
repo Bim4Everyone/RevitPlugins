@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     mc:Ignorable="d"
     SizeToContent="Height"
@@ -41,9 +41,9 @@
 
         <StackPanel Grid.Row="2" Margin="0 5">
             <dxe:CheckEdit Content="Добавить отметку уровня"
-                               EditValue="{Binding WithElevation, UpdateSourceTrigger=PropertyChanged}" />
+                           EditValue="{Binding WithElevation, UpdateSourceTrigger=PropertyChanged}" />
             <lc:GroupBox Margin="0 5" Header="Префикс">
-                <StackPanel >
+                <StackPanel>
                     <dxe:CheckEdit
                         Content="Заменить"
                         EditValue="{Binding ReplacePrefix, UpdateSourceTrigger=PropertyChanged}"
@@ -57,7 +57,7 @@
             </lc:GroupBox>
 
             <lc:GroupBox Margin="0 5 0 10" Header="Суффикс">
-                <StackPanel >
+                <StackPanel>
 
                     <dxe:CheckEdit
                         Content="Заменить"
