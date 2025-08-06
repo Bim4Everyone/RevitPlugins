@@ -41,6 +41,10 @@
     
     <system:String x:Key="RenameView.NotSelectedViewsTitle">Warning!</system:String>
     <system:String x:Key="RenameView.NotSelectedViewsMessage">Select views that need to be renamed.</system:String>
+    
+    <system:String x:Key="UpdateElevation.TransactionName">Update floor elevation</system:String>
+    <system:String x:Key="UpdateElevation.NotSelectedViewsTitle">Warning!</system:String>
+    <system:String x:Key="UpdateElevation.NotSelectedViewsMessage">Names were not changed for the following views:</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>

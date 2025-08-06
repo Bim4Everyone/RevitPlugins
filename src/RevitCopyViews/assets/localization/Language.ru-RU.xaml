@@ -41,6 +41,10 @@
     
     <system:String x:Key="RenameView.NotSelectedViewsTitle">Предупреждение!</system:String>
     <system:String x:Key="RenameView.NotSelectedViewsMessage">Выберите виды, которые требуется переименовать.</system:String>
+   
+    <system:String x:Key="UpdateElevation.TransactionName">Обновление отметки этажа</system:String>
+    <system:String x:Key="UpdateElevation.NotSelectedViewsTitle">Предупреждение!</system:String>
+    <system:String x:Key="UpdateElevation.NotSelectedViewsMessage">Не были изменены имена у следующих видов:</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
