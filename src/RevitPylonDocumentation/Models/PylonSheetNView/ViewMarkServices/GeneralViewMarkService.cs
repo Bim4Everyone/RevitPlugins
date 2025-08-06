@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization.Configuration;
 
 using Autodesk.Revit.DB;
 
@@ -95,212 +94,224 @@ internal class GeneralViewMarkService {
     /// <summary>
     /// Создает марку арматурного каркаса на основном виде опалубки
     /// </summary>
-    internal void CreateSkeletonMark() {
+    internal void TryCreateSkeletonMark() {
         var simpleRebars = SheetInfo.RebarInfo.SimpleVerticalRebars;
         if(simpleRebars.Count == 0) { return; }
-
-        // Получаем референс-элемент
-        Element rightVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.Right,
-                                                                            false);
-        // Получаем точку в которую нужно поставить аннотацию
-        var pointRight= _viewPointsAnalyzer.GetPointByDirection(rightVerticalBar, DirectionType.Right,
-                                                                0, 0, true);
-        // Корректируем положение точки, куда будет установлена марка (текст)
-        pointRight = _viewPointsAnalyzer.GetPointByDirection(pointRight, DirectionType.RightBottom, 1.5, 3.5);
-        // Создаем марку арматуры
-        var rightTag = _annotationService.CreateRebarTag(pointRight, _tagSkeletonSymbol, rightVerticalBar);
+        try {
+            // Получаем референс-элемент
+            Element rightVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.Right,
+                                                                                 false);
+            // Получаем точку в которую нужно поставить аннотацию
+            var pointRight = _viewPointsAnalyzer.GetPointByDirection(rightVerticalBar, DirectionType.Right,
+                                                                     0, 0, true);
+            // Корректируем положение точки, куда будет установлена марка (текст)
+            pointRight = _viewPointsAnalyzer.GetPointByDirection(pointRight, DirectionType.RightBottom, 1.5, 3.5);
+            // Создаем марку арматуры
+            var rightTag = _annotationService.CreateRebarTag(pointRight, _tagSkeletonSymbol, rightVerticalBar);
 
 #if REVIT_2022_OR_GREATER
-        rightTag.LeaderEndCondition = LeaderEndCondition.Free;
-        var rightVerticalBarRef = new Reference(rightVerticalBar);
+            rightTag.LeaderEndCondition = LeaderEndCondition.Free;
+            var rightVerticalBarRef = new Reference(rightVerticalBar);
 
-        var tagLeaderEnd = rightTag.GetLeaderEnd(rightVerticalBarRef);
-        tagLeaderEnd = _viewPointsAnalyzer.GetPointByDirection(tagLeaderEnd, DirectionType.Bottom, 0, 3);
-        rightTag.SetLeaderEnd(rightVerticalBarRef, tagLeaderEnd);
+            var tagLeaderEnd = rightTag.GetLeaderEnd(rightVerticalBarRef);
+            tagLeaderEnd = _viewPointsAnalyzer.GetPointByDirection(tagLeaderEnd, DirectionType.Bottom, 0, 3);
+            rightTag.SetLeaderEnd(rightVerticalBarRef, tagLeaderEnd);
 #endif
+        } catch(Exception) { }
     }
 
     /// <summary>
     /// Создает марки хомутов на основном виде опалубки в зависимости от положения на виде
     /// </summary>
-    internal void CreateClampMarks() {
-        var simpleClamps = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
-                                                                 _formNumberForClampsMin, _formNumberForClampsMax);
+    internal void TryCreateClampMarks() {
+        try {
+            var simpleClamps = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
+                                                                     _formNumberForClampsMin, _formNumberForClampsMax);
 
-        var pointForCompare = _viewPointsAnalyzer.GetTransformedPoint(SheetInfo.RebarInfo.SkeletonParentRebar, true);
-        foreach(var simpleClamp in simpleClamps) {
-            var clampPoint = _viewPointsAnalyzer.GetTransformedPoint(simpleClamp, true);
-            if(clampPoint.X < pointForCompare.X) {
-                CreateClampMark(simpleClamp, DirectionType.LeftTop);
-            } else {
-                CreateClampMark(simpleClamp, DirectionType.RightTop);
+            var pointForCompare = _viewPointsAnalyzer.GetTransformedPoint(SheetInfo.RebarInfo.SkeletonParentRebar, true);
+            foreach(var simpleClamp in simpleClamps) {
+                var clampPoint = _viewPointsAnalyzer.GetTransformedPoint(simpleClamp, true);
+                if(clampPoint.X < pointForCompare.X) {
+                    TryCreateClampMark(simpleClamp, DirectionType.LeftTop);
+                } else {
+                    TryCreateClampMark(simpleClamp, DirectionType.RightTop);
+                }
             }
-        }
+        } catch(Exception) { }
     }
 
     /// <summary>
     /// Создает марку хомута на основном виде опалубки
     /// </summary>
-    private void CreateClampMark(Element simpleClamp, DirectionType directionType) {
-        // Получаем точку в которую нужно поставить аннотацию
-        var annotPoint = _viewPointsAnalyzer.GetPointByDirection(simpleClamp, directionType, 0, 0, true);
-        // Корректируем положение точки, куда будет установлена марка (текст)
-        annotPoint = _viewPointsAnalyzer.GetPointByDirection(annotPoint, directionType, 2.4, 0.3);
+    private void TryCreateClampMark(Element simpleClamp, DirectionType directionType) {
+        try {
+            // Получаем точку в которую нужно поставить аннотацию
+            var annotPoint = _viewPointsAnalyzer.GetPointByDirection(simpleClamp, directionType, 0, 0, true);
+            // Корректируем положение точки, куда будет установлена марка (текст)
+            annotPoint = _viewPointsAnalyzer.GetPointByDirection(annotPoint, directionType, 2.4, 0.3);
 
-        // Создаем марку арматуры
-        var clampTag = _annotationService.CreateRebarTag(annotPoint, _tagSymbolWithoutSerif, simpleClamp);
-        clampTag.LeaderEndCondition = LeaderEndCondition.Free;
+            // Создаем марку арматуры
+            var clampTag = _annotationService.CreateRebarTag(annotPoint, _tagSymbolWithoutSerif, simpleClamp);
+            clampTag.LeaderEndCondition = LeaderEndCondition.Free;
+        } catch(Exception) { }
     }
 
-    internal void CreateAdditionalMark() {
-        // Получаем референс-элемент
-        var bottomElement = SheetInfo.HostElems.First();
+    internal void TryCreateAdditionalMark() {
+        try {
+            // Получаем референс-элемент
+            var bottomElement = SheetInfo.HostElems.First();
 
-        // Получаем точку в которую нужно поставить аннотацию
-        var annotPoint = _viewPointsAnalyzer.GetPointByDirection(bottomElement, DirectionType.RightBottom,
-                                                                 5, 1, false);
-        var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(bottomElement, DirectionType.RightBottom,
-                                                                 2.5, 0.5, false);
-        // Создаем типовую аннотацию для обозначения ГОСТа
-        _annotationService.CreateUniversalTag(annotPoint, _gostTagSymbol, leaderPoint, 
-                                              UnitUtilsHelper.ConvertToInternalValue(40),
-                                              "Арматурные выпуски", "показаны условно");
+            // Получаем точку в которую нужно поставить аннотацию
+            var annotPoint = _viewPointsAnalyzer.GetPointByDirection(bottomElement, DirectionType.RightBottom,
+                                                                     5, 1, false);
+            var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(bottomElement, DirectionType.RightBottom,
+                                                                      2.5, 0.5, false);
+            // Создаем типовую аннотацию для обозначения ГОСТа
+            _annotationService.CreateUniversalTag(annotPoint, _gostTagSymbol, leaderPoint,
+                                                  UnitUtilsHelper.ConvertToInternalValue(40),
+                                                  "Арматурные выпуски", "показаны условно");
+        } catch(Exception) { }
     }
 
     /// <summary>
     /// Создаем линии обрыва ниже первого опалубочного элемента
     /// </summary>
-    internal void CreateLowerBreakLines() {
+    internal void TryCreateLowerBreakLines() {
         if(_breakLineSymbol is null) { return; }
         var view = ViewOfPylon.ViewElement;
-        
-        // Т.к. линии обрыва будут снизу, то берем первый элемент пилона
-        var bottomElement = SheetInfo.HostElems.First();
+        try {
+            // Т.к. линии обрыва будут снизу, то берем первый элемент пилона
+            var bottomElement = SheetInfo.HostElems.First();
 
-        // Получаем спроецированные на плоскость вида граничные точки
-        var bbMin = bottomElement.get_BoundingBox(view).Min;
-        bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
-        var bbMax = bottomElement.get_BoundingBox(view).Max;
-        bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
-        var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
+            // Получаем спроецированные на плоскость вида граничные точки
+            var bbMin = bottomElement.get_BoundingBox(view).Min;
+            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
+            var bbMax = bottomElement.get_BoundingBox(view).Max;
+            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
+            var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
 
-        // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-        var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMin, DirectionType.Left, 
-                                                             _breakLinesOffsetX, _breakLinesOffsetBottomY);
-        var point2 = _viewPointsAnalyzer.GetPointByDirection(bbMin, DirectionType.LeftBottom, 
-                                                             _breakLinesOffsetX, _breakLinesOffsetBottomY);
-        var point3 = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.RightBottom, 
-                                                             _breakLinesOffsetX, _breakLinesOffsetBottomY);
-        var point4 = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.Right, 
-                                                             _breakLinesOffsetX, _breakLinesOffsetBottomY);
-        // Линии обрыва - это 2D-аннотационные семейства на основе линии
-        var line1 = Line.CreateBound(point1, point2);
-        var line2 = Line.CreateBound(point2, point3);
-        var line3 = Line.CreateBound(point3, point4);
-        Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
-        Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
-        Repository.Document.Create.NewFamilyInstance(line3, _breakLineSymbol, view);
+            // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
+            var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMin, DirectionType.Left,
+                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
+            var point2 = _viewPointsAnalyzer.GetPointByDirection(bbMin, DirectionType.LeftBottom,
+                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
+            var point3 = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.RightBottom,
+                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
+            var point4 = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.Right,
+                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
+            // Линии обрыва - это 2D-аннотационные семейства на основе линии
+            var line1 = Line.CreateBound(point1, point2);
+            var line2 = Line.CreateBound(point2, point3);
+            var line3 = Line.CreateBound(point3, point4);
+            Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
+            Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
+            Repository.Document.Create.NewFamilyInstance(line3, _breakLineSymbol, view);
+        } catch(Exception) { }
     }
 
     /// <summary>
     /// Создаем линии обрыва выше последнего опалубочного элемента
     /// </summary>
-    internal void CreateUpperBreakLines() {
+    internal void TryCreateUpperBreakLines() {
         if(_breakLineSymbol is null) { return; }
         var view = ViewOfPylon.ViewElement;
+        try {
+            // Т.к. линии обрыва будут сверху, то берем последний элемент пилона
+            var topElement = SheetInfo.HostElems.Last();
 
-        // Т.к. линии обрыва будут сверху, то берем последний элемент пилона
-        var topElement = SheetInfo.HostElems.Last();
+            // Получаем спроецированные на плоскость вида граничные точки
+            var bbMin = topElement.get_BoundingBox(view).Min;
+            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
+            var bbMax = topElement.get_BoundingBox(view).Max;
+            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
+            var topLeftPt = new XYZ(bbMin.X, bbMin.Y, bbMax.Z);
 
-        // Получаем спроецированные на плоскость вида граничные точки
-        var bbMin = topElement.get_BoundingBox(view).Min;
-        bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
-        var bbMax = topElement.get_BoundingBox(view).Max;
-        bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
-        var topLeftPt = new XYZ(bbMin.X, bbMin.Y, bbMax.Z);
-
-        // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-        var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMax, DirectionType.Right, 
-                                                             _breakLinesOffsetX, _breakLinesOffsetTopY);
-        var point2 = _viewPointsAnalyzer.GetPointByDirection(bbMax, DirectionType.RightTop, 
-                                                             _breakLinesOffsetX, _breakLinesOffsetTopY);
-        var point3 = _viewPointsAnalyzer.GetPointByDirection(topLeftPt, DirectionType.LeftTop, 
-                                                             _breakLinesOffsetX, _breakLinesOffsetTopY);
-        var point4 = _viewPointsAnalyzer.GetPointByDirection(topLeftPt, DirectionType.Left, 
-                                                             _breakLinesOffsetX, _breakLinesOffsetTopY);
-        // Линии обрыва - это 2D-аннотационные семейства на основе линии
-        var line1 = Line.CreateBound(point1, point2);
-        var line2 = Line.CreateBound(point2, point3);
-        var line3 = Line.CreateBound(point3, point4);
-        Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
-        Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
-        Repository.Document.Create.NewFamilyInstance(line3, _breakLineSymbol, view);
+            // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
+            var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMax, DirectionType.Right,
+                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
+            var point2 = _viewPointsAnalyzer.GetPointByDirection(bbMax, DirectionType.RightTop,
+                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
+            var point3 = _viewPointsAnalyzer.GetPointByDirection(topLeftPt, DirectionType.LeftTop,
+                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
+            var point4 = _viewPointsAnalyzer.GetPointByDirection(topLeftPt, DirectionType.Left,
+                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
+            // Линии обрыва - это 2D-аннотационные семейства на основе линии
+            var line1 = Line.CreateBound(point1, point2);
+            var line2 = Line.CreateBound(point2, point3);
+            var line3 = Line.CreateBound(point3, point4);
+            Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
+            Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
+            Repository.Document.Create.NewFamilyInstance(line3, _breakLineSymbol, view);
+        } catch(Exception) { }
     }
 
     /// <summary>
     /// Создаем линии обрыва между опалубочными элементами, если их несколько
     /// </summary>
-    internal void CreateMiddleBreakLines() {
+    internal void TryCreateMiddleBreakLines() {
         if(SheetInfo.HostElems.Count == 1 || _breakLineSymbol is null) {
             return;
         }
         var view = ViewOfPylon.ViewElement;
         var previousElement = SheetInfo.HostElems.First();
+        try {
+            for(int i = 1; i < SheetInfo.HostElems.Count; i++) {
+                var currentElement = SheetInfo.HostElems[i];
 
-        for(int i = 1; i < SheetInfo.HostElems.Count; i++) {
-            var currentElement = SheetInfo.HostElems[i];
+                // Получаем спроецированные на плоскость вида граничные точки
+                var currentBbMax = currentElement.get_BoundingBox(view).Max;
+                var currentBbMin = currentElement.get_BoundingBox(view).Min;
+                var previousBbMax = previousElement.get_BoundingBox(view).Max;
+                var previousBbMin = previousElement.get_BoundingBox(view).Min;
 
-            // Получаем спроецированные на плоскость вида граничные точки
-            var currentBbMax = currentElement.get_BoundingBox(view).Max;
-            var currentBbMin = currentElement.get_BoundingBox(view).Min;
-            var previousBbMax = previousElement.get_BoundingBox(view).Max;
-            var previousBbMin = previousElement.get_BoundingBox(view).Min;
+                currentBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, currentBbMax);
+                currentBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, currentBbMin);
+                previousBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, previousBbMax);
+                previousBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, previousBbMin);
 
-            currentBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, currentBbMax);
-            currentBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, currentBbMin);
-            previousBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, previousBbMax);
-            previousBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, previousBbMin);
+                var currentBottomRightPt = new XYZ(currentBbMax.X, currentBbMax.Y, currentBbMin.Z);
+                var previousTopLeftPt = new XYZ(previousBbMin.X, previousBbMin.Y, previousBbMax.Z);
 
-            var currentBottomRightPt = new XYZ(currentBbMax.X, currentBbMax.Y, currentBbMin.Z);
-            var previousTopLeftPt = new XYZ(previousBbMin.X, previousBbMin.Y, previousBbMax.Z);
+                // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
+                var point1 = _viewPointsAnalyzer.GetPointByDirection(previousBbMax, DirectionType.Right,
+                                                                     _breakLinesOffsetX, _breakLinesOffsetBottomY);
+                var point2 = _viewPointsAnalyzer.GetPointByDirection(currentBottomRightPt, DirectionType.Right,
+                                                                     _breakLinesOffsetX, _breakLinesOffsetTopY);
+                var point3 = _viewPointsAnalyzer.GetPointByDirection(currentBbMin, DirectionType.Left,
+                                                                     _breakLinesOffsetX, _breakLinesOffsetTopY);
+                var point4 = _viewPointsAnalyzer.GetPointByDirection(previousTopLeftPt, DirectionType.Left,
+                                                                     _breakLinesOffsetX, _breakLinesOffsetBottomY);
+                // Линии обрыва - это 2D-аннотационные семейства на основе линии
+                var line1 = Line.CreateBound(point1, point2);
+                var line2 = Line.CreateBound(point3, point4);
+                Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
+                Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
 
-            // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-            var point1 = _viewPointsAnalyzer.GetPointByDirection(previousBbMax, DirectionType.Right, 
-                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
-            var point2 = _viewPointsAnalyzer.GetPointByDirection(currentBottomRightPt, DirectionType.Right, 
-                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
-            var point3 = _viewPointsAnalyzer.GetPointByDirection(currentBbMin, DirectionType.Left, 
-                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
-            var point4 = _viewPointsAnalyzer.GetPointByDirection(previousTopLeftPt, DirectionType.Left, 
-                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
-            // Линии обрыва - это 2D-аннотационные семейства на основе линии
-            var line1 = Line.CreateBound(point1, point2);
-            var line2 = Line.CreateBound(point3, point4);
-            Repository.Document.Create.NewFamilyInstance(line1, _breakLineSymbol, view);
-            Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
-
-            previousElement = currentElement;
-        }
+                previousElement = currentElement;
+            }
+        } catch(Exception) { }
     }
 
-    internal void CreateConcretingSeams() {
+    internal void TryCreateConcretingSeams() {
         var view = ViewOfPylon.ViewElement;
         if(_concretingSeamSymbol is null) { return; }
 
-        foreach(var pylon in SheetInfo.HostElems) {
-            // Получаем спроецированные на плоскость вида граничные точки
-            var bbMax = pylon.get_BoundingBox(view).Max;
-            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
-            var bbMin = pylon.get_BoundingBox(view).Min;
-            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
-            var topLeftPt = new XYZ(bbMin.X, bbMin.Y, bbMax.Z);
-            var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
+        try {
+            foreach(var pylon in SheetInfo.HostElems) {
+                // Получаем спроецированные на плоскость вида граничные точки
+                var bbMax = pylon.get_BoundingBox(view).Max;
+                bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
+                var bbMin = pylon.get_BoundingBox(view).Min;
+                bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
+                var topLeftPt = new XYZ(bbMin.X, bbMin.Y, bbMax.Z);
+                var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
 
-            // Аннотации швов бетонирования - это 2D-аннотационные семейства на основе линии
-            var line1 = Line.CreateBound(bbMin, bottomRightPt);
-            var line2 = Line.CreateBound(bbMax, topLeftPt);
-            Repository.Document.Create.NewFamilyInstance(line1, _concretingSeamSymbol, view);
-            Repository.Document.Create.NewFamilyInstance(line2, _concretingSeamSymbol, view);
-        }
+                // Аннотации швов бетонирования - это 2D-аннотационные семейства на основе линии
+                var line1 = Line.CreateBound(bbMin, bottomRightPt);
+                var line2 = Line.CreateBound(bbMax, topLeftPt);
+                Repository.Document.Create.NewFamilyInstance(line1, _concretingSeamSymbol, view);
+                Repository.Document.Create.NewFamilyInstance(line2, _concretingSeamSymbol, view);
+            }
+        } catch(Exception) { }
     }
 }

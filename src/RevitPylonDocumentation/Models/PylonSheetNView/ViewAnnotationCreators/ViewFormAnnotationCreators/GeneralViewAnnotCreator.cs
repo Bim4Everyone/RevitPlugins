@@ -44,13 +44,13 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
         try {
             var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             markService.TryCreatePylonElevMark(SheetInfo.HostElems, dimensionBaseService);
-            markService.CreateSkeletonMark();
-            markService.CreateClampMarks();
-            markService.CreateAdditionalMark();
-            markService.CreateLowerBreakLines();
-            markService.CreateUpperBreakLines();
-            markService.CreateMiddleBreakLines();
-            markService.CreateConcretingSeams();
+            markService.TryCreateSkeletonMark();
+            markService.TryCreateClampMarks();
+            markService.TryCreateAdditionalMark();
+            markService.TryCreateLowerBreakLines();
+            markService.TryCreateUpperBreakLines();
+            markService.TryCreateMiddleBreakLines();
+            markService.TryCreateConcretingSeams();
         } catch(Exception) { }
     }
 }
