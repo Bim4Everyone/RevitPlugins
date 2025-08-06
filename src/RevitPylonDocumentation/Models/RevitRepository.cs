@@ -282,7 +282,6 @@ internal class RevitRepository {
         }
     }
 
-
     /// <summary>
     /// Ищет типоразмер по имени типа
     /// </summary>
@@ -291,6 +290,25 @@ internal class RevitRepository {
             .OfCategory(builtInCategory)
             .WhereElementIsElementType()
             .FirstOrDefault(e => e.Name == typeName) is not FamilySymbol symbol) {
+            return null;
+        }
+
+        // Убедимся, что типоразмер активен
+        if(!symbol.IsActive) {
+            symbol.Activate();
+        }
+        return symbol;
+    }
+
+    /// <summary>
+    /// Ищет типоразмер по имени типа
+    /// </summary>
+    public FamilySymbol FindSymbol(BuiltInCategory builtInCategory, string familyName, string typeName) {
+        if(new FilteredElementCollector(Document)
+            .OfCategory(builtInCategory)
+            .WhereElementIsElementType()
+            .Cast<ElementType>()
+            .FirstOrDefault(e => e.FamilyName == familyName && e.Name == typeName) is not FamilySymbol symbol) {
             return null;
         }
 

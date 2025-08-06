@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Configuration;
 
 using Autodesk.Revit.DB;
 
@@ -15,6 +16,7 @@ internal class GeneralViewMarkService {
     private readonly FamilySymbol _tagSymbolWithoutSerif;
     private readonly FamilySymbol _gostTagSymbol;
     private readonly FamilySymbol _breakLineSymbol;
+    private readonly FamilySymbol _concretingSeamSymbol;
 
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
@@ -45,6 +47,10 @@ internal class GeneralViewMarkService {
 
         // Находим типоразмер аннотации линии разрыва
         _breakLineSymbol = Repository.FindSymbol(BuiltInCategory.OST_DetailComponents, "Линейный обрыв");
+
+        // Находим типоразмер аннотации рабочего шва бетонирования
+        _concretingSeamSymbol = Repository.FindSymbol(BuiltInCategory.OST_DetailComponents, "ЭУ_ПКУ_Шов бетонирования", 
+                                                      "3 мм_М 20");
     }
 
     internal MainViewModel ViewModel { get; set; }
@@ -159,17 +165,15 @@ internal class GeneralViewMarkService {
         _annotationService.CreateUniversalTag(annotPoint, _gostTagSymbol, leaderPoint, 
                                               UnitUtilsHelper.ConvertToInternalValue(40),
                                               "Арматурные выпуски", "показаны условно");
-
-        CreateLowerBreakLines();
-        CreateUpperBreakLines();
-        CreateMiddleBreakLines();
     }
 
     /// <summary>
     /// Создаем линии обрыва ниже первого опалубочного элемента
     /// </summary>
-    private void CreateLowerBreakLines() {
+    internal void CreateLowerBreakLines() {
+        if(_breakLineSymbol is null) { return; }
         var view = ViewOfPylon.ViewElement;
+        
         // Т.к. линии обрыва будут снизу, то берем первый элемент пилона
         var bottomElement = SheetInfo.HostElems.First();
 
@@ -201,8 +205,10 @@ internal class GeneralViewMarkService {
     /// <summary>
     /// Создаем линии обрыва выше последнего опалубочного элемента
     /// </summary>
-    private void CreateUpperBreakLines() {
+    internal void CreateUpperBreakLines() {
+        if(_breakLineSymbol is null) { return; }
         var view = ViewOfPylon.ViewElement;
+
         // Т.к. линии обрыва будут сверху, то берем последний элемент пилона
         var topElement = SheetInfo.HostElems.Last();
 
@@ -234,8 +240,8 @@ internal class GeneralViewMarkService {
     /// <summary>
     /// Создаем линии обрыва между опалубочными элементами, если их несколько
     /// </summary>
-    private void CreateMiddleBreakLines() {
-        if(SheetInfo.HostElems.Count == 1) {
+    internal void CreateMiddleBreakLines() {
+        if(SheetInfo.HostElems.Count == 1 || _breakLineSymbol is null) {
             return;
         }
         var view = ViewOfPylon.ViewElement;
@@ -274,6 +280,27 @@ internal class GeneralViewMarkService {
             Repository.Document.Create.NewFamilyInstance(line2, _breakLineSymbol, view);
 
             previousElement = currentElement;
+        }
+    }
+
+    internal void CreateConcretingSeams() {
+        var view = ViewOfPylon.ViewElement;
+        if(_concretingSeamSymbol is null) { return; }
+
+        foreach(var pylon in SheetInfo.HostElems) {
+            // Получаем спроецированные на плоскость вида граничные точки
+            var bbMax = pylon.get_BoundingBox(view).Max;
+            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
+            var bbMin = pylon.get_BoundingBox(view).Min;
+            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
+            var topLeftPt = new XYZ(bbMin.X, bbMin.Y, bbMax.Z);
+            var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
+
+            // Аннотации швов бетонирования - это 2D-аннотационные семейства на основе линии
+            var line1 = Line.CreateBound(bbMin, bottomRightPt);
+            var line2 = Line.CreateBound(bbMax, topLeftPt);
+            Repository.Document.Create.NewFamilyInstance(line1, _concretingSeamSymbol, view);
+            Repository.Document.Create.NewFamilyInstance(line2, _concretingSeamSymbol, view);
         }
     }
 }

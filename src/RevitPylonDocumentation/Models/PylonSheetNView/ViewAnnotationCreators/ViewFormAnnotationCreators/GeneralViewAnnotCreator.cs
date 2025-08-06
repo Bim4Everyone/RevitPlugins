@@ -47,6 +47,10 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
             markService.CreateSkeletonMark();
             markService.CreateClampMarks();
             markService.CreateAdditionalMark();
+            markService.CreateLowerBreakLines();
+            markService.CreateUpperBreakLines();
+            markService.CreateMiddleBreakLines();
+            markService.CreateConcretingSeams();
         } catch(Exception) { }
     }
 }
