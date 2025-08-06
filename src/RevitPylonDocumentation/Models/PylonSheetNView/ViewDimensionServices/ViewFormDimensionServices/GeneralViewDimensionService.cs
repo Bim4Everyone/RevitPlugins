@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using Ninject.Planning;
+
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
@@ -65,7 +67,17 @@ internal class GeneralViewDimensionService {
                 var refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view, new XYZ(0, 0, 1),
                                                                                       refArrayFormworkFront);
                 Repository.Document.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkGridFront,
-                                                            ViewModel.SelectedDimensionType);
+                                                        ViewModel.SelectedDimensionType);
+
+                // Корректируем концы осей, приближая их на виде к опалубке пилона, чтобы сократить габариты
+                // видового экрана
+                var transverseViewGridOffsets = new OffsetOption() {
+                    LeftOffset = 1,
+                    RightOffset = 1,
+                    TopOffset = 1,
+                    BottomOffset = 2.2
+                };
+                EditGridEnds(view, SheetInfo.HostElems.First(), grids, transverseViewGridOffsets, dimensionBaseService);
             }
         } catch(Exception) { }
     }
@@ -286,5 +298,47 @@ internal class GeneralViewDimensionService {
         dimSegmentOpts.Add(new DimensionSegmentOption(false));
 
         return dimSegmentOpts;
+    }
+
+    private void EditGridEnds(View view, Element rebar, List<Grid> grids, OffsetOption offsetOption,
+                              DimensionBaseService dimensionBaseService) {
+        if(view is null || rebar is null) { return; }
+        var rightDirection = view.RightDirection;
+
+        foreach(var grid in grids) {
+            var gridLine = grid.Curve as Line;
+            var gridDir = gridLine.Direction;
+
+            if(rightDirection.IsAlmostEqualTo(gridDir)
+                || rightDirection.IsAlmostEqualTo(gridDir.Negate())) {
+
+                var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
+
+                var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Left,
+                                                                        offsetOption.LeftOffset, false);
+                var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
+
+                var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Right,
+                                                                        offsetOption.RightOffset, false);
+                var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
+
+                var newLine = Line.CreateBound(pt1, pt2);
+                grid.SetCurveInView(DatumExtentType.ViewSpecific, view, newLine);
+
+            } else {
+                var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
+
+                var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Bottom,
+                                                                        offsetOption.BottomOffset, false);
+                var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
+
+                var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Top,
+                                                                        offsetOption.TopOffset, false);
+                var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
+
+                var newLine = Line.CreateBound(pt1, pt2);
+                grid.SetCurveInView(DatumExtentType.ViewSpecific, view, newLine);
+            }
+        }
     }
 }

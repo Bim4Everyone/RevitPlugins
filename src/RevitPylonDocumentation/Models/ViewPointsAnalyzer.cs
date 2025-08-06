@@ -220,4 +220,21 @@ public class ViewPointsAnalyzer {
         var inverseTransform = transform.Inverse;
         return inverseTransform.OfPoint(point);
     }
+
+    /// <summary>
+    /// Возвращает точку спроецированную на плоскость вида
+    /// </summary>
+    public XYZ ProjectPointToViewFront(View view, XYZ point) {
+        XYZ origin = view.Origin;
+        XYZ normal = view.ViewDirection.Normalize();
+
+        // Вычисляем вектор от точки на плоскости к целевой точке
+        XYZ vector = point - origin;
+
+        // Находим расстояние вдоль нормали (скалярное произведение)
+        double distance = normal.DotProduct(vector);
+
+        // Проецируем точку на плоскость
+        return point - distance * normal;
+    }
 }

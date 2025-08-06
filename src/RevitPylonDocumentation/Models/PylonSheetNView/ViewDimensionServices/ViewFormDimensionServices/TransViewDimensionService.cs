@@ -19,7 +19,7 @@ internal class TransViewDimensionService {
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
-    internal void TryCreateTransverseViewDimensions(View view, bool onTopOfRebar) {
+    internal void TryCreateDimensions(View view, bool onTopOfRebar) {
         var doc = Repository.Document;
         string rebarPart = onTopOfRebar ? "верх" : "низ";
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
@@ -114,15 +114,16 @@ internal class TransViewDimensionService {
                     TopOffset = 0.6,
                     BottomOffset = 1.1
                 };
-                EditGridEnds(view, pylon as FamilyInstance, grids, transverseViewGridOffsets, 
+                EditGridEnds(view, pylon, grids, transverseViewGridOffsets, 
                              dimensionBaseService);
             }
         } catch(Exception) { }
     }
 
 
-    private void EditGridEnds(View view, FamilyInstance familyInstance,
-                              List<Grid> grids, OffsetOption offsetOption, DimensionBaseService dimensionBaseService) {
+    private void EditGridEnds(View view, Element rebar, List<Grid> grids, OffsetOption offsetOption, 
+                              DimensionBaseService dimensionBaseService) {
+        if(view is null || rebar is null) { return; }
         var rightDirection = view.RightDirection;
 
         foreach(var grid in grids) {
@@ -134,13 +135,11 @@ internal class TransViewDimensionService {
 
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
-                var offsetLine1 = dimensionBaseService.GetDimensionLine(familyInstance,
-                                                                        DimensionOffsetType.Left,
+                var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Left,
                                                                         offsetOption.LeftOffset, false);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
-                var offsetLine2 = dimensionBaseService.GetDimensionLine(familyInstance,
-                                                                        DimensionOffsetType.Right,
+                var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Right,
                                                                         offsetOption.RightOffset, false);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
@@ -150,13 +149,11 @@ internal class TransViewDimensionService {
             } else {
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
-                var offsetLine1 = dimensionBaseService.GetDimensionLine(familyInstance,
-                                                                        DimensionOffsetType.Bottom,
+                var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Bottom,
                                                                         offsetOption.BottomOffset, false);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
-                var offsetLine2 = dimensionBaseService.GetDimensionLine(familyInstance,
-                                                                        DimensionOffsetType.Top,
+                var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Top,
                                                                         offsetOption.TopOffset, false);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
