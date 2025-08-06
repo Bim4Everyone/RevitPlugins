@@ -1,0 +1,20 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="CopyUserWindow.Title">Копирование пользователя</system:String>
+    <system:String x:Key="CopyUserWindow.Prefix">Префикс</system:String>
+    <system:String x:Key="CopyUserWindow.LastName">Фамилия</system:String>
+    <system:String x:Key="CopyUser.TransactionName">Копирование видов</system:String>
+    
+    <system:String x:Key="CopyUser.EmptyPrefix">Не заполнен префикс</system:String>
+    <system:String x:Key="CopyUser.EmptyLastName">Не заполнена фамилия</system:String>
+    <system:String x:Key="CopyUser.GroupExists">Данная группа видов "{0}" уже используется</system:String>
+    <system:String x:Key="CopyUser.PrefixExists">Данный префикс "{0}" уже используется</system:String>
+    
+    <system:String x:Key="CopyUser.NotFoundUserViewsTitle">Предупреждение!</system:String>
+    <system:String x:Key="CopyUser.NotFoundUserViewsMessage">Не были найдены шаблонные виды "{0}".</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+</ResourceDictionary>

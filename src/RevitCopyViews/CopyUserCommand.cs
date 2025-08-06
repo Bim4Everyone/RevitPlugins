@@ -1,13 +1,22 @@
-﻿using System.Linq;
+﻿using System;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.ProjectParams;
-using dosymep.Bim4Everyone.Templates;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
+using Ninject;
+
+using RevitCopyViews.Models;
 using RevitCopyViews.ViewModels;
 using RevitCopyViews.Views;
 
@@ -20,52 +29,58 @@ public class CopyUserCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        var application = uiApplication.Application;
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
 
-        var uiDocument = uiApplication.ActiveUIDocument;
-        var document = uiDocument.Document;
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
 
-        var projectParameters = ProjectParameters.Create(application);
-        projectParameters.SetupBrowserOrganization(document);
-        projectParameters.SetupRevitParams(
-            document,
-            ProjectParamsConfig.Instance.ViewGroup,
-            ProjectParamsConfig.Instance.ProjectStage);
+        // Настройка конфигурации плагина
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        var views = new FilteredElementCollector(document).OfClass(typeof(View)).ToElements();
-        var selectedViews = views
-            .OfType<View>()
-            .Where(item => item.Name.StartsWith("User_"))
-            .ToList();
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
 
-        if(selectedViews.Count == 0) {
-            TaskDialog.Show("Предупреждение!", "Не были найдены виды начинающиеся на \"User_\".");
-            return;
+        // Настройка запуска окна
+        kernel.BindMainWindow<CopyUserViewModel, CopyUserWindow>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        // используем message box без привязки к окну,
+        // потому что он вызывается до запуска основного окна
+        kernel.UseWpfUIMessageBox();
+        
+        // Проверка запуска плагина
+        Check(kernel);
+
+        // Вызывает стандартное уведомление
+        Notification(kernel.Get<CopyUserWindow>());
+    }
+
+    private static void Check(IKernel kernel) {
+        var revitRepository = kernel.Get<RevitRepository>();
+        var messageBoxService = kernel.Get<IMessageBoxService>();
+        var localizationService = kernel.Get<ILocalizationService>();
+
+        var userViews = revitRepository.GetUserViews(revitRepository.GetViews()).ToArray();
+        if(userViews.Length == 0) {
+            string title = localizationService.GetLocalizedString("CopyUser.NotFoundUserViewsTitle");
+            string message = localizationService.GetLocalizedString(
+                "CopyUser.NotFoundUserViewsMessage", RevitRepository.UserViewPrefix);
+
+            messageBoxService.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
+            throw new OperationCanceledException();
         }
-
-        var groupViews = views
-            .Select(item => (string) item.GetParamValueOrDefault(ProjectParamsConfig.Instance.ViewGroup))
-            .Where(item => !string.IsNullOrEmpty(item))
-            .OrderBy(item => item)
-            .Distinct()
-            .ToList();
-
-        var restrictedViewNames = views
-            .Select(item => item.Name)
-            .OrderBy(item => item)
-            .ToList();
-
-        var window = new CopyUserWindow {
-            DataContext = new CopyUserViewModel {
-                Document = document,
-                UIDocument = uiDocument,
-                Application = application,
-                Views = selectedViews,
-                GroupViews = groupViews,
-                RestrictedViewNames = restrictedViewNames
-            }
-        };
-
-        Notification(window);
     }
 }
