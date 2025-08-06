@@ -29,6 +29,18 @@
     <system:String x:Key="CopyView.EmptyGroupView">View group is not filled.</system:String>
     <system:String x:Key="CopyView.FoundRepeatedViewName">Duplicate view name found "{0}".</system:String>
     <system:String x:Key="CopyView.FoundExistsViewName">Existing view name found "{0}".</system:String>
+    
+    <system:String x:Key="RenameViewWindow.Title">Rename Views</system:String>
+    <system:String x:Key="RenameView.Find">Find</system:String>
+    <system:String x:Key="RenameView.Replace">Replace</system:String>
+    <system:String x:Key="RenameView.Prefix">Prefix</system:String>
+    <system:String x:Key="RenameView.Suffix">Suffix</system:String>
+    <system:String x:Key="RenameView.TransactionName">Rename Views</system:String>
+    <system:String x:Key="RenameView.FoundRepeatViewName">Found duplicate view name "{0}".</system:String>
+    <system:String x:Key="RenameView.FoundExistsViewName">Found existing view name "{0}".</system:String>
+    
+    <system:String x:Key="RenameView.NotSelectedViewsTitle">Warning!</system:String>
+    <system:String x:Key="RenameView.NotSelectedViewsMessage">Select views that need to be renamed.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>

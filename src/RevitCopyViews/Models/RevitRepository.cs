@@ -76,8 +76,12 @@ internal class RevitRepository {
             .OrderBy(item => item.Name);
     }
     
+    public IEnumerable<View> GetSelectedViews() {
+        return ActiveUIDocument.GetSelectedElements().OfType<View>();
+    }
+    
     public IEnumerable<View> GetSelectedCopyViews() {
-        return ActiveUIDocument.GetSelectedElements().OfType<View>().Where(IsCopyView);
+        return GetSelectedViews().Where(IsCopyView);
     }
 
     public IEnumerable<View> GetUserViews(IEnumerable<View> views) {

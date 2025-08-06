@@ -7,44 +7,59 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+
+using RevitCopyViews.Models;
 
 namespace RevitCopyViews.ViewModels;
 
 internal class RenameViewViewModel : BaseViewModel {
+    private readonly PluginConfig _pluginConfig;
+    private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
+
     private string _errorText;
-    private bool _isAllowReplacePrefix;
 
-    private bool _isAllowReplaceSuffix;
     private string _prefix;
-
-    private ObservableCollection<string> _prefixes;
+    private string _suffix;
     private string _replaceNewText;
     private string _replaceOldText;
 
+    private bool _isAllowReplacePrefix;
+    private bool _isAllowReplaceSuffix;
+
+    private bool _withPrefix;
     private bool _replacePrefix;
     private bool _replaceSuffix;
-    private string _suffix;
-    private ObservableCollection<string> _suffixes;
-    private bool _withPrefix;
 
-    public RenameViewViewModel(List<View> selectedViews) {
-        Prefixes = [];
-        RevitViewViewModels =
-            new ObservableCollection<RevitViewViewModel>(selectedViews.Select(item => new RevitViewViewModel(item)));
+    private ObservableCollection<string> _prefixes;
+    private ObservableCollection<string> _suffixes;
+
+    private ObservableCollection<string> _restrictedViewNames;
+    private ObservableCollection<RevitViewViewModel> _selectedViews;
+
+    public RenameViewViewModel(
+        PluginConfig pluginConfig,
+        RevitRepository revitRepository,
+        ILocalizationService localizationService) {
+        _pluginConfig = pluginConfig;
+        _revitRepository = revitRepository;
+        _localizationService = localizationService;
 
         ReplacePrefix = true;
-        RenameViewCommand = new RelayCommand(RenameView, CanRenameView);
-
-        Reload();
+        LoadViewCommand = RelayCommand.Create(LoadView);
+        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
-    public Document Document { get; set; }
-    public UIDocument UIDocument { get; set; }
-    public Application Application { get; set; }
+    public ICommand LoadViewCommand { get; }
+    public ICommand AcceptViewCommand { get; }
 
-    public List<string> RestrictedViewNames { get; set; }
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
 
     public string Prefix {
         get => _prefix;
@@ -91,13 +106,6 @@ internal class RenameViewViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _replaceNewText, value);
     }
 
-    public string ErrorText {
-        get => _errorText;
-        set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
-
-    public ObservableCollection<RevitViewViewModel> RevitViewViewModels { get; }
-
     public ObservableCollection<string> Prefixes {
         get => _prefixes;
         private set => RaiseAndSetIfChanged(ref _prefixes, value);
@@ -108,39 +116,82 @@ internal class RenameViewViewModel : BaseViewModel {
         private set => RaiseAndSetIfChanged(ref _suffixes, value);
     }
 
-    public ICommand RenameViewCommand { get; }
+    public ObservableCollection<RevitViewViewModel> SelectedViews {
+        get => _selectedViews;
+        set => RaiseAndSetIfChanged(ref _selectedViews, value);
+    }
 
-    private void RenameView(object p) {
-        using var transaction = new Transaction(Document);
-        transaction.Start("Переименование видов");
+    public ObservableCollection<string> RestrictedViewNames {
+        get => _restrictedViewNames;
+        set => RaiseAndSetIfChanged(ref _restrictedViewNames, value);
+    }
 
-        foreach(var revitView in RevitViewViewModels) {
+    private void LoadView() {
+        SelectedViews = new ObservableCollection<RevitViewViewModel>(
+            _revitRepository.GetSelectedViews()
+                .Select(item => new RevitViewViewModel(item)));
+
+        RestrictedViewNames =
+            new ObservableCollection<string>(_revitRepository.GetViewNames(_revitRepository.GetViews()));
+
+        Prefixes = new ObservableCollection<string>(
+            SelectedViews
+                .Select(item => item.Prefix)
+                .Where(item => !string.IsNullOrEmpty(item))
+                .Distinct());
+
+        Suffixes = new ObservableCollection<string>(
+            SelectedViews
+                .Select(item => item.Suffix)
+                .Where(item => !string.IsNullOrEmpty(item))
+                .Distinct());
+
+        IsAllowReplacePrefix = Prefixes.Count > 0;
+        IsAllowReplaceSuffix = Suffixes.Count > 0;
+
+        ReplacePrefix = IsAllowReplacePrefix && ReplacePrefix;
+        ReplaceSuffix = IsAllowReplaceSuffix && ReplaceSuffix;
+
+        if(Prefixes.Count == 1) {
+            Prefix = Prefixes.First();
+        }
+
+        if(Suffixes.Count == 1) {
+            Suffix = Suffixes.First();
+        }
+    }
+
+    private void AcceptView() {
+        using var transaction =
+            _revitRepository.StartTransaction(_localizationService.GetLocalizedString("RenameView.TransactionName"));
+
+        foreach(var revitView in SelectedViews) {
             revitView.View.Name = GetViewName(revitView);
         }
 
         transaction.Commit();
     }
 
-    private bool CanRenameView(object p) {
-        string[] generatingNames = RevitViewViewModels
+    private bool CanAcceptView() {
+        string[] generatingNames = SelectedViews
             .Select(GetViewName)
             .ToArray();
-        
+
         string generateName = generatingNames.GroupBy(item => item)
             .Where(item => item.Count() > 1)
             .Select(item => item.Key)
             .FirstOrDefault();
-        
+
         if(!string.IsNullOrEmpty(generateName)) {
-            ErrorText = $"Найдено повторяющееся имя вида \"{generateName}\".";
+            ErrorText = _localizationService.GetLocalizedString("RenameView.FoundRepeatViewName", generateName);
             return false;
         }
 
         string existingName =
-            generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(viewName => item.Equals(viewName)));
-        
+            generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(item.Equals));
+
         if(!string.IsNullOrEmpty(existingName)) {
-            ErrorText = $"Найдено существующее имя вида \"{existingName}\".";
+            ErrorText = _localizationService.GetLocalizedString("RenameView.FoundExistsViewName", existingName);
             return false;
         }
 
@@ -168,26 +219,5 @@ internal class RenameViewViewModel : BaseViewModel {
         splittedViewName.Suffix = Suffix;
 
         return Delimiter.CreateViewName(splittedViewName);
-    }
-
-    private void Reload() {
-        Prefixes = new ObservableCollection<string>(
-            RevitViewViewModels.Select(item => item.Prefix).Where(item => !string.IsNullOrEmpty(item)).Distinct());
-        Suffixes = new ObservableCollection<string>(
-            RevitViewViewModels.Select(item => item.Suffix).Where(item => !string.IsNullOrEmpty(item)).Distinct());
-
-        IsAllowReplacePrefix = Prefixes.Count > 0;
-        IsAllowReplaceSuffix = Suffixes.Count > 0;
-
-        ReplacePrefix = IsAllowReplacePrefix && ReplacePrefix;
-        ReplaceSuffix = IsAllowReplaceSuffix && ReplaceSuffix;
-
-        if(Prefixes.Count == 1) {
-            Prefix = Prefixes.First();
-        }
-
-        if(Suffixes.Count == 1) {
-            Suffix = Suffixes.First();
-        }
     }
 }

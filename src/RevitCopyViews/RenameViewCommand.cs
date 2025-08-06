@@ -1,11 +1,22 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
+using Ninject;
+
+using RevitCopyViews.Models;
 using RevitCopyViews.ViewModels;
 using RevitCopyViews.Views;
 
@@ -18,37 +29,57 @@ public class RenameViewCommand : BasePluginCommand {
     }
 
     protected override void Execute(UIApplication uiApplication) {
-        var application = uiApplication.Application;
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
 
-        var uiDocument = uiApplication.ActiveUIDocument;
-        var document = uiDocument.Document;
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
 
-        var selectedViews = uiDocument.Selection.GetElementIds()
-            .Select(item => document.GetElement(item))
-            .OfType<View>()
-            .ToList();
-        if(selectedViews.Count == 0) {
-            TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется переименовать.");
-            return;
+        // Настройка конфигурации плагина
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
+        // Настройка запуска окна
+        kernel.BindMainWindow<RenameViewViewModel, RenameViewWindow>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        // используем message box без привязки к окну,
+        // потому что он вызывается до запуска основного окна
+        kernel.UseWpfUIMessageBox();
+
+        // Проверка запуска плагина
+        Check(kernel);
+
+        // Вызывает стандартное уведомление
+        Notification(kernel.Get<RenameViewWindow>());
+    }
+
+    private static void Check(IKernel kernel) {
+        var revitRepository = kernel.Get<RevitRepository>();
+        var messageBoxService = kernel.Get<IMessageBoxService>();
+        var localizationService = kernel.Get<ILocalizationService>();
+
+        var userViews = revitRepository.GetUserViews(revitRepository.GetViews()).ToArray();
+        if(userViews.Length == 0) {
+            string title = localizationService.GetLocalizedString("RenameView.NotSelectedViewsTitle");
+            string message = localizationService.GetLocalizedString("RenameView.NotSelectedViewsMessage");
+
+            messageBoxService.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
+            throw new System.OperationCanceledException();
         }
-
-        var restrictedViewNames = new FilteredElementCollector(document)
-            .OfClass(typeof(View))
-            .Select(item => item.Name)
-            .OrderBy(item => item)
-            .Distinct()
-            .Except(selectedViews.Select(item => item.Name))
-            .ToList();
-
-        var window = new RenameViewWindow {
-            DataContext = new RenameViewViewModel(selectedViews) {
-                Document = document,
-                UIDocument = uiDocument,
-                Application = application,
-                RestrictedViewNames = restrictedViewNames
-            }
-        };
-
-        Notification(window);
     }
 }

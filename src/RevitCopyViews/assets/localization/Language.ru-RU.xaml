@@ -29,6 +29,18 @@
     <system:String x:Key="CopyView.EmptyGroupView">Не заполнена группа видов.</system:String>
     <system:String x:Key="CopyView.FoundRepeatedViewName">Найдено повторяющееся имя вида "{0}".</system:String>
     <system:String x:Key="CopyView.FoundExistsViewName">Найдено существующее имя вида "{0}".</system:String>
+    
+    <system:String x:Key="RenameViewWindow.Title">Переименование видов</system:String>
+    <system:String x:Key="RenameView.Find">Найти</system:String>
+    <system:String x:Key="RenameView.Replace">Заменить</system:String>
+    <system:String x:Key="RenameView.Prefix">Префикс</system:String>
+    <system:String x:Key="RenameView.Suffix">Суффикс</system:String>
+    <system:String x:Key="RenameView.TransactionName">Переименование видов</system:String>
+    <system:String x:Key="RenameView.FoundRepeatViewName">Найдено повторяющееся имя вида "{0}".</system:String>
+    <system:String x:Key="RenameView.FoundExistsViewName">Найдено существующее имя вида "{0}".</system:String>
+    
+    <system:String x:Key="RenameView.NotSelectedViewsTitle">Предупреждение!</system:String>
+    <system:String x:Key="RenameView.NotSelectedViewsMessage">Выберите виды, которые требуется переименовать.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
