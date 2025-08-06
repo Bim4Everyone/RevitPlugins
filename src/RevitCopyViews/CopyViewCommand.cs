@@ -76,7 +76,7 @@ public class CopyViewCommand : BasePluginCommand {
         var messageBoxService = kernel.Get<IMessageBoxService>();
         var localizationService = kernel.Get<ILocalizationService>();
         
-        var copyViews = revitRepository.GetUserViews(revitRepository.GetSelectedCopyViews()).ToArray();
+        var copyViews = revitRepository.GetSelectedCopyViews().ToArray();
         if(copyViews.Length == 0) {
             string title = localizationService.GetLocalizedString("CopyView.NotSelectedCopyViewTitle");
             string message = localizationService.GetLocalizedString("CopyView.NotSelectedCopyViewMessage");

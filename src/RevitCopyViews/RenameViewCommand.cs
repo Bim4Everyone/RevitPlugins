@@ -73,8 +73,8 @@ public class RenameViewCommand : BasePluginCommand {
         var messageBoxService = kernel.Get<IMessageBoxService>();
         var localizationService = kernel.Get<ILocalizationService>();
 
-        var userViews = revitRepository.GetUserViews(revitRepository.GetViews()).ToArray();
-        if(userViews.Length == 0) {
+        var renameViews = revitRepository.GetSelectedViews().ToArray();
+        if(renameViews.Length == 0) {
             string title = localizationService.GetLocalizedString("RenameView.NotSelectedViewsTitle");
             string message = localizationService.GetLocalizedString("RenameView.NotSelectedViewsMessage");
 
