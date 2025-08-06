@@ -14,6 +14,21 @@
     
     <system:String x:Key="CopyUser.NotFoundUserViewsTitle">Warning!</system:String>
     <system:String x:Key="CopyUser.NotFoundUserViewsMessage">Template views "{0}" were not found.</system:String>
+        
+    <system:String x:Key="CopyView.CopyViewWithDetails">Copy with details</system:String>
+    <system:String x:Key="CopyView.AddElevationMark">Add elevation mark</system:String>
+    <system:String x:Key="CopyView.Options">Copy options</system:String>
+    <system:String x:Key="CopyView.GroupView">View group</system:String>
+    <system:String x:Key="CopyView.Prefix">Prefix</system:String>
+    <system:String x:Key="CopyView.Suffix">Suffix</system:String>
+    <system:String x:Key="CopyView.Replace">Replace</system:String>
+    
+    <system:String x:Key="CopyView.NotSelectedCopyViewTitle">Warning!</system:String>
+    <system:String x:Key="CopyView.NotSelectedCopyViewMessage">Select views that need to be copied.</system:String>
+    <system:String x:Key="CopyView.TransactionName">Copying views.</system:String>
+    <system:String x:Key="CopyView.EmptyGroupView">View group is not filled.</system:String>
+    <system:String x:Key="CopyView.FoundRepeatedViewName">Duplicate view name found "{0}".</system:String>
+    <system:String x:Key="CopyView.FoundExistsViewName">Existing view name found "{0}".</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>

@@ -20,6 +20,9 @@ namespace RevitCopyViews.Models;
 /// </remarks>
 internal class RevitRepository {
     public const string UserViewPrefix = "User_";
+    
+    private readonly ElementId _sheetsCategory = new (BuiltInCategory.OST_Sheets);
+    private readonly ElementId _schedulesCategory = new (BuiltInCategory.OST_Schedules);
 
     /// <summary>
     /// Создает экземпляр репозитория.
@@ -72,6 +75,10 @@ internal class RevitRepository {
             .OfType<View>()
             .OrderBy(item => item.Name);
     }
+    
+    public IEnumerable<View> GetSelectedCopyViews() {
+        return ActiveUIDocument.GetSelectedElements().OfType<View>().Where(IsCopyView);
+    }
 
     public IEnumerable<View> GetUserViews(IEnumerable<View> views) {
         return views.Where(item => item.Name.StartsWith(UserViewPrefix));
@@ -89,5 +96,10 @@ internal class RevitRepository {
         return views
             .Select(item => item.Name)
             .OrderBy(item => item);
+    }
+    
+    public bool IsCopyView(View item) {
+        return item.Category?.Id != _sheetsCategory
+               && item.Category?.Id != _schedulesCategory;
     }
 }

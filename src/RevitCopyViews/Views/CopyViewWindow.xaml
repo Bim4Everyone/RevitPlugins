@@ -1,96 +1,165 @@
-﻿<base:ThemedPlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitCopyViews.Views.CopyViewWindow"
+
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-    xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:vms="clr-namespace:RevitCopyViews.ViewModels"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+
     mc:Ignorable="d"
-    SizeToContent="Height"
-    ResizeMode="NoResize"
-    MinWidth="500"
-    Width="600" WindowStartupLocation="CenterOwner" Title="Копирование видов">
-    <Grid Margin="10">
+    WindowStartupLocation="CenterOwner"
+
+    Title="{me:LocalizationSource CopyViewWindow.Title}"
+
+    Width="600"
+    Height="550"
+
+    MinWidth="600"
+    MinHeight="550"
+
+    d:DataContext="{d:DesignInstance vms:CopyViewViewModel, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewsStyles/LabelStyles.xaml" />
+                <ResourceDictionary Source="../ViewsStyles/BorderStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger
+            EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
+    <Grid>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <dxe:CheckEdit
+        <ui:TitleBar
             Grid.Row="0"
-            Margin="0 5"
-            Content="Копировать с детализацией"
-            EditValue="{Binding CopyWithDetail, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            Title="{me:LocalizationSource CopyViewWindow.Title}" />
 
-        <StackPanel Grid.Row="1" Margin="0 0 0 5">
-            <dxe:TextEdit
-                IsReadOnly="True"
-                EditMode="InplaceActive"
-                EditValue="Группы видов" />
+        <Border
+            Grid.Row="1"
+            Style="{StaticResource BorderStyle}">
+            <StackPanel>
+                <ui:TextBlock
+                    Style="{StaticResource LabelStyle}"
+                    Text="{me:LocalizationSource CopyView.Options}" />
+                
+                <CheckBox
+                    Content="{me:LocalizationSource CopyView.AddElevationMark}"
+                    IsChecked="{Binding WithElevation, UpdateSourceTrigger=PropertyChanged}" />
+                
+                <CheckBox
+                    Content="{me:LocalizationSource CopyView.CopyViewWithDetails}"
+                    IsChecked="{Binding CopyWithDetail, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+        </Border>
 
-            <dxe:ComboBoxEdit
-                AutoComplete="True"
-                ItemsSource="{Binding GroupViews}"
-                EditValue="{Binding GroupView, UpdateSourceTrigger=PropertyChanged}" />
-        </StackPanel>
+        <Border
+            Grid.Row="2"
+            Style="{StaticResource BorderStyle}">
+            <StackPanel>
+                <ui:TextBlock
+                    Style="{StaticResource LabelStyle}"
+                    Text="{me:LocalizationSource CopyView.GroupView}" />
 
-        <StackPanel Grid.Row="2" Margin="0 5">
-            <dxe:CheckEdit Content="Добавить отметку уровня"
-                           EditValue="{Binding WithElevation, UpdateSourceTrigger=PropertyChanged}" />
-            <lc:GroupBox Margin="0 5" Header="Префикс">
-                <StackPanel>
-                    <dxe:CheckEdit
-                        Content="Заменить"
-                        EditValue="{Binding ReplacePrefix, UpdateSourceTrigger=PropertyChanged}"
-                        IsEnabled="{Binding IsAllowReplacePrefix, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox
+                    IsEditable="True"
+                    ItemsSource="{Binding GroupViews}"
+                    Text="{Binding GroupView, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+        </Border>
 
-                    <dxe:ComboBoxEdit
-                        AutoComplete="True"
-                        ItemsSource="{Binding Prefixes}"
-                        EditValue="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-            </lc:GroupBox>
+        <Border
+            Grid.Row="3"
+            Style="{StaticResource BorderStyle}">
 
-            <lc:GroupBox Margin="0 5 0 10" Header="Суффикс">
-                <StackPanel>
+            <StackPanel>
+                <ui:TextBlock
+                    Style="{StaticResource LabelStyle}"
+                    Text="{me:LocalizationSource CopyView.Prefix}" />
 
-                    <dxe:CheckEdit
-                        Content="Заменить"
-                        EditValue="{Binding ReplaceSuffix, UpdateSourceTrigger=PropertyChanged}"
-                        IsEnabled="{Binding IsAllowReplaceSuffix, UpdateSourceTrigger=PropertyChanged}" />
+                <CheckBox
+                    Content="{me:LocalizationSource CopyView.Replace}"
+                    IsChecked="{Binding ReplacePrefix, UpdateSourceTrigger=PropertyChanged}"
+                    IsEnabled="{Binding IsAllowReplacePrefix, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <dxe:ComboBoxEdit
-                        AutoComplete="True"
-                        ItemsSource="{Binding Suffixes}"
-                        EditValue="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-            </lc:GroupBox>
-        </StackPanel>
+                <ComboBox
+                    IsEditable="True"
+                    ItemsSource="{Binding Prefixes}"
+                    Text="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <dxe:TextEdit
-                Margin="5 0"
-                IsReadOnly="True"
-                EditMode="InplaceActive"
+        </Border>
+
+        <Border
+            Grid.Row="4"
+            Style="{StaticResource BorderStyle}">
+
+            <StackPanel>
+                <ui:TextBlock
+                    Style="{StaticResource LabelStyle}"
+                    Text="{me:LocalizationSource CopyView.Suffix}" />
+
+                <CheckBox
+                    Content="{me:LocalizationSource CopyView.Replace}"
+                    IsChecked="{Binding ReplaceSuffix, UpdateSourceTrigger=PropertyChanged}"
+                    IsEnabled="{Binding IsAllowReplaceSuffix, UpdateSourceTrigger=PropertyChanged}" />
+
+                <ComboBox
+                    IsEditable="True"
+                    ItemsSource="{Binding Suffixes}"
+                    Text="{Binding Suffix, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+        </Border>
+
+        <StackPanel
+            Grid.Row="6"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <ui:TextBlock
+                Margin="10"
                 Foreground="Orange"
-                EditValue="{Binding ErrorText}" />
-            <dx:SimpleButton
-                Margin="10 0"
-                Content="ОК"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <ui:Button
+                Margin="10"
                 Width="80"
-                Height="25"
+                Appearance="Info"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
-                Command="{Binding CopyViewsCommand}" />
-            <dx:SimpleButton
-                Content="Отмена"
+                Command="{Binding AcceptViewCommand}" />
+
+            <ui:Button
+                Margin="10"
                 Width="80"
-                Height="25"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                IsCancel="True"
                 Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
-</base:ThemedPlatformWindow>
+</core:WpfUIPlatformWindow>

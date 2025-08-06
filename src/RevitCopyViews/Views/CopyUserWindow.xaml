@@ -19,12 +19,21 @@
     Title="{me:LocalizationSource CopyUserWindow.Title}"
 
     Width="500"
-    Height="250"
+    Height="300"
 
     MinWidth="500"
-    MinHeight="250"
+    MinHeight="300"
 
     d:DataContext="{d:DesignInstance vms:CopyUserViewModel, IsDesignTimeCreatable=False}">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewsStyles/LabelStyles.xaml" />
+                <ResourceDictionary Source="../ViewsStyles/BorderStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     
     <b:Interaction.Triggers>
         <b:EventTrigger
@@ -34,7 +43,7 @@
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
-    <Grid Margin="8">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -49,43 +58,30 @@
 
         <Border
             Grid.Row="1"
-            Margin="0 8"
-            Padding="14 8"
-            Background="{DynamicResource CardBackground}"
-            CornerRadius="{DynamicResource ControlCornerRadius}">
+            Style="{StaticResource BorderStyle}">
 
-            <DockPanel
-                LastChildFill="True">
+            <StackPanel>
                 <ui:TextBlock
-                    Width="100"
-                    DockPanel.Dock="Left"
-                    VerticalAlignment="Center"
+                    Style="{StaticResource LabelStyle}"
                     Text="{me:LocalizationSource CopyUserWindow.LastName}" />
 
                 <ui:TextBox
-                    Margin="14 0 0 0"
                     Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
+            </StackPanel>
         </Border>
 
         <Border
             Grid.Row="2"
-            Padding="14 8"
-            Background="{DynamicResource CardBackground}"
-            CornerRadius="{DynamicResource ControlCornerRadius}">
+            Style="{StaticResource BorderStyle}">
 
-            <DockPanel
-                LastChildFill="True">
+            <StackPanel>
                 <ui:TextBlock
-                    Width="100"
-                    DockPanel.Dock="Left"
-                    VerticalAlignment="Center"
+                    Style="{StaticResource LabelStyle}"
                     Text="{me:LocalizationSource CopyUserWindow.Prefix}" />
 
                 <ui:TextBox
-                    Margin="14 0 0 0"
                     Text="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
+            </StackPanel>
         </Border>
 
         <StackPanel

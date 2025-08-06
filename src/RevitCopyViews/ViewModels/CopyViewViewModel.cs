@@ -10,51 +10,61 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+
+using RevitCopyViews.Models;
 
 namespace RevitCopyViews.ViewModels;
 
 internal class CopyViewViewModel : BaseViewModel {
-    private readonly List<View> _selectedViews;
+    private readonly PluginConfig _pluginConfig;
+    private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
+
+    private string _errorText;
 
     private bool _copyWithDetail;
-    private string _errorText;
-    private string _groupView;
-    private ObservableCollection<string> _groupViews;
     private bool _isAllowReplacePrefix;
     private bool _isAllowReplaceSuffix;
 
     private string _prefix;
+    private string _suffix;
+    private string _groupView;
 
-    private ObservableCollection<string> _prefixes;
     private bool _replacePrefix;
     private bool _replaceSuffix;
-    private string _suffix;
-    private ObservableCollection<string> _suffixes;
     private bool _withElevation;
 
-    public CopyViewViewModel(List<View> selectedViews) {
-        _selectedViews = selectedViews;
+    private ObservableCollection<string> _prefixes;
+    private ObservableCollection<string> _suffixes;
+    private ObservableCollection<string> _groupViews;
+    private ObservableCollection<string> _restrictedViewNames;
+    private ObservableCollection<RevitViewViewModel> _selectedViews;
 
-        Prefixes = [];
-        RevitViewViewModels =
-            new ObservableCollection<RevitViewViewModel>(_selectedViews.Select(item => new RevitViewViewModel(item)));
+    public CopyViewViewModel(
+        PluginConfig pluginConfig,
+        RevitRepository revitRepository,
+        ILocalizationService localizationService) {
+        _pluginConfig = pluginConfig;
+        _revitRepository = revitRepository;
+        _localizationService = localizationService;
 
         ReplacePrefix = true;
         CopyWithDetail = true;
-        CopyViewsCommand = new RelayCommand(CopyViews, CanCopyViews);
 
-        Reload();
+        LoadViewCommand = RelayCommand.Create(LoadView);
+        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
-    public Document Document { get; set; }
-    public UIDocument UIDocument { get; set; }
-    public Application Application { get; set; }
+    public ICommand LoadViewCommand { get; }
+    public ICommand AcceptViewCommand { get; }
 
-    public List<string> RestrictedViewNames { get; set; }
-
-    public ICommand CopyViewsCommand { get; }
+    public bool CopyWithDetail {
+        get => _copyWithDetail;
+        set => RaiseAndSetIfChanged(ref _copyWithDetail, value);
+    }
 
     public bool IsAllowReplacePrefix {
         get => _isAllowReplacePrefix;
@@ -81,9 +91,9 @@ internal class CopyViewViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _withElevation, value);
     }
 
-    public bool CopyWithDetail {
-        get => _copyWithDetail;
-        set => RaiseAndSetIfChanged(ref _copyWithDetail, value);
+    public string GroupView {
+        get => _groupView;
+        set => RaiseAndSetIfChanged(ref _groupView, value);
     }
 
     public string Prefix {
@@ -91,14 +101,14 @@ internal class CopyViewViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _prefix, value);
     }
 
-    public ObservableCollection<string> Prefixes {
-        get => _prefixes;
-        private set => RaiseAndSetIfChanged(ref _prefixes, value);
-    }
-
     public string Suffix {
         get => _suffix;
         set => RaiseAndSetIfChanged(ref _suffix, value);
+    }
+
+    public ObservableCollection<string> Prefixes {
+        get => _prefixes;
+        private set => RaiseAndSetIfChanged(ref _prefixes, value);
     }
 
     public ObservableCollection<string> Suffixes {
@@ -106,28 +116,51 @@ internal class CopyViewViewModel : BaseViewModel {
         private set => RaiseAndSetIfChanged(ref _suffixes, value);
     }
 
-    public string GroupView {
-        get => _groupView;
-        set => RaiseAndSetIfChanged(ref _groupView, value);
-    }
-
     public ObservableCollection<string> GroupViews {
         get => _groupViews;
         set => RaiseAndSetIfChanged(ref _groupViews, value);
     }
 
-    public ObservableCollection<RevitViewViewModel> RevitViewViewModels { get; }
+    public ObservableCollection<string> RestrictedViewNames {
+        get => _restrictedViewNames;
+        set => RaiseAndSetIfChanged(ref _restrictedViewNames, value);
+    }
+
+    public ObservableCollection<RevitViewViewModel> SelectedViews {
+        get => _selectedViews;
+        set => RaiseAndSetIfChanged(ref _selectedViews, value);
+    }
 
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    private void Reload() {
+    private void LoadView() {
+        _revitRepository.TransferStandards();
+
+        List<View> views = _revitRepository.GetViews()
+            .Where(_revitRepository.IsCopyView)
+            .ToList();
+
+        GroupViews = new ObservableCollection<string>(_revitRepository.GetGroupViews(views));
+        RestrictedViewNames = new ObservableCollection<string>(_revitRepository.GetViewNames(views));
+
+        SelectedViews = new ObservableCollection<RevitViewViewModel>(
+            _revitRepository.GetSelectedCopyViews()
+                .Select(item => new RevitViewViewModel(item)));
+
         Prefixes = new ObservableCollection<string>(
-            RevitViewViewModels.Select(item => item.Prefix).Where(item => !string.IsNullOrEmpty(item)).Distinct());
+            SelectedViews
+                .Select(item => item.Prefix)
+                .Where(item => !string.IsNullOrEmpty(item))
+                .Distinct());
+
         Suffixes = new ObservableCollection<string>(
-            RevitViewViewModels.Select(item => item.Suffix).Where(item => !string.IsNullOrEmpty(item)).Distinct());
+            SelectedViews
+                .Select(item => item.Suffix)
+                .Where(item => !string.IsNullOrEmpty(item))
+                .Distinct());
 
         IsAllowReplacePrefix = Prefixes.Count > 0;
         IsAllowReplaceSuffix = Suffixes.Count > 0;
@@ -143,23 +176,24 @@ internal class CopyViewViewModel : BaseViewModel {
             Suffix = Suffixes.First();
         }
 
-        string[] groupViews = RevitViewViewModels
+        string[] groupViews = SelectedViews
             .Select(item => item.GroupView)
             .Distinct()
             .ToArray();
-        
+
         if(groupViews.Length == 1) {
             GroupView = groupViews.First();
         }
     }
 
-    private void CopyViews(object p) {
-        using var transaction = Document.StartTransaction("Копирование видов");
-        
-        foreach(var revitView in RevitViewViewModels) {
+    private void AcceptView() {
+        using var transaction =
+            _revitRepository.StartTransaction(_localizationService.GetLocalizedString("CopyView.TransactionName"));
+
+        foreach(var revitView in SelectedViews) {
             var copyOption = CopyWithDetail ? ViewDuplicateOption.WithDetailing : ViewDuplicateOption.Duplicate;
 
-            var newView = (View) Document.GetElement(revitView.Duplicate(copyOption));
+            var newView = _revitRepository.GetElement<View>(revitView.Duplicate(copyOption));
             newView.Name = GetViewName(revitView);
 
             // У некоторых видов установлен шаблон,
@@ -170,6 +204,39 @@ internal class CopyViewViewModel : BaseViewModel {
         }
 
         transaction.Commit();
+    }
+
+    private bool CanAcceptView() {
+        if(string.IsNullOrEmpty(GroupView)) {
+            ErrorText = _localizationService.GetLocalizedString("CopyView.EmptyGroupView");
+            ;
+            return false;
+        }
+
+        string[] generatingNames = SelectedViews
+            .Select(GetViewName)
+            .ToArray();
+
+        string generateName = generatingNames.GroupBy(item => item)
+            .Where(item => item.Count() > 1)
+            .Select(item => item.Key)
+            .FirstOrDefault();
+
+        if(!string.IsNullOrEmpty(generateName)) {
+            ErrorText = _localizationService.GetLocalizedString("CopyView.FoundRepeatedViewName", generateName);
+            return false;
+        }
+
+        string existingName =
+            generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(item.Equals));
+
+        if(!string.IsNullOrEmpty(existingName)) {
+            ErrorText = _localizationService.GetLocalizedString("CopyView.FoundExistsViewName");
+            return false;
+        }
+
+        ErrorText = null;
+        return true;
     }
 
     private string GetViewName(RevitViewViewModel revitView) {
@@ -184,37 +251,5 @@ internal class CopyViewViewModel : BaseViewModel {
         splittedViewName.Elevations = WithElevation ? SplittedViewName.GetElevation(revitView.View) : null;
 
         return Delimiter.CreateViewName(splittedViewName);
-    }
-
-    private bool CanCopyViews(object p) {
-        if(string.IsNullOrEmpty(GroupView)) {
-            ErrorText = "Не заполнена группа видов.";
-            return false;
-        }
-
-        string[] generatingNames = RevitViewViewModels
-            .Select(GetViewName)
-            .ToArray();
-        
-        string generateName = generatingNames.GroupBy(item => item)
-            .Where(item => item.Count() > 1)
-            .Select(item => item.Key)
-            .FirstOrDefault();
-        
-        if(!string.IsNullOrEmpty(generateName)) {
-            ErrorText = $"Найдено повторяющееся имя вида \"{generateName}\".";
-            return false;
-        }
-
-        string existingName =
-            generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(item.Equals));
-        
-        if(!string.IsNullOrEmpty(existingName)) {
-            ErrorText = $"Найдено существующее имя вида \"{existingName}\".";
-            return false;
-        }
-
-        ErrorText = null;
-        return true;
     }
 }

@@ -1,0 +1,9 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <Style x:Key="LabelStyle" TargetType="ui:TextBlock">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontTypography" Value="Body" />
+        <Setter Property="Margin" Value="0 0 0 8" />
+    </Style>
+</ResourceDictionary>

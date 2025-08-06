@@ -14,6 +14,21 @@
     
     <system:String x:Key="CopyUser.NotFoundUserViewsTitle">Предупреждение!</system:String>
     <system:String x:Key="CopyUser.NotFoundUserViewsMessage">Не были найдены шаблонные виды "{0}".</system:String>
+        
+    <system:String x:Key="CopyView.CopyViewWithDetails">Копирование с детализацией</system:String>
+    <system:String x:Key="CopyView.AddElevationMark">Добавить отметку уровня</system:String>
+    <system:String x:Key="CopyView.Options">Опции копирования</system:String>
+    <system:String x:Key="CopyView.GroupView">Группа видов</system:String>
+    <system:String x:Key="CopyView.Prefix">Префикс</system:String>
+    <system:String x:Key="CopyView.Suffix">Суффикс</system:String>
+    <system:String x:Key="CopyView.Replace">Заменить</system:String>
+    
+    <system:String x:Key="CopyView.NotSelectedCopyViewTitle">Предупреждение!</system:String>
+    <system:String x:Key="CopyView.NotSelectedCopyViewMessage">Выберите виды, которые требуется скопировать.</system:String>
+    <system:String x:Key="CopyView.TransactionName">Копирование видов.</system:String>
+    <system:String x:Key="CopyView.EmptyGroupView">Не заполнена группа видов.</system:String>
+    <system:String x:Key="CopyView.FoundRepeatedViewName">Найдено повторяющееся имя вида "{0}".</system:String>
+    <system:String x:Key="CopyView.FoundExistsViewName">Найдено существующее имя вида "{0}".</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
