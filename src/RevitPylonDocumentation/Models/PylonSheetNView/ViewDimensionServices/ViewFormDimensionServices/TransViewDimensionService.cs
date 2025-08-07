@@ -36,7 +36,7 @@ internal class TransViewDimensionService {
                 .ToList();
 
             // Определяем относительно чего нужно строить размерные линии - каркаса или пилона
-            var pylon = SheetInfo.HostElems.First();
+            var pylon = onTopOfRebar ?  SheetInfo.HostElems.Last() : SheetInfo.HostElems.First();
             var dimensionLineHostRef = onTopOfRebar ? skeletonParentRebar : pylon;
 
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
