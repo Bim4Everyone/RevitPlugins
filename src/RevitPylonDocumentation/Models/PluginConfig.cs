@@ -140,6 +140,19 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         viewSectionSettings.TransverseRebarViewTemplateName = settings.TransverseRebarViewTemplateName;
         viewSectionSettings.TransverseRebarViewTemplateNameTemp = settings.TransverseRebarViewTemplateName;
 
+        viewSectionSettings.TransverseRebarViewFirstPrefix = settings.TransverseRebarViewFirstPrefix;
+        viewSectionSettings.TransverseRebarViewFirstPrefixTemp = settings.TransverseRebarViewFirstPrefix;
+        viewSectionSettings.TransverseRebarViewFirstSuffix = settings.TransverseRebarViewFirstSuffix;
+        viewSectionSettings.TransverseRebarViewFirstSuffixTemp = settings.TransverseRebarViewFirstSuffix;
+        viewSectionSettings.TransverseRebarViewFirstElevation = settings.TransverseRebarViewFirstElevation;
+        viewSectionSettings.TransverseRebarViewFirstElevationTemp = settings.TransverseRebarViewFirstElevation;
+        viewSectionSettings.TransverseRebarViewSecondPrefix = settings.TransverseRebarViewSecondPrefix;
+        viewSectionSettings.TransverseRebarViewSecondPrefixTemp = settings.TransverseRebarViewSecondPrefix;
+        viewSectionSettings.TransverseRebarViewSecondSuffix = settings.TransverseRebarViewSecondSuffix;
+        viewSectionSettings.TransverseRebarViewSecondSuffixTemp = settings.TransverseRebarViewSecondSuffix;
+        viewSectionSettings.TransverseRebarViewSecondElevation = settings.TransverseRebarViewSecondElevation;
+        viewSectionSettings.TransverseRebarViewSecondElevationTemp = settings.TransverseRebarViewSecondElevation;
+
         viewSectionSettings.TransverseViewXOffset = settings.TransverseViewXOffset;
         viewSectionSettings.TransverseViewXOffsetTemp = settings.TransverseViewXOffset;
         viewSectionSettings.TransverseViewYOffset = settings.TransverseViewYOffset;
@@ -291,6 +304,14 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.TransverseViewThirdPrefix = viewSectionSettings.TransverseViewThirdPrefix;
         settings.TransverseViewThirdSuffix = viewSectionSettings.TransverseViewThirdSuffix;
         settings.TransverseViewThirdElevation = viewSectionSettings.TransverseViewThirdElevation;
+
+        settings.TransverseRebarViewFirstPrefix = viewSectionSettings.TransverseRebarViewFirstPrefix;
+        settings.TransverseRebarViewFirstSuffix = viewSectionSettings.TransverseRebarViewFirstSuffix;
+        settings.TransverseRebarViewFirstElevation = viewSectionSettings.TransverseRebarViewFirstElevation;
+        settings.TransverseRebarViewSecondPrefix = viewSectionSettings.TransverseRebarViewSecondPrefix;
+        settings.TransverseRebarViewSecondSuffix = viewSectionSettings.TransverseRebarViewSecondSuffix;
+        settings.TransverseRebarViewSecondElevation = viewSectionSettings.TransverseRebarViewSecondElevation;
+
         settings.TransverseViewTemplateName = viewSectionSettings.TransverseViewTemplateName;
         settings.TransverseRebarViewTemplateName = viewSectionSettings.TransverseRebarViewTemplateName;
 
@@ -408,6 +429,12 @@ internal class PluginSettings : ProjectSettings {
     public string TransverseViewThirdPrefix { get; set; }
     public string TransverseViewThirdSuffix { get; set; }
     public string TransverseViewThirdElevation { get; set; }
+    public string TransverseRebarViewFirstPrefix { get; set; }
+    public string TransverseRebarViewFirstSuffix { get; set; }
+    public string TransverseRebarViewFirstElevation { get; set; }
+    public string TransverseRebarViewSecondPrefix { get; set; }
+    public string TransverseRebarViewSecondSuffix { get; set; }
+    public string TransverseRebarViewSecondElevation { get; set; }
     public string TransverseViewTemplateName { get; set; }
     public string TransverseRebarViewTemplateName { get; set; }
     public string TransverseViewXOffset { get; set; }
