@@ -3,6 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
@@ -39,6 +41,7 @@ internal class TransViewRebarDimensionService {
             var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
             var dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom, 
                                                           ViewModel.SelectedDimensionType);
+            dimensionBottom.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
 
             var dimensionLineBottomEdge = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 1);
             var refArrayBottomEdge = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 

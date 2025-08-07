@@ -4,6 +4,9 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
+
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
@@ -65,8 +68,9 @@ internal class TransViewDimensionService {
                 var refArrayFormworkRebarFrontSecond = 
                     dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', [rebarPart, "фронт"], 
                                                           oldRefArray: refArrayFormworkFront);
-                doc.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkRebarFrontSecond, 
+                var dimension = doc.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkRebarFrontSecond, 
                                         ViewModel.SelectedDimensionType);
+                dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
             }
             // Размер по ФРОНТУ опалубка + армирование в случае, если есть Г-стержни (положение снизу 0)
             if(onTopOfRebar && SheetInfo.RebarInfo.HasLRebar) {
@@ -76,8 +80,9 @@ internal class TransViewDimensionService {
                 var refArrayFormworkRebarFrontSecond = 
                     dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"],
                                                           oldRefArray: refArrayFormworkFront);
-                doc.Create.NewDimension(view, dimensionLineTopSecond, refArrayFormworkRebarFrontSecond, 
+                var dimension = doc.Create.NewDimension(view, dimensionLineTopSecond, refArrayFormworkRebarFrontSecond, 
                                         ViewModel.SelectedDimensionType);
+                dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
             }
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ

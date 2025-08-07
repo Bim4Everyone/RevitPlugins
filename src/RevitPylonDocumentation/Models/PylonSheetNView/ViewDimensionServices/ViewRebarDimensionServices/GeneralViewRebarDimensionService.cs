@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -33,8 +32,9 @@ internal class GeneralViewRebarDimensionService {
             var dimensionLineBottom = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
                                                                             DimensionOffsetType.Bottom);
             var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
-            Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineBottom, refArrayBottom,
+            var dimension = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineBottom, refArrayBottom,
                                                     ViewModel.SelectedDimensionType);
+            dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
         } catch(Exception) { }
     }
 
@@ -48,8 +48,9 @@ internal class GeneralViewRebarDimensionService {
             if(SheetInfo.RebarInfo.AllRebarAreL) { return; }
             var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top);
             var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "фронт"]);
-            Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineTop, refArrayTop,
+            var dimension = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineTop, refArrayTop,
                                                     ViewModel.SelectedDimensionType);
+            dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
         } catch(Exception) { }
     }
 
