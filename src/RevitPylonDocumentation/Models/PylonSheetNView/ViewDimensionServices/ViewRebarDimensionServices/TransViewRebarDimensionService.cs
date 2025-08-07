@@ -37,11 +37,40 @@ internal class TransViewRebarDimensionService {
             var dimensionLineHostRef = onTopOfRebar ? skeletonParentRebar : pylon;
 
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            var dimensionLineBottom = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
-            var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
-            var dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom, 
-                                                          ViewModel.SelectedDimensionType);
-            dimensionBottom.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            if(!onTopOfRebar) {
+                var dimensionLineBottom = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
+                var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
+                var dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom,
+                                                              ViewModel.SelectedDimensionType);
+                dimensionBottom.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+            } else {
+                if(SheetInfo.RebarInfo.AllRebarAreL) {
+                    var dimensionLine = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
+                    var refArray = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
+                    var dimension = doc.Create.NewDimension(view, dimensionLine, refArray,
+                                                            ViewModel.SelectedDimensionType);
+                    dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+                } else if(!SheetInfo.RebarInfo.HasLRebar) {
+                    var dimensionLine = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
+                    var refArray = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "фронт"]);
+                    var dimension = doc.Create.NewDimension(view, dimensionLine, refArray,
+                                                                  ViewModel.SelectedDimensionType);
+                    dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+                } else {
+                    var dimensionLineBottom = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
+                    var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
+                    var dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom,
+                                                                  ViewModel.SelectedDimensionType);
+                    dimensionBottom.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+
+                    offsetType = offsetType is DimensionOffsetType.Bottom ? DimensionOffsetType.Top : DimensionOffsetType.Bottom;
+                    var dimensionLineTop = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
+                    var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "фронт"]);
+                    var dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop,
+                                                                  ViewModel.SelectedDimensionType);
+                    dimensionTop.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+                }
+            }
 
             var dimensionLineBottomEdge = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 1);
             var refArrayBottomEdge = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
