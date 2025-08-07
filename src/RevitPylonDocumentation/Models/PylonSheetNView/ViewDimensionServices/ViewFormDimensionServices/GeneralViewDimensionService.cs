@@ -6,8 +6,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-using Ninject.Planning;
-
 using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewFormDimensionServices;
@@ -50,14 +48,15 @@ internal class GeneralViewDimensionService {
     }
 
     internal void TryCreatePylonDimensions(FamilyInstance skeletonParentRebar, List<Grid> grids,
-                                        DimensionBaseService dimensionBaseService) {
+                                           DimensionBaseService dimensionBaseService, bool isFrontView) {
         var view = ViewOfPylon.ViewElement;
         try {
             // Размер по ФРОНТУ опалубка (положение снизу 1)
+            var side = isFrontView ? "фронт" : "торец";
             var dimensionLineBottomFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
                                                                                  DimensionOffsetType.Bottom, 2);
             var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance, 
-                                                                              '#', '/', ["фронт", "край"]);
+                                                                              '#', '/', [side, "край"]);
             Repository.Document.Create.NewDimension(view, dimensionLineBottomFirst, refArrayFormworkFront, 
                                                     ViewModel.SelectedDimensionType);
             if(grids.Count > 0) {

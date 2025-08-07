@@ -236,6 +236,14 @@ internal class PylonSheetInfoManager {
             }
         }
 
+        // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ПЕРПЕНДИКУЛЯРНОГО ВИДА
+        if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
+            // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
+            if(SheetInfo.GeneralViewPerpendicular.ViewportElement is null) {
+                SheetInfo.GeneralViewPerpendicular.AnnotationCreator.TryCreateViewAnnotations();
+            }
+        }
+
         // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА
         if(selectionSettings.NeedWorkWithTransverseViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего

@@ -33,7 +33,7 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
 
             var dimensionService = new GeneralViewDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreatePylonDimensions(skeletonParentRebar, grids, dimensionBaseService);
+            dimensionService.TryCreatePylonDimensions(skeletonParentRebar, grids, dimensionBaseService, true);
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
             dimensionService.TryCreatePylonDimensions(SheetInfo.HostElems, dimensionBaseService);
             dimensionService.TryCreateClampsDimensions(clampsParentRebars, dimensionBaseService);
@@ -45,7 +45,7 @@ internal class GeneralViewAnnotCreator : ViewAnnotationCreator {
             var markService = new GeneralViewMarkService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             markService.TryCreatePylonElevMark(SheetInfo.HostElems, dimensionBaseService);
             markService.TryCreateSkeletonMark();
-            markService.TryCreateClampMarks();
+            markService.TryCreateClampMarks(true);
             markService.TryCreateAdditionalMark();
             markService.TryCreateLowerBreakLines();
             markService.TryCreateUpperBreakLines();

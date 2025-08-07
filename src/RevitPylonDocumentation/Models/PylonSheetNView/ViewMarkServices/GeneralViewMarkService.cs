@@ -21,7 +21,7 @@ internal class GeneralViewMarkService {
     private readonly AnnotationService _annotationService;
 
     // Отступы для формирования линий обрыва
-    private readonly double _breakLinesOffsetX = 0.6;
+    private readonly double _breakLinesOffsetX = 0.55;
     private readonly double _breakLinesOffsetTopY = 4;
     private readonly double _breakLinesOffsetBottomY = 1.2;
 
@@ -123,7 +123,7 @@ internal class GeneralViewMarkService {
     /// <summary>
     /// Создает марки хомутов на основном виде опалубки в зависимости от положения на виде
     /// </summary>
-    internal void TryCreateClampMarks() {
+    internal void TryCreateClampMarks(bool isFrontView) {
         try {
             var simpleClamps = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
                                                                      _formNumberForClampsMin, _formNumberForClampsMax);
@@ -131,10 +131,10 @@ internal class GeneralViewMarkService {
             var pointForCompare = _viewPointsAnalyzer.GetTransformedPoint(SheetInfo.RebarInfo.SkeletonParentRebar, true);
             foreach(var simpleClamp in simpleClamps) {
                 var clampPoint = _viewPointsAnalyzer.GetTransformedPoint(simpleClamp, true);
-                if(clampPoint.X < pointForCompare.X) {
-                    TryCreateClampMark(simpleClamp, DirectionType.LeftTop);
+                if(!isFrontView || clampPoint.X > pointForCompare.X) {
+                    TryCreateClampMark(simpleClamp, DirectionType.RightTop, isFrontView);
                 } else {
-                    TryCreateClampMark(simpleClamp, DirectionType.RightTop);
+                    TryCreateClampMark(simpleClamp, DirectionType.LeftTop, isFrontView);
                 }
             }
         } catch(Exception) { }
@@ -143,12 +143,13 @@ internal class GeneralViewMarkService {
     /// <summary>
     /// Создает марку хомута на основном виде опалубки
     /// </summary>
-    private void TryCreateClampMark(Element simpleClamp, DirectionType directionType) {
+    private void TryCreateClampMark(Element simpleClamp, DirectionType directionType, bool isFrontView) {
         try {
+            var xOffset = isFrontView ? 2.4 : 1;
             // Получаем точку в которую нужно поставить аннотацию
             var annotPoint = _viewPointsAnalyzer.GetPointByDirection(simpleClamp, directionType, 0, 0, true);
             // Корректируем положение точки, куда будет установлена марка (текст)
-            annotPoint = _viewPointsAnalyzer.GetPointByDirection(annotPoint, directionType, 2.4, 0.3);
+            annotPoint = _viewPointsAnalyzer.GetPointByDirection(annotPoint, directionType, xOffset, 0.3);
 
             // Создаем марку арматуры
             var clampTag = _annotationService.CreateRebarTag(annotPoint, _tagSymbolWithoutSerif, simpleClamp);
@@ -158,14 +159,23 @@ internal class GeneralViewMarkService {
 
     internal void TryCreateAdditionalMark() {
         try {
+            var view = ViewOfPylon.ViewElement;
+            
             // Получаем референс-элемент
             var bottomElement = SheetInfo.HostElems.First();
 
-            // Получаем точку в которую нужно поставить аннотацию
-            var annotPoint = _viewPointsAnalyzer.GetPointByDirection(bottomElement, DirectionType.RightBottom,
-                                                                     5, 1, false);
-            var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(bottomElement, DirectionType.RightBottom,
-                                                                      2.5, 0.5, false);
+            // Получаем спроецированные на плоскость вида граничные точки
+            var bbMin = bottomElement.get_BoundingBox(view).Min;
+            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
+            var bbMax = bottomElement.get_BoundingBox(view).Max;
+            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
+            var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
+
+            // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
+            var annotPoint = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.RightBottom,
+                                                                     2, 1.1);
+            var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.LeftBottom,
+                                                                      0.4, 0.4);
             // Создаем типовую аннотацию для обозначения ГОСТа
             _annotationService.CreateUniversalTag(annotPoint, _gostTagSymbol, leaderPoint,
                                                   UnitUtilsHelper.ConvertToInternalValue(40),

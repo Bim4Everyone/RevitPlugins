@@ -15,16 +15,16 @@ internal class UserViewSectionSettings : BaseViewModel {
 
     private string _generalViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ВЕРТ_Пилоны";
     private string _generalRebarViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ВЕРТ_Пилоны_Каркас";
-    private string _generalViewXOffsetTemp = "200";
+    private string _generalViewXOffsetTemp = "250";
     private string _generalViewYTopOffsetTemp = "1300";
-    private string _generalViewYBottomOffsetTemp = "200";
+    private string _generalViewYBottomOffsetTemp = "500";
 
     private string _transverseViewFirstPrefixTemp = "";
     private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
     private string _transverseViewFirstElevationTemp = "0,25";
     private string _transverseViewSecondPrefixTemp = "";
     private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
-    private string _transverseViewSecondElevationTemp = "0,5";
+    private string _transverseViewSecondElevationTemp = "0,45";
     private string _transverseViewThirdPrefixTemp = "";
     private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
     private string _transverseViewThirdElevationTemp = "1,1";
@@ -38,7 +38,7 @@ internal class UserViewSectionSettings : BaseViewModel {
 
     private string _transverseViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны";
     private string _transverseRebarViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны_Каркас";
-    private string _transverseViewXOffsetTemp = "400";
+    private string _transverseViewXOffsetTemp = "200";
     private string _transverseViewYOffsetTemp = "600";
 
     private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Номер вида без номера листа";
