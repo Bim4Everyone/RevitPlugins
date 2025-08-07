@@ -14,7 +14,7 @@ internal class GeneralViewRebarPerpMarkService {
     private readonly AnnotationService _annotationService;
     private readonly FamilySymbol _tagSymbolWithoutSerif;
     private readonly FamilySymbol _independentTagSymbol;
-    private readonly string _linkToNodeText = "по а";
+    private readonly string _linkToNodeText = "по А";
 
     internal GeneralViewRebarPerpMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
                                 PylonView pylonView) {

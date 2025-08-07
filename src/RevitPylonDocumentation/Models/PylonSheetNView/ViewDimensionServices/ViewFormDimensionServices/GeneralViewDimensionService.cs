@@ -24,29 +24,6 @@ internal class GeneralViewDimensionService {
     internal PylonView ViewOfPylon { get; set; }
 
 
-    /// <summary>
-    /// Метод по созданию размеров по опалубке пилонов
-    /// </summary>
-    /// <param name="view">Вид, на котором нужно создать размеры</param>
-    /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
-    /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
-    internal void TryCreatePylonDimensions(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
-        try {
-            var dimensionLineLeft = dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance,
-                                                           DimensionOffsetType.Left, 1.7);
-            foreach(var item in hostElems) {
-                if(item is not FamilyInstance hostElem) { return; }
-
-                // Собираем опорные плоскости по опалубке, например:
-                // #_1_горизонт_край_низ
-                // #_1_горизонт_край_верх
-                var refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
-                Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArraySide,
-                                                        ViewModel.SelectedDimensionType);
-            }
-        } catch(Exception) { }
-    }
-
     internal void TryCreatePylonDimensions(FamilyInstance skeletonParentRebar, List<Grid> grids,
                                            DimensionBaseService dimensionBaseService, bool isFrontView) {
         var view = ViewOfPylon.ViewElement;
@@ -54,15 +31,15 @@ internal class GeneralViewDimensionService {
             // Размер по ФРОНТУ опалубка (положение снизу 1)
             var side = isFrontView ? "фронт" : "торец";
             var dimensionLineBottomFirst = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                 DimensionOffsetType.Bottom, 2);
-            var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance, 
+                                                                                 DimensionOffsetType.Bottom, 2.3);
+            var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(SheetInfo.HostElems.First() as FamilyInstance,
                                                                               '#', '/', [side, "край"]);
-            Repository.Document.Create.NewDimension(view, dimensionLineBottomFirst, refArrayFormworkFront, 
+            Repository.Document.Create.NewDimension(view, dimensionLineBottomFirst, refArrayFormworkFront,
                                                     ViewModel.SelectedDimensionType);
             if(grids.Count > 0) {
                 // Размер по ФРОНТУ опалубка + оси (положение снизу 2)
                 var dimensionLineBottomSecond = dimensionBaseService.GetDimensionLine(skeletonParentRebar,
-                                                                                      DimensionOffsetType.Bottom, 1.5);
+                                                                                      DimensionOffsetType.Bottom, 1.8);
                 var refArrayFormworkGridFront = dimensionBaseService.GetDimensionRefs(grids, view, new XYZ(0, 0, 1),
                                                                                       refArrayFormworkFront);
                 Repository.Document.Create.NewDimension(view, dimensionLineBottomSecond, refArrayFormworkGridFront,
@@ -74,9 +51,32 @@ internal class GeneralViewDimensionService {
                     LeftOffset = 1,
                     RightOffset = 1,
                     TopOffset = 1,
-                    BottomOffset = 2.2
+                    BottomOffset = 2.5
                 };
                 EditGridEnds(view, SheetInfo.HostElems.First(), grids, transverseViewGridOffsets, dimensionBaseService);
+            }
+        } catch(Exception) { }
+    }
+
+    /// <summary>
+    /// Метод по созданию размеров по опалубке пилонов
+    /// </summary>
+    /// <param name="view">Вид, на котором нужно создать размеры</param>
+    /// <param name="clampsParentRebars">Список экземпляров семейств пилонов</param>
+    /// <param name="dimensionBaseService">Сервис по анализу основ размеров</param>
+    internal void TryCreatePylonDimensions(List<Element> hostElems, DimensionBaseService dimensionBaseService) {
+        try {
+            var dimensionLineLeft = dimensionBaseService.GetDimensionLine(hostElems.First() as FamilyInstance,
+                                                                          DimensionOffsetType.Left, 1.8);
+            foreach(var item in hostElems) {
+                if(item is not FamilyInstance hostElem) { return; }
+
+                // Собираем опорные плоскости по опалубке, например:
+                // #_1_горизонт_край_низ
+                // #_1_горизонт_край_верх
+                var refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', ["горизонт", "край"]);
+                Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArraySide,
+                                                        ViewModel.SelectedDimensionType);
             }
         } catch(Exception) { }
     }
@@ -109,7 +109,7 @@ internal class GeneralViewDimensionService {
                 dimSegmentOpts = GetClampsDimensionSegmentOptions(clampsParentRebar, dimSegmentOpts);
             }
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
-                                                                          DimensionOffsetType.Left, 1);
+                                                                          DimensionOffsetType.Left, 1.1);
             var dimensionRebarSide =
                 Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArraySide,
                                                         ViewModel.SelectedDimensionType);
@@ -147,13 +147,13 @@ internal class GeneralViewDimensionService {
             var lastFloorBottomFace = GetBottomFloorFace(lastFloor, viewOptions);
 
             var dimensionLineLeft = dimensionBaseService.GetDimensionLine(SheetInfo.HostElems.First() as FamilyInstance,
-                                                               DimensionOffsetType.Left, 1);
+                                                                          DimensionOffsetType.Left, 1.1);
             // #1_горизонт_выпуск
             var refArray = dimensionBaseService.GetDimensionRefs(rebar, '#', '/', ["горизонт", "выпуск"]);
             refArray.Append(lastFloorTopFace.Reference);
             refArray.Append(lastFloorBottomFace.Reference);
             Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineLeft, refArray,
-                                                        ViewModel.SelectedDimensionType);
+                                                    ViewModel.SelectedDimensionType);
         } catch(Exception) { }
     }
 

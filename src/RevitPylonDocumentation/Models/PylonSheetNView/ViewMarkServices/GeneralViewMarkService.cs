@@ -201,14 +201,14 @@ internal class GeneralViewMarkService {
             var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
 
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-            var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMin, DirectionType.Left,
-                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
+            var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMin, DirectionType.LeftTop,
+                                                                 _breakLinesOffsetX, 0.1);
             var point2 = _viewPointsAnalyzer.GetPointByDirection(bbMin, DirectionType.LeftBottom,
                                                                  _breakLinesOffsetX, _breakLinesOffsetBottomY);
             var point3 = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.RightBottom,
                                                                  _breakLinesOffsetX, _breakLinesOffsetBottomY);
-            var point4 = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.Right,
-                                                                 _breakLinesOffsetX, _breakLinesOffsetBottomY);
+            var point4 = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.RightTop,
+                                                                 _breakLinesOffsetX, 0.1);
             // Линии обрыва - это 2D-аннотационные семейства на основе линии
             var line1 = Line.CreateBound(point1, point2);
             var line2 = Line.CreateBound(point2, point3);
@@ -237,14 +237,14 @@ internal class GeneralViewMarkService {
             var topLeftPt = new XYZ(bbMin.X, bbMin.Y, bbMax.Z);
 
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-            var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMax, DirectionType.Right,
-                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
+            var point1 = _viewPointsAnalyzer.GetPointByDirection(bbMax, DirectionType.RightBottom,
+                                                                 _breakLinesOffsetX, 0.1);
             var point2 = _viewPointsAnalyzer.GetPointByDirection(bbMax, DirectionType.RightTop,
                                                                  _breakLinesOffsetX, _breakLinesOffsetTopY);
             var point3 = _viewPointsAnalyzer.GetPointByDirection(topLeftPt, DirectionType.LeftTop,
                                                                  _breakLinesOffsetX, _breakLinesOffsetTopY);
-            var point4 = _viewPointsAnalyzer.GetPointByDirection(topLeftPt, DirectionType.Left,
-                                                                 _breakLinesOffsetX, _breakLinesOffsetTopY);
+            var point4 = _viewPointsAnalyzer.GetPointByDirection(topLeftPt, DirectionType.LeftBottom,
+                                                                 _breakLinesOffsetX, 0.1);
             // Линии обрыва - это 2D-аннотационные семейства на основе линии
             var line1 = Line.CreateBound(point1, point2);
             var line2 = Line.CreateBound(point2, point3);
@@ -283,14 +283,14 @@ internal class GeneralViewMarkService {
                 var previousTopLeftPt = new XYZ(previousBbMin.X, previousBbMin.Y, previousBbMax.Z);
 
                 // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
-                var point1 = _viewPointsAnalyzer.GetPointByDirection(previousBbMax, DirectionType.Right,
-                                                                     _breakLinesOffsetX, _breakLinesOffsetBottomY);
-                var point2 = _viewPointsAnalyzer.GetPointByDirection(currentBottomRightPt, DirectionType.Right,
-                                                                     _breakLinesOffsetX, _breakLinesOffsetTopY);
-                var point3 = _viewPointsAnalyzer.GetPointByDirection(currentBbMin, DirectionType.Left,
-                                                                     _breakLinesOffsetX, _breakLinesOffsetTopY);
-                var point4 = _viewPointsAnalyzer.GetPointByDirection(previousTopLeftPt, DirectionType.Left,
-                                                                     _breakLinesOffsetX, _breakLinesOffsetBottomY);
+                var point1 = _viewPointsAnalyzer.GetPointByDirection(previousBbMax, DirectionType.RightBottom,
+                                                                     _breakLinesOffsetX, 0.1);
+                var point2 = _viewPointsAnalyzer.GetPointByDirection(currentBottomRightPt, DirectionType.RightTop,
+                                                                     _breakLinesOffsetX, 0.1);
+                var point3 = _viewPointsAnalyzer.GetPointByDirection(currentBbMin, DirectionType.LeftTop,
+                                                                     _breakLinesOffsetX, 0.1);
+                var point4 = _viewPointsAnalyzer.GetPointByDirection(previousTopLeftPt, DirectionType.LeftBottom,
+                                                                     _breakLinesOffsetX, 0.1);
                 // Линии обрыва - это 2D-аннотационные семейства на основе линии
                 var line1 = Line.CreateBound(point1, point2);
                 var line2 = Line.CreateBound(point3, point4);

@@ -38,7 +38,7 @@ internal class UserViewSectionSettings : BaseViewModel {
 
     private string _transverseViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны";
     private string _transverseRebarViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны_Каркас";
-    private string _transverseViewXOffsetTemp = "200";
+    private string _transverseViewXOffsetTemp = "230";
     private string _transverseViewYOffsetTemp = "600";
 
     private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Номер вида без номера листа";

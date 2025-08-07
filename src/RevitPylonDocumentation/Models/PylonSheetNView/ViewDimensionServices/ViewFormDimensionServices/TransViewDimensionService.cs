@@ -91,7 +91,7 @@ internal class TransViewDimensionService {
 
             // Размер по ТОРЦУ опалубка + армирование (положение справа 2)
             var dimensionLineRightSecond = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Right, 
-                                                                                 0.4, false);
+                                                                                 0.5, false);
             // Добавляем ссылки на арматурные стержни
             var refArrayFormworkRebarSide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
                                                                                   [rebarPart, "торец"],
