@@ -1192,7 +1192,7 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Отступ по X у основного и бокового вида">
+                                            Text="Отступ по X у основного вида">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock
@@ -1230,7 +1230,7 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Отступ по Y сверху у основного и бокового вида">
+                                            Text="Отступ по Y сверху у основного вида">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock
@@ -1268,7 +1268,7 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Отступ по Y снизу у основного и бокового вида">
+                                            Text="Отступ по Y снизу у основного вида">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock
@@ -1303,6 +1303,120 @@
                                             </i:Interaction.Triggers>
                                         </TextBox>
 
+                                        
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Отступ по X у бокового вида">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource GeneralViewPerpXOffsetStyle}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=ViewSectionSettings.GeneralViewPerpXOffsetTemp,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource GeneralViewPerpXOffsetStyle}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Отступ по Y сверху у бокового вида">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource GeneralViewPerpYTopOffsetStyle}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=ViewSectionSettings.GeneralViewPerpYTopOffsetTemp,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource GeneralViewPerpYTopOffsetStyle}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Отступ по Y снизу у бокового вида">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource GeneralViewPerpYBottomOffsetStyle}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=ViewSectionSettings.GeneralViewPerpYBottomOffsetTemp,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource GeneralViewPerpYBottomOffsetStyle}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
                                     </StackPanel>
                                 </GroupBox>
 

@@ -117,6 +117,13 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         viewSectionSettings.GeneralViewYBottomOffset = settings.GeneralViewYBottomOffset;
         viewSectionSettings.GeneralViewYBottomOffsetTemp = settings.GeneralViewYBottomOffset;
 
+        viewSectionSettings.GeneralViewPerpXOffset = settings.GeneralViewPerpXOffset;
+        viewSectionSettings.GeneralViewPerpXOffsetTemp = settings.GeneralViewPerpXOffset;
+        viewSectionSettings.GeneralViewPerpYTopOffset = settings.GeneralViewPerpYTopOffset;
+        viewSectionSettings.GeneralViewPerpYTopOffsetTemp = settings.GeneralViewPerpYTopOffset;
+        viewSectionSettings.GeneralViewPerpYBottomOffset = settings.GeneralViewPerpYBottomOffset;
+        viewSectionSettings.GeneralViewPerpYBottomOffsetTemp = settings.GeneralViewPerpYBottomOffset;
+
         viewSectionSettings.TransverseViewFirstPrefix = settings.TransverseViewFirstPrefix;
         viewSectionSettings.TransverseViewFirstPrefixTemp = settings.TransverseViewFirstPrefix;
         viewSectionSettings.TransverseViewFirstSuffix = settings.TransverseViewFirstSuffix;
@@ -294,6 +301,9 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.GeneralViewXOffset = viewSectionSettings.GeneralViewXOffset;
         settings.GeneralViewYTopOffset = viewSectionSettings.GeneralViewYTopOffset;
         settings.GeneralViewYBottomOffset = viewSectionSettings.GeneralViewYBottomOffset;
+        settings.GeneralViewPerpXOffset = viewSectionSettings.GeneralViewPerpXOffset;
+        settings.GeneralViewPerpYTopOffset = viewSectionSettings.GeneralViewPerpYTopOffset;
+        settings.GeneralViewPerpYBottomOffset = viewSectionSettings.GeneralViewPerpYBottomOffset;
 
         settings.TransverseViewFirstPrefix = viewSectionSettings.TransverseViewFirstPrefix;
         settings.TransverseViewFirstSuffix = viewSectionSettings.TransverseViewFirstSuffix;
@@ -420,6 +430,9 @@ internal class PluginSettings : ProjectSettings {
     public string GeneralViewXOffset { get; set; }
     public string GeneralViewYTopOffset { get; set; }
     public string GeneralViewYBottomOffset { get; set; }
+    public string GeneralViewPerpXOffset { get; set; }
+    public string GeneralViewPerpYTopOffset { get; set; }
+    public string GeneralViewPerpYBottomOffset { get; set; }
     public string TransverseViewFirstPrefix { get; set; }
     public string TransverseViewFirstSuffix { get; set; }
     public string TransverseViewFirstElevation { get; set; }

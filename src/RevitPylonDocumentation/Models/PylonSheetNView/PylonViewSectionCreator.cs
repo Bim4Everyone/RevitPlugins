@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -21,7 +22,7 @@ public class PylonViewSectionCreator {
 
     public bool TryCreateGeneralView(ViewFamilyType selectedViewFamilyType) {
         // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems[0];
+        var elemForWork = SheetInfo.HostElems.First();
 
         if(elemForWork is null) { return false; }
 
@@ -50,9 +51,12 @@ public class PylonViewSectionCreator {
         double minZ = bb.Min.Z;
         double maxZ = bb.Max.Z;
 
-        double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
-        double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
-        double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+        double coordinateX = hostLength * 0.5 
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+        double coordinateYTop = maxZ - originPoint.Z 
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+        double coordinateYBottom = minZ - originPoint.Z 
+            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
         var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
         var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostWidth);
@@ -67,7 +71,8 @@ public class PylonViewSectionCreator {
         try {
             viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
             if(viewSection != null) {
-                viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewSuffix;
+                viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPrefix + SheetInfo.PylonKeyName 
+                    + ViewModel.ViewSectionSettings.GeneralViewSuffix;
                 if(ViewModel.SelectedGeneralViewTemplate != null) {
                     viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
                 }
@@ -87,7 +92,7 @@ public class PylonViewSectionCreator {
 
     public bool TryCreateGeneralRebarView(ViewFamilyType selectedViewFamilyType) {
         // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems[0];
+        var elemForWork = SheetInfo.HostElems.First();
 
         if(elemForWork is null) { return false; }
 
@@ -116,9 +121,12 @@ public class PylonViewSectionCreator {
         double minZ = bb.Min.Z;
         double maxZ = bb.Max.Z;
 
-        double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
-        double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
-        double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+        double coordinateX = hostLength * 0.5 
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+        double coordinateYTop = maxZ - originPoint.Z 
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+        double coordinateYBottom = minZ - originPoint.Z 
+            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
 
         var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
         var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostWidth);
@@ -156,7 +164,7 @@ public class PylonViewSectionCreator {
 
     public bool TryCreateGeneralPerpendicularView(ViewFamilyType selectedViewFamilyType) {
         // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems[0];
+        var elemForWork = SheetInfo.HostElems.First();
 
         if(elemForWork is null) { return false; }
 
@@ -183,11 +191,14 @@ public class PylonViewSectionCreator {
 
         var bb = elemForWork.get_BoundingBox(null);
         double minZ = bb.Min.Z;
-        double maxZ = bb.Max.Z;
+        double maxZ = bb.Max.Z; 
 
-        double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
-        double coordinateYTop = maxZ - originPoint.Z + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
-        double coordinateYBottom = minZ - originPoint.Z - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+        double coordinateX = hostWidth * 0.5 
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpXOffset));
+        double coordinateYTop = maxZ - originPoint.Z 
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYTopOffset));
+        double coordinateYBottom = minZ - originPoint.Z 
+            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYBottomOffset));
 
         var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
         var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0);
@@ -202,7 +213,8 @@ public class PylonViewSectionCreator {
         try {
             viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
             if(viewSection != null) {
-                viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPerpendicularPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.GeneralViewPerpendicularSuffix;
+                viewSection.Name = ViewModel.ViewSectionSettings.GeneralViewPerpendicularPrefix + SheetInfo.PylonKeyName 
+                    + ViewModel.ViewSectionSettings.GeneralViewPerpendicularSuffix;
                 if(ViewModel.SelectedGeneralViewTemplate != null) {
                     viewSection.ViewTemplateId = ViewModel.SelectedGeneralViewTemplate.Id;
                 }
@@ -222,7 +234,7 @@ public class PylonViewSectionCreator {
 
     public bool TryCreateGeneralRebarPerpendicularView(ViewFamilyType selectedViewFamilyType) {
         // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems[0];
+        var elemForWork = SheetInfo.HostElems.First();
 
         if(elemForWork is null) { return false; }
 
@@ -251,12 +263,12 @@ public class PylonViewSectionCreator {
         double minZ = bb.Min.Z;
         double maxZ = bb.Max.Z;
 
-        double coordinateX = hostLength * 0.5
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+        double coordinateX = hostWidth * 0.5
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpXOffset));
         double coordinateYTop = maxZ - originPoint.Z
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYTopOffset));
         double coordinateYBottom = minZ - originPoint.Z
-            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYBottomOffset));
 
         var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
         var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0.2);
@@ -294,7 +306,7 @@ public class PylonViewSectionCreator {
 
     public bool TryCreateTransverseView(ViewFamilyType selectedViewFamilyType, int transverseViewNum) {
         // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems[0];
+        var elemForWork = SheetInfo.HostElems.First();
 
         if(elemForWork is null) { return false; }
 
@@ -326,8 +338,10 @@ public class PylonViewSectionCreator {
         XYZ sectionBoxMin;
         XYZ sectionBoxMax;
         double elevation;
-        double coordinateX = hostLength * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
-        double coordinateY = hostWidth * 0.5 + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
+        double coordinateX = hostLength * 0.5 
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
+        double coordinateY = hostWidth * 0.5 
+            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
         if(transverseViewNum == 1) {
             // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
@@ -368,7 +382,8 @@ public class PylonViewSectionCreator {
             viewSection = ViewSection.CreateSection(Repository.Document, selectedViewFamilyType.Id, sectionBox);
             if(viewSection != null) {
                 if(transverseViewNum == 1) {
-                    viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewFirstPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewFirstSuffix;
+                    viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewFirstPrefix + SheetInfo.PylonKeyName 
+                        + ViewModel.ViewSectionSettings.TransverseViewFirstSuffix;
                     // Если был выбран шаблон вида, то назначаем
                     if(ViewModel.SelectedTransverseViewTemplate != null) {
                         viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
@@ -376,13 +391,15 @@ public class PylonViewSectionCreator {
                     SheetInfo.TransverseViewFirst.ViewElement = viewSection;
 
                 } else if(transverseViewNum == 2) {
-                    viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewSecondPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewSecondSuffix;
+                    viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewSecondPrefix + SheetInfo.PylonKeyName 
+                        + ViewModel.ViewSectionSettings.TransverseViewSecondSuffix;
                     if(ViewModel.SelectedTransverseViewTemplate != null) {
                         viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewSecond.ViewElement = viewSection;
                 } else if(transverseViewNum == 3) {
-                    viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewThirdPrefix + SheetInfo.PylonKeyName + ViewModel.ViewSectionSettings.TransverseViewThirdSuffix;
+                    viewSection.Name = ViewModel.ViewSectionSettings.TransverseViewThirdPrefix + SheetInfo.PylonKeyName 
+                        + ViewModel.ViewSectionSettings.TransverseViewThirdSuffix;
                     if(ViewModel.SelectedTransverseViewTemplate != null) {
                         viewSection.ViewTemplateId = ViewModel.SelectedTransverseViewTemplate.Id;
                     }
@@ -403,7 +420,7 @@ public class PylonViewSectionCreator {
 
     public bool TryCreateTransverseRebarView(ViewFamilyType selectedViewFamilyType, int transverseRebarViewNum) {
         // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems[0];
+        var elemForWork = SheetInfo.HostElems.First();
 
         if(elemForWork is null) { return false; }
 
@@ -502,7 +519,8 @@ public class PylonViewSectionCreator {
     }
 
 
-    public bool PrepareInfoForTransform(Element elemForWork, ref XYZ middlePoint, ref XYZ hostVector, ref double hostLength, ref double hostWidth) {
+    public bool PrepareInfoForTransform(Element elemForWork, ref XYZ middlePoint, ref XYZ hostVector, 
+                                        ref double hostLength, ref double hostWidth) {
         if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns) {
             var column = elemForWork as FamilyInstance;
 

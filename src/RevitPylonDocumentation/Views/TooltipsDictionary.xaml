@@ -226,6 +226,24 @@
         <Setter Property="Text" Value="Укажите отступ от пилона снизу у основного вида" />
     </Style>
 
+    <Style
+        x:Key="GeneralViewPerpXOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ от пилона вправо и влево у бокового вида" />
+    </Style>
+
+    <Style
+        x:Key="GeneralViewPerpYTopOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ от пилона сверху у бокового вида" />
+    </Style>
+
+    <Style
+        x:Key="GeneralViewPerpYBottomOffsetStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">
+
+        <Setter Property="Text" Value="Укажите отступ от пилона снизу у бокового вида" />
+    </Style>
+
 
 
     <Style x:Key="TransViewFirstNameStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SettingsTooltipStyle}">

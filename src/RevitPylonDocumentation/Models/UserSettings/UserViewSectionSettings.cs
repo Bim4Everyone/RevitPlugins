@@ -19,6 +19,10 @@ internal class UserViewSectionSettings : BaseViewModel {
     private string _generalViewYTopOffsetTemp = "1300";
     private string _generalViewYBottomOffsetTemp = "500";
 
+    private string _generalViewPerpXOffsetTemp = "500";
+    private string _generalViewPerpYTopOffsetTemp = "1300";
+    private string _generalViewPerpYBottomOffsetTemp = "500";
+
     private string _transverseViewFirstPrefixTemp = "";
     private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
     private string _transverseViewFirstElevationTemp = "0,25";
@@ -126,6 +130,24 @@ internal class UserViewSectionSettings : BaseViewModel {
     public string GeneralViewYBottomOffsetTemp {
         get => _generalViewYBottomOffsetTemp;
         set => RaiseAndSetIfChanged(ref _generalViewYBottomOffsetTemp, value);
+    }
+
+    public string GeneralViewPerpXOffset { get; set; }
+    public string GeneralViewPerpXOffsetTemp {
+        get => _generalViewPerpXOffsetTemp;
+        set => RaiseAndSetIfChanged(ref _generalViewPerpXOffsetTemp, value);
+    }
+
+    public string GeneralViewPerpYTopOffset { get; set; }
+    public string GeneralViewPerpYTopOffsetTemp {
+        get => _generalViewPerpYTopOffsetTemp;
+        set => RaiseAndSetIfChanged(ref _generalViewPerpYTopOffsetTemp, value);
+    }
+
+    public string GeneralViewPerpYBottomOffset { get; set; }
+    public string GeneralViewPerpYBottomOffsetTemp {
+        get => _generalViewPerpYBottomOffsetTemp;
+        set => RaiseAndSetIfChanged(ref _generalViewPerpYBottomOffsetTemp, value);
     }
 
     public string TransverseViewFirstPrefix { get; set; }
@@ -266,6 +288,9 @@ internal class UserViewSectionSettings : BaseViewModel {
         GeneralViewXOffset = GeneralViewXOffsetTemp;
         GeneralViewYTopOffset = GeneralViewYTopOffsetTemp;
         GeneralViewYBottomOffset = GeneralViewYBottomOffsetTemp;
+        GeneralViewPerpXOffset = GeneralViewPerpXOffsetTemp;
+        GeneralViewPerpYTopOffset = GeneralViewPerpYTopOffsetTemp;
+        GeneralViewPerpYBottomOffset = GeneralViewPerpYBottomOffsetTemp;
 
         TransverseViewFirstPrefix = TransverseViewFirstPrefixTemp;
         TransverseViewFirstSuffix = TransverseViewFirstSuffixTemp;
@@ -300,7 +325,16 @@ internal class UserViewSectionSettings : BaseViewModel {
             ViewModel.ErrorText = "Значение отступа основного вида по Y сверху некорректно";
         }
         if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset, out _)) {
-            ViewModel.ErrorText = "Значение отступа основного вида по Y сверху некорректно";
+            ViewModel.ErrorText = "Значение отступа основного вида по Y снизу некорректно";
+        }
+        if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewPerpXOffset, out _)) {
+            ViewModel.ErrorText = "Значение отступа бокового вида по X некорректно";
+        }
+        if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewPerpYTopOffset, out _)) {
+            ViewModel.ErrorText = "Значение отступа бокового вида по Y сверху некорректно";
+        }
+        if(!int.TryParse(ViewModel.ViewSectionSettings.GeneralViewPerpYBottomOffset, out _)) {
+            ViewModel.ErrorText = "Значение отступа бокового вида по Y снизу некорректно";
         }
 
         if(!int.TryParse(ViewModel.ViewSectionSettings.TransverseViewXOffset, out _)) {
