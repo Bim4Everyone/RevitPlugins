@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -233,7 +234,7 @@ internal class PylonSheetInfo : BaseViewModel {
                 GeneralView.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(GeneralView, viewport);
+                GetInfoAboutViewport(GeneralView, viewport, true);
                 continue;
             }
 
@@ -243,7 +244,7 @@ internal class PylonSheetInfo : BaseViewModel {
                 GeneralViewRebar.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(GeneralViewRebar, viewport);
+                GetInfoAboutViewport(GeneralViewRebar, viewport, true);
                 continue;
             }
 
@@ -253,7 +254,7 @@ internal class PylonSheetInfo : BaseViewModel {
                 GeneralViewPerpendicular.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(GeneralViewPerpendicular, viewport);
+                GetInfoAboutViewport(GeneralViewPerpendicular, viewport, true);
                 continue;
             }
 
@@ -263,7 +264,7 @@ internal class PylonSheetInfo : BaseViewModel {
                 GeneralViewPerpendicularRebar.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(GeneralViewPerpendicularRebar, viewport);
+                GetInfoAboutViewport(GeneralViewPerpendicularRebar, viewport, true);
                 continue;
             }
 
@@ -273,7 +274,7 @@ internal class PylonSheetInfo : BaseViewModel {
                 TransverseViewFirst.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(TransverseViewFirst, viewport);
+                GetInfoAboutViewport(TransverseViewFirst, viewport, true);
                 continue;
             }
 
@@ -283,7 +284,7 @@ internal class PylonSheetInfo : BaseViewModel {
                 TransverseViewSecond.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(TransverseViewSecond, viewport);
+                GetInfoAboutViewport(TransverseViewSecond, viewport, true);
                 continue;
             }
 
@@ -293,7 +294,7 @@ internal class PylonSheetInfo : BaseViewModel {
                 TransverseViewThird.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(TransverseViewThird, viewport);
+                GetInfoAboutViewport(TransverseViewThird, viewport, true);
                 continue;
             }
 
@@ -303,7 +304,7 @@ internal class PylonSheetInfo : BaseViewModel {
                 TransverseViewFirstRebar.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(TransverseViewFirstRebar, viewport);
+                GetInfoAboutViewport(TransverseViewFirstRebar, viewport, true);
                 continue;
             }
 
@@ -313,7 +314,7 @@ internal class PylonSheetInfo : BaseViewModel {
                 TransverseViewSecondRebar.ViewportElement = viewport;
 
                 // Получение центра и габаритов видового экрана
-                GetInfoAboutViewport(TransverseViewSecondRebar, viewport);
+                GetInfoAboutViewport(TransverseViewSecondRebar, viewport, true);
                 continue;
             }
         }
@@ -444,7 +445,27 @@ internal class PylonSheetInfo : BaseViewModel {
     /// <summary>
     /// Получение и сохранение информации о центре и габаритах видового экрана
     /// </summary>
-    public void GetInfoAboutViewport(PylonView pylonView, Viewport viewport) {
+    public void GetInfoAboutViewport(PylonView pylonView, Viewport viewport, bool hideUnnecessaryCategories) {
+        // Скрывать элементы перечисленных ниже категорий может быть необходимо в связи с тем, что они сильно
+        // расширяют габариты видового экрана на листе, при этом не являясь существенными элементами на виде
+        var view = pylonView.ViewElement;
+        if(hideUnnecessaryCategories) {
+            BuiltInCategory[] categoriesToHide = {
+                BuiltInCategory.OST_GenericAnnotation,
+                BuiltInCategory.OST_RebarTags,
+                BuiltInCategory.OST_Viewers
+            };
+            var multiCategoryFilter = new LogicalOrFilter(
+                categoriesToHide
+                    .Select<BuiltInCategory, ElementFilter>(bic => new ElementCategoryFilter(bic))
+                    .ToList()
+            );
+            var elemIdsForHide = new FilteredElementCollector(Repository.Document, view.Id)
+                .WherePasses(multiCategoryFilter)
+                .ToElementIds();
+            view.HideElementsTemporary(elemIdsForHide);
+        }
+
         var viewportCenter = viewport.GetBoxCenter();
         var viewportOutline = viewport.GetBoxOutline();
         double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
@@ -453,6 +474,10 @@ internal class PylonSheetInfo : BaseViewModel {
         pylonView.ViewportCenter = viewportCenter;
         pylonView.ViewportHalfWidth = viewportHalfWidth;
         pylonView.ViewportHalfHeight = viewportHalfHeight;
+
+        if(hideUnnecessaryCategories) {
+            view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+        }
     }
 
 

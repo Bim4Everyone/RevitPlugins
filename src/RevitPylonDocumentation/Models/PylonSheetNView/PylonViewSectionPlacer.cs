@@ -48,7 +48,7 @@ public class PylonViewSectionPlacer {
         }
 
         // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
-        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralView)) {
+        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralView, false)) {
             return false;
         }
 
@@ -96,7 +96,7 @@ public class PylonViewSectionPlacer {
         }
 
         // Передаем основной вид пилона в метод по созданию видов в (0.0.0)
-        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewRebar)) {
+        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewRebar, true)) {
             return false;
         }
 
@@ -149,7 +149,7 @@ public class PylonViewSectionPlacer {
         }
 
         // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
-        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicular)) {
+        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicular, true)) {
             return false;
         }
 
@@ -158,7 +158,9 @@ public class PylonViewSectionPlacer {
 
         // Рассчитываем и задаем корректную точку вставки основного перпендикулярного вида пилона, если размещен основной вид
         if(SheetInfo.GeneralView.ViewportElement != null) {
-            newCenterX = newCenterX - SheetInfo.GeneralView.ViewportHalfWidth - SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth - _titleBlockFrameLeftOffset;
+            newCenterX = SheetInfo.GeneralView.ViewportCenter.X 
+                         + SheetInfo.GeneralView.ViewportHalfWidth 
+                         + SheetInfo.GeneralViewPerpendicular.ViewportHalfWidth;
         }
 
         var newCenter = new XYZ(
@@ -189,7 +191,7 @@ public class PylonViewSectionPlacer {
         }
 
         // Передаем основной перпендикулярный вид пилона в метод по созданию видов в (0.0.0)
-        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicularRebar)) {
+        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.GeneralViewPerpendicularRebar, true)) {
             return false;
         }
 
@@ -238,7 +240,7 @@ public class PylonViewSectionPlacer {
         }
 
         // Передаем первый поперечный вид пилона в метод по созданию видов в (0.0.0)
-        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewFirst)) {
+        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewFirst, true)) {
             return false;
         }
 
@@ -301,7 +303,7 @@ public class PylonViewSectionPlacer {
         }
 
         // Передаем второй поперечный вид пилона в метод по созданию видов в (0.0.0)
-        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewSecond)) {
+        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewSecond, true)) {
             return false;
         }
 
@@ -363,7 +365,7 @@ public class PylonViewSectionPlacer {
         }
 
         // Передаем третий поперечный вид пилона в метод по созданию видов в (0.0.0)
-        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewThird)) {
+        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewThird, true)) {
             return false;
         }
 
@@ -430,7 +432,7 @@ public class PylonViewSectionPlacer {
         }
 
         // Передаем поперечный вид армирования пилона в метод по созданию видов в (0.0.0)
-        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewFirstRebar)) {
+        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewFirstRebar, true)) {
             return false;
         }
 
@@ -482,7 +484,7 @@ public class PylonViewSectionPlacer {
         }
 
         // Передаем поперечный вид армирования пилона в метод по созданию видов в (0.0.0)
-        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewSecondRebar)) {
+        if(!PlacePylonViewport(SheetInfo.PylonViewSheet, SheetInfo.TransverseViewSecondRebar, true)) {
             return false;
         }
 
@@ -518,7 +520,7 @@ public class PylonViewSectionPlacer {
     }
 
 
-    internal bool PlacePylonViewport(ViewSheet viewSheet, PylonView pylonView) {
+    internal bool PlacePylonViewport(ViewSheet viewSheet, PylonView pylonView, bool hideUnnecessaryCategories) {
         var doc = Repository.Document;
         // Проверяем можем ли разместить на листе видовой экран вида
         if(!Viewport.CanAddViewToSheet(doc, viewSheet.Id, pylonView.ViewElement.Id)) {
@@ -549,7 +551,7 @@ public class PylonViewSectionPlacer {
                 break;
             }
         }
-        SheetInfo.GetInfoAboutViewport(pylonView, viewPort);
+        SheetInfo.GetInfoAboutViewport(pylonView, viewPort, hideUnnecessaryCategories);
 
         // Задание правильного положения метки видового экрана
 #if REVIT_2021_OR_LESS
