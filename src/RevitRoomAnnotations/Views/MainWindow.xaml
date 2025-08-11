@@ -67,8 +67,13 @@
                 
                 <DataGrid.Columns>
                     <DataGridTemplateColumn
-                        Header="{me:LocalizationSource MainWindow.Select}"
                         Width="90">
+
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.Select}" />
+
+                        </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid
@@ -103,8 +108,13 @@
                     </DataGridTemplateColumn>
 
                     <DataGridTemplateColumn
-                        Header="{me:LocalizationSource MainWindow.Loaded}"
                         Width="90">
+                        
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.Loaded}" />
+
+                        </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox
@@ -119,8 +129,14 @@
                     <DataGridTextColumn
                         IsReadOnly="True"
                         Width="*"
-                        Header="{me:LocalizationSource MainWindow.ToolTipNoLoaded}"
-                        Binding="{Binding Name}"/>
+                        Binding="{Binding Name}">
+                        
+                        <DataGridTextColumn.Header>
+                            <TextBlock
+                                Text="{me:LocalizationSource MainWindow.LinkedFiles}" />
+
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
