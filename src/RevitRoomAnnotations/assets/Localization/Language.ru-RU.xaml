@@ -3,11 +3,25 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!-- Пример перевода на русский язык (google translate) -->
-
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
-
+    <system:String x:Key="MainWindow.Title">Помещение в ЭОМ</system:String>
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.Select">Выбрать</system:String>   
+    <system:String x:Key="MainWindow.Loaded">Загружена</system:String>   
+    <system:String x:Key="MainWindow.LinkedFiles">Связанные файлы</system:String>   
+    <system:String x:Key="MainWindow.ToolTipNoLoaded">Связь не загружена. Загрузите связь.</system:String>
+    <system:String x:Key="MainWindow.GetRooms">Получение помещений: </system:String>
+    <system:String x:Key="MainWindow.CreateRooms">Будет создано: </system:String>
+    <system:String x:Key="MainWindow.DeleteRooms">Будет удалено: </system:String>
+    <system:String x:Key="MainWindow.updateRooms">Обновить: </system:String>
+    <system:String x:Key="MainWindow.DeleteOtherViews">Будет удалено с других видов: </system:String>
+    <system:String x:Key="MainWindow.TitlePreview">Предварительный просмотр изменений</system:String>
+    <system:String x:Key="MainWindow.ProcessRooms">Обработка помещений и аннотаций </system:String>
+    <system:String x:Key="MainWindow.CreateEomView">Создать вид 'Помещения ЭОМ'</system:String>
+    <system:String x:Key="MainWindow.CreateRoomAnnotation">Создать аннотацию помещения</system:String>
+    <system:String x:Key="MainWindow.DeleteRoomAnnotations">Удалить аннотации помещений</system:String>
+
+    <system:String x:Key="GeneralSettings.ErrorAnnotationTypeNotFound">Не найден тип аннотации 'ТипАн_Помещение'. Загрузите семейство перед запуском плагина.</system:String>
+    <system:String x:Key="GeneralSettings.ErrorNoLinkedFiles">В проекте нет связанных файлов</system:String>
+    <system:String x:Key="GeneralSettings.ErrorMessage">Ошибка</system:String>
 </ResourceDictionary>

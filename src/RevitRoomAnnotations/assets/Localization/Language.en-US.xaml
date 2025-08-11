@@ -3,11 +3,22 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!-- Пример перевода на английский американский язык (google translate) -->
-
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
-
+    <system:String x:Key="placement in the EOM"></system:String>
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="MainWindow.Select">Select</system:String>  
+    <system:String x:Key="MainWindow.Loaded">Loaded</system:String>   
+    <system:String x:Key="MainWindow.LinkedFiles">Linked files</system:String>   
+    <system:String x:Key="MainWindow.ToolTipNoLoaded">The link is not loaded. Upload the link.</system:String>
+    <system:String x:Key="MainWindow.GetRooms">Getting premises:</system:String>
+    <system:String x:Key="MainWindow.CreateRooms">It will be created:</system:String>
+    <system:String x:Key="MainWindow.DeleteRooms">It will be deleted:</system:String>
+    <system:String x:Key="MainWindow.updateRooms">Update: </system:String>
+    <system:String x:Key="MainWindow.DeleteOtherViews">Will be removed from other views.:</system:String>
+    <system:String x:Key="MainWindow.TitlePreview">Preview of changes</system:String>
+    <system:String x:Key="MainWindow.ProcessRooms">Processing of premises and annotations</system:String>
+
+    <system:String x:Key="GeneralSettings.ErrorAnnotationTypeNotFound">The annotation type 'ТипАн_Помещение' was not found. Download the family before launching the plugin.</system:String>
+    <system:String x:Key="GeneralSettings.ErrorNoLinkedFiles">There are no related files in the project</system:String>
+    <system:String x:Key="GeneralSettings.ErrorMessage">Error</system:String>
 </ResourceDictionary>
