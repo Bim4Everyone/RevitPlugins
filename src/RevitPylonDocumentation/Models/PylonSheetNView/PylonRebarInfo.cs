@@ -54,9 +54,9 @@ internal class PylonRebarInfo {
         if(SkeletonParentRebar is null) { return; }
         
         // Определяем наличие в каркасе Г-образных стержней
-        FirstLRebarParamValue = ViewModel.ParamValService.GetParamValueAnywhere(SkeletonParentRebar, _hasFirstLRebarParamName) == 1;
-        SecondLRebarParamValue = ViewModel.ParamValService.GetParamValueAnywhere(SkeletonParentRebar, _hasSecondLRebarParamName) == 1;
-        DifferentRebarParamValue = ViewModel.ParamValService.GetParamValueAnywhere(SkeletonParentRebar, _hasDifferentRebarParamName) == 1;
+        FirstLRebarParamValue = ViewModel.ParamValService.GetParamValueAnywhere<int>(SkeletonParentRebar, _hasFirstLRebarParamName) == 1;
+        SecondLRebarParamValue = ViewModel.ParamValService.GetParamValueAnywhere<int>(SkeletonParentRebar, _hasSecondLRebarParamName) == 1;
+        DifferentRebarParamValue = ViewModel.ParamValService.GetParamValueAnywhere<int>(SkeletonParentRebar, _hasDifferentRebarParamName) == 1;
 
         AllRebarAreL = FirstLRebarParamValue && SecondLRebarParamValue;
         HasLRebar = FirstLRebarParamValue || SecondLRebarParamValue;

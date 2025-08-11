@@ -35,6 +35,8 @@ internal class PylonSheetInfoManager {
         // Если вдруг по какой-то причине лист не был создан, то создание видов/видовых экранов не выполняем 
         if(SheetInfo.PylonViewSheet is null) { return; }
 
+        SheetInfo.GetBoundingBox();
+
         // ОСНОВНОЙ ВИД
         if(selectionSettings.NeedWorkWithGeneralView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
@@ -231,7 +233,8 @@ internal class PylonSheetInfoManager {
         // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ВИДА
         if(selectionSettings.NeedWorkWithGeneralView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralView.ViewportElement is null) {
+            if(SheetInfo.GeneralView.ViewportElement is null 
+                    && SheetInfo.GeneralView.ViewElement != null) {
                 SheetInfo.GeneralView.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
@@ -239,7 +242,8 @@ internal class PylonSheetInfoManager {
         // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ПЕРПЕНДИКУЛЯРНОГО ВИДА
         if(selectionSettings.NeedWorkWithGeneralPerpendicularView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralViewPerpendicular.ViewportElement is null) {
+            if(SheetInfo.GeneralViewPerpendicular.ViewportElement is null 
+                    && SheetInfo.GeneralViewPerpendicular.ViewElement != null) {
                 SheetInfo.GeneralViewPerpendicular.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
@@ -247,7 +251,8 @@ internal class PylonSheetInfoManager {
         // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА
         if(selectionSettings.NeedWorkWithTransverseViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewFirst.ViewportElement is null) {
+            if(SheetInfo.TransverseViewFirst.ViewportElement is null 
+                    && SheetInfo.TransverseViewFirst.ViewElement != null) {
                 SheetInfo.TransverseViewFirst.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
@@ -255,7 +260,8 @@ internal class PylonSheetInfoManager {
         // СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИДА
         if(selectionSettings.NeedWorkWithTransverseViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewSecond.ViewportElement is null) {
+            if(SheetInfo.TransverseViewSecond.ViewportElement is null 
+                    && SheetInfo.TransverseViewSecond.ViewElement != null) {
                 SheetInfo.TransverseViewSecond.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
@@ -263,7 +269,8 @@ internal class PylonSheetInfoManager {
         // СОЗДАНИЕ АННОТАЦИЙ ТРЕТЬЕГО ПОПЕРЕЧНОГО ВИДА
         if(selectionSettings.NeedWorkWithTransverseViewThird) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewThird.ViewportElement is null) {
+            if(SheetInfo.TransverseViewThird.ViewportElement is null 
+                    && SheetInfo.TransverseViewThird.ViewElement != null) {
                 SheetInfo.TransverseViewThird.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
@@ -271,7 +278,8 @@ internal class PylonSheetInfoManager {
         // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО АРМАТУРНОГО ВИДА
         if(selectionSettings.NeedWorkWithGeneralRebarView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralViewRebar.ViewportElement is null) {
+            if(SheetInfo.GeneralViewRebar.ViewportElement is null 
+                    && SheetInfo.GeneralViewRebar.ViewElement != null) {
                 SheetInfo.GeneralViewRebar.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
@@ -279,7 +287,8 @@ internal class PylonSheetInfoManager {
         // СОЗДАНИЕ АННОТАЦИЙ ОСНОВНОГО ПЕРПЕНДИКУЛЯРНОГО АРМАТУРНОГО ВИДА
         if(selectionSettings.NeedWorkWithGeneralPerpendicularRebarView) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.GeneralViewPerpendicularRebar.ViewportElement is null) {
+            if(SheetInfo.GeneralViewPerpendicularRebar.ViewportElement is null 
+                    && SheetInfo.GeneralViewPerpendicularRebar.ViewElement != null) {
                 SheetInfo.GeneralViewPerpendicularRebar.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
@@ -287,7 +296,8 @@ internal class PylonSheetInfoManager {
         // СОЗДАНИЕ АННОТАЦИЙ ПЕРВОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
         if(selectionSettings.NeedWorkWithTransverseRebarViewFirst) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewFirstRebar.ViewportElement is null) {
+            if(SheetInfo.TransverseViewFirstRebar.ViewportElement is null 
+                    && SheetInfo.TransverseViewFirstRebar.ViewElement != null) {
                 SheetInfo.TransverseViewFirstRebar.AnnotationCreator.TryCreateViewAnnotations();
             }
         }
@@ -295,7 +305,8 @@ internal class PylonSheetInfoManager {
         // СОЗДАНИЕ АННОТАЦИЙ ВТОРОГО ПОПЕРЕЧНОГО ВИДА АРМИРОВАНИЯ
         if(selectionSettings.NeedWorkWithTransverseRebarViewSecond) {
             // Здесь может быть два варианта: 1) найден и вид, и видовой экран; 2) не найдено ничего
-            if(SheetInfo.TransverseViewSecondRebar.ViewportElement is null) {
+            if(SheetInfo.TransverseViewSecondRebar.ViewportElement is null 
+                    && SheetInfo.TransverseViewSecondRebar.ViewElement != null) {
                 SheetInfo.TransverseViewSecondRebar.AnnotationCreator.TryCreateViewAnnotations();
             }
         }

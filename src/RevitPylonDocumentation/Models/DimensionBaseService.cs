@@ -304,7 +304,7 @@ internal class DimensionBaseService {
                 if(paramPart == string.Empty) {
                     paramValue = 1;
                 } else {
-                    paramValue = _paramValueService.GetParamValueAnywhere(elem, paramPart);
+                    paramValue = _paramValueService.GetParamValueAnywhere<int>(elem, paramPart);
                 }
 
                 if(paramValue == 0) {

@@ -92,7 +92,7 @@ public class RebarFinderService {
             }
             // Фильтрация по номеру формы
             // Номер формы должен попадать в диапазон нужных форм и не попадать в диапазон форм для отсева
-            int formNumber = _paramValueService.GetParamValueAnywhere(rebar, _formNumberParamName);
+            int formNumber = _paramValueService.GetParamValueAnywhere<int>(rebar, _formNumberParamName);
             bool includeInNeededRange = formNumber >= formNumberMin && formNumber <= formNumberMax;
             bool includeInExceptionRange = formNumber >= formNumberMinException && formNumber <= formNumberMaxException;
 
@@ -102,28 +102,6 @@ public class RebarFinderService {
         }
         return simpleRebars;
     }
-
-    //public FamilyInstance GetSkeletonParentRebar(View view) {
-    //    var rebars = new FilteredElementCollector(view.Document, view.Id)
-    //        .OfCategory(BuiltInCategory.OST_Rebar)
-    //        .WhereElementIsNotElementType()
-    //        .ToElements();
-
-    //    foreach(var rebar in rebars) {
-    //        // Фильтрация по комплекту документации
-    //        if(rebar.GetParamValue<string>(ViewModel.ProjectSettings.ProjectSection) != ViewModel.SelectedProjectSection) {
-    //            continue;
-    //        }
-    //        // Фильтрация по имени семейства
-    //        if(view.Document.GetElement(rebar.GetTypeId()) is not FamilySymbol rebarType) {
-    //            continue;
-    //        }
-    //        if(rebarType.FamilyName.Equals("IFC_Пилон_Верт.Арм.") || rebarType.FamilyName.Contains("IFC_Каркас_Пилон")) {
-    //            return rebar as FamilyInstance;
-    //        }
-    //    }
-    //    return null;
-    //}
 
     public List<FamilyInstance> GetClampsParentRebars(View view, string projectSection) {
         var rebars = new FilteredElementCollector(view.Document, view.Id)
@@ -162,7 +140,7 @@ public class RebarFinderService {
                 continue;
             }
             // Фильтрация по номеру формы - отсев вертикальных стержней армирования
-            int formNumber = _paramValueService.GetParamValueAnywhere(rebar, _formNumberParamName);
+            int formNumber = _paramValueService.GetParamValueAnywhere<int>(rebar, _formNumberParamName);
             if(formNumber >= formNumberMin && formNumber <= formNumberMax) {
                 simpleRebars.Add(rebar);
             }
@@ -185,7 +163,7 @@ public class RebarFinderService {
                 continue;
             }
             // Фильтрация по номеру формы - отсев вертикальных стержней армирования
-            int formNumber = _paramValueService.GetParamValueAnywhere(rebar, _formNumberParamName);
+            int formNumber = _paramValueService.GetParamValueAnywhere<int>(rebar, _formNumberParamName);
             bool includeInNeededRange = formNumber >= formNumberMin && formNumber <= formNumberMax;
             bool includeInExceptionRange = formNumber >= formNumberMinException && formNumber <= formNumberMaxException;
 
@@ -211,7 +189,7 @@ public class RebarFinderService {
                 continue;
             }
             // Фильтрация по номеру формы - отсев вертикальных стержней армирования
-            int formNumber = _paramValueService.GetParamValueAnywhere(rebar, _formNumberParamName);
+            int formNumber = _paramValueService.GetParamValueAnywhere<int>(rebar, _formNumberParamName);
             if(formNumber == neededFormNumber) {
                 simpleRebars.Add(rebar);
             }

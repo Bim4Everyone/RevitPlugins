@@ -4,6 +4,8 @@ using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
 using dosymep.WPF.ViewModels;
 
 using RevitPylonDocumentation.Models.PylonSheetNView.ViewAnnotationCreatorFactories;
@@ -46,6 +48,73 @@ internal class PylonSheetInfo : BaseViewModel {
 
         RebarInfo = new PylonRebarInfo(mvm, Repository, this);
     }
+
+    public void GetBoundingBox() {
+        BuiltInCategory[] categories = {
+                BuiltInCategory.OST_StructuralColumns,
+                BuiltInCategory.OST_Columns,
+                BuiltInCategory.OST_Rebar,
+                BuiltInCategory.OST_GenericModel
+            };
+
+        var multiCategoryFilter = new LogicalOrFilter(
+                categories
+                    .Select<BuiltInCategory, ElementFilter>(bic => new ElementCategoryFilter(bic))
+                    .ToList()
+            );
+
+
+        var elems = new FilteredElementCollector(Repository.Document)
+            .WherePasses(multiCategoryFilter)
+            .WhereElementIsNotElementType()
+            .Where(e =>
+                ViewModel.ParamValService.GetParamValueAnywhere<string>(e, ViewModel.ProjectSettings.ProjectSection)
+                    == ProjectSection)
+            .Where(e =>
+                ViewModel.ParamValService.GetParamValueAnywhere<string>(e, ViewModel.ProjectSettings.TypicalPylonFilterParameter)
+                    == ViewModel.ProjectSettings.TypicalPylonFilterValue)
+            .Where(e => e.Category.GetBuiltInCategory().Equals(BuiltInCategory.OST_Rebar) ?
+                ViewModel.ParamValService.GetParamValueAnywhere<string>(e, "обр_ФОП_Метка основы IFC")
+                    == PylonKeyName :
+                ViewModel.ParamValService.GetParamValueAnywhere<string>(e, ViewModel.ProjectSettings.Mark)
+                    == PylonKeyName)
+            .ToList();
+
+
+
+        BoundingBoxXYZ combinedBoundingBox = null;
+        foreach(Element elem in elems) {
+            BoundingBoxXYZ elemBoundingBox = elem.get_BoundingBox(null); // Get 3D bounding box
+            if(elemBoundingBox == null)
+                continue;
+
+            // Initialize combinedBoundingBox with the first valid bounding box
+            if(combinedBoundingBox == null) {
+                combinedBoundingBox = elemBoundingBox;
+            } else {
+                // Expand the combined bounding box
+                combinedBoundingBox.Min = new XYZ(
+                    System.Math.Min(combinedBoundingBox.Min.X, elemBoundingBox.Min.X),
+                    System.Math.Min(combinedBoundingBox.Min.Y, elemBoundingBox.Min.Y),
+                    System.Math.Min(combinedBoundingBox.Min.Z, elemBoundingBox.Min.Z)
+                );
+
+                combinedBoundingBox.Max = new XYZ(
+                    System.Math.Max(combinedBoundingBox.Max.X, elemBoundingBox.Max.X),
+                    System.Math.Max(combinedBoundingBox.Max.Y, elemBoundingBox.Max.Y),
+                    System.Math.Max(combinedBoundingBox.Max.Z, elemBoundingBox.Max.Z)
+                );
+            }
+        }
+
+        //View3D v = Repository.Document.ActiveView as View3D;
+        //v.SetSectionBox(combinedBoundingBox);
+
+        ElemsBoundingBox = combinedBoundingBox;
+    }
+
+    public BoundingBoxXYZ ElemsBoundingBox { get; set; }
+
 
     internal MainViewModel ViewModel { get; set; }
     internal RevitRepository Repository { get; set; }

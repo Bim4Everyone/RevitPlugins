@@ -31,84 +31,84 @@ internal class RevitRepository {
     /// Возвращает список всех листов, имеющихся  в проекте
     /// </summary>
     public List<ViewSheet> AllSheets => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewSheet))
-            .OfType<ViewSheet>()
-            .ToList();
+        .OfClass(typeof(ViewSheet))
+        .OfType<ViewSheet>()
+        .ToList();
 
     /// <summary>
     /// Возвращает список всех сечений, имеющихся в проекте
     /// </summary>
     public List<ViewSection> AllSectionViews => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewSection))
-            .WhereElementIsNotElementType()
-            .OfType<ViewSection>()
-            .ToList();
+        .OfClass(typeof(ViewSection))
+        .WhereElementIsNotElementType()
+        .OfType<ViewSection>()
+        .ToList();
 
     /// <summary>
     /// Возвращает список всех спецификаций, имеющихся в проекте
     /// </summary>
     public List<ViewSchedule> AllScheduleViews => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewSchedule))
-            .WhereElementIsNotElementType()
-            .OfType<ViewSchedule>()
-            .Where(view => !view.IsTemplate)
-            .ToList();
+        .OfClass(typeof(ViewSchedule))
+        .WhereElementIsNotElementType()
+        .OfType<ViewSchedule>()
+        .Where(view => !view.IsTemplate)
+        .ToList();
 
     /// <summary>
     /// Возвращает список всех типоразмеров рамок листа
     /// </summary>
     public List<FamilySymbol> TitleBlocksInProject => new FilteredElementCollector(Document)
-            .OfCategory(BuiltInCategory.OST_TitleBlocks)
-            .WhereElementIsElementType()
-            .OfType<FamilySymbol>()
-            .ToList();
+        .OfCategory(BuiltInCategory.OST_TitleBlocks)
+        .WhereElementIsElementType()
+        .OfType<FamilySymbol>()
+        .ToList();
 
     /// <summary>
     /// Возвращает список типоразмеров видов в проекте
     /// </summary>
     public List<ViewFamilyType> ViewFamilyTypes => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewFamilyType))
-            .OfType<ViewFamilyType>()
-            .Where(a => ViewFamily.Section == a.ViewFamily)
-            .ToList();
+        .OfClass(typeof(ViewFamilyType))
+        .OfType<ViewFamilyType>()
+        .Where(a => ViewFamily.Section == a.ViewFamily)
+        .ToList();
     
     /// <summary>
     /// Возвращает список всех легенд, присутствующих в проекте
     /// </summary>
     public List<View> LegendsInProject => new FilteredElementCollector(Document)
-            .OfClass(typeof(View))
-            .OfType<View>()
-            .Where(view => view.ViewType == ViewType.Legend)
-            .ToList();
+        .OfClass(typeof(View))
+        .OfType<View>()
+        .Where(view => view.ViewType == ViewType.Legend)
+        .ToList();
     
     /// <summary>
     /// Возвращает список всех шаблонов сечений в проекте
     /// </summary>
     public List<ViewSection> AllViewTemplates => new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewSection))
-            .WhereElementIsNotElementType()
-            .OfType<ViewSection>()
-            .Where(v => v.IsTemplate == true)
-            .OrderBy(a => a.Name)
-            .ToList();
+        .OfClass(typeof(ViewSection))
+        .WhereElementIsNotElementType()
+        .OfType<ViewSection>()
+        .Where(v => v.IsTemplate == true)
+        .OrderBy(a => a.Name)
+        .ToList();
 
     /// <summary>
     /// Возвращает список типоразмеров высотных отметок
     /// </summary>
     public List<DimensionType> DimensionTypes => new FilteredElementCollector(Document)
-            .OfClass(typeof(DimensionType))
-            .OfType<DimensionType>()
-            .OrderBy(a => a.Name)
-            .ToList();
+        .OfClass(typeof(DimensionType))
+        .OfType<DimensionType>()
+        .OrderBy(a => a.Name)
+        .ToList();
 
     /// <summary>
     /// Возвращает список типоразмеров высотных отметок
     /// </summary>
     public List<SpotDimensionType> SpotDimensionTypes => new FilteredElementCollector(Document)
-            .OfClass(typeof(SpotDimensionType))
-            .OfType<SpotDimensionType>()
-            .OrderBy(a => a.Name)
-            .ToList();
+        .OfClass(typeof(SpotDimensionType))
+        .OfType<SpotDimensionType>()
+        .OrderBy(a => a.Name)
+        .ToList();
 
     /// <summary>
     /// Возвращает список осей, видимых на виде

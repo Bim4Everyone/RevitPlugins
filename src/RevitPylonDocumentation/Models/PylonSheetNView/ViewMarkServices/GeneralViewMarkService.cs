@@ -166,9 +166,9 @@ internal class GeneralViewMarkService {
 
             // Получаем спроецированные на плоскость вида граничные точки
             var bbMin = bottomElement.get_BoundingBox(view).Min;
-            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
+            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(bbMin);
             var bbMax = bottomElement.get_BoundingBox(view).Max;
-            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
+            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(bbMax);
             var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
 
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
@@ -195,9 +195,9 @@ internal class GeneralViewMarkService {
 
             // Получаем спроецированные на плоскость вида граничные точки
             var bbMin = bottomElement.get_BoundingBox(view).Min;
-            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
+            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(bbMin);
             var bbMax = bottomElement.get_BoundingBox(view).Max;
-            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
+            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(bbMax);
             var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
 
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
@@ -231,9 +231,9 @@ internal class GeneralViewMarkService {
 
             // Получаем спроецированные на плоскость вида граничные точки
             var bbMin = topElement.get_BoundingBox(view).Min;
-            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
+            bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(bbMin);
             var bbMax = topElement.get_BoundingBox(view).Max;
-            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
+            bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(bbMax);
             var topLeftPt = new XYZ(bbMin.X, bbMin.Y, bbMax.Z);
 
             // Получаем точки со смещением относительно граничных точек опалубки для размещения аннотаций
@@ -274,10 +274,10 @@ internal class GeneralViewMarkService {
                 var previousBbMax = previousElement.get_BoundingBox(view).Max;
                 var previousBbMin = previousElement.get_BoundingBox(view).Min;
 
-                currentBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, currentBbMax);
-                currentBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, currentBbMin);
-                previousBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, previousBbMax);
-                previousBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, previousBbMin);
+                currentBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(currentBbMax);
+                currentBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(currentBbMin);
+                previousBbMax = _viewPointsAnalyzer.ProjectPointToViewFront(previousBbMax);
+                previousBbMin = _viewPointsAnalyzer.ProjectPointToViewFront(previousBbMin);
 
                 var currentBottomRightPt = new XYZ(currentBbMax.X, currentBbMax.Y, currentBbMin.Z);
                 var previousTopLeftPt = new XYZ(previousBbMin.X, previousBbMin.Y, previousBbMax.Z);
@@ -310,9 +310,9 @@ internal class GeneralViewMarkService {
             foreach(var pylon in SheetInfo.HostElems) {
                 // Получаем спроецированные на плоскость вида граничные точки
                 var bbMax = pylon.get_BoundingBox(view).Max;
-                bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMax);
+                bbMax = _viewPointsAnalyzer.ProjectPointToViewFront(bbMax);
                 var bbMin = pylon.get_BoundingBox(view).Min;
-                bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(view, bbMin);
+                bbMin = _viewPointsAnalyzer.ProjectPointToViewFront(bbMin);
                 var topLeftPt = new XYZ(bbMin.X, bbMin.Y, bbMax.Z);
                 var bottomRightPt = new XYZ(bbMax.X, bbMax.Y, bbMin.Z);
 

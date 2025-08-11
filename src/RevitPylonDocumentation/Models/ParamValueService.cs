@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
@@ -11,10 +13,10 @@ internal class ParamValueService {
     }
 
 
-    public int GetParamValueAnywhere(Element elem, string paramName) {
-        int paramValue = elem.GetParamValueOrDefault<int>(paramName, 0);
-        return paramValue == 0
-            ? _revitRepository.Document.GetElement(elem.GetTypeId()).GetParamValueOrDefault<int>(paramName, 0)
+    public T GetParamValueAnywhere<T>(Element elem, string paramName) {
+        T paramValue = elem.GetParamValueOrDefault<T>(paramName, default);
+        return EqualityComparer<T>.Default.Equals(paramValue, default)
+            ? _revitRepository.Document.GetElement(elem.GetTypeId()).GetParamValueOrDefault<T>(paramName, default)
             : paramValue;
     }
 }
