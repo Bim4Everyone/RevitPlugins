@@ -1,23 +1,28 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Documents;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Microsoft.WindowsAPICodePack.Dialogs;
+
 using RevitExportSpecToExcel.Models;
 
 namespace RevitExportSpecToExcel.ViewModels;
 
-/// <summary>
-/// Основная ViewModel главного окна плагина.
-/// </summary>
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
+    private IList<ScheduleViewModel> _schedules;
+    private bool _saveAsOneFile;
     private string _errorText;
-    private string _saveProperty;
     
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -33,67 +38,59 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        
+        _schedules = _revitRepository.GetSchedulesVM().OrderBy(x => x.OpenStatus).ToList();
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
-        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        LoadConfig();
+        ExportSchedulesCommand = RelayCommand.Create(ExportSchedules, CanAcceptView);
     }
 
-    /// <summary>
-    /// Команда загрузки главного окна.
-    /// </summary>
-    public ICommand LoadViewCommand { get; }
-    
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
-    public ICommand AcceptViewCommand { get; }
+    public ICommand ExportSchedulesCommand { get; }
 
-    /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
-    /// </summary>
+    public IList<ScheduleViewModel> Schedules {
+        get => _schedules;
+        set => RaiseAndSetIfChanged(ref _schedules, value);
+    }
+    
+    public bool SaveAsOneFile {
+        get => _saveAsOneFile;
+        set => RaiseAndSetIfChanged(ref _saveAsOneFile, value);
+    }
+
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
+    public string SelectFolder() {
+        CommonOpenFileDialog dialog = new CommonOpenFileDialog() {
+            IsFolderPicker = true
+        };
+
+        if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+            return dialog.FileName;
+        }
+
+        return string.Empty;
     }
 
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
-    private void LoadView() {
-        LoadConfig();
-    }
+    private void ExportSchedules() {
+        string path = SelectFolder();
+        path += "//export.xlsx";
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
-    private void AcceptView() {
+        var schedulesToExport = _schedules
+            .Where(x => x.IsChecked)
+            .Select(x => x.Schedule);
+
+        ExcelExporter exporter = new ExcelExporter();
+        exporter.ExportSchedulesToExcel(path, schedulesToExport, SaveAsOneFile);
+
         SaveConfig();
     }
 
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+        if(!_schedules.Where(x => x.IsChecked).Any()) {
+            ErrorText = "Не выбраны спецификации";
             return false;
         }
 
@@ -101,23 +98,14 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
 
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
     private void SaveConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.SaveProperty = SaveProperty;
         _pluginConfig.SaveProjectConfig();
     }
 }

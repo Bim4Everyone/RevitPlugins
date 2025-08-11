@@ -1,15 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using RevitExportSpecToExcel.ViewModels;
+
 namespace RevitExportSpecToExcel.Models;
 
-/// <summary>
-/// Класс доступа к документу и приложению Revit.
-/// </summary>
-/// <remarks>
-/// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
-/// </remarks>
 internal class RevitRepository {
     /// <summary>
     /// Создает экземпляр репозитория.
@@ -19,23 +19,38 @@ internal class RevitRepository {
         UIApplication = uiApplication;
     }
 
-    /// <summary>
-    /// Класс доступа к интерфейсу Revit.
-    /// </summary>
     public UIApplication UIApplication { get; }
-    
-    /// <summary>
-    /// Класс доступа к интерфейсу документа Revit.
-    /// </summary>
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    
-    /// <summary>
-    /// Класс доступа к приложению Revit.
-    /// </summary>
     public Application Application => UIApplication.Application;
-    
-    /// <summary>
-    /// Класс доступа к документу Revit.
-    /// </summary>
     public Document Document => ActiveUIDocument.Document;
+
+    public IList<ViewSchedule> GetSchedules() {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewSchedule))
+            .OfType<ViewSchedule>()
+            .ToList();
+    }
+
+    public IList<ScheduleViewModel> GetSchedulesVM() {
+        IList<ViewSchedule> schedulesRevit = GetSchedules();
+        List<ScheduleViewModel> schedules = new List<ScheduleViewModel>();
+
+        ElementId activeViewId = Document.ActiveView.Id;
+        IList<ElementId> openedViewIds = ActiveUIDocument
+            .GetOpenUIViews()
+            .Select(x => x.ViewId)
+            .ToList();
+
+        foreach(var schedule in schedulesRevit) {
+            if(schedule.Id == activeViewId) {
+                schedules.Add(new ScheduleViewModel(schedule, OpenStatus.ActiveView));
+            } else if(openedViewIds.Contains(schedule.Id)) {
+                schedules.Add(new ScheduleViewModel(schedule, OpenStatus.OpenedView));
+            } else {
+                schedules.Add(new ScheduleViewModel(schedule, OpenStatus.OtherVIew));
+            }
+        }
+
+        return schedules;
+    }
 }

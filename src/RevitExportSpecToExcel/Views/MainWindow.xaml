@@ -29,8 +29,17 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
+    <core:WpfUIPlatformWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformWindow.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -40,15 +49,42 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <Border
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            Margin="10,5"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel
+                Orientation="Vertical">
+                <CheckBox
+                    Margin="5"
+                    Content="Create one file"/>
+                <TextBox
+                    Margin="5"/>
+            </StackPanel>
+        </Border>
+
+        <Border
+            Grid.Row="2"
+            Margin="10,5"
+            Style="{StaticResource CustomBorder}">
+            <TreeView>
+                <ui:TreeViewItem 
+                    Header="All schedules"
+                    IsExpanded="True"
+                    ItemsSource="{Binding Schedules}">
+                    <ui:TreeViewItem.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox
+                                Content="{Binding Name}"
+                                IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                        </DataTemplate>
+                    </ui:TreeViewItem.ItemTemplate>
+                </ui:TreeViewItem>
+            </TreeView>
+        </Border>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
@@ -64,7 +100,7 @@
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
-                Command="{Binding AcceptViewCommand}" />
+                Command="{Binding ExportSchedulesCommand}" />
 
             <ui:Button
                 Margin="10"
