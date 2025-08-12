@@ -76,7 +76,6 @@ internal class MainViewModel : BaseViewModel {
 
     private void ExportSchedules() {
         string path = SelectFolder();
-        path += "//export.xlsx";
 
         var schedulesToExport = _schedules
             .Where(x => x.IsChecked)
