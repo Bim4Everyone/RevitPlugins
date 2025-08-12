@@ -35,7 +35,14 @@ internal class PylonSheetInfoManager {
         // Если вдруг по какой-то причине лист не был создан, то создание видов/видовых экранов не выполняем 
         if(SheetInfo.PylonViewSheet is null) { return; }
 
-        SheetInfo.GetBoundingBox();
+        // Получаем суммарный BoundingBox по всем элементам, принадлежащим пилону
+        // (нужен для формирования рамки подрезки видов)
+        SheetInfo.ElemsInfo.FindPylonHostVector();
+        SheetInfo.ElemsInfo.FindPylonHostOrigin();
+        SheetInfo.ElemsInfo.FindElemsBoundingBox();
+        SheetInfo.ElemsInfo.FindElemsBoundingBoxProps();
+
+
 
         // ОСНОВНОЙ ВИД
         if(selectionSettings.NeedWorkWithGeneralView) {

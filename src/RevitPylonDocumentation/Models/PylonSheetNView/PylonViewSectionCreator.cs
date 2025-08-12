@@ -1,9 +1,6 @@
 using System;
-using System.Linq;
 
 using Autodesk.Revit.DB;
-
-using dosymep.Revit;
 
 using RevitPylonDocumentation.ViewModels;
 
@@ -21,22 +18,9 @@ public class PylonViewSectionCreator {
 
 
     public bool TryCreateGeneralView(ViewFamilyType selectedViewFamilyType) {
-        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems.First();
-
-        if(elemForWork is null) { return false; }
-
-        double hostLength = 0;
-        double hostWidth = 0;
-        XYZ midlePoint = null;
-        XYZ hostVector = null;
-
-        // Заполняем нужные поля для объекта Transform
-        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
-
         // Формируем данные для объекта Transform
-        var originPoint = midlePoint;
-        var hostDir = GetHostDirByProjectTransform(hostVector);
+        var originPoint = SheetInfo.ElemsInfo.HostOrigin;
+        var hostDir = SheetInfo.ElemsInfo.HostVector;
         var upDir = XYZ.BasisZ;
         var viewDir = hostDir.CrossProduct(upDir);
 
@@ -47,16 +31,21 @@ public class PylonViewSectionCreator {
         t.BasisY = upDir;
         t.BasisZ = viewDir;
 
-        var bb = elemForWork.get_BoundingBox(null);
-        double minZ = bb.Min.Z;
-        double maxZ = bb.Max.Z;
+        double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
+        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        double minZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMinZ;
+        double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
-        double coordinateX = hostLength * 0.5 
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
-        double coordinateYTop = maxZ - originPoint.Z 
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
-        double coordinateYBottom = minZ - originPoint.Z 
-            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+        double generalViewXOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                        int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+        double generalViewYTopOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                            int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+        double generalViewYBottomOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                            int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+
+        double coordinateX = hostLength * 0.5 + generalViewXOffset;
+        double coordinateYTop = maxZ - originPoint.Z + generalViewYTopOffset;
+        double coordinateYBottom = minZ - originPoint.Z - generalViewYBottomOffset;
 
         var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
         var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostWidth);
@@ -91,22 +80,9 @@ public class PylonViewSectionCreator {
 
 
     public bool TryCreateGeneralRebarView(ViewFamilyType selectedViewFamilyType) {
-        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems.First();
-
-        if(elemForWork is null) { return false; }
-
-        double hostLength = 0;
-        double hostWidth = 0;
-        XYZ midlePoint = null;
-        XYZ hostVector = null;
-
-        // Заполняем нужные поля для объекта Transform
-        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
-
         // Формируем данные для объекта Transform
-        var originPoint = midlePoint;
-        var hostDir = GetHostDirByProjectTransform(hostVector);
+        var originPoint = SheetInfo.ElemsInfo.HostOrigin;
+        var hostDir = SheetInfo.ElemsInfo.HostVector;
         var upDir = XYZ.BasisZ;
         var viewDir = hostDir.CrossProduct(upDir);
 
@@ -117,16 +93,21 @@ public class PylonViewSectionCreator {
         t.BasisY = upDir;
         t.BasisZ = viewDir;
 
-        var bb = elemForWork.get_BoundingBox(null);
-        double minZ = bb.Min.Z;
-        double maxZ = bb.Max.Z;
+        double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
+        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        double minZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMinZ;
+        double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
-        double coordinateX = hostLength * 0.5 
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
-        double coordinateYTop = maxZ - originPoint.Z 
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
-        double coordinateYBottom = minZ - originPoint.Z 
-            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+        double generalViewXOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                        int.Parse(ViewModel.ViewSectionSettings.GeneralViewXOffset));
+        double generalViewYTopOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                            int.Parse(ViewModel.ViewSectionSettings.GeneralViewYTopOffset));
+        double generalViewYBottomOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                            int.Parse(ViewModel.ViewSectionSettings.GeneralViewYBottomOffset));
+
+        double coordinateX = hostLength * 0.5 + generalViewXOffset;
+        double coordinateYTop = maxZ - originPoint.Z + generalViewYTopOffset;
+        double coordinateYBottom = minZ - originPoint.Z - generalViewYBottomOffset;
 
         var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostWidth);
         var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, -hostWidth);
@@ -163,23 +144,10 @@ public class PylonViewSectionCreator {
 
 
     public bool TryCreateGeneralPerpendicularView(ViewFamilyType selectedViewFamilyType) {
-        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems.First();
-
-        if(elemForWork is null) { return false; }
-
-        double hostLength = 0;
-        double hostWidth = 0;
-        XYZ midlePoint = null;
-        XYZ hostVector = null;
-
-        // Заполняем нужные для объекта Transform поля
-        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
-
         // Формируем данные для объекта Transform
-        var originPoint = midlePoint;
+        var originPoint = SheetInfo.ElemsInfo.HostOrigin;
         var upDir = XYZ.BasisZ;
-        var viewDir = GetHostDirByProjectTransform(hostVector).Negate();
+        var viewDir = SheetInfo.ElemsInfo.HostVector.Negate();
         var rightDir = upDir.CrossProduct(viewDir);
 
         // Передаем данные для объекта Transform
@@ -189,16 +157,21 @@ public class PylonViewSectionCreator {
         t.BasisY = upDir;
         t.BasisZ = viewDir;
 
-        var bb = elemForWork.get_BoundingBox(null);
-        double minZ = bb.Min.Z;
-        double maxZ = bb.Max.Z; 
+        double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
+        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        double minZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMinZ;
+        double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
-        double coordinateX = hostWidth * 0.5 
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpXOffset));
-        double coordinateYTop = maxZ - originPoint.Z 
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYTopOffset));
-        double coordinateYBottom = minZ - originPoint.Z 
-            - UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYBottomOffset));
+        double generalViewPerpXOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                            int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpXOffset));
+        double generalViewPerpYTopOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                                int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYTopOffset));
+        double generalViewPerpYBottomOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                                int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpYBottomOffset));
+
+        double coordinateX = hostWidth * 0.5 + generalViewPerpXOffset;
+        double coordinateYTop = maxZ - originPoint.Z + generalViewPerpYTopOffset;
+        double coordinateYBottom = minZ - originPoint.Z - generalViewPerpYBottomOffset;
 
         var sectionBoxMax = new XYZ(coordinateX, coordinateYTop, hostLength * 0.49);
         var sectionBoxMin = new XYZ(-coordinateX, coordinateYBottom, 0);
@@ -233,23 +206,10 @@ public class PylonViewSectionCreator {
 
 
     public bool TryCreateGeneralRebarPerpendicularView(ViewFamilyType selectedViewFamilyType) {
-        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems.First();
-
-        if(elemForWork is null) { return false; }
-
-        double hostLength = 0;
-        double hostWidth = 0;
-        XYZ midlePoint = null;
-        XYZ hostVector = null;
-
-        // Заполняем нужные для объекта Transform поля
-        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
-
         // Формируем данные для объекта Transform
-        var originPoint = midlePoint;
+        var originPoint = SheetInfo.ElemsInfo.HostOrigin;
         var upDir = XYZ.BasisZ;
-        var viewDir = GetHostDirByProjectTransform(hostVector).Negate();
+        var viewDir = SheetInfo.ElemsInfo.HostVector.Negate();
         var rightDir = upDir.CrossProduct(viewDir);
 
         // Передаем данные для объекта Transform
@@ -259,9 +219,10 @@ public class PylonViewSectionCreator {
         t.BasisY = upDir;
         t.BasisZ = viewDir;
 
-        var bb = elemForWork.get_BoundingBox(null);
-        double minZ = bb.Min.Z;
-        double maxZ = bb.Max.Z;
+        double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
+        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        double minZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMinZ;
+        double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
         double coordinateX = hostWidth * 0.5
             + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.GeneralViewPerpXOffset));
@@ -305,22 +266,9 @@ public class PylonViewSectionCreator {
 
 
     public bool TryCreateTransverseView(ViewFamilyType selectedViewFamilyType, int transverseViewNum) {
-        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems.First();
-
-        if(elemForWork is null) { return false; }
-
-        double hostLength = 0;
-        double hostWidth = 0;
-        XYZ midlePoint = null;
-        XYZ hostVector = null;
-
-        // Заполняем нужные для объекта Transform поля
-        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
-
         // Формируем данные для объекта Transform
-        var originPoint = midlePoint;
-        var hostDir = GetHostDirByProjectTransform(hostVector).Negate();
+        var originPoint = SheetInfo.ElemsInfo.HostOrigin;
+        var hostDir = SheetInfo.ElemsInfo.HostVector.Negate();
         var viewDir = XYZ.BasisZ.Negate();
         var upDir = viewDir.CrossProduct(hostDir);
 
@@ -331,18 +279,22 @@ public class PylonViewSectionCreator {
         t.BasisY = upDir;
         t.BasisZ = viewDir;
 
-        var bb = elemForWork.get_BoundingBox(null);
-        double minZ = bb.Min.Z;
-        double maxZ = bb.Max.Z;
+        double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
+        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        double minZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMinZ;
+        double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
+
+        double transverseViewXOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                            int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
+        double transverseViewYOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                            int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
+
+        double coordinateX = hostLength * 0.5 + transverseViewXOffset;
+        double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
 
         XYZ sectionBoxMin;
         XYZ sectionBoxMax;
         double elevation;
-        double coordinateX = hostLength * 0.5 
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
-        double coordinateY = hostWidth * 0.5 
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
-
         if(transverseViewNum == 1) {
             // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
             elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewFirstElevation);
@@ -419,22 +371,9 @@ public class PylonViewSectionCreator {
 
 
     public bool TryCreateTransverseRebarView(ViewFamilyType selectedViewFamilyType, int transverseRebarViewNum) {
-        // Потом сделать выбор через уникальный идентификатор (или сделать подбор раньше)
-        var elemForWork = SheetInfo.HostElems.First();
-
-        if(elemForWork is null) { return false; }
-
-        double hostLength = 0;
-        double hostWidth = 0;
-        XYZ midlePoint = null;
-        XYZ hostVector = null;
-
-        // Заполняем нужные для объекта Transform поля
-        if(!PrepareInfoForTransform(elemForWork, ref midlePoint, ref hostVector, ref hostLength, ref hostWidth)) { return false; }
-
         // Формируем данные для объекта Transform
-        var originPoint = midlePoint;
-        var hostDir = GetHostDirByProjectTransform(hostVector).Negate();
+        var originPoint = SheetInfo.ElemsInfo.HostOrigin;
+        var hostDir = SheetInfo.ElemsInfo.HostVector.Negate();
         var viewDir = XYZ.BasisZ.Negate();
         var upDir = viewDir.CrossProduct(hostDir);
 
@@ -445,18 +384,21 @@ public class PylonViewSectionCreator {
         t.BasisY = upDir;
         t.BasisZ = viewDir;
 
-        var bb = elemForWork.get_BoundingBox(null);
-        double minZ = bb.Min.Z;
-        double maxZ = bb.Max.Z;
+        double minZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMinZ;
+        double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
+
+        double transverseViewXOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                    int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
+        double transverseViewYOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                            int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
+
+        double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
+        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        double coordinateX = hostLength * 0.5 + transverseViewXOffset;
+        double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
 
         XYZ sectionBoxMin;
         XYZ sectionBoxMax;
-        //double elevation;
-        double coordinateX = hostLength * 0.5
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
-        double coordinateY = hostWidth * 0.5
-            + UnitUtilsHelper.ConvertToInternalValue(int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
-
         if(transverseRebarViewNum == 1) {
             // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
             double viewFirstElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
@@ -516,55 +458,5 @@ public class PylonViewSectionCreator {
 
         viewSection.CropBoxVisible = false;
         return true;
-    }
-
-
-    public bool PrepareInfoForTransform(Element elemForWork, ref XYZ middlePoint, ref XYZ hostVector, 
-                                        ref double hostLength, ref double hostWidth) {
-        if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns) {
-            var column = elemForWork as FamilyInstance;
-
-            var locationPoint = column.Location as LocationPoint;
-            middlePoint = locationPoint.Point;
-            double rotation = locationPoint.Rotation + 90 * Math.PI / 180;
-            hostVector = Transform.CreateRotation(XYZ.BasisZ, rotation).OfVector(XYZ.BasisX);
-
-            var hostSymbol = column.Symbol;
-            hostLength = hostSymbol.LookupParameter(ViewModel.ProjectSettings.PylonLengthParamName).AsDouble();
-            hostWidth = hostSymbol.LookupParameter(ViewModel.ProjectSettings.PylonWidthParamName).AsDouble();
-
-        } else if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
-            if(elemForWork is not Wall wall) { return false; }
-            var locationCurve = wall.Location as LocationCurve;
-
-            if(locationCurve.Curve is not Line line) { return false; }
-
-            var wallLineStart = line.GetEndPoint(0);
-            var wallLineEnd = line.GetEndPoint(1);
-            hostVector = wallLineEnd - wallLineStart;
-            hostLength = hostVector.GetLength();
-
-            hostWidth = wall.WallType.Width;
-            middlePoint = wallLineStart + 0.5 * hostVector;
-        } else { return false; }
-        return true;
-    }
-
-
-    /// <summary>
-    /// Метод проверяет вектор основы на направленность и редактирует при необходимости
-    /// Виды должны располагаться на плане снизу-вверх и справа-налево
-    /// Некоторые основы локально повернуты не по данным направлениям, поэтому вектор нужно исправить
-    /// </summary>
-    private XYZ GetHostDirByProjectTransform(XYZ hostVector) {
-        var hostDir = hostVector.Normalize();
-
-        // Получаем углы между вектором основы и базисами
-        var angleToX = Math.Round(hostDir.AngleTo(XYZ.BasisX) * (180.0 / Math.PI));
-        var angleToY = Math.Round(hostDir.AngleTo(XYZ.BasisY) * (180.0 / Math.PI));
-
-        // Определяем нужно ли инвертировать вектор в зависимости от его положения в системе координат проекта
-        bool shouldInvert = (angleToX <= 45 || angleToX >= 135) ? (angleToX <= 45) : (angleToY <= 45);
-        return shouldInvert ? hostDir.Negate() : hostDir;
     }
 }
