@@ -1803,7 +1803,46 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Положение первого горизонтального вида">
+                                            Text="Глубина горизонтального вида">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource TransverseViewDepthStyle}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=ViewSectionSettings.TransverseViewDepthTemp,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource TransverseViewDepthStyle}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                          RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                        
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Отступ снизу до первого горизонтального вида">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock
@@ -1842,7 +1881,7 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Положение второго горизонтального вида">
+                                            Text="Отступ снизу до второго горизонтального вида">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock
@@ -1881,7 +1920,7 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Положение третьего горизонтального вида">
+                                            Text="Отступ сверху до третьего горизонтального вида">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock
@@ -1920,7 +1959,47 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Положение первого горизонтального вида армирования">
+                                            Text="Глубина горизонтального вида армирования">
+                                            <TextBlock.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource TransverseViewDepthStyle}" />
+                                                </ToolTip>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+
+                                        <TextBox
+                                            Style="{StaticResource TextBoxWithTooltipStyle}"
+                                            HorizontalAlignment="Left"
+                                            Margin="10 0 10 10"
+                                            Text="{Binding Path=ViewSectionSettings.TransverseRebarViewDepthTemp,
+                                                           UpdateSourceTrigger=PropertyChanged}"
+                                            Width="460"
+                                            Height="25"
+                                            VerticalContentAlignment="Center">
+
+                                            <TextBox.ToolTip>
+                                                <ToolTip>
+                                                    <TextBlock
+                                                        Style="{StaticResource TransverseViewDepthStyle}" />
+                                                </ToolTip>
+                                            </TextBox.ToolTip>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="TextChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                                    RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                        
+                                        
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
+                                            Text="Отступ снизу до первого горизонтального вида армирования">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock
@@ -1959,7 +2038,7 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Положение второго горизонтального вида армирования">
+                                            Text="Отступ сверху до второго горизонтального вида армирования">
                                             <TextBlock.ToolTip>
                                                 <ToolTip>
                                                     <TextBlock

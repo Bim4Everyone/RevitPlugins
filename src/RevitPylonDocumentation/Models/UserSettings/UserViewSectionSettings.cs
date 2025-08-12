@@ -15,35 +15,37 @@ internal class UserViewSectionSettings : BaseViewModel {
 
     private string _generalViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ВЕРТ_Пилоны";
     private string _generalRebarViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ВЕРТ_Пилоны_Каркас";
-    private string _generalViewXOffsetTemp = "250";
-    private string _generalViewYTopOffsetTemp = "1300";
+    private string _generalViewXOffsetTemp = "100";
+    private string _generalViewYTopOffsetTemp = "300";
     private string _generalViewYBottomOffsetTemp = "500";
 
-    private string _generalViewPerpXOffsetTemp = "500";
-    private string _generalViewPerpYTopOffsetTemp = "1300";
+    private string _generalViewPerpXOffsetTemp = "100";
+    private string _generalViewPerpYTopOffsetTemp = "300";
     private string _generalViewPerpYBottomOffsetTemp = "500";
 
+    private string _transverseViewDepthTemp = "900";
     private string _transverseViewFirstPrefixTemp = "";
     private string _transverseViewFirstSuffixTemp = "_Сеч.1-1";
-    private string _transverseViewFirstElevationTemp = "0,25";
+    private string _transverseViewFirstElevationTemp = "1000";
     private string _transverseViewSecondPrefixTemp = "";
     private string _transverseViewSecondSuffixTemp = "_Сеч.2-2";
-    private string _transverseViewSecondElevationTemp = "0,45";
+    private string _transverseViewSecondElevationTemp = "2000";
     private string _transverseViewThirdPrefixTemp = "";
     private string _transverseViewThirdSuffixTemp = "_Сеч.3-3";
-    private string _transverseViewThirdElevationTemp = "1,1";
+    private string _transverseViewThirdElevationTemp = "400";
 
+    private string _transverseRebarViewDepthTemp = "1200";
     private string _transverseRebarViewFirstPrefixTemp = "Каркас ";
     private string _transverseRebarViewFirstSuffixTemp = "_Сеч.а-а";
-    private string _transverseRebarViewFirstElevationTemp = "0,3";
+    private string _transverseRebarViewFirstElevationTemp = "1000";
     private string _transverseRebarViewSecondPrefixTemp = "Каркас ";
     private string _transverseRebarViewSecondSuffixTemp = "_Сеч.б-б";
-    private string _transverseRebarViewSecondElevationTemp = "1,1";
+    private string _transverseRebarViewSecondElevationTemp = "600";
 
     private string _transverseViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны";
     private string _transverseRebarViewTemplateNameTemp = "я_КЖ1.1_АРМ_РЗ_ГОР_Пилоны_Каркас";
-    private string _transverseViewXOffsetTemp = "230";
-    private string _transverseViewYOffsetTemp = "600";
+    private string _transverseViewXOffsetTemp = "50";
+    private string _transverseViewYOffsetTemp = "50";
 
     private string _viewFamilyTypeNameTemp = "РАЗРЕЗ_Номер вида без номера листа";
 
@@ -150,6 +152,12 @@ internal class UserViewSectionSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _generalViewPerpYBottomOffsetTemp, value);
     }
 
+    public string TransverseViewDepth { get; set; }
+    public string TransverseViewDepthTemp {
+        get => _transverseViewDepthTemp;
+        set => RaiseAndSetIfChanged(ref _transverseViewDepthTemp, value);
+    }
+
     public string TransverseViewFirstPrefix { get; set; }
     public string TransverseViewFirstPrefixTemp {
         get => _transverseViewFirstPrefixTemp;
@@ -203,6 +211,12 @@ internal class UserViewSectionSettings : BaseViewModel {
     public string TransverseViewThirdElevationTemp {
         get => _transverseViewThirdElevationTemp;
         set => RaiseAndSetIfChanged(ref _transverseViewThirdElevationTemp, value);
+    }
+
+    public string TransverseRebarViewDepth { get; set; }
+    public string TransverseRebarViewDepthTemp {
+        get => _transverseRebarViewDepthTemp;
+        set => RaiseAndSetIfChanged(ref _transverseRebarViewDepthTemp, value);
     }
 
     public string TransverseRebarViewFirstPrefix { get; set; }
@@ -292,6 +306,7 @@ internal class UserViewSectionSettings : BaseViewModel {
         GeneralViewPerpYTopOffset = GeneralViewPerpYTopOffsetTemp;
         GeneralViewPerpYBottomOffset = GeneralViewPerpYBottomOffsetTemp;
 
+        TransverseViewDepth = TransverseViewDepthTemp;
         TransverseViewFirstPrefix = TransverseViewFirstPrefixTemp;
         TransverseViewFirstSuffix = TransverseViewFirstSuffixTemp;
         TransverseViewFirstElevation = TransverseViewFirstElevationTemp;
@@ -302,6 +317,7 @@ internal class UserViewSectionSettings : BaseViewModel {
         TransverseViewThirdSuffix = TransverseViewThirdSuffixTemp;
         TransverseViewThirdElevation = TransverseViewThirdElevationTemp;
 
+        TransverseRebarViewDepth = TransverseRebarViewDepthTemp;
         TransverseRebarViewFirstPrefix = TransverseRebarViewFirstPrefixTemp;
         TransverseRebarViewFirstSuffix = TransverseRebarViewFirstSuffixTemp;
         TransverseRebarViewFirstElevation = TransverseRebarViewFirstElevationTemp;

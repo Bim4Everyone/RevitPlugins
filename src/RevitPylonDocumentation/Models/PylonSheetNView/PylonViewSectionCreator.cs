@@ -292,33 +292,32 @@ public class PylonViewSectionCreator {
         double coordinateX = hostLength * 0.5 + transverseViewXOffset;
         double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
 
+        // Определяем глубину дальней плоскости горизонтального вида
+        double viewDepth = UnitUtilsHelper.ConvertToInternalValue(
+                                    double.Parse(ViewModel.ViewSectionSettings.TransverseViewDepth));
         XYZ sectionBoxMin;
         XYZ sectionBoxMax;
-        double elevation;
         if(transverseViewNum == 1) {
-            // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
-            elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewFirstElevation);
+            // Располагаем сечение на высоте 1000 мм от низа BoundingBox (или по значению указанному пользователем)
+            double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                    double.Parse(ViewModel.ViewSectionSettings.TransverseViewFirstElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseViewNum == 2) {
-            // Располагаем сечение на высоте 1/2 высоты пилона (или по пропорции, указанной пользователем)
-            elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewSecondElevation);
+            // Располагаем сечение на высоте 2000 мм от низа BoundingBox (или по значению указанному пользователем)
+            double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
+            double.Parse(ViewModel.ViewSectionSettings.TransverseViewSecondElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * elevation - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + (maxZ - minZ) * (elevation - 0.125) - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseViewNum == 3) {
-            // Располагаем сечение на высоте 5/4 высоты пилона (или по пропорции, указанной пользователем)
-            elevation = double.Parse(ViewModel.ViewSectionSettings.TransverseViewThirdElevation);
+            // Располагаем сечение на высоте -300 мм от верха BoundingBox (или по значению указанному пользователем)
+            double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                    double.Parse(ViewModel.ViewSectionSettings.TransverseViewThirdElevation));
 
-            double coordinateZBottom;
-            if(elevation >= 1) {
-                coordinateZBottom = -(minZ + ((maxZ - minZ) * 0.999) - originPoint.Z);
-            } else {
-                coordinateZBottom = -(minZ + ((maxZ - minZ) * (elevation - 0.125)) - originPoint.Z);
-            }
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + ((maxZ - minZ) * elevation) - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, coordinateZBottom);
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(maxZ - elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
         } else {
             return false;
         }
@@ -388,7 +387,7 @@ public class PylonViewSectionCreator {
         double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
         double transverseViewXOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                    int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
+                                            int.Parse(ViewModel.ViewSectionSettings.TransverseViewXOffset));
         double transverseViewYOffset = UnitUtilsHelper.ConvertToInternalValue(
                                             int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
@@ -397,22 +396,25 @@ public class PylonViewSectionCreator {
         double coordinateX = hostLength * 0.5 + transverseViewXOffset;
         double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
 
+        // Определяем глубину дальней плоскости горизонтального вида
+        double viewDepth = UnitUtilsHelper.ConvertToInternalValue(
+                                    double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewDepth));
         XYZ sectionBoxMin;
         XYZ sectionBoxMax;
         if(transverseRebarViewNum == 1) {
-            // Располагаем сечение на высоте 1/4 высоты пилона (или по пропорции, указанной пользователем)
-            double viewFirstElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
+            // Располагаем сечение на высоте 1000 мм от низа BoundingBox (или по значению указанному пользователем)
+            double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                        double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * viewFirstElevation - originPoint.Z));
-            // Дальняя секущая плоскость разреза будет немного выше низа опалубки пилона
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + 0.1 - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseRebarViewNum == 2) {
-            // Располагаем сечение на высоте 1/2 высоты пилона (или по пропорции, указанной пользователем)
-            double viewFirstElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation);
-            double viewSecondElevation = double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevation);
+            // Располагаем сечение на высоте -300 мм от верха BoundingBox (или по значению указанному пользователем)
+            double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
+                                    double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + (maxZ - minZ) * viewSecondElevation - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + ((maxZ - minZ) * viewFirstElevation + 0.1) - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(maxZ - elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
         } else {
             return false;
         }
