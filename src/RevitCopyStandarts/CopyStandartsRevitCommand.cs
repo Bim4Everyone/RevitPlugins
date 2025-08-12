@@ -1,52 +1,70 @@
 #region Namespaces
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using System.Windows.Interop;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 
-using dosymep;
 using dosymep.Bim4Everyone;
-using dosymep.SimpleServices;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
+using Ninject;
+
+using RevitCopyStandarts.Models;
+using RevitCopyStandarts.Services;
 using RevitCopyStandarts.ViewModels;
+using RevitCopyStandarts.Views;
 
 #endregion
 
-namespace RevitCopyStandarts {
-    [Transaction(TransactionMode.Manual)]
-    public class CopyStandartsRevitCommand : BasePluginCommand {
-        public CopyStandartsRevitCommand() {
-            PluginName = "Копирование стандартов";
-        }
+namespace RevitCopyStandarts;
 
-        protected override void Execute(UIApplication uiApplication) {
-            UIDocument uiDocument = uiApplication.ActiveUIDocument;
-            Application application = uiApplication.Application;
-            Document document = uiDocument.Document;
+[Transaction(TransactionMode.Manual)]
+public class CopyStandartsRevitCommand : BasePluginCommand {
+    public CopyStandartsRevitCommand() {
+        PluginName = "Копирование стандартов";
+    }
 
-            var mainFolder =
-                @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
+    protected override void Execute(UIApplication uiApplication) {
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
+        
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
 
-            mainFolder =
-                Path.Combine(mainFolder, ModuleEnvironment.RevitVersion, "RevitCopyStandarts");
-            
-            var mainWindow = new MainWindow() {
-                DataContext = new BimCategoriesViewModel(mainFolder, document, application)
-            };
+        // Настройка конфигурации плагина
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-            mainWindow.ShowDialog();
-        }
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
+
+        // Настройка запуска окна
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localizations/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        kernel.UseWpfUIProgressDialog<MainViewModel>(stepValue: 1);
+
+
+        kernel.Bind<IStandartsService>().To<StandartsService>();
+
+        // Вызывает стандартное уведомление
+        kernel.Get<MainWindow>().ShowDialog();
     }
 }

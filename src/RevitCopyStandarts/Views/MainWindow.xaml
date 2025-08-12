@@ -1,0 +1,72 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitCopyStandarts.Views.MainWindow"
+
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:vms="clr-namespace:RevitCopyStandarts.ViewModels"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:behaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+
+    x:Name="_this"
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+
+    Title="{me:LocalizationSource MainWindow.Title}"
+
+    Width="800"
+    Height="450"
+
+    MinWidth="800"
+    MinHeight="450"
+    
+    KeyUp="MainWindow_OnKeyUp"
+
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ViewsTemplates/TabControlItemTemplate.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger
+            EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+    
+    <b:Interaction.Behaviors>
+        <behaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}"/>
+    </b:Interaction.Behaviors>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource MainWindow.Title}" />
+
+        <TabControl
+            Grid.Row="1"
+            SelectedIndex="0"
+            ItemsSource="{Binding BimParts}"
+            ContentTemplate="{StaticResource TabControlItemTemplate}"
+            ItemContainerStyle="{StaticResource TabControlHeaderStyle}" />
+
+    </Grid>
+</core:WpfUIPlatformWindow>
