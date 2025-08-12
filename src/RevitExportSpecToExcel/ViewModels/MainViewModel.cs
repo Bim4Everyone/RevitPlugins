@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -21,7 +23,9 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
     private IList<ScheduleViewModel> _schedules;
+    private IList<ScheduleViewModel> _filteredSchedules;
     private bool _saveAsOneFile;
+    private string _searchText;
     private string _errorText;
     
     /// <summary>
@@ -40,21 +44,35 @@ internal class MainViewModel : BaseViewModel {
         _localizationService = localizationService;
         
         _schedules = _revitRepository.GetSchedulesVM().OrderBy(x => x.OpenStatus).ToList();
+        FilteredSchedules = new ObservableCollection<ScheduleViewModel>(_schedules);
 
         LoadConfig();
         ExportSchedulesCommand = RelayCommand.Create(ExportSchedules, CanAcceptView);
+        SearchCommand = RelayCommand.Create(ApplySearch);
     }
 
     public ICommand ExportSchedulesCommand { get; }
+    public ICommand SearchCommand { get; }
+
 
     public IList<ScheduleViewModel> Schedules {
         get => _schedules;
         set => RaiseAndSetIfChanged(ref _schedules, value);
     }
+
+    public IList<ScheduleViewModel> FilteredSchedules {
+        get => _filteredSchedules;
+        set => RaiseAndSetIfChanged(ref _filteredSchedules, value);
+    }
     
     public bool SaveAsOneFile {
         get => _saveAsOneFile;
         set => RaiseAndSetIfChanged(ref _saveAsOneFile, value);
+    }
+
+    public string SearchText {
+        get => _searchText;
+        set => RaiseAndSetIfChanged(ref _searchText, value);
     }
 
     public string ErrorText {
@@ -95,6 +113,16 @@ internal class MainViewModel : BaseViewModel {
 
         ErrorText = null;
         return true;
+    }
+
+    private void ApplySearch() {
+        if(string.IsNullOrEmpty(SearchText)) {
+            FilteredSchedules = new ObservableCollection<ScheduleViewModel>(Schedules);
+        } else {
+            FilteredSchedules = new ObservableCollection<ScheduleViewModel>(
+                Schedules
+                    .Where(item => item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0));
+        }
     }
 
     private void LoadConfig() {
