@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitCreatingFiltersByValues.Views"
     xmlns:vms="clr-namespace:RevitCreatingFiltersByValues.ViewModels"
@@ -13,15 +12,12 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
-    
-    MinHeight="600" 
+    MinHeight="600"
     MinWidth="1000"
     Height="600"
     Width="1000"
-
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     x:Name="window"
     Loaded="window_Loaded">
@@ -37,17 +33,25 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition
+                Width="*" />
+            <ColumnDefinition
+                Width="*" />
+            <ColumnDefinition
+                Width="*" />
+            <ColumnDefinition
+                Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <ui:TitleBar
@@ -257,7 +261,6 @@
             </Expander>
         </Canvas>-->
 
-
         <!--<ui:TextBlock
             Grid.Row="1"
             Grid.Column="0"
@@ -271,17 +274,20 @@
         <Border x:Name="QuickSettings"
             Grid.Row="1"
             Grid.ColumnSpan="3"
-            Margin="5"
+            Margin="10 5 5 5"
             Style="{StaticResource CustomBorder}">
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
+                    <RowDefinition
+                        Height="*" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <!--<ui:TextBlock
@@ -343,7 +349,7 @@
 
         <Border x:Name="Categories"
             Grid.Row="2"
-            Margin="5"
+            Margin="10 5 5 5"
             Style="{StaticResource CustomBorder}">
 
             <Grid>
@@ -379,17 +385,19 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    
+
                     <ui:TextBox
                         Grid.Column="0"
                         Margin="5"
                         Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
                         VerticalContentAlignment="Center"
-                        ToolTip="Напишите, чтобы произвести фильтрацию списка категорий" />
+                        ToolTip="Напишите, чтобы произвести фильтрацию списка категорий"
+                        VerticalAlignment="Top" />
 
                     <ui:Button
                         Grid.Column="1"
                         Margin="5"
+                        Padding="10"
                         Icon="{ui:SymbolIcon CheckboxChecked24}"
                         Command="{Binding SelectAllCategoriesInGUICommand}"
                         Style="{StaticResource CustomButtonWithToolTip}"
@@ -398,45 +406,49 @@
                     <ui:Button
                         Grid.Column="2"
                         Margin="5"
+                        Padding="10"
                         Icon="{ui:SymbolIcon CheckboxUnchecked24}"
                         Command="{Binding UnselectAllCategoriesInGUICommand}"
                         Style="{StaticResource CustomButtonWithToolTip}"
                         ToolTip="Нажмите, чтобы отменить выбор всех категорий отображенных в списке ниже" />
                 </Grid>
 
-                <ui:ListView
+                <Border
                     Grid.Row="2"
-                    x:Name="categories"
                     Margin="5"
-                    ItemsSource="{Binding Path=CategoryElements, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SelectionMode="Multiple"
-                    ItemContainerStyle="{StaticResource CustomListViewItem}">
+                    Style="{StaticResource CustomBorder}">
+                    <ui:ListView
+                        x:Name="categories"
+                        ItemsSource="{Binding Path=CategoryElements, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        SelectionMode="Multiple"
+                        ItemContainerStyle="{StaticResource CustomListViewItem}">
+                        <ui:ListView.ItemTemplate>
+                            <DataTemplate
+                                DataType="{x:Type models:CategoryElements}">
+                                <CheckBox
+                                    Content="{Binding Path=CategoryName}"
+                                    IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
 
-                    <ui:ListView.ItemTemplate>
-                        <DataTemplate
-                            DataType="{x:Type models:CategoryElements}">
-                            <CheckBox
-                                Content="{Binding Path=CategoryName}"
-                                IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger
+                                            EventName="Checked">
+                                            <i:InvokeCommandAction
+                                                Command="{Binding DataContext.GetFilterableParametersCommand, 
+                                RelativeSource={RelativeSource AncestorType=ListView}}" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger
+                                            EventName="Unchecked">
+                                            <i:InvokeCommandAction
+                                                Command="{Binding DataContext.GetFilterableParametersCommand, 
+                                RelativeSource={RelativeSource AncestorType=ListView}}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </CheckBox>
+                            </DataTemplate>
+                        </ui:ListView.ItemTemplate>
+                    </ui:ListView>
+                </Border>
 
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger
-                                        EventName="Checked">
-                                        <i:InvokeCommandAction
-                                            Command="{Binding DataContext.GetFilterableParametersCommand, 
-                                                RelativeSource={RelativeSource AncestorType=ListView}}" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger
-                                        EventName="Unchecked">
-                                        <i:InvokeCommandAction
-                                            Command="{Binding DataContext.GetFilterableParametersCommand, 
-                                                RelativeSource={RelativeSource AncestorType=ListView}}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </CheckBox>
-                        </DataTemplate>
-                    </ui:ListView.ItemTemplate>
-                </ui:ListView>
             </Grid>
         </Border>
 
@@ -448,12 +460,15 @@
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="Auto" />
+                    <RowDefinition
+                        Height="*" />
                 </Grid.RowDefinitions>
 
-                <ui:TextBlock 
+                <ui:TextBlock
                     Margin="5"
                     Text="Выберите параметр для фильтрации:"
                     VerticalAlignment="Center">
@@ -482,32 +497,35 @@
                     ToolTipService.ShowDuration="20000"
                     ToolTipService.BetweenShowDelay="1" />
 
-                <ListBox
+                <Border
                     Grid.Row="2"
                     Margin="5"
-                    Name="parameters"
-                    ItemsSource="{Binding Path=FilterableParameters, UpdateSourceTrigger=PropertyChanged}"
-                    DisplayMemberPath="ParamName"
-                    SelectedItem="{Binding SelectedFilterableParameter}"
-                    SelectionMode="Single"
-                    ToolTipService.InitialShowDelay="1000"
-                    ToolTipService.ShowDuration="20000"
-                    ToolTipService.BetweenShowDelay="1">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger
-                            EventName="SelectionChanged">
-                            <i:InvokeCommandAction
-                                Command="{Binding GetPossibleValuesCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ListBox>
+                    Style="{StaticResource CustomBorder}">
+                    <ListBox
+                        Name="parameters"
+                        ItemsSource="{Binding Path=FilterableParameters, UpdateSourceTrigger=PropertyChanged}"
+                        DisplayMemberPath="ParamName"
+                        SelectedItem="{Binding SelectedFilterableParameter}"
+                        SelectionMode="Single"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="SelectionChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding GetPossibleValuesCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListBox>
+                </Border>
             </Grid>
         </Border>
 
         <Border x:Name="Values"
             Grid.Row="2"
             Grid.Column="2"
-            Margin="5"
+            Margin="5 5 10 5"
             Style="{StaticResource CustomBorder}">
 
             <Grid>
@@ -544,9 +562,9 @@
 
                     <TextBox
                         Grid.Column="0"
-                        Text="{Binding Path=PossibleValuesFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         Margin="5"
                         VerticalContentAlignment="Center"
+                        Text="{Binding Path=PossibleValuesFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ToolTip="Напишите, чтобы произвести фильтрацию списка возможных значений"
                         ToolTipService.InitialShowDelay="1000"
                         ToolTipService.ShowDuration="20000"
@@ -555,40 +573,47 @@
                     <ui:Button
                         Grid.Column="1"
                         Margin="5"
+                        Padding="10"
                         Icon="{ui:SymbolIcon CheckboxChecked24}"
                         Command="{Binding SelectAllValuesInGUICommand}"
-                        ToolTip="Нажмите, чтобы выбрать все значения отображенные в списке ниже" />
-                    
+                        ToolTip="Нажмите, чтобы выбрать все значения отображенные в списке ниже"
+                        HorizontalAlignment="Center" />
+
                     <ui:Button
                         Grid.Column="2"
                         Margin="5"
+                        Padding="10"
                         Icon="{ui:SymbolIcon CheckboxUnchecked24}"
                         Command="{Binding UnselectAllValuesInGUICommand}"
-                        ToolTip="Нажмите, чтобы отменить выбор всех значений отображенных в списке ниже" />
+                        ToolTip="Нажмите, чтобы отменить выбор всех значений отображенных в списке ниже"
+                        HorizontalAlignment="Center" />
                 </Grid>
 
-                <ui:ListView
+                <Border
                     Grid.Row="2"
-                    x:Name="values"
                     Margin="5"
-                    ItemsSource="{Binding Path=PossibleValues, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SelectionMode="Multiple"
-                    ItemContainerStyle="{StaticResource CustomListViewItem}">
+                    Style="{StaticResource CustomBorder}">
+                    <ui:ListView
+                        x:Name="values"
+                        ItemsSource="{Binding Path=PossibleValues, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        SelectionMode="Multiple"
+                        ItemContainerStyle="{StaticResource CustomListViewItem}">
 
-                    <ui:ListView.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox
-                                Content="{Binding Path=ValueAsString}"
-                                IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                            </CheckBox>
-                        </DataTemplate>
-                    </ui:ListView.ItemTemplate>
-                </ui:ListView>
+                        <ui:ListView.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Content="{Binding Path=ValueAsString}"
+                                    IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                </CheckBox>
+                            </DataTemplate>
+                        </ui:ListView.ItemTemplate>
+                    </ui:ListView>
+                </Border>
             </Grid>
         </Border>
 
-
-        <StackPanel x:Name="OkCancel"
+        <StackPanel
+            x:Name="OkCancel"
             Grid.Row="3"
             Grid.ColumnSpan="4"
             Orientation="Horizontal"
@@ -611,7 +636,7 @@
                 Margin="10"
                 MinWidth="150"
                 Content="Отмена"
-                Click="ButtonCancel_Click"/>
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>
