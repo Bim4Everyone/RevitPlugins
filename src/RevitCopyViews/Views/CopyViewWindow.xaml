@@ -65,14 +65,14 @@
             <StackPanel>
                 <ui:TextBlock
                     Style="{StaticResource LabelStyle}"
-                    Text="{me:LocalizationSource CopyView.Options}" />
+                    Text="{me:LocalizationSource CopyViewWindow.Options}" />
                 
                 <CheckBox
-                    Content="{me:LocalizationSource CopyView.AddElevationMark}"
+                    Content="{me:LocalizationSource CopyViewWindow.AddElevationMark}"
                     IsChecked="{Binding WithElevation, UpdateSourceTrigger=PropertyChanged}" />
                 
                 <CheckBox
-                    Content="{me:LocalizationSource CopyView.CopyViewWithDetails}"
+                    Content="{me:LocalizationSource CopyViewWindow.CopyViewWithDetails}"
                     IsChecked="{Binding CopyWithDetail, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
         </Border>
@@ -83,7 +83,7 @@
             <StackPanel>
                 <ui:TextBlock
                     Style="{StaticResource LabelStyle}"
-                    Text="{me:LocalizationSource CopyView.GroupView}" />
+                    Text="{me:LocalizationSource CopyViewWindow.GroupView}" />
 
                 <ComboBox
                     IsEditable="True"
@@ -99,10 +99,10 @@
             <StackPanel>
                 <ui:TextBlock
                     Style="{StaticResource LabelStyle}"
-                    Text="{me:LocalizationSource CopyView.Prefix}" />
+                    Text="{me:LocalizationSource CopyViewWindow.Prefix}" />
 
                 <CheckBox
-                    Content="{me:LocalizationSource CopyView.Replace}"
+                    Content="{me:LocalizationSource CopyViewWindow.Replace}"
                     IsChecked="{Binding ReplacePrefix, UpdateSourceTrigger=PropertyChanged}"
                     IsEnabled="{Binding IsAllowReplacePrefix, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -121,10 +121,10 @@
             <StackPanel>
                 <ui:TextBlock
                     Style="{StaticResource LabelStyle}"
-                    Text="{me:LocalizationSource CopyView.Suffix}" />
+                    Text="{me:LocalizationSource CopyViewWindow.Suffix}" />
 
                 <CheckBox
-                    Content="{me:LocalizationSource CopyView.Replace}"
+                    Content="{me:LocalizationSource CopyViewWindow.Replace}"
                     IsChecked="{Binding ReplaceSuffix, UpdateSourceTrigger=PropertyChanged}"
                     IsEnabled="{Binding IsAllowReplaceSuffix, UpdateSourceTrigger=PropertyChanged}" />
 

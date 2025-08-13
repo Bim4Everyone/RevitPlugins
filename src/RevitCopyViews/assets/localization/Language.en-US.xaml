@@ -15,13 +15,14 @@
     <system:String x:Key="CopyUser.NotFoundUserViewsTitle">Warning!</system:String>
     <system:String x:Key="CopyUser.NotFoundUserViewsMessage">Template views "{0}" were not found.</system:String>
         
-    <system:String x:Key="CopyView.CopyViewWithDetails">Copy with details</system:String>
-    <system:String x:Key="CopyView.AddElevationMark">Add elevation mark</system:String>
-    <system:String x:Key="CopyView.Options">Copy options</system:String>
-    <system:String x:Key="CopyView.GroupView">View group</system:String>
-    <system:String x:Key="CopyView.Prefix">Prefix</system:String>
-    <system:String x:Key="CopyView.Suffix">Suffix</system:String>
-    <system:String x:Key="CopyView.Replace">Replace</system:String>
+    <system:String x:Key="CopyViewWindow.Title">Copy views</system:String>
+    <system:String x:Key="CopyViewWindow.CopyViewWithDetails">Copy with details</system:String>
+    <system:String x:Key="CopyViewWindow.AddElevationMark">Add elevation mark</system:String>
+    <system:String x:Key="CopyViewWindow.Options">Copy options</system:String>
+    <system:String x:Key="CopyViewWindow.GroupView">View group</system:String>
+    <system:String x:Key="CopyViewWindow.Prefix">Prefix</system:String>
+    <system:String x:Key="CopyViewWindow.Suffix">Suffix</system:String>
+    <system:String x:Key="CopyViewWindow.Replace">Replace</system:String>
     
     <system:String x:Key="CopyView.NotSelectedCopyViewTitle">Warning!</system:String>
     <system:String x:Key="CopyView.NotSelectedCopyViewMessage">Select views that need to be copied.</system:String>
@@ -31,13 +32,13 @@
     <system:String x:Key="CopyView.FoundExistsViewName">Existing view name found "{0}".</system:String>
     
     <system:String x:Key="RenameViewWindow.Title">Rename Views</system:String>
-    <system:String x:Key="RenameView.Find">Find</system:String>
-    <system:String x:Key="RenameView.Replace">Replace</system:String>
-    <system:String x:Key="RenameView.Prefix">Prefix</system:String>
-    <system:String x:Key="RenameView.Suffix">Suffix</system:String>
-    <system:String x:Key="RenameView.TransactionName">Rename Views</system:String>
-    <system:String x:Key="RenameView.FoundRepeatViewName">Found duplicate view name "{0}".</system:String>
-    <system:String x:Key="RenameView.FoundExistsViewName">Found existing view name "{0}".</system:String>
+    <system:String x:Key="RenameViewWindow.Find">Find</system:String>
+    <system:String x:Key="RenameViewWindow.Replace">Replace</system:String>
+    <system:String x:Key="RenameViewWindow.Prefix">Prefix</system:String>
+    <system:String x:Key="RenameViewWindow.Suffix">Suffix</system:String>
+    <system:String x:Key="RenameViewWindow.TransactionName">Rename Views</system:String>
+    <system:String x:Key="RenameViewWindow.FoundRepeatViewName">Found duplicate view name "{0}".</system:String>
+    <system:String x:Key="RenameViewWindow.FoundExistsViewName">Found existing view name "{0}".</system:String>
     
     <system:String x:Key="RenameView.NotSelectedViewsTitle">Warning!</system:String>
     <system:String x:Key="RenameView.NotSelectedViewsMessage">Select views that need to be renamed.</system:String>

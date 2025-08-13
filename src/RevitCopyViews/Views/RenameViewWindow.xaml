@@ -65,7 +65,7 @@
             <StackPanel>
                 <ui:TextBlock
                     Style="{StaticResource LabelStyle}"
-                    Text="{me:LocalizationSource RenameView.Find}" />
+                    Text="{me:LocalizationSource RenameViewWindow.Find}" />
 
                 <TextBox
                     Text="{Binding ReplaceOldText, UpdateSourceTrigger=PropertyChanged}" />
@@ -78,7 +78,7 @@
             <StackPanel>
                 <ui:TextBlock
                     Style="{StaticResource LabelStyle}"
-                    Text="{me:LocalizationSource RenameView.Replace}" />
+                    Text="{me:LocalizationSource RenameViewWindow.Replace}" />
 
                 <ui:TextBox
                     Text="{Binding ReplaceNewText, UpdateSourceTrigger=PropertyChanged}" />
@@ -101,10 +101,10 @@
             <StackPanel>
                 <ui:TextBlock
                     Style="{StaticResource LabelStyle}"
-                    Text="{me:LocalizationSource RenameView.Prefix}" />
+                    Text="{me:LocalizationSource RenameViewWindow.Prefix}" />
 
                 <CheckBox
-                    Content="{me:LocalizationSource RenameView.Replace}"
+                    Content="{me:LocalizationSource RenameViewWindow.Replace}"
                     IsChecked="{Binding ReplacePrefix, UpdateSourceTrigger=PropertyChanged}"
                     IsEnabled="{Binding IsAllowReplacePrefix, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -123,10 +123,10 @@
             <StackPanel>
                 <ui:TextBlock
                     Style="{StaticResource LabelStyle}"
-                    Text="{me:LocalizationSource RenameView.Suffix}" />
+                    Text="{me:LocalizationSource RenameViewWindow.Suffix}" />
 
                 <CheckBox
-                    Content="{me:LocalizationSource RenameView.Replace}"
+                    Content="{me:LocalizationSource RenameViewWindow.Replace}"
                     IsChecked="{Binding ReplaceSuffix, UpdateSourceTrigger=PropertyChanged}"
                     IsEnabled="{Binding IsAllowReplaceSuffix, UpdateSourceTrigger=PropertyChanged}" />
 

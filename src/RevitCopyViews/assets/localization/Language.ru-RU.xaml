@@ -15,13 +15,15 @@
     <system:String x:Key="CopyUser.NotFoundUserViewsTitle">Предупреждение!</system:String>
     <system:String x:Key="CopyUser.NotFoundUserViewsMessage">Не были найдены шаблонные виды "{0}".</system:String>
         
-    <system:String x:Key="CopyView.CopyViewWithDetails">Копирование с детализацией</system:String>
-    <system:String x:Key="CopyView.AddElevationMark">Добавить отметку уровня</system:String>
-    <system:String x:Key="CopyView.Options">Опции копирования</system:String>
-    <system:String x:Key="CopyView.GroupView">Группа видов</system:String>
-    <system:String x:Key="CopyView.Prefix">Префикс</system:String>
-    <system:String x:Key="CopyView.Suffix">Суффикс</system:String>
-    <system:String x:Key="CopyView.Replace">Заменить</system:String>
+    
+    <system:String x:Key="CopyViewWindow.Title">Копирование видов</system:String>
+    <system:String x:Key="CopyViewWindow.CopyViewWithDetails">Копирование с детализацией</system:String>
+    <system:String x:Key="CopyViewWindow.AddElevationMark">Добавить отметку уровня</system:String>
+    <system:String x:Key="CopyViewWindow.Options">Опции копирования</system:String>
+    <system:String x:Key="CopyViewWindow.GroupView">Группа видов</system:String>
+    <system:String x:Key="CopyViewWindow.Prefix">Префикс</system:String>
+    <system:String x:Key="CopyViewWindow.Suffix">Суффикс</system:String>
+    <system:String x:Key="CopyViewWindow.Replace">Заменить</system:String>
     
     <system:String x:Key="CopyView.NotSelectedCopyViewTitle">Предупреждение!</system:String>
     <system:String x:Key="CopyView.NotSelectedCopyViewMessage">Выберите виды, которые требуется скопировать.</system:String>
@@ -31,13 +33,13 @@
     <system:String x:Key="CopyView.FoundExistsViewName">Найдено существующее имя вида "{0}".</system:String>
     
     <system:String x:Key="RenameViewWindow.Title">Переименование видов</system:String>
-    <system:String x:Key="RenameView.Find">Найти</system:String>
-    <system:String x:Key="RenameView.Replace">Заменить</system:String>
-    <system:String x:Key="RenameView.Prefix">Префикс</system:String>
-    <system:String x:Key="RenameView.Suffix">Суффикс</system:String>
-    <system:String x:Key="RenameView.TransactionName">Переименование видов</system:String>
-    <system:String x:Key="RenameView.FoundRepeatViewName">Найдено повторяющееся имя вида "{0}".</system:String>
-    <system:String x:Key="RenameView.FoundExistsViewName">Найдено существующее имя вида "{0}".</system:String>
+    <system:String x:Key="RenameViewWindow.Find">Найти</system:String>
+    <system:String x:Key="RenameViewWindow.Replace">Заменить</system:String>
+    <system:String x:Key="RenameViewWindow.Prefix">Префикс</system:String>
+    <system:String x:Key="RenameViewWindow.Suffix">Суффикс</system:String>
+    <system:String x:Key="RenameViewWindow.TransactionName">Переименование видов</system:String>
+    <system:String x:Key="RenameViewWindow.FoundRepeatViewName">Найдено повторяющееся имя вида "{0}".</system:String>
+    <system:String x:Key="RenameViewWindow.FoundExistsViewName">Найдено существующее имя вида "{0}".</system:String>
     
     <system:String x:Key="RenameView.NotSelectedViewsTitle">Предупреждение!</system:String>
     <system:String x:Key="RenameView.NotSelectedViewsMessage">Выберите виды, которые требуется переименовать.</system:String>
