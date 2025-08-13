@@ -27,6 +27,8 @@ internal class PylonElemsInfo {
     public BoundingBoxXYZ ElemsBoundingBox { get; set; }
     public double ElemsBoundingBoxLength { get; set; }
     public double ElemsBoundingBoxWidth { get; set; }
+    public double ElemsBoundingBoxWidthToMax { get; set; }
+    public double ElemsBoundingBoxWidthToMin { get; set; }
     public double ElemsBoundingBoxMinZ { get; set; }
     public double ElemsBoundingBoxMaxZ { get; set; }
 
@@ -162,8 +164,15 @@ internal class PylonElemsInfo {
     public void FindElemsBoundingBoxProps() {
         var viewDir = HostVector.CrossProduct(XYZ.BasisZ);
 
-        ElemsBoundingBoxLength = GetProjectedMiddlePoint(viewDir);
-        ElemsBoundingBoxWidth = GetProjectedMiddlePoint(HostVector);
+        var forLength = GetProjectedMiddlePoint(viewDir);
+        var forWidth = GetProjectedMiddlePoint(HostVector);
+
+        ElemsBoundingBoxLength = forLength.toMax + forLength.toMin;
+        ElemsBoundingBoxWidth = forWidth.toMax + forWidth.toMin;
+
+        ElemsBoundingBoxWidthToMax = forWidth.toMax;
+        ElemsBoundingBoxWidthToMin = forWidth.toMin;
+
         ElemsBoundingBoxMinZ = ElemsBoundingBox.Min.Z;
         ElemsBoundingBoxMaxZ = ElemsBoundingBox.Max.Z;
     }
@@ -173,7 +182,7 @@ internal class PylonElemsInfo {
     /// его спроецировать
     /// </summary>
     /// <param name="vector">Вектор, который будет являться нормалью к плоскости проекции</param>
-    private double GetProjectedMiddlePoint(XYZ vector) {
+    private (double toMax, double toMin) GetProjectedMiddlePoint(XYZ vector) {
         var bb = SheetInfo.ElemsInfo.ElemsBoundingBox;
         var upDir = XYZ.BasisZ;
 
@@ -186,7 +195,7 @@ internal class PylonElemsInfo {
         bbMaxForLength = ProjectPointByPointNVector(HostOrigin, upDir, bbMaxForLength);
 
         // Вычисляем длину проекции
-        return bbMaxForLength.DistanceTo(bbMinForLength);
+        return (bbMaxForLength.DistanceTo(HostOrigin), bbMinForLength.DistanceTo(HostOrigin));
     }
 
     /// <summary>

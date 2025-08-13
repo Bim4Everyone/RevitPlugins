@@ -281,6 +281,10 @@ public class PylonViewSectionCreator {
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
         double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+
+        double hostWidthToMax = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax;
+        double hostWidthToMin = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin;
+
         double minZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMinZ;
         double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
@@ -290,7 +294,10 @@ public class PylonViewSectionCreator {
                                             int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
         double coordinateX = hostLength * 0.5 + transverseViewXOffset;
-        double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
+        //double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
+
+        double coordinateYToMax = hostWidthToMax + transverseViewYOffset;
+        double coordinateYToMin = hostWidthToMin + transverseViewYOffset;
 
         // Определяем глубину дальней плоскости горизонтального вида
         double viewDepth = UnitUtilsHelper.ConvertToInternalValue(
@@ -302,22 +309,22 @@ public class PylonViewSectionCreator {
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
                                     double.Parse(ViewModel.ViewSectionSettings.TransverseViewFirstElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + elevationOffset - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + elevationOffset - viewDepth - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(minZ + elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseViewNum == 2) {
             // Располагаем сечение на высоте 2000 мм от низа BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
             double.Parse(ViewModel.ViewSectionSettings.TransverseViewSecondElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + elevationOffset - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + elevationOffset - viewDepth - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(minZ + elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseViewNum == 3) {
             // Располагаем сечение на высоте -300 мм от верха BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
                                     double.Parse(ViewModel.ViewSectionSettings.TransverseViewThirdElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(maxZ - elevationOffset - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(maxZ - elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
         } else {
             return false;
         }
