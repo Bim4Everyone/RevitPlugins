@@ -6,7 +6,7 @@ using System.Text;
 namespace RevitDeclarations.Models {
     internal class CsvExporter : ITableExporter {
         public void Export(string path, IDeclarationDataTable table) {
-            string fullPath = Path.ChangeExtension(path, "csv");
+            string fullPath = $"{path}.csv";
 
             string strData = ConvertDataTableToString(table);
 
