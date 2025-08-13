@@ -23,7 +23,8 @@ namespace RevitExportSpecToExcel.Models
                     string sheetName = GenerateSheetName(schedule.Name);
                     var worksheet = workbook.Worksheets.Add(sheetName);
 
-                    FillWorkSheet(schedule, worksheet);
+                    var converter = new ScheduleToExcelConverter(worksheet, schedule);
+                    converter.Convert();
                 }
 
                 string fullPath = GenerateFullPath(folderPath, schedules.First().Name);
@@ -33,44 +34,14 @@ namespace RevitExportSpecToExcel.Models
                 foreach(var schedule in schedules) {
                     using var workbook = new XLWorkbook();
                     string sheetName = GenerateSheetName(schedule.Name);
-                    var worksheet = workbook.Worksheets.Add(schedule.Name);
+                    var worksheet = workbook.Worksheets.Add(sheetName);
 
-                    FillWorkSheet(schedule, worksheet);
+                    var converter = new ScheduleToExcelConverter(worksheet, schedule);
+                    converter.Convert();
 
                     string fullPath = GenerateFullPath(folderPath, schedule.Name);
                     workbook.SaveAs(fullPath);
                 }
-            }
-        }
-
-        private void FillWorkSheet(ViewSchedule schedule, IXLWorksheet worksheet) {
-            TableData tableData = schedule.GetTableData();
-            var tableSection = tableData.GetSectionData(SectionType.Body);
-            //var mergedCell = tableSection.GetMergedCell();
-
-            int headerRows = tableData.GetSectionData(SectionType.Header).NumberOfRows;
-            int rowCount = tableSection.NumberOfRows;
-            int colCount = tableSection.NumberOfColumns;
-
-            AlignCells(worksheet, tableData);
-
-            // Заполняем Excel данными
-            for(int i = 0; i < rowCount; i++) {
-                for(int j = 0; j < colCount; j++) {
-                    var cell = tableSection.GetCellText(i, j);
-                    worksheet.Cell(i + 1, j + 1).Value = cell;
-                }
-            }
-        }
-
-        private void AlignCells(IXLWorksheet worksheet, TableData tableData) {
-            var tableSection = tableData.GetSectionData(SectionType.Body);
-            int numberOfColumns = tableSection.NumberOfColumns;
-
-            for(int i = 0; i < numberOfColumns; i++) {
-                double width = tableSection.GetColumnWidth(i);
-                width = UnitUtils.ConvertFromInternalUnits(width, UnitTypeId.Millimeters);
-                worksheet.Column(i + 1).Width = width;
             }
         }
 
@@ -88,7 +59,6 @@ namespace RevitExportSpecToExcel.Models
             }
             return filePath;
         }
-
 
         private string GenerateSheetName(string name) {
             var charsToRemove = ProhibitedExcelChars;
