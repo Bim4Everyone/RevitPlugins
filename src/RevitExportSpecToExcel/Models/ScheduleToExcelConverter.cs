@@ -10,6 +10,9 @@ public class ScheduleToExcelConverter {
     private readonly ViewSchedule _schedule;
     private readonly int _numberOfColumns;
     private readonly TableData _tableData;
+    
+    private int _currentColumn;
+    private int _currentRow;
 
     public ScheduleToExcelConverter(IXLWorksheet worksheet, ViewSchedule schedule) {
         _worksheet = worksheet;
@@ -21,6 +24,9 @@ public class ScheduleToExcelConverter {
     }
 
     public void Convert() {
+        _currentColumn = 1;
+        _currentRow = 1;
+
         AlignCells();
         ExportSection(SectionType.Header);
         ExportSection(SectionType.Body);
@@ -43,27 +49,50 @@ public class ScheduleToExcelConverter {
 
         int numberOfRows = tableSection.NumberOfRows;
         int firstRowNumber = tableSection.FirstRowNumber;
-        int firstColumNumber = tableSection.FirstColumnNumber;
+        int firstColumnNumber = tableSection.FirstColumnNumber;
 
-        for(int i = firstRowNumber; i < numberOfRows; i++) {
-            for(int j = firstColumNumber; j < _numberOfColumns; j++) {
+        for(int i = firstRowNumber; i < firstRowNumber + numberOfRows; i++) {
+            double rowHeight = tableSection.GetRowHeightInPixels(i);
+            _worksheet.Row(i + 1).Height = rowHeight;
 
-                IXLCell excelCell = _worksheet.Cell(i + 1, j + 1);
-                var cellValue = tableSection.GetCellText(i, j);
-                
-                ExportCell(excelCell, cellValue);
+            for(int j = firstColumnNumber; j < _numberOfColumns + firstColumnNumber; j++) {
+
+                IXLCell excelCell = _worksheet.Cell(_currentRow, _currentColumn);
+                var cellValue = _schedule.GetCellText(sectionType, i, j);
+                var cellStyle = tableSection.GetTableCellStyle(i, j);
+
+                ExportCell(excelCell, cellValue, cellStyle);
+
+                _currentColumn++;
+
             }
+
+            _currentRow++;
+            _currentColumn = 1;
         }
     }
 
-    private void ExportCell(IXLCell cell, string value) {
+    private void ExportCell(IXLCell cell, string value, TableCellStyle cellStyle) {
+        cell.Style.Font.Bold = cellStyle.IsFontBold;
+        cell.Style.Font.Italic = cellStyle.IsFontItalic;
+        cell.Style.Font.Underline = cellStyle.IsFontUnderline ? XLFontUnderlineValues.Single : XLFontUnderlineValues.None;
+        cell.Style.Font.FontSize = cellStyle.TextSize;
+        cell.Style.Font.FontName = cellStyle.FontName;
 
-        try {
-            double doubleValue = double.Parse(value);
-            cell.Value = value;
-        }
-        catch {
+        cell.Style.Alignment.Horizontal = cellStyle.FontHorizontalAlignment switch {
+            HorizontalAlignmentStyle.Left => XLAlignmentHorizontalValues.Left,
+            HorizontalAlignmentStyle.Center => XLAlignmentHorizontalValues.Center,
+            HorizontalAlignmentStyle.Right => XLAlignmentHorizontalValues.Right,
+            _ => cell.Style.Alignment.Horizontal
+        };
 
-        }
+        cell.Style.Alignment.Vertical = cellStyle.FontVerticalAlignment switch {
+            VerticalAlignmentStyle.Bottom => XLAlignmentVerticalValues.Bottom,
+            VerticalAlignmentStyle.Middle => XLAlignmentVerticalValues.Center,
+            VerticalAlignmentStyle.Top => XLAlignmentVerticalValues.Top,
+            _ => cell.Style.Alignment.Vertical
+        };
+
+        cell.Value = value;
     }
 }
