@@ -36,21 +36,19 @@ internal class MainViewModel : BaseViewModel {
 
     private ColorHelper _selectedColor;
     private PatternsHelper _selectedPattern;
-    private List<string> patternNames = [
-        "ADSK_Линия_Диагональ_Вверх_2 мм",
-        "ADSK_Линия_Диагональ_Вниз_2 мм",
-        "ADSK_Линия_Накрест косая_2x2 мм",
-        "04_Песок",
-        "08.Грунт естественный",
-        "ADSK_Грунт_Гравий",
-        "ADSK_Древесина_01",
-        "ADSK_Древесина_02",
-        "ADSK_Формы_Зигзаг_01",
-        "ADSK_Формы_Зигзаг_02",
-        "ADSK_Формы_Соты",
-        "ADSK_Формы_Треугольники",
+    private List<string> _patternNames = [
+        "02_Железобетон_М1",
+        "05_Утеплитель-1_Крест 45 гр, и1 и1_М1",
+        "07_Сталь_Диагональ_лево_135гр, и0.5_М1",
+        "10_Кирпич_Вверх_3.5 мм_М1",
+        "Диагональ крест-накрест 3",
+        "Диагонально вверх",
+        "Стены_Высота штриховкой_01_Диагональ_право_45 гр, и2_М1",
+        "Стены_Высота штриховкой_02_Диагональ_лево_45 гр, и2_М1",
+        "Стены_Высота штриховкой_03",
+        "Стены_Высота штриховкой_05",
+        "Стены_Высота штриховкой_11"
     ];
-
 
 
     public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -61,7 +59,7 @@ internal class MainViewModel : BaseViewModel {
 
         CategoryElements = _revitRepository.GetCategoriesInView(false);
         SolidFillPattern = _revitRepository.SolidFillPattern;
-        PatternsInPj = _revitRepository.GetPatternsByNames(patternNames);
+        PatternsInPj = _revitRepository.GetPatternsByNames(_patternNames);
         SetCategoriesFilters();
 
         ClearCategoriesFilterInGUICommand = new RelayCommand(ClearCategoriesFilterInGUI);
@@ -162,8 +160,8 @@ internal class MainViewModel : BaseViewModel {
         new ColorHelper(255, 0, 0),
         new ColorHelper(0, 255, 0),
         new ColorHelper(0, 0, 255),
-        new ColorHelper(255, 255, 0),
         new ColorHelper(0, 255, 255),
+        new ColorHelper(255, 255, 0),
         new ColorHelper(255, 0, 255),
         new ColorHelper(255, 0, 128),
         new ColorHelper(128, 0, 255),
@@ -781,7 +779,7 @@ internal class MainViewModel : BaseViewModel {
         OverridingWithRepaint = setting.OverridingWithRepaint;
 
         Colors = setting.Colors;
-        patternNames = setting.PatternNames;
+        _patternNames = setting.PatternNames;
     }
 
     private void SaveConfig() {

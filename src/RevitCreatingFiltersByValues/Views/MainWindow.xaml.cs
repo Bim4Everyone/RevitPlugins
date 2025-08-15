@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 
 using dosymep.SimpleServices;
 
@@ -28,7 +29,7 @@ public partial class MainWindow {
         DialogResult = false;
     }
 
-    private void window_Loaded(object sender, RoutedEventArgs e) {
-        expander.MaxHeight = window.ActualHeight * 0.88;
+    private void WindowLoaded(object sender, RoutedEventArgs e) {
+        expander.MaxHeight = window.ActualHeight * 0.9;
     }
 }
