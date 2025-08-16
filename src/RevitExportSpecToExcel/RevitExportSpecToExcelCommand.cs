@@ -17,6 +17,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitExportSpecToExcel.Models;
+using RevitExportSpecToExcel.Services;
 using RevitExportSpecToExcel.ViewModels;
 using RevitExportSpecToExcel.Views;
 
@@ -25,14 +26,8 @@ namespace RevitExportSpecToExcel;
 /// <summary>
 /// Класс команды Revit плагина.
 /// </summary>
-/// <remarks>
-/// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
-/// </remarks>
 [Transaction(TransactionMode.Manual)]
 public class RevitExportSpecToExcelCommand : BasePluginCommand {
-    /// <summary>
-    /// Инициализирует команду плагина.
-    /// </summary>
     public RevitExportSpecToExcelCommand() {
         PluginName = "RevitExportSpecToExcel";
     }
@@ -41,10 +36,6 @@ public class RevitExportSpecToExcelCommand : BasePluginCommand {
     /// Метод выполнения основного кода плагина.
     /// </summary>
     /// <param name="uiApplication">Интерфейс взаимодействия с Revit.</param>
-    /// <remarks>
-    /// В случаях, когда не используется конфигурация
-    /// или локализация требуется удалять их использование полностью во всем проекте.
-    /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
@@ -52,6 +43,15 @@ public class RevitExportSpecToExcelCommand : BasePluginCommand {
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ExcelExporter>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ScheduleToExcelConverter>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<IConstantsProvider>()
+            .To<ConstantsProvider>()
             .InSingletonScope();
 
         // Настройка конфигурации плагина

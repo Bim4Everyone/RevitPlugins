@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -20,6 +21,7 @@ namespace RevitExportSpecToExcel.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly ExcelExporter _excelExporter;
     private readonly ILocalizationService _localizationService;
 
     private IList<ScheduleViewModel> _schedules;
@@ -37,10 +39,12 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
+        ExcelExporter excelExporter,
         ILocalizationService localizationService) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _excelExporter = excelExporter;
         _localizationService = localizationService;
         
         _schedules = _revitRepository.GetSchedulesVM().OrderBy(x => x.OpenStatus).ToList();
@@ -97,10 +101,12 @@ internal class MainViewModel : BaseViewModel {
 
         var schedulesToExport = _schedules
             .Where(x => x.IsChecked)
-            .Select(x => x.Schedule);
+            .Select(x => x.Schedule)
+            .ToList();
 
-        ExcelExporter exporter = new ExcelExporter();
-        exporter.ExportSchedulesToExcel(path, schedulesToExport, SaveAsOneFile);
+        var paramFactory = GetPlatformService<IRevitParamFactory>();
+
+        _excelExporter.ExportSchedules(path, schedulesToExport, SaveAsOneFile);
 
         SaveConfig();
     }

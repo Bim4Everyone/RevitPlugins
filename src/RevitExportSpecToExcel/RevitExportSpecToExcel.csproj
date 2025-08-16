@@ -5,6 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ClosedXML" Version="0.104.1" />
+		<PackageReference Include="ClosedXML" Version="0.104.1">
+			<PrivateAssets>all</PrivateAssets>
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
     </ItemGroup>
 </Project>

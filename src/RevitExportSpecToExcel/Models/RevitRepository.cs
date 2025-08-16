@@ -33,7 +33,7 @@ internal class RevitRepository {
 
     public IList<ScheduleViewModel> GetSchedulesVM() {
         IList<ViewSchedule> schedulesRevit = GetSchedules();
-        List<ScheduleViewModel> schedules = new List<ScheduleViewModel>();
+        List<ScheduleViewModel> schedules = [];
 
         ElementId activeViewId = Document.ActiveView.Id;
         IList<ElementId> openedViewIds = ActiveUIDocument
