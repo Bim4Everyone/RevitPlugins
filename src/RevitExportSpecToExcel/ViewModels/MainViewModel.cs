@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Documents;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -50,7 +48,10 @@ internal class MainViewModel : BaseViewModel {
         _schedules = _revitRepository.GetSchedulesVM().OrderBy(x => x.OpenStatus).ToList();
         FilteredSchedules = new ObservableCollection<ScheduleViewModel>(_schedules);
 
-        LoadConfig();
+        if(_revitRepository.Document.ActiveView is not ViewSchedule) {
+            LoadConfig();
+        }
+
         ExportSchedulesCommand = RelayCommand.Create(ExportSchedules, CanAcceptView);
         SearchCommand = RelayCommand.Create(ApplySearch);
     }
@@ -104,15 +105,13 @@ internal class MainViewModel : BaseViewModel {
             .Select(x => x.Schedule)
             .ToList();
 
-        var paramFactory = GetPlatformService<IRevitParamFactory>();
-
         _excelExporter.ExportSchedules(path, schedulesToExport, SaveAsOneFile);
 
         SaveConfig();
     }
 
     private bool CanAcceptView() {
-        if(!_schedules.Where(x => x.IsChecked).Any()) {
+        if(!_schedules.Any(x => x.IsChecked)) {
             ErrorText = "Не выбраны спецификации";
             return false;
         }
@@ -133,11 +132,23 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+        var schedules = _schedules
+            .Where(x => setting.SelectedSchedules.Contains(x.Name));
+
+        foreach(var schedule in schedules) {
+            schedule.IsChecked = true;
+        }
     }
 
     private void SaveConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
+
+        setting.SelectedSchedules = _schedules
+            .Where(x => x.IsChecked)
+            .Select(x => x.Name)
+            .ToList();
 
         _pluginConfig.SaveProjectConfig();
     }

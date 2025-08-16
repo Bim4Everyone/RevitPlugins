@@ -1,12 +1,8 @@
-using System;
-
 using Autodesk.Revit.DB;
 
 using ClosedXML.Excel;
 
-using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Revit;
 
 namespace RevitExportSpecToExcel.Models;
 
