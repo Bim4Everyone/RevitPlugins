@@ -59,7 +59,12 @@ internal class MainViewModel : BaseViewModel {
 
         CategoryElements = _revitRepository.GetCategoriesInView(false);
         SolidFillPattern = _revitRepository.SolidFillPattern;
-        PatternsInPj = _revitRepository.GetPatternsByNames(_patternNames);
+
+
+        var allDraftingPatterns = _revitRepository.AllDraftingPatterns;
+        PatternsInPj = new ObservableCollection<PatternsHelper>(allDraftingPatterns
+                                                                .Select(e => new PatternsHelper(e, allDraftingPatterns)));
+        Patterns = _revitRepository.GetPatternsByNames(_patternNames);
         SetCategoriesFilters();
 
         ClearCategoriesFilterInGUICommand = new RelayCommand(ClearCategoriesFilterInGUI);
@@ -117,6 +122,7 @@ internal class MainViewModel : BaseViewModel {
 
 
     public FillPatternElement SolidFillPattern { get; set; }
+    public ObservableCollection<PatternsHelper> Patterns { get; set; } = [];
     public ObservableCollection<PatternsHelper> PatternsInPj { get; set; } = [];
     public List<ParameterFilterElement> AllFiltersInPj { get; set; } = [];
     public List<string> AllFilterNamesInPj { get; set; } = [];
@@ -436,7 +442,7 @@ internal class MainViewModel : BaseViewModel {
                 if(++i > Colors.Count - 1) {
                     i = 0;
                 }
-                if(++j > PatternsInPj.Count - 1) {
+                if(++j > Patterns.Count - 1) {
                     j = 0;
                 }
             }
@@ -486,9 +492,9 @@ internal class MainViewModel : BaseViewModel {
 
         // Если пользователь поставил галку смены штриховки
         if(OverrideByPattern) {
-            settings.SetSurfaceForegroundPatternId(PatternsInPj[p].Pattern.Id);
+            settings.SetSurfaceForegroundPatternId(Patterns[p].Pattern.Id);
 
-            settings.SetCutForegroundPatternId(PatternsInPj[p].Pattern.Id);
+            settings.SetCutForegroundPatternId(Patterns[p].Pattern.Id);
         }
         return settings;
     }
@@ -725,7 +731,7 @@ internal class MainViewModel : BaseViewModel {
         List<FillPatternElement> allDraftingPatterns = _revitRepository.AllDraftingPatterns;
 
         if(allDraftingPatterns.Count > 0) {
-            PatternsInPj.Add(new PatternsHelper(allDraftingPatterns[0], allDraftingPatterns));
+            Patterns.Add(new PatternsHelper(allDraftingPatterns[0], allDraftingPatterns));
         }
     }
     /// <summary>
@@ -734,7 +740,7 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="p"></param>
     private void DeletePattern(object p) {
 
-        PatternsInPj.Remove(SelectedPattern);
+        Patterns.Remove(SelectedPattern);
     }
     /// <summary>
     /// Перемещает выбранную штриховку вверх в настройках плагина
@@ -742,9 +748,9 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="p"></param>
     private void MovePatternUp(object p) {
 
-        int index = PatternsInPj.IndexOf(SelectedPattern);
+        int index = Patterns.IndexOf(SelectedPattern);
         if(index != 0) {
-            PatternsInPj.Move(index, index - 1);
+            Patterns.Move(index, index - 1);
         }
     }
     /// <summary>
@@ -753,9 +759,9 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="p"></param>
     private void MovePatternDown(object p) {
 
-        int index = PatternsInPj.IndexOf(SelectedPattern);
-        if(PatternsInPj.Count - 1 != index) {
-            PatternsInPj.Move(index, index + 1);
+        int index = Patterns.IndexOf(SelectedPattern);
+        if(Patterns.Count - 1 != index) {
+            Patterns.Move(index, index + 1);
         }
     }
     /// <summary>
@@ -793,7 +799,7 @@ internal class MainViewModel : BaseViewModel {
         setting.OverridingWithRepaint = OverridingWithRepaint;
 
         setting.Colors = Colors;
-        setting.PatternNames = new List<string>(PatternsInPj.Select(item => item.PatternName));
+        setting.PatternNames = new List<string>(Patterns.Select(item => item.PatternName));
 
         _pluginConfig.SaveProjectConfig();
     }

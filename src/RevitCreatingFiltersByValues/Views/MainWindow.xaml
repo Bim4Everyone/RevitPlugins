@@ -25,8 +25,13 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <CollectionViewSource
+                x:Key="PjPatterns"
+                Source="{Binding Path=PatternsInPj}" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -426,52 +431,12 @@
                                     Text="Цвета для переопределения графики"
                                     VerticalAlignment="Center" />
 
-                                <ui:DataGrid
-                                    Grid.Row="1"
-                                    Grid.ColumnSpan="5"
-                                    Name="colors"
-                                    Margin="10 5"
-                                    AutoGenerateColumns="False"
-                                    ItemsSource="{Binding Colors, UpdateSourceTrigger=PropertyChanged}"
-                                    SelectedItem="{Binding SelectedColor}"
-                                    Style="{StaticResource CustomResizableDataGridStyle}">
-                                    <DataGrid.Columns>
-                                        <DataGridTemplateColumn
-                                            Header="Тест">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Viewbox
-                                                        Margin="0,0,0,0">
-                                                        <Rectangle
-                                                            Width="100"
-                                                            Height="30"
-                                                            Fill="{Binding UserBrush}"
-                                                            Visibility="Visible" />
-                                                    </Viewbox>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTextColumn
-                                            Binding="{Binding Path=UserColor.Red}"
-                                            Header="Красный"
-                                            IsReadOnly="False" />
-                                        <DataGridTextColumn
-                                            Binding="{Binding Path=UserColor.Green}"
-                                            Header="Зеленый"
-                                            IsReadOnly="False" />
-                                        <DataGridTextColumn
-                                            Binding="{Binding Path=UserColor.Blue}"
-                                            Header="Синий"
-                                            IsReadOnly="False" />
-                                    </DataGrid.Columns>
-                                </ui:DataGrid>
-
-                                <!--<ui:ListView
+                                <ui:ListView
                                     Grid.Row="1"
                                     Grid.ColumnSpan="5"
                                     Margin="10 5"
-                                    ItemsSource="{Binding Colors, UpdateSourceTrigger=PropertyChanged}"
-                                    SelectedItem="{Binding SelectedColor}"
+                                    ItemsSource="{Binding Path=Colors, UpdateSourceTrigger=PropertyChanged}"
+                                    SelectedItem="{Binding Path=SelectedColor}"
                                     ItemContainerStyle="{StaticResource CustomListViewItem}">
                                     <ui:ListView.View>
                                         <GridView>
@@ -484,7 +449,7 @@
                                                             <Rectangle
                                                                 Width="100"
                                                                 Height="30"
-                                                                Fill="{Binding UserBrush}"
+                                                                Fill="{Binding Path=UserBrush}"
                                                                 Visibility="Visible" />
                                                         </Viewbox>
                                                     </DataTemplate>
@@ -504,7 +469,7 @@
                                                 Width="60" />
                                         </GridView>
                                     </ui:ListView.View>
-                                </ui:ListView>-->
+                                </ui:ListView>
 
                                 <ui:Button
                                     Grid.Row="2"
@@ -560,30 +525,12 @@
                                     Text="Штриховки для переопределения графики"
                                     VerticalAlignment="Center" />
 
-                                <ui:DataGrid
-                                    Grid.Row="1"
-                                    Grid.ColumnSpan="5"
-                                    Name="patterns"
-                                    Margin="10"
-                                    ItemsSource="{Binding PatternsInPj, UpdateSourceTrigger=PropertyChanged}"
-                                    SelectedItem="{Binding SelectedPattern}"
-                                    Style="{StaticResource CustomResizableDataGridStyle}">
-                                    <DataGrid.Columns>
-                                        <DataGridComboBoxColumn
-                                            Header="Имя"
-                                            MinWidth="200"
-                                            ItemsSource="{Binding Path=PatternsInPj}"
-                                            DisplayMemberPath="PatternName"
-                                            SelectedItemBinding="{Binding Path=Pattern, Mode=TwoWay}"/>
-                                    </DataGrid.Columns>
-                                </ui:DataGrid>
-
-                                <!--<ui:ListView
+                                <ui:ListView
                                     Grid.Row="1"
                                     Grid.ColumnSpan="5"
                                     Margin="10"
-                                    ItemsSource="{Binding PatternsInPj, UpdateSourceTrigger=PropertyChanged}"
-                                    SelectedItem="{Binding SelectedPattern}"
+                                    ItemsSource="{Binding Path=Patterns, UpdateSourceTrigger=PropertyChanged}"
+                                    SelectedItem="{Binding Path=SelectedPattern}"
                                     ItemContainerStyle="{StaticResource CustomListViewItem}">
                                     <ui:ListView.View>
                                         <GridView>
@@ -593,15 +540,15 @@
                                                     <DataTemplate>
                                                         <ComboBox
                                                             Width="250"
-                                                            ItemsSource="{Binding Path=Patterns}"
                                                             DisplayMemberPath="Name"
-                                                            SelectedItem="{Binding Pattern, Mode=TwoWay}" />
+                                                            ItemsSource="{Binding Path=PatternsInPj}"
+                                                            SelectedItem="{Binding Path=Pattern, Mode=TwoWay}" />
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
                                         </GridView>
                                     </ui:ListView.View>
-                                </ui:ListView>-->
+                                </ui:ListView>
 
                                 <ui:Button
                                     Grid.Row="2"
