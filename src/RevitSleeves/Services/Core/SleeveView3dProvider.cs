@@ -127,7 +127,7 @@ internal class SleeveView3dProvider : IView3DProvider {
     }
 
     private ParameterFilterElement GetSecondaryCategoriesFilter(Document doc) {
-        // все категории, которые не должны попасть в не интересные
+        // все категории, которые не должны попасть в неинтересные
         var mainCategories = new HashSet<BuiltInCategory>();
         mainCategories.UnionWith(GetAllUsedMepCategories());
         mainCategories.UnionWith(GetAllUsedStructureCategories());
