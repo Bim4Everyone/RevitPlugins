@@ -68,7 +68,7 @@ internal class RevitRepository {
             .OfCategory(BuiltInCategory.OST_Rooms)
             .WherePasses(parameterFilter)
             .OfType<Room>()
-            .Select(x => x.UpperLimit)
+            .Select(x => x.Level)
             .GroupBy(x => new { x.Id, x.Name })
             .Select(g => g.First());
     }
