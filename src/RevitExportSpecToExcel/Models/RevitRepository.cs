@@ -40,13 +40,17 @@ internal class RevitRepository {
             .Select(x => x.ViewId)
             .ToList();
 
+        OpenStatus activeViewStatus = new OpenStatus("Активный вид", 1);
+        OpenStatus openedViewStatus = new OpenStatus("Открытый вид", 2);
+        OpenStatus otherViewStatus = new OpenStatus("Прочий вид", 3);
+
         foreach(var schedule in schedulesRevit) {
             if(schedule.Id == activeViewId) {
-                schedules.Add(new ScheduleViewModel(schedule, OpenStatus.ActiveView));
+                schedules.Add(new ScheduleViewModel(schedule, activeViewStatus));
             } else if(openedViewIds.Contains(schedule.Id)) {
-                schedules.Add(new ScheduleViewModel(schedule, OpenStatus.OpenedView));
+                schedules.Add(new ScheduleViewModel(schedule, openedViewStatus));
             } else {
-                schedules.Add(new ScheduleViewModel(schedule, OpenStatus.OtherVIew));
+                schedules.Add(new ScheduleViewModel(schedule, otherViewStatus));
             }
         }
 

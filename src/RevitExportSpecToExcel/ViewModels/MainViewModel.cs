@@ -45,12 +45,14 @@ internal class MainViewModel : BaseViewModel {
         _excelExporter = excelExporter;
         _localizationService = localizationService;
         
-        _schedules = _revitRepository.GetSchedulesVM().OrderBy(x => x.OpenStatus).ToList();
+        _schedules = _revitRepository
+            .GetSchedulesVM()
+            .ToList();
         FilteredSchedules = new ObservableCollection<ScheduleViewModel>(_schedules);
 
         if(_revitRepository.Document.ActiveView is not ViewSchedule) {
             LoadConfig();
-        }
+        } 
 
         ExportSchedulesCommand = RelayCommand.Create(ExportSchedules, CanAcceptView);
         SearchCommand = RelayCommand.Create(ApplySearch);
@@ -66,7 +68,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     public IList<ScheduleViewModel> FilteredSchedules {
-        get => _filteredSchedules;
+        get => _filteredSchedules.OrderBy(x => x.OpenStatus).ToList();
         set => RaiseAndSetIfChanged(ref _filteredSchedules, value);
     }
     
@@ -122,7 +124,7 @@ internal class MainViewModel : BaseViewModel {
 
     private void ApplySearch() {
         if(string.IsNullOrEmpty(SearchText)) {
-            FilteredSchedules = new ObservableCollection<ScheduleViewModel>(Schedules);
+            FilteredSchedules = new ObservableCollection<ScheduleViewModel>(_schedules);
         } else {
             FilteredSchedules = new ObservableCollection<ScheduleViewModel>(
                 Schedules

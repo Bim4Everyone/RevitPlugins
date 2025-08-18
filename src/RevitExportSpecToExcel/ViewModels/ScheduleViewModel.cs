@@ -16,10 +16,6 @@ internal class ScheduleViewModel : BaseViewModel {
         _schedule = schedule;
         _name = schedule.Name;
         _openStatus = status;
-
-        if(_openStatus == OpenStatus.ActiveView) {
-            IsChecked = true;
-        }
     }
 
     public bool IsChecked {
@@ -27,9 +23,8 @@ internal class ScheduleViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _isChecked, value);
     }
 
-    public ViewSchedule Schedule => _schedule;
-
     public string Name => _name;
     public OpenStatus OpenStatus => _openStatus;
+    public ViewSchedule Schedule => _schedule;
 }
 

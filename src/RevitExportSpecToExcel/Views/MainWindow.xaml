@@ -15,11 +15,11 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="500"
-    Width="700"
+    Height="700"
+    Width="800"
     
-    MinHeight="500"
-    MinWidth="700"
+    MinHeight="700"
+    MinWidth="800"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -65,6 +65,7 @@
             <StackPanel
                 Orientation="Vertical">
                 <ui:AutoSuggestBox
+                    Margin="0,0,0,5"
                     DockPanel.Dock="Top"
                     Icon="{ui:SymbolIcon Search24}"
                     Text="{Binding SearchText, Mode=TwoWay}"
@@ -76,21 +77,24 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ui:AutoSuggestBox>
-                <TreeView
-                    Margin="0,10">
-                    <ui:TreeViewItem 
-                        Header="All schedules"
-                        IsExpanded="True"
-                        ItemsSource="{Binding FilteredSchedules}">
-                        <ui:TreeViewItem.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox
-                                    Content="{Binding Name}"
-                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
-                            </DataTemplate>
-                        </ui:TreeViewItem.ItemTemplate>
-                    </ui:TreeViewItem>
-                </TreeView>
+                <ui:DataGrid
+                    ItemsSource="{Binding Path=FilteredSchedules}"
+                    Style="{StaticResource  CustomResizableDataGridStyle}">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn
+                            Binding="{Binding Path=IsChecked, Mode=TwoWay}"
+                            Header="Check" />
+                        <DataGridTextColumn
+                            Binding="{Binding Path=Name}"
+                            Header="Name"
+                            Width="550"
+                            IsReadOnly="True"/>
+                        <DataGridTextColumn
+                            Binding="{Binding Path=OpenStatus.Name}"
+                            Header="Status"
+                            IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </ui:DataGrid>
             </StackPanel>
         </Border>
 
