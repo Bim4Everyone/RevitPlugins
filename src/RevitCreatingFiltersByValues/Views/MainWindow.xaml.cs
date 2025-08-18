@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media;
 
 using dosymep.SimpleServices;
 
@@ -14,8 +15,10 @@ public partial class MainWindow {
             languageService, localizationService,
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
-    }
 
+        SetExpanderCollapsedBrushes();
+        uiThemeService.UIThemeChanged += UiThemeService_UIThemeChanged;
+    }
 
     public override string PluginName => nameof(RevitCreatingFiltersByValues);
     public override string ProjectConfigName => nameof(MainWindow);
@@ -28,7 +31,37 @@ public partial class MainWindow {
         DialogResult = false;
     }
 
-    private void WindowLoaded(object sender, RoutedEventArgs e) {
-        expander.MaxHeight = window.ActualHeight * 0.8;
+    private void UiThemeService_UIThemeChanged(UIThemes obj) {
+        if(expander.IsExpanded) {
+            SetExpanderExpandedBrushes();
+        } else {
+            SetExpanderCollapsedBrushes();
+        }
+    }
+
+    private void ExpanderExpanded(object sender, RoutedEventArgs e) {
+        SetExpanderExpandedBrushes();
+    }
+
+    private void ExpanderCollapsed(object sender, RoutedEventArgs e) {
+        SetExpanderCollapsedBrushes();
+    }
+
+    private void SetExpanderExpandedBrushes() {
+        var fillBrush = (SolidColorBrush) FindResource("WindowBackground");
+        Resources["ExpanderHeaderBackground"] = fillBrush;
+        Resources["ExpanderContentBackground"] = fillBrush;
+
+        var borderBrush = (SolidColorBrush) FindResource("AccentButtonBackground");
+        Resources["ExpanderHeaderBorderBrush"] = borderBrush;
+    }
+
+    private void SetExpanderCollapsedBrushes() {
+        var fillBrush = (SolidColorBrush) FindResource("ButtonBackground");
+        Resources["ExpanderHeaderBackground"] = fillBrush;
+        Resources["ExpanderContentBackground"] = fillBrush;
+
+        var borderBrush = (SolidColorBrush) FindResource("ButtonBorderBrushDisabled");
+        Resources["ExpanderHeaderBorderBrush"] = borderBrush;
     }
 }

@@ -17,6 +17,8 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/Expander/Expander.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <Style
         x:Key="CustomResizableDataGridStyle"

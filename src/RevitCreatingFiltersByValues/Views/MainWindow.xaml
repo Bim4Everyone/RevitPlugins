@@ -19,8 +19,7 @@
     Height="600"
     Width="1000"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
-    x:Name="window"
-    Loaded="WindowLoaded">
+    x:Name="window">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -28,557 +27,612 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <CollectionViewSource
-                x:Key="PjPatterns"
-                Source="{Binding Path=PatternsInPj}" />
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition x:Name="row" Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition x:Name="column" Width="0.2*" />
-        </Grid.ColumnDefinitions>
 
         <ui:TitleBar
             Grid.Row="0"
             Grid.ColumnSpan="2"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <Border x:Name="QuickSettings"
-            Grid.Row="1"
-            Margin="10 5 5 5"
-            Style="{StaticResource CustomBorder}">
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <CheckBox
-                    Grid.Column="0"
-                    HorizontalAlignment="Right"
-                    FlowDirection="RightToLeft"
-                    Content="Переопределять цвет"
-                    IsChecked="{Binding OverrideByColor}"
-                    ToolTip="Будет выполнено переопределение графики путем задания цвета"
-                    ToolTipService.InitialShowDelay="1000"
-                    ToolTipService.ShowDuration="20000"
-                    ToolTipService.BetweenShowDelay="1">
-                </CheckBox>
-
-                <CheckBox
-                    Grid.Column="1"
-                    Content="Переопределять штриховку"
-                    IsChecked="{Binding OverrideByPattern}"
-                    ToolTip="Будет выполнено переопределение графики путем задания штриховки"
-                    ToolTipService.InitialShowDelay="1000"
-                    ToolTipService.ShowDuration="20000"
-                    ToolTipService.BetweenShowDelay="1" />
-            </Grid>
-        </Border>
-
         <Grid
-            Grid.Row="2"
-            Grid.ColumnSpan="2">
+            x:Name="contentGrid"
+            Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="row" Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition  Width="*" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition x:Name="column" Width="0.2*" />
             </Grid.ColumnDefinitions>
-            
-            <Border x:Name="Categories"
+
+            <Border
+                x:Name="QuickSettings"
+                Grid.Row="0"
                 Margin="10 5 5 5"
                 Style="{StaticResource CustomBorder}">
 
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            Height="Auto" />
-                        <RowDefinition
-                            Height="Auto" />
-                        <RowDefinition
-                            Height="*" />
-                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="*" />
+                        <ColumnDefinition
+                            Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                    <ui:TextBlock
-                        Margin="5"
-                        Text="Выберите категории элементов на виде:"
-                        VerticalAlignment="Center">
-                        <ui:TextBlock.ToolTip>
-                            <ToolTip>
-                                <ui:TextBlock
-                                    Text="Перечень категорий элементов, видимых на текущем виде (в т.ч. из связанных файлов). которые имеют параметры для фильтрации. Выберите одну или несколько категорий, и тогда плагин произведет отбор параметров, по которым можно произвести фильтрацию одновременно по всем выбранным категориям. Если этот список пуст, значит на виде не виден ни один элемент из категорий, по которым доступна фильтрация."
-                                    TextWrapping="Wrap"
-                                    Width="300"
-                                    TextAlignment="Justify"
-                                    FlowDirection="LeftToRight"
-                                    ToolTipService.InitialShowDelay="1000"
-                                    ToolTipService.ShowDuration="20000"
-                                    ToolTipService.BetweenShowDelay="1" />
-                            </ToolTip>
-                        </ui:TextBlock.ToolTip>
-                    </ui:TextBlock>
+                    <CheckBox
+                        Grid.Column="0"
+                        HorizontalAlignment="Right"
+                        FlowDirection="RightToLeft"
+                        Content="Переопределять цвет"
+                        IsChecked="{Binding OverrideByColor}"
+                        ToolTip="Будет выполнено переопределение графики путем задания цвета"
+                        ToolTipService.InitialShowDelay="1000"
+                        ToolTipService.ShowDuration="20000"
+                        ToolTipService.BetweenShowDelay="1">
+                    </CheckBox>
 
-                    <Grid
-                        Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition
-                                Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <ui:TextBox
-                            Grid.Column="0"
-                            Margin="5"
-                            Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
-                            VerticalContentAlignment="Center"
-                            ToolTip="Напишите, чтобы произвести фильтрацию списка категорий"
-                            VerticalAlignment="Top" />
-
-                        <ui:Button
-                            Grid.Column="1"
-                            Margin="5"
-                            Padding="10"
-                            Icon="{ui:SymbolIcon CheckboxChecked24}"
-                            Command="{Binding SelectAllCategoriesInGUICommand}"
-                            Style="{StaticResource CustomButtonWithToolTip}"
-                            ToolTip="Нажмите, чтобы выбрать все категории отображенные в списке ниже" />
-
-                        <ui:Button
-                            Grid.Column="2"
-                            Margin="5"
-                            Padding="10"
-                            Icon="{ui:SymbolIcon CheckboxUnchecked24}"
-                            Command="{Binding UnselectAllCategoriesInGUICommand}"
-                            Style="{StaticResource CustomButtonWithToolTip}"
-                            ToolTip="Нажмите, чтобы отменить выбор всех категорий отображенных в списке ниже" />
-                    </Grid>
-
-                    <Border
-                        Grid.Row="2"
-                        Margin="5"
-                        Style="{StaticResource CustomBorder}">
-                        <ui:ListView
-                            x:Name="categories"
-                            ItemsSource="{Binding Path=CategoryElements, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            SelectionMode="Multiple"
-                            ItemContainerStyle="{StaticResource CustomListViewItem}">
-                            <ui:ListView.ItemTemplate>
-                                <DataTemplate
-                                    DataType="{x:Type models:CategoryElements}">
-                                    <CheckBox
-                                        Content="{Binding Path=CategoryName}"
-                                        IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger
-                                                EventName="Checked">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding DataContext.GetFilterableParametersCommand, 
-                        RelativeSource={RelativeSource AncestorType=ListView}}" />
-                                            </i:EventTrigger>
-                                            <i:EventTrigger
-                                                EventName="Unchecked">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding DataContext.GetFilterableParametersCommand, 
-                        RelativeSource={RelativeSource AncestorType=ListView}}" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </CheckBox>
-                                </DataTemplate>
-                            </ui:ListView.ItemTemplate>
-                        </ui:ListView>
-                    </Border>
-
-                </Grid>
-            </Border>
-
-            <Border x:Name="Parameter"
-                Grid.Column="1"
-                Margin="5"
-                Style="{StaticResource CustomBorder}">
-
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            Height="Auto" />
-                        <RowDefinition
-                            Height="Auto" />
-                        <RowDefinition
-                            Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <ui:TextBlock
-                        Margin="5"
-                        Text="Выберите параметр для фильтрации:"
-                        VerticalAlignment="Center">
-                        <ui:TextBlock.ToolTip>
-                            <ToolTip>
-                                <TextBlock
-                                    Text="Перечень параметров, по которым возможна фильтрация среди выбранных категорий. Выберите параметр для фильтрации, и тогда плагин произведет отбор значений по этому параметру среди элементов выбранных категорий. По выбранному здесь параметру будут работать созданные плагином фильтры в случае, если стоит галка &quot;Переопределять цвет&quot;. Если этот список пуст, значит не выбрана ни одна категория (см. выше)."
-                                    TextWrapping="Wrap"
-                                    Width="300"
-                                    TextAlignment="Justify"
-                                    FlowDirection="LeftToRight"
-                                    ToolTipService.InitialShowDelay="1000"
-                                    ToolTipService.ShowDuration="20000"
-                                    ToolTipService.BetweenShowDelay="1" />
-                            </ToolTip>
-                        </ui:TextBlock.ToolTip>
-                    </ui:TextBlock>
-
-                    <ui:TextBox
-                        Grid.Row="1"
-                        Margin="5"
-                        VerticalContentAlignment="Center"
-                        Text="{Binding Path=ParamsFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTip="Напишите, чтобы произвести фильтрацию списка параметров"
+                    <CheckBox
+                        Grid.Column="1"
+                        Content="Переопределять штриховку"
+                        IsChecked="{Binding OverrideByPattern}"
+                        ToolTip="Будет выполнено переопределение графики путем задания штриховки"
                         ToolTipService.InitialShowDelay="1000"
                         ToolTipService.ShowDuration="20000"
                         ToolTipService.BetweenShowDelay="1" />
-
-                    <Border
-                        Grid.Row="2"
-                        Margin="5"
-                        Style="{StaticResource CustomBorder}">
-                        <ListBox
-                            Name="parameters"
-                            ItemsSource="{Binding Path=FilterableParameters, UpdateSourceTrigger=PropertyChanged}"
-                            DisplayMemberPath="ParamName"
-                            SelectedItem="{Binding SelectedFilterableParameter}"
-                            SelectionMode="Single"
-                            ToolTipService.InitialShowDelay="1000"
-                            ToolTipService.ShowDuration="20000"
-                            ToolTipService.BetweenShowDelay="1">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger
-                                    EventName="SelectionChanged">
-                                    <i:InvokeCommandAction
-                                        Command="{Binding GetPossibleValuesCommand}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ListBox>
-                    </Border>
                 </Grid>
             </Border>
 
-            <Border x:Name="Values"
-                Grid.Column="2"
-                Margin="5 5 10 5"
-                Style="{StaticResource CustomBorder}">
+            <Grid
+                Grid.Row="1"
+                Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            Height="Auto" />
-                        <RowDefinition
-                            Height="Auto" />
-                        <RowDefinition
-                            Height="*" />
-                    </Grid.RowDefinitions>
+                <Border
+                    x:Name="Categories"
+                    Margin="10 5 5 5"
+                    Style="{StaticResource CustomBorder}">
 
-                    <ui:TextBlock
-                        Margin="5"
-                        Text="Выберите значения для перекраса:"
-                        VerticalAlignment="Center">
-                        <ui:TextBlock.ToolTip>
-                            <TextBlock
-                                Text="Перечень возможных значений выбранного параметра среди элементов выбранных категорий. Выберите одно или несколько значений, и тогда плагин перекрасит элементы с выбранными значениями. Если стоит галка &quot;Переопределять цвет&quot;, то плагин создаст фильтр на каждое из выбранных значений. Если этот список пуст, значит не выбран параметр для фильтрации (см. выше) или элементы выбранных категорий не имеют значений в выбранном параметре для фильтрации."
-                                TextWrapping="Wrap"
-                                Width="300"
-                                TextAlignment="Justify"
-                                FlowDirection="LeftToRight"
-                                ToolTipService.InitialShowDelay="1000"
-                                ToolTipService.ShowDuration="20000"
-                                ToolTipService.BetweenShowDelay="1" />
-                        </ui:TextBlock.ToolTip>
-                    </ui:TextBlock>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
 
-                    <Grid
-                        Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="*" />
-                            <ColumnDefinition
-                                Width="Auto" />
-                            <ColumnDefinition
-                                Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                        <ui:TextBlock
+                            Margin="5"
+                            Text="Выберите категории элементов на виде:"
+                            VerticalAlignment="Center">
+                            <ui:TextBlock.ToolTip>
+                                <ToolTip>
+                                    <ui:TextBlock
+                                        Text="Перечень категорий элементов, видимых на текущем виде (в т.ч. из связанных файлов). которые имеют параметры для фильтрации. Выберите одну или несколько категорий, и тогда плагин произведет отбор параметров, по которым можно произвести фильтрацию одновременно по всем выбранным категориям. Если этот список пуст, значит на виде не виден ни один элемент из категорий, по которым доступна фильтрация."
+                                        TextWrapping="Wrap"
+                                        Width="300"
+                                        TextAlignment="Justify"
+                                        FlowDirection="LeftToRight"
+                                        ToolTipService.InitialShowDelay="1000"
+                                        ToolTipService.ShowDuration="20000"
+                                        ToolTipService.BetweenShowDelay="1" />
+                                </ToolTip>
+                            </ui:TextBlock.ToolTip>
+                        </ui:TextBlock>
 
-                        <TextBox
-                            Grid.Column="0"
+                        <Grid
+                            Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="*" />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:TextBox
+                                Grid.Column="0"
+                                Margin="5"
+                                Text="{Binding Path=CategoriesFilter, UpdateSourceTrigger=PropertyChanged}"
+                                VerticalContentAlignment="Center"
+                                ToolTip="Напишите, чтобы произвести фильтрацию списка категорий"
+                                VerticalAlignment="Top" />
+
+                            <ui:Button
+                                Grid.Column="1"
+                                Margin="5"
+                                Padding="10"
+                                Icon="{ui:SymbolIcon CheckboxChecked24}"
+                                Command="{Binding SelectAllCategoriesInGUICommand}"
+                                Style="{StaticResource CustomButtonWithToolTip}"
+                                ToolTip="Нажмите, чтобы выбрать все категории отображенные в списке ниже" />
+
+                            <ui:Button
+                                Grid.Column="2"
+                                Margin="5"
+                                Padding="10"
+                                Icon="{ui:SymbolIcon CheckboxUnchecked24}"
+                                Command="{Binding UnselectAllCategoriesInGUICommand}"
+                                Style="{StaticResource CustomButtonWithToolTip}"
+                                ToolTip="Нажмите, чтобы отменить выбор всех категорий отображенных в списке ниже" />
+                        </Grid>
+
+                        <Border
+                            Grid.Row="2"
+                            Margin="5"
+                            Style="{StaticResource CustomBorder}">
+                            <ui:ListView
+                                x:Name="categories"
+                                ItemsSource="{Binding Path=CategoryElements, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SelectionMode="Multiple"
+                                ItemContainerStyle="{StaticResource CustomListViewItem}">
+                                <ui:ListView.ItemTemplate>
+                                    <DataTemplate
+                                        DataType="{x:Type models:CategoryElements}">
+                                        <CheckBox
+                                            Content="{Binding Path=CategoryName}"
+                                            IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="Checked">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.GetFilterableParametersCommand, 
+                        RelativeSource={RelativeSource AncestorType=ListView}}" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger
+                                                    EventName="Unchecked">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.GetFilterableParametersCommand, 
+                        RelativeSource={RelativeSource AncestorType=ListView}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ui:ListView.ItemTemplate>
+                            </ui:ListView>
+                        </Border>
+
+                    </Grid>
+                </Border>
+
+                <Border
+                    x:Name="Parameter"
+                    Grid.Column="1"
+                    Margin="5"
+                    Style="{StaticResource CustomBorder}">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <ui:TextBlock
+                            Margin="5"
+                            Text="Выберите параметр для фильтрации:"
+                            VerticalAlignment="Center">
+                            <ui:TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock
+                                        Text="Перечень параметров, по которым возможна фильтрация среди выбранных категорий. Выберите параметр для фильтрации, и тогда плагин произведет отбор значений по этому параметру среди элементов выбранных категорий. По выбранному здесь параметру будут работать созданные плагином фильтры в случае, если стоит галка &quot;Переопределять цвет&quot;. Если этот список пуст, значит не выбрана ни одна категория (см. выше)."
+                                        TextWrapping="Wrap"
+                                        Width="300"
+                                        TextAlignment="Justify"
+                                        FlowDirection="LeftToRight"
+                                        ToolTipService.InitialShowDelay="1000"
+                                        ToolTipService.ShowDuration="20000"
+                                        ToolTipService.BetweenShowDelay="1" />
+                                </ToolTip>
+                            </ui:TextBlock.ToolTip>
+                        </ui:TextBlock>
+
+                        <ui:TextBox
+                            Grid.Row="1"
                             Margin="5"
                             VerticalContentAlignment="Center"
-                            Text="{Binding Path=PossibleValuesFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            ToolTip="Напишите, чтобы произвести фильтрацию списка возможных значений"
+                            Text="{Binding Path=ParamsFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            ToolTip="Напишите, чтобы произвести фильтрацию списка параметров"
                             ToolTipService.InitialShowDelay="1000"
                             ToolTipService.ShowDuration="20000"
                             ToolTipService.BetweenShowDelay="1" />
 
-                        <ui:Button
-                            Grid.Column="1"
+                        <Border
+                            Grid.Row="2"
                             Margin="5"
-                            Padding="10"
-                            Icon="{ui:SymbolIcon CheckboxChecked24}"
-                            Command="{Binding SelectAllValuesInGUICommand}"
-                            ToolTip="Нажмите, чтобы выбрать все значения отображенные в списке ниже"
-                            HorizontalAlignment="Center" />
-
-                        <ui:Button
-                            Grid.Column="2"
-                            Margin="5"
-                            Padding="10"
-                            Icon="{ui:SymbolIcon CheckboxUnchecked24}"
-                            Command="{Binding UnselectAllValuesInGUICommand}"
-                            ToolTip="Нажмите, чтобы отменить выбор всех значений отображенных в списке ниже"
-                            HorizontalAlignment="Center" />
+                            Style="{StaticResource CustomBorder}">
+                            <ListBox
+                                Name="parameters"
+                                ItemsSource="{Binding Path=FilterableParameters, UpdateSourceTrigger=PropertyChanged}"
+                                DisplayMemberPath="ParamName"
+                                SelectedItem="{Binding SelectedFilterableParameter}"
+                                SelectionMode="Single"
+                                ToolTipService.InitialShowDelay="1000"
+                                ToolTipService.ShowDuration="20000"
+                                ToolTipService.BetweenShowDelay="1">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger
+                                        EventName="SelectionChanged">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding GetPossibleValuesCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ListBox>
+                        </Border>
                     </Grid>
+                </Border>
 
-                    <Border
-                        Grid.Row="2"
-                        Margin="5"
-                        Style="{StaticResource CustomBorder}">
-                        <ui:ListView
-                            x:Name="values"
-                            ItemsSource="{Binding Path=PossibleValues, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            SelectionMode="Multiple"
-                            ItemContainerStyle="{StaticResource CustomListViewItem}">
+                <Border
+                    x:Name="Values"
+                    Grid.Column="2"
+                    Margin="5 5 10 5"
+                    Style="{StaticResource CustomBorder}">
 
-                            <ui:ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox
-                                        IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                        <TextBlock
-                                            Text="{Binding Path=ValueAsString}" />
-                                    </CheckBox>
-                                </DataTemplate>
-                            </ui:ListView.ItemTemplate>
-                        </ui:ListView>
-                    </Border>
-                </Grid>
-            </Border>
-        </Grid>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
 
-        <Canvas
-            Grid.Row="1"
-            Grid.Column="1"
-            FlowDirection="RightToLeft"
-            x:Name="MyCanvas"
-            Margin="5 5 10 5">
-            <Expander
-                x:Name="expander"
-                ExpandDirection="Down"
-                Background="{DynamicResource CardBackground}"
-                BorderBrush="{DynamicResource CardBorderBrush}"
-                MinWidth="{Binding ElementName=MyCanvas, Path=ActualWidth}">
-                <Expander.Header>
-                    <TextBlock
-                        Text="Настройки"
-                        HorizontalAlignment="Center"
-                        Padding="3"
-                        ToolTipService.InitialShowDelay="1000"
-                        ToolTipService.ShowDuration="20000"
-                        ToolTipService.BetweenShowDelay="1">
-                        <TextBlock.ToolTip>
-                            <ToolTip>
+                        <ui:TextBlock
+                            Margin="5"
+                            Text="Выберите значения для перекраса:"
+                            VerticalAlignment="Center">
+                            <ui:TextBlock.ToolTip>
                                 <TextBlock
-                                    Text="Перечень настроек плагина.&#10;В блоке &quot;Цвета для переопределения графики&quot; вы можете задать перечень и последовательность цветов, которые будут задаваться фильтрам, либо использоваться при переопределении графики элементов, если стоит галка &quot;Переопределять цвет&quot;.&#10;Например, если стоит галка &quot;Переопределять цвет&quot; и первый цвет в &quot;Цвета для переопределения графики&quot; красный, а второй синий, то первому созданному фильтру, который будет добавлен на вид будет задан красный цвет, а второму - синий.&#10;Аналогично в блоке &quot;Штриховки для переопределения графики&quot; вы можете задать перечень и последовательность штриховок, которые будут задаваться, если стоит галка &quot;Переопределять штриховку&quot;."
-                                    MinWidth="500"
-                                    Padding="10"
+                                    Text="Перечень возможных значений выбранного параметра среди элементов выбранных категорий. Выберите одно или несколько значений, и тогда плагин перекрасит элементы с выбранными значениями. Если стоит галка &quot;Переопределять цвет&quot;, то плагин создаст фильтр на каждое из выбранных значений. Если этот список пуст, значит не выбран параметр для фильтрации (см. выше) или элементы выбранных категорий не имеют значений в выбранном параметре для фильтрации."
                                     TextWrapping="Wrap"
+                                    Width="300"
                                     TextAlignment="Justify"
-                                    FlowDirection="LeftToRight" />
-                            </ToolTip>
-                        </TextBlock.ToolTip>
-                    </TextBlock>
-                </Expander.Header>
+                                    FlowDirection="LeftToRight"
+                                    ToolTipService.InitialShowDelay="1000"
+                                    ToolTipService.ShowDuration="20000"
+                                    ToolTipService.BetweenShowDelay="1" />
+                            </ui:TextBlock.ToolTip>
+                        </ui:TextBlock>
 
-                <ScrollViewer 
-                    Width="400"
-                    FlowDirection="LeftToRight" >
-                    <StackPanel>
-                        <Border
-                            Margin="5"
-                            Style="{StaticResource CustomBorder}">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                        <Grid
+                            Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="*" />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                                <ColumnDefinition
+                                    Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                                <ui:TextBlock
-                                    Grid.ColumnSpan="5"
-                                    Margin="10 5"
-                                    Text="Цвета для переопределения графики"
-                                    VerticalAlignment="Center" />
+                            <TextBox
+                                Grid.Column="0"
+                                Margin="5"
+                                VerticalContentAlignment="Center"
+                                Text="{Binding Path=PossibleValuesFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ToolTip="Напишите, чтобы произвести фильтрацию списка возможных значений"
+                                ToolTipService.InitialShowDelay="1000"
+                                ToolTipService.ShowDuration="20000"
+                                ToolTipService.BetweenShowDelay="1" />
 
-                                <ui:ListView
-                                    Grid.Row="1"
-                                    Grid.ColumnSpan="5"
-                                    Margin="10 5"
-                                    ItemsSource="{Binding Path=Colors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                    SelectedItem="{Binding Path=SelectedColor}"
-                                    ItemContainerStyle="{StaticResource CustomListViewItem}"
-                                    Style="{StaticResource ListViewStyle}">
-                                    <ui:ListView.ItemTemplate>
-                                        <DataTemplate
-                                            DataType="{x:Type models:ColorHelper}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <Viewbox
-                                                    Margin="10 5"
-                                                    VerticalAlignment="Center">
-                                                    <Rectangle
-                                                        Width="100"
-                                                        Height="30"
-                                                        Fill="{Binding Path=UserBrush}"
-                                                        Visibility="Visible" />
-                                                </Viewbox>
-                                                <ui:TextBlock
-                                                    Margin="10 5"
-                                                    VerticalAlignment="Center"
-                                                    Text="{Binding Path=UserColor.Red, StringFormat='R: {0}'}" />
-                                                <ui:TextBlock
-                                                    Margin="10 5"
-                                                    VerticalAlignment="Center"
-                                                    Text="{Binding Path=UserColor.Green, StringFormat='G: {0}'}" />
-                                                <ui:TextBlock
-                                                    Margin="10 5"
-                                                    VerticalAlignment="Center"
-                                                    Text="{Binding Path=UserColor.Blue, StringFormat='B: {0}'}" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ui:ListView.ItemTemplate>
-                                </ui:ListView>
+                            <ui:Button
+                                Grid.Column="1"
+                                Margin="5"
+                                Padding="10"
+                                Icon="{ui:SymbolIcon CheckboxChecked24}"
+                                Command="{Binding SelectAllValuesInGUICommand}"
+                                ToolTip="Нажмите, чтобы выбрать все значения отображенные в списке ниже"
+                                HorizontalAlignment="Center" />
 
-                                <ui:Button
-                                    Grid.Row="2"
-                                    Grid.Column="0"
-                                    Margin="5 2 2 2"
-                                    Content="Изменить"
-                                    Command="{Binding ChangeColorCommand}" />
-                                <ui:Button
-                                    Grid.Row="2"
-                                    Grid.Column="1"
-                                    Margin="2"
-                                    Content="Добавить"
-                                    Command="{Binding AddColorCommand}" />
-                                <ui:Button
-                                    Grid.Row="2"
-                                    Grid.Column="2"
-                                    Margin="2"
-                                    Content="Удалить"
-                                    Command="{Binding DeleteColorCommand}" />
-                                <ui:Button
-                                    Grid.Row="2"
-                                    Grid.Column="3"
-                                    Margin="2"
-                                    Content=" ↑ "
-                                    Command="{Binding MoveColorUpCommand}" />
-                                <ui:Button
-                                    Grid.Row="2"
-                                    Grid.Column="4"
-                                    Margin="2 2 5 2"
-                                    Content=" ↓ "
-                                    Command="{Binding MoveColorDownCommand}" />
-                            </Grid>
-                        </Border>
+                            <ui:Button
+                                Grid.Column="2"
+                                Margin="5"
+                                Padding="10"
+                                Icon="{ui:SymbolIcon CheckboxUnchecked24}"
+                                Command="{Binding UnselectAllValuesInGUICommand}"
+                                ToolTip="Нажмите, чтобы отменить выбор всех значений отображенных в списке ниже"
+                                HorizontalAlignment="Center" />
+                        </Grid>
 
                         <Border
+                            Grid.Row="2"
                             Margin="5"
                             Style="{StaticResource CustomBorder}">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                            <ui:ListView
+                                x:Name="values"
+                                ItemsSource="{Binding Path=PossibleValues, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                SelectionMode="Multiple"
+                                ItemContainerStyle="{StaticResource CustomListViewItem}">
 
-                                <ui:TextBlock
-                                    Grid.ColumnSpan="5"
-                                    Margin="5"
-                                    Text="Штриховки для переопределения графики"
-                                    VerticalAlignment="Center" />
-
-                                <ui:ListView
-                                    Grid.Row="1"
-                                    Grid.ColumnSpan="5"
-                                    Margin="10"
-                                    ItemsSource="{Binding Path=Patterns, UpdateSourceTrigger=PropertyChanged}"
-                                    SelectedItem="{Binding Path=SelectedPattern}"
-                                    Style="{StaticResource ListViewStyle}">
-                                    <ui:ListView.ItemTemplate>
-                                        <DataTemplate
-                                            DataType="{x:Type models:PatternsHelper}">
-                                            <ComboBox
-                                                Margin="5"
-                                                HorizontalAlignment="Stretch"
-                                                DisplayMemberPath="Name"
-                                                ItemsSource="{Binding Path=PatternsInPj}"
-                                                SelectedItem="{Binding Path=Pattern, Mode=TwoWay}" />
-                                        </DataTemplate>
-                                    </ui:ListView.ItemTemplate>
-                                </ui:ListView>
-
-                                <ui:Button
-                                    Grid.Row="2"
-                                    Grid.Column="0"
-                                    Margin="5 2 2 2"
-                                    Content="Добавить"
-                                    Command="{Binding AddPatternCommand}" />
-                                <ui:Button
-                                    Grid.Row="2"
-                                    Grid.Column="1"
-                                    Margin="2"
-                                    Content="Удалить"
-                                    Command="{Binding DeletePatternCommand}" />
-                                <ui:Button
-                                    Grid.Row="2"
-                                    Grid.Column="2"
-                                    Margin="2"
-                                    Content=" ↑ "
-                                    Command="{Binding MovePatternUpCommand}" />
-                                <ui:Button
-                                    Grid.Row="2"
-                                    Grid.Column="3"
-                                    Margin="2 2 5 2"
-                                    Content=" ↓ "
-                                    Command="{Binding MovePatternDownCommand}" />
-                            </Grid>
+                                <ui:ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            IsChecked="{Binding Path=IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                            <TextBlock
+                                                Text="{Binding Path=ValueAsString}" />
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ui:ListView.ItemTemplate>
+                            </ui:ListView>
                         </Border>
-                    </StackPanel>
-                </ScrollViewer>
-            </Expander>
-        </Canvas>
+                    </Grid>
+                </Border>
+            </Grid>
 
-        <StackPanel
-            x:Name="OkCancel"
-            Grid.Row="3"
+            <Canvas
+                Grid.Row="0"
+                Grid.Column="1"
+                FlowDirection="RightToLeft"
+                x:Name="canvas"
+                Margin="5 5 10 5">
+                <Expander
+                    x:Name="expander"
+                    ExpandDirection="Down"
+                    Expanded="ExpanderExpanded"
+                    Collapsed="ExpanderCollapsed"
+                    MinWidth="{Binding ElementName=canvas, Path=ActualWidth}"
+                    MinHeight="{Binding ElementName=canvas, Path=ActualHeight}"
+                    MaxHeight="{Binding ElementName=contentGrid, Path=ActualHeight}">
+                    <Expander.Header>
+                        <TextBlock
+                            Text="Настройки"
+                            HorizontalAlignment="Center"
+                            Padding="3"
+                            ToolTipService.InitialShowDelay="1000"
+                            ToolTipService.ShowDuration="20000"
+                            ToolTipService.BetweenShowDelay="1">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <TextBlock
+                                        Text="Перечень настроек плагина.&#10;В блоке &quot;Цвета для переопределения графики&quot; вы можете задать перечень и последовательность цветов, которые будут задаваться фильтрам, либо использоваться при переопределении графики элементов, если стоит галка &quot;Переопределять цвет&quot;.&#10;Например, если стоит галка &quot;Переопределять цвет&quot; и первый цвет в &quot;Цвета для переопределения графики&quot; красный, а второй синий, то первому созданному фильтру, который будет добавлен на вид будет задан красный цвет, а второму - синий.&#10;Аналогично в блоке &quot;Штриховки для переопределения графики&quot; вы можете задать перечень и последовательность штриховок, которые будут задаваться, если стоит галка &quot;Переопределять штриховку&quot;."
+                                        MinWidth="500"
+                                        Padding="1"
+                                        TextWrapping="Wrap"
+                                        TextAlignment="Justify"
+                                        FlowDirection="LeftToRight" />
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+                    </Expander.Header>
+
+                    <ScrollViewer
+                        Width="400" 
+                        FlowDirection="LeftToRight">
+                        <StackPanel>
+                            <Border
+                                Margin="5"
+                                Style="{StaticResource CustomBorder}">
+                                <StackPanel>
+                                    <ui:TextBlock
+                                        Margin="10 5"
+                                        Text="Способ переопределения графики:"
+                                        VerticalAlignment="Center" />
+
+                                    <RadioButton
+                                        Grid.Row="1"
+                                        Margin="10 5"
+                                        GroupName="ways"
+                                        Content="Создание фильтров на виде"
+                                        IsChecked="{Binding OverridingWithFilters}" />
+                                    <RadioButton
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="10 5"
+                                        GroupName="ways"
+                                        IsChecked="{Binding OverridingWithRepaint}"
+                                        Content="Переопределение графики элементов" />
+                                </StackPanel>
+                            </Border>
+                            
+                            <Border
+                                Margin="5"
+                                Style="{StaticResource CustomBorder}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="*" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ui:TextBlock
+                                        Grid.ColumnSpan="5"
+                                        Margin="10 5"
+                                        Text="Цвета для переопределения графики:"
+                                        VerticalAlignment="Center" />
+
+                                    <ui:ListView
+                                        Grid.Row="1"
+                                        Grid.ColumnSpan="5"
+                                        Margin="5"
+                                        ItemsSource="{Binding Path=Colors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        SelectedItem="{Binding Path=SelectedColor}"
+                                        ItemContainerStyle="{StaticResource CustomListViewItem}"
+                                        Style="{StaticResource ListViewStyle}">
+                                        <ui:ListView.ItemTemplate>
+                                            <DataTemplate
+                                                DataType="{x:Type models:ColorHelper}">
+                                                <StackPanel
+                                                    Orientation="Horizontal">
+                                                    <Viewbox
+                                                        Margin="10 5"
+                                                        VerticalAlignment="Center">
+                                                        <Rectangle
+                                                            Width="100"
+                                                            Height="30"
+                                                            Fill="{Binding Path=UserBrush}"
+                                                            Visibility="Visible" />
+                                                    </Viewbox>
+                                                    <ui:TextBlock
+                                                        Margin="10 5"
+                                                        VerticalAlignment="Center"
+                                                        Text="{Binding Path=UserColor.Red, StringFormat='R: {0}'}" />
+                                                    <ui:TextBlock
+                                                        Margin="10 5"
+                                                        VerticalAlignment="Center"
+                                                        Text="{Binding Path=UserColor.Green, StringFormat='G: {0}'}" />
+                                                    <ui:TextBlock
+                                                        Margin="10 5"
+                                                        VerticalAlignment="Center"
+                                                        Text="{Binding Path=UserColor.Blue, StringFormat='B: {0}'}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ui:ListView.ItemTemplate>
+                                    </ui:ListView>
+
+                                    <ui:Button
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        Margin="5 2 2 2"
+                                        Content="Изменить"
+                                        Command="{Binding ChangeColorCommand}" />
+                                    <ui:Button
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Margin="2"
+                                        Content="Добавить"
+                                        Command="{Binding AddColorCommand}" />
+                                    <ui:Button
+                                        Grid.Row="2"
+                                        Grid.Column="2"
+                                        Margin="2"
+                                        Content="Удалить"
+                                        Command="{Binding DeleteColorCommand}" />
+                                    <ui:Button
+                                        Grid.Row="2"
+                                        Grid.Column="3"
+                                        Margin="2"
+                                        Content=" ↑ "
+                                        Command="{Binding MoveColorUpCommand}" />
+                                    <ui:Button
+                                        Grid.Row="2"
+                                        Grid.Column="4"
+                                        Margin="2 2 5 2"
+                                        Content=" ↓ "
+                                        Command="{Binding MoveColorDownCommand}" />
+                                </Grid>
+                            </Border>
+
+                            <Border
+                                Margin="5"
+                                Style="{StaticResource CustomBorder}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition
+                                            Height="Auto" />
+                                        <RowDefinition
+                                            Height="*" />
+                                        <RowDefinition
+                                            Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="*" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                        <ColumnDefinition
+                                            Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ui:TextBlock
+                                        Grid.ColumnSpan="5"
+                                        Margin="5"
+                                        Text="Штриховки для переопределения графики:"
+                                        VerticalAlignment="Center" />
+
+                                    <ui:ListView
+                                        Grid.Row="1"
+                                        Grid.ColumnSpan="5"
+                                        Margin="5"
+                                        ItemsSource="{Binding Path=Patterns, UpdateSourceTrigger=PropertyChanged}"
+                                        SelectedItem="{Binding Path=SelectedPattern}"
+                                        Style="{StaticResource ListViewStyle}">
+                                        <ui:ListView.ItemTemplate>
+                                            <DataTemplate
+                                                DataType="{x:Type models:PatternsHelper}">
+                                                <ComboBox
+                                                    Margin="5"
+                                                    HorizontalAlignment="Stretch"
+                                                    DisplayMemberPath="Name"
+                                                    ItemsSource="{Binding Path=PatternsInPj}"
+                                                    SelectedItem="{Binding Path=Pattern, Mode=TwoWay}" />
+                                            </DataTemplate>
+                                        </ui:ListView.ItemTemplate>
+                                    </ui:ListView>
+
+                                    <ui:Button
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        Margin="5 2 2 2"
+                                        Content="Добавить"
+                                        Command="{Binding AddPatternCommand}" />
+                                    <ui:Button
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Margin="2"
+                                        Content="Удалить"
+                                        Command="{Binding DeletePatternCommand}" />
+                                    <ui:Button
+                                        Grid.Row="2"
+                                        Grid.Column="2"
+                                        Margin="2"
+                                        Content=" ↑ "
+                                        Command="{Binding MovePatternUpCommand}" />
+                                    <ui:Button
+                                        Grid.Row="2"
+                                        Grid.Column="3"
+                                        Margin="2 2 5 2"
+                                        Content=" ↓ "
+                                        Command="{Binding MovePatternDownCommand}" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Expander>
+            </Canvas>
+        </Grid>
+        
+        <StackPanel x:Name="OkCancel"
+            Grid.Row="2"
             Grid.ColumnSpan="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
