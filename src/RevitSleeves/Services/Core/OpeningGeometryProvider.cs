@@ -76,7 +76,7 @@ internal class OpeningGeometryProvider : IOpeningGeometryProvider {
             double width = opening.GetSharedParamValue<double>(widthName);
             double height = opening.GetSharedParamValue<double>(heightName);
             double thickness = opening.GetSharedParamValue<double>(thicknessName);
-            var loopLeftUpperCorner = (opening.Location as LocationPoint).Point
+            var loopLeftUpperCorner = ((LocationPoint) opening.Location).Point
                 - frontNormal * thickness / 2
                 + leftDir * width / 2
                 + upDir * height;
@@ -109,7 +109,7 @@ internal class OpeningGeometryProvider : IOpeningGeometryProvider {
             double diameter = opening.GetSharedParamValue<double>(diameterName);
             double thickness = opening.GetSharedParamValue<double>(thicknessName);
 
-            var circleOrigin = (opening.Location as LocationPoint).Point - frontNormal * thickness / 2;
+            var circleOrigin = ((LocationPoint) opening.Location).Point - frontNormal * thickness / 2;
             var leftPoint = circleOrigin + leftDir * diameter / 2;
             var topPoint = circleOrigin + upDir * diameter / 2;
             var rightPoint = circleOrigin - leftDir * diameter / 2;
@@ -144,7 +144,7 @@ internal class OpeningGeometryProvider : IOpeningGeometryProvider {
             double width = opening.GetSharedParamValue<double>(widthName);
             double height = opening.GetSharedParamValue<double>(heightName);
             double thickness = opening.GetSharedParamValue<double>(thicknessName);
-            var loopLeftUpperCorner = (opening.Location as LocationPoint).Point
+            var loopLeftUpperCorner = ((LocationPoint) opening.Location).Point
                 + leftDir * width / 2
                 + frontDir * height / 2;
             var loopRightUpperCorner = loopLeftUpperCorner - leftDir * width;
@@ -176,7 +176,7 @@ internal class OpeningGeometryProvider : IOpeningGeometryProvider {
             double diameter = opening.GetSharedParamValue<double>(diameterName);
             double thickness = opening.GetSharedParamValue<double>(thicknessName);
 
-            var circleOrigin = (opening.Location as LocationPoint).Point;
+            var circleOrigin = ((LocationPoint) opening.Location).Point;
             var leftPoint = circleOrigin + leftDir * diameter / 2;
             var topPoint = circleOrigin + frontDir * diameter / 2;
             var rightPoint = circleOrigin - leftDir * diameter / 2;
