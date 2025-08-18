@@ -18,6 +18,7 @@ namespace RevitDeclarations.Models {
         private readonly Color _utpColor = Color.FromArgb(226, 207, 245);
 
         public void Export(string path, IDeclarationDataTable declarationDataTable) {
+            string fullPath = $"{path}.xlsx";
             /* Releasing all COM objects was made on the basis of the article:
              * https://www.add-in-express.com/creating-addins-blog/release-excel-com-objects/
              */
@@ -84,7 +85,7 @@ namespace RevitDeclarations.Models {
 
                 workSheet.Activate();
 
-                workBook.SaveAs(path);
+                workBook.SaveAs(fullPath);
                 workBook.Close(false);
             } finally {
                 excelApp.Quit();

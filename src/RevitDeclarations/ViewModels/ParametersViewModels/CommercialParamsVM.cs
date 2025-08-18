@@ -69,6 +69,7 @@ namespace RevitDeclarations.ViewModels {
                     SelectedApartAreaParam,
                     SelectedRoomsHeightParam,
                     SelectedParkingSpaceClass,
+                    SelectedParkingInfo,
 
                     SelectedRoomNameParam,
                     SelectedRoomAreaParam

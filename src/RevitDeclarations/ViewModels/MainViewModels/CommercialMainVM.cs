@@ -132,6 +132,7 @@ namespace RevitDeclarations.ViewModels {
             configSettings.RoomsHeightParam = settings.RoomsHeightParam?.Definition.Name;
             configSettings.GroupNameParam = settings.GroupNameParam?.Definition.Name;
             configSettings.ParkingSpaceClass = settings.ParkingSpaceClass?.Definition.Name;
+            configSettings.ParkingInfo = settings.ParkingInfo?.Definition.Name;
             configSettings.AddPrefixToNumber = settings.AddPrefixToNumber;
             if(settings.AddPrefixToNumber) {
                 configSettings.RoomNumberParam = settings.RoomNumberParam?.Definition.Name;
