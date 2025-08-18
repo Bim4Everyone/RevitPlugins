@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Reflection;
-using System.Windows.Interop;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -87,8 +86,6 @@ internal class ShowNavigatorCommand : BasePluginCommand {
 
         CheckSleevesCount(kernel);
 
-        var window = kernel.Get<NavigatorWindow>();
-        var helper = new WindowInteropHelper(window) { Owner = uiApplication.MainWindowHandle };
         kernel.Get<NavigatorWindow>().Show();
     }
 
