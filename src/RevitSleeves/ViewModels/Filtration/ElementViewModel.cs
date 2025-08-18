@@ -41,7 +41,7 @@ internal class ElementViewModel : BaseViewModel, IEquatable<ElementViewModel> {
     }
 
     public override bool Equals(object obj) {
-        return base.Equals(obj as ElementViewModel);
+        return Equals(obj as ElementViewModel);
     }
 
     public override int GetHashCode() {
