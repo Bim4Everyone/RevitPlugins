@@ -128,12 +128,17 @@ internal class MainViewModel : BaseViewModel {
         } else {
             FilteredSchedules = new ObservableCollection<ScheduleViewModel>(
                 Schedules
-                    .Where(item => item.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0));
+                    .Where(item => item.Name
+                        .IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0));
         }
     }
 
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+
+        if(setting is null) {
+            setting = _pluginConfig.AddSettings(_revitRepository.Document);
+        }
 
         var schedules = _schedules
             .Where(x => setting.SelectedSchedules.Contains(x.Name));
