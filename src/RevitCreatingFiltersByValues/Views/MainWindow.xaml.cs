@@ -1,4 +1,6 @@
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 using dosymep.SimpleServices;
@@ -63,5 +65,19 @@ public partial class MainWindow {
 
         var borderBrush = (SolidColorBrush) FindResource("ButtonBorderBrushDisabled");
         Resources["ExpanderHeaderBorderBrush"] = borderBrush;
+    }
+
+    private void WindowPreviewMouseDown(object sender, MouseButtonEventArgs e) {
+        if(!expander.IsMouseOver && expander.IsExpanded) {
+            expander.IsExpanded = false;
+        }
+    }
+
+    private void CanvasMouseDown(object sender, MouseButtonEventArgs e) {
+        if(expander.IsExpanded) {
+            expander.IsExpanded = false;
+        } else {
+            expander.IsExpanded = true;
+        }
     }
 }

@@ -19,7 +19,8 @@
     Height="600"
     Width="1000"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
-    x:Name="window">
+    x:Name="window"
+    PreviewMouseDown="WindowPreviewMouseDown">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -387,7 +388,8 @@
                 Grid.Column="1"
                 FlowDirection="RightToLeft"
                 x:Name="canvas"
-                Margin="5 5 10 5">
+                Margin="5 5 10 5"
+                MouseDown="CanvasMouseDown">
                 <Expander
                     x:Name="expander"
                     ExpandDirection="Down"
@@ -408,8 +410,7 @@
                                 <ToolTip>
                                     <TextBlock
                                         Text="Перечень настроек плагина.&#10;В блоке &quot;Цвета для переопределения графики&quot; вы можете задать перечень и последовательность цветов, которые будут задаваться фильтрам, либо использоваться при переопределении графики элементов, если стоит галка &quot;Переопределять цвет&quot;.&#10;Например, если стоит галка &quot;Переопределять цвет&quot; и первый цвет в &quot;Цвета для переопределения графики&quot; красный, а второй синий, то первому созданному фильтру, который будет добавлен на вид будет задан красный цвет, а второму - синий.&#10;Аналогично в блоке &quot;Штриховки для переопределения графики&quot; вы можете задать перечень и последовательность штриховок, которые будут задаваться, если стоит галка &quot;Переопределять штриховку&quot;."
-                                        MinWidth="500"
-                                        Padding="1"
+                                        FontSize="12"
                                         TextWrapping="Wrap"
                                         TextAlignment="Justify"
                                         FlowDirection="LeftToRight" />
