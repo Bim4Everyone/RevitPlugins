@@ -57,10 +57,12 @@ public class SleevesSettingsCommand : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<ActiveDocFilterViewModel>()
             .ToSelf()
-            .InTransientScope();
+            .InTransientScope()
+            .OnActivation(s => s.Initialize());
         kernel.Bind<StructureLinksFilterViewModel>()
             .ToSelf()
-            .InTransientScope();
+            .InTransientScope()
+            .OnActivation(s => s.Initialize());
         kernel.Bind<FilterWindow>()
             .ToSelf()
             .InTransientScope();

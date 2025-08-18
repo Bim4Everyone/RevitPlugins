@@ -19,7 +19,7 @@ internal class ActiveDocSearchSetViewModel : SearchSetViewModel {
     }
 
 
-    protected override ICollection<ElementViewModel> InitializeElements() {
+    protected override ICollection<ElementViewModel> GetElements() {
         var filter = Filter.GetRevitFilter(_revitRepository.Document, FilterGenerator);
         return [.. _revitRepository.GetClashRevitRepository()
             .GetFilteredElements(_revitRepository.Document, Filter.CategoryIds, filter)

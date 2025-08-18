@@ -17,7 +17,7 @@ internal class StructureLinksSearchSetViewModel : SearchSetViewModel {
         : base(revitRepository, filter, generator) {
     }
 
-    protected override ICollection<ElementViewModel> InitializeElements() {
+    protected override ICollection<ElementViewModel> GetElements() {
         var elements = new List<ElementViewModel>();
         var structureLinks = _revitRepository.GetStructureLinkInstances();
         foreach(var structureLink in structureLinks) {

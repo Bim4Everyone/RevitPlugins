@@ -15,10 +15,14 @@ internal class ActiveDocFilterViewModel : FilterViewModel {
     }
 
     protected override SearchSetViewModel GetInvertedSearchSet() {
-        return new ActiveDocSearchSetViewModel(_revitRepository, _filter, new InvertedRevitFilterGenerator());
+        var vm = new ActiveDocSearchSetViewModel(_revitRepository, _filter, new InvertedRevitFilterGenerator());
+        vm.Initialize();
+        return vm;
     }
 
     protected override SearchSetViewModel GetStraightSearchSet() {
-        return new ActiveDocSearchSetViewModel(_revitRepository, _filter, new StraightRevitFilterGenerator());
+        var vm = new ActiveDocSearchSetViewModel(_revitRepository, _filter, new StraightRevitFilterGenerator());
+        vm.Initialize();
+        return vm;
     }
 }

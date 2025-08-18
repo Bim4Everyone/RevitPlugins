@@ -15,11 +15,14 @@ namespace RevitSleeves.ViewModels.Filtration;
 internal abstract class SearchSetViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
 
+    /// <summary>
+    /// Базовый конструктор, после вызова конструктора необходимо вызвать метод <see cref="Initialize"/>
+    /// </summary>
     public SearchSetViewModel(RevitRepository revitRepository, Filter filter, RevitFilterGenerator generator) {
         _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
         Filter = filter ?? throw new System.ArgumentNullException(nameof(filter));
         FilterGenerator = generator ?? throw new System.ArgumentNullException(nameof(generator));
-        Elements = new ObservableCollection<ElementViewModel>(InitializeElements());
+        Elements = [];
         ShowElementCommand = RelayCommand.Create<ElementViewModel>(ShowElement, CanShowElement);
     }
 
@@ -32,7 +35,15 @@ internal abstract class SearchSetViewModel : BaseViewModel {
 
     public ObservableCollection<ElementViewModel> Elements { get; }
 
-    protected abstract ICollection<ElementViewModel> InitializeElements();
+
+    public void Initialize() {
+        Elements.Clear();
+        foreach(var element in GetElements()) {
+            Elements.Add(element);
+        }
+    }
+
+    protected abstract ICollection<ElementViewModel> GetElements();
 
     private void ShowElement(ElementViewModel element) {
         _revitRepository.GetClashRevitRepository().SelectAndShowElement([element.ElementModel]);

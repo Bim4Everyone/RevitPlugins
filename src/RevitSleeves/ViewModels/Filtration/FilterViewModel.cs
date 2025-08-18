@@ -16,19 +16,16 @@ namespace RevitSleeves.ViewModels.Filtration;
 internal abstract class FilterViewModel : BaseViewModel {
     protected readonly RevitRepository _revitRepository;
     protected readonly Filter _filter;
-    protected readonly SearchSetViewModel _straightSearchSet;
-    protected readonly SearchSetViewModel _invertedSearchSet;
     private SearchSetViewModel _activeSearchSet;
     private bool _inverted;
 
+    /// <summary>
+    /// Базовый конструктор, после вызова конструктора необходимо вызвать метод <see cref="Initialize"/>
+    /// </summary>
     protected FilterViewModel(RevitRepository revitRepository, Filter filter, IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _filter = filter ?? throw new ArgumentNullException(nameof(filter));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
-
-        _straightSearchSet = GetStraightSearchSet();
-        _invertedSearchSet = GetInvertedSearchSet();
-        ActiveSearchSet = _straightSearchSet;
 
         InversionChangedCommand = RelayCommand.Create(InversionChanged);
         CloseCommand = RelayCommand.Create(Close);
@@ -54,6 +51,17 @@ internal abstract class FilterViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _activeSearchSet, value);
     }
 
+    private SearchSetViewModel StraightSearchSet { get; set; }
+
+    private SearchSetViewModel InvertedSearchSet { get; set; }
+
+
+    public void Initialize() {
+        StraightSearchSet = GetStraightSearchSet();
+        InvertedSearchSet = GetInvertedSearchSet();
+        ActiveSearchSet = StraightSearchSet;
+    }
+
     protected abstract SearchSetViewModel GetStraightSearchSet();
 
     protected abstract SearchSetViewModel GetInvertedSearchSet();
@@ -61,9 +69,9 @@ internal abstract class FilterViewModel : BaseViewModel {
     private void ShowSet() {
         SearchSetViewModel invertedSet;
         if(Inverted) {
-            invertedSet = _straightSearchSet;
+            invertedSet = StraightSearchSet;
         } else {
-            invertedSet = _invertedSearchSet;
+            invertedSet = InvertedSearchSet;
         }
         HideSet(invertedSet);
     }
@@ -88,9 +96,9 @@ internal abstract class FilterViewModel : BaseViewModel {
 
     private void InversionChanged() {
         if(Inverted) {
-            ActiveSearchSet = _invertedSearchSet;
+            ActiveSearchSet = InvertedSearchSet;
         } else {
-            ActiveSearchSet = _straightSearchSet;
+            ActiveSearchSet = StraightSearchSet;
         }
         ShowSet();
     }

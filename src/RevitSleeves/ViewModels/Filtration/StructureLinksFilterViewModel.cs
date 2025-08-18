@@ -15,11 +15,17 @@ namespace RevitSleeves.ViewModels.Filtration {
         }
 
         protected override SearchSetViewModel GetInvertedSearchSet() {
-            return new StructureLinksSearchSetViewModel(_revitRepository, _filter, new InvertedRevitFilterGenerator());
+            var vm = new StructureLinksSearchSetViewModel(
+                _revitRepository, _filter, new InvertedRevitFilterGenerator());
+            vm.Initialize();
+            return vm;
         }
 
         protected override SearchSetViewModel GetStraightSearchSet() {
-            return new StructureLinksSearchSetViewModel(_revitRepository, _filter, new StraightRevitFilterGenerator());
+            var vm = new StructureLinksSearchSetViewModel(
+                _revitRepository, _filter, new StraightRevitFilterGenerator());
+            vm.Initialize();
+            return vm;
         }
     }
 }
