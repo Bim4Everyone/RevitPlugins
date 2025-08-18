@@ -23,12 +23,6 @@
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-
     <core:WpfUIPlatformWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -41,10 +35,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
@@ -62,8 +56,7 @@
             Grid.Row="2"
             Margin="10,5"
             Style="{StaticResource CustomBorder}">
-            <StackPanel
-                Orientation="Vertical">
+            <DockPanel>
                 <ui:AutoSuggestBox
                     Margin="0,0,0,5"
                     DockPanel.Dock="Top"
@@ -87,7 +80,7 @@
                         <DataGridTextColumn
                             Binding="{Binding Path=Name}"
                             Header="Name"
-                            Width="550"
+                            Width="530"
                             IsReadOnly="True"/>
                         <DataGridTextColumn
                             Binding="{Binding Path=OpenStatus.Name}"
@@ -95,7 +88,7 @@
                             IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </ui:DataGrid>
-            </StackPanel>
+            </DockPanel>
         </Border>
 
         <StackPanel
