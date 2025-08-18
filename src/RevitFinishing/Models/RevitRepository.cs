@@ -69,6 +69,7 @@ internal class RevitRepository {
             .WherePasses(parameterFilter)
             .OfType<Room>()
             .Select(x => x.Level)
+            .Where(x => x != null)
             .GroupBy(x => new { x.Id, x.Name })
             .Select(g => g.First());
     }
