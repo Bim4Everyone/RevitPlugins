@@ -87,13 +87,13 @@
         x:Key="SleevePlacementSettings.DefaultFileName">Sleeve placement settings</system:String>
 
     <system:String
-        x:Key="PlacingErrorsWindow.Title">Ошибки расстановки гильз</system:String>
+        x:Key="PlacingErrorsWindow.Title">Sleeves placing errors</system:String>
     <system:String
-        x:Key="PlacingErrorsWindow.MessageHeader">Заголовок</system:String>
+        x:Key="PlacingErrorsWindow.MessageHeader">Header</system:String>
     <system:String
-        x:Key="PlacingErrorsWindow.DependentElementsHeader">Зависимые элементы</system:String>
+        x:Key="PlacingErrorsWindow.DependentElementsHeader">Dependent elements</system:String>
     <system:String
-        x:Key="GroupItemsCount">Кол-во:</system:String>
+        x:Key="GroupItemsCount">Count:</system:String>
 
     <system:String
         x:Key="Navigator.Title">Navigator</system:String>
