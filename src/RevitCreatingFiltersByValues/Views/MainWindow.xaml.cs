@@ -29,6 +29,6 @@ public partial class MainWindow {
     }
 
     private void WindowLoaded(object sender, RoutedEventArgs e) {
-        expander.MaxHeight = window.ActualHeight * 0.9;
+        expander.MaxHeight = window.ActualHeight * 0.8;
     }
 }

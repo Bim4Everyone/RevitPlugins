@@ -406,8 +406,8 @@
                 </Expander.Header>
 
                 <ScrollViewer 
-                    MinHeight="400"
-                    FlowDirection="LeftToRight">
+                    Width="400"
+                    FlowDirection="LeftToRight" >
                     <StackPanel>
                         <Border
                             Margin="5"
@@ -420,13 +420,14 @@
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
                                 <ui:TextBlock
+                                    Grid.ColumnSpan="5"
                                     Margin="10 5"
                                     Text="Цвета для переопределения графики"
                                     VerticalAlignment="Center" />
@@ -435,70 +436,68 @@
                                     Grid.Row="1"
                                     Grid.ColumnSpan="5"
                                     Margin="10 5"
-                                    ItemsSource="{Binding Path=Colors, UpdateSourceTrigger=PropertyChanged}"
+                                    ItemsSource="{Binding Path=Colors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                     SelectedItem="{Binding Path=SelectedColor}"
-                                    ItemContainerStyle="{StaticResource CustomListViewItem}">
-                                    <ui:ListView.View>
-                                        <GridView>
-                                            <GridViewColumn
-                                                Header="Цвет">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Viewbox
-                                                            Margin="0,0,0,0">
-                                                            <Rectangle
-                                                                Width="100"
-                                                                Height="30"
-                                                                Fill="{Binding Path=UserBrush}"
-                                                                Visibility="Visible" />
-                                                        </Viewbox>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                            <GridViewColumn
-                                                DisplayMemberBinding="{Binding Path=UserColor.Red}"
-                                                Header="Красный"
-                                                Width="60" />
-                                            <GridViewColumn
-                                                DisplayMemberBinding="{Binding Path=UserColor.Green}"
-                                                Header="Зеленый"
-                                                Width="60" />
-                                            <GridViewColumn
-                                                DisplayMemberBinding="{Binding Path=UserColor.Blue}"
-                                                Header="Синий"
-                                                Width="60" />
-                                        </GridView>
-                                    </ui:ListView.View>
+                                    ItemContainerStyle="{StaticResource CustomListViewItem}"
+                                    Style="{StaticResource ListViewStyle}">
+                                    <ui:ListView.ItemTemplate>
+                                        <DataTemplate
+                                            DataType="{x:Type models:ColorHelper}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Viewbox
+                                                    Margin="10 5"
+                                                    VerticalAlignment="Center">
+                                                    <Rectangle
+                                                        Width="100"
+                                                        Height="30"
+                                                        Fill="{Binding Path=UserBrush}"
+                                                        Visibility="Visible" />
+                                                </Viewbox>
+                                                <ui:TextBlock
+                                                    Margin="10 5"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Path=UserColor.Red, StringFormat='R: {0}'}" />
+                                                <ui:TextBlock
+                                                    Margin="10 5"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Path=UserColor.Green, StringFormat='G: {0}'}" />
+                                                <ui:TextBlock
+                                                    Margin="10 5"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Path=UserColor.Blue, StringFormat='B: {0}'}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ui:ListView.ItemTemplate>
                                 </ui:ListView>
 
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="0"
-                                    Margin="10 5 5 5"
+                                    Margin="5 2 2 2"
                                     Content="Изменить"
                                     Command="{Binding ChangeColorCommand}" />
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="1"
-                                    Margin="5"
+                                    Margin="2"
                                     Content="Добавить"
                                     Command="{Binding AddColorCommand}" />
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="2"
-                                    Margin="5"
+                                    Margin="2"
                                     Content="Удалить"
                                     Command="{Binding DeleteColorCommand}" />
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="3"
-                                    Margin="5"
+                                    Margin="2"
                                     Content=" ↑ "
                                     Command="{Binding MoveColorUpCommand}" />
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="4"
-                                    Margin="5 5 10 5"
+                                    Margin="2 2 5 2"
                                     Content=" ↓ "
                                     Command="{Binding MoveColorDownCommand}" />
                             </Grid>
@@ -514,13 +513,14 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*" />
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
                                 <ui:TextBlock
+                                    Grid.ColumnSpan="5"
                                     Margin="5"
                                     Text="Штриховки для переопределения графики"
                                     VerticalAlignment="Center" />
@@ -531,47 +531,42 @@
                                     Margin="10"
                                     ItemsSource="{Binding Path=Patterns, UpdateSourceTrigger=PropertyChanged}"
                                     SelectedItem="{Binding Path=SelectedPattern}"
-                                    ItemContainerStyle="{StaticResource CustomListViewItem}">
-                                    <ui:ListView.View>
-                                        <GridView>
-                                            <GridViewColumn
-                                                Header="Имя">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <ComboBox
-                                                            Width="250"
-                                                            DisplayMemberPath="Name"
-                                                            ItemsSource="{Binding Path=PatternsInPj}"
-                                                            SelectedItem="{Binding Path=Pattern, Mode=TwoWay}" />
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                        </GridView>
-                                    </ui:ListView.View>
+                                    Style="{StaticResource ListViewStyle}">
+                                    <ui:ListView.ItemTemplate>
+                                        <DataTemplate
+                                            DataType="{x:Type models:PatternsHelper}">
+                                            <ComboBox
+                                                Margin="5"
+                                                HorizontalAlignment="Stretch"
+                                                DisplayMemberPath="Name"
+                                                ItemsSource="{Binding Path=PatternsInPj}"
+                                                SelectedItem="{Binding Path=Pattern, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </ui:ListView.ItemTemplate>
                                 </ui:ListView>
 
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="0"
-                                    Margin="10 5 5 5"
+                                    Margin="5 2 2 2"
                                     Content="Добавить"
                                     Command="{Binding AddPatternCommand}" />
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="1"
-                                    Margin="5"
+                                    Margin="2"
                                     Content="Удалить"
                                     Command="{Binding DeletePatternCommand}" />
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="2"
-                                    Margin="5"
+                                    Margin="2"
                                     Content=" ↑ "
                                     Command="{Binding MovePatternUpCommand}" />
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="3"
-                                    Margin="5 5 10 5"
+                                    Margin="2 2 5 2"
                                     Content=" ↓ "
                                     Command="{Binding MovePatternDownCommand}" />
                             </Grid>
