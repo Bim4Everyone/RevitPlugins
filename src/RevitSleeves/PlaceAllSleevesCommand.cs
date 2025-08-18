@@ -89,9 +89,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         var repo = kernel.Get<RevitRepository>();
         var oldSleeves = repo.GetSleeves();
 
-        var localizationService = kernel.Get<ILocalizationService>();
-        var cleanupService = kernel.Get<ISleeveCleanupService>();
-
         var newSleeves = CreateSleeves(kernel);
 
         var cleanedSleeves = CleanupSleeves(kernel, oldSleeves, newSleeves);
@@ -150,7 +147,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         var localizationService = kernel.Get<ILocalizationService>();
         var cleanupService = kernel.Get<ISleeveCleanupService>();
 
-        ICollection<SleeveModel> cleanedSleeves;
         string msg = localizationService.GetLocalizedString("Transaction.SleevesCleanup");
         using var cleanupTrans = repo.Document.StartTransaction(msg);
 
@@ -162,7 +158,7 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
         var ctCleanup = dialogCleanup.CreateCancellationToken();
         dialogCleanup.Show();
 
-        cleanedSleeves = cleanupService.CleanupSleeves(oldSleeves, newSleeves, progressCleanup, ctCleanup);
+        var cleanedSleeves = cleanupService.CleanupSleeves(oldSleeves, newSleeves, progressCleanup, ctCleanup);
         cleanupTrans.Commit();
         return cleanedSleeves;
     }
@@ -170,7 +166,6 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
     private void MergeSleeves(IKernel kernel, ICollection<SleeveModel> cleanedSleeves) {
         var repo = kernel.Get<RevitRepository>();
         var localizationService = kernel.Get<ILocalizationService>();
-        var cleanupService = kernel.Get<ISleeveCleanupService>();
 
         string msg = localizationService.GetLocalizedString("Transaction.SleevesMerging");
         using var mergeTrans = repo.Document.StartTransaction(msg);
