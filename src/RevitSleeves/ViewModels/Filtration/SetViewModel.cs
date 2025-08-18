@@ -109,7 +109,7 @@ internal class SetViewModel : BaseViewModel, ICriterionViewModel {
         }
     }
 
-    private void InitializeCriteria(IEnumerable<Criterion> criteria) {
+    private void InitializeCriteria(ICollection<Criterion> criteria) {
         Criteria = [];
         SetCriteriaRepository(criteria);
         foreach(var set in criteria.OfType<Set>()
@@ -122,7 +122,7 @@ internal class SetViewModel : BaseViewModel, ICriterionViewModel {
         }
     }
 
-    private void SetCriteriaRepository(IEnumerable<Criterion> criteria) {
+    private void SetCriteriaRepository(ICollection<Criterion> criteria) {
         foreach(var criterion in criteria) {
             criterion.SetRevitRepository(_revitRepository.GetClashRevitRepository());
         }
