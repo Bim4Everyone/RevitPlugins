@@ -230,7 +230,7 @@ internal class CopyViewViewModel : BaseViewModel {
             generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(item.Equals));
 
         if(!string.IsNullOrEmpty(existingName)) {
-            ErrorText = _localizationService.GetLocalizedString("CopyView.FoundExistsViewName");
+            ErrorText = _localizationService.GetLocalizedString("CopyView.FoundExistsViewName", existingName);
             return false;
         }
 
