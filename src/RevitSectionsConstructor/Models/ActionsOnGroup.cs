@@ -1,7 +1,6 @@
-namespace RevitSectionsConstructor.Models {
-    internal enum ActionsOnGroup {
-        Nothing,
-        Delete,
-        Copy
-    }
+namespace RevitSectionsConstructor.Models;
+internal enum ActionsOnGroup {
+    Nothing,
+    Delete,
+    Copy
 }
