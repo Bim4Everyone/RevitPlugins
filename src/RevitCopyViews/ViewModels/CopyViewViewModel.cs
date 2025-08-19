@@ -209,7 +209,6 @@ internal class CopyViewViewModel : BaseViewModel {
     private bool CanAcceptView() {
         if(string.IsNullOrEmpty(GroupView)) {
             ErrorText = _localizationService.GetLocalizedString("CopyView.EmptyGroupView");
-            ;
             return false;
         }
 
