@@ -3,8 +3,59 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String
-        x:Key="MainWindow.Title">Раскрасить по параметру</system:String>
-    <system:String
-        x:Key="MainWindow.SelectDocPackage">Выберите комплект документации:</system:String>
+    <system:String x:Key="MainWindow.Title">Раскрасить по параметру</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Ок</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.OverrideColor">Переопределять цвет</system:String>
+    <system:String x:Key="MainWindow.OverrideColorToolTip">Будет выполнено переопределение графики путем задания цвета</system:String>
+    
+    <system:String x:Key="MainWindow.OverrideHatching">Переопределять штриховку</system:String>
+    <system:String x:Key="MainWindow.OverrideHatchingToolTip">Будет выполнено переопределение графики путем задания штриховки</system:String>
+    
+    <system:String x:Key="MainWindow.SelectCategory">Выберите категории элементов на виде:</system:String>
+    <system:String x:Key="MainWindow.SelectCategoryToolTip">Перечень категорий элементов, видимых на текущем виде (в т.ч. из связанных файлов), 
+        которые имеют параметры для фильтрации. Выберите одну или несколько категорий, и тогда плагин произведет отбор параметров, по которым можно 
+        произвести фильтрацию одновременно по всем выбранным категориям. Если этот список пуст, значит на виде не виден ни один элемент из категорий, 
+        по которым доступна фильтрация.</system:String>
+    
+    <system:String x:Key="MainWindow.WriteForCategoryFilter">Напишите, чтобы произвести фильтрацию списка категорий</system:String>
+    <system:String x:Key="MainWindow.SelectAllCategories">Нажмите, чтобы выбрать все категории отображенные в списке ниже</system:String>
+    <system:String x:Key="MainWindow.UnselectAllCategories">Нажмите, чтобы отменить выбор всех категорий отображенных в списке ниже</system:String>
+    
+    <system:String x:Key="MainWindow.SelectParam">Выберите параметр для фильтрации:</system:String>
+    <system:String x:Key="MainWindow.SelectParamToolTip">Перечень параметров, по которым возможна фильтрация среди выбранных категорий. 
+        Выберите параметр для фильтрации, и тогда плагин произведет отбор значений по этому параметру среди элементов выбранных категорий. 
+        По выбранному здесь параметру будут работать созданные плагином фильтры в случае, если стоит галка &quot;Переопределять цвет&quot;. 
+        Если этот список пуст, значит не выбрана ни одна категория (см. выше).</system:String>
+    
+    <system:String x:Key="MainWindow.WriteForParamFilter">Напишите, чтобы произвести фильтрацию списка параметров</system:String>
+
+    <system:String x:Key="MainWindow.SelectValues">Выберите значения для перекраса:</system:String>
+    <system:String x:Key="MainWindow.SelectValuesToolTip">Перечень возможных значений выбранного параметра среди элементов выбранных категорий. 
+        Выберите одно или несколько значений, и тогда плагин перекрасит элементы с выбранными значениями. Если стоит галка &quot;
+        Переопределять цвет&quot;, то плагин создаст фильтр на каждое из выбранных значений. Если этот список пуст, значит не выбран параметр 
+        для фильтрации (см. выше) или элементы выбранных категорий не имеют значений в выбранном параметре для фильтрации.</system:String>
+    
+    <system:String x:Key="MainWindow.WriteForValuesFilter">Напишите, чтобы произвести фильтрацию списка возможных значений</system:String>
+    <system:String x:Key="MainWindow.SelectAllValues">Нажмите, чтобы выбрать все значения отображенные в списке ниже</system:String>
+    <system:String x:Key="MainWindow.UnselectAllValues">Нажмите, чтобы отменить выбор всех значений отображенных в списке ниже</system:String>
+
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
+    <system:String x:Key="MainWindow.SettingsToolTip">Перечень настроек плагина.&#10;В блоке &quot;Цвета для переопределения графики&quot; 
+        вы можете задать перечень и последовательность цветов, которые будут задаваться фильтрам, либо использоваться при переопределении 
+        графики элементов, если стоит галка &quot;Переопределять цвет&quot;.&#10;Например, если стоит галка &quot;Переопределять цвет&quot; 
+        и первый цвет в &quot;Цвета для переопределения графики&quot; красный, а второй синий, то первому созданному фильтру, который будет 
+        добавлен на вид будет задан красный цвет, а второму - синий.&#10;Аналогично в блоке &quot;Штриховки для переопределения графики&quot; 
+        вы можете задать перечень и последовательность штриховок, которые будут задаваться, если стоит галка &quot;Переопределять штриховку&quot;.</system:String>
+    
+    <system:String x:Key="MainWindow.OverrideWay">Способ переопределения графики:</system:String>
+    <system:String x:Key="MainWindow.CreatingFilters">Создание фильтров на виде</system:String>
+    <system:String x:Key="MainWindow.OverrideElementGraphics">Переопределение графики элементов</system:String>
+    
+    <system:String x:Key="MainWindow.OverrideColors">Цвета для переопределения графики:</system:String>
+    <system:String x:Key="MainWindow.OverrideHatchingList">Штриховки для переопределения графики:</system:String>
+    <system:String x:Key="MainWindow.Edit">Изменить</system:String>
+    <system:String x:Key="MainWindow.Add">Добавить</system:String>
+    <system:String x:Key="MainWindow.Delete">Удалить</system:String>
 </ResourceDictionary>
