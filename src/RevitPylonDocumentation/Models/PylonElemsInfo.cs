@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using System.Web.UI;
-using System.Windows;
 
 using Autodesk.Revit.DB;
 
@@ -22,7 +20,8 @@ internal class PylonElemsInfo {
     internal PylonSheetInfo SheetInfo { get; set; }
     internal RevitRepository Repository { get; set; }
 
-    public XYZ HostVector { get; set; }
+    public XYZ VectorByLength { get; set; }
+    public XYZ VectorByWidth { get; set; }
     public XYZ HostOrigin { get; set; }
     public BoundingBoxXYZ ElemsBoundingBox { get; set; }
     public double ElemsBoundingBoxLength { get; set; }
@@ -36,7 +35,7 @@ internal class PylonElemsInfo {
     /// <summary>
     /// Определяет вектор направления основы пилона
     /// </summary>
-    public void FindPylonHostVector() {
+    public void FindPylonHostVectors() {
         var bottomHost = SheetInfo.HostElems.First();
         // В зависимости от принадлежности к категории определяем вектор направления основы пилона
         if(bottomHost.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
@@ -46,15 +45,16 @@ internal class PylonElemsInfo {
 
             var wallLineStart = line.GetEndPoint(0);
             var wallLineEnd = line.GetEndPoint(1);
-            HostVector = wallLineEnd - wallLineStart;
+            VectorByLength = wallLineEnd - wallLineStart;
         } else {
             var column = bottomHost as FamilyInstance;
 
             var locationPoint = column.Location as LocationPoint;
             double rotation = locationPoint.Rotation + 90 * Math.PI / 180;
-            HostVector = Transform.CreateRotation(XYZ.BasisZ, rotation).OfVector(XYZ.BasisX);
+            VectorByLength = Transform.CreateRotation(XYZ.BasisZ, rotation).OfVector(XYZ.BasisX);
         }
-        HostVector = GetHostDirByProjectTransform(HostVector);
+        VectorByLength = GetHostDirByProjectTransform(VectorByLength);
+        VectorByWidth = VectorByLength.CrossProduct(XYZ.BasisZ);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ internal class PylonElemsInfo {
             var line = locationCurve.Curve as Line;
 
             var wallLineStart = line.GetEndPoint(0);
-            HostOrigin = wallLineStart + 0.5 * HostVector;
+            HostOrigin = wallLineStart + 0.5 * VectorByLength;
         } else {
             var column = bottomHost as FamilyInstance;
 
@@ -103,8 +103,7 @@ internal class PylonElemsInfo {
         BuiltInCategory[] categories = {
                 BuiltInCategory.OST_StructuralColumns,
                 BuiltInCategory.OST_Columns,
-                BuiltInCategory.OST_Rebar,
-                BuiltInCategory.OST_GenericModel
+                BuiltInCategory.OST_Rebar
             };
 
         // Создаем фильтр по указанным категориям
@@ -162,40 +161,56 @@ internal class PylonElemsInfo {
     /// Определяет характеристики BoundingBox элементов пилона
     /// </summary>
     public void FindElemsBoundingBoxProps() {
-        var viewDir = HostVector.CrossProduct(XYZ.BasisZ);
+        // Определяем стоит ли пилон параллельно какой либо оси системы координат проекта
+        var angle = Math.Round(VectorByLength.AngleTo(XYZ.BasisX) * 180 / Math.PI);
 
-        var forLength = GetProjectedMiddlePoint(viewDir);
-        var forWidth = GetProjectedMiddlePoint(HostVector);
+        if(angle % 90 > 0) {
+            // Если нет, то определять габариты будем не по BoundingBox, а по пилону
+            var dimensions = GetHostDimensions();
 
-        ElemsBoundingBoxLength = forLength.toMax + forLength.toMin;
-        ElemsBoundingBoxWidth = forWidth.toMax + forWidth.toMin;
+            ElemsBoundingBoxLength = dimensions.hostLength;
+            ElemsBoundingBoxWidth = dimensions.hostLength;
+            ElemsBoundingBoxWidthToMax = ElemsBoundingBoxWidthToMin = ElemsBoundingBoxWidth / 2;
+        } else {
+            var forLength = GetDistanceToProjectedMidPt(VectorByWidth);
+            var forWidth = GetDistanceToProjectedMidPt(VectorByLength);
 
-        ElemsBoundingBoxWidthToMax = forWidth.toMax;
-        ElemsBoundingBoxWidthToMin = forWidth.toMin;
+            ElemsBoundingBoxLength = forLength.toMax + forLength.toMin;
+            ElemsBoundingBoxWidth = forWidth.toMax + forWidth.toMin;
+
+            if(angle % 180 > 0) {
+                ElemsBoundingBoxWidthToMax = forWidth.toMax;
+                ElemsBoundingBoxWidthToMin = forWidth.toMin;
+            } else {
+                ElemsBoundingBoxWidthToMax = forWidth.toMin;
+                ElemsBoundingBoxWidthToMin = forWidth.toMax;
+            }
+        }
 
         ElemsBoundingBoxMinZ = ElemsBoundingBox.Min.Z;
         ElemsBoundingBoxMaxZ = ElemsBoundingBox.Max.Z;
     }
+
 
     /// <summary>
     /// Получаем длину проекции BoundingBox всех элементов пилона в зависимости от плоскости, на которую нужно 
     /// его спроецировать
     /// </summary>
     /// <param name="vector">Вектор, который будет являться нормалью к плоскости проекции</param>
-    private (double toMax, double toMin) GetProjectedMiddlePoint(XYZ vector) {
+    private (double toMax, double toMin) GetDistanceToProjectedMidPt(XYZ vector) {
         var bb = SheetInfo.ElemsInfo.ElemsBoundingBox;
         var upDir = XYZ.BasisZ;
 
         // Получаем точку минимума BoundingBox, спроецированную на плоскость с нормалью по вектору и горизонталь
-        var bbMinForLength = ProjectPointByPointNVector(HostOrigin, vector, bb.Min);
-        bbMinForLength = ProjectPointByPointNVector(HostOrigin, upDir, bbMinForLength);
+        var bbMinForVector = ProjectPointByPointNVector(HostOrigin, vector, bb.Min);
+        bbMinForVector = ProjectPointByPointNVector(HostOrigin, upDir, bbMinForVector);
 
         // Получаем точку максимума BoundingBox, спроецированную на плоскость с нормалью по вектору и горизонталь
-        var bbMaxForLength = ProjectPointByPointNVector(HostOrigin, vector, bb.Max);
-        bbMaxForLength = ProjectPointByPointNVector(HostOrigin, upDir, bbMaxForLength);
+        var bbMaxForVector = ProjectPointByPointNVector(HostOrigin, vector, bb.Max);
+        bbMaxForVector = ProjectPointByPointNVector(HostOrigin, upDir, bbMaxForVector);
 
         // Вычисляем длину проекции
-        return (bbMaxForLength.DistanceTo(HostOrigin), bbMinForLength.DistanceTo(HostOrigin));
+        return (bbMaxForVector.DistanceTo(HostOrigin), bbMinForVector.DistanceTo(HostOrigin));
     }
 
     /// <summary>
@@ -215,5 +230,36 @@ internal class PylonElemsInfo {
 
         // Проецируем точку на плоскость
         return point - distance * normal;
+    }
+
+
+
+    public (double hostLength, double hostWidth) GetHostDimensions() {
+        // Значения по умолчанию в случае, если произойдет ошибка
+        double hostLength = 6;
+        double hostWidth = 1;
+        
+        var elemForWork = SheetInfo.HostElems.First();
+
+        if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
+            if(elemForWork is not Wall wall) { return (hostLength, hostWidth); }
+            if(wall.Location is not LocationCurve locationCurve) { return (hostLength, hostWidth); }
+            if(locationCurve.Curve is not Line line) { return (hostLength, hostWidth); }
+
+            var wallLineStart = line.GetEndPoint(0);
+            var wallLineEnd = line.GetEndPoint(1);
+            var hostVector = wallLineEnd - wallLineStart;
+            hostLength = hostVector.GetLength();
+            hostWidth = wall.WallType.Width;
+            return (hostLength, hostWidth);
+        } else {
+            if(elemForWork is not FamilyInstance column) { return (hostLength, hostWidth); }
+            
+            hostLength = ViewModel.ParamValService
+                            .GetParamValueAnywhere<double>(column, ViewModel.ProjectSettings.PylonLengthParamName);
+            hostWidth = ViewModel.ParamValService
+                            .GetParamValueAnywhere<double>(column, ViewModel.ProjectSettings.PylonWidthParamName);
+            return (hostLength, hostWidth);
+        }
     }
 }

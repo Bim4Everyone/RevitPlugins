@@ -20,7 +20,7 @@ public class PylonViewSectionCreator {
     public bool TryCreateGeneralView(ViewFamilyType selectedViewFamilyType) {
         // Формируем данные для объекта Transform
         var originPoint = SheetInfo.ElemsInfo.HostOrigin;
-        var hostDir = SheetInfo.ElemsInfo.HostVector;
+        var hostDir = SheetInfo.ElemsInfo.VectorByLength;
         var upDir = XYZ.BasisZ;
         var viewDir = hostDir.CrossProduct(upDir);
 
@@ -82,7 +82,7 @@ public class PylonViewSectionCreator {
     public bool TryCreateGeneralRebarView(ViewFamilyType selectedViewFamilyType) {
         // Формируем данные для объекта Transform
         var originPoint = SheetInfo.ElemsInfo.HostOrigin;
-        var hostDir = SheetInfo.ElemsInfo.HostVector;
+        var hostDir = SheetInfo.ElemsInfo.VectorByLength;
         var upDir = XYZ.BasisZ;
         var viewDir = hostDir.CrossProduct(upDir);
 
@@ -147,7 +147,7 @@ public class PylonViewSectionCreator {
         // Формируем данные для объекта Transform
         var originPoint = SheetInfo.ElemsInfo.HostOrigin;
         var upDir = XYZ.BasisZ;
-        var viewDir = SheetInfo.ElemsInfo.HostVector.Negate();
+        var viewDir = SheetInfo.ElemsInfo.VectorByLength.Negate();
         var rightDir = upDir.CrossProduct(viewDir);
 
         // Передаем данные для объекта Transform
@@ -209,7 +209,7 @@ public class PylonViewSectionCreator {
         // Формируем данные для объекта Transform
         var originPoint = SheetInfo.ElemsInfo.HostOrigin;
         var upDir = XYZ.BasisZ;
-        var viewDir = SheetInfo.ElemsInfo.HostVector.Negate();
+        var viewDir = SheetInfo.ElemsInfo.VectorByLength.Negate();
         var rightDir = upDir.CrossProduct(viewDir);
 
         // Передаем данные для объекта Transform
@@ -268,7 +268,7 @@ public class PylonViewSectionCreator {
     public bool TryCreateTransverseView(ViewFamilyType selectedViewFamilyType, int transverseViewNum) {
         // Формируем данные для объекта Transform
         var originPoint = SheetInfo.ElemsInfo.HostOrigin;
-        var hostDir = SheetInfo.ElemsInfo.HostVector.Negate();
+        var hostDir = SheetInfo.ElemsInfo.VectorByLength.Negate();
         var viewDir = XYZ.BasisZ.Negate();
         var upDir = viewDir.CrossProduct(hostDir);
 
@@ -280,7 +280,7 @@ public class PylonViewSectionCreator {
         t.BasisZ = viewDir;
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
-        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        //double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
 
         double hostWidthToMax = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax;
         double hostWidthToMin = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin;
@@ -379,7 +379,7 @@ public class PylonViewSectionCreator {
     public bool TryCreateTransverseRebarView(ViewFamilyType selectedViewFamilyType, int transverseRebarViewNum) {
         // Формируем данные для объекта Transform
         var originPoint = SheetInfo.ElemsInfo.HostOrigin;
-        var hostDir = SheetInfo.ElemsInfo.HostVector.Negate();
+        var hostDir = SheetInfo.ElemsInfo.VectorByLength.Negate();
         var viewDir = XYZ.BasisZ.Negate();
         var upDir = viewDir.CrossProduct(hostDir);
 
@@ -399,9 +399,16 @@ public class PylonViewSectionCreator {
                                             int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
-        double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+        //double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
+
+        double hostWidthToMax = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax;
+        double hostWidthToMin = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin;
+
         double coordinateX = hostLength * 0.5 + transverseViewXOffset;
-        double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
+        //double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
+
+        double coordinateYToMax = hostWidthToMax + transverseViewYOffset;
+        double coordinateYToMin = hostWidthToMin + transverseViewYOffset;
 
         // Определяем глубину дальней плоскости горизонтального вида
         double viewDepth = UnitUtilsHelper.ConvertToInternalValue(
@@ -413,15 +420,15 @@ public class PylonViewSectionCreator {
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
                                         double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewFirstElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(minZ + elevationOffset - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(minZ + elevationOffset - viewDepth - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(minZ + elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseRebarViewNum == 2) {
             // Располагаем сечение на высоте -300 мм от верха BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
                                     double.Parse(ViewModel.ViewSectionSettings.TransverseRebarViewSecondElevation));
 
-            sectionBoxMin = new XYZ(-coordinateX, -coordinateY, -(maxZ - elevationOffset - originPoint.Z));
-            sectionBoxMax = new XYZ(coordinateX, coordinateY, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
+            sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(maxZ - elevationOffset - originPoint.Z));
+            sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
         } else {
             return false;
         }

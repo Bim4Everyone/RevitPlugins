@@ -37,7 +37,7 @@ internal class PylonSheetInfoManager {
 
         // Получаем суммарный BoundingBox по всем элементам, принадлежащим пилону
         // (нужен для формирования рамки подрезки видов)
-        SheetInfo.ElemsInfo.FindPylonHostVector();
+        SheetInfo.ElemsInfo.FindPylonHostVectors();
         SheetInfo.ElemsInfo.FindPylonHostOrigin();
         SheetInfo.ElemsInfo.FindElemsBoundingBox();
         SheetInfo.ElemsInfo.FindElemsBoundingBoxProps();
