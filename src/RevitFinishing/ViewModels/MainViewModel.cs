@@ -158,7 +158,7 @@ internal class MainViewModel : BaseViewModel {
         }
 
         WarningsViewModel parameterErrors = _projectValidationService
-            .CheckWarnings(selectedRooms, finishingElements, _selectedPhase, _revitRepository.Document);
+            .CheckWarnings(selectedRooms, finishingElements, _selectedPhase, _revitRepository);
         _errorWindowService.ShowNoticeWindow(parameterErrors);
 
         SaveConfig();

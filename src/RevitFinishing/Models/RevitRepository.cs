@@ -110,4 +110,8 @@ internal class RevitRepository {
             .OfType<Room>()
             .ToList();
     }
+
+    public IList<KeyFinishingType> GetKeyFinishingTypes() {
+
+    }
 }

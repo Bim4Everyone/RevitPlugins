@@ -8,17 +8,21 @@ using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.SimpleServices;
 
+using RevitFinishing.Models;
 using RevitFinishing.Models.Finishing;
 using RevitFinishing.ViewModels.Notices;
 
 namespace RevitFinishing.Services;
 internal class ProjectValidationService {
     private readonly FinishingValidationService _finishingValidationService;
+    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
     public ProjectValidationService(ILocalizationService localizationService,
+                                    RevitRepository revitRepository,
                                     FinishingValidationService finishingValidationService) {
         _localizationService = localizationService;
+        _revitRepository = revitRepository;
         _finishingValidationService = finishingValidationService;
     }
 
@@ -59,8 +63,8 @@ internal class ProjectValidationService {
 
     public WarningsViewModel CheckWarnings(IEnumerable<Room> selectedRooms,
                                            IEnumerable<FinishingElement> finishingElements,
-                                           Phase phase,
-                                           Document document) {
+                                           Phase phase) {
+        Document document = _revitRepository.Document;
         var parameterErrors = new WarningsViewModel(_localizationService);
 
         var numberParam = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.ROOM_NUMBER);
@@ -84,6 +88,13 @@ internal class ProjectValidationService {
             ErrorElements = [.. finishingElements
                 .Where(x => x.IsCustomFamily)
                 .Select(x => new NoticeElementViewModel(x.RevitElement, phase.Name, _localizationService))]
+        });
+
+        IList<KeyFinishingType> keys = _revitRepository.GetKeyFinishingTypes();
+
+        parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
+            Description = "Unused finishing types!",
+            ErrorElements = []
         });
 
         return parameterErrors;
