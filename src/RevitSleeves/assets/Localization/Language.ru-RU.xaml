@@ -1,0 +1,256 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="RevitUI.PickMepElements">Выберите элемент(ы) ВИС</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.Title">Настройки расстановки гильз</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.CheckFilter">Проверить фильтр</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.ShowPlacingErrors">Выводить ошибки расстановки</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.StructureFiltration">Фильтрация конструкций</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.DiameterRanges">Диапазоны диаметров, мм</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.Offsets">Отступы</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.SettingsName">Название настроек:</system:String>
+
+    <system:String
+        x:Key="LinksSelectorWindow.NameHeader">Название</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.CurrentStatusHeader">Текущий статус</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.NewStatusHeader">Новый статус</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.Title">Выбор связей для обработки</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkWillBeLoaded">Будет загружено</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkWillNotChange">Не изменится</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkIsNotLoaded">Не загружено</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkIsLoaded">Загружено</system:String>
+    
+    <system:String
+        x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Выберите связи для обработки</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.SetName">Укажите название настроек.</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.NameTooLong">Слишком длинное название настроек.</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesLessThanZero">Значения диапазонов диаметров должны быть неотрицательными</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.EndMepSizeMustBeGreaterThanZero">Значение размера 'до' должно быть больше 0</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.SleeveDiameterMustBeGreaterThanZero">Значение диаметра должно быть больше 0</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.StartMepSizeGreaterThanEnd">Значение размера 'от' должно быть меньше значения 'до'</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesIsEmpty">Должен быть задан хотя бы 1 диапазон диаметров</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesOverlap">Диапазоны диаметров пересекаются</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.OffsetsLessThanZero">Значения всех отступов должны быть неотрицательными</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.StructureCategoriesNotEnabled">Выберите хотя бы 1 категорию конструкций</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.FilterIsEmpty">Поля фильтрации для категории '{0}' должны быть заполнены</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamValueMustBeInt">Значение параметра '{0}' должно быть целым числом</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamValueMustBeDouble">Значение параметра '{0}' должно быть вещественным числом</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">У параметра {0} не определен тип данных</system:String>
+
+    <system:String
+        x:Key="FilterWindow.Title">Проверка фильтра</system:String>
+    <system:String
+        x:Key="FilterWindow.Invert">Инвертировать</system:String>
+    <system:String
+        x:Key="FilterWindow.ShowSet">Показать весь набор</system:String>
+    <system:String
+        x:Key="FilterWindow.FileHeader">Файл</system:String>
+    <system:String
+        x:Key="FilterWindow.CategoryHeader">Категория</system:String>
+    <system:String
+        x:Key="FilterWindow.TypeNameHeader">Имя типоразмера</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettings.DefaultFileName">Настройки расстановки гильз</system:String>
+    
+    <system:String
+        x:Key="PlacingErrorsWindow.Title">Ошибки расстановки гильз</system:String>
+    <system:String
+        x:Key="PlacingErrorsWindow.MessageHeader">Заголовок</system:String>
+    <system:String
+        x:Key="PlacingErrorsWindow.DependentElementsHeader">Зависимые элементы</system:String>
+    <system:String
+        x:Key="GroupItemsCount">Кол-во:</system:String>
+
+    <system:String
+        x:Key="Navigator.Title">Навигатор</system:String>
+    <system:String
+        x:Key="Navigator.SettingsNamePrefix">Статусы назначаются согласно настройкам: '{0}'</system:String>
+
+    <system:String
+        x:Key="Error">Ошибка</system:String>
+    <system:String
+        x:Key="Warning">Предупреждение</system:String>
+
+    <system:String
+        x:Key="Errors.CannotLoadPlacementSettings">Не удалось загрузить настройки.</system:String>
+    <system:String
+        x:Key="Errors.DuplicatedLinks">Следующие связи дублируются: {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotFindStructureLinks">Не найдено ни одной связи с конструкциями</system:String>
+
+    <system:String
+        x:Key="From">от</system:String>
+    <system:String
+        x:Key="To">до</system:String>
+    <system:String
+        x:Key="Mm">мм</system:String>
+    <system:String
+        x:Key="Diameter">Диаметр</system:String>
+    <system:String
+        x:Key="Length">Длина</system:String>
+    <system:String
+        x:Key="Comment">Комментарий</system:String>
+
+    <system:String
+        x:Key="Filtering.AddRule">Добавить правило</system:String>
+    <system:String
+        x:Key="Filtering.AddSet">Добавить набор</system:String>
+
+    <system:String
+        x:Key="SetEvaluators.Or">Или</system:String>
+    <system:String
+        x:Key="SetEvaluators.And">И</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringBeginsWith">Начинается с</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotBeginsWith">Не начинается с</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringContains">Содержит</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotContains">Не содержит</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEndsWith">Заканчивается на</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotEndsWith">Не заканчивается на</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEquals">Равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreater">Больше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreaterOrEqual">Больше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLess">Меньше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLessOrEqual">Меньше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericEquals">Равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreater">Больше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreaterOrEqual">Больше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLess">Меньше</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLessOrEqual">Меньше или равно</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasNoValue">Без значения</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasValue">Имеет значение</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNotEquals">Не равно</system:String>
+
+    <system:String
+        x:Key="OffsetType.FromSleeveAxisToMepAxis">Максимальное расстояние между осью гильзы и осью трубы</system:String>
+    <system:String
+        x:Key="OffsetType.FromSleeveEndToTopFloorFace">Расстояние от верхней грани перекрытия до верхнего торца гильзы</system:String>
+
+    <system:String
+        x:Key="SleeveStatus.Invalid">Ошибка обработки геометрии</system:String>
+    <system:String
+        x:Key="SleeveStatus.Empty">Пустая гильза</system:String>
+    <system:String
+        x:Key="SleeveStatus.OutsideOfStructure">Вне конструкции</system:String>
+    <system:String
+        x:Key="SleeveStatus.UnacceptableConstructions">В недопустимых конструкциях</system:String>
+    <system:String
+        x:Key="SleeveStatus.DifferentConstructions">В разных конструкциях</system:String>
+    <system:String
+        x:Key="SleeveStatus.BeyondOpening">Не соответствует отверстию</system:String>
+    <system:String
+        x:Key="SleeveStatus.MultipleMepElements">Пересечение с двумя и более элементами ВИС</system:String>
+    <system:String
+        x:Key="SleeveStatus.Irrelevant">Неактуальная гильза</system:String>
+    <system:String
+        x:Key="SleeveStatus.TooBigDiameter">Большой диаметр</system:String>
+    <system:String
+        x:Key="SleeveStatus.TooSmallDiameter">Маленький диаметр</system:String>
+    <system:String
+        x:Key="SleeveStatus.DiameterNotFound">Диаметр не задан в настройках</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceFarAwayFromStructure">Торец гильзы далеко от конструкции</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceInsideStructure">Торец гильзы внутри конструкции</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisNotParallelToMepElement">Ось гильзы не параллельна оси трубы</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisDistanceTooBig">Ось гильзы смещена от оси трубы</system:String>
+    <system:String
+        x:Key="SleeveStatus.IntersectSleeve">Пересекающиеся гильзы</system:String>
+    <system:String
+        x:Key="SleeveStatus.Correct">Актуальная гильза</system:String>
+
+    <system:String
+        x:Key="Ok">ОК</system:String>
+    <system:String
+        x:Key="Cancel">Отмена</system:String>
+
+    <system:String
+        x:Key="Exceptions.CannotCreateSleeve">Не удалось создать гильзу</system:String>
+    <system:String
+        x:Key="Exceptions.CannotSetSleeveParams">Не удалось назначить параметры гильзы, гильза удалена</system:String>
+    <system:String
+        x:Key="Exceptions.CannotRotateSleeve">Не удалось повернуть гильзу, гильза удалена</system:String>
+    <system:String
+        x:Key="Exceptions.FloorIsNotHorizontal">Перекрытие не горизонтально или содержит субэлементы</system:String>
+    <system:String
+        x:Key="Exceptions.MepCurveIsNotVertical">Ось инженерного элемента не вертикальна</system:String>
+    <system:String
+        x:Key="Exceptions.MepCurveIsVertical">Ось инженерного элемента вертикальна</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFindPlacingPoint">Не удалось найти точку вставки</system:String>
+    <system:String
+        x:Key="Exceptions.WallLocationIsNotLine">Ось стены не является прямой</system:String>
+    <system:String
+        x:Key="Exceptions.MepCurveIsParallelToWall">Ось инженерного элемента параллельна стене</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFindDiameterRange">Не удалось найти диаметр гильзы для трубы</system:String>
+    <system:String
+        x:Key="Exceptions.CannotMergeSleeves">Не удалось объединить гильзы</system:String>
+    <system:String
+        x:Key="Exceptions.SleevesNotFoundException">В документе отсутствуют размещенные гильзы</system:String>
+    <system:String
+        x:Key="Exceptions.StructureLinksNotFoundException">Не обнаружено ни одной связи с конструкциями</system:String>
+
+    <system:String
+        x:Key="Transaction.SleevesPlacing">Расстановка гильз</system:String>
+    <system:String
+        x:Key="Transaction.SleevesCleanup">Удаление дублирующих гильз</system:String>
+    <system:String
+        x:Key="Transaction.SleevesMerging">Объединение гильз</system:String>
+    <system:String
+        x:Key="Transaction.CreateFilter">Создание фильтра</system:String>
+</ResourceDictionary>

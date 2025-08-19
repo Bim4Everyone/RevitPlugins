@@ -1,0 +1,299 @@
+﻿<core:WpfUIPlatformWindow
+    x:Class="RevitSleeves.Views.Settings.SleevePlacementSettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitSleeves.Views.Settings"
+    xmlns:vms="clr-namespace:RevitSleeves.ViewModels.Settings"
+    xmlns:filterViewModel="clr-namespace:RevitSleeves.ViewModels.Filtration"
+    xmlns:filterView="clr-namespace:RevitSleeves.Views.Filtration"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:b="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    mc:Ignorable="d"
+    MinHeight="600"
+    MinWidth="1300"
+    Width="1500"
+    Height="900"
+    d:DataContext="{d:DesignInstance vms:SleevePlacementSettingsViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../assets/Styles/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <i:Interaction.Behaviors>
+        <b:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFileDialogService}" />
+        <b:WpfAttachServiceBehavior
+            AttachableService="{Binding SaveFileDialogService}" />
+        <b:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+    </i:Interaction.Behaviors>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource SleevePlacementSettingsWindow.Title}" />
+
+        <Grid
+            Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition
+                    Height="Auto" />
+                <RowDefinition
+                    Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Border
+                Style="{StaticResource CustomBorder}">
+                <DockPanel>
+                    <ui:Button
+                        Margin="0 0 10 0"
+                        Command="{Binding LoadSettingsCommand}"
+                        Content="{ui:SymbolIcon Symbol=ArrowDownload20}" />
+                    <ui:Button
+                        Margin="10 0"
+                        Command="{Binding SaveSettingsCommand}"
+                        Content="{ui:SymbolIcon Symbol=Save20}" />
+                    <ui:Button
+                        Margin="10 0"
+                        Command="{Binding SaveAsSettingsCommand}"
+                        Content="{ui:SymbolIcon Symbol=SaveEdit20}" />
+                    <ui:Button
+                        Margin="10 0"
+                        Command="{Binding ShowSettingsFolderCommand}"
+                        Content="{ui:SymbolIcon Symbol=FolderOpen20}" />
+                    <Label
+                        Margin="0 0 5 0"
+                        Style="{StaticResource CustomLabel}"
+                        Content="{me:LocalizationSource SleevePlacementSettingsWindow.SettingsName}" />
+                    <TextBox
+                        Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </Border>
+
+            <Border
+                Grid.Row="1"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="1*" />
+                        <RowDefinition
+                            Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Style="{StaticResource CustomBorder}">
+                        <DockPanel
+                            LastChildFill="True">
+                            <DockPanel
+                                VerticalAlignment="Center"
+                                DockPanel.Dock="Top">
+                                <Label
+                                    VerticalContentAlignment="Center"
+                                    Content="{me:LocalizationSource SleevePlacementSettingsWindow.DiameterRanges}"
+                                    Target="{Binding ElementName=DiameterRanges}" />
+                                <ui:Button
+                                    Margin="10 0"
+                                    Appearance="Info"
+                                    Content="{ui:SymbolIcon Symbol=Add24}"
+                                    Command="{Binding PipeSettings.AddDiameterRangeCommand}" />
+                                <ui:Button
+                                    Appearance="Danger"
+                                    Content="{ui:SymbolIcon Symbol=Delete24}"
+                                    Command="{Binding PipeSettings.RemoveDiameterRangeCommand}"
+                                    CommandParameter="{Binding PipeSettings.SelectedDiameterRange}" />
+                            </DockPanel>
+                            <ui:ListView
+                                DockPanel.Dock="Bottom"
+                                x:Name="DiameterRanges"
+                                SelectionMode="Single"
+                                ItemsSource="{Binding PipeSettings.DiameterRanges}"
+                                SelectedItem="{Binding PipeSettings.SelectedDiameterRange}">
+                                <ui:ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Padding="5"
+                                            Style="{StaticResource CustomBorder}">
+                                            <local:DiameterRangeView
+                                                DataContext="{Binding}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ui:ListView.ItemTemplate>
+                            </ui:ListView>
+                        </DockPanel>
+                    </Border>
+
+                    <Border
+                        Grid.Column="1"
+                        Style="{StaticResource CustomBorder}">
+                        <DockPanel
+                            LastChildFill="True">
+                            <Label
+                                DockPanel.Dock="Top"
+                                Content="{me:LocalizationSource SleevePlacementSettingsWindow.Offsets}"
+                                Target="{Binding ElementName=Offsets}">
+                            </Label>
+                            <ui:ListView
+                                DockPanel.Dock="Bottom"
+                                x:Name="Offsets"
+                                ItemsSource="{Binding PipeSettings.Offsets}">
+                                <ui:ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Padding="5"
+                                            Style="{StaticResource CustomBorder}">
+                                            <local:OffsetView
+                                                DataContext="{Binding}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ui:ListView.ItemTemplate>
+                            </ui:ListView>
+                        </DockPanel>
+                    </Border>
+
+                    <Border
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Style="{StaticResource CustomBorder}">
+                        <DockPanel
+                            LastChildFill="True">
+                            <Label
+                                DockPanel.Dock="Top"
+                                Content="{Binding PipeSettings.Name}"
+                                Target="{Binding ElementName=MepFilter}" />
+                            <ScrollViewer
+                                x:Name="MepFilter"
+                                DockPanel.Dock="Bottom">
+                                <filterView:SetView
+                                    DataContext="{Binding PipeSettings.MepFilterViewModel}" />
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border
+                Grid.RowSpan="2"
+                Grid.Column="1"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="Auto" />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <Label
+                        Content="{me:LocalizationSource SleevePlacementSettingsWindow.StructureFiltration}" />
+
+                    <Border
+                        Grid.Row="1"
+                        Style="{StaticResource CustomBorder}">
+                        <local:StructureSettingsView
+                            DataContext="{Binding PipeSettings.WallSettings}" />
+                    </Border>
+
+                    <Border
+                        Grid.Row="2"
+                        Style="{StaticResource CustomBorder}">
+                        <local:StructureSettingsView
+                            DataContext="{Binding PipeSettings.FloorSettings}" />
+                    </Border>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <ui:TextBlock
+                Margin="10"
+                Style="{StaticResource CustomErrorText}"
+                Text="{Binding ErrorText}" />
+
+            <ui:ToggleSwitch
+                Margin="10"
+                IsChecked="{Binding ShowPlacingErrors}"
+                Content="{me:LocalizationSource SleevePlacementSettingsWindow.ShowPlacingErrors}" />
+
+            <ui:DropDownButton
+                Margin="10"
+                Appearance="Secondary"
+                Content="{me:LocalizationSource SleevePlacementSettingsWindow.CheckFilter}"
+                Style="{StaticResource DefaultUiDropDownButtonStyle}">
+                <ui:DropDownButton.Flyout>
+                    <ContextMenu>
+                        <MenuItem
+                            Click="ButtonOk_Click"
+                            Header="{Binding PipeSettings.Name}"
+                            Command="{Binding ShowMepFilterCommand}" />
+                        <MenuItem
+                            Click="ButtonOk_Click"
+                            Header="{Binding PipeSettings.WallSettings.Name}"
+                            Command="{Binding ShowWallsFilterCommand}" />
+                        <MenuItem
+                            Click="ButtonOk_Click"
+                            Header="{Binding PipeSettings.FloorSettings.Name}"
+                            Command="{Binding ShowFloorFilterCommand}" />
+                    </ContextMenu>
+                </ui:DropDownButton.Flyout>
+            </ui:DropDownButton>
+
+            <ui:Button
+                Margin="10"
+                Width="80"
+                Appearance="Info"
+                d:Appearance="Danger"
+                d:Content="Ok"
+                Content="{me:LocalizationSource Ok}"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
+
+            <ui:Button
+                Margin="10"
+                Width="80"
+                Content="{me:LocalizationSource Cancel}"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</core:WpfUIPlatformWindow>

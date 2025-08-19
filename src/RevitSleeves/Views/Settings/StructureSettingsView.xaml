@@ -1,0 +1,40 @@
+﻿<UserControl
+    x:Class="RevitSleeves.Views.Settings.StructureSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitSleeves.Views.Settings"
+    xmlns:vms="clr-namespace:RevitSleeves.ViewModels.Settings"
+    xmlns:filterViewModel="clr-namespace:RevitSleeves.ViewModels.Filtration"
+    xmlns:filterView="clr-namespace:RevitSleeves.Views.Filtration"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    mc:Ignorable="d"
+    d:Background="White"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    d:DataContext="{d:DesignInstance vms:StructureCategoryViewModel, IsDesignTimeCreatable=False}">
+    <DockPanel
+        LastChildFill="True">
+        <DockPanel
+            DockPanel.Dock="Top"
+            Margin="0 0 0 10">
+            <ui:ToggleSwitch
+                DockPanel.Dock="Left"
+                Margin="0 0 10 0"
+                IsChecked="{Binding IsEnabled}" />
+            <Label
+                DockPanel.Dock="Left"
+                Target="{Binding ElementName=Filter}"
+                Content="{Binding Name}" />
+        </DockPanel>
+        <ScrollViewer
+            x:Name="Filter"
+            DockPanel.Dock="Bottom">
+            <filterView:SetView
+                IsEnabled="{Binding DataContext.IsEnabled, 
+                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                DataContext="{Binding StructureFilterViewModel}" />
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

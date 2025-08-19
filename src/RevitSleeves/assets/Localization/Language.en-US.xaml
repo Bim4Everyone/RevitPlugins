@@ -1,0 +1,256 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="RevitUI.PickMepElements">Pick mep element(s)</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.Title">Sleeves placement settings</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.CheckFilter">Check filter</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.ShowPlacingErrors">Show placing errors</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.StructureFiltration">Structure filtration</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.DiameterRanges">Diameter ranges, mm</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.Offsets">Offsets</system:String>
+    <system:String
+        x:Key="SleevePlacementSettingsWindow.SettingsName">Settings name:</system:String>
+
+    <system:String
+        x:Key="LinksSelectorWindow.NameHeader">Name</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.CurrentStatusHeader">Current status</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.NewStatusHeader">New status</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.Title">Links selection for calculation</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkWillBeLoaded">Will be loaded</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkWillNotChange">Will not change</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkIsNotLoaded">Loaded</system:String>
+    <system:String
+        x:Key="LinksSelectorWindow.LinkIsLoaded">Is not loaded</system:String>
+
+    <system:String
+        x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Select any link</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.SetName">Set settings name.</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.NameTooLong">Settings name is too long.</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesLessThanZero">Diameter range values ​​must be non-negative</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.EndMepSizeMustBeGreaterThanZero">The value of the 'to' dimension must be greater than 0</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.SleeveDiameterMustBeGreaterThanZero">The value of the diameter must be greater than 0</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.StartMepSizeGreaterThanEnd">The value of the 'from' dimension must be less than the 'to' value</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesIsEmpty">At least 1 diameter range must be specified</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.DiameterRangesOverlap">The diameter ranges overlap</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.OffsetsLessThanZero">The values ​​of all indents must be non-negative</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.StructureCategoriesNotEnabled">Select at least 1 design category</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.FilterIsEmpty">The filter fields for the '{0}' category must be filled in</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamValueMustBeInt">The value of the '{0}' parameter must be an integer</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamValueMustBeDouble">The value of the '{0}' parameter must be a real number</system:String>
+    <system:String
+        x:Key="SleevePlacementSettings.Validation.ParamHasNoDataType">The {0} parameter has no data type defined</system:String>
+
+    <system:String
+        x:Key="FilterWindow.Title">Filter checking</system:String>
+    <system:String
+        x:Key="FilterWindow.Invert">Invert</system:String>
+    <system:String
+        x:Key="FilterWindow.ShowSet">Show search set</system:String>
+    <system:String
+        x:Key="FilterWindow.FileHeader">File</system:String>
+    <system:String
+        x:Key="FilterWindow.CategoryHeader">Category</system:String>
+    <system:String
+        x:Key="FilterWindow.TypeNameHeader">Family type name</system:String>
+
+    <system:String
+        x:Key="SleevePlacementSettings.DefaultFileName">Sleeve placement settings</system:String>
+
+    <system:String
+        x:Key="PlacingErrorsWindow.Title">Sleeves placing errors</system:String>
+    <system:String
+        x:Key="PlacingErrorsWindow.MessageHeader">Header</system:String>
+    <system:String
+        x:Key="PlacingErrorsWindow.DependentElementsHeader">Dependent elements</system:String>
+    <system:String
+        x:Key="GroupItemsCount">Count:</system:String>
+
+    <system:String
+        x:Key="Navigator.Title">Navigator</system:String>
+    <system:String
+        x:Key="Navigator.SettingsNamePrefix">Statuses are assigned according to the settings: '{0}'</system:String>
+
+    <system:String
+        x:Key="Error">Error</system:String>
+    <system:String
+        x:Key="Warning">Warning</system:String>
+
+    <system:String
+        x:Key="Errors.CannotLoadPlacementSettings">Cannot load placement settings.</system:String>
+    <system:String
+        x:Key="Errors.DuplicatedLinks">Links are duplicated: {0}</system:String>
+    <system:String
+        x:Key="Errors.CannotFindStructureLinks">Cannot find structure links</system:String>
+
+    <system:String
+        x:Key="From">from</system:String>
+    <system:String
+        x:Key="To">to</system:String>
+    <system:String
+        x:Key="Mm">mm</system:String>
+    <system:String
+        x:Key="Diameter">Diameter</system:String>
+    <system:String
+        x:Key="Length">Length</system:String>
+    <system:String
+        x:Key="Comment">Comment</system:String>
+
+    <system:String
+        x:Key="Filtering.AddRule">Add rule</system:String>
+    <system:String
+        x:Key="Filtering.AddSet">Add set</system:String>
+
+    <system:String
+        x:Key="SetEvaluators.Or">Or</system:String>
+    <system:String
+        x:Key="SetEvaluators.And">And</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringBeginsWith">Begins with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotBeginsWith">Not begins with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringContains">Contains</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotContains">Not contains</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEndsWith">Ends with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringNotEndsWith">Not ends with</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringEquals">Equals</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreater">Greater</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringGreaterOrEqual">Greater or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLess">Less</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterStringLessOrEqual">Less or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericEquals">Equals</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreater">Greater</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericGreaterOrEqual">Greater or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLess">Less</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNumericLessOrEqual">Less or equal</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasNoValue">Has no value</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterHasValue">Has value</system:String>
+    <system:String
+        x:Key="RuleEvaluators.FilterNotEquals">Not equals</system:String>
+
+    <system:String
+        x:Key="OffsetType.FromSleeveAxisToMepAxis">Maximum distance between the axis of the sleeve and the axis of the pipe</system:String>
+    <system:String
+        x:Key="OffsetType.FromSleeveEndToTopFloorFace">Distance from the upper face of the floor to the upper end of the sleeve</system:String>
+
+    <system:String
+        x:Key="SleeveStatus.Invalid">Invalid</system:String>
+    <system:String
+        x:Key="SleeveStatus.Empty">Empty sleeve</system:String>
+    <system:String
+        x:Key="SleeveStatus.OutsideOfStructure">Outside of structure</system:String>
+    <system:String
+        x:Key="SleeveStatus.UnacceptableConstructions">Unacceptable constructions</system:String>
+    <system:String
+        x:Key="SleeveStatus.DifferentConstructions">Different constructions</system:String>
+    <system:String
+        x:Key="SleeveStatus.BeyondOpening">Beyond opening</system:String>
+    <system:String
+        x:Key="SleeveStatus.MultipleMepElements">Multiple mep elements intersection</system:String>
+    <system:String
+        x:Key="SleeveStatus.Irrelevant">Irrelevant sleeve</system:String>
+    <system:String
+        x:Key="SleeveStatus.TooBigDiameter">Too big diameter</system:String>
+    <system:String
+        x:Key="SleeveStatus.TooSmallDiameter">Too small diameter</system:String>
+    <system:String
+        x:Key="SleeveStatus.DiameterNotFound">Diameter is not set</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceFarAwayFromStructure">End face far away from structure</system:String>
+    <system:String
+        x:Key="SleeveStatus.EndFaceInsideStructure">End face inside structure</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisNotParallelToMepElement">Axis not parallel to mep element</system:String>
+    <system:String
+        x:Key="SleeveStatus.AxisDistanceTooBig">Axis distance too big</system:String>
+    <system:String
+        x:Key="SleeveStatus.IntersectSleeve">Intersecting sleeves</system:String>
+    <system:String
+        x:Key="SleeveStatus.Correct">Correct</system:String>
+
+    <system:String
+        x:Key="Ok">OK</system:String>
+    <system:String
+        x:Key="Cancel">Cancel</system:String>
+
+    <system:String
+        x:Key="Exceptions.CannotCreateSleeve">Cannot create sleeve</system:String>
+    <system:String
+        x:Key="Exceptions.CannotSetSleeveParams">Cannot set sleeve parameters values, sleeve was deleted</system:String>
+    <system:String
+        x:Key="Exceptions.CannotRotateSleeve">Cannot rotate sleeve, sleeve was deleted</system:String>
+    <system:String
+        x:Key="Exceptions.FloorIsNotHorizontal">The floor is not horizontal or contains sub-elements</system:String>
+    <system:String
+        x:Key="Exceptions.MepCurveIsNotVertical">Mep curve is not vertical</system:String>
+    <system:String
+        x:Key="Exceptions.MepCurveIsVertical">Mep curve is vertical</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFindPlacingPoint">Cannot find placing point</system:String>
+    <system:String
+        x:Key="Exceptions.WallLocationIsNotLine">Wall location is not a line</system:String>
+    <system:String
+        x:Key="Exceptions.MepCurveIsParallelToWall">Mep curve is parallel to wall</system:String>
+    <system:String
+        x:Key="Exceptions.CannotFindDiameterRange">Unable to find the diameter of the tube sleeve</system:String>
+    <system:String
+        x:Key="Exceptions.CannotMergeSleeves">Cannot merge sleeves</system:String>
+    <system:String
+        x:Key="Exceptions.SleevesNotFoundException">No sleeves placed in the document</system:String>
+    <system:String
+        x:Key="Exceptions.StructureLinksNotFoundException">No structural links found</system:String>
+
+    <system:String
+        x:Key="Transaction.SleevesPlacing">Sleeve placing</system:String>
+    <system:String
+        x:Key="Transaction.SleevesCleanup">Sleeve cleanup</system:String>
+    <system:String
+        x:Key="Transaction.SleevesMerging">Sleeve merging</system:String>
+    <system:String
+        x:Key="Transaction.CreateFilter">Create filter</system:String>
+</ResourceDictionary>

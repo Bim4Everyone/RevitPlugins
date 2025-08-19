@@ -1,0 +1,105 @@
+using System;
+using System.Globalization;
+using System.Reflection;
+
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.UI;
+
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
+
+using Ninject;
+
+using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.GraphicView;
+using RevitClashDetective.Models.Handlers;
+using RevitClashDetective.Models.Interfaces;
+
+using RevitSleeves.Models;
+using RevitSleeves.Models.Config;
+using RevitSleeves.Services.Core;
+using RevitSleeves.Services.Navigator;
+using RevitSleeves.ViewModels.Filtration;
+using RevitSleeves.ViewModels.Navigator;
+using RevitSleeves.Views.Filtration;
+using RevitSleeves.Views.Navigator;
+
+namespace RevitSleeves;
+[Transaction(TransactionMode.Manual)]
+internal class ShowNavigatorCommand : BasePluginCommand {
+    public ShowNavigatorCommand() {
+        PluginName = "Навигатор";
+    }
+
+
+    protected override void Execute(UIApplication uiApplication) {
+        using var kernel = uiApplication.CreatePlatformServices();
+
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitClashDetective.Models.RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RevitEventHandler>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ParameterFilterProvider>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<SleevePlacementSettingsConfig>()
+            .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(
+                new RevitClashConfigSerializer(
+                    new RevitClashesSerializationBinder(), uiApplication.ActiveUIDocument.Document)));
+
+        kernel.Bind<ISleeveStatusFinder>()
+            .To<SleeveStatusFinder>()
+            .InSingletonScope();
+        kernel.Bind<IOpeningGeometryProvider>()
+            .To<OpeningGeometryProvider>()
+            .InSingletonScope();
+        kernel.Bind<IStructureLinksProvider>()
+            .To<UserSelectedStructureLinks>()
+            .InSingletonScope();
+        kernel.Bind<IGeometryUtils>()
+            .To<GeometryUtils>()
+            .InSingletonScope();
+        kernel.Bind<IView3DProvider>()
+            .To<SleeveView3dProvider>()
+            .InSingletonScope();
+
+        kernel.BindMainWindow<NavigatorViewModel, NavigatorWindow>();
+        kernel.BindOtherWindow<StructureLinksSelectorViewModel, StructureLinksSelectorWindow>();
+        kernel.UseWpfUIMessageBox<NavigatorViewModel>();
+        kernel.UseWpfUIProgressDialog<NavigatorViewModel>();
+
+        kernel.UseWpfUIThemeUpdater();
+
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        CheckSleevesCount(kernel);
+
+        kernel.Get<NavigatorWindow>().Show();
+    }
+
+    private void CheckSleevesCount(IKernel kernel) {
+        var repo = kernel.Get<RevitRepository>();
+        var sleeves = repo.GetSleeves();
+        if(sleeves.Count == 0) {
+            var localization = kernel.Get<ILocalizationService>();
+            kernel.Get<IMessageBoxService>().Show(
+                localization.GetLocalizedString("Exceptions.SleevesNotFoundException"),
+                localization.GetLocalizedString("Warning"),
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Warning);
+            throw new OperationCanceledException();
+        }
+    }
+}

@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <UseWpfUI>true</UseWpfUI>
+        <UseRevitClashes>true</UseRevitClashes>
+        <LangVersion>12</LangVersion>
+    </PropertyGroup>
+</Project>
