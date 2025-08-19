@@ -1,0 +1,53 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="CopyUserWindow.Title">Копирование пользователя</system:String>
+    <system:String x:Key="CopyUserWindow.Prefix">Префикс</system:String>
+    <system:String x:Key="CopyUserWindow.LastName">Фамилия</system:String>
+    <system:String x:Key="CopyUser.TransactionName">Копирование видов</system:String>
+    
+    <system:String x:Key="CopyUser.EmptyPrefix">Не заполнен префикс</system:String>
+    <system:String x:Key="CopyUser.EmptyLastName">Не заполнена фамилия</system:String>
+    <system:String x:Key="CopyUser.GroupExists">Данная группа видов "{0}" уже используется</system:String>
+    <system:String x:Key="CopyUser.PrefixExists">Данный префикс "{0}" уже используется</system:String>
+    
+    <system:String x:Key="CopyUser.NotFoundUserViewsTitle">Предупреждение!</system:String>
+    <system:String x:Key="CopyUser.NotFoundUserViewsMessage">Не были найдены шаблонные виды "{0}".</system:String>
+        
+    
+    <system:String x:Key="CopyViewWindow.Title">Копирование видов</system:String>
+    <system:String x:Key="CopyViewWindow.CopyViewWithDetails">Копирование с детализацией</system:String>
+    <system:String x:Key="CopyViewWindow.AddElevationMark">Добавить отметку уровня</system:String>
+    <system:String x:Key="CopyViewWindow.Options">Опции копирования</system:String>
+    <system:String x:Key="CopyViewWindow.GroupView">Группа видов</system:String>
+    <system:String x:Key="CopyViewWindow.Prefix">Префикс</system:String>
+    <system:String x:Key="CopyViewWindow.Suffix">Суффикс</system:String>
+    <system:String x:Key="CopyViewWindow.Replace">Заменить</system:String>
+    
+    <system:String x:Key="CopyView.NotSelectedCopyViewTitle">Предупреждение!</system:String>
+    <system:String x:Key="CopyView.NotSelectedCopyViewMessage">Выберите виды, которые требуется скопировать.</system:String>
+    <system:String x:Key="CopyView.TransactionName">Копирование видов.</system:String>
+    <system:String x:Key="CopyView.EmptyGroupView">Не заполнена группа видов.</system:String>
+    <system:String x:Key="CopyView.FoundRepeatedViewName">Найдено повторяющееся имя вида "{0}".</system:String>
+    <system:String x:Key="CopyView.FoundExistsViewName">Найдено существующее имя вида "{0}".</system:String>
+    
+    <system:String x:Key="RenameViewWindow.Title">Переименование видов</system:String>
+    <system:String x:Key="RenameViewWindow.Find">Найти</system:String>
+    <system:String x:Key="RenameViewWindow.Replace">Заменить</system:String>
+    <system:String x:Key="RenameViewWindow.Prefix">Префикс</system:String>
+    <system:String x:Key="RenameViewWindow.Suffix">Суффикс</system:String>
+    <system:String x:Key="RenameViewWindow.TransactionName">Переименование видов</system:String>
+    <system:String x:Key="RenameViewWindow.FoundRepeatViewName">Найдено повторяющееся имя вида "{0}".</system:String>
+    <system:String x:Key="RenameViewWindow.FoundExistsViewName">Найдено существующее имя вида "{0}".</system:String>
+    
+    <system:String x:Key="RenameView.NotSelectedViewsTitle">Предупреждение!</system:String>
+    <system:String x:Key="RenameView.NotSelectedViewsMessage">Выберите виды, которые требуется переименовать.</system:String>
+   
+    <system:String x:Key="UpdateElevation.TransactionName">Обновление отметки этажа</system:String>
+    <system:String x:Key="UpdateElevation.NotSelectedViewsTitle">Предупреждение!</system:String>
+    <system:String x:Key="UpdateElevation.NotSelectedViewsMessage">Не были изменены имена у следующих видов:</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+</ResourceDictionary>

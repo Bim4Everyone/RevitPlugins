@@ -1,186 +1,223 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-namespace RevitCopyViews.ViewModels {
-    internal class RenameViewViewModel : BaseViewModel {
-        private string _prefix;
-        private string _suffix;
-        private string _replaceOldText;
-        private string _replaceNewText;
+using RevitCopyViews.Models;
 
-        private string _errorText;
+namespace RevitCopyViews.ViewModels;
 
-        private bool _isAllowReplaceSuffix;
-        private bool _isAllowReplacePrefix;
+internal class RenameViewViewModel : BaseViewModel {
+    private readonly PluginConfig _pluginConfig;
+    private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
 
-        private bool _replacePrefix;
-        private bool _replaceSuffix;
+    private string _errorText;
 
-        private ObservableCollection<string> _prefixes;
-        private ObservableCollection<string> _suffixes;
-        private bool _withPrefix;
+    private string _prefix;
+    private string _suffix;
+    private string _replaceNewText;
+    private string _replaceOldText;
 
-        public RenameViewViewModel(List<View> selectedViews) {
-            Prefixes = new ObservableCollection<string>();
-            RevitViewViewModels = new ObservableCollection<RevitViewViewModel>(selectedViews.Select(item => new RevitViewViewModel(item)));
+    private bool _isAllowReplacePrefix;
+    private bool _isAllowReplaceSuffix;
 
-            ReplacePrefix = true;
-            RenameViewCommand = new RelayCommand(RenameView, CanRenameView);
+    private bool _withPrefix;
+    private bool _replacePrefix;
+    private bool _replaceSuffix;
 
-            Reload();
+    private ObservableCollection<string> _prefixes;
+    private ObservableCollection<string> _suffixes;
+
+    private ObservableCollection<string> _restrictedViewNames;
+    private ObservableCollection<RevitViewViewModel> _selectedViews;
+
+    public RenameViewViewModel(
+        PluginConfig pluginConfig,
+        RevitRepository revitRepository,
+        ILocalizationService localizationService) {
+        _pluginConfig = pluginConfig;
+        _revitRepository = revitRepository;
+        _localizationService = localizationService;
+
+        ReplacePrefix = true;
+        LoadViewCommand = RelayCommand.Create(LoadView);
+        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+    }
+
+    public ICommand LoadViewCommand { get; }
+    public ICommand AcceptViewCommand { get; }
+
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+
+    public string Prefix {
+        get => _prefix;
+        set => RaiseAndSetIfChanged(ref _prefix, value);
+    }
+
+    public string Suffix {
+        get => _suffix;
+        set => RaiseAndSetIfChanged(ref _suffix, value);
+    }
+
+    public bool IsAllowReplacePrefix {
+        get => _isAllowReplacePrefix;
+        set => RaiseAndSetIfChanged(ref _isAllowReplacePrefix, value);
+    }
+
+    public bool IsAllowReplaceSuffix {
+        get => _isAllowReplaceSuffix;
+        set => RaiseAndSetIfChanged(ref _isAllowReplaceSuffix, value);
+    }
+
+    public bool WithPrefix {
+        get => _withPrefix;
+        set => RaiseAndSetIfChanged(ref _withPrefix, value);
+    }
+
+    public bool ReplacePrefix {
+        get => _replacePrefix;
+        set => RaiseAndSetIfChanged(ref _replacePrefix, value);
+    }
+
+    public bool ReplaceSuffix {
+        get => _replaceSuffix;
+        set => RaiseAndSetIfChanged(ref _replaceSuffix, value);
+    }
+
+    public string ReplaceOldText {
+        get => _replaceOldText;
+        set => RaiseAndSetIfChanged(ref _replaceOldText, value);
+    }
+
+    public string ReplaceNewText {
+        get => _replaceNewText;
+        set => RaiseAndSetIfChanged(ref _replaceNewText, value);
+    }
+
+    public ObservableCollection<string> Prefixes {
+        get => _prefixes;
+        private set => RaiseAndSetIfChanged(ref _prefixes, value);
+    }
+
+    public ObservableCollection<string> Suffixes {
+        get => _suffixes;
+        private set => RaiseAndSetIfChanged(ref _suffixes, value);
+    }
+
+    public ObservableCollection<RevitViewViewModel> SelectedViews {
+        get => _selectedViews;
+        set => RaiseAndSetIfChanged(ref _selectedViews, value);
+    }
+
+    public ObservableCollection<string> RestrictedViewNames {
+        get => _restrictedViewNames;
+        set => RaiseAndSetIfChanged(ref _restrictedViewNames, value);
+    }
+
+    private void LoadView() {
+        SelectedViews = new ObservableCollection<RevitViewViewModel>(
+            _revitRepository.GetSelectedViews()
+                .Select(item => new RevitViewViewModel(item)));
+
+        RestrictedViewNames =
+            new ObservableCollection<string>(_revitRepository.GetViewNames(_revitRepository.GetViews()));
+
+        Prefixes = new ObservableCollection<string>(
+            SelectedViews
+                .Select(item => item.Prefix)
+                .Where(item => !string.IsNullOrEmpty(item))
+                .Distinct());
+
+        Suffixes = new ObservableCollection<string>(
+            SelectedViews
+                .Select(item => item.Suffix)
+                .Where(item => !string.IsNullOrEmpty(item))
+                .Distinct());
+
+        IsAllowReplacePrefix = Prefixes.Count > 0;
+        IsAllowReplaceSuffix = Suffixes.Count > 0;
+
+        ReplacePrefix = IsAllowReplacePrefix && ReplacePrefix;
+        ReplaceSuffix = IsAllowReplaceSuffix && ReplaceSuffix;
+
+        if(Prefixes.Count == 1) {
+            Prefix = Prefixes.First();
         }
 
-        public Document Document { get; set; }
-        public UIDocument UIDocument { get; set; }
-        public Application Application { get; set; }
+        if(Suffixes.Count == 1) {
+            Suffix = Suffixes.First();
+        }
+    }
 
-        public List<string> RestrictedViewNames { get; set; }
+    private void AcceptView() {
+        using var transaction =
+            _revitRepository.StartTransaction(_localizationService.GetLocalizedString("RenameView.TransactionName"));
 
-        public string Prefix {
-            get => _prefix;
-            set => this.RaiseAndSetIfChanged(ref _prefix, value);
+        foreach(var revitView in SelectedViews) {
+            revitView.View.Name = GetViewName(revitView);
         }
 
-        public string Suffix {
-            get => _suffix;
-            set => this.RaiseAndSetIfChanged(ref _suffix, value);
+        transaction.Commit();
+    }
+
+    private bool CanAcceptView() {
+        string[] generatingNames = SelectedViews
+            .Select(GetViewName)
+            .ToArray();
+
+        string generateName = generatingNames.GroupBy(item => item)
+            .Where(item => item.Count() > 1)
+            .Select(item => item.Key)
+            .FirstOrDefault();
+
+        if(!string.IsNullOrEmpty(generateName)) {
+            ErrorText = _localizationService.GetLocalizedString("RenameView.FoundRepeatViewName", generateName);
+            return false;
         }
 
-        public bool IsAllowReplacePrefix {
-            get => _isAllowReplacePrefix;
-            set => this.RaiseAndSetIfChanged(ref _isAllowReplacePrefix, value);
-        }
-        public bool IsAllowReplaceSuffix {
-            get => _isAllowReplaceSuffix;
-            set => this.RaiseAndSetIfChanged(ref _isAllowReplaceSuffix, value);
-        }
+        string existingName =
+            generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(item.Equals));
 
-        public bool WithPrefix { 
-            get => _withPrefix; 
-            set => this.RaiseAndSetIfChanged(ref _withPrefix, value); 
+        if(!string.IsNullOrEmpty(existingName)) {
+            ErrorText = _localizationService.GetLocalizedString("RenameView.FoundExistsViewName", existingName);
+            return false;
         }
 
-        public bool ReplacePrefix {
-            get => _replacePrefix;
-            set => this.RaiseAndSetIfChanged(ref _replacePrefix, value);
+        ErrorText = null;
+        return true;
+    }
+
+    private string GetViewName(RevitViewViewModel revitView) {
+        string originalName = revitView.OriginalName;
+        if(!string.IsNullOrEmpty(ReplaceOldText)) {
+            originalName = revitView.OriginalName.Replace(ReplaceOldText, ReplaceNewText);
         }
 
-        public bool ReplaceSuffix {
-            get => _replaceSuffix;
-            set => this.RaiseAndSetIfChanged(ref _replaceSuffix, value);
+        if(!WithPrefix) {
+            return originalName;
         }
 
-        public string ReplaceOldText {
-            get => _replaceOldText;
-            set => this.RaiseAndSetIfChanged(ref _replaceOldText, value);
-        }
+        var splitViewOptions = new SplitViewOptions {
+            ReplacePrefix = ReplacePrefix,
+            ReplaceSuffix = ReplaceSuffix
+        };
 
-        public string ReplaceNewText {
-            get => _replaceNewText;
-            set => this.RaiseAndSetIfChanged(ref _replaceNewText, value);
-        }
+        var splittedViewName = revitView.SplitName(originalName, splitViewOptions);
+        splittedViewName.Prefix = Prefix;
+        splittedViewName.Suffix = Suffix;
 
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
-        }
-
-        public ObservableCollection<RevitViewViewModel> RevitViewViewModels { get; }
-
-        public ObservableCollection<string> Prefixes {
-            get => _prefixes;
-            private set => this.RaiseAndSetIfChanged(ref _prefixes, value);
-        }
-
-        public ObservableCollection<string> Suffixes {
-            get => _suffixes;
-            private set => this.RaiseAndSetIfChanged(ref _suffixes, value);
-        }
-
-        public ICommand RenameViewCommand { get; }
-
-        private void RenameView(object p) {
-            using(var transaction = new Transaction(Document)) {
-                transaction.Start("Переименование видов");
-
-                foreach(RevitViewViewModel revitView in RevitViewViewModels) {
-                    revitView.View.Name = GetViewName(revitView);
-                }
-
-                transaction.Commit();
-            }
-        }
-
-        private bool CanRenameView(object p) {
-            IEnumerable<string> generatingNames = RevitViewViewModels.Select(item => GetViewName(item));
-            string generateName = generatingNames.GroupBy(item => item).Where(item => item.Count() > 1).Select(item => item.Key).FirstOrDefault();
-            if(!string.IsNullOrEmpty(generateName)) {
-                ErrorText = $"Найдено повторяющееся имя вида \"{generateName}\".";
-                return false;
-            }
-
-
-            string existintName = generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(viewName => item.Equals(viewName)));
-            if(!string.IsNullOrEmpty(existintName)) {
-                ErrorText = $"Найдено существующее имя вида \"{existintName}\".";
-                return false;
-            }
-
-            ErrorText = null;
-            return true;
-        }
-
-        private string GetViewName(RevitViewViewModel revitView) {
-            string originalName = revitView.OriginalName;
-            if(!string.IsNullOrEmpty(ReplaceOldText)) {
-                originalName = revitView.OriginalName.Replace(ReplaceOldText, ReplaceNewText);
-            }
-
-            if(!WithPrefix) {
-                return originalName;
-            }
-
-            var splitViewOptions = new SplitViewOptions() {
-                ReplacePrefix = ReplacePrefix,
-                ReplaceSuffix = ReplaceSuffix
-            };
-
-            SplittedViewName splittedViewName = revitView.SplitName(originalName, splitViewOptions);
-            splittedViewName.Prefix = Prefix;
-            splittedViewName.Suffix = Suffix;
-
-            return Delimiter.CreateViewName(splittedViewName);
-        }
-
-        private void Reload() {
-            Prefixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Prefix).Where(item => !string.IsNullOrEmpty(item)).Distinct());
-            Suffixes = new ObservableCollection<string>(RevitViewViewModels.Select(item => item.Suffix).Where(item => !string.IsNullOrEmpty(item)).Distinct());
-
-            IsAllowReplacePrefix = Prefixes.Count > 0;
-            IsAllowReplaceSuffix = Suffixes.Count > 0;
-
-            ReplacePrefix = IsAllowReplacePrefix ? ReplacePrefix : false;
-            ReplaceSuffix = IsAllowReplaceSuffix ? ReplaceSuffix : false;
-
-            if(Prefixes.Count == 1) {
-                Prefix = Prefixes.First();
-            }
-
-            if(Suffixes.Count == 1) {
-                Suffix = Suffixes.First();
-            }
-        }
+        return Delimiter.CreateViewName(splittedViewName);
     }
 }

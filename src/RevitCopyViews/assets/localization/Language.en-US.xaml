@@ -1,0 +1,52 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="CopyUserWindow.Title">User Copy</system:String>
+    <system:String x:Key="CopyUserWindow.Prefix">Prefix</system:String>
+    <system:String x:Key="CopyUserWindow.LastName">Last Name</system:String>
+    <system:String x:Key="CopyUser.TransactionName">Copying views</system:String>
+    
+    <system:String x:Key="CopyUser.EmptyPrefix">Prefix is not filled</system:String>
+    <system:String x:Key="CopyUser.EmptyLastName">The last name is not filled</system:String>
+    <system:String x:Key="CopyUser.GroupExists">This view group "{0}" is already in use</system:String>
+    <system:String x:Key="CopyUser.PrefixExists">This prefix "{0}" is already in use</system:String>
+    
+    <system:String x:Key="CopyUser.NotFoundUserViewsTitle">Warning!</system:String>
+    <system:String x:Key="CopyUser.NotFoundUserViewsMessage">Template views "{0}" were not found.</system:String>
+        
+    <system:String x:Key="CopyViewWindow.Title">Copy views</system:String>
+    <system:String x:Key="CopyViewWindow.CopyViewWithDetails">Copy with details</system:String>
+    <system:String x:Key="CopyViewWindow.AddElevationMark">Add elevation mark</system:String>
+    <system:String x:Key="CopyViewWindow.Options">Copy options</system:String>
+    <system:String x:Key="CopyViewWindow.GroupView">View group</system:String>
+    <system:String x:Key="CopyViewWindow.Prefix">Prefix</system:String>
+    <system:String x:Key="CopyViewWindow.Suffix">Suffix</system:String>
+    <system:String x:Key="CopyViewWindow.Replace">Replace</system:String>
+    
+    <system:String x:Key="CopyView.NotSelectedCopyViewTitle">Warning!</system:String>
+    <system:String x:Key="CopyView.NotSelectedCopyViewMessage">Select views that need to be copied.</system:String>
+    <system:String x:Key="CopyView.TransactionName">Copying views.</system:String>
+    <system:String x:Key="CopyView.EmptyGroupView">View group is not filled.</system:String>
+    <system:String x:Key="CopyView.FoundRepeatedViewName">Duplicate view name found "{0}".</system:String>
+    <system:String x:Key="CopyView.FoundExistsViewName">Existing view name found "{0}".</system:String>
+    
+    <system:String x:Key="RenameViewWindow.Title">Rename Views</system:String>
+    <system:String x:Key="RenameViewWindow.Find">Find</system:String>
+    <system:String x:Key="RenameViewWindow.Replace">Replace</system:String>
+    <system:String x:Key="RenameViewWindow.Prefix">Prefix</system:String>
+    <system:String x:Key="RenameViewWindow.Suffix">Suffix</system:String>
+    <system:String x:Key="RenameViewWindow.TransactionName">Rename Views</system:String>
+    <system:String x:Key="RenameViewWindow.FoundRepeatViewName">Found duplicate view name "{0}".</system:String>
+    <system:String x:Key="RenameViewWindow.FoundExistsViewName">Found existing view name "{0}".</system:String>
+    
+    <system:String x:Key="RenameView.NotSelectedViewsTitle">Warning!</system:String>
+    <system:String x:Key="RenameView.NotSelectedViewsMessage">Select views that need to be renamed.</system:String>
+    
+    <system:String x:Key="UpdateElevation.TransactionName">Update floor elevation</system:String>
+    <system:String x:Key="UpdateElevation.NotSelectedViewsTitle">Warning!</system:String>
+    <system:String x:Key="UpdateElevation.NotSelectedViewsMessage">Names were not changed for the following views:</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+</ResourceDictionary>

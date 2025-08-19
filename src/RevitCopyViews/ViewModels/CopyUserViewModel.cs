@@ -3,97 +3,115 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-namespace RevitCopyViews.ViewModels {
-    internal class CopyUserViewModel : BaseViewModel {
-        private string _prefix;
-        private string _lastName;
-        private string _errorText;
+using RevitCopyViews.Models;
 
-        public CopyUserViewModel() {
-            CopyUserCommand = new RelayCommand(CopyUser, CanCopyUser);
+namespace RevitCopyViews.ViewModels;
+
+internal class CopyUserViewModel : BaseViewModel {
+    private readonly PluginConfig _pluginConfig;
+    private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
+
+    private string _prefix;
+    private string _lastName;
+    private string _errorText;
+
+    public CopyUserViewModel(
+        PluginConfig pluginConfig,
+        RevitRepository revitRepository,
+        ILocalizationService localizationService) {
+        _pluginConfig = pluginConfig;
+        _revitRepository = revitRepository;
+        _localizationService = localizationService;
+
+        LoadViewCommand = RelayCommand.Create(LoadView);
+        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+    }
+
+    public ICommand LoadViewCommand { get; }
+    public ICommand AcceptViewCommand { get; }
+
+    public List<View> Views { get; set; }
+    public List<string> GroupViews { get; set; }
+    public List<string> RestrictedViewNames { get; set; }
+
+    public string Prefix {
+        get => _prefix;
+        set => RaiseAndSetIfChanged(ref _prefix, value);
+    }
+
+    public string LastName {
+        get => _lastName;
+        set => RaiseAndSetIfChanged(ref _lastName, value);
+    }
+
+    public string GroupView => "01 " + LastName;
+
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
+    }
+
+    private void LoadView() {
+        _revitRepository.TransferStandards();
+        
+        List<View> views = _revitRepository.GetViews().ToList();
+        Views = _revitRepository.GetUserViews(views).ToList();
+        GroupViews = _revitRepository.GetGroupViews(views).ToList();
+        RestrictedViewNames = _revitRepository.GetViewNames(views).ToList();
+    }
+
+    private void AcceptView() {
+        using var transaction =
+            _revitRepository.StartTransaction(_localizationService.GetLocalizedString("CopyUser.TransactionName"));
+
+        foreach(var view in Views) {
+            var newView = _revitRepository.GetElement<View>(view.Duplicate(ViewDuplicateOption.Duplicate));
+
+            newView.Name = GetViewName(view);
+            newView.ViewTemplateId = ElementId.InvalidElementId;
+            newView.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
         }
 
-        public Document Document { get; set; }
-        public UIDocument UIDocument { get; set; }
-        public Application Application { get; set; }
+        transaction.Commit();
+    }
 
-        public List<View> Views { get; set; }
-        public List<string> GroupViews { get; set; }
-        public List<string> RestrictedViewNames { get; set; }
-
-        public string Prefix {
-            get => _prefix;
-            set => this.RaiseAndSetIfChanged(ref _prefix, value);
+    private bool CanAcceptView() {
+        if(string.IsNullOrEmpty(LastName)) {
+            ErrorText = _localizationService.GetLocalizedString("CopyUser.EmptyLastName");
+            return false;
         }
 
-        public string LastName {
-            get => _lastName;
-            set => this.RaiseAndSetIfChanged(ref _lastName, value);
+        if(string.IsNullOrEmpty(Prefix)) {
+            ErrorText = _localizationService.GetLocalizedString("CopyUser.EmptyPrefix");
+            return false;
         }
 
-        public string GroupView {
-            get { return "01 " + LastName; }
+        if(GroupViews.Any(item => item.Equals(GroupView, StringComparison.CurrentCultureIgnoreCase))) {
+            ErrorText = _localizationService.GetLocalizedString("CopyUser.GroupExists", GroupView);
+            return false;
         }
 
-        public string ErrorText {
-            get => _errorText;
-            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        if(RestrictedViewNames.Any(item =>
+               item.StartsWith(Prefix + "_", StringComparison.CurrentCultureIgnoreCase))) {
+            ErrorText = _localizationService.GetLocalizedString("CopyUser.PrefixExists", Prefix);
+            return false;
         }
 
-        public ICommand CopyUserCommand { get; }
+        ErrorText = null;
+        return true;
+    }
 
-        private void CopyUser(object p) {
-            using(var transaction = Document.StartTransaction("Копирование видов")) {
-                foreach(View revitView in Views) {
-                    View newView = (View) Document.GetElement(revitView.Duplicate(ViewDuplicateOption.Duplicate));
-
-                    newView.Name = GetViewName(revitView);
-                    newView.ViewTemplateId = ElementId.InvalidElementId;
-                    newView.SetParamValue(ProjectParamsConfig.Instance.ViewGroup, GroupView);
-                }
-
-                transaction.Commit();
-            }
-        }
-
-        private bool CanCopyUser(object p) {
-            if(string.IsNullOrEmpty(LastName)) {
-                ErrorText = "Не заполнена фамилия.";
-                return false;
-            }
-
-            if(string.IsNullOrEmpty(Prefix)) {
-                ErrorText = "Не заполнен префикс.";
-                return false;
-            }
-
-            if(GroupViews.Any(item => item.Equals(GroupView, StringComparison.CurrentCultureIgnoreCase))) {
-                ErrorText = "Данная группа видов уже используется.";
-                return false;
-            }
-
-            if(RestrictedViewNames.Any(item =>
-                   item.StartsWith(Prefix + "_", StringComparison.CurrentCultureIgnoreCase))) {
-                ErrorText = "Данный префикс уже используется.";
-                return false;
-            }
-
-            ErrorText = null;
-            return true;
-        }
-
-        private string GetViewName(View revitView) {
-            return revitView.Name.Replace("User_", Prefix + "_");
-        }
+    private string GetViewName(View view) {
+        return view.Name.Replace(RevitRepository.UserViewPrefix, Prefix + "_");
     }
 }

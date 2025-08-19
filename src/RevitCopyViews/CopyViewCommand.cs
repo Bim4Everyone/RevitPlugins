@@ -1,81 +1,88 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
+using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
-using dosymep;
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.Templates;
-using dosymep.Revit;
 using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
+using Ninject;
+
+using RevitCopyViews.Models;
 using RevitCopyViews.ViewModels;
 using RevitCopyViews.Views;
 
-namespace RevitCopyViews {
-    [Transaction(TransactionMode.Manual)]
-    public class CopyViewCommand : BasePluginCommand {
-        public CopyViewCommand() {
-            PluginName = "Копирование видов";
-        }
+namespace RevitCopyViews;
 
-        protected override void Execute(UIApplication uiApplication) {
-            var application = uiApplication.Application;
+[Transaction(TransactionMode.Manual)]
+public class CopyViewCommand : BasePluginCommand {
+    public CopyViewCommand() {
+        PluginName = "Копирование видов";
+    }
 
-            var uiDocument = uiApplication.ActiveUIDocument;
-            var document = uiDocument.Document;
+    protected override void Execute(UIApplication uiApplication) {
+        // Создание контейнера зависимостей плагина с сервисами из платформы
+        using IKernel kernel = uiApplication.CreatePlatformServices();
 
-            var projectParameters = ProjectParameters.Create(application);
-            projectParameters.SetupBrowserOrganization(document);
-            projectParameters.SetupRevitParams(document, ProjectParamsConfig.Instance.ViewGroup, ProjectParamsConfig.Instance.ProjectStage);
+        // Настройка доступа к Revit
+        kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
 
-            var selectedViews = uiDocument.Selection.GetElementIds()
-                .Select(item => document.GetElement(item))
-                .OfType<View>()
-                .Where(item => IsView(item))
-                .ToList();
+        // Настройка конфигурации плагина
+        kernel.Bind<PluginConfig>()
+            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-            if(selectedViews.Count == 0) {
-                TaskDialog.Show("Предупреждение!", "Выберите виды, которые требуется скопировать.");
-                return;
-            }
+        // Используем сервис обновления тем для WinUI
+        kernel.UseWpfUIThemeUpdater();
 
-            var views = new FilteredElementCollector(document)
-                .OfClass(typeof(View))
-                .OfType<View>()
-                .Where(item => IsView(item))
-                .ToList();
+        // Настройка запуска окна
+        kernel.BindMainWindow<CopyViewViewModel, CopyViewWindow>();
 
-            var groupViews = views
-                 .Select(item => (string) item.GetParamValueOrDefault(ProjectParamsConfig.Instance.ViewGroup))
-                 .Where(item => !string.IsNullOrEmpty(item))
-                 .OrderBy(item => item)
-                 .Distinct();
+        // Настройка локализации,
+        // получение имени сборки откуда брать текст
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
-            var window = new CopyViewWindow() {
-                DataContext = new CopyViewViewModel(selectedViews) {
-                    Document = document,
-                    UIDocument = uiDocument,
-                    Application = application,
+        // Настройка локализации,
+        // установка дефолтной локализации "ru-RU"
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
 
-                    GroupViews = new ObservableCollection<string>(groupViews),
-                    RestrictedViewNames = views.Select(item => item.Name).ToList()
-                }
-            };
+        // используем message box без привязки к окну,
+        // потому что он вызывается до запуска основного окна
+        kernel.UseWpfUIMessageBox();
+        
+        // Проверка запуска плагина
+        Check(kernel);
 
-            Notification(window);
-        }
+        // Вызывает стандартное уведомление
+        Notification(kernel.Get<CopyViewWindow>());
+    }
+    
+    private static void Check(IKernel kernel) {
+        var revitRepository = kernel.Get<RevitRepository>();
+        var messageBoxService = kernel.Get<IMessageBoxService>();
+        var localizationService = kernel.Get<ILocalizationService>();
+        
+        var copyViews = revitRepository.GetSelectedCopyViews().ToArray();
+        if(copyViews.Length == 0) {
+            string title = localizationService.GetLocalizedString("CopyView.NotSelectedCopyViewTitle");
+            string message = localizationService.GetLocalizedString("CopyView.NotSelectedCopyViewMessage");
 
-        private static bool IsView(View item) {
-            return item.Category?.Id != new ElementId(BuiltInCategory.OST_Schedules) && item.Category?.Id != new ElementId(BuiltInCategory.OST_Sheets);
+            messageBoxService.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
+            throw new System.OperationCanceledException();
         }
     }
 }
