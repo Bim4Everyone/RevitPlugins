@@ -118,35 +118,6 @@ internal class GeneralViewRebarPerpDimensionService {
         } catch(Exception) { }
     }
 
-    /// <summary>
-    /// Определение с какой стороны относительно вид находится Г-образный стержень
-    /// </summary>
-    internal bool LRebarIsRight() {
-        var view = ViewOfPylon.ViewElement;
-        var rebarFinder = ViewModel.RebarFinder;
-        // Г-образный стержень
-        var lRebar = rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, 1101).FirstOrDefault();
-        // Бутылка
-        var bottleRebar = rebarFinder.GetSimpleRebars(view, SheetInfo.ProjectSection, 1204).FirstOrDefault();
-
-        if(lRebar is null || bottleRebar is null) {
-            return false;
-        }
-
-        var lRebarLocation = lRebar.Location as LocationPoint;
-        var lRebarPt = lRebarLocation.Point;
-
-        var bottleRebarLocation = bottleRebar.Location as LocationPoint;
-        var bottleRebarPt = bottleRebarLocation.Point;
-
-        var transform = view.CropBox.Transform;
-        var inverseTransform = transform.Inverse;
-        // Получаем координаты точек вставки в координатах вида
-        var lRebarPtTransformed = inverseTransform.OfPoint(lRebarPt);
-        var bottleRebarPtTransformed = inverseTransform.OfPoint(bottleRebarPt);
-
-        return lRebarPtTransformed.X > bottleRebarPtTransformed.X;
-    }
 
     /// <summary>
     /// Создание размера сбоку между низом арматурного каркаса и Г-образным стержнем
@@ -186,7 +157,8 @@ internal class GeneralViewRebarPerpDimensionService {
                 CreateLRebarDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, ["#1_торец_Г"]);
                 CreateLRebarDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, ["#2_торец_Г"]);
             } else if(SheetInfo.RebarInfo.HasLRebar) {
-                if(LRebarIsRight() && SheetInfo.RebarInfo.SecondLRebarParamValue) {
+                if(ViewModel.RebarFinder.DirectionHasLRebar(ViewOfPylon.ViewElement, SheetInfo.ProjectSection, DirectionType.Right)
+                    && SheetInfo.RebarInfo.SecondLRebarParamValue) {
                     CreateLRebarDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, ["#2_торец_Г"]);
                 } else {
                     CreateLRebarDimension(skeletonParentRebar, dimensionLine, dimensionBaseService, ["#1_торец_Г"]);

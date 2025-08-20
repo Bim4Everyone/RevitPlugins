@@ -207,4 +207,40 @@ public class RebarFinderService {
             .ToElements();
         return collector.Intersect(rebars, ViewModel.ComparerOfElements).ToList();
     }
+
+
+    /// <summary>
+    /// Определение с какой стороны относительно вида находится Г-образный стержень
+    /// </summary>
+    public bool DirectionHasLRebar(View view, string projectSection, DirectionType directionType) {
+        var rebarFinder = ViewModel.RebarFinder;
+        // Г-образный стержень
+        var lRebar = rebarFinder.GetSimpleRebars(view, projectSection, 1101).FirstOrDefault();
+        // Бутылка
+        var bottleRebar = rebarFinder.GetSimpleRebars(view, projectSection, 1204).FirstOrDefault();
+
+        if(lRebar is null || bottleRebar is null) {
+            return false;
+        }
+
+        if(lRebar.Location is not LocationPoint lRebarLocation) { return false; }
+        var lRebarPt = lRebarLocation.Point;
+
+        if(bottleRebar.Location is not LocationPoint bottleRebarLocation) { return false; }
+        var bottleRebarPt = bottleRebarLocation.Point;
+
+        var transform = view.CropBox.Transform;
+        var inverseTransform = transform.Inverse;
+        // Получаем координаты точек вставки в координатах вида
+        var lRebarPtTransformed = inverseTransform.OfPoint(lRebarPt);
+        var bottleRebarPtTransformed = inverseTransform.OfPoint(bottleRebarPt);
+
+        return directionType switch {
+            DirectionType.Top => lRebarPtTransformed.Y > bottleRebarPtTransformed.Y,
+            DirectionType.Bottom => lRebarPtTransformed.Y < bottleRebarPtTransformed.Y,
+            DirectionType.Right => lRebarPtTransformed.X > bottleRebarPtTransformed.X,
+            DirectionType.Left => lRebarPtTransformed.X < bottleRebarPtTransformed.X,
+            _ => false
+        };
+    }
 }
