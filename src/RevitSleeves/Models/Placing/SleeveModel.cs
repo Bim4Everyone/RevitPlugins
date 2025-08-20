@@ -98,7 +98,8 @@ internal class SleeveModel : IEquatable<SleeveModel> {
         }
         double angleTolerance = _familyInstance.Document.Application.AngleTolerance;
         var locationDiff = this.Location - second.Location;
+        double angle = this.GetOrientation().AngleTo(locationDiff);
         return locationDiff.GetLength() <= (this.Length / 2 + second.Length / 2 + distanceTolerance * 2)
-            && this.GetOrientation().AngleTo(locationDiff) <= angleTolerance;
+            && (angle <= angleTolerance || (Math.PI - angleTolerance) <= angle && angle <= Math.PI);
     }
 }
