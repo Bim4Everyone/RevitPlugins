@@ -1,0 +1,369 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:local="clr-namespace:RevitCreatingFiltersByValues.Views"
+    xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ComboBox/ComboBox.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewHeaderRowIndicator.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/Expander/Expander.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style
+        x:Key="CustomResizableDataGridStyle"
+        TargetType="ui:DataGrid"
+        BasedOn="{StaticResource DefaultUiDataGridStyle}">
+        <Setter
+            Property="ColumnHeaderStyle"
+            Value="{DynamicResource CustomDataGridColumnHeaderStyle}" />
+        <Setter
+            Property="RowStyle"
+            Value="{DynamicResource CustomDataGridRowStyle}" />
+        <Setter
+            Property="AutoGenerateColumns"
+            Value="False" />
+        <Setter
+            Property="VirtualizingPanel.VirtualizationMode"
+            Value="Recycling" />
+        <Setter
+            Property="VirtualizingPanel.IsVirtualizing"
+            Value="True" />
+        <Setter
+            Property="VerticalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="HorizontalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="CanUserReorderColumns"
+            Value="False" />
+        <Setter
+            Property="CanUserResizeColumns"
+            Value="True" />
+        <Setter
+            Property="GridLinesVisibility"
+            Value="All" />
+        <Setter
+            Property="RowStyle"
+            Value="{x:Null}" />
+    </Style>
+    <Style
+        x:Key="CustomDataGridRowStyle"
+        TargetType="{x:Type DataGridRow}"
+        BasedOn="{StaticResource DefaultDataGridRowStyle}">
+        <Setter
+            Property="Margin"
+            Value="0 5" />
+    </Style>
+    <Style
+        x:Key="CustomColumnHeaderGripperStyle"
+        TargetType="{x:Type Thumb}">
+        <Setter
+            Property="Width"
+            Value="5" />
+        <Setter
+            Property="Background"
+            Value="Transparent" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="Padding"
+            Value="4,0" />
+        <Setter
+            Property="HorizontalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="Cursor"
+            Value="SizeWE" />
+        <Setter
+            Property="OverridesDefaultStyle"
+            Value="True" />
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="{x:Type Thumb}">
+                    <Border
+                        x:Name="Border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <Rectangle
+                            x:Name="Thumb"
+                            Width="4"
+                            Height="16"
+                            Margin="{TemplateBinding Padding}"
+                            RadiusX="2"
+                            RadiusY="2" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger
+                            Property="HorizontalAlignment"
+                            Value="Left">
+                            <Setter
+                                TargetName="Border"
+                                Property="CornerRadius"
+                                Value="4,0,0,4" />
+                        </Trigger>
+                        <Trigger
+                            Property="HorizontalAlignment"
+                            Value="Right">
+                            <Setter
+                                TargetName="Border"
+                                Property="CornerRadius"
+                                Value="0,4,4,0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="CustomDataGridColumnHeaderStyle"
+        BasedOn="{StaticResource DefaultUiDataGridColumnHeaderStyle}"
+        TargetType="DataGridColumnHeader">
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="{x:Type DataGridColumnHeader}">
+                    <Grid>
+                        <Border
+                            x:Name="HeaderBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource ControlCornerRadius}">
+                            <Grid
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                IsSharedSizeScope="True">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition
+                                        x:Name="FirstColumn"
+                                        Width="*" />
+                                    <ColumnDefinition
+                                        x:Name="SecondColumn"
+                                        Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter
+                                    Grid.Column="0"
+                                    x:Name="ContentPresenter"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                <controls:SymbolIcon
+                                    Grid.Column="1"
+                                    x:Name="SortIcon"
+                                    Margin="4,0,0,0"
+                                    RenderTransformOrigin="0.5, 0.5"
+                                    Symbol="ArrowSortUp24">
+                                    <controls:SymbolIcon.RenderTransform>
+                                        <RotateTransform
+                                            Angle="0" />
+                                    </controls:SymbolIcon.RenderTransform>
+                                </controls:SymbolIcon>
+                            </Grid>
+                        </Border>
+
+                        <Thumb
+                            x:Name="PART_LeftHeaderGripper"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource CustomColumnHeaderGripperStyle}" />
+                        <Thumb
+                            x:Name="PART_RightHeaderGripper"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource CustomColumnHeaderGripperStyle}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger
+                            Property="IsMouseOver"
+                            Value="True">
+                            <Setter
+                                TargetName="HeaderBorder"
+                                Property="Background"
+                                Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
+                        </Trigger>
+                        <Trigger
+                            Property="IsPressed"
+                            Value="True">
+                            <Setter
+                                TargetName="HeaderBorder"
+                                Property="Background"
+                                Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                        </Trigger>
+                        <Trigger
+                            Property="IsEnabled"
+                            Value="False">
+                            <Setter
+                                Property="TextElement.Foreground"
+                                Value="{DynamicResource TextFillColorDisabledBrush}" />
+                        </Trigger>
+                        <Trigger
+                            Property="SortDirection"
+                            Value="{x:Null}">
+                            <Setter
+                                TargetName="SortIcon"
+                                Property="Visibility"
+                                Value="Collapsed" />
+                        </Trigger>
+                        <Trigger
+                            Property="SortDirection"
+                            Value="Descending">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="SortIcon"
+                                            Storyboard.TargetProperty="(controls:SymbolIcon.RenderTransform).(RotateTransform.Angle)"
+                                            From="0"
+                                            To="180"
+                                            Duration="00:00:00.333" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="SortIcon"
+                                            Storyboard.TargetProperty="(controls:SymbolIcon.RenderTransform).(RotateTransform.Angle)"
+                                            From="180"
+                                            To="0"
+                                            Duration="00:00:00.333" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger
+                            Property="HorizontalContentAlignment"
+                            Value="Right">
+                            <Setter
+                                TargetName="FirstColumn"
+                                Property="Width"
+                                Value="Auto" />
+                            <Setter
+                                TargetName="SecondColumn"
+                                Property="Width"
+                                Value="*" />
+                            <Setter
+                                TargetName="ContentPresenter"
+                                Property="Grid.Column"
+                                Value="1" />
+                            <Setter
+                                TargetName="SortIcon"
+                                Property="Grid.Column"
+                                Value="0" />
+                            <Setter
+                                TargetName="SortIcon"
+                                Property="Margin"
+                                Value="0,0,4,0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style
+        TargetType="Border"
+        x:Key="CustomBorder">
+        <Setter
+            Property="Padding"
+            Value="7" />
+        <Setter
+            Property="CornerRadius"
+            Value="5" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="True" />
+        <Setter
+            Property="OverridesDefaultStyle"
+            Value="True" />
+        <Setter
+            Property="ScrollViewer.HorizontalScrollBarVisibility"
+            Value="Auto" />
+        <Setter
+            Property="ScrollViewer.VerticalScrollBarVisibility"
+            Value="Disabled" />
+        <Setter
+            Property="Background"
+            Value="{DynamicResource CardBackground}" />
+        <Setter
+            Property="BorderBrush"
+            Value="{DynamicResource CardBorderBrush}" />
+        <Setter
+            Property="BorderThickness"
+            Value="{DynamicResource CardControlBorderThemeThickness}" />
+        <Setter
+            Property="FocusVisualStyle"
+            Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+        <Setter
+            Property="CornerRadius"
+            Value="{DynamicResource ControlCornerRadius}" />
+    </Style>
+
+    <Style
+        TargetType="ComboBox"
+        x:Key="CustomComboBox">
+        <Setter
+            Property="HorizontalContentAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="Margin"
+            Value="0 2" />
+        <Setter
+            Property="MinWidth"
+            Value="250" />
+        <Setter
+            Property="HorizontalAlignment"
+            Value="Right" />
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+    </Style>
+
+    <Style
+        TargetType="ui:Button"
+        x:Key="CustomButtonWithToolTip"
+        BasedOn="{StaticResource DefaultUiButtonStyle}">
+        <Setter
+            Property="ToolTipService.InitialShowDelay"
+            Value="1000" />
+        <Setter
+            Property="ToolTipService.ShowDuration"
+            Value="20000" />
+        <Setter
+            Property="ToolTipService.BetweenShowDelay"
+            Value="1" />
+    </Style>
+
+    <Style
+        TargetType="ui:ListViewItem"
+        x:Key="CustomListViewItem"
+        BasedOn="{StaticResource ListViewItemStyle}">
+        <Setter
+            Property="IsSelected"
+            Value="{Binding IsCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+    </Style>
+</ResourceDictionary>

@@ -1,11 +1,25 @@
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
+
+using dosymep.SimpleServices;
 
 namespace RevitCreatingFiltersByValues.Views;
 public partial class MainWindow {
-    public MainWindow() {
+    public MainWindow(
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        : base(loggerService,
+            serializationService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
-    }
 
+        SetExpanderCollapsedBrushes();
+        uiThemeService.UIThemeChanged += UiThemeService_UIThemeChanged;
+    }
 
     public override string PluginName => nameof(RevitCreatingFiltersByValues);
     public override string ProjectConfigName => nameof(MainWindow);
@@ -18,7 +32,51 @@ public partial class MainWindow {
         DialogResult = false;
     }
 
-    private void window_Loaded(object sender, RoutedEventArgs e) {
-        expander.MaxHeight = window.ActualHeight * 0.88;
+    private void UiThemeService_UIThemeChanged(UIThemes obj) {
+        if(expander.IsExpanded) {
+            SetExpanderExpandedBrushes();
+        } else {
+            SetExpanderCollapsedBrushes();
+        }
+    }
+
+    private void ExpanderExpanded(object sender, RoutedEventArgs e) {
+        SetExpanderExpandedBrushes();
+    }
+
+    private void ExpanderCollapsed(object sender, RoutedEventArgs e) {
+        SetExpanderCollapsedBrushes();
+    }
+
+    private void SetExpanderExpandedBrushes() {
+        var fillBrush = (SolidColorBrush) FindResource("WindowBackground");
+        Resources["ExpanderHeaderBackground"] = fillBrush;
+        Resources["ExpanderContentBackground"] = fillBrush;
+
+        var borderBrush = (SolidColorBrush) FindResource("AccentButtonBackground");
+        Resources["ExpanderHeaderBorderBrush"] = borderBrush;
+    }
+
+    private void SetExpanderCollapsedBrushes() {
+        var fillBrush = (SolidColorBrush) FindResource("ButtonBackground");
+        Resources["ExpanderHeaderBackground"] = fillBrush;
+        Resources["ExpanderContentBackground"] = fillBrush;
+
+        var borderBrush = (SolidColorBrush) FindResource("ButtonBorderBrushDisabled");
+        Resources["ExpanderHeaderBorderBrush"] = borderBrush;
+    }
+
+    private void WindowPreviewMouseDown(object sender, MouseButtonEventArgs e) {
+        if(!expander.IsMouseOver && expander.IsExpanded) {
+            expander.IsExpanded = false;
+        }
+    }
+
+    private void CanvasMouseDown(object sender, MouseButtonEventArgs e) {
+        if(expander.IsExpanded) {
+            expander.IsExpanded = false;
+        } else {
+            expander.IsExpanded = true;
+        }
     }
 }

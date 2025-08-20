@@ -36,21 +36,17 @@ internal class MainViewModel : BaseViewModel {
 
     private ColorHelper _selectedColor;
     private PatternsHelper _selectedPattern;
-    private List<string> patternNames = [
-        "ADSK_Линия_Диагональ_Вверх_2 мм",
-        "ADSK_Линия_Диагональ_Вниз_2 мм",
-        "ADSK_Линия_Накрест косая_2x2 мм",
-        "04_Песок",
-        "08.Грунт естественный",
-        "ADSK_Грунт_Гравий",
-        "ADSK_Древесина_01",
-        "ADSK_Древесина_02",
-        "ADSK_Формы_Зигзаг_01",
-        "ADSK_Формы_Зигзаг_02",
-        "ADSK_Формы_Соты",
-        "ADSK_Формы_Треугольники",
+    private List<string> _patternNames = [
+        "02_Железобетон_М1",
+        "05_Утеплитель-1_Крест 45 гр, и1 и1_М1",
+        "07_Сталь_Диагональ_лево_135гр, и0.5_М1",
+        "10_Кирпич_Вверх_3.5 мм_М1",
+        "Диагональ крест-накрест 3",
+        "Диагонально вверх",
+        "Стены_Высота штриховкой_03",
+        "Стены_Высота штриховкой_05",
+        "Стены_Высота штриховкой_11"
     ];
-
 
 
     public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
@@ -61,7 +57,12 @@ internal class MainViewModel : BaseViewModel {
 
         CategoryElements = _revitRepository.GetCategoriesInView(false);
         SolidFillPattern = _revitRepository.SolidFillPattern;
-        PatternsInPj = _revitRepository.GetPatternsByNames(patternNames);
+
+
+        var allDraftingPatterns = _revitRepository.AllDraftingPatterns;
+        PatternsInPj = new ObservableCollection<PatternsHelper>(allDraftingPatterns
+                                                                .Select(e => new PatternsHelper(e, allDraftingPatterns)));
+        Patterns = _revitRepository.GetPatternsByNames(_patternNames);
         SetCategoriesFilters();
 
         ClearCategoriesFilterInGUICommand = new RelayCommand(ClearCategoriesFilterInGUI);
@@ -119,6 +120,7 @@ internal class MainViewModel : BaseViewModel {
 
 
     public FillPatternElement SolidFillPattern { get; set; }
+    public ObservableCollection<PatternsHelper> Patterns { get; set; } = [];
     public ObservableCollection<PatternsHelper> PatternsInPj { get; set; } = [];
     public List<ParameterFilterElement> AllFiltersInPj { get; set; } = [];
     public List<string> AllFilterNamesInPj { get; set; } = [];
@@ -162,8 +164,8 @@ internal class MainViewModel : BaseViewModel {
         new ColorHelper(255, 0, 0),
         new ColorHelper(0, 255, 0),
         new ColorHelper(0, 0, 255),
-        new ColorHelper(255, 255, 0),
         new ColorHelper(0, 255, 255),
+        new ColorHelper(255, 255, 0),
         new ColorHelper(255, 0, 255),
         new ColorHelper(255, 0, 128),
         new ColorHelper(128, 0, 255),
@@ -438,7 +440,7 @@ internal class MainViewModel : BaseViewModel {
                 if(++i > Colors.Count - 1) {
                     i = 0;
                 }
-                if(++j > PatternsInPj.Count - 1) {
+                if(++j > Patterns.Count - 1) {
                     j = 0;
                 }
             }
@@ -488,9 +490,9 @@ internal class MainViewModel : BaseViewModel {
 
         // Если пользователь поставил галку смены штриховки
         if(OverrideByPattern) {
-            settings.SetSurfaceForegroundPatternId(PatternsInPj[p].Pattern.Id);
+            settings.SetSurfaceForegroundPatternId(Patterns[p].Pattern.Id);
 
-            settings.SetCutForegroundPatternId(PatternsInPj[p].Pattern.Id);
+            settings.SetCutForegroundPatternId(Patterns[p].Pattern.Id);
         }
         return settings;
     }
@@ -727,7 +729,7 @@ internal class MainViewModel : BaseViewModel {
         List<FillPatternElement> allDraftingPatterns = _revitRepository.AllDraftingPatterns;
 
         if(allDraftingPatterns.Count > 0) {
-            PatternsInPj.Add(new PatternsHelper(allDraftingPatterns[0], allDraftingPatterns));
+            Patterns.Add(new PatternsHelper(allDraftingPatterns[0], allDraftingPatterns));
         }
     }
     /// <summary>
@@ -736,7 +738,7 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="p"></param>
     private void DeletePattern(object p) {
 
-        PatternsInPj.Remove(SelectedPattern);
+        Patterns.Remove(SelectedPattern);
     }
     /// <summary>
     /// Перемещает выбранную штриховку вверх в настройках плагина
@@ -744,9 +746,9 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="p"></param>
     private void MovePatternUp(object p) {
 
-        int index = PatternsInPj.IndexOf(SelectedPattern);
+        int index = Patterns.IndexOf(SelectedPattern);
         if(index != 0) {
-            PatternsInPj.Move(index, index - 1);
+            Patterns.Move(index, index - 1);
         }
     }
     /// <summary>
@@ -755,9 +757,9 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="p"></param>
     private void MovePatternDown(object p) {
 
-        int index = PatternsInPj.IndexOf(SelectedPattern);
-        if(PatternsInPj.Count - 1 != index) {
-            PatternsInPj.Move(index, index + 1);
+        int index = Patterns.IndexOf(SelectedPattern);
+        if(Patterns.Count - 1 != index) {
+            Patterns.Move(index, index + 1);
         }
     }
     /// <summary>
@@ -781,7 +783,7 @@ internal class MainViewModel : BaseViewModel {
         OverridingWithRepaint = setting.OverridingWithRepaint;
 
         Colors = setting.Colors;
-        patternNames = setting.PatternNames;
+        _patternNames = setting.PatternNames;
     }
 
     private void SaveConfig() {
@@ -795,7 +797,7 @@ internal class MainViewModel : BaseViewModel {
         setting.OverridingWithRepaint = OverridingWithRepaint;
 
         setting.Colors = Colors;
-        setting.PatternNames = new List<string>(PatternsInPj.Select(item => item.PatternName));
+        setting.PatternNames = new List<string>(Patterns.Select(item => item.PatternName));
 
         _pluginConfig.SaveProjectConfig();
     }
