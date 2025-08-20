@@ -87,16 +87,14 @@ internal class TransViewDimensionService {
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
             // Размер по ТОРЦУ опалубка (положение справа 1)
-            var dimensionLineRightFirst = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Right, 
-                                                                                0.8, false);
+            var dimensionLineRightFirst = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Right, 0.8);
             var refArrayFormworkSide = dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance, 
                                                                              '#', '/', ["торец", "край"]);
             var dimensionFormworkSide = doc.Create.NewDimension(view, dimensionLineRightFirst,
                                                                   refArrayFormworkSide, ViewModel.SelectedDimensionType);
 
             // Размер по ТОРЦУ опалубка + армирование (положение справа 2)
-            var dimensionLineRightSecond = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Right, 
-                                                                                 0.5, false);
+            var dimensionLineRightSecond = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Right, 0.5);
             // Добавляем ссылки на арматурные стержни
             var refArrayFormworkRebarSide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
                                                                                   [rebarPart, "торец"],
@@ -106,8 +104,7 @@ internal class TransViewDimensionService {
                                                                      ViewModel.SelectedDimensionType);
             if(grids.Count > 0) {
                 // Размер по ТОРЦУ опалубка + оси (положение слева 1)
-                var dimensionLineLeft = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Left, 
-                                                                              1, false);
+                var dimensionLineLeft = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Left, 1);
                 var refArrayFormworkGridSide = dimensionBaseService.GetDimensionRefs(grids, view, XYZ.BasisX,
                                                                                      refArrayFormworkSide);
                 var dimensionFormworkGridSide = doc.Create.NewDimension(view, dimensionLineLeft,
@@ -143,11 +140,11 @@ internal class TransViewDimensionService {
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
                 var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Left,
-                                                                        offsetOption.LeftOffset, false);
+                                                                        offsetOption.LeftOffset);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
                 var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Right,
-                                                                        offsetOption.RightOffset, false);
+                                                                        offsetOption.RightOffset);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
                 var newLine = Line.CreateBound(pt1, pt2);
@@ -157,11 +154,11 @@ internal class TransViewDimensionService {
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
                 var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Bottom,
-                                                                        offsetOption.BottomOffset, false);
+                                                                        offsetOption.BottomOffset);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
                 var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Top,
-                                                                        offsetOption.TopOffset, false);
+                                                                        offsetOption.TopOffset);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
                 var newLine = Line.CreateBound(pt1, pt2);

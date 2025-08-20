@@ -30,7 +30,7 @@ internal class GeneralViewRebarDimensionService {
                                                     DimensionBaseService dimensionBaseService) {
         try {
             var dimensionLineBottom = dimensionBaseService.GetDimensionLine(skeletonParentRebar, 
-                                                                            DimensionOffsetType.Bottom);
+                                                                            DimensionOffsetType.Bottom, 1);
             var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
             var dimension = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineBottom, refArrayBottom,
                                                     ViewModel.SelectedDimensionType);
@@ -46,7 +46,7 @@ internal class GeneralViewRebarDimensionService {
         try {
             // Если все стержни Г-образные,тогда нет смысле ставить этот размер
             if(SheetInfo.RebarInfo.AllRebarAreL) { return; }
-            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top);
+            var dimensionLineTop = dimensionBaseService.GetDimensionLine(skeletonParentRebar, DimensionOffsetType.Top, 1);
             var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "фронт"]);
             var dimension = Repository.Document.Create.NewDimension(ViewOfPylon.ViewElement, dimensionLineTop, refArrayTop,
                                                     ViewModel.SelectedDimensionType);

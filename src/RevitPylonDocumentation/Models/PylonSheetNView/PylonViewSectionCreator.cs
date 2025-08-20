@@ -280,8 +280,6 @@ public class PylonViewSectionCreator {
         t.BasisZ = viewDir;
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
-        //double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
-
         double hostWidthToMax = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax;
         double hostWidthToMin = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin;
 
@@ -294,8 +292,6 @@ public class PylonViewSectionCreator {
                                             int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
         double coordinateX = hostLength * 0.5 + transverseViewXOffset;
-        //double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
-
         double coordinateYToMax = hostWidthToMax + transverseViewYOffset;
         double coordinateYToMin = hostWidthToMin + transverseViewYOffset;
 
@@ -399,14 +395,10 @@ public class PylonViewSectionCreator {
                                             int.Parse(ViewModel.ViewSectionSettings.TransverseViewYOffset));
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
-        //double hostWidth = SheetInfo.ElemsInfo.ElemsBoundingBoxWidth;
-
         double hostWidthToMax = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax;
         double hostWidthToMin = SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin;
 
         double coordinateX = hostLength * 0.5 + transverseViewXOffset;
-        //double coordinateY = hostWidth * 0.5 + transverseViewYOffset;
-
         double coordinateYToMax = hostWidthToMax + transverseViewYOffset;
         double coordinateYToMin = hostWidthToMin + transverseViewYOffset;
 

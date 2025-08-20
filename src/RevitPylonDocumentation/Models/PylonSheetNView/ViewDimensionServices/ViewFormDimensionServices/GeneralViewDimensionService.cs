@@ -314,11 +314,11 @@ internal class GeneralViewDimensionService {
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
                 var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Left,
-                                                                        offsetOption.LeftOffset, false);
+                                                                        offsetOption.LeftOffset);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
                 var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Right,
-                                                                        offsetOption.RightOffset, false);
+                                                                        offsetOption.RightOffset);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
                 var newLine = Line.CreateBound(pt1, pt2);
@@ -328,11 +328,11 @@ internal class GeneralViewDimensionService {
                 var curve = grid.GetCurvesInView(DatumExtentType.ViewSpecific, view).First();
 
                 var offsetLine1 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Bottom,
-                                                                        offsetOption.BottomOffset, false);
+                                                                        offsetOption.BottomOffset);
                 var pt1 = curve.Project(offsetLine1.Origin).XYZPoint;
 
                 var offsetLine2 = dimensionBaseService.GetDimensionLine(rebar, DimensionOffsetType.Top,
-                                                                        offsetOption.TopOffset, false);
+                                                                        offsetOption.TopOffset);
                 var pt2 = curve.Project(offsetLine2.Origin).XYZPoint;
 
                 var newLine = Line.CreateBound(pt1, pt2);

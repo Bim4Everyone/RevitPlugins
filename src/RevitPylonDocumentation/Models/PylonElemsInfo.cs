@@ -25,6 +25,8 @@ internal class PylonElemsInfo {
     public XYZ HostOrigin { get; set; }
     public BoundingBoxXYZ ElemsBoundingBox { get; set; }
     public double ElemsBoundingBoxLength { get; set; }
+    public double ElemsBoundingBoxLengthToMax { get; set; }
+    public double ElemsBoundingBoxLengthToMin { get; set; }
     public double ElemsBoundingBoxWidth { get; set; }
     public double ElemsBoundingBoxWidthToMax { get; set; }
     public double ElemsBoundingBoxWidthToMin { get; set; }
@@ -169,6 +171,7 @@ internal class PylonElemsInfo {
             var dimensions = GetHostDimensions();
 
             ElemsBoundingBoxLength = dimensions.hostLength;
+            ElemsBoundingBoxLengthToMax = ElemsBoundingBoxLengthToMin = ElemsBoundingBoxLength / 2;
             ElemsBoundingBoxWidth = dimensions.hostLength;
             ElemsBoundingBoxWidthToMax = ElemsBoundingBoxWidthToMin = ElemsBoundingBoxWidth / 2;
         } else {
@@ -176,6 +179,7 @@ internal class PylonElemsInfo {
             var forWidth = GetDistanceToProjectedMidPt(VectorByLength);
 
             ElemsBoundingBoxLength = forLength.toMax + forLength.toMin;
+            ElemsBoundingBoxLengthToMax = ElemsBoundingBoxLengthToMin = ElemsBoundingBoxLength / 2;
             ElemsBoundingBoxWidth = forWidth.toMax + forWidth.toMin;
 
             if(angle % 180 > 0) {
@@ -186,7 +190,6 @@ internal class PylonElemsInfo {
                 ElemsBoundingBoxWidthToMin = forWidth.toMax;
             }
         }
-
         ElemsBoundingBoxMinZ = ElemsBoundingBox.Min.Z;
         ElemsBoundingBoxMaxZ = ElemsBoundingBox.Max.Z;
     }
