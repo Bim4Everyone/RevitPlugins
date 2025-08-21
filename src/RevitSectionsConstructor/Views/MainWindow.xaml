@@ -19,71 +19,77 @@
     Title="{me:LocalizationSource MainWindow.Title}"
     Height="700"
     Width="1100"
-    MinHeight="200"
-    MinWidth="300"
+    MinHeight="500"
+    MinWidth="1000"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <Window.Resources>
-        <ui:TextBlock
-            x:Key="NameHeaderLeft"
-            Text="{me:LocalizationSource MainWindow.NameHeader}" />
-        <ui:TextBlock
-            x:Key="CurrentLevelHeaderLeft"
-            Text="{me:LocalizationSource MainWindow.CurrentLevelHeader}" />
-        <ui:TextBlock
-            x:Key="NameHeaderRight"
-            Text="{me:LocalizationSource MainWindow.NameHeader}" />
-        <ui:TextBlock
-            x:Key="CurrentLevelHeaderRight"
-            Text="{me:LocalizationSource MainWindow.CurrentLevelHeader}" />
-        <ui:TextBlock
-            x:Key="DeleteGroupHeader"
-            Text="{me:LocalizationSource MainWindow.DeleteGroupHeader}" />
-        <ui:TextBlock
-            x:Key="StartLevelHeader"
-            Text="{me:LocalizationSource MainWindow.StartLevelHeader}" />
-        <ui:TextBlock
-            x:Key="EndLevelHeader"
-            Text="{me:LocalizationSource MainWindow.EndLevelHeader}" />
-        <Style
-            TargetType="Border"
-            x:Key="CustomBorder">
-            <Setter
-                Property="Padding"
-                Value="14 8 14 8" />
-            <Setter
-                Property="VerticalAlignment"
-                Value="Stretch" />
-            <Setter
-                Property="HorizontalAlignment"
-                Value="Stretch" />
-            <Setter
-                Property="SnapsToDevicePixels"
-                Value="True" />
-            <Setter
-                Property="OverridesDefaultStyle"
-                Value="True" />
-            <Setter
-                Property="ScrollViewer.HorizontalScrollBarVisibility"
-                Value="Auto" />
-            <Setter
-                Property="ScrollViewer.VerticalScrollBarVisibility"
-                Value="Disabled" />
-            <Setter
-                Property="Background"
-                Value="{DynamicResource CardBackground}" />
-            <Setter
-                Property="BorderBrush"
-                Value="{DynamicResource CardBorderBrush}" />
-            <Setter
-                Property="BorderThickness"
-                Value="{DynamicResource CardControlBorderThemeThickness}" />
-            <Setter
-                Property="FocusVisualStyle"
-                Value="{DynamicResource DefaultControlFocusVisualStyle}" />
-            <Setter
-                Property="CornerRadius"
-                Value="{DynamicResource ControlCornerRadius}" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/DataGrid/DataGrid.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <ui:TextBlock
+                x:Key="NameHeaderLeft"
+                Text="{me:LocalizationSource MainWindow.NameHeader}" />
+            <ui:TextBlock
+                x:Key="CurrentLevelHeaderLeft"
+                Text="{me:LocalizationSource MainWindow.CurrentLevelHeader}" />
+            <ui:TextBlock
+                x:Key="NameHeaderRight"
+                Text="{me:LocalizationSource MainWindow.NameHeader}" />
+            <ui:TextBlock
+                x:Key="CurrentLevelHeaderRight"
+                Text="{me:LocalizationSource MainWindow.CurrentLevelHeader}" />
+            <ui:TextBlock
+                x:Key="DeleteGroupHeader"
+                Text="{me:LocalizationSource MainWindow.DeleteGroupHeader}" />
+            <ui:TextBlock
+                x:Key="StartLevelHeader"
+                Text="{me:LocalizationSource MainWindow.StartLevelHeader}" />
+            <ui:TextBlock
+                x:Key="EndLevelHeader"
+                Text="{me:LocalizationSource MainWindow.EndLevelHeader}" />
+            <Style
+                TargetType="Border"
+                x:Key="CustomBorder">
+                <Setter
+                    Property="Padding"
+                    Value="14 8 14 8" />
+                <Setter
+                    Property="VerticalAlignment"
+                    Value="Stretch" />
+                <Setter
+                    Property="HorizontalAlignment"
+                    Value="Stretch" />
+                <Setter
+                    Property="SnapsToDevicePixels"
+                    Value="True" />
+                <Setter
+                    Property="OverridesDefaultStyle"
+                    Value="True" />
+                <Setter
+                    Property="ScrollViewer.HorizontalScrollBarVisibility"
+                    Value="Auto" />
+                <Setter
+                    Property="ScrollViewer.VerticalScrollBarVisibility"
+                    Value="Disabled" />
+                <Setter
+                    Property="Background"
+                    Value="{DynamicResource CardBackground}" />
+                <Setter
+                    Property="BorderBrush"
+                    Value="{DynamicResource CardBorderBrush}" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="{DynamicResource CardControlBorderThemeThickness}" />
+                <Setter
+                    Property="FocusVisualStyle"
+                    Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="{DynamicResource ControlCornerRadius}" />
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
     <i:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
@@ -200,12 +206,32 @@
                             Header="{StaticResource NameHeaderLeft}"
                             Binding="{Binding Name}"
                             Width="1*"
-                            IsReadOnly="True" />
+                            IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style
+                                    BasedOn="{StaticResource DefaultDataGridCellStyle}"
+                                    TargetType="DataGridCell">
+                                    <Setter
+                                        Property="ToolTip"
+                                        Value="{Binding Name}" />
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
                         <DataGridTextColumn
                             Header="{StaticResource CurrentLevelHeaderLeft}"
                             Width="1*"
                             Binding="{Binding Level.Name}"
-                            IsReadOnly="True" />
+                            IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style
+                                    BasedOn="{StaticResource DefaultDataGridCellStyle}"
+                                    TargetType="DataGridCell">
+                                    <Setter
+                                        Property="ToolTip"
+                                        Value="{Binding Level.Name}" />
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
                         <DataGridCheckBoxColumn
                             Header="{StaticResource DeleteGroupHeader}"
                             Width="130"
@@ -253,12 +279,32 @@
                             Header="{StaticResource NameHeaderRight}"
                             Binding="{Binding Name}"
                             Width="1*"
-                            IsReadOnly="True" />
+                            IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style
+                                    BasedOn="{StaticResource DefaultDataGridCellStyle}"
+                                    TargetType="DataGridCell">
+                                    <Setter
+                                        Property="ToolTip"
+                                        Value="{Binding Name}" />
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
                         <DataGridTextColumn
                             Header="{StaticResource CurrentLevelHeaderRight}"
                             Width="1*"
                             Binding="{Binding Level.Name}"
-                            IsReadOnly="True" />
+                            IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style
+                                    BasedOn="{StaticResource DefaultDataGridCellStyle}"
+                                    TargetType="DataGridCell">
+                                    <Setter
+                                        Property="ToolTip"
+                                        Value="{Binding Level.Name}" />
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
                         <DataGridTemplateColumn
                             Header="{StaticResource StartLevelHeader}"
                             Width="1*"
