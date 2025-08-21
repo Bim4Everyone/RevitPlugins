@@ -90,12 +90,28 @@ internal class ProjectValidationService {
                 .Select(x => new NoticeElementViewModel(x.RevitElement, phase.Name, _localizationService))]
         });
 
-        IList<KeyFinishingType> keys = _revitRepository.GetKeyFinishingTypes();
 
-        parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
-            Description = "Unused finishing types!",
-            ErrorElements = []
-        });
+
+
+
+        WarningsListViewModel warningList = new WarningsListViewModel(_localizationService) {
+            Description = "Unused finishing types!"
+        };
+
+        var roomsByFinishingType = calculator.RoomsByFinishingType;
+        IList<KeyFinishingType> keys = _revitRepository.GetKeyFinishingTypes();
+        foreach(var keyFinishingType in keys) {
+            var finishingType = roomsByFinishingType[keyFinishingType.Name];
+
+            if(finishingType.WallTypesNumber != keyFinishingType.NumberOfWalls) {
+                warningList.ErrorElements.Add(new NoticeElementViewModel(keyFinishingType, phase.Name, _localizationService));
+
+                
+            }
+        }
+
+
+        parameterErrors.AddElements(warningList);
 
         return parameterErrors;
     }

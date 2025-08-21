@@ -112,6 +112,6 @@ internal class RevitRepository {
     }
 
     public IList<KeyFinishingType> GetKeyFinishingTypes() {
-
+        return new List<KeyFinishingType>();
     }
 }
