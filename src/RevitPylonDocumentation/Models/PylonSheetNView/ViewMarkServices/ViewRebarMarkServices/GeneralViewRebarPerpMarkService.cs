@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Web.UI.WebControls;
 
 using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices;
+namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewRebarMarkServices;
 internal class GeneralViewRebarPerpMarkService {
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
@@ -58,11 +56,11 @@ internal class GeneralViewRebarPerpMarkService {
     /// Создает марки по сварочному узлу с ссылкой на узел легенды
     /// </summary>
     internal void TryCreateWeldingUnitMarks() {
-        List<Element> platesArray = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement,
+        var platesArray = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement,
                                                                           SheetInfo.ProjectSection, 2001);
         if(platesArray.Count == 0) { return; }
         // Получаем референс-элемент
-        Element plates = _viewPointsAnalyzer.GetElementByDirection(platesArray, DirectionType.Left, true);
+        var plates = _viewPointsAnalyzer.GetElementByDirection(platesArray, DirectionType.Left, true);
 
         var viewOptions = new Options {
             View = ViewOfPylon.ViewElement,
@@ -102,7 +100,7 @@ internal class GeneralViewRebarPerpMarkService {
     private void TryCreateVerticalBarMark(List<Element> rebars, DirectionType directionType) {
         try {
             // Получаем референс-элемент
-            Element verticalBar = _viewPointsAnalyzer.GetElementByDirection(rebars, directionType, false);
+            var verticalBar = _viewPointsAnalyzer.GetElementByDirection(rebars, directionType, false);
             // Получаем точку в которую нужно поставить аннотацию
             var point = _viewPointsAnalyzer.GetPointByDirection(verticalBar, directionType, 0, 0, true);
             // Корректируем положение точки, куда будет установлена марка (текст)

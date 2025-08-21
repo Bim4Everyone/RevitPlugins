@@ -7,7 +7,7 @@ using dosymep.Revit;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices;
+namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewRebarMarkServices;
 internal class TransViewRebarMarkService {
     private readonly string _commentParamName = "Комментарии";
     
@@ -139,7 +139,7 @@ internal class TransViewRebarMarkService {
     private void CreateTopMark(List<Element> simplePlates) {
 
         // Получаем референс-элемент
-        Element topPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Top, true);
+        var topPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Top, true);
 
         // Получаем точку в которую нужно поставить аннотацию
         var pointTopPlateLeader = _viewPointsAnalyzer.GetPointByDirection(topPlate, DirectionType.Right, 0.2, 0, true);
@@ -155,7 +155,7 @@ internal class TransViewRebarMarkService {
 
     private void CreateBottomMark(List<Element> simplePlates) {
         // Получаем референс-элемент
-        Element bottomPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Bottom, true);
+        var bottomPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Bottom, true);
 
         // Получаем точку в которую нужно поставить аннотацию
         var pointBottomPlateLeader = _viewPointsAnalyzer.GetPointByDirection(bottomPlate, DirectionType.Left, 
@@ -172,7 +172,7 @@ internal class TransViewRebarMarkService {
 
     private void CreateLeftMark(List<Element> simplePlates) {
         // Получаем референс-элемент
-        Element leftPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Left, true);
+        var leftPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Left, true);
 
         // Получаем точку в которую нужно поставить аннотацию
         var pointLeftPlateLeader = _viewPointsAnalyzer.GetPointByDirection(leftPlate, DirectionType.Bottom, 
@@ -189,7 +189,7 @@ internal class TransViewRebarMarkService {
 
     private void CreateRightMark(List<Element> simplePlates) {
         // Получаем референс-элемент
-        Element rightPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Right, true);
+        var rightPlate = _viewPointsAnalyzer.GetElementByDirection(simplePlates, DirectionType.Right, true);
 
         // Получаем точку в которую нужно поставить аннотацию
         var pointRightPlateLeader = _viewPointsAnalyzer.GetPointByDirection(rightPlate, DirectionType.Top, 0.4, 0, true);

@@ -5,7 +5,7 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices;
+namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
 internal class TransViewMarkService {
     private readonly int _formNumberForClampsMax = 1599;
     private readonly int _formNumberForClampsMin = 1500;
@@ -74,7 +74,7 @@ internal class TransViewMarkService {
 
     private void CreateLeftBottomMark(List<Element> simpleRebars) {
         // Получаем референс-элемент
-        Element leftBottomVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom, 
+        var leftBottomVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom, 
                                                                                   false);
         // Получаем точку в которую нужно поставить аннотацию
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftBottom);
@@ -87,7 +87,7 @@ internal class TransViewMarkService {
 
     private void CreateLeftTopMark(List<Element> simpleClamps, List<Element> simpleRebars) {
         // Получаем референс-элемент
-        Element leftClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Left, false);
+        var leftClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Left, false);
         
         // Получаем точку в которую нужно поставить аннотацию
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftTop);
@@ -108,7 +108,7 @@ internal class TransViewMarkService {
 
     private void CreateRightTopMark(List<Element> simpleClamps, List<Element> simpleRebars) {
         // Получаем референс-элемент
-        Element rightClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Right, true);
+        var rightClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Right, true);
 
         // Получаем точку в которую нужно поставить аннотацию
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.RightTop);
@@ -129,7 +129,7 @@ internal class TransViewMarkService {
 
     private void CreateLeftMark(List<Element> simpleCBars, List<Element> simpleRebars) {
         // Получаем референс-элемент
-        Element leftCBar = _viewPointsAnalyzer.GetElementByDirection(simpleCBars, DirectionType.Left, true);
+        var leftCBar = _viewPointsAnalyzer.GetElementByDirection(simpleCBars, DirectionType.Left, true);
 
         // Получаем точку в которую нужно поставить аннотацию
         var pointLeft = _viewPointsAnalyzer.GetPointByDirection(leftCBar, DirectionType.LeftBottom, 1.3, 0.1, true);

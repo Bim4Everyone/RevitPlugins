@@ -6,7 +6,7 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.ViewModels;
 
-namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices;
+namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewFormMarkServices;
 internal class GeneralViewMarkService {
     private readonly int _formNumberForClampsMax = 1599;
     private readonly int _formNumberForClampsMin = 1500;
@@ -74,10 +74,10 @@ internal class GeneralViewMarkService {
                 // Собираем опорные плоскости по опалубке, например:
                 // #_1_горизонт_край_низ
                 // #_1_горизонт_край_верх
-                ReferenceArray refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', 
+                var refArraySide = dimensionBaseService.GetDimensionRefs(hostElem, '#', '/', 
                                                                                     ["горизонт", "край"]);
                 foreach(Reference reference in refArraySide) {
-                    SpotDimension spotElevation = Repository.Document.Create.NewSpotElevation(
+                    var spotElevation = Repository.Document.Create.NewSpotElevation(
                         ViewOfPylon.ViewElement,
                         reference,
                         location,
@@ -99,7 +99,7 @@ internal class GeneralViewMarkService {
         if(simpleRebars.Count == 0) { return; }
         try {
             // Получаем референс-элемент
-            Element rightVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.Right,
+            var rightVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.Right,
                                                                                  false);
             // Получаем точку в которую нужно поставить аннотацию
             var pointRight = _viewPointsAnalyzer.GetPointByDirection(rightVerticalBar, DirectionType.Right,
