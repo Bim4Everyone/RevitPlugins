@@ -33,15 +33,14 @@ internal class TransViewMarkService {
         _viewPointsAnalyzer = new ViewPointsAnalyzer(pylonView);
         _annotationService = new AnnotationService(pylonView);
 
+        // Находим типоразмер марки несущей арматуры для обозначения марки изделия
+        _tagSkeletonSymbol = mvm.SelectedSkeletonTagType;
+
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithoutSerif = Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Шаг - Полка 10");
+        _tagSymbolWithoutSerif = mvm.SelectedRebarTagTypeWithoutSerif;
         // С засечкой на конце
-        _tagSymbolWithSerif = 
-            Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Шаг - Полка 10, Засечка");
-
-        // Находим типоразмер марки несущей арматуры для обозначения марки изделия
-        _tagSkeletonSymbol = Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Изделие_Марка - Полка 30");
+        _tagSymbolWithSerif = mvm.SelectedRebarTagTypeWithSerif;
     }
 
     internal MainViewModel ViewModel { get; set; }

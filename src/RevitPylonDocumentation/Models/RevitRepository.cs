@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -107,6 +108,16 @@ internal class RevitRepository {
     public List<SpotDimensionType> SpotDimensionTypes => new FilteredElementCollector(Document)
         .OfClass(typeof(SpotDimensionType))
         .OfType<SpotDimensionType>()
+        .OrderBy(a => a.Name)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список типоразмеров марок несущей арматуры
+    /// </summary>
+    public List<FamilySymbol> RebarTagTypes => new FilteredElementCollector(Document)
+        .OfCategory(BuiltInCategory.OST_RebarTags)
+        .WhereElementIsElementType()
+        .OfType<FamilySymbol>()
         .OrderBy(a => a.Name)
         .ToList();
 

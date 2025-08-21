@@ -38,6 +38,10 @@ internal class UserProjectSettings : BaseViewModel {
     private string _dimensionTypeNameTemp = "!Основной_2.5 мм";
     private string _spotDimensionTypeNameTemp = "Стрелка_Проектная_Верх";
 
+    private string _skeletonTagTypeNameTemp = "Изделие_Марка - Полка 20";
+    private string _rebarTagTypeWithSerifNameTemp = "Поз., Диаметр / Шаг - Полка 10, Засечка";
+    private string _rebarTagTypeWithoutSerifNameTemp = "Поз., Диаметр / Шаг - Полка 10";
+
     public UserProjectSettings(MainViewModel mainViewModel, RevitRepository repository) {
         ViewModel = mainViewModel;
         Repository = repository;
@@ -172,6 +176,24 @@ internal class UserProjectSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _spotDimensionTypeNameTemp, value);
     }
 
+    public string SkeletonTagTypeName { get; set; }
+    public string SkeletonTagTypeNameTemp {
+        get => _skeletonTagTypeNameTemp;
+        set => RaiseAndSetIfChanged(ref _skeletonTagTypeNameTemp, value);
+    }
+
+    public string RebarTagTypeWithSerifName { get; set; }
+    public string RebarTagTypeWithSerifNameTemp {
+        get => _rebarTagTypeWithSerifNameTemp;
+        set => RaiseAndSetIfChanged(ref _rebarTagTypeWithSerifNameTemp, value);
+    }
+
+    public string RebarTagTypeWithoutSerifName { get; set; }
+    public string RebarTagTypeWithoutSerifNameTemp {
+        get => _rebarTagTypeWithoutSerifNameTemp;
+        set => RaiseAndSetIfChanged(ref _rebarTagTypeWithoutSerifNameTemp, value);
+    }
+
     public void ApplyProjectSettings() {
         ProjectSection = ProjectSectionTemp;
         Mark = MarkTemp;
@@ -200,6 +222,10 @@ internal class UserProjectSettings : BaseViewModel {
 
         DimensionTypeName = DimensionTypeNameTemp;
         SpotDimensionTypeName = SpotDimensionTypeNameTemp;
+
+        SkeletonTagTypeName = SkeletonTagTypeNameTemp;
+        RebarTagTypeWithSerifName = RebarTagTypeWithSerifNameTemp;
+        RebarTagTypeWithoutSerifName = RebarTagTypeWithoutSerifNameTemp;
     }
 
     public void CheckProjectSettings() {

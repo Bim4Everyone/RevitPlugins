@@ -30,6 +30,10 @@ internal class MainViewModel : BaseViewModel {
     private string _selectedProjectSection = string.Empty;
     private ViewFamilyType _selectedViewFamilyType;
     private DimensionType _selectedDimensionType;
+    private FamilySymbol _selectedSkeletonTagType;
+    private FamilySymbol _selectedRebarTagTypeWithSerif;
+    private FamilySymbol _selectedRebarTagTypeWithoutSerif;
+
     private SpotDimensionType _selectedSpotDimensionType;
     private View _selectedGeneralViewTemplate;
     private View _selectedGeneralRebarViewTemplate;
@@ -58,8 +62,10 @@ internal class MainViewModel : BaseViewModel {
         TitleBlocks = _revitRepository.TitleBlocksInProject;
         Legends = _revitRepository.LegendsInProject;
         ViewTemplatesInPj = _revitRepository.AllViewTemplates;
+
         DimensionTypes = _revitRepository.DimensionTypes;
         SpotDimensionTypes = _revitRepository.SpotDimensionTypes;
+        RebarTagTypes = _revitRepository.RebarTagTypes;
 
         SetHostsInfoFilters();
 
@@ -242,6 +248,44 @@ internal class MainViewModel : BaseViewModel {
         set {
             RaiseAndSetIfChanged(ref _selectedDimensionType, value);
             ProjectSettings.DimensionTypeNameTemp = value?.Name;
+        }
+    }
+
+    /// <summary>
+    /// Типоразмеры марок арматурных стержней, имеющиеся в проекте
+    /// </summary>
+    public List<FamilySymbol> RebarTagTypes { get; set; } = [];
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки для обозначения каркаса
+    /// </summary>
+    public FamilySymbol SelectedSkeletonTagType {
+        get => _selectedSkeletonTagType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedSkeletonTagType, value);
+            ProjectSettings.SkeletonTagTypeNameTemp = value?.Name;
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки арматуры с засечкой
+    /// </summary>
+    public FamilySymbol SelectedRebarTagTypeWithSerif {
+        get => _selectedRebarTagTypeWithSerif;
+        set {
+            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithSerif, value);
+            ProjectSettings.RebarTagTypeWithSerifNameTemp = value?.Name;
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки арматуры без засечкой
+    /// </summary>
+    public FamilySymbol SelectedRebarTagTypeWithoutSerif {
+        get => _selectedRebarTagTypeWithoutSerif;
+        set {
+            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithoutSerif, value);
+            ProjectSettings.RebarTagTypeWithoutSerifNameTemp = value?.Name;
         }
     }
 
@@ -532,6 +576,9 @@ internal class MainViewModel : BaseViewModel {
         FindViewFamilyType();
         FindDimensionType();
         FindSpotDimensionType();
+        FindSkeletonTagType();
+        FindRebarTagTypeWithSerif();
+        FindRebarTagTypeWithoutSerif();
         FindLegend();
         FindRebarNode();
         FindTitleBlock();
@@ -592,6 +639,19 @@ internal class MainViewModel : BaseViewModel {
 
         if(SelectedSpotDimensionType is null) {
             ErrorText = "Не выбран типоразмер высотной отметки";
+            return;
+        }
+
+        if(SelectedSkeletonTagType is null) {
+            ErrorText = "Не задан типоразмер марки каркаса";
+            return;
+        }
+        if(SelectedRebarTagTypeWithSerif is null) {
+            ErrorText = "Не задан типоразмер марки арматуры с засечкой";
+            return;
+        }
+        if(SelectedRebarTagTypeWithoutSerif is null) {
+            ErrorText = "Не задан типоразмер марки арматуры без засечки";
             return;
         }
 
@@ -689,7 +749,7 @@ internal class MainViewModel : BaseViewModel {
     public void FindViewFamilyType() {
         if(ViewSectionSettings.ViewFamilyTypeName != string.Empty) {
             SelectedViewFamilyType = ViewFamilyTypes
-                .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
+                .FirstOrDefault(familyType => familyType.Name.Equals(ViewSectionSettings.ViewFamilyTypeName));
         }
     }
 
@@ -699,7 +759,7 @@ internal class MainViewModel : BaseViewModel {
     public void FindDimensionType() {
         if(ProjectSettings.DimensionTypeName != string.Empty) {
             SelectedDimensionType = DimensionTypes
-                .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ProjectSettings.DimensionTypeName));
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.DimensionTypeName));
         }
     }
 
@@ -709,7 +769,37 @@ internal class MainViewModel : BaseViewModel {
     public void FindSpotDimensionType() {
         if(ProjectSettings.SpotDimensionTypeName != string.Empty) {
             SelectedSpotDimensionType = SpotDimensionTypes
-                .FirstOrDefault(familyTypes => familyTypes.Name.Equals(ProjectSettings.SpotDimensionTypeName));
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.SpotDimensionTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматурного каркаса
+    /// </summary>
+    public void FindSkeletonTagType() {
+        if(ProjectSettings.SkeletonTagTypeName != string.Empty) {
+            SelectedSkeletonTagType = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.SkeletonTagTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматуры с засечкой
+    /// </summary>
+    public void FindRebarTagTypeWithSerif() {
+        if(ProjectSettings.RebarTagTypeWithSerifName != string.Empty) {
+            SelectedRebarTagTypeWithSerif = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithSerifName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматуры без засечки
+    /// </summary>
+    public void FindRebarTagTypeWithoutSerif() {
+        if(ProjectSettings.RebarTagTypeWithoutSerifName != string.Empty) {
+            SelectedRebarTagTypeWithoutSerif = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithoutSerifName));
         }
     }
 

@@ -24,12 +24,9 @@ internal class GeneralViewRebarPerpMarkService {
         _viewPointsAnalyzer = new ViewPointsAnalyzer(ViewOfPylon);
         _annotationService = new AnnotationService(ViewOfPylon);
 
-        ////// Находим типоразмер марки несущей арматуры для обозначения марки изделия
-        ////_tagSkeletonSymbol = Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Изделие_Марка - Полка 30");
-
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithoutSerif = Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Шаг - Полка 10");
+        _tagSymbolWithoutSerif = mvm.SelectedRebarTagTypeWithoutSerif;
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
         _independentTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
     }

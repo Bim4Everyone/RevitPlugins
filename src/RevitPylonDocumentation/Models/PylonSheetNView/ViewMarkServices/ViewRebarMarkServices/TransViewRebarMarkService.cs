@@ -37,8 +37,7 @@ internal class TransViewRebarMarkService {
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithoutSerif = 
-            Repository.FindSymbol(BuiltInCategory.OST_RebarTags, "Поз., Диаметр / Комментарий - Полка 10");
+        _tagSymbolWithoutSerif = mvm.SelectedRebarTagTypeWithoutSerif;
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
         _gostTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
     }
