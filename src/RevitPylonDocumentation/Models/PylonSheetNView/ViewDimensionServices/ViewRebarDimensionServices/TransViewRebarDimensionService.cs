@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -19,73 +20,74 @@ internal class TransViewRebarDimensionService {
     internal RevitRepository Repository { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
+
     internal void TryCreateTransViewRebarDimensions(View view, bool onTopOfRebar) {
-        var offsetType = onTopOfRebar ? DimensionOffsetType.Top : DimensionOffsetType.Bottom;
-
-        var doc = Repository.Document;
         var dimensionBaseService = new DimensionBaseService(view, ViewModel.ParamValService);
-
         try {
             var rebarFinder = ViewModel.RebarFinder;
             var skeletonParentRebar = SheetInfo.RebarInfo.SkeletonParentRebar;
             if(skeletonParentRebar is null) {
                 return;
             }
-
             // Определяем относительно чего нужно строить размерные линии - каркаса или пилона
             var pylon = SheetInfo.HostElems.First();
             var dimensionLineHostRef = onTopOfRebar ? skeletonParentRebar : pylon;
 
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
-            if(!onTopOfRebar) {
-                var dimensionLineBottom = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
-                var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
-                var dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom,
-                                                              ViewModel.SelectedDimensionType);
-                dimensionBottom.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
-            } else {
+            if(onTopOfRebar) {
                 if(SheetInfo.RebarInfo.AllRebarAreL) {
-                    var dimensionLine = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
-                    var refArray = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
-                    var dimension = doc.Create.NewDimension(view, dimensionLine, refArray,
-                                                            ViewModel.SelectedDimensionType);
-                    dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
-                } else if(!SheetInfo.RebarInfo.HasLRebar) {
-                    var dimensionLine = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
-                    var refArray = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "фронт"]);
-                    var dimension = doc.Create.NewDimension(view, dimensionLine, refArray,
-                                                                  ViewModel.SelectedDimensionType);
-                    dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+                    // Когда все Гэшки
+                    CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
+                                    ["низ", "фронт"], view, dimensionBaseService);
+                } else if(SheetInfo.RebarInfo.HasLRebar) {
+                    // Когда Гэшки с одной стороны
+                    if(rebarFinder.DirectionHasLRebar(view, SheetInfo.ProjectSection, DirectionType.Top)) {
+                        CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Top, 0.5,
+                                        ["низ", "фронт"], view, dimensionBaseService);
+                        CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
+                                        ["верх", "фронт"], view, dimensionBaseService);
+                    } else {
+                        CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Top, 0.5,
+                                        ["верх", "фронт"], view, dimensionBaseService);
+                        CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
+                                        ["низ", "фронт"], view, dimensionBaseService);
+                    }
                 } else {
-                    var dimensionLineBottom = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
-                    var refArrayBottom = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["низ", "фронт"]);
-                    var dimensionBottom = doc.Create.NewDimension(view, dimensionLineBottom, refArrayBottom,
-                                                                  ViewModel.SelectedDimensionType);
-                    dimensionBottom.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
-
-                    offsetType = offsetType is DimensionOffsetType.Bottom ? DimensionOffsetType.Top : DimensionOffsetType.Bottom;
-                    var dimensionLineTop = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 0.5);
-                    var refArrayTop = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', ["верх", "фронт"]);
-                    var dimensionTop = doc.Create.NewDimension(view, dimensionLineTop, refArrayTop,
-                                                                  ViewModel.SelectedDimensionType);
-                    dimensionTop.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+                    // Размер по ФРОНТУ каркас (положение снизу ближнее)
+                    CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
+                                    ["верх", "фронт"], view, dimensionBaseService);
                 }
+            } else {
+                // Размер по ФРОНТУ каркас (положение снизу ближнее)
+                CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
+                                ["низ", "фронт"], view, dimensionBaseService);
             }
-
-            var dimensionLineBottomEdge = dimensionBaseService.GetDimensionLine(dimensionLineHostRef, offsetType, 1);
-            var refArrayBottomEdge = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/', 
-                                                                           ["низ", "фронт", "край"]);
-            var dimensionBottomEdge = doc.Create.NewDimension(view, dimensionLineBottomEdge, refArrayBottomEdge, 
-                                                              ViewModel.SelectedDimensionType);
+            
+            // Размер по ФРОНТУ каркас края (положение снизу дальнее)
+            CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 1,
+                            ["низ", "фронт", "край"], view, dimensionBaseService);
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            // Размер по ТОРЦУ армирование (положение справа 2)
-            var dimensionLineRightSecond = dimensionBaseService.GetDimensionLine(pylon, DimensionOffsetType.Right, 0.5);
-            // Добавляем ссылки на арматурные стержни
-            var refArrayRebarSide = dimensionBaseService.GetDimensionRefs(skeletonParentRebar, '#', '/',
-                                                                          ["низ", "торец", "край"]);
-            var dimensionFormworkRebarSide = doc.Create.NewDimension(view, dimensionLineRightSecond,
-                                                                     refArrayRebarSide, ViewModel.SelectedDimensionType);
+            // Размер по ТОРЦУ армирование (положение справа ближнее)
+            CreateDimension(skeletonParentRebar, pylon, DimensionOffsetType.Right, 0.5, ["низ", "торец", "край"], view, 
+                            dimensionBaseService);
         } catch(Exception) { }
+    }
+
+    private void CreateDimension(Element dimensioningElement, Element elemForOffset,
+                         DimensionOffsetType dimensionOffsetType, double offsetCoefficient,
+                         List<string> importantRefNameParts, View view,
+                         DimensionBaseService dimensionBaseService, ReferenceArray oldRefArray = null,
+                         bool needEqualityFormula = true) {
+
+        if(dimensioningElement is null || (importantRefNameParts?.Count ?? 0) == 0) { return; }
+        var dimensionLine = dimensionBaseService.GetDimensionLine(elemForOffset, dimensionOffsetType, offsetCoefficient);
+        ReferenceArray refArray = dimensionBaseService.GetDimensionRefs(dimensioningElement as FamilyInstance, '#', '/',
+                                                                        importantRefNameParts, oldRefArray: oldRefArray);
+        var dimension = Repository.Document.Create.NewDimension(view, dimensionLine, refArray,
+                                                                ViewModel.SelectedDimensionType);
+        if(needEqualityFormula) {
+            dimension.SetParamValue(BuiltInParameter.DIM_DISPLAY_EQ, 2);
+        }
     }
 }
