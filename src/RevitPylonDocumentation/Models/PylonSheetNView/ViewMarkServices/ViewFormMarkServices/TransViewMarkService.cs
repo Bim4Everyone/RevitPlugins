@@ -20,7 +20,7 @@ internal class TransViewMarkService {
     private readonly AnnotationService _annotationService;
 
     private readonly FamilySymbol _tagSymbolWithSerif;
-    private readonly FamilySymbol _tagSymbolWithoutSerif;
+    private readonly FamilySymbol _tagSymbolWithStep;
     private readonly FamilySymbol _tagSkeletonSymbol;
 
     internal TransViewMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo, 
@@ -38,7 +38,7 @@ internal class TransViewMarkService {
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithoutSerif = mvm.SelectedRebarTagTypeWithoutSerif;
+        _tagSymbolWithStep = mvm.SelectedRebarTagTypeWithStep;
         // С засечкой на конце
         _tagSymbolWithSerif = mvm.SelectedRebarTagTypeWithSerif;
     }
@@ -92,7 +92,7 @@ internal class TransViewMarkService {
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftTop);
         var pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftTop, 0.8, 0.4);
         // Создаем марку арматуры
-        var leftTopTag = _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithoutSerif, leftClamp);
+        var leftTopTag = _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithStep, leftClamp);
 
 #if REVIT_2022_OR_GREATER
         leftTopTag.LeaderEndCondition = LeaderEndCondition.Free;
@@ -113,7 +113,7 @@ internal class TransViewMarkService {
         var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.RightTop);
         var pointRightTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightTop, 0.8, 0.4);
         // Создаем марку арматуры
-        var rightTopTag = _annotationService.CreateRebarTag(pointRightTop, _tagSymbolWithoutSerif, rightClamp);
+        var rightTopTag = _annotationService.CreateRebarTag(pointRightTop, _tagSymbolWithStep, rightClamp);
 
 #if REVIT_2022_OR_GREATER
         rightTopTag.LeaderEndCondition = LeaderEndCondition.Free;

@@ -93,8 +93,10 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.SkeletonTagTypeNameTemp = settings.SkeletonTagTypeName;
         projectSettings.RebarTagTypeWithSerifName = settings.RebarTagTypeWithSerifName;
         projectSettings.RebarTagTypeWithSerifNameTemp = settings.RebarTagTypeWithSerifName;
-        projectSettings.RebarTagTypeWithoutSerifName = settings.RebarTagTypeWithoutSerifName;
-        projectSettings.RebarTagTypeWithoutSerifNameTemp = settings.RebarTagTypeWithoutSerifName;
+        projectSettings.RebarTagTypeWithStepName = settings.RebarTagTypeWithStepName;
+        projectSettings.RebarTagTypeWithStepNameTemp = settings.RebarTagTypeWithStepName;
+        projectSettings.RebarTagTypeWithCountName = settings.RebarTagTypeWithCountName;
+        projectSettings.RebarTagTypeWithCountNameTemp = settings.RebarTagTypeWithCountName;
 
         viewSectionSettings.GeneralViewPrefix = settings.GeneralViewPrefix;
         viewSectionSettings.GeneralViewPrefixTemp = settings.GeneralViewPrefix;
@@ -289,7 +291,8 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.SpotDimensionTypeName = projectSettings.SpotDimensionTypeName;
         settings.SkeletonTagTypeName = projectSettings.SkeletonTagTypeName;
         settings.RebarTagTypeWithSerifName = projectSettings.RebarTagTypeWithSerifName;
-        settings.RebarTagTypeWithoutSerifName = projectSettings.RebarTagTypeWithoutSerifName;
+        settings.RebarTagTypeWithStepName = projectSettings.RebarTagTypeWithStepName;
+        settings.RebarTagTypeWithCountName = projectSettings.RebarTagTypeWithCountName;
 
         settings.SheetSize = projectSettings.SheetSize;
         settings.SheetCoefficient = projectSettings.SheetCoefficient;
@@ -428,7 +431,8 @@ internal class PluginSettings : ProjectSettings {
     public string SpotDimensionTypeName { get; set; }
     public string SkeletonTagTypeName { get; set; }
     public string RebarTagTypeWithSerifName { get; set; }
-    public string RebarTagTypeWithoutSerifName { get; set; }
+    public string RebarTagTypeWithStepName { get; set; }
+    public string RebarTagTypeWithCountName { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public string SheetPrefix { get; set; }

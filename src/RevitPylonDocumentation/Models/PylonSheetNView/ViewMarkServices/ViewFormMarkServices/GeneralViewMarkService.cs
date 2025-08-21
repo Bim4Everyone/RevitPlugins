@@ -12,7 +12,7 @@ internal class GeneralViewMarkService {
     private readonly int _formNumberForClampsMin = 1500;
 
     private readonly FamilySymbol _tagSkeletonSymbol;
-    private readonly FamilySymbol _tagSymbolWithoutSerif;
+    private readonly FamilySymbol _tagSymbolWithStep;
     private readonly FamilySymbol _gostTagSymbol;
     private readonly FamilySymbol _breakLineSymbol;
     private readonly FamilySymbol _concretingSeamSymbol;
@@ -40,7 +40,7 @@ internal class GeneralViewMarkService {
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithoutSerif = mvm.SelectedRebarTagTypeWithoutSerif;
+        _tagSymbolWithStep = mvm.SelectedRebarTagTypeWithStep;
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
         _gostTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
 
@@ -152,7 +152,7 @@ internal class GeneralViewMarkService {
             annotPoint = _viewPointsAnalyzer.GetPointByDirection(annotPoint, directionType, xOffset, 0.3);
 
             // Создаем марку арматуры
-            var clampTag = _annotationService.CreateRebarTag(annotPoint, _tagSymbolWithoutSerif, simpleClamp);
+            var clampTag = _annotationService.CreateRebarTag(annotPoint, _tagSymbolWithStep, simpleClamp);
             clampTag.LeaderEndCondition = LeaderEndCondition.Free;
         } catch(Exception) { }
     }

@@ -32,7 +32,8 @@ internal class MainViewModel : BaseViewModel {
     private DimensionType _selectedDimensionType;
     private FamilySymbol _selectedSkeletonTagType;
     private FamilySymbol _selectedRebarTagTypeWithSerif;
-    private FamilySymbol _selectedRebarTagTypeWithoutSerif;
+    private FamilySymbol _selectedRebarTagTypeWithStep;
+    private FamilySymbol _selectedRebarTagTypeWithCount;
 
     private SpotDimensionType _selectedSpotDimensionType;
     private View _selectedGeneralViewTemplate;
@@ -279,13 +280,24 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Выбранный пользователем типоразмер марки арматуры без засечкой
+    /// Выбранный пользователем типоразмер марки арматуры с шагом
     /// </summary>
-    public FamilySymbol SelectedRebarTagTypeWithoutSerif {
-        get => _selectedRebarTagTypeWithoutSerif;
+    public FamilySymbol SelectedRebarTagTypeWithStep {
+        get => _selectedRebarTagTypeWithStep;
         set {
-            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithoutSerif, value);
-            ProjectSettings.RebarTagTypeWithoutSerifNameTemp = value?.Name;
+            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithStep, value);
+            ProjectSettings.RebarTagTypeWithStepNameTemp = value?.Name;
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки арматуры с количеством
+    /// </summary>
+    public FamilySymbol SelectedRebarTagTypeWithCount {
+        get => _selectedRebarTagTypeWithCount;
+        set {
+            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithCount, value);
+            ProjectSettings.RebarTagTypeWithStepNameTemp = value?.Name;
         }
     }
 
@@ -578,7 +590,8 @@ internal class MainViewModel : BaseViewModel {
         FindSpotDimensionType();
         FindSkeletonTagType();
         FindRebarTagTypeWithSerif();
-        FindRebarTagTypeWithoutSerif();
+        FindRebarTagTypeWithStep();
+        FindRebarTagTypeWithCount();
         FindLegend();
         FindRebarNode();
         FindTitleBlock();
@@ -650,7 +663,7 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = "Не задан типоразмер марки арматуры с засечкой";
             return;
         }
-        if(SelectedRebarTagTypeWithoutSerif is null) {
+        if(SelectedRebarTagTypeWithStep is null) {
             ErrorText = "Не задан типоразмер марки арматуры без засечки";
             return;
         }
@@ -794,12 +807,22 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Получает типоразмер марки арматуры без засечки
+    /// Получает типоразмер марки арматуры с шагом
     /// </summary>
-    public void FindRebarTagTypeWithoutSerif() {
-        if(ProjectSettings.RebarTagTypeWithoutSerifName != string.Empty) {
-            SelectedRebarTagTypeWithoutSerif = RebarTagTypes
-                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithoutSerifName));
+    public void FindRebarTagTypeWithStep() {
+        if(ProjectSettings.RebarTagTypeWithStepName != string.Empty) {
+            SelectedRebarTagTypeWithStep = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithStepName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер марки арматуры с количеством
+    /// </summary>
+    public void FindRebarTagTypeWithCount() {
+        if(ProjectSettings.RebarTagTypeWithCountName != string.Empty) {
+            SelectedRebarTagTypeWithCount = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithCountName));
         }
     }
 

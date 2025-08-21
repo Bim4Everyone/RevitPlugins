@@ -10,7 +10,7 @@ namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewMarkServices.ViewRe
 internal class GeneralViewRebarPerpMarkService {
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
-    private readonly FamilySymbol _tagSymbolWithoutSerif;
+    private readonly FamilySymbol _tagSymbolWithStep;
     private readonly FamilySymbol _independentTagSymbol;
     private readonly string _linkToNodeText = "по А";
 
@@ -26,7 +26,7 @@ internal class GeneralViewRebarPerpMarkService {
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithoutSerif = mvm.SelectedRebarTagTypeWithoutSerif;
+        _tagSymbolWithStep = mvm.SelectedRebarTagTypeWithStep;
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
         _independentTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
     }
@@ -103,7 +103,7 @@ internal class GeneralViewRebarPerpMarkService {
             // Корректируем положение точки, куда будет установлена марка (текст)
             point = _viewPointsAnalyzer.GetPointByDirection(point, directionType, 0.6, 0.3);
             // Создаем марку арматуры
-            var tag = _annotationService.CreateRebarTag(point, _tagSymbolWithoutSerif, verticalBar);
+            var tag = _annotationService.CreateRebarTag(point, _tagSymbolWithStep, verticalBar);
             tag.LeaderEndCondition = LeaderEndCondition.Free;
         } catch(Exception) { }
     }
