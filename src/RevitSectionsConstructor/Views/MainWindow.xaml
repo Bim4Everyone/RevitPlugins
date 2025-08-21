@@ -44,6 +44,46 @@
         <ui:TextBlock
             x:Key="EndLevelHeader"
             Text="{me:LocalizationSource MainWindow.EndLevelHeader}" />
+        <Style
+            TargetType="Border"
+            x:Key="CustomBorder">
+            <Setter
+                Property="Padding"
+                Value="14 8 14 8" />
+            <Setter
+                Property="VerticalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="HorizontalAlignment"
+                Value="Stretch" />
+            <Setter
+                Property="SnapsToDevicePixels"
+                Value="True" />
+            <Setter
+                Property="OverridesDefaultStyle"
+                Value="True" />
+            <Setter
+                Property="ScrollViewer.HorizontalScrollBarVisibility"
+                Value="Auto" />
+            <Setter
+                Property="ScrollViewer.VerticalScrollBarVisibility"
+                Value="Disabled" />
+            <Setter
+                Property="Background"
+                Value="{DynamicResource CardBackground}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{DynamicResource CardBorderBrush}" />
+            <Setter
+                Property="BorderThickness"
+                Value="{DynamicResource CardControlBorderThemeThickness}" />
+            <Setter
+                Property="FocusVisualStyle"
+                Value="{DynamicResource DefaultControlFocusVisualStyle}" />
+            <Setter
+                Property="CornerRadius"
+                Value="{DynamicResource ControlCornerRadius}" />
+        </Style>
     </Window.Resources>
     <i:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
@@ -66,13 +106,12 @@
             Title="{me:LocalizationSource MainWindow.Title}" />
 
         <Grid
-            Grid.Row="1"
-            Margin="10 10 10 0">
+            Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition
                     Width="2*" />
                 <ColumnDefinition
-                    Width="50" />
+                    Width="Auto" />
                 <ColumnDefinition
                     Width="3*" />
             </Grid.ColumnDefinitions>
@@ -135,44 +174,47 @@
                     HorizontalAlignment="Right" />
                 <ui:Button
                     Width="80"
-                    Height="25"
-                    Margin="5 0 0 0"
+                    Margin="5 0 10 0"
                     HorizontalAlignment="Right"
                     Content="{me:LocalizationSource MainWindow.Browse}"
                     Command="{Binding SelectPathCommand}" />
             </DockPanel>
 
-            <ui:DataGrid
-                x:Name="LeftGrid"
+            <Border
                 Grid.Row="1"
                 Grid.Column="0"
-                AutoGenerateColumns="False"
-                ItemsSource="{Binding GroupsNotForCopy}"
-                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                VirtualizingPanel.VirtualizationMode="Recycling"
-                VirtualizingPanel.IsVirtualizing="True"
-                VerticalScrollBarVisibility="Auto"
-                HorizontalScrollBarVisibility="Auto"
-                SelectionMode="Extended">
-                <ui:DataGrid.Columns>
-                    <DataGridTextColumn
-                        Header="{StaticResource NameHeaderLeft}"
-                        Binding="{Binding Name}"
-                        Width="1*"
-                        IsReadOnly="True" />
-                    <DataGridTextColumn
-                        Header="{StaticResource CurrentLevelHeaderLeft}"
-                        Width="1*"
-                        Binding="{Binding Level.Name}"
-                        IsReadOnly="True" />
-                    <DataGridCheckBoxColumn
-                        Header="{StaticResource DeleteGroupHeader}"
-                        Width="120"
-                        IsReadOnly="False"
-                        Binding="{Binding DeleteGroup}">
-                    </DataGridCheckBoxColumn>
-                </ui:DataGrid.Columns>
-            </ui:DataGrid>
+                Style="{StaticResource CustomBorder}"
+                Margin="10 10 5 10">
+                <ui:DataGrid
+                    x:Name="LeftGrid"
+                    AutoGenerateColumns="False"
+                    ItemsSource="{Binding GroupsNotForCopy}"
+                    VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                    VirtualizingPanel.VirtualizationMode="Recycling"
+                    VirtualizingPanel.IsVirtualizing="True"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Auto"
+                    SelectionMode="Extended">
+                    <ui:DataGrid.Columns>
+                        <DataGridTextColumn
+                            Header="{StaticResource NameHeaderLeft}"
+                            Binding="{Binding Name}"
+                            Width="1*"
+                            IsReadOnly="True" />
+                        <DataGridTextColumn
+                            Header="{StaticResource CurrentLevelHeaderLeft}"
+                            Width="1*"
+                            Binding="{Binding Level.Name}"
+                            IsReadOnly="True" />
+                        <DataGridCheckBoxColumn
+                            Header="{StaticResource DeleteGroupHeader}"
+                            Width="130"
+                            IsReadOnly="False"
+                            Binding="{Binding DeleteGroup, UpdateSourceTrigger=PropertyChanged}">
+                        </DataGridCheckBoxColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </Border>
 
             <StackPanel
                 Grid.Row="1"
@@ -182,58 +224,72 @@
                     Margin="1"
                     CommandParameter="{Binding ElementName=LeftGrid, Path=SelectedItems}"
                     Command="{Binding MoveGroupsToCopyCommand}"
-                    Content="{ui:SymbolIcon Symbol=AlignRight20}" />
+                    Content="{ui:SymbolIcon Symbol=ArrowRight20}" />
                 <ui:Button
                     Margin="1"
                     CommandParameter="{Binding ElementName=RightGrid, Path=SelectedItems}"
                     Command="{Binding MoveGroupsFromCopyCommand}"
-                    Content="{ui:SymbolIcon Symbol=AlignLeft20}" />
+                    Content="{ui:SymbolIcon Symbol=ArrowLeft20}" />
             </StackPanel>
 
-            <ui:DataGrid
-                x:Name="RightGrid"
+            <Border
                 Grid.Row="1"
                 Grid.Column="2"
-                AutoGenerateColumns="False"
-                ItemsSource="{Binding GroupsForCopy}"
-                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                VirtualizingPanel.VirtualizationMode="Recycling"
-                VirtualizingPanel.IsVirtualizing="True"
-                VerticalScrollBarVisibility="Auto"
-                HorizontalScrollBarVisibility="Auto"
-                SelectionMode="Extended">
-                <ui:DataGrid.Columns>
-                    <DataGridTextColumn
-                        Header="{StaticResource NameHeaderRight}"
-                        Binding="{Binding Name}"
-                        Width="1*"
-                        IsReadOnly="True" />
-                    <DataGridTextColumn
-                        Header="{StaticResource CurrentLevelHeaderRight}"
-                        Width="1*"
-                        Binding="{Binding Level.Name}"
-                        IsReadOnly="True" />
-                    <DataGridComboBoxColumn
-                        Header="{StaticResource StartLevelHeader}"
-                        Width="1*"
-                        IsReadOnly="False"
-                        SelectedItemBinding="{Binding SelectedBottomLevel, UpdateSourceTrigger=PropertyChanged}"
-                        ItemsSource="{Binding EnabledBottomLevels}">
-                    </DataGridComboBoxColumn>
-                    <DataGridComboBoxColumn
-                        Header="{StaticResource EndLevelHeader}"
-                        Width="1*"
-                        IsReadOnly="False"
-                        SelectedItemBinding="{Binding SelectedTopLevel, UpdateSourceTrigger=PropertyChanged}"
-                        ItemsSource="{Binding EnabledTopLevels}">
-                    </DataGridComboBoxColumn>
-                </ui:DataGrid.Columns>
-            </ui:DataGrid>
+                Style="{StaticResource CustomBorder}"
+                Margin="5 10 10 10">
+
+                <ui:DataGrid
+                    x:Name="RightGrid"
+                    AutoGenerateColumns="False"
+                    ItemsSource="{Binding GroupsForCopy}"
+                    VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                    VirtualizingPanel.VirtualizationMode="Recycling"
+                    VirtualizingPanel.IsVirtualizing="True"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Auto"
+                    SelectionMode="Extended">
+                    <ui:DataGrid.Columns>
+                        <DataGridTextColumn
+                            Header="{StaticResource NameHeaderRight}"
+                            Binding="{Binding Name}"
+                            Width="1*"
+                            IsReadOnly="True" />
+                        <DataGridTextColumn
+                            Header="{StaticResource CurrentLevelHeaderRight}"
+                            Width="1*"
+                            Binding="{Binding Level.Name}"
+                            IsReadOnly="True" />
+                        <DataGridTemplateColumn
+                            Header="{StaticResource StartLevelHeader}"
+                            Width="1*"
+                            IsReadOnly="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox
+                                        ItemsSource="{Binding EnabledBottomLevels}"
+                                        SelectedItem="{Binding SelectedBottomLevel, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            Header="{StaticResource EndLevelHeader}"
+                            Width="1*"
+                            IsReadOnly="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox
+                                        ItemsSource="{Binding EnabledTopLevels}"
+                                        SelectedItem="{Binding SelectedTopLevel, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </Border>
         </Grid>
 
         <StackPanel
             Grid.Row="2"
-            Height="45"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <TextBlock
@@ -245,7 +301,6 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Height="25"
                 IsDefault="True"
                 Appearance="Info"
                 Content="{me:LocalizationSource Ok}"
@@ -255,7 +310,6 @@
             <ui:Button
                 Margin="10"
                 Width="80"
-                Height="25"
                 IsCancel="True"
                 Content="{me:LocalizationSource Cancel}"
                 Click="ButtonCancel_Click" />
