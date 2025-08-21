@@ -1,0 +1,49 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="MainWindow.Title">Sections constructor</system:String>
+    <system:String
+        x:Key="MainWindow.Browse">Browse</system:String>
+    <system:String
+        x:Key="MainWindow.PathHint">Path and name to save the model</system:String>
+    <system:String
+        x:Key="MainWindow.NameHeader">Group</system:String>
+    <system:String
+        x:Key="MainWindow.CurrentLevelHeader">Current level</system:String>
+    <system:String
+        x:Key="MainWindow.DeleteGroupHeader">Delete group</system:String>
+    <system:String
+        x:Key="MainWindow.StartLevelHeader">Start level</system:String>
+    <system:String
+        x:Key="MainWindow.EndLevelHeader">End level</system:String>
+
+    <system:String
+        x:Key="SaveFileDialog.Title">Select a location to save</system:String>
+
+    <system:String
+        x:Key="Validation.EmptyPath">Specify the path to save the model</system:String>
+
+    <system:String
+        x:Key="SyncTitle">Synchronization after processing groups</system:String>
+
+    <system:String
+        x:Key="TransTitle">Groups processing</system:String>
+
+    <system:String
+        x:Key="Errors.UnsupportedGroupAction">Unsupported group action: {0}</system:String>
+
+    <system:String
+        x:Key="ViewsWarning"
+        xml:space="preserve">
+Before running the plugin, it is highly recommended
+to switch to a blank sheet and close all other views.
+Do you want to continue?</system:String>
+
+    <system:String
+        x:Key="Ok">OK</system:String>
+    <system:String
+        x:Key="Cancel">Cancel</system:String>
+</ResourceDictionary>

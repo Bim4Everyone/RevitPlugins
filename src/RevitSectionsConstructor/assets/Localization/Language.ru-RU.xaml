@@ -1,0 +1,49 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="MainWindow.Title">Конструктор секций</system:String>
+    <system:String
+        x:Key="MainWindow.Browse">Обзор</system:String>
+    <system:String
+        x:Key="MainWindow.PathHint">Путь и имя для сохранения модели</system:String>
+    <system:String
+        x:Key="MainWindow.NameHeader">Группа</system:String>
+    <system:String
+        x:Key="MainWindow.CurrentLevelHeader">Текущий этаж</system:String>
+    <system:String
+        x:Key="MainWindow.DeleteGroupHeader">Удалить группу</system:String>
+    <system:String
+        x:Key="MainWindow.StartLevelHeader">Этаж стартовый</system:String>
+    <system:String
+        x:Key="MainWindow.EndLevelHeader">Этаж итоговый</system:String>
+
+    <system:String
+        x:Key="SaveFileDialog.Title">Выберите место для сохранения</system:String>
+
+    <system:String
+        x:Key="Validation.EmptyPath">Укажите путь для сохранения модели</system:String>
+
+    <system:String
+        x:Key="SyncTitle">Синхронизация после обработки групп</system:String>
+
+    <system:String
+        x:Key="TransTitle">Обработка групп</system:String>
+
+    <system:String
+        x:Key="Errors.UnsupportedGroupAction">Не поддерживаемое действие над группами: {0}</system:String>
+
+    <system:String
+        x:Key="ViewsWarning"
+        xml:space="preserve">
+Перед запуском плагина настоятельно рекомендуется
+перейти на пустой лист и закрыть все другие виды.
+Хотите продолжить?</system:String>
+
+    <system:String
+        x:Key="Ok">ОК</system:String>
+    <system:String
+        x:Key="Cancel">Отмена</system:String>
+</ResourceDictionary>

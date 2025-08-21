@@ -3,20 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitSectionsConstructor.Models;
 
 namespace RevitSectionsConstructor.Services;
 internal class GroupsHandler {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
 
-    public GroupsHandler(RevitRepository revitRepository) {
+    public GroupsHandler(RevitRepository revitRepository, ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
     }
 
 
     public void ProcessGroups(ICollection<GroupWithAction> groups) {
-        using var trans = _revitRepository.Document.StartTransaction("Обработка групп");
+        string msg = _localization.GetLocalizedString("TransTitle");
+        using var trans = _revitRepository.Document.StartTransaction(msg);
         foreach(var group in groups) {
             switch(group.ActionOnGroup) {
                 case ActionsOnGroup.Copy:
@@ -31,9 +35,8 @@ internal class GroupsHandler {
                 case ActionsOnGroup.Nothing:
                     break;
                 default:
-                    throw new NotSupportedException(
-                        $"Не поддерживаемое действие над группами: " +
-                        $"{group.ActionOnGroup}={(int) group.ActionOnGroup}");
+                    throw new NotSupportedException(_localization.GetLocalizedString("Errors.UnsupportedGroupAction",
+                        $"{group.ActionOnGroup}={(int) group.ActionOnGroup}"));
             }
         }
         trans.Commit();

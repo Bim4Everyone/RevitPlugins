@@ -1,10 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
-
-using DevExpress.Xpf.Core;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -18,13 +17,15 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly GroupsHandler _groupsHandler;
     private readonly DocumentSaver _documentSaver;
+    private readonly ILocalizationService _localization;
 
     public MainViewModel(
         RevitRepository revitRepository,
         GroupsHandler groupsHandler,
         DocumentSaver documentSaver,
         ISaveFileDialogService saveFileDialogService,
-        IMessageBoxService messageBoxService) {
+        IMessageBoxService messageBoxService,
+        ILocalizationService localization) {
 
         _revitRepository = revitRepository
             ?? throw new System.ArgumentNullException(nameof(revitRepository));
@@ -36,6 +37,8 @@ internal class MainViewModel : BaseViewModel {
             ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService
             ?? throw new ArgumentNullException(nameof(messageBoxService));
+        _localization = localization
+            ?? throw new ArgumentNullException(nameof(localization));
         GroupsNotForCopy = new ObservableCollection<GroupViewModel>(InitializeGroupViewModels(_revitRepository));
         GroupsForCopy = [];
 
@@ -44,9 +47,9 @@ internal class MainViewModel : BaseViewModel {
         SelectPathCommand
             = RelayCommand.Create(SelectPath);
         MoveGroupsToCopyCommand
-            = RelayCommand.Create<ObservableCollectionCore<object>>(MoveGroupsToCopy, CanMoveGroups);
+            = RelayCommand.Create<IList>(MoveGroupsToCopy, CanMoveGroups);
         MoveGroupsFromCopyCommand
-            = RelayCommand.Create<ObservableCollectionCore<object>>(MoveGroupsFromCopy, CanMoveGroups);
+            = RelayCommand.Create<IList>(MoveGroupsFromCopy, CanMoveGroups);
     }
 
 
@@ -85,7 +88,7 @@ internal class MainViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         if(string.IsNullOrWhiteSpace(Path)) {
-            ErrorText = "Укажите путь для сохранения модели";
+            ErrorText = _localization.GetLocalizedString("Validation.EmptyPath");
             return false;
         }
 
@@ -94,32 +97,28 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void SelectPath() {
-        SaveFileDialogService.Title = "Выберите место для сохранения";
-        SaveFileDialogService.AddExtension = true;
-        SaveFileDialogService.Filter = "Revit projects | *.rvt";
-        SaveFileDialogService.DefaultExt = "rvt";
-        if(SaveFileDialogService.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "")) {
+        if(SaveFileDialogService.ShowDialog(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), string.Empty)) {
             Path = SaveFileDialogService.File.FullName;
         }
     }
 
-    private void MoveGroupsToCopy(ObservableCollectionCore<object> selectedGroupViewModels) {
+    private void MoveGroupsToCopy(IList selectedGroupViewModels) {
         MoveGroupsFromTo(selectedGroupViewModels, GroupsNotForCopy, GroupsForCopy);
         UpdateActionsOnGroups();
     }
 
-    private void MoveGroupsFromCopy(ObservableCollectionCore<object> selectedGroupViewModels) {
+    private void MoveGroupsFromCopy(IList selectedGroupViewModels) {
         MoveGroupsFromTo(selectedGroupViewModels, GroupsForCopy, GroupsNotForCopy);
         UpdateActionsOnGroups();
     }
 
     private void MoveGroupsFromTo(
-        ObservableCollectionCore<object> selectedGroupViewModels,
+        IList selectedGroupViewModels,
         ObservableCollection<GroupViewModel> from,
         ObservableCollection<GroupViewModel> to) {
 
         var selectedItems = selectedGroupViewModels
-            .Where(item => item is GroupViewModel)
+            .OfType<GroupViewModel>()
             .Cast<GroupViewModel>()
             .ToArray();
         foreach(var item in selectedItems) {
@@ -140,9 +139,9 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-    private bool CanMoveGroups(ObservableCollectionCore<object> selectedGroupViewModels) {
+    private bool CanMoveGroups(IList selectedGroupViewModels) {
         return selectedGroupViewModels != null
-            && selectedGroupViewModels.Any(item => item is GroupViewModel);
+            && selectedGroupViewModels.OfType<GroupViewModel>().Any();
     }
 
     private IOrderedEnumerable<GroupViewModel> InitializeGroupViewModels(RevitRepository revitRepository) {

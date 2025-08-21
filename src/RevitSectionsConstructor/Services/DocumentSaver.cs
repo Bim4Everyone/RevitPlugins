@@ -2,14 +2,18 @@ using System;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using RevitSectionsConstructor.Models;
 
 namespace RevitSectionsConstructor.Services;
 internal class DocumentSaver {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localization;
 
-    public DocumentSaver(RevitRepository revitRepository) {
+    public DocumentSaver(RevitRepository revitRepository, ILocalizationService localization) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
     }
 
 
@@ -36,7 +40,7 @@ internal class DocumentSaver {
         _revitRepository.Document.SaveAs(path, options);
 
         var swcOptions = new SynchronizeWithCentralOptions() {
-            Comment = "Синхронизация после обработки групп",
+            Comment = _localization.GetLocalizedString("SyncTitle"),
             Compact = true
         };
         swcOptions.SetRelinquishOptions(new RelinquishOptions(true));

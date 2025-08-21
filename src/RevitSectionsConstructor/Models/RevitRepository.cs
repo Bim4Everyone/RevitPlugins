@@ -55,9 +55,6 @@ internal class RevitRepository {
     /// <exception cref="ArgumentException"></exception>
     public void CopyGroup(GroupWithAction group) {
         if(group is null) { throw new ArgumentNullException(nameof(group)); }
-        if(group.Group.Location is not LocationPoint) {
-            throw new ArgumentException($"Location группы с Id={group.Group.Id} не является точкой");
-        }
 
         var currentLocation = ((LocationPoint) group.Group.Location).Point;
         var groupType = group.Group.GroupType;
