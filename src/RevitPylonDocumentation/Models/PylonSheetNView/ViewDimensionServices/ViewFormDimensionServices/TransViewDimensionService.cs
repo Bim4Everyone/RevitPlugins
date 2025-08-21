@@ -49,11 +49,14 @@ internal class TransViewDimensionService {
             var refArrayFormworkFront = dimensionBaseService.GetDimensionRefs(pylon as FamilyInstance,
                                                                               '#', '/', ["фронт", "край"]);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
+            // Указывает нужно ли будет делать длинные оси снизу (сделано здесь, чтобы не выполнять запрос дважды)
+            var longGridsWillBeNeeded = false;
             if(onTopOfRebar) {
                 // Когда все Гэшки
                 if(SheetInfo.RebarInfo.AllRebarAreL) {
                     CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
                                     ["низ", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
+                    longGridsWillBeNeeded = true;
                 } else if(SheetInfo.RebarInfo.HasLRebar) {
                     // Когда Гэшки с одной стороны
                     if(rebarFinder.DirectionHasLRebar(view, SheetInfo.ProjectSection, DirectionType.Top)) {
@@ -66,6 +69,7 @@ internal class TransViewDimensionService {
                                         ["верх", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
                         CreateDimension(skeletonParentRebar, dimensionLineHostRef, DimensionOffsetType.Bottom, 0.5,
                                         ["низ", "фронт"], view, dimensionBaseService, refArrayFormworkFront);
+                        longGridsWillBeNeeded = true;
                     }
                 }
                 // Когда Гэшек нет вообще
@@ -99,7 +103,7 @@ internal class TransViewDimensionService {
                             [rebarPart, "торец"], view, dimensionBaseService, refArrayFormworkSide, false);
 
             // Размер по ТОРЦУ опалубка (положение справа дальнее)
-            CreateDimension(refArrayFormworkSide, pylon, DimensionOffsetType.Right, 0.8, view, dimensionBaseService);
+            CreateDimension(refArrayFormworkSide, pylon, DimensionOffsetType.Right, 1, view, dimensionBaseService);
 
             // Если на виде есть оси, то создаем размер
             if(grids.Count > 0) {
@@ -117,6 +121,10 @@ internal class TransViewDimensionService {
                     TopOffset = 0.6,
                     BottomOffset = 1.1
                 };
+                // В случае, если на виде вниз будут смотреть Гэшки, то нужно оставить больше места
+                if(longGridsWillBeNeeded) {
+                    transverseViewGridOffsets.BottomOffset = 2.6;
+                }
                 EditGridEnds(view, pylon, grids, transverseViewGridOffsets,
                              dimensionBaseService);
             }
