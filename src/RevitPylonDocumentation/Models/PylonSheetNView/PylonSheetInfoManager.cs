@@ -39,6 +39,7 @@ internal class PylonSheetInfoManager {
         // (нужен для формирования рамки подрезки видов)
         SheetInfo.ElemsInfo.FindPylonHostVectors();
         SheetInfo.ElemsInfo.FindPylonHostOrigin();
+        SheetInfo.ElemsInfo.FindHostDimensions();
         SheetInfo.ElemsInfo.FindElemsBoundingBox();
         SheetInfo.ElemsInfo.FindElemsBoundingBoxProps();
 

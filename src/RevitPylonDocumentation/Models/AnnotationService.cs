@@ -54,14 +54,18 @@ internal class AnnotationService {
 
 
     public void CreateUniversalTag(XYZ bodyPoint, FamilySymbol annotationSymbol, Element element, double tagLength,
-                                   string topText = null, string bottomText = null) {
+                                   string topText = null, string bottomText = null, XYZ leaderPoint = null) {
         var annotationInstance = CreateAnnotationSymbol(bodyPoint, annotationSymbol, tagLength, topText, bottomText);
         // Добавляем и устанавливаем точку привязки выноски
         annotationInstance.addLeader();
         Leader leader = annotationInstance.GetLeaders().FirstOrDefault();
         if(leader != null) {
-            var loc = element.Location as LocationPoint;
-            leader.End = loc.Point; // Точка на элементе
+            if(leaderPoint is null) {
+                var loc = element.Location as LocationPoint;
+                leader.End = loc.Point; // Точка на элементе
+            } else {
+                leader.End = leaderPoint;
+            }
         }
     }
 

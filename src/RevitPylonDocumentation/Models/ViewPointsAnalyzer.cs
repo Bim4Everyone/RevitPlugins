@@ -2,8 +2,6 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
-
 using RevitPylonDocumentation.Models.PylonSheetNView;
 
 namespace RevitPylonDocumentation.Models;
@@ -192,6 +190,15 @@ public class ViewPointsAnalyzer {
         var yOffset = offsets.yOffset;
 
         return point + xOffset + yOffset;
+    }
+
+    /// <summary>
+    /// Возвращает точку пилона в зависимости от направления в зависимости от ориентации вида
+    /// </summary>
+    /// <param name="directionType">Направление, в котором находит интересующий угол пилона в плане по виду</param>
+    internal XYZ GetPylonPointByDirection(PylonSheetInfo sheetInfo, DirectionType directionType) {
+        var info = sheetInfo.ElemsInfo;
+        return GetPointByDirection(info.HostOrigin, directionType, info.HostLength / 2, info.HostWidth / 2);
     }
 
     /// <summary>

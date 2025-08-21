@@ -78,8 +78,8 @@ internal class TransViewRebarMarkService {
     internal void TryCreatePlateMarks() {
         try {
             var simplePlates = ViewModel.RebarFinder.GetSimpleRebars(ViewOfPylon.ViewElement, SheetInfo.ProjectSection,
-                                                         _formNumberForSkeletonPlatesMin,
-                                                         _formNumberForSkeletonPlatesMax);
+                                                                     _formNumberForSkeletonPlatesMin,
+                                                                     _formNumberForSkeletonPlatesMax);
             if(simplePlates.Count == 0) {
                 return;
             }
@@ -99,8 +99,9 @@ internal class TransViewRebarMarkService {
         leftBottomElement.SetParamValue(_commentParamName, commentValue);
 
         // Получаем точку в которую нужно поставить аннотацию
-        var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(leftBottomElement, DirectionType.LeftBottom, 1, 
-                                                                      0.4, false);
+        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftBottom);
+        var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftBottom, 0.7, 0.25);
+        
         // Создаем марку арматуры
         _annotationService.CreateRebarTag(pointLeftBottom, _tagSymbolWithoutSerif, leftBottomElement);
     }
@@ -113,7 +114,8 @@ internal class TransViewRebarMarkService {
         leftTopElement.SetParamValue(_commentParamName, $"{simpleRebars.Count / 2} шт.");
 
         // Получаем точку в которую нужно поставить аннотацию
-        var pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(leftTopElement, DirectionType.LeftTop, 1, 0.4, false);
+        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftTop);
+        var pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftTop, 0.7, 0.25);
 
         // Создаем марку арматуры
         _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithoutSerif, leftTopElement);
@@ -124,11 +126,14 @@ internal class TransViewRebarMarkService {
         var rightBottomElement = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.RightBottom, 
                                                                            false);
         // Получаем точку в которую нужно поставить аннотацию
-        var pointRightBottom = _viewPointsAnalyzer.GetPointByDirection(rightBottomElement, DirectionType.RightBottom, 
-                                                                       2, 0.4, false);
+        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.RightBottom);
+        var pointForTag = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightBottom, 1.5, 0.4);
+        var pointForLeader = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftTop, 0.13, 0.13);
+
         // Создаем типовую аннотацию для обозначения ГОСТа
-        _annotationService.CreateUniversalTag(pointRightBottom, _gostTagSymbol, rightBottomElement, 
-                                              UnitUtilsHelper.ConvertToInternalValue(40), _weldingGostText);
+        _annotationService.CreateUniversalTag(pointForTag, _gostTagSymbol, rightBottomElement, 
+                                              UnitUtilsHelper.ConvertToInternalValue(40), _weldingGostText,
+                                              leaderPoint: pointForLeader);
     }
 
     private void CreateTopMark(List<Element> simplePlates) {

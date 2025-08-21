@@ -77,8 +77,9 @@ internal class TransViewMarkService {
         Element leftBottomVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftBottom, 
                                                                                   false);
         // Получаем точку в которую нужно поставить аннотацию
-        var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(leftBottomVerticalBar, DirectionType.LeftBottom, 
-                                                                      1.5, 0.6, false);
+        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftBottom);
+        var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftBottom, 0.9, 0.55);
+
         // Создаем марку арматуры
         _annotationService.CreateRebarTag(pointLeftBottom, _tagSkeletonSymbol, leftBottomVerticalBar);
     }
@@ -87,11 +88,10 @@ internal class TransViewMarkService {
     private void CreateLeftTopMark(List<Element> simpleClamps, List<Element> simpleRebars) {
         // Получаем референс-элемент
         Element leftClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Left, false);
-        Element leftTopVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.LeftTop, 
-                                                                               false);
+        
         // Получаем точку в которую нужно поставить аннотацию
-        var pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(leftTopVerticalBar, DirectionType.LeftTop, 
-                                                                   1.2, 0.6, false);
+        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.LeftTop);
+        var pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftTop, 0.8, 0.4);
         // Создаем марку арматуры
         var leftTopTag = _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithoutSerif, leftClamp);
 
@@ -109,11 +109,10 @@ internal class TransViewMarkService {
     private void CreateRightTopMark(List<Element> simpleClamps, List<Element> simpleRebars) {
         // Получаем референс-элемент
         Element rightClamp = _viewPointsAnalyzer.GetElementByDirection(simpleClamps, DirectionType.Right, true);
-        Element rightTopVerticalBar = _viewPointsAnalyzer.GetElementByDirection(simpleRebars, DirectionType.RightTop, 
-                                                                                false);
+
         // Получаем точку в которую нужно поставить аннотацию
-        var pointRightTop = _viewPointsAnalyzer.GetPointByDirection(rightTopVerticalBar, DirectionType.RightTop, 
-                                                                    1.2, 0.6, false);
+        var pylonPoint = _viewPointsAnalyzer.GetPylonPointByDirection(SheetInfo, DirectionType.RightTop);
+        var pointRightTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.RightTop, 0.8, 0.4);
         // Создаем марку арматуры
         var rightTopTag = _annotationService.CreateRebarTag(pointRightTop, _tagSymbolWithoutSerif, rightClamp);
 

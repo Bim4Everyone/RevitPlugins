@@ -23,6 +23,8 @@ internal class PylonElemsInfo {
     public XYZ VectorByLength { get; set; }
     public XYZ VectorByWidth { get; set; }
     public XYZ HostOrigin { get; set; }
+    public double HostLength { get; set; }
+    public double HostWidth { get; set; }
     public BoundingBoxXYZ ElemsBoundingBox { get; set; }
     public double ElemsBoundingBoxLength { get; set; }
     public double ElemsBoundingBoxLengthToMax { get; set; }
@@ -77,6 +79,35 @@ internal class PylonElemsInfo {
 
             var locationPoint = column.Location as LocationPoint;
             HostOrigin = locationPoint.Point;
+        }
+    }
+
+    /// <summary>
+    /// Получает габариты пилона в зависимости от категории, которой он был выполнен
+    /// </summary>
+    public void FindHostDimensions() {
+        // Значения по умолчанию в случае, если произойдет ошибка
+        HostLength = 6;
+        HostWidth = 1;
+
+        var elemForWork = SheetInfo.HostElems.First();
+        if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
+            if(elemForWork is not Wall wall) { return; }
+            if(wall.Location is not LocationCurve locationCurve) { return; }
+            if(locationCurve.Curve is not Line line) { return; }
+
+            var wallLineStart = line.GetEndPoint(0);
+            var wallLineEnd = line.GetEndPoint(1);
+            var hostVector = wallLineEnd - wallLineStart;
+            HostLength = hostVector.GetLength();
+            HostWidth = wall.WallType.Width;
+        } else {
+            if(elemForWork is not FamilyInstance column) { return; }
+
+            HostLength = ViewModel.ParamValService
+                            .GetParamValueAnywhere<double>(column, ViewModel.ProjectSettings.PylonLengthParamName);
+            HostWidth = ViewModel.ParamValService
+                            .GetParamValueAnywhere<double>(column, ViewModel.ProjectSettings.PylonWidthParamName);
         }
     }
 
@@ -168,12 +199,10 @@ internal class PylonElemsInfo {
 
         if(angle % 90 > 0) {
             // Если нет, то определять габариты будем не по BoundingBox, а по пилону
-            var dimensions = GetHostDimensions();
-
-            ElemsBoundingBoxLength = dimensions.hostLength;
-            ElemsBoundingBoxLengthToMax = ElemsBoundingBoxLengthToMin = ElemsBoundingBoxLength / 2;
-            ElemsBoundingBoxWidth = dimensions.hostLength;
-            ElemsBoundingBoxWidthToMax = ElemsBoundingBoxWidthToMin = ElemsBoundingBoxWidth / 2;
+            ElemsBoundingBoxLength = HostLength;
+            ElemsBoundingBoxLengthToMax = ElemsBoundingBoxLengthToMin = HostLength / 2;
+            ElemsBoundingBoxWidth = HostWidth;
+            ElemsBoundingBoxWidthToMax = ElemsBoundingBoxWidthToMin = HostWidth / 2;
         } else {
             var forLength = GetDistanceToProjectedMidPt(VectorByWidth);
             var forWidth = GetDistanceToProjectedMidPt(VectorByLength);
@@ -233,36 +262,5 @@ internal class PylonElemsInfo {
 
         // Проецируем точку на плоскость
         return point - distance * normal;
-    }
-
-
-
-    public (double hostLength, double hostWidth) GetHostDimensions() {
-        // Значения по умолчанию в случае, если произойдет ошибка
-        double hostLength = 6;
-        double hostWidth = 1;
-        
-        var elemForWork = SheetInfo.HostElems.First();
-
-        if(elemForWork.Category.GetBuiltInCategory() == BuiltInCategory.OST_Walls) {
-            if(elemForWork is not Wall wall) { return (hostLength, hostWidth); }
-            if(wall.Location is not LocationCurve locationCurve) { return (hostLength, hostWidth); }
-            if(locationCurve.Curve is not Line line) { return (hostLength, hostWidth); }
-
-            var wallLineStart = line.GetEndPoint(0);
-            var wallLineEnd = line.GetEndPoint(1);
-            var hostVector = wallLineEnd - wallLineStart;
-            hostLength = hostVector.GetLength();
-            hostWidth = wall.WallType.Width;
-            return (hostLength, hostWidth);
-        } else {
-            if(elemForWork is not FamilyInstance column) { return (hostLength, hostWidth); }
-            
-            hostLength = ViewModel.ParamValService
-                            .GetParamValueAnywhere<double>(column, ViewModel.ProjectSettings.PylonLengthParamName);
-            hostWidth = ViewModel.ParamValService
-                            .GetParamValueAnywhere<double>(column, ViewModel.ProjectSettings.PylonWidthParamName);
-            return (hostLength, hostWidth);
-        }
     }
 }
