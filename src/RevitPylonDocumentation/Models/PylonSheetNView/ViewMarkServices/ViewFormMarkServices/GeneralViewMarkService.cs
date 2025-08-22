@@ -13,7 +13,7 @@ internal class GeneralViewMarkService {
 
     private readonly FamilySymbol _tagSkeletonSymbol;
     private readonly FamilySymbol _tagSymbolWithStep;
-    private readonly FamilySymbol _gostTagSymbol;
+    private readonly FamilySymbol _universalTagType;
     private readonly FamilySymbol _breakLineSymbol;
     private readonly FamilySymbol _concretingSeamSymbol;
 
@@ -42,7 +42,7 @@ internal class GeneralViewMarkService {
         // Без засечки на конце
         _tagSymbolWithStep = mvm.SelectedRebarTagTypeWithStep;
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
-        _gostTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
+        _universalTagType = mvm.SelectedUniversalTagType;
 
         // Находим типоразмер аннотации линии разрыва
         _breakLineSymbol = mvm.SelectedBreakLineType;
@@ -176,7 +176,7 @@ internal class GeneralViewMarkService {
             var leaderPoint = _viewPointsAnalyzer.GetPointByDirection(bottomRightPt, DirectionType.LeftBottom,
                                                                       0.4, 0.4);
             // Создаем типовую аннотацию для обозначения ГОСТа
-            _annotationService.CreateUniversalTag(annotPoint, _gostTagSymbol, leaderPoint,
+            _annotationService.CreateUniversalTag(annotPoint, _universalTagType, leaderPoint,
                                                   UnitUtilsHelper.ConvertToInternalValue(40),
                                                   "Арматурные выпуски", "показаны условно");
         } catch(Exception) { }

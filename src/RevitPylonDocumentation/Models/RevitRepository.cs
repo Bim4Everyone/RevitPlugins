@@ -124,8 +124,18 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает список типоразмеров элементов узла
     /// </summary>
-    public List<FamilySymbol> DetailComponents => new FilteredElementCollector(Document)
+    public List<FamilySymbol> DetailComponentTypes => new FilteredElementCollector(Document)
         .OfCategory(BuiltInCategory.OST_DetailComponents)
+        .WhereElementIsElementType()
+        .OfType<FamilySymbol>()
+        .OrderBy(a => a.Name)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список типоразмеров типовых аннотаций
+    /// </summary>
+    public List<FamilySymbol> TypicalAnnotationsTypes => new FilteredElementCollector(Document)
+        .OfCategory(BuiltInCategory.OST_GenericAnnotation)
         .WhereElementIsElementType()
         .OfType<FamilySymbol>()
         .OrderBy(a => a.Name)

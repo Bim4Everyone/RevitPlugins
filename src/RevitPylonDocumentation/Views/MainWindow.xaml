@@ -666,6 +666,42 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
+                                            Text="Выберите типоразмер универсальной марки с текстом:">
+                                        </TextBlock>
+
+                                        <ComboBox
+                                            Style="{StaticResource ComboBoxWithTooltipStyle}"
+                                            Margin="10 0 10 10"
+                                            Width="460"
+                                            Height="25"
+                                            HorizontalAlignment="Left"
+                                            ItemsSource="{Binding Path=TypicalAnnotationsTypes}"
+                                            SelectedItem="{Binding Path=SelectedUniversalTagType}">
+
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock>
+                                                        <TextBlock.Text>
+                                                            <Binding
+                                                                Path="Name" />
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger
+                                                    EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding DataContext.SettingsChangedCommand, 
+                                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
+
+                                        <TextBlock
+                                            Style="{StaticResource TextBlockWithTooltipStyle}"
+                                            Margin="10 10 0 5"
                                             Text="Выберите типоразмер линии обрыва:">
                                         </TextBlock>
 

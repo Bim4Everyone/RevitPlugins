@@ -11,7 +11,7 @@ internal class GeneralViewRebarPerpMarkService {
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
     private readonly FamilySymbol _tagSymbolWithStep;
-    private readonly FamilySymbol _independentTagSymbol;
+    private readonly FamilySymbol _universalTagType;
     private readonly string _linkToNodeText = "по А";
 
     internal GeneralViewRebarPerpMarkService(MainViewModel mvm, RevitRepository repository, PylonSheetInfo pylonSheetInfo,
@@ -28,7 +28,7 @@ internal class GeneralViewRebarPerpMarkService {
         // Без засечки на конце
         _tagSymbolWithStep = mvm.SelectedRebarTagTypeWithStep;
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
-        _independentTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
+        _universalTagType = mvm.SelectedUniversalTagType;
     }
 
     internal MainViewModel ViewModel { get; set; }
@@ -86,7 +86,7 @@ internal class GeneralViewRebarPerpMarkService {
                                                                       UnitUtilsHelper.ConvertToInternalValue(70.7),
                                                                       UnitUtilsHelper.ConvertToInternalValue(70.7));
             var bodyPoint = _viewPointsAnalyzer.GetPointByDirection(point, DirectionType.LeftTop, 0.8, 0.6);
-            _annotationService.CreateUniversalTag(bodyPoint, _independentTagSymbol, leaderPoint,
+            _annotationService.CreateUniversalTag(bodyPoint, _universalTagType, leaderPoint,
                                                   UnitUtilsHelper.ConvertToInternalValue(10), _linkToNodeText);
         }
     }

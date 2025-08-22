@@ -42,6 +42,7 @@ internal class UserProjectSettings : BaseViewModel {
     private string _rebarTagTypeWithSerifNameTemp = "Поз., Диаметр / Шаг - Полка 10, Засечка";
     private string _rebarTagTypeWithStepNameTemp = "Поз., Диаметр / Шаг - Полка 10";
     private string _rebarTagTypeWithCommentNameTemp = "Поз., Диаметр / Комментарий - Полка 10";
+    private string _universalTagTypeNameTemp = "Без засечки";
     
     private string _breakLineTypeNameTemp = "Линейный обрыв";
     private string _concretingJointTypeNameTemp = "3 мм_М 20";
@@ -204,6 +205,12 @@ internal class UserProjectSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _rebarTagTypeWithCommentNameTemp, value);
     }
 
+    public string UniversalTagTypeName { get; set; }
+    public string UniversalTagTypeNameTemp {
+        get => _universalTagTypeNameTemp;
+        set => RaiseAndSetIfChanged(ref _universalTagTypeNameTemp, value);
+    }
+
     public string BreakLineTypeName { get; set; }
     public string BreakLineTypeNameTemp {
         get => _breakLineTypeNameTemp;
@@ -249,6 +256,7 @@ internal class UserProjectSettings : BaseViewModel {
         RebarTagTypeWithSerifName = RebarTagTypeWithSerifNameTemp;
         RebarTagTypeWithStepName = RebarTagTypeWithStepNameTemp;
         RebarTagTypeWithCommentName = RebarTagTypeWithCommentNameTemp;
+        UniversalTagTypeName = UniversalTagTypeNameTemp;
         BreakLineTypeName = BreakLineTypeNameTemp;
         ConcretingJointTypeName = ConcretingJointTypeNameTemp;
     }

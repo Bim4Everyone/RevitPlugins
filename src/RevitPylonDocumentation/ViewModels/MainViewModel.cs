@@ -34,6 +34,7 @@ internal class MainViewModel : BaseViewModel {
     private FamilySymbol _selectedRebarTagTypeWithSerif;
     private FamilySymbol _selectedRebarTagTypeWithStep;
     private FamilySymbol _selectedRebarTagTypeWithComment;
+    private FamilySymbol _selectedUniversalTagType;
     
     private FamilySymbol _selectedBreakLineType;
     private FamilySymbol _selectedConcretingJointType;
@@ -70,7 +71,8 @@ internal class MainViewModel : BaseViewModel {
         DimensionTypes = _revitRepository.DimensionTypes;
         SpotDimensionTypes = _revitRepository.SpotDimensionTypes;
         RebarTagTypes = _revitRepository.RebarTagTypes;
-        DetailComponentsTypes = _revitRepository.DetailComponents;
+        DetailComponentsTypes = _revitRepository.DetailComponentTypes;
+        TypicalAnnotationsTypes = _revitRepository.TypicalAnnotationsTypes;
 
         SetHostsInfoFilters();
 
@@ -267,6 +269,11 @@ internal class MainViewModel : BaseViewModel {
     public List<FamilySymbol> DetailComponentsTypes { get; set; } = [];
 
     /// <summary>
+    /// Типоразмеры типовых аннотаций, имеющиеся в проекте
+    /// </summary>
+    public List<FamilySymbol> TypicalAnnotationsTypes { get; set; } = [];
+
+    /// <summary>
     /// Выбранный пользователем типоразмер марки для обозначения каркаса
     /// </summary>
     public FamilySymbol SelectedSkeletonTagType {
@@ -307,6 +314,17 @@ internal class MainViewModel : BaseViewModel {
         set {
             RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithComment, value);
             ProjectSettings.RebarTagTypeWithCommentNameTemp = value?.Name;
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер аннотации рабочего шва бетонирования
+    /// </summary>
+    public FamilySymbol SelectedUniversalTagType {
+        get => _selectedUniversalTagType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedUniversalTagType, value);
+            ProjectSettings.UniversalTagTypeNameTemp = value?.Name;
         }
     }
 
@@ -623,6 +641,7 @@ internal class MainViewModel : BaseViewModel {
         FindRebarTagTypeWithSerif();
         FindRebarTagTypeWithStep();
         FindRebarTagTypeWithComment();
+        FindUniversalTagType();
         FindBreakLineType();
         FindConcretingJointType();
         FindLegend();
@@ -702,6 +721,10 @@ internal class MainViewModel : BaseViewModel {
         }
         if(SelectedRebarTagTypeWithComment is null) {
             ErrorText = "Не задан типоразмер марки арматуры с комментарием";
+            return;
+        }
+        if(SelectedUniversalTagType is null) {
+            ErrorText = "Не задан типоразмер универсальной марки";
             return;
         }
         if(SelectedBreakLineType is null) {
@@ -868,6 +891,16 @@ internal class MainViewModel : BaseViewModel {
         if(ProjectSettings.RebarTagTypeWithCommentName != string.Empty) {
             SelectedRebarTagTypeWithComment = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithCommentName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер универсальной марки
+    /// </summary>
+    public void FindUniversalTagType() {
+        if(ProjectSettings.UniversalTagTypeName != string.Empty) {
+            SelectedUniversalTagType = TypicalAnnotationsTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.UniversalTagTypeName));
         }
     }
 
