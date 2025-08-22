@@ -99,6 +99,7 @@ internal class RevitRepository {
     public IEnumerable<string> GetViewNames(IEnumerable<View> views) {
         return views
             .Select(item => item.Name)
+            .Distinct()
             .OrderBy(item => item);
     }
     

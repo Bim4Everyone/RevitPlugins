@@ -132,7 +132,9 @@ internal class RenameViewViewModel : BaseViewModel {
                 .Select(item => new RevitViewViewModel(item)));
 
         RestrictedViewNames =
-            new ObservableCollection<string>(_revitRepository.GetViewNames(_revitRepository.GetViews()));
+            new ObservableCollection<string>(
+                _revitRepository.GetViewNames(_revitRepository.GetViews())
+                    .Except(SelectedViews.Select(item => item.OriginalName)));
 
         Prefixes = new ObservableCollection<string>(
             SelectedViews
@@ -174,8 +176,8 @@ internal class RenameViewViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         string[] generatingNames = SelectedViews
-            .Select(GetViewName)
-            .ToArray();
+            ?.Select(GetViewName)
+            .ToArray() ?? [];
 
         string generateName = generatingNames.GroupBy(item => item)
             .Where(item => item.Count() > 1)
@@ -183,15 +185,15 @@ internal class RenameViewViewModel : BaseViewModel {
             .FirstOrDefault();
 
         if(!string.IsNullOrEmpty(generateName)) {
-            ErrorText = _localizationService.GetLocalizedString("RenameView.FoundRepeatViewName", generateName);
+            ErrorText = _localizationService.GetLocalizedString("RenameViewWindow.FoundRepeatViewName", generateName);
             return false;
         }
 
         string existingName =
-            generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(item.Equals));
+            generatingNames.FirstOrDefault(item => RestrictedViewNames?.Any(item.Equals) == true);
 
         if(!string.IsNullOrEmpty(existingName)) {
-            ErrorText = _localizationService.GetLocalizedString("RenameView.FoundExistsViewName", existingName);
+            ErrorText = _localizationService.GetLocalizedString("RenameViewWindow.FoundExistsViewName", existingName);
             return false;
         }
 
