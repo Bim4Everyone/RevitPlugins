@@ -174,8 +174,8 @@ internal class RenameViewViewModel : BaseViewModel {
 
     private bool CanAcceptView() {
         string[] generatingNames = SelectedViews
-            .Select(GetViewName)
-            .ToArray();
+            ?.Select(GetViewName)
+            .ToArray() ?? [];
 
         string generateName = generatingNames.GroupBy(item => item)
             .Where(item => item.Count() > 1)
@@ -188,7 +188,7 @@ internal class RenameViewViewModel : BaseViewModel {
         }
 
         string existingName =
-            generatingNames.FirstOrDefault(item => RestrictedViewNames.Any(item.Equals));
+            generatingNames.FirstOrDefault(item => RestrictedViewNames?.Any(item.Equals) == true);
 
         if(!string.IsNullOrEmpty(existingName)) {
             ErrorText = _localizationService.GetLocalizedString("RenameView.FoundExistsViewName", existingName);
