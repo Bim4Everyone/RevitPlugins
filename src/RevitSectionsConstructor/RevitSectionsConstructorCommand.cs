@@ -1,5 +1,6 @@
 using System;
-using System.Windows;
+using System.Globalization;
+using System.Reflection;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -7,6 +8,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
+using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
@@ -36,28 +39,37 @@ public class RevitSectionsConstructorCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.UseWpfUIMessageBox<MainViewModel>();
+
+        kernel.UseWpfUIThemeUpdater();
+
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization(
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+
+        var localization = kernel.Get<ILocalizationService>();
+
         kernel.UseXtraSaveFileDialog<MainViewModel>(
+            title: localization.GetLocalizedString("SaveFileDialog.Title"),
+            addExtension: true,
             filter: "Revit projects |*.rvt",
-            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-            );
-        kernel.UseXtraMessageBox<MainViewModel>();
+            defaultExt: "rvt");
 
-        kernel.Bind<MainViewModel>().ToSelf();
-        kernel.Bind<MainWindow>().ToSelf()
-            .WithPropertyValue(nameof(Window.Title), PluginName)
-            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
-
-        CheckViews(kernel.Get<RevitRepository>(), kernel.Get<IMessageBoxService>());
+        CheckViews(kernel.Get<RevitRepository>(), kernel.Get<IMessageBoxService>(), localization);
 
         Notification(kernel.Get<MainWindow>());
     }
 
-    private void CheckViews(RevitRepository revitRepository, IMessageBoxService messageBoxService) {
+    private void CheckViews(
+        RevitRepository revitRepository,
+        IMessageBoxService messageBoxService,
+        ILocalizationService localization) {
+
         if(!revitRepository.ActiveDocOnEmptySheet()) {
-            var result = messageBoxService.Show(
-                "Перед запуском плагина настоятельно рекомендуется перейти на пустой лист и закрыть все другие виды." +
-                "\nХотите продолжить?",
-                "Конструктор секций",
+            var result = messageBoxService.Show(localization.GetLocalizedString("ViewsWarning"),
+                localization.GetLocalizedString("MainWindow.Title"),
                 System.Windows.MessageBoxButton.YesNo,
                 System.Windows.MessageBoxImage.Warning);
             if(result != System.Windows.MessageBoxResult.Yes) {
