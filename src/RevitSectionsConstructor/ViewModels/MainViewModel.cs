@@ -119,7 +119,6 @@ internal class MainViewModel : BaseViewModel {
 
         var selectedItems = selectedGroupViewModels
             .OfType<GroupViewModel>()
-            .Cast<GroupViewModel>()
             .ToArray();
         foreach(var item in selectedItems) {
             to.Add(item);
