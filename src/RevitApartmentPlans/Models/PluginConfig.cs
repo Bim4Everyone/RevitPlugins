@@ -6,48 +6,47 @@ using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
-namespace RevitApartmentPlans.Models {
-    internal class PluginConfig : ProjectConfig<RevitSettings> {
-        [JsonIgnore] public override string ProjectConfigPath { get; set; }
+namespace RevitApartmentPlans.Models;
+internal class PluginConfig : ProjectConfig<RevitSettings> {
+    [JsonIgnore] public override string ProjectConfigPath { get; set; }
 
-        [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
+    [JsonIgnore] public override IConfigSerializer Serializer { get; set; }
 
-        public static PluginConfig GetPluginConfig() {
-            return new ProjectConfigBuilder()
-                .SetSerializer(new ConfigSerializer())
-                .SetPluginName(nameof(RevitApartmentPlans))
-                .SetRevitVersion(ModuleEnvironment.RevitVersion)
-                .SetProjectConfigName(nameof(PluginConfig) + ".json")
-                .Build<PluginConfig>();
-        }
+    public static PluginConfig GetPluginConfig() {
+        return new ProjectConfigBuilder()
+            .SetSerializer(new ConfigSerializer())
+            .SetPluginName(nameof(RevitApartmentPlans))
+            .SetRevitVersion(ModuleEnvironment.RevitVersion)
+            .SetProjectConfigName(nameof(PluginConfig) + ".json")
+            .Build<PluginConfig>();
     }
+}
 
-    internal class RevitSettings : ProjectSettings {
-        public override string ProjectName { get; set; }
+internal class RevitSettings : ProjectSettings {
+    public override string ProjectName { get; set; }
 
-        /// <summary>
-        /// Наружный отступ в мм от контура квартиры
-        /// </summary>
-        public double OffsetMm { get; set; }
+    /// <summary>
+    /// Наружный отступ в мм от контура квартиры
+    /// </summary>
+    public double OffsetMm { get; set; }
 
-        /// <summary>
-        /// Название параметра для группировки помещений по квартирам
-        /// </summary>
-        public string ParamName { get; set; }
+    /// <summary>
+    /// Название параметра для группировки помещений по квартирам
+    /// </summary>
+    public string ParamName { get; set; }
 
-        /// <summary>
-        /// Id всех выбранных пользователем шаблонов видов для создания планов
-        /// </summary>
-        public ElementId[] ViewTemplates { get; set; }
+    /// <summary>
+    /// Id всех выбранных пользователем шаблонов видов для создания планов
+    /// </summary>
+    public ElementId[] ViewTemplates { get; set; }
 
-        /// <summary>
-        /// Копировать с детализацией
-        /// </summary>
-        public bool CopyDetail { get; set; }
+    /// <summary>
+    /// Копировать с детализацией
+    /// </summary>
+    public bool CopyDetail { get; set; }
 
-        /// <summary>
-        /// Обрабатывать связанные файлы
-        /// </summary>
-        public bool ProcessLinks { get; set; }
-    }
+    /// <summary>
+    /// Обрабатывать связанные файлы
+    /// </summary>
+    public bool ProcessLinks { get; set; }
 }
