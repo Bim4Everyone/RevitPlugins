@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <UseDevExpress>true</UseDevExpress>
-    </PropertyGroup>
+	<PropertyGroup>
+		<UseDevExpress>true</UseDevExpress>
+		<LangVersion>12</LangVersion>
+	</PropertyGroup>
 </Project>
