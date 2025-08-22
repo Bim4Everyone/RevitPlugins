@@ -41,7 +41,7 @@ internal class UserProjectSettings : BaseViewModel {
     private string _skeletonTagTypeNameTemp = "Изделие_Марка - Полка 20";
     private string _rebarTagTypeWithSerifNameTemp = "Поз., Диаметр / Шаг - Полка 10, Засечка";
     private string _rebarTagTypeWithStepNameTemp = "Поз., Диаметр / Шаг - Полка 10";
-    private string _rebarTagTypeWithCountNameTemp = "Поз., Диаметр / Количество - Полка 10";
+    private string _rebarTagTypeWithCommentNameTemp = "Поз., Диаметр / Комментарий - Полка 10";
 
     public UserProjectSettings(MainViewModel mainViewModel, RevitRepository repository) {
         ViewModel = mainViewModel;
@@ -195,10 +195,10 @@ internal class UserProjectSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _rebarTagTypeWithStepNameTemp, value);
     }
 
-    public string RebarTagTypeWithCountName { get; set; }
-    public string RebarTagTypeWithCountNameTemp {
-        get => _rebarTagTypeWithCountNameTemp;
-        set => RaiseAndSetIfChanged(ref _rebarTagTypeWithCountNameTemp, value);
+    public string RebarTagTypeWithCommentName { get; set; }
+    public string RebarTagTypeWithCommentNameTemp {
+        get => _rebarTagTypeWithCommentNameTemp;
+        set => RaiseAndSetIfChanged(ref _rebarTagTypeWithCommentNameTemp, value);
     }
 
     public void ApplyProjectSettings() {
@@ -233,7 +233,7 @@ internal class UserProjectSettings : BaseViewModel {
         SkeletonTagTypeName = SkeletonTagTypeNameTemp;
         RebarTagTypeWithSerifName = RebarTagTypeWithSerifNameTemp;
         RebarTagTypeWithStepName = RebarTagTypeWithStepNameTemp;
-        RebarTagTypeWithCountName = RebarTagTypeWithCountNameTemp;
+        RebarTagTypeWithCommentName = RebarTagTypeWithCommentNameTemp;
     }
 
     public void CheckProjectSettings() {

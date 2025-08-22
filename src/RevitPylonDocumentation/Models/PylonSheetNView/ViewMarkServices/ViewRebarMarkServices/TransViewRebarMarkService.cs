@@ -20,7 +20,7 @@ internal class TransViewRebarMarkService {
     private readonly ViewPointsAnalyzer _viewPointsAnalyzer;
     private readonly AnnotationService _annotationService;
 
-    private readonly FamilySymbol _tagSymbolWithCount;
+    private readonly FamilySymbol _tagSymbolWithComment;
     private readonly FamilySymbol _gostTagSymbol;
 
     private readonly string _weldingGostText = "ГОСТ 14098-2014-Н1-Рш";
@@ -37,7 +37,7 @@ internal class TransViewRebarMarkService {
 
         // Находим типоразмер марки несущей арматуры для обозначения позиции, диаметра и комментариев арматуры
         // Без засечки на конце
-        _tagSymbolWithCount = mvm.SelectedRebarTagTypeWithCount;
+        _tagSymbolWithComment = mvm.SelectedRebarTagTypeWithComment;
         // Находим типоразмер типовой аннотации для метки ГОСТа сварки
         _gostTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
     }
@@ -102,7 +102,7 @@ internal class TransViewRebarMarkService {
         var pointLeftBottom = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftBottom, 0.7, 0.25);
         
         // Создаем марку арматуры
-        _annotationService.CreateRebarTag(pointLeftBottom, _tagSymbolWithCount, leftBottomElement);
+        _annotationService.CreateRebarTag(pointLeftBottom, _tagSymbolWithComment, leftBottomElement);
     }
 
     private void CreateLeftTopMark(List<Element> simpleRebars) {
@@ -117,7 +117,7 @@ internal class TransViewRebarMarkService {
         var pointLeftTop = _viewPointsAnalyzer.GetPointByDirection(pylonPoint, DirectionType.LeftTop, 0.7, 0.25);
 
         // Создаем марку арматуры
-        _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithCount, leftTopElement);
+        _annotationService.CreateRebarTag(pointLeftTop, _tagSymbolWithComment, leftTopElement);
     }
 
     private void CreateRightBottomMark(List<Element> simpleRebars) {
@@ -145,7 +145,7 @@ internal class TransViewRebarMarkService {
         var pointTopPlate = _viewPointsAnalyzer.GetPointByDirection(topPlate, DirectionType.LeftBottom, 0.5, 0.4, true);
 
         // Создаем марку арматуры
-        var topPlateTag = _annotationService.CreateRebarTag(pointTopPlate, _tagSymbolWithCount, topPlate);
+        var topPlateTag = _annotationService.CreateRebarTag(pointTopPlate, _tagSymbolWithComment, topPlate);
         topPlateTag.LeaderEndCondition = LeaderEndCondition.Free;
 #if REVIT_2022_OR_GREATER
         topPlateTag.SetLeaderEnd(new Reference(topPlate), pointTopPlateLeader);
@@ -162,7 +162,7 @@ internal class TransViewRebarMarkService {
         var pointBottomPlate = _viewPointsAnalyzer.GetPointByDirection(bottomPlate, DirectionType.RightTop, 
                                                                        0.35, 0.3, true);
         // Создаем марку арматуры
-        var bottomPlateTag = _annotationService.CreateRebarTag(pointBottomPlate, _tagSymbolWithCount, bottomPlate);
+        var bottomPlateTag = _annotationService.CreateRebarTag(pointBottomPlate, _tagSymbolWithComment, bottomPlate);
         bottomPlateTag.LeaderEndCondition = LeaderEndCondition.Free;
 #if REVIT_2022_OR_GREATER
         bottomPlateTag.SetLeaderEnd(new Reference(bottomPlate), pointBottomPlateLeader);
@@ -179,7 +179,7 @@ internal class TransViewRebarMarkService {
         var pointLeftPlate = _viewPointsAnalyzer.GetPointByDirection(leftPlate, DirectionType.LeftBottom, 
                                                                      0.8, 0.3, true);
         // Создаем марку арматуры
-        var leftPlateTag = _annotationService.CreateRebarTag(pointLeftPlate, _tagSymbolWithCount, leftPlate);
+        var leftPlateTag = _annotationService.CreateRebarTag(pointLeftPlate, _tagSymbolWithComment, leftPlate);
         leftPlateTag.LeaderEndCondition = LeaderEndCondition.Free;
 #if REVIT_2022_OR_GREATER
         leftPlateTag.SetLeaderEnd(new Reference(leftPlate), pointLeftPlateLeader);
@@ -195,7 +195,7 @@ internal class TransViewRebarMarkService {
         var pointRightPlate = _viewPointsAnalyzer.GetPointByDirection(rightPlate, DirectionType.RightTop, 0.8, 0.6, true);
 
         // Создаем марку арматуры
-        var rightPlateTag = _annotationService.CreateRebarTag(pointRightPlate, _tagSymbolWithCount, rightPlate);
+        var rightPlateTag = _annotationService.CreateRebarTag(pointRightPlate, _tagSymbolWithComment, rightPlate);
         rightPlateTag.LeaderEndCondition = LeaderEndCondition.Free;
 #if REVIT_2022_OR_GREATER
         rightPlateTag.SetLeaderEnd(new Reference(rightPlate), pointRightPlateLeader);

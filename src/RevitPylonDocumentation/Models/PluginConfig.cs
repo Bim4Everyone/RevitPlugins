@@ -95,8 +95,8 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.RebarTagTypeWithSerifNameTemp = settings.RebarTagTypeWithSerifName;
         projectSettings.RebarTagTypeWithStepName = settings.RebarTagTypeWithStepName;
         projectSettings.RebarTagTypeWithStepNameTemp = settings.RebarTagTypeWithStepName;
-        projectSettings.RebarTagTypeWithCountName = settings.RebarTagTypeWithCountName;
-        projectSettings.RebarTagTypeWithCountNameTemp = settings.RebarTagTypeWithCountName;
+        projectSettings.RebarTagTypeWithCommentName = settings.RebarTagTypeWithCommentName;
+        projectSettings.RebarTagTypeWithCommentNameTemp = settings.RebarTagTypeWithCommentName;
 
         viewSectionSettings.GeneralViewPrefix = settings.GeneralViewPrefix;
         viewSectionSettings.GeneralViewPrefixTemp = settings.GeneralViewPrefix;
@@ -292,7 +292,7 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.SkeletonTagTypeName = projectSettings.SkeletonTagTypeName;
         settings.RebarTagTypeWithSerifName = projectSettings.RebarTagTypeWithSerifName;
         settings.RebarTagTypeWithStepName = projectSettings.RebarTagTypeWithStepName;
-        settings.RebarTagTypeWithCountName = projectSettings.RebarTagTypeWithCountName;
+        settings.RebarTagTypeWithCommentName = projectSettings.RebarTagTypeWithCommentName;
 
         settings.SheetSize = projectSettings.SheetSize;
         settings.SheetCoefficient = projectSettings.SheetCoefficient;
@@ -432,7 +432,7 @@ internal class PluginSettings : ProjectSettings {
     public string SkeletonTagTypeName { get; set; }
     public string RebarTagTypeWithSerifName { get; set; }
     public string RebarTagTypeWithStepName { get; set; }
-    public string RebarTagTypeWithCountName { get; set; }
+    public string RebarTagTypeWithCommentName { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public string SheetPrefix { get; set; }

@@ -33,7 +33,7 @@ internal class MainViewModel : BaseViewModel {
     private FamilySymbol _selectedSkeletonTagType;
     private FamilySymbol _selectedRebarTagTypeWithSerif;
     private FamilySymbol _selectedRebarTagTypeWithStep;
-    private FamilySymbol _selectedRebarTagTypeWithCount;
+    private FamilySymbol _selectedRebarTagTypeWithComment;
 
     private SpotDimensionType _selectedSpotDimensionType;
     private View _selectedGeneralViewTemplate;
@@ -293,11 +293,11 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Выбранный пользователем типоразмер марки арматуры с количеством
     /// </summary>
-    public FamilySymbol SelectedRebarTagTypeWithCount {
-        get => _selectedRebarTagTypeWithCount;
+    public FamilySymbol SelectedRebarTagTypeWithComment {
+        get => _selectedRebarTagTypeWithComment;
         set {
-            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithCount, value);
-            ProjectSettings.RebarTagTypeWithStepNameTemp = value?.Name;
+            RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithComment, value);
+            ProjectSettings.RebarTagTypeWithCommentNameTemp = value?.Name;
         }
     }
 
@@ -591,7 +591,7 @@ internal class MainViewModel : BaseViewModel {
         FindSkeletonTagType();
         FindRebarTagTypeWithSerif();
         FindRebarTagTypeWithStep();
-        FindRebarTagTypeWithCount();
+        FindRebarTagTypeWithComment();
         FindLegend();
         FindRebarNode();
         FindTitleBlock();
@@ -819,10 +819,10 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Получает типоразмер марки арматуры с количеством
     /// </summary>
-    public void FindRebarTagTypeWithCount() {
-        if(ProjectSettings.RebarTagTypeWithCountName != string.Empty) {
-            SelectedRebarTagTypeWithCount = RebarTagTypes
-                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithCountName));
+    public void FindRebarTagTypeWithComment() {
+        if(ProjectSettings.RebarTagTypeWithCommentName != string.Empty) {
+            SelectedRebarTagTypeWithComment = RebarTagTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithCommentName));
         }
     }
 

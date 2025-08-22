@@ -630,7 +630,7 @@
                                         <TextBlock
                                             Style="{StaticResource TextBlockWithTooltipStyle}"
                                             Margin="10 10 0 5"
-                                            Text="Выберите типоразмер марки арматуры с количеством:">
+                                            Text="Выберите типоразмер марки арматуры с комментарием:">
                                         </TextBlock>
 
                                         <ComboBox
@@ -640,7 +640,7 @@
                                             Height="25"
                                             HorizontalAlignment="Left"
                                             ItemsSource="{Binding Path=RebarTagTypes}"
-                                            SelectedItem="{Binding Path=SelectedRebarTagTypeWithCount}">
+                                            SelectedItem="{Binding Path=SelectedRebarTagTypeWithComment}">
 
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
