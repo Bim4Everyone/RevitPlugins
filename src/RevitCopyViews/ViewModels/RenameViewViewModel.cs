@@ -183,7 +183,7 @@ internal class RenameViewViewModel : BaseViewModel {
             .FirstOrDefault();
 
         if(!string.IsNullOrEmpty(generateName)) {
-            ErrorText = _localizationService.GetLocalizedString("RenameView.FoundRepeatViewName", generateName);
+            ErrorText = _localizationService.GetLocalizedString("RenameViewWindow.FoundRepeatViewName", generateName);
             return false;
         }
 
@@ -191,7 +191,7 @@ internal class RenameViewViewModel : BaseViewModel {
             generatingNames.FirstOrDefault(item => RestrictedViewNames?.Any(item.Equals) == true);
 
         if(!string.IsNullOrEmpty(existingName)) {
-            ErrorText = _localizationService.GetLocalizedString("RenameView.FoundExistsViewName", existingName);
+            ErrorText = _localizationService.GetLocalizedString("RenameViewWindow.FoundExistsViewName", existingName);
             return false;
         }
 
