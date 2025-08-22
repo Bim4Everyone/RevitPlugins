@@ -132,7 +132,9 @@ internal class RenameViewViewModel : BaseViewModel {
                 .Select(item => new RevitViewViewModel(item)));
 
         RestrictedViewNames =
-            new ObservableCollection<string>(_revitRepository.GetViewNames(_revitRepository.GetViews()));
+            new ObservableCollection<string>(
+                _revitRepository.GetViewNames(_revitRepository.GetViews())
+                    .Except(SelectedViews.Select(item => item.OriginalName)));
 
         Prefixes = new ObservableCollection<string>(
             SelectedViews
