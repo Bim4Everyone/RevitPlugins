@@ -42,6 +42,9 @@ internal class UserProjectSettings : BaseViewModel {
     private string _rebarTagTypeWithSerifNameTemp = "Поз., Диаметр / Шаг - Полка 10, Засечка";
     private string _rebarTagTypeWithStepNameTemp = "Поз., Диаметр / Шаг - Полка 10";
     private string _rebarTagTypeWithCommentNameTemp = "Поз., Диаметр / Комментарий - Полка 10";
+    
+    private string _breakLineTypeNameTemp = "Линейный обрыв";
+    private string _concretingJointTypeNameTemp = "3 мм_М 20";
 
     public UserProjectSettings(MainViewModel mainViewModel, RevitRepository repository) {
         ViewModel = mainViewModel;
@@ -201,6 +204,18 @@ internal class UserProjectSettings : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _rebarTagTypeWithCommentNameTemp, value);
     }
 
+    public string BreakLineTypeName { get; set; }
+    public string BreakLineTypeNameTemp {
+        get => _breakLineTypeNameTemp;
+        set => RaiseAndSetIfChanged(ref _breakLineTypeNameTemp, value);
+    }
+
+    public string ConcretingJointTypeName { get; set; }
+    public string ConcretingJointTypeNameTemp {
+        get => _concretingJointTypeNameTemp;
+        set => RaiseAndSetIfChanged(ref _concretingJointTypeNameTemp, value);
+    }
+
     public void ApplyProjectSettings() {
         ProjectSection = ProjectSectionTemp;
         Mark = MarkTemp;
@@ -234,6 +249,8 @@ internal class UserProjectSettings : BaseViewModel {
         RebarTagTypeWithSerifName = RebarTagTypeWithSerifNameTemp;
         RebarTagTypeWithStepName = RebarTagTypeWithStepNameTemp;
         RebarTagTypeWithCommentName = RebarTagTypeWithCommentNameTemp;
+        BreakLineTypeName = BreakLineTypeNameTemp;
+        ConcretingJointTypeName = ConcretingJointTypeNameTemp;
     }
 
     public void CheckProjectSettings() {

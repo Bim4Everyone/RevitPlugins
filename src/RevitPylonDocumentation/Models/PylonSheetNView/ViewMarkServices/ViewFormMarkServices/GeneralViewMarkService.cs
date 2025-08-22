@@ -45,11 +45,10 @@ internal class GeneralViewMarkService {
         _gostTagSymbol = Repository.FindSymbol(BuiltInCategory.OST_GenericAnnotation, "Без засечки");
 
         // Находим типоразмер аннотации линии разрыва
-        _breakLineSymbol = Repository.FindSymbol(BuiltInCategory.OST_DetailComponents, "Линейный обрыв");
+        _breakLineSymbol = mvm.SelectedBreakLineType;
 
         // Находим типоразмер аннотации рабочего шва бетонирования
-        _concretingSeamSymbol = Repository.FindSymbol(BuiltInCategory.OST_DetailComponents, "ЭУ_ПКУ_Шов бетонирования", 
-                                                      "3 мм_М 20");
+        _concretingSeamSymbol = mvm.SelectedConcretingJointType;
     }
 
     internal MainViewModel ViewModel { get; set; }

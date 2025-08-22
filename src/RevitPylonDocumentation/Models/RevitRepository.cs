@@ -122,6 +122,16 @@ internal class RevitRepository {
         .ToList();
 
     /// <summary>
+    /// Возвращает список типоразмеров элементов узла
+    /// </summary>
+    public List<FamilySymbol> DetailComponents => new FilteredElementCollector(Document)
+        .OfCategory(BuiltInCategory.OST_DetailComponents)
+        .WhereElementIsElementType()
+        .OfType<FamilySymbol>()
+        .OrderBy(a => a.Name)
+        .ToList();
+
+    /// <summary>
     /// Возвращает список осей, видимых на виде
     /// </summary>
     public List<Grid> GridsInView(View view) => new FilteredElementCollector(Document, view.Id)

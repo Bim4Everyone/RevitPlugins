@@ -98,6 +98,11 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         projectSettings.RebarTagTypeWithCommentName = settings.RebarTagTypeWithCommentName;
         projectSettings.RebarTagTypeWithCommentNameTemp = settings.RebarTagTypeWithCommentName;
 
+        projectSettings.BreakLineTypeName = settings.BreakLineTypeName;
+        projectSettings.BreakLineTypeNameTemp = settings.BreakLineTypeName;
+        projectSettings.ConcretingJointTypeName = settings.ConcretingJointTypeName;
+        projectSettings.ConcretingJointTypeNameTemp = settings.ConcretingJointTypeName;
+
         viewSectionSettings.GeneralViewPrefix = settings.GeneralViewPrefix;
         viewSectionSettings.GeneralViewPrefixTemp = settings.GeneralViewPrefix;
         viewSectionSettings.GeneralViewSuffix = settings.GeneralViewSuffix;
@@ -294,6 +299,9 @@ internal class PluginConfig : ProjectConfig<PluginSettings> {
         settings.RebarTagTypeWithStepName = projectSettings.RebarTagTypeWithStepName;
         settings.RebarTagTypeWithCommentName = projectSettings.RebarTagTypeWithCommentName;
 
+        settings.BreakLineTypeName = projectSettings.BreakLineTypeName;
+        settings.ConcretingJointTypeName = projectSettings.ConcretingJointTypeName;
+
         settings.SheetSize = projectSettings.SheetSize;
         settings.SheetCoefficient = projectSettings.SheetCoefficient;
         settings.SheetPrefix = projectSettings.SheetPrefix;
@@ -433,6 +441,8 @@ internal class PluginSettings : ProjectSettings {
     public string RebarTagTypeWithSerifName { get; set; }
     public string RebarTagTypeWithStepName { get; set; }
     public string RebarTagTypeWithCommentName { get; set; }
+    public string BreakLineTypeName { get; set; }
+    public string ConcretingJointTypeName { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public string SheetPrefix { get; set; }

@@ -34,6 +34,9 @@ internal class MainViewModel : BaseViewModel {
     private FamilySymbol _selectedRebarTagTypeWithSerif;
     private FamilySymbol _selectedRebarTagTypeWithStep;
     private FamilySymbol _selectedRebarTagTypeWithComment;
+    
+    private FamilySymbol _selectedBreakLineType;
+    private FamilySymbol _selectedConcretingJointType;
 
     private SpotDimensionType _selectedSpotDimensionType;
     private View _selectedGeneralViewTemplate;
@@ -67,6 +70,7 @@ internal class MainViewModel : BaseViewModel {
         DimensionTypes = _revitRepository.DimensionTypes;
         SpotDimensionTypes = _revitRepository.SpotDimensionTypes;
         RebarTagTypes = _revitRepository.RebarTagTypes;
+        DetailComponentsTypes = _revitRepository.DetailComponents;
 
         SetHostsInfoFilters();
 
@@ -258,6 +262,11 @@ internal class MainViewModel : BaseViewModel {
     public List<FamilySymbol> RebarTagTypes { get; set; } = [];
 
     /// <summary>
+    /// Типоразмеры элементов узла, имеющиеся в проекте
+    /// </summary>
+    public List<FamilySymbol> DetailComponentsTypes { get; set; } = [];
+
+    /// <summary>
     /// Выбранный пользователем типоразмер марки для обозначения каркаса
     /// </summary>
     public FamilySymbol SelectedSkeletonTagType {
@@ -298,6 +307,28 @@ internal class MainViewModel : BaseViewModel {
         set {
             RaiseAndSetIfChanged(ref _selectedRebarTagTypeWithComment, value);
             ProjectSettings.RebarTagTypeWithCommentNameTemp = value?.Name;
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер марки арматуры с количеством
+    /// </summary>
+    public FamilySymbol SelectedBreakLineType {
+        get => _selectedBreakLineType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedBreakLineType, value);
+            ProjectSettings.BreakLineTypeNameTemp = value?.Name;
+        }
+    }
+
+    /// <summary>
+    /// Выбранный пользователем типоразмер аннотации рабочего шва бетонирования
+    /// </summary>
+    public FamilySymbol SelectedConcretingJointType {
+        get => _selectedConcretingJointType;
+        set {
+            RaiseAndSetIfChanged(ref _selectedConcretingJointType, value);
+            ProjectSettings.ConcretingJointTypeNameTemp = value?.Name;
         }
     }
 
@@ -592,6 +623,8 @@ internal class MainViewModel : BaseViewModel {
         FindRebarTagTypeWithSerif();
         FindRebarTagTypeWithStep();
         FindRebarTagTypeWithComment();
+        FindBreakLineType();
+        FindConcretingJointType();
         FindLegend();
         FindRebarNode();
         FindTitleBlock();
@@ -665,6 +698,18 @@ internal class MainViewModel : BaseViewModel {
         }
         if(SelectedRebarTagTypeWithStep is null) {
             ErrorText = "Не задан типоразмер марки арматуры без засечки";
+            return;
+        }
+        if(SelectedRebarTagTypeWithComment is null) {
+            ErrorText = "Не задан типоразмер марки арматуры с комментарием";
+            return;
+        }
+        if(SelectedBreakLineType is null) {
+            ErrorText = "Не задан типоразмер линии обрыва";
+            return;
+        }
+        if(SelectedConcretingJointType is null) {
+            ErrorText = "Не задан типоразмер рабочего шва бетонирования";
             return;
         }
 
@@ -823,6 +868,26 @@ internal class MainViewModel : BaseViewModel {
         if(ProjectSettings.RebarTagTypeWithCommentName != string.Empty) {
             SelectedRebarTagTypeWithComment = RebarTagTypes
                 .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.RebarTagTypeWithCommentName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер аннотацию линии обрыва
+    /// </summary>
+    public void FindBreakLineType() {
+        if(ProjectSettings.BreakLineTypeName != string.Empty) {
+            SelectedBreakLineType = DetailComponentsTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.BreakLineTypeName));
+        }
+    }
+
+    /// <summary>
+    /// Получает типоразмер аннотацию рабочего шва бетонирования
+    /// </summary>
+    public void FindConcretingJointType() {
+        if(ProjectSettings.ConcretingJointTypeName != string.Empty) {
+            SelectedConcretingJointType = DetailComponentsTypes
+                .FirstOrDefault(familyType => familyType.Name.Equals(ProjectSettings.ConcretingJointTypeName));
         }
     }
 
