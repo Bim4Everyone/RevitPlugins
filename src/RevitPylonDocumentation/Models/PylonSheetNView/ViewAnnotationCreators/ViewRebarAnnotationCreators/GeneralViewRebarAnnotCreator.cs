@@ -21,6 +21,11 @@ internal class GeneralViewRebarAnnotCreator : ViewAnnotationCreator {
             if(skeletonParentRebar is null) {
                 return;
             }
+            // Получаем родительское семейство хомутов на виде
+            var clampsParentRebars = rebarFinder.GetClampsParentRebars(view, SheetInfo.ProjectSection);
+            if(clampsParentRebars is null) {
+                return;
+            }
 
             var dimensionService = new GeneralViewRebarDimensionService(ViewModel, Repository, SheetInfo, ViewOfPylon);
             //ВЕРТИКАЛЬНЫЕ РАЗМЕРЫ
@@ -29,8 +34,7 @@ internal class GeneralViewRebarAnnotCreator : ViewAnnotationCreator {
             dimensionService.TryCreateEdgeRebarDimensions(skeletonParentRebar, dimensionBaseService);
 
             //ГОРИЗОНТАЛЬНЫЕ РАЗМЕРЫ
-            dimensionService.TryCreatePlateDimensions(skeletonParentRebar, DimensionOffsetType.Left, 
-                                                      dimensionBaseService);
+            dimensionService.TryCreateClampsDimensions(clampsParentRebars, skeletonParentRebar, dimensionBaseService);
         } catch(Exception) { }
 
         // Пытаемся создать марки на виде

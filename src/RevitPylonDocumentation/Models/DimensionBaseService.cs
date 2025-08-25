@@ -162,7 +162,6 @@ internal class DimensionBaseService {
                 refArray.Append(reference);
             }
         }
-
         importantRefNameParts.Add(keyRefNamePart.ToString());
         unimportantRefNameParts = unimportantRefNameParts is null ? [] : unimportantRefNameParts;
         foreach(var reference in references) {
@@ -173,28 +172,24 @@ internal class DimensionBaseService {
 
             // мод_ФОП_Доборный 1/мод_ФОП_Доборный 1_Массив#1_торец
             // мод_ФОП_Доборный 1#1_торец
-
             string paramParts = referenceName.Split(keyRefNamePart)[0];
             int paramValue = 0;
 
-            string[] test = [paramParts];
+            string[] parameters = [paramParts];
             if(paramParts.Contains(refNameParamsSeparator)) {
-                test = paramParts.Split(refNameParamsSeparator);
+                parameters = paramParts.Split(refNameParamsSeparator);
             }
 
-
-            foreach(string paramPart in test) {
+            foreach(string paramPart in parameters) {
                 if(paramPart == string.Empty) {
                     paramValue = 1;
                 } else {
                     paramValue = _paramValueService.GetParamValueAnywhere<int>(elem, paramPart);
                 }
-
                 if(paramValue == 0) {
                     break;
                 }
             }
-
             if(paramValue == 1) {
                 refArray.Append(reference);
             }
