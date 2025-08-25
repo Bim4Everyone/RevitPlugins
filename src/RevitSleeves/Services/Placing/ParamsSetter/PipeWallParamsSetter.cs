@@ -8,6 +8,7 @@ using dosymep.Revit;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
+using RevitSleeves.Services.Core;
 using RevitSleeves.Services.Placing.PointFinder;
 
 namespace RevitSleeves.Services.Placing.ParamsSetter;
@@ -17,7 +18,7 @@ internal class PipeWallParamsSetter : PipeParamsSetter, IParamsSetter<ClashModel
 
     public PipeWallParamsSetter(
         RevitRepository revitRepository,
-        IPlacingErrorsService errorsService,
+        IErrorsService errorsService,
         IPointFinder<ClashModel<Pipe, Wall>> pointFinder,
         SleevePlacementSettingsConfig config,
         ClashModel<Pipe, Wall> clash) : base(revitRepository, errorsService, config) {

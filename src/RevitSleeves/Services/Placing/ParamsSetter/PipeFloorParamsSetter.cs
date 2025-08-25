@@ -18,7 +18,7 @@ internal class PipeFloorParamsSetter : PipeParamsSetter, IParamsSetter<ClashMode
 
     public PipeFloorParamsSetter(
         RevitRepository revitRepository,
-        IPlacingErrorsService errorsService,
+        IErrorsService errorsService,
         IPointFinder<ClashModel<Pipe, Floor>> pointFinder,
         IGeometryUtils geometryUtils,
         SleevePlacementSettingsConfig config,

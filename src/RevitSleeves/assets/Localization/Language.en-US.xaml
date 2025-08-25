@@ -244,6 +244,18 @@
         x:Key="Exceptions.SleevesNotFoundException">No sleeves placed in the document</system:String>
     <system:String
         x:Key="Exceptions.StructureLinksNotFoundException">No structural links found</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.SleeveFamilyNotFound">
+Sleeve family is missing: '{0}'
+family type name: '{1}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.SleeveFamilyMissingParameters">
+Missing parameters in sleeve family:
+{0}
+
+Continue?</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Sleeve placing</system:String>
@@ -253,4 +265,6 @@
         x:Key="Transaction.SleevesMerging">Sleeve merging</system:String>
     <system:String
         x:Key="Transaction.CreateFilter">Create filter</system:String>
+    <system:String
+        x:Key="Transaction.SleevesUpdating">Sleeve updating</system:String>
 </ResourceDictionary>

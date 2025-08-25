@@ -14,14 +14,14 @@ using RevitSleeves.Services.Placing.RotationFinder;
 
 namespace RevitSleeves.Services.Placing.PlacingOptsProvider;
 internal abstract class PlacingOptsProvider<T> : IPlacingOptsProvider<T> where T : class {
-    private readonly IFamilySymbolFinder<T> _symbolFinder;
+    private readonly IFamilySymbolFinder _symbolFinder;
     private readonly ILevelFinder<T> _levelFinder;
     private readonly IPointFinder<T> _pointFinder;
     private readonly IRotationFinder<T> _rotationFinder;
     private readonly IParamsSetterFinder<T> _paramsSetterFinder;
 
     protected PlacingOptsProvider(
-        IFamilySymbolFinder<T> symbolFinder,
+        IFamilySymbolFinder symbolFinder,
         ILevelFinder<T> levelFinder,
         IPointFinder<T> pointFinder,
         IRotationFinder<T> rotationFinder,
@@ -49,7 +49,7 @@ internal abstract class PlacingOptsProvider<T> : IPlacingOptsProvider<T> where T
     private SleevePlacingOpts GetOpts(T param) {
         try {
             return new SleevePlacingOpts() {
-                FamilySymbol = _symbolFinder.GetFamilySymbol(param),
+                FamilySymbol = _symbolFinder.GetFamilySymbol(),
                 Level = _levelFinder.GetLevel(param),
                 Point = _pointFinder.GetPoint(param),
                 Rotation = _rotationFinder.GetRotation(param),

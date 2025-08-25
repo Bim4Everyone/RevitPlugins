@@ -9,16 +9,17 @@ using dosymep.Revit;
 using RevitSleeves.Exceptions;
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
+using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.ParamsSetter;
 internal abstract class PipeParamsSetter : ParamsSetter {
     protected readonly RevitRepository _revitRepository;
-    protected readonly IPlacingErrorsService _errorsService;
+    protected readonly IErrorsService _errorsService;
     protected readonly SleevePlacementSettingsConfig _config;
 
     protected PipeParamsSetter(
         RevitRepository revitRepository,
-        IPlacingErrorsService errorsService,
+        IErrorsService errorsService,
         SleevePlacementSettingsConfig config) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));

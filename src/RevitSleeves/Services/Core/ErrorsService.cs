@@ -7,12 +7,12 @@ using dosymep.SimpleServices;
 
 using RevitSleeves.Models.Placing;
 
-namespace RevitSleeves.Services.Placing;
-internal class PlacingErrorsService : IPlacingErrorsService {
+namespace RevitSleeves.Services.Core;
+internal class ErrorsService : IErrorsService {
     private readonly List<ErrorModel> _errors;
     private readonly ILocalizationService _localizationService;
 
-    public PlacingErrorsService(ILocalizationService localizationService) {
+    public ErrorsService(ILocalizationService localizationService) {
         _localizationService = localizationService
             ?? throw new ArgumentNullException(nameof(localizationService));
         _errors = [];

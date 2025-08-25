@@ -244,6 +244,18 @@
         x:Key="Exceptions.SleevesNotFoundException">В документе отсутствуют размещенные гильзы</system:String>
     <system:String
         x:Key="Exceptions.StructureLinksNotFoundException">Не обнаружено ни одной связи с конструкциями</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.SleeveFamilyNotFound">
+Не обнаружено семейство гильзы '{0}'
+с типоразмером '{1}'</system:String>
+    <system:String
+        xml:space="preserve"
+        x:Key="Exceptions.SleeveFamilyMissingParameters">
+В семействе гильзы отсутствуют параметры:
+{0}
+
+Хотите продолжить?</system:String>
 
     <system:String
         x:Key="Transaction.SleevesPlacing">Расстановка гильз</system:String>
@@ -253,4 +265,6 @@
         x:Key="Transaction.SleevesMerging">Объединение гильз</system:String>
     <system:String
         x:Key="Transaction.CreateFilter">Создание фильтра</system:String>
+    <system:String
+        x:Key="Transaction.SleevesUpdating">Обновление гильз</system:String>
 </ResourceDictionary>
