@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using RevitSleeves.Models.Placing;
+using RevitSleeves.Models;
 
 namespace RevitSleeves.Services.Core;
 internal interface IErrorsService {

@@ -13,12 +13,12 @@ using RevitClashDetective.Models.Clashes;
 using RevitSleeves.Models;
 using RevitSleeves.Services.Core;
 
-namespace RevitSleeves.ViewModels.Placing;
-internal class PlacingErrorsViewModel : BaseViewModel {
+namespace RevitSleeves.ViewModels.Core;
+internal class ErrorsViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly IErrorsService _placingErrorsService;
 
-    public PlacingErrorsViewModel(
+    public ErrorsViewModel(
         RevitRepository revitRepository,
         IErrorsService placingErrorsService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));

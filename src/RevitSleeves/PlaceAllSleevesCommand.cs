@@ -36,10 +36,10 @@ using RevitSleeves.Services.Placing.ParamsSetterFinder;
 using RevitSleeves.Services.Placing.PlacingOptsProvider;
 using RevitSleeves.Services.Placing.PointFinder;
 using RevitSleeves.Services.Placing.RotationFinder;
+using RevitSleeves.ViewModels.Core;
 using RevitSleeves.ViewModels.Filtration;
-using RevitSleeves.ViewModels.Placing;
+using RevitSleeves.Views.Core;
 using RevitSleeves.Views.Filtration;
-using RevitSleeves.Views.Placing;
 
 namespace RevitSleeves;
 [Transaction(TransactionMode.Manual)]
@@ -99,7 +99,7 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
 
         if(kernel.Get<SleevePlacementSettingsConfig>().ShowPlacingErrors
             && kernel.Get<IErrorsService>().ContainsErrors()) {
-            kernel.Get<PlacingErrorsWindow>().Show();
+            kernel.Get<ErrorsWindow>().Show();
         }
     }
 
@@ -199,7 +199,7 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
     }
 
     private void BindWindows(IKernel kernel) {
-        kernel.BindOtherWindow<PlacingErrorsViewModel, PlacingErrorsWindow>();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
     }
 
     private void BindCoreServices(IKernel kernel) {

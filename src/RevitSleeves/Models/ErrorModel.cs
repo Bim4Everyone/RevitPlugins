@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-namespace RevitSleeves.Models.Placing;
+namespace RevitSleeves.Models;
 internal class ErrorModel {
     private readonly ICollection<Element> _elements;
 

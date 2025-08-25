@@ -5,7 +5,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 
-using RevitSleeves.Models.Placing;
+using RevitSleeves.Models;
 
 namespace RevitSleeves.Services.Core;
 internal class ErrorsService : IErrorsService {

@@ -24,8 +24,8 @@ using RevitSleeves.Models.Config;
 using RevitSleeves.Services.Core;
 using RevitSleeves.Services.Placing.FamilySymbolFinder;
 using RevitSleeves.Services.Update;
-using RevitSleeves.ViewModels.Placing;
-using RevitSleeves.Views.Placing;
+using RevitSleeves.ViewModels.Core;
+using RevitSleeves.Views.Core;
 
 namespace RevitSleeves;
 
@@ -69,7 +69,7 @@ internal class UpdateSleevesCommand : BasePluginCommand {
                 new RevitClashConfigSerializer(
                     new RevitClashesSerializationBinder(), uiApplication.ActiveUIDocument.Document)));
 
-        kernel.BindOtherWindow<PlacingErrorsViewModel, PlacingErrorsWindow>();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
 
         kernel.UseWpfUIThemeUpdater();
 
@@ -106,7 +106,7 @@ internal class UpdateSleevesCommand : BasePluginCommand {
         trans.Commit();
 
         if(kernel.Get<IErrorsService>().ContainsErrors()) {
-            kernel.Get<PlacingErrorsWindow>().Show();
+            kernel.Get<ErrorsWindow>().Show();
         }
     }
 }
