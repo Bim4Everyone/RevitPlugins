@@ -35,7 +35,7 @@ internal class UserProjectSettings : BaseViewModel {
     private string _pylonLengthParamNameTemp = "ФОП_РАЗМ_Длина";
     private string _pylonWidthParamNameTemp = "ФОП_РАЗМ_Ширина";
 
-    private string _dimensionTypeNameTemp = "!Основной_2.5 мм";
+    private string _dimensionTypeNameTemp = "я_Основной_Плагин_2.5 мм";
     private string _spotDimensionTypeNameTemp = "Стрелка_Проектная_Верх";
 
     private string _skeletonTagTypeNameTemp = "Изделие_Марка - Полка 20";
