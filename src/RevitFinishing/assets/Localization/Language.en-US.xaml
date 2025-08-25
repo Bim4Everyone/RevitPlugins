@@ -51,5 +51,8 @@
     <system:String x:Key="ErrorsWindow.ErrorInfoTitle">Calculation not completed!</system:String>
     <system:String x:Key="ErrorsWindow.ErrorInfo">Check these errors:</system:String>
     <system:String x:Key="ErrorsWindow.WarningInfoTitle">Calculation completed!</system:String>
-    <system:String x:Key="ErrorsWindow.WarningInfo">But you have to check these warnings: </system:String>
+    <system:String x:Key="ErrorsWindow.WarningInfo">But you have to check these warnings:</system:String>
+    <system:String x:Key="ErrorsWindow.UnusedFinishingTypes">
+        For finishing types some finishing materials were founded
+    </system:String>
 </ResourceDictionary>

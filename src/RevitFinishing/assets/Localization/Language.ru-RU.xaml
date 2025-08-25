@@ -53,4 +53,7 @@
     <system:String x:Key="ErrorsWindow.WarningInfo">
         При этом были обнаружены следующие предупреждения, которые могли повлиять на корректность расчета:
     </system:String>
+    <system:String x:Key="ErrorsWindow.UnusedFinishingTypes">
+        Для типов отделки найдены неиспользуемые материалы отделки
+    </system:String>
 </ResourceDictionary>

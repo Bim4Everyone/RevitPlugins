@@ -17,6 +17,7 @@ internal class ProjectValidationService {
     private readonly FinishingValidationService _finishingValidationService;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly Document _document;
 
     public ProjectValidationService(ILocalizationService localizationService,
                                     RevitRepository revitRepository,
@@ -24,6 +25,8 @@ internal class ProjectValidationService {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
         _finishingValidationService = finishingValidationService;
+
+        _document = _revitRepository.Document;
     }
 
     public ErrorsViewModel CheckMainErrors(FinishingInProject allFinishing,
@@ -61,58 +64,69 @@ internal class ProjectValidationService {
         return finishingErrors;
     }
 
-    public WarningsViewModel CheckWarnings(IEnumerable<Room> selectedRooms,
-                                           IEnumerable<FinishingElement> finishingElements,
-                                           Phase phase) {
-        Document document = _revitRepository.Document;
-        var parameterErrors = new WarningsViewModel(_localizationService);
+    public WarningsListViewModel CheckNumberParam(IEnumerable<Room> selectedRooms, Phase phase) {
+        var numberParam = SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER);
 
-        var numberParam = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.ROOM_NUMBER);
-        parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
+        return new WarningsListViewModel(_localizationService) {
             Description =
                 $"{_localizationService.GetLocalizedString("ErrorsWindow.NoParam")} \"{numberParam.Name}\"",
-            ErrorElements = 
+            ErrorElements =
                 [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, numberParam, phase)]
-        });
+        };
+    }
 
-        var nameParam = SystemParamsConfig.Instance.CreateRevitParam(document, BuiltInParameter.ROOM_NUMBER);
-        parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
+    public WarningsListViewModel CheckNameParam(IEnumerable<Room> selectedRooms, Phase phase) {
+        var nameParam = SystemParamsConfig.Instance.CreateRevitParam(_document, BuiltInParameter.ROOM_NUMBER);
+
+        return new WarningsListViewModel(_localizationService) {
             Description =
                 $"{_localizationService.GetLocalizedString("ErrorsWindow.NoParam")} \"{nameParam.Name}\"",
             ErrorElements = 
                 [.. _finishingValidationService.CheckRoomsByParameter(selectedRooms, nameParam, phase)]
-        });
+        };
+    }
 
-        parameterErrors.AddElements(new WarningsListViewModel(_localizationService) {
+    public WarningsListViewModel CheckCustomFamilies(IEnumerable<FinishingElement> finishingElements,
+                                                             Phase phase) {
+        return new WarningsListViewModel(_localizationService) {
             Description = _localizationService.GetLocalizedString("ErrorsWindow.CustomFamilies"),
             ErrorElements = [.. finishingElements
                 .Where(x => x.IsCustomFamily)
                 .Select(x => new NoticeElementViewModel(x.RevitElement, phase.Name, _localizationService))]
-        });
+        };
+    }
 
-
-
-
-
+    public WarningsListViewModel CheckUnusedFinishing(FinishingCalculator calculator,
+                                                   Phase phase) {
         WarningsListViewModel warningList = new WarningsListViewModel(_localizationService) {
-            Description = "Unused finishing types!"
+            Description = _localizationService.GetLocalizedString("ErrorsWindow.UnusedFinishingTypes"),
+            ErrorElements = []
         };
 
         var roomsByFinishingType = calculator.RoomsByFinishingType;
         IList<KeyFinishingType> keys = _revitRepository.GetKeyFinishingTypes();
         foreach(var keyFinishingType in keys) {
-            var finishingType = roomsByFinishingType[keyFinishingType.Name];
-
-            if(finishingType.WallTypesNumber != keyFinishingType.NumberOfWalls) {
-                warningList.ErrorElements.Add(new NoticeElementViewModel(keyFinishingType, phase.Name, _localizationService));
-
-                
+            if(roomsByFinishingType.TryGetValue(keyFinishingType.Name, out FinishingType finishingType)) {
+                if(finishingType.WallTypesNumber != keyFinishingType.NumberOfWalls) {
+                    warningList.ErrorElements.Add(
+                        new NoticeElementViewModel(keyFinishingType.Element, phase.Name, _localizationService));                
+                }
+                if(finishingType.FloorTypesNumber != keyFinishingType.NumberOfFloors) {
+                    warningList.ErrorElements.Add(
+                        new NoticeElementViewModel(keyFinishingType.Element, phase.Name, _localizationService));
+                }
+                if(finishingType.BaseboardTypesNumber != keyFinishingType.NumberOfBaseboards) {
+                    warningList.ErrorElements.Add(
+                        new NoticeElementViewModel(keyFinishingType.Element, phase.Name, _localizationService));
+                }
+                if(finishingType.CeilingTypesNumber != keyFinishingType.NumberOfCeilings) {
+                    warningList.ErrorElements.Add(
+                        new NoticeElementViewModel(keyFinishingType.Element, phase.Name, _localizationService));
+                }
             }
         }
 
 
-        parameterErrors.AddElements(warningList);
-
-        return parameterErrors;
+        return warningList;
     }
 }

@@ -7,6 +7,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.KeySchedules;
 using dosymep.Revit;
 
 using RevitFinishing.Models.Finishing;
@@ -112,6 +113,14 @@ internal class RevitRepository {
     }
 
     public IList<KeyFinishingType> GetKeyFinishingTypes() {
-        return new List<KeyFinishingType>();
+        Element schedule = new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewSchedule))
+            .Where(x => x.Name == KeySchedulesConfig.Instance.RoomsFinishing.ScheduleName)
+            .First();
+
+       return new FilteredElementCollector(Document, schedule.Id)
+            .ToElements()
+            .Select(x => new KeyFinishingType(x))
+            .ToList();
     }
 }

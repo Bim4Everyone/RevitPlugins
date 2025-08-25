@@ -157,8 +157,13 @@ internal class MainViewModel : BaseViewModel {
             t.Commit();
         }
 
-        WarningsViewModel parameterErrors = _projectValidationService
-            .CheckWarnings(selectedRooms, finishingElements, _selectedPhase, _revitRepository);
+        WarningsViewModel parameterErrors = new WarningsViewModel(_localizationService);
+
+        parameterErrors.AddElements(_projectValidationService.CheckNumberParam(selectedRooms, _selectedPhase));
+        parameterErrors.AddElements(_projectValidationService.CheckNameParam(selectedRooms, _selectedPhase));
+        parameterErrors.AddElements(_projectValidationService.CheckCustomFamilies(finishingElements, _selectedPhase));
+        parameterErrors.AddElements(_projectValidationService.CheckUnusedFinishing(calculator, _selectedPhase));
+
         _errorWindowService.ShowNoticeWindow(parameterErrors);
 
         SaveConfig();
